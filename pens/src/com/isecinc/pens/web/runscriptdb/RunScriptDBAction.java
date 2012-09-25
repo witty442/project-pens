@@ -1,0 +1,328 @@
+package com.isecinc.pens.web.runscriptdb;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.ServletContext;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import com.isecinc.pens.SystemProperties;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
+import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.inf.manager.FTPManager;
+
+public class RunScriptDBAction {
+	protected static  Logger logger = Logger.getLogger("PENS");
+	private static String schema ="pens";
+	private static String table_control ="c_control_run_script_db";
+    private static String path_script_db = "/script_db/";
+    private static String STATUS_RUN_SUCCESS ="success";
+    private static String STATUS_RUN_BLANK ="blank";
+    
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public static void runProcess(ServletContext sc ){
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			
+			String appVersion =SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
+			String status = findStatusRunnScriptDB(conn,appVersion);
+			logger.info("appVersion:"+appVersion+",status run:"+status);
+			
+			if(STATUS_RUN_BLANK.equalsIgnoreCase(status)){
+				runScriptDBUpdate(sc, conn);
+			}
+			
+			//Purg data in First Day of Month 1/xx/xxxx 
+			Calendar c = Calendar.getInstance();
+			int day = c.get(Calendar.DATE);
+			logger.info("Check Day for PrugeMonitor Day(1,2,25,26,27) now_day:"+day);
+			
+			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
+				purgData_monitor(conn);	
+			}
+			
+			/** Drop table temp **/
+			dropTable(conn);
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn= null;
+				}
+			}catch(Exception e){}
+		}
+	}
+	
+	/**
+	 * runManualScriptProcess
+	 * @param userName
+	 * process : run In BatchExportManager : run manaul script db 
+	 */
+	public static void runManualScriptProcess(String userName){
+		Connection conn = null;
+		EnvProperties env = EnvProperties.getInstance();
+		String resultStr ="";
+		try{
+			logger.info("Start runManualScriptProcess ");
+			
+			conn = DBConnection.getInstance().getConnection();
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.script.in")+"script_"+userName+".sql","TIS-620");
+			
+			logger.info("scriptData:"+scriptData);
+			
+			// Excute Script
+			if( !Utils.isNull(scriptData).equals("")){
+				resultStr = excUpdate(conn,Utils.isNull(scriptData));
+			}
+			
+			// delete and Create new  File Ftp To In Processs
+			ftpManager.deleteFileFTP(env.getProperty("path.manual.script.in"), "script_"+userName+".sql");
+			
+			resultStr += "\n "+scriptData;
+			
+			//rename fileName
+			String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+			ftpManager.uploadFileToFTP(env.getProperty("path.manual.script.in.processed"), fileName, resultStr, "TIS-620");
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn= null;
+				}
+			}catch(Exception e){}
+		}
+	}
+	
+	private static boolean purgData_monitor(Connection conn){
+		boolean success = false;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			logger.info("*** Start PurgData Monitor ***************");
+			
+			sql.append(" delete  from monitor_item_detail where monitor_item_id in( \n");
+			sql.append("  select id from monitor_item where monitor_id in ( \n");
+			sql.append("    select monitor_id from monitor \n");
+			sql.append("    where submit_date < SUBDATE(NOW(),INTERVAL 1 MONTH) \n");
+			sql.append("   ) \n");
+			sql.append(" ) ; \n");
+
+			sql.append(" delete from monitor_item where monitor_id in( \n");
+			sql.append("   select monitor_id from monitor \n");
+			sql.append("   where submit_date < SUBDATE(NOW(),INTERVAL 1 MONTH) \n");
+			sql.append(" ); \n");
+
+			sql.append(" delete from monitor where submit_date < SUBDATE(NOW(),INTERVAL 1 MONTH); \n");
+
+			logger.info(excUpdate(conn,sql.toString()));
+			
+			logger.info("*** Success PurgData Monitor ***************");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return success;
+	}
+	
+	private static boolean runScriptDBUpdate(ServletContext sc ,Connection conn){
+		boolean success = false;
+		try{
+			logger.info("*** Start runScriptDBUpdater ***************");
+			
+		   //Read script from /script_db/script_db.sql
+			String pathScriptDB = sc.getRealPath(path_script_db)+"/script_db.sql";
+			logger.debug("read path:"+pathScriptDB);
+			String dataFile = FileUtil.readFile(pathScriptDB, "TIS-620");
+			
+			//logger.info("Data File:"+dataFile);
+			
+		   //run script split by ";"
+			logger.info(excUpdate(conn,dataFile));
+			logger.info("*** Success runScriptDBUpdater ***************");
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			
+		}
+		return success;
+	}
+	
+	/**
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws Exception
+	 */
+	private static String findStatusRunnScriptDB(Connection conn,String appVersion) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer("");
+		String status = STATUS_RUN_BLANK;
+		try{
+			//Check table Exist
+			sql.append(" SELECT table_name, table_type, engine \n");
+			sql.append("  FROM information_schema.tables \n");
+			sql.append("  WHERE table_schema = '"+schema+"' \n");
+			sql.append("  and engine ='InnoDB' \n");
+			sql.append("  and table_name ='"+table_control+"' \n");
+		
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){//Found Table
+				
+				sql = new StringBuffer("select status ,app_version, create_date from "+table_control +" where app_version ='"+appVersion+"'");
+				logger.debug("sqlectSQl:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				
+				if(rs.next()){ //found 
+					status = rs.getString("status");
+					/** Check Appverison is if run done then nothing else set status =run_done */
+				    if( !STATUS_RUN_SUCCESS.equals(Utils.isNull(status))){
+				    	// not run  -->set status to run_done
+				    	logger.debug("status "+status);
+				    	status = STATUS_RUN_BLANK;
+				    	ps = conn.prepareStatement("update "+table_control+" set status =? ,create_date =? where app_version = ?");
+						ps.setString(1, STATUS_RUN_SUCCESS);
+						ps.setDate(2, new java.sql.Date(new Date().getTime()));
+						ps.setString(3, appVersion);
+						ps.execute();
+				    }
+			    }else{//not found record insert new record
+			    	status = STATUS_RUN_BLANK;
+			    	ps = conn.prepareStatement(" insert into "+table_control+"(status,app_version,create_date)values(?,?,?)");
+					ps.setString(1, STATUS_RUN_SUCCESS);
+					ps.setString(2, appVersion);
+					ps.setDate(3, new java.sql.Date(new Date().getTime()));
+					ps.execute();
+			    	
+			    }
+				
+			}else{//Not Found Table
+				
+				sql = new StringBuffer(" CREATE TABLE "+table_control+" (status varchar(15) not null,app_version varchar(20) ,create_date timestamp not null) ");
+				ps = conn.prepareStatement(sql.toString());
+				ps.execute();
+				logger.debug("Create table "+table_control);
+				
+				ps = conn.prepareStatement(" insert into "+table_control+"(status,app_version,create_date)values(?,?,?)");
+				ps.setString(1, STATUS_RUN_SUCCESS);
+				ps.setString(2, appVersion);
+				ps.setDate(3, new java.sql.Date(new Date().getTime()));
+				ps.execute();
+				
+				status = STATUS_RUN_BLANK;
+				logger.debug("Insert value table "+table_control);
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return status;
+	} 
+	
+	
+	private static String excUpdate(Connection conn,String sql) {
+	    PreparedStatement ps =null;
+        StringBuffer str = new StringBuffer("");
+		try{  
+			String[] sqlArr = sql.split("\\;");
+			if(sqlArr != null && sqlArr.length>0){
+			   for(int i=0;i<sqlArr.length;i++){
+				 
+				 if( !Utils.isNull(sqlArr[i]).equals("")){
+					 try{
+					     ps = conn.prepareStatement(sqlArr[i]);
+					     int recordUpdate = ps.executeUpdate();
+					     //str.append("["+i+"] SQL Execute  :"+sqlArr[i]);
+					     str.append("\n"+sqlArr[i]+"- Result Effect:"+recordUpdate+" ");
+					 }catch(Exception ee){
+						 str.append("\n"+sqlArr[i]+"- Result Error:"+ee.getMessage()+" "); 
+					 }
+			     }
+			   }
+			}
+		}catch(Exception e){
+	      e.printStackTrace();
+	      str.append("ERROR: \n"+e.getMessage() +"\n");
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return str.toString();
+  }
+	
+	private static void dropTable(Connection conn) {
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			//Check table Exist
+			sql.append(" SELECT table_name, table_type, engine \n");
+			sql.append("  FROM information_schema.tables \n");
+			sql.append("  WHERE table_schema = '"+schema+"' \n");
+			sql.append("  and engine ='InnoDB' \n");
+			sql.append("  and table_name ='temp_run_script_db' \n");
+		
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){//Found Table
+				sql = new StringBuffer("drop table temp_run_script_db");
+				logger.debug("drop table :"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				ps.executeUpdate();
+			}	
+			
+		}catch(Exception e){
+	     logger.error("Error don't check drop table temp"+e.getMessage());
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				if(rs != null){
+				   rs.close();rs = null;
+				}
+			}catch(Exception e){
+			}
+		}
+	}
+
+}

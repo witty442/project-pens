@@ -1,0 +1,105 @@
+body {
+	font: 13px Tahoma;
+}
+
+#div-head-tree-menu {
+	width: 180px;
+	padding: 5px 0px 5px 0px;
+	text-align: center;
+	background-color: #1E90FF;
+	/**border: 1px solid #ccc;**/
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#div-tree-menu {
+	width: 180px;
+	/**padding-left: 10px;
+	padding-bottom: 10px;
+	padding-right: 10px;**/
+	background-color: #FFFFFF;
+	overflow: hidden;
+	/**border: 1px solid #aaa;*/
+	/**border-top: 1px solid #FFF;**/
+}
+
+#tree-menu {
+	width: 180px;
+	float: left;
+	margin: 0;
+	padding: 0;
+	margin-top: -1px;
+}
+
+#tree-menu ul {
+	margin: 0;
+	padding: 8px;
+}
+
+#tree-menu li {
+	list-style: none;
+	padding: 8px;
+	margin: 0;
+	border-bottom: 1px solid #87CEFF;
+	/***border-top: 1px solid #87CEFF;***/
+}
+
+#menu-lv1 {
+	display: none;
+}
+
+#menu-lv1 li {
+	border-bottom: none;
+	border-top: none;
+}
+
+#menu-lv2 {
+	display: none;
+}
+
+#menu-lv2 li {
+	border-bottom: none;
+	border-top: none;
+}
+
+#menu-lv3 {
+	display: none;
+}
+
+#menu-lv3 li {
+	border-bottom: none;
+	border-top: none;
+}
+
+#menu-lv4 {
+	display: none;
+}
+
+#menu-lv4 li {
+	border-bottom: none;
+	border-top: none;
+}
+
+a:link {
+	text-decoration: none;
+	color: #000000;
+}
+
+a:visited {
+	text-decoration: none;
+	color: #000000;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #000000;
+}
+
+a:active {
+	text-decoration: none;
+	color: #000000;
+}
+
+.txt-red {
+	color: #F00
+}

@@ -1,0 +1,3 @@
+#ColName,Action DB,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+USER_ID,I,0,INTEGER,,N           
+sub_inventory_id,UI,1,INTEGER,,N

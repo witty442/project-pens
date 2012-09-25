@@ -1,0 +1,11 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,Position: Start,Position: End,FillSymbol
+Record_Identifier,N,0,CHAR,,RIGHT,1,1,Blank
+Lockbox_Number,N,1,CHAR,,RIGHT,3,17,Blank
+Payment_Number,N,2,CHAR,,RIGHT,19,34,Blank
+Invoice,N,3,CHAR,,RIGHT,36,50,Blank
+Amount_Applied,N,4,CHAR,,RIGHT,52,62,Blank
+Overflow_Sequence,N,5,CHAR,,RIGHT,64,74,Blank
+Overflow_Indicator,N,6,CHAR,,RIGHT,76,76,Blank
+Currency_Code,N,7,CHAR,,RIGHT,78,80,Blank
+Item_Number,N,8,CHAR,,RIGHT,82,84,Blank
+Batch_Name,N,9,CHAR,,RIGHT,86,101,Blank

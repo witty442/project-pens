@@ -1,0 +1,8 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,Position: Start,Position: End,FillSymbol
+Record_Identifier,N,0,CHAR,,RIGHT,1,1,Blank
+Lockbox_Number,N,1,CHAR,,RIGHT,3,9,Blank
+Batch_Name,N,2,CHAR,,RIGHT,11,26,Blank
+Deposit_Date,N,3,DATE,dd-MMM-yyyy,RIGHT,28,38,Blank
+Destination_Account,N,4,CHAR,,RIGHT,40,60,Blank
+Remittance_Bank_Name,N,5,CHAR,,RIGHT,62,92,Blank
+Remittance_Bank_Branch_Name,N,6,CHAR,,RIGHT,94,124,Blank

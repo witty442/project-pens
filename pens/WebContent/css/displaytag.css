@@ -1,0 +1,242 @@
+<!-- ************** for DisplayTag Table *********************************-->
+TABLE{
+	width: 100%;
+}
+TABLE.resultDisp {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	overflow: scroll;
+}
+
+TABLE.resultDisp TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+	color: #FFFFFF;
+}
+
+TABLE.resultDisp TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
+<!-- Summary -->
+TD.orderDate {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+
+TD.productCode {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+
+TD.productName {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:30%;
+	text-align:left;
+}
+
+TD.qty {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:right;
+}
+
+TD.qtyPromotion {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:right;
+}
+
+TD.fullUOM {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+}
+
+<!-- Summary -->
+
+<!-- MoverOrder -->
+TD.moverOrder.No {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.moverOrder.requestNumber {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.moverOrder.requestDate {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.moverOrder.exported {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.moverOrder.edit {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+
+<!-- MoveOrder -->
+
+th.sorted {
+    background-color: orange;
+    color: orange;
+}
+
+th.sortable.sorted a {
+	background-position: right;
+	display: block;
+	width: 100%;
+	color: orange;
+}
+
+
+th.sortable a {
+	background-position: right;
+	display: block;
+	width: 100%;
+	color: #FFFFFF;
+
+}
+
+th.order1 a {
+
+}
+th.order2 a {
+	
+}
+
+tr.odd {
+	background-color: #fff
+}
+
+tr.tableRowEven,tr.even {
+	background-color: #fea
+}
+
+div.exportlinks {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	margin: 2px 0 10px 0;
+	width: 79%;
+}
+
+span.export {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	width: 99%;
+	display: block;
+	border-top: none;
+	margin-bottom: 0px;
+	
+	cursor: pointer;
+}
+
+span.excel {
+	 /* background-image: url(../img/ico_file_excel.png); */
+}
+
+span.csv {
+	background-image: url(../img/ico_file_csv.png);
+}
+
+span.xml {
+	background-image: url(../img/ico_file_xml.png);
+}
+
+span.pdf {
+	background-image: url(../img/ico_file_pdf.png);
+}
+
+span.rtf {
+	background-image: url(../img/ico_file_rtf.png);
+}
+
+span.pagebanner {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	width: 99%;
+	margin-top: 10px;
+	display: block;
+	border-bottom: none;
+}
+
+span.pagelinks {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	width: 99%;
+	display: block;
+	border-top: none;
+	margin-bottom: -1px;
+}
+
+
+.group-1 {
+    font-weight:bold;
+    padding-bottom:10px;
+    border-top:1px solid black;
+}
+.group-2 {
+    font-style:italic;
+    border-top: 1px solid black;
+
+}
+.subtotal-sum, .grandtotal-sum {
+    font-weight:bold;
+    text-align:right;
+}
+.subtotal-header {
+    padding-bottom: 0px;
+    border-top: 1px solid white;
+}
+.subtotal-label, .grandtotal-label {
+    border-top: 1px solid white;
+    font-weight: bold;
+}
+.grouped-table tr.even {
+    background-color: #fff;
+}
+.grouped-table tr.odd {
+    background-color: #fff;
+}
+.grandtotal-row {
+    border-top: 2px solid black;
+}
