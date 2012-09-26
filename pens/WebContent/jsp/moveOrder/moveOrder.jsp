@@ -331,41 +331,28 @@ function escapeParameter(param){
 								<td colspan="4" align="center">
 								   <table align="center" border="0" cellpadding="3" cellspacing="0" width="80%">
 									<tr>
-										<td align="right">ประเภทรายการ</td>
-										<td align="left">
-										   
-										   <html:text property="moveOrder.moveOrderTypeLabel" size="25" readonly="true" styleClass="disableText"/>
+										<td align="right" width="20%">ประเภทรายการ</td>
+										<td align="left"  width="10%">
+										   <html:text property="moveOrder.moveOrderTypeLabel" size="15" readonly="true" styleClass="disableText"/>
 										</td>
-										<td align="right">
+										<td align="right"  width="23%">
 										        เลขที่เอกสาร&nbsp;&nbsp;
 										</td>
-										<td align="left">
-											<html:text property="moveOrder.requestNumber" size="25"   readonly="true"  styleClass="disableText"/>
+										<td align="left"  width="27%" nowrap>
+											<html:text property="moveOrder.requestNumber" size="20"   readonly="true"  styleClass="disableText"/>
+											 &nbsp; 
+											จำนวนครั้งที่พิมพ์ &nbsp;
+											<html:text property="moveOrder.printNo" size="8" readonly="true"  styleId="statusLabel" styleClass="disableText"/>
 										</td>
-										<td align="right">สถานะการส่งข้อมูล</td>
-										<td align="left"> 
-										   <html:text property="moveOrder.exportedLabel" size="20" readonly="true"  styleId="exportedLabel" styleClass="disableText"/>
-										</td>
+										
 									</tr>
 									<tr>
-										<td align="right">หน่วยรถ</td>
-										<td align="left">
-										  <html:text property="moveOrder.salesCode" size="25"  readonly="true"  styleClass="disableText"/>
+										<td align="right"  width="20%">หน่วยรถ</td>
+										<td align="left"  width="10%">
+										  <html:text property="moveOrder.salesCode" size="15"  readonly="true"  styleClass="disableText"/>
 										</td>
-										<td align="right">
-										       วันที่ทำรายการ<font color="red">*</font>
-										</td>
-										<td align="left">
-											<html:text property="moveOrder.requestDate" maxlength="10" size="25" readonly="true" styleId="requestDate" />
-										</td>
-										<td align="right">จำนวนครั้งที่พิมพ์</td>
-										<td align="left">
-										   <html:text property="moveOrder.printNo" size="20" readonly="true"  styleId="statusLabel" styleClass="disableText"/>
-										</td>
-									</tr>
-									<tr>
-										<td align="right">
-											 <c:choose>
+										<td align="right"  width="23%" nowrap>
+										 <c:choose>
 												<c:when test="${moveOrderForm.moveOrder.moveOrderType == 'MoveOrderReturn'}">
 													ต้องการคืนสินค้าไปยัง PD
 												</c:when>
@@ -375,23 +362,41 @@ function escapeParameter(param){
 										    </c:choose>
 								        	<font color="red">*</font>
 										</td>
-										<td align="left">
-										    <html:select property="moveOrder.pdCode" styleId="pdCode" styleClass="moveOrder.pdCode" disabled ="${moveOrderForm.moveOrder.pdCodeDisabled}">
+										<td align="left"  width="27%" >
+										<html:select property="moveOrder.pdCode" styleId="pdCode" styleClass="moveOrder.pdCode" disabled ="${moveOrderForm.moveOrder.pdCodeDisabled}">
 										        <html:options collection="pdList" property="pdCode" labelProperty="pdDesc"/>
 									        </html:select>
-										  <%--   <html:text property="moveOrder.fromSubinventoryDesc" size="20" readonly="true" styleClass="disableText" styleId="fromSubinventoryDesc"/> --%>
-										</td>
-										<td align="right">
-										       สถานะ 
-										</td>
-										<td align="left">
-										   <html:text property="moveOrder.statusLabel" size="25" readonly="true"  styleId="statusLabel" styleClass="disableText"/>
-										</td>
-										<td align="right">เหตุผลในการยกเลิก </td>
-										<td align="left">
-										   <html:text property="moveOrder.description" size="50" readonly="true"  styleId="description" styleClass="disableText"/>
+											
 										</td>
 									</tr>
+									<tr>
+										<td align="right"  width="20%">
+											   วันที่ทำรายการ<font color="red">*</font>
+										</td>
+										<td align="left"  width="10%">
+										    <html:text property="moveOrder.requestDate" maxlength="10" size="15" readonly="true" styleId="requestDate" />
+										</td>
+										<td align="right"  width="23%" >
+										       สถานะ 
+										</td>
+										<td align="left"  width="27%" >
+										   <html:text property="moveOrder.statusLabel" size="30" readonly="true"  styleId="statusLabel" styleClass="disableText"/>
+										</td>
+									
+									</tr>
+									
+									 <tr>
+										<td align="right"  width="20%">สถานะการส่งข้อมูล</td>
+										<td align="left"  width="10%"> 
+										   <html:text property="moveOrder.exportedLabel" size="18" readonly="true"  styleId="exportedLabel" styleClass="disableText"/>
+										</td>
+										<td align="right"  width="22%" >เหตุผลในการยกเลิก </td>
+										<td align="left"  width="28%" >
+										   <html:text property="moveOrder.description" size="30" readonly="true"  styleId="description" styleClass="disableText"/>
+										</td>
+										
+									</tr>
+									
 									</table>
 									
 							     </td>
@@ -530,8 +535,8 @@ function escapeParameter(param){
 										<td class="status">&nbsp;</td>
 									</tr>
 								   <tr>
-									    <td  width="73%" >&nbsp;</td>
-										<td  align="right"><b>ยอดรวมทั้งสิ้น</b></td>
+									    <td  width="50%" >&nbsp;</td>
+										<td  align="right" width="23%"><b>ยอดรวมทั้งสิ้น</b></td>
 										<td  align="left">
 									         <html:text property="moveOrder.totalAmount"  size="20"  styleId="totalAmount" styleClass="disableText" style="text-align: right;"/>
 										</td>
