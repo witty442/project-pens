@@ -20,7 +20,7 @@ if(StringUtils.isEmpty(pageId_param))
 int pageId = Integer.valueOf(pageId_param);
 
 MProductCategory mProductCat = new MProductCategory();
-List<References> productCatL = mProductCat.lookUpBrandList(pageId);
+List<References> productCatL = mProductCat.lookUpBrandListCaseMoveOrder(pageId);
 
 int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
@@ -53,13 +53,17 @@ if(productCatL != null && productCatL.size() > 0){
 		String productCatCode = reference.getCode();
 		String productCatName = reference.getName();
 		idx++;
+		
+		//System.out.println("productCatKey:"+productCatKey);
+		//System.out.println("productCatCode:"+productCatCode);
+		//System.out.println("productCatName:"+productCatName);
 
 		String style = (basket.hasItemBrandInBasket(productCatCode))?"style=\"background-color:#FFFF99;\"":"";
 %>
 	<% if (newRow) { %><tr><% } %>
 	<td id="<%=productCatCode%>" class="catalog" <%=style%> >
 		<img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="68" width="68" onerror="imgError(this);" 
-						onclick="loadProducts(<%=productCatCode%>)"/>
+						onclick="loadProducts('<%=productCatCode%>');"/>
 	<br><p class="brandName"><%=productCatCode+"-"+productCatName%></p></td>
 	<% if (closeRow) { %></tr><% } %>
 <% } %>

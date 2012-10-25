@@ -29,7 +29,7 @@ String custId = request.getParameter("custId");
 MoveOrderBasket basket = (MoveOrderBasket)session.getAttribute(custId);
 if(basket != null ){
 	String json = new String(basket.getJSON().toString());
-	//System.out.println(json);
+	System.out.println(json);
 	session.removeAttribute(custId);
 %>
 <%=json%>

@@ -24,18 +24,14 @@ List<UOM> uoms = new ArrayList<UOM>();
 DecimalFormat formatter = new DecimalFormat("###0.00000");
 Product product = null;
 try{
-	if(pID != null && pID.length()>0){
+	if(pID != null && pID.length()>0 ){
 		
-		String sql = "SELECT um.UOM_ID, pp.PRICE " +
-					" FROM m_product_price pp " +
-					" LEFT JOIN m_uom um ON pp.UOM_ID = um.UOM_ID " +
-					" WHERE pp.PRODUCT_ID = " + pID + 
-					" AND pp.PRICELIST_ID = " + pricelistID +
-					" AND pp.ISACTIVE = 'Y' " +
-					" AND um.ISACTIVE = 'Y' " +
-					" GROUP BY pp.UOM_ID ";
+		String sql ="\n SELECT um.UOM_ID, 0 as PRICE " +
+					"\n FROM m_uom_conversion um " +
+					"\n WHERE um.PRODUCT_ID = " + pID + 
+	                "\n AND (um.disable_date is null or date_format(um.disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
 		
-		System.out.println("UOMQuery sql:"+sql);
+		System.out.println("UOMproductPremiumQuery sql:"+sql);
 		
 		conn = new DBCPConnectionProvider().getConnection(conn);
 		stmt = conn.createStatement();
@@ -66,5 +62,7 @@ try{
 		conn.close();
 	}catch(Exception e2){}
 }
+
 %>
+
 <%=uom1+"|"+uom2+"|"+formatter.format(priceUom1)+"|"+formatter.format(priceUom2)%>

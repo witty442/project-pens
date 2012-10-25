@@ -327,13 +327,13 @@ function findDupIndex(tbl,objValue){
 	for(i=0;i<tbl.rows.length;i++){
 		if(i!=0){
 			if(document.getElementsByName('lines.productId')[i-1].value==objValue.productId){
-				if(document.getElementsByName('lines.uom1')[i-1].value==objValue.uom1){
+				//if(document.getElementsByName('lines.uom1')[i-1].value==objValue.uom1){
 					if(document.getElementsByName('lines.ship')[i-1].value==objValue.ship){
 						if(document.getElementsByName('lines.req')[i-1].value==objValue.req){
 							index = (i-1);
 						}
 					}
-				}
+				//}
 			}
 		}
 	}
@@ -526,6 +526,8 @@ function createProductList(){
 		inputLabel+="<hr/>";
 		divlines.innerHTML += inputLabel;
 	}
+	
+	//alert(divlines.innerHTML);
 	
 	return true;
 }

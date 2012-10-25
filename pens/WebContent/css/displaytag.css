@@ -23,7 +23,7 @@ TABLE.resultDisp TD {
 	font-size: 13px;
 }
 
-<!-- Summary -->
+<!-- *** Summary****-->
 TD.orderDate {
 	color: #000000;
 	height: 25px;
@@ -109,8 +109,94 @@ TD.moverOrder.edit {
 	width:10%;
 	text-align:center;
 }
-
 <!-- MoveOrder -->
+
+<!-- MoverOrder Summary -->
+TD.ms_No {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.ms_requestNumber {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:15%;
+	text-align:center;
+}
+TD.ms_requestDate {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.ms_pdCode {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.ms_productCode {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.ms_uom1 {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:7%;
+	text-align:center;
+}
+TD.ms_qty1 {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:7%;
+	text-align:center;
+}
+TD.ms_uom2 {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:7%;
+	text-align:center;
+}
+TD.ms_qty2 {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:7%;
+	text-align:center;
+}
+TD.ms_totalAmount {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:7%;
+	text-align:right;
+}
+TD.ms_statusLabel {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:center;
+}
+TD.ms_exportedLabel {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:15%;
+	text-align:center;
+}
+<!-- MoveOrder Summary -->
 
 th.sorted {
     background-color: orange;
@@ -124,20 +210,17 @@ th.sortable.sorted a {
 	color: orange;
 }
 
-
 th.sortable a {
 	background-position: right;
 	display: block;
 	width: 100%;
 	color: #FFFFFF;
-
 }
 
 th.order1 a {
-
 }
+
 th.order2 a {
-	
 }
 
 tr.odd {
@@ -164,7 +247,6 @@ span.export {
 	display: block;
 	border-top: none;
 	margin-bottom: 0px;
-	
 	cursor: pointer;
 }
 
@@ -207,7 +289,6 @@ span.pagelinks {
 	border-top: none;
 	margin-bottom: -1px;
 }
-
 
 .group-1 {
     font-weight:bold;

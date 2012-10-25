@@ -406,7 +406,9 @@ function escapeParameter(param){
 								<td colspan="4" align="center">
 								<div align="left" style="margin-left:13px;">
 								   <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
-									<input type="button" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
+								     <input type="button" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
+								      &nbsp;&nbsp;
+								   	<input type="button" value="เลือกสินค้าของแถม" onclick="open_product_premium('${pageContext.request.contextPath}');"/>
 								   </c:if>
 								</div>
 								

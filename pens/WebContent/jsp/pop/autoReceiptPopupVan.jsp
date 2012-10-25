@@ -1,8 +1,14 @@
-<!--
-Product Popup for Sales Order 
- -->
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
+<%@page import="java.text.DecimalFormat"%><html>
+<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
@@ -14,19 +20,19 @@ List<References> payment= InitialReferences.getReferenes().get(InitialReferences
 List<References> banks= InitialReferences.getReferenes().get(InitialReferences.BANK);
 
 String amount= request.getParameter("amount");
+/* if(request.getParameter("amount") == null){
+	amount= Utils.isNull(request.getAttribute("amount"));
+} */
 String billId= request.getParameter("billId");
+/* if(request.getParameter("billId") ==null){
+	billId= Utils.isNull(request.getAttribute("billId"));
+} */
 
 List<References> internalBank= InitialReferences.getReferenes().get(InitialReferences.INTERNAL_BANK);
 pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 User user = (User)session.getAttribute("user");
-%>
 
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="java.text.DecimalFormat"%><html>
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
@@ -144,7 +150,6 @@ function save(path){
 		}
 
 		window.opener.document.getElementsByName('autoReceipt.internalBank')[0].value=$('#internalBank').val();
-
 		
 		var totalPaid=0;
 		//alert('auto');
@@ -158,8 +163,7 @@ function save(path){
 		var paid=document.getElementsByName('paidAmount');
 
 		for(i=0;i<method.length;i++){
-			if(Trim(recAmt[i].value)==''||Number(recAmt[i].value)==0)
-			{
+			if(Trim(recAmt[i].value)==''||Number(recAmt[i].value)==0){
 				//alert('กรุณากรอกข้อมูลให้ครบถ้วน');
 				//recAmt[i].focus();
 				//return false;
@@ -336,9 +340,7 @@ function createBysList(){
 		inputLabel+="<hr/>";
 		divlines.innerHTML += inputLabel;
 	}
-
 	return true;
-
 }
 
 function addRow(path){
@@ -573,7 +575,7 @@ function removeRow(){
 		<td align="center" colspan="2">
 			<a href="#" onclick="return save('${pageContext.request.contextPath}');">
 			<input type="button" value="บันทึก" class="newPosBtn"/>
-			<!-- <img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn"> --></a>
+			</a>
 		</td>
 	</tr>
 </table>

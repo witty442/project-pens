@@ -149,6 +149,8 @@
 		<!-- Mover Order Form -->
 		<form-bean name="moveOrderForm" type="com.isecinc.pens.web.moveorder.MoveOrderForm" />
 		
+		<!-- MoveOrder Summary Form -->
+		<form-bean name="moveOrderSummaryForm" type="com.isecinc.pens.web.moveordersummary.MoveOrderSummaryForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -688,7 +690,7 @@
 			<forward name="export" path="/jsp/summary/summary.jsp" />
 		</action>
 		
-		<!-- Summary -->
+		<!-- MoveOrder -->
 		<action name="moveOrderForm" path="/jsp/moveOrderAction" parameter="do" scope="request" type="com.isecinc.pens.web.moveorder.MoveOrderAction" >
 			<forward name="prepare" path="/jsp/moveOrder/moveOrderSearch.jsp" />
 			<forward name="search" path="/jsp/moveOrder/moveOrderSearch.jsp" />
@@ -697,6 +699,14 @@
 			<forward name="edit" path="/jsp/moveOrder/moveOrder.jsp"/>
 			<forward name="preview" path="/jsp/moveOrder/moveOrder.jsp" />
 			<forward name="popupPrint" path="/jsp/moveOrder/moveOrder.jsp" />
+		</action>
+
+		<!-- MoveOrder Summary -->
+		<action name="moveOrderSummaryForm" path="/jsp/moveOrderSummaryAction" parameter="do" scope="session" type="com.isecinc.pens.web.moveordersummary.MoveOrderSummaryAction" >
+			<forward name="search" path="/jsp/moveOrder/moveOrderSummary.jsp" />
+			<forward name="prepare" path="/jsp/moveOrder/moveOrderSummary.jsp" />
+			<forward name="clear" path="/jsp/moveOrder/moveOrderSummary.jsp" />
+			<forward name="export" path="/jsp/moveOrder/moveOrderSummary.jsp" />
 		</action>
 		
 	</action-mappings>

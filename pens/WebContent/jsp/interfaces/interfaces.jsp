@@ -17,10 +17,6 @@ pageContext.setAttribute("importList",importList,PageContext.PAGE_SCOPE);
 List<References> importSalesUpdateList = ImportHelper.readConfigTableUpdateSalesImport();
 pageContext.setAttribute("importUpdateSalesList",importSalesUpdateList,PageContext.PAGE_SCOPE);
 
-List<References> importWebMemberList = ImportHelper.readConfigTableWebMemberImport();
-pageContext.setAttribute("importWebMemberList",importWebMemberList,PageContext.PAGE_SCOPE);
-
-
 List<References> exportList = ExportHelper.readConfigTableExport();
 pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 %>
@@ -77,6 +73,8 @@ body {
 	   var stepMinUp = 1;
 	   var stepHaftMinUp = 0.5;
 	   var progressCount = 0;
+	   var useTimeMillisecs = 0;
+	   var startTime = new Date();
 	   
 	 /*   var displaytext = function () {
 		   var text = $("#progressbar").progressbar('value') + '%';
@@ -96,13 +94,16 @@ body {
 	    			 document.getElementById('progressbar').style.visibility='visible'; 
 	    		 } 	 */
 	    		 
-	    		 if(progressCount > 95){
+	    		 if(progressCount > 98){
+		    	   progressCount += 0; 
+	    		 }else if(progressCount > 95){
 	    		   progressCount += stepHaftMinUp; 
 	    		 }else if(progressCount > 80){
 	    		   progressCount += stepMinUp; 
 	    		 }else{
 	    		   progressCount += stepMaxUp;
 	    		 }
+	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
 	    	 }else{ //Success
 	    		/*  if (document.getElementById) { // DOM3 = IE5, NS6 
 	    			 document.getElementById("progressbar").style.visibility = 'hidden'; 
@@ -110,6 +111,7 @@ body {
 	    			 document.getElementById('progressbar').style.visibility='hidden';
 	    		 } 	  */
 	    		 progressCount = 100;
+	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
 	    	 }  
 	    	  
 	    	  var progress = $("#progressbar") .progressbar("option","value");
