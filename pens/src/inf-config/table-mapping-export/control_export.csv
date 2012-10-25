@@ -1,7 +1,6 @@
 #SeqNo ,TABLENAME,FILE_FTP_NAME,SOURCE,DESTINATION,TRANS_TYPE,AUTHEN
 #-- Export To Sales Client Only ***************#,,,,,,
 1,m_trip,TRIP,CENTER,SALES,MASTER,AD
-2,ad_user,AUTHEN,CENTER,SALES,MASTER,AD
 4,m_sales_inventory,SALES_INVENTORY,CENTER,SALES,MASTER,AD
 #-- Import To ORCL ****************************#,,,,,,
 5,m_customer,CUST,SALES,ORACLE,MASTER,AD|DD|VAN
