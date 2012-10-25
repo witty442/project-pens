@@ -33,17 +33,12 @@ public class CustomerDocumentProcess extends DocumentSequenceProcess {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getNextDocumentNo(String territory, String province, String district, int activeUserID,
-			Connection conn) throws Exception {
-		int seq = getNextSeqCustomerCode(territory, province, district, activeUserID);
-		String docNo = territory + province + district;
-		docNo += String.format("%s", new DecimalFormat("0000").format(seq));
+	public String getNextDocumentNo(String salesCode, int activeUserID,Connection conn) throws Exception {
+		int seq = getNextSeqCustomer(salesCode,CUSTOMER_NUMBER, activeUserID);
+		String docNo = "3"+salesCode.substring(1,4);
+		docNo += String.format("%s", new DecimalFormat("000000").format(seq));
 		
-		if(checkCustomerCodeDuplicate(docNo,conn)){
-			return getNextDocumentNo(territory,province,district,activeUserID,conn);
-		}else{
-		    return docNo;
-		}
+		return docNo;
 	}
 	
 	public boolean checkCustomerCodeDuplicate(String customerCode,Connection conn) throws Exception {
@@ -78,8 +73,8 @@ public class CustomerDocumentProcess extends DocumentSequenceProcess {
 		return dup;
 	}
 
-	protected int getNextSeqCustomerCode(String territory, String province, String district, int activeUserID)
-	throws Exception {
+	
+protected int getNextSeqCustomerCodeBK(String territory, String province, String district, int activeUserID)throws Exception {
 	
 	int currentNext = 1;
 	Connection conn = null;

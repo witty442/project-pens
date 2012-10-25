@@ -196,6 +196,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql += "  and doc_status = 'SV' ";
 			sql += "  order by order_date desc, order_no desc ";
 
+			logger.debug("sql:"+sql);
+			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);

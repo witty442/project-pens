@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -93,7 +92,7 @@ public class FTPManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public int loadFileMappingToTable(User user,LinkedHashMap<String,TableBean> controlTableMap ,String path,User userBean,String transType,boolean importAll) throws Exception
+	public int downloadFileMappingToTable(User user,LinkedHashMap<String,TableBean> controlTableMap ,String path,User userBean,String transType,boolean importAll) throws Exception
 	{
 		FTPClient ftp = null;
 		String ftpResponse = "";
@@ -135,7 +134,7 @@ public class FTPManager {
     					   }
     					  //logger.debug("tableName:"+tableName);
     					   if(typeName.equalsIgnoreCase("txt")){
-    					      canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,importAll);
+    					       canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,importAll);
     					   }
     					}
     					//logger.debug("canGetFtpFile:"+canGetFtpFile);
@@ -218,7 +217,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null && ftp.isConnected()) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -263,7 +262,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -299,7 +298,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -352,7 +351,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -527,7 +526,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -639,7 +638,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null && ftp.isConnected()) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 		}	
@@ -738,7 +737,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 		}	
@@ -812,7 +811,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 		}	
@@ -918,12 +917,12 @@ public class FTPManager {
 		} finally {
 			if(ftpFrom != null) {
 				ftpFrom.disconnect();
-				logger.info("ftp disconnect : "+ftpFrom.getReplyString());
+				//logger.info("ftp disconnect : "+ftpFrom.getReplyString());
 				ftpFrom = null;
 			}
 			if(ftpTo != null) {
 				ftpTo.disconnect();
-				logger.info("ftp disconnect : "+ftpTo.getReplyString());
+				//logger.info("ftp disconnect : "+ftpTo.getReplyString());
 				ftpTo = null;
 			}
 		}
@@ -984,7 +983,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -1040,7 +1039,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -1089,7 +1088,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			
@@ -1177,11 +1176,11 @@ public class FTPManager {
 			throw new FTPException(e.getMessage());
 		} finally {
 			if(ftp != null && ftp.logout()) {
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 			}
 			if(ftp != null && ftp.isConnected()) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			if(file != null){
@@ -1285,7 +1284,7 @@ public class FTPManager {
 		} finally {
 			if(ftp != null && ftp.isConnected()) {
 				ftp.disconnect();
-				logger.info("ftp disconnect : "+ftp.getReplyString());
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
 			if(file != null){
@@ -1307,7 +1306,7 @@ public class FTPManager {
 	 * @throws Exception
 	 * Upload Zip To FTP Server
 	 */
-	public void uploadBackUpDBZipFileToFTP_Type2(User user,String ftpFilePath,String localFile) throws Exception{
+	public void uploadBackUpDBZipFileToFTP_OPT2(User user,String ftpFilePath,String localFile) throws Exception{
 		
 		DataOutputStream dos = null;
 		sun.net.TelnetOutputStream tos = null;
@@ -1320,13 +1319,55 @@ public class FTPManager {
 		    
 		    fos = new FileInputStream(localFile);
 		    tos = ftp.put(ftpFilePath);
-		     dos = new DataOutputStream(tos);
+		    dos = new DataOutputStream(tos);
+		    
 		    byte[] buffer = new byte[1024 * 1024];
 		    for (int length; (length = fos.read(buffer)) > 0;) {
 		        dos.write(buffer, 0, length);
 		    }
 		    tos.flush();
 		    dos.flush();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(ftp != null){
+				ftp.closeServer();
+				ftp = null;
+			}
+			if(tos != null){
+				tos.close();
+			}
+			if(fos != null){
+				fos.close();
+			}
+			if(dos != null){
+				dos.close();
+			}
+		}
+	}
+	
+public void uploadBackUpDBZipFileToFTP_OPT3(User user,String ftpFilePath,String localFile) throws Exception{
+		
+		DataOutputStream dos = null;
+		sun.net.TelnetOutputStream tos = null;
+		FileInputStream fos = null;
+		sun.net.ftp.FtpClient ftp = null;
+		try{
+			ftp = new sun.net.ftp.FtpClient(server, 21);
+		    ftp.login(userFtp, passwordFtp);
+		    ftp.binary();
+		    
+		    fos = new FileInputStream(localFile);
+		    tos = ftp.put(ftpFilePath);
+		    dos = new DataOutputStream(tos);
+		    
+		    byte[] buffer = new byte[2048 * 2048];
+		    for (int length; (length = fos.read(buffer)) > 0;) {
+		        dos.write(buffer, 0, length);
+		    }
+		    tos.flush();
+		    dos.flush();
+		    logger.info("upload success");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{

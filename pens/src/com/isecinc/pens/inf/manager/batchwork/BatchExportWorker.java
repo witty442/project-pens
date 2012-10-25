@@ -7,11 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.db.backup.DBBackUpManager;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ExportManager;
-import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
+import com.isecinc.pens.inf.manager.process.ExternalProcess;
 
 /*
  * thread to run MasterImport
@@ -40,17 +39,18 @@ public class BatchExportWorker extends BatchWorker {
 	public void run() {
 		logger.debug("Start Thread:" + Thread.currentThread().getName());
 		HttpServletRequest requestB;
-		//User userB = null;
 		try {
 			requestB = request;
-			//userB = (User)request.getSession().getAttribute("user");
-			
+
 			if(requestTable != null && !Utils.isNull(requestTable).equals("")){
 				logger.debug(" **********Start Export By Request Table ******************");
 				startTaskStatus(this.transactionId,this.monitorID);
 				(new ExportManager()).exportToTxt(transactionId,monitorID,transType,userLogin,userRequest, requestTable, request);
 				endTaskStatus(this.transactionId,this.monitorID);
 			}else{
+				//Process Post Export
+				new ExternalProcess().processExportBefore(requestB, userLogin);
+				
 				logger.debug(" **********Start Export Master TXT ******************");
 				startTaskStatus(this.transactionId,this.monitorID);
 				MonitorBean model = (new ExportManager()).exportToTxt(transactionId,monitorID,transType,userLogin,userRequest, requestTable, request);
@@ -62,12 +62,8 @@ public class BatchExportWorker extends BatchWorker {
 				    logger.debug("Export Transaction Result ErrorCode:"+Utils.isNull(model.getErrorCode()));
 				}
 				
-				
-				//RunScript From FTP Server
-				RunScriptDBAction.runManualScriptProcess(userLogin.getUserName());
-	          
-				//DB BackUp DB and Transafer TO Ftp Server
-				DBBackUpManager.processBackup(requestB,userLogin);
+				//Process Post Export
+				new ExternalProcess().processExportAfter(requestB, userLogin);
 				
 				//Stamp Batch status to Success
 				endTaskStatus(this.transactionId,this.monitorID);

@@ -16,9 +16,11 @@ import org.apache.log4j.Logger;
 
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.NumberToolsUtil;
 
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
+import com.isecinc.pens.bean.MoveOrderSummary;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
@@ -50,13 +52,11 @@ public class MMoveOrder {
     private static double totalAmount = 0;
     
 	public MoveOrder save(User user,MoveOrder head) throws Exception {
-		boolean result = false;
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			//Genearte MoveOrderNo
-			String prefix = "";
 			String requestNumber  ="";
 			BigDecimal createdLong = Utils.getCurrentTimestampLong();
 			BigDecimal updatedLong = Utils.getCurrentTimestampLong();
@@ -64,9 +64,9 @@ public class MMoveOrder {
 			if("".equals(head.getRequestNumber())){
 				
 				if(MOVE_ORDER_REQUISITION.equals(head.getMoveOrderType())){
-				   requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
+				    requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
 				}else if(MOVE_ORDER_RETURN.equals(head.getMoveOrderType())){
-				   requestNumber = new MoveOrderReturnDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
+				    requestNumber = new MoveOrderReturnDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
 				}
 				
 				//prepare MoveOrder
@@ -135,6 +135,7 @@ public class MMoveOrder {
 			
 			conn.commit();
 		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 			conn.rollback();
 			throw e;
 		}finally{
@@ -151,14 +152,23 @@ public class MMoveOrder {
 	    UOMConversion  uc2 = null;
 	    if( !Utils.isNull(line.getUom2().getId()).equals("")){
 	        uc2 = new MUOMConversion().getCurrentConversion(line.getProduct().getId(), line.getUom2().getId());
-	        //logger.debug("("+uc1.getConversionRate()+"/"+uc2.getConversionRate()+")");
-	        if(uc2.getConversionRate() ==1.0){
-	           priQty = line.getQty1()  +( line.getQty2()/uc1.getConversionRate() ) ;
+	        logger.debug("("+uc1.getConversionRate()+"/"+uc2.getConversionRate()+")");
+	        
+	        if(uc2.getConversionRate() > 0){
+	        	double qty2Temp = line.getQty2()/ (uc1.getConversionRate()/uc2.getConversionRate()) ;
+	        	//convert to Str 1.666667
+				String qty2Str5Digit = NumberToolsUtil.decimalFormat(qty2Temp, NumberToolsUtil.format_current_6_digit);
+				//substr remove digit no 6 :"7" -> 1.66666
+				qty2Str5Digit = qty2Str5Digit.substring(0,qty2Str5Digit.length()-1);
+				
+				double pcsQty = Double.parseDouble((qty2Str5Digit));
+	        	priQty = line.getQty1()  +pcsQty;
 	        }else{
-	           priQty = line.getQty1()  +( line.getQty2()/uc2.getConversionRate() ) ;
+	        	priQty = line.getQty1();
 	        }
 	    }else{
-	    	uc2 = new MUOMConversion().getCurrentConversionNotIn(line.getProduct().getId(), line.getUom1().getId());
+	    	//No Qty2 ,UOM2
+	    	//uc2 = new MUOMConversion().getCurrentConversionNotIn(line.getProduct().getId(), line.getUom1().getId());
 	    	//logger.debug("("+uc1.getConversionRate()+"/"+uc2.getConversionRate()+")");
 		    priQty = line.getQty1();
 	    }
@@ -170,14 +180,21 @@ public class MMoveOrder {
 		double pack = 0;
 		UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(line.getProduct().getId(), line.getUom1().getId());
 	    UOMConversion  uc2 = null;
+	    
 	    if( !Utils.isNull(line.getUom2().getId()).equals("")){
-	    	
+	    	logger.debug("case 1 uom1,uom2 not null");
 	        uc2 = new MUOMConversion().getCurrentConversion(line.getProduct().getId(), line.getUom2().getId());
 	        pack =  uc1.getConversionRate()/uc2.getConversionRate() ;
 	        
 	    }else{
+	    	logger.debug("case 1 uom2 is null");
 	    	uc2 = new MUOMConversion().getCurrentConversionNotIn(line.getProduct().getId(), line.getUom1().getId());
-	    	pack =  uc1.getConversionRate()/uc2.getConversionRate() ;
+	    	
+	    	if(uc2 != null && uc2.getConversionRate() != 0){
+	    	   pack =  uc1.getConversionRate()/uc2.getConversionRate() ;
+	    	}else{
+	    	   pack = uc1.getConversionRate();
+	    	}
 	    }
 	    logger.debug("result calc pack["+pack+"]");
 	    return pack;
@@ -880,67 +897,207 @@ public class MMoveOrder {
 			return nextLineNo;
 		}
 	  
-	  @Deprecated
-	  public MoveOrderLine searchMoveOrderLineXX(Connection conn,String requestNumber,String lineNo) throws Exception {
+	  
+	  /**
+	   * searchMoveOrderSummary
+	   * @param mCriteria
+	   * @param user
+	   * @return
+	   * @throws Exception
+	   */
+	  public List<MoveOrderSummary> searchMoveOrderSummaryDetail(MoveOrderSummary mCriteria,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
+			List<MoveOrderSummary> list = new ArrayList<MoveOrderSummary>();
 			StringBuilder sql = new StringBuilder();
-			 MoveOrderLine m = null;
+			Connection conn = null;
+			int no = 0;
 			try {
-				sql.delete(0, sql.length());
-				sql.append("\n  SELECT l.*  from t_move_order_line l ");
-				sql.append("\n  where l.request_number ='"+requestNumber+"'");
-				sql.append("\n  and l.line_no ='"+lineNo+"'");
+				conn = new  DBCPConnectionProvider().getConnection(conn);
 				
-			    logger.debug("sql:"+sql);
+				sql.append("\n  SELECT " );
+				sql.append("\n   h.request_number,h.request_date ");
+				sql.append("\n  ,h.pd_code ,p.code as product_code ");
+				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
+				sql.append("\n  ,l.qty ,l.qty1 ,l.qty2 ");
+				sql.append("\n  ,l.uom1 ,l.uom2 ");
+				sql.append("\n  ,l.pack,l.total_amount");
+				sql.append("\n  ,h.status,h.exported");
+				sql.append("\n  from t_move_order h  ");
+				sql.append("\n  ,    t_move_order_line l  ");
+				sql.append("\n  ,    m_product p  ");
+				sql.append("\n  where 1=1 ");
+				sql.append("\n  and  h.request_number = l.request_number ");
+				sql.append("\n  and  l.inventory_item_id = p.product_id ");
+				sql.append("\n  and  h.user_id ='"+user.getId()+"'");
+				sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
+				
+				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
+					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
+					 sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					 sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				}
+				
+				if( !Utils.isNull(mCriteria.getProductCodeFrom()).equals("")
+						&&	!Utils.isNull(mCriteria.getProductCodeTo()).equals("")	){
+				     sql.append(" and p.code >= '"+mCriteria.getProductCodeFrom()+"' \n");
+					 sql.append(" and p.code <= '"+mCriteria.getProductCodeTo()+"' \n");
+				}
+				
+				if( !Utils.isNull(mCriteria.getStatus()).equals("")){
+				    sql.append("\n  and  h.status ='"+mCriteria.getStatus()+"'");
+			    }
+			
+				if( !Utils.isNull(mCriteria.getExported()).equals("")){
+				    sql.append("\n  and  h.exported ='"+mCriteria.getExported()+"'");
+			    }
+				
+				sql.append("\n  ORDER BY h.request_number asc \n");
+				
+				logger.info("sql:"+sql);
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-
+				
 				while (rst.next()) {
-				  m = new MoveOrderLine();
+				  no++;
+				  MoveOrderSummary m = new MoveOrderSummary();
+				  m.setNo(no);
 				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setLineNo(rst.getInt("line_no"));
-				 
-				  
-				  m.setProduct(new MProduct().find(rst.getString("inventory_item_id")));
-				  
-				  m.setUom1(new MUOM().find(rst.getString("uom1")));
-				  m.setUom2(new MUOM().find(rst.getString("uom2")));
-				  
-				//  logger.debug("uom1:"+rst.getString("uom1")+",uom2:"+rst.getString("uom2"));
-				//  logger.debug("uom1:"+m.getUom1().getCode()+",uom2:"+m.getUom2().getCode());
-				  
-				  //set FullUOM
-				  m.setFullUom(Utils.isNull(m.getUom1().getCode())+"/"+Utils.isNull(m.getUom2().getCode()));
-				  
-				  m.setQty(rst.getDouble("qty"));
-				  m.setQty1(rst.getDouble("qty1"));
-				  m.setQty2(rst.getDouble("qty2"));
-				  
+				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setPdCode(rst.getString("pd_code"));
+				  m.setPdDesc(rst.getString("pd_desc"));
+                  m.setProductCode(rst.getString("product_code"));
+                  m.setUom1(rst.getString("uom1"));
+                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
+                  m.setUom2(rst.getString("uom2"));
+                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
+                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
 				  m.setStatus(rst.getString("status"));
-				  m.setStatusLabel("Y".equals(m.getStatus())?"ใช้งาน":"ยกเลิก");
+				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 				  m.setExported(rst.getString("exported"));
+				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
 				  
-				  m.setUserId(rst.getString("user_id"));
-				  //m.setCreated(rst.getDate("created"));
-				  m.setCreatedBy(rst.getString("created_by"));
-				  //m.setUpdated(rst.getDate("updated"));
-				  m.setUpdateBy(rst.getString("updated_by"));
-				  
-				  m.setAmount1(rst.getDouble("amount1"));
-				  m.setAmount2(rst.getDouble("amount2"));
-				  m.setTotalAmount(rst.getDouble("total_amount"));
-				  
+				  list.add(m);
 				}//while
+			
 			} catch (Exception e) {
 				throw e;
 			} finally {
 				try {
-					rst.close();
-					stmt.close();
+					if(rst != null){
+						rst.close();rst = null;
+					}
+					if(stmt != null){
+						stmt.close(); stmt = null;
+					}
+					if(conn != null){
+					   conn.close();conn=null;
+					}
 				} catch (Exception e) {}
 			}
-			return m;
-		}
+			return list;
+	}
+	
+	/**
+	 * searchMoveOrderSummaryTotal
+	 * @param mCriteria
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	public List<MoveOrderSummary> searchMoveOrderSummaryTotal(MoveOrderSummary mCriteria,User user) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<MoveOrderSummary> list = new ArrayList<MoveOrderSummary>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			int no = 0;
+			try {
+				conn = new  DBCPConnectionProvider().getConnection(conn);
+				
+				sql.append("\n  SELECT " );
+				sql.append("\n   h.pd_code ,p.code as product_code ");
+				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
+				sql.append("\n  ,l.qty ,l.qty1 ,l.qty2 ");
+				sql.append("\n  ,l.uom1 ,l.uom2 ");
+				sql.append("\n  ,l.pack,l.total_amount");
+				sql.append("\n  ,h.status,h.exported");
+				sql.append("\n  from t_move_order h  ");
+				sql.append("\n  ,    t_move_order_line l  ");
+				sql.append("\n  ,    m_product p  ");
+				sql.append("\n  where 1=1 ");
+				sql.append("\n  and  h.request_number = l.request_number ");
+				sql.append("\n  and  l.inventory_item_id = p.product_id ");
+				sql.append("\n  and  h.user_id ='"+user.getId()+"'");
+				sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
+				
+				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
+					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
+						
+					 sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					 sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				}
+				
+				if( !Utils.isNull(mCriteria.getProductCodeFrom()).equals("")
+						&&	!Utils.isNull(mCriteria.getProductCodeTo()).equals("")	){
+				     sql.append(" and p.code >= '"+mCriteria.getProductCodeFrom()+"' \n");
+					 sql.append(" and p.code <= '"+mCriteria.getProductCodeTo()+"' \n");
+				}
+				
+				if( !Utils.isNull(mCriteria.getStatus()).equals("")){
+				    sql.append("\n  and  h.status ='"+mCriteria.getStatus()+"'");
+			    }
+			
+				if( !Utils.isNull(mCriteria.getExported()).equals("")){
+				    sql.append("\n  and  h.exported ='"+mCriteria.getExported()+"'");
+			    }
+				
+				sql.append("\n  ORDER BY h.pd_code asc \n");
+				
+				logger.info("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+				  no++;
+				  MoveOrderSummary m = new MoveOrderSummary();
+				  m.setNo(no);
+				  m.setRequestNumber(rst.getString("request_number"));
+				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setPdCode(rst.getString("pd_code"));
+				  m.setPdDesc(rst.getString("pd_desc"));
+                m.setProductCode(rst.getString("product_code"));
+                m.setUom1(rst.getString("uom1"));
+                m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
+                m.setUom2(rst.getString("uom2"));
+                m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
+                m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
+				  m.setStatus(rst.getString("status"));
+				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
+				  m.setExported(rst.getString("exported"));
+				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
+				  
+				  list.add(m);
+				}//while
+			
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					if(rst != null){
+						rst.close();rst = null;
+					}
+					if(stmt != null){
+						stmt.close(); stmt = null;
+					}
+					if(conn != null){
+					   conn.close();conn=null;
+					}
+				} catch (Exception e) {}
+			}
+			return list;
+	}
+	  
 }

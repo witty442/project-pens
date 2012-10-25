@@ -33,32 +33,29 @@ import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Member;
-import com.isecinc.pens.bean.MemberRenew;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
+import com.isecinc.pens.bean.OrgRuleBean;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.bean.OrgRuleBean;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MMember;
-import com.isecinc.pens.model.MMemberProduct;
-import com.isecinc.pens.model.MMemberRenew;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
+import com.isecinc.pens.model.MOrgRule;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.model.MOrgRule;
 import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
@@ -133,25 +130,9 @@ public class OrderAction extends I_Action {
 				Date regDate = formatter.parse(member.getRegisterDate());
 				String regDateString = DateToolsUtil.convertToStringEng(regDate);		
 				
-				//List<MemberRenew> mRenews = new MMemberRenew().lookUp(member.getId());
-				//List<MemberRenew> mRenewsMax = new MMemberRenew().lookUpLast(member.getId());
-				
-				
 				orderForm.getOrder().setPriceListId(
 						new MPriceList().getCurrentPriceListByCustomer(user.getOrderType().getKey(), 
-								regDateString).getId());
-				
-				/*if (mRenews.size() == 0) {
-					orderForm.getOrder().setPriceListId(
-							new MPriceList().getCurrentPriceListByCustomer(user.getOrderType().getKey(), 
-									regDateString).getId());
-				}else{
-					Date mRenewsRegDate = formatter.parse(mRenewsMax.get(0).getRenewedDate());
-					String mRenewsRegDateString = DateToolsUtil.convertToStringEng(mRenewsRegDate);
-					orderForm.getOrder().setPriceListId(
-							new MPriceList().getCurrentPriceListByCustomer(user.getOrderType().getKey(), 
-									mRenewsRegDateString).getId());
-				}	*/					
+								regDateString).getId());		
 				
 			}else{
 				orderForm.getOrder().setPriceListId(
@@ -231,33 +212,7 @@ public class OrderAction extends I_Action {
 				orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
 				orderForm.getOrder().setVatCode(customer.getVatCode());
 				request.getSession().setAttribute("memberVIP", "N");
-			} else {
-				// DD
-				// Default from member
-				member = new MMember().find(String.valueOf(customerId));
-				member.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
-				if (orderId != 0) {
-					orderForm.setOrder(new MOrder().find(String.valueOf(orderId)));
-				}
-				orderForm.getOrder().setCustomerId(member.getId());
-				orderForm.getOrder().setCustomerName(
-						(member.getName() + " " + member.getName2()).trim());
-				//orderForm.getOrder().setCustomerName(
-				//		(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-				// from customer or member
-				orderForm.getOrder().setPaymentTerm(member.getPaymentTerm());
-				orderForm.getOrder().setPaymentMethod(member.getPaymentMethod());
-				orderForm.getOrder().setVatCode(member.getVatCode());
-				orderForm.getOrder().setShippingDay(member.getShippingDate());
-				orderForm.getOrder().setShippingTime(member.getShippingTime());
-				if (!member.getRoundTrip().equals("")) {
-					orderForm.getOrder().setRoundTrip(Integer.parseInt(member.getRoundTrip()));
-				}
-				request.getSession().setAttribute("memberVIP", member.getIsvip());
-				if (!action.equals("add") && !action.equals("search")) {
-					orderForm.setLines(new OrderProcess().generateLine(member, orderForm.getOrder(), ""));
-				}
-			}
+			} 
 
 			request.getSession().removeAttribute("isAdd");
 			if (((String) request.getSession().getAttribute("memberVIP")).equals("N")) {
@@ -271,7 +226,6 @@ public class OrderAction extends I_Action {
 				}
 			}
 
-			// orderForm.getOrder().setOrderType(user.getOrderType().getKey());
 			// get Customer/Member Search Key
 			if (request.getParameter("key") != null) {
 				request.getSession(true).setAttribute("CMSearchKey", request.getParameter("key"));
@@ -680,8 +634,6 @@ public class OrderAction extends I_Action {
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--
 
-			
-            
 			/** WIT Edit 20110804 ****************************************/
 			/** Case Van and User choose payCashNow -> createAutoReceipt**/
 			if (userActive.getRole().getKey().equals(User.VAN) && orderForm.getOrder().isPaymentCashNow()) {
@@ -710,6 +662,10 @@ public class OrderAction extends I_Action {
 				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
 				 //set msg 
 				 msg = SystemMessages.getCaption("SaveOrderReceiptSuccess", Utils.local_th);
+			}else{
+				if(userActive.getRole().getKey().equals(User.VAN)){
+				    msg  = SystemMessages.getCaption("SaveSucessAndCreateReceipt", Utils.local_th);
+				}
 			}
 			/** WIT Edit 20110804 ****************************************/
 			
@@ -721,17 +677,16 @@ public class OrderAction extends I_Action {
 			conn.commit();
 			// set msg save success
 			request.setAttribute("Message",msg );
-            
-			logger.debug("isPaymentCashNow:"+orderForm.getOrder().isPaymentCashNow());
-			logger.debug("orderForm.getAutoReceiptFlag():"+orderForm.getAutoReceiptFlag());
-			
+            		
 			/********* WIT EDIT:20110804 :case not auto receipt cash  -> popup page AutoPay *****/
 			if(userActive.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
 				request.setAttribute("popup_autoreceipt", "true");
 			}
 			/**************************************************************/
+			
 			// save token
 			saveToken(request);
+			
 		} catch (Exception e) {
 			orderForm.getOrder().setId(orderId);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
@@ -765,11 +720,8 @@ public class OrderAction extends I_Action {
 		Order order = null;
 		int roundTrip = 0;
 		Connection conn = null;
-		
 		boolean isCash = "Y".equals(orderForm.getOrder().getIsCash());
-		
 		try {
-
 			// check Token
 			if (!isTokenValid(request)) {
 				if (!orderForm.getOrder().getOrderType().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
@@ -782,20 +734,7 @@ public class OrderAction extends I_Action {
 					orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
 					orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
 					orderForm.getOrder().setVatCode(customer.getVatCode());
-				} else {
-					// DD
-					Member member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-					orderForm.setOrder(new Order());
-					orderForm.getOrder().setCustomerId(member.getId());
-					orderForm.getOrder().setCustomerName(
-							(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-					// from customer or member
-					orderForm.getOrder().setPaymentTerm(member.getPaymentTerm());
-					orderForm.getOrder().setPaymentMethod(member.getPaymentMethod());
-					orderForm.getOrder().setVatCode(member.getVatCode());
-					orderForm.getOrder().setShippingDay(member.getShippingDate());
-					orderForm.getOrder().setShippingTime(member.getShippingTime());
-				}
+				} 
 				orderForm.getLines().clear();
 				return mapping.findForward("prepare");
 			}
@@ -844,17 +783,10 @@ public class OrderAction extends I_Action {
 			if (!user.getRole().getKey().equals(User.DD)) {
 				List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 				orderForm.setLines(lines);
-			} else {
-				if (((String) request.getSession().getAttribute("memberVIP")).equalsIgnoreCase("Y")) {
-					List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
-					orderForm.setLines(lines);
-				} else {
-					orderForm.setLines(lstLines);
-				}
-			}
+			} 
 			conn.commit();
 			//
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+			request.setAttribute("Message", SystemMessages.getCaption("SaveReceiptSuccess", Utils.local_th));
 			// Refresh Order
 			order = new MOrder().find(String.valueOf(orderForm.getOrder().getId()));
 			order.setRoundTrip(roundTrip);

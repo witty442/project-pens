@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
@@ -15,7 +16,7 @@ public class PreFunction {
 
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static String[] process(Connection conn ,TableBean tableBean){
+	public static String[] process(Connection conn ,TableBean tableBean,User user){
         String[] errors =new String[2];
 		String sqlManualExe = "";
 		PreparedStatement psManualExe = null;
@@ -61,6 +62,7 @@ public class PreFunction {
 			    		  errors[1] = ExceptionHandle.getExceptionCode(e);
 	                      logger.error(e.getMessage(),e);
 		    		  }
+	  	    	    
    	    	 }	    
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

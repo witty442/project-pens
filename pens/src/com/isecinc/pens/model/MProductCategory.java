@@ -125,6 +125,8 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		ResultSet rst = null;
 		try {
 			String sql = "select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')";
+			logger.debug("sql:\n"+sql);
+			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
@@ -162,15 +164,69 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		try {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			
-			StringBuffer sql = new StringBuffer("SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
-					sql.append("FROM M_PRODUCT_CATEGORY pdc ")
-					   .append("LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
-					   .append("WHERE pdc.ISACTIVE = 'Y' ")
-					   .append("AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
-					   .append("AND pdc.seg_value1 <> '000' ") //Except DefaultValue
-					   .append("AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
-					   .append("ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
-					   .append("LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
+					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
+					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
+					   .append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
+					   .append("\n AND pdc.seg_value1 <> '000' ") //Except DefaultValue
+					   .append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
+					   .append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
+					   .append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
+					
+			logger.debug("sql:\n"+sql.toString());
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				References r = new References(rst.getString("brand_code"),rst.getString("brand_code"),rst.getString("brand_name"));
+				pos.add(r);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return pos;
+	}
+	
+	/**
+	 * For MoveOrder
+	 * @param pageId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<References> lookUpBrandListCaseMoveOrder(int pageId) throws Exception {
+		List<References> pos = new ArrayList<References>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		
+		try {
+			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
+			
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
+					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
+					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
+					   .append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
+					   .append("\n AND pdc.seg_value1 <> '000' ") //Except DefaultValue
+					   .append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
+					   .append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
+					   .append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
+					
+			logger.debug("sql:\n"+sql.toString());
+			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());

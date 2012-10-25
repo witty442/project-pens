@@ -58,7 +58,7 @@ public class ImportProcess {
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
 	    		  logger.info("**** Script Pre Function name:"+tableBean.getPreFunction());
-	    		  String[] errors = PreFunction.process(conn, tableBean);
+	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
 	    	  }
 	    	  
 	    	  logger.debug("ImportToDB");
@@ -98,6 +98,7 @@ public class ImportProcess {
 						    	  canExc = psInsert.executeUpdate();
 					    	      //logger.debug("canIns:"+canExc);
 			    			  }
+			    			  
 			    		  }else if("m_pd".equalsIgnoreCase(tableBean.getTableName())){
 				    			  /** Delete form m_pd where user_id =''   1 Transaction **/
 				    			  if(tableBean.getActionDB().indexOf("D") != -1 && line ==0){
@@ -116,19 +117,45 @@ public class ImportProcess {
 				    					  canExc = -1;//case no import SalesCode no match
 				    				  }
 				    			  }
+
+				    	  /** case Import SalesRep update or insert record = userLogin only **/
+			    		  }else if("ad_user".equalsIgnoreCase(tableBean.getTableName())){
+			    			  
+			    			  if(tableBean.getActionDB().indexOf("U") != -1){
+			    				//logger.debug("**********Start Insert line By SalesCode (V203)******************");
+			    				  if(lineStr.indexOf(userBean.getUserName()) != -1){
+			    					  psUpdate = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
+							    	  canExc = psUpdate.executeUpdate();
+							    	  //logger.debug("canUpdate:"+canExc);
+						    	     
+						    	     if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
+							    		//logger.debug("**********Start Insert line By SalesCode (V203)******************");
+					    				 if(lineStr.indexOf(userBean.getUserName()) != -1){
+							    		     psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
+								    	     canExc = psInsert.executeUpdate();
+							    	         //logger.debug("canIns:"+canExc);
+					    				 }else{
+					    					 canExc = -1;//case no import SalesCode no match
+					    				 }
+								     }
+			    				  }else{
+			    					  canExc = -1;//case no import SalesCode no match
+			    				  }
+				    		  }
+
 			    		  }else{
 				    		  if(tableBean.getActionDB().indexOf("U") != -1){
 					    		  //logger.debug("**********Start Update ******************");
 					    		  psUpdate = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
 						    	  canExc = psUpdate.executeUpdate();
-						    	  //logger.debug("canUpdate:"+canExc);
+						    	  logger.debug("canUpdate:"+canExc);
 				    		  }
 	               
 					    	  if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
 					    		  //logger.debug("**********Start Insert ******************");
 					    		  psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
 						    	  canExc = psInsert.executeUpdate();
-					    	      //logger.debug("canIns:"+canExc);
+					    	      logger.debug("canIns:"+canExc);
 					    	  }
 			    		  }
 
@@ -192,7 +219,7 @@ public class ImportProcess {
 			   /*Case Table Have Post Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPostFunction())){
 	    		  logger.info("**** Script Post Function name:"+tableBean.getPostFunction());
-	    		  String[] errors = PostFunction.process(conn, tableBean);
+	    		  String[] errors = PostFunction.process(conn, tableBean,userBean);
 	    	  }
 			  
 			  

@@ -1,7 +1,5 @@
 package com.isecinc.pens.web.runscriptdb;
 
-import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,10 +9,10 @@ import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemProperties;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
@@ -48,6 +46,9 @@ public class RunScriptDBAction {
 			
 			if(STATUS_RUN_BLANK.equalsIgnoreCase(status)){
 				runScriptDBUpdate(sc, conn);
+				
+				/** Drop table no use or update or clear  wrong data**/
+				dropTableOrClearWrongData(conn);
 			}
 			
 			//Purg data in First Day of Month 1/xx/xxxx 
@@ -56,11 +57,14 @@ public class RunScriptDBAction {
 			logger.info("Check Day for PrugeMonitor Day(1,2,25,26,27) now_day:"+day);
 			
 			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
-				purgData_monitor(conn);	
+				purgDataMonitor(conn);	
 			}
 			
-			/** Drop table temp **/
-			dropTable(conn);
+			if(day==30){
+				purgDataTransaction(conn);
+			}
+			
+			
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -73,28 +77,62 @@ public class RunScriptDBAction {
 		}
 	}
 	
+	public static void runManualScriptProcess(String prefix,User user){
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			
+			/** Run All Sales **/
+			runManualScriptProcessAllSales(conn,prefix,user.getUserName());
+			
+			/** Run ManualScript By Sales Type VAN or Credit **/
+			String salesType = "van";
+			if("TT".equals(user.getRole().getCode())){
+				salesType  ="credit";
+			}
+			runManualScriptProcessBySalesType(conn,prefix,salesType);
+			
+			/** Run ManualScript By SalesCode **/
+			runManualScriptProcessBySalesCode(conn,prefix,user.getUserName());
+			
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn= null;
+				}
+			}catch(Exception e){}
+		}
+	}
+	
+	
 	/**
-	 * runManualScriptProcess
+	 * runManualScriptProcessBySalesCode
 	 * @param userName
 	 * process : run In BatchExportManager : run manaul script db 
+	 * ex fileName : script_V107.sql  >success move to Script-In-Processed
 	 */
-	public static void runManualScriptProcess(String userName){
-		Connection conn = null;
+	public static void runManualScriptProcess_OLDCODE(String userName){
 		EnvProperties env = EnvProperties.getInstance();
 		String resultStr ="";
+		Connection conn = null;
 		try{
-			logger.info("Start runManualScriptProcess ");
+			logger.info("Start runManualScriptProcessBySalesCode OLDCODE ");
 			
 			conn = DBConnection.getInstance().getConnection();
+			
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.script.in")+"script_"+userName+".sql","TIS-620");
 			
-			logger.info("scriptData:"+scriptData);
+			//logger.info("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
 				resultStr = excUpdate(conn,Utils.isNull(scriptData));
+				logger.info("resultExeSctipt:"+resultStr);
 			}
 			
 			// delete and Create new  File Ftp To In Processs
@@ -117,7 +155,105 @@ public class RunScriptDBAction {
 		}
 	}
 	
-	private static boolean purgData_monitor(Connection conn){
+	/**
+	 * 
+	 * @param conn
+	 * @param userName
+	 * process : run In BatchExportManager : run manaul script db all salesCode
+	 * ex fileName : /AllSales/script.sql  -->success no move   and stamp sales is run to ResultSalesRun.txt;
+	 */
+	public static void runManualScriptProcessAllSales(Connection conn,String prefix,String userName){
+		EnvProperties env = EnvProperties.getInstance();
+		try{
+			logger.info("Start runManualScriptProcessAllSale: "+prefix);
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.AllSales")+prefix+"_script.sql","TIS-620");
+			
+			//logger.info("scriptData:"+scriptData);
+			
+			// Excute Script
+			if( !Utils.isNull(scriptData).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData));
+				logger.info("resultExeSctipt:"+resultStr);
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param conn
+	 * @param userName
+	 * process : run In BatchExportManager : run manaul script db all salesCode
+	 * ex fileName : /AllSales/script.sql  -->success no move   and stamp sales is run to ResultSalesRun.txt;
+	 */
+	public static void runManualScriptProcessBySalesType(Connection conn,String prefix,String salesType){
+		EnvProperties env = EnvProperties.getInstance();
+		try{
+			logger.info("Start runManualScriptProcessAllSale: "+prefix);
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql","TIS-620");
+			
+			//logger.info("scriptData:"+scriptData);
+			
+			// Excute Script
+			if( !Utils.isNull(scriptData).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData));
+				logger.info("resultExeSctipt:"+resultStr);
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
+	/**
+	 * runManualScriptProcessBySalesCode
+	 * @param userName
+	 * process : run In BatchExportManager : run manaul script db by SalesCode
+	 * ex fileName : /BySales/script_V107.sql  >success move to /BySales/In-Processed/
+	 */
+	public static void runManualScriptProcessBySalesCode(Connection conn,String prefix,String userName){
+		EnvProperties env = EnvProperties.getInstance();
+		String resultStr ="";
+		try{
+			logger.info("Start runManualScriptProcessBySalesCode : "+prefix);
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.BySales")+prefix+"/script_"+userName+".sql","TIS-620");
+			
+			//logger.info("scriptData:"+scriptData);
+			
+			// Excute Script
+			if( !Utils.isNull(scriptData).equals("")){
+				resultStr = excUpdate(conn,Utils.isNull(scriptData));
+				logger.info("resultExeSctipt:"+resultStr);
+			}
+			
+			// delete and Create new  File Ftp To In Processs
+			ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+userName+".sql");
+			
+			//rename fileName
+			String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+			ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
+	
+	/**
+	 * purgDataMonitor
+	 * @param conn
+	 * @return
+	 * submit_date < 1 month 
+	 */
+	private static boolean purgDataMonitor(Connection conn){
 		boolean success = false;
 		StringBuffer sql = new StringBuffer("");
 		try{
@@ -144,8 +280,21 @@ public class RunScriptDBAction {
 			logger.error(e.getMessage(),e);
 		}
 		return success;
-	}
+  }
 	
+  private static boolean purgDataTransaction(Connection conn){
+		boolean success = false;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			//logger.info("*** Start PurgData purgDataTransaction ***************");
+			
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return success;
+   }
+
 	private static boolean runScriptDBUpdate(ServletContext sc ,Connection conn){
 		boolean success = false;
 		try{
@@ -257,8 +406,10 @@ public class RunScriptDBAction {
 	    PreparedStatement ps =null;
         StringBuffer str = new StringBuffer("");
 		try{  
+			
 			String[] sqlArr = sql.split("\\;");
 			if(sqlArr != null && sqlArr.length>0){
+			  //str.append("\n ------ Result ----------------------- ");
 			   for(int i=0;i<sqlArr.length;i++){
 				 
 				 if( !Utils.isNull(sqlArr[i]).equals("")){
@@ -266,16 +417,17 @@ public class RunScriptDBAction {
 					     ps = conn.prepareStatement(sqlArr[i]);
 					     int recordUpdate = ps.executeUpdate();
 					     //str.append("["+i+"] SQL Execute  :"+sqlArr[i]);
-					     str.append("\n"+sqlArr[i]+"- Result Effect:"+recordUpdate+" ");
+					     str.append("\n"+sqlArr[i]+"- eff:"+recordUpdate+" ");
 					 }catch(Exception ee){
-						 str.append("\n"+sqlArr[i]+"- Result Error:"+ee.getMessage()+" "); 
+						 str.append("\n"+sqlArr[i]+"- err:"+ee.getMessage()+" "); 
 					 }
 			     }
-			   }
+			   }//for
+			  // str.append("\n ----------------------------------\n");
 			}
 		}catch(Exception e){
-	      e.printStackTrace();
-	      str.append("ERROR: \n"+e.getMessage() +"\n");
+	      logger.error(e.getMessage(),e);
+	      str.append("err: \n"+e.getMessage() +"\n");
 		}finally{
 			try{
 				if(ps != null){
@@ -288,13 +440,15 @@ public class RunScriptDBAction {
 		return str.toString();
   }
 	
-	private static void dropTable(Connection conn) {
+	private static void dropTableOrClearWrongData(Connection conn) {
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
 		try{
+			logger.info("--dropTableOrClearWrongData--");
+			
 			//Check table Exist
-			sql.append(" SELECT table_name, table_type, engine \n");
+			/*sql.append(" SELECT table_name, table_type, engine \n");
 			sql.append("  FROM information_schema.tables \n");
 			sql.append("  WHERE table_schema = '"+schema+"' \n");
 			sql.append("  and engine ='InnoDB' \n");
@@ -308,8 +462,28 @@ public class RunScriptDBAction {
 				logger.debug("drop table :"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
 				ps.executeUpdate();
+			}	*/
+
+			/** Update monitor_item proe_rel fileName wrong **/
+			 /** 2012 10 15 1030 1-PROREL.txt **/
+			
+			sql.append("  select id from monitor_item where id in(select max(id) from monitor_item where table_name ='m_relation_modifier') \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){
+				sql = new StringBuffer("");
+				sql.append(" UPDATE monitor_item \n");
+				sql.append(" SET file_name =  (CONCAT( DATE_FORMAT(NOW(), '%Y%m%d%H%i')  ,'-PROREL.txt') ) \n");
+				sql.append(" WHERE  id = "+rs.getInt("id")+" \n") ;
+						
+				logger.debug("update monitor_item :"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				logger.debug("update monitor_item result:"+ps.executeUpdate());
 			}	
 			
+		
 		}catch(Exception e){
 	     logger.error("Error don't check drop table temp"+e.getMessage());
 		}finally{

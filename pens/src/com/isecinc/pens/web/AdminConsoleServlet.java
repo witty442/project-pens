@@ -177,7 +177,7 @@ public class AdminConsoleServlet  extends HttpServlet{
 			}else if(currentTab.equals("tab_backupdb") && "tab_backupdb".equalsIgnoreCase(action)){
 				  try {   
 					  User user = (User)request.getSession().getAttribute("user");
-				      String[] path = com.isecinc.pens.db.backup.DBBackUpManager.processBackup(request,user);
+				      String[] path = new com.isecinc.pens.db.backup.DBBackUpManager().process(request,user);
 				      
 				      resultBKDB +="\n ----------------- Result---------------------------- \n";
 				      resultBKDB +="\n Path Local To>> "+path[0];

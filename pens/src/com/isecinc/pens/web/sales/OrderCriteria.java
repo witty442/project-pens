@@ -2,6 +2,7 @@ package com.isecinc.pens.web.sales;
 
 import com.isecinc.core.web.I_Criteria;
 import com.isecinc.pens.bean.Order;
+import com.isecinc.pens.bean.Receipt;
 
 /**
  * Order Criteria
@@ -15,7 +16,8 @@ public class OrderCriteria extends I_Criteria {
 	private static final long serialVersionUID = 6220881218635143101L;
 
 	private Order order = new Order();
-
+	private Receipt autoReceipt = new Receipt();
+	
 	public Order getOrder() {
 		return order;
 	}
@@ -24,4 +26,13 @@ public class OrderCriteria extends I_Criteria {
 		this.order = order;
 	}
 
+	public Receipt getAutoReceipt() {
+		return autoReceipt;
+	}
+
+	public void setAutoReceipt(Receipt autoReceipt) {
+		this.autoReceipt = autoReceipt;
+	}
+
+	
 }

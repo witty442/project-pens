@@ -40,14 +40,13 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	getCurrentTimestampLong();
+	    	String salesCode ="V201";
+	    	System.out.println(salesCode.substring(1,4));
 	    	
-	    	BigDecimal b = new BigDecimal("20120919112759.000925");
-	    	logger.debug("String:"+b.toString());
-	    	logger.debug("long:"+new Long("1348036419217"));
-	    	logger.debug("double:"+b.doubleValue());
-	    	logger.debug("ti:"+new Timestamp(new Long("1348036419217")));
-	    	
+	    	double r = 0.0;
+	    	if(r== 0.000){
+	    	  System.out.println(r);
+	    	}
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }

@@ -24,6 +24,7 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
@@ -120,6 +121,9 @@ public class UpdateSalesManager {
 			List<FTPFileBean> fileImportSuccessList = new ArrayList<FTPFileBean>();
 			List<FTPFileBean> fileImportErrorList = new ArrayList<FTPFileBean>();
 			
+			//Reset RECEIPT_MAP 
+	    	ExternalFunctionHelper.RECEIPT_MAP.clear();
+			
 			Set s = initConfigMap.keySet();
 			Iterator it = s.iterator();
 			for (int i = 1; it.hasNext(); i++) { //for 1
@@ -128,7 +132,7 @@ public class UpdateSalesManager {
 				}
 				String tableName = (String) it.next();
 				TableBean tableBean = (TableBean) initConfigMap.get(tableName);
-				logger.debug("Import TableName:"+tableBean.getTableName());
+				logger.info("---Import TableName:"+tableBean.getTableName()+"---");
 				
 		        if(tableBean.getDataLineList() != null && tableBean.getDataLineList().size() > 0){
 		        	/** case have more one file **/

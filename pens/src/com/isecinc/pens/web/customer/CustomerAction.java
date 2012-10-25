@@ -245,7 +245,7 @@ public class CustomerAction extends I_Action {
 			}
 
 			// Save Customer
-			if (!new MCustomer().save(customer, userActive.getId(), conn)) {
+			if (!new MCustomer().save(customer, userActive.getId(),userActive.getUserName(), conn)) {
 				// return with duplicate Document no
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
 				conn.rollback();

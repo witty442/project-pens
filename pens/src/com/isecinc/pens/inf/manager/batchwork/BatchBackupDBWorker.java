@@ -11,23 +11,21 @@ import com.isecinc.pens.db.backup.DBBackUpManager;
 /*
  * thread to run MasterImport
  */
-public class BatchExportBackUPDBWorker extends BatchWorker {
+public class BatchBackupDBWorker extends BatchWorker {
 
 	private HttpServletRequest request;
 	private User user;
 	
     
-	public BatchExportBackUPDBWorker(HttpServletRequest request,User user) {
+	public BatchBackupDBWorker(HttpServletRequest request,User user) {
         this.request = request;
         this.user = user;
 	}
 
 	@Override
 	public void run() {
-
 		try {
-			DBBackUpManager.processBackup(request,user);
-			
+			new DBBackUpManager().process(request,user);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

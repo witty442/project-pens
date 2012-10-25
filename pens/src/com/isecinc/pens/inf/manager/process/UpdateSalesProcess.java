@@ -15,6 +15,7 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
@@ -39,8 +40,8 @@ public class UpdateSalesProcess {
 	    PreparedStatement psUpdateDCS = null;
 	    PreparedStatement psInsD = null;
 	    StringBuffer resultTxt = new StringBuffer("");
-	    List dataStrBuffList = new ArrayList();
-	    List orderList = new ArrayList();
+	    List<FTPFileBean> dataStrBuffList = new ArrayList<FTPFileBean>();
+	    List<String> orderList = new ArrayList<String>();
 	    String lineStr = "";
         int line=0;int lineNo = 0;
         int canExc = 0;int totalRos = 0;
@@ -52,7 +53,7 @@ public class UpdateSalesProcess {
         String[] results = new String[3];
         TableBean childBean = null;
 	    try {
-	    	  logger.debug("ImportToDB");
+	    	  
 	    	  dataTextLineArr = ftpFileBean.getDataLineText();
 	    	 	    	  
 	    	  /**  init prepareStatment Ins H **/
@@ -99,12 +100,13 @@ public class UpdateSalesProcess {
 			    		  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 				    		  //**Check Header Or Line**/
+			    		      logger.info("lineStr:"+lineStr);
 				    		  if(lineStr.startsWith("H")){  
 				    			  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(tableBean.getPrepareSqlUpd())){
 					    			  logger.debug("**********Start Update H ******************");
 					    		      psUpdateH = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdateH,userBean);
 						    	      canExc = psUpdateH.executeUpdate();
-						    	      logger.debug("canUpdate H:"+canExc);
+						    	      logger.info("canUpdate H:"+canExc);
 						    	      
 						    	      if(canExc != 0 && tableBean.getTableName().startsWith("t_order")){
 						    	    	  /** after Update Receipt from ORCL and add for update payment flag  **/
@@ -116,7 +118,7 @@ public class UpdateSalesProcess {
 				    				  logger.debug("**********Start Insert H ******************");
 					    		      psInsH = ImportHelper.spiltLineArrayToInsertStatement(conn, tableBean, lineStr, psInsH,userBean);
 						    	      canExc = psInsH.executeUpdate();
-						    	      logger.debug("canIns H:"+canExc); 
+						    	      logger.info("canIns H:"+canExc); 
 						    	      
 						    	      if(canExc != 0 && tableBean.getTableName().startsWith("t_order")){
 						    	    	  /** after Update Receipt from ORCL and add for update payment flag  **/
@@ -145,14 +147,14 @@ public class UpdateSalesProcess {
 						    				  logger.debug("**********Start Update L CS ******************");
 							    			  psUpdateDCS = ImportHelper.spiltLineArrayToUpdateStatementCS(conn, childBean, lineStr, psUpdateDCS,userBean);
 									    	  canExc = psUpdateDCS.executeUpdate();
-									    	  logger.debug("canUpdateCS L:"+canExc);
+									    	  logger.info("canUpdateCS L:"+canExc);
 					    				  }
 	                                      /** INSERT LINE **/
 							    		  if(canExc ==0){
 							    			  logger.debug("**********Start Insert L CS ******************");
 							    			  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
 							    			  canExc = psInsD.executeUpdate();
-									    	  logger.debug("canIns L:"+canExc);
+									    	  logger.info("canIns L:"+canExc);
 							    		 } 
 				    				  }else{
 				    					  /** Update Line  normal**/
@@ -160,7 +162,7 @@ public class UpdateSalesProcess {
 						    				  logger.debug("**********Start Update L ******************");
 							    			  psUpdateD = ImportHelper.spiltLineArrayToUpdateStatement(conn, childBean, lineStr, psUpdateD,userBean);
 									    	  canExc = psUpdateD.executeUpdate();
-									    	  logger.debug("canUpdate L:"+canExc);
+									    	  logger.info("canUpdate L:"+canExc);
 					    				  }
 				    				  }
 						    		  
@@ -188,11 +190,13 @@ public class UpdateSalesProcess {
 			    	  }//if 1
 			       
 		    	  }catch(Exception e){
-		    		  logger.error(e.getMessage(),e);
+		    		  
 		    		  errorMsg ="Error:Line{"+lineNo+"}:{LineText:"+lineStr+"}{ErrorMsg:"+e.getMessage()+"}";
 		    		  errorCode = ExceptionHandle.getExceptionCode(e);
 		    		  errorRow++;
 		    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:"+e.getMessage()+"]").append(Constants.newLine);
+		    		  
+		    		  logger.error(errorMsg,e);
 		    		  
 		    		  logger.debug("firstErrorMsg:"+firstErrorMsg);
 		    		  // Add First Error To Save In monitor_item
@@ -213,8 +217,8 @@ public class UpdateSalesProcess {
 	    			 String lineTextStr = (String)orderList.get(n);
     				 String[] lineArray = (lineTextStr+" ").split(Constants.delimeterPipe);
     				 
-//    				 logger.debug("lineTextStr:"+lineTextStr);
-//    				 logger.debug("lineArray:"+lineArray.length);
+    				 //logger.debug("lineTextStr:"+lineTextStr);
+    				 //logger.debug("lineArray:"+lineArray.length);
     				 
     		         if(lineArray != null && lineArray.length>0){
 	    		    	 if(tableBean.getTableName().equalsIgnoreCase("t_order")){
@@ -370,7 +374,6 @@ public class UpdateSalesProcess {
 				
 		 return 0;
 		}catch(Exception e){
-			logger.error(e.getMessage(),e);
 			throw e;
 		}
 	}

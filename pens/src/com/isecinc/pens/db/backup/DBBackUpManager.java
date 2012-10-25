@@ -30,80 +30,52 @@ public class DBBackUpManager {
    
 	protected static  Logger logger = Logger.getLogger("PENS");
 	private static String s ="`";
+	private static int maxRetryBackup = 3;
+	private static int countRetryBackup = 0;
 	
-	private static String getFileName(String schema,User user,String typeFile){
-		String fileName= "";
+	public static void main(String[] a){
 		try{
-			fileName = Utils.format(new Date(), "yyyyMMddHHmm")+"_"+user.getUserName()+"."+typeFile;
+			String r = "p'เพื่อนเกษตร";
+			String c = "\\\\";
+			String rr = r.replaceAll("'", "\\\\'");
+			System.out.println(rr);
+			rr = r.replaceAll(s, "\\\\'");
+			System.out.println(rr);
+			
 		}catch(Exception e){
-			logger.error(e.getMessage(),e);
+			e.printStackTrace();
 		}
-		return fileName;
 	}
 	
-	private static String getLocalPath(HttpServletRequest request){
-		String path = "D:/DB_Backup/";
+	/**
+	 * Main Process Backup DB();
+	 * @param request
+	 * @param user
+	 * @return
+	 */
+	public String[] process(HttpServletRequest request,User user ){
+		String[] resultPath = new String[2];
 		try{
-			File directory = new File(path);
-			if(!directory.exists()){
-				FileUtils.forceMkdir(directory);
-			}
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-			try{
-				path = "C:/DB_Backup/";
-				File directory = new File(path);
-				if(!directory.exists()){
-					FileUtils.forceMkdir(directory);
-				}
-			}catch(Exception ee){
-				logger.error(ee.getMessage(),ee);
-			}
+			resultPath = processBackup(request,user);
+		}catch(OutOfMemoryError e){
+			//countRetryBackup++;
+			System.gc();
+			//logger.info("countRetryBackup["+countRetryBackup+"]");
+			//if(countRetryBackup<=maxRetryBackup){
+			//	processBackup(request,user);
+			//}
+		}catch(Exception ee){
+			logger.error(ee.getMessage(),ee);
 		}
-		return path;
+		return resultPath;
 	}
 	
-	private static String getFtpPath(HttpServletRequest request){
-		String path = "/DB_Backup/"; //PROD Default
-		try{
-			logger.debug("contextPath:"+request.getLocalAddr());
-	        if("/penstest".equalsIgnoreCase(request.getContextPath())){
-	        	//UAT
-				path = "/DB_Backup/";
-	        }else if("127.0.0.1".equalsIgnoreCase(request.getLocalAddr())){
-	        	//UAT
-				path = "/DB_Backup/";
-			}else{
-				//PROD
-				path = "/DB_Backup/";
-			}
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-		return path;
-	}
-	
-	private static String getSchemaName(){
-		String schema = "pens";
-		try{
-			// Get Schema From Connection URL 
-			// jdbc:mysql://localhost:3306/pens?useUnicode=true&amp;characterEncoding=UTF-8
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			String url = hibernateConfig.getProperty("connection.url");
-			schema = url.substring(url.lastIndexOf("/")+1,url.indexOf("?"));
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-		return schema;
-	}
-	
-	public static String[] processBackup(HttpServletRequest request,User user ){
+	private  String[] processBackup(HttpServletRequest request,User user ) throws OutOfMemoryError{
 		Connection conn = null;
 		EnvProperties env = EnvProperties.getInstance();
-		List<List> allList = new ArrayList<List>();
+		List<List<DBBean>> allList = new ArrayList<List<DBBean>>();
 		List<DBBean> tableList = new ArrayList<DBBean>();
-		List<DBBean> tableUnAvaiableList = new ArrayList<DBBean>();
+		//List<DBBean> tableUnAvaiableList = new ArrayList<DBBean>();
 		int i = 0;
 		StringBuffer scriptStr = new StringBuffer("");
 		BufferedReader br = null;
@@ -136,8 +108,10 @@ public class DBBackUpManager {
 			conn = DBConnection.getInstance().getConnection();
 			/** Step 1 **/
 			allList = listTableBackUp(schema,conn);
-			tableList = (List)allList.get(0);
-			tableUnAvaiableList = (List)allList.get(1);
+			tableList = (List<DBBean>)allList.get(0);
+			//tableUnAvaiableList = (List<DBBean>)allList.get(1);
+			
+			logger.info("Generate Insert Statement ");
 			
             if(tableList != null && tableList.size() >0){
             	// Get Header Mysqldump format 
@@ -193,13 +167,13 @@ public class DBBackUpManager {
 				scriptStr.append("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */; ");
 
 				
-				logger.debug("Write File");
+				logger.info("Write File to d:/DB_Backup/");
 				/** Create file SQl **/
-				FileUtil.writeFile(pathSqlFull,scriptStr.toString(),"utf-8");
+				FileUtil.writeFile(pathSqlFull,scriptStr,"utf-8");
+				
+				logger.info("Zip File to d:/DB_Backup/");
 				/** Zip Sql File **/
 				FileUtil.zipFile(pathSqlFull,pathZipFull,sqlFileName); 
-				
-				//fullZipPath
 				
 				//Move DBbackupFile.zip to FtpServer
 				ftpFilePath = getFtpPath(request);
@@ -213,17 +187,19 @@ public class DBBackUpManager {
 				 }else if(Utils.isNull(user.getType()).equals(User.VAN)){
 					 ftpFilePath += "Van/"+zipFileName;
 				 }
-					 
+				
+				logger.info("Upload Zip File To FTP Server");
 				FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-				ftpManager.uploadBackUpDBZipFileToFTP_Type2(user, ftpFilePath, pathZipFull);
+				ftpManager.uploadBackUpDBZipFileToFTP_OPT3(user, ftpFilePath, pathZipFull);
 			}
 
-            if(tableUnAvaiableList != null && tableUnAvaiableList.size() > 0){
+            /*if(tableUnAvaiableList != null && tableUnAvaiableList.size() > 0){
             	for(int n=0;n<tableUnAvaiableList.size();n++){
             		logger.debug("table UnAvaiable :"+((DBBean)tableUnAvaiableList.get(n)).getTableName());
             	}
-            }
+            }*/
             
+            logger.info("Delete Zip File IN d:/DB_Backup/");
             /** Delete Sql Temp File **/
 			FileUtil.deleteFile(pathSqlFull);
 			
@@ -231,10 +207,19 @@ public class DBBackUpManager {
 			resultPath[1] = ftpFilePath;//remote FTP server
 			
 			logger.info("--End processBackup-- ");
+			
+		}catch(OutOfMemoryError e){
+			logger.error(e.getMessage(), e);
+			throw e;
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
+			
 		}finally{
 			try{
+			   allList = null;
+			   tableList = null;
+			   //tableUnAvaiableList = null;
+			   scriptStr = null;
 			   FileUtil.close(br);
 			   DBConnection.close(conn);
 			}catch(Exception e){
@@ -244,13 +229,80 @@ public class DBBackUpManager {
 		return resultPath;
 	}
 	
-	private static List<List> listTableBackUp(String schema,Connection conn) throws Exception{
+	private  String getFileName(String schema,User user,String typeFile){
+		String fileName= "";
+		try{
+			fileName = Utils.format(new Date(), "yyyyMMddHHmm")+"_"+user.getUserName()+"."+typeFile;
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return fileName;
+	}
+	
+	private  String getLocalPath(HttpServletRequest request){
+		String path = "D:/DB_Backup/";
+		try{
+			File directory = new File(path);
+			if(!directory.exists()){
+				FileUtils.forceMkdir(directory);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			try{
+				path = "C:/DB_Backup/";
+				File directory = new File(path);
+				if(!directory.exists()){
+					FileUtils.forceMkdir(directory);
+				}
+			}catch(Exception ee){
+				logger.error(ee.getMessage(),ee);
+			}
+		}
+		return path;
+	}
+	
+	private  String getFtpPath(HttpServletRequest request){
+		String path = "/DB_Backup/"; //PROD Default
+		try{
+			logger.debug("contextPath:"+request.getLocalAddr());
+	        if("/penstest".equalsIgnoreCase(request.getContextPath())){
+	        	//UAT
+				path = "/DB_Backup/";
+	        }else if("127.0.0.1".equalsIgnoreCase(request.getLocalAddr())){
+	        	//UAT
+				path = "/DB_Backup/";
+			}else{
+				//PROD
+				path = "/DB_Backup/";
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return path;
+	}
+	
+	private  String getSchemaName(){
+		String schema = "pens";
+		try{
+			// Get Schema From Connection URL 
+			// jdbc:mysql://localhost:3306/pens?useUnicode=true&amp;characterEncoding=UTF-8
+			Configuration hibernateConfig = new Configuration();
+			hibernateConfig.configure();
+			String url = hibernateConfig.getProperty("connection.url");
+			schema = url.substring(url.lastIndexOf("/")+1,url.indexOf("?"));
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return schema;
+	}
+	
+	private  List<List<DBBean>> listTableBackUp(String schema,Connection conn) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
-		List<List> allList = new ArrayList<List>();
+		List<List<DBBean>> allList = new ArrayList<List<DBBean>>();
 		List<DBBean> tableList = new ArrayList<DBBean>();
 		List<DBBean> tableUnAvaiableList = new ArrayList<DBBean>();
-		logger.debug("listTableBackUp");
+		logger.info("listTableBackUp");
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" SELECT table_name, table_type, engine \n");
@@ -267,7 +319,7 @@ public class DBBackUpManager {
 			
 			sql.append("  ORDER BY table_name asc \n");
 			
-			logger.info("sql:"+sql.toString());
+			logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -298,7 +350,7 @@ public class DBBackUpManager {
 		}
 	}
 	
-	private static boolean isTableAvaiable(String schema,Connection conn,String tableName,String type) {
+	private  boolean isTableAvaiable(String schema,Connection conn,String tableName,String type) {
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		boolean r = true;
@@ -326,7 +378,7 @@ public class DBBackUpManager {
 		return r;
 	}
 	
-	private static String generateCreateScript(String schema,Connection conn,DBBean dbBean) {
+	private  String generateCreateScript(String schema,Connection conn,DBBean dbBean) {
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer createTableScript = new StringBuffer("");
@@ -393,7 +445,7 @@ public class DBBackUpManager {
 		return createTableScript.toString();
 	}
 	*/
-	private static StringBuffer generateInsertScript(String schema,Connection conn,String tableName){
+	private  StringBuffer generateInsertScript(String schema,Connection conn,String tableName){
 		logger.debug("generateInsertScript:"+tableName);
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -523,27 +575,13 @@ public class DBBackUpManager {
 	 * @param str
 	 * @return  'xxx'  -> \'xxx\'
 	 */
-	private static String replaceSingleQuote(String str){
+	private  String replaceSingleQuote(String str){
 		try{
 			str = str.replaceAll("'", "\\\\'");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
 		return str;
-	}
-	
-	public static void main(String[] a){
-		try{
-			String r = "p'เพื่อนเกษตร";
-			String c = "\\\\";
-			String rr = r.replaceAll("'", "\\\\'");
-			System.out.println(rr);
-			rr = r.replaceAll(s, "\\\\'");
-			System.out.println(rr);
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 	}
 	
 }

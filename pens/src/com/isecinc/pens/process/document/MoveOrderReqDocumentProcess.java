@@ -4,11 +4,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 import util.DBCPConnectionProvider;
 
+import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
+import com.isecinc.pens.model.MDocSequence;
+import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MUser;
 
 /**
@@ -28,7 +32,9 @@ public class MoveOrderReqDocumentProcess extends DocumentSequenceProcess {
 	 */
 	public String getNextDocumentNo(String salesCode, String pdCode, int activeUserID, Connection conn)
 			throws Exception {
-		int seq = getNextSeq(salesCode, MOVE_ORDER_REQ_NUMBER, activeUserID); //connection seprarate
+		
+		
+		int seq = getNextSeqMoveOrder(MMoveOrder.MOVE_ORDER_REQUISITION,salesCode,pdCode, MOVE_ORDER_REQ_NUMBER, activeUserID); //connection seprarate
 		// String docNo = "O";
 		String docNo = "";
 		User user = new MUser().find(String.valueOf(activeUserID));
@@ -90,6 +96,9 @@ public boolean checkCodeDuplicate(String code,Connection conn) throws Exception 
 		}
 		return dup;
 	}
+
+
+
 	/**
 	 * Test
 	 * 

@@ -1180,10 +1180,10 @@ public class InterfaceDAO {
   * @return
   * @throws Exception
   */
- public  List getOrderIdListByOrderNo(Connection conn,String orderNoInStr) throws Exception{
+ public  List<String> getOrderIdListByOrderNo(Connection conn,String orderNoInStr) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
-	    List orderList = new ArrayList();
+	    List<String> orderList = new ArrayList<String>();
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select order_id from t_order where 1=1 and order_no in("+orderNoInStr+") \n");

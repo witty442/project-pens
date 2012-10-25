@@ -770,7 +770,7 @@ public class ModifierProcess {
 		// Is Promotion
 		if (isPromotion) {
 			logger.info("Is Promotion..Round[" + round+"]");
-			logger.info("Relate relate.m_line_to.MLines.." + modifierLine.getRelatedModifier().size());
+			logger.info("Relate relate.m_line_to.MLines Size[" + modifierLine.getRelatedModifier().size()+"]");
 			// get relate line
 			boolean baseUOM = true;
 			for (ModifierLine mrline : modifierLine.getRelatedModifier()) {

@@ -35,10 +35,6 @@ public class OrderForm extends I_Form {
 
 	private String deletedId = "";
 
-	private String autoReceiptFlag = "N";
-
-	private Receipt autoReceipt = new Receipt();
-
 	private int orderLineQty = 0;
 
 	private String newShipDate;
@@ -48,6 +44,16 @@ public class OrderForm extends I_Form {
 	private int editTripNo;
 
 	private OrderLine memberNewLine = new OrderLine();
+	
+	private String autoReceiptFlag;
+	
+	public String getAutoReceiptFlag() {
+		return autoReceiptFlag;
+	}
+
+	public void setAutoReceiptFlag(String autoReceiptFlag) {
+		this.autoReceiptFlag = autoReceiptFlag;
+	}
 
 	@SuppressWarnings("unchecked")
 	public OrderForm() {
@@ -63,6 +69,14 @@ public class OrderForm extends I_Form {
 			}
 		};
 		bys = LazyList.decorate(new ArrayList<ReceiptBy>(), factory2);
+	}
+
+	public Receipt getAutoReceipt() {
+		return criteria.getAutoReceipt();
+	}
+
+	public void setAutoReceipt(Receipt autoReceipt) {
+		criteria.setAutoReceipt(autoReceipt);
 	}
 
 	public OrderCriteria getCriteria() {
@@ -111,22 +125,6 @@ public class OrderForm extends I_Form {
 
 	public void setDeletedId(String deletedId) {
 		this.deletedId = deletedId;
-	}
-
-	public Receipt getAutoReceipt() {
-		return autoReceipt;
-	}
-
-	public void setAutoReceipt(Receipt autoReceipt) {
-		this.autoReceipt = autoReceipt;
-	}
-
-	public String getAutoReceiptFlag() {
-		return autoReceiptFlag;
-	}
-
-	public void setAutoReceiptFlag(String autoReceiptFlag) {
-		this.autoReceiptFlag = autoReceiptFlag;
 	}
 
 	public List<ReceiptBy> getBys() {

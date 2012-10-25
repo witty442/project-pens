@@ -9,6 +9,7 @@ import util.DBCPConnectionProvider;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
+import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MUser;
 
 /**
@@ -28,7 +29,7 @@ public class MoveOrderReturnDocumentProcess extends DocumentSequenceProcess {
 	 */
 	public String getNextDocumentNo(String salesCode, String pdCode, int activeUserID, Connection conn)
 			throws Exception {
-		int seq = getNextSeq(salesCode, MOVE_ORDER_RETURN_NUMBER, activeUserID); //connection seprarate
+		int seq = getNextSeqMoveOrder(MMoveOrder.MOVE_ORDER_RETURN,salesCode,pdCode, MOVE_ORDER_RETURN_NUMBER, activeUserID); //connection seprarate
 		// String docNo = "O";
 		String docNo = "";
 		User user = new MUser().find(String.valueOf(activeUserID));

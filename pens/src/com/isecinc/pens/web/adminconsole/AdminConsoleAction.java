@@ -141,7 +141,7 @@ public class AdminConsoleAction extends I_Action {
 			}else if(currentTab.equals("tab_backupdb") && "tab_backupdb".equalsIgnoreCase(action)){
 				String resultBKDB = "";
 				  try {   
-				      String[] path = com.isecinc.pens.db.backup.DBBackUpManager.processBackup(request,user);
+				      String[] path = new com.isecinc.pens.db.backup.DBBackUpManager().process(request,user);
 				      
 				      resultBKDB +="\n ----------------- Result---------------------------- \n";
 				      resultBKDB +="\n Path Local To>> "+path[0];

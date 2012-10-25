@@ -1,16 +1,11 @@
 package com.isecinc.pens.inf.manager.process;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 
 public class FunctionHelper {
@@ -68,6 +63,8 @@ public class FunctionHelper {
 			pathManualScript += "Promotion/"+functionName+".sql";
 		}else if(functionName.indexOf("product") != -1){
 			pathManualScript += "Product/"+functionName+".sql";
+		}else if(functionName.indexOf("ad_user") != -1){
+			pathManualScript += "AdUser/"+functionName+".sql";
 		}
 		return pathManualScript;
 	}

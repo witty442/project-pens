@@ -184,6 +184,18 @@ public class Receipt extends I_PO {
 	private String pdPaidDate;
 	private String pdPaymentMethod;
 	
+	private String paymentType;
+	
+	
+
+	public String getPaymentType() {
+		return paymentType;
+	}
+
+	public void setPaymentType(String paymentType) {
+		this.paymentType = paymentType;
+	}
+
 	public String getReason() {
 		return reason;
 	}

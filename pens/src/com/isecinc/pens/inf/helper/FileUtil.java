@@ -1,7 +1,6 @@
 package com.isecinc.pens.inf.helper;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,15 +16,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
-import com.isecinc.pens.bean.User;
 
 
 
@@ -120,23 +116,6 @@ public class FileUtil {
        return writer.toString();
     }
 	
-	public static void writeFile(String fileName,String str) {
-		FileWriter fstream =null;
-		try{
-		    // Create file 
-		    fstream = new FileWriter(fileName);
-		    BufferedWriter out = new BufferedWriter(fstream);
-		    out.write(str);
-		    //Close the output stream
-		    out.close();
-		    fstream.close();
-		    
-	    }catch (Exception e){//Catch exception if any
-	       logger.error("Write File Error:"+e.getMessage(),e);
-	    }
-	  }
-	
-	
 	public static String getFileSize(String str) {
 		File file = null;
 		BufferedWriter out = null;
@@ -161,16 +140,87 @@ public class FileUtil {
 	    return fileSize;
 	  }
 	
+	public static void writeFile(String fileName,String str) {
+		FileWriter fstream =null;
+		try{
+		    // Create file 
+		    fstream = new FileWriter(fileName);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    out.write(str);
+		    //Close the output stream
+		    out.close();
+		    fstream.close();
+		    
+	    }catch (Exception e){//Catch exception if any
+	       logger.error("Write File Error:"+e.getMessage(),e);
+	    }
+	}
+	
    public static void writeFile(String filename,String dataStr,String encoding) {
 	   File backupFile = new File(filename);
         try {
             // Change Method TO Write File
             FileUtils.writeStringToFile(backupFile, dataStr,encoding);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex.getMessage(),ex);
         } finally {
             //Close the BufferedOutputStream
         }
+    }
+   
+   public static void writeFile(String fileName,StringBuffer dataStr,String encoding) {
+	   OutputStreamWriter os = null;
+	   BufferedWriter out = null;
+	   FileOutputStream fs = null;
+	   try{
+		   fs = new FileOutputStream(fileName);
+		   os = new OutputStreamWriter(fs,encoding);
+		   out = new BufferedWriter(os);
+		   out.write(dataStr.toString());
+		  
+		  }catch(UnsupportedEncodingException ue){
+		     logger.error(ue.getMessage(),ue);
+		  }catch(IOException e){
+			  logger.error(e.getMessage(),e);
+		  }finally{
+			  try{
+				  if(out != null){
+					 out.close();out=null;
+				  }
+				  if(os != null){
+					 os.close();os=null;
+				  }
+				  if(fs != null){
+					 fs.close();fs = null;
+				  }
+			  }catch(Exception ee){}
+		  }
+		  
+	}
+   
+   public static void writeFileOpt(String fileName,String dataStr) {
+	   FileWriter fs =null;
+	   BufferedWriter out = null;
+	   try{
+		    // Create file 
+		    fs = new FileWriter(fileName);
+		    out = new BufferedWriter(fs);
+		    out.write(dataStr);
+		    //Close the output stream
+		    out.flush();
+		    fs.flush();
+	    }catch (Exception e){//Catch exception if any
+	       logger.error("Write File Error:"+e.getMessage(),e);
+	    }finally{
+	    	try{
+	    		if(out != null){
+	    	       out.close();out = null;
+	    		}
+	    		if(fs != null){
+			       fs.close();fs = null;
+	    		}
+	    	}catch(Exception ee){}
+	    }
     }
 	
 	public static void writeFile(String fileName,byte[] bytefile) throws Exception{
@@ -188,6 +238,7 @@ public class FileUtil {
 	        }
 	    }	    
 	  }
+	
 	/**
 	 * get file content from classloader path
 	 */
@@ -275,12 +326,16 @@ public class FileUtil {
 	}
 
 	public static void deleteFile(String fileName) {
-		// create dir
+		File f = null;
 		try{
-		   File f = new File(fileName);
+		   f = new File(fileName);
 		   f.delete();
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
+		}finally{
+			if( f != null){
+				f = null;
+			}
 		}
 	}
 

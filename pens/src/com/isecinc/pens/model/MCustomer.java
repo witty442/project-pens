@@ -206,16 +206,11 @@ public class MCustomer extends I_Model<Customer> {
 	 */
 	private int id = 0;
 
-	public boolean save(Customer customer, int activeUserID, Connection conn) throws Exception {
+	public boolean save(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 
 		if (customer.getId() == 0) {
 			id = SequenceProcess.getNextValue(TABLE_NAME);
-			// String prefix = new DecimalFormat("00").format(Integer.parseInt(customer.getTerritory()));
-			// String prefix = customer.getCodePrefix();
-			// customer.setCode(new CustomerDocumentProcess().getNextDocumentNo(customer.getSalesRepresent().getCode(),
-			// prefix, activeUserID, conn));
-			customer.setCode(new CustomerDocumentProcess().getNextDocumentNo(customer.getTerritory(), customer
-					.getProvince(), customer.getDistrict(), activeUserID, conn));
+			customer.setCode(new CustomerDocumentProcess().getNextDocumentNo(salesCode, activeUserID, conn));
 		} else {
 			id = customer.getId();
 		}

@@ -28,7 +28,7 @@ import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
 import com.isecinc.pens.inf.manager.WebMemberManager;
-import com.isecinc.pens.inf.manager.batchwork.BatchExportBackUPDBWorker;
+import com.isecinc.pens.inf.manager.batchwork.BatchBackupDBWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 

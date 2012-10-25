@@ -313,6 +313,7 @@ public class ImportManager {
 											|| tableBean.getTableName().equalsIgnoreCase("m_address")
 											|| tableBean.getTableName().equalsIgnoreCase("m_contact")
 											|| tableBean.getTableName().equalsIgnoreCase("m_trip")
+											|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
 											){
 										
 										fileMasterImportSuccessList.add(ftpBean); //Add For Delete file and Move to In Processed

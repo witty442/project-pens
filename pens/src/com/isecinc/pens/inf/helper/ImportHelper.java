@@ -61,8 +61,8 @@ public class ImportHelper {
 				if (!Utils.isBlank(lineStr)) { // exclude blank line
 					String[] cs = lineStr.split("\t");
 					if (!cs[0].startsWith("Seq") && !cs[0].startsWith("#")) { // exclude header, comment
+						TableBean tableBean = new TableBean();
 						try {
-							TableBean tableBean = new TableBean();
 							String[] p = ((String)cs[0]).split(",");
 							tableBean.setTableName(Utils.isNull(p[1].toLowerCase()));
 							tableBean.setFileFtpName(Utils.isNull(p[2]));
@@ -101,7 +101,7 @@ public class ImportHelper {
 						        tableMap.put(tableBean.getTableName(),tableBean);
 							}
 						} catch (Exception e) {
-							//log.debug(lineStr);
+							logger.info("TabelName Error:"+tableBean.getTableName());
 							throw e;
 						}
 					}//if 2
@@ -119,7 +119,7 @@ public class ImportHelper {
 			monitorTime = new MonitorTime("initImportConfig>>Download file from Ftp Server");
 			/** Load File From FTP Server To Table Map By Table**/
 		    FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-	        int countFileMap = ftpManager.loadFileMappingToTable(userBean,tableMap,pathImport,userBean,transType,importAll);
+	        int countFileMap = ftpManager.downloadFileMappingToTable(userBean,tableMap,pathImport,userBean,transType,importAll);
 	        
 	        monitorTime.debugUsedTime();
 	        return countFileMap;
@@ -722,7 +722,7 @@ public class ImportHelper {
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 			    	String idFind = ExternalFunctionHelper.findExternalFunc(conn, colBean,lineArray,userBean);	    	
-	    			logger.debug("External Function Result ID["+idFind+"]");
+			    	logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
 			    	ps =setObjectPS(ps,colBean,parameterIndex,idFind);
 			    }else{
 			    	if(colBean.getTextPosition() >= lineArray.length ){/** Text Position > Array Index  set To NUll **/
@@ -833,6 +833,7 @@ public class ImportHelper {
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 	    			String idFind = ExternalFunctionHelper.findExternalFunc(conn, colBean,lineArray,userBean);	  
+	    			logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
 			    	ps = setObjectPS(ps,colBean,parameterIndex,idFind);
 				}else{
 					if(colBean.getTextPosition() >= lineArray.length ){/** Text Position > Array Index OF LineStr  set To NULL **/
@@ -1132,6 +1133,7 @@ public class ImportHelper {
 					|| tableBean.getTableName().equalsIgnoreCase("m_address")
 					|| tableBean.getTableName().equalsIgnoreCase("m_contact")
 					|| tableBean.getTableName().equalsIgnoreCase("m_trip")
+					|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
 					|| tableBean.getTableName().equalsIgnoreCase("m_member_health")){
 				
 				//logger.debug("fileFtpFullName:"+fileFtpFullName);
@@ -1150,7 +1152,7 @@ public class ImportHelper {
 						}
 					}
 				}//if
-				/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN)**/
+				/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN,m_sales_target_new)**/
 			}else{
 				if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
 					    if(ImportHelper.isCanGetFtpFile(tableBean, fileFtpFullName,importAll)){
@@ -1269,7 +1271,7 @@ public class ImportHelper {
 					ftpFileTableName4 = ftpFileTableName4.substring(0,ftpFileTableName4.indexOf("."));
 				}
 			}
-			int userId = user.getId();
+			String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
 			
 			/*logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
 			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
@@ -1278,7 +1280,7 @@ public class ImportHelper {
 			logger.debug("All:ALL:"+ftpFileTableName4);	
 			logger.debug("********************************************************");*/
 			if(     ftpFileVesrionInt1 >salesFileLastVersionInt
-					&& (userId+"").equals(ftpFileTableName2)
+					&& (userId).equals(ftpFileTableName2)
 					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3)
 					&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName4) ){
 				map = true;
@@ -1292,7 +1294,7 @@ public class ImportHelper {
 			if(ftpFileTableName3.indexOf(".") != -1){
 				ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
 			}
-			int userId = user.getId();
+			String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
 			
 			/*logger.debug("*******Compare File Get FTP FIle Name*******************");
 			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
@@ -1300,7 +1302,7 @@ public class ImportHelper {
 			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
 			logger.debug("********************************************************");*/
 			if(ftpFileVesrionInt1 > salesFileLastVersionInt 
-				&& (userId+"").equals(ftpFileTableName2)
+				&& (userId).equals(ftpFileTableName2)
 				&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
 				map = true;
 			}

@@ -233,7 +233,7 @@ public class ExportProcess {
 			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
 			
 			rs = ps.executeQuery();
-			while(rs.next()){
+			while(rs.next()){ 
 				totalRows++;
 				String ADDRESS_ID_BILL_TO = dao.isSameAddress(conn, rs.getString("customer_id"));
 			

@@ -13,6 +13,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
 import com.isecinc.pens.inf.manager.WebMemberManager;
+import com.isecinc.pens.inf.manager.process.ExternalProcess;
 
 /**
  * @author WITTY
@@ -71,7 +72,6 @@ public class BatchImportWorker extends BatchWorker {
 			/** 1.Import Update Sales Transaction **/
 			/** 2.Import Master **/
 			/** 3.Import Transaction (onhand) **/
-			/** WAIT ..4.Import Web Member **/
 			
 			/** Pasuwat Wang-arrayagul
 			 *  ReSequence Import Process
@@ -81,6 +81,10 @@ public class BatchImportWorker extends BatchWorker {
 			 ** */ 
 			
 			else {
+				
+				/** Process run Script Before Import **/
+				new ExternalProcess().processImportBefore(request, userLogin);
+				
 				logger.debug(" **********Start Import Master Table ******************");
 				MonitorBean monitorModel =(new ImportManager()).importTxtByTransType(transactionId,Constants.TRANSACTION_MASTER_TYPE, userLogin,userRequest, requestTable, request, importAll);
 				logger.debug(" **********Result Import Master Table :"+monitorModel.getStatus()+"******************");
@@ -99,11 +103,10 @@ public class BatchImportWorker extends BatchWorker {
 		                logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
 					}
 					
-					/** WIT: Wait for requirement **/
-					//logger.debug(" **********Start Import Web Member Table ******************");
-					//monitorModel =(new WebMemberManager()).importTxt(userLogin,userRequest, requestTable, request, importAll,transactionId);
-					//logger.debug(" **********Result Import Web Member Table  :"+monitorModel.getStatus()+" ******************");
 				}
+				
+				/** Process Run Script After Import **/
+				new ExternalProcess().processImportAfter(request,userLogin);
 				
 				endTaskStatus(this.transactionId,this.monitorId);
 			} 

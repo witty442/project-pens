@@ -89,9 +89,9 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					if(orderLine.getPromotion().equals("Y")){
 					   item.setPriceString("0.000000");
 					}else{
-					   item.setPriceString(NumberToolsUtil.decimalFormat(orderLine.getPrice1(),NumberToolsUtil.format_current_5_digit)+"/"+NumberToolsUtil.decimalFormat(orderLine.getPrice2(),NumberToolsUtil.format_current_5_digit));
+					   item.setPriceString(NumberToolsUtil.decimalFormat(orderLine.getPrice1(),NumberToolsUtil.format_current_6_digit)+"/"+NumberToolsUtil.decimalFormat(orderLine.getPrice2(),NumberToolsUtil.format_current_6_digit));
 					}
-					item.setLineAmount(NumberToolsUtil.decimalFormat(orderLine.getLineAmount(),NumberToolsUtil.format_current_5_digit));
+					item.setLineAmount(NumberToolsUtil.decimalFormat(orderLine.getLineAmount(),NumberToolsUtil.format_current_6_digit));
 					item.setDiscountAmount(NumberToolsUtil.decimalFormat(orderLine.getDiscount()));
 					item.setTotalAmount(NumberToolsUtil.decimalFormat(orderLine.getLineAmount()-orderLine.getDiscount()));
 					item.setShippingDate(orderLine.getShippingDate());

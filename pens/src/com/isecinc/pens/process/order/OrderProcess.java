@@ -426,6 +426,7 @@ public class OrderProcess {
 					line.setLineAmount(odLine.getLineAmount());
 					line.setDiscount(odLine.getDiscount());
 					line.setTotalAmount(odLine.getTotalAmount());
+					
 					if (odLine.getProduct().getUom().getId().equals(odLine.getUom().getId())) {
 						line.setVatAmount1(odLine.getVatAmount());
 						line.setUom1(odLine.getUom());
@@ -465,7 +466,6 @@ public class OrderProcess {
 				} else {
 					// Update previous line if repeat product code & promotion.
 
-					// Aneak.t 24/01/2011
 					if (odLine.getIscancel() != null && odLine.getIscancel().equals("Y")) {
 						continue;
 					}
@@ -551,6 +551,7 @@ public class OrderProcess {
 						line.setLineAmount(odLine.getLineAmount());
 						line.setDiscount(odLine.getDiscount());
 						line.setTotalAmount(odLine.getTotalAmount());
+						
 						if (odLine.getProduct().getUom().getId().equals(odLine.getUom().getId())) {
 							line.setVatAmount1(odLine.getVatAmount());
 							line.setUom1(odLine.getUom());

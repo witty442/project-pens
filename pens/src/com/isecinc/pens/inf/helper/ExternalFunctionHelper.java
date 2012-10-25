@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -20,6 +22,7 @@ public class ExternalFunctionHelper {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
+	public static Map<String, String> RECEIPT_MAP = new HashMap<String, String>();
 	/**
 	 * @param args
 	 */
@@ -116,6 +119,12 @@ public class ExternalFunctionHelper {
 				if(Utils.isNull(value).equals("")){
 					exe = false;
 				}
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_CUSTOMER_NAME_BY_CODE")){
+				findColumn = "NAME";
+				sql.append(" select "+findColumn+" FROM m_customer WHERE CODE = '"+value+"'" );		
+				if(Utils.isNull(value).equals("")){
+					exe = false;
+				}
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_MODIFIER_ID")){
 				findColumn = "MODIFIER_ID";
 				sql.append(" select "+findColumn+" FROM m_modifier WHERE MODIFIER_ID = "+value+"" );		
@@ -148,7 +157,6 @@ public class ExternalFunctionHelper {
 				 String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
 				 id = SequenceHelper.getNextValue(values[1]).toString();
 				 exe = false;
-				 
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_PURPOSE")){	
 				if("BILL_TO".equalsIgnoreCase(value)){
 					id = "B";
@@ -195,6 +203,85 @@ public class ExternalFunctionHelper {
 				if(Utils.isNull(value).equals("")){
 					exe = false;
 				}	
+			/** RECEIPT_NO have 2 case  **/
+			/** Case 1 Pay by Cash Receipt_no = SaleApp.receipt_no(ORCL) **/
+			/** Case 2 Pay by Cheque receipt_no = cheque_no(ORCL)  **/
+			/** After receipt_id not found gen new receipt_id for insert and put receipt_id for line **/
+		    }else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_RECEIPT_ID_IN_HEAD")){
+					/** GET_RECEIPT_ID **/
+					findColumn = "RECEIPT_ID";
+					sql.append(" select "+findColumn+" FROM t_receipt WHERE receipt_no = '"+value+"' \n" );		
+					sql.append(" union all \n" );
+					sql.append(" select distinct "+findColumn+" from t_receipt_match where receipt_by_id in( \n" );
+					sql.append("  	select receipt_by_id from t_receipt_by  where cheque_no ='"+value+"' \n" );
+					sql.append("   ) \n" );
+					
+					if( !Utils.isNull(value).equals("")){
+						ps = conn.prepareStatement(sql.toString());
+						rs = ps.executeQuery();
+						if(rs.next()){
+							id = rs.getString(findColumn);
+						}
+						
+						//** Case not found Receipt Id and Insert new receipt  Gen new receipt_id **/
+						if("".equals(Utils.isNull(id))){
+							id = String.valueOf(SequenceHelper.getNextValue("t_receipt"));
+							RECEIPT_MAP.put(Utils.isNull(value), id);//Put New ReceiptId for use in receiptId Line
+						}
+						
+					}	
+					exe = false;
+			
+			/** RECEIPT_NO have 2 case  **/
+			/** Case 1 Pay by Cash Receipt_no = SaleApp.receipt_no(ORCL) **/
+			/** Case 2 Pay by Cheque receipt_no = cheque_no(ORCL)  **/
+			/** After receipt_id not found  get receipt_id from RECEIPT_MAP **/
+		    }else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_RECEIPT_ID_IN_LINE")){
+				/** GET_RECEIPT_ID **/
+				findColumn = "RECEIPT_ID";
+				sql.append(" select "+findColumn+" FROM t_receipt WHERE receipt_no = '"+value+"' \n" );		
+				sql.append(" union all \n" );
+				sql.append(" select distinct "+findColumn+" from t_receipt_match where receipt_by_id in( \n" );
+				sql.append("  	select receipt_by_id from t_receipt_by  where cheque_no ='"+value+"' \n" );
+				sql.append("   ) \n" );
+				
+				if( !Utils.isNull(value).equals("")){
+					ps = conn.prepareStatement(sql.toString());
+					rs = ps.executeQuery();
+					if(rs.next()){
+						id = rs.getString(findColumn);
+					}
+					
+					//** Case not found Receipt Id Get From RECEIPT_MAP **/
+					if("".equals(Utils.isNull(id))){
+						id = RECEIPT_MAP.get(Utils.isNull(value));
+					}
+					
+				}	
+				exe = false;
+			
+		    /**
+		     * GET_LINE_NO By Receipt ID and get Max(line_no) +1
+		     */
+		    }else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_LINE_NO_BY_RECEIPT_ID")){
+		    	findColumn = "next_line_no";
+		    	String receiptId = RECEIPT_MAP.get(Utils.isNull(value));
+				sql.append(" select (max(line_no)+1) as next_line_no FROM t_receipt_line WHERE receipt_id = "+receiptId+" \n" );		
+                logger.info("sql:"+sql.toString());
+                
+				if( !Utils.isNull(value).equals("")){
+					ps = conn.prepareStatement(sql.toString());
+					rs = ps.executeQuery();
+					if(rs.next()){
+						id = rs.getString(findColumn);
+						if("".equals(Utils.isNull(id))){
+						   id = "1"; 
+						}
+					}else{
+						id = "1";
+					}
+				}	
+				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CANCEL_FLAG")){	
 				if(Utils.isNull(value).equals(Constants.INTERFACES_DOC_STATUS_VOID)){
 					id = "Y";
@@ -277,6 +364,44 @@ public class ExternalFunctionHelper {
 				if(Utils.isNull(lineArray[Integer.parseInt(values[1])]).equals("") || Utils.isNull(lineArray[Integer.parseInt(values[2])]).equals("")){
 					exe = false;
 				}
+			/** Get Role By UserName :V001 ->VAN  ,S101 -> TT  **/
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ROLE_BY_USER")){	
+				id = "";
+				if(userBean.getUserName().startsWith("V")){
+					id = "VAN";
+				}else if(userBean.getUserName().startsWith("S")){
+					id ="TT";
+				}
+				
+				exe = false;
+			/** Get Code of Payment Method **/	
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_PAYMENT_METHOD_CODE")){
+				findColumn = "value";
+				sql.append("  select max("+findColumn+") as "+findColumn+" FROM c_reference WHERE code = 'PaymentMethod' and name like'%"+Utils.isNull(value)+"%'");		
+				if(Utils.isNull(value).equals("")){
+					exe = false;
+				}
+				
+			/** Find order_id by ar_invoice_no **/
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_ORDER_ID_BY_AR_INVOICE_NO")){
+				findColumn = "ORDER_ID";
+				sql.append("  select "+findColumn+" FROM t_order WHERE ar_invoice_no = '"+value+"'" );		
+				if(Utils.isNull(value).equals("")){
+					exe = false;
+				}	
+			
+			/** Find order_line_id by ar_invoice_no **/
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_ORDER_LINE_ID_BY_AR_INVOICE_NO")){
+				findColumn = "ORDER_LINE_ID";
+				sql.append("  select "+findColumn+" FROM t_order_line WHERE ar_invoice_no = '"+value+"'" );		
+				if(Utils.isNull(value).equals("")){
+					exe = false;
+				}	
+				
+			/** GET Order Type  **/
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ORDER_TYPE")){	
+				id =  userBean.getOrderType().getKey();
+				exe = false;
 			}else{
 				exe = false;
 			}
