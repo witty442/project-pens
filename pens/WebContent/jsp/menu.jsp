@@ -274,6 +274,9 @@ User user = (User)session.getAttribute("user");
 		        <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderAction.do?do=prepare&action=new&moveOrderType=MoveOrderReturn';"><span>รายการใบคืนสินค้า</span></a>
 		        </li>
+		         <%-- <li>
+		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderSummaryAction.do?do=prepare&action=new';"><span>รายงานสรุป ใบเบิก/คืน  </span></a>
+		        </li> --%>
 		     </ul>
 	     </li>
 	 <%} %>
