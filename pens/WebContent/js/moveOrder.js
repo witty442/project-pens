@@ -113,26 +113,22 @@ function clearForm(path){
 	return true;
 }
 
-function add_product(path, id){
-	window.open(path + "/jsp/pop/productPopup.jsp?id=" + id, "Product", "width=939,height=450,location=No,resizable=No");
-	return;
-}
-
 function open_product(path, rowNo){
 	if(rowNo==null)
-		window.open(path + "/jsp/moveOrder/moveOrderProductPopup.jsp", "Product", "width=939,height=450,location=No,resizable=No");
+		window.open(path + "/jsp/moveOrder/moveOrderProductPopup.jsp", "Product", "width=700,height=400,location=No,resizable=No");
 	else
-		window.open(path + "/jsp/moveOrder/moveOrderProductPopup.jsp?row="+rowNo, "Product", "width=939,height=450,location=No,resizable=No");
+		window.open(path + "/jsp/moveOrder/moveOrderProductPopup.jsp?row="+rowNo, "Product", "width=700,height=400,location=No,resizable=No");
 	return;
 }
 
 function open_product_premium(path, rowNo){
 	if(rowNo==null)
-		window.open(path + "/jsp/moveOrder/moveOrderProductPremiumPopup.jsp", "Product", "width=939,height=450,location=No,resizable=No");
+		window.open(path + "/jsp/moveOrder/moveOrderProductPremiumPopup.jsp", "Product", "width=700,height=400,location=No,resizable=No");
 	else
-		window.open(path + "/jsp/moveOrder/moveOrderProductPremiumPopup.jsp?row="+rowNo, "Product", "width=939,height=450,location=No,resizable=No");
+		window.open(path + "/jsp/moveOrder/moveOrderProductPremiumPopup.jsp?row="+rowNo, "Product", "width=700,height=400,location=No,resizable=No");
 	return;
 }
+
 /** Product Table */
 function addProduct2(path,objValue){
 	
