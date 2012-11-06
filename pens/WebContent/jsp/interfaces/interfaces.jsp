@@ -355,7 +355,7 @@ body {
 								<td align="center" width ="100%">
 								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtn" style="width: 160px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
 								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtn" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=500px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
+								    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
 								</td>
 							</tr>
 						</table>

@@ -357,13 +357,7 @@ function onQty2KeyPressNextTab(e){
 		<td align="right">แบรนด์</td>
 		<td align="left">
 			<select id="pBrand" name="pBrand" onchange="loadProductOnblur(null);">
-			  <option value=""></option>
-			  <%if(brandList != null){ 
-			     for(int i=0;i<brandList.size();i++){
-			    	 References rb = (References)brandList.get(i);
-			  %>
-			     <option value="<%=rb.getCode()%>"><%=rb.getCode() %></option>
-			    <%}} %>
+			  <option value="">สินค้าของแถม</option>
 			</select>
 		</td>
 	</tr>

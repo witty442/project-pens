@@ -41,14 +41,11 @@ body {
 				<tr>
 			        <td>
 			        	<jsp:include page="menu.jsp"/>
-			        	<%if(role.equals(User.DD)){ %>
-			        		<br/>
-							<jsp:include page='../jsp/member/memberRenewView.jsp'/>
-						<%} %>
 			       	</td>
 				</tr>
 	    	</table>
 	    	</div>
+	    	
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
@@ -57,6 +54,8 @@ body {
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<jsp:include page="contentbottom.jsp"/>
         </td>
+        
+        
         <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
     <tr>
@@ -72,7 +71,7 @@ body {
 
 <script>
   $(function() {
-	$("#dialog").dialog({ height: 250,width:300 });
+	$("#dialog").dialog({ height: 250,width:300,modal:true });
   });
  
  function close(){

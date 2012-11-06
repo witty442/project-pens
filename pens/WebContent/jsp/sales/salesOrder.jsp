@@ -89,11 +89,11 @@ body {
 
 -->
 
-.currPage{ border:1px solid #000000; padding:4px; }
-.pageLink{padding:4px;}
-.paging{height:20px;width:100%;}
-.catalog{text-align:center;padding-top:4px;/*background-color:#FFCC99;*/}
-.brandName{width:140px;vertical-align:top;}
+.currPage{ border:1px solid #000000; padding-left:4px;padding-right:4px;padding-top:2px; }
+.pageLink{padding-left:4px;padding-right:2px;padding-top:2px; }
+.paging{height:18px;width:100%;}
+.catalog{text-align:center;/*background-color:#FFCC99;*/}
+.brandName{width:120px;vertical-align:top;}
 
 table#productList thead{background:#FFE4CA;}
 .qtyInput{width:35px; text-align:right;}
@@ -186,8 +186,8 @@ function loadMe(){
 $(function(){
 	  $('#brand-dialog').dialog({
 						autoOpen: false,
-						width: 600,
-						modal:true,
+						width: 550,
+						height:425,
 						title:"เลือกกลุ่มสินค้า",
 						buttons: {
 							"OK": function() { addProductToSalesOrder(); }, 

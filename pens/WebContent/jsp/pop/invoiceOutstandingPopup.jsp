@@ -42,7 +42,7 @@ function loadMe(path){
 </head>
 <body onload="loadMe('${pageContext.request.contextPath}');" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <!-- BODY -->
-<html:form action="/jsp/memberRenewAction">
+<html:form action="/jsp/tempAction">
 <!-- INCLUDE -->
 <jsp:include page="../program.jsp">
 	<jsp:param name="system" value=""/>

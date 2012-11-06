@@ -43,8 +43,6 @@
 		<!-- INVENTORY TRANSACTION -->
 		<form-bean name="inventoryTransactionForm"
 			type="com.isecinc.pens.web.inventorytransaction.InventoryTransactionForm" />
-		<!-- MEMBER -->
-		<form-bean name="memberForm" type="com.isecinc.pens.web.member.MemberForm" />
 		<!-- SALES ORDER -->
 		<form-bean name="orderForm" type="com.isecinc.pens.web.sales.OrderForm" />
 		<!-- TRIP -->
@@ -53,15 +51,8 @@
 		<form-bean name="modifierForm" type="com.isecinc.pens.web.modifier.ModifierForm" />
 		<!-- RECEIPT -->
 		<form-bean name="receiptForm" type="com.isecinc.pens.web.receipt.ReceiptForm" />
-		<!-- MEMBER RENEW -->
-		<form-bean name="memberRenewForm"
-			type="com.isecinc.pens.web.memberrenew.MemberRenewForm" />
-		<!-- MEMBER FOLLOW -->
-		<form-bean name="memberFollowForm"
-			type="com.isecinc.pens.web.memberfollow.MemberFollowForm" />
-		<!-- MEMBER IMPORT -->
-		<form-bean name="memberImportForm"
-			type="com.isecinc.pens.web.dataimports.member.MemberImportForm" />
+		<!-- TEMP Form -->
+		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 		<!-- SHIPMENT REPORT -->
 		<form-bean name="shipmentReportForm"
 			type="com.isecinc.pens.web.report.shipment.ShipmentReportForm" />
@@ -77,9 +68,6 @@
 		<!-- SHIPMENT BENECOL REPORT -->
 		<form-bean name="shipmentBenecolReportForm"
 			type="com.isecinc.pens.web.report.shipmentbenecol.ShipmentBenecolReportForm" />
-		<!-- RECEIVE BENECOL REPORT -->
-		<form-bean name="receiveBenecolReportForm"
-			type="com.isecinc.pens.web.report.receivebenecol.ReceiveBenecolReportForm" />
 		<!-- RECEIVE BAG REPORT -->
 		<form-bean name="receiveBagReportForm"
 			type="com.isecinc.pens.web.report.receivebag.ReceiveBagReportForm" />
@@ -101,9 +89,6 @@
 		<!-- Sales Analyst -->
 		<form-bean name="salesAnalystReportForm"
 			type="com.isecinc.pens.web.report.salesanalyst.SalesAnalystReportForm" />
-		<!-- Member Order Import -->
-		<form-bean name="memberOrderImportForm"
-			type="com.isecinc.pens.web.dataimports.memberorder.MemberOrderImportForm" />
 		<!-- Manage Order Receipt -->
 		<form-bean name="manageOrderReceiptForm"
 			type="com.isecinc.pens.web.admin.ManageOrderReceiptForm" />
@@ -279,53 +264,11 @@
 				path="/jsp/productMovement/productMovementSearch.jsp" />
 		</action>
 
-		<!-- MEMBER -->
-		<action name="memberForm" path="/jsp/member" forward="/jsp/member/memberSearch.jsp" />
-		<action name="memberForm" path="/jsp/memberAction" parameter="do"
-			scope="request" type="com.isecinc.pens.web.member.MemberAction">
-			<forward name="search" path="/jsp/member/memberSearch.jsp" />
-			<forward name="prepare" path="/jsp/member/member.jsp" />
-			<forward name="re-search" path="/jsp/member/memberSearch.jsp" />
-			<forward name="clearform" path="/jsp/member/memberSearch.jsp" />
-			<forward name="view" path="/jsp/member/memberView.jsp" />
-			<forward name="cancel-member" path="/jsp/pop/cancelMemberPopup.jsp" />
-		</action>
-
-		<!-- MEMBER RENEW -->
-		<action name="memberRenewForm" path="/jsp/memberrenew"
-			forward="/jsp/member/memberRenewSearch.jsp" />
-		<action name="memberRenewForm" path="/jsp/memberRenewAction"
+	    <!--  TEMP Form -->
+		<action name="tempForm" path="/jsp/tempAction"
 			parameter="do" scope="request"
-			type="com.isecinc.pens.web.memberrenew.MemberRenewAction">
-			<forward name="search" path="/jsp/member/memberRenewSearch.jsp" />
-			<forward name="re-search" path="/jsp/member/memberRenewSearch.jsp" />
-			<forward name="clearform" path="/jsp/member/memberRenewSearch.jsp" />
-			<forward name="view" path="/jsp/member/memberView.jsp" />
-			<forward name="show" path="/jsp/mainpage.jsp" />
-			<forward name="add" path="/jsp/pop/memberRenewPopup.jsp" />
-		</action>
-
-		<!-- MEMBER FOLLOW -->
-		<action name="memberFollowForm" path="/jsp/memberfollow"
-			forward="/jsp/pop/memberFollowPopup.jsp" />
-		<action name="memberFollowForm" path="/jsp/memberFollowAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.memberfollow.MemberFollowAction">
-			<forward name="search" path="/jsp/pop/memberFollowPopup.jsp" />
-			<forward name="re-search" path="/jsp/memberFollowAction.do?do=search" />
-		</action>
-
-		<!-- MEMBER IMPORT -->
-		<action name="memberImportForm" path="/jsp/memberimport"
-			forward="/jsp/dataimports/memberImport.jsp" />
-		<action name="memberImportForm" path="/jsp/memberImportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.dataimports.member.MemberImportAction">
-			<forward name="clearform" path="/jsp/dataimports/memberImport.jsp" />
-			<forward name="view" path="/jsp/dataimports/memberImportView.jsp" />
-			<!-- for paging -->
-			<forward name="paging" path="/jsp/dataimports/memberImportView.jsp" />
-			<!-- for paging -->
+			type="com.isecinc.pens.web.temp.TempAction">
+			<forward name="prepare" path="/jsp/pop/invoiceOutstandingPopup.jsp" />
 		</action>
 
 		<!-- SALES ORDER -->
@@ -469,16 +412,6 @@
 			<forward name="clearform" path="/jsp/reports/shipmentBenecolReport.jsp" />
 		</action>
 
-		<!-- RECEIVE BENECOL REPORT -->
-		<action name="receiveBenecolReportForm" path="/jsp/receiveBenecolReport"
-			forward="/jsp/reports/receiveBenecolReport.jsp" />
-		<action name="receiveBenecolReportForm" path="/jsp/receiveBenecolAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.receivebenecol.ReceiveBenecolReportAction">
-			<forward name="report" path="/jsp/reports/receiveBenecolReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/receiveBenecolReport.jsp" />
-		</action>
-
 		<!-- RECEIVE BAG REPORT -->
 		<action name="receiveBagReportForm" path="/jsp/receiveBagReport"
 			forward="/jsp/reports/receiveBagReport.jsp" />
@@ -564,41 +497,12 @@
 			<forward name="clearform" path="/jsp/salesAnalyst/sales_analyst.jsp" />
 		</action>
 
-		<!-- Member Order Import -->
-		<action name="memberOrderImportForm" path="/jsp/memberOrderImport"
-			forward="/jsp/memberOrderImportAction.do?do=prepare" />
-		<action name="memberOrderImportForm" path="/jsp/memberOrderImportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.dataimports.memberorder.MemberOrderImportAction">
-			<forward name="import" path="/jsp/dataimports/memberOrderImport.jsp" />
-			<forward name="importOrder" path="/jsp/dataimports/memberOrderImportResult.jsp" />
-		</action>
-
-		<!-- Member Order Modifier -->
-		<action name="orderForm" path="/jsp/memberOrder"
-			forward="/jsp/memberorder/memberOrderSearch.jsp" />
-		<action name="orderForm" path="/jsp/memberOrderAction"
-			parameter="do" scope="request" type="com.isecinc.pens.web.sales.MemberOrderAction">
-			<forward name="mosearch" path="/jsp/memberorder/memberOrderSearch.jsp" />
-			<forward name="clearform" path="/jsp/memberorder/memberOrderSearch.jsp" />
-			<forward name="prepare" path="/jsp/memberorder/memberOrderEdit.jsp" />
-		</action>
-
 		<!-- Member Receipt -->
 		<action name="receiptForm" path="/jsp/memberReceiptAction"
 			parameter="do" scope="request"
 			type="com.isecinc.pens.web.receipt.MemberReceiptAction">
 			<forward name="prepareMR" path="/jsp/receipt/memberReceipt.jsp" />
 			<forward name="viewMR" path="/jsp/receipt/memberReceiptView.jsp" />
-		</action>
-
-		<!-- BENECOL SUMMARY REPORT -->
-		<action path="/jsp/benecolSummaryReport" forward="/jsp/reports/benecolSummaryReport.jsp" />
-		<action path="/jsp/benecolSummaryReportAction" parameter="do"
-			scope="request"
-			type="com.isecinc.pens.web.report.summary.BenecolSummaryReportAction">
-			<forward name="report" path="/jsp/reports/benecolSummaryReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/benecolSummaryReport.jsp" />
 		</action>
 
 		<!-- Manage Order Receipt -->

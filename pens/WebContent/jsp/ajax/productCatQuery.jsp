@@ -58,7 +58,7 @@ if(productCatL != null && productCatL.size() > 0){
 %>
 	<% if (newRow) { %><tr><% } %>
 	<td id="<%=productCatCode%>" class="catalog" <%=style%> >
-		<img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="68" width="68" onerror="imgError(this);" 
+		<img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="50" width="68" onerror="imgError(this);" 
 						onclick="loadProducts(<%=productCatCode%>)"/>
 	<br><p class="brandName"><%=productCatCode+"-"+productCatName%></p></td>
 	<% if (closeRow) { %></tr><% } %>

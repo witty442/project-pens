@@ -125,19 +125,19 @@ function loadMe(){
 								</html:select></td>
 						   </tr>
 						<tr>
-							<td align="left">
+							<td align="left" nowrap>
 							  จากวันที่ทำรายการ&nbsp;&nbsp;<html:text property="summary.requestDateFrom" styleId="requestDateFrom" readonly="true" size="10"/>
 							  ถึง วันที่รายการ&nbsp;&nbsp;<html:text property="summary.requestDateTo" styleId="requestDateTo" readonly="true" size="10"/>
 							</td>
 						</tr>
 						<tr>
-							<td align="left">
+							<td align="left" nowrap>
 							   จาก รหัสสินค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="summary.productCodeFrom" size="10"/>
 							   ถึง รหัสสินค้า&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="summary.productCodeTo" size="10"/>
 							</td>
 						</tr>
 						 <tr>
-							<td align="left">สถานะเอกสาร&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<td align="left" nowrap>สถานะเอกสาร&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							      <html:select property="summary.status">
 									<html:options collection="statusTypes" property="key" labelProperty="name"/>
 								  </html:select>
@@ -149,7 +149,7 @@ function loadMe(){
 							</td>
 						</tr>
 						 <tr>
-							<td align="left">การแสดงผล&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<td align="left" nowrap>การแสดงผล&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							     <html:select property="summary.type">
 									<html:options collection="types" property="key" labelProperty="name"/>
 								  </html:select>

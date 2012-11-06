@@ -233,7 +233,7 @@ function loadMe(){
 									<c:if test="${customervisitForm.visit.isActive!='C'}">
 									<a href="#" onclick="prepare('${pageContext.request.contextPath}','edit','${customervisitForm.visit.id}');">
 									<!--<img src="${pageContext.request.contextPath}/images/b_edit.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="แำก้ไขรายการ" class="newPosBtnLong">
+									<input type="button" value="แก้ไขรายการ" class="newPosBtnLong">
 									</a>
 									</c:if>
 									</c:if>	

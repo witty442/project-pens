@@ -5,7 +5,7 @@
 		<td width="44px;"><img src="${pageContext.request.contextPath}/images2/footer_left2.png" border="0"/></td>
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
         	Application Version
-			 <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=800px,height=600px')" title="Configuration">
+			 <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=800px,height=400px')" title="Configuration">
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			 </a>
 		</td>
