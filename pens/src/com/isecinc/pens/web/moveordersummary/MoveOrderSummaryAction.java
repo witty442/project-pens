@@ -3,10 +3,6 @@ package com.isecinc.pens.web.moveordersummary;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,53 +12,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
-import util.DateToolsUtil;
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.Member;
-import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderSummary;
-import com.isecinc.pens.bean.Order;
-import com.isecinc.pens.bean.OrderLine;
-import com.isecinc.pens.bean.Receipt;
-import com.isecinc.pens.bean.ReceiptBy;
-import com.isecinc.pens.bean.ReceiptCN;
-import com.isecinc.pens.bean.ReceiptLine;
-import com.isecinc.pens.bean.ReceiptMatch;
-import com.isecinc.pens.bean.ReceiptMatchCN;
-import com.isecinc.pens.bean.Summary;
-import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.FTPManager;
-import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MMember;
-import com.isecinc.pens.model.MMemberProduct;
 import com.isecinc.pens.model.MMoveOrder;
-import com.isecinc.pens.model.MOrder;
-import com.isecinc.pens.model.MOrderLine;
-import com.isecinc.pens.model.MReceipt;
-import com.isecinc.pens.model.MReceiptBy;
-import com.isecinc.pens.model.MReceiptCN;
-import com.isecinc.pens.model.MReceiptLine;
-import com.isecinc.pens.model.MReceiptMatch;
-import com.isecinc.pens.model.MReceiptMatchCN;
-import com.isecinc.pens.model.MSummary;
-import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.model.MUser;
-import com.isecinc.pens.web.interfaces.InterfacesForm;
-import com.isecinc.pens.web.sales.OrderForm;
 
 /**
  * Summary Action
@@ -82,6 +38,7 @@ public class MoveOrderSummaryAction extends I_Action {
 		try {
 			 logger.debug("prepare");
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
+				 summaryForm.setSummary(null);
 				 summaryForm.setResults(null);
 			 }
 			
@@ -102,6 +59,7 @@ public class MoveOrderSummaryAction extends I_Action {
 		try {
 			logger.debug("prepare 2");
 			if("new".equalsIgnoreCase(request.getParameter("action"))){
+				summaryForm.setSummary(null);
 				summaryForm.setResults(null);
 			 }
 		} catch (Exception e) {
@@ -184,7 +142,6 @@ public class MoveOrderSummaryAction extends I_Action {
 			moveOrderType = form.getSummary().getMoveOrderType().equals(MMoveOrder.MOVE_ORDER_REQUISITION)?"ใบเบิกสินค้า":"ใบคืนสินค้า";
 			moveOrderTypeDisp = form.getSummary().getMoveOrderType().equals(MMoveOrder.MOVE_ORDER_REQUISITION)?"เบิกสินค้าจาก PD":"คืนสินค้าเข้า PD";
 			
-			
 			isTotal = form.getSummary().getType().equals("TOTAL")?true:false;
 			colspan = form.getSummary().getType().equals("TOTAL")?9:11;
 			
@@ -198,10 +155,20 @@ public class MoveOrderSummaryAction extends I_Action {
 			h.append("<td align='left' colspan='"+colspan+"' >หน่วยรถ:"+user.getUserName()+" "+user.getName()+"</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"' >วันที่เรียกข้อมูล:"+form.getSummary().getRequestDateFrom()+"  ถึงวันที่ขาย:"+form.getSummary().getRequestDateTo()+"</td> \n");
-			h.append("</tr> \n");
-
+			if( !Utils.isNull(form.getSummary().getRequestDateFrom()).equals("") 
+				&&  !Utils.isNull(form.getSummary().getRequestDateTo()).equals("") ){
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ทำรายการ:"+form.getSummary().getRequestDateFrom()+"  ถึง:"+form.getSummary().getRequestDateTo()+"</td> \n");
+				h.append("</tr> \n");
+			}
+			
+			if( !Utils.isNull(form.getSummary().getProductCodeFrom()).equals("") 
+					&&  !Utils.isNull(form.getSummary().getProductCodeTo()).equals("") ){
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colspan+"' >จาก รหัสสินค้า:"+form.getSummary().getProductCodeFrom()+"  ถึง:"+form.getSummary().getProductCodeTo()+"</td> \n");
+				h.append("</tr> \n");
+			}
+			
 			h.append("<tr> \n");
 			h.append("<td align='left' colspan='"+colspan+"' >รูปแบบการพิมพ์ :"+(isTotal?"แสดงผลรวม":"แสดงรายละเอียด")+" </td>\n");
 			h.append("</tr> \n");

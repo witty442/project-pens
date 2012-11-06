@@ -35,7 +35,7 @@ public class RunScriptDBAction {
 
 	}
 	
-	public static void runProcess(ServletContext sc ){
+	public static void runProcessOnStartSalesApp(ServletContext sc ){
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
@@ -107,53 +107,6 @@ public class RunScriptDBAction {
 		}
 	}
 	
-	
-	/**
-	 * runManualScriptProcessBySalesCode
-	 * @param userName
-	 * process : run In BatchExportManager : run manaul script db 
-	 * ex fileName : script_V107.sql  >success move to Script-In-Processed
-	 */
-	public static void runManualScriptProcess_OLDCODE(String userName){
-		EnvProperties env = EnvProperties.getInstance();
-		String resultStr ="";
-		Connection conn = null;
-		try{
-			logger.info("Start runManualScriptProcessBySalesCode OLDCODE ");
-			
-			conn = DBConnection.getInstance().getConnection();
-			
-			//read data from FTP /Manual_script 
-			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.script.in")+"script_"+userName+".sql","TIS-620");
-			
-			//logger.info("scriptData:"+scriptData);
-			
-			// Excute Script
-			if( !Utils.isNull(scriptData).equals("")){
-				resultStr = excUpdate(conn,Utils.isNull(scriptData));
-				logger.info("resultExeSctipt:"+resultStr);
-			}
-			
-			// delete and Create new  File Ftp To In Processs
-			ftpManager.deleteFileFTP(env.getProperty("path.manual.script.in"), "script_"+userName+".sql");
-			
-			resultStr += "\n "+scriptData;
-			
-			//rename fileName
-			String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
-			ftpManager.uploadFileToFTP(env.getProperty("path.manual.script.in.processed"), fileName, resultStr, "TIS-620");
-			
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}finally{
-			try{
-				if(conn != null){
-					conn.close();conn= null;
-				}
-			}catch(Exception e){}
-		}
-	}
 	
 	/**
 	 * 
@@ -232,15 +185,15 @@ public class RunScriptDBAction {
 			if( !Utils.isNull(scriptData).equals("")){
 				resultStr = excUpdate(conn,Utils.isNull(scriptData));
 				logger.info("resultExeSctipt:"+resultStr);
+			
+				// delete and Create new  File Ftp To In Processs
+				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+userName+".sql");
+			
+				//rename fileName
+				String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
+			
 			}
-			
-			// delete and Create new  File Ftp To In Processs
-			ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+userName+".sql");
-			
-			//rename fileName
-			String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
-			ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
-			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -467,7 +420,7 @@ public class RunScriptDBAction {
 			/** Update monitor_item proe_rel fileName wrong **/
 			 /** 2012 10 15 1030 1-PROREL.txt **/
 			
-			sql.append("  select id from monitor_item where id in(select max(id) from monitor_item where table_name ='m_relation_modifier') \n");
+			/*sql.append("  select id from monitor_item where id in(select max(id) from monitor_item where table_name ='m_relation_modifier') \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -482,7 +435,7 @@ public class RunScriptDBAction {
 				ps = conn.prepareStatement(sql.toString());
 				logger.debug("update monitor_item result:"+ps.executeUpdate());
 			}	
-			
+			*/
 		
 		}catch(Exception e){
 	     logger.error("Error don't check drop table temp"+e.getMessage());

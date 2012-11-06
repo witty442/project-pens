@@ -1,8 +1,6 @@
 package com.isecinc.pens.process.order;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,32 +11,24 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
-import com.isecinc.pens.bean.Member;
-import com.isecinc.pens.bean.MemberProduct;
-import com.isecinc.pens.bean.MemberRenew;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
-import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.ReceiptMatch;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.model.MMemberRenew;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MProduct;
-import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.model.MUOM;
 
 /**
  * Order Process Class
@@ -50,110 +40,7 @@ import com.isecinc.pens.model.MUOM;
 public class OrderProcess {
 	private Logger logger = Logger.getLogger("PENS");
 
-	/*
-	 * Generate Sale Order Line from member
-	 */
-	public List<OrderLine> generateLine(Member member, Order order, String defineFirstRound) throws Exception {
-		logger.debug("Generate Member Lines...");
-
-		List<OrderLine> listOrderLine = new ArrayList<OrderLine>();
-
-		// int months = Integer.parseInt(member.getMemberType()) * 3;
-		int months = Integer.parseInt(member.getMemberType());
-		int days = months * 30;
-		int rounds = days / (new Double(member.getRoundTrip()).intValue());
-		// int qty = rounds * member.getOrderAmountPeriod();
-
-		OrderLine orderLine = null;
-		int lineNo = 1;
-		int tripNo = 1;
-		int j = -1;
-		int size = member.getMemberProducts().size();
-		MProductPrice productPrice = new MProductPrice();
-		List<ProductPrice> pps;
-		List<MemberRenew> mRenews = new MMemberRenew().lookUp(member.getId());
-		List<MemberRenew> mRenewsMax = new MMemberRenew().lookUpLast(member.getId());
-		
-		MUOM muom = new MUOM();
-		MProduct mProduct = new MProduct();
-
-		for (int i = 0; i < rounds; i++) {
-			for (MemberProduct mp : member.getMemberProducts()) {
-				pps = null;
-				orderLine = new OrderLine();
-				orderLine.setPromotion("N");
-				orderLine.setTripNo(tripNo);
-				orderLine.setProduct(mProduct.find(String.valueOf(mp.getProduct().getId())));
-				orderLine.setQty(mp.getOrderQty());
-				orderLine.setUom(muom.find(String.valueOf(mp.getUomId())));
-
-				// get Product Price
-				pps = productPrice.getCurrentPrice(String.valueOf(orderLine.getProduct().getId()), String.valueOf(order
-						.getPriceListId()), orderLine.getUom().getId());
-
-				for (ProductPrice pp : pps) {
-					orderLine.setPrice(pp.getPrice());
-				}
-				orderLine.setLineAmount(orderLine.getQty() * orderLine.getPrice());
-				orderLine.setDiscount(0);
-				orderLine.setTotalAmount(orderLine.getLineAmount() - orderLine.getDiscount());
-				if (i == 0) {
-
-					if (ConvertNullUtil.convertToString(defineFirstRound).length() > 0) {
-						// Define First Round Day
-						orderLine.setShippingDate(defineFirstRound);
-						orderLine.setRequestDate(defineFirstRound);
-					} else {
-						// Common Calculate on Register Date or Renew Date
-						if (mRenews.size() == 0) {
-							/*orderLine.setShippingDate(calShippingDate(order.getShippingDay(), member.getRegisterDate(),
-									i));
-							orderLine.setRequestDate(calShippingDate(order.getShippingDay(), member.getRegisterDate(),
-									i));*/
-							//logger.debug("firstDeliverlyDate()--->"+member.getFirstDeliverlyDate());
-							
-							if(!member.getFirstDeliverlyDate().isEmpty()){
-								orderLine.setShippingDate(calShippingDate(order.getShippingDay(), member.getFirstDeliverlyDate(),
-										i));
-								orderLine.setRequestDate(calShippingDate(order.getShippingDay(), member.getFirstDeliverlyDate(),
-										i));
-							}else{
-								
-								orderLine.setShippingDate(calShippingDate(order.getShippingDay(), member.getRegisterDate(),
-								i));
-								
-								orderLine.setRequestDate(calShippingDate(order.getShippingDay(), member.getRegisterDate(),
-								i));
-							}
-							
-						} else {
-							/*orderLine.setShippingDate(calShippingDate(order.getShippingDay(), mRenews.get(
-									mRenews.lastIndexOf(mRenews)).getRenewedDate(), i));
-							orderLine.setRequestDate(calShippingDate(order.getShippingDay(), mRenews.get(
-									mRenews.size() - 1).getRenewedDate(), i));*/
-							
-							
-							orderLine.setShippingDate(calShippingDate(order.getShippingDay(), mRenews.get(
-									mRenewsMax.size() - 1).getRenewedDate(), i));
-							orderLine.setRequestDate(calShippingDate(order.getShippingDay(), mRenews.get(
-									mRenewsMax.size() - 1).getRenewedDate(), i));
-						}
-					}
-				} else {
-					orderLine.setShippingDate(addDate(listOrderLine.get(j).getShippingDate(),
-							7 * calWeekByRoundtrip(member.getRoundTrip())));
-					orderLine.setRequestDate(addDate(listOrderLine.get(j).getRequestDate(),
-							7 * calWeekByRoundtrip(member.getRoundTrip())));
-				}
-				orderLine.setLineNo(lineNo++);
-				listOrderLine.add(orderLine);
-			}
-			j = j + size;
-			tripNo++;
-		}
-
-		return listOrderLine;
-	}
+	
 
 	/**
 	 * Cal Shipment Date
@@ -615,75 +502,6 @@ public class OrderProcess {
 		return false;
 	}
 
-	/**
-	 * Check sale order in register date or renew date and member expire date.
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean isWithinDateRange(Member member) throws Exception {
-		boolean result = false;
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-		String regisDate = "";
-		String expireDate = "";
-
-		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
-
-			// check renew date, get register date and expire date from m_member_renew
-			sql.delete(0, sql.length());
-			sql.append(" SELECT MAX(mr.RENEWED_DATE) AS RENEWED_DATE ");
-			sql.append(" FROM m_member_renew mr ");
-			sql.append(" WHERE mr.CUSTOMER_ID = " + member.getId());
-
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			if (rst.next()) {
-				if (rst.getDate("RENEWED_DATE") != null)
-					regisDate = DateToolsUtil.convertToString(rst.getDate("RENEWED_DATE"));
-			}
-
-			// if not have renew date, get register date and expire date from m_customer
-			if (regisDate.equals("")) {
-				regisDate = member.getRegisterDate();
-			}
-			expireDate = member.getExpiredDate();
-
-			int count = 0;
-			sql.delete(0, sql.length());
-			sql.append(" SELECT COUNT(*) AS COUNT ");
-			sql.append(" FROM t_order t ");
-			sql.append(" WHERE t.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(regisDate) + "'");
-			sql.append(" AND t.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(expireDate) + "'");
-			sql.append(" AND t.CUSTOMER_ID = " + member.getId());
-
-			rst = stmt.executeQuery(sql.toString());
-			if (rst.next()) {
-				count = rst.getInt("COUNT");
-				if (count > 0) {
-					result = true;
-				}
-			}
-
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			try {
-				rst.close();
-			} catch (Exception e2) {}
-			try {
-				stmt.close();
-			} catch (Exception e2) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
-		}
-
-		return result;
-	}
 
 	/**
 	 * Create Auto Receipt

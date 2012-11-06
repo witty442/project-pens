@@ -11,18 +11,14 @@ import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.report.I_ReportProcess;
-import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.model.MMember;
 import com.isecinc.pens.model.MOrder;
-import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
-import com.isecinc.pens.web.sales.OrderForm;
 
 /**
  * InvoiceDetailReportProcess Report

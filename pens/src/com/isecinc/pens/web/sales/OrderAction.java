@@ -32,7 +32,6 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.OrgRuleBean;
@@ -47,7 +46,6 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MMember;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MOrgRule;
@@ -85,7 +83,6 @@ public class OrderAction extends I_Action {
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
 			Customer customer = null;
-			Member member = null;
 			int orderId = orderForm.getOrder().getId();
 
 			int customerId = 0;
@@ -120,26 +117,9 @@ public class OrderAction extends I_Action {
 					new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
 			orderForm.getOrder().setOrderTime(new SimpleDateFormat("HH:mm", new Locale("th", "TH")).format(new Date()));
 
-			
-			// GET PRICELIST
-			if(user.getOrderType().getKey().equalsIgnoreCase("DD")){
-				
-				member = new MMember().find(String.valueOf(customerId));
-				//logger.debug("member.getRegisterDate()--->"+member.getRegisterDate());
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"));
-				Date regDate = formatter.parse(member.getRegisterDate());
-				String regDateString = DateToolsUtil.convertToStringEng(regDate);		
-				
-				orderForm.getOrder().setPriceListId(
-						new MPriceList().getCurrentPriceListByCustomer(user.getOrderType().getKey(), 
-								regDateString).getId());		
-				
-			}else{
-				orderForm.getOrder().setPriceListId(
-						new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId());
-			}
-			
-			
+			//PriceListID
+			orderForm.getOrder().setPriceListId(new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId());
+
 			// user
 			orderForm.getOrder().setSalesRepresent(user);
 
@@ -217,13 +197,6 @@ public class OrderAction extends I_Action {
 			request.getSession().removeAttribute("isAdd");
 			if (((String) request.getSession().getAttribute("memberVIP")).equals("N")) {
 				// non-vip
-				if (user.getCustomerType().getKey().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
-					// Check order date in register date or renew date and expire date.
-					// if return false is not found , return true is found.
-					if (new OrderProcess().isWithinDateRange(member)) {
-						request.getSession(true).setAttribute("isAdd", "N");
-					}
-				}
 			}
 
 			// get Customer/Member Search Key
@@ -442,20 +415,7 @@ public class OrderAction extends I_Action {
 					orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
 					orderForm.getOrder().setVatCode(customer.getVatCode());
 					
-				} else {
-					// DD
-					Member member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-					orderForm.setOrder(new Order());
-					orderForm.getOrder().setCustomerId(member.getId());
-					orderForm.getOrder().setCustomerName(
-							(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-					// from customer or member
-					orderForm.getOrder().setPaymentTerm(member.getPaymentTerm());
-					orderForm.getOrder().setPaymentMethod(member.getPaymentMethod());
-					orderForm.getOrder().setVatCode(member.getVatCode());
-					orderForm.getOrder().setShippingDay(member.getShippingDate());
-					orderForm.getOrder().setShippingTime(member.getShippingTime());
-				}
+				} 
 				orderForm.getLines().clear();
 				return "prepare";
 			}
@@ -603,23 +563,9 @@ public class OrderAction extends I_Action {
 			// Re-Save
 			new MOrder().save(order, userActive.getId(), conn);
 
-			Member member = null;
-			if (orderForm.getOrder().getOrderType().equalsIgnoreCase(Receipt.DIRECT_DELIVERY)) {
-				// VAN && TT
-				member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-
-				// atiz.b 20110520 --member re-expired date with last order date
-				member.setExpiredDate(lastShipDate);
-				new MMember().save(member, userActive.getId(), conn);
-			}
-
 			// auto create receipt with member
 			if (orderForm.getAutoReceiptFlag().equalsIgnoreCase("Y")) {
 				String creditCardExpired = "";
-				if (member != null) {
-					// credit card
-					creditCardExpired = member.getCreditcardExpired();
-				}
 				new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), orderForm
 						.getBys(), creditCardExpired, userActive, conn);
 			}
@@ -753,17 +699,8 @@ public class OrderAction extends I_Action {
 			// Get Lines to Create Receipt
 			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
 
-			Member member = null;
-			if (orderForm.getOrder().getOrderType().equalsIgnoreCase(Receipt.DIRECT_DELIVERY)) {
-				// VAN && TT
-				member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-			}
 			String creditCardExpired = "";
-			if (member != null) {
-				// credit card
-				creditCardExpired = member.getCreditcardExpired();
-			}
-
+		
 			if (user.getType().equalsIgnoreCase(User.VAN)) {
 				// assign order no to receipt no
 				orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
@@ -820,14 +757,6 @@ public class OrderAction extends I_Action {
 		try {
 
 			request.getSession().removeAttribute("isAdd");
-			if (user.getCustomerType().getKey().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
-				// Check order date in register date or renew date and expire date.
-				// if return false is not found , return true is found.
-				Member member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-				if (new OrderProcess().isWithinDateRange(member)) {
-					request.getSession().setAttribute("isAdd", "N");
-				}
-			}
 
 			OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
 			orderForm.setCriteria(criteria);
@@ -926,16 +855,7 @@ public class OrderAction extends I_Action {
 			orderForm.setCriteria(new OrderCriteria());
 			orderForm.getOrder().setCustomerId(customer.getId());
 			orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
-		} else {
-			// DD
-			Member member = new MMember().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-			orderForm.setCriteria(new OrderCriteria());
-			orderForm.getOrder().setCustomerId(member.getId());
-			orderForm.getOrder().setCustomerName(
-					(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-			orderForm.getOrder().setPaymentTerm(member.getPaymentTerm());
-			orderForm.getOrder().setPaymentMethod(member.getPaymentMethod());
-		}
+		} 
 		orderForm.getOrder().setPricelistLabel(pricelistlabel);
 		orderForm.getOrder().setPriceListId(pricelistid);
 
@@ -970,7 +890,6 @@ public class OrderAction extends I_Action {
 		Order order = null;
 		List<OrderLine> lines = null;
 		Customer customer = null;
-		Member member = null;
 		Address address = null;
 		List<Address> addresses = new ArrayList<Address>();
 		try {
@@ -990,13 +909,9 @@ public class OrderAction extends I_Action {
 			lines = reportForm.getLines();
 			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
 
-			if (user.getType().equalsIgnoreCase(User.DD)) {
-				member = new MMember().find(String.valueOf(order.getCustomerId()));
-				addresses = new MAddress().lookUp(member.getId());
-			} else {
-				customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
-				addresses = new MAddress().lookUp(customer.getId());
-			}
+			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
+			addresses = new MAddress().lookUp(customer.getId());
+			
 			for (Address addr : addresses) {
 				if (addr.getPurpose().equalsIgnoreCase("S")) {
 					address = addr;
@@ -1021,14 +936,10 @@ public class OrderAction extends I_Action {
 			parameterMap.put("p_code", user.getCode());
 			parameterMap.put("p_name", user.getName());
 			parameterMap.put("p_taxNo", BeanParameter.getPensTaxNo());
-			if (user.getType().equalsIgnoreCase(User.DD)) {
-				parameterMap.put("p_customerCode", member.getCode());
-				parameterMap.put("p_customerName", member.getName() + " "
-						+ ConvertNullUtil.convertToString(member.getName2()));
-			} else {
-				parameterMap.put("p_customerCode", customer.getCode());
-				parameterMap.put("p_customerName", customer.getName());
-			}
+			
+			parameterMap.put("p_customerCode", customer.getCode());
+			parameterMap.put("p_customerName", customer.getName());
+			
 
 			lstData = new ArrayList<TaxInvoiceReport>();
 			int id = 1;
@@ -1042,15 +953,10 @@ public class OrderAction extends I_Action {
 				taxInvoice.setCode(user.getCode());
 				taxInvoice.setName(user.getName());
 
-				if (user.getType().equalsIgnoreCase(User.DD)) {
-					taxInvoice.setCustomerCode(member.getCode());
-					taxInvoice.setCustomerName(member.getName() + " "
-							+ ConvertNullUtil.convertToString(member.getName2()));
-				} else {
-					taxInvoice.setCustomerCode(customer.getCode());
-					taxInvoice.setCustomerName(customer.getName());
-				}
-
+			
+				taxInvoice.setCustomerCode(customer.getCode());
+				taxInvoice.setCustomerName(customer.getName());
+				
 				taxInvoice.setProductCode(line.getProduct().getCode());
 				taxInvoice.setProductName(line.getProduct().getName());
 				taxInvoice.setUomId(line.getProduct().getUom().getId());
@@ -1135,15 +1041,7 @@ public class OrderAction extends I_Action {
 				// credit van
 				List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 				orderForm.setLines(lines);
-			} else {
-				Member member = new MMember().find(String.valueOf(order.getCustomerId()));
-				if (member.getIsvip().equalsIgnoreCase("Y")) {
-					List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
-					orderForm.setLines(lines);
-				} else {
-					orderForm.setLines(lstLines);
-				}
-			}
+			} 
 			orderForm.setOrder(order);
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

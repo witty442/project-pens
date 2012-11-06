@@ -1,7 +1,6 @@
 package com.isecinc.pens.web.receipt;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import util.NumberToolsUtil;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Receipt;
@@ -33,8 +31,6 @@ import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MMember;
-import com.isecinc.pens.model.MMemberProduct;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MReceipt;
@@ -44,7 +40,6 @@ import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.web.sales.OrderForm;
 
 /**
  * Receipt Action
@@ -108,15 +103,7 @@ public class ReceiptAction extends I_Action {
 				receiptForm.getReceipt().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
 				receiptForm.getReceipt().setPaymentMethod(customer.getPaymentMethod());
 			} else {
-				// DD
-				// Default from member
-				Member member = new MMember().find(String.valueOf(customerId));
-				member.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
-				receiptForm.getReceipt().setCustomerId(member.getId());
-				receiptForm.getReceipt().setCustomerName(
-						(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-				// from customer or member
-				receiptForm.getReceipt().setPaymentMethod(member.getPaymentMethod());
+				
 			}
 			receiptForm.getReceipt().setOrderType(user.getOrderType().getKey());
 
@@ -368,12 +355,7 @@ public class ReceiptAction extends I_Action {
 			if (ConvertNullUtil.convertToString(receiptForm.getDeletedRecpById()).trim().length() > 0)
 				new MReceiptBy().delete(receiptForm.getDeletedRecpById().substring(1).trim(), conn);
 
-			Member member = null;
-			if (receipt.getOrderType().equalsIgnoreCase(Receipt.DIRECT_DELIVERY)) {
-				// VAN && TT
-				member = new MMember().find(String.valueOf(receiptForm.getReceipt().getCustomerId()));
-			}
-
+		
 			// Receipt By
 			MReceiptBy mReceiptBy = new MReceiptBy();
 			double receiptAmount = 0;
@@ -397,11 +379,6 @@ public class ReceiptAction extends I_Action {
 				by.setPaidAmount(paidAmount);
 				by.setRemainAmount(remainAmount);
 				by.setReceiptId(receipt.getId());
-				if (member != null) {
-					// credit card
-					if (by.getPaymentMethod().equalsIgnoreCase("CR"))
-						by.setCreditcardExpired(member.getCreditcardExpired());
-				}
 				
 				mReceiptBy.save(by, userActive.getId(), conn);				
 
@@ -502,18 +479,7 @@ public class ReceiptAction extends I_Action {
 			receiptForm.getReceipt().setCustomerId(customer.getId());
 			receiptForm.getReceipt().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
 			receiptForm.getReceipt().setPaymentMethod(customer.getPaymentMethod());
-		} else {
-			// DD
-			// Default from member
-			receiptForm.setCriteria(new ReceiptCriteria());
-			Member member = new MMember().find(String.valueOf(customerId));
-			member.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
-			receiptForm.getReceipt().setCustomerId(member.getId());
-			receiptForm.getReceipt().setCustomerName(
-					(member.getCode() + "-" + member.getName() + " " + member.getName2()).trim());
-			// from customer or member
-			receiptForm.getReceipt().setPaymentMethod(member.getPaymentMethod());
-		}
+		} 
 	}
 	
 	public ActionForward cancelReceipt(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -27,8 +27,6 @@ import com.isecinc.pens.inf.manager.ExportManager;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
-import com.isecinc.pens.inf.manager.WebMemberManager;
-import com.isecinc.pens.inf.manager.batchwork.BatchBackupDBWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 
@@ -291,53 +289,7 @@ public class InterfacesAction extends I_Action {
 	}
 	
 	
-	public ActionForward importWebMember(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Import :importWebMember");
-		InterfacesForm interfacesForm = (InterfacesForm) form;
-		User userLogin = (User) request.getSession().getAttribute("user");
-		WebMemberManager importManager =  new WebMemberManager();
-		User userRequest = new User();
-		try {
-			logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-			
-			/** Import Update Sales Transaction */
-			logger.debug("importAll:"+interfacesForm.getMonitorBean().isImportAll());
-			 String requestTable = "";
-	         String requestTableTransType = "";
-		     if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestWebMemberTable()).equals("")){
-				String[] exportArray = interfacesForm.getMonitorBean().getRequestWebMemberTable().split("\\|");
-				requestTable = exportArray[0];
-				requestTableTransType = exportArray[1];
-				
-				/** Case Admin Update By Request Table Replace UserId*/
-				String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestImportWebMemberUserName()+"%'";
-				if(Utils.isNull(interfacesForm.getMonitorBean().getRequestImportWebMemberUserName()).equals("")){
-					whereClause = "AND USER_NAME LIKE '%ADMIN%'";
-				}
-				User[] results = new MUser().search(whereClause);
-				if(results != null && results.length >0){
-					userRequest = results[0];
-				}
-			 }
-		     
-		    logger.debug("requestTable:"+interfacesForm.getMonitorBean().getRequestWebMemberTable());
-		    logger.debug("UserId Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
-		     
-			MonitorBean m = importManager.importMain(userLogin,userRequest, requestTable, request, interfacesForm.getMonitorBean().isImportAll());
-		    
-			/** Set for Progress Bar */
-			request.setAttribute("action", "submited");
-			request.setAttribute("id", m.getTransactionId());
-			
-			/** Chekc For ProgressBar  **/
-			request.setAttribute("transaction_count", "1");
-			
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return mapping.findForward("success");
-	}
+	
 	/**
 	 * Export To Txt
 	 */
