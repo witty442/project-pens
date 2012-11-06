@@ -12,6 +12,7 @@ import util.DBCPConnectionProvider;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptLine;
@@ -135,6 +136,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql += "  and rl.receipt_id in (select receipt_id from " + MReceipt.TABLE_NAME + " where doc_status = '"
 					+ Receipt.DOC_SAVE + "' ) ";
 
+			logger.debug("sql:\n"+sql);
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while (rst.next()) {
@@ -212,6 +215,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 				double cnAmt = cn.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
 				
 				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt);
+				
 				rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
 				
 				if (rl.getCreditAmount() > 0) 
@@ -234,6 +238,62 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		}
 		return pos;
 	}
+	
+	
+	public double lookCreditAmt(int customerId) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		double creditAmt  =0;
+		try {
+			String sql = "select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";
+			sql += "from t_order ";
+			sql += "where 1=1 ";
+			sql += "  and customer_id = " + customerId;
+			sql += "  and doc_status = 'SV' ";
+			sql += "  order by order_date desc, order_no desc ";
+
+			logger.debug("sql:"+sql);
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			ReceiptLine rl;
+			MCreditNote cn = new MCreditNote();
+			while (rst.next()) {
+				rl = new ReceiptLine();
+
+				rl.setOrder(new MOrder().find(rst.getString("order_id")));
+				rl.setInvoiceAmount(rst.getDouble("NET_AMOUNT"));
+				
+				double cnAmt = cn.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
+				
+				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt);
+				
+				rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
+				
+				if (rl.getCreditAmount() > 0) {
+					creditAmt += rl.getCreditAmount();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return creditAmt;
+	}
+	
 	
 	/**
 	 * 
