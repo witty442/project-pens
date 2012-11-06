@@ -58,7 +58,7 @@ public class ValidateImportHelper {
 				valueDispError = value;
 			}else if(Utils.isNull(colBean.getValidateFunc()).equalsIgnoreCase("VALIDATE_USER_ID")){
 				findColumn = "USER_ID";
-				sql = " select "+findColumn+" FROM ad_user WHERE USER_ID ='"+value+"'" ;
+				sql = " select "+findColumn+" FROM ad_user WHERE USER_ID ="+value+"" ;
 				if(Utils.isNull(value).equals("")){
 					exe = false;
 				}
@@ -215,16 +215,19 @@ public class ValidateImportHelper {
 				isRequireField = true;
 			}
 			
-			//logger.debug("Exc:"+exe);
+			logger.debug("Exc:"+exe);
 			/** Case Value Validate NOT NULL **/
 			if(exe){
-				//logger.debug("SQL:"+sql);
+				logger.debug("SQL:"+sql);
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
 				if(rs.next()){
+					//logger.info("rs.getString(findColumn):"+rs.getString(findColumn));
 					result = Utils.isNull(rs.getString(findColumn));
 				}
+				
+				logger.debug("result["+result+"]");
 				
 				/** Validate Exception  */
 				if(result.equals("")){
@@ -243,6 +246,7 @@ public class ValidateImportHelper {
 			
 			//logger.debug(msg);
 		}catch(Exception e){
+		
 			/** Throws Exception Case Exception unknow **/
 			ExceptionHandle.throwExceptionClass(classException,valueDispError,colBean.getColumnName());
 	   

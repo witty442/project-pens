@@ -18,38 +18,30 @@ public class ExternalProcess {
 		   
 		  //RunScript From FTP Server Folder :Manual-script
 		  RunScriptDBAction.runManualScriptProcess("import_before",userLogin);
-		 		
 	}
 	
 	public void processImportAfter(HttpServletRequest request,User userLogin){
 		  logger.info("--- After importProcess Start ---");
 		   
-		  RunScriptDBAction.runManualScriptProcess("import_after",userLogin);
-		 		
+		  RunScriptDBAction.runManualScriptProcess("import_after",userLogin);	
 	}
-	
-	
+
 	/******* export *********************************************/
 	public void processExportBefore(HttpServletRequest request,User userLogin){
-		  logger.info("--- Before ExportProcess Start ---");
+		 logger.info("--- Before ExportProcess Start ---");
 		   
 		 //RunScript From FTP Server Folder :Manual-script
 		 RunScriptDBAction.runManualScriptProcess("export_before",userLogin);
-		 		
 	}
 	
 	public void processExportAfter(HttpServletRequest request,User userLogin){
-		logger.info("--- PostExportProcess Start ---");
+		logger.info("--- after ExportProcess Start ---");
 		 
 		//DB BackUp DB and Transafer TO Ftp Server Folder:DB_Backup
 		new DBBackUpManager().process(request,userLogin);
 		
 		//RunScript From FTP Server Folder :Manual-script
 		RunScriptDBAction.runManualScriptProcess("export_after",userLogin);
-		
-		//OLD ManualScript Next version wil be remove 
-		RunScriptDBAction.runManualScriptProcess_OLDCODE(userLogin.getUserName());
-				
 	}
 	
 }

@@ -12,7 +12,6 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
-import com.isecinc.pens.inf.manager.WebMemberManager;
 import com.isecinc.pens.inf.manager.process.ExternalProcess;
 
 /**
@@ -56,9 +55,7 @@ public class BatchImportWorker extends BatchWorker {
 					MonitorBean monitorModel =(new UpdateSalesManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
 					logger.debug(" **********Result Import Control Transaction  By Request Table :"+monitorModel.getStatus()+" ******************");
 				}else if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equals(this.transType)){
-					logger.debug(" **********Start Import Web Member  By Request Table ******************");
-					MonitorBean monitorModel =(new WebMemberManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
-					logger.debug(" **********Result Import Web Member  By Request Table :"+monitorModel.getStatus()+" ******************");
+					
 				}else{
 					logger.debug(" **********Start Import Master ,Tranasaction  By Request Table ******************");
 					MonitorBean monitorModel =(new ImportManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);

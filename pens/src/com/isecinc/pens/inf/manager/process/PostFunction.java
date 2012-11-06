@@ -83,7 +83,8 @@ public class PostFunction {
     	    	    sqlManualList.add(sqlManualExe);
     	    	    
     	    	    //delete salestarget_new <> UserId Login
-    	    	    sqlManualExe = "delete from ad_user where user_name not in('admin','"+user.getUserName()+"');";
+    	    	    //sqlManualExe = "delete from ad_user where user_name not in('admin','"+user.getUserName()+"');";
+    	    	    sqlManualExe = "delete from ad_user where 1=1 and ( user_name not in('admin') and user_id not in("+user.getId()+") );";
     	    	    sqlManualList.add(sqlManualExe);
     	    	    
     	    	    for(int i = 0;i< sqlManualList.size();i++){
@@ -97,7 +98,6 @@ public class PostFunction {
 	    		    	}
 	    		    }
  	    		  }catch(Exception e){
- 	    			 
                        logger.error(e.getMessage(),e);
  	    		  }
    	    	 }
