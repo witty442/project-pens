@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.bean.Product"%>
 <%@page import="com.isecinc.pens.model.MProduct"%>
@@ -10,11 +11,12 @@ String desc="";
 String code="";
 String whereCause = "";
 Product[] results = null;
-
+User user = ((User)session.getAttribute("user"));
 try{
 	
 	if(pCode != null && pCode.length() > 0){
 		whereCause += " AND CODE = '" + pCode + "' AND ISACTIVE ='Y' ";
+		whereCause += " AND CODE NOT IN( SELECT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+user.getRole().getKey()+"') ";
 		
 		 if (pBrand != null && pBrand.trim().length() > 0) {
 			pBrand = new String(pBrand.getBytes("ISO8859_1"), "UTF-8");

@@ -157,17 +157,16 @@ function addRow(){
 	window.close();
 }
 
-
-
 //change pv
 function changePV(pvid){
 	$("#district").html("");
 	<%for(District d : districts){%>
 	if(pvid == <%=d.getProvinceId()%>){
-	$("<option value=<%=d.getId()%>><%=d.getName()%></option>").appendTo("#district");
+    	$("<option value=<%=d.getId()%>><%=d.getName()%></option>").appendTo("#district");
 	}
 	<%}%>
 }
+
 </script>
 </head>
 <body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">

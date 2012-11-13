@@ -70,7 +70,10 @@ function clearForm(path){
 /** ADDRESS */
 function open_address(path, rowNo, type){
 	if(rowNo==null){
-		window.open(path + "/jsp/pop/addressPopup.jsp", "Address", "width=939,height=400,location=No,resizable=No");
+		var address2 = document.getElementsByName('addr.purpose').length;
+		if(address2 < 2){
+		   window.open(path + "/jsp/pop/addressPopup.jsp", "Address", "width=939,height=400,location=No,resizable=No");
+     	}
 	}else{
 		window.open(path + "/jsp/pop/addressPopup.jsp?row="+rowNo+"&type="+type, "Address", "width=939,height=400,location=No,resizable=No");
 	}
@@ -176,14 +179,89 @@ function setValueToAddress(path, objValue){
 	var rowAddr = document.getElementsByName('addr.id').length;
 	document.getElementsByName('addr_id')[0].value = rowAddr;
 	
+	//alert(rowAddr);
+	
 	if(eval(document.getElementsByName('addr_id')[0].value)==1){
-		copyAddress(path, objValue);
+	   copyAddress(path, objValue);
+	}else{
+	   copyAddressCaseEdit(path, objValue);	
 	}
 	
 	return true;
 }
 
-//Aneak.t 24/01/2011
+function copyAddressCaseEdit(path, objValue){
+	
+	if(objValue.purpose=='S'){
+		objValue.row = 1;
+		objValue.purpose = 'B';
+		objValue.purposeLabel = 'Bill To';
+		objValue.id = document.getElementsByName('addr.id')[1].value;
+	}else{
+		objValue.row = 0;
+		objValue.purpose = 'S';
+		objValue.purposeLabel = 'Ship To';
+		objValue.id = document.getElementsByName('addr.id')[0].value;
+	}
+		
+	var tbl = document.getElementById('tblAddress');
+	
+	// address object split
+    var addressLabel="";
+    addressLabel+=(objValue.line1)+' ';
+	addressLabel+=(objValue.line2)+' ';
+	if(objValue.provinceLabel=='กรุงเทพฯ'||objValue.provinceLabel=='กรุงเทพมหานคร'){
+		addressLabel+="แขวง";
+		addressLabel+=(objValue.line3)+' ';
+		addressLabel+="เขต";
+		addressLabel+=(objValue.districtLabel)+' ';
+		addressLabel+="";
+    }else{
+    	addressLabel+="ตำบล";
+    	addressLabel+=(objValue.line3)+' ';
+    	addressLabel+="อำเภอ";
+    	addressLabel+=(objValue.districtLabel)+' ';
+    	addressLabel+="จังหวัด";
+	}
+	addressLabel+=(objValue.provinceLabel)+' ';
+	addressLabel+=(objValue.postcode)+' ';
+	
+	var proposeLabel="";
+	// proposeLabel+=(objValue.purpose);
+	proposeLabel+=(objValue.purposeLabel);
+
+	var statusLabel="";
+	// statusLabel+=(objValue.status);
+	statusLabel+=(objValue.statusLabel);
+	
+	var inputLabel="";
+	inputLabel+="<input type='hidden' name='addr.id' value='"+objValue.id+"'>";
+	inputLabel+="<input type='hidden' name='addr.row' value='"+(eval(objValue.row)+1)+"'>";
+	inputLabel+="<input type='hidden' name='addr.line1' value='"+objValue.line1+"'>";
+	inputLabel+="<input type='hidden' name='addr.line2' value='"+objValue.line2+"'>";
+	inputLabel+="<input type='hidden' name='addr.line3' value='"+objValue.line3+"'>";
+	inputLabel+="<input type='hidden' name='addr.district' value='"+objValue.district+"'>";
+	inputLabel+="<input type='hidden' name='addr.districtLabel' value='"+objValue.districtLabel+"'>";
+	inputLabel+="<input type='hidden' name='addr.province' value='"+objValue.province+"'>";
+	inputLabel+="<input type='hidden' name='addr.provinceLabel' value='"+objValue.provinceLabel+"'>";
+	inputLabel+="<input type='hidden' name='addr.postcode' value='"+objValue.postcode+"'>";
+	inputLabel+="<input type='hidden' name='addr.purpose' value='"+objValue.purpose+"'>";
+	inputLabel+="<input type='hidden' name='addr.purposeLabel' value='"+objValue.purposeLabel+"'>";
+	inputLabel+="<input type='hidden' name='addr.status' value='"+objValue.status+"'>";
+	inputLabel+="<input type='hidden' name='addr.statusLabel' value='"+objValue.statusLabel+"'>";
+	
+	var iconLabel="";
+	iconLabel+='<a href="#" onclick="open_address(\''+path+'\','+(eval(objValue.row)+1)+',\'edit\');">';
+	iconLabel+="<img border=0 src='"+path+"/icons/doc_edit.gif'></a>";
+	
+	tbl.rows[objValue.row].cells[0].innerHTML= addressLabel+inputLabel;
+	tbl.rows[objValue.row].cells[1].innerHTML= proposeLabel;
+	tbl.rows[objValue.row].cells[2].innerHTML= statusLabel;
+	tbl.rows[objValue.row].cells[3].innerHTML= iconLabel;
+	
+}
+
+
 function copyAddress(path, objValue){
 	if(objValue.purpose=='S'){
 		objValue.purpose = 'B';
@@ -243,6 +321,7 @@ function createAddressList(){
 		
 		inputLabel+="<hr/>";
 		divAddr.innerHTML += inputLabel;
+		//alert(inputLabel);
 		
 		if(purposes[i].value=='S'){
 			bshipto = true;

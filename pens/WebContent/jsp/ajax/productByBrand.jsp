@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.sales.bean.ProductCatalog"%>
 <%@page import="com.isecinc.pens.web.sales.bean.Basket"%>
@@ -7,6 +8,7 @@
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%
+User user = ((User)session.getAttribute("user"));
 String custId = request.getParameter("custId");
 Basket basket = (Basket)session.getAttribute(custId);
 if(basket == null ){
@@ -33,7 +35,7 @@ List<ProductCatalog> catalogs = null;
 
 try{	
 	if(categoryCode != null && categoryCode.length()>0){
-		catalogs = new MProduct().getProductCatalogByBrand(categoryCode,orderDate,priceListId);
+		catalogs = new MProduct().getProductCatalogByBrand(categoryCode,orderDate,priceListId,user);
 	}
 }catch(Exception e){
 	e.printStackTrace();

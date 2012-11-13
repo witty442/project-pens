@@ -44,6 +44,8 @@
 		
 		whereCause += "\n WHERE T.ISACTIVE = 'Y' ";
 		
+		whereCause += "\n AND T.CODE NOT IN( SELECT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+user.getRole().getKey()+"') ";
+		
 		if (pName != null && pName.trim().length() > 0) {
 			pName = new String(pName.getBytes("ISO8859_1"), "UTF-8");
 			whereCause += "\n AND T.CODE LIKE '%" + pName + "%' OR T.NAME LIKE '%" + pName

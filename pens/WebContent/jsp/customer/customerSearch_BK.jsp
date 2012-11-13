@@ -5,8 +5,6 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -160,8 +158,7 @@ function loadProvince(){
 								<!-- <img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn"> --></a>
 							</td>
 						</tr>
-					</table>				
-                    
+					</table>
 					<!-- RESULT -->
 					<c:if test="${customerForm.results != null}">
 					<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>&nbsp;
@@ -228,7 +225,8 @@ function loadProvince(){
 							<td align="center">
 							     <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${results.id})">
 							         <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
-							     </a> 
+							     </a>
+							   
 							</td>
 							<%if( role.equalsIgnoreCase(User.TT)){ %>
 								<td align="center">

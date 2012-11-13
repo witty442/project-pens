@@ -12,6 +12,7 @@ import util.DBCPConnectionProvider;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ProductCategory;
+import com.isecinc.pens.bean.User;
 
 /**
  * MProductCategory Class
@@ -155,7 +156,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 	public static int NO_OF_DISPLAY_ROWS = 3;
 	public static int NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE = NO_OF_DISPLAY_COLUMNS * NO_OF_DISPLAY_ROWS ;
 	
-	public List<References> lookUpBrandList(int pageId) throws Exception {
+	public List<References> lookUpBrandList(int pageId,User u) throws Exception {
 		List<References> pos = new ArrayList<References>();
 		Connection conn = null;
 		Statement stmt = null;
@@ -171,6 +172,13 @@ public class MProductCategory extends I_Model<ProductCategory> {
 					   .append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
 					   .append("\n AND pdc.seg_value1 <> '000' ") //Except DefaultValue
 					   .append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
+					   
+					   .append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ")
+					   .append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ")
+					   .append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ")
+					   .append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'")
+					   .append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ")
+					
 					   .append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
 					   .append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
 					
@@ -206,7 +214,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<References> lookUpBrandListCaseMoveOrder(int pageId) throws Exception {
+	public List<References> lookUpBrandListCaseMoveOrder(int pageId,User u) throws Exception {
 		List<References> pos = new ArrayList<References>();
 		Connection conn = null;
 		Statement stmt = null;
@@ -222,12 +230,20 @@ public class MProductCategory extends I_Model<ProductCategory> {
 					   .append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
 					   .append("\n AND pdc.seg_value1 <> '000' ") //Except DefaultValue
 					   .append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
+					   
+					   .append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ")
+					   .append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ")
+					   .append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ")
+					   .append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'")
+					   .append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ")
+					   
 					   .append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
 					   .append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
 					
 			logger.debug("sql:\n"+sql.toString());
 			
 			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {

@@ -38,7 +38,7 @@ public class MoveOrderSummaryAction extends I_Action {
 		try {
 			 logger.debug("prepare");
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				 summaryForm.setSummary(null);
+				 summaryForm.setSummary(new MoveOrderSummary());
 				 summaryForm.setResults(null);
 			 }
 			
@@ -59,8 +59,8 @@ public class MoveOrderSummaryAction extends I_Action {
 		try {
 			logger.debug("prepare 2");
 			if("new".equalsIgnoreCase(request.getParameter("action"))){
-				summaryForm.setSummary(null);
-				summaryForm.setResults(null);
+				summaryForm.setSummary(new MoveOrderSummary());
+			    summaryForm.setResults(null);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

@@ -11,6 +11,7 @@ import util.DBCPConnectionProvider;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.web.moveorder.MoveOrderProductCatalog;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
 
@@ -57,21 +58,23 @@ public class MProduct extends I_Model<Product>{
 		return array;
 	}
 	
-	public List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId) throws Exception {
+	public List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId ,User u) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		
 		List<ProductCatalog> productL = new ArrayList<ProductCatalog>();
 		
-		String sql = "SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 " +
-					 " FROM M_Product pd "+
-					 " INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID "+
-					 " LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID "+
-					 " WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+productCatCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" "+
-					 " AND COALESCE(pp2.UOM_ID,pp1.UOM_ID) IN (SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now()) "+
-					 " ORDER BY pd.CODE ";
-
+		String sql = " \n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 " +
+					 "\n FROM M_Product pd "+
+					 "\n INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID "+
+					 "\n LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID "+
+					 "\n WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+productCatCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" "+
+					 "\n AND COALESCE(pp2.UOM_ID,pp1.UOM_ID) IN (SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now()) "+
+					 "\n AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') "+
+					 "\n ORDER BY pd.CODE ";
+		
+        logger.debug("sql:"+sql);
 		conn = new DBCPConnectionProvider().getConnection(conn);
 		try {
 			stmt = conn.createStatement();
@@ -99,7 +102,7 @@ public class MProduct extends I_Model<Product>{
 		return productL;
 	}
 	
-	public List<MoveOrderProductCatalog> getMoveOrderProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId) throws Exception {
+	public List<MoveOrderProductCatalog> getMoveOrderProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId,User u) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -112,6 +115,7 @@ public class MProduct extends I_Model<Product>{
 					 " \n LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID "+
 					 " \n WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+productCatCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" "+
 					 " \n AND COALESCE(pp2.UOM_ID,pp1.UOM_ID) IN (SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now()) "+
+					 " \n AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') "+
 					 " \n ORDER BY pd.CODE ";
 
 		logger.debug("sql:"+sql);

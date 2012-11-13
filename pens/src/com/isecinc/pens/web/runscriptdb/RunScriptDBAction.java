@@ -86,8 +86,9 @@ public class RunScriptDBAction {
 			runManualScriptProcessAllSales(conn,prefix,user.getUserName());
 			
 			/** Run ManualScript By Sales Type VAN or Credit **/
+			logger.info("role:"+user.getRole().getKey());
 			String salesType = "van";
-			if("TT".equals(user.getRole().getCode())){
+			if("TT".equals(user.getRole().getKey())){
 				salesType  ="credit";
 			}
 			runManualScriptProcessBySalesType(conn,prefix,salesType);
@@ -118,12 +119,12 @@ public class RunScriptDBAction {
 	public static void runManualScriptProcessAllSales(Connection conn,String prefix,String userName){
 		EnvProperties env = EnvProperties.getInstance();
 		try{
-			logger.info("Start runManualScriptProcessAllSale: "+prefix);
+			logger.info("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.AllSales")+prefix+"_script.sql");
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.AllSales")+prefix+"_script.sql","TIS-620");
 			
-			//logger.info("scriptData:"+scriptData);
+			logger.info("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
@@ -146,12 +147,12 @@ public class RunScriptDBAction {
 	public static void runManualScriptProcessBySalesType(Connection conn,String prefix,String salesType){
 		EnvProperties env = EnvProperties.getInstance();
 		try{
-			logger.info("Start runManualScriptProcessAllSale: "+prefix);
+			logger.info("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql");
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql","TIS-620");
 			
-			//logger.info("scriptData:"+scriptData);
+			logger.info("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
@@ -174,12 +175,12 @@ public class RunScriptDBAction {
 		EnvProperties env = EnvProperties.getInstance();
 		String resultStr ="";
 		try{
-			logger.info("Start runManualScriptProcessBySalesCode : "+prefix);
+			logger.info("Start runManualScriptProcessBySalesCode : "+env.getProperty("path.manual.BySales")+prefix+"/script_"+userName+".sql");
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.BySales")+prefix+"/script_"+userName+".sql","TIS-620");
 			
-			//logger.info("scriptData:"+scriptData);
+			logger.info("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){

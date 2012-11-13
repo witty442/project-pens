@@ -162,7 +162,10 @@ public class ModifierProcess {
 				if (oline.getProduct().getProductCategory() != null)
 					cat = new MProductCategory().find(String.valueOf(oline.getProduct().getProductCategory().getId()));
 				if (cat != null) {
-					if (itemCats.size() == 0) itemCats.add(cat);
+					if (itemCats.size() == 0) {
+						logger.info("product_cate_id:"+cat.getId());
+						itemCats.add(cat);
+					}
 					bIn = false;
 					for (ProductCategory item : itemCats) {
 						if (item.getId() == cat.getId()) {
@@ -170,7 +173,10 @@ public class ModifierProcess {
 						}
 					}
 					//Check Duplicate 
-					if (!bIn) itemCats.add(cat);
+					if (!bIn) {
+						logger.info("product_cate_id:"+cat.getId());
+						itemCats.add(cat);
+					}
 				}
 			}
 			

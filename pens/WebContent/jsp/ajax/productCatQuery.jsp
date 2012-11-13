@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.model.MProductCategory"%>
@@ -6,6 +7,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.math.BigDecimal"%>
 <%
+User user = ((User)session.getAttribute("user"));
 String pageId_param = request.getParameter("pageId");
 
 String custId = request.getParameter("custId");
@@ -20,7 +22,7 @@ if(StringUtils.isEmpty(pageId_param))
 int pageId = Integer.valueOf(pageId_param);
 
 MProductCategory mProductCat = new MProductCategory();
-List<References> productCatL = mProductCat.lookUpBrandList(pageId);
+List<References> productCatL = mProductCat.lookUpBrandList(pageId,user);
 
 int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;

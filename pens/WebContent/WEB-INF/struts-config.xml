@@ -40,75 +40,89 @@
 		<!-- INVENTORY -->
 		<form-bean name="inventoryForm"
 			type="com.isecinc.pens.web.inventory.InventoryForm" />
+			
 		<!-- INVENTORY TRANSACTION -->
 		<form-bean name="inventoryTransactionForm"
 			type="com.isecinc.pens.web.inventorytransaction.InventoryTransactionForm" />
+			
 		<!-- SALES ORDER -->
 		<form-bean name="orderForm" type="com.isecinc.pens.web.sales.OrderForm" />
+		
 		<!-- TRIP -->
 		<form-bean name="tripForm" type="com.isecinc.pens.web.trip.TripForm" />
+		
 		<!-- MODIFIER -->
 		<form-bean name="modifierForm" type="com.isecinc.pens.web.modifier.ModifierForm" />
+		
 		<!-- RECEIPT -->
 		<form-bean name="receiptForm" type="com.isecinc.pens.web.receipt.ReceiptForm" />
+		
 		<!-- TEMP Form -->
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
+		
 		<!-- SHIPMENT REPORT -->
 		<form-bean name="shipmentReportForm"
 			type="com.isecinc.pens.web.report.shipment.ShipmentReportForm" />
+			
 		<!-- SHIPMENT TEMPORARY REPORT -->
 		<form-bean name="shipmentTempReportForm"
 			type="com.isecinc.pens.web.report.shipmenttemp.ShipmentTempReportForm" />
+			
 		<!-- PERFORMANCE REPORT -->
 		<form-bean name="performanceReportForm"
 			type="com.isecinc.pens.web.report.performance.PerformanceReportForm" />
+			
 		<!-- INVOICE PAYMENT REPORT -->
 		<form-bean name="invoicePaymentReportForm"
 			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm" />
-		<!-- SHIPMENT BENECOL REPORT -->
-		<form-bean name="shipmentBenecolReportForm"
-			type="com.isecinc.pens.web.report.shipmentbenecol.ShipmentBenecolReportForm" />
+			
 		<!-- RECEIVE BAG REPORT -->
 		<form-bean name="receiveBagReportForm"
 			type="com.isecinc.pens.web.report.receivebag.ReceiveBagReportForm" />
+			
 		<!-- ORDER 3 MONTHS REPORT -->
 		<form-bean name="orderThreeMonthsReportForm"
 			type="com.isecinc.pens.web.report.salesorder.OrderThreeMonthsReportForm" />
+			
 		<!-- RECEIPT TEMPORARY REPORT -->
 		<form-bean name="receiptTempReportForm"
 			type="com.isecinc.pens.web.report.receipttemp.ReceiptTempReportForm" />
+			
 		<!-- REMITTANCE REPORT -->
 		<form-bean name="remittanceReportForm"
 			type="com.isecinc.pens.web.report.remittance.RemittanceReportForm" />
+			
 		<!-- DETAILED SALES REPORT -->
 		<form-bean name="detailedSalesReportForm"
 			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportForm" />
+			
 		<!-- Interfaces -->
 		<form-bean name="interfacesForm"
 			type="com.isecinc.pens.web.interfaces.InterfacesForm" />
+			
 		<!-- Sales Analyst -->
 		<form-bean name="salesAnalystReportForm"
 			type="com.isecinc.pens.web.report.salesanalyst.SalesAnalystReportForm" />
+			
 		<!-- Manage Order Receipt -->
 		<form-bean name="manageOrderReceiptForm"
 			type="com.isecinc.pens.web.admin.ManageOrderReceiptForm" />
+			
 		<!-- Manage Order Receipt By User -->
 		<form-bean name="manageOrderReceiptByUserForm"
 			type="com.isecinc.pens.web.admin.ManageOrderReceiptByUserForm" />
-		<!-- Call Before Send -->
-		<form-bean name="callBeforeReportForm"
-			type="com.isecinc.pens.web.report.callbefore.CallBeforeReportForm" />
-		<!-- Tax Invoice DD -->
-		<form-bean name="taxInvoiceDDReportForm"
-			type="com.isecinc.pens.web.report.taxinvoice.TaxInvoiceDDReportForm" />
+
 		<!-- Manual Update Address -->
 		<form-bean name="manualUpdateAddressForm"
 			type="com.isecinc.pens.web.manual.ManualUpdateAddressForm" />
+			
 		<!-- BackUp DataBase -->
 		<form-bean name="dbManagementForm" type="com.isecinc.pens.web.db.DBManagementForm" />
+		
 		<!-- INVOICE PAYMENT ALL REPORT -->
 		<form-bean name="invoicePaymentAllReportForm"
 			type="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportForm" />
+			
 		<!-- INVOICE DETAIL REPORT -->
 		<form-bean name="invoiceDetailReportForm"
 			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportForm" />
@@ -321,36 +335,6 @@
 			<forward name="view" path="/jsp/receipt/receiptView.jsp" />
 			<forward name="cancelReceiptPopup" path="/jsp/pop/cancelReceiptPopup.jsp" />
 		</action>
-
-		<!-- SHIPMENT REPORT -->
-		<action name="shipmentReportForm" path="/jsp/shipmentReport"
-			forward="/jsp/reports/shipmentReport.jsp" />
-		<action name="shipmentReportForm" path="/jsp/shipmentReportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.shipment.ShipmentReportAction">
-			<forward name="report" path="/jsp/reports/shipmentReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/shipmentReport.jsp" />
-		</action>
-
-		<!-- CALL BEFORE SEND REPORT -->
-		<action name="callBeforeReportForm" path="/jsp/callBeforeReport"
-			forward="/jsp/reports/callBeforeReport.jsp" />
-		<action name="callBeforeReportForm" path="/jsp/callBeforeReportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.callbefore.CallBeforeReportAction">
-			<forward name="report" path="/jsp/reports/callBeforeReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/callBeforeReport.jsp" />
-		</action>
-			
-		<!-- TAX INVOICE DD REPORT -->
-		<action name="taxInvoiceDDReportForm" path="/jsp/taxInvoiceDDReport"
-			forward="/jsp/reports/taxInvoiceDDReport.jsp" />
-		<action name="taxInvoiceDDReportForm" path="/jsp/taxInvoiceDDReportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.taxinvoice.TaxInvoiceDDReportAction">
-			<forward name="report" path="/jsp/reports/taxInvoiceDDReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/taxInvoiceDDReport.jsp" />
-		</action>
 		
 		<!-- DETAILED SALES REPORT -->
 		<action name="detailedSalesReportForm" path="/jsp/detailedSalesReport"
@@ -360,16 +344,6 @@
 			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportAction">
 			<forward name="report" path="/jsp/reports/detailedSalesReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/detailedSalesReport.jsp" />
-		</action>
-
-		<!-- SHIPMENT TEMPORARY REPORT -->
-		<action name="shipmentTempReportForm" path="/jsp/shipmentTempReport"
-			forward="/jsp/reports/shipmentTempReport.jsp" />
-		<action name="shipmentTempReportForm" path="/jsp/shipmentTempReportAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.shipmenttemp.ShipmentTempReportAction">
-			<forward name="report" path="/jsp/reports/shipmentTempReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/shipmentTempReport.jsp" />
 		</action>
 
 		<!-- PERFORMANCE REPORT -->
@@ -400,16 +374,6 @@
 			type="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportAction">
 			<forward name="report" path="/jsp/reports/invoicePaymentAllReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/invoicePaymentAllReport.jsp" />
-		</action>
-
-		<!-- SHIPMENT BENECOL REPORT -->
-		<action name="shipmentBenecolReportForm" path="/jsp/shipmentBenecolReport"
-			forward="/jsp/reports/shipmentBenecolReport.jsp" />
-		<action name="shipmentBenecolReportForm" path="/jsp/shipmentBenecolAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.report.shipmentbenecol.ShipmentBenecolReportAction">
-			<forward name="report" path="/jsp/reports/shipmentBenecolReport.jsp" />
-			<forward name="clearform" path="/jsp/reports/shipmentBenecolReport.jsp" />
 		</action>
 
 		<!-- RECEIVE BAG REPORT -->

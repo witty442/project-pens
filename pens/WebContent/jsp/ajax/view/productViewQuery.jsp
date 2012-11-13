@@ -34,6 +34,7 @@
 			whereCause += "\n AND T.CODE LIKE '%" + pName + "%' OR T.NAME LIKE '%" + pName
 					+ "%' OR T.DESCRIPTION LIKE '" + pName + "%' ";
 		}
+		whereCause += "\n AND T.CODE NOT IN(SELECT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+user.getRole().getKey()+"') ";
 		
 		whereCause += "\n GROUP BY T.CODE, T.PRODUCT_ID, T.UOM_ID, T.DESCRIPTION, ";
 		whereCause += "\n T.ISACTIVE, T.NAME, T.PRODUCT_CATEGORY_ID ";
