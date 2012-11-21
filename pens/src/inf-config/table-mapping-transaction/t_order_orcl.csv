@@ -30,3 +30,4 @@ created_by,IU,27,INTEGER,,N,N,AD|DD|TT|VAN,N,N
 updated,IU,28,DATE,,N,N,AD|DD|TT|VAN,N,N
 updated_by,IU,29,INTEGER,,N,N,AD|DD|TT|VAN,N,N
 exported,IU,30,CHAR,Y,N,N,AD|DD|TT|VAN,N,N
+DESCRIPTION,IU,99,CHAR,Generate From orcl,N,N,AD|DD|TT|VAN,N,N
