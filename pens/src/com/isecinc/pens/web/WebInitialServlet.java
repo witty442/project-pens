@@ -5,7 +5,9 @@ import java.sql.Connection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.catalina.connector.Request;
 import org.apache.log4j.Logger;
+import org.apache.struts.tiles.taglib.GetAttributeTag;
 
 import util.DBCPConnectionProvider;
 
@@ -34,6 +36,7 @@ public class WebInitialServlet extends HttpServlet {
 		Connection conn = null;
 		try {
 			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			//
 			I_Initial initial;
 			logger.info("Initial References");

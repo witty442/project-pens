@@ -79,7 +79,7 @@ body {
 function loadMe(){
 	document.getElementById("tempTotalAmount").value = addCommas(Number(document.getElementsByName("order.totalAmount")[0].value).toFixed(2));
 	document.getElementById("tempVatAmount").value = addCommas(Number(document.getElementsByName("order.vatAmount")[0].value).toFixed(2));
-	document.getElementById("tempNetAmount").value = addCommas(Number(document.getElementsByName("order.netAmount")[0].value).toFixed(2));
+	document.getElementById("tempNetAmount").value = addCommas(Number(document.getElementsByName("order.netAmount")[0].value).toFixed(2)); 
 
 	//WIT EDIT :20110804
 	<%if( ("true").equals(util.ConvertNullUtil.convertToString(request.getAttribute("popup_autoreceipt")))){ %>
@@ -91,7 +91,6 @@ function loadMe(){
 	    loadAutoReceipt();
 	<%}else{ %>
 	    $('#divOrderView').show();
-	 
 	<%} %>
 }
 

@@ -453,7 +453,7 @@ public class FTPManager {
  * @param controlTableMap
  * @throws Exception
  */
-	public void writeFileToFTP(String path,LinkedHashMap<String,TableBean> controlTableMap,User userBean) throws Exception{
+	public void uploadFileToFTP(String path,LinkedHashMap<String,TableBean> controlTableMap,User userBean) throws Exception{
 		String ftpResponse = "";
 		FTPClient ftp = null;
 		try {		
@@ -626,6 +626,90 @@ public class FTPManager {
 					logger.debug("Data not found");
 				}
 			}//for		
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+		}	
+	}
+	
+	/**
+	 * 
+	 * @param controlTableMap
+	 * @param path
+	 * @throws Exception
+	 */
+	public void deleteAllFileInFTPCaseRollback(LinkedHashMap<String,TableBean> controlTableMap,String path) throws Exception{
+		FTPClient ftp = null;
+		try {		
+			ftp = new FTPClient();
+			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+			ftp.connect(server);
+			//ftp.enterLocalActiveMode();
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			 
+			Set s = controlTableMap.keySet();
+			Iterator it = s.iterator();
+			for (int i = 1; it.hasNext(); i++) {
+				String tableName = (String) it.next();
+				TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+				if(tableBean.getFileExportList() != null && tableBean.getFileExportList().size() > 0){
+	                for(int f=0;f<tableBean.getFileExportList().size();f++){
+	                	TableBean fileExportBean =(TableBean)tableBean.getFileExportList().get(f);
+	               
+	                	if("".equalsIgnoreCase(path)){
+	 					   path = fileExportBean.getExportPath();
+	 					}
+	 					logger.debug("Write To Path:"+path);
+	 					
+	 					ftp.changeWorkingDirectory(path);
+	 					logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+	 					
+	 				    ftp.deleteFile(tableBean.getFileFtpNameFull());
+	 					logger.debug("Delete "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+	 			
+	 				    /** Close Command FTP **/
+	 					ftp.completePendingCommand();
+	 				    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+
+	                }//for
+	                
+	            }else if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
+					if("".equalsIgnoreCase(path)){
+					   path = tableBean.getExportPath();
+					}
+					logger.debug("Write To Path:"+path);
+					
+					ftp.changeWorkingDirectory(path);
+					logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+					ftp.deleteFile(tableBean.getFileFtpNameFull());
+	 			    logger.debug("Delete "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+	 					
+				    /** Close Command FTP **/
+					ftp.completePendingCommand();
+				    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    
+				}else{
+					// Data not Found
+					logger.debug("Data not found");
+				}
+			}//for		
 
 		} catch (SocketException e) {
 			throw new FTPException("Could not connect to FTP server");
@@ -650,7 +734,7 @@ public class FTPManager {
 	 * @throws Exception
 	 * ExportManager Call
 	 */
-	public String exportFileToFTP(TableBean tableBean,String path,String encoding) throws Exception{
+	public String uploadFileToFTP(TableBean tableBean,String path,String encoding) throws Exception{
 		String ftpResponse = "";
 		FTPClient ftp = null;
 		String fileSize = "0";

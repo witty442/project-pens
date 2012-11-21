@@ -319,27 +319,27 @@ public class ExportHelper {
 
 		if(tableBean.getTransactionType().equals(Constants.TRANSACTION_MASTER_TYPE)){
 			if("CUST".equalsIgnoreCase(tableBean.getFileFtpName())){
-				strGen = dateStr+"-"+userBean.getId()+"-"+tableBean.getFileFtpName()+".txt";
+				strGen = dateStr+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}else{
 			    strGen = dateStr+"-"+tableBean.getFileFtpName()+".txt";
 			}
 		}else{
 			if(User.TT.equalsIgnoreCase(userBean.getType()) && "SALESRECEIPT".equalsIgnoreCase(tableBean.getFileFtpName())){
-		        strGen = dateStr+"-"+userBean.getId()+"-TTLOCKBOX.txt";
+		        strGen = dateStr+"-"+userBean.getUserName()+"-TTLOCKBOX.txt";
 			}else if(User.VAN.equalsIgnoreCase(userBean.getType()) && "MOVEORDERS".equalsIgnoreCase(tableBean.getFileFtpName())){
-				strGen = dateStr+"-"+userBean.getId()+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
+				strGen = dateStr+"-"+userBean.getUserName()+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}else{
-				strGen = dateStr+"-"+userBean.getId()+"-"+tableBean.getFileFtpName()+".txt";
+				strGen = dateStr+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}
 		}
 		
 		return strGen;
 	}
 	
-	public static String genFileNameMTrip(TableBean tableBean,String userId) throws Exception{
+	public static String genFileNameMTrip(TableBean tableBean,String userName) throws Exception{
 		String strGen = "";
 		String dateStr = Utils.format(new Date(), "yyyyMMddHHmm");
-		strGen = dateStr+"-"+userId+"-"+tableBean.getFileFtpName()+".txt";
+		strGen = dateStr+"-"+userName+"-"+tableBean.getFileFtpName()+".txt";
 		return strGen;
 	}
 	

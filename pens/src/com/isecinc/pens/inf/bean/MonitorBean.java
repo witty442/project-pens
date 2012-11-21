@@ -23,6 +23,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private   String transactionType ;
    private   Date submitDate ;
    private   int status ;
+   private   int batchTaskStatus ;
    private   Date createDate ;
    private   String createUser ;
    private   Date updateDate ;
@@ -52,6 +53,12 @@ private String requestImportWebMemberUserName;
 
 
 
+public int getBatchTaskStatus() {
+	return batchTaskStatus;
+}
+public void setBatchTaskStatus(int batchTaskStatus) {
+	this.batchTaskStatus = batchTaskStatus;
+}
 public String getRequestWebMemberTable() {
 	return requestWebMemberTable;
 }

@@ -411,9 +411,9 @@ public class ImportManager {
 				
 				logger.info("*** Step Write Log Result *******");
 			    if(Constants.TRANSACTION_MASTER_TYPE.equals(transType)){
-			        ftpManager.writeFileToFTP( EnvProperties.getInstance().getProperty("path.master.sales.in.result"), initConfigMap,userLogin);
+			        ftpManager.uploadFileToFTP( EnvProperties.getInstance().getProperty("path.master.sales.in.result"), initConfigMap,userLogin);
 			    } else{
-			        ftpManager.writeFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
+			        ftpManager.uploadFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
 			    }
 			}
 		}catch(Exception e){
@@ -422,11 +422,16 @@ public class ImportManager {
 			/** End process ***/
 			logger.debug("Update Monitor to Fail ");
 			monitorModel.setStatus(Constants.STATUS_FAIL);
+			monitorModel.setBatchTaskStatus(Constants.STATUS_SUCCESS);//Thread batchTask end process
 			monitorModel.setFileCount(countFileMap);
 			monitorModel.setTransactionType(transType);
 			monitorModel.setErrorCode(ExceptionHandle.getExceptionCode(e));
-			dao.updateMonitor(connMonitor,monitorModel);
+			
+			dao.updateMonitorCaseError(connMonitor,monitorModel);
 
+			//clear Task running for next run
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
+			
 			if(conn != null){
 			  logger.debug("Transaction Rolback");
 			  conn.rollback();

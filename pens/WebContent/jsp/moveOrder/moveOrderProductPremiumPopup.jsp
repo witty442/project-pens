@@ -308,7 +308,8 @@ function addRow(){
 function showProduct(path){
 	var pBrand = $('#pBrand').val();
    // alert(pBrand);
-	window.open(path + '/jsp/pop/view/productPremiumViewPopup.jsp?pBrand='+encodeURIComponent(pBrand), 'Product List', 'width=500,height=350,location=No,resizable=No');
+	window.open(path + '/jsp/pop/view/productPremiumViewPopup.jsp?pBrand='+encodeURIComponent(pBrand),
+			'Product List', 'width=500,height=450,location=0,resizable=0,menubar=0');
 }
 
 function setProduct(code, name){

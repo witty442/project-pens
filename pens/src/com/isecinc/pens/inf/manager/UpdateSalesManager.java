@@ -244,7 +244,7 @@ public class UpdateSalesManager {
 			/** Optional Step Write Result Logs Process By File Name **/
 			if("true".equals(EnvProperties.getInstance().getProperty("ftp.export.logs.result.enable"))){
 				logger.info("**** Step Write Log Result In Ftp Server ******");
-			    ftpManager.writeFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
+			    ftpManager.uploadFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
 			}
 
 			monitorModel.setMonitorItemList(monitorItemList);

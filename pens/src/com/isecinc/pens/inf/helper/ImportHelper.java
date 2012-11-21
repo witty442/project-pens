@@ -32,7 +32,7 @@ public class ImportHelper {
 			System.out.println("["+ssArr[8]+"]");
 			System.out.println("["+ssArr[9]+"]");
 			
-			System.out.println("OrderNo:"+getReplcaeNewOrderNo("210154010001"));
+			//System.out.println("OrderNo:"+getReplcaeNewOrderNo("210154010001"));
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -722,7 +722,7 @@ public class ImportHelper {
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 			    	String idFind = ExternalFunctionHelper.findExternalFunc(conn, colBean,lineArray,userBean);	    	
-			    	logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
+			    	//logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
 			    	ps =setObjectPS(ps,colBean,parameterIndex,idFind);
 			    }else{
 			    	if(colBean.getTextPosition() >= lineArray.length ){/** Text Position > Array Index  set To NUll **/
@@ -833,7 +833,7 @@ public class ImportHelper {
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 	    			String idFind = ExternalFunctionHelper.findExternalFunc(conn, colBean,lineArray,userBean);	  
-	    			logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
+	    			//logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
 			    	ps = setObjectPS(ps,colBean,parameterIndex,idFind);
 				}else{
 					if(colBean.getTextPosition() >= lineArray.length ){/** Text Position > Array Index OF LineStr  set To NULL **/
@@ -1513,26 +1513,6 @@ public class ImportHelper {
 			//logger.debug("ResultMap:"+map);
         }
 		return map;
-	}
-	
-	/** Case Order Manaul (from Oracle )
-	 * order_no length == 12 only
-	 * order ที่ขึ้นต้นด้วย 2  ให้ replace เป็น S
-       order ที่ขึ้นต้นด้วย 3 ให้ replace เป็น C
-	 * @param orderNo
-	 * @return
-	 * @throws Exception
-	 */
-	public static String getReplcaeNewOrderNo(String orderNo) throws Exception{
-		if(Utils.isNull(orderNo).length() ==12){
-			String firstPos = orderNo.substring(0,1);
-			if(firstPos.equals("2")){
-				orderNo = "S"+orderNo.substring(1,orderNo.length());
-			}else if(firstPos.equals("3")){
-				orderNo = "C"+orderNo.substring(1,orderNo.length());
-			}
-		}
-		return orderNo;
 	}
 	
 }

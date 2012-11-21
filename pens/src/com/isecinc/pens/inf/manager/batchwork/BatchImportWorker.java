@@ -48,7 +48,7 @@ public class BatchImportWorker extends BatchWorker {
 		try {
 			logger.debug("requestTable:"+requestTable);
 			if(requestTable != null && !requestTable.isEmpty()){
-				startTaskStatus(this.transactionId,this.monitorId);
+				startTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
 				
 				if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(this.transType)){
 					logger.debug(" **********Start Import Update Transaction Sales By Request Table ******************");
@@ -61,8 +61,9 @@ public class BatchImportWorker extends BatchWorker {
 					MonitorBean monitorModel =(new ImportManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
 					logger.debug(" **********Result Import Master ,Tranasaction  By Request Table :"+monitorModel.getStatus()+" ******************");
 				}	
-				
-				endTaskStatus(this.transactionId,this.monitorId);
+			
+				//Stamp Task to Success
+				endTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
 			}
 			
 			/** Import All Transaction  **/ 
@@ -86,7 +87,7 @@ public class BatchImportWorker extends BatchWorker {
 				MonitorBean monitorModel =(new ImportManager()).importTxtByTransType(transactionId,Constants.TRANSACTION_MASTER_TYPE, userLogin,userRequest, requestTable, request, importAll);
 				logger.debug(" **********Result Import Master Table :"+monitorModel.getStatus()+"******************");
 				
-                startTaskStatus(this.transactionId,this.monitorId);
+                startTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
                 
 				if( !Utils.isNull(monitorModel.getErrorCode()).equalsIgnoreCase("FTPException")){
 					logger.debug(" **********Start Import Transaction Table ******************");
@@ -105,7 +106,8 @@ public class BatchImportWorker extends BatchWorker {
 				/** Process Run Script After Import **/
 				new ExternalProcess().processImportAfter(request,userLogin);
 				
-				endTaskStatus(this.transactionId,this.monitorId);
+				//Stamp task to Success
+				endTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
 			} 
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

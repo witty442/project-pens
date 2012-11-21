@@ -84,7 +84,7 @@ public class MoveOrderSummaryAction extends I_Action {
 			if(m.getType().equals("DETAIL")){
 			   summaryList = mDAO.searchMoveOrderSummaryDetail(m,user);
 			}else{
-			   summaryList = mDAO.searchMoveOrderSummaryDetail(m,user);
+			   summaryList = mDAO.searchMoveOrderSummaryTotal(m,user);
 			}
 			summaryForm.setResults(summaryList);
 			if(summaryList != null && summaryList.size()==0){
@@ -208,7 +208,7 @@ public class MoveOrderSummaryAction extends I_Action {
 					   h.append("<td>"+s.getRequestNumber()+"</td> \n");
 					   h.append("<td>"+s.getRequestDate()+"</td> \n");
 					}
-					  h.append("<td>"+s.getPdCode()+"</td> \n");
+					  h.append("<td>"+s.getPdCodeShow()+"</td> \n");
 					  h.append("<td>"+s.getProductCode()+"</td> \n");
 					  h.append("<td>"+s.getUom1()+"</td> \n");
 					  h.append("<td>"+s.getQty1()+"</td> \n");

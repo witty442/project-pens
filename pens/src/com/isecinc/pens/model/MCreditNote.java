@@ -50,6 +50,9 @@ public class MCreditNote extends I_Model<CreditNote> {
 		    }
 			if (ids.length() > 0) whereCause += "  AND CREDIT_NOTE_ID NOT IN(" + ids + ") ";
 			whereCause += " ORDER BY CREDIT_NOTE_NO ";
+			
+			logger.info("whereCause:"+whereCause);
+			
 			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, CreditNote.class);
 		} catch (Exception e) {
 			e.printStackTrace();

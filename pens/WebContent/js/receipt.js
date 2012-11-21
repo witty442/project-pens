@@ -204,10 +204,13 @@ function save(path,type) {
 	
 	var totalReceiptAmt = totalBillAmt+totalCNAmt;
 	
-	if($("#applyAmount").val()=='' || (Number($("#applyAmount").val())==0 && totalReceiptAmt != 0 ))
+	/** wit edit : 21/11/2012  not check remainAmount**/
+	/*if($("#applyAmount").val()=='' || (Number($("#applyAmount").val())==0 && totalReceiptAmt != 0 ))
 	{
 		alert('ไม่มียอดการตัดชำระ กรุณาตัดชำระใบแจ้งหนี้');return false;
-	}
+	}*/
+	
+	
 	if(type=='VAN'){
 		if(Number($("#remainAmount").val())!=0){ 
 			alert('ยอดตัดชำระไม่ครบถ้วน   คงเหลือ '+ addCommas(Number($("#remainAmount").val()).toFixed(2)));return false;
@@ -239,14 +242,20 @@ function validateReceiptByAmtCash_USER_TT(type){
 		
 		if(recAmts != null){
 			for(i=0;i<recAmts.length;i++){
-				//alert(recAmts[i].value+":"+Number(recAmts[i].value).toFixed(2)+":"+checkAmtLessthan1(Number(recAmts[i]).toFixed(2)) +":WriteOff:"+writeOff[i].checked);
+				//alert(recAmts[i].value+":"+Number(recAmts[i].value).toFixed(2)+":"+checkAmtLessthan1(Number(recAmts[i]).toFixed(2)) +":WriteOff:"+writeOff[i].checked+",isZero["+isZero+"]");
 				//alert(payMethod[i].value);
 				if(payMethod[i].value == 'CS'){
-					if(checkAmtLessthan1(Number(recAmts[i].value).toFixed(2)) && writeOff[i].checked == false && !isZero ){
+					if(checkAmtLessthan1(Number(recAmts[i].value).toFixed(2)) && writeOff[i].checked == false ){
 						alert("กรุณาระบุข้อมูลให้ถูกต้อง ในกรณีที่จำนวนเงินเป็นเศษ(บันทึกเซลล์จ่าย)");
 						r = false;
 						break;
 					}//if 
+					else if(checkAmtmorethan1(Number(recAmts[i].value).toFixed(2)) && writeOff[i].checked == true ){
+						alert("กรุณาระบุข้อมูลให้ถูกต้อง ในกรณีที่จำนวนเงินเป็นเศษ(บันทึกเซลล์จ่าย) ยอดต้องน้อยกว่า 0");
+						r = false;
+						break;
+					}
+					
 				}//if
 			}//for
 		}//if
@@ -493,7 +502,14 @@ function checkAmtLessthanZero(amt){
 }
 
 function checkAmtLessthan1(amt){
-	if(amt < 1){
+	if(amt < 1 && amt != 0){
+	  return true;
+	}
+	return false;
+}
+
+function checkAmtmorethan1(amt){
+	if(amt > 1){
 	  return true;
 	}
 	return false;

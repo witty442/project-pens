@@ -8,6 +8,7 @@ import java.util.List;
 import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MProductCategory;
 
 /**
@@ -79,7 +80,7 @@ public class InitialReferences extends I_Initial {
 			
 			//init BrandList
 			MProductCategory prodC = new MProductCategory();
-			referenes.put(BRAND_LIST,prodC.lookUpBrandList());
+			referenes.put(BRAND_LIST,prodC.lookUpBrandList(null));
 			
 		} catch (Exception e) {
 			logger.error(e.toString());

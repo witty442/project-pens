@@ -17,14 +17,22 @@ import com.isecinc.pens.inf.helper.DBConnection;
 public abstract class BatchWorker extends Thread {
 	protected Logger logger = Logger.getLogger("PENS");
 	
-	public void startTaskStatus(BigDecimal transactionId,BigDecimal monitorId) {
+	public void startTaskStatus(String type,BigDecimal transactionId,BigDecimal monitorId) {
 		logger.info("startTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
 		updateTaskStatus(transactionId,monitorId,"0"); //Start BatchTask = 0;
+		
+		//control uniq task
+		InterfaceDAO dao = new InterfaceDAO();
+		dao.updateControlMonitor(transactionId,type);
 	}
 	
-	public void endTaskStatus(BigDecimal transactionId,BigDecimal monitorId) {
+	public void endTaskStatus(String type,BigDecimal transactionId,BigDecimal monitorId) {
 		logger.info("endTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
 		updateTaskStatus(transactionId,monitorId,"1");//finish BatchTask = 1	
+		
+		//control uniq task set transaction_id = 0 for run next batch
+		InterfaceDAO dao = new InterfaceDAO();
+		dao.updateControlMonitor(new BigDecimal(0),type);
 	}
 	
     public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {
@@ -38,7 +46,7 @@ public abstract class BatchWorker extends Thread {
         }finally{
         	try{
 	        	if(conn != null){
-	        		conn.close();conn=null;
+	        	   conn.close();conn=null;
 	        	}
         	}catch(Exception e){
         		e.printStackTrace();
@@ -46,5 +54,6 @@ public abstract class BatchWorker extends Thread {
         }
     }
     
+   
    
 }

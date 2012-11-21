@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ExportManager;
 import com.isecinc.pens.inf.manager.process.ExternalProcess;
@@ -37,22 +38,26 @@ public class BatchExportWorker extends BatchWorker {
 
 	@Override
 	public void run() {
-		logger.debug("Start Thread:" + Thread.currentThread().getName());
+		logger.debug("Start Thread:" + Thread.currentThread().getName()+"request:"+request);
 		HttpServletRequest requestB;
 		try {
 			requestB = request;
 
 			if(requestTable != null && !Utils.isNull(requestTable).equals("")){
 				logger.debug(" **********Start Export By Request Table ******************");
-				startTaskStatus(this.transactionId,this.monitorID);
+				
+				startTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
+				
 				(new ExportManager()).exportToTxt(transactionId,monitorID,transType,userLogin,userRequest, requestTable, request);
-				endTaskStatus(this.transactionId,this.monitorID);
+				
+				//Stamp End task to success
+				endTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
 			}else{
 				//Process Post Export
 				new ExternalProcess().processExportBefore(requestB, userLogin);
 				
 				logger.debug(" **********Start Export Master TXT ******************");
-				startTaskStatus(this.transactionId,this.monitorID);
+				startTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
 				MonitorBean model = (new ExportManager()).exportToTxt(transactionId,monitorID,transType,userLogin,userRequest, requestTable, request);
 				logger.debug("Export Master Result ErrorCode:"+Utils.isNull(model.getErrorCode()));
 				
@@ -66,7 +71,7 @@ public class BatchExportWorker extends BatchWorker {
 				new ExternalProcess().processExportAfter(requestB, userLogin);
 				
 				//Stamp Batch status to Success
-				endTaskStatus(this.transactionId,this.monitorID);
+				endTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
 			}
 
 		} catch (Exception e) {

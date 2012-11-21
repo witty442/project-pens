@@ -15,6 +15,7 @@ public class MoveOrderSummary {
     private String requestDate;
     private String requestNumber;
     private String pdCode;
+    private String pdCodeShow;
     private String pdDesc;
     private String salesCode;
     private String salesDesc;
@@ -46,6 +47,14 @@ public class MoveOrderSummary {
 	
 	
 	
+	public String getPdCodeShow() {
+		return pdCodeShow;
+	}
+
+	public void setPdCodeShow(String pdCodeShow) {
+		this.pdCodeShow = pdCodeShow;
+	}
+
 	public String getDescription() {
 		return description;
 	}

@@ -43,6 +43,26 @@ public class InterfaceDAO {
 
 	}
 	
+	 /** c_monitor **/
+    public void updateControlMonitor(BigDecimal transactionId,String type) {
+    	Connection conn = null;
+    	try {
+           InterfaceDAO dao = new InterfaceDAO();
+           conn = DBConnection.getInstance().getConnection();
+           dao.updateControlMonitor(conn,transactionId,type);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }finally{
+        	try{
+	        	if(conn != null){
+	        		conn.close();conn=null;
+	        	}
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        }
+    }
+	
 	public MonitorBean insertMonitor(Connection conn ,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -347,7 +367,7 @@ public class InterfaceDAO {
 			sql.append(" select channel as batch_task_status from monitor \n");
 			sql.append("where MONITOR_ID = (select min(monitor_id) from monitor where transaction_id ="+id+") \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		    //logger.info("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -363,6 +383,39 @@ public class InterfaceDAO {
 			}
 			if(rs != null){
 			   rs.close();rs = null;
+			}
+		}
+		return status;
+	} 
+	
+	public  String findControlMonitor(String action) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String status = "";
+		Connection conn = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from c_monitor where action ='"+action+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+		    conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				status = rs.getString("transaction_id");
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn != null){
+			   conn.close();conn = null;
 			}
 		}
 		return status;
@@ -400,6 +453,36 @@ public class InterfaceDAO {
 		}
 	}
 	
+	public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
+		PreparedStatement ps = null;
+		try {
+			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
+			//logger.info("SQL:"+sql);
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			ps.setBigDecimal(++index, transactionId);
+			ps.setString(++index,type);
+			
+			int r = ps.executeUpdate();
+			if(r==0){
+				//insert 
+				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
+				index = 0;
+				ps = conn.prepareStatement(sql);
+				ps.setString(++index,type);
+				ps.setBigDecimal(++index, transactionId);
+				ps.executeUpdate();
+				
+			}
+		
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+	}
 	
 	
 	public  String findMonitorStatusBK(Connection conn,String id,String transaction_count) throws Exception{
@@ -878,6 +961,43 @@ public class InterfaceDAO {
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			ps.setInt(++index, model.getStatus());
+			ps.setInt(++index, model.getFileCount());
+			ps.setString(++index, Utils.isNull(model.getErrorCode()).length()> 300?model.getErrorCode().substring(0,299):model.getErrorCode());
+			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());
+			ps.setBigDecimal(++index, model.getMonitorId());
+			ps.setBigDecimal(++index, model.getTransactionId());
+			
+			int ch = ps.executeUpdate();
+			result = ch>0?true:false;
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+			
+		}
+		return model;
+	}
+	
+	
+	public MonitorBean updateMonitorCaseError(Connection conn,MonitorBean model) throws Exception {
+		boolean result = false;
+		PreparedStatement ps = null;
+
+		try {
+			String sql = "UPDATE monitor SET " +
+			" status = ? ,channel = ? ,file_count =? ,error_code = ? ,error_msg =?"+
+			" WHERE MONITOR_ID = ? and transaction_id =?";
+			
+			logger.debug("SQL:"+sql);
+
+			logger.debug("monitor_id:"+model.getMonitorId()+",transType:"+model.getTransactionType());
+		
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			ps.setInt(++index, model.getStatus());
+			ps.setInt(++index, model.getBatchTaskStatus());
 			ps.setInt(++index, model.getFileCount());
 			ps.setString(++index, Utils.isNull(model.getErrorCode()).length()> 300?model.getErrorCode().substring(0,299):model.getErrorCode());
 			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());

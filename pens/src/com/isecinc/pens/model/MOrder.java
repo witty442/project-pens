@@ -186,7 +186,7 @@ public class MOrder extends I_Model<Order> {
 		DecimalFormat df = new DecimalFormat("###0.00");
 		double totalAmount = 0;
 		for (OrderLine l : lines) {
-			totalAmount += l.getTotalAmount();
+			totalAmount += l.getLineAmount()-l.getDiscount();
 		}
 		double vat = order.getVatRate() * totalAmount / 100;
 		double netAmount = totalAmount + vat;
@@ -238,7 +238,7 @@ public class MOrder extends I_Model<Order> {
 		whereCause += "  order by Ar_invoice_no asc ";
 		pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Order.class);
 		return pos;
-}
+    }
 	
 	/**
 	 * LookUp

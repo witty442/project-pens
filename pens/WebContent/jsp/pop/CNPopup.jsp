@@ -100,6 +100,7 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 <table align="center" border="0" cellpadding="0" cellspacing="1" width="100%" class="result">
 	<tr>
 		<th>เลขที่ใบลดหนี้</th>
+		<th>วันที่ใบลดหนี้</th>
 		<th><bean:message key="Bill.No" bundle="sysele"/></th>
 		<th><bean:message key="TotalAmount" bundle="sysele"/></th>
 		<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
@@ -123,6 +124,9 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 				<input type="hidden" name="totalAmount" value="${results.totalAmount}">
 			</td>
 			<td align="center">
+				${results.documentDate}
+			</td>
+			<td align="center">
 				${results.arInvoiceNo}
 			</td>
 			<td>
@@ -140,7 +144,7 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 		</tr>
 	</c:forEach>
 	<tr>
-		<td align="left" colspan="5" class="footer">&nbsp;</td>
+		<td align="left" colspan="6" class="footer">&nbsp;</td>
 	</tr>
 </table>	
 <br>

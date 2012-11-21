@@ -47,9 +47,9 @@ public class InterfacesAction extends I_Action {
 			throws Exception {
 		logger.debug("Interfaces Prepare Form");
 		InterfacesForm conversionForm = (InterfacesForm) form;
-		Trip trip = null;
 		String returnText = "prepare";
 		try {
+			
 			//for test
 			/*User user = new User();
 			com.isecinc.core.bean.References ref = new com.isecinc.core.bean.References("AD","AD","AD");
@@ -58,6 +58,12 @@ public class InterfacesAction extends I_Action {
 			request.getSession().setAttribute("user",user);*/
 			
 			conversionForm.setMonitorBean(new MonitorBean());
+			
+			//clear Task running for next run
+			InterfaceDAO dao = new InterfaceDAO();
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -76,8 +82,9 @@ public class InterfacesAction extends I_Action {
 		logger.debug("Interfaces Prepare Form without ID");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		String returnText = "prepare";
-		Connection conn = null;
+		//Connection conn = null;
 		try {
+			
 			interfacesForm.setResults(null);
 			//for test
 			/*
@@ -96,6 +103,12 @@ public class InterfacesAction extends I_Action {
 			request.getSession().setAttribute("user",user);*/
 			
 			interfacesForm.setMonitorBean(new MonitorBean());
+			
+			//clear Task running for next run
+			InterfaceDAO dao = new InterfaceDAO();
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -106,8 +119,6 @@ public class InterfacesAction extends I_Action {
 		return returnText;
 	}
 
-	
-	
 	/**
 	 * Search
 	 */
@@ -199,36 +210,50 @@ public class InterfacesAction extends I_Action {
 		ImportManager importManager =  new ImportManager();
 		User userRequest = new User();
 		try {
-			logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-			/** Import Data */
-			logger.debug("importAll:"+interfacesForm.getMonitorBean().isImportAll());
-			 String requestTable = "";
-	         String requestTableTransType = "";
-	         
-		     if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestTable()).equals("")){
-				String[] exportArray = interfacesForm.getMonitorBean().getRequestTable().split("\\|");
-				requestTable = exportArray[0];
-				requestTableTransType = exportArray[1];
+			boolean canRunBatch = false;
+			InterfaceDAO dao = new InterfaceDAO();
+			String status = dao.findControlMonitor(Constants.TYPE_IMPORT);
+			logger.info("status["+status+"]");
+			if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+			    canRunBatch = true;
+			}
+		
+			if(canRunBatch){
 				
-				/** Case Admin Update By Request Table Replace UserId*/
-				String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestImportUserName()+"%'";
-				if(Utils.isNull(interfacesForm.getMonitorBean().getRequestImportUserName()).equals("")){
-					whereClause = "AND USER_NAME LIKE '%ADMIN%'";
-				}
-				User[] results = new MUser().search(whereClause);
-				if(results != null && results.length >0){
-					userRequest = results[0];
-				}
-			 }
-		     
-		    logger.debug("requestTable:"+interfacesForm.getMonitorBean().getRequestTable());
-			logger.debug("User Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
+				logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+				/** Import Data */
+				logger.debug("importAll:"+interfacesForm.getMonitorBean().isImportAll());
+				 String requestTable = "";
+		         String requestTableTransType = "";
+		         
+			     if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestTable()).equals("")){
+					String[] exportArray = interfacesForm.getMonitorBean().getRequestTable().split("\\|");
+					requestTable = exportArray[0];
+					requestTableTransType = exportArray[1];
+					
+					/** Case Admin Update By Request Table Replace UserId*/
+					String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestImportUserName()+"%'";
+					if(Utils.isNull(interfacesForm.getMonitorBean().getRequestImportUserName()).equals("")){
+						whereClause = "AND USER_NAME LIKE '%ADMIN%'";
+					}
+					User[] results = new MUser().search(whereClause);
+					if(results != null && results.length >0){
+						userRequest = results[0];
+					}
+				 }
 			     
-			MonitorBean m = importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
-		   
-			/** Set for Progress Bar Opoup **/
-			request.setAttribute("action", "submited");
-			request.setAttribute("id", m.getTransactionId());
+			    logger.debug("requestTable:"+interfacesForm.getMonitorBean().getRequestTable());
+				logger.debug("User Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
+				     
+				MonitorBean m = importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
+			   
+				/** Set for Progress Bar Opoup **/
+				request.setAttribute("action", "submited");
+				request.setAttribute("id", m.getTransactionId());
+				
+			}else{
+				request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+			}
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -237,10 +262,86 @@ public class InterfacesAction extends I_Action {
 		return mapping.findForward("success");
 	}
 	
+	
+	/**
+	 * Export To Txt
+	 */
+	public ActionForward syschronizeToOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("Export :syschronizeToOracle");
+		InterfacesForm interfacesForm = (InterfacesForm) form;
+		User userLogin = (User) request.getSession().getAttribute("user");
+		ExportManager exportManager =  new ExportManager();
+		User userRequest = new User();
+		String isImport = "N";
+		try {
+			if(request.getParameter("import") != null){
+				isImport = (String)request.getParameter("import");
+			}
+			
+			boolean canRunBatch = false;
+			InterfaceDAO dao = new InterfaceDAO();
+			String status = dao.findControlMonitor(Constants.TYPE_EXPORT);
+			logger.info("status["+status+"]");
+			if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+			    canRunBatch = true;
+			}
+					
+			if(canRunBatch){
+				
+				logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+				
+	            String requestTable = "";
+	            String requestTableTransType = "";
+			    if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestExportTable()).equals("")){
+					String[] exportArray = interfacesForm.getMonitorBean().getRequestExportTable().split("\\|");
+					requestTable = exportArray[0];
+					requestTableTransType = exportArray[1];
+					
+					/** Case Admin Update By Request Table Replace UserId*/
+					String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestExportUserName()+"%'";
+					if(Utils.isNull(interfacesForm.getMonitorBean().getRequestExportUserName()).equals("")){
+						whereClause = "AND USER_NAME LIKE '%ADMIN%'";
+					}
+					User[] results = new MUser().search(whereClause);
+					if(results != null && results.length >0){
+						userRequest = results[0];/** Replace UserID for Serach File in FTP Server */
+					}
+				}
+			    
+			    logger.debug("requestUpdateSalesTable:"+interfacesForm.getMonitorBean().getRequestExportTable());
+			    logger.debug("UserId Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
+	
+				MonitorBean m = exportManager.exportMain(userLogin,userRequest, requestTable,requestTableTransType, request);
+				
+				/** Set from Progress Popup **/
+				request.setAttribute("action", "submited");
+				request.setAttribute("id", m.getTransactionId());
+				//request.setAttribute("import", isImport);
+				
+				/** Check For ProgressBar  **/
+				 if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestExportTable()).equals("")){
+				     request.setAttribute("transaction_count", "1");
+				 }else{
+					 request.setAttribute("transaction_count", "2"); 
+				 }
+ 
+				logger.debug("getTransactionId:"+m.getTransactionId());
+				
+			}else{
+				request.setAttribute("Message","กำลังส่งข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("success");
+	}
+	
+	
 	/**
 	 * Import To DB
 	 */
-	public ActionForward updateSalesTransaction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward updateSalesTransaction1(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("Import :updateSalesTransaction");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
@@ -288,67 +389,6 @@ public class InterfacesAction extends I_Action {
 		return mapping.findForward("success");
 	}
 	
-	
-	
-	/**
-	 * Export To Txt
-	 */
-	public ActionForward syschronizeToOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Export :syschronizeToOracle");
-		InterfacesForm interfacesForm = (InterfacesForm) form;
-		User userLogin = (User) request.getSession().getAttribute("user");
-		ExportManager exportManager =  new ExportManager();
-		User userRequest = new User();
-		
-		String isImport = "N";
-		if(request.getParameter("import") != null)
-			isImport = (String)request.getParameter("import");
-		
-		try {
-			logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-			
-            String requestTable = "";
-            String requestTableTransType = "";
-		    if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestExportTable()).equals("")){
-				String[] exportArray = interfacesForm.getMonitorBean().getRequestExportTable().split("\\|");
-				requestTable = exportArray[0];
-				requestTableTransType = exportArray[1];
-				
-				/** Case Admin Update By Request Table Replace UserId*/
-				String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestExportUserName()+"%'";
-				if(Utils.isNull(interfacesForm.getMonitorBean().getRequestExportUserName()).equals("")){
-					whereClause = "AND USER_NAME LIKE '%ADMIN%'";
-				}
-				User[] results = new MUser().search(whereClause);
-				if(results != null && results.length >0){
-					userRequest = results[0];/** Replace UserID for Serach File in FTP Server */
-				}
-			}
-		    
-		    logger.debug("requestUpdateSalesTable:"+interfacesForm.getMonitorBean().getRequestExportTable());
-		    logger.debug("UserId Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
-
-			MonitorBean m = exportManager.exportMain(userLogin,userRequest, requestTable,requestTableTransType, request);
-			
-			/** Set from Progress Popup **/
-			request.setAttribute("action", "submited");
-			request.setAttribute("id", m.getTransactionId());
-			//request.setAttribute("import", isImport);
-			
-			/** Check For ProgressBar  **/
-			 if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestExportTable()).equals("")){
-			     request.setAttribute("transaction_count", "1");
-			 }else{
-				 request.setAttribute("transaction_count", "2"); 
-			 }
-			 
-			logger.debug("getTransactionId:"+m.getTransactionId());
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return mapping.findForward("success");
-	}
 	
 	
 	

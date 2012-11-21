@@ -183,7 +183,7 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ORDER_ID_MANUAL")){
 				/** GET_ORDER_ID CASE Manual Form Oracl and Regen OrderNo  **/
 				findColumn = "ORDER_ID";
-				value = ImportHelper.getReplcaeNewOrderNo(value);
+				value = getReplcaeNewOrderNo(value);
 				sql.append(" select "+findColumn+" FROM t_order WHERE order_no = '"+value+"'" );		
 				if(Utils.isNull(value).equals("")){
 					exe = false;
@@ -210,11 +210,12 @@ public class ExternalFunctionHelper {
 		    }else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_RECEIPT_ID_IN_HEAD")){
 					/** GET_RECEIPT_ID **/
 					findColumn = "RECEIPT_ID";
+					
 					sql.append(" select "+findColumn+" FROM t_receipt WHERE receipt_no = '"+value+"' \n" );		
 					sql.append(" union all \n" );
-					sql.append(" select distinct "+findColumn+" from t_receipt_match where receipt_by_id in( \n" );
+					sql.append(" select distinct m.receipt_id as "+findColumn+" from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( \n" );
 					sql.append("  	select receipt_by_id from t_receipt_by  where cheque_no ='"+value+"' \n" );
-					sql.append("   ) \n" );
+					sql.append(" ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' \n" );
 					
 					if( !Utils.isNull(value).equals("")){
 						ps = conn.prepareStatement(sql.toString());
@@ -227,6 +228,8 @@ public class ExternalFunctionHelper {
 						if("".equals(Utils.isNull(id))){
 							id = String.valueOf(SequenceHelper.getNextValue("t_receipt"));
 							RECEIPT_MAP.put(Utils.isNull(value), id);//Put New ReceiptId for use in receiptId Line
+						}else{
+							RECEIPT_MAP.put(Utils.isNull(value), id);
 						}
 						
 					}	
@@ -241,9 +244,9 @@ public class ExternalFunctionHelper {
 				findColumn = "RECEIPT_ID";
 				sql.append(" select "+findColumn+" FROM t_receipt WHERE receipt_no = '"+value+"' \n" );		
 				sql.append(" union all \n" );
-				sql.append(" select distinct "+findColumn+" from t_receipt_match where receipt_by_id in( \n" );
+				sql.append(" select distinct m.receipt_id as "+findColumn+" from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( \n" );
 				sql.append("  	select receipt_by_id from t_receipt_by  where cheque_no ='"+value+"' \n" );
-				sql.append("   ) \n" );
+				sql.append(" ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' \n" );
 				
 				if( !Utils.isNull(value).equals("")){
 					ps = conn.prepareStatement(sql.toString());
@@ -261,15 +264,56 @@ public class ExternalFunctionHelper {
 				exe = false;
 			
 		    /**
-		     * GET_LINE_NO By Receipt ID and get Max(line_no) +1
+		     * GET_LINE_NO IN t_receipt By Receipt ID and paid_amount  and get Max(line_no) +1
+		     * FIND_LINE_NO_BY_RECEIPT_ID|1        |4
+		     *                            receiptNo|paidAmount
 		     */
-		    }else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_LINE_NO_BY_RECEIPT_ID")){
+		    }else if(Utils.isNull(colBean.getExternalFunction()).startsWith("FIND_LINE_NO_BY_RECEIPT_ID")){
 		    	findColumn = "next_line_no";
-		    	String receiptId = RECEIPT_MAP.get(Utils.isNull(value));
-				sql.append(" select (max(line_no)+1) as next_line_no FROM t_receipt_line WHERE receipt_id = "+receiptId+" \n" );		
-                logger.info("sql:"+sql.toString());
-                
-				if( !Utils.isNull(value).equals("")){
+		    	
+		    	String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
+		    	logger.info("values[0]:"+values[0]+",values[1]:"+values[1]+",values[2]:"+values[2]);
+		    	
+		    	//String receiptId = RECEIPT_MAP.get(Utils.isNull(values[0]));
+		    	
+		    	sql.append("\n select l.line_no as "+findColumn);
+		    	sql.append("\n from t_receipt_line l ,t_receipt_match m ,t_receipt_by b where 1=1 ");
+		    	sql.append("\n and l.receipt_line_id = m.receipt_line_id ");
+		    	sql.append("\n and m.receipt_by_id = b.receipt_by_id ");
+		    	sql.append("\n and ( b.paid_amount = "+lineArray[Integer.parseInt(values[2])] +" OR l.paid_amount ="+lineArray[Integer.parseInt(values[2])] +")");
+		    	sql.append("\n and m.receipt_id in( ");
+		    	sql.append("\n   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' " );		
+				sql.append("\n   union all " );
+				sql.append("\n   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( " );
+				sql.append("\n  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' " );
+				sql.append("\n    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' " );
+				sql.append("\n ) ");
+		    	
+		    	//Find by receiptId and compare paidAmount
+		    	if( !Utils.isNull(values[1]).equals("") && !Utils.isNull(values[2]).equals("")){
+					ps = conn.prepareStatement(sql.toString());
+					rs = ps.executeQuery();
+					if(rs.next()){
+					   id = rs.getString(findColumn);
+					}
+					
+					logger.info("sql 1:"+sql.toString());
+					logger.info("Step 1 Find by Logic result["+id+"]");
+				}
+			
+			  //Case not found Set Next line_no
+			    if("".equals(Utils.isNull(id))){
+			    	sql = new StringBuffer("");
+					sql.append(" select (max(line_no)+1) as next_line_no FROM t_receipt_line WHERE 1=1 \n" );	
+					sql.append(" and receipt_id in( ");
+			    	sql.append("   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' \n" );		
+					sql.append("   union all \n" );
+					sql.append("   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( \n" );
+					sql.append("  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' \n" );
+					sql.append("    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' \n" );
+					sql.append(" ) \n");
+	                
+	                
 					ps = conn.prepareStatement(sql.toString());
 					rs = ps.executeQuery();
 					if(rs.next()){
@@ -280,7 +324,11 @@ public class ExternalFunctionHelper {
 					}else{
 						id = "1";
 					}
-				}	
+					
+					logger.info("sql 2:"+sql.toString());
+					logger.info("Step 2 Find by max(lineNo)+1 result["+id+"]");
+					
+			    }
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CANCEL_FLAG")){	
 				if(Utils.isNull(value).equals(Constants.INTERFACES_DOC_STATUS_VOID)){
@@ -316,7 +364,7 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_REPLACE_ORDER_NO")){
 				findColumn = "";
 				if( !value.equals("")){
-					id = ImportHelper.getReplcaeNewOrderNo(value);
+					id = getReplcaeNewOrderNo(value);
 				}
 				exe = false;
 				
@@ -449,6 +497,26 @@ public class ExternalFunctionHelper {
 			}
 		}
 		return id;
+	}
+	
+	/** Case Order Manaul (from Oracle )
+	 * order_no length == 12 only
+	 * order ที่ขึ้นต้นด้วย 2  ให้ replace เป็น S
+       order ที่ขึ้นต้นด้วย 3 ให้ replace เป็น C
+	 * @param orderNo
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getReplcaeNewOrderNo(String orderNo) throws Exception{
+		if(Utils.isNull(orderNo).length() ==12){
+			String firstPos = orderNo.substring(0,1);
+			if(firstPos.equals("2")){
+				orderNo = "S"+orderNo.substring(1,orderNo.length());
+			}else if(firstPos.equals("3")){
+				orderNo = "C"+orderNo.substring(1,orderNo.length());
+			}
+		}
+		return orderNo;
 	}
 	
 	

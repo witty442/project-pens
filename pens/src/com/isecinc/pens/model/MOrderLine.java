@@ -1,6 +1,7 @@
 package com.isecinc.pens.model;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -175,6 +176,57 @@ public class MOrderLine extends I_Model<OrderLine> {
 			return true;
 		} catch (Exception e) {
 			throw e;
+		}
+	}
+	
+	/**
+	 * Check lineNo duplicate  and reorg lineno
+	 * @param orderId
+	 * @param conn
+	 * @throws Exception
+	 */
+	public void reOrgLineNo(int orderId, Connection conn) throws Exception {
+		Statement stmt = null;
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		ResultSet rst2 = null;
+		int lineNo = 1;
+		try {
+			String sql = "select count(*) as dup from t_order_line  where order_id ="+orderId+" group by line_no having count(*) > 1";
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				// line_no duplicate and reorg line_no 
+				sql = "select order_line_id from t_order_line  where order_id ="+orderId+"";
+				stmt = conn.createStatement();
+				rst2 = stmt.executeQuery(sql);
+
+				//update 
+				ps = conn.prepareStatement("update t_order_line set line_no =? where order_line_id =? ");
+				while(rst2.next()){
+					ps.setInt(1, lineNo);
+					ps.setInt(2, rst2.getInt("order_line_id"));
+					ps.executeUpdate();
+					lineNo++;
+				}
+			}
+		
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e) {}
+			try {
+				rst2.close();
+			} catch (Exception e) {}
+			try {
+				stmt.close();
+			} catch (Exception e) {}
+			try {
+				ps.close();
+			} catch (Exception e) {}
 		}
 	}
 

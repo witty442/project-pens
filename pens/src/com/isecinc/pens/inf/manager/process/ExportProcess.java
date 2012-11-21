@@ -151,7 +151,7 @@ public class ExportProcess {
 			fileExportBean.setDestination(tableBean.getDestination());
 			fileExportBean.setTransactionType(tableBean.getTransactionType());
 			fileExportBean.setExportPath(tableBean.getExportPath());
-			fileExportBean.setFileFtpNameFull(ExportHelper.genFileNameMTrip(tableBean, userId));
+			fileExportBean.setFileFtpNameFull(ExportHelper.genFileNameMTrip(tableBean, userBean.getUserName()));
 			
 	         String sql ="	select 	\n"+
 					"	m.TRIP_ID,	\n"+
@@ -736,7 +736,7 @@ public class ExportProcess {
 			/** Init Config Column */
 			TableBean orderDBean = new TableBean();
             orderDBean.setTableName("t_lockbox_header");
-            List columnList = ExportHelper.initColumn(orderDBean);
+            List<ColumnBean> columnList = ExportHelper.initColumn(orderDBean);
              
 			sql = "	select 			\n"+
 			"	'1'	AS	Record_Identifier,	\n"+
@@ -825,9 +825,9 @@ public class ExportProcess {
         List<String> sqlUpdateExportFlagList = new ArrayList<String>();
 		try{
 			/** Init Config Column */
-			TableBean orderDBean = new TableBean();
-            orderDBean.setTableName("t_lockbox_batch_header");
-            List columnList = ExportHelper.initColumn(orderDBean);
+			TableBean table = new TableBean();
+			table.setTableName("t_lockbox_batch_header");
+            List<ColumnBean> columnList = ExportHelper.initColumn(table);
 
 			sql = "	select 			\n"+
 			"	 '2'  AS	Record_Identifier,		\n"+
@@ -850,7 +850,7 @@ public class ExportProcess {
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 			\n"+
 			"   and t_receipt.DOC_STATUS = 'SV' 	\n"+
 			"   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
-			"	and  m_customer.user_id =  "+userBean.getId()+"		\n"+
+			"	and m_customer.user_id =  "+userBean.getId()+"		\n"+
 			"   and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL) \n"+
 			"   and t_receipt.internal_bank = '"+internalBank+"' \n"+
 			"	group by t_receipt.receipt_id,		\n"+
@@ -877,9 +877,9 @@ public class ExportProcess {
 						}
 					}else{
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-						   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-						   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						    dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}
 					//check Last Position
@@ -936,7 +936,7 @@ public class ExportProcess {
 			/** Init Config Column */
 			TableBean orderDBean = new TableBean();
             orderDBean.setTableName("t_lockbox_batch_payment");
-            List columnList = ExportHelper.initColumn(orderDBean);
+            List<ColumnBean> columnList = ExportHelper.initColumn(orderDBean);
             
             sql="	select	\n"+
             "	'3' AS Record_Identifier,	\n"+

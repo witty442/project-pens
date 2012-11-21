@@ -45,12 +45,12 @@ body {
 .style1 {color: #004a80}
 
 -->
-
+ 
 .currPage{ border:1px solid #000000; padding-left:4px;padding-right:4px;padding-top:2px; }
 .pageLink{padding-left:4px;padding-right:4px;padding-top:2px; }
 .paging{height:18px;width:100%;}
 .catalog{text-align:center;/*background-color:#FFCC99;*/}
-.brandName{width:120px;vertical-align:top;}
+.brandName{width:120px;vertical-align:top;} 
 
 table#productList thead{background:#FFE4CA;}
 .qtyInput{width:35px; text-align:right;}

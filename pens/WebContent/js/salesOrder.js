@@ -232,7 +232,7 @@ function add_product(path, id){
 
 function open_product(path, rowNo){
 	if(rowNo==null)
-		window.open(path + "/jsp/pop/productPopup.jsp", "Product", "width=700,height=400,location=No,resizable=No");
+		window.open(path + "/jsp/pop/productPopup.jsp", "Product", "width=700,height=450,location=No,resizable=No");
 	else
 		window.open(path + "/jsp/pop/productPopup.jsp?row="+rowNo, "Product", "width=700,height=450,location=No,resizable=No");
 	return;
@@ -262,10 +262,6 @@ function addProduct2(path,objValue){
         tds += '<td align="right"></td>';
         tds += '<td align="right"></td>';
         tds += '<td align="right"></td>';
-//        tds += '<td align="right"></td>';
-//        tds += '<td align="right"></td>';
-        if(orderType=='DD')
-        	tds += '<td align="center"></td>';
         tds += '<td align="center"></td>';
         tds += '<td align="center"></td>';
         tds += '<td align="center"></td>';
@@ -276,8 +272,8 @@ function addProduct2(path,objValue){
             $(this).append(tds);
         }
     });
-    setValueToProduct(path,objValue);
     
+    setValueToProduct(path,objValue);
 }
 
 function addProduct(path,objValue){
@@ -299,13 +295,9 @@ function addProduct(path,objValue){
 		var vat1 = eval(document.getElementsByName('lines.vat1')[index].value) + eval(objValue.vat1);
 		var vat2 = eval(document.getElementsByName('lines.vat2')[index].value) + eval(objValue.vat2);
 		
-		tbl.rows[index+1].cells[4].innerHTML = addCommas(qty1) + '/' + addCommas(qty2);
-		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2));
-		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));
-		//tbl.rows[index+1].cells[8].innerHTML = addCommas((vat1 + vat2).toFixed(5));
-		
-		//WIT Edit 09/06/2011: commnet this line 227
-		//tbl.rows[index+1].cells[10].innerHTML = addCommas((total1 + total2).toFixed(2));
+		tbl.rows[index+1].cells[4].innerHTML = addCommas(qty1) + '/' + addCommas(qty2); //qty
+		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2)); //total amount
+		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));//total discount
 		
 		document.getElementsByName('lines.qty1')[index].value = qty1;
 		document.getElementsByName('lines.qty2')[index].value = qty2;
@@ -391,23 +383,18 @@ function setValueToProduct(path, objValue){
 	var c=0;
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.row;
 	tbl.rows[objValue.row].cells[c++].innerHTML=checkBoxLabel;
-	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.product+' '+objValue.productLabel+inputLabel;
-	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.uomLabel1 + '/' + objValue.uomLabel2;
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.qty1) + '/' + addCommas(objValue.qty2);
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.price1) + '/' + addCommas(objValue.price2);
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.amount1) + eval(objValue.amount2)).toFixed(5));
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.disc1) + eval(objValue.disc2)).toFixed(5));
-	/** WIT EDIT 09/06/2011 */
-	/*totalAmount*/ tbl.rows[objValue.row].cells[c++].innerHTML='0';
-	/*vatAmount*/ //tbl.rows[objValue.row].cells[c++].innerHTML='0';//tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.vat1) + eval(objValue.vat2)).toFixed(5));
-	/*netAmount*/ //tbl.rows[objValue.row].cells[c++].innerHTML= '0';//addCommas((eval(objValue.total1) + eval(objValue.total2)).toFixed(5));
+	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.product+' '+objValue.productLabel+inputLabel;//ชื่อรหีสสินค้า
+	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.uomLabel1 + '/' + objValue.uomLabel2; //uom
+	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.qty1) + '/' + addCommas(objValue.qty2);//qty
+	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.price1) + '/' + addCommas(objValue.price2);//price per unit
+	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.amount1) + eval(objValue.amount2)).toFixed(5));//amount 
+	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.disc1) + eval(objValue.disc2)).toFixed(5));//discount
+	tbl.rows[objValue.row].cells[c++].innerHTML='0';//netAmount
+	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.ship; //shipDate
+	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.req; //requestDate
+	tbl.rows[objValue.row].cells[c++].innerHTML=iconLabel; //icon promotion
 	
-	if(orderType=='DD')
-		tbl.rows[objValue.row].cells[c++].innerHTML=1;
-	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.ship;
-	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.req;
-	tbl.rows[objValue.row].cells[c++].innerHTML=iconLabel;
-	
+	//caculate price
 	calculatePrice();
 	
 	return true;
@@ -612,65 +599,26 @@ function calculatePrice(){
 		totals1[i].value = Number(toFixed(s1,5)).toFixed(2);
 		totals2[i].value = Number(toFixed(s2,5)).toFixed(2);
 		
-		if(orderType=='DD' && memberVIP == 'N'){
-			
-			sumT+=Number(afdiscs[i].value);
-			sumVat+=Number(vats[i].value);
-			sumTot+=Number(totals[i].value);
-			
-			//display in table
-			//after discount
-			tbl.rows[i+1].cells[8].innerHTML=addCommas(Number(Number(afdiscs[i].value)).toFixed(2));
-			//vat
-			//tbl.rows[i+1].cells[9].innerHTML=addCommas(Number(Number(vats[i].value)).toFixed(2));
-			//total
-			//tbl.rows[i+1].cells[10].innerHTML=addCommas(Number(Number(totals[i].value)).toFixed(2));
-			
-		}else{ // customer
-			
-			sumT+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);
-			sumVat+=Number(vats1[i].value) +  Number(vats2[i].value);
-			sumTot+=Number(totals1[i].value) + Number(totals2[i].value);
-			
-			//display in table
-			total_ex_disc = t1 + t2;
-			//after discount
-			tbl.rows[i+1].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(2));
-			//vat
-			//tbl.rows[i+1].cells[9].innerHTML=addCommas(Number(Number(vats1[i].value) +  Number(vats2[i].value)).toFixed(2));
-			//total
-			//tbl.rows[i+1].cells[10].innerHTML=addCommas(Number(Number(totals1[i].value) + Number(totals2[i].value)).toFixed(2));
-		}
+		sumT+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);
+		//alert("afdiscs1["+afdiscs1[i].value+"],afdiscs2["+afdiscs2[i].value+"] -->sumT["+sumT+"]");
+		
+		sumVat+=Number(vats1[i].value) +  Number(vats2[i].value);
+		sumTot+=Number(totals1[i].value) + Number(totals2[i].value);
+		
+		//display in table
+		total_ex_disc = t1 + t2;
+		//after discount >> netAmount
+		tbl.rows[i+1].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(2));
+
 	}
 	//alert(sumT);
-	
-	if(orderType=='DD'){
-		//included vat
-		//document.getElementsByName("order.totalAmount")[0].value = Number(sumT.toFixed(5)-sumVat.toFixed(5));
-		//document.getElementById("tempTotalAmount").value = addCommas(Number(sumT.toFixed(5)-sumVat.toFixed(5)).toFixed(5));
-		//document.getElementsByName("order.totalAmount")[0].value = Number(sumT.toFixed(5));
-		document.getElementsByName("order.totalAmount")[0].value = Number(toFixed(sumT,5));
-		document.getElementById("tempTotalAmount").value = addCommas(Number(toFixed(sumT,5)).toFixed(2));
-	}else{
-		//excluded vat
-		//document.getElementsByName("order.totalAmount")[0].value = Number(sumT.toFixed(5));
-		document.getElementsByName("order.totalAmount")[0].value = Number(toFixed(sumT,5));
-		document.getElementById("tempTotalAmount").value = addCommas(Number(toFixed(sumT,5)).toFixed(2));
-	}
-	
-	// OLDE CODE 
-	/*
-	//document.getElementsByName("order.vatAmount")[0].value = sumVat.toFixed(5);
-	document.getElementsByName("order.vatAmount")[0].value = Number(toFixed(sumVat,5));
-	document.getElementById("tempVatAmount").value = addCommas(Number(toFixed(sumVat,5)).toFixed(2));
-	
-	//document.getElementsByName("order.netAmount")[0].value = sumTot.toFixed(5);
-	document.getElementsByName("order.netAmount")[0].value = toFixed(Number(sumT)+Number(sumVat),5);
-	document.getElementById("tempNetAmount").value = addCommas(Number(toFixed(Number(sumT)+Number(sumVat),5)).toFixed(2));
-	*/
-	
 	//WIT Edit :08/06/2011  Cale Vat by total_amount of Header 
 	
+	//total_amount- total_discount  excluded vat
+	document.getElementsByName("order.totalAmount")[0].value = Number(toFixed(sumT,5));
+	document.getElementById("tempTotalAmount").value = addCommas(Number(toFixed(sumT,5)).toFixed(2));
+	
+	//total_vat_amount
 	var sumVatAmount = (Number(v)*Number(sumT))/100; 
 	document.getElementsByName("order.vatAmount")[0].value = Number(toFixed(sumVatAmount,5));
 	document.getElementById("tempVatAmount").value = addCommas(Number(toFixed(sumVatAmount,5)).toFixed(2));

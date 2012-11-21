@@ -32,7 +32,6 @@ try{
 			whereCause += "\n AND PRODUCT_CATEGORY_ID IN( ";
 			whereCause += "\n  select product_category_id from m_product_category  WHERE name LIKE '%" + pBrand + "%'";
 			whereCause += "\n )";
-			
 		}
 		
 		results = new MProduct().search(whereCause);

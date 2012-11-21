@@ -109,7 +109,7 @@ public class MoveOrderAction extends I_Action {
 		try {
 			MMoveOrder mDAO = new MMoveOrder();
 			MoveOrder m = prepareCreateMoveOrder(user, mForm);
-			List moveOrderList = mDAO.searchMoveOrderList(m,user);
+			List<MoveOrder> moveOrderList = mDAO.searchMoveOrderList(m,user);
 			mForm.setResults(moveOrderList);
 			if(moveOrderList != null && moveOrderList.size()==0){
 				request.setAttribute("Message","ไม่พบข้อมูล");

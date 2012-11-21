@@ -102,7 +102,7 @@ function selectProduct(code, name){
 	</tr>
 	<tr>
 		<td colspan="3">
-			<div id="results" style="height:220px; overflow-x: hidden; overflow-y: scroll;"></div>
+			<div id="results"></div>
 		</td>
 	</tr>
 	<tr><td colspan="2">&nbsp;</td></tr>

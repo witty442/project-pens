@@ -71,7 +71,7 @@ body {
 
 <script>
   $(function() {
-	$("#dialog").dialog({ height: 250,width:300,modal:true });
+	$("#dialog").dialog({ height: 250,width:300,modal:false });
   });
  
  function close(){

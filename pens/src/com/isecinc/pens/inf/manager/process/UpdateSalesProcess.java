@@ -75,17 +75,17 @@ public class UpdateSalesProcess {
 				  childBean = ImportHelper.genPrepareSQLUTS(childBean,userBean);
 
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("U") != -1 && !Utils.isNull(childBean.getPrepareSqlUpd()).equals("")){
-					  logger.debug("sqlUpd_D:"+childBean.getPrepareSqlUpd());
+					  logger.info("sqlUpddate_Line:"+childBean.getPrepareSqlUpd());
 					  psUpdateD = conn.prepareStatement(childBean.getPrepareSqlUpd());
 				  }
 				  
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("U") != -1 && !Utils.isNull(childBean.getPrepareSqlUpdCS()).equals("")){
-					  logger.debug("sqlUpdateD_CS:"+childBean.getPrepareSqlUpdCS());
+					  logger.info("sqlUpdate_Line_CS:"+childBean.getPrepareSqlUpdCS());
 				      psUpdateDCS = conn.prepareStatement(childBean.getPrepareSqlUpdCS());
 				  }
 
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(childBean.getPrepareSqlIns()).equals("")){
-					  logger.debug("sqlIns_D:"+childBean.getPrepareSqlIns());
+					  logger.info("sqlInsert_Line:"+childBean.getPrepareSqlIns());
 					  psInsD = conn.prepareStatement(childBean.getPrepareSqlIns());
 				  }
 			  }
@@ -100,7 +100,7 @@ public class UpdateSalesProcess {
 			    		  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 				    		  //**Check Header Or Line**/
-			    		      logger.info("lineStr:"+lineStr);
+			    		      logger.info("lineStr["+lineStr+"]");
 				    		  if(lineStr.startsWith("H")){  
 				    			  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(tableBean.getPrepareSqlUpd())){
 					    			  logger.debug("**********Start Update H ******************");
@@ -140,7 +140,7 @@ public class UpdateSalesProcess {
 				    		  if(lineStr.startsWith("L")){
 				    			  if(!"".equalsIgnoreCase(tableBean.getChildTable())){
 				    				  
-				    				  /** Case Special **/
+				    				  /** Case Special t_order only**/
 				    				  if(isOrderLineCanInsert(tableBean, childBean, userBean, lineStr)){
 					    				  /** Update Line **/
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpdCS())){
@@ -159,10 +159,19 @@ public class UpdateSalesProcess {
 				    				  }else{
 				    					  /** Update Line  normal**/
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpd())){
-						    				  logger.debug("**********Start Update L ******************");
+						    				  logger.debug("**********Start Update L normal ******************");
 							    			  psUpdateD = ImportHelper.spiltLineArrayToUpdateStatement(conn, childBean, lineStr, psUpdateD,userBean);
 									    	  canExc = psUpdateD.executeUpdate();
-									    	  logger.info("canUpdate L:"+canExc);
+									    	  logger.info("canUpdate Line:"+canExc);
+					    				  }
+					    				  /** INSERT LINE **/
+					    				  if(tableBean.getActionDB().indexOf("I") != -1 && !"".equals(childBean.getPrepareSqlIns())){
+								    		  if(canExc ==0){
+								    			  logger.debug("**********Start Insert L normal  ******************");
+								    			  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
+								    			  canExc = psInsD.executeUpdate();
+										    	  logger.info("canInsert Line:"+canExc);
+								    		 } 
 					    				  }
 				    				  }
 						    		  
@@ -222,9 +231,9 @@ public class UpdateSalesProcess {
     				 
     		         if(lineArray != null && lineArray.length>0){
 	    		    	 if(tableBean.getTableName().equalsIgnoreCase("t_order")){
-	    		    		 orderNoAll +="'"+ImportHelper.getReplcaeNewOrderNo(Utils.isNull(lineArray[1]))+"',";//ORDER_NO POSITION TEXT
+	    		    		 orderNoAll +="'"+ExternalFunctionHelper.getReplcaeNewOrderNo(Utils.isNull(lineArray[1]))+"',";//ORDER_NO POSITION TEXT
 	    		    	 }else if(tableBean.getTableName().equalsIgnoreCase("t_order_orcl")){ //order manual from ORCL
-	    		    		 orderNoAll +="'"+ImportHelper.getReplcaeNewOrderNo(Utils.isNull(lineArray[2]))+"',";//ORDER_NO POSITION TEXT
+	    		    		 orderNoAll +="'"+ExternalFunctionHelper.getReplcaeNewOrderNo(Utils.isNull(lineArray[2]))+"',";//ORDER_NO POSITION TEXT
 	    		    	 }
     		         }
 				  }
@@ -299,12 +308,12 @@ public class UpdateSalesProcess {
 	}
   	
 	
-	private boolean isOrderLineCanInsert(TableBean tableBean ,TableBean chileBean,User user ,String lineStr) throws Exception{
+	private boolean isOrderLineCanInsert(TableBean tableBean ,TableBean childBean,User user ,String lineStr) throws Exception{
 		boolean canAccess = false;
 		try{
-			if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(chileBean.getPrepareSqlIns()).equals("")){
+			if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(childBean.getPrepareSqlIns()).equals("")){
 				
-				if(chileBean.getTableName().equalsIgnoreCase("t_order_line")){
+				if(childBean.getTableName().equalsIgnoreCase("t_order_line")){
 					if( !Utils.isNull(lineStr).equals("")){
 						String[] lineArray = (lineStr+" ").split(Constants.delimeterPipe);
 						/** validate product_id in lineText position = 6  */
@@ -314,10 +323,10 @@ public class UpdateSalesProcess {
 						}
 					}
 				}else{
-					canAccess = true;
+					canAccess = false;
 				}
 			}
-			logger.debug("CanAccess:"+chileBean.getTableName()+":"+canAccess);
+			logger.info("CanAccess:"+childBean.getTableName()+":"+canAccess);
 			
 		}catch(Exception e){
 			throw e;

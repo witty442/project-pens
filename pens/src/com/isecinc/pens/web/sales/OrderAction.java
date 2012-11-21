@@ -172,8 +172,7 @@ public class OrderAction extends I_Action {
 					lines.setFullUom(ConvertNullUtil.convertToString(lines.getUom1().getCode()) + "/"
 							+ ConvertNullUtil.convertToString(lines.getUom2().getCode()));
 					lines.setPromotion("N");
-					lines
-							.setShippingDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"))
+					lines.setShippingDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"))
 									.format(new Date()));
 					lines.setRequestDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
 					orderForm.getLines().add(lines);
@@ -228,7 +227,7 @@ public class OrderAction extends I_Action {
 		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
-        logger.debug("prepare 1");
+        logger.info("prepare 1");
 		try {
 			roundTrip = orderForm.getOrder().getRoundTrip();
 
@@ -267,7 +266,8 @@ public class OrderAction extends I_Action {
 	}
 
 	/**
-	 * Pre-Save
+	 * Pre-Save 
+	 * :Caculate Promotion 
 	 */
 	public ActionForward preSave(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -503,9 +503,7 @@ public class OrderAction extends I_Action {
 			}
 
 			for (OrderLine line : orderForm.getLines()) {
-				if (!order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-					line.setLineNo(i++);
-				}
+				line.setLineNo(i++);
 				line.setPayment("N");
 			}
 
@@ -524,21 +522,22 @@ public class OrderAction extends I_Action {
 			new MOrderLine().deletePromotion(orderForm.getOrder().getId(), conn);
 
 			// Delete Line
-			if (ConvertNullUtil.convertToString(orderForm.getDeletedId()).trim().length() > 0)
+			if (ConvertNullUtil.convertToString(orderForm.getDeletedId()).trim().length() > 0){
 				new MOrderLine().delete(orderForm.getDeletedId().substring(1).trim(), conn);
-
+			}
+			
 			// Delete All Lines if Member Edit
 			if (order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)
 					&& ((String) request.getSession().getAttribute("memberVIP")).equals("N")) {
 				new MOrderLine().deleteAllLines(orderForm.getOrder().getId(), conn);
 			}
-			// Save Lines
+			
+			// Save Lines all new
 			i = 1;
 			String lastShipDate = "";
 			for (OrderLine line : orderForm.getLines()) {
-				if (!order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-					line.setLineNo(i++);
-				}
+				line.setLineNo(i++);
+				
 				line.setPayment("N");
 				line.setOrderId(order.getId());
 				line.setNeedExport("N");
@@ -547,9 +546,9 @@ public class OrderAction extends I_Action {
 				
 				//Wit Edit 15/05/2555 Obj:Case PlaceOfBilled
 				line.setOrg(org);
-				
 				line.setSubInv(subInv);
 				
+				//Save Line to DB
 				new MOrderLine().save(line, userActive.getId(), conn);
 			}
 			// atiz.b 20110520 --member re-expired date with last order date
@@ -557,8 +556,8 @@ public class OrderAction extends I_Action {
 				lastShipDate = orderForm.getLines().get(orderForm.getLines().size() - 1).getShippingDate();
 			}
 
-			// Re-Calculate
-			// new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
+			// Re-Calculate totalAmount vatAmount netAmount From line
+			new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
 
 			// Re-Save
 			new MOrder().save(order, userActive.getId(), conn);
@@ -585,9 +584,8 @@ public class OrderAction extends I_Action {
 			if (userActive.getRole().getKey().equals(User.VAN) && orderForm.getOrder().isPaymentCashNow()) {
 				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
 				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
-				 orderForm.getAutoReceipt().setInternalBank("002");
+				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
 				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
-				 //orderForm.getAutoReceipt().setInternalBank("CASH");
 				 
 				 /** Set ReceiptBy Manual **/
 				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
@@ -619,6 +617,9 @@ public class OrderAction extends I_Action {
 				orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			}
 			
+			// re org case line_no duplicate
+			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
+			
 			// Commit Transaction
 			conn.commit();
 			// set msg save success
@@ -629,7 +630,6 @@ public class OrderAction extends I_Action {
 				request.setAttribute("popup_autoreceipt", "true");
 			}
 			/**************************************************************/
-			
 			// save token
 			saveToken(request);
 			
@@ -724,10 +724,12 @@ public class OrderAction extends I_Action {
 			conn.commit();
 			//
 			request.setAttribute("Message", SystemMessages.getCaption("SaveReceiptSuccess", Utils.local_th));
+			
 			// Refresh Order
 			order = new MOrder().find(String.valueOf(orderForm.getOrder().getId()));
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
+			
 			// save token
 			saveToken(request);
 		} catch (Exception e) {

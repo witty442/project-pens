@@ -966,6 +966,7 @@ public class MMoveOrder {
 				  m.setRequestNumber(rst.getString("request_number"));
 				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setPdCode(rst.getString("pd_code"));
+				  m.setPdCodeShow(rst.getString("pd_code"));
 				  m.setPdDesc(rst.getString("pd_desc"));
                   m.setProductCode(rst.getString("product_code"));
                   m.setUom1(rst.getString("uom1"));
@@ -1019,9 +1020,9 @@ public class MMoveOrder {
 				sql.append("\n  SELECT " );
 				sql.append("\n   h.pd_code ,p.code as product_code ");
 				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
-				sql.append("\n  ,l.qty ,l.qty1 ,l.qty2 ");
+				sql.append("\n  ,sum(l.qty) as qty ,sum(l.qty1) as qty1 ,sum(l.qty2) as qty2 ");
 				sql.append("\n  ,l.uom1 ,l.uom2 ");
-				sql.append("\n  ,l.pack,l.total_amount");
+				sql.append("\n  ,l.pack,sum(l.total_amount) as total_amount");
 				sql.append("\n  ,h.status,h.exported");
 				sql.append("\n  from t_move_order h  ");
 				sql.append("\n  ,    t_move_order_line l  ");
@@ -1053,33 +1054,47 @@ public class MMoveOrder {
 				    sql.append("\n  and  h.exported ='"+mCriteria.getExported()+"'");
 			    }
 				
-				sql.append("\n  ORDER BY h.pd_code asc \n");
+				sql.append("\n  GROUP BY h.pd_code,h.status,h.exported ,p.code ,l.uom1 ,l.uom2,l.pack \n");
+				sql.append("\n  ORDER BY h.pd_code ,p.code asc \n");
 				
 				logger.info("sql:"+sql);
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				
+				int i = 0;
+				String tempPDCode = "";
 				while (rst.next()) {
 				  no++;
 				  MoveOrderSummary m = new MoveOrderSummary();
 				  m.setNo(no);
-				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setPdCode(rst.getString("pd_code"));
 				  m.setPdDesc(rst.getString("pd_desc"));
-                m.setProductCode(rst.getString("product_code"));
-                m.setUom1(rst.getString("uom1"));
-                m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
-                m.setUom2(rst.getString("uom2"));
-                m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
-                m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
+                  m.setProductCode(rst.getString("product_code"));
+                  m.setUom1(rst.getString("uom1"));
+                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
+                  m.setUom2(rst.getString("uom2"));
+                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
+                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 				  m.setExported(rst.getString("exported"));
 				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
 				  
+				  if(i==0){
+					  m.setPdCodeShow(m.getPdCode());
+					  tempPDCode = m.getPdCode();
+				  }else{
+					  if( !tempPDCode.equals(m.getPdCode())){
+						  m.setPdCodeShow(m.getPdCode());
+						  tempPDCode = m.getPdCode();
+					  }else{
+						  m.setPdCodeShow(""); 
+					  }
+				  }
+				  
 				  list.add(m);
+				  i++;
 				}//while
 			
 			} catch (Exception e) {
@@ -1087,10 +1102,10 @@ public class MMoveOrder {
 			} finally {
 				try {
 					if(rst != null){
-						rst.close();rst = null;
+					   rst.close();rst = null;
 					}
 					if(stmt != null){
-						stmt.close(); stmt = null;
+					   stmt.close(); stmt = null;
 					}
 					if(conn != null){
 					   conn.close();conn=null;

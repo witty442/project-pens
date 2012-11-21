@@ -4,6 +4,8 @@ import java.sql.Connection;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
+
 /**
  * Initial Class
  * 

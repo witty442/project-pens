@@ -76,7 +76,7 @@ public class ValidateImportHelper {
 			}else if(Utils.isNull(colBean.getValidateFunc()).equalsIgnoreCase("VALIDATE_ORDER_ID_MANUAL")){
 				/** GET_ORDER_ID CASE Manual Form Oracle and Regen OrderNo  **/
 				/** Regen OrderNo New Beacuse Oracle set OrderNo difference SaleApp **/ 
-				value = ImportHelper.getReplcaeNewOrderNo(value);
+				value = ExternalFunctionHelper.getReplcaeNewOrderNo(value);
 				findColumn = "ORDER_ID";
 				sql = " select "+findColumn+" FROM t_order WHERE order_no = '"+value+"'";		
 				if(Utils.isNull(value).equals("")){

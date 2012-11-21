@@ -181,8 +181,11 @@ public class ExportManager {
 		InterfaceDAO infDAO = new InterfaceDAO();
 		String fileSize = "0 bytes";
 		int statusTaskAll = Constants.STATUS_SUCCESS;
+		FTPManager ftpManager = null;
 		try{
-			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			//initail FTP Manager
+			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			
 			/** Connection Monitor */
 			connMonitor = DBConnection.getInstance().getConnection();
 			monitorModel.setTransactionId(transactionId);
@@ -282,9 +285,8 @@ public class ExportManager {
 						   
 						    /** Check Data Found Before Export **/
 						    if( modelDetailItem != null && modelDetailItem.length > 0){
-							   tableBean = exProcess.exportSalesReceiptHeaderVan(conn, tableBean,userRequest);	
+							    tableBean = exProcess.exportSalesReceiptHeaderVan(conn, tableBean,userRequest);	
 						    } 
-						    
 						}
 						
 					/*** User Role :DD (RECEIPT_LINE)   ***/
@@ -413,12 +415,15 @@ public class ExportManager {
 				    int updateRecord = exProcess.updateExportFlag(conn, userRequest,tableBean);
 				    logger.debug("***** -Result Update Interfaces "+tableBean.getTableName()+"  Flag "+updateRecord+" *************");
 				}
+				
+				
+				
 				isExc = true;
 			}//for
 			
 			logger.debug("Step Upload ALL File To FTP Server");
 			ftpManager.uploadAllFileToFTP(initConfigMap, "");
-		    
+
 			logger.debug("Step Success Transaction Commit");
 			conn.commit();
 			
@@ -428,19 +433,29 @@ public class ExportManager {
 			monitorModel.setSubmitDate(new Date());
 			monitorModel.setFileCount(fileCount);
 			dao.updateMonitor(connMonitor,monitorModel);
+			
 		}catch(Exception e){
 			if(conn != null){
-			   logger.debug("Step Transaction Rollback");
+			   logger.debug("Error:Step Transaction Rollback");
 			   conn.rollback();
+			   
+			   logger.debug("Error:Step delete file in FTP Case Roolback ");
+			   ftpManager.deleteAllFileInFTPCaseRollback(initConfigMap, "");
+			   
 			}
 			/** End process ***/
 			logger.debug("-Update Monitor to Fail ");
 			monitorModel.setStatus(Constants.STATUS_FAIL);
+			monitorModel.setBatchTaskStatus(Constants.STATUS_SUCCESS);//Thread batchTask end process
 			monitorModel.setSubmitDate(new Date());
 			monitorModel.setFileCount(fileCount);
 			monitorModel.setErrorCode(ExceptionHandle.getExceptionCode(e));
 			monitorModel.setErrorMsg(e.getMessage());
-			dao.updateMonitor(connMonitor,monitorModel);
+			
+			dao.updateMonitorCaseError(connMonitor,monitorModel);
+			
+			//clear Task running for next run
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
             
 			logger.error(e.getMessage(),e);
 		}finally{

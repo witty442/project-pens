@@ -19,8 +19,16 @@ create table m_product_unused(
    type  varchar(10) ,
    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    primary key(code,type)
-);
+)ENGINE=InnoDB DEFAULT CHARSET=tis620;  
 
+ create table c_monitor(
+  action varchar(10),
+   transaction_id  bigint
+ )ENGINE=InnoDB DEFAULT CHARSET=tis620;  
+ 
+
+INSERT INTO m_product_unused(code, type, create_date) VALUES ('821001', 'TT', '2012-11-08 13:53:00');
+INSERT INTO m_product_unused(code, type, create_date) VALUES ('821001', 'VAN', '2012-11-08 13:53:00');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('302009', 'TT', '2012-11-08 13:53:00');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('302009', 'VAN', '2012-11-07 14:56:51');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('302010', 'TT', '2012-11-08 13:53:00');
@@ -769,3 +777,116 @@ INSERT INTO m_product_unused(code, type, create_date) VALUES ('838017', 'TT', '2
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('838017', 'VAN', '2012-11-07 15:10:36');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('838018', 'TT', '2012-11-08 13:53:00');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('838018', 'VAN', '2012-11-07 15:10:36');
+
+insert into m_product_unused(type,code)values(	'TT','X0101001'	);
+insert into m_product_unused(type,code)values(	'TT','X0101002'	);
+insert into m_product_unused(type,code)values(	'TT','X0101003'	);
+insert into m_product_unused(type,code)values(	'TT','X0201001'	);
+insert into m_product_unused(type,code)values(	'TT','X0201002'	);
+insert into m_product_unused(type,code)values(	'TT','X0401001'	);
+insert into m_product_unused(type,code)values(	'TT','X0401002'	);
+insert into m_product_unused(type,code)values(	'TT','X0401003'	);
+insert into m_product_unused(type,code)values(	'TT','X0401004'	);
+insert into m_product_unused(type,code)values(	'TT','X0701001'	);
+insert into m_product_unused(type,code)values(	'TT','X0701002'	);
+insert into m_product_unused(type,code)values(	'TT','X0701003'	);
+insert into m_product_unused(type,code)values(	'TT','911001'	);
+insert into m_product_unused(type,code)values(	'TT','131001'	);
+insert into m_product_unused(type,code)values(	'TT','221001'	);
+insert into m_product_unused(type,code)values(	'TT','221002'	);
+insert into m_product_unused(type,code)values(	'TT','221003'	);
+insert into m_product_unused(type,code)values(	'TT','222001'	);
+insert into m_product_unused(type,code)values(	'TT','222002'	);
+insert into m_product_unused(type,code)values(	'TT','223001'	);
+insert into m_product_unused(type,code)values(	'TT','223002'	);
+insert into m_product_unused(type,code)values(	'TT','223003'	);
+insert into m_product_unused(type,code)values(	'TT','223004'	);
+insert into m_product_unused(type,code)values(	'TT','223005'	);
+insert into m_product_unused(type,code)values(	'TT','223006'	);
+insert into m_product_unused(type,code)values(	'TT','223007'	);
+insert into m_product_unused(type,code)values(	'TT','224001'	);
+insert into m_product_unused(type,code)values(	'TT','224002'	);
+insert into m_product_unused(type,code)values(	'TT','225001'	);
+insert into m_product_unused(type,code)values(	'TT','225002'	);
+insert into m_product_unused(type,code)values(	'TT','226001'	);
+insert into m_product_unused(type,code)values(	'TT','226002'	);
+insert into m_product_unused(type,code)values(	'TT','226003'	);
+
+insert into m_product_unused(type,code)values(	'VAN'	,'X0101001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0101002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0101003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0201001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0201002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0401001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0401002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0401003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0401004'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0701001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0701002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'X0701003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'911001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'131001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'221001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'221002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'221003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'222001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'222002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223004'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223005'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223006'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'223007'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'224001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'224002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'225001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'225002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'226001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'226002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'226003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621004'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621005'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621006'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621007'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621008'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621009'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621010'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621011'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621012'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621013'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621014'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621015'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621016'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621017'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621018'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621019'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621020'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621021'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'621022'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622004'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622005'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622006'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622007'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622008'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622009'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622010'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622011'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622012'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622013'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622014'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622015'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'622016'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721001'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721002'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721003'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721004'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721005'	);
+insert into m_product_unused(type,code)values(	'VAN'	,'721006'	);
+

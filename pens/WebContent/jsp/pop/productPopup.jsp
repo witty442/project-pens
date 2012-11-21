@@ -335,7 +335,7 @@ function addRow(){
 function showProduct(path){
 	var pBrand = $('#pBrand').val();
    // alert(pBrand);
-	window.open(path + '/jsp/pop/view/productViewPopup.jsp?pBrand='+encodeURIComponent(pBrand), 'Product List', 'width=500,height=350,location=No,resizable=No');
+	window.open(path + '/jsp/pop/view/productViewPopup.jsp?pBrand='+encodeURIComponent(pBrand), 'Product List', 'width=500,height=450,location=No,resizable=No');
 }
 function setProduct(code, name){
 	$('#pCode').val(code);

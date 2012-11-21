@@ -79,10 +79,6 @@ function selectProduct(code, name){
 <input type ="hidden" name ="pBrand" id="pBrand" value ="<%=pBrand %>"/>
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<td width="35%">&nbsp;</td>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
 		<td align="right">áºÃ¹´ì&nbsp;</td>
 		<td align="left" width="50%">
 			<%=pBrand %> 
@@ -102,7 +98,7 @@ function selectProduct(code, name){
 	</tr>
 	<tr>
 		<td colspan="3">
-			<div id="results" style="height:220px; overflow-x: hidden; overflow-y: scroll;"></div>
+			<div id="results" ></div>
 		</td>
 	</tr>
 	<tr><td colspan="2">&nbsp;</td></tr>

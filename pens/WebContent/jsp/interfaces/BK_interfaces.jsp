@@ -63,6 +63,7 @@ body {
 	    margin-top:-20;
 	    left:0;
 	}
+
 }
 </style>
 
@@ -70,21 +71,17 @@ body {
 	function disableF5(e) {
 		if (e.which == 116) e.preventDefault(); 
 	}
+	//To disable f5
+	//$(document).bind("keydown", disableF5);
 	//To re-enable f5
-	$(document).unbind("keydown", disableF5);
+	//$(document).unbind("keydown", disableF5);
+
 </Script>
+
 
 	<!-- ProgressBar -->
 	<% if( "submited".equals(request.getAttribute("action"))){ %>
 	   <script type="text/javascript" language="javascript">
-	   
-	   //To disable f5
-	   $(document).bind("keydown", disableF5);
-	 
-	   $(function() {
-			///$("#dialog").dialog({ height: 200,width:650,modal:true });
-		   $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '20%', width: '60%' } }); 
-		});
 	   
 	   var stepMaxUp = 2;
 	   var stepMinUp = 1;
@@ -93,8 +90,24 @@ body {
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
 	   
-	   function update(status){
-	    	 if(status != '1' && status != "-1"){ //Running
+	 /*   var displaytext = function () {
+		   var text = $("#progressbar").progressbar('value') + '%';
+		   var element = $("<span style='position: absolute;'>" + progressCount + "</span>");
+		   $(document.body).append(element);
+		   var width = element.width();
+		   var height = element.height();
+		   var location = $("#progressbar").offset();
+		   element.css({ left: location.left + $("#progressbar").width() / 2 - width / 2, top: location.top +    $("#progressbar").height() / 2 - height / 2 });
+		} */
+	   
+	    function update(status){
+	    	  if(status != '1' && status != "-1"){ //Running
+	    		 /* if (document.getElementById) { // DOM3 = IE5, NS6 
+	    			 document.getElementById("progressbar").style.visibility = 'visible'; 
+	    		 }else{
+	    			 document.getElementById('progressbar').style.visibility='visible'; 
+	    		 } 	 */
+	    		 
 	    		 if(progressCount > 98){
 		    	   progressCount += 0; 
 	    		 }else if(progressCount > 95){
@@ -106,20 +119,28 @@ body {
 	    		 }
 	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
 	    	 }else{ //Success
+	    		/*  if (document.getElementById) { // DOM3 = IE5, NS6 
+	    			 document.getElementById("progressbar").style.visibility = 'hidden'; 
+	    		 }else{
+	    			 document.getElementById('progressbar').style.visibility='hidden';
+	    		 } 	  */
 	    		 progressCount = 100;
 	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
 	    	 }  
 	    	  
-	    	 var progress = $("#progressbar") .progressbar("option","value");
-	    	 if (progress < 100) {
+	    	  var progress = $("#progressbar") .progressbar("option","value");
+	    	  if (progress < 100) {
 		   	      $("#progressbar").progressbar("option", "value", progressCount);  
 		   	      $("#progresstext").html("<b>"+progressCount+" %</b>");
-		   	 }
+		   	  }
+	    	  
+	    	//  displaytext();
+	    	  
 	    }
 	    
-	    $(function() {
+	     $(function() {
 	    	$("#progressbar").progressbar({ value: progressCount });
-	    });
+	    	});
 
 	   /** Onload Window    */
 	   window.onload=function(){
@@ -159,9 +180,14 @@ body {
 	    }
 	    </script>
 	<% } %>
+	
+	
+	
+	
 <!-- PROGRESS BAR -->
-</head>
 
+<!-- Move for new index. -->
+</head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;"  style="height: 100%;">
 
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -200,8 +226,6 @@ body {
 						<html:form action="/jsp/interfacesAction">
 			
 						<jsp:include page="../error.jsp"/>
-						
-						<html:hidden property="monitorBean.status"/>
 						
 						<!-- CRITERIA  Submit-->
 						<% if( request.getAttribute("action") == null){ %>  
@@ -308,6 +332,33 @@ body {
 						   <%} %>
 					    <%} %>
 				
+						<!-- PROGRESS BAR-->
+						 <html:hidden property="monitorBean.status"/>
+						<% if( "submited".equals(request.getAttribute("action"))){ %>  
+						 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+						    <tr>
+								<td align="center" width ="100%">
+								    <%--  <div id="progressbarXX"  style="width:600px;">
+								       <img alt="" src="${pageContext.request.contextPath}/images/progress_bar.gif"">
+								   </div> --%>
+								   
+									 <!-- End demo -->
+									   <div style="height:50px;align:center">
+									     กรุณารอสักครู่......
+									   </div>
+									  <div id="main_progressbar" style="height:80px;width:600px;">
+			                              <div id="progressbar"></div>
+			                              <div id="progresstext"></div>
+			                          </div>
+			                          <!-- End demo -->
+			                          
+								 </td>
+							</tr>
+						</table>
+						
+                          
+					    <%} %>
+							
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						   <tr>
@@ -416,26 +467,6 @@ body {
 								</c:forEach>
 							</table>
 						</c:if>
-					
-					
-						<div id="dialog" title=" กรุณารอสักครู่......">
-							<!-- PROGRESS BAR-->
-							  <% if( "submited".equals(request.getAttribute("action"))){ %>  
-							 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							    <tr>
-									<td align="center" width ="100%">
-									   <div style="height:50px;align:center">
-									     กรุณารอสักครู่......
-									   </div>
-									  <div id="main_progressbar" style="height:80px;width:600px;">
-						                     <div id="progressbar"></div>
-						                     <div id="progresstext"></div>
-						              </div>   
-									 </td>
-								</tr>
-							   </table>   
-						    <%} %>			    
-						</div>
 					
 						<br><br>
 						<!-- BODY -->

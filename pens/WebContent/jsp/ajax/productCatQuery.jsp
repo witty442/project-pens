@@ -28,7 +28,7 @@ int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
 int no_of_total_display = no_of_column * no_of_rows;
 
-int totalBrand = mProductCat.lookUpBrandList().size();
+int totalBrand = mProductCat.lookUpBrandList(user).size();
 /// Find Total Page
 
 if(productCatL != null && productCatL.size() > 0){

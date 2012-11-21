@@ -119,18 +119,26 @@ public class MProductCategory extends I_Model<ProductCategory> {
 	}
 	
 	
-	public List<References> lookUpBrandList() throws Exception {
+	public List<References> lookUpBrandList(User u) throws Exception {
 		List<References> pos = new ArrayList<References>();
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			String sql = "select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')";
-			logger.debug("sql:\n"+sql);
+			StringBuffer sql = new StringBuffer("select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
+			if(u != null){  
+			   sql.append("\n AND PRODUCT_CATEGORY_ID NOT IN ");
+			   sql.append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ");
+			   sql.append("\n  FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ");
+			   sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
+			   sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
+			}
+			
+			logger.debug("sql:\n"+sql.toString());
 			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql);
+			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
 				References r = new References(rst.getString("brand"),rst.getString("brand"),rst.getString("brand"));
 				pos.add(r);
