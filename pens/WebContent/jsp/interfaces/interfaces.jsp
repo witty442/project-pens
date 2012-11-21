@@ -72,6 +72,10 @@ body {
 	}
 	//To re-enable f5
 	$(document).unbind("keydown", disableF5);
+	
+	//clear cach
+	$.ajaxSetup({cache: false});
+	
 </Script>
 
 	<!-- ProgressBar -->
