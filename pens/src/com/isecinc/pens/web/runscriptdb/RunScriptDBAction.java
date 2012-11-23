@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.runscriptdb;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,8 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
@@ -64,6 +67,11 @@ public class RunScriptDBAction {
 				purgDataTransaction(conn);
 			}
 			
+			
+			//clear Task running for next run
+			InterfaceDAO dao = new InterfaceDAO();
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
 			
 			
 		}catch(Exception e){
