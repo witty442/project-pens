@@ -16,13 +16,14 @@ User user = (User)session.getAttribute("user");
 List<References> territories = InitialReferences.getReferenes().get(InitialReferences.TERRITORY);
 pageContext.setAttribute("territories",territories,PageContext.PAGE_SCOPE);
 
+/** Edit **/
 List<References> paymentTerm = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_TERM);
 pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
 
 List<References> vatCode = InitialReferences.getReferenes().get(InitialReferences.VAT_CODE);
 pageContext.setAttribute("vatCode",vatCode,PageContext.PAGE_SCOPE);
 
-List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
+List<References> paymentMethod = InitialReferences.getReferenes(InitialReferences.PAYMENT_METHOD,"CS");
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
 List<References> shippingMethod = InitialReferences.getReferenes().get(InitialReferences.SHIPMENT);

@@ -26,6 +26,9 @@ create table m_product_unused(
    transaction_id  bigint
  )ENGINE=InnoDB DEFAULT CHARSET=tis620;  
  
+delete from c_reference where code = 'PaymentTerm' and reference_id in( 901,902,903);
+delete from c_reference where code = 'VatCode' and reference_id in( 1001);
+delete from c_reference where code = 'Shipment' and reference_id in( 502);
 
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('821001', 'TT', '2012-11-08 13:53:00');
 INSERT INTO m_product_unused(code, type, create_date) VALUES ('821001', 'VAN', '2012-11-08 13:53:00');
