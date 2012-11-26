@@ -816,12 +816,10 @@ function escapeParameter(param){
 									<%} %>
 									<%if(user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
 									<a href="#" onclick="return autoReceipt('${pageContext.request.contextPath}','<%=user.getType() %>');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
 									<input type="button" value="บันทึก" class="newPosBtn">
 									</a>
 									<%} %>
 									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
 									<input type="button" value="ยกเลิก" class="newNegBtn">
 									</a>
 								</td>

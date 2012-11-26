@@ -291,6 +291,7 @@
 			scope="request" type="com.isecinc.pens.web.sales.OrderAction">
 			<forward name="search" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="prepare" path="/jsp/sales/salesOrder.jsp" />
+			<forward name="prepareEdit" path="/jsp/sales/salesOrder.jsp" />
 			<forward name="re-search" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="clearform" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="view" path="/jsp/sales/salesOrderView.jsp" />

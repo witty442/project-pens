@@ -47,6 +47,17 @@ public class OrderForm extends I_Form {
 	
 	private String autoReceiptFlag;
 	
+	private String mode ="";
+	
+	
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
 	public String getAutoReceiptFlag() {
 		return autoReceiptFlag;
 	}

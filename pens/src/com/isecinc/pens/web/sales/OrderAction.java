@@ -227,7 +227,7 @@ public class OrderAction extends I_Action {
 		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
-        logger.info("prepare 1");
+        logger.info("prepare have orderId ");
 		try {
 			roundTrip = orderForm.getOrder().getRoundTrip();
 
@@ -236,20 +236,11 @@ public class OrderAction extends I_Action {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 				return "view";
 			}
-			// orderForm.setLines(new MOrderLine().lookUp(order.getId()));
+			
 			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
-			if (!user.getRole().getKey().equals(User.DD)) {
-				//logger.debug("fillLinesShow No DD");
-				List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
-				orderForm.setLines(lines);
-			} else {
-				if (((String) request.getSession().getAttribute("memberVIP")).equalsIgnoreCase("Y")) {
-					List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
-					orderForm.setLines(lines);
-				} else {
-					orderForm.setLines(lstLines);
-				}
-			}
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
@@ -263,6 +254,76 @@ public class OrderAction extends I_Action {
 		}
 		if (request.getParameter("action").equalsIgnoreCase("edit")) return "prepare";
 		return "view";
+	}
+	
+	
+	/**
+	 * Prepare to Edit order
+	 */
+	public ActionForward prepareEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		User user = (User) request.getSession(true).getAttribute("user");
+		Order order = null;
+		int roundTrip = 0;
+		logger.info("prepareEdit orderId["+Utils.isNull(request.getParameter("id"))+"]");
+		try {
+			OrderForm orderForm = (OrderForm) form;
+			
+			//Find Order by order_id
+			String id = Utils.isNull(request.getParameter("id"));
+			roundTrip = orderForm.getOrder().getRoundTrip();
+			order = new MOrder().find(id);
+			if (order == null) {
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+				return mapping.findForward("prepare");
+			}
+			
+			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			
+			order.setRoundTrip(roundTrip);
+			orderForm.setOrder(order);
+			orderForm.setAutoReceipt(new Receipt());
+			orderForm.setAutoReceiptFlag("N");
+
+			// Prepare order line to Edit
+			/** Promotion Process add add to Lines */
+			// remove promotion line
+			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("Y")) {
+					promotionLine.add(line);
+				}
+			}
+			for (OrderLine line : promotionLine) {
+				orderForm.getLines().remove(line);
+			}
+			
+			// Save Lines
+			int i = 1;
+			for (OrderLine line : orderForm.getLines()) {
+				// Clear Discount
+				line.setLineNo(i++);
+				line.setDiscount(0);
+				line.setProduct(new MProduct().find(String.valueOf(line.getProduct().getId())));
+				line.setTotalAmount(line.getLineAmount());
+			}
+
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request.getSession().getAttribute("memberVIP")));
+			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
+
+			/** Manage Mode (add,edit,view) **/
+			orderForm.setMode("edit");
+			
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			return mapping.findForward("prepare");
+		} finally {
+		}
+		return mapping.findForward("prepareEdit");
 	}
 
 	/**
@@ -630,6 +691,10 @@ public class OrderAction extends I_Action {
 				request.setAttribute("popup_autoreceipt", "true");
 			}
 			/**************************************************************/
+			
+			/** Manage Mode (add,edit,view) **/
+			orderForm.setMode("edit");
+			
 			// save token
 			saveToken(request);
 			

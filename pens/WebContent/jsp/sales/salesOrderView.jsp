@@ -998,20 +998,25 @@ function removeRow(){
 							<tr>
 								<td align="right" width="10%"></td>
 								<td align="left">
+							  
 									<%if(!isAdd.equals("N") || ((String)session.getAttribute("memberVIP")).equalsIgnoreCase("Y")){ %>
-									<a href="#" onclick="prepare('${pageContext.request.contextPath}','add');">
-									<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong">
-									</a>
+										<a href="#" onclick="prepare('${pageContext.request.contextPath}','add');">
+										<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong">
+										</a>
 									<%} %>
-									<c:if test="${orderForm.order.exported=='N'}">
-										<c:if test="${orderForm.order.docStatus=='SV'}">
-										<c:if test="${orderForm.order.payment=='N'}">
-											<a href="#" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
-											<input type="button" value="แก้ไขรายการ" class="newPosBtnLong">
-											</a>
+									
+								    <c:if test="${orderForm.mode=='edit'}">
+										<c:if test="${orderForm.order.exported=='N'}">
+											<c:if test="${orderForm.order.docStatus=='SV'}">
+											<c:if test="${orderForm.order.payment=='N'}">
+												<a href="#" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
+												<input type="button" value="แก้ไขรายการ" class="newPosBtnLong">
+												</a>
+											</c:if>
+											</c:if>
 										</c:if>
-										</c:if>
-									</c:if>
+								   </c:if>
+									
 									<%if(role.equals(User.VAN) || role.equals(User.DD)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
@@ -1019,11 +1024,14 @@ function removeRow(){
 										</a>
 									</c:if>
 									<%} %>
-									<%if(role.equals(User.VAN)){ %>
-									<c:if test="${orderForm.order.payment=='N'}">
-										<c:if test="${orderForm.order.docStatus=='SV'}">
-										<a href="#" onclick="autoReceipt('${pageContext.request.contextPath}','<%=role %>');">
-										<input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
+									
+								  <%if(role.equals(User.VAN)){ %>
+								    <c:if test="${orderForm.mode=='edit'}">
+										<c:if test="${orderForm.order.payment=='N'}">
+											<c:if test="${orderForm.order.docStatus=='SV'}">
+											<a href="#" onclick="autoReceipt('${pageContext.request.contextPath}','<%=role %>');">
+											<input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
+											</c:if>
 										</c:if>
 									</c:if>
 									<%} %>

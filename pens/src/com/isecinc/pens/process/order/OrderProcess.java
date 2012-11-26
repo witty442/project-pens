@@ -160,56 +160,7 @@ public class OrderProcess {
 			while (i < lines.size()) {
 				odLine = lines.get(i);
 				// Generate 2 lines.
-				if (user.getRole().getKey().equals(User.DD)) {
-					if (isVIP.equalsIgnoreCase("N")) {
-						// Line default.
-						line = new OrderLine();
-						line.setId(odLine.getId());
-						line.setProduct(new MProduct().find(String.valueOf(odLine.getProduct().getId())));
-						line.setActiveLabel(odLine.getActiveLabel());
-						line.setArInvoiceNo(odLine.getArInvoiceNo());
-						line.setDiscount(odLine.getDiscount());
-						line.setLineAmount(odLine.getLineAmount());
-						line.setLineNo(odLine.getLineNo());
-						line.setOrderId(odLine.getOrderId());
-						line.setPayment(odLine.getPayment());
-						line.setPrice(odLine.getPrice());
-						line.setPromotion(odLine.getPromotion());
-						line.setQty(odLine.getQty());
-						line.setRequestDate(odLine.getRequestDate());
-						line.setShippingDate(odLine.getShippingDate());
-						line.setTotalAmount(odLine.getTotalAmount());
-						line.setUom(odLine.getUom());
-						line.setVatAmount(odLine.getVatAmount());
-						line.setTripNo(odLine.getTripNo());
-						line.setFullUom(odLine.getFullUom());
-						newLines.add(line);
-					} else {
-						// VIP Line default 1.
-						line = new OrderLine();
-						line.setId(odLine.getId());
-						line.setProduct(new MProduct().find(String.valueOf(odLine.getProduct().getId())));
-						line.setActiveLabel(odLine.getActiveLabel());
-						line.setArInvoiceNo(odLine.getArInvoiceNo());
-						line.setDiscount(odLine.getDiscount1());
-						line.setLineAmount(odLine.getLineAmount1());
-						line.setLineNo(odLine.getLineNo());
-						line.setOrderId(odLine.getOrderId());
-						line.setPayment(odLine.getPayment());
-						line.setPrice(odLine.getPrice1());
-						line.setPromotion(odLine.getPromotion());
-						line.setQty(odLine.getQty1());
-						line.setRequestDate(odLine.getRequestDate());
-						line.setShippingDate(odLine.getShippingDate());
-						line.setTotalAmount(odLine.getTotalAmount1());
-						line.setUom(odLine.getUom1());
-						line.setVatAmount(odLine.getVatAmount1());
-						line.setTripNo(1);
-						line.setFullUom(odLine.getFullUom());
-						newLines.add(line);
-					}
-
-				} else {
+	
 					if (odLine.getQty1() != 0) {
 						// Line 1
 						line = new OrderLine();
@@ -258,7 +209,6 @@ public class OrderProcess {
 						line.setFullUom(odLine.getFullUom());
 						newLines.add(line);
 					}
-				}
 				i++;
 			}
 		} catch (Exception e) {

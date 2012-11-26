@@ -8,6 +8,14 @@ function prepare(path,type,id){
 	return true;
 }
 
+function prepareEdit(path,type,id){
+	if(id!=null){
+	  document.orderForm.action = path + "/jsp/saleOrderAction.do?do=prepareEdit&id=" + id;
+	}
+	document.orderForm.submit();
+	return true;
+}
+
 function cancelOrder(path){
 	var remark = document.getElementsByName('order.reason');
 	
