@@ -32,6 +32,9 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<meta http-equiv="Cache-Control" content="no-cache" /> 
+<meta http-equiv="Pragma" content="no-cache" /> 
+<meta http-equiv="Expires" content="0" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
