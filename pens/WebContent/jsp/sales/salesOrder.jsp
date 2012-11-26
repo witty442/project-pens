@@ -128,7 +128,10 @@ html>body tbody.scrollContent {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
+
 <script type="text/javascript">
+//clear cach
+$.ajaxSetup({cache: false});
 
 function openProductCategory(){
 	  // CAll AJAX PAGE

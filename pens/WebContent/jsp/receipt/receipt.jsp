@@ -57,6 +57,8 @@ body {
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
+//clear cach
+$.ajaxSetup({cache: false});
 
 function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('receiptDate'));
