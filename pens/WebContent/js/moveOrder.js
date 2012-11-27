@@ -414,8 +414,8 @@ function deleteProduct(path,type){
 	var bcheck=false;
 	for(i=chk.length-1;i>=0;i--){
 		if(chk[i].checked){
-			//alert(i+":"+lineNo[i].value);
-			if(lineNo[i].value != "0" && lineNo[i].value != ""){
+			alert(i+":"+lineNo[i].value);
+			if(lineNo[i].value != "0" && lineNo[i].value != "" && lineNo[i].value != 'undefined'){
 			   lineNoDeleteArray.value += lineNo[i].value+","; 
 			}
 			
