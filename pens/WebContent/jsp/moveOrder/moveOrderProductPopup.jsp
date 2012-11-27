@@ -1,6 +1,7 @@
 <!--
 Product Popup for Sales Order 
  -->
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -69,13 +70,13 @@ String reqDate = new SimpleDateFormat("dd/MM/yyyy",new Locale("th","TH")).format
 function loadMe(){
 	var cdoc = window.opener.document;
 	$('#pricelistId').val(cdoc.getElementsByName('moveOrder.priceListId')[0].value);
-	if('<%=row%>'!='')
-	{
+	if('<%=row%>'!=''){
 		putData(<%=row%>);
 	}
 	$('#pCode').focus();	
 }
 
+//Case edit not loadProduct and disable productCode
 function putData(rowNo){
 
 	//alert(rowNo);
@@ -106,7 +107,9 @@ function putData(rowNo){
 	var reqs=cdoc.getElementsByName('lines.req')[rowNo-1];
 	var promos=cdoc.getElementsByName('lines.promo')[rowNo-1];
 
-
+    //read only productCode
+    $('#pCode').attr("readonly", true); 
+	
 	$('#lineId').val(ids.value);
 	$('#lineNo').val(lineNOS.value);
 	$('#productId').val(productIds.value);
@@ -132,7 +135,7 @@ function putData(rowNo){
 	//alert("price1["+prices1.value+"],price1["+prices2.value+"]");
 	    
 	    
-	loadProductModel(null);
+	//loadProductModel(null);
 
 	//$('#uom').val(uomIds.value);
 	//$('#price').val(prices.value);
@@ -361,9 +364,12 @@ function onQty2KeyPressNextTab(e){
 	<tr>
 		<td align="right"><bean:message key="Product" bundle="sysele"/><font color="red">*</font></td>
 		<td align="left">
-			<input type="text" id="pCode" name="pCode"  onkeypress="loadProductOnKeyPress(event);" onblur="loadProductOnblur(null);" tabindex="1" />&nbsp;
-			<a href="#" onclick="showProduct('${pageContext.request.contextPath}');" id="lookProduct">
-			<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" align="absmiddle"></a>
+			<input type="text" id="pCode" name="pCode" <% if(Utils.isNull(row).equals("")) {%> onkeypress="loadProductOnKeyPress(event);" onblur="loadProductOnblur(null);"<%}%> tabindex="1" />&nbsp;
+			<% if(Utils.isNull(row).equals("")) {%>
+			       <a href="#" onclick="showProduct('${pageContext.request.contextPath}');" id="lookProduct">
+			       <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" align="absmiddle"></a>
+			<%} %>
+			
 		</td>
 	</tr>
 	<tr>
