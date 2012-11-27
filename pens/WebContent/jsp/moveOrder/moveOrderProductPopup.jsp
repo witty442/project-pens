@@ -146,6 +146,13 @@ function putData(rowNo){
 	$('#uom2').val(uomIds2.value);
 	$('#price1').val(prices1.value);
 	$('#price2').val(prices2.value);
+	
+	if($('#uom1').val() ==''){
+	   $('#qty1').attr("disabled", "disabled"); 
+	}
+    if($('#uom2').val() ==''){
+       $('#qty2').attr("disabled", "disabled"); 
+	}
 }
 
 function loadProductOnKeyPress(e){
