@@ -218,13 +218,17 @@ function loadProductModel(e){
 	if(document.getElementById('uom1').value==''){
 		document.getElementById('qty1').readOnly=true;
 		document.getElementById('qty1').className='disableText';
+		document.getElementById('qty1').value ="";
+		
 	}else{
 		document.getElementById('qty1').readOnly=false;
 		document.getElementById('qty1').className='';
 	}
+	
 	if(document.getElementById('uom2').value==''){
 		document.getElementById('qty2').readOnly=true;
 		document.getElementById('qty2').className='disableText';
+		document.getElementById('qty2').value ="";
 	}else{
 		document.getElementById('qty2').readOnly=false;
 		document.getElementById('qty2').className='';
