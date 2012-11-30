@@ -272,7 +272,7 @@ public class ExternalFunctionHelper {
 		    	findColumn = "next_line_no";
 		    	
 		    	String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
-		    	logger.info("values[0]:"+values[0]+",values[1]:"+values[1]+",values[2]:"+values[2]);
+		    	logger.debug("values[0]:"+values[0]+",values[1]:"+values[1]+",values[2]:"+values[2]);
 		    	
 		    	//String receiptId = RECEIPT_MAP.get(Utils.isNull(values[0]));
 		    	
@@ -281,12 +281,14 @@ public class ExternalFunctionHelper {
 		    	sql.append("\n and l.receipt_line_id = m.receipt_line_id ");
 		    	sql.append("\n and m.receipt_by_id = b.receipt_by_id ");
 		    	sql.append("\n and ( b.paid_amount = "+lineArray[Integer.parseInt(values[2])] +" OR l.paid_amount ="+lineArray[Integer.parseInt(values[2])] +")");
-		    	sql.append("\n and m.receipt_id in( ");
+		    	sql.append("\n and exists ( ");
+		    	sql.append("\n select 'x' as r from ( ");
 		    	sql.append("\n   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' " );		
 				sql.append("\n   union all " );
 				sql.append("\n   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( " );
 				sql.append("\n  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' " );
 				sql.append("\n    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' " );
+				sql.append("\n   ) r where r.receipt_id = l.receipt_id ");
 				sql.append("\n ) ");
 		    	
 		    	//Find by receiptId and compare paidAmount
@@ -297,21 +299,23 @@ public class ExternalFunctionHelper {
 					   id = rs.getString(findColumn);
 					}
 					
-					logger.info("sql 1:"+sql.toString());
-					logger.info("Step 1 Find by Logic result["+id+"]");
+					logger.debug("sql 1:"+sql.toString());
+					logger.debug("Step 1 Find by Logic result["+id+"]");
 				}
 			
 			  //Case not found Set Next line_no
 			    if("".equals(Utils.isNull(id))){
 			    	sql = new StringBuffer("");
-					sql.append(" select (max(line_no)+1) as next_line_no FROM t_receipt_line WHERE 1=1 \n" );	
-					sql.append(" and receipt_id in( ");
-			    	sql.append("   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' \n" );		
-					sql.append("   union all \n" );
-					sql.append("   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( \n" );
-					sql.append("  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' \n" );
-					sql.append("    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' \n" );
-					sql.append(" ) \n");
+					sql.append(" select (max(l.line_no)+1) as next_line_no FROM t_receipt_line l WHERE 1=1 \n" );	
+					sql.append("\n and exists ( ");
+			    	sql.append("\n select 'x' as r from ( ");
+			    	sql.append("\n   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' " );		
+					sql.append("\n   union all " );
+					sql.append("\n   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( " );
+					sql.append("\n  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' " );
+					sql.append("\n    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' " );
+					sql.append("\n   ) r where r.receipt_id = l.receipt_id ");
+					sql.append("\n ) ");
 	                
 	                
 					ps = conn.prepareStatement(sql.toString());
@@ -325,8 +329,8 @@ public class ExternalFunctionHelper {
 						id = "1";
 					}
 					
-					logger.info("sql 2:"+sql.toString());
-					logger.info("Step 2 Find by max(lineNo)+1 result["+id+"]");
+					logger.debug("sql 2:"+sql.toString());
+					logger.debug("Step 2 Find by max(lineNo)+1 result["+id+"]");
 					
 			    }
 				exe = false;
