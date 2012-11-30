@@ -774,6 +774,8 @@ public class OrderAction extends I_Action {
 					orderForm.getAutoReceipt().setIsPDPaid("N");
 			}
 			
+			logger.info("internalBank:"+orderForm.getAutoReceipt().getInternalBank());
+			
 			if (!new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, lstLines, orderForm.getBys(),
 					creditCardExpired, user, conn)) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());

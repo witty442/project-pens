@@ -313,33 +313,33 @@ public class ExportHelper {
 	}
 	
 	
-	public static String genFileName(TableBean tableBean,User userBean) throws Exception{
+	public static String genFileName(TableBean tableBean,User user) throws Exception{
 		String strGen = "";
 		String dateStr = Utils.format(new Date(), "yyyyMMddHHmm");
 
 		if(tableBean.getTransactionType().equals(Constants.TRANSACTION_MASTER_TYPE)){
 			if("CUST".equalsIgnoreCase(tableBean.getFileFtpName())){
-				strGen = dateStr+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
+				strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}else{
-			    strGen = dateStr+"-"+tableBean.getFileFtpName()+".txt";
+			    strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}
 		}else{
-			if(User.TT.equalsIgnoreCase(userBean.getType()) && "SALESRECEIPT".equalsIgnoreCase(tableBean.getFileFtpName())){
-		        strGen = dateStr+"-"+userBean.getUserName()+"-TTLOCKBOX.txt";
-			}else if(User.VAN.equalsIgnoreCase(userBean.getType()) && "MOVEORDERS".equalsIgnoreCase(tableBean.getFileFtpName())){
-				strGen = dateStr+"-"+userBean.getUserName()+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
+			if(User.TT.equalsIgnoreCase(user.getType()) && "SALESRECEIPT".equalsIgnoreCase(tableBean.getFileFtpName())){
+		        strGen = dateStr+"-"+user.getUserName()+"-TTLOCKBOX.txt";
+			}else if(User.VAN.equalsIgnoreCase(user.getType()) && "MOVEORDERS".equalsIgnoreCase(tableBean.getFileFtpName())){
+				strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}else{
-				strGen = dateStr+"-"+userBean.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
+				strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 			}
 		}
 		
 		return strGen;
 	}
 	
-	public static String genFileNameMTrip(TableBean tableBean,String userName) throws Exception{
+	public static String genFileNameMTrip(TableBean tableBean,User user) throws Exception{
 		String strGen = "";
 		String dateStr = Utils.format(new Date(), "yyyyMMddHHmm");
-		strGen = dateStr+"-"+userName+"-"+tableBean.getFileFtpName()+".txt";
+		strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 		return strGen;
 	}
 	

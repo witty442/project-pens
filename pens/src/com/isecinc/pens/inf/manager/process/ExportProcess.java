@@ -151,7 +151,7 @@ public class ExportProcess {
 			fileExportBean.setDestination(tableBean.getDestination());
 			fileExportBean.setTransactionType(tableBean.getTransactionType());
 			fileExportBean.setExportPath(tableBean.getExportPath());
-			fileExportBean.setFileFtpNameFull(ExportHelper.genFileNameMTrip(tableBean, userBean.getUserName()));
+			fileExportBean.setFileFtpNameFull(ExportHelper.genFileNameMTrip(tableBean, userBean));
 			
 	         String sql ="	select 	\n"+
 					"	m.TRIP_ID,	\n"+
