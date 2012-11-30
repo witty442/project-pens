@@ -125,6 +125,7 @@ var rowseed=2;
 var isPDPaid = <%=user.isPDPaid()%> 
 
 function loadAutoReceipt(){
+	
 	//check payment term payment method
 	//CS - CS ->> default check box
 	pt = document.getElementsByName('order.paymentTerm')[0].value;
@@ -215,7 +216,8 @@ function saveAutoReceiptVan(path){
 	var amount = document.getElementsByName('order.netAmount')[0].value;
 	var billId = document.getElementsByName('order.id')[0].value;
 	
-	//alert(document.getElementsByName('autoReceipt.paymentType')[3].value);
+	//enable 
+	$("#autoReceipt.internalBank").removeAttr("disabled"); 
 	
 	if(!document.getElementsByName('autoReceipt.paymentType')[3].checked) {
 		//order.iscash = 'Y'
@@ -589,7 +591,7 @@ function removeRow(){
 												<bean:message key="InternalBank" bundle="sysele"/><font color="red">*</font>
 											</td>
 											<td align="left">
-											   <html:select property="autoReceipt.internalBank" disabled="true" styleClass="disableText">
+											   <html:select property="autoReceipt.internalBank" styleId="autoReceipt.internalBank" styleClass="disableText">
 										           <html:options collection="internalBank" property="key" labelProperty="name"/>
 									            </html:select>
 											</td>
@@ -675,9 +677,6 @@ function removeRow(){
 											</td>
 										</tr>
 									</table>
-									
-									
-						
 									</td>
 								</tr>
 						</table>
@@ -1056,13 +1055,14 @@ function removeRow(){
 						
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
-						<html:hidden property="autoReceipt.paymentMethod"/>
 						<html:hidden property="autoReceipt.bank"/>
 						<html:hidden property="autoReceipt.chequeNo"/>
 						<html:hidden property="autoReceipt.chequeDate"/>
-						<html:hidden property="autoReceipt.creditCardType"/>
-						<html:hidden property="autoReceipt.internalBank"/>
-									
+						<html:hidden property="autoReceipt.creditCardType"/>	
+						<%if( ("true").equals(util.ConvertNullUtil.convertToString(request.getAttribute("popup_autoreceipt")))){ %>			    
+						    <html:hidden property="autoReceipt.internalBank"/>
+						    <html:hidden property="autoReceipt.paymentMethod"/>
+						<%} %>	
 						<input type="hidden" name="fileType" id="fileType"/>
 						<input type="hidden" name="nextVisitDate">
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
