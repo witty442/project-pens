@@ -183,9 +183,6 @@ function addProductToSalesOrder(){
 
 	var products = [];
 	products = eval(data);
-	//alert(products);
-	//alert(products.length);
-	//alert(products[0].amount1);
 	for(var i=0; i < products.length ; i++){
 		//var p = new Object();
 		var product = new Object();
@@ -334,6 +331,17 @@ function escapeParameter(param){
 							<tr>
 								<td colspan="4" align="center">
 								   <table align="center" border="0" cellpadding="3" cellspacing="0" width="80%">
+								   <tr>
+										<td align="right" width="20%">วันที่ปัจจุบัน</td>
+										<td align="left"  width="10%">
+										   <html:text property="moveOrder.currentDate" size="15" readonly="true" styleClass="disableText"/>
+										</td>
+										<td align="right"  width="23%">
+										       &nbsp;&nbsp;
+										</td>
+										<td align="left"  width="27%" nowrap>&nbsp; </td>
+										
+									</tr>
 									<tr>
 										<td align="right" width="20%">ประเภทรายการ</td>
 										<td align="left"  width="10%">
@@ -378,15 +386,14 @@ function escapeParameter(param){
 											   วันที่ทำรายการ<font color="red">*</font>
 										</td>
 										<td align="left"  width="10%">
-										    <html:text property="moveOrder.requestDate" maxlength="10" size="15" readonly="true" styleId="requestDate" />
+										    <html:text property="moveOrder.requestDate" maxlength="10" size="15" readonly="true" styleId="requestDate" disabled="${moveOrderForm.moveOrder.requestDateDisabled}"/>
 										</td>
 										<td align="right"  width="23%" >
 										       สถานะ 
 										</td>
 										<td align="left"  width="27%" >
 										   <html:text property="moveOrder.statusLabel" size="30" readonly="true"  styleId="statusLabel" styleClass="disableText"/>
-										</td>
-									
+										</td>	
 									</tr>
 									
 									 <tr>

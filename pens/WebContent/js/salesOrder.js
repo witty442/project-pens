@@ -8,9 +8,17 @@ function prepare(path,type,id){
 	return true;
 }
 
-function prepareEdit(path,type,id){
+function prepareEditOrder(path,type,id){
 	if(id!=null){
-	  document.orderForm.action = path + "/jsp/saleOrderAction.do?do=prepareEdit&id=" + id;
+	  document.orderForm.action = path + "/jsp/saleOrderAction.do?do=prepareEditOrder&id=" + id;
+	}
+	document.orderForm.submit();
+	return true;
+}
+
+function prepareEditReceipt(path,type,id){
+	if(id!=null){
+	  document.orderForm.action = path + "/jsp/saleOrderAction.do?do=prepareEditReceipt&id=" + id;
 	}
 	document.orderForm.submit();
 	return true;
@@ -680,10 +688,21 @@ function deleteProduct(path,type){
 	calculatePrice();
 }
 
-function createAutoReceipt(path) {
-	//alert(document.getElementsByName('order.orderType'));
-	//if(!createProductList()){return false;}
-	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=createAutoReceipt";
+function createAutoReceipt(path,action) {
+	//alert("action:"+action);
+	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=createAutoReceipt&actionSave="+action;
 	document.orderForm.submit();
 	return true;
 }
+
+/** 10/10/2555 to 10/10/2012**/
+function thaiDateToChristDate(thaiDate){
+	if(thaiDate != ''){
+		var dd = thaiDate.substring(0,2);
+	    var mm =  thaiDate.substring(3,5);
+	    var yyyy =  parseFloat(thaiDate.substring(6,10))-543;
+		//alert(dd+"/"+mm+"/"+yyyy);
+	    return new Date(mm+"/"+dd+"/"+yyyy);
+	}
+}
+

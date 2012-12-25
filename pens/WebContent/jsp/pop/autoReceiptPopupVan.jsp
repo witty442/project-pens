@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
+<%@page import="java.util.Date"%>
+<%@page import="util.DateToolsUtil"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
@@ -28,6 +30,8 @@ String billId= request.getParameter("billId");
 	billId= Utils.isNull(request.getAttribute("billId"));
 } */
 
+String receiptDate = DateToolsUtil.convertToString(new Date());
+
 List<References> internalBank= InitialReferences.getReferenes().get(InitialReferences.INTERNAL_BANK);
 pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 User user = (User)session.getAttribute("user");
@@ -47,6 +51,8 @@ User user = (User)session.getAttribute("user");
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js"></script>
+
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -60,6 +66,7 @@ function loadMe(){
 	//CS - CS ->> default check box
 	pt = window.opener.document.getElementsByName('order.paymentTerm')[0].value;
 	pm = window.opener.document.getElementsByName('order.paymentMethod')[0].value;
+	//alert("pt["+pt+"]pm["+pm+"]");
 	if(pt=='IM'&&pm=='CS'){
 		//default radio CS
 		document.getElementsByName('payType')[0].checked=true;
@@ -140,6 +147,9 @@ function change_payment(){
 
 function save(path){
 	var auto='N';
+	var receiptDate = new Date();
+	var orderDateObj = thaiDateToChristDate(document.getElementsByName('orderDate')[0].value);
+	
 	if(!document.getElementsByName('payType')[3].checked)
 	{
 		//order.iscash = 'Y'
@@ -189,6 +199,16 @@ function save(path){
 					alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 					chqDate[i].focus();
 					return false;
+				}else{
+					var chqDateObj = thaiDateToChristDate(chqDate[i].value);
+					//alert("chDate["+chqDateObj+"]orderDate["+orderDateObj+"]");
+					if(chqDateObj <= orderDateObj){
+						if( confirm("วันที่หน้าเช็คต้องมากกว่าวันที่รับเงิน ยืนยันที่จะทำรายการต่อไป")){
+						}else{
+						   chqDate[i].focus();
+						   return false;
+						}
+					}
 				}
 			}
 			if(method[i].value=='CR'){
@@ -295,9 +315,11 @@ function save(path){
 		//window.opener.createAutoReceipt(path);
 	}
 
-	if(auto=='Y')
-		window.opener.createAutoReceipt(path);
-	
+	if(auto=='Y'){
+		window.opener.createAutoReceipt(path,'saveAutoReceipt');
+	}else{
+		window.opener.createAutoReceipt(path,'');
+	}
 	window.close();
 	return true;
 }
@@ -470,6 +492,12 @@ function removeRow(){
 	<jsp:param name="code" value=""/>
 </jsp:include>
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+     <input type="hidden" name="orderDate" id="orderDate" value="<%=receiptDate%>"/>
+     <tr>
+		<td colspan="2">
+			&nbsp;&nbsp;วันทีรับเงิน = <font color="red"><b><%=receiptDate%></b></font>
+		</td>
+	</tr>
 	<tr>
 		<td colspan="2">
 			&nbsp;&nbsp;<bean:message key="Receipt.AmountToPaid" bundle="sysele"/> = <font color="red"><b><%=new DecimalFormat("#,##0.00").format(new Double(amount)) %></b></font>

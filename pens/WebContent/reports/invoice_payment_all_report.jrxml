@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="shipment_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="88"/>
-	<property name="ireport.y" value="4"/>
+	<property name="ireport.x" value="203"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="receipt_date" class="java.lang.String"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="total_customer" class="java.lang.Integer"/>
@@ -361,7 +361,7 @@
 				<textElement textAlignment="Center">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{isPDPaid}!=null?"\u0e02\u0e32\u0e22\u0e40\u0e0a\u0e37\u0e48\u0e2d":($F{paymentMethod}.equals("CS")?"\u0e40\u0e07\u0e34\u0e19\u0e2a\u0e14":"\u0e40\u0e0a\u0e47\u0e04")]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[($F{isPDPaid}!=null && ($F{isPDPaid}.equals('N') || $F{isPDPaid}.equals('Y')))?"\u0e02\u0e32\u0e22\u0e40\u0e0a\u0e37\u0e48\u0e2d":($F{paymentMethod}.equals("CS")?"\u0e40\u0e07\u0e34\u0e19\u0e2a\u0e14":"\u0e40\u0e0a\u0e47\u0e04")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="111" y="5" width="58" height="20"/>

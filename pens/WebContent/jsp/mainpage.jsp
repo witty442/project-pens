@@ -1,3 +1,4 @@
+<%@page import="util.AppversionVerify"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 String role = ((User)session.getAttribute("user")).getType();
@@ -64,6 +65,8 @@ body {
 </table>
 
 <div id="dialog" title="คำแนะนำ">
+    <p><b> <font color="red"><%=AppversionVerify.checkAppVersion(request) %></font></b></p>
+    <p><b><%=AppversionVerify.getMessageToSales(request)%></b></p>
 	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p><br />
 	<p align="center"> <a href="javascript:close();"><input type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a></p>
 	<p align="center"> <a href="javascript:close();"><input type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
@@ -71,7 +74,7 @@ body {
 
 <script>
   $(function() {
-	$("#dialog").dialog({ height: 250,width:300,modal:false });
+	$("#dialog").dialog({ height: 260,width:430,modal:false });
   });
  
  function close(){

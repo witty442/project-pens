@@ -92,6 +92,7 @@ for(MoveOrderProductCatalog catalog:catalogs) {
 	<input name="productName" type="hidden" value="<%=catalog.getProductNameDisplay()%>" />
 	<input name="productCode" type="hidden" value="<%=catalog.getProductCode()%>" />
 	<input name="productId" type="hidden" value="<%=catalog.getProductId()%>" />
+	<input name="pacQty2" type="hidden" value="<%=catalog.getPacQty2()%>" />
 </td>
 </tr>
 <% 
@@ -103,6 +104,8 @@ rowNo++;
 function linePrice(rowNo,price1,price2){
 	var qty1 = document.getElementsByName("qty1")[rowNo].value;
 	var qty2 = document.getElementsByName("qty2")[rowNo].value;
+	
+	var pacQty2 = document.getElementsByName("pacQty2")[rowNo].value;
 	 
 	var totalAmtText = document.getElementsByName("totalLineAmtT")[rowNo];
 	var totalAmt = document.getElementsByName("totalLineAmt")[rowNo];
@@ -113,12 +116,23 @@ function linePrice(rowNo,price1,price2){
 		return ;
 	}
 	
+	//validate pacQty2
+	if(qty2 != null && qty2 != 0){
+		if(parseFloat(qty2) > parseFloat(pacQty2)){
+			//alert("qty2:"+qty2+",pacQty2:"+pacQty2);
+			alert("บันทึกจำนวนเศษไม่ถูกต้อง กรุณาตรวจสอบและบันทึกใหม่ ");
+			document.getElementsByName("qty2")[rowNo].focus();
+			return false;
+		}
+	}
+	
 	if(qty1 == null)
 		qty1 = 0;
 
 	if(qty2 == null)
 		qty2 = 0;
-
+      
+	
 	var amt1 = (qty1 * price1);
 	var amt2 = (qty2 * price2);
 

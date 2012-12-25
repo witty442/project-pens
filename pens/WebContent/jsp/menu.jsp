@@ -277,6 +277,9 @@ User user = (User)session.getAttribute("user");
 		         <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderSummaryAction.do?do=prepare&action=new';"><span>รายงานสรุป ใบเบิก/คืน  </span></a>
 		        </li>
+		         <li>
+		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/billPlanAction.do?do=prepare&action=new';"><span>รับบิลที (Bill T)  </span></a>
+		        </li>
 		     </ul>
 	     </li>
 	 <%} %>

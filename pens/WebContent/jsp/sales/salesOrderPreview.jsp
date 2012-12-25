@@ -187,18 +187,6 @@ function loadMe(){
 									<html:hidden property="order.paymentTerm"/>
 									<html:hidden property="order.paymentMethod"/>
 								</td>
-<!--							</tr>-->
-<!--							<tr>-->
-<!--								<td align="right"><bean:message key="Profile.PaymentMethod" bundle="sysele"/>&nbsp;&nbsp;</td>-->
-<!--								<td align="left">-->
-<!--									<html:select property="order.paymentMethod" disabled="true" styleClass="disableText">-->
-<!--										<html:options collection="paymentMethod" property="key" labelProperty="name"/>-->
-<!--									</html:select>-->
-<!--								</td>-->
-<!--								<td colspan="2">-->
-<!--									-->
-<!--								</td>-->
-<!--							</tr>-->
 							<%if(role.equalsIgnoreCase(User.DD)) {%>
 							<tr>
 								<td align="right"><bean:message key="Condition.ShipmentDay" bundle="sysele"/>&nbsp;&nbsp;</td>

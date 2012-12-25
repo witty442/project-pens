@@ -52,8 +52,6 @@
 					+ "%' OR T.DESCRIPTION LIKE '" + pName + "%' ";
 		}
 		
-		whereCause += "\n GROUP BY T.CODE, T.PRODUCT_ID, T.UOM_ID, T.DESCRIPTION, ";
-		whereCause += "\n T.ISACTIVE, T.NAME, T.PRODUCT_CATEGORY_ID ";
 		whereCause += "\n ORDER BY T.CODE ) ";
 		
 		if (pBrand != null && pBrand.trim().length() > 0) {
@@ -64,7 +62,9 @@
 		}
 		
 		whereCause += " ORDER BY CODE DESC";
-
+         
+		System.out.println("Find ProductPremium whereCause:\n"+whereCause);
+		
 		results = new MProduct().search(whereCause);
 
 	} catch (Exception e) {

@@ -314,6 +314,13 @@ TABLE.result2 TD {
 	height: 25px;
 }
 
+.newCancelBtnLong {
+	font-weight: bold;
+	/**background-color: #1E90FF;**/
+	color: red;
+	height: 25px;
+}
+
 /* POSITIVE */
 .newPosBtn {
 	font-weight: bold;

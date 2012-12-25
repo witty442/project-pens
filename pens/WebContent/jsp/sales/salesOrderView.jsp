@@ -75,6 +75,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
 <script type="text/javascript">
 function loadMe(){
 	document.getElementById("tempTotalAmount").value = addCommas(Number(document.getElementsByName("order.totalAmount")[0].value).toFixed(2));
@@ -216,9 +217,10 @@ function saveAutoReceiptVan(path){
 	var amount = document.getElementsByName('order.netAmount')[0].value;
 	var billId = document.getElementsByName('order.id')[0].value;
 	
+	var orderDateObj = thaiDateToChristDate(document.getElementsByName('orderDate')[0].value);
+
 	//enable 
 	$("#autoReceipt.internalBank").removeAttr("disabled"); 
-	
 	if(!document.getElementsByName('autoReceipt.paymentType')[3].checked) {
 		//order.iscash = 'Y'
 		
@@ -245,7 +247,6 @@ function saveAutoReceiptVan(path){
 				//recAmt[i].focus();
 				//return false;
 			}
-
 			if(method[i].value=='CH'){
 				if(bank[i].value==''){
 					alert('กรุณาระบุข้อมูลให้ครบถ้วน');
@@ -263,6 +264,16 @@ function saveAutoReceiptVan(path){
 					alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 					chqDate[i].focus();
 					return false;
+				}else{
+					var chqDateObj = thaiDateToChristDate(chqDate[i].value);
+					//alert("chDate["+chqDateObj+"]orderDate["+orderDateObj+"]");
+					if(chqDateObj <= orderDateObj){
+						if( confirm("วันที่หน้าเช็คต้องมากกว่าวันที่รับเงิน ยืนยันที่จะทำรายการต่อไป")){
+						}else{
+						   chqDate[i].focus();
+						   return false;
+						}
+					}
 				}
 			}
 			if(method[i].value=='CR'){
@@ -309,6 +320,8 @@ function saveAutoReceiptVan(path){
 		//window.opener.save(path);
 	}else if(document.getElementsByName('autoReceipt.paymentType')[3].checked && isPDPaid) // Case Credit Sales for VAN Sales PD Paid
 	{
+		//alert("case2:");
+		
 		if($('#autoReceipt.internalBank').val()==''){
 			alert('ใส่ข้อมูลฝากเงินเข้าบัญชี');
 			$('#autoReceipt.internalBank').focus();
@@ -353,8 +366,12 @@ function saveAutoReceiptVan(path){
 		document.getElementsByName('autoReceiptFlag')[0].value='Y';
 	}
 
-	if(auto=='Y')
-		createAutoReceipt(path);
+	 
+	if(auto=='Y'){
+		createAutoReceipt(path,"saveAutoReceipt");
+	}else{
+		createAutoReceipt(path,"");
+	}
 	
 	return true;
 }
@@ -569,6 +586,12 @@ function removeRow(){
 									<td colspan="4">
 									
 									<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+									     <tr>
+											<td colspan="2">
+												&nbsp;&nbsp;วันที่รับเงิน = 
+												<font color="red"><b>${orderForm.order.orderDate}</b></font>
+											</td>
+										</tr>
 										<tr>
 											<td colspan="2">
 												&nbsp;&nbsp;<bean:message key="Receipt.AmountToPaid" bundle="sysele"/> = 
@@ -1016,7 +1039,7 @@ function removeRow(){
 										</c:if>
 								   </c:if>
 									
-									<%if(role.equals(User.VAN) || role.equals(User.DD)){ %>
+									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										<input type="button" value="พิมพ์" class="newPosBtn">
@@ -1025,14 +1048,14 @@ function removeRow(){
 									<%} %>
 									
 								  <%if(role.equals(User.VAN)){ %>
-								    <c:if test="${orderForm.mode=='edit'}">
+								     <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.payment=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
 											<a href="#" onclick="autoReceipt('${pageContext.request.contextPath}','<%=role %>');">
 											<input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
 											</c:if>
 										</c:if>
-									</c:if>
+									   </c:if>
 									<%} %>
 								</td>
 								<td align="right">
@@ -1053,16 +1076,16 @@ function removeRow(){
 						<html:hidden property="order.exported"/>
 						<html:hidden property="order.isCash"/>
 						
+						
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
 						<html:hidden property="autoReceipt.bank"/>
 						<html:hidden property="autoReceipt.chequeNo"/>
 						<html:hidden property="autoReceipt.chequeDate"/>
-						<html:hidden property="autoReceipt.creditCardType"/>	
-						<%if( ("true").equals(util.ConvertNullUtil.convertToString(request.getAttribute("popup_autoreceipt")))){ %>			    
-						    <html:hidden property="autoReceipt.internalBank"/>
-						    <html:hidden property="autoReceipt.paymentMethod"/>
-						<%} %>	
+						<html:hidden property="autoReceipt.creditCardType"/>	    
+						<html:hidden property="autoReceipt.internalBank"/>
+						<html:hidden property="autoReceipt.paymentMethod"/>
+						
 						<input type="hidden" name="fileType" id="fileType"/>
 						<input type="hidden" name="nextVisitDate">
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
@@ -1070,6 +1093,8 @@ function removeRow(){
 						<div id="productList" style="display: none;"></div>
 						<div id="ByList" style="display: none;"></div>
 						
+						 <input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
+						 
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 						<jsp:include page="../trxhist.jsp">
 							<jsp:param name="module" value="<%=TrxHistory.MOD_ORDER%>"/>

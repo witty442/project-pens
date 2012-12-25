@@ -185,7 +185,7 @@ body {
 									<th class="code"><bean:message key="Bill.No"  bundle="sysele"/></th>
 									<th class="status"><bean:message key="Status" bundle="sysele" /></th>
 									<th class="status"><bean:message key="Order.Search.CreditNote" bundle="sysprop" /></th>
-									<th class="status"><bean:message key="Edit" bundle="sysprop" /></th>
+									<th class="status">ทำรายการ</th>
 									<th class="status"><bean:message key="View" bundle="sysprop" /></th>
 								</tr>
 							<c:forEach var="results" items="${orderForm.results}" varStatus="rows">
@@ -233,11 +233,21 @@ body {
 										<c:if test="${results.exported=='N'}">
 											<c:if test="${results.docStatus=='SV'}">
 												<c:if test="${results.payment=='N'}">
-													<a href="#" onclick="javascript:prepareEdit('${pageContext.request.contextPath}','edit','${results.id}');">
-												    <img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
+													<a href="#" onclick="javascript:prepareEditOrder('${pageContext.request.contextPath}','edit','${results.id}');">
+												    <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
 												</c:if>
 											</c:if>
 										</c:if>
+										<%if(role.equals(User.VAN)){ %>
+											<c:if test="${results.exported=='Y'}">
+												<c:if test="${results.docStatus=='SV'}">
+													<c:if test="${results.payment=='N'}">
+														<a href="#" onclick="javascript:prepareEditReceipt('${pageContext.request.contextPath}','edit','${results.id}');">
+													      <img border=0 src="${pageContext.request.contextPath}/icons/process.gif" title="รายการนี้ยังไม่ทำรายการรับเงิน"></a>						   
+													</c:if>
+												</c:if>
+											</c:if>
+									    <% } %>
 									</td>
 									<td align="center">
 										<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">

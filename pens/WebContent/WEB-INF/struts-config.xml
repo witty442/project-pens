@@ -150,6 +150,9 @@
 		
 		<!-- MoveOrder Summary Form -->
 		<form-bean name="moveOrderSummaryForm" type="com.isecinc.pens.web.moveordersummary.MoveOrderSummaryForm" />
+		
+		<!-- Bill Plan Form -->
+		<form-bean name="billPlanForm" type="com.isecinc.pens.web.billplan.BillPlanForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -291,7 +294,8 @@
 			scope="request" type="com.isecinc.pens.web.sales.OrderAction">
 			<forward name="search" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="prepare" path="/jsp/sales/salesOrder.jsp" />
-			<forward name="prepareEdit" path="/jsp/sales/salesOrder.jsp" />
+			<forward name="prepareEditOrder" path="/jsp/sales/salesOrder.jsp" />
+			<forward name="prepareEditReceipt" path="/jsp/sales/salesOrderView.jsp" />
 			<forward name="re-search" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="clearform" path="/jsp/sales/salesOrderSearch.jsp" />
 			<forward name="view" path="/jsp/sales/salesOrderView.jsp" />
@@ -576,6 +580,14 @@
 			<forward name="prepare" path="/jsp/moveOrder/moveOrderSummary.jsp" />
 			<forward name="clear" path="/jsp/moveOrder/moveOrderSummary.jsp" />
 			<forward name="export" path="/jsp/moveOrder/moveOrderSummary.jsp" />
+		</action>
+		
+		<!-- MoveOrder -->
+		<action name="billPlanForm" path="/jsp/billPlanAction" parameter="do" scope="request" type="com.isecinc.pens.web.billplan.BillPlanAction" >
+			<forward name="prepare" path="/jsp/billPlan/billPlanSearch.jsp" />
+			<forward name="search" path="/jsp/billPlan/billPlanSearch.jsp" />
+			<forward name="clear" path="/jsp/billPlan/billPlanSearch.jsp" />
+			<forward name="view" path="/jsp/billPlan/billPlan.jsp"/>
 		</action>
 		
 	</action-mappings>

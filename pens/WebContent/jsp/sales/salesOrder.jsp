@@ -103,22 +103,6 @@ table#productList thead{background:#FFE4CA;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
-/*
-thead.fixedHeader tr {
-	position: relative
-}
-
-html>body thead.fixedHeader tr {
-	display: block
-}
-
-html>body tbody.scrollContent {
-	display: block;
-	height: 210px;
-	overflow: auto;
-	width: 100%
-}
- */
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->

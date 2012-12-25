@@ -200,6 +200,16 @@ function loadProductModel(e){
 							$('#price1Show').val(addCommas($('#price1').val()));
 							$('#price2Show').val(addCommas($('#price2').val()));
 							
+							var getData3 = $.ajax({
+								url: "${pageContext.request.contextPath}/jsp/ajax/UOMProductCapacityQuery.jsp",
+								data : "pId=" + $('#productId').val()+ "&uom1=" + $('#uom1').val()+ "&uom2=" + $('#uom2').val(),
+								async: false,
+								success: function(getData){
+									var returnString = jQuery.trim(getData);
+									$('#pacQty2').val(returnString);
+				
+								}
+							}).responseText;
 						}
 					}).responseText;
 				}
@@ -233,17 +243,26 @@ function loadProductModel(e){
 		document.getElementById('qty2').readOnly=false;
 		document.getElementById('qty2').className='';
 	}
-
-    
 }
 
 function calPrice(){
 	
 	var qty1 = $('#qty1').val();
 	var qty2 = $('#qty2').val();
+	var pacQty2 = $('#pacQty2').val();
 
 	if(qty1==0 && qty2==0){
 		return;
+	}
+	
+	//validate pacQty2
+	if(qty2 != null && qty2 != 0){
+		if(parseFloat(qty2) > parseFloat(pacQty2)){
+			//alert("qty2:"+qty2+",pacQty2:"+pacQty2);
+			alert("บันทึกจำนวนเศษไม่ถูกต้อง กรุณาตรวจสอบและบันทึกใหม่ ");
+			$('#qty2').focus();
+			return false;
+		}
 	}
 	
 	var price1 = $('#price1').val();
@@ -402,6 +421,7 @@ function onQty2KeyPressNextTab(e){
 			<input type="text" id="qty1" name="qty1" value="0"  onkeydown="return inputNum(event);" onblur="calPrice();" size="10" style="text-align: right;" tabindex="2" >
 			&nbsp;/&nbsp;
 			<input type="text" id="qty2" name="qty2" value="0"  onkeydown="return inputNum(event);" onblur="calPrice();" size="10" style="text-align: right;" tabindex="3">
+		    <input type="hidden" id="pacQty2" name="pacQty2">
 		</td>
 	</tr>
 	<tr>

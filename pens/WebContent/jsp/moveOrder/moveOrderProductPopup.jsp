@@ -107,8 +107,6 @@ function putData(rowNo){
 	var reqs=cdoc.getElementsByName('lines.req')[rowNo-1];
 	var promos=cdoc.getElementsByName('lines.promo')[rowNo-1];
 
-    //read only productCode
-    $('#pCode').attr("readonly", true); 
 	
 	$('#lineId').val(ids.value);
 	$('#lineNo').val(lineNOS.value);
@@ -129,18 +127,8 @@ function putData(rowNo){
 	$('#total').val(eval(totals1.value) + eval(totals2.value));
 	
 	$('#productRow').val(rowNo);
-
-	
-	//alert("uom1["+uomIds1.value+"],uom2["+uomIds2.value+"]");
-	//alert("price1["+prices1.value+"],price1["+prices2.value+"]");
 	    
-	    
-	//loadProductModel(null);
-
-	//$('#uom').val(uomIds.value);
-	//$('#price').val(prices.value);
-    //alert(uomIds2.value);
-    
+	loadProductModel(null);
  
 	$('#uom1').val(uomIds1.value);
 	$('#uom2').val(uomIds2.value);
@@ -171,7 +159,6 @@ function loadProductOnblur(e){
 }
 // call ajax
 function loadProductModel(e){
-
 		$(function(){
 			var getData = $.ajax({
 				url: "${pageContext.request.contextPath}/jsp/ajax/productQueryOrder.jsp",
@@ -182,7 +169,7 @@ function loadProductModel(e){
 					$('#productId').val(returnString.split('||')[0]);
 					$('#pName').val(returnString.split('||')[1]+" "+returnString.split('||')[2]);
 					var getData2 = $.ajax({
-						url: "${pageContext.request.contextPath}/jsp/ajax/UOMQuery.jsp",
+						url: "${pageContext.request.contextPath}/jsp/ajax/UOMAll_PremiumQuery.jsp",
 						data : "pId=" + $('#productId').val()
 						+ "&plId=" + $('#pricelistId').val(),
 						async: false,
@@ -202,6 +189,16 @@ function loadProductModel(e){
 							$('#price1Show').val(addCommas($('#price1').val()));
 							$('#price2Show').val(addCommas($('#price2').val()));
 							
+							var getData3 = $.ajax({
+								url: "${pageContext.request.contextPath}/jsp/ajax/UOMProductCapacityQuery.jsp",
+								data : "pId=" + $('#productId').val()+ "&uom1=" + $('#uom1').val()+ "&uom2=" + $('#uom2').val(),
+								async: false,
+								success: function(getData){
+									var returnString = jQuery.trim(getData);
+									$('#pacQty2').val(returnString);
+				
+								}
+							}).responseText;
 						}
 					}).responseText;
 				}
@@ -218,6 +215,7 @@ function loadProductModel(e){
 	calPrice();
 	if(document.getElementById('uom1').value==''){
 		document.getElementById('qty1').readOnly=true;
+		document.getElementById('qty1').value =0;
 		document.getElementById('qty1').className='disableText';
 	}else{
 		document.getElementById('qty1').readOnly=false;
@@ -225,22 +223,32 @@ function loadProductModel(e){
 	}
 	if(document.getElementById('uom2').value==''){
 		document.getElementById('qty2').readOnly=true;
+		document.getElementById('qty2').value =0;
 		document.getElementById('qty2').className='disableText';
 	}else{
 		document.getElementById('qty2').readOnly=false;
 		document.getElementById('qty2').className='';
 	}
-
-    
 }
 
 function calPrice(){
 	
 	var qty1 = $('#qty1').val();
 	var qty2 = $('#qty2').val();
-
+	var pacQty2 = $('#pacQty2').val();
+	
 	if(qty1==0 && qty2==0){
 		return;
+	}
+	
+	//validate pacQty2
+	if(qty2 != null && qty2 != 0){
+		if(parseFloat(qty2) > parseFloat(pacQty2)){
+			//alert("qty2:"+qty2+",pacQty2:"+pacQty2);
+			alert("บันทึกจำนวนเศษไม่ถูกต้อง กรุณาตรวจสอบและบันทึกใหม่ ");
+			$('#qty2').focus();
+			return false;
+		}
 	}
 	
 	var price1 = $('#price1').val();
@@ -371,7 +379,7 @@ function onQty2KeyPressNextTab(e){
 	<tr>
 		<td align="right"><bean:message key="Product" bundle="sysele"/><font color="red">*</font></td>
 		<td align="left">
-			<input type="text" id="pCode" name="pCode" <% if(Utils.isNull(row).equals("")) {%> onkeypress="loadProductOnKeyPress(event);" onblur="loadProductOnblur(null);"<%}%> tabindex="1" />&nbsp;
+			<input type="text" id="pCode" name="pCode"  onkeypress="loadProductOnKeyPress(event);" onblur="loadProductOnblur(null);" tabindex="1" />&nbsp;
 			<% if(Utils.isNull(row).equals("")) {%>
 			       <a href="#" onclick="showProduct('${pageContext.request.contextPath}');" id="lookProduct">
 			       <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" align="absmiddle"></a>
@@ -407,6 +415,7 @@ function onQty2KeyPressNextTab(e){
 			<input type="text" id="qty1" name="qty1" value="0"  onkeydown="return inputNum(event);" onblur="calPrice();" size="10" style="text-align: right;" tabindex="2" >
 			&nbsp;/&nbsp;
 			<input type="text" id="qty2" name="qty2" value="0"  onkeydown="return inputNum(event);" onblur="calPrice();" size="10" style="text-align: right;" tabindex="3">
+		    <input type="hidden" id="pacQty2" name="pacQty2">
 		</td>
 	</tr>
 	<tr>
