@@ -273,8 +273,9 @@ public class ExportHelper {
 			    tableBean.getTableName().equalsIgnoreCase("t_visit") ||
 			    tableBean.getTableName().equalsIgnoreCase("m_sales_inventory") ||
 			    tableBean.getTableName().equalsIgnoreCase("m_trip") ||
-			    tableBean.getTableName().equalsIgnoreCase("m_member_health") || // edit by tutiya
-			    tableBean.getTableName().equalsIgnoreCase("t_move_order")
+			    tableBean.getTableName().equalsIgnoreCase("m_member_health") || 
+			    tableBean.getTableName().equalsIgnoreCase("t_move_order") ||
+			    tableBean.getTableName().equalsIgnoreCase("t_bill_plan")
 			    ) {
 					
 				selectSql = ExportSQL.genSpecialSQL(tableBean,userBean);
@@ -396,6 +397,8 @@ public class ExportHelper {
 			
 			/** Case Normal  **/
 			if(colBean.getColumnType().equalsIgnoreCase("DATE")){
+				logger.debug("colBean.getColumnName():"+colBean.getColumnName());
+				
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					 dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
 				}else{

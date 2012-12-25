@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.MonitorSales;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
@@ -72,6 +74,7 @@ public class BatchExportWorker extends BatchWorker {
 				
 				//Stamp Batch status to Success
 				endTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
+
 			}
 
 		} catch (Exception e) {

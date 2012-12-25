@@ -49,16 +49,7 @@ public abstract class DocumentSequenceProcess {
 
 	protected DocSequence docSequence;
 
-	/**
-	 * Get Next Doc No...
-	 * 
-	 * @param activeUserId
-	 * @return
-	 * @throws Exception
-	 */
-	public abstract String getNextDocumentNo(String salesCode, String prefix, int activeUserID, Connection conn)
-			throws Exception;
-
+	
 	/**
 	 * Get Next Sequence
 	 * 
@@ -215,7 +206,7 @@ public abstract class DocumentSequenceProcess {
 	 * MoveOrder Req
 	 * MoveOrder Return
 	 */
-	protected int getNextSeqMoveOrder(String moveOrderType,String salesCode,String pdCode, int docTypeId, int activeUserID) throws Exception {
+	protected int getNextSeqMoveOrder(Date requestDate,String moveOrderType,String salesCode,String pdCode, int docTypeId, int activeUserID) throws Exception {
 		boolean newSeq = false;
 		String curYear = "";
 		int curMonth = 0;
@@ -229,7 +220,7 @@ public abstract class DocumentSequenceProcess {
 				 keyNextSeq = pdCode+"-"+salesCode ;//P001-V001
 			}
 			
-			String today = df.format(new Date());
+			String today = df.format(requestDate);
 			String[] d1 = today.split("/");
 			curYear = d1[0];
 			curMonth = Integer.parseInt(d1[1]);

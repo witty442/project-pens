@@ -57,7 +57,7 @@ public class ImportProcess {
 	    	  
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
-	    		  logger.info("**** Script Pre Function name:"+tableBean.getPreFunction());
+	    		  logger.debug("**** Script Pre Function name:"+tableBean.getPreFunction());
 	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
 	    	  }
 	    	  

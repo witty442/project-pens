@@ -46,7 +46,9 @@ public class InitialReferences extends I_Initial {
 	public static final String INTERNAL_BANK = "InternalBank";
 	public static final String BRAND_LIST = "BrandList";
 	public static final String ORGID_LIST = "OrgID"; 
-
+	public static final String MOVEORDER = "MoveOrder"; 
+	public static final String BILLPLAN = "BillPlan"; 
+	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
 	public void init() {}

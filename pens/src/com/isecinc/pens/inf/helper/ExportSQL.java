@@ -10,45 +10,7 @@ public class ExportSQL {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
 	
-	/**
-	 * Gen SQl Receipt Type User Credit
-	 * @param tableBean
-	 * @param userBean
-	 * @return
-	 */
-	public static String genSqlSalesReceiptCredit(TableBean tableBean,User userBean) throws Exception {
-		String sql ="	select t_receipt.receipt_id,\n"+
-		"		'H'	AS	RECORD_TYPE ,	\n"+
-		"		t_receipt.receipt_no	AS	RECEIPT_NO,	\n"+
-		"		t_receipt.receipt_date	AS	RECEIPT_DATE,	\n"+
-		"		t_receipt.order_type	AS	ORDER_TYPE,	\n"+
-		"		t_receipt.customer_id	AS	CUSTOMER_ID,	\n"+
-		"		m_customer.code	AS	CUSTOMER_NUMBER,	\n"+
-		"		t_receipt.customer_name	AS	CUSTOMER_NAME,	\n"+
-		
-		/** Don't use ****/
-		"		''	AS	PAYMENT_METHOD,	\n"+
-		"		''	AS	BANK,	\n"+
-		"		''	AS	CHEQUE_NO,	\n"+
-		"		null	AS	CHEQUE_DATE,	\n"+
-		"		''	AS	CREDIT_CARD_TYPE,	\n"+
-		/** Don't use ****/
-		
-		"		t_receipt.description	AS	DESCRIPTION,	\n"+
-		"		(select max(value) from c_reference where code ='OrgID') AS ORG_ID,	\n"+
-		"		'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,		\n"+
-		"       IF(AD_USER.PD_PAID='Y','CASH',t_receipt.INTERNAL_BANK) AS INTERNAL_BANK , \n"+
-		/** Optional **/
-		"      t_receipt.receipt_amount AS amount \n"+
-		"	   from t_receipt ,m_customer ,ad_user			\n"+
-		"	   where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 				\n"+
-		"	   and ad_user.user_id = t_receipt.user_id \n "+
-		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
-		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
-		"      and  t_receipt.DOC_STATUS = 'SV' \n"+
-		"      and ( t_receipt.TEMP2_EXPORTED  = 'N' OR t_receipt.TEMP2_EXPORTED  IS NULL)     \n";
-        return sql;
-	}
+	
 	
 	/**
 	 * Get SQL By Special Case Export
@@ -224,12 +186,66 @@ public class ExportSQL {
 					"	DESCRIPTION \n"+
 
 				"	from t_move_order \n"+
-				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL) and status ='SV' \n";
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL) and status ='SV' \n"+
+				"   and request_date <= now() \n";
+			
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_bill_plan")){
+				str ="select \n"+
+					"	'H'	AS 	RECORD_TYPE,	\n"+
+					"	bill_plan_no  , \n"+
+					"	bill_plan_request_date ,\n"+
+					"   '"+userBean.getCode()+"' as sales_code, \n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,	\n"+
+					"	DESCRIPTION \n"+
+	
+				"	from t_bill_plan \n"+
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL) and status ='SV' \n"+
+				"   and bill_plan_request_date <= now() \n";
 			}
 			return str;
 		}catch(Exception e){
 			throw e;
 		}
+	}
+	
+	/**
+	 * Gen SQl Receipt Type User Credit
+	 * @param tableBean
+	 * @param userBean
+	 * @return
+	 */
+	public static String genSqlSalesReceiptCredit(TableBean tableBean,User userBean) throws Exception {
+		String sql ="	select t_receipt.receipt_id,\n"+
+		"		'H'	AS	RECORD_TYPE ,	\n"+
+		"		t_receipt.receipt_no	AS	RECEIPT_NO,	\n"+
+		"		t_receipt.receipt_date	AS	RECEIPT_DATE,	\n"+
+		"		t_receipt.order_type	AS	ORDER_TYPE,	\n"+
+		"		t_receipt.customer_id	AS	CUSTOMER_ID,	\n"+
+		"		m_customer.code	AS	CUSTOMER_NUMBER,	\n"+
+		"		t_receipt.customer_name	AS	CUSTOMER_NAME,	\n"+
+		
+		/** Don't use ****/
+		"		''	AS	PAYMENT_METHOD,	\n"+
+		"		''	AS	BANK,	\n"+
+		"		''	AS	CHEQUE_NO,	\n"+
+		"		null	AS	CHEQUE_DATE,	\n"+
+		"		''	AS	CREDIT_CARD_TYPE,	\n"+
+		/** Don't use ****/
+		
+		"		t_receipt.description	AS	DESCRIPTION,	\n"+
+		"		(select max(value) from c_reference where code ='OrgID') AS ORG_ID,	\n"+
+		"		'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,		\n"+
+		"       IF(AD_USER.PD_PAID='Y','CASH',t_receipt.INTERNAL_BANK) AS INTERNAL_BANK , \n"+
+		/** Optional **/
+		"      t_receipt.receipt_amount AS amount \n"+
+		"	   from t_receipt ,m_customer ,ad_user			\n"+
+		"	   where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 				\n"+
+		"	   and ad_user.user_id = t_receipt.user_id \n "+
+		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
+		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
+		"      and  t_receipt.DOC_STATUS = 'SV' \n"+
+		"      and ( t_receipt.TEMP2_EXPORTED  = 'N' OR t_receipt.TEMP2_EXPORTED  IS NULL)     \n";
+        return sql;
 	}
 	
 	/**

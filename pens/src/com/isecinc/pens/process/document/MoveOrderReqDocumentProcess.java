@@ -25,16 +25,17 @@ import com.isecinc.pens.model.MUser;
  */
 public class MoveOrderReqDocumentProcess extends DocumentSequenceProcess {
 
+
+	
 	/**
 	 * Get Next DocNo
 	 * V302-P301-5508001
 	 * Dest-Source-date
 	 */
-	public String getNextDocumentNo(String salesCode, String pdCode, int activeUserID, Connection conn)
+	public String getNextDocumentNo(Date requestDate,String salesCode, String pdCode, int activeUserID, Connection conn)
 			throws Exception {
 		
-		
-		int seq = getNextSeqMoveOrder(MMoveOrder.MOVE_ORDER_REQUISITION,salesCode,pdCode, MOVE_ORDER_REQ_NUMBER, activeUserID); //connection seprarate
+		int seq = getNextSeqMoveOrder(requestDate,MMoveOrder.MOVE_ORDER_REQUISITION,salesCode,pdCode, MOVE_ORDER_REQ_NUMBER, activeUserID); //connection seprarate
 		// String docNo = "O";
 		String docNo = "";
 		User user = new MUser().find(String.valueOf(activeUserID));
@@ -57,7 +58,7 @@ public class MoveOrderReqDocumentProcess extends DocumentSequenceProcess {
 		docNo += String.format("%s", new DecimalFormat("000").format(seq));
 		
 		if(checkCodeDuplicate(docNo,conn)){
-			return getNextDocumentNo(salesCode,pdCode,activeUserID,conn);
+			return getNextDocumentNo(requestDate,salesCode,pdCode,activeUserID,conn);
 		}else{
 		    return docNo;
 		}
@@ -98,7 +99,6 @@ public boolean checkCodeDuplicate(String code,Connection conn) throws Exception 
 	}
 
 
-
 	/**
 	 * Test
 	 * 
@@ -111,7 +111,7 @@ public boolean checkCodeDuplicate(String code,Connection conn) throws Exception 
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			InitialReferences init = new InitialReferences();
 			init.init(conn);
-			System.out.println(new MoveOrderReqDocumentProcess().getNextDocumentNo("VAN001", "xxx", 1, conn));
+			System.out.println(new MoveOrderReqDocumentProcess().getNextDocumentNo(new Date(),"VAN001", "xxx", 1, conn));
 			
 		} catch (Exception e) {
 			try {

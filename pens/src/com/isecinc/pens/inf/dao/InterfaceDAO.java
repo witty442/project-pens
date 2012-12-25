@@ -295,6 +295,12 @@ public class InterfaceDAO {
 					   item.setCode(rs.getString("REQUEST_NUMBER"));
 					   item.setType(type);
 					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("t_bill_plan")){
+					   item.setCustomerCode("");
+					   item.setCustomerName("");
+					   item.setCode(rs.getString("bill_plan_no"));
+					   item.setType(type);
+					   item.setAmount(0); 
 				   }
 				   itemList.add(item);
 				}

@@ -224,7 +224,6 @@ public class OrderAction extends I_Action {
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		OrderForm orderForm = (OrderForm) form;
-		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
         logger.info("prepare have orderId ");
@@ -260,13 +259,13 @@ public class OrderAction extends I_Action {
 	/**
 	 * Prepare to Edit order
 	 */
-	public ActionForward prepareEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	public ActionForward prepareEditOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
 		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
-		logger.info("prepareEdit orderId["+Utils.isNull(request.getParameter("id"))+"]");
+		logger.info("prepareEditOrder orderId["+Utils.isNull(request.getParameter("id"))+"]");
 		try {
 			OrderForm orderForm = (OrderForm) form;
 			
@@ -323,9 +322,52 @@ public class OrderAction extends I_Action {
 			return mapping.findForward("prepare");
 		} finally {
 		}
-		return mapping.findForward("prepareEdit");
+		return mapping.findForward("prepareEditOrder");
 	}
 
+	
+	/**
+	 * Prepare to Edit receipt
+	 */
+	public ActionForward prepareEditReceipt(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		OrderForm orderForm = (OrderForm) form;
+		Order order = null;
+		int roundTrip = 0;
+        logger.info("prepareEditReceipt ");
+		try {
+			roundTrip = orderForm.getOrder().getRoundTrip();
+			
+			String id = Utils.isNull(request.getParameter("id"));
+			
+			order = new MOrder().find(id);
+			if (order == null) {
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+				return mapping.findForward("view");
+			}
+			
+			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			
+			order.setRoundTrip(roundTrip);
+			orderForm.setOrder(order);
+			orderForm.setAutoReceipt(new Receipt());
+			orderForm.setAutoReceiptFlag("N");
+			
+			/** Manage Mode (add,edit,view) **/
+			orderForm.setMode("edit");
+			
+			// save token
+			saveToken(request);
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		}
+		return mapping.findForward("prepareEditReceipt");
+	}
+	
 	/**
 	 * Pre-Save 
 	 * :Caculate Promotion 
@@ -624,6 +666,8 @@ public class OrderAction extends I_Action {
 			new MOrder().save(order, userActive.getId(), conn);
 
 			// auto create receipt with member
+			logger.info("AutoReceiptFlag:"+orderForm.getAutoReceiptFlag());
+			
 			if (orderForm.getAutoReceiptFlag().equalsIgnoreCase("Y")) {
 				String creditCardExpired = "";
 				new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), orderForm
@@ -748,7 +792,7 @@ public class OrderAction extends I_Action {
 				} 
 				orderForm.getLines().clear();
 				return mapping.findForward("prepare");
-			}
+			 }
 
 			conn = new DBCPConnectionProvider().getConnection(conn);
 
@@ -764,31 +808,38 @@ public class OrderAction extends I_Action {
 			// Get Lines to Create Receipt
 			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
 
-			String creditCardExpired = "";
-		
-			if (user.getType().equalsIgnoreCase(User.VAN)) {
-				// assign order no to receipt no
-				orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+			logger.info("action:"+Utils.isNull(request.getParameter("actionSave")));
+			
+		   //Case Van pd+paid =Y and and payment method ='CR' Create AutoReceipt actionSave='saveAutoReceipt' 
+	       if(Utils.isNull(request.getParameter("actionSave")).equalsIgnoreCase("saveAutoReceipt")){
+				String creditCardExpired = "";
+				if (user.getType().equalsIgnoreCase(User.VAN)) {
+					// assign order no to receipt no
+					orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+					
+					if(user.isPDPaid() && !isCash)
+						orderForm.getAutoReceipt().setIsPDPaid("N");
+				}
 				
-				if(user.isPDPaid() && !isCash)
-					orderForm.getAutoReceipt().setIsPDPaid("N");
-			}
-			
-			logger.info("internalBank:"+orderForm.getAutoReceipt().getInternalBank());
-			
-			if (!new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, lstLines, orderForm.getBys(),
-					creditCardExpired, user, conn)) {
-				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
-				conn.rollback();
-				return mapping.findForward("view");
-			}
-
+				logger.info("internalBank:"+orderForm.getAutoReceipt().getInternalBank());
+				
+				if (!new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, lstLines, orderForm.getBys(),
+						creditCardExpired, user, conn)) {
+					request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
+					conn.rollback();
+					return mapping.findForward("view");
+				}
+	        }else{
+	        	//Case Van and pd_paid =N and payment method ='CR' no Create AutoReceipt actionSave ="" **/
+	        }
+	       
 			// Set Lines to Show
 			if (!user.getRole().getKey().equals(User.DD)) {
 				List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 				orderForm.setLines(lines);
 			} 
 			conn.commit();
+		
 			//
 			request.setAttribute("Message", SystemMessages.getCaption("SaveReceiptSuccess", Utils.local_th));
 			
@@ -801,18 +852,19 @@ public class OrderAction extends I_Action {
 			saveToken(request);
 		} catch (Exception e) {
 			try {
-				conn.rollback();
+				if(conn != null){conn.rollback();}
 			} catch (Exception e2) {}
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			e.printStackTrace();
 		} finally {
 			try {
-				conn.setAutoCommit(true);
+				if(conn != null){
+					conn.setAutoCommit(true);
+					conn.close();
+				}
 			} catch (Exception e2) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
+		
 		}
 		return mapping.findForward("view");
 	}
@@ -859,8 +911,7 @@ public class OrderAction extends I_Action {
 
 			whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' ";
 			whereCause += " AND CUSTOMER_ID = " + orderForm.getOrder().getCustomerId() + " ";
-
-			//if (!user.getType().equalsIgnoreCase(User.DD)) whereCause += " AND USER_ID = " + user.getId();
+			whereCause += " AND USER_ID = " + user.getId();
 
 			whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC ";
 			Order[] results = new MOrder().search(whereCause);

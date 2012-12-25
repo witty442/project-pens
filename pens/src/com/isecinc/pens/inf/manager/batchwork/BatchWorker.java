@@ -6,6 +6,8 @@ import java.sql.Connection;
 
 import org.apache.log4j.Logger;
 
+import util.MonitorSales;
+
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 
@@ -33,6 +35,9 @@ public abstract class BatchWorker extends Thread {
 		//control uniq task set transaction_id = 0 for run next batch
 		InterfaceDAO dao = new InterfaceDAO();
 		dao.updateControlMonitor(new BigDecimal(0),type);
+		
+		/** Stamp Monitor Task Sales**/
+		MonitorSales.monitorSales(transactionId);
 	}
 	
     public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {

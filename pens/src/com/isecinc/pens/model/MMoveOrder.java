@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.MoveOrderSummary;
@@ -27,6 +29,7 @@ import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 
@@ -63,20 +66,27 @@ public class MMoveOrder {
 		
 			if("".equals(head.getRequestNumber())){
 				
+				//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
+				head = checkRequestDate(head);
+				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
 				if(MOVE_ORDER_REQUISITION.equals(head.getMoveOrderType())){
-				    requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
+				    requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(requestDate,user.getCode(), head.getPdCode(),user.getId(), conn);
 				}else if(MOVE_ORDER_RETURN.equals(head.getMoveOrderType())){
-				    requestNumber = new MoveOrderReturnDocumentProcess().getNextDocumentNo(user.getCode(), head.getPdCode(),user.getId(), conn);
+				    requestNumber = new MoveOrderReturnDocumentProcess().getNextDocumentNo(requestDate,user.getCode(), head.getPdCode(),user.getId(), conn);
 				}
 				
 				//prepare MoveOrder
 				logger.debug("MoveOrderType["+head.getMoveOrderType()+"]requestNumber["+requestNumber+"]");
 				//prepare MoveOrder Model
 				head.setRequestNumber(requestNumber);
-				
+
 				head = insertMoveOrder(conn , head);
 				
 			}else{
+				//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
+				head = checkRequestDate(head);
+				
 				updateMoveOrder(conn , head);
 			}
 	
@@ -113,6 +123,7 @@ public class MMoveOrder {
 					}
 				}//for
 			}
+			
 			if(head.getLineNoDeleteList() != null && head.getLineNoDeleteList().size() > 0){
 				for(int i =0;i< head.getLineNoDeleteList().size();i++){
 					int lineNo = Integer.parseInt((String)head.getLineNoDeleteList().get(i));
@@ -145,6 +156,91 @@ public class MMoveOrder {
 		}
 		return head;
 	}
+	
+	public static void main(String[] ar){
+		try{
+			Calendar currentDate = Calendar.getInstance();
+			
+			String requestDateStr = "01/12/2555";
+			Date requestDateObj = Utils.parse(requestDateStr, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Calendar requestDate = Calendar.getInstance();
+			requestDate.setTime(requestDateObj);
+			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
+			
+			Calendar monthEndDate = Calendar.getInstance();
+			int lastDayInMonthOfCurrentDate = monthEndDate.getActualMaximum(Calendar.DATE);
+			
+			//diff day 
+			int diffDayRequestDateToMonthEndDate = lastDayInMonthOfCurrentDate - dayInMonthOfRequestDate;
+			
+			System.out.println("currentDate:"+currentDate);
+			System.out.println("requestDate:"+requestDate.getTime());
+			System.out.println("monthEndDate:"+monthEndDate.getTime());
+			System.out.println("lastDayInMonthOfCurrentDate:"+lastDayInMonthOfCurrentDate);
+			System.out.println("dayInMonthOfRequestDate:"+dayInMonthOfRequestDate);
+			
+			System.out.println("diffDayRequestDateToMonthEndDate:"+diffDayRequestDateToMonthEndDate);
+			
+			//int diffDay <=1 
+			if(diffDayRequestDateToMonthEndDate <= 1){
+				System.out.println("set request Date to 01/nextMonth/nextYear");
+				currentDate.add(Calendar.MONTH, 1);//next Month or NextYear 
+				currentDate.set(Calendar.DATE, 1);//set to 01/xx/xxxx
+				
+				System.out.println("requestDate :"+currentDate.getTime());
+			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
+	private MoveOrder checkRequestDate(MoveOrder head) {
+		try{
+			List<References> refList = InitialReferences.getReferenes().get(InitialReferences.MOVEORDER);
+			//logger.info("Integer.parseInt(refList.get(0).getKey()):"+Integer.parseInt(refList.get(0).getKey()));
+			int diffDayToEndConfig = refList != null? Integer.parseInt(refList.get(0).getKey())-1:1;
+			
+            Calendar currentDate = Calendar.getInstance();
+			
+			Date requestDateObj = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Calendar requestDate = Calendar.getInstance();
+			requestDate.setTime(requestDateObj);
+			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
+			
+			Calendar monthEndDate = Calendar.getInstance();
+			int lastDayInMonthOfCurrentDate = monthEndDate.getActualMaximum(Calendar.DATE);
+			
+			//diff day 
+			int diffDayRequestDateToMonthEndDate = lastDayInMonthOfCurrentDate - dayInMonthOfRequestDate;
+			
+			System.out.println("currentDate:"+currentDate);
+			System.out.println("requestDate:"+requestDate.getTime());
+			System.out.println("monthEndDate:"+monthEndDate.getTime());
+			System.out.println("lastDayInMonthOfCurrentDate:"+lastDayInMonthOfCurrentDate);
+			System.out.println("dayInMonthOfRequestDate:"+dayInMonthOfRequestDate);
+			
+			System.out.println("diffDayRequestDateToMonthEndDate:"+diffDayRequestDateToMonthEndDate);
+			
+			//int diffDay <=1 
+			if(diffDayRequestDateToMonthEndDate <= diffDayToEndConfig){
+				System.out.println("set request Date to 01/nextMonth/nextYear");
+				currentDate.add(Calendar.MONTH, 1);//next Month or NextYear 
+				currentDate.set(Calendar.DATE, 1);//set to 01/xx/xxxx
+				
+				String requestDateStr = Utils.stringValue(currentDate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				head.setRequestDate(requestDateStr);
+				System.out.println("requestDate :"+head.getRequestDate());
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return head;
+	}
+	
 	
 	private double calcQty(MoveOrderLine line) throws Exception{
 		double priQty = 0;
@@ -636,6 +732,8 @@ public class MMoveOrder {
 		MoveOrder m = null;
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
+		Date currentDate = new Date();
+		Date requestDate = null;
 		try {
 			conn = new  DBCPConnectionProvider().getConnection(conn);
 			
@@ -663,6 +761,14 @@ public class MMoveOrder {
 			  m = mCriteria;
 			  m.setRequestNumber(rst.getString("request_number"));
 			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  requestDate = Utils.parse(m.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			  //Check 
+			  if(requestDate != null){
+				  if(currentDate.before(requestDate)){
+					  m.setRequestDateDisabled(true);
+				  }
+			  }
+			  
 			  m.setOrganizationId(rst.getString("organization_id"));
 			  
 			  m.setSalesCode(rst.getString("sales_code"));

@@ -11,6 +11,16 @@ public class MoveOrderProductCatalog implements Comparable{
 	private double qty1;
 	private double qty2;
 	private double lineNetAmt;
+	private double pacQty2;
+
+	
+	public double getPacQty2() {
+		return pacQty2;
+	}
+
+	public void setPacQty2(double pacQty2) {
+		this.pacQty2 = pacQty2;
+	}
 
 	public int getProductId() {
 		return productId;

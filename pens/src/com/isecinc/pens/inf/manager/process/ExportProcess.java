@@ -1663,6 +1663,68 @@ public class ExportProcess {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param conn
+	 * @param tableBean
+	 * @param userBean
+	 * @return
+	 * @throws Exception
+	 */
+	public  TableBean exportBillPlan(Connection conn,TableBean tableBean,User userBean) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+		try{
+            logger.debug("Select:"+tableBean.getPrepareSqlSelect());
+			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				//Add Order Header
+				for(i=0;i<tableBean.getColumnBeanList().size();i++){
+					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+					if(i==tableBean.getColumnBeanList().size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					//logger.debug("colName["+colBean.getColumnName()+"]");
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}	
+				}//for
+				/** Add New Line **/
+				dataAppend.append(Constants.newLine);//new line
+				/** Set Data For Update InterfacesFlag **/
+				sqlUpdateExportFlagList.add("update t_bill_plan set exported ='Y' WHERE bill_plan_no = '"+rs.getString("bill_plan_no")+"'");
+				
+			}//while
+			logger.debug("totalRows:"+totalRows);
+
+			tableBean.setExportCount(totalRows);
+			tableBean.setDataStrExport(dataAppend);
+			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+		
+			return tableBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
 	private   StringBuffer exportMoveOrderLine(Connection conn,String requestNumber,List<String> sqlUpdateExportFlagList) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;

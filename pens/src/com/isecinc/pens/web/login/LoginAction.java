@@ -63,6 +63,11 @@ public class LoginAction extends DispatchAction {
 				return mapping.findForward("fail");
 			}
 			request.getSession(true).setAttribute("user", user);
+			
+			//clear check version
+			request.getSession().setAttribute("appVersionCheckMsg",null);
+			request.getSession().setAttribute("massageToSales",null);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

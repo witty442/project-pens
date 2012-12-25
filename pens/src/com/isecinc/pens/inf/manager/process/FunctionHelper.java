@@ -29,17 +29,17 @@ public class FunctionHelper {
 	 * @throws Exception
 	 * readSQlExternalFunc  case read manual script delete fro delete promotion
 	 */
-	public static  List<String> readSQlExternalFunction(String functionName) throws Exception {
-		logger.debug("readSQlExternalFunc Name:["+functionName+"]");
+	public static  List<String> readSQlExternalFunction(String function ,String tableName) throws Exception {
+		logger.debug("readSQlExternalFunc function["+function+"] Table Name:["+tableName+"]");
 		EnvProperties env = EnvProperties.getInstance();		
 		List<String> sqlList = null;
 		try {
-			String pathFullName = getPathFullName(functionName);
-			logger.info("pathFullName["+pathFullName+"]");
+			String pathFullName = getPathFullName(function,tableName);
+			//logger.info("pathFullName["+pathFullName+"]");
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			
 			String sqlAll = ftpManager.getDownloadFTPFileByName(pathFullName);
-			logger.info("SQLALL:"+sqlAll);
+			//logger.info("SQLALL:"+sqlAll);
 			
 			sqlList = new ArrayList<String>();
 			
@@ -57,14 +57,12 @@ public class FunctionHelper {
 		return sqlList;
 	}
 	
-	public static String getPathFullName(String functionName){
-		String pathManualScript  = "/Manual-script/";
-		if(functionName.indexOf("promotion") != -1){
-			pathManualScript += "Promotion/"+functionName+".sql";
-		}else if(functionName.indexOf("product") != -1){
-			pathManualScript += "Product/"+functionName+".sql";
-		}else if(functionName.indexOf("ad_user") != -1){
-			pathManualScript += "AdUser/"+functionName+".sql";
+	public static String getPathFullName(String function ,String tableName){
+		String pathManualScript ="";
+		if("Pre".equalsIgnoreCase(function)){
+		   pathManualScript = "/Manual-script/Script-Pre-Import/"+tableName+".sql";
+		}else if("Post".equalsIgnoreCase(function)){
+		   pathManualScript = "/Manual-script/Script-Post-Import/"+tableName+".sql";
 		}
 		return pathManualScript;
 	}

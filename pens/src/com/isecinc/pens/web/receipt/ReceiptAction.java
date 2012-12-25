@@ -185,7 +185,7 @@ public class ReceiptAction extends I_Action {
 			whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' ";
 			whereCause += " AND CUSTOMER_ID = " + receiptForm.getReceipt().getCustomerId() + " ";
 
-			if (!user.getType().equalsIgnoreCase(User.DD)) whereCause += " AND USER_ID = " + user.getId();
+			whereCause += " AND USER_ID = " + user.getId();
 
 			if (receiptForm.getReceipt().getSearchInvoiceNo() != null
 					&& !receiptForm.getReceipt().getSearchInvoiceNo().equals("")) {

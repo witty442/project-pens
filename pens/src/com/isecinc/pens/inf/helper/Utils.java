@@ -25,6 +25,7 @@ public class Utils {
 	protected static Logger logger = Logger.getLogger("PENS");
 	public static final String DD_MM_YYYY_WITH_SLASH = "dd/MM/yyyy";
 	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
+	public static final String DD_MM_YYYY_HH_mm_ss_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
 	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
 	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
@@ -156,6 +157,19 @@ public class Utils {
 	public static Date parse(String dateString, String format ,String locale) throws Exception {
 		Date date = null;
 		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale(locale.toLowerCase()));
+		
+		try {
+			date = ft.parse(dateString);
+		} catch (Exception e) {
+			
+		}
+		
+		return date;
+	}
+	
+	public static Date parse(String dateString, String format ,Locale locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
 		
 		try {
 			date = ft.parse(dateString);

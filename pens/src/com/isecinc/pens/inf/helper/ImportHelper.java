@@ -1088,18 +1088,11 @@ public class ImportHelper {
 	 * DESC: Compare file Name with FTP Server 
 	 * tableBean.getFileFtpName() -> name file on FTP Server
 	 */
-	public static boolean canGetFtpFile(User user,String transType,TableBean tableBean,String fileFtpFullName,boolean importAll) throws Exception{
+	public static boolean canGetFtpFile(User user,String transType,TableBean tableBean,String fileFtpFullName,boolean importAll) {
 		boolean canGetFtpFile = false;
-		//logger.debug("TransType:"+transType);
-		if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(transType)){
-			if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
-				if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
-					canGetFtpFile = true;
-				}else{
-					canGetFtpFile = false;
-				}
-			}
-		}else if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equalsIgnoreCase(transType)){
+		try{
+			//logger.debug("TransType:"+transType);
+			if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(transType)){
 				if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
 					if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
 						canGetFtpFile = true;
@@ -1107,61 +1100,72 @@ public class ImportHelper {
 						canGetFtpFile = false;
 					}
 				}
-		}else{
-			
-			if(tableBean.getTableName().equalsIgnoreCase("m_inventory_onhand")){
-			   if(    fileFtpFullName.indexOf("VISIT") == -1
-				   && fileFtpFullName.indexOf("ORDER") == -1
-				   && fileFtpFullName.indexOf("RECEIPT") == -1 
-				   && fileFtpFullName.indexOf("CN") == -1  ){
-					
-			    	if(ImportHelper.isCanGetFtpFileCaseSubInv(tableBean, fileFtpFullName,importAll)){
-	            		canGetFtpFile = true;
-					}else{
-						canGetFtpFile = false;
-					}
-			    }
-			}else 	if(tableBean.getTableName().equalsIgnoreCase("t_credit_note")){
-				if(fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1){
-					if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
-						canGetFtpFile = true;
-					}else{
-						canGetFtpFile = false;
-					}
-			    }
-			}else if(tableBean.getTableName().equalsIgnoreCase("m_customer")
-					|| tableBean.getTableName().equalsIgnoreCase("m_address")
-					|| tableBean.getTableName().equalsIgnoreCase("m_contact")
-					|| tableBean.getTableName().equalsIgnoreCase("m_trip")
-					|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
-					|| tableBean.getTableName().equalsIgnoreCase("m_member_health")){
-				
-				//logger.debug("fileFtpFullName:"+fileFtpFullName);
-				if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
-					if(User.ADMIN.equals(user.getType())){
-						if(ImportHelper.isCanGetFtpFileBySalesCodeCaseAdmin(user, tableBean, fileFtpFullName,importAll)){
-							canGetFtpFile = true;
-						}else{
-							canGetFtpFile = false;
-						}
-					}else{
+			}else if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equalsIgnoreCase(transType)){
+					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
 						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
 							canGetFtpFile = true;
 						}else{
 							canGetFtpFile = false;
 						}
 					}
-				}//if
-				/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN,m_sales_target_new)**/
 			}else{
-				if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
-					    if(ImportHelper.isCanGetFtpFile(tableBean, fileFtpFullName,importAll)){
-		        		    canGetFtpFile = true;
-			        	}else{
-			        		canGetFtpFile = false;
-			        	}
+				
+				if(tableBean.getTableName().equalsIgnoreCase("m_inventory_onhand")){
+				   if(    fileFtpFullName.indexOf("VISIT") == -1
+					   && fileFtpFullName.indexOf("ORDER") == -1
+					   && fileFtpFullName.indexOf("RECEIPT") == -1 
+					   && fileFtpFullName.indexOf("CN") == -1  ){
+						
+				    	if(ImportHelper.isCanGetFtpFileCaseSubInv(tableBean, fileFtpFullName,importAll)){
+		            		canGetFtpFile = true;
+						}else{
+							canGetFtpFile = false;
+						}
+				    }
+				}else 	if(tableBean.getTableName().equalsIgnoreCase("t_credit_note")){
+					if(fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1){
+						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+							canGetFtpFile = true;
+						}else{
+							canGetFtpFile = false;
+						}
+				    }
+				}else if(tableBean.getTableName().equalsIgnoreCase("m_customer")
+						|| tableBean.getTableName().equalsIgnoreCase("m_address")
+						|| tableBean.getTableName().equalsIgnoreCase("m_contact")
+						|| tableBean.getTableName().equalsIgnoreCase("m_trip")
+						|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
+						|| tableBean.getTableName().equalsIgnoreCase("m_member_health")){
+					
+					//logger.debug("fileFtpFullName:"+fileFtpFullName);
+					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
+						if(User.ADMIN.equals(user.getType())){
+							if(ImportHelper.isCanGetFtpFileBySalesCodeCaseAdmin(user, tableBean, fileFtpFullName,importAll)){
+								canGetFtpFile = true;
+							}else{
+								canGetFtpFile = false;
+							}
+						}else{
+							if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+								canGetFtpFile = true;
+							}else{
+								canGetFtpFile = false;
+							}
+						}
+					}//if
+					/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN,m_sales_target_new)**/
+				}else{
+					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
+						    if(ImportHelper.isCanGetFtpFile(tableBean, fileFtpFullName,importAll)){
+			        		    canGetFtpFile = true;
+				        	}else{
+				        		canGetFtpFile = false;
+				        	}
+					}
 				}
 			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
 		return canGetFtpFile;
 	}
@@ -1177,60 +1181,63 @@ public class ImportHelper {
 	 * tableName : for mapping ftp file
 	 * ftpFileFullName : file name full in FTP Server ex, -> 1). 201010311010-UOM.txt  ,2).201012081631-PROLINE-ALL.txt
 	 */
-	public static boolean isCanGetFtpFile(TableBean tableBean, String ftpFileFullName,boolean importAll) throws Exception{
+	public static boolean isCanGetFtpFile(TableBean tableBean, String ftpFileFullName,boolean importAll){
 		//logger.debug("isCanGetFtpFile");
 		boolean map = false;
-		long ftpFileVesrionInt1 = 0;
-		long salesFileLastVersionInt = 0;
-		
-		String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
-		String salesFileMappingName = tableBean.getFileNameMapping();
-		if( !Utils.isNull(salesFileNameLastImport).equals("")){
-			salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]);
-		}
-		
-		/** Case Import File ALL  */
-		if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
-			/** 201012081631-PROLINE-ALL.txt  */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);
-			String ftpFileTableName2 = ftpFileFullNameArr[1];
-			String ftpFileTableName3 = "";
-			if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==3){
-				ftpFileTableName3 = ftpFileFullNameArr[2];
-				if(ftpFileTableName3.indexOf(".") != -1){
-					ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
+		try{
+			long ftpFileVesrionInt1 = 0;
+			long salesFileLastVersionInt = 0;
+			
+			String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
+			String salesFileMappingName = tableBean.getFileNameMapping();
+			if( !Utils.isNull(salesFileNameLastImport).equals("")){
+				salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]);
+			}
+			
+			/** Case Import File ALL  */
+			if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
+				/** 201012081631-PROLINE-ALL.txt  */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);
+				String ftpFileTableName2 = ftpFileFullNameArr[1];
+				String ftpFileTableName3 = "";
+				if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==3){
+					ftpFileTableName3 = ftpFileFullNameArr[2];
+					if(ftpFileTableName3.indexOf(".") != -1){
+						ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
+					}
+				}
+				/*logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName2);
+				logger.debug("All:ALL:"+ftpFileTableName3);	
+				logger.debug("********************************************************");*/
+				if(     ftpFileVesrionInt1 >salesFileLastVersionInt
+						&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName2)
+						&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName3) ){
+					map = true;
+				}
+			}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
+				/**201010311010-UOM.txt  */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]); //201010311010 
+				String ftpFileTableName2 = ftpFileFullNameArr[1];//UOM
+				
+				if(ftpFileTableName2.indexOf(".") != -1){
+					ftpFileTableName2 = ftpFileTableName2.substring(0,ftpFileTableName2.indexOf("."));
+				}
+				/*logger.debug("*******Compare File Get FTP FIle Name*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName2);
+				logger.debug("********************************************************");*/
+				if(ftpFileVesrionInt1 >salesFileLastVersionInt 
+					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName2)){
+					map = true;
 				}
 			}
-			/*logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName2);
-			logger.debug("All:ALL:"+ftpFileTableName3);	
-			logger.debug("********************************************************");*/
-			if(     ftpFileVesrionInt1 >salesFileLastVersionInt
-					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName2)
-					&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName3) ){
-				map = true;
-			}
-		}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
-			/**201010311010-UOM.txt  */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]); //201010311010 
-			String ftpFileTableName2 = ftpFileFullNameArr[1];//UOM
-			
-			if(ftpFileTableName2.indexOf(".") != -1){
-				ftpFileTableName2 = ftpFileTableName2.substring(0,ftpFileTableName2.indexOf("."));
-			}
-			/*logger.debug("*******Compare File Get FTP FIle Name*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName2);
-			logger.debug("********************************************************");*/
-			if(ftpFileVesrionInt1 >salesFileLastVersionInt 
-				&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName2)){
-				map = true;
-			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
-		
 		return map;
 
 	}
@@ -1246,68 +1253,71 @@ public class ImportHelper {
 	 * tableName : for mapping ftp file
 	 * ftpFileFullName : file name full in FTP Server ex, -> Case 1) 201010311010-100040-RECEIPT.txt ,Case 2).201010311010-100040-RECEIPT-ALL.txt
 	 */
-	public static boolean isCanGetFtpFileBySalesCode(User user,TableBean tableBean, String ftpFileFullName,boolean importAll) throws Exception{
+	public static boolean isCanGetFtpFileBySalesCode(User user,TableBean tableBean, String ftpFileFullName,boolean importAll) {
 		//logger.debug("isCanGetFtpFileBySalesCode");
 		boolean map = false;
-		long ftpFileVesrionInt1 = 0;
-		long salesFileLastVersionInt = 0;
-		String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
-		String salesFileMappingName = tableBean.getFileNameMapping();
-		if( !Utils.isNull(salesFileNameLastImport).equals("")){
-			salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]); //201010311010
-		}
-		
-		/** Case Import File ALL  */
-		if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
-			/** 201010311010-100040-CUST-ALL.txt */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
-			String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
-			String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
-			String ftpFileTableName4 = "";//ALL
-			if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==4){
-				ftpFileTableName4 = ftpFileFullNameArr[3];//ALL
-				if(ftpFileTableName4.indexOf(".") != -1){
-					ftpFileTableName4 = ftpFileTableName4.substring(0,ftpFileTableName4.indexOf("."));
+		try{
+			long ftpFileVesrionInt1 = 0;
+			long salesFileLastVersionInt = 0;
+			String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
+			String salesFileMappingName = tableBean.getFileNameMapping();
+			if( !Utils.isNull(salesFileNameLastImport).equals("")){
+				salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]); //201010311010
+			}
+			
+			/** Case Import File ALL  */
+			if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
+				/** 201010311010-100040-CUST-ALL.txt */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
+				String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
+				String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
+				String ftpFileTableName4 = "";//ALL
+				if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==4){
+					ftpFileTableName4 = ftpFileFullNameArr[3];//ALL
+					if(ftpFileTableName4.indexOf(".") != -1){
+						ftpFileTableName4 = ftpFileTableName4.substring(0,ftpFileTableName4.indexOf("."));
+					}
+				}
+				String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
+				
+				/*logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
+				logger.debug("All:ALL:"+ftpFileTableName4);	
+				logger.debug("********************************************************");*/
+				if(     ftpFileVesrionInt1 >salesFileLastVersionInt
+						&& (userId).equals(ftpFileTableName2)
+						&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3)
+						&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName4) ){
+					map = true;
+				}
+			}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
+				/**201010311010-100040-CUST.txt */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
+				String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
+				String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
+				if(ftpFileTableName3.indexOf(".") != -1){
+					ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
+				}
+				String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
+				
+				/*logger.debug("*******Compare File Get FTP FIle Name*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
+				logger.debug("********************************************************");*/
+				if(ftpFileVesrionInt1 > salesFileLastVersionInt 
+					&& (userId).equals(ftpFileTableName2)
+					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
+					map = true;
 				}
 			}
-			String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
-			
-			/*logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
-			logger.debug("All:ALL:"+ftpFileTableName4);	
-			logger.debug("********************************************************");*/
-			if(     ftpFileVesrionInt1 >salesFileLastVersionInt
-					&& (userId).equals(ftpFileTableName2)
-					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3)
-					&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName4) ){
-				map = true;
-			}
-		}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
-			/**201010311010-100040-CUST.txt */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
-			String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
-			String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
-			if(ftpFileTableName3.indexOf(".") != -1){
-				ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
-			}
-			String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
-			
-			/*logger.debug("*******Compare File Get FTP FIle Name*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
-			logger.debug("********************************************************");*/
-			if(ftpFileVesrionInt1 > salesFileLastVersionInt 
-				&& (userId).equals(ftpFileTableName2)
-				&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
-				map = true;
-			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
-		
 		return map;
 	}
 	
@@ -1322,67 +1332,70 @@ public class ImportHelper {
 	 * 
 	 * Case User Admin Not Check User_ID (customer,address,contact,trip)
 	 */
-	public static boolean isCanGetFtpFileBySalesCodeCaseAdmin(User user,TableBean tableBean, String ftpFileFullName,boolean importAll) throws Exception{
+	public static boolean isCanGetFtpFileBySalesCodeCaseAdmin(User user,TableBean tableBean, String ftpFileFullName,boolean importAll){
 		logger.debug("isCanGetFtpFileBySalesCodeCaseAdmin");
 		boolean map = false;
-		long ftpFileVesrionInt1 = 0;
-		long salesFileLastVersionInt = 0;
-		String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
-		String salesFileMappingName = tableBean.getFileNameMapping();
-		if( !Utils.isNull(salesFileNameLastImport).equals("")){
-			salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]); //201010311010
-		}
-		
-		logger.debug("importAll:"+importAll+",indexOF ALL :"+ftpFileFullName.indexOf("-ALL"));
-		/** Case Import File ALL  */
-		if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
-			/** 201010311010-100040-CUST-ALL.txt */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
-			String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
-			String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
-			String ftpFileTableName4 = "";//ALL
-			if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==4){
-				ftpFileTableName4 = ftpFileFullNameArr[3];//ALL
-				if(ftpFileTableName4.indexOf(".") != -1){
-					ftpFileTableName4 = ftpFileTableName4.substring(0,ftpFileTableName4.indexOf("."));
+		try{
+			long ftpFileVesrionInt1 = 0;
+			long salesFileLastVersionInt = 0;
+			String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
+			String salesFileMappingName = tableBean.getFileNameMapping();
+			if( !Utils.isNull(salesFileNameLastImport).equals("")){
+				salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]); //201010311010
+			}
+			
+			logger.debug("importAll:"+importAll+",indexOF ALL :"+ftpFileFullName.indexOf("-ALL"));
+			/** Case Import File ALL  */
+			if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
+				/** 201010311010-100040-CUST-ALL.txt */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
+				String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
+				String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
+				String ftpFileTableName4 = "";//ALL
+				if(ftpFileFullNameArr != null && ftpFileFullNameArr.length ==4){
+					ftpFileTableName4 = ftpFileFullNameArr[3];//ALL
+					if(ftpFileTableName4.indexOf(".") != -1){
+						ftpFileTableName4 = ftpFileTableName4.substring(0,ftpFileTableName4.indexOf("."));
+					}
+				}
+				int userId = user.getId();
+				
+				logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
+				logger.debug("All:ALL:"+ftpFileTableName4);	
+				logger.debug("********************************************************");
+				if(     ftpFileVesrionInt1 >salesFileLastVersionInt
+						&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3)
+						&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName4) ){
+					map = true;
+				}
+			}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
+				/**201010311010-100040-CUST.txt */
+				String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+				ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
+				String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
+				String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
+				if(ftpFileTableName3.indexOf(".") != -1){
+					ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
+				}
+				int userId = user.getId();
+				
+				logger.debug("*******Compare File Get FTP FIle Name*******************");
+				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
+				logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
+				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
+				logger.debug("********************************************************");
+				if(ftpFileVesrionInt1 > salesFileLastVersionInt 
+					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
+					map = true;
 				}
 			}
-			int userId = user.getId();
-			
-			logger.debug("*******Compare File Get FTP FIle Name Case Import ALL*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
-			logger.debug("All:ALL:"+ftpFileTableName4);	
-			logger.debug("********************************************************");
-			if(     ftpFileVesrionInt1 >salesFileLastVersionInt
-					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3)
-					&& Constants.FTP_FILE_NAME_ALL.equalsIgnoreCase(ftpFileTableName4) ){
-				map = true;
-			}
-		}else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
-			/**201010311010-100040-CUST.txt */
-			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//201010311010
-			String ftpFileTableName2 = ftpFileFullNameArr[1];//100040 userId
-			String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//CUST tableName
-			if(ftpFileTableName3.indexOf(".") != -1){
-				ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
-			}
-			int userId = user.getId();
-			
-			logger.debug("*******Compare File Get FTP FIle Name*******************");
-			logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
-			logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
-			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
-			logger.debug("********************************************************");
-			if(ftpFileVesrionInt1 > salesFileLastVersionInt 
-				&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
-				map = true;
-			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
-		
 		return map;
 	}
 	
@@ -1399,119 +1412,123 @@ public class ImportHelper {
 	   //201011031542-R001-03-Sorlor-ALL.txt	
 	   and check lastImport < ftpName[201011031542]
 	 */
-	public static boolean isCanGetFtpFileCaseSubInv(TableBean tableBean , String ftpFileFullName,boolean importAll) throws Exception{
+	public static boolean isCanGetFtpFileCaseSubInv(TableBean tableBean , String ftpFileFullName,boolean importAll){
 		//logger.debug("isCanGetFtpFileCaseSubInv");
 		boolean map = false;
-		long saleFileVersion1 = 0;
-		long ftpFileVersion1 = 0;
-		
-		String saleFileName = tableBean.getFileNameLastImport(); //for version Date
-		Map subInvMap = tableBean.getSubInvMap();
-		Map userCodeMap = tableBean.getUserCodeMap();
-		
-		//logger.debug("subInvMap:"+subInvMap);
-		//logger.debug("userCodeMap:"+userCodeMap);
-		
-        if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
-        	// 201011031542-R001-Sorlor-ALL.txt  Case1 length =4
-        	// 201011031542-R001-03-Sorlor-ALL.txt Case2 length =5
-        	//FTP FIle
-        	String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-        	ftpFileVersion1 = Long.parseLong(ftpFileFullNameArr[0]);
+		try{
+			long saleFileVersion1 = 0;
+			long ftpFileVersion1 = 0;
 			
-			String subInvName2 = "";
-			String userCodeName3 = "";
-			String all4 = "";
-			if(ftpFileFullNameArr.length ==4){	
-				subInvName2 = ftpFileFullNameArr[1];//R001
-				userCodeName3 = ftpFileFullNameArr[2];
-				all4 = ftpFileFullNameArr[3];
-			}else{
-				subInvName2 = ftpFileFullNameArr[1]+"-"+ftpFileFullNameArr[2];//R001,Solor
-				userCodeName3 = ftpFileFullNameArr[3];
-				all4 = ftpFileFullNameArr[4];
-		     }
-		
-			if(all4.indexOf(".") != -1){
-				all4 = all4.substring(0,all4.indexOf("."));
-			}
+			String saleFileName = tableBean.getFileNameLastImport(); //for version Date
+			Map subInvMap = tableBean.getSubInvMap();
+			Map userCodeMap = tableBean.getUserCodeMap();
 			
-            // Sales File
-			if( !Utils.isNull(saleFileName).equals("")){
-				saleFileVersion1 = Long.parseLong(saleFileName.split("\\-")[0]);
-			}
-			/*logger.debug("version:"+saleFileVersion1+":"+ftpFileVersion1);
-			logger.debug("subInvName:"+subInvMap.get(subInvName2)+":"+subInvName2);
-			logger.debug("userCodeName:"+userCodeMap.get(userCodeName3)+":"+userCodeName3);
-			logger.debug("ALL:ALL:"+all4);*/
-			/** Case สร. YYYYMMDDHHMM-SubInv-Sorlor-ALL.txt */
-			if(ftpFileFullName.indexOf(Constants.SUB_INV_SOLOR) != -1){
-				if(        ftpFileVersion1 > saleFileVersion1 
-						&& subInvMap.get(subInvName2) != null 
-						&& userCodeName3.equals(Constants.SUB_INV_SOLOR)
-						&& Constants.FTP_FILE_NAME_ALL.equals(all4)
-						){
-					
-					map = true;
+			//logger.debug("subInvMap:"+subInvMap);
+			//logger.debug("userCodeMap:"+userCodeMap);
+			
+	        if(importAll && ftpFileFullName.indexOf("-ALL") != -1){
+	        	// 201011031542-R001-Sorlor-ALL.txt  Case1 length =4
+	        	// 201011031542-R001-03-Sorlor-ALL.txt Case2 length =5
+	        	//FTP FIle
+	        	String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+	        	ftpFileVersion1 = Long.parseLong(ftpFileFullNameArr[0]);
+				
+				String subInvName2 = "";
+				String userCodeName3 = "";
+				String all4 = "";
+				if(ftpFileFullNameArr.length ==4){	
+					subInvName2 = ftpFileFullNameArr[1];//R001
+					userCodeName3 = ftpFileFullNameArr[2];
+					all4 = ftpFileFullNameArr[3];
+				}else{
+					subInvName2 = ftpFileFullNameArr[1]+"-"+ftpFileFullNameArr[2];//R001,Solor
+					userCodeName3 = ftpFileFullNameArr[3];
+					all4 = ftpFileFullNameArr[4];
+			     }
+			
+				if(all4.indexOf(".") != -1){
+					all4 = all4.substring(0,all4.indexOf("."));
 				}
-			}else{
-			/** Van YYYYMMDDHHMM-SubInv-SalesCode-ALL.txt */
-				if( ftpFileVersion1 > saleFileVersion1 && subInvMap.get(subInvName2) != null ){
-					if(userCodeMap.get(userCodeName3) != null && Constants.FTP_FILE_NAME_ALL.equals(all4)){
-					  map = true;
+				
+	            // Sales File
+				if( !Utils.isNull(saleFileName).equals("")){
+					saleFileVersion1 = Long.parseLong(saleFileName.split("\\-")[0]);
+				}
+				/*logger.debug("version:"+saleFileVersion1+":"+ftpFileVersion1);
+				logger.debug("subInvName:"+subInvMap.get(subInvName2)+":"+subInvName2);
+				logger.debug("userCodeName:"+userCodeMap.get(userCodeName3)+":"+userCodeName3);
+				logger.debug("ALL:ALL:"+all4);*/
+				/** Case สร. YYYYMMDDHHMM-SubInv-Sorlor-ALL.txt */
+				if(ftpFileFullName.indexOf(Constants.SUB_INV_SOLOR) != -1){
+					if(        ftpFileVersion1 > saleFileVersion1 
+							&& subInvMap.get(subInvName2) != null 
+							&& userCodeName3.equals(Constants.SUB_INV_SOLOR)
+							&& Constants.FTP_FILE_NAME_ALL.equals(all4)
+							){
+						
+						map = true;
+					}
+				}else{
+				/** Van YYYYMMDDHHMM-SubInv-SalesCode-ALL.txt */
+					if( ftpFileVersion1 > saleFileVersion1 && subInvMap.get(subInvName2) != null ){
+						if(userCodeMap.get(userCodeName3) != null && Constants.FTP_FILE_NAME_ALL.equals(all4)){
+						  map = true;
+						}
 					}
 				}
-			}
-			//logger.debug("ResultMap:"+map);
+				//logger.debug("ResultMap:"+map);
+				
+	        }else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
+	        	// 201011031542-R001-Sorlor.txt  Case 1 length =3
+	        	// 201011031542-R001-03-Sorlor.txt Case 2 length =4
+	        	
+	        	//FTP FIle
+	        	String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+	        	ftpFileVersion1 = Long.parseLong(ftpFileFullNameArr[0]);
+	        	String subInvName2 = "";
+				String userCodeName3 = "";
+				if(ftpFileFullNameArr.length ==3){	
+					subInvName2 = ftpFileFullNameArr[1];//R001
+					userCodeName3 = ftpFileFullNameArr[2];//Solor Or SalesCode
+				}else{
+					subInvName2 = ftpFileFullNameArr[1]+"-"+ftpFileFullNameArr[2];//R001-03
+					userCodeName3 = ftpFileFullNameArr[3];//Solor Or SalesCode
+			     }
 			
-        }else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
-        	// 201011031542-R001-Sorlor.txt  Case 1 length =3
-        	// 201011031542-R001-03-Sorlor.txt Case 2 length =4
-        	
-        	//FTP FIle
-        	String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
-        	ftpFileVersion1 = Long.parseLong(ftpFileFullNameArr[0]);
-        	String subInvName2 = "";
-			String userCodeName3 = "";
-			if(ftpFileFullNameArr.length ==3){	
-				subInvName2 = ftpFileFullNameArr[1];//R001
-				userCodeName3 = ftpFileFullNameArr[2];//Solor Or SalesCode
-			}else{
-				subInvName2 = ftpFileFullNameArr[1]+"-"+ftpFileFullNameArr[2];//R001-03
-				userCodeName3 = ftpFileFullNameArr[3];//Solor Or SalesCode
-		     }
-		
-			if(userCodeName3.indexOf(".") != -1){
-				userCodeName3 = userCodeName3.substring(0,userCodeName3.indexOf("."));
-			}
-			
-            // Sales File
-			if( !Utils.isNull(saleFileName).equals("")){
-				saleFileVersion1 = Long.parseLong(saleFileName.split("\\-")[0]);
-			}
-			
-		/*	logger.debug("version:"+saleFileVersion1+":"+ftpFileVersion1);
-			logger.debug("subInvName:"+subInvMap.get(subInvName2)+":"+subInvName2);
-			logger.debug("userCodeName:"+userCodeMap.get(userCodeName3)+":"+userCodeName3);*/
-			
-			/** Case สร. YYYYMMDDHHMM-SubInv-Sorlor.txt */
-			if(ftpFileFullName.indexOf(Constants.SUB_INV_SOLOR) != -1){
-				if(        ftpFileVersion1 > saleFileVersion1 
-						&& subInvMap.get(subInvName2) != null 
-						&& userCodeName3.equals(Constants.SUB_INV_SOLOR)){
-					
-					map = true;
+				if(userCodeName3.indexOf(".") != -1){
+					userCodeName3 = userCodeName3.substring(0,userCodeName3.indexOf("."));
 				}
-			}else{
-			/** Van YYYYMMDDHHMM-SubInv-SalesCode.txt */
-				if( ftpFileVersion1 > saleFileVersion1 && subInvMap.get(subInvName2) != null ){
-					if(userCodeMap.get(userCodeName3) != null){
-					  map = true;
+				
+	            // Sales File
+				if( !Utils.isNull(saleFileName).equals("")){
+					saleFileVersion1 = Long.parseLong(saleFileName.split("\\-")[0]);
+				}
+				
+			/*	logger.debug("version:"+saleFileVersion1+":"+ftpFileVersion1);
+				logger.debug("subInvName:"+subInvMap.get(subInvName2)+":"+subInvName2);
+				logger.debug("userCodeName:"+userCodeMap.get(userCodeName3)+":"+userCodeName3);*/
+				
+				/** Case สร. YYYYMMDDHHMM-SubInv-Sorlor.txt */
+				if(ftpFileFullName.indexOf(Constants.SUB_INV_SOLOR) != -1){
+					if(        ftpFileVersion1 > saleFileVersion1 
+							&& subInvMap.get(subInvName2) != null 
+							&& userCodeName3.equals(Constants.SUB_INV_SOLOR)){
+						
+						map = true;
+					}
+				}else{
+				/** Van YYYYMMDDHHMM-SubInv-SalesCode.txt */
+					if( ftpFileVersion1 > saleFileVersion1 && subInvMap.get(subInvName2) != null ){
+						if(userCodeMap.get(userCodeName3) != null){
+						  map = true;
+						}
 					}
 				}
-			}
-			//logger.debug("ResultMap:"+map);
-        }
+				//logger.debug("ResultMap:"+map);
+	        }
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
 		return map;
 	}
 	

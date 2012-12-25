@@ -75,17 +75,17 @@ public class UpdateSalesProcess {
 				  childBean = ImportHelper.genPrepareSQLUTS(childBean,userBean);
 
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("U") != -1 && !Utils.isNull(childBean.getPrepareSqlUpd()).equals("")){
-					  logger.info("sqlUpddate_Line:"+childBean.getPrepareSqlUpd());
+					  logger.debug("sqlUpddate_Line:"+childBean.getPrepareSqlUpd());
 					  psUpdateD = conn.prepareStatement(childBean.getPrepareSqlUpd());
 				  }
 				  
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("U") != -1 && !Utils.isNull(childBean.getPrepareSqlUpdCS()).equals("")){
-					  logger.info("sqlUpdate_Line_CS:"+childBean.getPrepareSqlUpdCS());
+					  logger.debug("sqlUpdate_Line_CS:"+childBean.getPrepareSqlUpdCS());
 				      psUpdateDCS = conn.prepareStatement(childBean.getPrepareSqlUpdCS());
 				  }
 
 				  if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(childBean.getPrepareSqlIns()).equals("")){
-					  logger.info("sqlInsert_Line:"+childBean.getPrepareSqlIns());
+					  logger.debug("sqlInsert_Line:"+childBean.getPrepareSqlIns());
 					  psInsD = conn.prepareStatement(childBean.getPrepareSqlIns());
 				  }
 			  }
@@ -100,13 +100,13 @@ public class UpdateSalesProcess {
 			    		  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 				    		  //**Check Header Or Line**/
-			    		      logger.info("lineStr["+lineStr+"]");
+			    		      logger.debug("lineStr["+lineStr+"]");
 				    		  if(lineStr.startsWith("H")){  
 				    			  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(tableBean.getPrepareSqlUpd())){
 					    			  logger.debug("**********Start Update H ******************");
 					    		      psUpdateH = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdateH,userBean);
 						    	      canExc = psUpdateH.executeUpdate();
-						    	      logger.info("canUpdate H:"+canExc);
+						    	      logger.debug("canUpdate H:"+canExc);
 						    	      
 						    	      if(canExc != 0 && tableBean.getTableName().startsWith("t_order")){
 						    	    	  /** after Update Receipt from ORCL and add for update payment flag  **/
@@ -118,7 +118,7 @@ public class UpdateSalesProcess {
 				    				  logger.debug("**********Start Insert H ******************");
 					    		      psInsH = ImportHelper.spiltLineArrayToInsertStatement(conn, tableBean, lineStr, psInsH,userBean);
 						    	      canExc = psInsH.executeUpdate();
-						    	      logger.info("canIns H:"+canExc); 
+						    	      logger.debug("canIns H:"+canExc); 
 						    	      
 						    	      if(canExc != 0 && tableBean.getTableName().startsWith("t_order")){
 						    	    	  /** after Update Receipt from ORCL and add for update payment flag  **/
@@ -154,7 +154,7 @@ public class UpdateSalesProcess {
 							    			  logger.debug("**********Start Insert L CS ******************");
 							    			  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
 							    			  canExc = psInsD.executeUpdate();
-									    	  logger.info("canIns L:"+canExc);
+									    	  logger.debug("canIns L:"+canExc);
 							    		 } 
 				    				  }else{
 				    					  /** Update Line  normal**/
@@ -162,7 +162,7 @@ public class UpdateSalesProcess {
 						    				  logger.debug("**********Start Update L normal ******************");
 							    			  psUpdateD = ImportHelper.spiltLineArrayToUpdateStatement(conn, childBean, lineStr, psUpdateD,userBean);
 									    	  canExc = psUpdateD.executeUpdate();
-									    	  logger.info("canUpdate Line:"+canExc);
+									    	  logger.debug("canUpdate Line:"+canExc);
 					    				  }
 					    				  /** INSERT LINE **/
 					    				  if(tableBean.getActionDB().indexOf("I") != -1 && !"".equals(childBean.getPrepareSqlIns())){
@@ -170,7 +170,7 @@ public class UpdateSalesProcess {
 								    			  logger.debug("**********Start Insert L normal  ******************");
 								    			  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
 								    			  canExc = psInsD.executeUpdate();
-										    	  logger.info("canInsert Line:"+canExc);
+										    	  logger.debug("canInsert Line:"+canExc);
 								    		 } 
 					    				  }
 				    				  }
@@ -326,7 +326,7 @@ public class UpdateSalesProcess {
 					canAccess = false;
 				}
 			}
-			logger.info("CanAccess:"+childBean.getTableName()+":"+canAccess);
+			logger.debug("CanAccess:"+childBean.getTableName()+":"+canAccess);
 			
 		}catch(Exception e){
 			throw e;

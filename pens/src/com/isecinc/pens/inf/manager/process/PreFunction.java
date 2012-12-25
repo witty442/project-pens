@@ -21,49 +21,30 @@ public class PreFunction {
 		String sqlManualExe = "";
 		PreparedStatement psManualExe = null;
   	     try{
-  	    	 logger.info("Start Process pre Function ");
+  	    	 logger.debug("Start Process pre Function ");
 
-	  	     //before import Product
-  	    	 if("before_import_product".equalsIgnoreCase(tableBean.getPreFunction())){
-   	    		    logger.info("process prefunction Name:"+tableBean.getPreFunction());
- 	  	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction(tableBean.getPreFunction());
+  	    	 if("Y".equalsIgnoreCase(tableBean.getPreFunction())){
+   	    		    logger.debug("process prefunction Name:"+tableBean.getPreFunction());
+ 	  	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction("Pre",tableBean.getTableName());
  	  	    	    try{
- 		    		    for(int i = 0;i< sqlManualList.size();i++){
- 		    		    	sqlManualExe = Utils.isNull(sqlManualList.get(i));
- 		    		    	if(!"".equals(sqlManualExe)){
- 							    psManualExe = conn.prepareStatement(sqlManualExe);
- 							 
- 							    int r = psManualExe.executeUpdate();
- 							    logger.info("sqlManualExe :"+sqlManualExe +":result>>"+r);
- 		    		    	}
- 		    		    }
+ 	  	    	    	if(sqlManualList != null && sqlManualList.size() >0){
+	 		    		    for(int i = 0;i< sqlManualList.size();i++){
+	 		    		    	sqlManualExe = Utils.isNull(sqlManualList.get(i));
+	 		    		    	if(!"".equals(sqlManualExe)){
+	 							    psManualExe = conn.prepareStatement(sqlManualExe);
+	 							 
+	 							    int r = psManualExe.executeUpdate();
+	 							    logger.info("sqlManualExe :"+sqlManualExe +":result>>"+r);
+	 		    		    	}
+	 		    		    }
+ 	  	    	    	}
  		    		  }catch(Exception e){
  		    			  errors[0] = "Error External Function:sql{"+sqlManualExe+"}:{ErrorMsg:"+e.getMessage()+"}";
  			    		  errors[1] = ExceptionHandle.getExceptionCode(e);
  	                      logger.error(e.getMessage(),e);
  		    		  }
  	  	    	    
- 	  	    //case before import Promotion
-   	    	 }else  if("before_import_promotion".equalsIgnoreCase(tableBean.getPreFunction())){
-	    		    logger.info("process prefunction Name:"+tableBean.getPreFunction());
-	  	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction(tableBean.getPreFunction());
-	  	    	    try{
-		    		    for(int i = 0;i< sqlManualList.size();i++){
-		    		    	sqlManualExe = Utils.isNull(sqlManualList.get(i));
-		    		    	if(!"".equals(sqlManualExe)){
-							    psManualExe = conn.prepareStatement(sqlManualExe);
-							 
-							    int r = psManualExe.executeUpdate();
-							    logger.info("sqlManualExe :"+sqlManualExe +":result>>"+r);
-		    		    	}
-		    		    }
-		    		  }catch(Exception e){
-		    			  errors[0] = "Error External Function:sql{"+sqlManualExe+"}:{ErrorMsg:"+e.getMessage()+"}";
-			    		  errors[1] = ExceptionHandle.getExceptionCode(e);
-	                      logger.error(e.getMessage(),e);
-		    		  }
-	  	    	    
-   	    	 }	    
+  	    	 }
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{

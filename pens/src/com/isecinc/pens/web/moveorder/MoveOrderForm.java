@@ -41,7 +41,6 @@ public class MoveOrderForm extends I_Form {
 		lines = LazyList.decorate(new ArrayList<OrderLine>(), factory);
 	}
 	
-
 	public String getLineNoDeleteArray() {
 		return lineNoDeleteArray;
 	}

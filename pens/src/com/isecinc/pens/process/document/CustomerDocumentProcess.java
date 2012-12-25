@@ -38,7 +38,11 @@ public class CustomerDocumentProcess extends DocumentSequenceProcess {
 		String docNo = "3"+salesCode.substring(1,4);
 		docNo += String.format("%s", new DecimalFormat("000000").format(seq));
 		
-		return docNo;
+		if(checkCustomerCodeDuplicate(docNo,conn)){
+			return getNextDocumentNo(salesCode,activeUserID,conn);
+		}else{
+		    return docNo;
+		}
 	}
 	
 	public boolean checkCustomerCodeDuplicate(String customerCode,Connection conn) throws Exception {

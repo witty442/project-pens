@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.isecinc.pens.inf.helper.Utils;
+
 public class MoveOrder {
     
 	/** Criteria **/
@@ -21,7 +23,8 @@ public class MoveOrder {
 	
 	private String no;    
 	private String requestNumber ;       
-	private String requestDate ; 
+	private String requestDate ;
+	private String currentDate ;
 	private String organizationId ;
 	private String salesCode;
 	private String salesDesc;
@@ -29,7 +32,7 @@ public class MoveOrder {
 	private String pdDesc ;
 	private boolean pdCodeDisabled;
 	
-	private boolean requestDateReadonly = false;
+	private boolean requestDateDisabled = false;
 	private boolean pdCodeReadonly = false;
 	
 	private String description ;
@@ -59,6 +62,30 @@ public class MoveOrder {
     private List<String> lineNoDeleteList;
 	
 	
+	public String getCurrentDate() {
+		try{
+			currentDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+		}catch(Exception e){
+			
+		}
+		return currentDate;
+	}
+
+	
+	public boolean isRequestDateDisabled() {
+		return requestDateDisabled;
+	}
+
+
+	public void setRequestDateDisabled(boolean requestDateDisabled) {
+		this.requestDateDisabled = requestDateDisabled;
+	}
+
+
+	public void setCurrentDate(String currentDate) {
+		this.currentDate = currentDate;
+	}
+
 	public boolean isPdCodeDisabled() {
 		return pdCodeDisabled;
 	}
@@ -73,14 +100,6 @@ public class MoveOrder {
 
 	public void setLineNoDeleteList(List<String> lineNoDeleteList) {
 		this.lineNoDeleteList = lineNoDeleteList;
-	}
-
-	public boolean isRequestDateReadonly() {
-		return requestDateReadonly;
-	}
-
-	public void setRequestDateReadonly(boolean requestDateReadonly) {
-		this.requestDateReadonly = requestDateReadonly;
 	}
 
 	public boolean isPdCodeReadonly() {

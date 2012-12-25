@@ -20,6 +20,7 @@ import util.ReportUtilServlet;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.BillPlan;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.User;
@@ -57,6 +58,14 @@ public class MoveOrderAction extends I_Action {
 				 moveOrderForm.getMoveOrder().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
 				 moveOrderForm.setResults(null);
 				 moveOrderForm.setLines(null);
+				 
+				 //Clear Criteria
+				 request.getSession().setAttribute("criteria_",null);
+				 
+			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
+				 MoveOrder b = (MoveOrder)request.getSession().getAttribute("criteria_");
+				 moveOrderForm.getCriteria().setMoveOrder(b);
+				 search(moveOrderForm,request,response); 
 			 }
 			// save token
 			saveToken(request);
@@ -88,6 +97,8 @@ public class MoveOrderAction extends I_Action {
 				 moveOrderForm.getMoveOrder().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
 				 moveOrderForm.setResults(null);
 				 moveOrderForm.setLines(null);
+				 //Clear Criteria
+				 request.getSession().setAttribute("criteria_",null);
 			 }
 			
 			 // save token
@@ -114,6 +125,10 @@ public class MoveOrderAction extends I_Action {
 			if(moveOrderList != null && moveOrderList.size()==0){
 				request.setAttribute("Message","ไม่พบข้อมูล");
 			}
+			
+			// Save Criteria
+			request.getSession().setAttribute("criteria_",m);
+			
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
@@ -180,7 +195,11 @@ public class MoveOrderAction extends I_Action {
 			 moveOrderForm.getMoveOrder().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
 			 
 			 //set Btn Display
-			 moveOrderForm.getMoveOrder().setShowSaveBtn(true);
+			 if(m.isRequestDateDisabled()){ //Case requestDate 30-31 
+			    moveOrderForm.getMoveOrder().setShowSaveBtn(false);
+			 }else{
+				moveOrderForm.getMoveOrder().setShowSaveBtn(true); 
+			 }
 			 moveOrderForm.getMoveOrder().setShowCancelBtn(true);
 			 moveOrderForm.getMoveOrder().setShowPrintBtn(true);
 			 
@@ -477,11 +496,15 @@ public class MoveOrderAction extends I_Action {
 		logger.debug("clear");
 		MoveOrderForm moveOrderForm = (MoveOrderForm) form;
 		try {
-			//Clear Parametor 
+			//Clear Parameter 
 			 moveOrderForm.getMoveOrder().setRequestDateFrom(null);
 			 moveOrderForm.getMoveOrder().setRequestDateTo(null);
 			 moveOrderForm.setResults(null);
 			 moveOrderForm.setLines(null);
+			 
+			 //Clear Criteria
+			 request.getSession().setAttribute("criteria_",null);
+			 
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
