@@ -123,6 +123,7 @@ public class FTPManager {
     				Iterator it = s.iterator();
     				boolean canGetFtpFile = false;
     				for (int j = 1; it.hasNext(); j++) {
+    					canGetFtpFile = false; 
     					String tableName = (String) it.next();
     					TableBean tableBean = (TableBean) controlTableMap.get(tableName);
                         String ftpFileName = Utils.isNull(file.getName());
@@ -132,12 +133,11 @@ public class FTPManager {
     					   if( !ftpFileName.equals("") && ftpFileName.indexOf(".") != -1){
     						   typeName = ftpFileName.substring(ftpFileName.indexOf(".")+1,ftpFileName.length());
     					   }
-    					  //logger.debug("tableName:"+tableName);
-    					   if(typeName.equalsIgnoreCase("txt")){
+    					   if(typeName.equalsIgnoreCase("txt") && ftpFileName.indexOf(tableBean.getFileFtpName()) != -1){
     					       canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,importAll);
     					   }
     					}
-    					//logger.debug("canGetFtpFile:"+canGetFtpFile);
+    					//logger.info("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
     					
     					if(canGetFtpFile==true){
     						

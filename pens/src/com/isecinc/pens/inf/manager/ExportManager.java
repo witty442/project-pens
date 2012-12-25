@@ -237,6 +237,15 @@ public class ExportManager {
 						   tableBean = exProcess.exportMoveOrder(conn,tableBean,userRequest);	
 						}
 						
+						/** T_BILL_PLAN(BILL T) **/	
+					}else if(tableBean.getTableName().equalsIgnoreCase("t_bill_plan")){
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+						   tableBean = exProcess.exportBillPlan(conn,tableBean,userRequest);	
+						}
+						
 					/** Case Export Order Line Only User Role DD **/
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_order_dd")){
 						/** Gen SQL Select **/
