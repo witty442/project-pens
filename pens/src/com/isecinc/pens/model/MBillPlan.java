@@ -103,13 +103,17 @@ public class MBillPlan {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and  h.user_id ='"+user.getId()+"'");
 				
+				if( !Utils.isNull(mCriteria.getNoBillPlan()).equals("")){
+				  sql.append("\n  and ( h.bill_plan_request_date is  null or trim(bill_plan_request_date) = '') ");	
+				}
+						
 				if( !Utils.isNull(mCriteria.getBillPlanDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getBillPlanDateTo()).equals("")	){
 						
 					  sql.append(" and h.bill_plan_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getBillPlanDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 					  sql.append(" and h.bill_plan_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getBillPlanDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
-				sql.append("\n  ORDER BY h.bill_plan_date asc \n");
+				sql.append("\n  ORDER BY h.bill_plan_date desc \n");
 				
 				logger.debug("sql:"+sql);
 				
@@ -250,7 +254,7 @@ public class MBillPlan {
 				sql.append("\n   SELECT l.* ,p.code,p.name  from t_bill_plan_line l ,m_product p ");
 				sql.append("\n   WHERE l.bill_plan_no ='"+mCriteria.getBillPlanNo()+"'");
 				sql.append("\n   and l.product_id = p.product_id ");
-				sql.append("\n  ) A ORDER BY A.code asc \n");
+				sql.append("\n  ) A ORDER BY A.line_no,A.code asc \n");
 				
 				logger.debug("sql:"+sql);
 				
@@ -261,6 +265,7 @@ public class MBillPlan {
 				  BillPlan m = new BillPlan();
 				  no++;
 				  m.setNo(no+"");
+				  m.setLineNo(rst.getInt("line_no"));
 				  m.setProductId(rst.getString("product_id"));
 				  m.setProductCode(rst.getString("code"));
 				  m.setProductName(rst.getString("name"));

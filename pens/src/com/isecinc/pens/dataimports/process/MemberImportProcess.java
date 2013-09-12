@@ -4,6 +4,6 @@ import org.apache.log4j.Logger;
 
 public class MemberImportProcess {
 
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 }

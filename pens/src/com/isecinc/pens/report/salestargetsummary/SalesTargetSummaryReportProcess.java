@@ -5,14 +5,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import util.DateToolsUtil;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MSalesTargetNew;
 import com.isecinc.pens.model.MOrderLine;
 
@@ -40,11 +43,16 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		String p_dateTo = report.getDateTo();
 		String p_productCodeFrom = report.getProductCodeFrom();
 		String p_productCodeTo = report.getProductCodeTo();
-		int month = DateToolsUtil.convertToTimeStamp(p_dateFrom).getMonth()+1;
+		Calendar c = Calendar.getInstance(Locale.US);
+		c.setTime(Utils.parse(p_dateFrom,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+	
+		int month = c.get(Calendar.MONTH)+1;
+		int year = c.get(Calendar.YEAR);
 		
 		StringBuffer whereClause = new StringBuffer();
 		whereClause.append(" AND User_ID = "+user.getId());
 		whereClause.append(" AND MONTH(TARGET_FROM) = "+month);
+		whereClause.append(" AND YEAR(TARGET_FROM) = "+year);
 		if(p_productCodeFrom != null && p_productCodeFrom.length() >0)
 			whereClause.append(" AND ProductCode >= "+p_productCodeFrom);
 		
@@ -56,6 +64,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		
 		stns = new MSalesTargetNew().search(whereClause.toString());
 		
+		logger.debug("whereClause:"+whereClause.toString());
 		if(stns != null){
 			new MOrderLine().compareSalesTarget(stns, p_dateFrom, p_dateTo);
 			
@@ -83,31 +92,33 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		
 		// Include Order that don't have 
 		StringBuffer sql = new StringBuffer();
-		sql.append("SELECT pd.code as ProductCode , pd.Name as ProductName ,uom.UOM_ID , uom.Name as UOM_NAME ")
-			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Qty,0)) as BaseQty ")
-			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Qty,0)) as SecondQty " )
-			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Line_Amount,0)) as BaseLineAmt ")
-			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Line_Amount,0)) as SecondLineAmt ")
-			.append("FROM T_Order od ")
-			.append("INNER JOIN T_Order_Line odl ON (od.Order_ID = odl.Order_ID) ")
-			.append("INNER JOIN M_Product pd ON (pd.Product_Id = odl.Product_ID) ")
-			.append("INNER JOIN M_UOM uom ON (uom.UOM_ID = pd.UOM_ID) ")
-			.append("WHERE od.User_ID = ? ")
-			.append("AND od.order_date >= ? ")
-			.append("AND od.order_date <= ? ")
-			.append("AND odl.IsCancel = 'N' ")// FIXED : Not Include Cancel Line To Calculate
-			.append("AND od.Doc_STATUS = 'SV' ")// FIXED : Not Include Order was Void To Calculate
-			.append("AND odl.Product_ID NOT IN ")
-			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn WHERE stn.User_ID = ? AND month(stn.Target_From) = ?) ");
+		sql.append("SELECT pd.code as ProductCode , pd.Name as ProductName ,uom.UOM_ID , uom.Name as UOM_NAME \n")
+			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Qty,0)) as BaseQty \n")
+			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Qty,0)) as SecondQty \n" )
+			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Line_Amount,0)) as BaseLineAmt \n")
+			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Line_Amount,0)) as SecondLineAmt \n ")
+			.append("FROM T_Order od \n")
+			.append("INNER JOIN T_Order_Line odl ON (od.Order_ID = odl.Order_ID) \n")
+			.append("INNER JOIN M_Product pd ON (pd.Product_Id = odl.Product_ID) \n")
+			.append("INNER JOIN M_UOM uom ON (uom.UOM_ID = pd.UOM_ID) \n")
+			.append("WHERE od.User_ID = ? \n")
+			.append("AND od.order_date >= ? \n")
+			.append("AND od.order_date <= ? \n")
+			.append("AND odl.IsCancel = 'N' \n")// FIXED : Not Include Cancel Line To Calculate
+			.append("AND od.Doc_STATUS = 'SV' \n")// FIXED : Not Include Order was Void To Calculate
+			.append("AND odl.Product_ID NOT IN \n")
+			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn WHERE stn.User_ID = ? AND month(stn.Target_From) = ?) \n");
 
 			if(p_productCodeFrom != null && p_productCodeFrom.length() >0)
-				sql.append(" AND pd.Code >= ? ");
+				sql.append(" AND pd.Code >= ? \n");
 		
 			if(p_productCodeTo != null && p_productCodeTo.length() > 0)
-				sql.append(" AND pd.Code <= ? ");
+				sql.append(" AND pd.Code <= ? \n");
 			
-			sql.append("GROUP BY pd.code , pd.Name ,pd.UOM_ID ");
+			sql.append("GROUP BY pd.code , pd.Name ,pd.UOM_ID \n");
 		
+	    logger.debug("sql:"+sql.toString());
+	    
 		PreparedStatement ppstmt = conn.prepareStatement(sql.toString());
 		
 		ppstmt.setInt(1, user.getId());

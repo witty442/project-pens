@@ -36,7 +36,7 @@ import com.isecinc.pens.inf.manager.process.UpdateSalesProcess;
  */
 public class UpdateSalesManager {
    
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	public static Object IMPORT_Q = new Object();
 	public static String  PATH_CONTROL = "inf-config/table-mapping-transaction/";
 	public static String  FILE_CONTROL_NAME = "control_transaction.csv";

@@ -19,7 +19,7 @@ import com.isecinc.pens.inf.manager.process.ExternalProcess;
  *
  */
 public class BatchImportWorker extends BatchWorker {
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	private BigDecimal reGenTransactionId;
 	private BigDecimal transactionId;
 	private BigDecimal monitorId;

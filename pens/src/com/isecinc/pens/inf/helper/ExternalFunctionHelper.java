@@ -28,8 +28,14 @@ public class ExternalFunctionHelper {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-        
-        
+		try{
+		   //SN20156050001
+		   //SN20156050001
+           String r = getReplcaeNewOrderNo("2020156050001");
+           System.out.println("r:"+r);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -507,6 +513,8 @@ public class ExternalFunctionHelper {
 	 * order_no length == 12 only
 	 * order ที่ขึ้นต้นด้วย 2  ให้ replace เป็น S
        order ที่ขึ้นต้นด้วย 3 ให้ replace เป็น C
+       Case length =13
+       'SN20156050001',
 	 * @param orderNo
 	 * @return
 	 * @throws Exception
@@ -517,7 +525,12 @@ public class ExternalFunctionHelper {
 			if(firstPos.equals("2")){
 				orderNo = "S"+orderNo.substring(1,orderNo.length());
 			}else if(firstPos.equals("3")){
-				orderNo = "C"+orderNo.substring(1,orderNo.length());
+				orderNo = "V"+orderNo.substring(1,orderNo.length());
+			}
+		}else if(Utils.isNull(orderNo).length() ==13){
+			String firstPos = orderNo.substring(0,1);
+			if(firstPos.equals("2")){
+				orderNo = "SN"+orderNo.substring(2,orderNo.length());
 			}
 		}
 		return orderNo;

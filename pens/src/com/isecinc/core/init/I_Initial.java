@@ -16,7 +16,7 @@ import com.isecinc.pens.bean.User;
 public abstract class I_Initial {
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	/** Default Initial */
 	public abstract void init();

@@ -38,7 +38,7 @@ import com.isecinc.pens.inf.manager.process.ImportProcess;
  */
 public class ImportManager {
    
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	public static Object IMPORT_Q = new Object();
 	public static String PATH_CONTROL ="inf-config/table-mapping-import/";
 	public static String FILE_CONTROL_NAME ="control_import.csv";

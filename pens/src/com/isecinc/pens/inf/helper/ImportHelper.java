@@ -74,6 +74,7 @@ public class ImportHelper {
 							tableBean.setActionDB(Utils.isNull(p[8]));
 							tableBean.setPreFunction(Utils.isNull(p[9]));
 							tableBean.setPostFunction(Utils.isNull(p[10]));
+							tableBean.setCheckDupFile(Utils.isNull(p[11]));
 							
 							//** case Transaction set file_ftp_name =user_id **/
 							if(tableBean.getTableName().equals("m_inventory_onhand")){
@@ -1413,7 +1414,7 @@ public class ImportHelper {
 	   and check lastImport < ftpName[201011031542]
 	 */
 	public static boolean isCanGetFtpFileCaseSubInv(TableBean tableBean , String ftpFileFullName,boolean importAll){
-		//logger.debug("isCanGetFtpFileCaseSubInv");
+		//logger.info("isCanGetFtpFileCaseSubInv");
 		boolean map = false;
 		try{
 			long saleFileVersion1 = 0;
@@ -1476,7 +1477,7 @@ public class ImportHelper {
 						}
 					}
 				}
-				//logger.debug("ResultMap:"+map);
+				logger.info("ResultMap:"+map);
 				
 	        }else if( !importAll && ftpFileFullName.indexOf("-ALL") == -1){
 	        	// 201011031542-R001-Sorlor.txt  Case 1 length =3

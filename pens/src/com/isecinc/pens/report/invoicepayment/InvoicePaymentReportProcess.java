@@ -82,7 +82,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			switch (type) {
 			case 1: {
 				// today receipt, today order
-				sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.RECEIPT_DATE,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+				sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.RECEIPT_DATE,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 				sql.append("\n  AND rcl.ORDER_ID IN ( ");
 				sql.append("\n  SELECT order_id FROM t_order od  ");
 				sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
@@ -91,7 +91,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 				break;
 			case 2: {
 				// today receipt, post order
-				sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+				sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 				sql.append("\n  AND rcl.ORDER_ID IN ( ");
 				sql.append("\n  SELECT order_id FROM t_order od  ");
 				sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
@@ -99,8 +99,8 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			}
 				break;
 			case 3: {
-				sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
-				sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
+				sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+				sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
 				sql.append("\n  AND rcl.ORDER_ID IN ( ");
 				sql.append("\n  SELECT order_id FROM t_order od  ");
 				sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS ) ");
@@ -199,7 +199,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 		switch (type) {
 		case 1: {
 			// today receipt, today order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
@@ -208,7 +208,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			break;
 		case 2: {
 			// today receipt, post order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
@@ -216,8 +216,8 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 		}
 			break;
 		case 3: {
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS ) ");
@@ -286,13 +286,13 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 		sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
 		sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
 		sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
-		sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL ,rcby.PAYMENT_METHOD ,rc.PD_PAYMENTMETHOD) IN('CH','CS')");
+		sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL  OR rc.ISPDPAID ='',rcby.PAYMENT_METHOD ,rc.PD_PAYMENTMETHOD) IN('CH','CS')");
 		sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 	
 		switch (type) {
 		case 1: {
 			// today receipt, today order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
@@ -301,7 +301,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			break;
 		case 2: {
 			// today receipt, post order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
@@ -310,8 +310,8 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			break;
 		case 3: {
 			//ALL
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS ) ");
@@ -355,9 +355,9 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL ,rcby.PAYMENT_METHOD , rc.PD_PAYMENTMETHOD ) = 'CS' ");
+			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL  OR rc.ISPDPAID ='' ,rcby.PAYMENT_METHOD , rc.PD_PAYMENTMETHOD ) = 'CS' ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
 			sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
 			sql.append("\n  WHERE t_order.DOC_STATUS = 'SV') ");
@@ -400,9 +400,9 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL,rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) = 'CH' ");
+			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) = 'CH' ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
 			sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
 			sql.append("\n  WHERE t_order.DOC_STATUS = 'SV' )");
@@ -446,10 +446,9 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  WHERE rc.ISPDPAID IS NULL ");
+			sql.append("\n  WHERE (rc.ISPDPAID IS NULL  OR rc.ISPDPAID ='') ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
-			sql.append("\n  AND rc.ISPDPAID IS NULL ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
 			sql.append("\n  AND rc.RECEIPT_DATE < '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			
@@ -498,11 +497,11 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL,rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) = 'CH' ");
+			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) = 'CH' ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.RECEIPT_DATE,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.RECEIPT_DATE,rc.PDPAID_DATE) < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.RECEIPT_DATE,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.RECEIPT_DATE,rc.PDPAID_DATE) < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			
 			// Wit Edit 18/05/2011
 			sql.append("\n  AND rc.user_id = "+user.getId());
@@ -549,7 +548,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  WHERE 1=1 ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL,rc.receipt_date,rc.PDPAID_DATE) = DATE(rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE(rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
 			sql.append("\n  AND rc.DOC_STATUS = 'VO' ");
 			//sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
 			//sql.append("\n  WHERE t_order.DOC_STATUS = 'VO' ");
@@ -581,7 +580,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 		StringBuffer reportSql = new StringBuffer(); 
 		reportSql = reportSql.append("SELECT inv.name as inv_name , inv.description , rcb.BANK , rcb.CHEQUE_NO, rcb.CHEQUE_DATE , us.CODE, us.NAME ")
 						  	.append(", cus.NAME AS CUSTOMER_NAME, cus.CODE AS CUSTOMER_CODE, rch.receipt_no  , od.ORDER_NO, rch.receipt_date ")
-						  	.append(", od.ORDER_DATE, rcb.receipt_amount, IF(rch.ISPDPAID IS NULL,rcb.payment_method , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD, IF(rch.ISPDPAID IS NULL,IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ")
+						  	.append(", od.ORDER_DATE, rcb.receipt_amount, IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rcb.payment_method , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD, IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ")
 						  	.append("FROM t_receipt rch ")
 						  	.append("INNER JOIN t_receipt_line rcl ON rch.receipt_id = rcl.receipt_id ")
 						  	.append("INNER JOIN t_receipt_by rcb ON rch.receipt_id = rcb.receipt_id ")
@@ -592,7 +591,7 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 						  	.append("WHERE rch.DOC_STATUS = 'SV' ")
 						  	.append("AND rcb.write_off = 'N' ")
 						  	.append("AND rch.user_id = ? ")
-						  	.append("AND IF(rch.ISPDPAID IS NULL,rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ")
+						  	.append("AND IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ")
 						  	.append("ORDER BY payment_term ");
 		
 		PreparedStatement ppstmt = conn.prepareStatement(reportSql.toString());

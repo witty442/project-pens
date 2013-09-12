@@ -166,8 +166,8 @@ public class CustomerAction extends I_Action {
 						+ ")";
 			}
 
-			Customer[] results = new MCustomer().search(whereCause);
-			//Customer[] results = new MCustomer().searchOpt(whereCause);//new method optimize
+			//Customer[] results = new MCustomer().search(whereCause);
+			Customer[] results = new MCustomer().searchOpt(whereCause,user);//new method optimize
 			customerForm.setResults(results);
 
 			if (results != null) {

@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.customer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import com.isecinc.pens.bean.Customer;
  * 
  */
 
-public class CustomerForm extends I_Form {
+public class CustomerForm extends I_Form implements Serializable{
 
 	private static final long serialVersionUID = 9066506758859129582L;
 

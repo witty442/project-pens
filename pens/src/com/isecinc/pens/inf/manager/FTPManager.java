@@ -13,7 +13,10 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.SocketException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,6 +59,32 @@ public class FTPManager {
 		this.server = server;
 		this.userFtp = userFtp;
 		this.passwordFtp = passwordFtp;
+	}
+	
+	
+	public boolean testConnectionURL() {
+	   boolean re = true;
+	   FTPClient ftp = null;
+    	try{
+			ftp = new FTPClient();
+			//ftp.connect(server);
+			ftp.isConnected();
+		}catch(Exception e){
+			re = false;
+		} finally {
+			try{
+				if(ftp != null && ftp.isConnected()) {
+					// Logout from the FTP Server and disconnect
+					ftp.logout();
+					ftp.disconnect();
+					logger.info("ftp disconnect : "+ftp.getReplyString());
+					ftp = null;
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+	    return re;
 	}
 	
 	/**
@@ -133,7 +162,7 @@ public class FTPManager {
     					   if( !ftpFileName.equals("") && ftpFileName.indexOf(".") != -1){
     						   typeName = ftpFileName.substring(ftpFileName.indexOf(".")+1,ftpFileName.length());
     					   }
-    					   if(typeName.equalsIgnoreCase("txt") && ftpFileName.indexOf(tableBean.getFileFtpName()) != -1){
+    					   if(typeName.equalsIgnoreCase("txt")){
     					       canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,importAll);
     					   }
     					}
@@ -191,6 +220,39 @@ public class FTPManager {
 		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
 		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
 		                		tableBean.getDataLineList().add(ftpBean);
+		                	}
+		                	/** Case Get Ftp File Master ,Product,C4 get Latest One File only **/
+		                	/** Exm 201308051515-UOMCVS.txt **/
+		                	if(("Y").equals(tableBean.getCheckDupFile())){
+		                		logger.info("GetFileFtp CheckDupFile["+tableBean.getCheckDupFile()+"] tabelName["+tableBean.getTableName()+"]");
+		                		if(tableBean.getDataLineList() != null && tableBean.getDataLineList().size()>1){
+		                			long fileNameLongLatest = 0;
+		                			long fileNameLongTemp = 0;
+		                			FTPFileBean ftpBeanLastest = null;
+		                			
+		                			for(int n=0;n<tableBean.getDataLineList().size();n++){
+		                				FTPFileBean ftpBean = (FTPFileBean)tableBean.getDataLineList().get(n);
+		                				String fileNameLongStr = ftpBean.getFileName().substring(0,ftpBean.getFileName().indexOf("-")-1);
+		                				
+		                				fileNameLongTemp = Long.parseLong(fileNameLongStr);
+		                				logger.info("fileNameLongStr["+fileNameLongStr+"]fileNameLongTemp["+fileNameLongTemp+"]");
+		                				if(n==0){
+		                					fileNameLongLatest = fileNameLongTemp;
+		                					ftpBeanLastest = ftpBean;
+		                				}else{
+		                					if(fileNameLongTemp > fileNameLongLatest){
+		                						fileNameLongLatest = fileNameLongTemp;
+		                						ftpBeanLastest = ftpBean;
+		                					}
+		                				}
+		                			}
+		                			
+		                			//set On file to dataLineList
+		                			List<FTPFileBean> fileBeanList = new ArrayList<FTPFileBean>();
+		                			fileBeanList.add(ftpBeanLastest);
+		                			
+		                			tableBean.setDataLineList(fileBeanList);
+		                		}
 		                	}
 		                	
 		                	/** put to Map Main **/
@@ -729,6 +791,67 @@ public class FTPManager {
 	}
 	
 	/**
+	 * 
+	 * @param controlTableMap
+	 * @param path
+	 * @throws Exception
+	 */
+	public StringBuffer downloadAllFileInFolder(String path) throws Exception{
+		FTPClient ftp = null;
+		StringBuffer data = new StringBuffer("");
+		try {		
+			ftp = new FTPClient();
+			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+			ftp.connect(server);
+			//ftp.enterLocalActiveMode();
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			logger.debug("Write To Path:"+path);
+				
+			ftp.changeWorkingDirectory(path);
+			logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+			
+			FTPFile[] files = ftp.listFiles();
+			for(FTPFile file: files){
+				if( !file.getName().startsWith(".")){
+	             
+	              String line = convertStreamToString(ftp.retrieveFileStream(file.getName()),"",null);
+	              logger.info("fileName:"+file.getName()+",data["+line+"]");
+	              
+	              data.append(line +"\n");
+	              ftp.completePendingCommand();
+				}
+	        }
+			
+			logger.info("data:"+data.toString());
+			
+			logger.info("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+            
+			ftp.logout();
+			
+			return data;
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+		}	
+	}
+	
+	/**
 	 * writeFileToFTP
 	 * @param controlTableMap
 	 * @throws Exception
@@ -1056,6 +1179,49 @@ public class FTPManager {
 				}//for 3
 	        }
 
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
+	
+	public void createFolderFTP(String rootPath ,String newFolder) throws Exception{
+		FTPClient ftp = null;
+		try {	
+			//logger.debug("createFolderFTP :"+rootPath+" NewFolder :"+newFolder);
+			//System.out.println("createFolderFTP :"+rootPath+" NewFolder :"+newFolder);
+			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+
+			//Step1 Check Folder
+			ftp.changeWorkingDirectory(rootPath+newFolder);
+			int response = ftp.getReplyCode();
+			//System.out.println("Step1 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+			
+			if(response==550){
+				ftp.changeWorkingDirectory(rootPath);
+				ftp.makeDirectory(newFolder);
+			   logger.debug("Step1 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+			}
+					
 		} catch (SocketException e) {
 			throw new FTPException("Could not connect to FTP server");
 		} catch (UnknownHostException e) {

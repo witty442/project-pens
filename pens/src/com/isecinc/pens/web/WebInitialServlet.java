@@ -5,7 +5,6 @@ import java.sql.Connection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.catalina.connector.Request;
 import org.apache.log4j.Logger;
 import org.apache.struts.tiles.taglib.GetAttributeTag;
 

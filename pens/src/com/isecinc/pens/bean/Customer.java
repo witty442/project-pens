@@ -47,6 +47,7 @@ public class Customer extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	public Customer(ResultSet rst) throws Exception {
+		no++;
 		// Mandatory
 		setId(rst.getInt("CUSTOMER_ID"));
 		setReferencesID(rst.getInt("REFERENCE_ID"));
@@ -113,6 +114,7 @@ public class Customer extends I_PO implements Serializable {
 		return String.format("Customer[%s] %s %s", getId(), getName(), getName2());
 	}
 
+	private int no;
 	/** ID */
 	private int id;
 
@@ -505,5 +507,82 @@ public class Customer extends I_PO implements Serializable {
 	public void setTrip(String trip) {
 		this.trip = trip;
 	}
+
+	public int getNo() {
+		return no;
+	}
+
+	public void setNo(int no) {
+		this.no = no;
+	}
+	
+	public String displayExported;
+	public String displayInterfaces;
+	
+	public String displayActionEditCust;
+	public boolean canActionEditCust;
+	
+	public String displayActionReceipt;
+	public String displayActionView;
+	public String displayActionEdit;
+
+	
+	public boolean isCanActionEditCust() {
+		return canActionEditCust;
+	}
+
+	public void setCanActionEditCust(boolean canActionEditCust) {
+		this.canActionEditCust = canActionEditCust;
+	}
+
+	public String getDisplayExported() {
+		return displayExported;
+	}
+
+	public void setDisplayExported(String displayExported) {
+		this.displayExported = displayExported;
+	}
+
+	public String getDisplayInterfaces() {
+		return displayInterfaces;
+	}
+
+	public void setDisplayInterfaces(String displayInterfaces) {
+		this.displayInterfaces = displayInterfaces;
+	}
+
+	public String getDisplayActionEditCust() {
+		return displayActionEditCust;
+	}
+
+	public void setDisplayActionEditCust(String displayActionEditCust) {
+		this.displayActionEditCust = displayActionEditCust;
+	}
+
+	public String getDisplayActionReceipt() {
+		return displayActionReceipt;
+	}
+
+	public void setDisplayActionReceipt(String displayActionReceipt) {
+		this.displayActionReceipt = displayActionReceipt;
+	}
+
+	public String getDisplayActionView() {
+		return displayActionView;
+	}
+
+	public void setDisplayActionView(String displayActionView) {
+		this.displayActionView = displayActionView;
+	}
+
+	public String getDisplayActionEdit() {
+		return displayActionEdit;
+	}
+
+	public void setDisplayActionEdit(String displayActionEdit) {
+		this.displayActionEdit = displayActionEdit;
+	}
+	
+	
 
 }

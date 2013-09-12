@@ -180,6 +180,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  AND t_order.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getOrderDate()) + "' ");
 			sql.append("\n  GROUP BY t_order.ORDER_ID ");
 
+			logger.info("sql receipt :"+sql.toString());
+			
 			rst = stmt.executeQuery(sql.toString());
 			double allCashAmount = 0;
 			double allReceiptAmount = 0;

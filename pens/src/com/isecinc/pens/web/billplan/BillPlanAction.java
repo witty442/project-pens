@@ -43,9 +43,12 @@ public class BillPlanAction extends I_Action {
 			 User user = (User) request.getSession(true).getAttribute("user");
 			
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				 billPlanForm.setBillPlan(new BillPlan());
+				 BillPlan b = new BillPlan();
+				 b.setNoBillPlan("true");
+				 billPlanForm.setBillPlan(b);
 				 billPlanForm.setResults(null);
 				 billPlanForm.setLines(null);
+				 
 				 request.getSession().setAttribute("criteria_",null);
 				 
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
@@ -73,7 +76,9 @@ public class BillPlanAction extends I_Action {
 			 logger.debug("prepare 2:"+request.getParameter("action"));
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				 billPlanForm.setBillPlan(new BillPlan());
+				 BillPlan b = new BillPlan();
+				 b.setNoBillPlan("true");
+				 billPlanForm.setBillPlan(b);
 				 billPlanForm.setResults(null);
 				 billPlanForm.setLines(null);
 				 
@@ -114,6 +119,8 @@ public class BillPlanAction extends I_Action {
 		BillPlanForm mForm = (BillPlanForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+			logger.debug("noBillPlan:"+mForm.getCriteria().getBillPlan().getNoBillPlan());
+			
 			MBillPlan mDAO = new MBillPlan();
 			List<BillPlan> billPlanList = mDAO.searchBillPlanList(mForm.getCriteria().getBillPlan(),user);
 			mForm.setResults(billPlanList);

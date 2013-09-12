@@ -16,7 +16,7 @@ import com.isecinc.pens.model.MReceipt;
 import util.UploadXLSUtil;
 
 public class AutoCreateReceiptProcess {
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	private static int sheetNo = 0;
 

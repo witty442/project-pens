@@ -23,7 +23,7 @@ import util.Paginator;
 public abstract class I_Action extends DispatchAction {
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	/**
 	 * Prepare form to Add/Edit

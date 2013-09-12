@@ -22,7 +22,7 @@ import com.isecinc.pens.inf.manager.UpdateSalesManager;
 
 public class UpdateSalesProcess {
   
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	/**
 	 * importToDB
 	 * @param conn

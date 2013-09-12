@@ -32,7 +32,7 @@ import com.isecinc.pens.process.SequenceProcess;
  */
 public abstract class DocumentSequenceProcess {
 
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	protected static final int CUSTOMER_NUMBER = 100;
 	protected static final int MEMBER_NUMBER = 200;
@@ -42,6 +42,7 @@ public abstract class DocumentSequenceProcess {
 	
 	protected static final int MOVE_ORDER_REQ_NUMBER = 600;
 	protected static final int MOVE_ORDER_RETURN_NUMBER = 700;
+	protected static final int STOCK_PD_NUMBER = 800;
 	
 	protected static final int MAX_SEQ_NO = 9999;
 	
@@ -217,7 +218,7 @@ public abstract class DocumentSequenceProcess {
 			
 			String keyNextSeq = salesCode+"-"+pdCode;//V001-P001
 			if(docTypeId==MOVE_ORDER_RETURN_NUMBER){
-				 keyNextSeq = pdCode+"-"+salesCode ;//P001-V001
+			   keyNextSeq = pdCode+"-"+salesCode ;//P001-V001
 			}
 			
 			String today = df.format(requestDate);
@@ -348,6 +349,143 @@ public abstract class DocumentSequenceProcess {
 		}
 	}
 	
+	protected int getNextSeqStockPD(Date requestDate,String salesCode,String pdCode, int docTypeId, int activeUserID) throws Exception {
+		boolean newSeq = false;
+		String curYear = "";
+		int curMonth = 0;
+		int nextValue = 0;
+		Connection conn = null;
+		try {
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			String keyNextSeq = salesCode+"-"+pdCode;//V001-P001
+			String today = df.format(requestDate);
+			String[] d1 = today.split("/");
+			curYear = d1[0];
+			curMonth = Integer.parseInt(d1[1]);
+			
+			User user = new MUser().find(String.valueOf(activeUserID));
+			
+			// get order type
+			StringBuffer whereCause = new StringBuffer("");
+			whereCause.append("\n  AND doctype_id = " + docTypeId);
+			whereCause.append("\n  AND current_month = " + curMonth);
+			whereCause.append("\n  AND current_year = " + curYear);
+			
+			if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
+				whereCause.append("\n AND sales_code = '" + keyNextSeq + "' ");
+			}
+		
+			DocSequence[] seq = new MDocSequence().search(whereCause.toString());
+		
+			if (seq == null){
+				
+				//get OrderType
+				whereCause = new StringBuffer("");
+				whereCause.append("\n  AND doctype_id = " + docTypeId);
+				if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
+					whereCause.append("\n AND sales_code = '" + keyNextSeq + "' ");
+				}
+				
+				DocSequence[] docSeqFindOrderType = new MDocSequence().search(whereCause.toString());
+				String orderType = "MM";//Default MM(month) ->DD or MM or YY
+				if(docSeqFindOrderType != null){
+					docSeqFindOrderType[0].getOrderType();
+				}
+				
+				
+				DocSequence docSeq = new DocSequence();
+				docSeq.setId(getNexSeqAndChkDuplicate(conn, "c_doctype_sequence", "doctype_sequence_id", 0));
+				docSeq.setOrderType(orderType); //DEFALUT
+				docSeq.setCurrentYear(curYear);
+				docSeq.setCurrentMonth(String.valueOf(curMonth));
+				docSeq.setStartNo(1);
+				docSeq.setCurrentNext(getCurrentNextStockPD(conn,salesCode, pdCode,docSeq.getCurrentMonth(),docSeq.getCurrentYear()));
+				docSeq.setDoctypeID(docTypeId);
+				docSeq.setActive("Y");
+				docSeq.setSalesCode(keyNextSeq);
+				
+				nextValue = docSeq.getCurrentNext();
+				
+				// insert here
+				System.out.println("Insert Case No found in c_doctype_sequence");
+				new MDocSequence().saveNew(docSeq, activeUserID, conn);
+				
+				docSequence = docSeq;
+				
+				return nextValue;
+				
+			}else{
+			
+				String orderType = seq[0].getOrderType();
+				logger.debug("orderType["+orderType+"]Year["+d1[0]+":"+seq[0].getCurrentYear()+"]Month["+Integer.parseInt(d1[1])+":"+Integer.parseInt(seq[0].getCurrentMonth())+"]");
+				
+				
+				// reset by DD
+				if (orderType.equalsIgnoreCase("DD")) {
+					if (d1[0].equalsIgnoreCase(seq[0].getCurrentYear())
+							&& Integer.parseInt(d1[1]) == Integer.parseInt(seq[0].getCurrentMonth())) {
+						newSeq = false;
+					} else {
+						newSeq = true;
+					}
+				}
+
+				// reset by MM
+				if (orderType.equalsIgnoreCase("MM")) {
+					if (d1[0].equalsIgnoreCase(seq[0].getCurrentYear())
+							&& Integer.parseInt(d1[1]) == Integer.parseInt(seq[0].getCurrentMonth())) {
+						newSeq = false;
+					} else {
+						newSeq = true;
+					}
+				}
+
+				// reset by YY
+				if (orderType.equalsIgnoreCase("YY")) {
+					if (d1[0].equalsIgnoreCase(seq[0].getCurrentYear())) {
+						newSeq = false;
+					} else {
+						newSeq = true;
+					}
+				}
+
+				if (newSeq) {
+					// start new seq with current month/year
+					
+					seq[0].setId(getNexSeqAndChkDuplicate(conn, "c_doctype_sequence", "doctype_sequence_id", 0));
+					seq[0].setOrderType(orderType);
+					seq[0].setCurrentYear(curYear);
+					seq[0].setCurrentMonth(String.valueOf(curMonth));
+					seq[0].setCurrentNext(getCurrentNextStockPD(conn, salesCode, pdCode,seq[0].getCurrentMonth(),seq[0].getCurrentYear()));// getCurrentNextSeq
+					nextValue = seq[0].getCurrentNext();
+					
+					// insert here
+					logger.debug("Exist Insert ");
+					new MDocSequence().saveNew(seq[0], activeUserID, conn);
+					
+				}else{
+					//update old sequence
+					seq[0].setCurrentNext(getCurrentNextStockPD(conn,salesCode, pdCode,seq[0].getCurrentMonth(),seq[0].getCurrentYear()));// getCurrentNextSeq
+					nextValue = seq[0].getCurrentNext();
+					
+					// update here
+					logger.debug("Exist Update:");
+					new MDocSequence().update(seq[0], activeUserID, conn);
+				}
+
+				docSequence = seq[0];
+			}
+			return nextValue;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn = null;
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param salesCode
@@ -365,7 +503,8 @@ public abstract class DocumentSequenceProcess {
 		ResultSet rs = null;
 		try {
 			currentYear = currentYear.substring(2,4);//2555 -> 55
-	
+			currentMonth = currentMonth.length()==1?"0"+currentMonth:currentMonth;
+					
 			StringBuffer whereCause = new StringBuffer("");
 			whereCause.append("\n select max(a.currentSeq) max_current_seq from( "); 
 			whereCause.append("\n select request_number ,substring(request_number,15,3)  as currentSeq from t_move_order ");
@@ -407,6 +546,55 @@ public abstract class DocumentSequenceProcess {
 		}
 	}
 	
+	
+	protected int getCurrentNextStockPD(Connection conn ,String salesCode,String pdCode,String currentMonth,String currentYear) throws Exception {
+		int nextValue = 0;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			currentYear = currentYear.substring(2,4);//2555 -> 55
+			currentMonth = currentMonth.length()==1?"0"+currentMonth:currentMonth;
+					
+			StringBuffer whereCause = new StringBuffer("");
+			whereCause.append("\n select max(a.currentSeq) max_current_seq from( "); 
+			whereCause.append("\n select request_number ,substring(request_number,15,3)  as currentSeq from t_stock_pd ");
+			whereCause.append("\n where 1=1 ");
+			whereCause.append("\n and sales_code = '" + salesCode + "' ");
+			whereCause.append("\n and pd_code = '" + pdCode + "' ");
+			whereCause.append("\n and substring(request_number,11,2) = '"+currentYear+"'");
+			whereCause.append("\n and substring(request_number,13,2) = '"+currentMonth+"'");
+			whereCause.append("\n )a ");
+			
+			logger.debug("sql:"+whereCause.toString());
+			
+			ps = conn.prepareStatement(whereCause.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				logger.debug("max_current_seq["+Utils.isNull(rs.getString("max_current_seq"))+"]");
+				if( !Utils.isNull(rs.getString("max_current_seq")).equals("")){
+				   nextValue = Integer.parseInt(rs.getString("max_current_seq")) +1;
+				}else{
+				   nextValue = 1;
+				}
+			}else{
+				nextValue = 1;
+			}
+			
+			logger.debug("result nextValue["+nextValue+"]");
+			
+			return nextValue;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps = null;
+			}
+			if(rs != null){
+				rs.close();rs = null;
+			}
+		}
+	}
 	
 	/**
 	 * getNextSeqCustomer

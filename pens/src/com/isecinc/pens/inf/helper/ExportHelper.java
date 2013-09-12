@@ -400,19 +400,38 @@ public class ExportHelper {
 				logger.debug("colBean.getColumnName():"+colBean.getColumnName());
 				
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
-					 dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
+					}
 				}else{
-				     dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				       dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
+					}
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
-					dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyyhhmmss");
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+					}
 				}else{
-				    dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyyhhmmss");
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				      dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+					}
+				}else{
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				       dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+					}
 				}
 			}else{
 				 dataConvertStr = Utils.isNull(rs.getString(Utils.removeStringEnter(colBean.getColumnName())));
 			}
+			
 		}
 	   return dataConvertStr;
 	}

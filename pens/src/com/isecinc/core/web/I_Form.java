@@ -15,7 +15,7 @@ public abstract class I_Form extends ActionForm {
 	private static final long serialVersionUID = -5128814193636175092L;
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	/** ID with Multiplicity */
 	private String[] ids;

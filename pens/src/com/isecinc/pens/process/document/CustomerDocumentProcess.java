@@ -39,7 +39,7 @@ public class CustomerDocumentProcess extends DocumentSequenceProcess {
 		docNo += String.format("%s", new DecimalFormat("000000").format(seq));
 		
 		if(checkCustomerCodeDuplicate(docNo,conn)){
-			return getNextDocumentNo(salesCode,activeUserID,conn);
+			return docNo;//getNextDocumentNo(salesCode,activeUserID,conn);
 		}else{
 		    return docNo;
 		}

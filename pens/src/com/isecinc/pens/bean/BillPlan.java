@@ -15,10 +15,11 @@ public class BillPlan implements Serializable{
 	/** Criteria **/
 	private String billPlanDateFrom;
 	private String billPlanDateTo;
-    
+    private String noBillPlan;
     
 	/** properties**/
-	private String no;    
+	private String no; 
+	private int lineNo;
 	private String billPlanNo ;  
 	private String productId ;  
 	private String billPlanDate ;
@@ -58,6 +59,26 @@ public class BillPlan implements Serializable{
 	private List<BillPlan> billPlanLineList;
 
     
+	public String getNoBillPlan() {
+		return noBillPlan;
+	}
+
+
+	public void setNoBillPlan(String noBillPlan) {
+		this.noBillPlan = noBillPlan;
+	}
+
+
+	public int getLineNo() {
+		return lineNo;
+	}
+
+
+	public void setLineNo(int lineNo) {
+		this.lineNo = lineNo;
+	}
+
+
 	public String getCurrentDate() {
 		try{
 			currentDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

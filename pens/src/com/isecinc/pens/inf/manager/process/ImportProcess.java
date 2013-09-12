@@ -22,7 +22,7 @@ import com.isecinc.pens.inf.helper.Utils;
 
 public class ImportProcess {
   
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	/**
 	 * importToDB
 	 * @param conn
@@ -57,7 +57,7 @@ public class ImportProcess {
 	    	  
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
-	    		  logger.debug("**** Script Pre Function name:"+tableBean.getPreFunction());
+	    		  logger.info("**** Script "+tableBean.getTableName()+" Pre Function name:"+tableBean.getPreFunction());
 	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
 	    	  }
 	    	  
@@ -218,7 +218,7 @@ public class ImportProcess {
 			  
 			   /*Case Table Have Post Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPostFunction())){
-	    		  logger.info("**** Script Post Function name:"+tableBean.getPostFunction());
+	    		  logger.info("**** Script "+tableBean.getTableName()+" Post Function name:"+tableBean.getPostFunction());
 	    		  String[] errors = PostFunction.process(conn, tableBean,userBean);
 	    	  }
 			  

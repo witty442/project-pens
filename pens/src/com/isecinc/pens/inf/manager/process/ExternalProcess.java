@@ -4,13 +4,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.AppversionVerify;
+import util.MonitorSales;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 
 public class ExternalProcess {
 
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	
 	/******* Import *********************************************/
 	public void processImportBefore(HttpServletRequest request,User userLogin){
@@ -24,6 +27,9 @@ public class ExternalProcess {
 		  logger.info("--- After importProcess Start ---");
 		   
 		  RunScriptDBAction.runManualScriptProcess("import_after",userLogin);	
+		  
+		  //Get AppVersion and MessageToSales
+		  AppversionVerify.processAfterImport();
 	}
 
 	/******* export *********************************************/
@@ -42,6 +48,9 @@ public class ExternalProcess {
 		
 		//RunScript From FTP Server Folder :Manual-script
 		RunScriptDBAction.runManualScriptProcess("export_after",userLogin);
+		
+		//Run SalesAppVersion to Ftp Server
+		MonitorSales.uploadSalesAppVersion(userLogin);
 	}
 	
 }

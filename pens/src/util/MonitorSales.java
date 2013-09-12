@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +10,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemMessages;
@@ -18,6 +20,7 @@ import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 
@@ -29,6 +32,9 @@ public class MonitorSales {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		User u = new User();
+		u.setCode("V105");
+		uploadSalesAppVersion(u);
 	}
 	
 	public static String monitorSales(BigDecimal transactionId){
@@ -36,7 +42,7 @@ public class MonitorSales {
 		FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 		String msg = "";
 		try{
-			String dateStr  = Utils.format(new Date(), "yyyyMM");
+			/*String dateStr  = Utils.format(new Date(), "yyyyMM");
             String fileName = dateStr+"-Monitor-Sales.csv";
 					
 			String lastMonitorFile = Utils.isNull(ftpManager.getDownloadFTPFileByName("/Manual-script/Monitor-Sales/"+fileName));
@@ -45,12 +51,54 @@ public class MonitorSales {
 			m.append(getLastInterfaces(transactionId));
 			
 			//Upload to FTP
-			ftpManager.uploadFileToFTP("/Manual-script/Monitor-Sales/", fileName, m.toString(), "UTF-8");
+			ftpManager.uploadFileToFTP("/Manual-script/Monitor-Sales/", fileName, m.toString(), "UTF-8");*/
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
 		return msg;
 	}
+	
+	public static void uploadSalesAppVersion(User u){
+		try{
+			EnvProperties env = EnvProperties.getInstance();
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String path = "D:/SalesApp/";
+			
+			String currentAppVersion = Utils.isNull(FileUtil.readFile(path+"current-app-version.txt", "UTF-8"));
+			String latestAppVersion  = Utils.isNull(FileUtil.readFile(path+"Lastest-app-version.txt", "UTF-8"));
+			
+			String dateStr  = Utils.format(new Date(), "yyyyMM");
+            String fileName = u.getCode()+".txt";
+            if(!currentAppVersion.equalsIgnoreCase(latestAppVersion)){
+            	
+               //CreateFolder FTP
+            	ftpManager.createFolderFTP("/Manual-script/Monitor-Sales/SalesAppVersion/", dateStr);
+            	
+			   //Upload File to FTP
+			   ftpManager.uploadFileToFTP("/Manual-script/Monitor-Sales/SalesAppVersion/"+dateStr+"/", fileName, currentAppVersion, "UTF-8");
+            }
+            
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
+	
+	public static void getAllSalesAppVersion(){
+		try{
+			EnvProperties env = EnvProperties.getInstance();
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			String path = "D:/SalesApp/";
+			
+			StringBuffer data = ftpManager.downloadAllFileInFolder("/Manual-script/Monitor-Sales/SalesAppVersion/");
+			
+			FileUtil.writeFile(path+"SalesAppVersionAll.csv", data.toString(), "UTF-8");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 
 	public static StringBuffer getLastInterfaces(BigDecimal transactionId) throws Exception{
 		PreparedStatement ps =null;

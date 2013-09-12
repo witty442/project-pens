@@ -34,7 +34,7 @@ import com.isecinc.pens.inf.manager.process.ExportProcess;
  */
 public class ExportManager {
 
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	public static String PATH_CONTROL ="inf-config/table-mapping-export/";
 	public static String FILE_CONTROL_NAME ="control_export.csv";
 	/**

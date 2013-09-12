@@ -18,7 +18,9 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -329,8 +331,30 @@ public class FileUtil {
 		File f = null;
 		try{
 		   f = new File(fileName);
-		   f.delete();
+		   boolean success = f.delete();
+		   if(!success){
+			   logger.info("deleteFile "+fileName+" fail");
+		   }
 		}catch(Exception e){
+			e.printStackTrace();
+			logger.error(e.getMessage(),e);
+		}finally{
+			if( f != null){
+				f = null;
+			}
+		}
+	}
+	
+	public static void deleteFile2(String fileName) {
+		File f = null;
+		try{
+		   f = new File(fileName);
+		   boolean success = f.delete();
+		   if(!success){
+			   logger.info("deleteFile "+fileName+" fail");
+		   }
+		}catch(Exception e){
+			e.printStackTrace();
 			logger.error(e.getMessage(),e);
 		}finally{
 			if( f != null){
@@ -357,6 +381,7 @@ public class FileUtil {
 		// }
 		return r;
 	}
+	
 	
 	
 	public static void zipFile(String sourceFile ,String destFile,String fileName) throws Exception{

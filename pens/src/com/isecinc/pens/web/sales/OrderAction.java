@@ -24,6 +24,7 @@ import util.BundleUtil;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.ReceiptFilterUtils;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
@@ -108,13 +109,21 @@ public class OrderAction extends I_Action {
 				// go add for customer/member
 				customerId = orderForm.getOrder().getCustomerId();
 			}
+			
+			//Filter Check Van Can Receipt Cheque
+			orderForm.setCanReceiptCheque(ReceiptFilterUtils.canReceiptCheque(customerId));
 
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
+			
+			//wit edit VAN :default Auto receipt Cash 
+			if(User.VAN.equals(user.getType())){
+			  orderForm.getOrder().setPaymentCashNow(true);
+			}
+			
 			// default date time
-			orderForm.getOrder().setOrderDate(
-					new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
+			orderForm.getOrder().setOrderDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
 			orderForm.getOrder().setOrderTime(new SimpleDateFormat("HH:mm", new Locale("th", "TH")).format(new Date()));
 
 			//PriceListID

@@ -23,7 +23,7 @@ import com.isecinc.pens.inf.manager.ExportManager;
 
 public class ExportProcess {
 
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	/**
 	 * readTableDataDB
@@ -356,7 +356,7 @@ public class ExportProcess {
 				totalRows++;
 				for(i=0;i<tableBean.getColumnBeanList().size();i++){
 					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
-					
+					logger.debug("colName:"+colBean.getColumnName());
 					if(i==tableBean.getColumnBeanList().size()-1){
 						lastAppen = "";
 					}else{

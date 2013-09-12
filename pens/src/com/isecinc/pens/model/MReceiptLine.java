@@ -113,6 +113,20 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		return pos;
 	}
 
+	
+	public double calculateCreditAmount(Order order) throws Exception {
+		Connection conn = null;
+		try{
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			return calculateCreditAmount(conn, order);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+	}
 	/**
 	 * Calculate Credit Amount
 	 * 
@@ -120,14 +134,13 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	 * @return
 	 * @throws Exception
 	 */
-	public double calculateCreditAmount(Order order) throws Exception {
-		Connection conn = null;
+	public double calculateCreditAmount(Connection conn,Order order) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		double creditAmt = NumberToolsUtil.round(order.getNetAmount(), 2, BigDecimal.ROUND_HALF_UP);
 		double paidAmt = 0;
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			String sql = "select SUM(rl.PAID_AMOUNT) as PAID_AMOUNT ";
 			sql += "from t_receipt_line rl, t_order o ";
 			sql += "where rl.order_id = " + order.getId();
@@ -151,7 +164,6 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			order.setRemainAmount(creditAmt - paidAmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw e;
 		} finally {
 			try {
@@ -159,9 +171,6 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			} catch (Exception e2) {}
 			try {
 				stmt.close();
-			} catch (Exception e2) {}
-			try {
-				conn.close();
 			} catch (Exception e2) {}
 		}
 		return creditAmt;
@@ -242,6 +251,19 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	
 	public double lookCreditAmt(int customerId) throws Exception {
 		Connection conn = null;
+		try{
+		   conn = new DBCPConnectionProvider().getConnection(conn);
+		   return lookCreditAmt(conn,customerId);
+		}catch(Exception e){
+			 throw e;
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+	}
+	
+	public double lookCreditAmt(Connection conn,int customerId) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		double creditAmt  =0;
@@ -254,8 +276,6 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql += "  order by order_date desc, order_no desc ";
 
 			logger.debug("sql:"+sql);
-			
-			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			ReceiptLine rl;
@@ -268,7 +288,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 				
 				double cnAmt = cn.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
 				
-				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt);
+				rl.setCreditAmount(calculateCreditAmount(conn,rl.getOrder())+cnAmt);
 				
 				rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
 				
@@ -287,9 +307,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			try {
 				stmt.close();
 			} catch (Exception e2) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
+
 		}
 		return creditAmt;
 	}

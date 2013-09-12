@@ -47,9 +47,19 @@ public class OrderForm extends I_Form {
 	
 	private String autoReceiptFlag;
 	
+	private String canReceiptCheque;
+	
 	private String mode ="";
 	
 	
+	public String getCanReceiptCheque() {
+		return canReceiptCheque;
+	}
+
+	public void setCanReceiptCheque(String canReceiptCheque) {
+		this.canReceiptCheque = canReceiptCheque;
+	}
+
 	public String getMode() {
 		return mode;
 	}

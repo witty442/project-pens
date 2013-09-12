@@ -77,23 +77,35 @@ public class MCustomer extends I_Model<Customer> {
 	 * @throws Exception
 	 * Tunnig Method By Wit
 	 */
-	public Customer[] searchOpt(String whereCause) throws Exception {
+	public Customer[] searchOpt(String whereCause,User user) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		List<Customer> custList = new ArrayList<Customer>();
 		Customer[] array = null;
+		int no = 0;
 		try {
+			//Filter display Column
+			String displayActionReceipt ="";
+			String displayActionEditCust  ="";
+			String role = user.getType();
+			if( !role.equalsIgnoreCase(User.TT)){
+				displayActionReceipt ="none";
+			}
+			if( role.equalsIgnoreCase(User.TT)){
+				displayActionEditCust ="none";
+			}
+			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String sql = "select m_customer.* ,  \n";
 			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
                    sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
                    sql+=" ad_user.ROLE,ad_user.ISACTIVE,ad_user.CODE,ad_user.UPDATED,ad_user.UPDATED_BY,ad_user.TERRITORY, \n";
-                   sql+= " ( select count(*) as tot from t_order od where od.customer_id = m_customer.customer_id)  as order_amount, \n";
-                   sql+= " ( select sum(o.net_amount) net_amount from t_order o  where o.doc_status = 'SV'  and o.CUSTOMER_ID= m_customer.CUSTOMER_ID ) \n";
-                   sql+= "   - \n";
-                   sql+= "  ( select sum(r.receipt_amount) receipt_amount from t_receipt r where r.doc_status = 'SV'   and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) \n";
-                   sql+= "  as  total_invoice \n";
+                   sql+= " ( select count(*) as tot from t_order od where od.customer_id = m_customer.customer_id)  as order_amount \n";
+                  // sql+= " ( select sum(o.net_amount) net_amount from t_order o \n where o.doc_status = 'SV'  and o.CUSTOMER_ID = m_customer.CUSTOMER_ID ) as total_order_amt,\n";
+               
+                  // sql+= " ( select sum(r.receipt_amount) receipt_amount from t_receipt r \n where r.doc_status = 'SV' and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) as total_receipt_amt \n";
+              
                    sql+= " from m_customer  ,ad_user where m_customer.user_id = ad_user.user_id \n";
 			       sql+= whereCause;
 			       
@@ -101,7 +113,9 @@ public class MCustomer extends I_Model<Customer> {
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while(rst.next()){
+				no++;
 				Customer m = new Customer();
+				m.setNo(no);
 				// Mandatory
 				m.setId(rst.getInt("CUSTOMER_ID"));
 				m.setReferencesID(rst.getInt("REFERENCE_ID"));
@@ -165,12 +179,37 @@ public class MCustomer extends I_Model<Customer> {
 				m.setExported(rst.getString("EXPORTED"));
 
 				// Total Invoice
-				m.setTotalInvoice(rst.getDouble("total_invoice"));
+				//double totalOrderAmt = rst.getDouble("total_order_amt");
+				//double totalReceiptAmt = rst.getDouble("total_receipt_amt");
+				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
+				
+				m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+				
 				// Order Amount
 				m.setOrderAmount(rst.getInt("order_amount"));
 
 				// set display label
 				m.setDisplayLabel();
+				
+				//Show or Display Column
+				
+				//Disp Column Edit Customer
+				m.setDisplayActionEditCust(displayActionEditCust);//disp
+				//Can Edit Dust
+				if(role.equalsIgnoreCase(User.ADMIN)){
+					m.setCanActionEditCust(true);
+				}else if(role.equalsIgnoreCase(User.VAN)){
+					if (m.getOrderAmount()== 0){
+					   if ( !m.getInterfaces().equalsIgnoreCase("Y")){
+						  if(!m.getExported().equalsIgnoreCase("Y")){
+							  m.setCanActionEditCust(true);
+						  }
+					   }
+					}
+				}
+				
+				//displayActionReceipt
+				m.setDisplayActionReceipt(displayActionReceipt);
 				
 				custList.add(m);
 			}

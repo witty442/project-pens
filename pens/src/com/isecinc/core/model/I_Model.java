@@ -25,7 +25,7 @@ public abstract class I_Model<T> implements Serializable {
 	private static final long serialVersionUID = -5758544910967488311L;
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	/**
 	 * Find

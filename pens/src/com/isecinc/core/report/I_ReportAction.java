@@ -32,7 +32,7 @@ import com.isecinc.pens.init.InitialMessages;
 public abstract class I_ReportAction<E> extends DispatchAction {
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	private static String fileType;
 	private static String fileName;

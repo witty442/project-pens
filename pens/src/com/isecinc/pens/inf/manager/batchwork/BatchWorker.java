@@ -17,7 +17,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
  *
  */
 public abstract class BatchWorker extends Thread {
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 	
 	public void startTaskStatus(String type,BigDecimal transactionId,BigDecimal monitorId) {
 		logger.info("startTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");

@@ -27,9 +27,9 @@ public class ExportSQL {
 				" INNER JOIN m_address A 	\n"+
 				" ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
 				" WHERE  M.user_id = "+userBean.getId() +"\n"+
-				" AND   M.reference_id is null \n"+
+				" AND   (M.reference_id is null or M.reference_id =0) \n"+
 				" AND   A.PURPOSE IS NOT NULL \n"+
-				" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL) \n"+
+				" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+
 				" GROUP BY M.CUSTOMER_ID ";
 
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_order") ){
@@ -77,12 +77,12 @@ public class ExportSQL {
 				"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
 				"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
 				"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
-				"   t.org as ORG \n"+
+				"   t.org as ORG ,t.created \n"+
 				"	FROM t_order t ,m_customer m	\n"+
 				"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
 				"   and  m.user_id = "+userBean.getId()+" \n"+
 				"   and  t.DOC_STATUS = 'SV' \n"+
-				"   and ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL) \n"+
+				"   and ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
 				"   ORDER BY t.ORDER_NO \n";
 			}
 			else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec") ){
@@ -135,7 +135,7 @@ public class ExportSQL {
 				"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
 				"   and  m.user_id = "+userBean.getId()+" \n"+
 				"   and  t.DOC_STATUS = 'SV' \n"+
-				"   and ( t.TEMP2_EXPORTED  = 'N' OR t.TEMP2_EXPORTED  IS NULL) \n"+
+				"   and ( t.TEMP2_EXPORTED  = 'N' OR t.TEMP2_EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
 				"   ORDER BY t.ORDER_NO \n";
 			}
 			else if(tableBean.getTableName().equalsIgnoreCase("t_visit")){
@@ -162,7 +162,7 @@ public class ExportSQL {
 				"   where t_visit.user_id ="+userBean.getId()+ " \n"+
 				"   and m_customer.customer_id = t_visit.customer_id \n"+
 				"   and t_visit.ISACTIVE ='Y'  \n"+
-				"   and ( t_visit.EXPORTED  = 'N' OR t_visit.EXPORTED  IS NULL) \n";
+				"   and ( t_visit.EXPORTED  = 'N' OR t_visit.EXPORTED  IS NULL OR TRIM(t_visit.EXPORTED) ='') \n";
 			}else if(tableBean.getTableName().equalsIgnoreCase("m_sales_inventory")){
 				str ="	select 	\n"+
 				"	(select name from m_sub_inventory s1 where s.sub_inventory_id = s1.sub_inventory_id)AS 	sub_inventory_id,	\n"+
@@ -172,7 +172,7 @@ public class ExportSQL {
 				str ="	select distinct	\n"+
 				"	m.USER_ID	\n"+
 				"	from m_trip	m \n"+
-				"   where ( m.EXPORTED  = 'N' OR m.EXPORTED  IS NULL) \n";
+				"   where ( m.EXPORTED  = 'N' OR m.EXPORTED  IS NULL OR TRIM(m.EXPORTED) ='') \n";
 				
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_move_order")){
 				str ="select \n"+
@@ -186,7 +186,7 @@ public class ExportSQL {
 					"	DESCRIPTION \n"+
 
 				"	from t_move_order \n"+
-				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL) and status ='SV' \n"+
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
 				"   and request_date <= now() \n";
 			
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_bill_plan")){
@@ -199,7 +199,7 @@ public class ExportSQL {
 					"	DESCRIPTION \n"+
 	
 				"	from t_bill_plan \n"+
-				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL) and status ='SV' \n"+
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
 				"   and bill_plan_request_date <= now() \n";
 			}
 			return str;
@@ -244,7 +244,7 @@ public class ExportSQL {
 		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
 		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
 		"      and  t_receipt.DOC_STATUS = 'SV' \n"+
-		"      and ( t_receipt.TEMP2_EXPORTED  = 'N' OR t_receipt.TEMP2_EXPORTED  IS NULL)     \n";
+		"      and ( t_receipt.TEMP2_EXPORTED  = 'N' OR t_receipt.TEMP2_EXPORTED  IS NULL OR TRIM(t_receipt.EXPORTED) ='')     \n";
         return sql;
 	}
 	
@@ -347,7 +347,7 @@ public class ExportSQL {
 		"		and r.DOC_STATUS = 'SV'	\n"+
 		"		and r.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"'	\n"+
 		"		and r.USER_ID ="+userBean.getId()+"	\n"+
-		"		and ( r.EXPORTED  = 'N' OR r.EXPORTED  IS NULL)	\n"+
+		"		and ( r.EXPORTED  = 'N' OR r.EXPORTED  IS NULL OR TRIM(r.EXPORTED) ='' ) \n"+
 		"       and  r.DOC_STATUS = 'SV' \n"+
 		"		group by r.receipt_id, r.receipt_date,m.code	\n"+
 		"	  ) H		\n"+
@@ -399,7 +399,7 @@ public class ExportSQL {
 		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
 		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
 		"      and  t_receipt.DOC_STATUS = 'SV' \n"+
-		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL)     \n";
+		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL OR TRIM(t_receipt.EXPORTED) ='')     \n";
         return sql;
 	}
 	
@@ -427,7 +427,7 @@ public class ExportSQL {
 		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
 		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
 		"      and t_receipt.DOC_STATUS = 'SV' \n"+
-		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL)     \n"+
+		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL OR TRIM(t_receipt.EXPORTED) ='')     \n"+
 		"      and t_receipt.receipt_id = t_receipt_line.receipt_id  \n"+
 		"      and t_receipt_line.ORDER_LINE_ID IS NOT NULL \n";
         return sql;

@@ -50,7 +50,7 @@ import com.isecinc.pens.model.MUser;
 public class ModifierProcess {
 
 	/** Logger */
-	protected Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger("PENS");
 
 	private String LEVEL_LINE = "LINE";
 	private String LEVEL_LINEGROUP = "LINEGROUP";

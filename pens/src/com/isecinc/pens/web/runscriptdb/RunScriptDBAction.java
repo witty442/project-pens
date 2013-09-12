@@ -59,10 +59,11 @@ public class RunScriptDBAction {
 			int day = c.get(Calendar.DATE);
 			logger.info("Check Day for PrugeMonitor Day(1,2,25,26,27) now_day:"+day);
 			
+			//Delete All Monitor 
 			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
 				purgDataMonitor(conn);	
 			}
-			
+			//Delete all Transaction 
 			if(day==30){
 				purgDataTransaction(conn);
 			}
@@ -72,6 +73,7 @@ public class RunScriptDBAction {
 			InterfaceDAO dao = new InterfaceDAO();
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
+			
 			
 			
 		}catch(Exception e){
@@ -132,7 +134,7 @@ public class RunScriptDBAction {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.AllSales")+prefix+"_script.sql","TIS-620");
 			
-			logger.info("scriptData:"+scriptData);
+			//logger.info("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){

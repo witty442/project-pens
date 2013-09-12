@@ -16,7 +16,7 @@ public class PreFunction {
 
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static String[] process(Connection conn ,TableBean tableBean,User user){
+	public static String[] process(Connection conn ,TableBean tableBean,User user) {
         String[] errors =new String[2];
 		String sqlManualExe = "";
 		PreparedStatement psManualExe = null;
