@@ -84,6 +84,15 @@ button.positive,.buttons a.positive {
 	color: #fff;
 }
 
+.currPageBtn{
+	border: 1px;
+}
+.currPageActiveBtn{
+	background-color: #6299c5;
+	border: 1px solid #6299c5;
+	color: #fff;
+}
+
 /* NEGATIVE */
 .buttons a.negative,button.negative {
 	color: #d12f19;
@@ -330,6 +339,12 @@ TABLE.result2 TD {
 	width: 100px;
 }
 
+.freeBtn {
+	font-weight: bold;
+	background-color: #B2DFEE;
+	color: #68838B;
+	height: 25px;
+}
 .newPosBtn:hover,.newPosBtnLong:hover {
 	background-color: #E6EFC2;
 	border: 1px solid #C6D880;

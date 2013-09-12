@@ -198,6 +198,107 @@ TD.ms_exportedLabel {
 }
 <!-- MoveOrder Summary -->
 
+<!--Customer --->
+TD.cust_no {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:3%;
+	text-align:center;
+}
+TD.cust_code {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:left;
+}
+TD.cust_name {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:15%;
+	text-align:left;
+}
+TD.cust_name2 {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:15%;
+	text-align:left;
+}
+TD.cust_creditLimit {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:right;
+}
+TD.cust_totalInvoice {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:10%;
+	text-align:right;
+}
+TD.cust_exported {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_interfaces {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_status {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_actionOrder {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_actionReceipt {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_actionEditCust {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_actionView {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+TD.cust_actionEdit {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	width:5%;
+	text-align:center;
+}
+
+
 th.sorted {
     background-color: orange;
     color: orange;
