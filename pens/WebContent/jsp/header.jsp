@@ -4,13 +4,13 @@
 		</td>
         <td width="341px;" background="${pageContext.request.contextPath}/images2/header01.png">&nbsp;
             <div class="userlabel">
-        	   ${user.code} : ${user.name} / ${user.role.name}
+        	   ${user.code} : ${user.name} / ${user.role.name}<br/>
         	</div>
-        	
         </td>
-        <td background="${pageContext.request.contextPath}/images2/header_bg.png">&nbsp; </td>
+        <td background="${pageContext.request.contextPath}/images2/header_bg.png">&nbsp;
+         </td>
         <td width="523px;" background="${pageContext.request.contextPath}/images2/header02.png" align="right" valign="top">
-        	
+        
         	<a href="${pageContext.request.contextPath}/?logoff=T" onmouseout="MM_swapImgRestore()" 
         	  onmouseover="MM_swapImage('Image14','','${pageContext.request.contextPath}/images2/button_logout2.png',1)">
         	  <img src="${pageContext.request.contextPath}/images2/button_logout1.png" name="Image14" width="46" height="46" border="0" id="Image14" />

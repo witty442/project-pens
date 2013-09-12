@@ -10,7 +10,8 @@
 
 	<reportPath>reports</reportPath>
 	<logo>pens_logo_en.jpg</logo>
-	<penstaxno>3034010670</penstaxno>
+	<!--  penstaxno>3034010670</penstaxno> OLD taxNo-->
+	<penstaxno>0105553086671</penstaxno>
 
 	<!-- Modifier -->
 	<modifier>

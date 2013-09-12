@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.web.sales.OrderForm"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -39,6 +41,15 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
 List<References> w1List = new MOrgRule().getW1RefList("","");
 pageContext.setAttribute("w1List",w1List,PageContext.PAGE_SCOPE);
+
+//Filter Can Receipt Cheque
+OrderForm orderFrom = null;
+String canReceiptCheque = "N";
+if(request.getAttribute("orderForm") != null){
+   orderFrom = (OrderForm)request.getAttribute("orderForm");
+   canReceiptCheque = orderFrom.getCanReceiptCheque();
+   System.out.println("canReceiptCheque:"+canReceiptCheque);
+}
 
 %>
 
@@ -417,7 +428,20 @@ function loadMe(){
 								<td></td>
 								<%if(User.VAN.equals(user.getType())){%>
 									<td class="textSpecial">
-									<html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที 
+									    <%
+										  if("N".equals(canReceiptCheque)){
+										%>
+											  <input type="checkbox" name="tempCheck" checked disabled/>  บันทึกรับเงินสดทันที
+											  <html:checkbox property="order.paymentCashNow" styleId="paymentCashNow"/>
+											  
+											  <script>
+											   document.getElementById("paymentCashNow").style.display = 'none';
+											   </script>
+									    <%}else{ %>
+											  <html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที
+									    <%
+										 } 											
+									    %> 
 									
 								   </td>
 								<%}else if(User.TT.equals(user.getType())){%>

@@ -123,6 +123,10 @@
 		<form-bean name="invoicePaymentAllReportForm"
 			type="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportForm" />
 			
+		<!-- CHEQUE REPORT -->
+		<form-bean name="chequeReportForm"
+			type="com.isecinc.pens.web.report.cheque.ChequeReportForm" />
+			
 		<!-- INVOICE DETAIL REPORT -->
 		<form-bean name="invoiceDetailReportForm"
 			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportForm" />
@@ -153,6 +157,12 @@
 		
 		<!-- Bill Plan Form -->
 		<form-bean name="billPlanForm" type="com.isecinc.pens.web.billplan.BillPlanForm" />
+		
+		<!-- StockPD Form -->
+		<form-bean name="stockPDForm" type="com.isecinc.pens.web.stockpd.StockPDForm" />
+		
+		<!-- Requisition Product Form -->
+		<form-bean name="requisitionProductForm" type="com.isecinc.pens.web.requisitionProduct.RequisitionProductForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -380,6 +390,16 @@
 			<forward name="report" path="/jsp/reports/invoicePaymentAllReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/invoicePaymentAllReport.jsp" />
 		</action>
+		
+		<!-- Cheque REPORT -->
+		<action name="chequeReportForm" path="/jsp/chequeReport"
+			forward="/jsp/reports/chequeReport.jsp" />
+		<action name="chequeReportForm" path="/jsp/chequeReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.cheque.ChequeReportAction">
+			<forward name="report" path="/jsp/reports/chequeReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/chequeReport.jsp" />
+		</action>
 
 		<!-- RECEIVE BAG REPORT -->
 		<action name="receiveBagReportForm" path="/jsp/receiveBagReport"
@@ -588,6 +608,27 @@
 			<forward name="search" path="/jsp/billPlan/billPlanSearch.jsp" />
 			<forward name="clear" path="/jsp/billPlan/billPlanSearch.jsp" />
 			<forward name="view" path="/jsp/billPlan/billPlan.jsp"/>
+		</action>
+		
+		<!-- StockPD -->
+		<action name="stockPDForm" path="/jsp/stockPDAction" parameter="do" scope="request" type="com.isecinc.pens.web.stockpd.StockPDAction" >
+			<forward name="prepare" path="/jsp/stockpd/stockpdSearch.jsp" />
+			<forward name="search" path="/jsp/stockpd/stockpdSearch.jsp" />
+			<forward name="clear" path="/jsp/stockpd/stockpdSearch.jsp" />
+			<forward name="new" path="/jsp/stockpd/stockpd.jsp"/>
+			<forward name="edit" path="/jsp/stockpd/stockpd.jsp"/>
+			<forward name="preview" path="/jsp/stockpd/stockpd.jsp" />
+		</action>
+		
+		<!-- MoveOrder -->
+		<action name="requisitionProductForm" path="/jsp/requisitionProductAction" parameter="do" scope="request" type="com.isecinc.pens.web.requisitionProduct.RequisitionProductAction" >
+			<forward name="prepare" path="/jsp/requisitionProduct/requisitionProductSearch.jsp" />
+			<forward name="search" path="/jsp/requisitionProduct/requisitionProductSearch.jsp" />
+			<forward name="clear" path="/jsp/requisitionProduct/requisitionProductSearch.jsp" />
+			<forward name="new" path="/jsp/requisitionProduct/requisitionProduct.jsp"/>
+			<forward name="edit" path="/jsp/requisitionProduct/requisitionProduct.jsp"/>
+			<forward name="preview" path="/jsp/requisitionProduct/requisitionProduct.jsp" />
+			<forward name="popupPrint" path="/jsp/requisitionProduct/requisitionProduct.jsp" />
 		</action>
 		
 	</action-mappings>

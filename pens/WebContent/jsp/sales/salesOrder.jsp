@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.web.sales.OrderForm"%>
+<%@page import="util.ReceiptFilterUtils"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -65,6 +68,16 @@ pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
 
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
+
+
+//Filter Can Receipt Cheque
+OrderForm orderFrom = null;
+String canReceiptCheque = "N";
+if(request.getAttribute("orderForm") != null){
+  orderFrom = (OrderForm)request.getAttribute("orderForm");
+  canReceiptCheque = orderFrom.getCanReceiptCheque();
+}
+
 %>
 
 <%@page import="java.util.List"%>
@@ -124,9 +137,10 @@ function openProductCategory(){
 	  // CAll AJAX PAGE
 	  loadProductCat(0);
 	  
-	  $(document).ready(function() {
+	   $(document).ready(function() {
 	    $("#brand-dialog").dialog("open");	    
-	  });
+	  }); 
+  
 }
 
 var currPage = 0;
@@ -140,6 +154,8 @@ function loadProductCat(page){
 			async: false,
 			success: function(getData){
 				var htmlText = jQuery.trim(getData);
+				
+				//alert(htmlText);
 				document.getElementById('brand-dialog').innerHTML = htmlText;
 			}
 		}).responseText;
@@ -174,18 +190,46 @@ function loadMe(){
 }
 
 $(function(){
-	  $('#brand-dialog').dialog({
+	
+
+	    $('#brand-dialog').dialog({
 						autoOpen: false,
 						width: 550,
 						height:425,
 						title:"เลือกกลุ่มสินค้า",
+						position:'center',
 						buttons: {
 							"OK": function() { addProductToSalesOrder(); }, 
 							"Cancel": function() { 
 								$(this).dialog("close"); 
 							}
 						}
-					});
+					}); 
+	   
+
+       /** dialog move follow scroll **/	    
+	   /* $(document).ready(function() {  
+			  oDetail  = $('<div id="brand-dialog" style="overflow:scroll"></div>') 
+			    .dialog({  
+			      autoOpen: false,
+				  width: 550,
+				  height:425,
+				  title:"เลือกกลุ่มสินค้า", 
+			      position: 'center',  
+			      resizable: 'false',
+			      buttons: {
+						"OK": function() { addProductToSalesOrder(); }, 
+						"Cancel": function() { 
+							$(this).dialog("close"); 
+						}
+					},
+			      draggable: true }); 
+			  
+			  $(window).scroll(function () {  
+			      oDetail .dialog("option","position","center");  
+			    }); 
+			   
+			});  */
 
 	  $('#selectProduct').dialog({
 			autoOpen: false,
@@ -743,7 +787,24 @@ function escapeParameter(param){
 							</tr>
 							<tr>
 								<td></td>
-								<td class="textSpecial"><%if(User.VAN.equals(user.getType())){%><html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที <%} %></td>
+								<td class="textSpecial">
+								<%
+								if(User.VAN.equals(user.getType())){
+									  if("N".equals(canReceiptCheque)){
+									%>
+									      <input type="checkbox" name="tempCheck" checked disabled/>
+										   บันทึกรับเงินสดทันที
+										  <html:checkbox property="order.paymentCashNow" styleId="paymentCashNow"/>
+										  <script>
+										   document.getElementById("paymentCashNow").style.display = 'none';
+										   </script>
+								    <%}else{ %>
+										  <html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที
+								     <%
+									 } 		
+								} 
+								%>
+								</td>
 								<td></td>
 								<td valign="top">
 									<html:checkbox property="order.payment" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Order.Paid" bundle="sysele"/>
@@ -817,6 +878,7 @@ function escapeParameter(param){
 						<html:hidden property="autoReceipt.chequeDate"/>
 						<html:hidden property="autoReceipt.creditCardType"/>
 						<html:hidden property="autoReceipt.internalBank"/>
+						
 						<!--  -->
 						<html:hidden property="deletedId"/>
 						<html:hidden property="order.orderType"/>
@@ -826,6 +888,10 @@ function escapeParameter(param){
 						<html:hidden property="order.exported" value="N"/>
 						<html:hidden property="order.isCash" value="N"/>
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
+						
+						<!--  Can Receipt Cheque (VAN)-->
+						<html:hidden property="canReceiptCheque"/>
+							
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>
 						

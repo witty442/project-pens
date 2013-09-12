@@ -135,22 +135,7 @@ function loadProducts(brandCode){
 
 
 $(function(){
-	
-	 $('#brand-dialog').dialog({
-			autoOpen: false,
-			width: 550,
-			height:425,
-			title:"เลือกกลุ่มสินค้า",
-			position:'center',
-			buttons: {
-				"OK": function() { addProductToSalesOrder(); }, 
-				"Cancel": function() { 
-					$(this).dialog("close"); 
-				}
-			}
-		}); 
-	 
-	/*   $('#brand-dialog').dialog({
+	  $('#brand-dialog').dialog({
 						autoOpen: false,
 						width: 550,
 						height:425,
@@ -162,7 +147,7 @@ $(function(){
 								$(this).dialog("close"); 
 							}
 						}
-					}); */
+					});
 
 	  $('#selectProduct').dialog({
 			autoOpen: false,

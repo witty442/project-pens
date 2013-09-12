@@ -16,7 +16,7 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="java.util.ArrayList"%>
-<jsp:useBean id="billPlanForm" class="com.isecinc.pens.web.billplan.BillPlanForm" scope="request" />
+<jsp:useBean id="moveOrderForm" class="com.isecinc.pens.web.stockpd.StockPDForm" scope="request" />
 <%
 String role = ((User)session.getAttribute("user")).getType();
 %>
@@ -42,14 +42,14 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/billPlan.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/stockpd.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('billPlanDateFrom'));
-	new Epoch('epoch_popup', 'th', document.getElementById('billPlanDateTo'));
+	new Epoch('epoch_popup', 'th', document.getElementById('requestDateFrom'));
+	new Epoch('epoch_popup', 'th', document.getElementById('requestDateTo'));
 }
 
 </script>
@@ -74,7 +74,7 @@ function loadMe(){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="BillPlan"/>
+				<jsp:param name="function" value="stockPD"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -88,16 +88,23 @@ function loadMe(){
 		            <td bgcolor="#f8f8f8">
 		            
 						<!-- BODY -->
-						<html:form action="/jsp/billPlanAction">
+						<html:form action="/jsp/stockPDAction">
 						<jsp:include page="../error.jsp"/>
+						
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
-							
 							<tr>
-								<td align="right">จาก วันทีเอกสารบิล T&nbsp;&nbsp; <html:text property="billPlan.billPlanDateFrom" styleId="billPlanDateFrom" readonly="true"/></td>
-								<td align="left">ถึง วันที่เอกสารบิล T&nbsp;&nbsp; <html:text property="billPlan.billPlanDateTo" styleId="billPlanDateTo" readonly="true"/></td>
+								<td colspan="2" align="left">
+									 <a href="javascript:createNewStockPD('${pageContext.request.contextPath}')">
+								       <img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif" align="absmiddle">สร้างรายการใหม่
+								      </a>
+								</td>
 							</tr>
 							<tr>
-							    <td align="right"><html:checkbox property="billPlan.noBillPlan"></html:checkbox>แสดงเฉพาะรายการที่ไม่ได้รับ&nbsp;&nbsp;</td>
+								<td align="right">จาก วันทีรายการ&nbsp;&nbsp; <html:text property="stockPD.requestDateFrom" styleId="requestDateFrom" readonly="true"/></td>
+								<td align="left">ถึง วันที่รายการ&nbsp;&nbsp; <html:text property="stockPD.requestDateTo" styleId="requestDateTo"/></td>
+							</tr>
+							<tr>
+							    <td align="right">&nbsp;&nbsp;</td>
 								<td align="right">&nbsp;&nbsp;</td>
 							</tr>
 					   </table>
@@ -118,24 +125,13 @@ function loadMe(){
 					</table>
 					<!-- RESULT -->
 				    
-			        <c:if test="${billPlanForm.results != null}">
-						<display:table id="item" name="requestScope.billPlanForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
-						    requestURI="../jsp/billPlanAction.do?do=search" sort="list" pagesize="30">	
+			        <c:if test="${moveOrderForm.results != null}">
+						<display:table id="item" name="requestScope.moveOrderForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
+						    requestURI="../jsp/moveOrderAction.do?do=search" sort="list" pagesize="30">	
 			
 						    <display:column  title="ลำดับที่" property="no"  sortable="false" class="moverOrder.No"/>	
-						   	<display:column  title="เลขที่เอกสาร" property="billPlanNo"  sortable="false" class="moverOrder.requestNumber"/>	
-						   	<display:column  title="วันที่เอกสารบิล T" property="billPlanDate"  sortable="false" class="moverOrder.requestDate"/>	
-						   	<display:column  title="วันที่รับสินค้า" property="billPlanRequestDate"  sortable="false" class="moverOrder.requestDate"/>	
-						   	<display:column title="สถานะการรับสินค้า">
-						   	     <c:choose>
-									<c:when test="${item.status == 'SV'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-									</c:when>
-									<c:otherwise>
-										
-									</c:otherwise>
-								  </c:choose>	
-						   	</display:column>
+						   	<display:column  title="เลขที่เอกสาร" property="requestNumber"  sortable="false" class="moverOrder.requestNumber"/>	
+						   	<display:column  title="วันที่ทำรายการ" property="requestDate"  sortable="false" class="moverOrder.requestDate"/>	
 						   	<display:column title ="โอนข้อมูลแล้ว">
 						   	     <c:choose>
 									<c:when test="${item.exported == 'Y'}">
@@ -147,11 +143,20 @@ function loadMe(){
 								  </c:choose>	
 						   	</display:column>
 						   	
-						   
+						   	<display:column  title="สถานะ" property="statusLabel"  sortable="false" class="moverOrder.status"/>	
 						   	<display:column title="แก้ไข/ดู ข้อมูล">
-						   	    <a href="#" onclick="view('${pageContext.request.contextPath}','${item.billPlanNo}');">
-								  <img src="${pageContext.request.contextPath}/icons/process.gif" border="0"/>
-								</a>			
+				
+						       	<c:if test="${item.canEdit =='true'}">
+							   	    <a href="#" onclick="editMoveOrder('${pageContext.request.contextPath}','${moveOrderForm.moveOrder.moveOrderType}','${item.requestNumber}');">
+									  <img src="${pageContext.request.contextPath}/icons/process.gif" border="0"/>
+									</a>
+								</c:if>
+								<c:if test="${item.canEdit =='false'}">
+							   	    <a href="#" onclick="editMoveOrder('${pageContext.request.contextPath}','${moveOrderForm.moveOrder.moveOrderType}','${item.requestNumber}');">
+									  <img src="${pageContext.request.contextPath}/icons/lookup.gif"  border="0"/>
+									</a>
+								</c:if>
+							
 						   	</display:column>	
 						   		
 						</display:table>

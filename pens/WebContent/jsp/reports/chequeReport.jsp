@@ -4,32 +4,21 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<jsp:useBean id="performanceReportForm" class="com.isecinc.pens.web.report.performance.PerformanceReportForm" scope="request" />
+<%
 
+%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="java.util.ArrayList"%>
-<jsp:useBean id="billPlanForm" class="com.isecinc.pens.web.billplan.BillPlanForm" scope="request" />
-<%
-String role = ((User)session.getAttribute("user")).getType();
-%>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
 <style type="text/css">
 <!--
 body {
@@ -42,14 +31,41 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/billPlan.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<!-- Calendar -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('billPlanDateFrom'));
-	new Epoch('epoch_popup', 'th', document.getElementById('billPlanDateTo'));
+	new Epoch('epoch_popup','th',document.getElementById('orderDateFrom'));
+	new Epoch('epoch_popup','th',document.getElementById('orderDateTo'));
+}
+
+function gotoReport(path){
+	
+	/* if($('#orderDateFrom').val()==''){
+		alert('กรุณาใส่เงื่อนไขในการออกรายงาน');
+		$('#orderDateFrom').focus();
+		return;
+	}
+	if($('#orderDateTo').val()==''){
+		alert('กรุณาใส่เงื่อนไขในการออกรายงาน');
+		$('#orderDateTo').focus();
+		return;
+	} */
+	
+	if(document.getElementById('msg')!=null){
+	   document.getElementById('msg').innerHTML = '';
+	}
+	document.chequeReportForm.action = path + "/jsp/chequeReportAction.do?do=searchReport&rf=Y";
+	document.chequeReportForm.submit();
+	return true;
+}
+
+function clearForm(path){
+	document.chequeReportForm.action = path + "/jsp/chequeReportAction.do?do=clearForm";
+	document.chequeReportForm.submit();
+	return true;
 }
 
 </script>
@@ -60,7 +76,7 @@ function loadMe(){
 		<td colspan="3"><jsp:include page="../header.jsp"/></td>
 	</tr>
   	<tr id="framerow">
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
+  		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
@@ -74,7 +90,7 @@ function loadMe(){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="BillPlan"/>
+				<jsp:param name="function" value="ChequeReport"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -86,79 +102,59 @@ function loadMe(){
 	      		<tr>
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
 		            <td bgcolor="#f8f8f8">
-		            
 						<!-- BODY -->
-						<html:form action="/jsp/billPlanAction">
+						<html:form action="/jsp/chequeReportAction">
 						<jsp:include page="../error.jsp"/>
-						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+						<!-- CRITERIA -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							
 							<tr>
-								<td align="right">จาก วันทีเอกสารบิล T&nbsp;&nbsp; <html:text property="billPlan.billPlanDateFrom" styleId="billPlanDateFrom" readonly="true"/></td>
-								<td align="left">ถึง วันที่เอกสารบิล T&nbsp;&nbsp; <html:text property="billPlan.billPlanDateTo" styleId="billPlanDateTo" readonly="true"/></td>
+								<td align="right">
+								  จากวันที่<html:text property="chequeReport.orderDateFrom" styleId="orderDateFrom" readonly="true" size="15"/></td>
+								<td align="left">
+								     ถึงวันที่<html:text property="chequeReport.orderDateTo" styleId="orderDateTo" readonly="true" size="15"/>
+								</td>
 							</tr>
 							<tr>
-							    <td align="right"><html:checkbox property="billPlan.noBillPlan"></html:checkbox>แสดงเฉพาะรายการที่ไม่ได้รับ&nbsp;&nbsp;</td>
-								<td align="right">&nbsp;&nbsp;</td>
+								<td align="right"><bean:message key="ReportFormat" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="left">
+									<!--<html:radio property="criteria.fileType" value="XLS"/>&nbsp;<bean:message key="Excel" bundle="sysele"/>&nbsp;&nbsp;-->
+									<html:radio property="criteria.fileType" value="PDF"/>&nbsp;<bean:message key="PDF" bundle="sysele"/>&nbsp;&nbsp;
+									<html:radio property="criteria.fileType" value="PRINTER"/>&nbsp;<bean:message key="Printer" bundle="sysele"/>
+								</td>
 							</tr>
-					   </table>
-					   
-					<br>
-					<!-- BUTTON -->
-					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
-						<tr>
-							<td align="center">
-								<a href="javascript:search('${pageContext.request.contextPath}')">
-								  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-								</a>
-								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-								  <input type="button" value="     Clear     " class="newPosBtnLong">
-								</a>
-							</td>
-						</tr>
-					</table>
-					<!-- RESULT -->
-				    
-			        <c:if test="${billPlanForm.results != null}">
-						<display:table id="item" name="requestScope.billPlanForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
-						    requestURI="../jsp/billPlanAction.do?do=search" sort="list" pagesize="30">	
-			
-						    <display:column  title="ลำดับที่" property="no"  sortable="false" class="moverOrder.No"/>	
-						   	<display:column  title="เลขที่เอกสาร" property="billPlanNo"  sortable="false" class="moverOrder.requestNumber"/>	
-						   	<display:column  title="วันที่เอกสารบิล T" property="billPlanDate"  sortable="false" class="moverOrder.requestDate"/>	
-						   	<display:column  title="วันที่รับสินค้า" property="billPlanRequestDate"  sortable="false" class="moverOrder.requestDate"/>	
-						   	<display:column title="สถานะการรับสินค้า">
-						   	     <c:choose>
-									<c:when test="${item.status == 'SV'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-									</c:when>
-									<c:otherwise>
-										
-									</c:otherwise>
-								  </c:choose>	
-						   	</display:column>
-						   	<display:column title ="โอนข้อมูลแล้ว">
-						   	     <c:choose>
-									<c:when test="${item.exported == 'Y'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-									</c:when>
-									<c:otherwise>
-										
-									</c:otherwise>
-								  </c:choose>	
-						   	</display:column>
-						   	
-						   
-						   	<display:column title="แก้ไข/ดู ข้อมูล">
-						   	    <a href="#" onclick="view('${pageContext.request.contextPath}','${item.billPlanNo}');">
-								  <img src="${pageContext.request.contextPath}/icons/process.gif" border="0"/>
-								</a>			
-						   	</display:column>	
-						   		
-						</display:table>
-                    </c:if>
-					<jsp:include page="../searchCriteria.jsp"></jsp:include>
-					</html:form>
-					<!-- BODY -->
+						</table>
+						<br>
+						<!-- BUTTON -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+							<tr>
+								<td align="center">
+									<a href="javascript:gotoReport('${pageContext.request.contextPath}')">
+			<!--						<img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn">-->
+									<input type="button" value="พิมพ์" class="newPosBtn">
+									</a>
+									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+			<!--						<img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn">-->
+									<input type="button" value="Clear" class="newNegBtn">
+									</a>
+								</td>
+							</tr>
+						</table>
+						<!-- BUTTON -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+							<tr>
+								<td align="right">
+									<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
+			<!--						<img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn">-->
+									<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
+									</a>
+								</td>
+								<td width="10%">&nbsp;</td>
+							</tr>
+						</table>
+						<jsp:include page="../searchCriteria.jsp"></jsp:include>
+						</html:form>
+						<!-- BODY -->
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>
@@ -171,7 +167,7 @@ function loadMe(){
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
-   <tr>
+    <tr>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
    			<jsp:include page="../contentbottom.jsp"/>

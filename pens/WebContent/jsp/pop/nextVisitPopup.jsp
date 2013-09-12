@@ -17,6 +17,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css" type="text/css">
@@ -25,20 +26,24 @@
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
 <script type="text/javascript">
+
 function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('nextVisitDate'));
 }
 
 function gotoReport(path){
-	<%if(!role.equals(User.DD)){%>
-		if(document.getElementsByName('nextVisitDate')[0].value==''){
-			alert('กรุณาใส่ข้อมูลให้ครบถ้วน');
-			document.getElementsByName('nextVisitDate')[0].focus();
-			return;
-		}
-		if(!compareCurrentDate(document.getElementsByName('nextVisitDate')[0])){return;}
-	<%}%>
+	
+	if(document.getElementsByName('nextVisitDate')[0].value==''){
+		alert('กรุณาใส่ข้อมูลให้ครบถ้วน');
+		document.getElementsByName('nextVisitDate')[0].focus();
+		return;
+	}
+	if(!compareCurrentDate(document.getElementsByName('nextVisitDate')[0])){return;}
+	
 	var nextVisitDate = document.getElementsByName('nextVisitDate')[0].value;
 	var fileType = '';
 	if(document.getElementsByName('fileType')[0].checked){
@@ -52,9 +57,10 @@ function gotoReport(path){
 
 </script>
 </head>
-<body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
+<body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="100" rightmargin="150" class="popbody">
 <!-- BODY -->
 <html:form action="/jsp/saleOrderAction">
+<input type="hidden" name="load" value="">
 <!-- INCLUDE -->
 <jsp:include page="../program.jsp">
 	<jsp:param name="system" value="Transaction"/>
@@ -62,20 +68,13 @@ function gotoReport(path){
 </jsp:include>
 <jsp:include page="../error.jsp"/>
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+
 	<tr>
-		<td colspan="4" align="left">&nbsp;</td>
+		<td align="right" width="35%"><bean:message key="NextVisit" bundle="sysele"/></td>
+		<td align="center" width="1%"><font color="red">*</font></td>
+		<td align="left"><input type="text" name="nextVisitDate" id="nextVisitDate" readonly="readonly" size="15"/></td>
 	</tr>
-	<%if(!role.equals(User.DD)){%>
-		<tr>
-			<td align="right" width="35%"><bean:message key="NextVisit" bundle="sysele"/></td>
-			<td align="center" width="1%"><font color="red">*</font></td>
-			<td align="left"><input type="text" name="nextVisitDate" id="nextVisitDate" readonly="readonly" size="15"/></td>
-		</tr>
-	<%}else{%>
-		<tr>
-			<td colspan="3"><input type="hidden" name="nextVisitDate" id="nextVisitDate"/></td>
-		</tr>
-	<%} %>
+	
 	<tr>
 		<td align="right"><bean:message key="ReportFormat" bundle="sysele"/>&nbsp;&nbsp;</td>
 		<td align="left" colspan="2">
@@ -84,7 +83,6 @@ function gotoReport(path){
 		</td>
 	</tr>
 </table>
-<br><br><br>
 <!-- BUTTON -->
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>

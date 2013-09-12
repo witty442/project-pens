@@ -149,7 +149,12 @@ function newDayAdd(inputDate, addDay){
 }  
 
 function gotoReport(path, role){
-	window.open(path + "/jsp/pop/nextVisitPopup.jsp?role="+role, "Print Receipt/Tax Invoice", "width=400,height=260,location=No,resizable=No");
+	var rand = Math.floor(Math.random()*11);
+	var w = 700;
+	var h = 280;
+	var left =  (screen.width/2)-(w/2);
+    var top = (screen.height/2)-(h/2);
+	window.open(path + "/jsp/pop/nextVisitPopup.jsp?rand="+rand+"&role="+role, "Print Receipt/Tax Invoice", "width="+w+",height="+h+", top="+top+", left="+left+",location=0,resizable=0");
 }
 
 function presave(path) {

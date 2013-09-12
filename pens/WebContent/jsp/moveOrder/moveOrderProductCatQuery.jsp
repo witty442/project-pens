@@ -28,8 +28,15 @@ int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
 int no_of_total_display = no_of_column * no_of_rows;
 
-int totalBrand = mProductCat.lookUpBrandList(user).size();
+int totalRecord = mProductCat.lookUpBrandList(user).size();
+
+int totalPage = totalRecord/(no_of_column * no_of_rows);
+BigDecimal r = new BigDecimal(totalPage);
+r = r.setScale(0,BigDecimal.ROUND_UP);
+totalPage = r.intValue();
+
 /// Find Total Page
+System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
 
 if(productCatL != null && productCatL.size() > 0){
 %>
@@ -37,16 +44,23 @@ if(productCatL != null && productCatL.size() > 0){
 <tr>
 <td class="paging" colspan="<%=no_of_column%>">หน้าที่
 <%  int id = 1 ;
-	for(int no = 0 ; no < totalBrand; ) {  
+	for(int no = 0 ; no < totalPage;no++ ) {  
 		int id_param = id-1;
-		String className = "pageLink";
+		System.out.println("id:"+id);
+		String className = "currPageBtn";
 		if(id_param == pageId)
-			className = "currPage";
+			className = "currPageActiveBtn";
 %>
-<a href="#" onclick="loadProductCat(<%=id_param%>)"><span class="<%=className%>"><%=id%></span></a>
-<%  no = no + no_of_total_display;id++; } %> 
+<%-- <a href="#" onclick="loadProductCat(<%=id_param%>)">&nbsp;<span class="<%=className%>"><%=id%></span></a> --%>
+<input type="button" name="xx" value="<%=id%>" onclick="loadProductCat(<%=id_param%>)" class="<%=className%>"/>
+<%       //  no = no + no_of_total_display;
+         id++;
+
+	}//for
+%> 
 </td>
 </tr>
+
 <% 	int idx = 0; 
 	for(References reference : productCatL ) {
 		boolean newRow = (idx%no_of_column == 0);

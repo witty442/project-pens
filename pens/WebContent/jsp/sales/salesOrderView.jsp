@@ -43,7 +43,6 @@ List<References> internalBank= InitialReferences.getReferenes().get(InitialRefer
 pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 
 /* -- Auto Receipt --> */
-
 %>
 
 <%@page import="java.util.List"%>
@@ -77,6 +76,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script type="text/javascript">
+
 function loadMe(){
 	document.getElementById("tempTotalAmount").value = addCommas(Number(document.getElementsByName("order.totalAmount")[0].value).toFixed(2));
 	document.getElementById("tempVatAmount").value = addCommas(Number(document.getElementsByName("order.vatAmount")[0].value).toFixed(2));
@@ -142,8 +142,12 @@ function loadAutoReceipt(){
 		document.getElementsByName('autoReceipt.paymentType')[1].checked=true;
 		changePayType('CH');
 	}else{
-		document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
-		changePayType('CR');
+		//Wit Edit 26/07/2556 display Credit Pay
+		//document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
+		//changePayType('CR');
+		
+		document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
+		changePayType('CS');
 	}
 }
 
@@ -604,7 +608,8 @@ function removeRow(){
 											    <html:radio property="autoReceipt.paymentType" value="CS" onclick="changePayType(this.value);"/> รับเงินสดทันที<br>
 	 										    <html:radio property="autoReceipt.paymentType" value="CH" onclick="changePayType(this.value);"/> รับเช็ค<br>
 											    <html:radio property="autoReceipt.paymentType" value="MIX" onclick="changePayType(this.value);"/> ชำระแบบผสม<br>
-											    <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);"/> เงินเชื่อ<br>							
+											    <!-- Wit edit 26/07/2556  -->
+											    <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" disabled="true"/> ...<br> 							
 											</td>
 										</tr>
 									</table>
@@ -623,7 +628,7 @@ function removeRow(){
 										<tr>
 											<td align="left" id="divAddBtn" colspan="2">
 												&nbsp;&nbsp;<input type="button" value="เพิ่มประเภทการชำระเงิน" onclick="addRow('${pageContext.request.contextPath}');"/>
-											</td>
+											</td> 
 										</tr>
 										<tr>
 											<td align="center" colspan="2">
@@ -1042,7 +1047,7 @@ function removeRow(){
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
-										<input type="button" value="พิมพ์" class="newPosBtn">
+										<input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn">
 										</a>
 									</c:if>
 									<%} %>

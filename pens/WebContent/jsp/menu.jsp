@@ -57,11 +57,7 @@ User user = (User)session.getAttribute("user");
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/inventory.do';"><span><bean:message key="InventoryOnhand" bundle="sysprop"/></span></a>
             </li>
-            <!-- 
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/inventoryTransaction.do';"><span>Inventory Movement</span></a>
-            </li>
-             -->
+           
             <%} %>
             <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
             <li>
@@ -92,6 +88,10 @@ User user = (User)session.getAttribute("user");
 					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><bean:message key="PD" bundle="sysprop"/></span></a>
 				</li>
 			<% } %>
+			
+			<li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"><span>ปรับปรุงโปรแกรม SalesApp</span></a>
+			</li>
 		</ul>
 	</li>
 	<!-- WIT Edit :04/08/2554 -->
@@ -127,33 +127,7 @@ User user = (User)session.getAttribute("user");
     <li><a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/customer.do';"><span><bean:message key="Customer" bundle="sysprop"/></span></a></li>
     <%} %>
     <%} %>
-    <%if(role.equalsIgnoreCase(User.DD)){ %>
-    <li><a href="#"><span><bean:message key="Member" bundle="sysprop"/></span></a>
-    		<ul>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/member.do';"><span><bean:message key="MemberInfo" bundle="sysprop"/></span></a>
-            </li>
-           	<li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/memberrenew.do';"><span><bean:message key="Renew" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/member/memberBirthDaySearch.jsp';"><span><bean:message key="Member.BirthDay" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/memberimport.do';"><span><bean:message key="MemberImport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/memberOrderImport.do';"><span><bean:message key="MemberOrderImport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/dataimports/memberImportSearch.jsp';"><span><bean:message key="MemberImportSearch" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/memberOrder.do';"><span><bean:message key="MemberOrderAdjust" bundle="sysprop"/></span></a>
-            </li>
-        </ul>
-    </li>
-    <%} %>
+    
     <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
     <li><a href="#" class="parent"><span><bean:message key="Reports" bundle="sysprop"/></span></a>
     	<ul>
@@ -171,38 +145,7 @@ User user = (User)session.getAttribute("user");
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';"><span><bean:message key="InvoiceDetailReport" bundle="sysprop"/></span></a>
             </li>
             <%} %>
-    		<%if(role.equalsIgnoreCase(User.DD)){ %>
-			<li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/shipmentReport.do';"><span><bean:message key="HeartiBenecolShipment" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/shipmentTempReport.do';"><span><bean:message key="HeartiBenecolShipmentTemp" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/shipmentBenecolReport.do';"><span><bean:message key="ShipmentBenecolToMember" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/receiptTempReport.do';"><span><bean:message key="ReceiptTemporary" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/remittanceReport.do';"><span><bean:message key="Remittance" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/receiveBenecolReport.do';"><span><bean:message key="ReceiveBenecol" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/receiveBagReport.do';"><span><bean:message key="ReceiveBag" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/benecolSummaryReport.do';"><span><bean:message key="BenecolSummaryReport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/callBeforeReport.do';"><span><bean:message key="CallBeforeSendReport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/taxInvoiceDDReport.do';"><span><bean:message key="TaxInvoiceDDReport" bundle="sysprop"/></span></a>
-            </li>
-    		<%} %>
+
     		<%if(role.equalsIgnoreCase(User.VAN)){ %>
     		<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/performanceReport.do';"><span><bean:message key="PerformanceReport" bundle="sysprop"/></span></a>
@@ -216,6 +159,9 @@ User user = (User)session.getAttribute("user");
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/detailedSalesReport.do';"><span><bean:message key="DetailedSalesReport" bundle="sysprop"/></span></a>
             </li>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/chequeReport.do';"><span><bean:message key="ChequeReport" bundle="sysprop"/></span></a>
+            </li>
         	<%} %>
         	<%if(role.equalsIgnoreCase(User.TT)){ %>
         	<li>
@@ -228,9 +174,7 @@ User user = (User)session.getAttribute("user");
         </ul>
     </li>
     <%} %>
-    <%if(role.equalsIgnoreCase(User.DD)){ %>
-    	<li><a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/reports/printStickerReport.jsp';"><span><bean:message key="PrintStickerReport" bundle="sysprop"/></span></a></li>
-    <%} %>
+   
     <li class="parent"><a href="#"><span><bean:message key="Interfaces" bundle="sysprop"/></a>
    		<ul>
            	<li>
@@ -279,6 +223,9 @@ User user = (User)session.getAttribute("user");
 		        </li>
 		         <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/billPlanAction.do?do=prepare&action=new';"><span>รับบิลที (Bill T)  </span></a>
+		        </li>
+		         <li>
+		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requisitionProductAction.do?do=prepare&action=new';"><span><bean:message key="RequisitionProduct" bundle="sysprop"/> </span></a>
 		        </li>
 		     </ul>
 	     </li>

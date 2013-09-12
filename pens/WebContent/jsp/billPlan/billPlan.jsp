@@ -179,6 +179,7 @@ function loadMe(){
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="moveOrder">
 									<tr>
 										<th class="moveOrder.no">No.</th>
+										<th class="moveOrder.no">Line No</th>
 										<th class="moveOrder.productName">รหัสสินค้า</th>
 										<th class="moveOrder.uom">ชื่อสินค้า</th>
 										<th class="moveOrder.qty">จำนวน</th>
@@ -194,7 +195,10 @@ function loadMe(){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td align="center" class = "moveOrder.no">${rows1.index + 1}</td>				
+										<td align="center" class = "moveOrder.no">${rows1.index + 1}</td>	
+										<td align="center" class ="moveOrder.uom">
+										   ${lines1.lineNo}
+										</td>			
 										<td align="left" class ="moveOrder.uom">
 										   ${lines1.productCode}
 										</td>
