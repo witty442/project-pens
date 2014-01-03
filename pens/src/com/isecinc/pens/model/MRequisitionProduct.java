@@ -34,6 +34,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
+import com.isecinc.pens.process.document.RequisitionProductDocumentProcess;
 
 public class MRequisitionProduct {
 
@@ -69,17 +70,13 @@ public class MRequisitionProduct {
 			if("".equals(head.getRequestNumber())){
 				
 				//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
-				head = checkRequestDate(head);
+				//head = checkRequestDate(head);
 				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				
-				if(MOVE_ORDER_REQUISITION.equals(head.getMoveOrderType())){
-				    requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(requestDate,user.getCode(), head.getPdCode(),user.getId(), conn);
-				}else if(MOVE_ORDER_RETURN.equals(head.getMoveOrderType())){
-				    requestNumber = new MoveOrderReturnDocumentProcess().getNextDocumentNo(requestDate,user.getCode(), head.getPdCode(),user.getId(), conn);
-				}
-				
+
+				requestNumber = new RequisitionProductDocumentProcess().getNextDocumentNo(requestDate,user.getCode(),user.getId(), conn);
+
 				//prepare MoveOrder
-				logger.debug("MoveOrderType["+head.getMoveOrderType()+"]requestNumber["+requestNumber+"]");
+				logger.debug("requestNumber["+requestNumber+"]");
 				//prepare MoveOrder Model
 				head.setRequestNumber(requestNumber);
 
@@ -87,7 +84,7 @@ public class MRequisitionProduct {
 				
 			}else{
 				//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
-				head = checkRequestDate(head);
+				//head = checkRequestDate(head);
 				
 				updateRequisitionProduct(conn , head);
 			}
@@ -323,8 +320,8 @@ public class MRequisitionProduct {
 		PreparedStatement ps = null;
 		try {
 			
-			StringBuffer sql = new StringBuffer("update t_move_order \n");
-			sql.append(" set  request_date = ?  \n"); 
+			StringBuffer sql = new StringBuffer("update t_requisition_product \n");
+			sql.append(" set  request_date = ? ,reason_code =? ,remark = ? \n"); 
 			sql.append(" ,updated_long =? ,updated_by = ?   \n"); 
 			sql.append(" where request_number =?  \n");
 
@@ -333,6 +330,8 @@ public class MRequisitionProduct {
 			int index = 0;
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(head.getRequestDate()).getTime()));//request_date
+			ps.setString(++index, head.getReasonCode());
+			ps.setString(++index, head.getRemark());
 			ps.setBigDecimal(++index, head.getUpdatedLong().setScale(6));//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setString(++index, head.getRequestNumber());//request_number
@@ -359,8 +358,8 @@ public class MRequisitionProduct {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			conn.setAutoCommit(false);
 			
-			StringBuffer sql = new StringBuffer("update t_move_order \n");
-			sql.append(" set  status = ?  ,description = ? \n"); 
+			StringBuffer sql = new StringBuffer("update t_requisition_product \n");
+			sql.append(" set  status = ?  ,cancel_reason = ? \n"); 
 			sql.append(" ,updated_long =? ,updated_by = ?   \n"); 
 			sql.append(" where request_number =?  \n");
 
@@ -369,7 +368,7 @@ public class MRequisitionProduct {
 			int index = 0;
 			ps = conn.prepareStatement(sql.toString());
 			ps.setString(++index, head.getStatus());//status
-			ps.setString(++index, head.getDescription());//status
+			ps.setString(++index, head.getCancelReason());//
 			ps.setBigDecimal(++index, head.getUpdatedLong().setScale(6));//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setString(++index, head.getRequestNumber());//request_number
@@ -393,56 +392,17 @@ public class MRequisitionProduct {
 		return head;
 	}
 	
-	public RequisitionProduct updatePrintRequisitionProduct(RequisitionProduct head) throws Exception {
-		boolean result = false;
-		PreparedStatement ps = null;
-		Connection conn  = null;
-		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			conn.setAutoCommit(false);
-			
-			StringBuffer sql = new StringBuffer("update t_move_order \n");
-			sql.append(" set print_no = (print_no +1) ,print_date_long = ? ,  \n"); 
-			sql.append(" updated_by = ?   \n"); 
-			sql.append(" where request_number =?  \n");
-
-			//logger.debug("SQL:"+sql);
-			
-			int index = 0;
-			ps = conn.prepareStatement(sql.toString());
-			ps.setBigDecimal(++index, head.getPrintDateLong().setScale(6));//print_date
-			ps.setString(++index, head.getUpdateBy());//update_dby
-			ps.setString(++index, head.getRequestNumber());//request_number
-
-			int ch = ps.executeUpdate();
-			result = ch>0?true:false;
-			
-			logger.debug("ins:"+ch);
-			conn.commit();
-		} catch (Exception ex) {
-			conn.rollback();
-			throw ex;
-		} finally {
-			if(ps != null){
-				ps.close();ps = null;
-			}
-			if(conn != null){
-			   conn.close();conn = null;
-			}
-		}
-		return head;
-	}
 	
 	private RequisitionProduct insertRequisitionProduct(Connection conn ,RequisitionProduct model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("INSERT INTO t_move_order( \n");
+			StringBuffer sql = new StringBuffer("INSERT INTO t_requisition_product( \n");
 			sql.append(" request_number, request_date, organization_id, \n");
-			sql.append(" sales_code, pd_code, description, \n");
-			sql.append(" move_order_type, status, print_no,  \n");
+			sql.append(" sales_code, reason_code, cancel_reason, \n");
+			sql.append(" remark, status,  \n");
 			sql.append(" exported, USER_ID, CREATED_LONG,CREATED_BY ) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?) \n");
 			  
 			//logger.debug("SQL:"+sql);
 			
@@ -452,11 +412,10 @@ public class MRequisitionProduct {
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(model.getRequestDate()).getTime()));//request_date
 			ps.setInt(++index, Utils.convertStrToInt(model.getOrganizationId()));//organization_id
 			ps.setString(++index, model.getSalesCode());//sales_code
-			ps.setString(++index, model.getPdCode());//pd_code 
-			ps.setString(++index, model.getDescription());//description
-			ps.setString(++index, model.getMoveOrderType());//move_order_type
+			ps.setString(++index, model.getReasonCode());//reason_code 
+			ps.setString(++index, model.getCancelReason());//description
+			ps.setString(++index, model.getRemark());//
 			ps.setString(++index, STATUS_SAVE);//status
-			ps.setInt(++index, Utils.convertStrToInt(model.getPrintNo()));//print_no
 			ps.setString(++index, STATUS_NO_EXPORTED);//exported
 			ps.setString(++index, model.getUserId());
 			ps.setBigDecimal(++index, model.getCreatedLong().setScale(6));
@@ -480,7 +439,7 @@ public class MRequisitionProduct {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("delete from t_move_order_line where request_number =? \n");
+			StringBuffer sql = new StringBuffer("delete from t_requisition_product_line where request_number =? \n");
 			//logger.debug("SQL:"+sql);
 			int index = 0;
 
@@ -505,7 +464,7 @@ public class MRequisitionProduct {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("INSERT INTO t_move_order_line( \n");
+			StringBuffer sql = new StringBuffer("INSERT INTO t_requisition_product_line( \n");
 			sql.append(" request_number, line_number, inventory_item_id, \n"); 
 			sql.append(" qty, qty1, qty2, \n"); 
 			sql.append(" uom1, uom2, status,  \n");
@@ -556,7 +515,7 @@ public class MRequisitionProduct {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("update t_move_order_line set \n");
+			StringBuffer sql = new StringBuffer("update t_requisition_product_line set \n");
 			sql.append(" inventory_item_id =? ,pack = ? , \n"); 
 			sql.append(" qty =? , qty1 = ? , qty2 =?, \n"); 
 			sql.append(" uom1 =? , uom2 = ? ,  \n");
@@ -605,7 +564,7 @@ public class MRequisitionProduct {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("update t_move_order_line set \n");
+			StringBuffer sql = new StringBuffer("update t_requisition_product_line set \n");
 			sql.append(" status = ? , \n"); 
 			sql.append(" USER_ID=?, UPDATED_LONG =?, UPDATED_BY =?  \n");
 			sql.append(" WHERE request_number=? and line_number = ? \n");
@@ -649,17 +608,15 @@ public class MRequisitionProduct {
 				
 				sql.append("\n  SELECT " );
 				sql.append("\n h.request_number,h.request_date,h.organization_id, ");
-				sql.append("\n h.sales_code,h.pd_code,h.description,");
-				sql.append("\n h.move_order_type,h.status,h.print_no, ");
-				sql.append("\n h.print_date_long,h.exported,h.USER_ID,");
+				sql.append("\n h.sales_code,h.reason_code,h.cancel_reason,");
+				sql.append("\n h.status,h.remark, ");
+				sql.append("\n h.exported,h.USER_ID,");
 				sql.append("\n h.CREATED_LONG,h.CREATED_BY,h.UPDATED_LONG,h.UPDATED_BY, ");
-				sql.append("\n timestamp(h.CREATED_LONG) as CREATED, timestamp(h.UPDATED_LONG) as UPDATED, timestamp(h.print_date_long) as print_date ");
-				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
+				sql.append("\n timestamp(h.CREATED_LONG) as CREATED, timestamp(h.UPDATED_LONG) as UPDATED  ");
 				sql.append("\n  ,(select p.name from ad_user p where p.user_name = h.sales_code) as sales_desc ");
-				sql.append("\n  from t_move_order h ");
+				sql.append("\n  from t_requisition_product h ");
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
-				sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
 				
 				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
@@ -685,25 +642,23 @@ public class MRequisitionProduct {
 				  m.setSalesCode(rst.getString("sales_code"));
 				  m.setSalesDesc(rst.getString("sales_desc"));
 				  
-				  m.setPdCode(rst.getString("pd_code"));
-				  m.setPdDesc(rst.getString("pd_desc"));
+				  m.setReasonCode(rst.getString("reason_code"));
+				  m.setRemark(rst.getString("remark"));
 				  
-				  m.setDescription(rst.getString("description"));
-				  m.setMoveOrderType(rst.getString("move_order_type"));
-				  
+				  m.setCancelReason(rst.getString("cancel_reason"));
+
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 				  m.setExported(rst.getString("exported"));
 				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
 				  
-				  m.setPrintNo(rst.getString("print_no"));
+				
 				  m.setUserId(rst.getString("user_id")); 
 				  m.setCreatedBy(rst.getString("created_by"));
 				  m.setUpdateBy(rst.getString("updated_by"));
 				  
 				  m.setCreated(Utils.stringValueSpecial(rst.getLong("created_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
 				  m.setUpdated(Utils.stringValueSpecial(rst.getLong("updated_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
-				  m.setPrintDate(Utils.stringValueSpecial(rst.getLong("print_date_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
 				  
 				  //Check canEdit
 				  if((STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) 
@@ -741,16 +696,14 @@ public class MRequisitionProduct {
 			
 			sql.append("\n  SELECT ");
 			sql.append("\n h.request_number,h.request_date,h.organization_id, ");
-			sql.append("\n h.sales_code,h.pd_code,h.description,");
-			sql.append("\n h.move_order_type,h.status,h.print_no, ");
-			sql.append("\n h.print_date_long,h.exported,h.USER_ID,");
+			sql.append("\n h.sales_code,h.reason_code,h.cancel_reason,");
+			sql.append("\n h.remark,h.status, ");
+			sql.append("\n h.exported,h.USER_ID,");
 			sql.append("\n h.CREATED_LONG,h.CREATED_BY,h.UPDATED_LONG,h.UPDATED_BY, ");
-			sql.append("\n timestamp(h.CREATED_LONG) as CREATED, timestamp(h.UPDATED_LONG) as UPDATED, timestamp(h.print_date_long) as print_date ");
-			sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
+			sql.append("\n timestamp(h.CREATED_LONG) as CREATED, timestamp(h.UPDATED_LONG) as UPDATED ");
 			sql.append("\n  ,(select p.name from ad_user p where p.user_name = h.sales_code) as sales_desc ");
-			sql.append("\n  from t_move_order h ");
+			sql.append("\n  from t_requisition_product h ");
 			sql.append("\n  where h.request_number ='"+mCriteria.getRequestNumber()+"'");
-			sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
 			sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
 			sql.append("\n  ORDER BY h.request_date desc  \n");
 			
@@ -776,37 +729,28 @@ public class MRequisitionProduct {
 			  m.setSalesCode(rst.getString("sales_code"));
 			  m.setSalesDesc(rst.getString("sales_desc"));
 			  
-			  m.setPdCode(rst.getString("pd_code"));
-			  m.setPdDesc(rst.getString("pd_desc"));
-			  m.setPdCodeDisabled(true);
+			  m.setReasonCode(rst.getString("reason_code"));
+			  m.setRemark(rst.getString("remark"));
+			  m.setCancelReason(rst.getString("cancel_reason"));
 			  
-			  m.setDescription(rst.getString("description"));
-			  m.setMoveOrderType(rst.getString("move_order_type"));
 			  
 			  m.setStatus(rst.getString("status"));
 			  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 			  m.setExported(rst.getString("exported"));
 			  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
 			  
-			  m.setPrintNo(rst.getString("print_no"));
 			  m.setUserId(rst.getString("user_id"));
 			  m.setCreatedBy(rst.getString("created_by"));
 			  m.setUpdateBy(rst.getString("updated_by"));
 			  
 			  m.setCreated(Utils.stringValueSpecial(rst.getLong("created_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
 			  m.setUpdated(Utils.stringValueSpecial(rst.getLong("updated_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
-			  m.setPrintDate(Utils.stringValueSpecial(rst.getLong("print_date_long"),Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th));
-			  			  
-			  m.setMoveOrderType(rst.getString("move_order_type"));
-			  m.setMoveOrderTypeLabel(MRequisitionProduct.MOVE_ORDER_TYPE_MAP.get(m.getMoveOrderType()));
-			  
+			
 			  //Check canEdit
 			  if(  (STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) 
 				){
 				  m.setCanEdit(true);
 			  }
-			  
-			  
 
 			}//while
 			//Find Lines
@@ -837,7 +781,7 @@ public class MRequisitionProduct {
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n SELECT A.* FROM ( ");
-				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code   from t_move_order_line l ");
+				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code   from t_requisition_product_line l ");
 				sql.append("\n   WHERE l.request_number ='"+mCriteria.getRequestNumber()+"'");
 				sql.append("\n   and l.status ='SV' ");
 				sql.append("\n  ) A ORDER BY A.code asc \n");
@@ -949,7 +893,7 @@ public class MRequisitionProduct {
 			RequisitionProductLine m = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT l.request_number ,l.line_number,l.qty from t_move_order_line l ");
+				sql.append("\n  SELECT l.request_number ,l.line_number,l.qty from t_requisition_product_line l ");
 				sql.append("\n  where l.request_number ='"+requestNumber+"'");
 				sql.append("\n  and l.line_number ="+lineNo+"");
 				
@@ -983,7 +927,7 @@ public class MRequisitionProduct {
 			int nextLineNo = 1;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT max(l.line_number) as max_line_no from t_move_order_line l ");
+				sql.append("\n  SELECT max(l.line_number) as max_line_no from t_requisition_product_line l ");
 				sql.append("\n  where l.request_number ='"+requestNumber+"'");
 				
 			    logger.debug("sql:"+sql);
@@ -1005,222 +949,5 @@ public class MRequisitionProduct {
 			return nextLineNo;
 		}
 	  
-	  
-	  /**
-	   * searchMoveOrderSummary
-	   * @param mCriteria
-	   * @param user
-	   * @return
-	   * @throws Exception
-	   */
-	  public List<MoveOrderSummary> searchMoveOrderSummaryDetail(MoveOrderSummary mCriteria,User user) throws Exception {
-			Statement stmt = null;
-			ResultSet rst = null;
-			List<MoveOrderSummary> list = new ArrayList<MoveOrderSummary>();
-			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
-			int no = 0;
-			try {
-				conn = new  DBCPConnectionProvider().getConnection(conn);
-				
-				sql.append("\n  SELECT " );
-				sql.append("\n   h.request_number,h.request_date ");
-				sql.append("\n  ,h.pd_code ,p.code as product_code ");
-				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
-				sql.append("\n  ,l.qty ,l.qty1 ,l.qty2 ");
-				sql.append("\n  ,l.uom1 ,l.uom2 ");
-				sql.append("\n  ,l.pack,l.total_amount");
-				sql.append("\n  ,h.status,h.exported");
-				sql.append("\n  from t_move_order h  ");
-				sql.append("\n  ,    t_move_order_line l  ");
-				sql.append("\n  ,    m_product p  ");
-				sql.append("\n  where 1=1 ");
-				sql.append("\n  and  h.request_number = l.request_number ");
-				sql.append("\n  and  l.inventory_item_id = p.product_id ");
-				sql.append("\n  and  h.user_id ='"+user.getId()+"'");
-				sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
-				
-				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
-					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
-					 sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					 sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				}
-				
-				if( !Utils.isNull(mCriteria.getProductCodeFrom()).equals("")
-						&&	!Utils.isNull(mCriteria.getProductCodeTo()).equals("")	){
-				     sql.append(" and p.code >= '"+mCriteria.getProductCodeFrom()+"' \n");
-					 sql.append(" and p.code <= '"+mCriteria.getProductCodeTo()+"' \n");
-				}
-				
-				if( !Utils.isNull(mCriteria.getStatus()).equals("")){
-				    sql.append("\n  and  h.status ='"+mCriteria.getStatus()+"'");
-			    }
-			
-				if( !Utils.isNull(mCriteria.getExported()).equals("")){
-				    sql.append("\n  and  h.exported ='"+mCriteria.getExported()+"'");
-			    }
-				
-				sql.append("\n  ORDER BY h.request_number asc \n");
-				
-				logger.info("sql:"+sql);
-				
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-				
-				while (rst.next()) {
-				  no++;
-				  MoveOrderSummary m = new MoveOrderSummary();
-				  m.setNo(no);
-				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setPdCode(rst.getString("pd_code"));
-				  m.setPdCodeShow(rst.getString("pd_code"));
-				  m.setPdDesc(rst.getString("pd_desc"));
-                  m.setProductCode(rst.getString("product_code"));
-                  m.setUom1(rst.getString("uom1"));
-                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
-                  m.setUom2(rst.getString("uom2"));
-                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
-                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
-				  m.setStatus(rst.getString("status"));
-				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
-				  m.setExported(rst.getString("exported"));
-				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
-				  
-				  list.add(m);
-				}//while
-			
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					if(rst != null){
-						rst.close();rst = null;
-					}
-					if(stmt != null){
-						stmt.close(); stmt = null;
-					}
-					if(conn != null){
-					   conn.close();conn=null;
-					}
-				} catch (Exception e) {}
-			}
-			return list;
-	}
-	
-	/**
-	 * searchMoveOrderSummaryTotal
-	 * @param mCriteria
-	 * @param user
-	 * @return
-	 * @throws Exception
-	 */
-	public List<MoveOrderSummary> searchMoveOrderSummaryTotal(MoveOrderSummary mCriteria,User user) throws Exception {
-			Statement stmt = null;
-			ResultSet rst = null;
-			List<MoveOrderSummary> list = new ArrayList<MoveOrderSummary>();
-			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
-			int no = 0;
-			try {
-				conn = new  DBCPConnectionProvider().getConnection(conn);
-				
-				sql.append("\n  SELECT " );
-				sql.append("\n   h.pd_code ,p.code as product_code ");
-				sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
-				sql.append("\n  ,sum(l.qty) as qty ,sum(l.qty1) as qty1 ,sum(l.qty2) as qty2 ");
-				sql.append("\n  ,l.uom1 ,l.uom2 ");
-				sql.append("\n  ,l.pack,sum(l.total_amount) as total_amount");
-				sql.append("\n  ,h.status,h.exported");
-				sql.append("\n  from t_move_order h  ");
-				sql.append("\n  ,    t_move_order_line l  ");
-				sql.append("\n  ,    m_product p  ");
-				sql.append("\n  where 1=1 ");
-				sql.append("\n  and  h.request_number = l.request_number ");
-				sql.append("\n  and  l.inventory_item_id = p.product_id ");
-				sql.append("\n  and  h.user_id ='"+user.getId()+"'");
-				sql.append("\n  and  h.move_order_type ='"+mCriteria.getMoveOrderType()+"'");
-				
-				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
-					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
-						
-					 sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					 sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				}
-				
-				if( !Utils.isNull(mCriteria.getProductCodeFrom()).equals("")
-						&&	!Utils.isNull(mCriteria.getProductCodeTo()).equals("")	){
-				     sql.append(" and p.code >= '"+mCriteria.getProductCodeFrom()+"' \n");
-					 sql.append(" and p.code <= '"+mCriteria.getProductCodeTo()+"' \n");
-				}
-				
-				if( !Utils.isNull(mCriteria.getStatus()).equals("")){
-				    sql.append("\n  and  h.status ='"+mCriteria.getStatus()+"'");
-			    }
-			
-				if( !Utils.isNull(mCriteria.getExported()).equals("")){
-				    sql.append("\n  and  h.exported ='"+mCriteria.getExported()+"'");
-			    }
-				
-				sql.append("\n  GROUP BY h.pd_code,h.status,h.exported ,p.code ,l.uom1 ,l.uom2,l.pack \n");
-				sql.append("\n  ORDER BY h.pd_code ,p.code asc \n");
-				
-				logger.info("sql:"+sql);
-				
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-				
-				int i = 0;
-				String tempPDCode = "";
-				while (rst.next()) {
-				  no++;
-				  MoveOrderSummary m = new MoveOrderSummary();
-				  m.setNo(no);
-				  m.setPdCode(rst.getString("pd_code"));
-				  m.setPdDesc(rst.getString("pd_desc"));
-                  m.setProductCode(rst.getString("product_code"));
-                  m.setUom1(rst.getString("uom1"));
-                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
-                  m.setUom2(rst.getString("uom2"));
-                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
-                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
-				  m.setStatus(rst.getString("status"));
-				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
-				  m.setExported(rst.getString("exported"));
-				  m.setExportedLabel(STATUS_EXPORTED.equals(m.getExported())?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
-				  
-				  if(i==0){
-					  m.setPdCodeShow(m.getPdCode());
-					  tempPDCode = m.getPdCode();
-				  }else{
-					  if( !tempPDCode.equals(m.getPdCode())){
-						  m.setPdCodeShow(m.getPdCode());
-						  tempPDCode = m.getPdCode();
-					  }else{
-						  m.setPdCodeShow(""); 
-					  }
-				  }
-				  
-				  list.add(m);
-				  i++;
-				}//while
-			
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					if(rst != null){
-					   rst.close();rst = null;
-					}
-					if(stmt != null){
-					   stmt.close(); stmt = null;
-					}
-					if(conn != null){
-					   conn.close();conn=null;
-					}
-				} catch (Exception e) {}
-			}
-			return list;
-	}
 	  
 }

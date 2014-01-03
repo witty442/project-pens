@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.sales.bean;
 
 public class ProductCatalog implements Comparable{
+	private String target;
 	private int productId;
 	private String productCode;
 	private String productName;
@@ -11,6 +12,15 @@ public class ProductCatalog implements Comparable{
 	private double qty1;
 	private double qty2;
 	private double lineNetAmt;
+
+	
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
 
 	public int getProductId() {
 		return productId;

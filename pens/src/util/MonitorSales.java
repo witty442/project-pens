@@ -90,7 +90,9 @@ public class MonitorSales {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String path = "D:/SalesApp/";
 			
-			StringBuffer data = ftpManager.downloadAllFileInFolder("/Manual-script/Monitor-Sales/SalesAppVersion/");
+			String yyyymm = Utils.format(new Date(), "yyyyMM");
+			
+			StringBuffer data = ftpManager.downloadAllFileInFolder("/Manual-script/Monitor-Sales/SalesAppVersion/"+yyyymm+"/");
 			
 			FileUtil.writeFile(path+"SalesAppVersionAll.csv", data.toString(), "UTF-8");
 			

@@ -63,6 +63,11 @@ public class RunScriptDBAction {
 			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
 				purgDataMonitor(conn);	
 			}
+			//Delete m_sales_target_new back 2 month
+			if(day==5){
+				purgDataSalesTarget(conn);	
+			}
+			
 			//Delete all Transaction 
 			if(day==30){
 				purgDataTransaction(conn);
@@ -240,6 +245,27 @@ public class RunScriptDBAction {
 			logger.info(excUpdate(conn,sql.toString()));
 			
 			logger.info("*** Success PurgData Monitor ***************");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return success;
+  }
+	
+	//Delete Data m_sales_target_new back 2 month
+	private static boolean purgDataSalesTarget(Connection conn){
+		boolean success = false;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			logger.debug("*** Start PurgData m_sales_target_new back 2 month ***************");
+			
+			sql.append(" delete from m_sales_target_new where sales_target_id in (  \n");
+			sql.append(" select A.* from( select sales_target_id from m_sales_target_new   \n");
+			sql.append(" where target_from < SUBDATE(NOW(),INTERVAL 2 MONTH)   \n");
+			sql.append(" )A ) \n");
+
+			logger.debug(excUpdate(conn,sql.toString()));
+			
+			logger.info("*** Success PurgData m_sales_target_new back 2 month ***************");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
@@ -84,6 +86,7 @@ public class CustomerAction extends I_Action {
 			throw e;
 		}
 		if (request.getParameter("action").equalsIgnoreCase("edit")) return "prepare";
+		if (request.getParameter("action").equalsIgnoreCase("edit2")) return "viewEdit";
 		return "view";
 	}
 
@@ -318,6 +321,54 @@ public class CustomerAction extends I_Action {
 			} catch (Exception e2) {}
 		}
 		return "view";
+	}
+	
+	public ActionForward saveEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		CustomerForm customerForm = (CustomerForm) form;
+		int customerId = 0;
+		try {
+			customerId = customerForm.getCustomer().getId();
+
+			// check Token
+			if (!isTokenValid(request)) {
+				customerForm.setCustomer(new Customer());
+				customerForm.getAddresses().clear();
+				customerForm.getContacts().clear();
+				return mapping.findForward("prepare"); 
+			}
+			User userActive = (User) request.getSession(true).getAttribute("user");
+			Customer customer = customerForm.getCustomer();
+
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			// Begin Transaction
+			conn.setAutoCommit(false);
+
+			// Save Customer tax_no only
+			new MCustomer().update(customer, userActive.getId(),userActive.getUserName(), conn);
+				
+			// Commit Transaction
+			conn.commit();
+			//
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+			// Save Token
+			saveToken(request);
+		} catch (Exception e) {
+			customerForm.getCustomer().setId(customerId);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
+					+ e.getMessage());
+			try {
+				conn.rollback();
+			} catch (Exception e2) {}
+			e.printStackTrace();
+			return mapping.findForward("prepare"); 
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("view"); 
 	}
 
 	@Override

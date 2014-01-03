@@ -22,9 +22,10 @@ import org.apache.struts.action.ActionMapping;
 import util.BeanParameter;
 import util.BundleUtil;
 import util.ConvertNullUtil;
+import util.CustomerReceiptFilterUtils;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
-import util.ReceiptFilterUtils;
+import util.ReportHelper;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
@@ -42,21 +43,26 @@ import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MCustomer;
+import com.isecinc.pens.model.MDistrict;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MOrgRule;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MProductPrice;
+import com.isecinc.pens.model.MProvince;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.process.order.OrderProcess;
+import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
+import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
 
 /**
@@ -111,7 +117,7 @@ public class OrderAction extends I_Action {
 			}
 			
 			//Filter Check Van Can Receipt Cheque
-			orderForm.setCanReceiptCheque(ReceiptFilterUtils.canReceiptCheque(customerId));
+			orderForm.setCanReceiptCheque(CustomerReceiptFilterUtils.canReceiptCheque(customerId));
 
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
@@ -433,6 +439,9 @@ public class OrderAction extends I_Action {
 			// Re-Calculate
 			// new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
 
+			//Set Data to Session to Print ListOrderProduct
+			request.getSession().setAttribute("order_from_to_print", orderForm);
+			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -512,6 +521,9 @@ public class OrderAction extends I_Action {
 		String subInv ="";
 		OrgRuleBean orgRuleBean;
 		try {
+			//clear Session Temp to Print ListOrderProduct
+			request.getSession().setAttribute("order_from_to_print",null);
+			
 			orderId = orderForm.getOrder().getId();
 
 			// check Token
@@ -1058,7 +1070,8 @@ public class OrderAction extends I_Action {
 				}
 			}
 
-			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? receiptNo : order.getOrderNo());
+			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? ReportHelper.convertOrderNoForReport(receiptNo) : ReportHelper.convertOrderNoForReport(order.getOrderNo()));
+			
 			parameterMap.put("p_vatcode", order.getVatCode());
 			parameterMap.put("p_address", address.getLineString());
 			parameterMap.put("p_orderDate", order.getOrderDate());
@@ -1068,7 +1081,7 @@ public class OrderAction extends I_Action {
 			
 			parameterMap.put("p_customerCode", customer.getCode());
 			parameterMap.put("p_customerName", customer.getName());
-			
+			parameterMap.put("p_custTaxNo", "".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo()));
 
 			lstData = new ArrayList<TaxInvoiceReport>();
 			int id = 1;
@@ -1137,6 +1150,239 @@ public class OrderAction extends I_Action {
 		} finally {
 			try {
 				// conn.close();
+			} catch (Exception e2) {}
+		}
+		// return null;
+		return null;
+	}
+	
+	public ActionForward printReportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.debug("printReportSummary : " + this.getClass());
+		OrderForm reportForm = (OrderForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		TaxInvoiceReport taxInvoice = new TaxInvoiceReport();
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		List<TaxInvoiceReport> lstData = null;
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		Order order = null;
+		List<OrderLine> lines = null;
+		Customer customer = null;
+		Address address = null;
+		List<Address> addresses = new ArrayList<Address>();
+		try {
+			boolean baddr = false;
+			String fileType = request.getParameter("fileType");
+			String orderId = request.getParameter("id");
+			String visitDate = request.getParameter("visitDate");
+            
+			logger.debug("fileType:"+fileType);
+			
+			order = new MOrder().find(orderId);
+			reportForm.setOrder(order);
+			lines = new MOrderLine().lookUp(reportForm.getOrder().getId());
+			reportForm.setLines(new OrderProcess().fillLinesShow(lines));
+			lines = reportForm.getLines();
+			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
+
+			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
+
+			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? ReportHelper.convertOrderNoForReport(receiptNo) : ReportHelper.convertOrderNoForReport(order.getOrderNo()));
+			parameterMap.put("p_vatcode", order.getVatCode());
+			parameterMap.put("p_orderDate", order.getOrderDate());
+			parameterMap.put("p_code", user.getCode());
+			parameterMap.put("p_name", user.getName());
+			parameterMap.put("p_taxNo", BeanParameter.getPensTaxNo());
+			
+			conn = DBConnection.getInstance().getConnection();
+			
+			//Split address to Show 2 Line
+			String[] custAddressArr = new String[2];
+			Address addressTemp = new MAddress().findAddressByCustomerId(conn,customer.getId()+"");
+			if(addressTemp != null ){
+				custAddressArr = splitAddress(addressTemp);
+			}
+			
+			parameterMap.put("custName", order.getCustomerName());
+			parameterMap.put("custAddress1", custAddressArr[0]);
+			parameterMap.put("custAddress2", custAddressArr[1]);
+			parameterMap.put("p_custTaxNo", "".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo()));
+
+			lstData = new ArrayList<TaxInvoiceReport>();
+			int id = 1;
+			int no =1;
+			for (OrderLine line : lines) {
+				taxInvoice = new TaxInvoiceReport();
+				taxInvoice.setOrderID(String.valueOf(order.getId()));
+				taxInvoice.setId(id++);
+				//taxInvoice.setAddress(address.getLineString());
+				taxInvoice.setOrderDate(order.getOrderDate());
+				taxInvoice.setTaxNo("Tax No in Line");
+				taxInvoice.setCode(user.getCode());
+				taxInvoice.setName(user.getName());
+			
+				taxInvoice.setCustomerCode(customer.getCode());
+				taxInvoice.setCustomerName(customer.getName());
+				
+				if("Y".equalsIgnoreCase(line.getPromotion())){
+				  taxInvoice.setProductCode("*"+no+":"+line.getProduct().getCode());
+				}else{
+				  taxInvoice.setProductCode(no+":"+line.getProduct().getCode());	
+				}
+				taxInvoice.setProductName(line.getProduct().getName());
+				taxInvoice.setUomId(line.getProduct().getUom().getId());
+				taxInvoice.setMainQty(new Double(line.getQty1()).intValue());
+				taxInvoice.setSubQty(new Double(line.getQty2()).intValue());
+				taxInvoice.setAddQty(new Double(line.getQty2()).intValue());
+				taxInvoice.setSalePrice(line.getLineAmount());
+				taxInvoice.setPercentDiscount(0);
+				taxInvoice.setDiscount(line.getDiscount());
+				taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
+				// Summary
+				taxInvoice.setTotalAmount(line.getLineAmount() - line.getDiscount());
+				taxInvoice.setVatAmount(line.getVatAmount());
+				//taxInvoice.setNetAmount(line.getTotalAmount());
+							
+				
+				//BigDecimal totalAmount = new BigDecimal(taxInvoice.getTotalAmount());
+				//BigDecimal vatAmount = new BigDecimal(taxInvoice.getVatAmount());
+				//BigDecimal netAmount = totalAmount.add(vatAmount);
+				
+				taxInvoice.setNetAmount(taxInvoice.getTotalAmount()+taxInvoice.getVatAmount());
+				//taxInvoice.setNetAmount(netAmount.doubleValue());
+
+				lstData.add(taxInvoice);
+				no++;
+			}
+			parameterMap.put("p_next_visit", visitDate);
+
+			String fileName = "tax_invoice_summary_report";
+			String fileJasper = BeanParameter.getReportPath() + fileName;
+            reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
+	
+	public String[] splitAddress(Address a) {
+		String[] lineString = new String[2];
+		String line1 = Utils.isNull(a.getLine1()) + " "+Utils.isNull(a.getLine2()) + " ";
+		if ("กรุงเทพฯ".equalsIgnoreCase(a.getProvince().getName())
+				|| "กรุงเทพมหานคร".equalsIgnoreCase(a.getProvince().getName())) {
+			        line1 += "แขวง"
+                          + (Utils.isNull(a.getLine3())) + " ";
+						 
+			        
+			lineString[0] = line1;
+			lineString[1] = " เขต"
+					  + (Utils.isNull(a.getDistrict().getName())) + " "
+					  + " "+(Utils.isNull(a.getProvince().getName())) + " "+(Utils.isNull(a.getPostalCode()));
+			
+		} else {
+			line1 += "ตำบล" + (Utils.isNull(a.getLine3())) ;
+			
+			lineString[0] = line1;
+			lineString[1] =   "อำเภอ  "
+					 + (Utils.isNull(a.getDistrict().getName())) + " "
+					 + "จังหวัด "+(Utils.isNull(a.getProvince().getName())) + " "+(Utils.isNull(a.getPostalCode()));
+			
+		}
+		return lineString;
+	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward printListOrderProductReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.debug("Search for report : " + this.getClass());
+		OrderForm orderForm = (OrderForm) form;
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		Connection conn = null;
+		try{
+			
+			orderForm = (OrderForm)request.getSession().getAttribute("order_from_to_print");
+			/**Debug **/
+			logger.debug("CustomerId:"+orderForm.getOrder().getCustomerId());
+			logger.debug("Lines:"+orderForm.getLines().size());
+			
+		    conn = DBConnection.getInstance().getConnection();
+			ListOrderProductReportProcess process = new ListOrderProductReportProcess();
+			User user = (User)request.getSession().getAttribute("user");
+			
+			//Split address to Show 2 Line
+			String[] custAddressArr = new String[2];
+			Address address = new MAddress().findAddressByCustomerId(conn,request.getParameter("customerId"));
+			if(address != null ){
+				custAddressArr = splitAddress(address);
+			}
+
+			List<ListOrderProductReport> lstData = new ArrayList<ListOrderProductReport>();
+			//Disply Item Line
+			int no =1;
+			for (OrderLine line : orderForm.getLines()) {
+				ListOrderProductReport b = new ListOrderProductReport();
+				if("Y".equalsIgnoreCase(line.getPromotion())){
+				  b.setProduct("*"+no+":"+line.getProduct().getCode()+" "+line.getProduct().getName());
+				}else{
+				  b.setProduct(no+":"+line.getProduct().getCode()+" "+line.getProduct().getName());
+				}
+				b.setQty(line.getQty1()+"/"+line.getQty2());
+				b.setUnit(Utils.isNull(line.getUom1().getCode())+"/"+Utils.isNull(line.getUom2().getCode()));
+				b.setPrice(line.getPrice1()+"/"+line.getPrice2());
+				no++;
+				
+				lstData.add(b);
+			}
+			logger.debug("List Data Size:"+lstData.size());
+			
+		    //Param Report
+			String fileName = "list_order_product_report";
+			String fileType = SystemElements.PRINTER;
+			String fileJasper = BeanParameter.getReportPath() + fileName;
+			
+			//Set Report Parameter Map
+			parameterMap.put("totalLine", lstData.size()+"");
+			parameterMap.put("userName", user.getName());
+			parameterMap.put("custName", orderForm.getOrder().getCustomerName());
+			parameterMap.put("custAddress1", custAddressArr[0]);
+			parameterMap.put("custAddress2", custAddressArr[1]);
+			parameterMap.put("report_title", "list_order_product_report");
+			
+			 
+			//start Report
+		    reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+			
+		    //pdf
+			/*parameterMap.put("report_title", "list_order_product_pdf_report");
+			fileName = "list_order_product_pdf_report";
+			fileType = SystemElements.PDF;
+			fileJasper = BeanParameter.getReportPath() + fileName;
+		    reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);*/
+		    
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				conn.close();
 			} catch (Exception e2) {}
 		}
 		// return null;

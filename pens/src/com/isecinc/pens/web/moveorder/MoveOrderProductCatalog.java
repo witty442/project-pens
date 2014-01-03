@@ -2,6 +2,7 @@ package com.isecinc.pens.web.moveorder;
 
 public class MoveOrderProductCatalog implements Comparable{
 	private int productId;
+	private String target;
 	private String productCode;
 	private String productName;
 	private String uom1;
@@ -12,8 +13,16 @@ public class MoveOrderProductCatalog implements Comparable{
 	private double qty2;
 	private double lineNetAmt;
 	private double pacQty2;
-
+   
 	
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
 	public double getPacQty2() {
 		return pacQty2;
 	}

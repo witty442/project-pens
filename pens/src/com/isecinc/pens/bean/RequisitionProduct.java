@@ -16,8 +16,6 @@ public class RequisitionProduct {
     
     
 	/** properties**/
-	private String moveOrderType;
-	private String moveOrderTypeLabel;
 	private String priceListId;
 	private double totalAmount;
 	
@@ -28,28 +26,24 @@ public class RequisitionProduct {
 	private String organizationId ;
 	private String salesCode;
 	private String salesDesc;
-	private String pdCode ;
-	private String pdDesc ;
-	private boolean pdCodeDisabled;
+	private String reasonCode ;
+	private String remark ;
 	
 	private boolean requestDateDisabled = false;
 	private boolean pdCodeReadonly = false;
 	
-	private String description ;
+	private String cancelReason ;
 	private String status ;
 	private String statusLabel ;
-	private String printNo;
 	private String exported; 
 	private String exportedLabel;
 	private String userId;
 	private String createdBy; 
 	private String updateBy; 
 	
-	private String printDate; 
 	private String updated; 
 	private String created; 
 	
-	private BigDecimal printDateLong; 
 	private BigDecimal updatedLong; 
 	private BigDecimal createdLong;
 	
@@ -71,7 +65,14 @@ public class RequisitionProduct {
 		return currentDate;
 	}
 
-	
+	public String getReasonCode() {
+		return reasonCode;
+	}
+
+	public void setReasonCode(String reasonCode) {
+		this.reasonCode = reasonCode;
+	}
+
 	public boolean isRequestDateDisabled() {
 		return requestDateDisabled;
 	}
@@ -84,14 +85,6 @@ public class RequisitionProduct {
 
 	public void setCurrentDate(String currentDate) {
 		this.currentDate = currentDate;
-	}
-
-	public boolean isPdCodeDisabled() {
-		return pdCodeDisabled;
-	}
-
-	public void setPdCodeDisabled(boolean pdCodeDisabled) {
-		this.pdCodeDisabled = pdCodeDisabled;
 	}
 
 	public List<String> getLineNoDeleteList() {
@@ -158,13 +151,6 @@ public class RequisitionProduct {
 		this.totalAmount = totalAmount;
 	}
 
-	public String getMoveOrderTypeLabel() {
-		return moveOrderTypeLabel;
-	}
-
-	public void setMoveOrderTypeLabel(String moveOrderTypeLabel) {
-		this.moveOrderTypeLabel = moveOrderTypeLabel;
-	}
 
 	public String getStatusLabel() {
 		return statusLabel;
@@ -180,14 +166,6 @@ public class RequisitionProduct {
 
 	public void setPriceListId(String priceListId) {
 		this.priceListId = priceListId;
-	}
-
-	public String getMoveOrderType() {
-		return moveOrderType;
-	}
-
-	public void setMoveOrderType(String moveOrderType) {
-		this.moveOrderType = moveOrderType;
 	}
 
 	public String getNo() {
@@ -255,28 +233,21 @@ public class RequisitionProduct {
 		this.salesDesc = salesDesc;
 	}
 
-	public String getPdCode() {
-		return pdCode;
+	
+	public String getRemark() {
+		return remark;
 	}
 
-	public void setPdCode(String pdCode) {
-		this.pdCode = pdCode;
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
-	public String getPdDesc() {
-		return pdDesc;
+	public String getCancelReason() {
+		return cancelReason;
 	}
 
-	public void setPdDesc(String pdDesc) {
-		this.pdDesc = pdDesc;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public void setCancelReason(String cancelReason) {
+		this.cancelReason = cancelReason;
 	}
 
 	public String getStatus() {
@@ -285,14 +256,6 @@ public class RequisitionProduct {
 
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	public String getPrintNo() {
-		return printNo;
-	}
-
-	public void setPrintNo(String printNo) {
-		this.printNo = printNo;
 	}
 
 	public String getExported() {
@@ -311,15 +274,6 @@ public class RequisitionProduct {
 		this.userId = userId;
 	}
 
-    
-	public String getPrintDate() {
-		return printDate;
-	}
-
-	public void setPrintDate(String printDate) {
-		this.printDate = printDate;
-	}
-
 	public String getUpdated() {
 		return updated;
 	}
@@ -334,15 +288,6 @@ public class RequisitionProduct {
 
 	public void setCreated(String created) {
 		this.created = created;
-	}
-
-	
-	public BigDecimal getPrintDateLong() {
-		return printDateLong;
-	}
-
-	public void setPrintDateLong(BigDecimal printDateLong) {
-		this.printDateLong = printDateLong;
 	}
 
 	public BigDecimal getUpdatedLong() {

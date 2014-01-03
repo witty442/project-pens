@@ -12,8 +12,17 @@ public class RequisitionProductCatalog implements Comparable{
 	private double qty2;
 	private double lineNetAmt;
 	private double pacQty2;
-
+    private String target;
 	
+    
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
 	public double getPacQty2() {
 		return pacQty2;
 	}

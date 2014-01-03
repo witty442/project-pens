@@ -50,7 +50,6 @@ public class RequisitionProductAction extends I_Action {
 		try {
 			 logger.debug("prepare :"+request.getParameter("action"));
 			 User user = (User) request.getSession(true).getAttribute("user");
-			 String moveOrderType = Utils.isNull(request.getParameter("moveOrderType"));
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 //Clear and init Parametor By moveOrderType  
@@ -66,6 +65,8 @@ public class RequisitionProductAction extends I_Action {
 				 
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
 				 RequisitionProduct b = (RequisitionProduct)request.getSession().getAttribute("criteria_");
+				 logger.debug("b:"+b);
+				 
 				 sForm.getCriteria().setRequisitionProduct(b);
 				 search(sForm,request,response); 
 			 }
@@ -88,7 +89,6 @@ public class RequisitionProductAction extends I_Action {
 		try {
 			logger.debug("prepare 2:"+request.getParameter("action"));
 			 User user = (User) request.getSession(true).getAttribute("user");
-			 String moveOrderType = Utils.isNull(request.getParameter("moveOrderType"));
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				//Clear and init Parametor By moveOrderType  
@@ -142,7 +142,7 @@ public class RequisitionProductAction extends I_Action {
 	}
 
 	public ActionForward createNewRequisitionProduct(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("createNewMoveOrder");
+		logger.debug("createNewRequisitionProduct");
 		RequisitionProductForm moveOrderForm = (RequisitionProductForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
@@ -244,116 +244,6 @@ public class RequisitionProductAction extends I_Action {
 		return mapping.findForward("preview");
 	}
 	
-	public ActionForward printRequisitionProduct(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("printMoveOrder");
-		RequisitionProductForm moveOrderForm = (RequisitionProductForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		MRequisitionProduct mDAO = new MRequisitionProduct();
-		try {
-			//Update Print Date
-			RequisitionProduct m = preparePrintRequisitionProduct(user, moveOrderForm);
-			 mDAO.updatePrintRequisitionProduct(m);
-			 
-			/** Search **/
-			 m = mDAO.searchRequisitionProduct(moveOrderForm.getRequisitionProduct(),user);
-			 moveOrderForm.setRequisitionProduct(m);
-			 //Set Lines
-			 moveOrderForm.setLines(m.getRequisitionProductLineList());
-			 moveOrderForm.getRequisitionProduct().setMoveOrderTypeLabel(MMoveOrder.MOVE_ORDER_TYPE_MAP.get(m.getMoveOrderType()));
-			//init priceListId by User Type
-			 moveOrderForm.getRequisitionProduct().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
-			 
-			 request.setAttribute("Message","พิมพ์รายการสำเร็จ");
-			 request.setAttribute("popupPrint", "true");
-			 
-			 //set Btn Display
-			 moveOrderForm.getRequisitionProduct().setShowSaveBtn(false);
-			 moveOrderForm.getRequisitionProduct().setShowCancelBtn(false);
-			 moveOrderForm.getRequisitionProduct().setShowPrintBtn(false);
-			 
-			// save token
-			saveToken(request);
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return mapping.findForward("preview");
-	}
-	
-	
-	public ActionForward popupPrint(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("printMoveOrder");
-		RequisitionProductForm moveOrderForm = (RequisitionProductForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		try {
-			String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
-
-			moveOrderForm.getRequisitionProduct().setRequestNumber(requestNumber);
-			moveOrderForm.getRequisitionProduct().setUserId(user.getId()+"");
-			 
-			ReportUtilServlet reportServlet = new ReportUtilServlet();
-			HashMap<String,String> parameterMap = new HashMap<String,String>();
-			List<RequisitionProductLine> lstData = null;
-			Connection conn = null;
-			String fileName = "move_order_report";
-			String reportName = "";
-			String reportType ="";
-            String fileJasper = BeanParameter.getReportPath() + fileName;
-			
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			RequisitionProduct mResult = new MRequisitionProduct().searchRequisitionProduct(moveOrderForm.getRequisitionProduct(),user);
-			
-			if(MMoveOrder.MOVE_ORDER_REQUISITION.equals(moveOrderForm.getRequisitionProduct().getMoveOrderType())){
-				reportName = "ใบเบิกสินค้า";
-				reportType = "request";
-				
-				parameterMap.put("p_fromCode",mResult.getPdCode());
-				parameterMap.put("p_fromDesc",mResult.getPdDesc());
-				parameterMap.put("p_toCode",mResult.getSalesCode());
-				parameterMap.put("p_toDesc",mResult.getSalesDesc());
-			}else{
-				reportName = "ใบคืนสินค้า";
-				reportType = "return";
-				
-				parameterMap.put("p_fromCode",mResult.getSalesCode());
-				parameterMap.put("p_fromDesc",mResult.getSalesDesc());
-				parameterMap.put("p_toCode",mResult.getPdCode());
-				parameterMap.put("p_toDesc",mResult.getPdDesc());
-			}
-			
-			//Set Parameter Map
-			parameterMap.put("p_reportName",reportName);
-			parameterMap.put("p_reportType",reportType);
-			parameterMap.put("p_printDate",mResult.getPrintDate());
-			parameterMap.put("p_requestNumber",mResult.getRequestNumber());
-			parameterMap.put("p_createDate",mResult.getCreated());
-			parameterMap.put("p_printNo",mResult.getPrintNo());
-			parameterMap.put("p_requestDate",mResult.getRequestDate());
-			
-			
-			if(MMoveOrder.STATUS_VOID.equals(mResult.getStatus())){
-			  parameterMap.put("p_statusLabel","(ยกเลิก)");
-			  parameterMap.put("p_cancelReason","เหตุผลในการยกเลิก "+mResult.getDescription());
-			}else{
-			  parameterMap.put("p_statusLabel","");
-			  parameterMap.put("p_cancelReason",mResult.getDescription());
-			}
-			//Set Lines
-			lstData = mResult.getRequisitionProductLineList();
-			
-			if (lstData != null && lstData.size() > 0) {
-				reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);
-			} 
-			
-			// save token
-			saveToken(request);
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return mapping.findForward("popupPrint");
-	}
-	
 	
 	/**
 	 * Save
@@ -391,10 +281,13 @@ public class RequisitionProductAction extends I_Action {
 			request.setAttribute("Message",msg );
 			
 			 //set Btn Display
-			 moveOrderForm.getRequisitionProduct().setShowSaveBtn(false);
-			 moveOrderForm.getRequisitionProduct().setShowCancelBtn(false);
+			 moveOrderForm.getRequisitionProduct().setShowSaveBtn(true);
+			 moveOrderForm.getRequisitionProduct().setShowCancelBtn(true);
 			 moveOrderForm.getRequisitionProduct().setShowPrintBtn(true);
 			 
+			// Save Criteria
+			request.getSession().setAttribute("criteria_",moveOrderForm.getCriteria().getRequisitionProduct());
+				
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
@@ -410,8 +303,11 @@ public class RequisitionProductAction extends I_Action {
 	}
 
     private RequisitionProduct prepareCreateRequisitionProduct(User user,RequisitionProductForm mForm) throws Exception {
-    	RequisitionProduct m = mForm.getRequisitionProduct();
-    	logger.debug("RequisitionProduct:"+mForm.getRequisitionProduct().getSalesCode()+","+mForm.getRequisitionProduct().getPdCode()+",");
+    	RequisitionProduct m = mForm.getCriteria().getRequisitionProduct();
+    	if(m==null){
+    		m = new RequisitionProduct();
+    	}
+    	logger.debug("RequisitionProduct:"+mForm.getRequisitionProduct()+",User:"+user);
     	m.setUserId(user.getId()+"");
     	m.setCreatedBy(user.getUserName());
     	m.setUpdateBy(user.getUserName());
@@ -445,7 +341,7 @@ public class RequisitionProductAction extends I_Action {
     
     private RequisitionProduct prepareUpdateRequisitionProduct(User user,RequisitionProductForm mForm) throws Exception {
     	RequisitionProduct m = mForm.getRequisitionProduct();
-    	logger.debug("RequisitionProduct:"+mForm.getRequisitionProduct().getSalesCode()+","+mForm.getRequisitionProduct().getPdCode()+",");
+    	logger.debug("prepareUpdateRequisitionProduct:");
     	m.setUserId(user.getId()+"");
     	m.setCreatedBy(user.getUserName());
     	m.setUpdateBy(user.getUserName());
@@ -464,13 +360,12 @@ public class RequisitionProductAction extends I_Action {
     			m.setLineNoDeleteList(lineNoDeleteList);
     		}
     	}
-    	
 		return m;
 	}
     
     private RequisitionProduct prepareCancelRequisitionProduct(User user,RequisitionProductForm mForm) throws Exception {
     	RequisitionProduct m = mForm.getRequisitionProduct();
-    	logger.debug("RequisitionProduct:"+mForm.getRequisitionProduct().getSalesCode()+","+mForm.getRequisitionProduct().getPdCode()+",");
+    	logger.debug("prepareCancelRequisitionProduct:");
     	m.setStatus(MMoveOrder.STATUS_VOID);//Cancel MoveOrder
     	m.setUserId(user.getId()+"");
     	m.setUpdateBy(user.getUserName());
@@ -479,15 +374,6 @@ public class RequisitionProductAction extends I_Action {
 		return m;
 	}
     
-    private RequisitionProduct preparePrintRequisitionProduct(User user,RequisitionProductForm mForm) throws Exception {
-    	RequisitionProduct m = mForm.getRequisitionProduct();
-    	logger.debug("RequisitionProduct:"+mForm.getRequisitionProduct().getSalesCode()+","+mForm.getRequisitionProduct().getPdCode()+",");
-    	m.setUserId(user.getId()+"");
-    	m.setPrintDateLong(Utils.getCurrentTimestampLong());
-    	
-		return m;
-	}
-	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		RequisitionProductForm moveOrderForm = (RequisitionProductForm) form;

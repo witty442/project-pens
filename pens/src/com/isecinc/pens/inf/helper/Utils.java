@@ -41,13 +41,11 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	String salesCode ="V201";
-	    	System.out.println(salesCode.substring(1,4));
+	    	String s1 ="เลขประจำตัวผู้เสียภาษี";
+	    	String s2 ="สำนักงานใหญ่";
 	    	
-	    	double r = 0.0;
-	    	if(r== 0.000){
-	    	  System.out.println(r);
-	    	}
+	    	System.out.println(toUnicodeChar(s1));
+	    	System.out.println(toUnicodeChar(s2));
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }

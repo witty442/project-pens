@@ -3,6 +3,7 @@ package com.isecinc.pens.model;
 import static util.ConvertNullUtil.convertToString;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -183,6 +184,7 @@ public class MCustomer extends I_Model<Customer> {
 				//double totalReceiptAmt = rst.getDouble("total_receipt_amt");
 				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
 				
+				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
 				m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
 				
 				// Order Amount
@@ -195,18 +197,29 @@ public class MCustomer extends I_Model<Customer> {
 				
 				//Disp Column Edit Customer
 				m.setDisplayActionEditCust(displayActionEditCust);//disp
+				
 				//Can Edit Dust
 				if(role.equalsIgnoreCase(User.ADMIN)){
 					m.setCanActionEditCust(true);
 				}else if(role.equalsIgnoreCase(User.VAN)){
 					if (m.getOrderAmount()== 0){
-					   if ( !m.getInterfaces().equalsIgnoreCase("Y")){
-						  if(!m.getExported().equalsIgnoreCase("Y")){
-							  m.setCanActionEditCust(true);
-						  }
+					   if (!m.getExported().equalsIgnoreCase("Y")){
+						  m.setCanActionEditCust(true);
+						  m.setCanActionEditCust2(false);
+					   }else{
+						 // m.setDisplayActionEditCust("");
+						   if( role.equalsIgnoreCase(User.VAN)){
+						     m.setCanActionEditCust2(true);
+						   }
 					   }
+					}else{
+						if( role.equalsIgnoreCase(User.VAN)){
+						  m.setCanActionEditCust2(true);
+						}
 					}
 				}
+				
+				logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
 				
 				//displayActionReceipt
 				m.setDisplayActionReceipt(displayActionReceipt);
@@ -270,7 +283,7 @@ public class MCustomer extends I_Model<Customer> {
 				ConvertNullUtil.convertToString(customer.getVatCode()).trim(),
 				ConvertNullUtil.convertToString(customer.getPaymentMethod()).trim(),
 				ConvertNullUtil.convertToString(customer.getShippingMethod()).trim(),
-				customer.getSalesRepresent().getId(), customer.getIsActive() != null ? customer.getIsActive() : "N",
+				activeUserID, customer.getIsActive() != null ? customer.getIsActive() : "N",
 				activeUserID, activeUserID, customer.getParentID(),
 				ConvertNullUtil.convertToString(customer.getPartyType()).trim() };
 		if (super.save(TABLE_NAME, columns, values, customer.getId(), conn)) {
@@ -279,6 +292,20 @@ public class MCustomer extends I_Model<Customer> {
 		return true;
 	}
 
+	public boolean update(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
+		PreparedStatement ps = null;
+		try{
+			 ps = conn.prepareStatement("update m_customer set tax_no ='"+customer.getTaxNo()+"' where customer_id ="+ customer.getId());
+			 ps.executeUpdate();
+			 return true;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps=null;
+			}
+		}
+	}
 	/**
 	 * Get Invoice Amount
 	 * 

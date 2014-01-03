@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.inf.helper.DBConnection;
 
 
-public class ReceiptFilterUtils {
+public class CustomerReceiptFilterUtils {
 
 	public static Logger logger = Logger.getLogger("PENS");
 	/**
@@ -22,6 +22,12 @@ public class ReceiptFilterUtils {
 
 	}
 	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 * :for van 
+	 */
 	public  static String canReceiptCheque(int customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
@@ -29,7 +35,7 @@ public class ReceiptFilterUtils {
 		Connection conn = null;
 		try{
 			String sql = "select count(*) as x from m_customer c, c_customer_receipt_cheque r \n" +
-					" where c.customer_id ="+customerId+" and r.isactive ='Y' \n"+
+					" where c.customer_id ="+customerId+" and (r.isactive ='Y' or r.isactive is null or trim(r.isactive) ='') \n"+
 					" and r.customer_code = c.code \n";
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql);

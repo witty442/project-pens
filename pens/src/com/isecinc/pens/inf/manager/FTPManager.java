@@ -93,11 +93,19 @@ public class FTPManager {
 	 */
 	public void canConnectFTPServer() throws Exception{
 		FTPClient ftp = null;
+		String replyDesc = "";
 		try{
+			logger.debug("["+server+"]:"+replyDesc);
+			
 			ftp = new FTPClient();
+			//ftp.setDefaultPort(FTPClient.DEFAULT_PORT);
+			//ftp.setDefaultPort(FTPClient.DEFAULT_PORT);
 			ftp.connect(server);
+			replyDesc = ftp.getReplyString();
+			logger.debug("["+server+"]:["+replyDesc+"]");
 		}catch(Exception e){
-			throw new FTPException("Could not connect to FTP server");
+			e.printStackTrace();
+			throw new FTPException("Could not connect to FTP server :"+replyDesc);
 		} finally {
 			try{
 				if(ftp != null && ftp.isConnected()) {
@@ -822,7 +830,7 @@ public class FTPManager {
 	              String line = convertStreamToString(ftp.retrieveFileStream(file.getName()),"",null);
 	              logger.info("fileName:"+file.getName()+",data["+line+"]");
 	              
-	              data.append(line +"\n");
+	              data.append(file.getName().substring(0,file.getName().indexOf("."))+","+line +"\n");
 	              ftp.completePendingCommand();
 				}
 	        }

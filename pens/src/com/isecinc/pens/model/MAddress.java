@@ -1,13 +1,20 @@
 package com.isecinc.pens.model;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import util.ConvertNullUtil;
+import util.DBCPConnectionProvider;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Address;
+import com.isecinc.pens.bean.Customer;
+import com.isecinc.pens.bean.District;
+import com.isecinc.pens.bean.Province;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
 
 /**
@@ -98,5 +105,58 @@ public class MAddress extends I_Model<Address> {
 			e.printStackTrace();
 		}
 		return pos;
+	}
+	
+	public Address findAddressByCustomerId(Connection conn,String customerId) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		Address a = null;
+		try {
+			String sql = "select  a.*,\n";
+				 sql +=" (select max(d.name) from m_district d where d.district_id = a.district_id) as district_name \n";
+				 sql +=" from m_address a \n";
+				 sql +=" where purpose ='S' \n";	
+				 sql +=" and customer_id = "+customerId;
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				a = new Address();
+				a.setId(rst.getInt("ADDRESS_ID"));
+				a.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				a.setLine1(rst.getString("Line1").trim());
+				a.setLine2(rst.getString("Line2").trim());
+				a.setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());
+				a.setLine4(ConvertNullUtil.convertToString(rst.getString("Line4")).trim());
+				
+				District d = new District();
+				d.setName(rst.getString("district_name"));
+				a.setDistrict(d);
+				Province p = new Province();
+				p.setName(rst.getString("province_name"));
+				a.setProvince(p);
+				
+				a.setPostalCode(rst.getString("POSTAL_CODE").trim());
+				a.setPurpose(rst.getString("PURPOSE").trim());
+				a.setIsActive(rst.getString("ISACTIVE").trim());
+
+			}
+
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+	
+		}
+		
+		return a;
 	}
 }

@@ -169,7 +169,7 @@ public class ExportSQL {
 				"	 s.user_id as user_id	\n"+
 				"	 from m_sales_inventory	s \n";
 			}else if(tableBean.getTableName().equalsIgnoreCase("m_trip")){
-				str ="	select distinct	\n"+
+				str ="select distinct	\n"+
 				"	m.USER_ID	\n"+
 				"	from m_trip	m \n"+
 				"   where ( m.EXPORTED  = 'N' OR m.EXPORTED  IS NULL OR TRIM(m.EXPORTED) ='') \n";
@@ -188,7 +188,22 @@ public class ExportSQL {
 				"	from t_move_order \n"+
 				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
 				"   and request_date <= now() \n";
-			
+				
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_requisition_product")){
+				str ="select \n"+
+					"	'H'	AS 	RECORD_TYPE,	\n"+
+					"	REQUEST_NUMBER  , \n"+
+					"	REQUEST_DATE ,\n"+
+					"	ORGANIZATION_ID , \n"+
+					"	'"+userBean.getCode()+"' AS SALES_CODE , \n"+
+					"	REASON_CODE, \n "+
+					"	REMARK, \n"+
+					"	'O' AS STATUS_O, \n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME	\n"+
+				"	from t_requisition_product \n"+
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
+				"   and request_date <= now() \n";
+				
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_bill_plan")){
 				str ="select \n"+
 					"	'H'	AS 	RECORD_TYPE,	\n"+

@@ -211,6 +211,8 @@ public class ExportManager {
 				MonitorItemBean modelItem = new MonitorItemBean();
 				MonitorItemDetailBean[] modelDetailItem = null;
                 try{
+                	
+                	
 					if(tableBean.getTableName().equalsIgnoreCase("m_customer")){
 					   /** Count Record and Prepare Monitor_item_detail(Data Export) */
 					   modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
@@ -237,6 +239,14 @@ public class ExportManager {
 						   tableBean = exProcess.exportMoveOrder(conn,tableBean,userRequest);	
 						}
 						
+					/** T_REQUISITION_PRODUCT **/	
+					}else if(tableBean.getTableName().equalsIgnoreCase("t_requisition_product")){
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+						   tableBean = exProcess.exportRequisitionProduct(conn,tableBean,userRequest);	
+						}
 						/** T_BILL_PLAN(BILL T) **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_bill_plan")){
 						/** Count Record and Prepare Monitor_item_detail(Data Export)  */

@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import util.DateToolsUtil;
+import util.ReportHelper;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
@@ -82,7 +83,7 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setOrderDate(rst.getString("ORDER_DATE"));
 				p.setCode(rst.getString("CODE"));
 				p.setName(rst.getString("NAME"));
-				p.setOrderNo(rst.getString("ORDER_NO"));
+				p.setOrderNo(ReportHelper.convertOrderNoForReport(rst.getString("ORDER_NO")));
 				p.setDiscount(rst.getDouble("DISCOUNT"));
 				p.setCashAmount(rst.getDouble("CASH_AMOUNT"));
 				p.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));

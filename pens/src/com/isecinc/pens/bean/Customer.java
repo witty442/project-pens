@@ -220,6 +220,36 @@ public class Customer extends I_PO implements Serializable {
 	/** TRIP **/
 	private String trip;
 
+	public String displayExported;
+	public String displayInterfaces;
+	
+	public String displayActionEditCust;
+	public boolean canActionEditCust;
+	
+	public String displayActionEditCust2;
+	public boolean canActionEditCust2;
+	
+	public String displayActionReceipt;
+	public String displayActionView;
+	public String displayActionEdit;
+
+	
+	public String getDisplayActionEditCust2() {
+		return displayActionEditCust2;
+	}
+
+	public void setDisplayActionEditCust2(String displayActionEditCust2) {
+		this.displayActionEditCust2 = displayActionEditCust2;
+	}
+
+	public boolean isCanActionEditCust2() {
+		return canActionEditCust2;
+	}
+
+	public void setCanActionEditCust2(boolean canActionEditCust2) {
+		this.canActionEditCust2 = canActionEditCust2;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -515,18 +545,7 @@ public class Customer extends I_PO implements Serializable {
 	public void setNo(int no) {
 		this.no = no;
 	}
-	
-	public String displayExported;
-	public String displayInterfaces;
-	
-	public String displayActionEditCust;
-	public boolean canActionEditCust;
-	
-	public String displayActionReceipt;
-	public String displayActionView;
-	public String displayActionEdit;
 
-	
 	public boolean isCanActionEditCust() {
 		return canActionEditCust;
 	}
