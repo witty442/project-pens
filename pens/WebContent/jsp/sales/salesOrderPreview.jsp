@@ -89,6 +89,11 @@ function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 }
 
+function printListOrderProductReport(path,userType){
+	var customerId = document.getElementsByName("order.customerId");
+    window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+}
+
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -519,7 +524,11 @@ function loadMe(){
 									   <input type="button" value="บันทึก" class="newPosBtn">
 									</a>
 									<!-- OLD CODE ************************ -->
-									
+									<%if(User.VAN.equals(user.getType())){%>
+									  <a href="#" onclick="printListOrderProductReport('${pageContext.request.contextPath}','<%=user.getType() %>')">
+									   <input type="button" value="พิมพ์ใบหยิบของ" class="newPosBtnLong">
+									  </a> 
+									<%} %>
 									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
 		
 									<input type="button" value="ยกเลิก" class="newNegBtn">

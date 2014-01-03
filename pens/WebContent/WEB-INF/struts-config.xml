@@ -127,6 +127,10 @@
 		<form-bean name="chequeReportForm"
 			type="com.isecinc.pens.web.report.cheque.ChequeReportForm" />
 			
+		<!-- List Order Report REPORT -->
+		<form-bean name="listOrderProductForm"
+			type="com.isecinc.pens.web.report.listOrderProduct.ListOrderProductReportForm" />
+			
 		<!-- INVOICE DETAIL REPORT -->
 		<form-bean name="invoiceDetailReportForm"
 			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportForm" />
@@ -236,6 +240,7 @@
 			<forward name="re-search" path="/jsp/customer/customerSearch.jsp" />
 			<forward name="clearform" path="/jsp/customer/customerSearch.jsp" />
 			<forward name="view" path="/jsp/customer/customerView.jsp" />
+			<forward name="viewEdit" path="/jsp/customer/customerViewEdit.jsp" />
 		</action>
 
 		<!-- CUSTOMER VISIT -->

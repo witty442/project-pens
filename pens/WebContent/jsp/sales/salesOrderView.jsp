@@ -109,6 +109,17 @@ function setNextVisit(path, visitDate, fileType){
 	return true;
 }
 
+function setNextVisitSummary(path, visitDate, fileType){
+	i=0;
+	_path = path;
+	document.getElementsByName('fileType')[0].value = fileType;
+	document.getElementsByName('nextVisitDate')[0].value = visitDate;
+	
+	window.open(path + "/jsp/saleOrderAction.do?do=printReportSummary&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&visitDate="+visitDate+"&fileType="+fileType, "Print1", "width=100,height=100,location=No,resizable=No");
+	
+	return true;
+}
+
 function close(){
 	window.close();
 }
@@ -1046,6 +1057,9 @@ function removeRow(){
 									
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
+									   <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','<%=role %>');">
+										<input type="button" id ="reportBtn" value="พิมพ์แบบย่อ" class="newPosBtn">
+										</a>
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										<input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn">
 										</a>

@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.web.requisitionProduct.RequisitionProductCatalog"%>
+<%@page import="com.isecinc.pens.web.requisitionProduct.RequisitionProductBasket"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.moveorder.MoveOrderProductCatalog"%>
@@ -10,9 +12,9 @@
 <%
 User user = ((User)session.getAttribute("user"));
 String custId = request.getParameter("custId");
-MoveOrderBasket basket = (MoveOrderBasket)session.getAttribute(custId);
+RequisitionProductBasket basket = (RequisitionProductBasket)session.getAttribute(custId);
 if(basket == null ){
-	basket = new MoveOrderBasket();	
+	basket = new RequisitionProductBasket();	
 }
 
 String categoryCode = "";
@@ -31,11 +33,11 @@ if(request.getParameter("pricelistId")!=null)
 	priceListId = request.getParameter("pricelistId");
 
 String whereCause = "";
-List<MoveOrderProductCatalog> catalogs = null;
+List<RequisitionProductCatalog> catalogs = null;
 
 try{	
 	if(categoryCode != null && categoryCode.length()>0){
-		catalogs = new MProduct().getMoveOrderProductCatalogByBrand(categoryCode,orderDate,priceListId,user);
+		catalogs = new MProduct().getRequisitionProductCatalogByBrand(categoryCode,orderDate,priceListId,user);
 	}
 }catch(Exception e){
 	e.printStackTrace();
@@ -58,9 +60,9 @@ try{
 <%
 int rowNo = 0;
 String lineClass = "";
-for(MoveOrderProductCatalog catalog:catalogs) {
+for(RequisitionProductCatalog catalog:catalogs) {
 	String disable ="";
-	MoveOrderProductCatalog item = basket.getBasketItem(catalog);
+	RequisitionProductCatalog item = basket.getBasketItem(catalog);
 	String qty1 = "";
 	String qty2 = "";
 	String lineAmt = "";
@@ -81,7 +83,6 @@ for(MoveOrderProductCatalog catalog:catalogs) {
 	}else{
 		lineClass  ="pop_lineE";
 	}
-
 %>
 <tr class="<%=lineClass%>">
 <td align="center" valign="middle">

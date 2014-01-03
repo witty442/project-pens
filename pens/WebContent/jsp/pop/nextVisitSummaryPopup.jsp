@@ -51,7 +51,7 @@ function gotoReport(path){
 	}else{
 		fileType = document.getElementsByName('fileType')[1].value;
 	}
-	window.opener.setNextVisit(path, nextVisitDate, fileType);
+	window.opener.setNextVisitSummary(path, nextVisitDate, fileType);
 	window.close();
 }
 
@@ -78,7 +78,7 @@ function gotoReport(path){
 	<tr>
 		<td align="right"><bean:message key="ReportFormat" bundle="sysele"/>&nbsp;&nbsp;</td>
 		<td align="left" colspan="2">
-		    <input type="radio" name="fileType" value="PDF" checked="checked">&nbsp;<bean:message key="PDF" bundle="sysele"/>&nbsp;&nbsp;
+		   <%--  <input type="radio" name="fileType" value="PDF" checked="checked">&nbsp;<bean:message key="PDF" bundle="sysele"/>&nbsp;&nbsp; --%>
 			<input type="radio" name="fileType" value="PRINTER" checked="checked">&nbsp;<bean:message key="Printer" bundle="sysele"/>
 		</td>
 	</tr>

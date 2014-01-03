@@ -112,7 +112,7 @@ body {
 .brandName{width:120px;vertical-align:top;}
 
 table#productList thead{background:#FFE4CA;}
-.qtyInput{width:35px; text-align:right;}
+.qtyInput{height:30px;width:35px; text-align:right;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
@@ -236,7 +236,6 @@ $(function(){
 			width: 770,
 			height : 380,
 			modal:true,
-			position:'fixed',
 			title:"กำหนดรายการสินค้าที่ต้องการ",
 			buttons: {
 				"OK": function() { addProductToBasket(); }, 

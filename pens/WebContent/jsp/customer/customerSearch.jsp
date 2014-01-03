@@ -177,8 +177,7 @@ function loadProvince(){
 							    </display:column>	
 							    <display:column  title="ÂÍ´ºÔÅ¤éÒ§ªÓÃÐ " sortable="false" class="cust_totalInvoice">
 							        <fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/>
-							    </display:column>		
-							    	
+							    </display:column>						    
 							    <display:column  title="âÍ¹¢éÍÁÙÅáÅéÇ" sortable="false" class="cust_exported" >	
 								    <c:if test="${item.exported=='Y'}">
 										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
@@ -208,6 +207,11 @@ function loadProvince(){
 									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
 									  </a>
 									</c:if>
+									<c:if test="${item.canActionEditCust2=='true'}">
+							          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
+									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+									  </a>
+									</c:if>
 							    </display:column>		
 							    
 							    <display:column  title="áÊ´§" sortable="false" class="cust_actionView">
@@ -223,8 +227,6 @@ function loadProvince(){
 					</display:table>
 					
 				<!-- Result -->	
-				
-				
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">

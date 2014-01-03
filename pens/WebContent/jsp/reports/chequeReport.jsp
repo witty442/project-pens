@@ -120,7 +120,7 @@ function clearForm(path){
 								<td align="left">
 									<!--<html:radio property="criteria.fileType" value="XLS"/>&nbsp;<bean:message key="Excel" bundle="sysele"/>&nbsp;&nbsp;-->
 									<html:radio property="criteria.fileType" value="PDF"/>&nbsp;<bean:message key="PDF" bundle="sysele"/>&nbsp;&nbsp;
-									<html:radio property="criteria.fileType" value="PRINTER"/>&nbsp;<bean:message key="Printer" bundle="sysele"/>
+									<%-- <html:radio property="criteria.fileType" value="PRINTER"/>&nbsp;<bean:message key="Printer" bundle="sysele"/> --%>
 								</td>
 							</tr>
 						</table>
