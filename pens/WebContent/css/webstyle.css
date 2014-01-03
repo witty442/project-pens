@@ -230,6 +230,22 @@ TABLE.result TD {
 	background-color: red;
 }
 
+.pop_lineE {
+	background-color: #F8F2E8;
+}
+
+.pop_lineE:hover {
+	background-color: #FFBBFF;
+}
+
+.pop_lineO {
+	background-color: #e7eefa;
+}
+
+.pop_lineO:hover {
+	background-color: #FFBBFF;
+}
+
 input,texarea,button {
 	border: 1px solid;
 	border-color: #BEBEBE;
@@ -318,7 +334,7 @@ TABLE.result2 TD {
 
 .newPosBtnLong {
 	font-weight: bold;
-	/**background-color: #1E90FF;**/
+	background-color: #B2DFEE;
 	color: #529214;
 	height: 25px;
 }
