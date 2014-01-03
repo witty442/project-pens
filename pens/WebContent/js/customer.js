@@ -60,6 +60,12 @@ function save(path) {
 	return true;
 }
 
+function saveEdit(path) {
+	document.customerForm.action = path + "/jsp/customerAction.do?do=saveEdit";
+	document.customerForm.submit();
+	return true;
+}
+
 function clearForm(path){
 	document.customerForm.action = path + "/jsp/customerAction.do?do=clearForm";
 	document.customerForm.submit();

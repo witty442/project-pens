@@ -39,7 +39,7 @@ function cancelRequisitionProduct(path){
 	if(confirm("ยืนยันการ ยกเลิกรายการ")){
 		var input= confirmInputReason();
 		if(input){
-			document.getElementsByName('requisitionProduct.description')[0].value = input;
+			document.getElementsByName('requisitionProduct.cancelReason')[0].value = input;
 		    document.requisitionProductForm.action = path + "/jsp/requisitionProductAction.do?do=cancelRequisitionProduct";
 		    document.requisitionProductForm.submit();
 		    return true;
@@ -64,12 +64,6 @@ function viewRequisitionProduct(path,requestNumber){
 
 function save(path){
 	var requestDate = document.getElementsByName('requisitionProduct.requestDate')[0];
-	var pdCode = document.getElementsByName('requisitionProduct.pdCode')[0];
-	
-	if(pdCode.value ==''){
-		alert("กรุณาใส่ข้อมูล PD");
-		return false;
-	}
 	
 	if(requestDate.value ==''){
 		alert("กรุณาใส่วันที่ทำรายการ");
@@ -100,7 +94,7 @@ function save(path){
 	return true;
 }
 
-function backsearch(path,moveOrderType) {
+function backsearch(path) {
 
 	document.requisitionProductForm.action = path + "/jsp/requisitionProductAction.do?do=prepare"+"&action=back";
 	document.requisitionProductForm.submit();
@@ -389,7 +383,7 @@ function calculatePrice(){
 	for(i=0;i<totals1.length;i++){
 		sumAmount += Number(amounts1[i].value) + Number(amounts2[i].value);
 	}
-	document.getElementsByName("moveOrder.totalAmount")[0].value = addCommas(Number(toFixed(sumAmount,5)).toFixed(2));
+	document.getElementsByName("requisitionProduct.totalAmount")[0].value = addCommas(Number(toFixed(sumAmount,5)).toFixed(2));
 
 }
 
