@@ -158,17 +158,7 @@ function gotoReport(path, role){
 	window.open(path + "/jsp/pop/nextVisitPopup.jsp?rand="+rand+"&role="+role, "Print Receipt/Tax Invoice", "width="+w+",height="+h+", top="+top+", left="+left+",location=0,resizable=0");
 }
 
-function gotoSummaryReport(path, role){
-	/*var rand = Math.floor(Math.random()*11);
-	var w = 700;
-	var h = 280;
-	var left =  (screen.width/2)-(w/2);
-    var top = (screen.height/2)-(h/2);*/
-	//window.open(path + "/jsp/pop/nextVisitSummaryPopup.jsp?rand="+rand+"&role="+role, "Print Receipt/Tax Invoice", "width="+w+",height="+h+", top="+top+", left="+left+",location=0,resizable=0");
-    var fileType ='PRINTER';
-    window.open(path + "/jsp/saleOrderAction.do?do=printReportSummary&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&fileType="+fileType, "Print1", "width=100,height=100,location=No,resizable=No");
-	
-}
+
 
 function presave(path) {
 	if(document.getElementsByName('order.shipAddressId')[0].value==''){

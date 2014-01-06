@@ -91,7 +91,8 @@ function loadMe(){
 
 function printListOrderProductReport(path,userType){
 	var customerId = document.getElementsByName("order.customerId");
-    window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+   // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/pop/printPopup.jsp?type_report=list_order_product&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
 }
 
 </script>

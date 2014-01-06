@@ -120,6 +120,10 @@ function setNextVisitSummary(path, visitDate, fileType){
 	return true;
 }
 
+function gotoSummaryReport(path, role){
+ window.open(path + "/jsp/pop/printPopup.jsp?type_report=tax_invoice_summary&orderId="+document.getElementsByName('order.id')[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+}
+
 function close(){
 	window.close();
 }

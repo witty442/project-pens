@@ -49,7 +49,7 @@
 				<text><![CDATA[ลูกค้า:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="26" width="205" height="16"/>
+				<reportElement x="0" y="26" width="201" height="16"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="6" isBold="true" pdfEncoding="Identity-H"/>
 				</textElement>
@@ -57,14 +57,14 @@
 กรุงเทพฯ 10120 โทร. 0-2294-7300 โทรสาร. 0-2294-7560 ]]></text>
 			</staticText>
 			<textField pattern="">
-				<reportElement x="143" y="42" width="61" height="12"/>
+				<reportElement x="143" y="42" width="59" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="6" isBold="true"/>
+					<font fontName="SansSerif" size="6" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["วันที่:"+$P{p_orderDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="18" y="54" width="90" height="12"/>
+				<reportElement x="18" y="54" width="88" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="6" isBold="true"/>
 				</textElement>
@@ -78,7 +78,7 @@
 				<text><![CDATA[ที่อยู่:]]></text>
 			</staticText>
 			<textField pattern="">
-				<reportElement x="16" y="66" width="80" height="12"/>
+				<reportElement x="16" y="66" width="78" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="6" isBold="true"/>
 				</textElement>
@@ -99,7 +99,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{custAddress2}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="13" width="206" height="13"/>
+				<reportElement x="0" y="13" width="202" height="13"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7" isBold="true" pdfEncoding="Identity-H"/>
 				</textElement>
@@ -133,9 +133,9 @@
 				<text><![CDATA[ราคา/หน่วย]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="96" y="66" width="108" height="13"/>
+				<reportElement x="95" y="66" width="107" height="13"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="6" isBold="true" pdfEncoding="Identity-H"/>
+					<font fontName="SansSerif" size="6" isBold="false" pdfEncoding="Identity-H"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["พนักงานขาย  " + $P{p_code} + " " + $P{p_name}]]></textFieldExpression>
 			</textField>
@@ -173,9 +173,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_custTaxNo} != null?"\u0E40\u0E25\u0E02\u0E1B\u0E23\u0E30\u0E08\u0E33\u0E15\u0E31\u0E27\u0E1C\u0E39\u0E49\u0E40\u0E2A\u0E35\u0E22\u0E20\u0E32\u0E29\u0E35 "+$P{p_custTaxNo} +" \u0E2A\u0E33\u0E19\u0E31\u0E01\u0E07\u0E32\u0E19\u0E43\u0E2B\u0E0D\u0E48":""]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement stretchType="RelativeToTallestObject" x="110" y="54" width="94" height="12"/>
+				<reportElement stretchType="RelativeToTallestObject" x="108" y="54" width="94" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="6" isBold="true" pdfEncoding="Identity-H"/>
+					<font fontName="SansSerif" size="6" isBold="false" pdfEncoding="Identity-H"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[($P{p_receiptNo}!=null? "\u0e40\u0e25\u0e02\u0e17\u0e35\u0e48 " + $P{p_receiptNo}:"")]]></textFieldExpression>
 			</textField>

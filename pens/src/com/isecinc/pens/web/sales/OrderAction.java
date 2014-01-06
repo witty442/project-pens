@@ -1175,7 +1175,7 @@ public class OrderAction extends I_Action {
 		try {
 			boolean baddr = false;
 			String fileType = request.getParameter("fileType");
-			String orderId = request.getParameter("id");
+			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
             
 			logger.debug("fileType:"+fileType);
@@ -1271,7 +1271,7 @@ public class OrderAction extends I_Action {
 				 conn.close();
 			} catch (Exception e2) {}
 		}
-		return null;
+		return mapping.findForward("print");
 	}
 	
 	public String[] splitAddress(Address a) {
@@ -1386,7 +1386,7 @@ public class OrderAction extends I_Action {
 			} catch (Exception e2) {}
 		}
 		// return null;
-		return null;
+		return mapping.findForward("print");
 	}
 
 	/**
