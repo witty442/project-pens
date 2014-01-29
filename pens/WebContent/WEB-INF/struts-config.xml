@@ -173,7 +173,8 @@
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request"
 			type="com.isecinc.pens.web.login.LoginAction">
-			<forward name="pass" path="/jsp/mainpage.jsp" redirect="true" />
+			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
+			<forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" />
 			<forward name="fail" path="/index.jsp" />
 		</action>
 

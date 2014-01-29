@@ -19,7 +19,6 @@
 	<parameter name="p_vatcode" class="java.lang.String"/>
 	<parameter name="p_receiptNo" class="java.lang.String"/>
 	<parameter name="p_receipt_by_msg" class="java.lang.String"/>
-	<parameter name="p_create_date" class="java.lang.String"/>
 	<field name="id" class="java.lang.Integer"/>
 	<field name="orderID" class="java.lang.String"/>
 	<field name="productCode" class="java.lang.String"/>
@@ -42,19 +41,19 @@
 		<band splitType="Stretch"/>
 	</background>
 	<pageHeader>
-		<band height="126" splitType="Stretch">
+		<band height="128" splitType="Stretch">
 			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 			<staticText>
 				<reportElement x="0" y="70" width="18" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ลูกค้า:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="24" width="199" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="6" isBold="false"/>
+					<font fontName="Browallia New" size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
  โทร. 0-2294-7300 โทรสาร. 0-2294-7560 สำนักงานใหญ่]]></text>
@@ -62,54 +61,54 @@
 			<textField pattern="">
 				<reportElement x="130" y="57" width="69" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["วันที่:"+$P{p_orderDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
 				<reportElement x="18" y="70" width="95" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{custName}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="114" y="70" width="16" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ที่อยู่:]]></text>
 			</staticText>
 			<textField pattern="">
 				<reportElement x="130" y="70" width="78" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{custAddress1}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="2" y="0" width="197" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="8" isBold="true"/>
+					<font fontName="Browallia New" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_report_title}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
 				<reportElement x="1" y="82" width="207" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{custAddress2}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="12" width="199" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="8" isBold="false"/>
+					<font fontName="Browallia New" size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[บริษัท เพนส์ มาร์เก็ตติ้ง แอนด์ ดิสทริบิวชั่น จำกัด]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="1" y="107" width="43" height="18" backcolor="#CCCCCC"/>
+				<reportElement mode="Transparent" x="1" y="107" width="43" height="21" backcolor="#CCCCCC"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -117,13 +116,13 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[สินค้า
 จำนวน]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="43" y="107" width="51" height="18" backcolor="#CCCCCC"/>
+				<reportElement mode="Transparent" x="43" y="107" width="51" height="21" backcolor="#CCCCCC"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -131,12 +130,12 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ราคา/หน่วย]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="94" y="107" width="44" height="18" backcolor="#CCCCCC"/>
+				<reportElement mode="Transparent" x="94" y="107" width="44" height="21" backcolor="#CCCCCC"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -144,12 +143,12 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ส่วนลด(บาท)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="138" y="107" width="52" height="18" backcolor="#CCCCCC"/>
+				<reportElement mode="Transparent" x="138" y="107" width="52" height="21" backcolor="#CCCCCC"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -157,28 +156,28 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[จำนวนเงิน]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="1" y="94" width="207" height="12" isPrintWhenDetailOverflows="true"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_custTaxNo} != null?"เลขประจำตัวผู้เสียภาษี "+$P{p_custTaxNo} +" \u0E2A\u0E33\u0E19\u0E31\u0E01\u0E07\u0E32\u0E19\u0E43\u0E2B\u0E0D\u0E48":""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement stretchType="RelativeToTallestObject" x="0" y="57" width="126" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[($P{p_receiptNo}!=null? "เลขที่ " + $P{p_receiptNo}:"")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="1" y="42" width="198" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["เลขประจำตัวผู้เสียภาษี "+$P{p_taxNo}]]></textFieldExpression>
 			</textField>
@@ -201,7 +200,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{productCode}+" "+$F{productName}]]></textFieldExpression>
 			</textField>
@@ -214,7 +213,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{salePrice}]]></textFieldExpression>
 			</textField>
@@ -227,7 +226,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{mainQty} + "/" + $F{subQty}]]></textFieldExpression>
 			</textField>
@@ -240,7 +239,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{discount}]]></textFieldExpression>
 			</textField>
@@ -253,7 +252,7 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{lineAmount}]]></textFieldExpression>
 			</textField>
@@ -263,18 +262,18 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<summary>
-		<band height="110" splitType="Stretch">
+		<band height="100" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="58" width="100" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ลงชื่อ:.....................................]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="101" y="58" width="106" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ลงชื่อ:..................................... ]]></text>
 			</staticText>
@@ -287,63 +286,63 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7"/>
+					<font fontName="Browallia New" size="7"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField pattern="#,##0.00">
 				<reportElement x="130" y="2" width="61" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_total_amount}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="45" y="26" width="85" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[รวมเงินทั้งสิน]]></text>
 			</staticText>
 			<textField pattern="#,##0.00">
 				<reportElement x="130" y="26" width="61" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_total_amount}+($V{v_sum_total_amount}*(Integer.parseInt($P{p_vatcode})/100))]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="45" y="14" width="85" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["ภาษีมูลค่าเพิ่ม "+$P{p_vatcode}+"%"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="130" y="14" width="61" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_total_amount}*(Integer.parseInt($P{p_vatcode})/100)]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="45" y="2" width="85" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7" isBold="true"/>
+					<font fontName="Browallia New" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[รวมเงิน]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="120" y="70" width="71" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ผู้รับสินค้า]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="14" y="70" width="72" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ ผู้ส่งสินค้า/ผู้รับเงิน ]]></text>
 			</staticText>
@@ -356,59 +355,45 @@
 					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="7"/>
+					<font fontName="Browallia New" size="7"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="2" y="38" width="41" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<text><![CDATA[รับชำระโดย]]></text>
 			</staticText>
 			<textField pattern="">
 				<reportElement x="43" y="38" width="164" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_receipt_by_msg}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="2" y="98" width="203" height="12"/>
+				<reportElement x="1" y="82" width="117" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="9" isBold="false"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["พนักงานขาย "+$P{p_code} + " " + $P{p_name}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_code} + " " + $P{p_name}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd/MM/yyyy HH:mm">
-				<reportElement x="144" y="86" width="60" height="12"/>
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="147" y="82" width="58" height="12"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="111" y="86" width="33" height="12"/>
+				<reportElement x="119" y="82" width="27" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
+					<font fontName="Browallia New" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[พิมพ์วันที่:]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="2" y="86" width="48" height="12"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
-				</textElement>
-				<text><![CDATA[วันทีทำรายการ:]]></text>
-			</staticText>
-			<textField pattern="">
-				<reportElement x="50" y="86" width="60" height="12"/>
-				<textElement verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="7" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_create_date}]]></textFieldExpression>
-			</textField>
 		</band>
 	</summary>
 </jasperReport>

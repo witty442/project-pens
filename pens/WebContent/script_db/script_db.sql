@@ -1,0 +1,11 @@
+CREATE INDEX IDX_m_customer_1 
+ON pens.m_customer (CUSTOMER_TYPE, ISACTIVE, USER_ID);
+
+CREATE INDEX IDX_m_customer_2
+ON pens.m_customer (CUSTOMER_TYPE, ISACTIVE, USER_ID,NAME,CODE);
+
+CREATE INDEX IDX_m_customer_3
+ON pens.m_customer (CUSTOMER_TYPE, ISACTIVE, USER_ID,NAME);
+
+CREATE INDEX IDX_m_customer_4
+ON pens.m_customer (CUSTOMER_TYPE, ISACTIVE, USER_ID,CODE);
