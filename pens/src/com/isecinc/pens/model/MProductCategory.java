@@ -160,7 +160,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		return pos;
 	}
 
-	public static int NO_OF_DISPLAY_COLUMNS = 4;
+	public static int NO_OF_DISPLAY_COLUMNS = 5;
 	public static int NO_OF_DISPLAY_ROWS = 3;
 	public static int NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE = NO_OF_DISPLAY_COLUMNS * NO_OF_DISPLAY_ROWS ;
 	

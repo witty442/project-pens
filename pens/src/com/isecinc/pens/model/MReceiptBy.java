@@ -102,6 +102,17 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 		}
 		return pos;
 	}
+	
+	public List<ReceiptBy> lookUp(String receiptNo) {
+		List<ReceiptBy> pos = new ArrayList<ReceiptBy>();
+		try {
+			String whereCause = " AND RECEIPT_ID = (select receipt_id from t_receipt where receipt_no='" + receiptNo + "') ORDER BY PAYMENT_METHOD DESC";
+			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, ReceiptBy.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pos;
+	}
 
 	/**
 	 * Delete
@@ -145,6 +156,8 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 		}
 		return true;
 	}
+	
+	
 	
 	
 }

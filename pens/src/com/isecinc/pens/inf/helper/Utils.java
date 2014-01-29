@@ -2,6 +2,7 @@
 package com.isecinc.pens.inf.helper;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,11 +42,9 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	String s1 ="เลขประจำตัวผู้เสียภาษี";
-	    	String s2 ="สำนักงานใหญ่";
+	    	BigDecimal value1 = new BigDecimal("39.24").setScale(0,BigDecimal.ROUND_UP);
+	    	System.out.println(value1);
 	    	
-	    	System.out.println(toUnicodeChar(s1));
-	    	System.out.println(toUnicodeChar(s2));
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -290,6 +289,13 @@ public class Utils {
 			return 0;
 		}
 		return Integer.parseInt(str);
+	}
+	
+	public static double convertStrToDouble(String str) {
+		if (str ==null || "".equals(str)){
+			return 0;
+		}
+		return new Double(str).doubleValue();
 	}
 	
 	public static boolean isBlank(Object o) {

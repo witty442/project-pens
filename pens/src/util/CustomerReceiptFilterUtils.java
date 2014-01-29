@@ -28,16 +28,14 @@ public class CustomerReceiptFilterUtils {
 	 * @return
 	 * :for van 
 	 */
-	public  static String canReceiptCheque(int customerId){
+	public  static String canReceiptCheque(Connection conn,int customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection conn = null;
 		try{
 			String sql = "select count(*) as x from m_customer c, c_customer_receipt_cheque r \n" +
 					" where c.customer_id ="+customerId+" and (r.isactive ='Y' or r.isactive is null or trim(r.isactive) ='') \n"+
 					" and r.customer_code = c.code \n";
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -51,9 +49,42 @@ public class CustomerReceiptFilterUtils {
 			e.printStackTrace();
 		}finally{
 			try{
-				if(conn != null){
-				   conn.close();conn=null;
+				
+				if(rs !=null){
+				   rs.close();rs=null;
 				}
+				if(ps !=null ){
+				  ps.close();ps=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return canFlag;
+	}
+	
+	public  static String canReceiptCredit(Connection conn,int customerId){
+		String canFlag = "N";
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try{
+			String sql = "select count(*) as x from m_customer c, c_customer_receipt_credit r \n" +
+					" where c.customer_id ="+customerId+" and (r.isactive ='Y' or r.isactive is null or trim(r.isactive) ='') \n"+
+					" and r.customer_code = c.code \n";
+			
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				if(rs.getInt("x") > 0){
+					canFlag = "Y";
+				}
+			}
+			
+			logger.debug("canFlag:"+canFlag);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
 				if(rs !=null){
 				   rs.close();rs=null;
 				}

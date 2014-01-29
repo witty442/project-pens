@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.customer;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.DecimalFormat;
 
@@ -42,6 +43,7 @@ import com.isecinc.pens.model.MTrxHistory;
 
 public class CustomerAction extends I_Action {
 
+	private int MAX_ROW_PAGE = 50;
 	/**
 	 * Prepare
 	 */
@@ -132,6 +134,190 @@ public class CustomerAction extends I_Action {
 		logger.debug("Customer Search");
 		CustomerForm customerForm = (CustomerForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+        int currPage = 1;
+        int totalRow = 0;
+        int totalPage = 0;
+        int start = 0;
+        int end = 50;
+		try {
+			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
+			customerForm.setCriteria(criteria);
+			String whereCause = "";
+			if (customerForm.getCustomer().getTerritory() != null
+					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
+				whereCause += " AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+			}
+			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
+				whereCause += " AND m_customer.CODE LIKE '%"
+						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
+				whereCause += " AND m_customer.NAME LIKE '%"
+						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getIsActive() != null
+					&& !customerForm.getCustomer().getIsActive().equals("")) {
+				whereCause += " AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+			}
+			// WIT EDIT :04/08/2554 
+			if(!User.ADMIN.equals(user.getType())){
+			   whereCause += " AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += " AND m_customer.USER_ID = " + user.getId();
+			}
+			
+			if (customerForm.getCustomer().getSearchProvince() != 0) {
+				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
+				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
+						 + ")";
+			}
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			//** get From Session **/
+			//currPage = customerForm.getCurPage();
+			//totalRow = customerForm.getTotalRow();
+			
+			/** Get TotalRow **/
+		    totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
+		    if(totalRow > 0){
+		    	double t = new Double(totalRow)/new Double(MAX_ROW_PAGE);
+		    	logger.debug("t:"+t);
+		    	BigDecimal totalPageB = new BigDecimal(t);
+		    	totalPageB = totalPageB.setScale(0,BigDecimal.ROUND_UP);
+		    	
+		    	logger.debug("totalPageB:"+totalPageB);
+		    	
+			    totalPage = totalPageB.intValue();
+		    }
+		    
+			logger.debug("totalRow:"+totalRow);
+			logger.debug("totalPage:"+totalPage);
+			logger.debug("currPage:"+currPage);
+			
+			end = 50;
+			whereCause +="\n limit "+start+","+end;
+			
+			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start);//new method optimize
+			customerForm.setResults(results);
+			customerForm.setTotalPage(totalPage);
+			customerForm.setTotalRow(totalRow);
+			customerForm.setCurPage(currPage);
+
+			if (results != null) {
+				customerForm.getCriteria().setSearchResult(results.length);
+			} else {
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+			}
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return "search";
+	}
+	
+	public ActionForward searchPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		logger.debug("Customer Search Page");
+		CustomerForm customerForm = (CustomerForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+        int currPage = 1;
+        int totalRow = 0;
+        int totalPage = 0;
+        int start = 0;
+        int end = 50;
+		try {
+			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
+			customerForm.setCriteria(criteria);
+			String whereCause = "";
+			if (customerForm.getCustomer().getTerritory() != null
+					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
+				whereCause += " AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+			}
+			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
+				whereCause += " AND m_customer.CODE LIKE '%"
+						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
+				whereCause += " AND m_customer.NAME LIKE '%"
+						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getIsActive() != null
+					&& !customerForm.getCustomer().getIsActive().equals("")) {
+				whereCause += " AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+			}
+			// WIT EDIT :04/08/2554 
+			if(!User.ADMIN.equals(user.getType())){
+			   whereCause += " AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += " AND m_customer.USER_ID = " + user.getId();
+			}
+			
+			if (customerForm.getCustomer().getSearchProvince() != 0) {
+				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
+				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
+						 + ")";
+			}
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			//** get From Session **/
+			currPage = customerForm.getCurPage();
+			totalPage = customerForm.getTotalPage();
+			totalRow = customerForm.getTotalRow();
+
+			logger.debug("totalRow:"+totalRow);
+			logger.debug("totalPage:"+totalPage);
+			logger.debug("currPage:"+currPage);
+			
+			start = (currPage-1)*MAX_ROW_PAGE;
+			end =  MAX_ROW_PAGE;
+			
+			logger.debug("start["+start+"]end["+end+"]");
+			
+			whereCause +="\n limit "+start+","+end;
+			
+			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start);//new method optimize
+			
+			logger.debug("results.length:"+results.length);
+			
+			customerForm.setResults(results);
+			customerForm.setTotalPage(totalPage);
+			customerForm.setTotalRow(totalRow);
+			customerForm.setCurPage(currPage);
+			
+			if (results != null) {
+				customerForm.getCriteria().setSearchResult(results.length);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return mapping.findForward("search"); 
+	}
+	
+	
+	protected String search_V1(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.debug("Customer Search");
+		CustomerForm customerForm = (CustomerForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 
 		try {
 			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
@@ -170,7 +356,7 @@ public class CustomerAction extends I_Action {
 			}
 
 			//Customer[] results = new MCustomer().search(whereCause);
-			Customer[] results = new MCustomer().searchOpt(whereCause,user);//new method optimize
+			Customer[] results = new MCustomer().searchOpt(whereCause,user,0);//new method optimize
 			customerForm.setResults(results);
 
 			if (results != null) {

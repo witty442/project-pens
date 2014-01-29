@@ -25,6 +25,7 @@ import util.ConvertNullUtil;
 import util.CustomerReceiptFilterUtils;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.NumberToolsUtil;
 import util.ReportHelper;
 import util.ReportUtilServlet;
 
@@ -58,6 +59,7 @@ import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MProvince;
 import com.isecinc.pens.model.MReceipt;
+import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.process.order.OrderProcess;
@@ -87,6 +89,7 @@ public class OrderAction extends I_Action {
 		OrderForm orderForm = (OrderForm) form;
 		String action = request.getParameter("action") != null ? (String) request.getParameter("action") : "";
 		logger.debug("prepare 0");
+		Connection conn = null;
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
 			Customer customer = null;
@@ -116,9 +119,20 @@ public class OrderAction extends I_Action {
 				customerId = orderForm.getOrder().getCustomerId();
 			}
 			
-			//Filter Check Van Can Receipt Cheque
-			orderForm.setCanReceiptCheque(CustomerReceiptFilterUtils.canReceiptCheque(customerId));
-
+			//Filter Check Van Can Receipt Cheque Or Credit
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,customerId);
+			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,customerId);
+			
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			  orderForm.setCanReceiptMoreCash("Y");
+			}else{
+			  orderForm.setCanReceiptMoreCash("N");
+			}
+			
+			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
+			
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
@@ -229,6 +243,10 @@ public class OrderAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			return forward;
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
 		}
 		return forward;
 	}
@@ -276,7 +294,7 @@ public class OrderAction extends I_Action {
 	 */
 	public ActionForward prepareEditOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		
+		Connection conn = null;
 		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
@@ -302,6 +320,18 @@ public class OrderAction extends I_Action {
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
 
+			//Filter Check Van Can Receipt Cheque Or Credit
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+			
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			  orderForm.setCanReceiptMoreCash("Y");
+			}else{
+			  orderForm.setCanReceiptMoreCash("N");
+			}
+			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
 			// Prepare order line to Edit
 			/** Promotion Process add add to Lines */
 			// remove promotion line
@@ -336,6 +366,13 @@ public class OrderAction extends I_Action {
 					+ e.getMessage());
 			return mapping.findForward("prepare");
 		} finally {
+			try{
+				if(conn != null){
+			       conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
 		}
 		return mapping.findForward("prepareEditOrder");
 	}
@@ -346,7 +383,7 @@ public class OrderAction extends I_Action {
 	 */
 	public ActionForward prepareEditReceipt(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		
+		Connection conn = null;
 		OrderForm orderForm = (OrderForm) form;
 		Order order = null;
 		int roundTrip = 0;
@@ -371,6 +408,18 @@ public class OrderAction extends I_Action {
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
 			
+			//Filter Check Van Can Receipt Cheque Or Credit
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+			
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			  orderForm.setCanReceiptMoreCash("Y");
+			}else{
+			  orderForm.setCanReceiptMoreCash("N");
+			}
+			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
 			
@@ -379,6 +428,14 @@ public class OrderAction extends I_Action {
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
+		}finally{
+			try{
+				if(conn != null){
+				  conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
 		}
 		return mapping.findForward("prepareEditReceipt");
 	}
@@ -464,6 +521,18 @@ public class OrderAction extends I_Action {
 			OrderForm orderForm = (OrderForm) form;
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			User userActive = (User) request.getSession().getAttribute("user");
+			
+			//Filter Check Van Can Receipt Cheque Or Credit
+			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			   orderForm.setCanReceiptMoreCash("Y");
+			}else{
+			   orderForm.setCanReceiptMoreCash("N");
+			}
+			
+			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
 			if (!userActive.getType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
 				/** Promotion Process add add to Lines */
 				// remove promotion line
@@ -488,11 +557,11 @@ public class OrderAction extends I_Action {
 				line.setTotalAmount(line.getLineAmount());
 			}
 
-			if (!userActive.getRole().getKey().equals(User.DD)) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
+			
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
 						.getSession().getAttribute("memberVIP")));
-				orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
-			}
+			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
+			
 
 			// Re-Calculate
 			// new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
@@ -528,18 +597,17 @@ public class OrderAction extends I_Action {
 
 			// check Token
 			if (!isTokenValid(request)) {
-				if (!orderForm.getOrder().getOrderType().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
-					// VAN && TT
-					Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-					orderForm.setOrder(new Order());
-					orderForm.getOrder().setCustomerId(customer.getId());
-					orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
-					// from customer or member
-					orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
-					orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
-					orderForm.getOrder().setVatCode(customer.getVatCode());
+			
+				// VAN && TT
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				orderForm.setOrder(new Order());
+				orderForm.getOrder().setCustomerId(customer.getId());
+				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
+				// from customer or member
+				orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
+				orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
+				orderForm.getOrder().setVatCode(customer.getVatCode());
 					
-				} 
 				orderForm.getLines().clear();
 				return "prepare";
 			}
@@ -800,17 +868,17 @@ public class OrderAction extends I_Action {
 		try {
 			// check Token
 			if (!isTokenValid(request)) {
-				if (!orderForm.getOrder().getOrderType().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
-					// VAN && TT
-					Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-					orderForm.setOrder(new Order());
-					orderForm.getOrder().setCustomerId(customer.getId());
-					orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
-					// from customer or member
-					orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
-					orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
-					orderForm.getOrder().setVatCode(customer.getVatCode());
-				} 
+				
+				// VAN && TT
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				orderForm.setOrder(new Order());
+				orderForm.getOrder().setCustomerId(customer.getId());
+				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
+				// from customer or member
+				orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
+				orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
+				orderForm.getOrder().setVatCode(customer.getVatCode());
+				
 				orderForm.getLines().clear();
 				return mapping.findForward("prepare");
 			 }
@@ -855,10 +923,9 @@ public class OrderAction extends I_Action {
 	        }
 	       
 			// Set Lines to Show
-			if (!user.getRole().getKey().equals(User.DD)) {
-				List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
-				orderForm.setLines(lines);
-			} 
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			
 			conn.commit();
 		
 			//
@@ -1177,8 +1244,9 @@ public class OrderAction extends I_Action {
 			String fileType = request.getParameter("fileType");
 			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
+			String reportType = request.getParameter("reportType");
             
-			logger.debug("fileType:"+fileType);
+			logger.debug("reportType:"+reportType);
 			
 			order = new MOrder().find(orderId);
 			reportForm.setOrder(order);
@@ -1187,14 +1255,54 @@ public class OrderAction extends I_Action {
 			lines = reportForm.getLines();
 			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
 
+			//Check Cash or Cheque
+			String pReceiptByMsg = "เงินสด ";
+			String pReportTitle = "ใบส่งสินค้า/ใบกำกับภาษี/ใบเสร็จรับเงิน"; //default
+			List<ReceiptBy> receiptByList = new MReceiptBy().lookUp(receiptNo);
+			
+			if(receiptByList != null && receiptByList.size() >0){
+				ReceiptBy receiptBy = receiptByList.get(0);
+				if("CS".equalsIgnoreCase(receiptBy.getPaymentMethod())){
+					if("Y".equals(order.getIsCash())){
+					   pReceiptByMsg = "เงินสด";	
+					}else{
+						 pReceiptByMsg = "เงินเชื่อ";
+						 pReportTitle = "ใบส่งสินค้า"; 
+					}
+				}else if("CH".equalsIgnoreCase(receiptBy.getPaymentMethod())){
+					 pReceiptByMsg = "เช็ค เลขที่  "+receiptBy.getChequeNo();
+				}
+				if(receiptByList.size() ==2){
+					 receiptBy = receiptByList.get(1);
+					if("CS".equalsIgnoreCase(receiptBy.getPaymentMethod())){
+						if("Y".equals(order.getIsCash())){
+						   pReceiptByMsg += " ,เงินสด";	
+						}else{
+						   pReceiptByMsg += " ,เงินเชื่อ";	
+						}
+					}else if("CH".equalsIgnoreCase(receiptBy.getPaymentMethod())){
+						 pReceiptByMsg += " ,เช็ค เลขที่  "+receiptBy.getChequeNo();
+					}
+				}
+			}
+			
+			//original or copy report
+			if("original".equalsIgnoreCase(reportType)){
+				pReportTitle +="(ต้นฉบับ)";
+			}else if("copy".equalsIgnoreCase(reportType)){ 
+				pReportTitle +="(สำเนา)";
+			}
 			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
 
+			parameterMap.put("p_report_title", pReportTitle);
 			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? ReportHelper.convertOrderNoForReport(receiptNo) : ReportHelper.convertOrderNoForReport(order.getOrderNo()));
 			parameterMap.put("p_vatcode", order.getVatCode());
 			parameterMap.put("p_orderDate", order.getOrderDate());
 			parameterMap.put("p_code", user.getCode());
 			parameterMap.put("p_name", user.getName());
 			parameterMap.put("p_taxNo", BeanParameter.getPensTaxNo());
+			parameterMap.put("p_receipt_by_msg", pReceiptByMsg);
+			parameterMap.put("p_create_date", order.getCreated());
 			
 			conn = DBConnection.getInstance().getConnection();
 			
@@ -1209,7 +1317,8 @@ public class OrderAction extends I_Action {
 			parameterMap.put("custAddress1", custAddressArr[0]);
 			parameterMap.put("custAddress2", custAddressArr[1]);
 			parameterMap.put("p_custTaxNo", "".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo()));
-
+			parameterMap.put("p_next_visit", visitDate);
+			
 			lstData = new ArrayList<TaxInvoiceReport>();
 			int id = 1;
 			int no =1;
@@ -1227,9 +1336,9 @@ public class OrderAction extends I_Action {
 				taxInvoice.setCustomerName(customer.getName());
 				
 				if("Y".equalsIgnoreCase(line.getPromotion())){
-				  taxInvoice.setProductCode("*"+no+":"+line.getProduct().getCode());
+				  taxInvoice.setProductCode("*"+no+")"+line.getProduct().getCode());
 				}else{
-				  taxInvoice.setProductCode(no+":"+line.getProduct().getCode());	
+				  taxInvoice.setProductCode(no+")"+line.getProduct().getCode());	
 				}
 				taxInvoice.setProductName(line.getProduct().getName());
 				taxInvoice.setUomId(line.getProduct().getUom().getId());
@@ -1256,7 +1365,6 @@ public class OrderAction extends I_Action {
 				lstData.add(taxInvoice);
 				no++;
 			}
-			parameterMap.put("p_next_visit", visitDate);
 
 			String fileName = "tax_invoice_summary_report";
 			String fileJasper = BeanParameter.getReportPath() + fileName;
@@ -1340,13 +1448,13 @@ public class OrderAction extends I_Action {
 			for (OrderLine line : orderForm.getLines()) {
 				ListOrderProductReport b = new ListOrderProductReport();
 				if("Y".equalsIgnoreCase(line.getPromotion())){
-				  b.setProduct("*"+no+":"+line.getProduct().getCode()+" "+line.getProduct().getName());
+				  b.setProduct("*"+no+")"+line.getProduct().getCode()+" "+line.getProduct().getName());
 				}else{
-				  b.setProduct(no+":"+line.getProduct().getCode()+" "+line.getProduct().getName());
+				  b.setProduct(no+")"+line.getProduct().getCode()+" "+line.getProduct().getName());
 				}
-				b.setQty(line.getQty1()+"/"+line.getQty2());
+				b.setQty(NumberToolsUtil.decimalFormat(line.getQty1(),NumberToolsUtil.format_current_no_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getQty2(),NumberToolsUtil.format_current_no_disgit));
 				b.setUnit(Utils.isNull(line.getUom1().getCode())+"/"+Utils.isNull(line.getUom2().getCode()));
-				b.setPrice(line.getPrice1()+"/"+line.getPrice2());
+				b.setPrice(NumberToolsUtil.decimalFormat(line.getPrice1(),NumberToolsUtil.format_current_2_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getPrice2(),NumberToolsUtil.format_current_2_disgit));
 				no++;
 				
 				lstData.add(b);
@@ -1359,6 +1467,8 @@ public class OrderAction extends I_Action {
 			String fileJasper = BeanParameter.getReportPath() + fileName;
 			
 			//Set Report Parameter Map
+			parameterMap.put("p_totalAmount", orderForm.getOrder().getTotalAmount());
+			parameterMap.put("p_vatcode", orderForm.getOrder().getVatCode());
 			parameterMap.put("totalLine", lstData.size()+"");
 			parameterMap.put("userName", user.getName());
 			parameterMap.put("custName", orderForm.getOrder().getCustomerName());

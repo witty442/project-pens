@@ -31,6 +31,11 @@ public class CustomerForm extends I_Form implements Serializable{
 	List<Address> addresses = null;
 
 	List<Contact> contacts = null;
+	
+	private int curPage;
+	private int totalRow;
+	private int totalPage;
+	
 
 	@SuppressWarnings("unchecked")
 	public CustomerForm() {
@@ -88,5 +93,31 @@ public class CustomerForm extends I_Form implements Serializable{
 	public void setContacts(List<Contact> contacts) {
 		this.contacts = contacts;
 	}
+
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
+	}
+
+	public int getTotalRow() {
+		return totalRow;
+	}
+
+	public void setTotalRow(int totalRow) {
+		this.totalRow = totalRow;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+	
+	
 
 }

@@ -65,6 +65,7 @@ public class MoveOrderAction extends I_Action {
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
 				 MoveOrder b = (MoveOrder)request.getSession().getAttribute("criteria_");
 				 moveOrderForm.getCriteria().setMoveOrder(b);
+				 
 				 search(moveOrderForm,request,response); 
 			 }
 			// save token
@@ -122,6 +123,8 @@ public class MoveOrderAction extends I_Action {
 			MoveOrder m = prepareCreateMoveOrder(user, mForm);
 			List<MoveOrder> moveOrderList = mDAO.searchMoveOrderList(m,user);
 			mForm.setResults(moveOrderList);
+			mForm.setMoveOrder(m);
+			
 			if(moveOrderList != null && moveOrderList.size()==0){
 				request.setAttribute("Message","ไม่พบข้อมูล");
 			}
@@ -159,6 +162,10 @@ public class MoveOrderAction extends I_Action {
 			 moveOrderForm.getMoveOrder().setShowSaveBtn(true);
 			 moveOrderForm.getMoveOrder().setShowCancelBtn(false);
 			 moveOrderForm.getMoveOrder().setShowPrintBtn(false);
+			 
+			// Save Criteria
+			request.getSession().setAttribute("criteria_",moveOrderForm.getMoveOrder());
+				
 			 
 			// save token
 			saveToken(request);
@@ -415,10 +422,23 @@ public class MoveOrderAction extends I_Action {
 
     private MoveOrder prepareCreateMoveOrder(User user,MoveOrderForm mForm) throws Exception {
     	MoveOrder m = mForm.getMoveOrder();
-    	logger.debug("moveOrder:"+mForm.getMoveOrder().getSalesCode()+","+mForm.getMoveOrder().getPdCode()+",");
+    	logger.debug("moveOrder1:"+m);
+    	if(m == null ){
+    		logger.debug("moveOrder2:"+mForm.getCriteria().getMoveOrder());
+    		m = mForm.getCriteria().getMoveOrder();
+    	}
+    	if(m==null){
+    		m = new MoveOrder();
+    	}
+    	//logger.debug("moveOrder:"+mForm.getMoveOrder().getSalesCode()+","+mForm.getMoveOrder().getPdCode()+",");
+    	logger.debug("moveOrder3:"+m);
+    	
+    	logger.debug("user:"+user);
+    	
     	m.setUserId(user.getId()+"");
     	m.setCreatedBy(user.getUserName());
     	m.setUpdateBy(user.getUserName());
+    	
         
     	if("".equals(m.getRequestNumber())){
     		//create 

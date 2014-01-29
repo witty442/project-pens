@@ -71,6 +71,52 @@ public class MCustomer extends I_Model<Customer> {
 		return array;
 	}
 
+	
+	public int getTotalRowCustomer(Connection conn,String whereCause,User user) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		int totalRow = 0;
+		try{
+			String sql = "select count(*) total_row from m_customer where 1=1 "+whereCause;
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				totalRow = rst.getInt("total_row");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return totalRow;
+	}
+	
+	
+	public Customer[] searchOpt(Connection conn,String whereCause,User user,int start) throws Exception {
+		return searchOptModel(conn,whereCause,user,start);
+	}
+	
+    public Customer[] searchOpt(String whereCause,User user,int start) throws Exception {
+	   Connection conn = null;
+	   try{
+		   conn = new DBCPConnectionProvider().getConnection(conn);
+		   return searchOptModel(conn,whereCause,user,start);
+	   }catch(Exception e){
+		   throw e;
+	   }finally{
+			conn.close();
+	   }
+	}
+	
 	/**
 	 * 
 	 * @param whereCause
@@ -78,13 +124,12 @@ public class MCustomer extends I_Model<Customer> {
 	 * @throws Exception
 	 * Tunnig Method By Wit
 	 */
-	public Customer[] searchOpt(String whereCause,User user) throws Exception {
-		Connection conn = null;
+	private Customer[] searchOptModel(Connection conn,String whereCause,User user,int start) throws Exception {
+		
 		Statement stmt = null;
 		ResultSet rst = null;
 		List<Customer> custList = new ArrayList<Customer>();
 		Customer[] array = null;
-		int no = 0;
 		try {
 			//Filter display Column
 			String displayActionReceipt ="";
@@ -97,7 +142,7 @@ public class MCustomer extends I_Model<Customer> {
 				displayActionEditCust ="none";
 			}
 			
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			String sql = "select m_customer.* ,  \n";
 			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
                    sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
@@ -114,9 +159,9 @@ public class MCustomer extends I_Model<Customer> {
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while(rst.next()){
-				no++;
+				start++;
 				Customer m = new Customer();
-				m.setNo(no);
+				m.setNo(start);
 				// Mandatory
 				m.setId(rst.getInt("CUSTOMER_ID"));
 				m.setReferencesID(rst.getInt("REFERENCE_ID"));
@@ -219,7 +264,7 @@ public class MCustomer extends I_Model<Customer> {
 					}
 				}
 				
-				logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
+				//logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
 				
 				//displayActionReceipt
 				m.setDisplayActionReceipt(displayActionReceipt);
@@ -228,8 +273,12 @@ public class MCustomer extends I_Model<Customer> {
 			}
 			
 			//convert to Obj
-			array = new Customer[custList.size()];
-			array = custList.toArray(array);
+			if(custList != null && custList.size() >0){
+				array = new Customer[custList.size()];
+				array = custList.toArray(array);
+			}else{
+				array = null;
+			}
 			
 		} catch (Exception e) {
 			throw e;
@@ -240,9 +289,7 @@ public class MCustomer extends I_Model<Customer> {
 			try {
 				stmt.close();
 			} catch (Exception e2) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
+			
 		}
 		
 		return array;

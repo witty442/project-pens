@@ -161,6 +161,8 @@ public class RequisitionProductAction extends I_Action {
 			 moveOrderForm.getRequisitionProduct().setShowCancelBtn(false);
 			 moveOrderForm.getRequisitionProduct().setShowPrintBtn(false);
 			 
+			// Save Criteria
+		    request.getSession().setAttribute("criteria_",moveOrderForm.getRequisitionProduct());
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
@@ -336,6 +338,8 @@ public class RequisitionProductAction extends I_Action {
     			m.setLineNoDeleteList(lineNoDeleteList);
     		}
     	}
+    	
+    
 		return m;
 	}
     

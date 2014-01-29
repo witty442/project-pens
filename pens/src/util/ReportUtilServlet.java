@@ -515,13 +515,14 @@ public class ReportUtilServlet extends HttpServlet {
 			
 			/** Set property printer and Report **/
 			HashMap fontMap = new HashMap();
-			FontKey key = new FontKey("Angsana New", false, false);
+			/*FontKey key = new FontKey("Angsana New", false, false);
 			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
 			fontMap.put(key, font);
 
 			FontKey key2 = new FontKey("Angsana New", true, false);
 			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			fontMap.put(key2, font2);
+			Print
+			fontMap.put(key2, font2);*/
 
 			/** Case print Tax Invoice **/
 			if("tax_invoice_report".equalsIgnoreCase(fileName)){
@@ -537,7 +538,7 @@ public class ReportUtilServlet extends HttpServlet {
 
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
 		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
@@ -555,7 +556,7 @@ public class ReportUtilServlet extends HttpServlet {
 
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
 					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
@@ -591,7 +592,7 @@ public class ReportUtilServlet extends HttpServlet {
 					
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 	
 					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
@@ -610,7 +611,7 @@ public class ReportUtilServlet extends HttpServlet {
 
 				JRExporter exporter = new JRPrintServiceExporter();
 				exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-				exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+				//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 
 				exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 				exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);

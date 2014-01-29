@@ -317,7 +317,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 				sql.append(" )C ON M.ar_invoice_no = C.ar_invoice_no \n");
 			sql.append(" )B	 \n");
 			sql.append(")A	 \n");
-			logger.debug("sql:"+sql.toString());
+			//logger.debug("sql:"+sql.toString());
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {

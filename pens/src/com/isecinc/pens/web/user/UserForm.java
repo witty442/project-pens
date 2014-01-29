@@ -3,6 +3,7 @@ package com.isecinc.pens.web.user;
 import java.util.List;
 
 import com.isecinc.core.web.I_Form;
+import com.isecinc.pens.bean.PD;
 import com.isecinc.pens.bean.SubInventory;
 import com.isecinc.pens.bean.User;
  
@@ -22,7 +23,9 @@ public class UserForm extends I_Form {
 	private User[] results = null;
 
 	private List<SubInventory> subInventories = null;
-
+	
+	private List<PD> pdList = null;
+	
 	private String[] subinvids;
 
 	public User getUser() {
@@ -64,5 +67,14 @@ public class UserForm extends I_Form {
 	public void setSubinvids(String[] subinvids) {
 		this.subinvids = subinvids;
 	}
+
+	public List<PD> getPdList() {
+		return pdList;
+	}
+
+	public void setPdList(List<PD> pdList) {
+		this.pdList = pdList;
+	}
+	
 
 }

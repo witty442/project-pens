@@ -18,6 +18,7 @@ import com.isecinc.pens.bean.SalesInventory;
 import com.isecinc.pens.bean.SubInventory;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.model.MPD;
 import com.isecinc.pens.model.MSalesInventory;
 import com.isecinc.pens.model.MSubInventory;
 import com.isecinc.pens.model.MUser;
@@ -57,7 +58,9 @@ public class UserAction extends I_Action {
 			userForm.setUser(user);
 
 			//
-			userForm.setSubInventories(new MSubInventory().lookUp());
+			userForm.setPdList(new MPD().getPDList(user));
+			
+			/*userForm.setSubInventories(new MSubInventory().lookUp());
 
 			// selected invs
 			List<SalesInventory> invs = new MSalesInventory().lookUp(userForm.getUser().getId());
@@ -71,7 +74,9 @@ public class UserAction extends I_Action {
 					}
 				}
 			}
-			if (userForm.getSubInventories().size() == 0) userForm.setSubInventories(null);
+			if (userForm.getSubInventories().size() == 0) userForm.setSubInventories(null);*/
+			
+			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
