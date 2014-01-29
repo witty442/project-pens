@@ -11,7 +11,7 @@
 			 <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=800px,height=400px')" title="Configuration">
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			 </a>&nbsp;&nbsp;
-			  <font color="red"><%=AppversionVerify.checkAppVersion(request) %> </font>&nbsp;&nbsp;
+			  <font color="red"><blink><%=AppversionVerify.checkAppVersion(request) %> </blink></font>&nbsp;&nbsp;
 			  <font color="black">วันที่ปัจจุบัน 
 			   <script>
 			  var currentdate = new Date(); 
@@ -29,4 +29,26 @@
         <td width="31px;"><img src="${pageContext.request.contextPath}/images2/footer_right.png" border="0"/></td>
 	</tr>
 </table>
+
+<script type="text/javascript">
+
+	spe=1000;
+	na=document.all.tags("blink");
+	swi=1;
+	bringBackBlinky();
+	function bringBackBlinky() {
+	  if (swi == 1) {
+	     sho="visible";
+	     swi=0;
+	  }else {
+	    sho="hidden";
+	    swi=1;
+	  }
+		for(i=0;i<na.length;i++) {
+		   na[i].style.visibility=sho;
+		}
+	  setTimeout("bringBackBlinky()", spe);
+	}
+	
+</script>
   

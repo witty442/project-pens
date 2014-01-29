@@ -218,13 +218,13 @@ body {
 								<tr>
 									<td align="right" width ="50%"><b>Import ข้อมูลจากส่วนกลาง<font color="red">*</font> </b></td>
 									<td align="left" width ="50%">
-									   <input type="button" name ="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtn" style="height:30px;width: 160px;" onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','sales')">
+									   <input type="button" name ="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtnLong"  onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','sales')">
 									</td>
 								</tr>
 								<tr>
 								  <td align="right" width ="50%"><b>Export ข้อมูลไปยังส่วนกลาง<font color="red">*</font> </b></td>
 								  <td align="left">
-								       <input type="button" name ="export" value="ส่งข้อมูลไปส่วนกลาง" class="newPosBtn" style="height:30px; width: 160px;" onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','sales')">
+								       <input type="button" name ="export" value="ส่งข้อมูลไปส่วนกลาง   " class="newPosBtnLong"  onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','sales')">
 				                  </td>
 							  </tr>
 							</table>
@@ -255,7 +255,7 @@ body {
 									<tr>
 										<td align="right" width ="50%"></td>
 										<td align="left" width ="50%">
-										<input type="button" name ="import" value="Import" class="newPosBtn" style="width: 100px;" onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','admin')">	
+										<input type="button" name ="import" value="Import" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','admin')">	
 										</td>
 									</tr>
 								</table>
@@ -281,7 +281,7 @@ body {
 									<tr>
 										<td align="right" width ="50%"></td>
 										<td align="left" width ="50%">
-										<input type="button" name ="importTrans" value="Import Update Sales Transaction" class="newPosBtn" style="width: 280px;" onClick="javascript:updateSalesTransaction('${pageContext.request.contextPath}','admin')">
+										<input type="button" name ="importTrans" value="Import Update Sales Transaction" class="newPosBtnLong" style="width: 280px;" onClick="javascript:updateSalesTransaction('${pageContext.request.contextPath}','admin')">
 										</td>
 									</tr>
 								</table>
@@ -306,7 +306,7 @@ body {
 									<tr>
 										<td align="right" width ="50%"></td>
 										<td align="left" width ="50%">
-										    <input type="button" name ="export" value="Export" class="newPosBtn" style="width: 100px;" onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','admin')">
+										    <input type="button" name ="export" value="Export" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','admin')">
 										    
 										</td>
 									</tr>
@@ -323,8 +323,8 @@ body {
 							</tr>
 							<tr>
 								<td align="center" width ="100%">
-								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtn" style="width: 160px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtn" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong" style="width: 180px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
+								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
 								</td>
 							</tr>

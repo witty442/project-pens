@@ -50,13 +50,13 @@ body {
 -->
  
 .currPage{ border:1px solid #000000; padding-left:4px;padding-right:4px;padding-top:2px; }
-.pageLink{padding-left:4px;padding-right:4px;padding-top:2px; }
+.pageLink{padding-left:4px;padding-right:2px;padding-top:2px; }
 .paging{height:18px;width:100%;}
-.catalog{text-align:center;/*background-color:#FFCC99;*/}
-.brandName{width:120px;vertical-align:top;} 
+.catalog{text-align:center;height:60px;width:25%;/*background-color:#FFCC99;*/}
+.brandName{width:120px;vertical-align:top;}
 
 table#productList thead{background:#FFE4CA;}
-.qtyInput{width:35px; text-align:right;}
+.qtyInput{width:50px; height:26px;text-align:right;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
@@ -133,43 +133,83 @@ function loadProducts(brandCode){
 	});
 }
 
+function lockScreen() {
+	$('#div_body').hide();
+	
+	 /*  $.blockUI({ 
+		overlayCSS: { backgroundColor: '#00f' },
+	    message: ''
+	});   */
+	  
+	 // disable_scroll();
+}
+
+function unlockScreen() {
+	// $.unblockUI({backgroundColor: '#00f' }); 
+	 //enable_scroll();
+	$('#div_body').show();
+}
+
+//set Cannot Dragg
+$.ui.dialog.prototype._makeDraggable = function() { 
+    this.uiDialog.draggable({
+        containment: true
+    });
+};
+
+function brandDialogClose(){
+	$('#brand-dialog').dialog("close"); 
+	unlockScreen();
+}
+
+function productDialogClose(){
+	$('#selectProduct').dialog("close"); 	
+	unlockScreen();
+}
+
 
 $(function(){
+	var screen_height= $(window).height();
+	var screen_width = $(window).width();
 	
 	 $('#brand-dialog').dialog({
 			autoOpen: false,
-			width: 550,
-			height:425,
+			//width: 550,
+			//height:425,
+			width: screen_width-10,
+			height:screen_height-20,
 			title:"เลือกกลุ่มสินค้า",
 			position:'center',
+			resizable: false,
+			dialogClass: 'brandDialog',
 			buttons: {
 				"OK": function() { addProductToSalesOrder(); }, 
 				"Cancel": function() { 
 					$(this).dialog("close"); 
+					unlockScreen();
 				}
 			}
 		}); 
 	 
-	/*   $('#brand-dialog').dialog({
-						autoOpen: false,
-						width: 550,
-						height:425,
-						modal:true,
-						title:"เลือกกลุ่มสินค้า",
-						buttons: {
-							"OK": function() { addProductToSalesOrder(); }, 
-							"Cancel": function() { 
-								$(this).dialog("close"); 
-							}
-						}
-					}); */
+	 var btns = " <div align='center'>"
+         +" <input onclick='addProductToSalesOrder()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
+         +" <input onclick='brandDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
+         +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+         +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+
+     $(".brandDialog").children(".ui-dialog-titlebar").append(btns);
+	 
 
 	  $('#selectProduct').dialog({
 			autoOpen: false,
-			width: 770,
-			height : 380,
+			//width: 770,
+			//height : 380,
+			width: screen_width-10,
+			height:screen_height-20,
 			modal:true,
+			resizable: false,
 			title:"กำหนดรายการสินค้าที่ต้องการ",
+			dialogClass: 'productDialog',
 			buttons: {
 				"OK": function() { addProductToBasket(); }, 
 				"Cancel": function() { 
@@ -177,10 +217,21 @@ $(function(){
 				}
 			}
 		});
+					
+	  var btns = " <div align='center'>"
+          +" <input onclick='addProductToBasket()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
+          +" <input onclick='productDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
+          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+
+      $(".productDialog").children(".ui-dialog-titlebar").append(btns);
 });
 
 function addProductToSalesOrder(){
 	//alert("addProductToSalesOrder!");
+	
+	 unlockScreen();
+	 
 	var data = '';
 	var custId = 0;//document.getElementById("order.customerId").value;
 	$(function(){
@@ -198,44 +249,46 @@ function addProductToSalesOrder(){
 
 	var products = [];
 	products = eval(data);
-	for(var i=0; i < products.length ; i++){
-		//var p = new Object();
-		var product = new Object();
-		//product.lineNo = products[i].lineNo;
-		
-		product.productId = products[i].productId;
-		product.product = products[i].productCode;
-//		alert(products[i].productName);
-		product.productLabel = decodeURIComponent(escapeParameter(products[i].productName));
-		//alert(products[i].productName);
-		
-		product.uom1 = products[i].uom1;
-		product.uom2 = products[i].uom2;
-		product.uomLabel1 = products[i].uom1;
-		product.uomLabel2 = products[i].uom2;
-		product.price1 = products[i].price1;
-		product.price2 = products[i].price2;
-		product.qty1 = products[i].qty1;
-		product.qty2 = products[i].qty2;
-		
-		product.amount1 = products[i].amount1;
-		product.amount2 = products[i].amount2;
-		product.disc1 = 0;
-		product.disc2 = 0;
-		product.total1 = products[i].amount1;
-		product.total2 = products[i].amount2;
-
-		product.vat1 = "";
-		product.vat2 = "";
-		
-		product.ship = "<%//reqDate%>";
-		product.req = "<%//today%>";
-		product.id = "";
-		product.row = "";
-		
-		addProduct('${pageContext.request.contextPath}', product);
+	if(products != null){
+		for(var i=0; i < products.length ; i++){
+			//var p = new Object();
+			var product = new Object();
+			//product.lineNo = products[i].lineNo;
+			
+			product.productId = products[i].productId;
+			product.product = products[i].productCode;
+	//		alert(products[i].productName);
+			product.productLabel = decodeURIComponent(escapeParameter(products[i].productName));
+			//alert(products[i].productName);
+			
+			product.uom1 = products[i].uom1;
+			product.uom2 = products[i].uom2;
+			product.uomLabel1 = products[i].uom1;
+			product.uomLabel2 = products[i].uom2;
+			product.price1 = products[i].price1;
+			product.price2 = products[i].price2;
+			product.qty1 = products[i].qty1;
+			product.qty2 = products[i].qty2;
+			
+			product.amount1 = products[i].amount1;
+			product.amount2 = products[i].amount2;
+			product.disc1 = 0;
+			product.disc2 = 0;
+			product.total1 = products[i].amount1;
+			product.total2 = products[i].amount2;
+	
+			product.vat1 = "";
+			product.vat2 = "";
+			
+			product.ship = "<%//reqDate%>";
+			product.req = "<%//today%>";
+			product.id = "";
+			product.row = "";
+			
+			addProduct('${pageContext.request.contextPath}', product);
+		}
 	}
-
+	
 	$(document).ready(function() {
 	    $("#brand-dialog").dialog("close");
 	});
@@ -432,9 +485,9 @@ function escapeParameter(param){
 								<td colspan="4" align="center">
 								<div align="left" style="margin-left:13px;">
 								   <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
-								     <input type="button" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
+								     <input type="button" value="เลือกสินค้าใหม่ " class="newPosBtn" onclick="openProductCategory();" />
 								      &nbsp;&nbsp;
-								   	<input type="button" value="เลือกสินค้าของแถม" onclick="open_product_premium('${pageContext.request.contextPath}');"/>
+								   	<input type="button" value="เลือกสินค้าของแถม" class="newPosBtn" onclick="open_product_premium('${pageContext.request.contextPath}');"/>
 								   </c:if>
 								</div>
 								
@@ -448,7 +501,7 @@ function escapeParameter(param){
 										<th class="moveOrder.uom">หน่วยนับ</th>
 										<th class="moveOrder.qty">จำนวน</th>
 										<th class="moveOrder.amount">ยอดเงิน</th>
-										<th class="moveOrder.edit">แก้ไข</th>
+										<th class="moveOrder.edit"><!-- แก้ไข --></th>
 									</tr>
 									<c:forEach var="lines1" items="${moveOrderForm.lines}" varStatus="rows1">
 									<c:choose>

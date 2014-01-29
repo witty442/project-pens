@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
+<%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="java.util.Date"%>
 <%@page import="util.DateToolsUtil"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -17,6 +18,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
+
 <%
 List<References> payment= InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 List<References> banks= InitialReferences.getReferenes().get(InitialReferences.BANK);
@@ -36,6 +38,15 @@ List<References> internalBank= InitialReferences.getReferenes().get(InitialRefer
 pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 User user = (User)session.getAttribute("user");
 
+
+/** Allow Van Credit **/
+   boolean vanAllowCredit = false;
+  String canReceiptCredit = request.getParameter("canReceiptCredit");
+  System.out.println("canReceiptCredit:"+canReceiptCredit);
+  if("Y".equalsIgnoreCase(canReceiptCredit)){
+	  vanAllowCredit = true;
+  }
+ 
 %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -509,7 +520,14 @@ function removeRow(){
 			<input type="radio" name="payType" value="CS" onclick="changePayType(this.value);"/>รับเงินสดทันที<br>
 			<input type="radio" name="payType" value="CH" onclick="changePayType(this.value);"/>สดรับเช็ค<br>
 			<input type="radio" name="payType" value="MIX" onclick="changePayType(this.value);"/>ชำระแบบผสม<br>
-			<input type="radio" name="payType" value="CR" onclick="changePayType(this.value);"/>เงินเชื่อ<br>
+			
+		 <!-- Wit edit 26/07/2556  -->
+		    <%if(vanAllowCredit){%>
+		       <input type="radio" name="payType" value="CR" onclick="changePayType(this.value);"/>เงินเชื่อ<br>
+		    <%}else{ %>
+		       <input type="radio" name="payType" value="CR" onclick="" disabled/> ...<br> 							
+		    <%} %>			
+
 		</td>
 	</tr>
 </table>

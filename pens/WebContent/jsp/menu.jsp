@@ -201,7 +201,7 @@ User user = (User)session.getAttribute("user");
       </li>
      <%} %>
      
-     <li><a href="#" onclick="#" class="parent"><span>ค้นหาข้อมูล</span></a>
+     <li><a href="#" onclick="" class="parent"><span>ค้นหาข้อมูล</span></a>
 	     <ul>
 	    		<li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span>รายงานการขาย By Item</span></a>
@@ -210,7 +210,7 @@ User user = (User)session.getAttribute("user");
      </li>
  
 	 <%if(role.equalsIgnoreCase(User.VAN)){ %>
-	     <li><a href="#" onclick="#" class="parent"><span>รายการ เบิก/คืน</span></a>
+	     <li><a href="#" onclick="" class="parent"><span>รายการ เบิก/คืน</span></a>
 		     <ul>
 		    	<li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderAction.do?do=prepare&action=new&moveOrderType=MoveOrderRequisition';"><span>รายการใบเบิกสินค้า</span></a>

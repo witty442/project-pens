@@ -70,12 +70,12 @@ List<References> paymentMethod = InitialReferences.getReferenes().get(InitialRef
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
 
-//Filter Can Receipt Cheque
+//Filter Can Receipt More Cash
 OrderForm orderFrom = null;
-String canReceiptCheque = "N";
+String canReceiptMoreCash = "N";
 if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
-  canReceiptCheque = orderFrom.getCanReceiptCheque();
+  canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
 
 %>
@@ -95,6 +95,9 @@ if(request.getAttribute("orderForm") != null){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
+<!-- Calendar -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/tablesorter.css" />
 <style type="text/css">
 <!--
 body {
@@ -104,30 +107,30 @@ body {
 .style1 {color: #004a80}
 
 -->
-
 .currPage{ border:1px solid #000000; padding-left:4px;padding-right:4px;padding-top:2px; }
 .pageLink{padding-left:4px;padding-right:2px;padding-top:2px; }
-.paging{height:18px;width:100%;}
-.catalog{text-align:center;/*background-color:#FFCC99;*/}
+.paging{height:18px;width:100%;padding-left:4px;padding-right:2px;padding-top:2px;}
+.catalog{text-align:center;height:60px;width:25%;/*background-color:#FFCC99;*/}
 .brandName{width:120px;vertical-align:top;}
 
 table#productList thead{background:#FFE4CA;}
-.qtyInput{width:35px; text-align:right;}
+.qtyInput{width:50px; height:26px;text-align:right;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<!-- Calendar -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/tablesorter.css" />
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js"></script>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
+
 
 <script type="text/javascript">
 //clear cach
@@ -137,8 +140,12 @@ function openProductCategory(){
 	  // CAll AJAX PAGE
 	  loadProductCat(0);
 	  
+	  //lockscreen
+	  lockScreen();
+	  
 	   $(document).ready(function() {
-	    $("#brand-dialog").dialog("open");	    
+		 // event.preventDefault();
+	     $("#brand-dialog").dialog("open");	    
 	  }); 
 }
 
@@ -188,67 +195,106 @@ function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 }
 
-$(function(){
+function lockScreen() {
+	$('#div_body').hide();
 	
+	 /*  $.blockUI({ 
+		overlayCSS: { backgroundColor: '#00f' },
+	    message: ''
+	});   */
+	  
+	 // disable_scroll();
+}
+
+function unlockScreen() {
+	// $.unblockUI({backgroundColor: '#00f' }); 
+	 //enable_scroll();
+	$('#div_body').show();
+}
+
+//set Cannot Dragg
+$.ui.dialog.prototype._makeDraggable = function() { 
+    this.uiDialog.draggable({
+        containment: true
+    });
+};
+
+function brandDialogClose(){
+	$('#brand-dialog').dialog("close"); 
+	unlockScreen();
+}
+
+function productDialogClose(){
+	$('#selectProduct').dialog("close"); 	
+	unlockScreen();
+}
+
+$(function(){
+	var screen_height= $(window).height();
+	var screen_width = $(window).width();
+	
+	//alert(screen.height+":"+screen.width);
 
 	    $('#brand-dialog').dialog({
 						autoOpen: false,
-						width: 550,
-						height:425,
+						modal:true,
+						width: screen_width-10,
+						height:screen_height-20,
 						title:"เลือกกลุ่มสินค้า",
 						position:'center',
+						resizable: false,
+						dialogClass: 'brandDialog',
 						buttons: {
-							"OK":  function() { addProductToSalesOrder(); } , 
-							"Cancel": 
+							 "OK.":  function() { addProductToSalesOrder(); } , 
+							"Cancel.": 
 								function() { 
 								   $(this).dialog("close"); 
-							     }
+								   unlockScreen();
+							     } 
 							}
-					}); 
-	   
+					});
+	    
+	   var btns = " <div align='center'>"
+	               +" <input onclick='addProductToSalesOrder()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
+		           +" <input onclick='brandDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
+	               +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+	               +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+	    
+	    $(".brandDialog").children(".ui-dialog-titlebar").append(btns);
 
-       /** dialog move follow scroll **/	    
-	   /* $(document).ready(function() {  
-			  oDetail  = $('<div id="brand-dialog" style="overflow:scroll"></div>') 
-			    .dialog({  
-			      autoOpen: false,
-				  width: 550,
-				  height:425,
-				  title:"เลือกกลุ่มสินค้า", 
-			      position: 'center',  
-			      resizable: 'false',
-			      buttons: {
-						"OK": function() { addProductToSalesOrder(); }, 
-						"Cancel": function() { 
-							$(this).dialog("close"); 
-						}
-					},
-			      draggable: true }); 
-			  
-			  $(window).scroll(function () {  
-			      oDetail .dialog("option","position","center");  
-			    }); 
-			   
-			});  */
-
+    
 	  $('#selectProduct').dialog({
 			autoOpen: false,
-			width: 770,
-			height : 380,
+			width: screen_width-10,
+			height:screen_height-20,
 			modal:true,
+			resizable: false,
+			dialogClass: 'productDialog',
 			position:'fixed',
 			title:"กำหนดรายการสินค้าที่ต้องการ",
 			buttons: {
-				"OK": function() { addProductToBasket(); }, 
-				"Cancel": function() { 
+				"OK.": function() {  addProductToBasket(); }, 
+				"Cancel.": function() { 
 					$(this).dialog("close");
 				}
 			}
 		});
+			
+	  var btns = " <div align='center'>"
+          +" <input onclick='addProductToBasket()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
+          +" <input onclick='productDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
+          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+
+      $(".productDialog").children(".ui-dialog-titlebar").append(btns);
+      
 });
 
 function addProductToSalesOrder(){
 	//alert("addProductToSalesOrder!");
+	
+	unlockScreen();
+	
 	var data = '';
 	var custId = document.getElementById("order.customerId").value;
 	$(function(){
@@ -379,6 +425,7 @@ function escapeParameter(param){
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
+<div id="div_body">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
 		<td colspan="3"><jsp:include page="../header.jsp"/></td>
@@ -438,18 +485,10 @@ function escapeParameter(param){
 							</tr>
 							<tr>
 								<td align="right">
-									<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
 									<bean:message key="Customer" bundle="sysele"/>&nbsp;&nbsp;
-									<%}else{ %>
-									<bean:message key="Member" bundle="sysele"/>&nbsp;&nbsp;
-									<%} %>
 								</td>
 								<td align="left" colspan="3">
-									<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
 									<html:text property="order.customerName" size="80" readonly="true" styleClass="disableText"/>
-									<%}else{ %>
-									<html:text property="order.customerName" size="80"  />
-									<%} %>
 									<html:hidden property="order.customerId" styleId="order.customerId" />
 								</td>
 							</tr>
@@ -489,34 +528,15 @@ function escapeParameter(param){
 									<html:hidden property="order.oraBillAddressID"/>
 									<html:hidden property="order.oraShipAddressID"/>
 								</td>
-							<%if(role.equalsIgnoreCase(User.DD)) {%>
-							<tr>
-								<td align="right"><bean:message key="Condition.ShipmentDay" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:hidden property="order.shippingDay" />
-									<html:select property="order.shippingDay" disabled="true" styleClass="disableText">
-										<html:option value="Mon"><bean:message key="Monday" bundle="sysele" /></html:option>
-										<html:option value="Tue"><bean:message key="Tueday" bundle="sysele" /></html:option>
-										<html:option value="Wed"><bean:message key="Wednesday" bundle="sysele" /></html:option>
-										<html:option value="Thu"><bean:message key="Thursday" bundle="sysele" /></html:option>
-										<html:option value="Fri"><bean:message key="Friday" bundle="sysele" /></html:option>
-										<html:option value="Sat"><bean:message key="Saturday" bundle="sysele" /></html:option>
-									</html:select>
-								</td>
-								<td align="right"><bean:message key="Condition.ShipmentTime" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.shippingTime" size="5" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<%} %>
+							
 							<tr>
 								<td colspan="4" align="center">
 								<div align="left">
 									&nbsp;&nbsp;
 									<%if(!role.equalsIgnoreCase(User.DD)) {%>
-									<input type="button" value="เพิ่มสินค้า" onclick="open_product('${pageContext.request.contextPath}');"/>
+									<input type="button" class="newPosBtn" value="เพิ่มสินค้า" onclick="open_product('${pageContext.request.contextPath}');"/>
 									&nbsp;&nbsp;
-									<input type="button" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
+									<input type="button" class="newPosBtn" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
 									<%} %>
 									<%if(role.equalsIgnoreCase(User.DD)) {%>
 										<c:if test="${memberVIP=='Y'}">
@@ -530,20 +550,10 @@ function escapeParameter(param){
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 									<tr>
 										<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-										<%if(!role.equalsIgnoreCase(User.DD)) {%>
+										
 										<th class="checkBox"><input type="checkbox" name="chkAll"
 											onclick="checkSelect(this,document.getElementsByName('lineids'));" /></th>
-										<%}else{ %>
-										<c:if test="${memberVIP=='N'}">
-										<th class="checkBox" style="display: none;"><input type="checkbox" name="chkAll"
-											onclick="checkSelect(this,document.getElementsByName('lineids'));" /></th>
-										</c:if>
-										<c:if test="${memberVIP=='Y'}">
-										<th class="checkBox">
-											<input type="checkbox" name="chkAll" onclick="checkSelect(this,document.getElementsByName('lineids'));" />
-										</th>
-										</c:if>
-										<%} %>
+										
 										<th class="name"><bean:message key="Product.Name" bundle="sysele"/></th>
 										<th><bean:message key="Product.UOM" bundle="sysele"/></th>
 										<th><bean:message key="Quantity" bundle="sysele"/></th>
@@ -553,17 +563,10 @@ function escapeParameter(param){
 										<th class="costprice"><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
 <!--										<th class="costprice"><bean:message key="Tax" bundle="sysele"/></th>-->
 <!--										<th class="costprice"><bean:message key="Overall" bundle="sysele"/></th>-->
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<th><bean:message key="Member.Time" bundle="sysele"/></th>
-										<%} %>
-										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<th><bean:message key="Order.ReceiveDate" bundle="sysele"/></th>
-										<%} %>
-										<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
+										
+										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>							
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<%} %>
-										<th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
+										<th class="status"><%-- <bean:message key="Edit" bundle="sysprop"/> --%></th>
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -576,16 +579,8 @@ function escapeParameter(param){
 									</c:choose>
 									<tr class="${tabclass}">
 										<td>${rows1.index + 1}</td>
-										<%if(!role.equalsIgnoreCase(User.DD)) {%>
-											<td align="center"><input type="checkbox" name="lineids" value="${lines1.id}" /></td>
-										<%}else{ %>
-											<c:if test="${memberVIP=='N'}">
-											<td align="center" style="display: none;"><input type="checkbox" name="lineids" value="${lines1.id}" /></td>
-											</c:if>
-											<c:if test="${memberVIP=='Y'}">
-											<td align="center"><input type="checkbox" name="lineids" value="${lines1.id}" /></td>
-											</c:if>
-										<%} %>
+										<td align="center"><input type="checkbox" name="lineids" value="${lines1.id}" /></td>
+										
 										<td align="left">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
@@ -640,16 +635,7 @@ function escapeParameter(param){
 											</c:choose>
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.qty==0}">
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -667,19 +653,10 @@ function escapeParameter(param){
 													<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
 												</c:otherwise>
 											</c:choose>
-											<%} %>
+										
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.price==0}">
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
@@ -689,7 +666,7 @@ function escapeParameter(param){
 													<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price2}"/>												
 												</c:otherwise>
 											</c:choose>											
-											<%} %>
+										
 										</td>
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
@@ -708,32 +685,16 @@ function escapeParameter(param){
 <!--											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.totalAmount}"/>-->
 <!--										</td>-->
 										
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<td align="center">${lines1.tripNo}</td>
-										<%} %>
+										
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
 										<td align="center">
-											<%if(((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
-											<c:if test="${memberVIP=='Y'}">
+											
 												<c:if test="${lines1.promotion=='N'}">
-													<a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
-													<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
+													<%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
+													<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a> --%>
 												</c:if>
-											</c:if>
-											<c:if test="${memberVIP=='N'}">
-												<%if(!tripNo.equals(orderForm.getLines().get(ind).getTripNo()+"")){ %>
-													<a href="#" onclick="edit_shipdate('${pageContext.request.contextPath}','${lines1.shippingDate}','${rows1.index + 1}');">
-													<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
-													<%tripNo = orderForm.getLines().get(ind).getTripNo()+""; %>	
-												<% }ind++;%>
-											</c:if>
-											<%} else {%>
-												<c:if test="${lines1.promotion=='N'}">
-													<a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
-													<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
-												</c:if>
-											<%} %>
+											
 										</td>
 									</tr>
 									</c:forEach>
@@ -741,18 +702,10 @@ function escapeParameter(param){
 								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 									<tr>
 										<td align="left" class="footer">&nbsp;
-											<%if(!role.equalsIgnoreCase(User.DD)) {%>
-												<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
-												<img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif">&nbsp;
-												<bean:message key="Delete" bundle="sysprop"/></a>
-											<%} %>
-											<%if(role.equalsIgnoreCase(User.DD)) {%>
-											<c:if test="${memberVIP=='Y'}">
-												<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
-												<img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif">&nbsp;
-												<bean:message key="Delete" bundle="sysprop"/></a>
-											</c:if>
-											<%} %>
+											<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
+											   <img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif">&nbsp;
+											   <bean:message key="Delete" bundle="sysprop"/>
+											</a>
 										</td>
 									</tr>
 								</table>
@@ -793,7 +746,7 @@ function escapeParameter(param){
 								<td class="textSpecial">
 								<%
 								if(User.VAN.equals(user.getType())){
-									  if("N".equals(canReceiptCheque)){
+									  if("N".equals(canReceiptMoreCash)){
 									%>
 									      <input type="checkbox" name="tempCheck" checked disabled/>
 										   บันทึกรับเงินสดทันที
@@ -892,8 +845,9 @@ function escapeParameter(param){
 						<html:hidden property="order.isCash" value="N"/>
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						
-						<!--  Can Receipt Cheque (VAN)-->
-						<html:hidden property="canReceiptCheque"/>
+						<!--  Can Receipt Credit (VAN)-->
+						<html:hidden property="canReceiptMoreCash"/>
+						<html:hidden property="canReceiptCredit"/>
 							
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>
@@ -926,7 +880,9 @@ function escapeParameter(param){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+</div>
 </body>
 </html>
-<div id="brand-dialog">No Product Catalog To Display!</div>
-<div id="selectProduct">No Product To Display!</div>
+ 
+<div id="brand-dialog"></div>
+<div id="selectProduct" >No Product To Display!</div>

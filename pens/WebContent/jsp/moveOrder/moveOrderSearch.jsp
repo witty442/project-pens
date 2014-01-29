@@ -92,7 +92,7 @@ function loadMe(){
 						<html:form action="/jsp/moveOrderAction">
 						<jsp:include page="../error.jsp"/>
 						
-						<html:hidden property="moveOrder.moveOrderType" />
+						
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 							<tr>
 								<td colspan="2" align="left">
@@ -163,6 +163,8 @@ function loadMe(){
 						   		
 						</display:table>
                     </c:if>
+                    <html:hidden property="moveOrder.moveOrderType" />
+                    
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form>
 					<!-- BODY -->

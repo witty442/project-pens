@@ -45,12 +45,12 @@ try{
 <table id="productList" width="100%">
 <thead>
 <tr>
-<th width="8%">T</th>
+<th width="6%">T</th>
 <th width="10%">รหัสสินค้า</th>
 <th width="30%">ชื่อสินค้า</th>
-<th width="10%">หน่วยนับ</th>
+<th width="8%">หน่วยนับ</th>
 <th width="16%">ราคาต่อหน่วย</th>
-<th width="14%">จำนวน</th>
+<th width="18%">จำนวน</th>
 <th width="12%">รวมทั้งสิ้น</th>
 </tr>
 </thead>
@@ -94,8 +94,8 @@ for(MoveOrderProductCatalog catalog:catalogs) {
 <td align="left"><%=catalog.getUom1()%> &frasl; <%=catalog.getUom2()%></td>
 <td align="right"><%=formatter.format(catalog.getPrice1())%> &frasl; <%=formatter.format(catalog.getPrice2())%>
 </td>
-<td><input name="qty1" type="text" class="qtyInput" onkeydown="return inputNum(event);" onblur="linePrice('<%=rowNo%>','<%=catalog.getPrice1()%>','<%=catalog.getPrice2()%>')" value="<%=qty1%>" />&nbsp;&frasl;&nbsp;
-	<input name="qty2" type="text" class="qtyInput" <%=disable%> onkeydown="return inputNum(event);" onblur="linePrice('<%=rowNo%>','<%=catalog.getPrice1()%>','<%=catalog.getPrice2()%>')" value="<%=qty2%>" />
+<td><input name="qty1" type="text" class="qtyInput" onkeydown="return inputNum2(event,this);" onblur="isNumeric(this);linePrice('<%=rowNo%>','<%=catalog.getPrice1()%>','<%=catalog.getPrice2()%>')" value="<%=qty1%>" />&nbsp;&frasl;&nbsp;
+	<input name="qty2" type="text" class="qtyInput" <%=disable%> onkeydown="return inputNum2(event,this);" onblur="isNumeric(this);linePrice('<%=rowNo%>','<%=catalog.getPrice1()%>','<%=catalog.getPrice2()%>')" value="<%=qty2%>" />
 </td>
 <td class="number"><span name="totalLineAmtT"><%=lineAmtText%></span><input name="totalLineAmt" type="hidden" value="<%=lineAmt%>" />
 <input name="price1" type="hidden" value="<%=catalog.getPrice1()%>" />

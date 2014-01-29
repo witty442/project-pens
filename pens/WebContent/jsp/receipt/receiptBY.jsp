@@ -11,7 +11,7 @@ User user = (User) session.getAttribute("user");
 %>
 
 <%@page import="com.isecinc.pens.bean.User"%><jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
-<div align="left">&nbsp;&nbsp;<input type="button" value="เพิ่มประเภทการชำระเงิน" onclick="open_recpBy('${pageContext.request.contextPath}', 0);"/></div>
+<div align="left">&nbsp;&nbsp;<input type="button" value="เพิ่มประเภทการชำระเงิน" class="newPosBtn" onclick="open_recpBy('${pageContext.request.contextPath}', 0);"/></div>
 <table id="tblRecpBy" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>

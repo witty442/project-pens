@@ -93,7 +93,7 @@ function selectProduct(code, name){
 			<input type="text" id="productName" name="productName" size="15" onkeypress="searchProduct(event)"/>
 		</td>
 		<td align="left">
-			<input type="button" value="Search" onclick="searchProduct(null);"/>
+			<input type="button" value="Search" class="newNegBtn" onclick="searchProduct(null);"/>
 		</td>
 	</tr>
 	<tr>

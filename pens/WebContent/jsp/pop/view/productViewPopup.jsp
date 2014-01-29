@@ -87,9 +87,7 @@ function selectProduct(code, name){
 		<td align="left" width="50%">
 			<%=pBrand %> 
 		</td>
-		<td align="left">
-			
-		</td>
+		<td align="left"></td>
 	</tr>
 	<tr>
 		<td align="right"><bean:message key="Product.Name" bundle="sysele"/>&nbsp;&nbsp;</td>
@@ -97,7 +95,7 @@ function selectProduct(code, name){
 			<input type="text" id="productName" name="productName" size="15" onkeypress="searchProduct(event)"/>
 		</td>
 		<td align="left">
-			<input type="button" value="Search" onclick="searchProduct(null);"/>
+			<input type="button" value="Search" class="newNegBtn" onclick="searchProduct(null);"/>
 		</td>
 	</tr>
 	<tr>

@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -41,6 +42,16 @@ List<References> banks= InitialReferences.getReferenes().get(InitialReferences.B
 
 List<References> internalBank= InitialReferences.getReferenes().get(InitialReferences.INTERNAL_BANK);
 pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
+
+/** Allow Van Credit **/
+boolean vanAllowCredit = false;
+if(request.getAttribute("orderForm") != null){
+  System.out.println("vanReceiptCredit:"+orderForm.getCanReceiptCredit());
+  if("Y".equalsIgnoreCase(orderForm.getCanReceiptCredit())){
+	  vanAllowCredit = true;
+  }
+}
+
 
 /* -- Auto Receipt --> */
 %>
@@ -120,8 +131,8 @@ function setNextVisitSummary(path, visitDate, fileType){
 	return true;
 }
 
-function gotoSummaryReport(path, role){
- window.open(path + "/jsp/pop/printPopup.jsp?type_report=tax_invoice_summary&orderId="+document.getElementsByName('order.id')[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+function gotoSummaryReport(path, reportType){
+ window.open(path + "/jsp/pop/printPopup.jsp?report_name=tax_invoice_summary&orderId="+document.getElementsByName('order.id')[0].value+"&reportType="+reportType, "Print2", "width=100,height=100,location=No,resizable=No");
 }
 
 function close(){
@@ -624,7 +635,11 @@ function removeRow(){
 	 										    <html:radio property="autoReceipt.paymentType" value="CH" onclick="changePayType(this.value);"/> รับเช็ค<br>
 											    <html:radio property="autoReceipt.paymentType" value="MIX" onclick="changePayType(this.value);"/> ชำระแบบผสม<br>
 											    <!-- Wit edit 26/07/2556  -->
-											    <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" disabled="true"/> ...<br> 							
+											    <%if(vanAllowCredit){%>
+											      <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" /> เงินเชื่อ<br> 	
+											    <%}else{ %>
+											      <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" disabled="true"/> ...<br> 							
+											    <%} %>						
 											</td>
 										</tr>
 									</table>
@@ -751,11 +766,7 @@ function removeRow(){
 							</tr>
 							<tr>
 								<td align="right">
-									<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
 									<bean:message key="Customer" bundle="sysprop"/>&nbsp;&nbsp;
-									<%}else{ %>
-									<bean:message key="Member" bundle="sysprop"/>&nbsp;&nbsp;
-									<%} %>
 								</td>
 								<td align="left" colspan="3">
 									<html:text property="order.customerName" size="80" readonly="true" styleClass="disableText"/>
@@ -797,25 +808,7 @@ function removeRow(){
 									<html:hidden property="order.paymentMethod"/>
 								</td>
 							</tr>
-							<%if(role.equalsIgnoreCase(User.DD)) {%>
-							<tr>
-								<td align="right"><bean:message key="Condition.ShipmentDay" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="order.shippingDay" disabled="true" styleClass="disableText">
-										<html:option value="Mon"><bean:message key="Monday" bundle="sysele" /></html:option>
-										<html:option value="Tue"><bean:message key="Tueday" bundle="sysele" /></html:option>
-										<html:option value="Wed"><bean:message key="Wednesday" bundle="sysele" /></html:option>
-										<html:option value="Thu"><bean:message key="Thursday" bundle="sysele" /></html:option>
-										<html:option value="Fri"><bean:message key="Friday" bundle="sysele" /></html:option>
-										<html:option value="Sat"><bean:message key="Saturday" bundle="sysele" /></html:option>
-									</html:select>
-								</td>
-								<td align="right"><bean:message key="Condition.ShipmentTime" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.shippingTime" size="5" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<%} %>
+							
 							<tr>
 								<td colspan="4" align="center">
 								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
@@ -828,23 +821,11 @@ function removeRow(){
 										<th><bean:message key="Total" bundle="sysele"/></th>
 										<th><bean:message key="Discount" bundle="sysele"/></th>
 										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<th><bean:message key="Member.Time" bundle="sysele"/></th>
-										<%} %>
-										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<th><bean:message key="Order.ReceiveDate" bundle="sysele"/></th>
-										<%} %>
-										<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
+										
+										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<%} %>
-										<%if(!user.getType().equals(User.DD)){ %>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
-										<%} %>
-										<%if(user.getType().equals(User.DD)){ %>
-										<th><bean:message key="Order.Paid" bundle="sysele"/></th>
-										<th><bean:message key="Bill.No" bundle="sysele"/></th>
-										<%} %>
+
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -869,16 +850,7 @@ function removeRow(){
 											</c:choose>
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.qty==0}">
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -896,19 +868,10 @@ function removeRow(){
 													<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
 												</c:otherwise>
 											</c:choose>
-											<%} %>
+											
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.price==0}">
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
@@ -918,7 +881,7 @@ function removeRow(){
 													<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price2}"/>												
 												</c:otherwise>
 											</c:choose>											
-											<%} %>
+										
 										</td>
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
@@ -929,25 +892,17 @@ function removeRow(){
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<td align="center">${lines1.tripNo}</td>
-										<%} %>
+										
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
-										<%if(!user.getType().equals(User.DD)){ %>
+										
 										<td align="center">
 											<c:if test="${lines1.promotion=='Y'}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:if>
 										</td>
-										<%} %>
-										<%if(user.getType().equals(User.DD)){ %>
-										<td align="center">
-											<c:if test="${lines1.payment=='Y'}">
-											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if></td>
-										<td align="center">${lines1.arInvoiceNo}</td>
-										<%} %>
+										
+										
 									</tr>
 									</c:forEach>
 								</table>
@@ -1061,8 +1016,11 @@ function removeRow(){
 									
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
-									   <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','<%=role %>');">
-										<input type="button" id ="reportBtn" value="พิมพ์แบบย่อ" class="newPosBtn">
+									    <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+										  <input type="button" id ="reportBtn" value="พิมพ์แบบย่อ(ต้นฉบับ)" class="newPosBtn">
+										</a>
+										<a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+										  <input type="button" id ="reportBtn" value="พิมพ์แบบย่อ(สำเนา)" class="newPosBtn">
 										</a>
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										<input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn">
@@ -1074,8 +1032,8 @@ function removeRow(){
 								     <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.payment=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
-											<a href="#" onclick="autoReceipt('${pageContext.request.contextPath}','<%=role %>');">
-											<input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
+											<a href="#" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','${orderForm.canReceiptCredit}');">
+											    <input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
 											</c:if>
 										</c:if>
 									   </c:if>
@@ -1099,6 +1057,9 @@ function removeRow(){
 						<html:hidden property="order.exported"/>
 						<html:hidden property="order.isCash"/>
 						
+						<!--  Can Receipt Credit (VAN)-->
+						<html:hidden property="canReceiptMoreCash"/>
+						<html:hidden property="canReceiptCredit"/>
 						
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>

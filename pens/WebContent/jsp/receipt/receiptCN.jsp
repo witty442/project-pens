@@ -7,7 +7,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
-<div align="left">&nbsp;&nbsp;<input type="button" value="เพิ่มใบลดหนี้" onclick="openCn('${pageContext.request.contextPath}','${receiptForm.receipt.customerId }');"/></div>
+<div align="left">&nbsp;&nbsp;<input type="button" value="เพิ่มใบลดหนี้" class="newPosBtn" onclick="openCn('${pageContext.request.contextPath}','${receiptForm.receipt.customerId }');"/></div>
 <table id="tblCN" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>

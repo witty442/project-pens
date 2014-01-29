@@ -42,13 +42,12 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 List<References> w1List = new MOrgRule().getW1RefList("","");
 pageContext.setAttribute("w1List",w1List,PageContext.PAGE_SCOPE);
 
-//Filter Can Receipt Cheque
+//Filter Can Receipt More Cash
 OrderForm orderFrom = null;
-String canReceiptCheque = "N";
+String canReceiptMoreCash = "N";
 if(request.getAttribute("orderForm") != null){
-   orderFrom = (OrderForm)request.getAttribute("orderForm");
-   canReceiptCheque = orderFrom.getCanReceiptCheque();
-   System.out.println("canReceiptCheque:"+canReceiptCheque);
+  orderFrom = (OrderForm)request.getAttribute("orderForm");
+  canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
 
 %>
@@ -92,7 +91,7 @@ function loadMe(){
 function printListOrderProductReport(path,userType){
 	var customerId = document.getElementsByName("order.customerId");
    // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/pop/printPopup.jsp?type_report=list_order_product&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/pop/printPopup.jsp?report_name=list_order_product&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
 }
 
 </script>
@@ -157,11 +156,7 @@ function printListOrderProductReport(path,userType){
 							</tr>
 							<tr>
 								<td align="right">
-									<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
 									<bean:message key="Customer" bundle="sysprop"/>&nbsp;&nbsp;
-									<%}else{ %>
-									<bean:message key="Member" bundle="sysprop"/>&nbsp;&nbsp;
-									<%} %>
 								</td>
 								<td align="left" colspan="3">
 									<html:text property="order.customerName" size="80" readonly="true" styleClass="disableText"/>
@@ -204,26 +199,7 @@ function printListOrderProductReport(path,userType){
 									<html:hidden property="order.paymentTerm"/>
 									<html:hidden property="order.paymentMethod"/>
 								</td>
-							<%if(role.equalsIgnoreCase(User.DD)) {%>
-							<tr>
-								<td align="right"><bean:message key="Condition.ShipmentDay" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:hidden property="order.shippingDay" />
-									<html:select property="order.shippingDay" disabled="true" styleClass="disableText">
-										<html:option value="Mon"><bean:message key="Monday" bundle="sysele" /></html:option>
-										<html:option value="Tue"><bean:message key="Tueday" bundle="sysele" /></html:option>
-										<html:option value="Wed"><bean:message key="Wednesday" bundle="sysele" /></html:option>
-										<html:option value="Thu"><bean:message key="Thursday" bundle="sysele" /></html:option>
-										<html:option value="Fri"><bean:message key="Friday" bundle="sysele" /></html:option>
-										<html:option value="Sat"><bean:message key="Saturday" bundle="sysele" /></html:option>
-									</html:select>
-								</td>
-								<td align="right"><bean:message key="Condition.ShipmentTime" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.shippingTime" size="5" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<%} %>
+							
 							<tr>
 								<td colspan="4" align="center">
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
@@ -239,13 +215,8 @@ function printListOrderProductReport(path,userType){
 										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
 <!--										<th><bean:message key="Tax" bundle="sysele"/></th>-->
 <!--										<th><bean:message key="Overall" bundle="sysele"/></th>-->
-										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>
-										<%if(user.getType().equalsIgnoreCase(User.DD)){ %>
-										<th><bean:message key="Order.ReceiveDate" bundle="sysele"/></th>
-										<%} %>
-										<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
+										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>					
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<%} %>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
@@ -304,30 +275,10 @@ function printListOrderProductReport(path,userType){
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 										</td>
 										<td align="center">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.uom.name==''}">
-														${lines1.uom1.code}
-													</c:when>
-													<c:otherwise>
-														${lines1.uom.code}
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
-												${lines1.fullUom}
-											<%} %>
+									        ${lines1.fullUom}
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.qty==0}">
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0" value="${lines1.qty}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -345,19 +296,10 @@ function printListOrderProductReport(path,userType){
 													<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
 												</c:otherwise>
 											</c:choose>
-											<%} %>
+											
 										</td>
 										<td align="right">
-											<%if(user.getType().equals(User.DD)){ %>
-												<c:choose>
-													<c:when test="${lines1.price==0}">
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price1}"/>
-													</c:when>
-													<c:otherwise>
-														<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price}"/>
-													</c:otherwise>
-												</c:choose>
-											<%}else{ %>
+											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
@@ -367,7 +309,7 @@ function printListOrderProductReport(path,userType){
 													<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price2}"/>												
 												</c:otherwise>
 											</c:choose>											
-											<%} %>
+										
 										</td>
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
@@ -435,7 +377,7 @@ function printListOrderProductReport(path,userType){
 								<%if(User.VAN.equals(user.getType())){%>
 									<td class="textSpecial">
 									    <%
-										  if("N".equals(canReceiptCheque)){
+										  if("N".equals(canReceiptMoreCash)){
 										%>
 											  <input type="checkbox" name="tempCheck" checked disabled/>  บันทึกรับเงินสดทันที
 											  <html:checkbox property="order.paymentCashNow" styleId="paymentCashNow"/>
@@ -546,6 +488,10 @@ function printListOrderProductReport(path,userType){
 						<html:hidden property="autoReceipt.creditCardType"/>
 						<html:hidden property="autoReceipt.internalBank"/>
 						<!--  -->
+						<!--  Can Receipt Credit (VAN)-->
+						<html:hidden property="canReceiptMoreCash"/>
+						<html:hidden property="canReceiptCredit"/>
+					
 						<html:hidden property="deletedId"/>
 						<html:hidden property="order.orderType"/>
 						<html:hidden property="order.id"/>

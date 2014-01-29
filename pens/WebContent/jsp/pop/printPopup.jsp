@@ -34,18 +34,19 @@
 function loadMe(_path){
 	
    <%
-	if("list_order_product".equals(request.getParameter("type_report"))){
+	if("list_order_product".equals(request.getParameter("report_name"))){
 		String customerId = request.getParameter("customerId");
 		%>
 	
 		document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId=<%=customerId%>";
 		document.orderForm.submit();
 		
-  <%}else if("tax_invoice_summary".equals(request.getParameter("type_report"))){ 
+  <%}else if("tax_invoice_summary".equals(request.getParameter("report_name"))){ 
 	  String orderId = request.getParameter("orderId");
+	  String reportType = request.getParameter("reportType");
   %>
 
-     document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER";
+     document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
 	 document.orderForm.submit();
   <%} %>
 }
