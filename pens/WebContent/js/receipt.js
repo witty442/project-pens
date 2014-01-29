@@ -81,6 +81,7 @@ function backToCusotmer(path,customerId) {
 function add_bill(path, id) {
 	// window.open(path + "/jsp/pop/billPopup.jsp?id=" + id, "Bill",
 	// "width=650,height=400,location=No,resizable=No");
+	alert('addBill');
 	
 	window.open(path + "/jsp/pop/billPopup2.jsp?id=" + id, "Bill",
 	"width=939,height=400,location=No,resizable=No");
@@ -88,10 +89,16 @@ function add_bill(path, id) {
 }
 
 function open_bill(path, rowNo) {
+	
+	//alert('openBill');
+	
+	//var screen_height= $(window).height();
+	var screen_width = $(window).width()-10;
+	
 	// get selected id
 	var selected="";
 	var objtxt = document.getElementsByName('bill.orderId');
-	for(i=0;i<objtxt.length;i++)
+	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
 	}
@@ -104,13 +111,13 @@ function open_bill(path, rowNo) {
 // window.open(path + "/jsp/pop/billPopup.jsp?selected="+selected, "Bill",
 // "width=650,height=400,location=No,resizable=No");
 		window.open(path + "/jsp/pop/billPopup2.jsp?selected="+selected+"&cust="+customerId, "Bill",
-			"width=939,height=400,location=No,resizable=No");
+			"width="+screen_width+",height=400,location=0");
 	else
 // window.open(path + "/jsp/pop/billPopup.jsp?row=" +
 // rowNo+"&selected="+selected, "Bill",
 // "width=650,height=400,location=No,resizable=No");
 		window.open(path + "/jsp/pop/billPopup2.jsp?row=" + rowNo+"&selected="+selected+"&cust="+customerId, "Bill",
-			"width=939,height=400,location=No,resizable=No");
+			"width="+screen_width+",height=400,location=0");
 	return;
 }
 
@@ -152,11 +159,11 @@ function deleteBill(path){
 	var bcheck=false;
 	var applyId = document.getElementsByName('pb.allBillId');
 	var allId;
-	for(i=chk.length-1;i>=0;i--){
+	for(var i=chk.length-1;i>=0;i--){
 		if(chk[i].checked){
 			
 			// check with apply
-			for(j=0;j<applyId.length;j++){
+			for(var j=0;j<applyId.length;j++){
 				allId = ','+applyId[j].value+',';
 				// alert(allId);
 				if(allId.indexOf(','+billIds[i].value+',')!=-1){
@@ -177,7 +184,7 @@ function deleteBill(path){
 	
 	chk = document.getElementsByName("billids");
 	var iconLabel="";
-	for(i=0;i<chk.length;i++){
+	for(var i=0;i<chk.length;i++){
 		tbl.rows[i+1].cells[0].innerHTML=(i+1);
 		iconLabel = "";
 		iconLabel += '<a href="#" onclick="editBill(\'' + path + '\','	+ (i+1) + ');">';
@@ -241,7 +248,7 @@ function validateReceiptByAmtCash_USER_TT(type){
 		var isZero = ((totalBillAmount+totalCNAmount)==0);
 		
 		if(recAmts != null){
-			for(i=0;i<recAmts.length;i++){
+			for(var i=0;i<recAmts.length;i++){
 				//alert(recAmts[i].value+":"+Number(recAmts[i].value).toFixed(2)+":"+checkAmtLessthan1(Number(recAmts[i]).toFixed(2)) +":WriteOff:"+writeOff[i].checked+",isZero["+isZero+"]");
 				//alert(payMethod[i].value);
 				if(payMethod[i].value == 'CS'){
@@ -267,7 +274,7 @@ function addBill(path, arrayVal) {
 
 	var jQtable = $('#tblBill');
 
-	for (i = 0; i < arrayVal.length; i++) {
+	for (var i = 0; i < arrayVal.length; i++) {
 		jQtable.each(function() {
 			var $table = $(this);
 			// Number of td's in the last table row
@@ -307,7 +314,7 @@ function setValueToBill(path, arrayVal) {
 	var checkBoxLabel;
 	var iconLabel;
 	var inputLabel;
-	for (i = 0; i < arrayVal.length; i++) {
+	for (var i = 0; i < arrayVal.length; i++) {
 
 		checkBoxLabel = '<input type="checkbox" name="billids" value="0"/>';
 
@@ -365,7 +372,7 @@ function createBillList(){
 	}
 	
 	divlines.innerHTML="";
-	for(i=0;i<ids.length;i++){
+	for(var i=0;i<ids.length;i++){
 		inputLabel="";
 		inputLabel+="<input type='text' name='lines["+i+"].id' value='"+ids[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].order.id' value='"+orderIds[i].value+"'>";
@@ -393,9 +400,10 @@ function createBillList(){
 function open_recpBy(path, rowNo) {
 	// get selected id
 	var selected="";
+	var screen_width = $(window).width()-10;
 	
 	window.open(path + "/jsp/pop/payByPopup.jsp?selected="+selected, "Bill",
-		"width=939,height=400,location=No,resizable=No");
+		"width="+screen_width+",height=400,location=No,resizable=No");
 	return;
 }
 
@@ -521,7 +529,7 @@ function deleteRecpBy(path){
 	var delId = document.getElementsByName('deletedRecpById')[0];
 	var drow;
 	var bcheck=false;
-	for(i=chk.length-1;i>=0;i--){
+	for(var i=chk.length-1;i>=0;i--){
 		if(chk[i].checked){
 			if(chk[i].value!=0)
 				delId.value+=","+chk[i].value;
@@ -538,7 +546,7 @@ function deleteRecpBy(path){
 	var mt;
 	var rca;
 	var ss;
-	for(i=0;i<chk.length;i++){
+	for(var i=0;i<chk.length;i++){
 		tbl.rows[i+1].cells[0].innerHTML=(i+1);
 		mt = document.getElementsByName('pb.methodName')[i];
 		rca = document.getElementsByName('pb.recAmount')[i];
@@ -559,7 +567,7 @@ function calculateAll(){
 	// Total Bill Amount
 	var creditAmt = document.getElementsByName('bill.creditAmt');
 	var totalBillAmt=0;
-	for(i=0;i<creditAmt.length;i++){
+	for(var i=0;i<creditAmt.length;i++){
 		totalBillAmt+=Number(creditAmt[i].value);
 	}
 	if(creditAmt.length==0){
@@ -575,7 +583,7 @@ function calculateAll(){
 	// Total CN Amount
 	var cnCreditAmt = document.getElementsByName('cn.creditAmt');
 	var totalCNAmt=0;
-	for(i=0;i<cnCreditAmt.length;i++){
+	for(var i=0;i<cnCreditAmt.length;i++){
 		totalCNAmt+=Number(cnCreditAmt[i].value);
 	}
 	
@@ -588,7 +596,7 @@ function calculateAll(){
 	// total Receipt
 	var recamt = document.getElementsByName('pb.recAmount');
 	var totRec=0;
-	for(i=0;i<recamt.length;i++){
+	for(var i=0;i<recamt.length;i++){
 		totRec+=Number(recamt[i].value);
 	}
 	document.getElementById('receiptAmount').value = Number(totRec).toFixed(2); 
@@ -602,11 +610,11 @@ function calculateAll(){
 	// Total Apply
 	var totalPaid=0;
 	var bp = document.getElementsByName('bill.paidAmt');
-	for(i=0;i<bp.length;i++){
+	for(var i=0;i<bp.length;i++){
 		totalPaid += Number(bp[i].value);
 	}
 	var cbp = document.getElementsByName('cn.paidAmt');
-	for(i=0;i<cbp.length;i++){
+	for(var i=0;i<cbp.length;i++){
 		totalPaid += Number(cbp[i].value);
 	}
 	if(document.getElementById('applyAmount'))
@@ -617,7 +625,7 @@ function calculateAll(){
 	if(creditAmt.length==0){
 		//worse case
 		var recAmt = document.getElementsByName('pb.recAmount');
-		for(i=0;i<recAmt.length;i++){
+		for(var i=0;i<recAmt.length;i++){
 			totalPaid+=Number(recAmt[i].value);
 		}
 	}
@@ -642,12 +650,12 @@ function updatePaidToBill(){
 	
 	var tbl = document.getElementById('tblBill');
 	
-	for(i=0;i<orders.length;i++){
+	for(var i=0;i<orders.length;i++){
 		paid=0;
 		remain=0;
-		for(j=0;j<allBill.length;j++){
+		for(var j=0;j<allBill.length;j++){
 			var bill = allBill[j].value.split(','); 
-			for(b=0;b<bill.length;b++){
+			for(var b=0;b<bill.length;b++){
 				if(bill[b]==orders[i].value){
 					// alert(bill[b]);
 					// alert(allPaid[j].value.split('||')[b]);
@@ -698,12 +706,12 @@ function updatePaidToCN(){
 	
 	var tbl = document.getElementById('tblCN');
 	
-	for(i=0;i<cns.length;i++){
+	for(var i=0;i<cns.length;i++){
 		paid=0;
 		remain=0;
-		for(j=0;j<allBill.length;j++){
+		for(var j=0;j<allBill.length;j++){
 			var bill = allBill[j].value.split(','); 
-			for(b=0;b<bill.length;b++){
+			for(var b=0;b<bill.length;b++){
 				if(bill[b]==cns[i].value){
 					// alert(bill[b]);
 					// alert(allPaid[j].value.split('||')[b]);
@@ -724,9 +732,10 @@ function updatePaidToCN(){
 
 function applyBill(path, rowNo, type , recAmount, seedId) {
 	// get selected id
+	var screen_width = $(window).width()-10;
 	var selected="";
 	var objtxt = document.getElementsByName('bill.orderId');
-	for(i=0;i<objtxt.length;i++)
+	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
 	}
@@ -738,7 +747,7 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 	// Credit Note..
 	var cns="";
 	var objCNs = document.getElementsByName('cn.cnId');
-	for(i=0;i<objCNs.length;i++)
+	for(var i=0;i<objCNs.length;i++)
 		cns+=','+objCNs[i].value;
 	
 	if(cns.length>0)
@@ -765,16 +774,16 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 	
 	if (rowNo == null)
 		window.open(path + "/jsp/pop/applyBillPopup.jsp?selected="+selected+"&rec="+recAmount+"&type="+type+"&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value, "ApplyBill",
-			"width=939,height=400,location=No,resizable=No");
+			"width="+screen_width+",height=400,location=No,resizable=No");
 	else
 		window.open(path + "/jsp/pop/applyBillPopup.jsp?row=" + rowNo+"&selected="+selected+"&rec="+recAmount+"&type="+type+"&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value, "ApplyBill",
-			"width=939,height=400,location=No,resizable=No");
+			"width="+screen_width+",height=400,location=No,resizable=No");
 	return;
 }
 
 function fillApply(seed,allbill,allpaid){
 	var seedObjs = document.getElementsByName('pb.seedId');
-	for(i=0;i<seedObjs.length;i++){
+	for(var i=0;i<seedObjs.length;i++){
 		if(seedObjs[i].value==seed){
 			if(allbill.length>0){allbill=allbill.substring(1,allbill.length);}
 			if(allpaid.length>0){allpaid=allpaid.substring(1,allpaid.length);}
@@ -820,7 +829,7 @@ function createBysList(){
 	var isOnlySalesPaid = true;
 	var no_of_customer_pay_by_cash = 0;
 	
-	for(i=0;i<ids.length;i++){
+	for(var i=0;i<ids.length;i++){
 		if( (allbills[i].value == null || allbills[i].value.length==0) 
 			&& (allCNs[i].value ==null || allCNs[i].value.length==0)){
 			alert('ไม่มียอดการตัดชำระ กรุณาตัดชำระใบแจ้งหนี้');return false;
@@ -874,7 +883,7 @@ function applyBillView(path, rowNo, type , recAmount, seedId) {
 	// get selected id
 	var selected="";
 	var objtxt = document.getElementsByName('bill.orderId');
-	for(i=0;i<objtxt.length;i++)
+	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
 	}
@@ -887,7 +896,7 @@ function applyBillView(path, rowNo, type , recAmount, seedId) {
 	// Credit Note..
 	var cns="";
 	var objCNs = document.getElementsByName('cn.cnId');
-	for(i=0;i<objCNs.length;i++)
+	for(var i=0;i<objCNs.length;i++)
 		cns+=','+objCNs[i].value;
 	
 	if(cns.length>0)
@@ -905,9 +914,10 @@ function applyBillView(path, rowNo, type , recAmount, seedId) {
 
 function openCn(path,customerId) {
 	// get selected id
+	var screen_width = $(window).width()-10;
 	var selected="";
 	var objtxt = document.getElementsByName('cn.cnId');
-	for(i=0;i<objtxt.length;i++)
+	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
 	}
@@ -915,13 +925,13 @@ function openCn(path,customerId) {
 		selected = selected.substring(1, selected.length);
 	
 	window.open(path + "/jsp/pop/CNPopup.jsp?selected="+selected+"&customerId="+customerId, "CN",
-			"width=939,height=400,location=No,resizable=No");
+			"width="+screen_width+",height=400,location=No,resizable=No");
 	return;
 }
 
 function addCN(path, arrayVal) {
 	var jQtable = $('#tblCN');
-	for (i = 0; i < arrayVal.length; i++) {
+	for (var i = 0; i < arrayVal.length; i++) {
 		jQtable.each(function() {
 			var $table = $(this);
 			// Number of td's in the last table row
@@ -959,7 +969,7 @@ function setValueToCN(path, arrayVal) {
 	var checkBoxLabel;
 	var iconLabel;
 	var inputLabel;
-	for (i = 0; i < arrayVal.length; i++) {
+	for (var i = 0; i < arrayVal.length; i++) {
 
 		checkBoxLabel = '<input type="checkbox" name="cnids" value="0"/>';
 
@@ -993,7 +1003,7 @@ function deleteCN(path){
 	var drow;
 	var bcheck=false;
 	var allId;
-	for(i=chk.length-1;i>=0;i--){
+	for(var i=chk.length-1;i>=0;i--){
 		if(chk[i].checked){
 			// alert(i);
 			drow = tbl.rows[i+1];
@@ -1005,14 +1015,14 @@ function deleteCN(path){
 	
 	chk = document.getElementsByName("cnids");
 	var iconLabel="";
-	for(i=0;i<chk.length;i++){
+	for(var i=0;i<chk.length;i++){
 		tbl.rows[i+1].cells[0].innerHTML=(i+1);
 	}
 }
 
 function fillCN(seed,allbill,allpaid){
 	var seedObjs = document.getElementsByName('pb.seedId');
-	for(i=0;i<seedObjs.length;i++){
+	for(var i=0;i<seedObjs.length;i++){
 		if(seedObjs[i].value==seed){
 			if(allbill.length>0){allbill=allbill.substring(1,allbill.length);}
 			if(allpaid.length>0){allpaid=allpaid.substring(1,allpaid.length);}
@@ -1041,7 +1051,7 @@ function createCNSList(){
 	var inputLabel="";
 	
 	divlines.innerHTML="";
-	for(i=0;i<ids.length;i++){
+	for(var i=0;i<ids.length;i++){
 		inputLabel="";
 		inputLabel+="<input type='text' name='cns["+i+"].id' value='"+ids[i].value+"'>";
 		inputLabel+="<input type='text' name='cns["+i+"].creditNote.id' value='"+cnIds[i].value+"'>";

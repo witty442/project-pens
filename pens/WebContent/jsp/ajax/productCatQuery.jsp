@@ -73,10 +73,17 @@ if(productCatL != null && productCatL.size() > 0){
 		String style = (basket.hasItemBrandInBasket(productCatCode))?"style=\"background-color:#FFFF99;\"":"";
 %>
 	<% if (newRow) { %><tr><% } %>
-	<td id="<%=productCatCode%>" class="catalog" <%=style%> >
-		<img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="50" width="68" onerror="imgError(this);" 
+	<td id="<%=productCatCode%>" class="catalog" <%=style%> width="20%">
+	  <table border='0'>
+	  <tr><td>
+		  <img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="60" width="120" onerror="imgError(this);" 
 						onclick="loadProducts(<%=productCatCode%>)"/>
-	<br><p class="brandName"><%=productCatCode+"-"+productCatName%></p></td>
+	   </td></tr>
+	   <tr><td>
+		   <p class="brandName"><%=productCatCode+"-"+productCatName%></p>
+	   </td></tr>
+	  </table>
+	</td>
 	<% if (closeRow) { %></tr><% } %>
 <% } %>
 	<tr></tr>

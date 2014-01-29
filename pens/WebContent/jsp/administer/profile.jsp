@@ -181,6 +181,33 @@ function changeRoles(val){
 								</td>
 							</tr>
 							<tr id="subInvs">
+								<c:if test="${userForm.pdList!=null}">
+								<td align="right" valign="top"><bean:message key="User.SubInv"  bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td colspan="2" align="left">
+									<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+										<c:forEach var="results" items="${userForm.pdList}" varStatus="rows">
+										  <c:if test="${results.pdCode !=''}">
+											<c:choose>
+												<c:when test="${rows.index %2 == 0}">
+													<c:set var="tabclass" value="lineO"/>
+												</c:when>
+												<c:otherwise>
+													<c:set var="tabclass" value="lineE"/>
+												</c:otherwise>
+											</c:choose>
+											<tr class="<c:out value='${tabclass}'/>">
+												<td align="center" width="10px">
+													<input type="checkbox" name="subinvids" value="${results.pdCode}" checked="checked" disabled="disabled"/>
+												</td>
+												<td align="left">${results.pdCode} - ${results.pdDesc}</td>
+											</tr>
+										   </c:if>
+										</c:forEach>
+									</table>
+								</td>
+								</c:if>
+							</tr> 
+							<%-- <tr id="subInvs">
 								<c:if test="${userForm.subInventories!=null}">
 								<td align="right" valign="top"><bean:message key="User.SubInv"  bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td colspan="2" align="left">
@@ -209,7 +236,7 @@ function changeRoles(val){
 									</table>
 								</td>
 								</c:if>
-							</tr>
+							</tr> --%>
 						</table>
 						<br>
 						<!-- BUTTON -->

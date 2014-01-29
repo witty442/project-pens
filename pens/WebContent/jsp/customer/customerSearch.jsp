@@ -1,3 +1,4 @@
+<%@page import="util.AppversionVerify"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -5,7 +6,7 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
+<%@taglib uri="http://displaytag.sf.net" prefix="display_cust" %>
 
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -33,6 +34,9 @@ pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -48,6 +52,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -69,6 +74,35 @@ function loadProvince(){
 		}).responseText;
 	});
 }
+
+<%if("true".equalsIgnoreCase(request.getParameter("showMsg"))){ %>
+
+$(function() {
+	$("#dialog").dialog({ height: 260,width:540,modal:false });
+  });
+ 
+ function close(){
+	 $("#dialog").dialog('close');
+ }
+ 
+ function linkToInterfaces(path){
+	window.location = path+"/jsp/interfaces/interfaces.jsp";
+ }
+ 
+ setTimeout(function(){ $("#dialog").dialog('close');},4000);
+ 
+ <%}else{%>
+ 
+ 
+ <%}%>
+ 
+ function gotoPage(path,page){
+		document.customerForm.action = path + "/jsp/customerAction.do?do=searchPage&rf=Y";
+		document.getElementsByName('curPage')[0].value = page;
+		document.customerForm.submit();
+		return true;
+	}
+ 
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -164,67 +198,112 @@ function loadProvince(){
 					</table>				
                     
 					<!-- RESULT -->
-					
-					<display:table id="item" name="requestScope.customerForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/customerAction.do?do=search" sort="list" pagesize="50">	
-							    
-					            <display:column  title="No" property="no"  sortable="false" class="cust_no" media=""/>
-							    <display:column  title="หมายเลขลูกค้า" property="code"  sortable="false" class="cust_code"/>
-							    <display:column  title="ชื่อ" property="name"  sortable="false" class="cust_name"/>	
-							    <display:column  title="ชื่อรอง" property="name2"  sortable="false" class="cust_name2"/>	
-							    <display:column  title="วงเงินสินเชื่อ" sortable="false" class="cust_creditLimit">
-							        <fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/>
-							    </display:column>	
-							    <display:column  title="ยอดบิลค้างชำระ " sortable="false" class="cust_totalInvoice">
-							        <fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/>
-							    </display:column>						    
-							    <display:column  title="โอนข้อมูลแล้ว" sortable="false" class="cust_exported" >	
+					<!-- Paging -->
+					 <c:if test="${customerForm.results != null}">
+						<span class="pagebanner">พบรายการ  ${customerForm.totalRow} รายการ  ,แสดงรายการทั้งหมด </span>
+						 <span class="pagelinks">หน้า
+							<c:forEach var="i" begin="1" end="${customerForm.totalPage}">
+							     <c:if test="${customerForm.curPage != i}">
+								    <a href="javascript:gotoPage('${pageContext.request.contextPath}','${i}')"><c:out value="${i}"/></a>&nbsp;,
+								 </c:if> 
+								 <c:if test="${customerForm.curPage == i}">
+								    &nbsp;<b><c:out value="${i}"/>&nbsp;,</b>
+								 </c:if> 
+						    </c:forEach>
+					    </span>
+					    
+					    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<tr >
+								<th class="cust_no">No.</th>
+								<th class="cust_code">หมายเลขลูกค้า</th>
+								<th class="cust_name">ชื่อ</th>
+								<th class="cust_name2">ชื่อรอง</th>
+								<th class="cust_creditLimit">วงเงินสินเชื่อ</th>
+								<th class="cust_totalInvoice">ยอดบิลค้างชำระ</th>
+								<th class="cust_exported" >โอนข้อมูลแล้ว</th>
+								<th class="cust_interfaces">สร้างข้อมูลที่ระบบกลางแล้ว</th>
+								<th class="cust_status">สถานะ</th>
+								<th class="cust_actionOrder">ทำรายการขาย</th>
+								<% if( role.equalsIgnoreCase(User.TT)){ %>
+								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
+								<%} %>
+								<% if( role.equalsIgnoreCase(User.VAN)){ %>
+								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
+								<%} %>
+								<th class="cust_actionView">แสดง</th>
+								<th class="cust_actionEdit">ทำรายการ</th>
+							</tr>	
+							<c:forEach var="item" items="${customerForm.results}" varStatus="rows">
+							<c:choose>
+								<c:when test="${item.no %2 == 0}">
+									<c:set var="tabclass" value="lineO"/>
+								</c:when>
+								<c:otherwise>
+									<c:set var="tabclass" value="lineE"/>
+								</c:otherwise>
+							</c:choose>
+							<tr class="<c:out value='${tabclass}'/>">
+								<td class="cust_no"><c:out value='${item.no}'/></td>
+								<td class="cust_code"><c:out value='${item.code}'/></td>
+								<td class="cust_name"><c:out value='${item.name}'/></td>
+								<td class="cust_name2"><c:out value='${item.name2}'/></td>
+								<td class="cust_creditLimit"><fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/></td>
+								<td class="cust_totalInvoice"><fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/></td>
+								<td class="cust_exported">
 								    <c:if test="${item.exported=='Y'}">
 										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 									</c:if>
-							    </display:column>
-							    
-							    <display:column  title="สร้างข้อมูลที่ระบบกลางแล้ว"  sortable="false" class="cust_interfaces">
-								    <c:if test="${item.interfaces=='Y'}">
+								</td>
+								<td class="cust_interfaces">
+								   <c:if test="${item.interfaces=='Y'}">
 										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 									</c:if>
-							    </display:column>
-							    <display:column  title="สถานะ" property ="activeLabel" sortable="false" class="cust_status"/>
-							    
-							    <display:column  title="ทำรายการขาย"  sortable="false" class="cust_actionOrder">
-							    	 <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${item.id})">
+								</td>
+								<td class="cust_status"><c:out value='${item.activeLabel}'/></td>
+								<td class="cust_actionOrder">
+								    <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${item.id})">
 							           <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
 							        </a> 
-							    </display:column>
-							    <display:column  title="ทำรายการรับเงิน" sortable="false" class="cust_actionReceipt" media="${item.displayActionReceipt}">
-							       <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${item.id}');">
-								         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
-								    </a>
-							    </display:column>	
-							    <display:column  title="แก้ไข ข้อมูลลูกค้า" sortable="false" class="cust_actionEditCust" media="${item.displayActionEditCust}">
-							       <c:if test="${item.canActionEditCust=='true'}">
-							          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${item.id}');">
-									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
-									  </a>
-									</c:if>
-									<c:if test="${item.canActionEditCust2=='true'}">
-							          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
-									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
-									  </a>
-									</c:if>
-							    </display:column>		
-							    
-							    <display:column  title="แสดง" sortable="false" class="cust_actionView">
-							        <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
+								</td>
+								<% if( role.equalsIgnoreCase(User.TT)){ %>
+									<td class="cust_actionReceipt">
+									 <c:if test="${item.displayActionReceipt==''}">
+									    <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${item.id}');">
+									         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
+									    </a>
+									 </c:if>
+									</td>
+								<%} %>
+								<% if( role.equalsIgnoreCase(User.VAN)){ %>
+									<td class="cust_actionEditCust">
+									   <c:if test="${item.displayActionEditCust==''}">
+										   <c:if test="${item.canActionEditCust=='true'}">
+									          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${item.id}');">
+											     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+											  </a>
+											</c:if>
+											<c:if test="${item.canActionEditCust2=='true'}">
+									          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
+											     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+											  </a>
+											</c:if>
+									   </c:if>
+									</td>
+								<%} %>
+								<td class="cust_actionView">
+								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
 									   <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
 									</a>
-							    </display:column>	
-							    <display:column  title="ทำรายการ"  sortable="false" class="cust_actionEdit">
-							       <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
+								</td>
+								<td class="cust_actionEdit">
+								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
 									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
 								   </a>
-							    </display:column>		
-					</display:table>
+								</td>
+							</tr>
+							</c:forEach>
+							</table>
+					</c:if>	
 					
 				<!-- Result -->	
 					<br>
@@ -239,6 +318,11 @@ function loadProvince(){
 							<td width="10%">&nbsp;</td>
 						</tr>
 					</table>
+					<!-- Hidden Field -->
+					<html:hidden property="curPage"/>
+					<html:hidden property="totalPage"/>
+					<html:hidden property="totalRow"/>
+					
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form>
 					<!-- BODY -->
@@ -265,5 +349,16 @@ function loadProvince(){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+
+<div id="dialog" title="คำแนะนำ" style="display:none">
+    <p align="center"><b>
+     <font color="red"><%=AppversionVerify.checkAppVersion(request) %></font></b>
+    </p>
+    <%=AppversionVerify.getMessageToSales(request)%>
+	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>
+	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
+	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
+</div>
+
 </body>
 </html>

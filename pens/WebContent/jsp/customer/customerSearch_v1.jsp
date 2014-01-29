@@ -1,3 +1,4 @@
+<%@page import="util.AppversionVerify"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -32,6 +33,9 @@ pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -47,6 +51,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -68,6 +73,27 @@ function loadProvince(){
 		}).responseText;
 	});
 }
+
+<%if("true".equalsIgnoreCase(request.getParameter("showMsg"))){ %>
+
+$(function() {
+	$("#dialog").dialog({ height: 260,width:540,modal:false });
+  });
+ 
+ function close(){
+	 $("#dialog").dialog('close');
+ }
+ 
+ function linkToInterfaces(path){
+	window.location = path+"/jsp/interfaces/interfaces.jsp";
+ }
+ 
+ setTimeout(function(){ $("#dialog").dialog('close');},4000);
+ 
+ <%}else{%>
+ 
+ 
+ <%}%>
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -163,120 +189,69 @@ function loadProvince(){
 					</table>				
                     
 					<!-- RESULT -->
-					<c:if test="${customerForm.results != null}">
-					<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>&nbsp;
-					<span class="searchResult">${customerForm.criteria.searchResult}</span>&nbsp;<bean:message key="Records"  bundle="sysprop"/></div>
-					<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-						<tr>
-							<th width="20px;"><bean:message key="No" bundle="sysprop"/></th>
-							<th width="50px;"><bean:message key="Customer.Code" bundle="sysele"/></th>
-							<th width="70px;"><bean:message key="Customer.Name" bundle="sysele"/></th>
-							<th width="70px;"><bean:message key="Customer.SubName" bundle="sysele"/></th>
-							<th class="costprice"><bean:message key="Customer.CreditLimit" bundle="sysele"/></th>
-							<th class="costprice"><bean:message key="Customer.TotalInvoice" bundle="sysele"/></th>
-							<%if(role.equalsIgnoreCase(User.VAN)) {%>
-							<th width="40px;"><bean:message key="Exported" bundle="sysele"/></th>
-							<th width="40px;"><bean:message key="Interfaces" bundle="sysele"/></th>
-							<%} %>
-							<th width="40px;"><bean:message key="Status" bundle="sysele"/></th>
-						    <th width="40px;">ทำรายการขาย</th>
-							<%if( role.equalsIgnoreCase(User.TT)){ %>
-							    <th width="40px;">ทำรายการรับเงิน</th>
-							<% } %>
-							<%if(role.equalsIgnoreCase(User.ADMIN) || role.equalsIgnoreCase(User.VAN)){ %>
-							<th width="40px;">แก้ไข<br/>ข้อมูลลูกค้า</th>
-							<%} %>
-                           <%if( !role.equalsIgnoreCase(User.ADMIN)){ %>
-							<th width="40px;"><bean:message key="View" bundle="sysprop"/></th>
-							<th width="40px;"><bean:message key="Transaction" bundle="sysprop"/></th>
-							<%} %>
-						</tr>
-					<c:forEach var="results" items="${customerForm.results}" varStatus="rows">
-						<c:choose>
-							<c:when test="${rows.index %2 == 0}">
-								<c:set var="tabclass" value="lineO"/>
-							</c:when>
-							<c:otherwise>
-								<c:set var="tabclass" value="lineE"/>
-							</c:otherwise>
-						</c:choose>
-						<tr class="<c:out value='${tabclass}'/>">
-							<td ><c:out value='${rows.index+1}'/></td>
-							<td align="left" >${results.code}</td>
-							<td align="left" >${results.name}</td>
-							<td align="left" >${results.name2}</td>
-							<td align="right" >
-								<fmt:formatNumber pattern="#,##0.00" value="${results.creditLimit}"/>
-							</td>
-							<td align="right" >
-								<fmt:formatNumber pattern="#,##0.00" value="${results.totalInvoice}"/>
-							</td>
-							<%if(role.equalsIgnoreCase(User.VAN)) {%>
-							<td align="center">
-								<c:if test="${results.exported=='Y'}">
-									<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-								</c:if>
-							</td>
-							<td align="center">
-								<c:if test="${results.interfaces=='Y'}">
-									<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-								</c:if>
-							</td>
-							<%} %>
-							<td align="center">${results.activeLabel}</td>
-
-							<td align="center">
-							     <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${results.id})">
-							         <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
-							     </a> 
-							</td>
-							<%if( role.equalsIgnoreCase(User.TT)){ %>
-								<td align="center">
-								      <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${results.id}');">
-								         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
-								      </a>
-								</td>
-							<% } %>
-							
-                        <!-- WIT EDIT:04/08/2554***************** -->
-                           <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-								<td>
-									<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${results.id}');">
-									<img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif"></a>
-								</td>
-							<%} %>
-						    <%if(role.equalsIgnoreCase(User.VAN)){ %>
-								<td align="center" width="50px;">
-									<c:if test="${results.orderAmount == 0}">
-									   <c:if test="${results.interfaces != 'Y'}">
-											<c:if test="${results.exported != 'Y'}">
-												<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${results.id}');">
-												<img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif"></a>
-											</c:if>
-									   </c:if>
+					
+					<display:table id="item" name="requestScope.customerForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
+							    requestURI="../jsp/customerAction.do?do=search" sort="list" pagesize="50">	
+							    
+					            <display:column  title="No" property="no"  sortable="false" class="cust_no" media=""/>
+							    <display:column  title="หมายเลขลูกค้า" property="code"  sortable="false" class="cust_code"/>
+							    <display:column  title="ชื่อ" property="name"  sortable="false" class="cust_name"/>	
+							    <display:column  title="ชื่อรอง" property="name2"  sortable="false" class="cust_name2"/>	
+							    <display:column  title="วงเงินสินเชื่อ" sortable="false" class="cust_creditLimit">
+							        <fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/>
+							    </display:column>	
+							    <display:column  title="ยอดบิลค้างชำระ " sortable="false" class="cust_totalInvoice">
+							        <fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/>
+							    </display:column>						    
+							    <display:column  title="โอนข้อมูลแล้ว" sortable="false" class="cust_exported" >	
+								    <c:if test="${item.exported=='Y'}">
+										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 									</c:if>
-								</td>
-							<%} %>
-							
-					   <!-- WIT EDIT:04/08/2554***************** -->
-						   <%if( !role.equalsIgnoreCase(User.ADMIN)){ %>
-								<td align="center" width="48px;">
-									<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
-									<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
-								</td>
-								<td align="center">
-									<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${results.id}');">
-									<img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
-								</td>
-							<%} %>
-						</tr>
-						
-					</c:forEach>
-					<tr>
-						<td align="left" class="footer" colspan="12">&nbsp;</td>
-					</tr>
-				</table>
-					</c:if>
+							    </display:column>
+							    
+							    <display:column  title="สร้างข้อมูลที่ระบบกลางแล้ว"  sortable="false" class="cust_interfaces">
+								    <c:if test="${item.interfaces=='Y'}">
+										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									</c:if>
+							    </display:column>
+							    <display:column  title="สถานะ" property ="activeLabel" sortable="false" class="cust_status"/>
+							    
+							    <display:column  title="ทำรายการขาย"  sortable="false" class="cust_actionOrder">
+							    	 <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${item.id})">
+							           <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
+							        </a> 
+							    </display:column>
+							    <display:column  title="ทำรายการรับเงิน" sortable="false" class="cust_actionReceipt" media="${item.displayActionReceipt}">
+							       <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${item.id}');">
+								         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
+								    </a>
+							    </display:column>	
+							    <display:column  title="แก้ไข ข้อมูลลูกค้า" sortable="false" class="cust_actionEditCust" media="${item.displayActionEditCust}">
+							       <c:if test="${item.canActionEditCust=='true'}">
+							          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${item.id}');">
+									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+									  </a>
+									</c:if>
+									<c:if test="${item.canActionEditCust2=='true'}">
+							          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
+									     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+									  </a>
+									</c:if>
+							    </display:column>		
+							    
+							    <display:column  title="แสดง" sortable="false" class="cust_actionView">
+							        <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
+									   <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
+									</a>
+							    </display:column>	
+							    <display:column  title="ทำรายการ"  sortable="false" class="cust_actionEdit">
+							       <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
+									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
+								   </a>
+							    </display:column>		
+					</display:table>
+					
+				<!-- Result -->	
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -315,5 +290,16 @@ function loadProvince(){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+
+<div id="dialog" title="คำแนะนำ" style="display:none">
+    <p align="center"><b>
+     <font color="red"><%=AppversionVerify.checkAppVersion(request) %></font></b>
+    </p>
+    <%=AppversionVerify.getMessageToSales(request)%>
+	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>
+	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
+	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
+</div>
+
 </body>
 </html>

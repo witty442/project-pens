@@ -45,11 +45,48 @@ function inputNum(e){
 	}else if(e.which){// NC//FF//OP
 		keynum = e.which;
 	}
+	
+	//alert(keynum);
 	if(!keynum){return true;}
 	if(keynum==8){return true;}
 	if(keynum==9){return true;}
-	if ((keynum>=48 && keynum<=57) || keynum==37 || keynum==39 ||(keynum>=96 && keynum<=105)){
-    	return true;
+	
+	//  eng top(pc) 48 -57
+	//  thai numpad(tablet) 231
+	//  del = 46
+	//  backspace = 8
+	//  left arrow	 37
+	//  right arrow	 39
+	//  eng numpad(pc) 96-105
+	if ((keynum>=48 && keynum<=57) || keynum==231 || keynum==37 || keynum==39 ||(keynum>=96 && keynum<=105)){
+		return true;
+	}else{
+	    return false;
+	}
+}
+
+function inputNum2(e,valueObj){
+	var keynum;
+	if(window.event){// IE
+		keynum = e.keyCode;
+	}else if(e.which){// NC//FF//OP
+		keynum = e.which;
+	}
+	
+	//alert(keynum);
+	if(!keynum){return true;}
+	if(keynum==8){return true;}
+	if(keynum==9){return true;}
+	
+	//  eng top(pc) 48 -57
+	//  thai numpad(tablet) 231
+	//  del = 46
+	//  backspace = 8
+	//  left arrow	 37
+	//  right arrow	 39
+	//  eng numpad(pc) 96-105
+	if ((keynum>=48 && keynum<=57) || keynum==231 || keynum==46 || keynum==8 || keynum==37 || keynum==39 ||(keynum>=96 && keynum<=105)){
+		return true;
 	}else{
 	    return false;
 	}
@@ -63,7 +100,7 @@ function isNum0to9andpoint(objText, e){// get number and point
 	}else if(e.which){// NC//FF//OP
 		keynum = e.which;
 	}
-	//alert(keynum);
+	//alert("x"+keynum);
 	if(!keynum){return true;}
 	if(keynum==8 || keynum==9 || keynum==189){return true;}
   	if ((keynum>=48 && keynum<=57) || keynum==46 || keynum==190 || keynum==110 || keynum==37 || keynum==39 || (keynum>=96 && keynum<=105)){
@@ -321,4 +358,10 @@ function days_between(date1, date2) {
     var difference_ms = Math.abs(date1_ms - date2_ms);
     
     return Math.round(difference_ms/one_day);
+}
+
+function isNumeric(obj){
+	if(isNaN(obj.value)){
+		obj.value = "";
+	}
 }

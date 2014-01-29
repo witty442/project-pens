@@ -199,11 +199,33 @@ function autoReceipt(path,type) {
 	var billId=0;
 	amount = document.getElementsByName('order.netAmount')[0].value;
 	billId = document.getElementsByName('order.id')[0].value;
-	if(type=='DD'){
-		window.open(path + "/jsp/pop/autoReceiptPopup.jsp?amount="+amount+"&billId="+billId, "AutoReceipt", "width=1000,height=300,location=No,resizable=No");
-	}
-	else if(type=='VAN'){
+	
+	if(type=='VAN'){
 		window.open(path + "/jsp/pop/autoReceiptPopupVan.jsp?amount="+amount+"&billId="+billId, "AutoReceipt", "width=1000,height=500,location=No,resizable=No");
+	}else{
+		save(path);
+	}
+}
+
+function autoReceiptNew(path,type,canReceiptCredit) {
+	
+	if(document.getElementsByName('order.shipAddressId')[0].value==''){
+		alert('ไม่มีที่อยู่แบบ Ship to ไม่สามารถบันทึกข้อมูลได้');
+		return false;
+	}
+	
+	if(document.getElementsByName('order.billAddressId')[0].value==''){
+		alert('ไม่มีที่อยู่แบบ Bill to ไม่สามารถบันทึกข้อมูลได้');
+		return false;
+	}
+	
+	var amount=0;
+	var billId=0;
+	amount = document.getElementsByName('order.netAmount')[0].value;
+	billId = document.getElementsByName('order.id')[0].value;
+	
+	if(type=='VAN'){
+		window.open(path + "/jsp/pop/autoReceiptPopupVan.jsp?amount="+amount+"&billId="+billId+"&canReceiptCredit="+canReceiptCredit, "AutoReceipt", "width=1000,height=500,location=No,resizable=No");
 	}else{
 		save(path);
 	}
@@ -262,6 +284,44 @@ function open_product(path, rowNo){
 	return;
 }
 
+
+function addProduct(path,objValue){
+	var tbl = document.getElementById('tblProduct');
+	var index = findDupIndex(tbl,objValue);
+	if(index<0){
+		addProduct2(path,objValue);
+		return;
+	}else{
+		//alert(1);
+		var qty1 = eval(document.getElementsByName('lines.qty1')[index].value) + eval(objValue.qty1);
+		var qty2 = eval(document.getElementsByName('lines.qty2')[index].value) + eval(objValue.qty2);
+		var amt1 = eval(document.getElementsByName('lines.amount1')[index].value) + eval(objValue.amount1);
+		var amt2 = eval(document.getElementsByName('lines.amount2')[index].value) + eval(objValue.amount2);
+		var disc1 = eval(document.getElementsByName('lines.disc1')[index].value) + eval(objValue.disc1);
+		var disc2 = eval(document.getElementsByName('lines.disc2')[index].value) + eval(objValue.disc2);
+		var total1 = eval(document.getElementsByName('lines.total1')[index].value) + eval(objValue.total1);
+		var total2 = eval(document.getElementsByName('lines.total2')[index].value) + eval(objValue.total2);
+		var vat1 = eval(document.getElementsByName('lines.vat1')[index].value) + eval(objValue.vat1);
+		var vat2 = eval(document.getElementsByName('lines.vat2')[index].value) + eval(objValue.vat2);
+		
+		tbl.rows[index+1].cells[4].innerHTML = addCommas(qty1) + '/' + addCommas(qty2); //qty
+		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2)); //total amount
+		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));//total discount
+		
+		document.getElementsByName('lines.qty1')[index].value = qty1;
+		document.getElementsByName('lines.qty2')[index].value = qty2;
+		document.getElementsByName('lines.amount1')[index].value = amt1;
+		document.getElementsByName('lines.amount2')[index].value = amt2;
+		document.getElementsByName('lines.disc1')[index].value = disc1;
+		document.getElementsByName('lines.disc2')[index].value = disc2;
+		document.getElementsByName('lines.total1')[index].value = total1;
+		document.getElementsByName('lines.total2')[index].value = total2;
+		
+		//WIT Edit :09/06/2011 :add method calculatePrice()
+		calculatePrice();
+	}
+}
+
 /** Product Table */
 function addProduct2(path,objValue){
 	var orderType = document.getElementsByName('order.orderType')[0].value;
@@ -300,41 +360,40 @@ function addProduct2(path,objValue){
     setValueToProduct(path,objValue);
 }
 
-function addProduct(path,objValue){
+function deleteProduct(path,type){
+	//todo play with type
 	var tbl = document.getElementById('tblProduct');
-	var index = findDupIndex(tbl,objValue);
-	if(index<0){
-		addProduct2(path,objValue);
-		return;
-	}else{
-		//alert(1);
-		var qty1 = eval(document.getElementsByName('lines.qty1')[index].value) + eval(objValue.qty1);
-		var qty2 = eval(document.getElementsByName('lines.qty2')[index].value) + eval(objValue.qty2);
-		var amt1 = eval(document.getElementsByName('lines.amount1')[index].value) + eval(objValue.amount1);
-		var amt2 = eval(document.getElementsByName('lines.amount2')[index].value) + eval(objValue.amount2);
-		var disc1 = eval(document.getElementsByName('lines.disc1')[index].value) + eval(objValue.disc1);
-		var disc2 = eval(document.getElementsByName('lines.disc2')[index].value) + eval(objValue.disc2);
-		var total1 = eval(document.getElementsByName('lines.total1')[index].value) + eval(objValue.total1);
-		var total2 = eval(document.getElementsByName('lines.total2')[index].value) + eval(objValue.total2);
-		var vat1 = eval(document.getElementsByName('lines.vat1')[index].value) + eval(objValue.vat1);
-		var vat2 = eval(document.getElementsByName('lines.vat2')[index].value) + eval(objValue.vat2);
-		
-		tbl.rows[index+1].cells[4].innerHTML = addCommas(qty1) + '/' + addCommas(qty2); //qty
-		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2)); //total amount
-		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));//total discount
-		
-		document.getElementsByName('lines.qty1')[index].value = qty1;
-		document.getElementsByName('lines.qty2')[index].value = qty2;
-		document.getElementsByName('lines.amount1')[index].value = amt1;
-		document.getElementsByName('lines.amount2')[index].value = amt2;
-		document.getElementsByName('lines.disc1')[index].value = disc1;
-		document.getElementsByName('lines.disc2')[index].value = disc2;
-		document.getElementsByName('lines.total1')[index].value = total1;
-		document.getElementsByName('lines.total2')[index].value = total2;
-		
-		//WIT Edit :09/06/2011 :add method calculatePrice()
-		calculatePrice();
+	var chk = document.getElementsByName("lineids");
+	var delId = document.getElementsByName('deletedId')[0];
+	var drow;
+	var bcheck=false;
+	for(var i=chk.length-1;i>=0;i--){
+		if(chk[i].checked){
+			delId.value+=","+chk[i].value;
+			// alert(i);
+			drow = tbl.rows[i+1];
+			$(drow).remove();
+			bcheck=true;
+		}
 	}
+	if(!bcheck){alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;}
+	
+	var orderType = document.getElementsByName('order.orderType')[0].value;
+	
+	chk = document.getElementsByName("lineids");
+	//alert(chk.length);
+	
+	var iconLabel="";
+	for(var i=0;i<chk.length;i++){
+		//alert("row["+(i+1)+"]:"+tbl.rows[i+1].cells[2].innerHTML);
+		tbl.rows[i+1].cells[0].innerHTML=(i+1);
+		iconLabel="";
+		iconLabel+='<a href="#" onclick="open_product(\''+path+'\','+(i+1)+');">';
+		iconLabel+="<img border=0 src='"+path+"/icons/doc_edit.gif'></a>";
+		
+		tbl.rows[i+1].cells[11].innerHTML= "";//iconLabel;
+	}
+	calculatePrice();
 }
 
 function findDupIndex(tbl,objValue){
@@ -416,7 +475,7 @@ function setValueToProduct(path, objValue){
 	tbl.rows[objValue.row].cells[c++].innerHTML='0';//netAmount
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.ship; //shipDate
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.req; //requestDate
-	tbl.rows[objValue.row].cells[c++].innerHTML=iconLabel; //icon promotion
+	tbl.rows[objValue.row].cells[c++].innerHTML= "";//iconLabel; //icon edit
 	
 	//caculate price
 	calculatePrice();
@@ -476,56 +535,27 @@ function createProductList(){
 	}
 	
 	divlines.innerHTML="";
-	for(i=0;i<ids.length;i++){
+	for(var i=0;i<ids.length;i++){
 		inputLabel="";
 		inputLabel+="<input type='text' name='lines["+i+"].id' value='"+ids[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].product.id' value='"+productIds[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].product.code' value='"+products[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].product.name' value='"+productLabels[i].value+"'>";
-		
-		if(orderType=='DD' && uomIds[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].uom.id' value='"+uomIds[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].uom1.id' value='"+uomIds1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].uom2.id' value='"+uomIds2[i].value+"'>";
-		
 		inputLabel+="<input type='text' name='lines["+i+"].fullUom' value='"+fullUoms[i].value+"'>";
-		
-		if(orderType=='DD' && uomLabels[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].uom.code' value='"+uomLabels[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].uom1.code' value='"+uomLabels1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].uom2.code' value='"+uomLabels2[i].value+"'>";
-		if(orderType=='DD' && prices[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].price' value='"+prices[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].price1' value='"+prices1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].price2' value='"+prices2[i].value+"'>";
-		if(orderType=='DD' && qtys[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].qty' value='"+qtys[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].qty1' value='"+qtys1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].qty2' value='"+qtys2[i].value+"'>";
-		if(orderType=='DD' && amounts[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].lineAmount' value='"+amounts[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].lineAmount1' value='"+amounts1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].lineAmount2' value='"+amounts2[i].value+"'>";
-		if(orderType=='DD' && discs[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].discount' value='"+discs[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].discount1' value='"+discs1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].discount2' value='"+discs2[i].value+"'>";
-		
-		if(orderType=='DD' && vats[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].vatAmount' value='"+vats[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].vatAmount1' value='"+vats1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].vatAmount2' value='"+vats2[i].value+"'>";
-		
-		if(orderType=='DD' && totals[i]!=null){
-			inputLabel+="<input type='text' name='lines["+i+"].totalAmount' value='"+totals[i].value+"'>";
-		}
 		inputLabel+="<input type='text' name='lines["+i+"].totalAmount1' value='"+totals1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].totalAmount2' value='"+totals2[i].value+"'>";
 		
@@ -583,7 +613,7 @@ function calculatePrice(){
 	var memberVIP = document.getElementsByName('memberVIP')[0].value;
 	//alert(orderType);
 	
-	for(i=0;i<totals1.length;i++)
+	for(var i=0;i<totals1.length;i++)
 	{
 		t=0;
 		vl=0;
@@ -658,43 +688,6 @@ function toFixed(num, pre){
 	return num.toFixed(pre);
 }
 
-function deleteProduct(path,type){
-	//todo play with type
-	var tbl = document.getElementById('tblProduct');
-	var chk = document.getElementsByName("lineids");
-	var delId = document.getElementsByName('deletedId')[0];
-	var drow;
-	var bcheck=false;
-	for(i=chk.length-1;i>=0;i--){
-		if(chk[i].checked){
-			delId.value+=","+chk[i].value;
-			// alert(i);
-			drow = tbl.rows[i+1];
-			$(drow).remove();
-			bcheck=true;
-		}
-	}
-	if(!bcheck){alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;}
-	
-	var orderType = document.getElementsByName('order.orderType')[0].value;
-	
-	chk = document.getElementsByName("lineids");
-	var iconLabel="";
-	for(i=0;i<chk.length;i++){
-		tbl.rows[i+1].cells[0].innerHTML=(i+1);
-		iconLabel="";
-		iconLabel+='<a href="#" onclick="open_product(\''+path+'\','+(i+1)+');">';
-		iconLabel+="<img border=0 src='"+path+"/icons/doc_edit.gif'></a>";
-		
-		if(orderType=='DD'){
-			tbl.rows[i+1].cells[13].innerHTML=iconLabel;
-		}else{
-			tbl.rows[i+1].cells[12].innerHTML=iconLabel;
-		}
-	}
-	
-	calculatePrice();
-}
 
 function createAutoReceipt(path,action) {
 	//alert("action:"+action);

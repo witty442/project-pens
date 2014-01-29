@@ -268,7 +268,7 @@ function setValueToProduct(path, objValue){
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.uomLabel1 + '/' + objValue.uomLabel2;
 	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.qty1) + '/' + addCommas(objValue.qty2);
 	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.amount1) + eval(objValue.amount2)).toFixed(2));
-	tbl.rows[objValue.row].cells[c++].innerHTML=iconLabel;
+	tbl.rows[objValue.row].cells[c++].innerHTML="";//iconLabel;
 	
 	calculatePrice();
 	return true;
@@ -433,7 +433,7 @@ function deleteProduct(path,type){
 		iconLabel+='<a href="#" onclick="open_product(\''+path+'\','+(i+1)+');">';
 		iconLabel+="<img border=0 src='"+path+"/icons/doc_edit.gif'></a>";
 		
-		tbl.rows[i+1].cells[6].innerHTML=iconLabel;
+		//tbl.rows[i+1].cells[6].innerHTML=iconLabel;
 		
 	}
 	
