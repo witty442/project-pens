@@ -176,16 +176,16 @@ body {
 									    <a href="javascript:addNewUser('${pageContext.request.contextPath}');"> 
 										<img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif">&nbsp; เพิ่ม</a>
 										&nbsp; 
-										<a href="javascript:changeActive('${pageContext.request.contextPath}','Y');"> 
+										<a href="javascript:changeActive('${pageContext.request.contextPath}','Y',document.getElementsByName('ids'));"> 
 										<img border=0 src="${pageContext.request.contextPath}/icons/user_active.gif"> <bean:message key="Active" bundle="sysprop"/></a> &nbsp; 
-										<a href="javascript:changeActive('${pageContext.request.contextPath}','N');"> 
+										<a href="javascript:changeActive('${pageContext.request.contextPath}','N',document.getElementsByName('ids'));"> 
 										<img border=0 src="${pageContext.request.contextPath}/icons/user_inactive.gif"> ยกเลิก</a>
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									     เลือกข้อมูลกลุ่มผู้ใช้
 									     <html:select property="user.changeUserGroup">
 									         <html:options collection="groupList" property="key" labelProperty="name"/>
 							            </html:select>
-							            <a href="javascript:changeUserGroup('${pageContext.request.contextPath}')">
+							            <a href="javascript:changeUserGroup('${pageContext.request.contextPath}',document.getElementsByName('ids'))">
 											<input type="button" value="เปลี่ยนกลุ่มผู้ใช้  " class="newNegBtn">
 										</a>
 									</td>

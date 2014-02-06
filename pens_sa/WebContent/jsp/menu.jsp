@@ -9,26 +9,35 @@
 	User user = (User)session.getAttribute("user");
 %>
 <ul id="nav">
+<%
+if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
+%>
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
 		<ul>
-			<%
-				if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
-			%>
-<!--           	<li>-->
-<!--				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/userAction.do?do=init&action=new';"><span><bean:message key="User" bundle="sysprop"/></span></a>-->
-<!--			</li>-->
-<!--			<li>-->
-<!--				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/groupRoleAction.do?do=prepare&action=new';"><span><bean:message key="Group" bundle="sysprop"/></span></a>-->
-<!--			</li>-->
-<!--			<li>-->
-<!--				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/roleAction.do?do=prepare&action=new';"><span><bean:message key="Role" bundle="sysprop"/></span></a>-->
-<!--			</li>-->
-			<%} %>
+           	<li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/userAction.do?do=init&action=new';"><span><bean:message key="User" bundle="sysprop"/></span></a>
+			</li>
+			<%-- <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/groupRoleAction.do?do=prepare&action=new';"><span><bean:message key="Group" bundle="sysprop"/></span></a>
+			</li>
 			<li>
-	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalyst/sales_analyst.jsp?action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/roleAction.do?do=prepare&action=new';"><span><bean:message key="Role" bundle="sysprop"/></span></a>
+			</li>  --%>
+			
+		</ul>
+	</li>
+<%} %>
+	
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
+		<ul>
+			<li>
+	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
 	       </li>
 		</ul>
 	</li>
 	
+	<li>
+	   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
+	</li>
 </ul>
    

@@ -14,9 +14,10 @@
 <%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
 
 <%
-	if(request.getParameter("action") != null){
-        SAProcess.getInstance().initSession(request);
-     }
+
+if(request.getParameter("action") != null){
+    SAProcess.getInstance().initSession(request);
+ }
 
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
 java.util.List yearList = null;
@@ -106,9 +107,12 @@ function chkSearch(){
    //alert(typeSearch.value);
 	disabledObj(document.getElementsByName("salesBean.day")[0] ,false);
 	disabledObj(document.getElementsByName("salesBean.dayTo")[0] ,false);
-	for(i=0;i<4;i++){
+	
+	var quarterList = document.getElementsByName("salesBean.chkQuarter");
+	for(i=0;i<quarterList.length;i++){
 	   disabledObj(document.getElementsByName("salesBean.chkQuarter")[i],false);
 	}
+	
 	var monthList = document.getElementsByName("salesBean.chkMonth");
 	for(i=0;i<monthList.length;i++){
        disabledObj(document.getElementsByName("salesBean.chkMonth")[i],false);
@@ -124,18 +128,18 @@ function chkSearch(){
 	   for(i=0;i< <%=yearList!=null?yearList.size():0%>; i++){
 		  disabledObj(document.getElementsByName("salesBean.chkYear")[i],true);
 	   }
-	   for(i=0;i<4;i++){
-		  disabledObj(document.getElementsByName("salesBean.chkQuarter")[i],true);
-	   }
+	   for(i=0;i<quarterList.length;i++){
+		   disabledObj(document.getElementsByName("salesBean.chkQuarter")[i],true);
+		}
     }else  if(typeSearch.value == 'MONTH'){
        disabledObj(document.getElementsByName("salesBean.day")[0] ,true);
        disabledObj(document.getElementsByName("salesBean.dayTo")[0] ,true);
        for(i=0;i < <%=yearList!=null?yearList.size():0%>; i++){
     	   disabledObj(document.getElementsByName("salesBean.chkYear")[i],true);
     	}
-       for(i=0;i<4;i++){
+       for(i=0;i<quarterList.length;i++){
     	   disabledObj(document.getElementsByName("salesBean.chkQuarter")[i],true);
-    	}
+       }
     }else  if(typeSearch.value == 'QUARTER'){
    	   disabledObj(document.getElementsByName("salesBean.day")[0] ,true);
        disabledObj(document.getElementsByName("salesBean.dayTo")[0] ,true);
@@ -151,9 +155,9 @@ function chkSearch(){
     	for(i=0;i<monthList.length;i++){
  	       disabledObj(document.getElementsByName("salesBean.chkMonth")[i],true);
  	    }
-    	for(i=0;i<4;i++){
+    	for(i=0;i<quarterList.length;i++){
     	   disabledObj(document.getElementsByName("salesBean.chkQuarter")[i],true);
-    	}
+        }
     }
 }
 
@@ -162,12 +166,23 @@ function chkYear(){
 	
 	var yearList = $('select#yearList option');
 
+	//Month
 	for(var i=0; i<yearList.size();i++){
 		if(yearList[i].value == year){
 			$('tr#'+yearList[i].value).show();
 		}
 		else{
 			$('tr#'+yearList[i].value).hide();
+		}
+	}
+	
+	//Quarter
+	for(var i=0; i<yearList.size();i++){
+		if(yearList[i].value == year){
+			$('tr#'+yearList[i].value+"_Q").show();
+		}
+		else{
+			$('tr#'+yearList[i].value+"_Q").hide();
 		}
 	}
 }
@@ -196,6 +211,26 @@ function searchOrder(path, type, field) {
 function getSQL(path, type) {
 	if(validateCriteria()){
 	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=getSQL";
+	   document.salesAnalystReportForm.submit();
+	   return true;
+	}
+	return false;
+}
+
+function saveProfile(path, type) {
+	var profileId = $('#profileId').val();
+	if(profileId != '0'){
+	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=saveProfile";
+	   document.salesAnalystReportForm.submit();
+	   return true;
+	}
+	return false;
+}
+
+function changeProfile(path, type) {
+	var profileId = $('#profileId').val();
+	if(profileId != '0'){
+	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=changeProfile";
 	   document.salesAnalystReportForm.submit();
 	   return true;
 	}
@@ -428,7 +463,7 @@ function showSearchValuePopup(path,currCondNo){
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
 		window.open(encodeURI(url),"",
-				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=500px,status=no,left="+ 50 + ",top=" + 0);
+				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 	}
 }
 
@@ -758,7 +793,41 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 						<html:form action="/jsp/salesAnalystReportAction">
 						<html:hidden property="salesBean.returnString"/>
 			            <jsp:include page="../error.jsp"/>	
-                            
+			             <fieldset>
+			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+			                  <tr><td>
+                               <%out.println(Utils.isNull(session.getAttribute("USER_ROLE_INFO"))); %>
+                              </td></tr>
+                             
+                            </table>
+                           </fieldset>
+                           
+                           <fieldset>
+			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+			                  <tr><td>
+			                  
+		                            <fieldset>
+					                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+					                  <tr>
+					                      <td width="30%" align="right">
+					                                                                                       รูปแบบการค้นหาที่ใช้ประจำ
+					                      <td>
+					                      <td width="15%" align="left">
+		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" >
+											         <html:options collection="profileList" property="key" labelProperty="name"/>
+									            </html:select>
+		                                  </td>
+		                                  <td width="35%" align="center">
+		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="newPosBtn" style="width: 150px;" 
+												     onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" />
+										 </td>
+		                              </tr>
+		                            </table>
+		                           </fieldset>
+                                </td> </tr>
+                            </table>
+                           </fieldset>
+                           
                             <!-- Criteria -->
                             <fieldset>
                            
@@ -827,12 +896,14 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									       <fieldset>
 									       <legend>ไตรมาส</legend>
 										    <table width="100%" border="0">
-	                                         <tr>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">1</html:multibox>ไตรมาส 1</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">2</html:multibox>ไตรมาส 2</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">3</html:multibox>ไตรมาส 3</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">4</html:multibox>ไตรมาส 4</td>
-	                                         </tr>
+										     <c:forEach var="item" items="${yearList}" >
+		                                         <tr id="${item.key}_Q">
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}1</html:multibox>ไตรมาส 1</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}2</html:multibox>ไตรมาส 2</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}3</html:multibox>ไตรมาส 3</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}4</html:multibox>ไตรมาส 4</td>
+		                                         </tr>
+		                                     </c:forEach>
                                            </table>
                                         </fieldset>
                                       </td>
@@ -956,6 +1027,14 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									         <html:hidden property="salesBean.condValue4"  styleId="condValue4"></html:hidden>							 
 								        </td>
 		                              </tr>
+		                              
+		                              <tr nowarp="nowarp" >
+		                                <%-- <td align="left" width="20%"></td>
+		                                <td align="center" width="5%"></td>
+		                                <td align="left" width="75%"><html:radio property="salesBean.includePos" value="Y" />รวม Pos
+		                                &nbsp;<html:radio property="salesBean.includePos" value="N"/>Offtake</td> --%>
+		                              </tr>
+		                              
 	                              </table>
 	                           </fieldset>
                             </td>
@@ -1069,6 +1148,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 							<br></br>
 							
 							<!-- RESULT -->
+							
 							<%out.print(Utils.isNull(session.getAttribute("RESULT"))); %>
 							
 						    <!-- RESULT -->

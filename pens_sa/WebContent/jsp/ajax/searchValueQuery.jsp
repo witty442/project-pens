@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.report.salesanalyst.DisplayBean"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>
@@ -8,7 +9,7 @@ String condCode = (String)request.getParameter("condCode");
 String condType = (String) request.getParameter("condType");
 String outputText = "";
 SAProcess process = new SAProcess();
-List<References> lstData = null;
+List<DisplayBean> lstData = null;
 
 boolean isMultiCode = condCode.indexOf(",") > -1;
 String value = "";

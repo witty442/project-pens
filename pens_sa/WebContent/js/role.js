@@ -33,7 +33,7 @@ function addRole(path,roleId) {
 }
 
 function editRole(path,roleId,roleName) {
-	document.roleForm.action = path + "/jsp/roleAddAction.do?do=editRole&roleId="+roleId+"&roleName="+roleName;
+	document.roleForm.action = path + "/jsp/roleAddAction.do?do=editRole&roleId="+roleId;;
 	document.roleForm.submit();
 	return true;
 }

@@ -87,7 +87,7 @@ body {
 							</tr>
 							<tr>
 								<td align="right">Role&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="role.roleId" size="20"/></td>
+								<td align="left"><html:text property="role.roleName" size="20"/></td>
 							</tr>
 							<tr>
 								<td align="right">ประเภทข้อมูล&nbsp;&nbsp;</td>
@@ -111,6 +111,11 @@ body {
 									<!--<img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn">-->
 									<input type="button" value="ค้นหา" class="newPosBtn">
 									</a>
+									
+									<a href="javascript:addRole('${pageContext.request.contextPath}','');"> 
+										<input type="button" value="Add New Role" class="newPosBtn">
+									</a>
+										
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 									<!--<img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn">-->
 									<input type="button" value="Clear" class="newNegBtn">
@@ -124,7 +129,7 @@ body {
 				        <c:if test="${ROLE_LIST != null}">
 				        
 				        <display:table width="70%" id="item" name="sessionScope.ROLE_LIST"  
-						    defaultsort="0" defaultorder="descending" requestURI="../jsp/roleAction.do?do=search" sort="list" pagesize="30"
+						    defaultsort="0" defaultorder="descending" requestURI="../jsp/roleAction.do?do=search" sort="list" pagesize="60"
 						    class ="resultDisp" border="0" cellpadding="1" cellspacing="1"
 						    align ="center">	
 						    
@@ -156,7 +161,7 @@ body {
 									<td align="left" colspan="10" class="footer">&nbsp; 
 										<a href="javascript:addRole('${pageContext.request.contextPath}','');"> 
 										<img border=0 src="${pageContext.request.contextPath}/icons/data_add.gif"> 
-										Add Role</a> &nbsp; 
+										Add New Role</a> &nbsp; 
 									</td>
 								</tr>
 						</table>

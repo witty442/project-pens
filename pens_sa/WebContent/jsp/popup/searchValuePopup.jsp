@@ -41,23 +41,25 @@
  String condType3 = Utils.isNull(request.getParameter("condType3"));
  String condCode3 = Utils.isNull(request.getParameter("condCode3"));
  
- System.out.println("currCondNo:"+currCondNo+",currCondNameValue:"+currCondTypeValue);
- 
+// System.out.println("currCondNo:"+currCondNo+",currCondNameValue:"+currCondTypeValue);
+String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+System.out.println("currentPage:"+currentPage);
+
  String navigation = "";
  if(currCondNo.equals("1")){
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(currCondTypeValue)); 
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
  }else if(currCondNo.equals("2")){
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(currCondTypeValue)); 
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
  }else if(currCondNo.equals("3")){
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(currCondTypeValue)); 
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
  }else if(currCondNo.equals("4")){
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(condType3))+"["+condCode3+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(currCondTypeValue)); 
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType3))+"["+condCode3+"]" +"->";
+	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
  }
  
  
@@ -66,6 +68,15 @@
  }
  
  pageContext.setAttribute("isMultiSelect", isMultiSelect, PageContext.PAGE_SCOPE);
+ 
+ 
+ /** Store Select MutilCode in each Page **/
+ String codes = Utils.isNull(session.getAttribute("codes"));
+ String keys = Utils.isNull(session.getAttribute("keys"));
+ String descs = Utils.isNull(session.getAttribute("descs"));
+ 
+ System.out.println("codes:"+codes);
+ 
 %>
 <script type="text/javascript">
 
@@ -136,43 +147,29 @@ function setConditionParent(condNo,condCode,condType){
 
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
-	var code = document.getElementsByName("code");
-	var key = document.getElementsByName("key");
-	var desc = document.getElementsByName("desc");
 
 	var currCondTypeValue = document.getElementsByName("currCondTypeValue")[0].value;
     var currCondNo = document.getElementsByName("currCondNo")[0].value;
 	
-	var idx = 0;
-	var retCode = '';
-	var retKey = '';
-	var retDesc = '';
-
-	for(i=0;i<chk.length;i++){
-        if(chk[i].checked){
-			if(idx<=0){
-				retCode = code[i].value;
-				retKey = key[i].value;
-				retDesc = desc[i].value;
-			}
-			else{
-				retCode = retCode+','+code[i].value;
-				retKey = retKey+','+key[i].value;
-				retDesc = retDesc+','+desc[i].value;
-			}
-
-			idx++;
-        }
-	}
+	var idx = 2;
+	//Add Select Muti in each page 
+	
+	var retCode = document.getElementsByName("codes")[0].value;
+	var retKey = document.getElementsByName("keys")[0].value;
+	var retDesc = document.getElementsByName("descs")[0].value;
+	
+	retCode = retCode.substring(0,retCode.length-1);
+	retKey = retKey.substring(0,retKey.length-1);
+	retDesc = retDesc.substring(0,retDesc.length-1);
+	
+	//alert(retCode);
 	
 	//alert("idx:"+idx);
 	if(idx ==1){
 		//alert(currCondNo+","+retCode+":"+retKey+":"+retDesc);
 		window.opener.setMainValue(retCode,retKey,retDesc ,currCondNo);
-	}
-	else{
+	}else{
 		//alert(currCondNo+":"+retCode+":"+retKey+":"+retDesc);
-		
 		window.opener.setMultiCode(retKey);
 		window.opener.setMultiKey(retCode);
 		window.opener.setMultiValueDisp(retDesc);
@@ -186,12 +183,147 @@ function selectMultiple(){
 	window.close();
 }
 
+function saveSelectedInPage(no){
+	//alert(no);
+	var chk = document.getElementsByName("chCheck");
+	var code = document.getElementsByName("code");
+	var key = document.getElementsByName("key");
+	var desc = document.getElementsByName("desc");
+	
+	var currentPage = document.getElementsByName("currentPage")[0].value;
+	
+	var retCode = '';
+	var retKey = '';
+	var retDesc = '';
+	
+	var codesAllNew = "";
+	var keysAllNew = "";
+	var descsAllNew = "";
+
+	if(no >= 21){
+	   no = no - ( (currentPage-1) *20);
+	}
+	//alert(no);
+	
+    if(chk[no-1].checked){
+    	//Add 
+        retCode = code[no-1].value;
+		retKey = key[no-1].value;
+		retDesc = desc[no-1].value;
+		
+		//alert(retCode);
+	    codesAllNew = document.getElementsByName("codes")[0].value;
+		keysAllNew = document.getElementsByName("keys")[0].value;
+		descsAllNew = document.getElementsByName("descs")[0].value;
+		
+	    var found = chekCodeDupInCodesAll(retCode);
+
+	    if(found == false){
+	  	   codesAllNew += retCode +",";
+	  	   keysAllNew  += retKey  +",";
+	  	   descsAllNew += retDesc +",";
+	    }
+	    document.getElementsByName("codes")[0].value =  codesAllNew;
+	    document.getElementsByName("keys")[0].value =  keysAllNew;
+	    document.getElementsByName("descs")[0].value =  descsAllNew;
+	    
+    }else{
+    	//remove
+    	retCode = code[no-1].value;
+		retKey = key[no-1].value;
+		retDesc = desc[no-1].value;
+		
+		//alert(retCode);
+	    codesAllNew = document.getElementsByName("codes")[0].value;
+		keysAllNew = document.getElementsByName("keys")[0].value;
+		descsAllNew = document.getElementsByName("descs")[0].value;
+		
+	    removeUnSelected(retCode);
+    }
+	
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/setValueSelected.jsp",
+			data : "codes=" + encodeURIComponent(document.getElementsByName("codes")[0].value) +
+			       "&keys=" + encodeURIComponent(document.getElementsByName("keys")[0].value) +
+			       "&descs=" + encodeURIComponent(document.getElementsByName("descs")[0].value),
+			//async: false,
+			cache: true,
+			success: function(){
+			}
+		}).responseText;
+	});
+}
+
+function chekCodeDupInCodesAll(codeCheck){
+	var codesAll = document.getElementsByName("codes")[0].value;
+	var codesAllArray = codesAll.split(",");
+	var found = false;;
+	for(var i=0;i < codesAllArray.length; i++){
+   		if(codesAllArray[i] == codeCheck){
+   			found = true;
+   			break;
+   		}//if
+	}//for
+	return found;
+}
+
+function removeUnSelected(codeCheck){
+	var codesAll = document.getElementsByName("codes")[0].value;
+	var keysAll = document.getElementsByName("keys")[0].value;
+	var descsAll = document.getElementsByName("descs")[0].value;
+	
+	var codesAllArray = codesAll.split(",");
+	var keysAllArray = keysAll.split(",");
+	var descsAllArray = descsAll.split(",");
+	
+	var codesAllNew  = "";
+	var keysAllNew  = "";
+	var descsAllNew  = "";
+	
+	for(var i=0;i < codesAllArray.length; i++){
+   		if(codesAllArray[i] != codeCheck){
+   		   codesAllNew += codesAllArray[i] +",";
+	  	   keysAllNew  += keysAllArray[i]  +",";
+	  	   descsAllNew += descsAllArray[i] +",";
+   		}//if
+	}//for
+	
+	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
+	keysAllNew = keysAllNew.substring(0,keysAllNew.length-1);
+	descsAllNew = descsAllNew.substring(0,descsAllNew.length-1);
+	
+	document.getElementsByName("codes")[0].value =  codesAllNew;
+	document.getElementsByName("keys")[0].value =  keysAllNew;
+	document.getElementsByName("descs")[0].value =  descsAllNew;
+}
+
+function setChkInPage(){
+	var chk = document.getElementsByName("chCheck");
+	var code = document.getElementsByName("code");
+	
+	var codes = document.getElementsByName("codes")[0].value;
+	var codesChk = codes.split(",");
+	//alert(codesChk);
+	
+	for(var i=0;i<chk.length;i++){
+		for(var c=0;c<codesChk.length;c++){
+			if(code[i].value == codesChk[c]){
+				chk[i].checked = true;
+				break;
+			}
+		}
+	}	
+}
+
+window.onload = function(){
+	setChkInPage();
+}
 
 </script>
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <html:form action="/jsp/searchValuePopupAction">
-
 <input type="hidden" name="currCondNo" value ="<%=currCondNo%>" />
 <input type="hidden" name="currCondTypeValue" value ="<%=currCondTypeValue%>" />
 <input type="hidden" name="currCondNameText" value ="<%=currCondNameText%>" />
@@ -207,7 +339,13 @@ function selectMultiple(){
 <input type="hidden" name="condType3" value ="<%=condType3%>" />
 <input type="hidden" name="condCode3" value ="<%=condCode3%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%">
+<input type="hidden" name="codes" size="50" value ="<%=codes%>" />
+<input type="hidden" name="keys" size="50" value ="<%=keys%>" />
+<input type="hidden" name="descs" size="50" value ="<%=descs%>" />
+
+<input type="hidden" name="currentPage" size="50" value ="<%=currentPage%>" />
+
+<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px">
 		<td width="15%" >&nbsp;</td>
 		<td width="90%" class="h1"><b>ค้นหาข้อมูล :<%=navigation %></b></td>
@@ -224,26 +362,26 @@ function selectMultiple(){
 	</tr>
 </table>
 
-<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
 			<c:if test="${isMultiSelect}" >
-				<input type="button" name="ok" value="OK" onclick="selectMultiple()"/>
+				<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
 			</c:if>
 			<c:if test="${!isMultiSelect}" >
-				<input type="button" name="ok" value="OK" onclick="selectOneRadio()"/>
+				<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:60px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();"/>
+			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
 		</td>
 	</tr>
 </table>
 <!-- RESULT -->
 <display:table width="100%" id="item" name="sessionScope.VALUE_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchValuePopupAction.do?do=search" sort="list" pagesize="20">	
+    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchValuePopupAction.do?do=search" sort="list" pagesize="20" class="resultDisp">	
     	
-    <display:column align="left" title="เลือกข้อมูล"  width="20" nowrap="true" sortable="true">
+    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
 		<c:if test="${isMultiSelect}" >
-			<input type ="checkbox" name="chCheck" />
+			<input type ="checkbox" name="chCheck" onclick="saveSelectedInPage(${item.no})"  />
 		</c:if>
 		<c:if test="${!isMultiSelect}" >
 			<input type ="radio" name="chRadio" />
@@ -253,10 +391,11 @@ function selectMultiple(){
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" />
 	 </display:column>
     											    
-    <display:column align="left" title="รหัส" property="key" width="80" nowrap="false" sortable="true"/>
-    <display:column align="left" title="รายละเอียด" property="name" width="100" nowrap="false" sortable="true"/>								
+    <display:column align="left" title="รหัส" property="key"  nowrap="false" sortable="false" class="code"/>
+    <display:column align="left" title="รายละเอียด" property="name" nowrap="false" sortable="false" class="desc"/>								
 </display:table>	
 <!-- RESULT -->
+
 
 
 </html:form>

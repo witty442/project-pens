@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -39,19 +40,47 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script type="text/javascript">
-function loadMe(){
-	
+function loadMe(path){
+	<%if(request.getAttribute("changePassword") != null){ 
+	    //session.setAttribute("user", null);
+	 %>
+	  // alert("เปลี่ยนรหัสผ่านเรียบร้อยแล้ว");
+	   setTimeout("logout('path')",800);
+	 <%
+	  } 
+	 %>
+}
+
+function logout(path){
+	 window.location = path+"/?logoff=T";
 }
 
 </script>
 </head>
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
+<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-  		
+  		<tr>
+		<td colspan="3"><jsp:include page="../header.jsp"/></td>
+	</tr>
   	<tr id="framerow">
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-
+    		<div style="height: 60px;">
+    		<!-- MENU -->
+	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
+				<tr>
+			        <td width="100%">
+			        	<jsp:include page="../menu.jsp"/>
+			       	</td>
+				</tr>
+	    	</table>
+	    	</div>
+	    	<!-- PROGRAM HEADER -->
+	      	<jsp:include page="../program.jsp">
+				<jsp:param name="function" value="ResetPassword"/>
+				<jsp:param name="code" value=""/>
+			</jsp:include>
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -68,22 +97,16 @@ function loadMe(){
 						<!-- CRITERIA -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							
-							<tr>
-								<td align="right"><b>หน้าจอเปลี่ยนรหัสผ่านใหม่</b></td>
+							 <tr>
+								<td align="right"></td>
 								<td align="left">
-									
+								  <font color="red">
+								    <%=Utils.isNull(request.getAttribute("loginMsg")) %>
+								  </font>
 								</td>
 								<td align="right"></td>
 								<td align="left"></td>
-							</tr>
-							<tr>
-								<td align="right">รหัสผู้ใช้<font color="red">*</font>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="user.userName" size="20"  />
-								</td>
-								<td align="right"></td>
-								<td align="left"></td>
-							</tr>
+							</tr> 
 							<tr>
 								<td align="right">รหัสผ่านเก่า<font color="red">*</font></td>
 								<td align="left">
@@ -140,7 +163,16 @@ function loadMe(){
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
-   
+    <tr>
+    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
+    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
+   			<jsp:include page="../contentbottom.jsp"/>
+        </td>
+        <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
+    </tr>
+    <tr>
+    	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
+  	</tr>
 </table>
 </body>
 </html>

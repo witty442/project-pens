@@ -71,10 +71,14 @@ function popupChangePassword(path){
        	 		<html:form action="/login" onsubmit="return false;">
        	 		<table width="355" border="0" cellspacing="0" cellpadding="0">
 		            <tr>
-		              <td colspan="5"><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="50" /></td>
+		              <td colspan="5">
+		                <img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="50" />
+		              </td>
 		            </tr>
 		            <tr>
-		              <td colspan="5"><img src="${pageContext.request.contextPath}/images2/logo_salesystem.gif" width="303" height="38" /></td>
+		              <td colspan="5">
+		                  <img src="${pageContext.request.contextPath}/images2/logo_salesystem.gif" width="303" height="38" />
+		              </td>
 		            </tr>
 		            <tr>
 		              <td width="103">&nbsp;</td>

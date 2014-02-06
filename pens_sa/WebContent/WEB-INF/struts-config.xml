@@ -42,9 +42,9 @@
 
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
-			 <forward name="pass_admin" path="/jsp/mainpage.jsp" redirect="true" />
-             <forward name="pass_user" path="/jsp/salesAnalyst/sales_analyst.jsp?action=new" redirect="true" />
-			 <forward name="fail" path="/index.jsp" />
+			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
+             <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
+			 <forward name="fail" path="/index.jsp" /> 
 		</action>
 
         <!-- USER -->
@@ -55,7 +55,8 @@
 			<forward name="prepare" path="/jsp/administer/user.jsp" />
 			<forward name="re-search" path="/jsp/userAction.do?do=search" />
 			<forward name="clearform" path="/jsp/administer/userSearch.jsp" />
-			<forward name="changePassword" path="/jsp/administer/changePassword.jsp" />
+			<forward name="changePassword" path="/jsp/administer/changePassword.jsp"  />
+			<forward name="logout" path="/index.jsp" redirect="true" />
 		</action>
 		
 		 <!-- ROLE -->

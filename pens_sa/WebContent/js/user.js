@@ -16,6 +16,12 @@ function search(path) {
 	return true;
 }
 
+function savePassword(path) {
+	document.userForm.action = path + "/jsp/userAction.do?do=savePassword&rf=Y";
+	document.userForm.submit();
+	return true;
+}
+
 function backToMain(path) {
 	document.userForm.action = path + "/jsp/userAction.do?do=backToMain";
 	document.userForm.submit();
@@ -55,7 +61,7 @@ function save(path) {
 
 function changePassword(path) {
 	
-	 if (document.getElementsByName('user.userName')[0].value == '') {
+	 /*if (document.getElementsByName('user.userName')[0].value == '') {
 		 document.getElementsByName('user.userName')[0].focus();
          alert('กรุณาใส่ User Name');
          return false;
@@ -64,7 +70,7 @@ function changePassword(path) {
 		document.getElementsByName('user.password')[0].focus();
 		alert('กรุณาใส่รหัสผ่านเดิม');
 		return false;
-	}
+	}*/
 	if (Trim(document.getElementsByName('user.newPassword')[0].value) == '') {
 		document.getElementsByName('user.newPassword')[0].focus();
 		alert('กรุณาใส่รหัสผ่านใหม่');
@@ -119,17 +125,37 @@ function clearForm(path) {
 	return true;
 }
 
-function changeActive(path, active) {
-	document.userForm.action = path + "/jsp/userAction.do?status=" + active
-			+ "&do=changeActive";
-	document.userForm.submit();
-	return true;
+function changeActive(path, active,obj) {
+	if(isChkOne(obj)){
+		document.userForm.action = path + "/jsp/userAction.do?status=" + active
+				+ "&do=changeActive";
+		document.userForm.submit();
+		return true;
+	}else{
+		alert("กรุณาเลือกรายการอย่างน้อยหนึ่งรายการ");
+		return false;
+	}
 }
 
-function changeUserGroup(path) {
-	var userGroupId = document.getElementsByName("user.changeUserGroup")[0].value ;
-	document.userForm.action = path + "/jsp/userAction.do?userGroupId=" + userGroupId
-			+ "&do=changeUserGroup";
-	document.userForm.submit();
-	return true;
+function changeUserGroup(path,obj) {
+	if(isChkOne(obj)){
+		var userGroupId = document.getElementsByName("user.changeUserGroup")[0].value ;
+		document.userForm.action = path + "/jsp/userAction.do?userGroupId=" + userGroupId
+				+ "&do=changeUserGroup";
+		document.userForm.submit();
+		return true;
+	}else{
+		alert("กรุณาเลือกรายการอย่างน้อยหนึ่งรายการ");
+		return false;
+	}
+}
+
+function isChkOne(obj){
+	for(i=0;i<obj.length;i++){
+		var chk = obj[i].checked;
+		if(chk){
+		  return true;
+		}
+	}
+	return false;
 }

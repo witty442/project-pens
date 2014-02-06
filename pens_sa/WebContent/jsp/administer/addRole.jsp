@@ -259,7 +259,7 @@ body {
 											<html:text property="role.roleName" size="40"/>
 										</c:otherwise>
 									</c:choose>
-									<html:hidden property="role.roleId"/>
+									<html:text property="role.roleId"/>
 								</td>
 							</tr>
 						</table>
@@ -306,7 +306,7 @@ body {
 								  </select>
 						    </display:column>
 						    <display:column align="left" title="ประเภทข้อมูลย่อย" width="100" nowrap="false" sortable="false" valign="top">
-								    <input type="hidden" name="roleDataAccess" value="${item.roleDataAccess}"/>
+								    <input type="text" name="roleDataAccess" value="${item.roleDataAccess}"/>
 								    <textarea  name="roleDataAccessDesc" rows="2" cols="60">${item.roleDataAccessDesc} </textarea >
 								   &nbsp;   
 									 <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','${item.index}');">

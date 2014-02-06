@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.SecurityHelper"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -23,9 +24,9 @@
 <%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
 <jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="request" />
 <%
-	String condNo = request.getParameter("condNo");
+ String condNo = request.getParameter("condNo");
  String condNameValue = request.getParameter("condNameValue");
- String condNameText = (String)SAProcess.getInstance().GROUP_BY_MAP.get(request.getParameter("condNameValue"));
+ String condNameText = (String)SecurityHelper.COLUMN_KEY_MAP.get(request.getParameter("condNameValue"));
  String searchType = request.getParameter("searchType");
 %>
 <script type="text/javascript">
