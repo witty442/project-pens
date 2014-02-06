@@ -442,7 +442,7 @@ public class Utils {
 	public static String convertDigitToDisplay(String columnDisyplay , Object s) {
 		//logger.debug("columnDisyplay:"+columnDisyplay);
 		
-		if("CALL".equalsIgnoreCase(columnDisyplay)){
+		if("CALL".equalsIgnoreCase(columnDisyplay) || "CALL NEW".equalsIgnoreCase(columnDisyplay)){
 			if( s instanceof BigDecimal){
 				return convertToNumberStr((BigDecimal)s);
 			}else {

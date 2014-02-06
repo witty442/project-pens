@@ -16,6 +16,7 @@ import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.report.salesanalyst.SAConstants;
 import com.isecinc.pens.report.salesanalyst.SAProcess;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
+import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class MRole {
@@ -54,8 +55,8 @@ public class MRole {
 		PreparedStatement ps = null;
 		int roleId = 0;
 		try{
-			ps = conn.prepareStatement("insert into ad_role(role_id,role_name) values(?,?)");
-			roleId =SequenceProcess.getNextValue("ad_role", "role_id");
+			ps = conn.prepareStatement("insert into c_role(role_id,role_name) values(?,?)");
+			roleId =SequenceProcess.getNextValue("c_role", "role_id");
 			logger.debug("roleId:"+roleId);
 			
 			ps.setInt(1, roleId);
@@ -72,7 +73,7 @@ public class MRole {
 	private static boolean updateAdRole(Connection conn,Role role) throws Exception{
 		PreparedStatement ps = null;
 		try{
-			ps = conn.prepareStatement("update ad_role set role_name = ? where role_id =? ");
+			ps = conn.prepareStatement("update c_role set role_name = ? where role_id =? ");
 			ps.setString(1, role.getRoleName());
 			ps.setInt(2, Integer.parseInt(role.getRoleId()));
 			
@@ -88,7 +89,7 @@ public class MRole {
 	private static boolean insertAdRoleAccess(Connection conn,int roleId,List<Role> roleList) throws Exception{
 		PreparedStatement ps = null;
 		try{
-			ps = conn.prepareStatement("insert into ad_role_access(role_id,role_column_access,role_data_access) values(?,?,?)");
+			ps = conn.prepareStatement("insert into c_role_access(role_id,role_column_access,role_data_access) values(?,?,?)");
 			if(roleList != null && roleList.size() > 0){
 				for(int i=0;i<roleList.size();i++){
 					Role role =(Role)roleList.get(i);
@@ -116,7 +117,7 @@ public class MRole {
 		PreparedStatement ps = null;
 		try{
 			logger.debug("role_id:"+roleId);
-			ps = conn.prepareStatement("delete from ad_role_access where role_id = ? ");
+			ps = conn.prepareStatement("delete from c_role_access where role_id = ? ");
 			ps.setString(1, roleId);
 			ps.execute();
 			
@@ -136,15 +137,14 @@ public class MRole {
 		int index =0;
 		int indexDisp =0;
 		try{
-			String sql = "select \n ";
-	        sql += "distinct r.role_id ,r.role_name, \n ";
-	        sql += "rc.role_column_access , \n ";
-	        sql += "(select max(th_name) from ad_reference c where c.code = rc.role_column_access and type ='GROUP_BY' ) as role_column_access_desc  \n ";
-	        sql += " from ad_role r , ad_role_access rc  where 1=1 \n";
+			String sql = "select distinct \n ";
+	        sql += " r.role_id ,r.role_name, \n ";
+	        sql += " rc.role_column_access  \n ";
+	        sql += " from c_role r , c_role_access rc  where 1=1 \n";
 	        sql += " and r.role_id = rc.role_id \n";
 	        
-			if( !Utils.isNull(roleCriteria.getRoleId()).equals("")){
-				sql +=" and r.role_id = '"+Utils.isNull(roleCriteria.getRoleId())+"' \n ";
+			if( !Utils.isNull(roleCriteria.getRoleName()).equals("")){
+				sql +=" and r.role_name LIKE '%"+Utils.isNull(roleCriteria.getRoleName())+"%' \n ";
 			}
 			if( !Utils.isNull(roleCriteria.getRoleColumnAccess()).equals("")){
 				sql +=" and rc.role_column_access = '"+Utils.isNull(roleCriteria.getRoleColumnAccess())+"' \n ";
@@ -153,7 +153,7 @@ public class MRole {
 				sql +=" and rc.role_data_access = '"+Utils.isNull(roleCriteria.getRoleDataAccess())+"' \n ";
 			}
 			
-			sql +=" order by r.role_id \n";
+			sql +=" order by r.role_name asc \n";
 			
 			logger.debug("sql:"+sql);
 			
@@ -169,19 +169,41 @@ public class MRole {
 				role.setRoleId(rs.getString("role_id"));
 				role.setRoleName(rs.getString("role_name"));
 				role.setRoleColumnAccess(rs.getString("role_column_access"));
-				role.setRoleColumnAccessDesc(rs.getString("role_column_access_desc"));
-				role.setStyleClass("group_odd");
+				role.setRoleColumnAccessDesc(rs.getString("role_column_access"));
 				
+				//Get Description
+               List<String> roleDataAccessArray = getRoleDataAccessArray(conn,role.getRoleId(),role.getRoleColumnAccess()," ,");
+               String role_data_access_desc ="";
+	           String role_data_access = "";
+				for(int i=0;i<roleDataAccessArray.size();i++){
+					String roleDataAccess =(String)roleDataAccessArray.get(i);
+					role_data_access +=roleDataAccess+",";
+					if("ALL".equalsIgnoreCase(roleDataAccess)){
+						role_data_access_desc  += "ดูข้อมูลได้ทั้งหมด,";
+					}else{
+						logger.debug("RoledatAccess:"+roleDataAccess);
+						if( !Utils.isNull(roleDataAccess).equalsIgnoreCase("")){
+							List<References> dataList  = SAProcess.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
+							
+							if(dataList !=null && dataList.size()> 1){
+								role_data_access_desc  += ((References)dataList.get(1)).getName()+",";
+							}else{
+								role_data_access_desc  += ((References)dataList.get(0)).getName()+",";
+							}
+						}
+					}
+				}//for
 				
-				String[] roleDataAccessArray = getRoleDataAccessArray(conn,role.getRoleId(),role.getRoleColumnAccess(),",");
-				role.setRoleDataAccess(roleDataAccessArray[0]);
-				// Set bullet in
-				String descArray[] = roleDataAccessArray[1].split(",");
-				String htmlCode ="";
-				for(int u=0;u<descArray.length;u++){
-					htmlCode +=  "<img border=0 height='25px' src='/pens_sa/icons/blue_bullet_icon.png' /> "+descArray[u]+"<br>";
+				if( !Utils.isNull(role_data_access).equals("")){
+					role_data_access = role_data_access.substring(0,role_data_access.length()-1);
 				}
-				role.setRoleDataAccessDesc(htmlCode);
+				if( !Utils.isNull(role_data_access_desc).equals("")){
+					role_data_access_desc = role_data_access_desc.substring(0,role_data_access_desc.length()-1);
+				}
+				
+				role.setRoleDataAccessDesc(role_data_access_desc);
+				role.setRoleDataAccess(role_data_access);
+				role.setStyleClass("group_odd");
 				
 				if(roleId.equals(rs.getString("role_name"))){
 					role.setRoleIdDisp("");
@@ -211,7 +233,7 @@ public class MRole {
 		ResultSet rs = null;
 		int index =0;
 		try{
-			String sql  = "select distinct r.role_name,r.role_id ,rc.role_column_access from ad_role r ,ad_role_access rc where 1=1 \n";
+			String sql  = "select distinct r.role_name,r.role_id ,rc.role_column_access from c_role r ,c_role_access rc where 1=1 \n";
 			       sql += " and r.role_id = rc.role_id \n";
 			if( !Utils.isNull(roleCriteria.getRoleId()).equals("")){
 				sql +=" and r.role_id = "+Utils.isNull(roleCriteria.getRoleId())+" \n ";
@@ -232,10 +254,40 @@ public class MRole {
 				role.setRoleId(rs.getString("role_id"));
 				role.setRoleName(rs.getString("role_name"));
 				role.setRoleColumnAccess(rs.getString("role_column_access"));
+
+				//Get Description
+	            List<String> roleDataAccessArray = getRoleDataAccessArray(conn,role.getRoleId(),role.getRoleColumnAccess()," ,");
+	            String role_data_access_desc ="";
+	            String role_data_access = "";
+				for(int i=0;i<roleDataAccessArray.size();i++){
+					String roleDataAccess =(String)roleDataAccessArray.get(i);
+					role_data_access +=roleDataAccess+",";
+					
+					if("ALL".equalsIgnoreCase(roleDataAccess)){
+						role_data_access_desc  += "ดูข้อมูลได้ทั้งหมด,";
+					}else{
+						logger.debug("RoledatAccess:"+roleDataAccess);
+						if( !Utils.isNull(roleDataAccess).equalsIgnoreCase("")){
+							List<References> dataList  = SAProcess.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
+							
+							if(dataList !=null && dataList.size()> 1){
+								role_data_access_desc  += ((References)dataList.get(1)).getName()+",";
+							}else{
+								role_data_access_desc  += ((References)dataList.get(0)).getName()+",";
+							}
+						}
+					}
+				}//for
 				
-				String[] roleDataAccessArray = getRoleDataAccessArray(conn,role.getRoleId(),role.getRoleColumnAccess()," ,");
-				role.setRoleDataAccess(roleDataAccessArray[0]);
-				role.setRoleDataAccessDesc(roleDataAccessArray[1]);
+				if( !Utils.isNull(role_data_access).equals("")){
+					role_data_access = role_data_access.substring(0,role_data_access.length()-1);
+				}
+				if( !Utils.isNull(role_data_access_desc).equals("")){
+					role_data_access_desc = role_data_access_desc.substring(0,role_data_access_desc.length()-1);
+				}
+				
+				role.setRoleDataAccessDesc(role_data_access_desc);
+				role.setRoleDataAccess(role_data_access);
 				
 				roleList.add(role);
 			}
@@ -247,35 +299,26 @@ public class MRole {
 		return roleList;
 	}
 	
-	private static String[] getRoleDataAccessArray(Connection conn,String roleId,String roleColumnAccess,String newLine) throws Exception {
-		String[] roleDataAccessS = new String[2];;
+	private static List<String> getRoleDataAccessArray(Connection conn,String roleId,String roleColumnAccess,String newLine) throws Exception {
+		List<String> roleDataAccessS = new ArrayList<String>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String roleDataAccessCode = "";
-		String roleDataAccessDesc = "";
 		int no = 0;
 		try{
 			String sql  = " select rc.role_data_access   \n";
-			       sql += " from ad_role_access rc where 1=1\n";
+			       sql += " from c_role_access rc where 1=1\n";
 			       sql += " and rc.role_id = "+roleId+" \n";
 			       sql += " and rc.role_column_access = '"+roleColumnAccess+"' \n";
-			       sql +="  order by rc.role_data_access \n";
 			logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			
 			while(rs.next()){
+				roleDataAccessS.add(rs.getString("role_data_access"));
 				no++;
-				roleDataAccessCode +=rs.getString("role_data_access")+",";
-				roleDataAccessDesc += getRoleDataAccessDesc(conn,roleColumnAccess,rs.getString("role_data_access"))+" "+newLine;
 			}
-			if(roleDataAccessCode != null){
-				roleDataAccessCode = roleDataAccessCode.substring(0,roleDataAccessCode.length()-1);
-				roleDataAccessDesc = roleDataAccessDesc.substring(0,roleDataAccessDesc.length()-1);
-				roleDataAccessS[0] = roleDataAccessCode;
-				roleDataAccessS[1] = roleDataAccessDesc;
-			}
+			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -296,7 +339,7 @@ public class MRole {
 			if("ALL".equalsIgnoreCase(roleColumn)){
 				msg = SAConstants.MSG_ALL_TH;
 			}else if("inventory_item_id".equalsIgnoreCase(roleColumn)){
-				sql  = "SELECT  CODE ,TH_NAME FROM ad_reference where GROUP_NAME ='SKU' \n";
+				sql  = "SELECT  CODE ,TH_NAME FROM c_reference where GROUP_NAME ='SKU' \n";
 				sql +=" AND CODE ='"+roleAccess+"'";
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -305,7 +348,7 @@ public class MRole {
 					msg = rs.getString("TH_NAME");
 				}
 			}else if("Customer_Category".equalsIgnoreCase(roleColumn)){
-				sql  = "SELECT  CODE ,TH_NAME FROM ad_reference where GROUP_NAME ='CUST_CATE' \n";
+				sql  = "SELECT  CODE ,TH_NAME FROM c_reference where GROUP_NAME ='CUST_CATE' \n";
 				sql +=" AND CODE ='"+roleAccess+"'";
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -316,7 +359,7 @@ public class MRole {
 			}else if("Division".equalsIgnoreCase(roleColumn)){
 				msg = SAConstants.MSG_ALL_TH;
 			}else if("Salesrep_id".equalsIgnoreCase(roleColumn)){
-				sql  = "SELECT  CODE ,TH_NAME FROM ad_reference where GROUP_NAME ='CUST_CATE' \n";
+				sql  = "SELECT  CODE ,TH_NAME FROM c_reference where GROUP_NAME ='CUST_CATE' \n";
 				sql +=" AND CODE ='"+roleAccess+"'";
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -338,7 +381,7 @@ public class MRole {
 					}
 				}
 			}else if("Customer_Group".equalsIgnoreCase(roleColumn)){
-				sql  = "SELECT  CODE ,TH_NAME FROM ad_reference where GROUP_NAME ='CUST_CATE' \n";
+				sql  = "SELECT  CODE ,TH_NAME FROM c_reference where GROUP_NAME ='CUST_CATE' \n";
 				sql +=" AND CODE ='"+roleAccess+"'";
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -347,7 +390,7 @@ public class MRole {
 					msg = rs.getString("TH_NAME");
 				}
 			}else if("Customer_id".equalsIgnoreCase(roleColumn)){
-				sql  = "SELECT  CODE ,TH_NAME FROM ad_reference where GROUP_NAME ='CUST_CATE' \n";
+				sql  = "SELECT  CODE ,TH_NAME FROM c_reference where GROUP_NAME ='CUST_CATE' \n";
 				sql +=" AND CODE ='"+roleAccess+"'";
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -367,22 +410,7 @@ public class MRole {
 						msg = rs.getString("TH_NAME");
 					}
 				}
-			}else if("Invoice_Date".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("SALES_ORDER_DATE".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("Province".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("AMPHOR".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("TAMBOL".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("SALES_ORDER_NO".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
-			}else if("INVOICE_NO".equalsIgnoreCase(roleColumn)){
-				msg = SAConstants.MSG_ALL_TH;
 			}
-			
 			logger.debug("SQL:"+sql);
 		}catch(Exception e){
 			logger.debug("SQL:"+sql);
@@ -432,21 +460,49 @@ public class MRole {
 	}
 	
 	public static List<References> findCReferenceByType(String type) {
-		Connection conn = null;
 		try{
-			conn = DBConnection.getInstance().getConnection();
-			return findCReferenceByType(conn, type,"","");
+			return findCReferenceByType();
 		}finally{
-			DBConnection.getInstance().closeConn(conn, null,null);
+			
 		}
 	}
 	
-	public static List<References> findCReferenceByType(Connection conn,String type,String code,String groupName) {
+	/*
+	COLUMN_KEY_MAP.put("Brand", "Brand");//Brand
+	COLUMN_KEY_MAP.put("Division","Division"); //Division
+	COLUMN_KEY_MAP.put("Sales_Channel", "Sales_Channel"); //Area ภาคตามพนักงานขาย
+	COLUMN_KEY_MAP.put("Customer_Category","customer_category");//SaleType
+	COLUMN_KEY_MAP.put("Salesrep_id", "customer_category");	//SalesMan
+	*/
+	public static List<References> findCReferenceByType() {
+		List<References> dataList = new ArrayList<References>();
+		try{
+			References r = new References("Brand", SecurityHelper.COLUMN_KEY_MAP.get("Brand"));
+			dataList.add(r);
+			r = new References("Division",SecurityHelper.COLUMN_KEY_MAP.get("Division"));
+			dataList.add(r);
+			r = new References("Sales_Channel", SecurityHelper.COLUMN_KEY_MAP.get("Sales_Channel"));
+			dataList.add(r);
+			r = new References("Customer_Category",SecurityHelper.COLUMN_KEY_MAP.get("Customer_Category"));
+			dataList.add(r);
+			r = new References("Salesrep_id", SecurityHelper.COLUMN_KEY_MAP.get("Salesrep_id"));
+			dataList.add(r);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			
+		}
+		return dataList;
+	}
+	
+	
+	@Deprecated
+	public static List<References> findCReferenceByTypeTemp(Connection conn,String type,String code,String groupName) {
 		List<References> dataList = new ArrayList<References>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try{
-			String sql = "select distinct code,th_name ,order_index from ad_reference where 1=1  \n" ;
+			String sql = "select distinct code,th_name ,order_index from c_reference where 1=1  \n" ;
 	        if( !Utils.isNull(type).equals("")){
 	        	  sql += "and type ='"+type+"' \n" ;
 	        }
@@ -482,7 +538,7 @@ public class MRole {
 		try{
 			String groupName = getGroupNameOfSubRole(roleColumnAccess);
 			
-			String sql = "select * from ad_reference where 1=1  \n" ;
+			String sql = "select * from c_reference where 1=1  \n" ;
 	        if( !Utils.isNull(type).equals("")){
 	        	  sql += "and type ='"+type+"' \n" ;
 	        }
@@ -519,7 +575,7 @@ public class MRole {
 		ResultSet rs = null;
 		String str ="";
 		try{
-		    String sql = "select * from ad_role where 1=1  \n" ;
+		    String sql = "select * from c_role where 1=1  \n" ;
 	        if( !Utils.isNull(roleName).equals("")){
 	        	  sql += "and role_name ='"+roleName+"' \n" ;
 	        }

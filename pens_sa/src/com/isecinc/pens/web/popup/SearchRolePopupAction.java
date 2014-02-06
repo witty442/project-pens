@@ -78,7 +78,7 @@ public class SearchRolePopupAction extends I_Action {
 			String condNo = request.getParameter("condNo");
 			String searchType = request.getParameter("searchType");
 			
-			request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueList4Role(request,condType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
+			request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueList4Role(condType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
 
 		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);

@@ -43,7 +43,7 @@ public class GroupRoleAction extends I_Action {
 		try {
 			if(request.getParameter("action") != null){
 				formBean.setGroupRole(new GroupRole());
-				request.getSession().removeAttribute("GROUP_ROLE_LIST");
+				request.getSession().setAttribute("GROUP_ROLE_LIST",MGroupRole.findGroupRoleList(formBean.getGroupRole()));
 			}
 
 		} catch (Exception e) {
@@ -59,7 +59,7 @@ public class GroupRoleAction extends I_Action {
 		try {
 			if(request.getParameter("action") != null){
 				formBean.setGroupRole(new GroupRole());
-				request.getSession().removeAttribute("GROUP_ROLE_LIST");
+				request.getSession().setAttribute("GROUP_ROLE_LIST",MGroupRole.findGroupRoleList(formBean.getGroupRole()));
 			}
 		
 		} catch (Exception e) {

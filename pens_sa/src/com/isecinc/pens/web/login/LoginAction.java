@@ -28,7 +28,8 @@ public class LoginAction extends DispatchAction {
 
 	/** Logger */
 	private Logger logger = Logger.getLogger("PENS");
-
+	private static String DEFAULT_PASSWORD = "12345";
+	
 	/**
 	 * Login
 	 * 
@@ -50,15 +51,16 @@ public class LoginAction extends DispatchAction {
 			loginForm = (LoginForm) form;
 			User user = null;
 			conn = DBConnection.getInstance().getConnection();
-			user = new LoginProcess().loginDummy(loginForm.getUserName(), loginForm.getPassword(), conn);
+			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
             
 			if (user == null) {
 				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
 				return mapping.findForward("fail");
 			}else{
 				logger.debug("User Group:"+user.getUserGroupId());
-				if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
-					//forwordStr = "pass_admin";
+				if(user.getPassword().equalsIgnoreCase(DEFAULT_PASSWORD)){
+					forwordStr = "change_password";
+					request.setAttribute("loginMsg", "กรุณาเปลี่ยนรหัสผ่านใหม่ เนื่องจาก รหัสผ่านคุณเป็นรหัสผ่านชั่วคราว");
 				}
 			}
 			

@@ -53,7 +53,7 @@ public class InitialReferences extends I_Initial {
 	public void init(Connection conn) {
 		try {
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT * FROM ad_reference WHERE ISACTIVE = 'Y' ");
+			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' ");
 			List<References> refList = Database.query(sql.toString(), null, References.class, conn);
 			// logger.debug(refList);
 			for (References r : refList) {

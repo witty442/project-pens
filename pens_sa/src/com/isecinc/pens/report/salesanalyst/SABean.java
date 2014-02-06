@@ -21,6 +21,8 @@ public class SABean implements Serializable{
 	private String[] chkQuarter;
 	private String[] chkYear;
 	private String groupBy;
+	private String profileId;
+	private String userId;
 	
 	/** Condition Search **/
 	private String condCode1;
@@ -60,16 +62,37 @@ public class SABean implements Serializable{
 	private String summaryType;
 
 	private String returnString;
+	private String includePos;
+	
 	
 	/** for Search **/
-	String code;
-	String desc;
+	private String code;
+	private String desc;
 	
 	/** for order column **/ 
-	// modify by tutiya
+
 	private String order_type = "";
 	private String order_by_name= "";
 
+	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getProfileId() {
+		return profileId;
+	}
+	public void setProfileId(String profileId) {
+		this.profileId = profileId;
+	}
+	public String getIncludePos() {
+		return includePos;
+	}
+	public void setIncludePos(String includePos) {
+		this.includePos = includePos;
+	}
 	public String getOrder_type() {
 		return order_type;
 	}

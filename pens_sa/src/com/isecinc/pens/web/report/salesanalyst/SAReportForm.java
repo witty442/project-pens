@@ -26,8 +26,5 @@ public class SAReportForm extends I_Form {
 	public void setCriteria(SACriteria criteria) {
 		this.criteria = criteria;
 	}
-	
-	
-	
 
 }

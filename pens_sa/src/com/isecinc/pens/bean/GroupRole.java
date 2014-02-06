@@ -1,10 +1,12 @@
 package com.isecinc.pens.bean;
 
+import java.io.Serializable;
+
 /**
  * @author WITTY
  *
  */
-public class GroupRole {
+public class GroupRole implements Serializable{
   private String userGroupId;
   private String userGroupName;
   private String roleId;

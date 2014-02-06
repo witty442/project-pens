@@ -59,12 +59,16 @@ public class SAGenerate {
 					Date startDate = DateToolsUtil.convertStringToDate(salesBean.getDay());
 					Date endDate = DateToolsUtil.convertStringToDate(salesBean.getDayTo());
 					
-					while(startDate.compareTo(endDate) <= 0){
-						colGroupList.add(new ConfigBean(DateToolsUtil.convertToString(startDate,"yyyyMMdd"),DateToolsUtil.convertToString(startDate),DateToolsUtil.convertToString(startDate)));
-						startDate = DateUtils.addDays(startDate, 1); 
+					if(startDate.compareTo(endDate) != 0){
+						while(startDate.compareTo(endDate) <= 0){
+							colGroupList.add(new ConfigBean(DateToolsUtil.convertToString(startDate,"yyyyMMdd"),DateToolsUtil.convertToString(startDate),DateToolsUtil.convertToString(startDate)));
+							startDate = DateUtils.addDays(startDate, 1); 
+						}
+					}else{
+						//DateFrom == DateTo
+						colGroupList.add(new ConfigBean(salesBean.getGroupBy(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay()));
 					}
-				}
-				else{
+				}else{
 					colGroupList.add(new ConfigBean(salesBean.getGroupBy(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay()));
 				}
 				/** Display group by **/
@@ -370,7 +374,7 @@ public class SAGenerate {
 		StringBuffer htmlStr = new StringBuffer("");
 		boolean found = false;
 		Map<String,BigDecimal> summaryColumnMap = new HashMap<String,BigDecimal>();
-		Map<String,BigDecimal> summaryMap1 = new HashMap<String,BigDecimal>();
+		Map<String,BigDecimal> summaryPerMap1 = new HashMap<String,BigDecimal>();
 		BigDecimal bigZero = new BigDecimal("0");
 		int totalRecord = 0;
 		int no =0;
@@ -381,8 +385,8 @@ public class SAGenerate {
 		if(SAProcess.SUMMARY_TYPE_NONE.equals(summaryType))
 			isSummry = false;
 		
-		//boolean isDebug = false;
-		boolean isDebug = true;
+		boolean isDebug = false;
+		//boolean isDebug = true;
 		
 		try{
 			String groupBy = groupByBean.getDispText();
@@ -429,7 +433,7 @@ public class SAGenerate {
 					
 					String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName()); 
 					
-				    htmlStr.append("<th>"+configBean.getDispText()+"&nbsp;&nbsp;");
+				    htmlStr.append("<th nowrap>"+configBean.getDispText()+"&nbsp;&nbsp;");
 				    htmlStr.append(" <img style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_down.gif' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
 				    htmlStr.append(" &nbsp;&nbsp;");
 				    htmlStr.append(" <img style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_up.gif' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
@@ -496,59 +500,54 @@ public class SAGenerate {
 					
 					logger.debug("colDispList:"+colDispList.size());
 					BigDecimal value = null;
-					BigDecimal valueSummary = null;
+					BigDecimal valueRowSummary = null;
+					BigDecimal valueColSummary = null;
+					
 					for(int d=0;d<colDispList.size();d++){
 						ConfigBean configBean = (ConfigBean)colDispList.get(d);
 						String resultKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
 						
+						logger.debug("resultKey:"+resultKey);
+						
 						/** Case Column CALL Summary CALL_NO DUP  and Type Summary **/
-						if(resultKey.startsWith("CALL") && isSummry && SAProcess.SUMMARY_TYPE_SUM.equals(summaryType)){
-							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal Value
-							valueSummary = Utils.isNullToZero(rs.getBigDecimal(SAProcess.NO_DUP_PREFIX+resultKey));
+						if(resultKey.startsWith("CALL") && !resultKey.startsWith("CALL_NEW") && isSummry && SAProcess.SUMMARY_TYPE_SUM.equals(summaryType)){
+							logger.debug("CALL:"+resultKey);
+							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
+							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAProcess.NO_DUP_PREFIX+resultKey));//ND_ Value
+							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}else{
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal Value
-							valueSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//for summary
-						}
-						
-						//logger.debug("Summary **>>ColumnName:"+resultKey);
-					
-						String resultKey1 = configBean.getName();
-						
-						/** Summary By Row **/
-						if(summaryRowMap.get(resultKey1) != null){
-							BigDecimal sumRowValueAdd = (BigDecimal)summaryRowMap.get(resultKey1);
-							sumRowValueAdd = sumRowValueAdd.add(valueSummary);
-							summaryRowMap.put(resultKey1, sumRowValueAdd);
-						}else{
-							summaryRowMap.put(resultKey1, valueSummary);
-						}
-						
-						/** Summary 1 For case PER **/
-						if(summaryMap1.get(resultKey1) != null){
-							BigDecimal summaryValueAdd = (BigDecimal)summaryMap1.get(resultKey1);
-							summaryValueAdd = summaryValueAdd.add(valueSummary);
-							summaryMap1.put(resultKey1, summaryValueAdd);
-
-						}else{
-							summaryMap1.put(resultKey1, valueSummary);
+							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//for summary
+							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}
 						
 						/** Summary By Column **/						
 						if(summaryColumnMap.get(resultKey) != null){
-							BigDecimal summaryValueAdd = (BigDecimal)summaryColumnMap.get(resultKey);
-							if(resultKey.startsWith("CALL") && isSummry && SAProcess.SUMMARY_TYPE_SUM.equals(summaryType)){
-							    summaryValueAdd = summaryValueAdd.add(value);
-							}else{
-							    summaryValueAdd = summaryValueAdd.add(valueSummary);
-							}
-							summaryColumnMap.put(resultKey, summaryValueAdd);
+							BigDecimal summaryColValueAdd = (BigDecimal)summaryColumnMap.get(resultKey);
+							summaryColValueAdd = summaryColValueAdd.add(valueColSummary);
+							summaryColumnMap.put(resultKey, summaryColValueAdd);
 						}else{
-							if(resultKey.startsWith("CALL") && isSummry && SAProcess.SUMMARY_TYPE_SUM.equals(summaryType)){
-							    summaryColumnMap.put(resultKey, value);	
-							}else{
-							    summaryColumnMap.put(resultKey, valueSummary);	
-							}
+							summaryColumnMap.put(resultKey, valueColSummary);	
 						}
+		
+						String resultKey1 = configBean.getName();
+						/** Summary By Row **/
+						if(summaryRowMap.get(resultKey1) != null){
+							BigDecimal sumRowValueAdd = (BigDecimal)summaryRowMap.get(resultKey1);
+							sumRowValueAdd = sumRowValueAdd.add(valueRowSummary);
+							summaryRowMap.put(resultKey1, sumRowValueAdd);
+						}else{
+							summaryRowMap.put(resultKey1, valueRowSummary);
+						}
+						
+						/** Summary 1 For case PER **/
+						if(summaryPerMap1.get(resultKey1) != null){
+							BigDecimal summaryValueAdd = (BigDecimal)summaryPerMap1.get(resultKey1);
+							summaryValueAdd = summaryValueAdd.add(valueRowSummary);
+							summaryPerMap1.put(resultKey1, summaryValueAdd);
+						}else{
+							summaryPerMap1.put(resultKey1, valueRowSummary);
+						}			
 						
 						String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
 						
@@ -640,32 +639,31 @@ public class SAGenerate {
 						}
 						
 						if(resultKey.startsWith("PER")){
-								//Sum1
-								ConfigBean configBean1 = (ConfigBean)colDispList.get(d-2);
-								String resultKey1 = configBean1.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
-								BigDecimal summaryValue1 = new BigDecimal("0");
-								if(summaryColumnMap != null && summaryColumnMap.get(resultKey1) != null){
-									summaryValue1 = (BigDecimal)summaryColumnMap.get(resultKey1);	
-								}
-								//Sum2
-								ConfigBean configBean2 = (ConfigBean)colDispList.get(d-1);
-								String resultKey2 = configBean2.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
-								BigDecimal summaryValue2 = new BigDecimal("0");
-								if(summaryColumnMap != null && summaryColumnMap.get(resultKey2) != null){
-									summaryValue2 = (BigDecimal)summaryColumnMap.get(resultKey2);
-								
-								}
-								logger.debug("summaryValue1:"+summaryValue1);
-								logger.debug("summaryValue2:"+summaryValue2);
-								
-								if(summaryValue1.compareTo(bigZero) != 0){
-									summaryValue = (summaryValue2.divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
-								}
+							//Sum1
+							ConfigBean configBean1 = (ConfigBean)colDispList.get(d-2);
+							String resultKey1 = configBean1.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
+							BigDecimal summaryValue1 = new BigDecimal("0");
+							if(summaryColumnMap != null && summaryColumnMap.get(resultKey1) != null){
+								summaryValue1 = (BigDecimal)summaryColumnMap.get(resultKey1);	
 							}
+							//Sum2
+							ConfigBean configBean2 = (ConfigBean)colDispList.get(d-1);
+							String resultKey2 = configBean2.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
+							BigDecimal summaryValue2 = new BigDecimal("0");
+							if(summaryColumnMap != null && summaryColumnMap.get(resultKey2) != null){
+								summaryValue2 = (BigDecimal)summaryColumnMap.get(resultKey2);
+							}
+							logger.debug("summaryValue1:"+summaryValue1);
+							logger.debug("summaryValue2:"+summaryValue2);
 							
-						 columnCount++;
-						 String debug = isDebug?"CSum:":"";
-					     htmlStr.append("<td align='right'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),summaryValue)+"</td> \n");    
+							if(summaryValue1.compareTo(bigZero) != 0){
+								summaryValue = (summaryValue2.divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
+							}
+						}
+							
+						columnCount++;
+						String debug = isDebug?"CSum:":"";
+					    htmlStr.append("<td align='right'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),summaryValue)+"</td> \n");    
 						   
 					}//for2
 				}//for1
@@ -675,7 +673,7 @@ public class SAGenerate {
 				for(int d=0;d<colDispList.size();d++){
 					ConfigBean configBean = (ConfigBean)colDispList.get(d);
 					String resultRowSumBean = configBean.getName();
-					BigDecimal valueRowSum = (BigDecimal)summaryMap1.get(resultRowSumBean);
+					BigDecimal valueRowSum = (BigDecimal)summaryPerMap1.get(resultRowSumBean);
 					boolean isPct = false;
 					
 					if(resultRowSumBean.startsWith("PER")){
@@ -683,16 +681,16 @@ public class SAGenerate {
 						ConfigBean configBean1 = (ConfigBean)colDispList.get(d-2);
 						String resultKey1 = configBean1.getName();
 						BigDecimal summaryValue1 = new BigDecimal("0");
-						if(summaryMap1 != null && summaryMap1.get(resultKey1) != null){
-							summaryValue1 = (BigDecimal)summaryMap1.get(resultKey1);
+						if(summaryPerMap1 != null && summaryPerMap1.get(resultKey1) != null){
+							summaryValue1 = (BigDecimal)summaryPerMap1.get(resultKey1);
 						}
 						
 						//Sum2
 						ConfigBean configBean2 = (ConfigBean)colDispList.get(d-1);
 						String resultKey2 = configBean2.getName();
 						BigDecimal summaryValue2 = new BigDecimal("0");
-						if(summaryMap1 != null && summaryMap1.get(resultKey2) != null){
-							summaryValue2 = (BigDecimal)summaryMap1.get(resultKey2);
+						if(summaryPerMap1 != null && summaryPerMap1.get(resultKey2) != null){
+							summaryValue2 = (BigDecimal)summaryPerMap1.get(resultKey2);
 						}
 						//logger.debug("summaryValue1:"+summaryValue1);
 						//logger.debug("summaryValue2:"+summaryValue2);
@@ -740,15 +738,19 @@ public class SAGenerate {
 		List<ConfigBean> colDispList = new ArrayList<ConfigBean>();	
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp1()))){
 			//Case Column Display =CALL  set unit = "" 
-			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1()))){
-				 colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+""));
+			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1())) ||
+			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1())) ){
+				
+			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+""));
 			}else{
 			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit1()))+")"));
 			}
 		}
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp2()))){
 			//Case Column Display =CALL  set unit = "" 
-			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2()))){
+			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2())) ||
+			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2()))){
+				
 				colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+""));
 			}else{
 			    colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit2()))+")"));
@@ -759,7 +761,9 @@ public class SAGenerate {
 		}
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp3()))){
 			//Case Column Display =CALL  set unit = "" 
-			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3()))){
+			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3())) || 
+			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3()))	){
+	
 			    colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+""));
 			}else{
 				colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit3()))+")"));
@@ -767,7 +771,8 @@ public class SAGenerate {
 		}
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp4()))){
 			//Case Column Display =CALL  set unit = "" 
-			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4()))){
+			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4())) || 
+			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4()))	){
 			    colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+""));
 			}else{
 				colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit4()))+")"));

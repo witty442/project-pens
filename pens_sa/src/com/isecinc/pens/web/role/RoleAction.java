@@ -128,9 +128,17 @@ public class RoleAction extends I_Action {
 				
 				if(roleDetailList != null && roleDetailList.size() ==0){
 					roleDetailList = new ArrayList<Role>();
+					
 			    	Role roleItem = new Role();
-			        roleItem.setIndex(1);
-			        roleItem.setRoleColumnAccess("Customer_Category");
+			        roleItem.setIndex(4);
+			        roleItem.setRoleColumnAccess("Brand");
+			        roleItem.setRoleDataAccess("ALL");
+			        roleItem.setRoleDataAccessDesc(SAConstants.MSG_ALL_TH);
+				    roleDetailList.add(roleItem);
+				    
+				    roleItem = new Role();
+			        roleItem.setIndex(3);
+			        roleItem.setRoleColumnAccess("Division");
 			        roleItem.setRoleDataAccess("ALL");
 			        roleItem.setRoleDataAccessDesc(SAConstants.MSG_ALL_TH);
 				    roleDetailList.add(roleItem);
@@ -143,22 +151,15 @@ public class RoleAction extends I_Action {
 				    roleDetailList.add(roleItem);
 				    
 				    roleItem = new Role();
-			        roleItem.setIndex(3);
-			        roleItem.setRoleColumnAccess("Salesrep_id");
-			        roleItem.setRoleDataAccess("ALL");
-			        roleItem.setRoleDataAccessDesc(SAConstants.MSG_ALL_TH);
-				    roleDetailList.add(roleItem);
-				    
-				    roleItem = new Role();
-			        roleItem.setIndex(4);
-			        roleItem.setRoleColumnAccess("Brand");
+			        roleItem.setIndex(1);
+			        roleItem.setRoleColumnAccess("Customer_Category");
 			        roleItem.setRoleDataAccess("ALL");
 			        roleItem.setRoleDataAccessDesc(SAConstants.MSG_ALL_TH);
 				    roleDetailList.add(roleItem);
 				    
 				    roleItem = new Role();
 			        roleItem.setIndex(5);
-			        roleItem.setRoleColumnAccess("inventory_item_id");
+			        roleItem.setRoleColumnAccess("Salesrep_id");
 			        roleItem.setRoleDataAccess("ALL");
 			        roleItem.setRoleDataAccessDesc(SAConstants.MSG_ALL_TH);
 				    roleDetailList.add(roleItem);
@@ -219,11 +220,12 @@ public class RoleAction extends I_Action {
 			
 			if(Utils.isNull(formBean.getRole().getRoleId()).equals("")){
 			    formBean.getRole().setRoleId(roleIdParam);
-			    formBean.getRole().setRoleName(roleNameParam);
+			   
 			}
 			formBean.setMode("Edit");
-		    request.getSession().setAttribute("ROLE_DETAIL_LIST",MRole.findRoleListByRole(formBean.getRole()));
-		    
+			List roleList = MRole.findRoleListByRole(formBean.getRole());
+		    request.getSession().setAttribute("ROLE_DETAIL_LIST",roleList);
+		 
 		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);
 			request.setAttribute("Message",  e.toString());

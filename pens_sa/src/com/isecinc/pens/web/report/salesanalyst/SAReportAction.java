@@ -18,11 +18,12 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.report.salesanalyst.ProfileProcess;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAGenerate;
 import com.isecinc.pens.report.salesanalyst.SAProcess;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
+import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 
@@ -35,13 +36,21 @@ public class SAReportAction extends I_Action {
 	protected Logger logger = Logger.getLogger("PENS");
 	
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception {
-		logger.debug("SalesAnalystReportAction Prepare Form");
+		logger.debug("SalesAnalystReportAction Prepare Form action:"+request.getParameter("action"));
 		SAReportForm formBean = (SAReportForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "prepare";
 		try {
 			logger.debug("Clear Session");
 			request.getSession().setAttribute("RESULT",null);
-			formBean.setSalesBean(new SABean());
+			//Display User Role Info\
+			request.getSession().setAttribute("USER_ROLE_INFO", SecurityHelper.genHtmlUserRoleInfo(user));	
+			
+			SABean saBean = new SABean();
+			saBean.setIncludePos("Y");
+			
+			formBean.setSalesBean(saBean);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -52,13 +61,21 @@ public class SAReportAction extends I_Action {
 	}
 	
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception {
-		logger.debug("SalesAnalystReportAction Prepare Form");
+		logger.debug("SalesAnalystReportAction Prepare Form action:"+request.getParameter("action"));
 		SAReportForm formBean = (SAReportForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "prepare";
 		try {
 			logger.debug("Clear Session");
 			request.getSession().setAttribute("RESULT",null);
-			formBean.setSalesBean(new SABean());
+			//Display User Role Info\
+			request.getSession().setAttribute("USER_ROLE_INFO", SecurityHelper.genHtmlUserRoleInfo(user));	
+			
+			SABean saBean = new SABean();
+			saBean.setIncludePos("Y");
+			
+			formBean.setSalesBean(saBean);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -70,32 +87,17 @@ public class SAReportAction extends I_Action {
 	}
 	
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		logger.debug("SalesAnalystReportAction Search Current Action");
 		SAReportForm formBean = (SAReportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "search";
 		Connection conn = null;
-		SAGenCondition reportGen = new SAGenCondition();
 		String htmlCode = "";
 		String sql = "";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			
 			logger.debug("search");
-			/** Init condValue 1-4 ***/
-		    if(!Utils.isNull(formBean.getSalesBean().getCondName1()).equals("0")){
-		    	request.setAttribute("valuesList1", SAProcess.getInstance().getConditionValueList(conn,request,Utils.isNull(formBean.getSalesBean().getCondName1())));
-		    }
-		    if(!Utils.isNull(formBean.getSalesBean().getCondName2()).equals("0")){
-		    	request.setAttribute("valuesList2", SAProcess.getInstance().getConditionValueList(conn,request,Utils.isNull(formBean.getSalesBean().getCondName2())));
-		    } 
-		    if(!Utils.isNull(formBean.getSalesBean().getCondName3()).equals("0")){
-		    	request.setAttribute("valuesList3", SAProcess.getInstance().getConditionValueList(conn,request,Utils.isNull(formBean.getSalesBean().getCondName3())));
-		    }
-		    if(!Utils.isNull(formBean.getSalesBean().getCondName4()).equals("0")){
-		    	request.setAttribute("valuesList4", SAProcess.getInstance().getConditionValueList(conn,request,Utils.isNull(formBean.getSalesBean().getCondName4())));
-		    }
-		    
+			
 		    String order_by_name = request.getParameter("order_by_name");
 		    String order_type = request.getParameter("order_type");
 
@@ -116,9 +118,7 @@ public class SAReportAction extends I_Action {
 			request.getSession().setAttribute("maxOrderedDate", maxDate);
 			request.getSession().setAttribute("maxOrderedTime", maxTime);
 			
-			
 			if( !Utils.isNull(htmlCode).equals("")){
-
 			    request.getSession().setAttribute("RESULT", htmlCode);
 			    request.getSession().setAttribute("RESULT_SQL", sql);
 			}else{
@@ -127,6 +127,7 @@ public class SAReportAction extends I_Action {
 			    request.getSession().setAttribute("RESULT", null);	
 			    request.getSession().setAttribute("RESULT_SQL", null);	
 			}
+
 			
 		} catch (Exception e) {
 			request.getSession().setAttribute("RESULT", null);	
@@ -141,7 +142,6 @@ public class SAReportAction extends I_Action {
 	
 	
 	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("SalesAnalystReportAction Search Current Action");
 		SAReportForm formBean = (SAReportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String htmlCode ="";
@@ -158,8 +158,6 @@ public class SAReportAction extends I_Action {
 		    	String condDisp2 = Utils.isNull(request.getParameter("condDisp2"));
 		    	String condDisp3 = Utils.isNull(request.getParameter("condDisp3"));
 		        String condDisp4 = Utils.isNull(request.getParameter("condDisp4"));
-		        
-		        
 		        String condDisp5 = Utils.isNull(request.getParameter("condDisp5"));
 		        
 		    	String headerHtml  = SAGenerate.genHeaderReportExportExcel( user,formBean.getSalesBean(),columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
@@ -192,15 +190,11 @@ public class SAReportAction extends I_Action {
 	}
 
 	public ActionForward getSQL(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("SalesAnalystReportAction Search Current Action");
-		SAReportForm formBean = (SAReportForm) form;
-		User user = (User) request.getSession().getAttribute("user");
 		try {	
 			logger.debug("getSQL");
 			String sql = "";
 			if( request.getSession().getAttribute("RESULT_SQL") != null	){
             	sql = Utils.isNull(request.getSession().getAttribute("RESULT_SQL"));
-            	
             }
 			
 			java.io.OutputStream out = response.getOutputStream();
@@ -215,6 +209,55 @@ public class SAReportAction extends I_Action {
 		    out.flush();
 		    out.close();
 
+		} catch (Exception e) {
+			logger.debug(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("search");
+	}
+	
+	public ActionForward saveProfile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		try {	
+			logger.debug("saveProfile");
+			
+			SAReportForm formBean = (SAReportForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			boolean status = ProfileProcess.saveProfile(user, formBean.getSalesBean());
+			
+			if(status){
+			   request.setAttribute("Message", "บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"เรียบร้อยแล้ว");
+			}else{
+			   request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"โปรดตรวจสอบข้อมูล");
+			}
+			
+			request.getSession().setAttribute("RESULT", null);	
+			request.getSession().setAttribute("RESULT_SQL", null);	
+		} catch (Exception e) {
+			logger.debug(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("search");
+	}
+
+	
+	public ActionForward changeProfile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		try {	
+			logger.debug("changeProfile");
+			
+			SAReportForm formBean = (SAReportForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			SABean saBean = ProfileProcess.getProfile(user.getId()+"", formBean.getSalesBean().getProfileId());
+			
+			
+			formBean.setSalesBean(saBean);
+			
+			/*if(status){
+			   request.setAttribute("Message", "บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"เรียบร้อยแล้ว");
+			}else{
+			   request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"โปรดตรวจสอบข้อมูล");
+			}*/
+			request.getSession().setAttribute("RESULT", null);	
+			request.getSession().setAttribute("RESULT_SQL", null);	
 		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());

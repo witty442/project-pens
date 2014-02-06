@@ -11,11 +11,12 @@ import org.apache.struts.action.ActionForm;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.ConditionFilterBean;
+import com.isecinc.pens.report.salesanalyst.DisplayBean;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAProcess;
-import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 
@@ -53,6 +54,9 @@ public class SearchValuePopupAction extends I_Action {
 			 String condNameValue = request.getParameter("condNameValue");
 			 String condNameText = request.getParameter("condNameText");
 			
+			 request.getSession().setAttribute("codes", null);
+			 request.getSession().setAttribute("keys", null);
+			 request.getSession().setAttribute("descs", null);
 			 
 			 String action =  request.getParameter("action");
 			 if(action != null){
@@ -76,10 +80,15 @@ public class SearchValuePopupAction extends I_Action {
 		logger.debug("SearchValuePopupAction Search Current Action");
 		SearchValuePopupForm forms = (SearchValuePopupForm) form;
 		String returnText = "search";
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String currCondType = Utils.isNull(request.getParameter("currCondType"));
 			String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
 			
+			/*request.getSession().setAttribute("codes", null);
+			request.getSession().setAttribute("keys", null);
+			request.getSession().setAttribute("descs", null);*/
+			 
 			logger.debug("currCondNo:"+currCondNo+",currCondNo:"+currCondNo);
 			
 			if (currCondNo.equalsIgnoreCase("2") || currCondNo.equalsIgnoreCase("3") || currCondNo.equalsIgnoreCase("4")){
@@ -108,7 +117,7 @@ public class SearchValuePopupAction extends I_Action {
 				logger.debug("condType2:"+condType2+",condCode2:"+condCode2);
 				logger.debug("condType3:"+condType3+",condCode3:"+condCode3);
 				
-			    request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueListByParent(currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc(),filterBean));
+			    request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueListByParent(user,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc(),filterBean));
 			}else{
 				request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueList(request,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
 			}

@@ -29,7 +29,8 @@ import com.isecinc.pens.report.salesanalyst.helper.Utils;
  * 
  */
 public class UserAction extends I_Action {
-
+    
+	
 	
 	public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("Init Action");	
@@ -104,7 +105,9 @@ public class UserAction extends I_Action {
 		logger.debug("changePassword");
 		UserForm userForm = (UserForm) form;
 		Connection conn = null;
+		String re = "changePassword";
 		try {
+			User userSession = (User) request.getSession(true).getAttribute("user");
 			if( !Utils.isNull(request.getParameter("action")).equals("init")){
 				//validate newPassword = reNewPassord
 				if( !Utils.isNull(userForm.getUser().getNewPassword()).equals(Utils.isNull(userForm.getUser().getReNewPassword()))){
@@ -112,26 +115,32 @@ public class UserAction extends I_Action {
 					 request.setAttribute("Message", SystemMessages.getCaption("NewPasswordNotMatch", Locale.getDefault()));
 				}else{
 					//validate UserName && Password
-					User user = new MUser().findByUserName(String.valueOf(userForm.getUser().getUserName()));
+					User user = new MUser().findByUserName(String.valueOf(userSession.getUserName()));
 					if(user == null){
 						request.setAttribute("Message", SystemMessages.getCaption("NoMemberCodeFor", Locale.getDefault())+userForm.getUser().getUserName());
 					}else{
-						//validate old password
-						if( userForm.getUser().getPassword().equals(user.getPassword())){
+						if( userForm.getUser().getPassword().equals(userSession.getPassword())){
+							logger.debug("Password old match");
+							
 							conn = DBConnection.getInstance().getConnection();
 							conn.setAutoCommit(false);
-							new MUser().changePassword(conn, user.getId(), Utils.isNull(userForm.getUser().getNewPassword()));
+							new MUser().changePassword(conn, userSession.getId(), Utils.isNull(userForm.getUser().getNewPassword()));
 							//request.setAttribute("Message", "Change Password Success");
 							request.setAttribute("Message", SystemMessages.getCaption("SaveSucess", Locale.getDefault()));
 							conn.commit();
+							
+							request.setAttribute("changePassword", "success");	
 						}else{
-							//request.setAttribute("Message", "Old password wrong");
+							logger.debug("Password old not match");
+							
 							request.setAttribute("Message", SystemMessages.getCaption("OldPassWrong", Locale.getDefault()));
 						}
 					}
 				}
 			}
+			
 		} catch (Exception e) {
+			e.printStackTrace();
 			try{
 			   request.setAttribute("Message",  e.getMessage());
 			   conn.rollback();
@@ -147,7 +156,7 @@ public class UserAction extends I_Action {
 				ee.printStackTrace();
 			}
 		}
-		return mapping.findForward("changePassword");
+		return mapping.findForward(re);
 	}
 
 	/**
@@ -246,16 +255,19 @@ public class UserAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		UserForm userForm = (UserForm) form;
+		MUser mUser = new MUser();
 		try {
 			User userActive = (User) request.getSession(true).getAttribute("user");
 			conn = DBConnection.getInstance().getConnection();
 			// Begin Transaction
 			conn.setAutoCommit(false);
-			//
-			if(userForm.getUser().getId() != 0){
-			    new MUser().update(userForm.getUser(), userActive.getId(), conn);
+			//check User Exist
+			User userExist = mUser.findByUserName(userForm.getUser().getUserName());
+			
+			if(userExist !=null && !Utils.isNull(userExist.getUserName()).equals("")){
+			    mUser.update(userForm.getUser(), userExist.getId(), conn);
 			}else{
-				int id = new MUser().insert(userForm.getUser(), userActive.getId(), conn);
+				int id = mUser.insert(userForm.getUser(), userActive.getId(), conn);
 				userForm.getUser().setId(id);
 			}
 			request.setAttribute("Message", SystemMessages.getCaption("SaveSucess", Locale.getDefault()));
@@ -322,6 +334,10 @@ public class UserAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// Begin Transaction
 			conn.setAutoCommit(false);
+			
+			logger.debug("userForm.getIds():"+userForm.getIds());
+			//logger.debug("userForm.getIds():"+userForm.getIds().length);
+			
 			//
 			new MUser().changeUserGroup(userForm.getUser().getChangeUserGroup(), userForm.getIds(), userActive.getId(), conn);
 			// Commit Transaction
@@ -336,6 +352,30 @@ public class UserAction extends I_Action {
 			throw e;
 		} finally {
 			conn.close();
+		}
+		return mapping.findForward("re-search");
+	}
+	
+	public ActionForward savePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("savePassword Action");
+		Connection conn = null;
+		UserForm userForm = (UserForm) form;
+		
+		try {
+			User user = (User) request.getSession(true).getAttribute("user");
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			//new MUser().changePassword(conn, userId, newPassword);
+			
+			request.setAttribute("Message", "");
+		} catch (Exception e) {
+			try {
+				conn.rollback();
+			} catch (Exception ex) {}
+			request.setAttribute("Message", e.getMessage());
+			throw e;
+		} finally {
+			conn.close();conn=null;
 		}
 		return mapping.findForward("re-search");
 	}

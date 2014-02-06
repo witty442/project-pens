@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.isecinc.core.bean.References;
@@ -8,7 +9,7 @@ import com.isecinc.core.bean.References;
  * @author WITTY
  *
  */
-public class Role {
+public class Role implements Serializable{
 	
   private int index;	
 

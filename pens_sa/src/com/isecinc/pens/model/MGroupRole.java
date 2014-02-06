@@ -60,8 +60,8 @@ public class MGroupRole {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
-			psIns = conn.prepareStatement("insert into ad_group_role(user_group_id,user_group_name,role_id) values(?,?,?)");
-			psUpd = conn.prepareStatement("update ad_group_role set user_group_name =? ,role_id =? where user_group_id =? ");
+			psIns = conn.prepareStatement("insert into c_group_role(user_group_id,user_group_name,role_id) values(?,?,?)");
+			psUpd = conn.prepareStatement("update c_group_role set user_group_name =? ,role_id =? where user_group_id =? ");
 			
 			if(roleList != null && roleList.size() > 0){
 				for(int i=0;i<roleList.size();i++){
@@ -75,14 +75,24 @@ public class MGroupRole {
 					   psUpd.executeUpdate();
 					   
 					}else{
-					   // Insert 
-					   int seqId = SequenceProcess.getNextValue(conn,"ad_group_role", "user_group_id");
-					   logger.debug("seqId:"+seqId);
-					   
-					   psIns.setInt(1,seqId );
-					   psIns.setString(2, role.getUserGroupName());
-					   psIns.setString(3, role.getRoleId());
-					   psIns.executeUpdate();
+						
+					   int userGroupId = getUserGropIdByGroupName(role.getUserGroupName());
+					   if(userGroupId != -1){
+	                       //Insert same GroupName
+						   psIns.setInt(1,userGroupId );
+						   psIns.setString(2, role.getUserGroupName());
+						   psIns.setString(3, role.getRoleId());
+						   psIns.executeUpdate();
+					   }else{   
+						   // Insert 
+						   int seqId = SequenceProcess.getNextValue(conn,"c_group_role", "user_group_id");
+						   logger.debug("seqId:"+seqId);
+						   
+						   psIns.setInt(1,seqId );
+						   psIns.setString(2, role.getUserGroupName());
+						   psIns.setString(3, role.getRoleId());
+						   psIns.executeUpdate();
+					   }
 				    }
 				}
 
@@ -105,7 +115,7 @@ public class MGroupRole {
 		PreparedStatement ps = null;
 		try{
 			logger.debug("userGroupId:"+userGroupId);
-			String sql = "delete from ad_group_role where 1=1 ";
+			String sql = "delete from c_group_role where 1=1 ";
 			if( !Utils.isNull(userGroupId).equals("")){
 				sql +=" and user_group_id = '"+userGroupId+"'";
 			}
@@ -130,7 +140,7 @@ public class MGroupRole {
 		ResultSet rs = null;
 		List<References> dataList = new ArrayList<References>();
 		try{
-			String sql = "select distinct role_id ,role_name from ad_role where 1=1  \n" ;
+			String sql = "select distinct role_id ,role_name from c_role where 1=1  order by role_name \n" ;
 			
 			logger.debug("sql:"+sql);
 			
@@ -156,7 +166,7 @@ public class MGroupRole {
 		ResultSet rs = null;
 		List<References> dataList = new ArrayList<References>();
 		try{
-			String sql = "select distinct user_group_id ,user_group_name from ad_group_role where 1=1 order by user_group_id \n" ;
+			String sql = "select distinct user_group_id ,user_group_name from c_group_role where 1=1 order by user_group_id \n" ;
 			
 			logger.debug("sql:"+sql);
 			
@@ -181,7 +191,7 @@ public class MGroupRole {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try{
-			String sql = "select user_group_id ,user_group_name from ad_group_role where user_group_id ="+userGroupId+"\n" ;
+			String sql = "select user_group_id ,user_group_name from c_group_role where user_group_id ="+userGroupId+"\n" ;
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -198,6 +208,28 @@ public class MGroupRole {
 		return "";
 	}
 	
+	public static int getUserGropIdByGroupName(String groupName){
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try{
+			String sql = "select user_group_id ,user_group_name from c_group_role where user_group_name ='"+groupName+"'\n" ;
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+			   return rs.getInt("user_group_id");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			DBConnection.getInstance().closeConn(conn, ps, rs);
+		}
+		return -1;
+	}
+	
 	public static List<GroupRole> findGroupRoleList(GroupRole groupRole){
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -205,11 +237,11 @@ public class MGroupRole {
 		List<GroupRole> dataList = new ArrayList<GroupRole>();
 		int index =0;
 		try{
-			String sql = "select user_group_id,user_group_name,role_id from ad_group_role where 1=1  \n" ;
+			String sql = "select user_group_id,user_group_name,role_id from c_group_role where 1=1  \n" ;
 			if( !Utils.isNull(groupRole.getUserGroupId()).equals("")){
 				sql +=" and user_group_id ='"+groupRole.getUserGroupId()+"'";
 			}
-			sql += " order by user_group_name,user_group_id \n";
+			sql += " order by user_group_name asc \n";
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
