@@ -1,4 +1,7 @@
 function login(path){
+	//set screenWidth
+	document.getElementsByName('screenWidth')[0].value = screen.width-50;
+	
     if(Trim(document.getElementsByName('userName')[0].value)==''){
         document.getElementsByName('userName')[0].focus();
         return false;

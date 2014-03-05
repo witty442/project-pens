@@ -16,6 +16,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.report.salesanalyst.SAConstants;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
+import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 /**
  * Login Action Class
@@ -63,6 +64,15 @@ public class LoginAction extends DispatchAction {
 					request.setAttribute("loginMsg", "กรุณาเปลี่ยนรหัสผ่านใหม่ เนื่องจาก รหัสผ่านคุณเป็นรหัสผ่านชั่วคราว");
 				}
 			}
+			
+			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			logger.debug("Before ScreenWidth:"+screenWidth);
+			if(Integer.parseInt(screenWidth) < 600){
+				screenWidth = "0";
+			}
+			logger.debug("After Calc ScreenWidth:"+screenWidth);
+			
+			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			
 			request.getSession(true).setAttribute("user", user);
 		} catch (Exception e) {

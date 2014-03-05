@@ -123,6 +123,7 @@ function popupChangePassword(path){
 		            	</td>
 		            </tr>
 		        </table>
+		        <input type="hidden" id = "screenWidth" name="screenWidth" />
 		        </html:form>
 			</td>
         	<td width="523">&nbsp;</td>

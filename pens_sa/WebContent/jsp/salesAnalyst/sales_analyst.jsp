@@ -23,6 +23,15 @@ String typeSearch = Utils.isNull(request.getAttribute("DATA"));
 java.util.List yearList = null;
 if(session.getAttribute("yearList") != null) 
 	yearList = (java.util.List)session.getAttribute("yearList");
+
+java.util.List yearListASC = null;
+if(session.getAttribute("yearListASC") != null) 
+	yearListASC = (java.util.List)session.getAttribute("yearListASC");
+
+String screenWidth = "";
+if(session.getAttribute("screenWidth") != null){ 
+	screenWidth = (String)session.getAttribute("screenWidth");
+}
 %>
 <html>
 <head>
@@ -41,6 +50,22 @@ body {
 select#summaryType{width:150px;}
 fieldset#condition-frame{height:186px}
 fieldset#display-frame{height:186px}
+
+
+#scroll {
+<%if(!"0".equals(screenWidth)){%>
+    width:<%=screenWidth%>px;
+    background:#A3CBE0;
+	border:1px solid #000;
+	overflow:auto;
+	white-space:nowrap;
+	box-shadow:0 0 25px #000;
+<%}else{%>
+ 
+<%}%>
+
+}
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -803,22 +828,20 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
                            </fieldset>
                            
                            <fieldset>
-			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+			                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
 			                  <tr><td>
 			                  
 		                            <fieldset>
-					                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+		                             <legend><b>รูปแบบการค้นหาที่ใช้ประจำ</b></legend>
+					                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
 					                  <tr>
-					                      <td width="30%" align="right">
-					                                                                                       รูปแบบการค้นหาที่ใช้ประจำ
-					                      <td>
 					                      <td width="15%" align="left">
 		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" >
 											         <html:options collection="profileList" property="key" labelProperty="name"/>
 									            </html:select>
 		                                  </td>
-		                                  <td width="35%" align="center">
-		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="newPosBtn" style="width: 150px;" 
+		                                  <td width="65%" align="left">
+		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="newPosBtnLong" style="width: 180px;" 
 												     onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" />
 										 </td>
 		                              </tr>
@@ -914,9 +937,9 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									       <legend>ปี</legend>
 										    <table width="80%" border="0">
 	                                         <tr>
-	                                         <%if(yearList != null){ 
-	                                              for(int i=0;i<yearList.size();i++){
-	                                            	  com.isecinc.core.bean.References ref=(com.isecinc.core.bean.References)yearList.get(i);
+	                                         <%if(yearListASC != null){ 
+	                                              for(int i=0;i<yearListASC.size();i++){
+	                                            	  com.isecinc.core.bean.References ref=(com.isecinc.core.bean.References)yearListASC.get(i);
 	                                              
 		                                         %>
 		                                          <td width="5%"><html:multibox  property="salesBean.chkYear"><%=ref.getKey()%></html:multibox><%=ref.getName() %></td>
@@ -1145,11 +1168,15 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 								</tr>
 							</table>
 							<!-- BUTTON -->
-							<br></br>
+							</br>
 							
 							<!-- RESULT -->
-							
+							<script>
+						
+							</script>
+							<div id ="scroll" >
 							<%out.print(Utils.isNull(session.getAttribute("RESULT"))); %>
+							</div>
 							
 						    <!-- RESULT -->
 					  </html:form>

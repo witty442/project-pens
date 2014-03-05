@@ -286,6 +286,13 @@ TABLE.result2 TD {
 	font-size: 13px;
 }
 
+TABLE.result2 TD.summary {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	font-weight: bold;
+	background-color: #AFDDE0;
+}
 .userlabel {
 	color: #8B3A3A;
 	font-family: Tahoma;

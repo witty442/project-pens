@@ -50,6 +50,7 @@ public class SAProcess {
 	public	 static String SUMMARY_TYPE_NONE = "";
 	public	 static String SUMMARY_TYPE_SUM = "SUM";
 	public	 static String SUMMARY_TYPE_AVG = "AVG";
+	public	 static String SUMMARY_TYPE_PERCENT = "PERCENT";
 	
 	public static final String TYPE_SEARCH_DAY = "DAY";
 	public static final String TYPE_SEARCH_MONTH = "MONTH";
@@ -127,6 +128,7 @@ public class SAProcess {
 		SUMMARY_TYPE_MAP.put(SUMMARY_TYPE_NONE , "ไม่เลือก");
 		SUMMARY_TYPE_MAP.put(SUMMARY_TYPE_SUM , "ยอดรวม");
 		SUMMARY_TYPE_MAP.put(SUMMARY_TYPE_AVG , "ค่าเฉลี่ย");
+		SUMMARY_TYPE_MAP.put(SUMMARY_TYPE_PERCENT , "เปอร์เซ็นต์");
 	}
 	
 	private String maxOrderedDate = "";
@@ -170,8 +172,11 @@ public class SAProcess {
 			
 			/** init year **/
 			
-			List<References> yearL = initYearList(conn);
+			List<References> yearL = initYearList(conn," DESC");
 			session.setAttribute("yearList", yearL);
+			
+			List<References> yearLSAC = initYearList(conn," ASC");
+			session.setAttribute("yearListASC", yearLSAC);
 			
 			
 			for(References year:yearL){
@@ -369,13 +374,13 @@ public class SAProcess {
 		return maxOrderedTime;
 	}
 
-	public  List<References> initYearList(Connection conn) throws Exception{
+	public  List<References> initYearList(Connection conn,String sort) throws Exception{
 		String sql = "";
 		PreparedStatement ps = null;
 		ResultSet rs= null;
         List<References> yearList = new ArrayList<References>();
 		try{
-			sql = "SELECT DISTINCT ORDER_YEAR from XXPENS_BI_MST_ORDER_DATE ORDER BY ORDER_YEAR DESC ";
+			sql = "SELECT DISTINCT ORDER_YEAR from XXPENS_BI_MST_ORDER_DATE ORDER BY ORDER_YEAR "+sort;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){
