@@ -69,6 +69,7 @@ public class MonitorSales {
 			
 			String dateStr  = Utils.format(new Date(), "yyyyMM");
             String fileName = u.getCode()+".txt";
+            
             if(!currentAppVersion.equalsIgnoreCase(latestAppVersion)){
             	
                //CreateFolder FTP

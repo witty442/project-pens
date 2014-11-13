@@ -18,13 +18,30 @@ public class NumberToolsUtil {
     public static final String format_current_5_digit = "#,##0.00000";
 	public static final String format_current_6_digit = "#,##0.000000";
 	
+	public static final String format_current_five_digit = "00000";
 	
+	public static void main(String[] a){
+		try{
+			String v ="001";
+			String r = NumberToolsUtil.decimalFormat(Integer.parseInt(v),NumberToolsUtil.format_current_five_digit);
+			System.out.println(r);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	public static String decimalFormat(double num){
 		NumberFormat formatter = new DecimalFormat(format_current_2_disgit);
 		return formatter.format(num);
 	}
 	
 	public static String decimalFormat(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
+	
+	public static String decimalFormat(BigDecimal num,String format){
+		if(num==null) return "";
 		NumberFormat formatter = new DecimalFormat(format);
 		return formatter.format(num);
 	}

@@ -78,6 +78,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.lowagie.text.pdf.BaseFont;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })
@@ -231,6 +232,8 @@ public class ReportUtilServlet extends HttpServlet {
 		if (user != null) {
 			userPrint = bundle.getString("PrinterName") + " " + user.getName() + "  " + user.getOrganization();
 		}
+		//logger.debug("logoPath:"+BeanParameter.getLogo());
+		
 		parameterMap.put("logo", BeanParameter.getLogo());
 		parameterMap.put("userPrint", userPrint);
 
@@ -251,6 +254,76 @@ public class ReportUtilServlet extends HttpServlet {
 			} else if (fileType.equals(SystemElements.PDF)) {
 				try {
 					runReportListToPDF(request, response, conn, fileJasper, lstData, parameterMap, fileName);
+				} catch (Exception ex) {
+					System.out.print(ex.toString());
+				}
+			} else if (fileType.equals(SystemElements.PRINTER)) {
+				try {
+					runReportListToPrinter(request, response, conn, fileJasper, lstData, parameterMap, fileName);
+				} catch (Exception ex) {
+					System.out.print(ex.toString());
+				}
+			} else if (fileType.equals(SystemElements.HTML)) {
+				try {
+					// generateHtmlOutput(jasperPrint, request, response);
+					generateHTML(request, response, fileJasper);
+				} catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param request
+	 * @param response
+	 * @param dataSource
+	 * @throws IOException
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws NamingException
+	 * @Description for run jasper report
+	 * @Example fileJasper ="/reports/FirstReport.jasper" typeOfOutputReport = "application/pdf"
+	 */
+	@SuppressWarnings("unchecked")
+	public void runReport(HttpServletRequest request, HttpServletResponse response, Connection conn, String fileJasper,
+			String fileType, HashMap parameterMap, String fileName, List lstData,String fileNameExport) throws Exception {
+
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("user");
+		String userPrint = "";
+		ResourceBundle bundle = null;
+		bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		if (user != null) {
+			userPrint = bundle.getString("PrinterName") + " " + user.getName() + "  " + user.getOrganization();
+		}
+		//logger.debug("logoPath:"+BeanParameter.getLogo());
+		
+		parameterMap.put("logo", BeanParameter.getLogo());
+		parameterMap.put("userPrint", userPrint);
+
+		try {
+
+			if (fileType.equals(SystemElements.WORD)) {
+				try {
+					// generateRTFOutput(response, new HashMap(), jasperReport, jasperPrint, fileName);
+				} catch (Exception ex) {
+					System.out.print(ex.toString());
+				}
+			} else if (fileType.equals(SystemElements.EXCEL)) {
+				try {
+					runReportListToXLS(request, response, conn, fileJasper, lstData, parameterMap, fileName,fileNameExport);
+				} catch (Exception ex) {
+					System.out.print(ex.toString());
+				}
+			} else if (fileType.equals(SystemElements.PDF)) {
+				try {
+					runReportListToPDF(request, response, conn, fileJasper, lstData, parameterMap, fileName,fileNameExport);
 				} catch (Exception ex) {
 					System.out.print(ex.toString());
 				}
@@ -344,6 +417,8 @@ public class ReportUtilServlet extends HttpServlet {
 		}
 	}
 
+	
+	
 	@SuppressWarnings( { "unchecked" })
 	private void runReportListToXLS(HttpServletRequest request, HttpServletResponse response, Connection conn,
 			String fileJasper, List lstData, HashMap parameterMap, String fileName) throws ServletException,
@@ -388,6 +463,51 @@ public class ReportUtilServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings( { "unchecked" })
+	private void runReportListToXLS(HttpServletRequest request, HttpServletResponse response, Connection conn,
+			String fileJasper, List lstData, HashMap parameterMap, String fileName,String fileNameExport) throws ServletException,
+			IOException, JRException {
+
+		File rptFile = null;
+		fileName = fileName + ".xls";
+
+		try {
+			fileNameExport = Utils.isNull(fileNameExport).equals("")?fileName:fileNameExport;
+			
+			JRDataSource jrDataSource = createDataSource(lstData);
+			rptFile = new File(fileJasper + ".jasper");
+
+			JasperReport rtfReport = (JasperReport) JRLoader.loadObject(rptFile.getPath());
+			JasperPrint rtfPrint = null;
+			rtfPrint = JasperFillManager.fillReport(rtfReport, parameterMap, jrDataSource);
+
+			JRXlsExporter exporter = new JRXlsExporter();
+			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, rtfOutput);
+			exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, fileName);
+			exporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+			exporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
+			exporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+
+			exporter.setParameter(JRXlsExporterParameter.IS_AUTO_DETECT_CELL_TYPE, Boolean.FALSE);
+			exporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.FALSE);
+
+			exporter.exportReport();
+
+			byte[] bytes = null;
+			bytes = rtfOutput.toByteArray();
+			response.setHeader("Content-Disposition", "attachment;filename=" + fileNameExport);
+			response.setContentType("application/ms-excel");
+			response.setContentLength(bytes.length);
+			ServletOutputStream servletOutputStream = response.getOutputStream();
+			servletOutputStream.write(bytes, 0, bytes.length);
+			servletOutputStream.flush();
+			servletOutputStream.close();
+		} catch (JRException e) {
+			throw e;
+		}
+	}
 	/**
 	 * sample fileName = "C1_report"; Run report to pdf file without list data.
 	 */
@@ -487,6 +607,60 @@ public class ReportUtilServlet extends HttpServlet {
 		}
 	}
 
+	@SuppressWarnings( { "unchecked" })
+	private void runReportListToPDF(HttpServletRequest request, HttpServletResponse response, Connection conn,
+			String fileJasper, List lstData, HashMap parameterMap, String fileName,String fileNameExport) throws ServletException,
+			IOException, JRException {
+
+		File rptFile = null;
+		fileName = fileName + ".pdf";
+
+		try {
+			fileNameExport = Utils.isNull(fileNameExport).equals("")?fileName:fileNameExport;
+			
+			//Wit Edit
+		    ServletContext context = request.getSession().getServletContext();
+            String fontPath = context.getRealPath("/reports/fonts/");//
+            logger.debug("fontPath:"+fontPath);
+            
+			rptFile = new File(fileJasper + ".jasper");
+			JRDataSource jrDataSource = createDataSource(lstData);
+
+			JasperReport rtfReport = (JasperReport) JRLoader.loadObject(rptFile.getPath());
+			JasperPrint rtfPrint = JasperFillManager.fillReport(rtfReport, parameterMap, jrDataSource);
+
+			// Set font for pdf.
+			HashMap fontMap = new HashMap();
+			FontKey key = new FontKey("Angsana New", false, false);
+			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
+			fontMap.put(key, font);
+
+			FontKey key2 = new FontKey("Angsana New", true, false);
+			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
+			fontMap.put(key2, font2);
+
+			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
+			JRPdfExporter exporter = new JRPdfExporter();
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, rtfOutput);
+			exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, fileName);
+			exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+			exporter.exportReport();
+
+			byte[] bytes = null;
+			bytes = rtfOutput.toByteArray();
+			response.setHeader("Content-Disposition", "attachment;filename=" + fileNameExport);
+			response.setContentType("application/pdf");
+			response.setContentLength(bytes.length);
+			ServletOutputStream servletOutputStream = response.getOutputStream();
+			servletOutputStream.write(bytes, 0, bytes.length);
+			servletOutputStream.flush();
+			servletOutputStream.close();
+
+		} catch (JRException e) {
+			throw e;
+		}
+	}
 	@SuppressWarnings("unchecked")
 	private void runReportListToPrinter(HttpServletRequest request, HttpServletResponse response, Connection conn,
 			String fileJasper, List lstData, HashMap parameterMap, String fileName) throws ServletException,
@@ -514,14 +688,13 @@ public class ReportUtilServlet extends HttpServlet {
 			logger.debug("default printerName:"+pService.getName());
 			
 			/** Set property printer and Report **/
-			HashMap fontMap = new HashMap();
-			/*FontKey key = new FontKey("Angsana New", false, false);
+			/*HashMap fontMap = new HashMap();
+			FontKey key = new FontKey("Angsana New", false, false);
 			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
 			fontMap.put(key, font);
 
 			FontKey key2 = new FontKey("Angsana New", true, false);
 			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			Print
 			fontMap.put(key2, font2);*/
 
 			/** Case print Tax Invoice **/

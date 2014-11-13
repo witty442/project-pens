@@ -29,7 +29,8 @@ import com.isecinc.pens.inf.manager.batchwork.DownloadWorker;
 public class AppversionVerify {
 
 	protected static Logger logger = Logger.getLogger("PENS");
-	private static String URL_DROPBOX = "http://dl.dropbox.com/u/24337336/pens/SalesApp/";
+	private static String URL_DROPBOX_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/";
+	private static String URL_DROPBOX_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/";
 	/**
 	 * @param args
 	 */
@@ -43,6 +44,8 @@ public class AppversionVerify {
 		try{
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			
+			String currentAppVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
+			
 			String appVersionLatest = Utils.isNull(getLatestSalesVersion("Lastest-app-version.txt"));
 			String msgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/message-to-sales.txt");
 			logger.info("appVersionLatest :"+appVersionLatest);
@@ -52,6 +55,10 @@ public class AppversionVerify {
 			
 			//Write AppVersion Latest
 			FileUtil.writeFile(localSalesAppPath+"Lastest-app-version.txt", appVersionLatest, "UTF-8");
+			
+			//Write Current AppVersion
+			FileUtil.writeFile(localSalesAppPath+"current-app-version.txt", currentAppVersion, "UTF-8");
+			
 			//Write Message To Sales
 			FileUtil.writeFile(localSalesAppPath+"message-to-sales.txt", msgToSales, "UTF-8");
 			
@@ -70,14 +77,17 @@ public class AppversionVerify {
 		try{
 			if(request.getSession().getAttribute("appVersionCheckMsg") == null){
 			    String localSalesAppPath = getLocalPathSalesApp();
+
+			    //get Latest version from local
 				String appVersionLatest = Utils.isNull(FileUtil.readFile(localSalesAppPath+"Lastest-app-version.txt", "UTF-8"));
+
 				String appVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
 				logger.debug("appVersionLatest :"+appVersionLatest);
 				logger.debug("CurrentAppVersion :"+appVersion);
 				
 				if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
 					//appVersion not match
-					msg = ""+SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
+					msg = ""+SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th")) +"-><a href='https://dl.dropboxusercontent.com/u/24337336/pens/SalesApp/pensclient.war'>Download</a>";
 				}else{
 					msg = "";
 				}
@@ -177,7 +187,8 @@ public class AppversionVerify {
     /** Software For Sales App **/
     public static void getSoftware4SalesApp(){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath = URL_DROPBOX+"Software4SalesApp.zip";
+		String sourcePath = URL_DROPBOX_+"Software4SalesApp.zip";
+		String sourcePath2 = URL_DROPBOX_2+"Software4SalesApp.zip";
         String destPath  = localSalesAppPath+"Software4SalesApp.zip";
         String dest2Path = localSalesAppPath+"Software4SalesApp";
 		try{
@@ -189,9 +200,18 @@ public class AppversionVerify {
 				
 				String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
 				System.out.println(logs);
-	            URL url = new URL(sourcePath);
-	            url.openConnection();
-	            InputStream reader = url.openStream();
+				URL url = null;
+	            InputStream reader = null;
+	            try{
+		            url = new URL(sourcePath);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }catch(Exception e){
+	            	logger.error("Error Source1 retry Source2");
+	            	url = new URL(sourcePath2);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }
 	
 	            FileOutputStream writer = new FileOutputStream(destPath);
 	            byte[] buffer = new byte[1024];
@@ -220,7 +240,8 @@ public class AppversionVerify {
     /** Software SalesAppUpdater.jsr **/
 	public static void getSalesAppUpdater(boolean checkVersion){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath = URL_DROPBOX+"SalesAppUpdater.zip";
+		String sourcePath = URL_DROPBOX_+"SalesAppUpdater.zip";
+		String sourcePath2 = URL_DROPBOX_2+"SalesAppUpdater.zip";
         String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
         String dest2Path = localSalesAppPath+"SalesAppUpdater";
 		try{
@@ -244,10 +265,19 @@ public class AppversionVerify {
 				
 				String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
 				System.out.println(logs);
-	            URL url = new URL(sourcePath);
-	            url.openConnection();
-	            InputStream reader = url.openStream();
-	
+				URL url = null;
+	            InputStream reader = null;
+	            try{
+		            url = new URL(sourcePath);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }catch(Exception e){
+	            	logger.error("Error Source1 retry Source2");
+	            	url = new URL(sourcePath2);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }
+	            
 	            FileOutputStream writer = new FileOutputStream(destPath);
 	            byte[] buffer = new byte[1024];
 	            //int totalBytesRead = 0;
@@ -352,7 +382,7 @@ public class AppversionVerify {
 	private static String getLatestSalesVersion(String name){
         String appVersion = "";
         try{
-        	String str = URL_DROPBOX+name+"";
+        	String str = URL_DROPBOX_+name+"";
         	logger.info("url:"+str);
             URL url = new URL(str);
             url.openConnection();

@@ -48,22 +48,32 @@ public class TestALL {
  public static String testFTPCon() {
 	 String output = "";
 	 EnvProperties env =EnvProperties.getInstance();
+	 boolean can = true;
+	 String errorMsg = "";
 	 try{
 		 String ip = env.getProperty("ftp.ip.server");
 		 String user = env.getProperty("ftp.username");
 		 String pwd = env.getProperty("ftp.password");
-	 
-		 output +="FTP SERVER  IP : "+ip+"\n";
+		 
+		 FTPManager ftpManager = new FTPManager(ip,user, pwd );
+		 try{
+		   ftpManager.canConnectFTPServer();
+		 }catch(Exception ee){
+			 can = false;
+			 errorMsg = ee.getMessage();
+		 }
+		 output +="FTP SERVER IP : "+ftpManager.server+"\n";
 		 output +="FTP SERVER User : "+user+"\n";
 		 output +="FTP SERVER Password : "+pwd+"\n";
 		 
-		 FTPManager ftpManager = new FTPManager(ip,user, pwd );
-		 ftpManager.canConnectFTPServer();
-		 
-		 output +="FTP SERVER Result Connection: Success \n";
+		 if(can==false){
+		    output +="FTP SERVER Result Connection:"+errorMsg+"\n"; 
+		 }else{
+		    output +="FTP SERVER Result Connection: Success \n";
+		 }
 	 }catch(Exception e){
 		 e.printStackTrace();
-		 output +="FTP SERVER Result Connection:"+e.getMessage()+"\n";
+		 
 	 }finally{
 		
 	 }
