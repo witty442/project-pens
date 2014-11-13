@@ -29,6 +29,7 @@ import com.isecinc.pens.bean.ReceiptMatch;
 import com.isecinc.pens.bean.ReceiptMatchCN;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
@@ -194,6 +195,8 @@ public class ReceiptAction extends I_Action {
 			}
 
 			whereCause += " ORDER BY RECEIPT_DATE DESC ,RECEIPT_NO DESC ";
+			logger.debug("whereCaluse:"+whereCause);
+			
 			Receipt[] results = new MReceipt().search(whereCause);
 			receiptForm.setResults(results);
 			if (results != null) {
@@ -249,18 +252,19 @@ public class ReceiptAction extends I_Action {
 				line.setLineNo(i++);
 			}
 
-			// if (user.getType().equalsIgnoreCase(User.VAN)) {
-			// // assign order no to receipt no
-			// receipt.setReceiptNo(receiptForm.getLines().get(0).getOrder().getOrderNo());
-			// }
-			
 			// Check Dupplicate Cheque No.
 			if(!isChequeNoUnique(receiptForm.getBys(),conn)){
 				request.setAttribute("JSMsg", InitialMessages.getMessages().get(Messages.CHEQUE_DUPLICATE).getDesc());
 				conn.rollback();
 				return "prepare";
 			}
-
+			
+			//Validate User
+			if(Utils.isNull(receipt.getSalesRepresent().getCode()).equals("")){
+				User user = (User) request.getSession().getAttribute("user");
+				receipt.setSalesRepresent(user);
+			}
+			
 			// Save Receipt
 			if (!new MReceipt().save(receipt, userActive.getId(), conn)) {
 				// return with duplicate Document no
