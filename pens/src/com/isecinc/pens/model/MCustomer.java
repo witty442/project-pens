@@ -18,6 +18,7 @@ import util.DateToolsUtil;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
 
@@ -41,7 +42,8 @@ public class MCustomer extends I_Model<Customer> {
 	// Column Sales Online Side active
 	private String[] columns = { COLUMN_ID, "CODE", "NAME", "NAME2", "CUSTOMER_TYPE", "TAX_NO", "TERRITORY", "WEBSITE",
 			"BUSINESS_TYPE", "BIRTHDAY", "CREDIT_CHECK", "PAYMENT_TERM", "VAT_CODE", "PAYMENT_METHOD",
-			"SHIPPING_METHOD", "USER_ID", "ISACTIVE", "CREATED_BY", "UPDATED_BY", "PARENT_CUSTOMER_ID", "PARTY_TYPE" };
+			"SHIPPING_METHOD", "USER_ID", "ISACTIVE", "CREATED_BY", "UPDATED_BY", "PARENT_CUSTOMER_ID", "PARTY_TYPE",
+			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC"};
 
 	/**
 	 * Find
@@ -78,7 +80,8 @@ public class MCustomer extends I_Model<Customer> {
 		ResultSet rst = null;
 		int totalRow = 0;
 		try{
-			String sql = "select count(*) total_row from m_customer where 1=1 "+whereCause;
+			String sql = "select count(*) total_row from m_customer ,m_address  where 1=1 and m_customer.customer_id = m_address.customer_id " +
+					"\n and m_address.purpose ='B' "+whereCause;
 			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
@@ -143,7 +146,10 @@ public class MCustomer extends I_Model<Customer> {
 			}
 			
 			
-			String sql = "select m_customer.* ,  \n";
+			String sql = "select m_customer.*  \n";
+			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
+				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
+				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
 			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
                    sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
                    sql+=" ad_user.ROLE,ad_user.ISACTIVE,ad_user.CODE,ad_user.UPDATED,ad_user.UPDATED_BY,ad_user.TERRITORY, \n";
@@ -151,8 +157,9 @@ public class MCustomer extends I_Model<Customer> {
                   // sql+= " ( select sum(o.net_amount) net_amount from t_order o \n where o.doc_status = 'SV'  and o.CUSTOMER_ID = m_customer.CUSTOMER_ID ) as total_order_amt,\n";
                
                   // sql+= " ( select sum(r.receipt_amount) receipt_amount from t_receipt r \n where r.doc_status = 'SV' and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) as total_receipt_amt \n";
-              
-                   sql+= " from m_customer  ,ad_user where m_customer.user_id = ad_user.user_id \n";
+                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX ";
+                   sql+= " from m_customer ,m_address ,ad_user where m_customer.user_id = ad_user.user_id \n";
+                   sql+= " and m_customer.customer_id = m_address.customer_id  and m_address.purpose ='B'\n";
 			       sql+= whereCause;
 			       
 			logger.debug("sql:"+sql);
@@ -224,6 +231,10 @@ public class MCustomer extends I_Model<Customer> {
 				m.setPartyType(ConvertNullUtil.convertToString(rst.getString("PARTY_TYPE")).trim());
 				m.setExported(rst.getString("EXPORTED"));
 
+				String addressSummary  = Utils.isNull(rst.getString("line1"))+" "+Utils.isNull(rst.getString("line2"))+" "+Utils.isNull(rst.getString("line3"));
+				       addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
+				m.setAddressSummary(addressSummary);
+				
 				// Total Invoice
 				//double totalOrderAmt = rst.getDouble("total_order_amt");
 				//double totalReceiptAmt = rst.getDouble("total_receipt_amt");
@@ -332,7 +343,9 @@ public class MCustomer extends I_Model<Customer> {
 				ConvertNullUtil.convertToString(customer.getShippingMethod()).trim(),
 				activeUserID, customer.getIsActive() != null ? customer.getIsActive() : "N",
 				activeUserID, activeUserID, customer.getParentID(),
-				ConvertNullUtil.convertToString(customer.getPartyType()).trim() };
+				ConvertNullUtil.convertToString(customer.getPartyType()).trim(),
+				customer.getPrintTax(),customer.getPrintType(),customer.getPrintBranchDesc(),customer.getPrintHeadBranchDesc()
+		      };
 		if (super.save(TABLE_NAME, columns, values, customer.getId(), conn)) {
 			customer.setId(id);
 		}
@@ -342,7 +355,15 @@ public class MCustomer extends I_Model<Customer> {
 	public boolean update(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 		PreparedStatement ps = null;
 		try{
-			 ps = conn.prepareStatement("update m_customer set tax_no ='"+customer.getTaxNo()+"' where customer_id ="+ customer.getId());
+			// ps = conn.prepareStatement("update m_customer set tax_no ='"+customer.getTaxNo()+"' where customer_id ="+ customer.getId());
+			String sql = "update m_customer set tax_no ='"+customer.getTaxNo()+"' " +
+			        "\n ,print_type ='"+customer.getPrintType()+"',print_tax='"+customer.getPrintTax()+"'"+
+			        "\n ,PRINT_BRANCH_DESC ='"+customer.getPrintBranchDesc()+"',PRINT_HEAD_BRANCH_DESC='"+customer.getPrintHeadBranchDesc()+"'"+
+					"\n  where customer_id ="+ customer.getId();
+			
+			 logger.debug("sql:"+sql);
+			 
+			 ps = conn.prepareStatement(sql);
 			 ps.executeUpdate();
 			 return true;
 		}catch(Exception e){

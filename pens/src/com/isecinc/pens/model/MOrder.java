@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +16,7 @@ import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
 
@@ -182,7 +182,7 @@ public class MOrder extends I_Model<Order> {
 	 * @param lines
 	 * @throws Exception
 	 */
-	public void reCalculate(Order order, List<OrderLine> lines) throws Exception {
+	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) throws Exception {
 		DecimalFormat df = new DecimalFormat("###0.00");
 		double totalAmount = 0;
 		for (OrderLine l : lines) {
@@ -193,8 +193,60 @@ public class MOrder extends I_Model<Order> {
 		order.setTotalAmount(new Double(df.format(totalAmount)));
 		order.setVatAmount(new Double(df.format(vat)));
 		order.setNetAmount(new Double(df.format(netAmount)));
+		
+		return order;
+	}
+	
+	
+	public Order reCalculateHeadAmountDB(Connection conn, Order order) {
+		try{
+			//get OrderLine 
+			List<OrderLine> newlines = new MOrderLine().lookUp(conn,order.getId());
+			
+			DecimalFormat df = new DecimalFormat("###0.00");
+			double totalAmount = 0;
+			for (OrderLine l : newlines) {
+				totalAmount += l.getLineAmount()-l.getDiscount();
+			}
+			double vat = order.getVatRate() * totalAmount / 100;
+			double netAmount = totalAmount + vat;
+			order.setTotalAmount(new Double(df.format(totalAmount)));
+			order.setVatAmount(new Double(df.format(vat)));
+			order.setNetAmount(new Double(df.format(netAmount)));
+			
+		}catch(Exception e){
+		   logger.debug(e.getMessage(),e);
+		}finally{
+			
+		}
+		return order;
+	}
+	
+
+	public List<OrderLine> reCalculateLineAmountInLinesBeforeCalcPromotion(List<OrderLine> lines) throws Exception {
+		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
+		for (OrderLine l : lines) {
+			//recalc LineAmount
+			l.setLineAmount(l.getPrice()*l.getQty());
+			logger.info("recal :product["+l.getProduct().getCode()+"],qty["+l.getQty()+"]price["+l.getPrice()+"] after LineAmount["+l.getLineAmount()+"]");
+			newRecallines.add(l);
+		}
+		return newRecallines;
 	}
 
+	
+	public List<OrderLine> reCalculateLineAmountInLinesAfterCalcPromotion(List<OrderLine> lines) throws Exception {
+		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
+		for (OrderLine l : lines) {
+			//recalc LineAmount
+			l.setLineAmount(l.getPrice()*l.getQty());
+			l.setTotalAmount(l.getLineAmount()-l.getDiscount());
+			logger.info("recal :product["+l.getProduct().getCode()+"]qty["+l.getQty()+"]price["+l.getPrice()+"]LineAmount["+l.getLineAmount()+"]Disc["+l.getDiscount()+"]total["+l.getTotalAmount()+"]");
+			newRecallines.add(l);
+		}
+		return newRecallines;
+	}
+	
 	/**
 	 * LookUp
 	 * 
@@ -426,4 +478,71 @@ public class MOrder extends I_Model<Order> {
 			}
 		}
 	}
+	
+	
+	public List<Order> getOrderVanNotReceipt(Connection conn,User user) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Order> orderList = new ArrayList<Order>();
+		try{
+			String sql =""+
+			 "select * "+
+			 "from t_order where 1=1 \n"+
+			 "and doc_status ='SV' \n"+
+			 "and payment ='N' \n"+
+			 "and user_id = '"+user.getId()+"' \n"+
+			 "and date(created) = date( sysdate()) \n"+
+			 "and order_no like '"+user.getCode()+"%' \n"+
+			 "and order_no not in( \n"+
+			    "select receipt_no from t_receipt where 1=1 \n"+
+			    "and user_id = '"+user.getId()+"' \n"+
+			    "and doc_status ='SV' \n"+
+			 ") \n";
+			 
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				Order o = new Order(rst);
+				
+				orderList.add(o);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return orderList;
+	}
+	
+	public int updatePaymentByOrderId(Connection conn,int orderId,String payment) throws Exception {
+		PreparedStatement ps = null;
+		try {
+			String sql = "UPDATE "+TABLE_NAME+" SET  PAYMENT = ?  ,UPDATED_BY =? ,UPDATED = CURRENT_TIMESTAMP WHERE order_id = ? ";
+			logger.debug("order_id:"+orderId);
+			logger.debug("SQL:"+sql);
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			ps.setString(++index,payment);
+			ps.setInt(++index, 9999);
+			ps.setInt(++index, orderId);
+			
+			return ps.executeUpdate();
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+	}
+	
 }

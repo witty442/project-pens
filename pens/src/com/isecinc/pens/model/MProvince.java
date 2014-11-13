@@ -70,6 +70,9 @@ public class MProvince extends I_Model<Province> {
 			whereCause += " select m.province_id from m_map_province m,c_reference r ";
 			whereCause += " where m.reference_id = r.reference_id and r.value = " + territory + ") ";
 			whereCause += "  ORDER BY NAME ";
+			
+			logger.debug("whereClause :"+whereCause);
+			
 			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Province.class);
 		} catch (Exception e) {
 			e.printStackTrace();

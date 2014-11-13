@@ -112,6 +112,17 @@ public class MOrderLine extends I_Model<OrderLine> {
 		}
 		return pos;
 	}
+	
+	public List<OrderLine> lookUp(Connection conn,int orderId) {
+		List<OrderLine> pos = new ArrayList<OrderLine>();
+		try {
+			String whereCause = " AND ORDER_ID = " + orderId + " AND ISCANCEL='N' ORDER BY TRIP_NO, LINE_NO ";
+			pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, OrderLine.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pos;
+	}
 
 	/**
 	 * Look Up By OrderNo for(report)
@@ -390,6 +401,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 		sql += "	  and order_date >= '" + (DateToolsUtil.convertToTimeStamp(dateFrom==null?t.getTargetFrom():dateFrom)) + "' \r\n";
 		sql += "	  and order_date <= '" + (DateToolsUtil.convertToTimeStamp(dateTo==null?t.getTargetTo():dateTo)) + "' \r\n";
 		sql += "	  and user_id = " + t.getUserId() + " \r\n";
+		sql += "	  and ar_invoice_no is not null \r\n";
 		sql += "  ) \r\n";
 
 		return sql;
