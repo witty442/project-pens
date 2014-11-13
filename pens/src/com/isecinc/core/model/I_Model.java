@@ -74,6 +74,7 @@ public abstract class I_Model<T> implements Serializable {
 		try {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String sql = "SELECT * FROM " + tableName + " WHERE 1 = 1 " + (whereCause.length() > 0 ? whereCause : "");
+			
 			List<T> ts = Database.query(sql, null, classes, conn);
 			return ts;
 		} catch (Exception e) {
@@ -82,6 +83,18 @@ public abstract class I_Model<T> implements Serializable {
 			try {
 				conn.close();
 			} catch (Exception e2) {}
+		}
+	}
+	
+	protected List<T> search(Connection conn,String tableName, String columnID, String whereCause, Class<T> classes) throws Exception {
+		// logger.debug("Search " + this.getClass());
+		try {
+			String sql = "SELECT * FROM " + tableName + " WHERE 1 = 1 " + (whereCause.length() > 0 ? whereCause : "");
+			List<T> ts = Database.query(sql, null, classes, conn);
+			return ts;
+		} catch (Exception e) {
+			throw e;
+		} finally {
 		}
 	}
 
@@ -144,8 +157,8 @@ public abstract class I_Model<T> implements Serializable {
 				col += ", " + s;
 				val += ", ?";
 			}
-			col += ", UPDATED";
-			val += ", CURRENT_TIMESTAMP";
+			//col += ", UPDATED";
+			//val += ", NULL";
 			col = col.substring(1).trim();
 			val = val.substring(1).trim();
 			StringBuilder sql = new StringBuilder();

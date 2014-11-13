@@ -70,6 +70,23 @@ public class DBBackUpManager {
 		return resultPath;
 	}
 	
+	public String[] processOnLocalOnly(HttpServletRequest request,User user ){
+		String[] resultPath = new String[2];
+		try{
+			resultPath = processBackupOnLocalOnly(request,user);
+		}catch(OutOfMemoryError e){
+			//countRetryBackup++;
+			System.gc();
+			//logger.info("countRetryBackup["+countRetryBackup+"]");
+			//if(countRetryBackup<=maxRetryBackup){
+			//	processBackup(request,user);
+			//}
+		}catch(Exception ee){
+			logger.error(ee.getMessage(),ee);
+		}
+		return resultPath;
+	}
+	
 	private  String[] processBackup(HttpServletRequest request,User user ) throws OutOfMemoryError{
 		Connection conn = null;
 		EnvProperties env = EnvProperties.getInstance();
@@ -111,7 +128,7 @@ public class DBBackUpManager {
 			tableList = (List<DBBean>)allList.get(0);
 			//tableUnAvaiableList = (List<DBBean>)allList.get(1);
 			
-			logger.info("Generate Insert Statement ");
+			logger.debug("Generate Insert Statement ");
 			
             if(tableList != null && tableList.size() >0){
             	// Get Header Mysqldump format 
@@ -167,11 +184,11 @@ public class DBBackUpManager {
 				scriptStr.append("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */; ");
 
 				
-				logger.info("Write File to d:/DB_Backup/");
+				logger.debug("Write File to d:/DB_Backup/");
 				/** Create file SQl **/
 				FileUtil.writeFile(pathSqlFull,scriptStr,"utf-8");
 				
-				logger.info("Zip File to d:/DB_Backup/");
+				logger.debug("Zip File to d:/DB_Backup/");
 				/** Zip Sql File **/
 				FileUtil.zipFile(pathSqlFull,pathZipFull,sqlFileName); 
 				
@@ -188,7 +205,7 @@ public class DBBackUpManager {
 					 ftpFilePath += "Van/"+zipFileName;
 				 }
 				
-				logger.info("Upload Zip File To FTP Server");
+				logger.debug("Upload Zip File To FTP Server");
 				FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 				ftpManager.uploadBackUpDBZipFileToFTP_OPT3(user, ftpFilePath, pathZipFull);
 			}
@@ -199,12 +216,156 @@ public class DBBackUpManager {
             	}
             }*/
             
-            logger.info("Delete Zip File IN d:/DB_Backup/");
+            logger.debug("Delete Zip File IN d:/DB_Backup/");
             /** Delete Sql Temp File **/
 			FileUtil.deleteFile(pathSqlFull);
 			
 			resultPath[0] = pathZipFull;//local
 			resultPath[1] = ftpFilePath;//remote FTP server
+			
+			logger.info("--End processBackup-- ");
+			
+		}catch(OutOfMemoryError e){
+			logger.error(e.getMessage(), e);
+			throw e;
+		}catch(Exception e){
+			logger.error(e.getMessage(), e);
+			
+		}finally{
+			try{
+			   allList = null;
+			   tableList = null;
+			   //tableUnAvaiableList = null;
+			   scriptStr = null;
+			   FileUtil.close(br);
+			   DBConnection.close(conn);
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return resultPath;
+	}
+	
+
+	private  String[] processBackupOnLocalOnly(HttpServletRequest request,User user ) throws OutOfMemoryError{
+		Connection conn = null;
+		EnvProperties env = EnvProperties.getInstance();
+		List<List<DBBean>> allList = new ArrayList<List<DBBean>>();
+		List<DBBean> tableList = new ArrayList<DBBean>();
+		//List<DBBean> tableUnAvaiableList = new ArrayList<DBBean>();
+		int i = 0;
+		StringBuffer scriptStr = new StringBuffer("");
+		BufferedReader br = null;
+		String schema = "pens";
+		String pathSqlFull = "";
+		String pathZipFull = "";
+		String sqlFileName = "";
+		String zipFileName = "";
+		String[] resultPath = new String[2];
+		String ftpFilePath = "";
+		try{
+			logger.info("Start processBackup ");
+			
+			//ADMIN and DD no BackUp DB
+			if( "ADMIN".equalsIgnoreCase(user.getType()) || "DD".equalsIgnoreCase(user.getType())){
+				return null;
+			}
+			
+			// get Schema name by select by requestContextPath
+			schema = getSchemaName();
+			
+			//Gen FileName
+			sqlFileName = getFileName(schema,user,"sql");
+			zipFileName = getFileName(schema,user,"zip");
+					
+			// get Path + fileName
+			pathSqlFull = getLocalPath(request)+sqlFileName;
+			pathZipFull = getLocalPath(request)+zipFileName;
+
+			conn = DBConnection.getInstance().getConnection();
+			/** Step 1 **/
+			allList = listTableBackUp(schema,conn);
+			tableList = (List<DBBean>)allList.get(0);
+			//tableUnAvaiableList = (List<DBBean>)allList.get(1);
+			
+			logger.debug("Generate Insert Statement ");
+			
+            if(tableList != null && tableList.size() >0){
+            	// Get Header Mysqldump format 
+            	br = FileUtil.getBufferReaderFromClassLoader("mysql_dump_head.txt");
+            	String lineStr = null;
+    			while ((lineStr = br.readLine()) != null) {
+    				scriptStr.append(lineStr+"\n");
+    			}
+                
+    			//Difinitions 
+    			scriptStr.append("\n--");
+    			scriptStr.append("\n-- Create schema "+s+schema+s+"");
+    			scriptStr.append("\n--");
+    			
+    			// Gen Script create DB 
+            	scriptStr.append("\n CREATE DATABASE IF NOT EXISTS "+s+schema+s+"; \n");
+            	scriptStr.append("USE "+s+schema+s+";\n");
+            	
+				for(i=0;i<tableList.size();i++){
+					DBBean dbBean = (DBBean)tableList.get(i);
+					String tableName = dbBean.getTableName();
+                    String tableType = dbBean.getTableType();
+					
+					if( !"view".equalsIgnoreCase(tableType)){
+						scriptStr.append("\n -- ");
+						scriptStr.append("\n -- Definition of table "+s+tableName+s+"  ");
+						scriptStr.append("\n -- \n");
+					}else{
+						scriptStr.append("\n -- ");
+						scriptStr.append("\n -- Definition of view "+s+tableName+s+"  ");
+						scriptStr.append("\n -- \n");
+					}
+					scriptStr.append(generateCreateScript(schema, conn, dbBean) +"  \n");
+					
+					
+					if( !"view".equalsIgnoreCase(tableType)){
+						scriptStr.append("\n -- ");
+						scriptStr.append("\n -- Dumping data for table "+s+tableName+s+"  ");
+						scriptStr.append("\n -- \n");
+						
+						scriptStr.append("\n\n /*!40000 ALTER TABLE "+s+tableName+s+" DISABLE KEYS */; \n");
+						scriptStr.append(generateInsertScript(schema, conn, tableName) +"  \n");
+						scriptStr.append("\n /*!40000 ALTER TABLE "+s+tableName+s+" ENABLE KEYS */; \n");
+					}
+				}
+					
+				scriptStr.append("\n/*!40101 SET SQL_MODE=@OLD_SQL_MODE */; ");
+				scriptStr.append("\n/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */; ");
+				scriptStr.append("\n/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */; ");
+				scriptStr.append("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */; ");
+				scriptStr.append("\n/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */; ");
+				scriptStr.append("\n/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */; ");
+				scriptStr.append("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */; ");
+
+				
+				logger.debug("Write File to d:/DB_Backup/");
+				/** Create file SQl **/
+				FileUtil.writeFile(pathSqlFull,scriptStr,"utf-8");
+				
+				logger.debug("Zip File to d:/DB_Backup/");
+				/** Zip Sql File **/
+				FileUtil.zipFile(pathSqlFull,pathZipFull,sqlFileName); 
+
+			}
+
+            /*if(tableUnAvaiableList != null && tableUnAvaiableList.size() > 0){
+            	for(int n=0;n<tableUnAvaiableList.size();n++){
+            		logger.debug("table UnAvaiable :"+((DBBean)tableUnAvaiableList.get(n)).getTableName());
+            	}
+            }*/
+            
+            logger.debug("Delete Zip File IN d:/DB_Backup/");
+            /** Delete Sql Temp File **/
+			FileUtil.deleteFile(pathSqlFull);
+			
+			resultPath[0] = pathZipFull;//local
+			resultPath[1] = "LOCAL ONLY";//remote FTP server
 			
 			logger.info("--End processBackup-- ");
 			
@@ -354,7 +515,7 @@ public class DBBackUpManager {
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		boolean r = true;
-		logger.debug("isTableAvaiable:"+tableName);
+		//logger.debug("isTableAvaiable:"+tableName);
 		try{
 			StringBuffer sql = new StringBuffer("");
 			if("view".equalsIgnoreCase(type)){
@@ -382,7 +543,7 @@ public class DBBackUpManager {
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer createTableScript = new StringBuffer("");
-		logger.debug("createScript:"+dbBean.getTableName());
+		//logger.debug("createScript:"+dbBean.getTableName());
 		try{
 			StringBuffer sql = new StringBuffer("");
 			if("view".equalsIgnoreCase(dbBean.getTableType())){
@@ -511,11 +672,19 @@ public class DBBackUpManager {
 						   values += "NULL,";
 						}
 					}else if(config.getType().startsWith(("timestamp"))){
-						if(rsSelect.getTimestamp(config.getField()) != null){
-							values += "'"+rsSelect.getString(config.getField())+"',";
-							//values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getTimestamp(config.getField()),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH )+"','%d%m%Y %H%i%S'),";
-						}else{
-						   values += "NULL,";
+						
+						//0000-00-00 00:00:00
+						//2014-02-17 22:17:35.0
+						try{
+							if(rsSelect.getTimestamp(config.getField()) != null ){
+								values += "'"+rsSelect.getString(config.getField())+"',";
+								//values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getTimestamp(config.getField()),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH )+"','%d%m%Y %H%i%S'),";
+							}else{
+							   values += "NULL,";
+							}
+						}catch(Exception e){
+							logger.debug("error timestamp:"+e.getMessage());
+							values += "NULL,";
 						}
 					}else if(config.getType().startsWith(("int"))){
 						values +=rsSelect.getInt(config.getField())+",";

@@ -9,6 +9,7 @@ import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
@@ -93,7 +94,12 @@ public class Customer extends I_PO implements Serializable {
 
 		// set display label
 		setDisplayLabel();
-
+		
+		//setPint 
+		setPrintTax( Utils.isNull(rst.getString("PRINT_TAX")));
+		setPrintBranchDesc(Utils.isNull(rst.getString("PRINT_BRANCH_DESC")));//สาขาที่
+		setPrintHeadBranchDesc(Utils.isNull(rst.getString("PRINT_HEAD_BRANCH_DESC"))); //"พิมพ์สนญ./สาขาที่"
+		setPrintType(Utils.isNull(rst.getString("PRINT_TYPE")));//Y or N
 	}
 
 	/**
@@ -194,6 +200,8 @@ public class Customer extends I_PO implements Serializable {
 
 	/** Search Province */
 	private int searchProvince;
+	
+	private int searchDistrict;
 
 	/** Order Amount */
 	private int orderAmount = 0;
@@ -219,6 +227,8 @@ public class Customer extends I_PO implements Serializable {
 	
 	/** TRIP **/
 	private String trip;
+	
+	public String addressSummary;
 
 	public String displayExported;
 	public String displayInterfaces;
@@ -233,7 +243,53 @@ public class Customer extends I_PO implements Serializable {
 	public String displayActionView;
 	public String displayActionEdit;
 
+	private String printType;
+	private String printBranchDesc;
+	private String printHeadBranchDesc;
+	private String printTax;
 	
+
+
+	public String getPrintType() {
+		return printType;
+	}
+
+	public void setPrintType(String printType) {
+		this.printType = printType;
+	}
+
+	public String getPrintBranchDesc() {
+		return printBranchDesc;
+	}
+
+	public void setPrintBranchDesc(String printBranchDesc) {
+		this.printBranchDesc = printBranchDesc;
+	}
+
+	public String getPrintHeadBranchDesc() {
+		return printHeadBranchDesc;
+	}
+
+	public void setPrintHeadBranchDesc(String printHeadBranchDesc) {
+		this.printHeadBranchDesc = printHeadBranchDesc;
+	}
+
+	public String getPrintTax() {
+		return printTax;
+	}
+
+	public void setPrintTax(String printTax) {
+		this.printTax = printTax;
+	}
+
+	public String getAddressSummary() {
+		return addressSummary;
+	}
+
+	public void setAddressSummary(String addressSummary) {
+		this.addressSummary = addressSummary;
+	}
+
 	public String getDisplayActionEditCust2() {
 		return displayActionEditCust2;
 	}
@@ -472,6 +528,15 @@ public class Customer extends I_PO implements Serializable {
 
 	public void setSearchProvince(int searchProvince) {
 		this.searchProvince = searchProvince;
+	}
+	
+
+	public int getSearchDistrict() {
+		return searchDistrict;
+	}
+
+	public void setSearchDistrict(int searchDistrict) {
+		this.searchDistrict = searchDistrict;
 	}
 
 	public int getOrderAmount() {
