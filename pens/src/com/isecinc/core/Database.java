@@ -12,10 +12,13 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
+import util.Debug;
+
 public class Database {
 
 	private static Logger logger = Logger.getLogger("PENS");
-
+	public static Debug debug = new Debug(false);
+	
 	/**
 	 * Query
 	 * 
@@ -34,7 +37,7 @@ public class Database {
 		PreparedStatement pstmt = null;
 		ResultSet rst = null;
 		try {
-			logger.debug(sql);
+			debug.debug(sql);
 			Constructor<?> constructor = classes.getDeclaredConstructor(new Class[] { ResultSet.class });
 			pstmt = conn.prepareStatement(sql);
 			int i = 1;
