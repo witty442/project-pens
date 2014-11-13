@@ -208,7 +208,17 @@ User user = (User)session.getAttribute("user");
 	            </li>
 	     </ul>
      </li>
- 
+   <%if(role.equalsIgnoreCase(User.TT)){ %>
+    <li><a href="#" class="parent"><span>รายการทั่วไป</span></a>
+    	<ul>
+    		<li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requestPromotionAction.do?do=prepare';"><span>บันทึกใบอนุมัติจัดรายการร้านค้า</span></a>
+            </li>
+           
+         </ul>
+      </li>
+     <%} %>
+     
 	 <%if(role.equalsIgnoreCase(User.VAN)){ %>
 	     <li><a href="#" onclick="" class="parent"><span>รายการ เบิก/คืน</span></a>
 		     <ul>

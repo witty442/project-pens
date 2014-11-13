@@ -49,6 +49,7 @@ if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
   canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
+System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
 %>
 
@@ -85,7 +86,7 @@ body {
 <script type="text/javascript">
 function loadMe(){
 	calculatePrice();	
-	new Epoch('epoch_popup','th',document.getElementById('orderDate'));
+	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 }
 
 function printListOrderProductReport(path,userType){
@@ -320,12 +321,7 @@ function printListOrderProductReport(path,userType){
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
-<!--										<td align="right">-->
-<!--											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.vatAmount}"/>-->
-<!--										</td>-->
-<!--										<td align="right">-->
-<!--											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.totalAmount}"/>-->
-<!--										</td>-->
+
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
 										<td align="center">

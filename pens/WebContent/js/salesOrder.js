@@ -207,7 +207,7 @@ function autoReceipt(path,type) {
 	}
 }
 
-function autoReceiptNew(path,type,canReceiptCredit) {
+function autoReceiptNew(path,type,canReceiptMoreCash) {
 	
 	if(document.getElementsByName('order.shipAddressId')[0].value==''){
 		alert('ไม่มีที่อยู่แบบ Ship to ไม่สามารถบันทึกข้อมูลได้');
@@ -225,7 +225,7 @@ function autoReceiptNew(path,type,canReceiptCredit) {
 	billId = document.getElementsByName('order.id')[0].value;
 	
 	if(type=='VAN'){
-		window.open(path + "/jsp/pop/autoReceiptPopupVan.jsp?amount="+amount+"&billId="+billId+"&canReceiptCredit="+canReceiptCredit, "AutoReceipt", "width=1000,height=500,location=No,resizable=No");
+		window.open(path + "/jsp/pop/autoReceiptPopupVan.jsp?amount="+amount+"&billId="+billId+"&canReceiptMoreCash="+canReceiptMoreCash, "AutoReceipt", "width=1000,height=500,location=No,resizable=No");
 	}else{
 		save(path);
 	}
@@ -288,11 +288,12 @@ function open_product(path, rowNo){
 function addProduct(path,objValue){
 	var tbl = document.getElementById('tblProduct');
 	var index = findDupIndex(tbl,objValue);
-	if(index<0){
+	if(index < 0){
 		addProduct2(path,objValue);
 		return;
 	}else{
 		//alert(1);
+		
 		var qty1 = eval(document.getElementsByName('lines.qty1')[index].value) + eval(objValue.qty1);
 		var qty2 = eval(document.getElementsByName('lines.qty2')[index].value) + eval(objValue.qty2);
 		var amt1 = eval(document.getElementsByName('lines.amount1')[index].value) + eval(objValue.amount1);
@@ -304,7 +305,14 @@ function addProduct(path,objValue){
 		var vat1 = eval(document.getElementsByName('lines.vat1')[index].value) + eval(objValue.vat1);
 		var vat2 = eval(document.getElementsByName('lines.vat2')[index].value) + eval(objValue.vat2);
 		
-		tbl.rows[index+1].cells[4].innerHTML = addCommas(qty1) + '/' + addCommas(qty2); //qty
+		//alert("uom1:"+objValue.uom1+",uom2:"+objValue.uom2);
+		
+		var qty1Label = addCommas(qty1);
+		var qty2Lable = addCommas(qty2);
+		var qtyFullLabel = qty1Label + '/' + qty2Lable;
+		
+		tbl.rows[index+1].cells[4].innerHTML = qtyFullLabel; //qty
+		//tbl.rows[index+1].cells[5].innerHTML = addCommas(qty1) + '/' + addCommas(qty2);//price
 		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2)); //total amount
 		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));//total discount
 		
@@ -316,7 +324,15 @@ function addProduct(path,objValue){
 		document.getElementsByName('lines.disc2')[index].value = disc2;
 		document.getElementsByName('lines.total1')[index].value = total1;
 		document.getElementsByName('lines.total2')[index].value = total2;
+	
+		document.getElementsByName('lines.price1')[index].value = objValue.price1;
+		document.getElementsByName('lines.price2')[index].value = objValue.price2;
 		
+		document.getElementsByName('lines.uom1')[index].value = objValue.uom1;
+		document.getElementsByName('lines.uom2')[index].value = objValue.uom2;
+		document.getElementsByName('lines.uomLabel1')[index].value = objValue.uom1;
+		document.getElementsByName('lines.uomLabel2')[index].value = objValue.uom2;
+
 		//WIT Edit :09/06/2011 :add method calculatePrice()
 		calculatePrice();
 	}
@@ -356,6 +372,8 @@ function addProduct2(path,objValue){
             $(this).append(tds);
         }
     });
+    
+  //  alert(objValue);
     
     setValueToProduct(path,objValue);
 }
@@ -468,8 +486,18 @@ function setValueToProduct(path, objValue){
 	tbl.rows[objValue.row].cells[c++].innerHTML=checkBoxLabel;
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.product+' '+objValue.productLabel+inputLabel;//ชื่อรหีสสินค้า
 	tbl.rows[objValue.row].cells[c++].innerHTML=objValue.uomLabel1 + '/' + objValue.uomLabel2; //uom
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.qty1) + '/' + addCommas(objValue.qty2);//qty
-	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas(objValue.price1) + '/' + addCommas(objValue.price2);//price per unit
+	
+	var qty1Label = addCommas(objValue.qty1);
+	var qty2Lable = addCommas(objValue.qty2);
+	var qtyFullLabel = qty1Label + '/' + qty2Lable;
+	
+	var priceLabel1 = addCommas5format(objValue.price1);
+	var priceLabel2 = addCommas5format(objValue.price2);
+	var priceFullLabel = priceLabel1 + '/' + priceLabel2;
+	
+	tbl.rows[objValue.row].cells[c++].innerHTML= qtyFullLabel;//qty 3
+	tbl.rows[objValue.row].cells[c++].innerHTML= priceFullLabel;//price per unit 10 
+	
 	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.amount1) + eval(objValue.amount2)).toFixed(5));//amount 
 	tbl.rows[objValue.row].cells[c++].innerHTML=addCommas((eval(objValue.disc1) + eval(objValue.disc2)).toFixed(5));//discount
 	tbl.rows[objValue.row].cells[c++].innerHTML='0';//netAmount
@@ -566,10 +594,8 @@ function createProductList(){
 		inputLabel+="<input type='text' name='lines["+i+"].tripNo' value='"+tripnos[i].value+"'>";
 		inputLabel+="<hr/>";
 		divlines.innerHTML += inputLabel;
+		
 	}
-	
-	//alert(divlines.innerHTML);
-	
 	return true;
 }
 

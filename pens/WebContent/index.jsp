@@ -83,7 +83,7 @@ function gologin(e){
 		              	<bean:message key="User.Password" bundle="sysele"/>
 		              </td>
 		              <td width="50" rowspan="3">
-		              	<a href="#" onclick="return login('${pageContext.request.contextPath}');" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','${pageContext.request.contextPath}/images2/button_login2.png',1)"><img src="${pageContext.request.contextPath}/images2/button_login1.png" name="Image1" width="46" height="46" border="0" id="Image1" /></a>
+		              	<a href="#" onclick="login('${pageContext.request.contextPath}');" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','${pageContext.request.contextPath}/images2/button_login2.png',1)"><img src="${pageContext.request.contextPath}/images2/button_login1.png" name="Image1" width="46" height="46" border="0" id="Image1" /></a>  
 		              </td>
 		              <td width="101" rowspan="3"></td>
 		              <td width="7" rowspan="3">&nbsp;</td>
@@ -94,7 +94,7 @@ function gologin(e){
 		            </tr>
 		            <tr>
 		              <td><html:text property="userName" size="10"/></td>
-		              <td><html:password property="password" size="10" onkeypress="gologin(event);"/></td>
+		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="1234"/></td>
 		            </tr>
 		            <tr>
 		            	<td colspan="2">

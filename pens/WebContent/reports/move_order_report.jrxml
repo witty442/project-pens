@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="move_order_req_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="203"/>
-	<property name="ireport.y" value="51"/>
+	<property name="ireport.x" value="192"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="logo" class="java.lang.String"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="p_fromCode" class="java.lang.String"/>
@@ -42,7 +42,7 @@
 		<band splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="100" splitType="Stretch">
+		<band height="135" splitType="Stretch">
 			<staticText>
 				<reportElement x="-1" y="0" width="556" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -79,14 +79,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="45" width="91" height="20"/>
+				<reportElement x="0" y="65" width="91" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["หน่วยงานต้นทาง"+" " + $P{p_fromCode}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="101" y="45" width="143" height="20"/>
+				<reportElement x="101" y="65" width="143" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
@@ -107,32 +107,60 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[" เลขที่  " + $P{p_requestNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="101" y="65" width="143" height="20"/>
+				<reportElement x="101" y="85" width="143" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["ชื่อหน่วย "+$P{p_toDesc}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="65" width="91" height="20"/>
+				<reportElement x="0" y="85" width="91" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["หน่วยปลายทาง"+" " + $P{p_toCode}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="224" y="25" width="110" height="20"/>
+				<reportElement x="223" y="25" width="158" height="40"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="16" isBold="true"/>
+					<font fontName="Angsana New" size="26" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_reportName}+""+$P{p_statusLabel}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="250" y="65" width="291" height="20"/>
+				<reportElement x="0" y="105" width="312" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_cancelReason}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="348" y="65" width="66" height="35"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[พิมพ์ครั้งที่ : ]]></text>
+			</staticText>
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="414" y="65" width="79" height="35"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="20" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_printNo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="348" y="100" width="66" height="35"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[พิมพ์วันที่  : ]]></text>
+			</staticText>
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="414" y="100" width="140" height="35"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_printDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -303,20 +331,6 @@
             พนักงานขาย]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="80" width="43" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<text><![CDATA[พิมพ์วันที่  : ]]></text>
-			</staticText>
-			<textField pattern="dd-MM-yyyy HH:mm:ss">
-				<reportElement x="43" y="80" width="142" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_printDate}]]></textFieldExpression>
-			</textField>
-			<staticText>
 				<reportElement x="439" y="19" width="116" height="41"/>
 				<box>
 					<topPen lineWidth="0.0"/>
@@ -340,20 +354,6 @@
 				<text><![CDATA[..................................................
             ผู้จัดการภาค]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="0" y="60" width="43" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<text><![CDATA[พิมพ์ครั้งที่ : ]]></text>
-			</staticText>
-			<textField pattern="dd-MM-yyyy HH:mm:ss">
-				<reportElement x="43" y="60" width="142" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_printNo}]]></textFieldExpression>
-			</textField>
 		</band>
 	</pageFooter>
 	<summary>

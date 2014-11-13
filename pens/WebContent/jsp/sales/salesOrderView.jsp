@@ -46,12 +46,17 @@ pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 /** Allow Van Credit **/
 boolean vanAllowCredit = false;
 if(request.getAttribute("orderForm") != null){
-  System.out.println("vanReceiptCredit:"+orderForm.getCanReceiptCredit());
+  System.out.println("canReceiptCredit:"+orderForm.getCanReceiptCredit());
   if("Y".equalsIgnoreCase(orderForm.getCanReceiptCredit())){
 	  vanAllowCredit = true;
   }
 }
 
+String canReceiptMoreCash = "N";
+if(request.getAttribute("orderForm") != null){
+  canReceiptMoreCash = orderForm.getCanReceiptMoreCash();
+}
+System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
 /* -- Auto Receipt --> */
 %>
@@ -761,7 +766,7 @@ function removeRow(){
 								<td></td><td></td>
 								<td align="right"><bean:message key="TransactionDate" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="order.created" maxlength="10" size="18" readonly="true" styleClass="disableText"/>
+									<html:text property="order.orderDate" maxlength="10" size="18" readonly="true" styleClass="disableText"/>
 								</td>
 							</tr>
 							<tr>
@@ -821,7 +826,6 @@ function removeRow(){
 										<th><bean:message key="Total" bundle="sysele"/></th>
 										<th><bean:message key="Discount" bundle="sysele"/></th>
 										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
-										
 										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
@@ -1016,12 +1020,14 @@ function removeRow(){
 									
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
-									    <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
-										  <input type="button" id ="reportBtn" value="พิมพ์แบบย่อ(ต้นฉบับ)" class="newPosBtn">
+									    <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+										  <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn">
 										</a>
-										<a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
-										  <input type="button" id ="reportBtn" value="พิมพ์แบบย่อ(สำเนา)" class="newPosBtn">
-										</a>
+										 
+										 <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+										  <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn">
+										</a> 
+										
 										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										<input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn">
 										</a>
@@ -1032,7 +1038,7 @@ function removeRow(){
 								     <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.payment=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
-											<a href="#" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','${orderForm.canReceiptCredit}');">
+											<a href="#" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','<%=canReceiptMoreCash%>');">
 											    <input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
 											</c:if>
 										</c:if>

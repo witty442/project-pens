@@ -105,6 +105,8 @@ function loadMe(){
 
 	new Epoch('epoch_popup','th',document.getElementById('birthDay'));
 	new Epoch('epoch_popup','th',document.getElementById('trip'));
+	
+	switchPrintType();
 }
 function showMainCustomer(path,id,custId){
 	window.open(path + "/jsp/pop/view/customerViewPopup.jsp?uId="+id+"&main='Y'&id="+custId, "Customer List", "width=500,height=350,location=No,resizable=No");
@@ -114,6 +116,18 @@ function setMainCustomer(code, name){
 	$('#parentName').val(name);
 	loadMainCustomer(null);
 }
+
+function switchPrintType(){
+	var printType = $('input[name=customer.printType]:checked').val();
+	if("H"==printType){
+		$('#printBranchDesc').attr('readonly', true);
+		$("input#printBranchDesc").attr("class", "disableText");
+	}else{
+		$('#printBranchDesc').attr('readonly', false);
+		$("input#printBranchDesc").attr("class", "normalText");
+	}
+}
+
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -160,6 +174,21 @@ function setMainCustomer(code, name){
 								<td></td>
 							</tr>
 							<tr>
+								<td align="right" colspan="2">
+								  <html:radio property="customer.printType" styleId="printType" value="H" onclick="switchPrintType()"></html:radio>สำนักงานใหญ่ 
+								</td>
+								<td align="left">
+									 <html:radio property="customer.printType" styleId="printType" value="B" onclick="switchPrintType()"></html:radio>สาขาที่
+								     <html:text property="customer.printBranchDesc" size="10" styleId="printBranchDesc" maxlength="5" readonly="true" onkeydown="return inputNum(event);" styleClass="disableText" />
+								</td>
+								<td align="right">
+								 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
+								 </td>
+								<td align="left">
+									
+								</td>
+							</tr>
+							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:text property="customer.code" readonly="true" styleClass="disableText"/>
@@ -184,8 +213,9 @@ function setMainCustomer(code, name){
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="customer.taxNo" size="25" />
+								<td align="left" nowrap>
+									<html:text property="customer.taxNo" size="25" maxlength="20"/>
+									 <html:checkbox property="customer.printTax" value="Y">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">

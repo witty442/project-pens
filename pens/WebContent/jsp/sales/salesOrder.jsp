@@ -77,6 +77,7 @@ if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
   canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
+System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
 %>
 
@@ -192,7 +193,7 @@ function loadProducts(brandCode){
 
 function loadMe(){
 	calculatePrice();	
-	new Epoch('epoch_popup','th',document.getElementById('orderDate'));
+	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 }
 
 function lockScreen() {
@@ -315,6 +316,9 @@ function addProductToSalesOrder(){
 	//alert(products);
 	//alert(products.length);
 	//alert(products[0].amount1);
+	
+	//Load data from screen to product screen
+	
 	if(products != null){
 		for(var i=0; i < products.length ; i++){
 			//var p = new Object();
@@ -331,6 +335,9 @@ function addProductToSalesOrder(){
 			product.uomLabel2 = products[i].uom2;
 			product.price1 = products[i].price1;
 			product.price2 = products[i].price2;
+			
+			//alert(products[i].qty1);
+			
 			product.qty1 = products[i].qty1;
 			product.qty2 = products[i].qty2;
 			
@@ -401,7 +408,6 @@ function addProductToBasket(){
 						alert(status);
 				}
 			}).responseText;
-
 			
 		});
 	}
@@ -480,7 +486,7 @@ function escapeParameter(param){
 								<td></td><td></td>
 								<td align="right"><bean:message key="TransactionDate" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
-									<html:text property="order.orderDate" maxlength="10" size="15" readonly="true" styleId="orderDate" />
+									<html:text property="order.orderDate" maxlength="10" size="15" readonly="true" styleId="orderDate" styleClass="disableText"/>
 								</td>
 							</tr>
 							<tr>
@@ -532,21 +538,13 @@ function escapeParameter(param){
 							<tr>
 								<td colspan="4" align="center">
 								<div align="left">
-									&nbsp;&nbsp;
-									<%if(!role.equalsIgnoreCase(User.DD)) {%>
-									<input type="button" class="newPosBtn" value="เพิ่มสินค้า" onclick="open_product('${pageContext.request.contextPath}');"/>
-									&nbsp;&nbsp;
-									<input type="button" class="newPosBtn" value="เลือกสินค้าใหม่ " onclick="openProductCategory();" />
-									<%} %>
-									<%if(role.equalsIgnoreCase(User.DD)) {%>
-										<c:if test="${memberVIP=='Y'}">
-										<input type="button" value="เพิ่มสินค้า" onclick="open_product('${pageContext.request.contextPath}');"/>
-										</c:if>
-										<c:if test="${memberVIP=='N'}">
-										<input type="button" value="สร้างรายการอัตโนมัติ" onclick="add_auto_transaction('${pageContext.request.contextPath}', 'find', $('#order.customer.id').val());"/>
-										</c:if>
-									<%} %>
+									<%-- &nbsp;&nbsp;
+									<input type="button" class="newPosBtn" value="เพิ่มสินค้ารายตัว" onclick="open_product('${pageContext.request.contextPath}');"/> --%>
+									&nbsp;&nbsp; 
+									<input type="button" class="newPosBtn" value="เลือกสินค้าตามแบรนด์" onclick="openProductCategory();" />
+
 								</div>
+								
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 									<tr>
 										<th class="order"><bean:message key="No" bundle="sysprop"/></th>
@@ -561,9 +559,6 @@ function escapeParameter(param){
 										<th><bean:message key="Total" bundle="sysele"/></th>
 										<th class="costprice"><bean:message key="Discount" bundle="sysele"/></th>
 										<th class="costprice"><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
-<!--										<th class="costprice"><bean:message key="Tax" bundle="sysele"/></th>-->
-<!--										<th class="costprice"><bean:message key="Overall" bundle="sysele"/></th>-->
-										
 										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>							
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
 										<th class="status"><%-- <bean:message key="Edit" bundle="sysprop"/> --%></th>
@@ -716,7 +711,7 @@ function escapeParameter(param){
 								<td align="right"><bean:message key="TotalAmount" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
-									<html:hidden property="order.totalAmount"/>
+									 <html:hidden property="order.totalAmount"/>	
 								</td>
 							</tr>
 							<tr>

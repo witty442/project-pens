@@ -103,6 +103,29 @@ function isNum0to9andpoint(objText, e){// get number and point
 	//alert("x"+keynum);
 	if(!keynum){return true;}
 	if(keynum==8 || keynum==9 || keynum==189){return true;}
+  	if ((keynum>=48 && keynum<=57)|| keynum==231 || keynum==46 || keynum==190 || keynum==110 || keynum==37 || keynum==39 || (keynum>=96 && keynum<=105)){
+  		if(keynum==190 || keynum==110){
+  			//check point(.)
+  			if(objText.value.indexOf('.')>0){
+  				return false;
+  			}
+  		}
+		return true;
+	 }else{
+	    return false;
+	 }
+}
+
+function isNum0to9andpointBK(objText, e){// get number and point
+	var keynum;
+	if(window.event){// IE
+		keynum = e.keyCode;
+	}else if(e.which){// NC//FF//OP
+		keynum = e.which;
+	}
+	//alert("x"+keynum);
+	if(!keynum){return true;}
+	if(keynum==8 || keynum==9 || keynum==189){return true;}
   	if ((keynum>=48 && keynum<=57) || keynum==46 || keynum==190 || keynum==110 || keynum==37 || keynum==39 || (keynum>=96 && keynum<=105)){
   		if(keynum==190 || keynum==110){
   			//check point(.)
@@ -115,6 +138,7 @@ function isNum0to9andpoint(objText, e){// get number and point
 	    return false;
 	 }
 }
+
 
 function inputReal(objText,point,e){
 	var keynum;
@@ -184,7 +208,7 @@ function getCursorPos(textElement) {
 
 // look through the new string we saved off and find the location of
 // the weirdstring that was inserted and return that value
-	for (i=0; i <= sNewText.length; i++) {
+	for (var i=0; i <= sNewText.length; i++) {
 		var sTemp = sNewText.substring(i, i + sWeirdString.length);
 		if (sTemp == sWeirdString) {
 			var cursorPos = (i - sOldRange.length);
@@ -195,6 +219,20 @@ function getCursorPos(textElement) {
 
 function addCommas(nStr) {
 	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
+}
+
+function addCommas5format(value) {
+	value = value.toFixed(5);
+	
+	var nStr = value +'';
 	x = nStr.split('.');
 	x1 = x[0];
 	x2 = x.length > 1 ? '.' + x[1] : '';

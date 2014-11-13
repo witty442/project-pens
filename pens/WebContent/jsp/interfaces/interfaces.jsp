@@ -43,7 +43,6 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/interfaces.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 
 
@@ -51,21 +50,28 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.8.23.custom.css" type="text/css" /> 
 
 <style type="text/css">
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	/**background-repeat: repeat;**/
-	
-	#main_progressbar {
-	    position:relative;
-	}
-	#progresstext {
-	    position:absolute;
-	    margin-top:-20;
-	    left:0;
-	}
+}
+#progress {
+ width: 500px;   
+ border: 1px solid black;
+ position: relative;
+ padding: 3px;
+}
+
+#percent {
+ position: absolute;   
+ left: 50%;
+}
+
+#bar {
+ height: 40px;
+ background-color: green;
+ width: 10%;
 }
 </style>
 
@@ -93,14 +99,15 @@ body {
 		   $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '20%', width: '60%' } }); 
 		});
 	   
-	   var stepMaxUp = 2;
-	   var stepMinUp = 1;
+	   var stepMaxUp = 4;
+	   var stepMinUp = 2;
 	   var stepHaftMinUp = 0.5;
 	   var progressCount = 0;
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
 	   
 	   function update(status){
+		   
 	    	 if(status != '1' && status != "-1"){ //Running
 	    		 if(progressCount > 98){
 		    	   progressCount += 0; 
@@ -113,22 +120,30 @@ body {
 	    		 }
 	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
 	    	 }else{ //Success
+	    		 
 	    		 progressCount = 100;
 	    		 useTimeMillisecs = (new Date()).getTime()-startTime.getTime();
+	    		 
+	    		 $("#percent").html("<b>"+progressCount+" %</b>");
+	    		 document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
+	    		 
+	    		// $("#progress").hide();
+	    		 
+	    		 setTimeout(function(){ $("#progress").hide();}, 3000);
 	    	 }  
 	    	  
-	    	 var progress = $("#progressbar") .progressbar("option","value");
-	    	 if (progress < 100) {
-		   	      $("#progressbar").progressbar("option", "value", progressCount);  
-		   	      $("#progresstext").html("<b>"+progressCount+" %</b>");
+	    	 //var progress = $("#progressbar") .progressbar("option","value");
+	    	 if (progressCount < 100) {  
+		   	      $("#percent").html("<b>"+progressCount+" %</b>");
+	    		  $("#progress").show();
+	    		  //set progress count
+	    		  document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
 		   	 }
 	    }
-	    
-	    $(function() {
-	    	$("#progressbar").progressbar({ value: progressCount });
-	    });
-
+	
 	   /** Onload Window    */
+	   var startDate = new Date();
+	   
 	   window.onload=function(){
     	   var status = document.getElementsByName("monitorBean.status")[0]; 
     	   if (status.value != "1" && status.value != "-1"){
@@ -155,9 +170,28 @@ body {
 	    function checkStatus(){
 	    	  var status =  document.getElementsByName("monitorBean.status")[0].value;
 	    	   if(status == '1'){ //Finish Task
+	    		   
+	    		   //Calc Time thred use
+	    		   try{
+		    		   var endDate = new Date();
+		    		   var dif = endDate.getTime() - startDate.getTime();
+	
+		    		   var Seconds_from_T1_to_T2 = dif / 1000;
+		    		   var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+		    		   
+		    		   document.getElementsByName("monitorBean.timeInUse")[0].value = Seconds_from_T1_to_T2;//Seconds_Between_Dates; 
+		    		   
+		    		  // alert( document.getElementsByName("monitorBean.timeInUse")[0].value);
+		    		   
+	    		   }catch(e){
+	    			 
+	    		   }
+	    		   
 	    		   /** Task Success ***/
 	    		   update(status);
+	    		   //search display
 	    		   search('<%=request.getContextPath()%>', 'admin');
+
 	    	   }else { //Task Running
 	    		   /** Task Not Success  and Re Check Status**/
 		    	   update(status);
@@ -430,14 +464,16 @@ body {
 							  <% if( "submited".equals(request.getAttribute("action"))){ %>  
 							 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							    <tr>
-									<td align="center" width ="100%">
+									<td align="left" width ="100%">
 									   <div style="height:50px;align:center">
 									     กรุณารอสักครู่......
 									   </div>
-									  <div id="main_progressbar" style="height:80px;width:600px;">
-						                     <div id="progressbar"></div>
-						                     <div id="progresstext"></div>
+									 <div id="progress" style="height:40px;width:100%;">
+						                    <div id="percent"></div>     
+											<div id="bar"></div>  
 						              </div>   
+						              
+						                 
 									 </td>
 								</tr>
 							   </table>   
@@ -446,6 +482,7 @@ body {
 					
 						<br><br>
 						<!-- BODY -->
+						Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"></html:text> Seconds
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form>
 					<!-- BODY -->

@@ -167,7 +167,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{price}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="1" y="13" width="66" height="12"/>
+				<reportElement x="5" y="13" width="61" height="12"/>
 				<box rightPadding="3">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -188,7 +188,7 @@
 		<band splitType="Stretch"/>
 	</pageFooter>
 	<summary>
-		<band height="68" splitType="Stretch">
+		<band height="71" splitType="Stretch">
 			<staticText>
 				<reportElement x="-1" y="44" width="43" height="12"/>
 				<textElement verticalAlignment="Bottom">

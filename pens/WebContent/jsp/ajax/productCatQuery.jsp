@@ -76,8 +76,10 @@ if(productCatL != null && productCatL.size() > 0){
 	<td id="<%=productCatCode%>" class="catalog" <%=style%> width="20%">
 	  <table border='0'>
 	  <tr><td>
-		  <img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="60" width="120" onerror="imgError(this);" 
+	      <a href="">
+		    <img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="60" width="120" onerror="imgError(this);" 
 						onclick="loadProducts(<%=productCatCode%>)"/>
+		   </a> 
 	   </td></tr>
 	   <tr><td>
 		   <p class="brandName"><%=productCatCode+"-"+productCatName%></p>

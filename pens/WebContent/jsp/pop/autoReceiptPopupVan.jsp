@@ -40,11 +40,11 @@ User user = (User)session.getAttribute("user");
 
 
 /** Allow Van Credit **/
-   boolean vanAllowCredit = false;
-  String canReceiptCredit = request.getParameter("canReceiptCredit");
-  System.out.println("canReceiptCredit:"+canReceiptCredit);
-  if("Y".equalsIgnoreCase(canReceiptCredit)){
-	  vanAllowCredit = true;
+   boolean vanAllowMore = false;
+  String canReceiptMoreCash = request.getParameter("canReceiptMoreCash");
+  System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
+  if("Y".equalsIgnoreCase(canReceiptMoreCash)){
+	  vanAllowMore = true;
   }
  
 %>
@@ -90,6 +90,11 @@ function loadMe(){
 		document.getElementsByName('payType')[3].checked=true;
 		changePayType('CR');
 	}
+	
+	<%if(vanAllowMore==false){%>//Cash Only
+	   document.getElementsByName('payType')[0].checked=true;
+	   changePayType('CS');
+	<%}%>
 }
 
 function change_payment(){
@@ -518,13 +523,17 @@ function removeRow(){
 		<td align="right" width="45%">&nbsp;&nbsp;</td>
 		<td align="left">
 			<input type="radio" name="payType" value="CS" onclick="changePayType(this.value);"/>รับเงินสดทันที<br>
-			<input type="radio" name="payType" value="CH" onclick="changePayType(this.value);"/>สดรับเช็ค<br>
-			<input type="radio" name="payType" value="MIX" onclick="changePayType(this.value);"/>ชำระแบบผสม<br>
+			
 			
 		 <!-- Wit edit 26/07/2556  -->
-		    <%if(vanAllowCredit){%>
+		    <%if(vanAllowMore){%>
+		       <input type="radio" name="payType" value="CH" onclick="changePayType(this.value);"/>สดรับเช็ค<br>
+			   <input type="radio" name="payType" value="MIX" onclick="changePayType(this.value);"/>ชำระแบบผสม<br>
 		       <input type="radio" name="payType" value="CR" onclick="changePayType(this.value);"/>เงินเชื่อ<br>
+		      
 		    <%}else{ %>
+		       <input type="radio" name="payType" value="CH" onclick="" disabled/>สดรับเช็ค<br>
+			   <input type="radio" name="payType" value="MIX" onclick="" disabled/>ชำระแบบผสม<br>
 		       <input type="radio" name="payType" value="CR" onclick="" disabled/> ...<br> 							
 		    <%} %>			
 

@@ -1,3 +1,4 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -15,7 +16,14 @@ java.sql.Connection conn= null;
 try{
 	conn = DBConnection.getInstance().getConnection();
 	status = dao.findMonitorStatus(conn,id);
-	System.out.println("id :"+id+",status:"+status);
+	
+	String s = "";
+	if(Utils.isNull(status).equals("") || Utils.isNull(status).equals("0")){
+		s = "Running";
+	}else{
+		s ="Success";
+	}
+	//System.out.println("Check Status DateTime["+(new Date())+"]TransId["+id+"]Status["+s+"]statisId["+status+"]");
 }catch(Exception e){
 	e.printStackTrace();
 }finally{

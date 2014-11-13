@@ -159,12 +159,7 @@ UL {
 	width: 99%;
 }
 
-.disableText {
-	background-color: #DCDCDC;
-	border: 1px solid;
-	border-color: #BEBEBE;
-	color: #000000;
-}
+
 
 .recordfound {
 	text-align: left;
@@ -326,6 +321,25 @@ TABLE.result2 TD {
 	font-size: 13px;
 }
 
+.resultByManual {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+TABLE.resultByManual TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+TABLE.resultByManual TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
 .userlabel {
 	color: #8B3A3A;
 	font-family: Tahoma;
@@ -334,7 +348,18 @@ TABLE.result2 TD {
 	font-variant: small-caps;
 	font-style: italic;
 	vertical-align: top;
-	height: 90px;
+	
+	margin-left:18px;
+}
+.itlabel {
+	color: #45619D;
+	font-family: Tahoma;
+	font-weight: bolder;
+	font-size: 15px;
+	font-variant: small-caps;
+	font-style: italic;
+	vertical-align: top;
+	height: 70px;
 	margin-left:18px;
 }
 
@@ -593,4 +618,25 @@ TABLE.moveOrder TD {
 
 SELECT.moveOrder.pdCode{
 	
+}
+
+.numberText {
+	color: #000000;
+	text-align: right;
+}
+.disableText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+}
+.normalText {
+	
+}
+.disableNumberText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
 }

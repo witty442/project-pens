@@ -32,11 +32,11 @@ item.setPrice1(Double.valueOf(price1));
 item.setPrice2(Double.valueOf(price2));
 if(StringUtils.isEmpty(qty1.trim()))
 	qty1 = "0";
-item.setQty1(Double.valueOf(qty1));
+item.setQty1(Integer.parseInt(qty1));
 
 if(StringUtils.isEmpty(qty2.trim()))
 	qty2 = "0";
-item.setQty2(Double.valueOf(qty2));
+item.setQty2(Integer.parseInt(qty2));
 
 if(StringUtils.isEmpty(linenetAmt.trim()))
 	linenetAmt = "0";

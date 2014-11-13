@@ -63,7 +63,6 @@ a:visited {
 	color: #1E90FF;
 	TEXT-DECORATION: none;
 }
-
 A:hover {
 	COLOR: #B22222;
 	TEXT-DECORATION: none;
@@ -93,6 +92,7 @@ BR.list BR {
 	border-color: #BEBEBE;
 	color: #000000;
 }
+
 
 INPUT:FOCUS {
 	border-width: 2px solid;

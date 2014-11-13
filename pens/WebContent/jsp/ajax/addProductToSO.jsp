@@ -29,7 +29,9 @@ String custId = request.getParameter("custId");
 Basket basket = (Basket)session.getAttribute(custId);
 if(basket != null ){
 	String json = new String(basket.getJSON().toString());
-	System.out.println(json);
+	
+	//System.out.println(json);
+	
 	session.removeAttribute(custId);
 %>
 <%=json%>

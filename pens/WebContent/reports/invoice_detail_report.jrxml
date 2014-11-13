@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="detailed_sales_report" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.0"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice_detail_report" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="logo" class="java.lang.String"/>
@@ -10,6 +10,7 @@
 	<field name="groupId" class="java.lang.Number"/>
 	<field name="id" class="java.lang.String"/>
 	<field name="orderNo" class="java.lang.String"/>
+	<field name="invoiceNo" class="java.lang.String"/>
 	<field name="customerName" class="java.lang.String"/>
 	<field name="productName" class="java.lang.String"/>
 	<field name="fullUom" class="java.lang.String"/>
@@ -47,21 +48,21 @@
 		<groupHeader>
 			<band height="35" splitType="Stretch">
 				<staticText>
-					<reportElement x="199" y="10" width="28" height="20"/>
+					<reportElement x="169" y="10" width="25" height="20"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
 					<text><![CDATA[วันที่  ]]></text>
 				</staticText>
 				<textField pattern="dd/MM/yyyy">
-					<reportElement x="231" y="10" width="85" height="20"/>
+					<reportElement x="195" y="10" width="55" height="20"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[$F{orderDate}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="22" y="10" width="52" height="20"/>
+					<reportElement x="19" y="10" width="52" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
@@ -69,7 +70,7 @@
 					<text><![CDATA[เลขที่บิลขาย]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="397" y="10" width="35" height="20"/>
+					<reportElement x="412" y="10" width="32" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
@@ -77,7 +78,7 @@
 					<text><![CDATA[ร้านค้า]]></text>
 				</staticText>
 				<textField isStretchWithOverflow="true">
-					<reportElement x="432" y="10" width="129" height="20"/>
+					<reportElement x="445" y="10" width="134" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Angsana New" size="14" isBold="true"/>
@@ -85,7 +86,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[" " + $F{customerName}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="76" y="10" width="77" height="20"/>
+					<reportElement x="72" y="10" width="64" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="14" isBold="true"/>
@@ -93,7 +94,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{orderNo}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="0" y="10" width="22" height="20"/>
+					<reportElement x="0" y="10" width="18" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="14" isBold="true"/>
@@ -101,15 +102,15 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{groupId}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="153" y="10" width="45" height="20"/>
+					<reportElement x="138" y="10" width="30" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
-					<textElement verticalAlignment="Middle">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{status}.equals("VO")?"\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01":""]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="316" y="10" width="81" height="20"/>
+					<reportElement x="332" y="10" width="78" height="20"/>
 					<box bottomPadding="0" rightPadding="0"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
@@ -117,7 +118,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{customerCode}+" "]]></textFieldExpression>
 				</textField>
 				<textField evaluationTime="Group" evaluationGroup="rptGroup" pattern="#,##0.00">
-					<reportElement x="625" y="10" width="69" height="20"/>
+					<reportElement x="631" y="10" width="67" height="20"/>
 					<box rightPadding="2"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
@@ -125,19 +126,27 @@
 					<textFieldExpression class="java.lang.Double"><![CDATA[$F{orderVATAmt}]]></textFieldExpression>
 				</textField>
 				<textField evaluationTime="Group" evaluationGroup="rptGroup" pattern="#,##0.00">
-					<reportElement x="561" y="15" width="64" height="20"/>
-					<textElement verticalAlignment="Middle">
+					<reportElement x="580" y="10" width="50" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.Double"><![CDATA[$F{orderAmt}]]></textFieldExpression>
 				</textField>
 				<textField evaluationTime="Group" evaluationGroup="rptGroup" pattern="#,##0.00">
-					<reportElement x="694" y="10" width="87" height="20"/>
+					<reportElement x="703" y="10" width="96" height="20"/>
 					<box rightPadding="2"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.Double"><![CDATA[$F{orderAmtIncludeVAT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement x="252" y="10" width="79" height="20"/>
+					<box bottomPadding="0" rightPadding="0"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Angsana New" size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[!$F{invoiceNo}.equals("")?"Inv.no " + $F{invoiceNo}:""]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -262,7 +271,7 @@
 				<text><![CDATA[ราคาต่อหน่วย]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="509" y="60" width="101" height="20"/>
+				<reportElement x="509" y="60" width="121" height="20"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.5" lineStyle="Dashed"/>
 					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
@@ -273,7 +282,7 @@
 				<text><![CDATA[ยอดรวม]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="610" y="60" width="88" height="20"/>
+				<reportElement x="630" y="60" width="68" height="20"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.5" lineStyle="Dashed"/>
 					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
@@ -328,21 +337,21 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{qtyString}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="509" y="0" width="101" height="20"/>
+				<reportElement x="509" y="0" width="121" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="13"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{lineAmount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="610" y="0" width="88" height="20"/>
+				<reportElement x="631" y="0" width="67" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="13"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{discountAmount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="698" y="0" width="103" height="20"/>
+				<reportElement x="703" y="0" width="96" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="13"/>
 				</textElement>

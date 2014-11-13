@@ -324,6 +324,8 @@ function addRow(){
 	product.id = $('#lineId').val();
 	product.row = $('#productRow').val();
 
+	//alert("product.row:"+product.row);
+	
 	if(product.row==''){
 		window.opener.addProduct('${pageContext.request.contextPath}', product);
 	}else{

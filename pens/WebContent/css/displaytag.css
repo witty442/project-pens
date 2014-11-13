@@ -224,28 +224,28 @@ TD.cust_name2 {
 	color: #000000;
 	height: 25px;
 	font-size: 13px;
-	width:15%;
+	width:22%;
 	text-align:left;
 }
 TD.cust_creditLimit {
 	color: #000000;
 	height: 25px;
 	font-size: 13px;
-	width:10%;
+	width:7%;
 	text-align:right;
 }
 TD.cust_totalInvoice {
 	color: #000000;
 	height: 25px;
 	font-size: 13px;
-	width:10%;
+	width:7%;
 	text-align:right;
 }
 TD.cust_exported {
 	color: #000000;
 	height: 25px;
 	font-size: 13px;
-	width:5%;
+	width:4%;
 	text-align:center;
 }
 TD.cust_interfaces {

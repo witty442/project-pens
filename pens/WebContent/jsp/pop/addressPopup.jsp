@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -5,7 +6,13 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%
-List<Province> provinces = new MProvince().lookUp();
+List<Province> provinces = new ArrayList<Province>();
+Province pBlank = new Province();
+pBlank.setId(0);
+pBlank.setName("");
+provinces.add(pBlank);
+provinces.addAll(new MProvince().lookUp());
+
 List<District> districts = new MDistrict().lookUp();
 
 String type="";

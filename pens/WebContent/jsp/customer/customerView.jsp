@@ -103,6 +103,21 @@ body {
 								<td></td>
 							</tr>
 							<tr>
+								<td align="right" colspan="2">
+								  <html:radio property="customer.printType" styleId="printType" value="H" onclick="switchPrintType()" disabled="true"></html:radio>สำนักงานใหญ่ 
+								</td>
+								<td align="left">
+									 <html:radio property="customer.printType" styleId="printType" value="B" onclick="switchPrintType()" disabled="true"></html:radio>สาขาที่
+								     <html:text property="customer.printBranchDesc" styleId="printBranchDesc" readonly="true" styleClass="disableText"/>
+								</td>
+								<td align="right">
+								 <html:checkbox property="customer.printHeadBranchDesc" value="Y" disabled="true">พิมพ์สนญ./สาขาที่</html:checkbox>
+								 </td>
+								<td align="left">
+									
+								</td>
+							</tr>
+							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:text property="customer.code" readonly="true" styleClass="disableText"/>
@@ -130,9 +145,13 @@ body {
 							</tr>
 							<%if(action.equals("view")){ %>
 							<tr>
-								<td align="right" colspan="2"><bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
+								<td align="right" colspan="2">
+								   <bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;
+								 
+								</td>
+								<td align="left" nowrap>
 									<html:text property="customer.taxNo" size="25" readonly="true" styleClass="disableText"/>
+									  <html:checkbox property="customer.printTax" value="Y" disabled="true">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -364,18 +383,20 @@ body {
 							<tr>
 								<td align="center">
 									<a href="#" onclick="toProduct('${pageContext.request.contextPath}','${customerForm.customer.id}','cus');">
-									<input type="button" value="ข้อมูลสินค้าพร้อมโปรโมชั่น" class="newTrxBtn"></a>
+									<input type="button" value="ข้อมูลสินค้าพร้อมโปรโมชั่น" class="newPosBtn"></a>
 									<a href="#" onclick="toOrder('${pageContext.request.contextPath}','${customerForm.customer.id}','cus');">
-									<input type="button" value="ทำรายการขาย" class="newTrxBtn">
+									<input type="button" value="ทำรายการขาย" class="newPosBtn">
 									<!-- <img src="${pageContext.request.contextPath}/images/b_salesorder.gif" border="1" class="newPicBtn"> --></a>
 									<a href="#" onclick="toReceipt('${pageContext.request.contextPath}','${customerForm.customer.id}','cus');">
-									<input type="button" value="ทำรายการรับเงิน" class="newTrxBtn">
+									<input type="button" value="ทำรายการรับเงิน" class="newPosBtn">
 									<!-- <img src="${pageContext.request.contextPath}/images/b_receipt.gif" border="1" class="newPicBtn"> --></a>
 									<a href="#" onclick="toVisit('${pageContext.request.contextPath}', '${customerForm.customer.id}', 'cus', '<%=action %>')">
-									<input type="button" value="เข้าเยี่ยมลูกค้า" class="newTrxBtn">
+									<input type="button" value="เข้าเยี่ยมลูกค้า" class="newPosBtn">
 									<!-- <img src="${pageContext.request.contextPath}/images/b_visit.gif" border="1" class="newPicBtn"> --></a>
 									<a href="#" onclick="open_invoiceOst('${pageContext.request.contextPath}','${customerForm.customer.id}');">
-									<input type="button" value="ยอดใบแจ้งหนี้ค้างชำระ" class="newTrxBtn"></a>
+									<input type="button" value="ยอดใบแจ้งหนี้ค้างชำระ" class="newPosBtn"></a>
+									<a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${customerForm.customer.id}','customerView');">
+									<input type="button" value="ใบอนุมัติจัดรายการ" class="newPosBtn"></a>
 								</td>
 							</tr>
 						</table>

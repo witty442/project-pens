@@ -1,3 +1,6 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.bean.District"%>
+<%@page import="com.isecinc.pens.model.MDistrict"%>
 <%@page import="util.AppversionVerify"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -18,13 +21,21 @@
 <%
 String role = ((User)session.getAttribute("user")).getType();
 
+List<District> districtsAll = new ArrayList<District>();
+District dBlank = new District();
+dBlank.setId(0);
+dBlank.setName("");
+districtsAll.add(dBlank);
+
+List<District> districts = new MDistrict().lookUp();
+districtsAll.addAll(districts);
+pageContext.setAttribute("districts", districtsAll, PageContext.PAGE_SCOPE);
+
 List<References> territorys = InitialReferences.getReferenes().get(InitialReferences.TERRITORY);
 pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
 
 List<References> actives= InitialReferences.getReferenes().get(InitialReferences.ACTIVE);
 pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
-
-
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
 <%@page import="com.isecinc.pens.model.MProvince"%><html>
@@ -57,7 +68,13 @@ body {
 
 function loadMe(){
 	loadProvince();
+	
 	document.getElementsByName('customer.searchProvince')[0].value = ${customerForm.customer.searchProvince};
+	
+	loadDistrict();
+	<%if( !"".equals(customerForm.getCustomer().getDistrict())){ %>
+	  document.getElementsByName('customer.district')[0].value = <%=customerForm.getCustomer().getDistrict()%>;
+	<% } %>
 }
 
 function loadProvince(){
@@ -70,6 +87,21 @@ function loadProvince(){
 			success: function(getData){
 				var returnString = jQuery.trim(getData);
 				cboProvince.innerHTML=returnString;
+			}
+		}).responseText;
+	});
+}
+
+function loadDistrict(){
+	var cboDistrict = document.getElementsByName('customer.district')[0];
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/DistrictAjax.jsp",
+			data : "refId=" + document.getElementsByName('customer.searchProvince')[0].value,
+			async: false,
+			success: function(getData){
+				var returnString = jQuery.trim(getData);
+				cboDistrict.innerHTML=returnString;
 			}
 		}).responseText;
 	});
@@ -102,6 +134,25 @@ $(function() {
 		document.customerForm.submit();
 		return true;
 	}
+ 
+ 
+//change pv
+ function changePV(pvid){
+	 var disId = parseInt(document.getElementsByName('customer.district')[0].value);
+	 alert("disId["+disId+"],pvid:"+pvid);
+ 	
+	 $("#district").html("");
+ 	<%for(District d : districts){%>
+	 	if(pvid == <%=d.getProvinceId()%>){
+	 		 if(disId  == <%=d.getId()%> ){
+	 			 alert(dispId);
+	 			 $("<option selected value=<%=d.getId()%>><%=d.getName()%></option>").appendTo("#district");
+	 		}else{
+	 			 $("<option value=<%=d.getId()%>><%=d.getName()%></option>").appendTo("#district");
+	 		} 
+	 	}
+   <%}%>
+ }
  
 </script>
 </head>
@@ -142,7 +193,7 @@ $(function() {
 						<jsp:include page="../error.jsp"/>
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						<tr>
-							<td colspan="2" align="left">
+							<td colspan="3" align="left">
 								<%if(role.equalsIgnoreCase(User.VAN)){ %>
 								<a href="#" onclick="prepare('${pageContext.request.contextPath}','add')">
 								<img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif" align="absmiddle">&nbsp;<bean:message key="CreateNewRecord" bundle="sysprop"/></a>
@@ -150,49 +201,60 @@ $(function() {
 							</td>
 						</tr>
 						<tr>
-							<td width="45%" align="right"><bean:message key="Customer.Territory" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left">
+							<td width="35%" align="right"><bean:message key="Customer.Territory" bundle="sysele"/>&nbsp;&nbsp;</td>
+							<td align="left" colspan="2">
 								<html:select property="customer.territory" onchange="loadProvince();">
 									<html:option value=""></html:option>
 									<html:options collection="territorys" property="key" labelProperty="name"/>
 								</html:select>
 							</td>
+							
 						</tr>
 						<tr>
-							<td align="right"><bean:message key="Address.Province" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left">
-								<html:select property="customer.searchProvince">
+						    <td align="right"><bean:message key="Address.Province" bundle="sysele"/>&nbsp;&nbsp;</td>
+							<td align="left" width="15%">
+								<html:select property="customer.searchProvince" onchange="loadDistrict();">
 								</html:select>
 							</td>
+							
+							<td align="left">
+							     เขต/อำเภอ
+							     <html:select property="customer.district" styleId="district">
+									<%-- <html:options collection="districts" property="id" labelProperty="name"/> --%>
+								</html:select>
+							</td>
+							
 						</tr>
+						
 						<tr>
 							<td align="right"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left"><html:text property="customer.code"/></td>
+							<td align="left" colspan="2"><html:text property="customer.code"/></td>
 						</tr>
 						<tr>
 							<td align="right"><bean:message key="Customer.Name" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left"><html:text property="customer.name"/></td>
+							<td align="left" colspan="2"><html:text property="customer.name"/></td>
 						</tr>
 						<tr>
 							<td align="right"><bean:message key="Status" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left">
+							<td align="left" colspan="2">
 								<html:select property="customer.isActive">
 									<html:options collection="actives" property="key" labelProperty="name"/>
 								</html:select>
 							</td>
 						</tr>
 					</table>
+					
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
 							<td align="center">
 								<a href="javascript:search('${pageContext.request.contextPath}')">
-								<input type="button" value="ค้นหา" class="newPosBtn">
-								<!-- <img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn"> --></a>
+								   <input type="button" value="ค้นหา" class="newPosBtn">
+								</a>
 								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-								<input type="button" value="Clear" class="newNegBtn">
-								<!-- <img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn"> --></a>
+								   <input type="button" value="Clear" class="newNegBtn">
+								</a>
 							</td>
 						</tr>
 					</table>				
@@ -217,7 +279,7 @@ $(function() {
 								<th class="cust_no">No.</th>
 								<th class="cust_code">หมายเลขลูกค้า</th>
 								<th class="cust_name">ชื่อ</th>
-								<th class="cust_name2">ชื่อรอง</th>
+								<th class="cust_name2">ที่อยู่</th>
 								<th class="cust_creditLimit">วงเงินสินเชื่อ</th>
 								<th class="cust_totalInvoice">ยอดบิลค้างชำระ</th>
 								<th class="cust_exported" >โอนข้อมูลแล้ว</th>
@@ -226,6 +288,7 @@ $(function() {
 								<th class="cust_actionOrder">ทำรายการขาย</th>
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
 								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
+								  <th class="cust_actionReceipt">ทำจัดรายการ</th>
 								<%} %>
 								<% if( role.equalsIgnoreCase(User.VAN)){ %>
 								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
@@ -246,7 +309,7 @@ $(function() {
 								<td class="cust_no"><c:out value='${item.no}'/></td>
 								<td class="cust_code"><c:out value='${item.code}'/></td>
 								<td class="cust_name"><c:out value='${item.name}'/></td>
-								<td class="cust_name2"><c:out value='${item.name2}'/></td>
+								<td class="cust_name2"><c:out value='${item.addressSummary}'/></td>
 								<td class="cust_creditLimit"><fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/></td>
 								<td class="cust_totalInvoice"><fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/></td>
 								<td class="cust_exported">
@@ -265,6 +328,7 @@ $(function() {
 							           <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
 							        </a> 
 								</td>
+								
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
 									<td class="cust_actionReceipt">
 									 <c:if test="${item.displayActionReceipt==''}">
@@ -272,6 +336,12 @@ $(function() {
 									         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
 									    </a>
 									 </c:if>
+									</td>
+									<td class="cust_actionReceipt">
+									    <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
+									       <%-- <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/> --%>
+									       จัดรายการ
+									    </a>
 									</td>
 								<%} %>
 								<% if( role.equalsIgnoreCase(User.VAN)){ %>

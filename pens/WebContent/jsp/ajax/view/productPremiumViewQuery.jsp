@@ -17,7 +17,8 @@
 
 		PriceList pls = new MPriceList().getCurrentPriceList(user.getOrderType().getKey());
 		int pricelistId = pls.getId();
-
+		
+    whereCause += "\n AND CODE  REGEXP '^[a-z]' ";
 	whereCause += "\n AND PRODUCT_ID IN ( ";
 	whereCause += "\n SELECT T.PRODUCT_ID FROM( ";
 		whereCause += "\n SELECT * FROM m_product pd ";

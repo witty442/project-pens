@@ -484,10 +484,12 @@ function escapeParameter(param){
 							<tr>
 								<td colspan="4" align="center">
 								<div align="left" style="margin-left:13px;">
-								   <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
-								     <input type="button" value="เลือกสินค้าใหม่ " class="newPosBtn" onclick="openProductCategory();" />
-								      &nbsp;&nbsp;
-								   	<input type="button" value="เลือกสินค้าของแถม" class="newPosBtn" onclick="open_product_premium('${pageContext.request.contextPath}');"/>
+								 <c:if test="${moveOrderForm.moveOrder.showSaveBtn =='true'}">
+								    <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
+								       <input type="button" value="เลือกสินค้าใหม่ " class="newPosBtn" onclick="openProductCategory();" />
+								        &nbsp;&nbsp;
+								      	<input type="button" value="เลือกสินค้าของแถม" class="newPosBtn" onclick="open_product_premium('${pageContext.request.contextPath}');"/>
+								     </c:if>
 								   </c:if>
 								</div>
 								
@@ -582,9 +584,9 @@ function escapeParameter(param){
 										<td align="right" class="moveOrder.edit">
 											<c:if test="${moveOrderForm.moveOrder.showSaveBtn =='true'}">
 												   <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
-													<a href="#" onclick="open_product('${pageContext.request.contextPath}','${rows1.index+1}');">
+													<%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}','${rows1.index+1}');">
 			                                           <img border=0 src='${pageContext.request.contextPath}/icons/doc_edit.gif'>
-			                                        </a>
+			                                        </a> --%>
 			                                      </c:if>
 		                                     </c:if>
 										</td>
@@ -598,10 +600,12 @@ function escapeParameter(param){
 								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 									<tr>
 										<td align="left" class="footer">&nbsp;	
+										  <c:if test="${moveOrderForm.moveOrder.showSaveBtn =='true'}">
 										   <c:if test="${moveOrderForm.moveOrder.canEdit =='true'}">
-											<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
-											<img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif">&nbsp;
-											<bean:message key="Delete" bundle="sysprop"/></a>
+											  <a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
+											  <img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif">&nbsp;
+											  <bean:message key="Delete" bundle="sysprop"/></a>
+										  </c:if>
 										  </c:if>
 										</td>
 									</tr>

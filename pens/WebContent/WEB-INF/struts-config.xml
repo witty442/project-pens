@@ -57,6 +57,9 @@
 		<!-- RECEIPT -->
 		<form-bean name="receiptForm" type="com.isecinc.pens.web.receipt.ReceiptForm" />
 		
+		<!-- Request Promotion -->
+		<form-bean name="requestPromotionForm" type="com.isecinc.pens.web.reqPromotion.RequestPromotionForm" />
+		
 		<!-- TEMP Form -->
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 		
@@ -167,9 +170,24 @@
 		
 		<!-- Requisition Product Form -->
 		<form-bean name="requisitionProductForm" type="com.isecinc.pens.web.requisitionProduct.RequisitionProductForm" />
+		
+		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 	</form-beans>
 
 	<action-mappings>
+	
+	  <!-- POPUP -->
+		<action name="popupForm" path="/jsp/searchCustomerPopupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.SearchCustomerPopupAction" >
+			<forward name="search" path="/jsp/pop/searchCustomerPopup.jsp" />
+			<forward name="prepare" path="/jsp/pop/searchCustomerPopup.jsp" />
+			<forward name="clear" path="/jsp/pop/searchCustomerPopup.jsp" />
+			
+			<forward name="search2" path="/jsp/pop/searchCustomerPopupOne.jsp" />
+			<forward name="prepare2" path="/jsp/pop/searchCustomerPopupOne.jsp" />
+			<forward name="clear2" path="/jsp/pop/searchCustomerPopupOne.jsp" />
+			
+		</action>
+		
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request"
 			type="com.isecinc.pens.web.login.LoginAction">
@@ -599,6 +617,17 @@
 			<forward name="edit" path="/jsp/moveOrder/moveOrder.jsp"/>
 			<forward name="preview" path="/jsp/moveOrder/moveOrder.jsp" />
 			<forward name="popupPrint" path="/jsp/moveOrder/moveOrder.jsp" />
+		</action>
+		
+			<!-- MoveOrder -->
+		<action name="requestPromotionForm" path="/jsp/requestPromotionAction" parameter="do" scope="request" type="com.isecinc.pens.web.reqPromotion.RequestPromotionAction" >
+			<forward name="prepare" path="/jsp/requestPromotion/requestPromotionSearch.jsp" />
+			<forward name="search" path="/jsp/requestPromotion/requestPromotionSearch.jsp" />
+			<forward name="clear" path="/jsp/requestPromotion/requestPromotionSearch.jsp" />
+			<forward name="new" path="/jsp/requestPromotion/requestPromotion.jsp"/>
+			<forward name="edit" path="/jsp/requestPromotion/requestPromotion.jsp"/>
+			<forward name="preview" path="/jsp/requestPromotion/requestPromotion.jsp" />
+			<forward name="popupPrint" path="/jsp/requestPromotion/requestPromotion.jsp" />
 		</action>
 
 		<!-- MoveOrder Summary -->

@@ -38,3 +38,9 @@ function toCreateNewReceipt(path,type,id){
 	document.customerForm.submit();
 	return true;
 }
+
+function toCreateNewReqPromotion(path,id,fromPage){
+	document.customerForm.action = path + "/jsp/requestPromotionAction.do?do=createRequestPromotion&shotcut_customerId=" +id+"&fromPage="+fromPage;
+	document.customerForm.submit();
+	return true;
+}
