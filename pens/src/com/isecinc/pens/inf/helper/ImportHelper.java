@@ -3,6 +3,7 @@ package com.isecinc.pens.inf.helper;
 import java.io.BufferedReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.Map;
 import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
-
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
@@ -640,15 +640,15 @@ public class ImportHelper {
 		    }
 		    
 		    if( !Utils.isNull(updateSQL).equals("")){
-		    	updateSQL =  "UPDATE "+tableName+" SET UPDATED = curdate(),updated_by ="+user.getId()+" ,"+updateSQL.substring(0,updateSQL.length()-1) +" WHERE 1=1 ";
+		    	updateSQL =  "UPDATE "+tableName+" SET UPDATED = sysdate(),updated_by = 9999, "+updateSQL.substring(0,updateSQL.length()-1) +" WHERE 1=1 ";
 		    }else{
-		    	updateSQL =  "UPDATE "+tableName+" SET UPDATED = curdate(),updated_by ="+user.getId()+"  WHERE 1=1 ";
+		    	updateSQL =  "UPDATE "+tableName+" SET UPDATED = sysdate(),updated_by = 9999  WHERE 1=1 ";
 		    }
 		    
 		    if( !Utils.isNull(updateSQLCS).equals("")){
-		    	updateSQLCS =  "UPDATE "+tableName+" SET UPDATED = curdate(),updated_by ="+user.getId()+" ,"+updateSQLCS.substring(0,updateSQLCS.length()-1) +" WHERE 1=1 ";
+		    	updateSQLCS =  "UPDATE "+tableName+" SET UPDATED = sysdate(),updated_by = 9999 , "+updateSQLCS.substring(0,updateSQLCS.length()-1) +" WHERE 1=1 ";
 		    }else{
-		    	updateSQLCS =  "UPDATE "+tableName+" SET UPDATED = curdate(),updated_by ="+user.getId()+"  WHERE 1=1 ";
+		    	updateSQLCS =  "UPDATE "+tableName+" SET UPDATED = sysdate(),updated_by = 9999  WHERE 1=1 ";
 		    }
 		    
 		    /** Add Key Column to Where Update SQL **/ 
@@ -658,12 +658,16 @@ public class ImportHelper {
 		    	    if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
 				        updateSQLCS += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
+				        
+				        
 		    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
 				        updateSQLCS += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
+
 		    	    }else{
 					    updateSQL += " AND "+ colBean.getColumnName()+" = ? ";
 					    updateSQLCS += " AND "+ colBean.getColumnName()+" = ? ";
+					   
 			        }
 		    	   // logger.debug("Add Keylist");
 		    	    orderUpdateList.add(colBean);
@@ -677,10 +681,12 @@ public class ImportHelper {
             tableBean.setColumnBeanList(insertColumnList);
 		    /** Set For Order Update SQL */
 		    tableBean.setColumnBeanOrderUpdateList(orderUpdateList);
-		    
+		   
 		    /** Set For Order Update Case Special (t_order_line) **/
 		    tableBean.setColumnBeanOrderUpdateCSList(orderUpdateCSList);
 		    tableBean.setPrepareSqlUpdCS(updateSQLCS);
+		    
+		    tableBean.setColumnKeyList(columnKeyList);
 		    
 		    return tableBean;
 		}catch(Exception e){
@@ -811,20 +817,22 @@ public class ImportHelper {
 	 */
 	public static  PreparedStatement spiltLineArrayToUpdateStatement(Connection conn,TableBean tableBean,String lineStr,PreparedStatement ps,User userBean) throws Exception{
 		int i=0;
+		int parameterIndex = 1;
+
 		try{
 			lineStr += " "; /** case last String | **/
 			String[] lineArray = lineStr.split(Constants.delimeterPipe);
-			int parameterIndex = 1;
+			
 			//logger.debug("UpdateList Size:"+tableBean.getColumnBeanOrderUpdateList().size());
 			for(i=0;i<tableBean.getColumnBeanOrderUpdateList().size();i++){
 	    		ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanOrderUpdateList().get(i);
-	    		
+
 	    		//DEBUG 
-	    		if(colBean.getTextPosition() >= lineArray.length ){
-	    			//logger.debug("i["+i+"]Update Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value[]pos["+colBean.getTextPosition()+"]");
+	    		/*if(colBean.getTextPosition() >= lineArray.length ){
+	    			logger.debug("Case 1 i["+i+"]Update Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value[XX]pos["+colBean.getTextPosition()+"]");
 				}else{
-					//logger.debug("i["+i+"]Update Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value["+Utils.isNull(lineArray[colBean.getTextPosition()])+"]pos["+colBean.getTextPosition()+"]");
-				}	
+					logger.debug("case 2 i["+i+"]Update Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value["+Utils.isNull(lineArray[colBean.getTextPosition()])+"]pos["+colBean.getTextPosition()+"]");
+			    }	*/
 	    		
 	    		/** Validate Column By Name **/
 	    		if( !Utils.isNull(colBean.getValidateFunc()).equalsIgnoreCase("N")){
@@ -840,17 +848,95 @@ public class ImportHelper {
 					if(colBean.getTextPosition() >= lineArray.length ){/** Text Position > Array Index OF LineStr  set To NULL **/
 				       ps =setObjectPS(ps,colBean,parameterIndex,"");
 				    }else{
-				       ps =setObjectPS(ps,colBean,parameterIndex,Utils.isNull(lineArray[colBean.getTextPosition()]));
+				       String posValue = Utils.isNull(lineArray[colBean.getTextPosition()]);
+				       
+				       // Case LineStr[pos]='' update by old data
+				       logger.debug("tableName["+tableBean.getTableName()+"]colName["+colBean.getColumnName()+"]posValue["+posValue+"]");
+				       
+				       if("".equals(posValue)){
+				    	   if(    !"t_order_orcl".equalsIgnoreCase(tableBean.getTableName())
+				    		  &&  !"t_order_line".equalsIgnoreCase(tableBean.getTableName())
+				    		  &&  !"t_order_line_orcl".equalsIgnoreCase(tableBean.getTableName())   
+				    		  && colBean.getColumnName().equalsIgnoreCase("AR_INVOICE_NO")){
+				    		   
+					    	  String oldValue = getOldDataValueByPK(conn,tableBean,lineArray,colBean.getColumnName(),userBean);
+					    	  
+					    	  ps = setObjectPS(ps,colBean,parameterIndex,oldValue); 
+				    	   }else{
+				    		   ps =setObjectPS(ps,colBean,parameterIndex,posValue);  
+				    	   }
+				       }else{
+				          ps =setObjectPS(ps,colBean,parameterIndex,posValue);
+				          
+				       }
 				    }
 				 }
 		        parameterIndex++;
 			}//for
 		}catch(Exception e){
 			throw e;
+		}finally{
+			
 		}
 		return ps;
 	}
 	
+	
+	private static String getOldDataValueByPK(Connection conn,TableBean tableBean,String[] lineArray,String columnName,User userBean) throws Exception{
+		PreparedStatement psFindOldData = null;
+		ResultSet rsFindOldData = null;
+		String sqlFindOldValue = "";
+		String oldValue =  "";
+		try{
+			//get Old data for update Case line[pos] String =''
+			 if(tableBean.getColumnKeyList() != null 
+			   && tableBean.getColumnKeyList().size() >0){
+				
+				 sqlFindOldValue = "select "+columnName+" from "+tableBean.getTableName()+" where 1=1 ";
+				// logger.debug("sqlFindOldValue:"+sqlFindOldValue);
+				 String valueKey = "";
+				 for(int r=0;r<tableBean.getColumnKeyList().size();r++){
+					 ColumnBean colBean = (ColumnBean)tableBean.getColumnKeyList().get(r);
+					
+					 if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
+			    		valueKey = ExternalFunctionHelper.findExternalFunc(conn, colBean,lineArray,userBean);	  
+					 }else{
+						valueKey = Utils.isNull(lineArray[colBean.getTextPosition()]); 
+					 }
+					 
+					// logger.debug("Key ColName["+colBean.getColumnName()+"]value["+valueKey+"]type["+colBean.getColumnType()+"]");
+					 
+					 if(colBean.getColumnType().equalsIgnoreCase("DATE")){
+						sqlFindOldValue += " AND "+colBean.getColumnName()+" = STR_TO_DATE('"+valueKey+"','%d%m%Y')";
+			    	 }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
+			    		sqlFindOldValue += " AND "+colBean.getColumnName()+" = STR_TO_DATE('"+valueKey+"','%d%m%Y %H%i%S')";   
+			    	 }else{
+			    		sqlFindOldValue += " AND "+ colBean.getColumnName()+" = '"+valueKey+"' ";   
+				     }
+				 }//for
+
+		    	 psFindOldData = conn.prepareStatement(sqlFindOldValue);
+		    	 rsFindOldData = psFindOldData.executeQuery();
+		    	  
+		    	 if(rsFindOldData.next()){
+		    		  oldValue = Utils.isNull(rsFindOldData.getString(columnName));
+		    	 }
+		    	  
+		    	 logger.info("sqlFindOldValue:"+sqlFindOldValue+"["+columnName+"]oldValue:"+oldValue);
+			   
+			  }
+			 return oldValue;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(psFindOldData !=null){
+				psFindOldData.close();psFindOldData=null;
+			}
+			if(rsFindOldData !=null){
+				rsFindOldData.close();rsFindOldData=null;
+			}
+		}
+	}
 	
 	
 	public static  PreparedStatement spiltLineArrayToUpdateStatement(Connection conn,TableBean tableBean,String lineStr,PreparedStatement ps,User userBean,ColumnBean[] replaceValues) throws Exception{

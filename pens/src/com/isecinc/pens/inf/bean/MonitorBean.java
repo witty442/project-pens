@@ -32,6 +32,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private  int successCount;
    private String errorCode;
    private String errorMsg;
+   private String timeInUse;
    
    private MonitorItemBean monitorItemBean;
    private List monitorItemList;
@@ -53,6 +54,12 @@ private String requestImportWebMemberUserName;
 
 
 
+public String getTimeInUse() {
+	return timeInUse;
+}
+public void setTimeInUse(String timeInUse) {
+	this.timeInUse = timeInUse;
+}
 public int getBatchTaskStatus() {
 	return batchTaskStatus;
 }

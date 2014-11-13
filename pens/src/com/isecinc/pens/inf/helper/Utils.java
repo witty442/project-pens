@@ -42,8 +42,9 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	BigDecimal value1 = new BigDecimal("39.24").setScale(0,BigDecimal.ROUND_UP);
-	    	System.out.println(value1);
+	    	//BigDecimal value1 = new BigDecimal("39.24").setScale(0,BigDecimal.ROUND_UP);
+	    	//String value1 = 
+	    	//System.out.println(value1);
 	    	
 	    }catch(Exception e){
 	        e.printStackTrace();
@@ -277,6 +278,7 @@ public class Utils {
 		return str.trim();
 	}
 	
+	
 	public static String isNull(Object str) {
 		if (str ==null){
 			return "";
@@ -284,10 +286,25 @@ public class Utils {
 		return ((String)str);
 	}
 	
+	public static String isNullInt(int str) {
+		if (str ==0){
+			return "";
+		}
+		return String.valueOf(str);
+	}
+	
+	public static String isNullBig(BigDecimal str) {
+		if (str == null){
+			return "";
+		}
+		return String.valueOf(str);
+	}
+	
 	public static int convertStrToInt(String str) {
 		if (str ==null || "".equals(str)){
 			return 0;
 		}
+		str = str.replaceAll(",", "");
 		return Integer.parseInt(str);
 	}
 	
@@ -295,7 +312,16 @@ public class Utils {
 		if (str ==null || "".equals(str)){
 			return 0;
 		}
+		str = str.replaceAll(",", "");
 		return new Double(str).doubleValue();
+	}
+	
+	public static BigDecimal convertStrToBig(String str) {
+		if (str ==null || "0".equals(str) || "0.00".equals(str) || isNull(str).equals("")){
+			return null;
+		}
+		str = str.replaceAll(",", "");
+		return new BigDecimal(str);
 	}
 	
 	public static boolean isBlank(Object o) {

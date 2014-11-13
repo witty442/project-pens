@@ -31,6 +31,7 @@ public class TableBean implements Serializable{
 	private List<ColumnBean> columnBeanOrderUpdateList;
 	private List<ColumnBean> columnBeanDeleteList;
 	private List<ColumnBean> columnBeanOrderUpdateCSList;
+	private List<ColumnBean> columnKeyList;
 	
 	private String whereClause;
 	private String prepareSqlIns;
@@ -38,7 +39,7 @@ public class TableBean implements Serializable{
 	private String prepareSqlSelect;
 	private String prepareSqlDelete;
 	private String prepareSqlUpdCS;
-	
+
 	
 	private String exportPath;
 	private String source;
@@ -62,6 +63,12 @@ public class TableBean implements Serializable{
     
 	
 	
+	public List<ColumnBean> getColumnKeyList() {
+		return columnKeyList;
+	}
+	public void setColumnKeyList(List<ColumnBean> columnKeyList) {
+		this.columnKeyList = columnKeyList;
+	}
 	public String getCheckDupFile() {
 		return checkDupFile;
 	}

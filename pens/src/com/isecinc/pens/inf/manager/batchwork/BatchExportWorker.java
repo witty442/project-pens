@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.MonitorSales;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
@@ -58,15 +56,15 @@ public class BatchExportWorker extends BatchWorker {
 				//Process Post Export
 				new ExternalProcess().processExportBefore(requestB, userLogin);
 				
-				logger.debug(" **********Start Export Master TXT ******************");
+				logger.info(" **********Start Export Master TXT ******************");
 				startTaskStatus(Constants.TYPE_EXPORT,this.transactionId,this.monitorID);
 				MonitorBean model = (new ExportManager()).exportToTxt(transactionId,monitorID,transType,userLogin,userRequest, requestTable, request);
-				logger.debug("Export Master Result ErrorCode:"+Utils.isNull(model.getErrorCode()));
+				logger.info(" **********END Export Master Result ErrorCode:"+Utils.isNull(model.getErrorCode())+"*****************");
 				
 				if( !Utils.isNull(model.getErrorCode()).equalsIgnoreCase("FTPException")){
-				    logger.debug(" **********Start Export Transaction TXT ******************");
+				    logger.info(" **********Start Export Transaction TXT ******************");
 				    model =(new ExportManager()).exportTransaction(transactionId,userLogin,userRequest, requestTable, request);
-				    logger.debug("Export Transaction Result ErrorCode:"+Utils.isNull(model.getErrorCode()));
+				    logger.info(" **********END Export Transaction Result ErrorCode:"+Utils.isNull(model.getErrorCode())+"******************");
 				}
 				
 				//Process Post Export

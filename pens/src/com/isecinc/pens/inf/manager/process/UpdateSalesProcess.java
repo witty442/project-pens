@@ -103,10 +103,11 @@ public class UpdateSalesProcess {
 			    		      logger.debug("lineStr["+lineStr+"]");
 				    		  if(lineStr.startsWith("H")){  
 				    			  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(tableBean.getPrepareSqlUpd())){
-					    			  logger.debug("**********Start Update H ******************");
+					    			  logger.debug("********Start Update H *********************");
+					    			  logger.debug("sql update:"+tableBean.getPrepareSqlUpd());
 					    		      psUpdateH = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdateH,userBean);
 						    	      canExc = psUpdateH.executeUpdate();
-						    	      logger.debug("canUpdate H:"+canExc);
+						    	      logger.debug("********End Update H canUpdate:"+canExc +"**");
 						    	      
 						    	      if(canExc != 0 && tableBean.getTableName().startsWith("t_order")){
 						    	    	  /** after Update Receipt from ORCL and add for update payment flag  **/

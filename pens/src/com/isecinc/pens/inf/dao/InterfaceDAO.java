@@ -197,10 +197,16 @@ public class InterfaceDAO {
 			" VALUES ((select max(id) from monitor_item),?,?,?,?,?) ";
 			  
 			logger.debug("SQL:"+sql);
+			
+			
+			
 			if( monitorItemDetailBean != null && monitorItemDetailBean.length >0){
 				psIns = conn.prepareStatement(sql);
 				for(int i=0;i<monitorItemDetailBean.length;i++){
+					
 					MonitorItemDetailBean item = monitorItemDetailBean[i];  
+					
+					logger.info("customeName:"+item.getCustomerName());
 				    psIns.setString(++index, item.getCustomerCode());
 				    psIns.setString(++index, item.getCustomerName());
 				    psIns.setString(++index, item.getCode());

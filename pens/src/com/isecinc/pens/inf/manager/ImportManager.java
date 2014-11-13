@@ -15,7 +15,6 @@ import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
 
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
