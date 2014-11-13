@@ -15,9 +15,14 @@ import java.util.Date;
 
 public class InvoiceDetailReport implements Serializable {
 
-    private int groupId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1454412685103136347L;
+	private int groupId;
 	private String id;
 	private String orderNo;
+	private String invoiceNo;
 	private Date orderDate;
 	private String productCode;
 	private String productName;
@@ -49,6 +54,13 @@ public class InvoiceDetailReport implements Serializable {
     private String productCodeFrom;
     private String productCodeTo;
 
+    
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public Double getTotalAmount1() {
 		return totalAmount1;
 	}

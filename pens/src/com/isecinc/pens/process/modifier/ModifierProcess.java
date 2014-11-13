@@ -65,6 +65,7 @@ public class ModifierProcess {
 
 	private String terriory = "";
 	private String territoryName = "";
+	boolean isDebug = true;
 
 	/**
 	 * Modifier with Territory
@@ -105,14 +106,20 @@ public class ModifierProcess {
 
 			// create statement
 			stmt = conn.createStatement();
-
-			logger.info("************** Start  LINE Modifier ************************************");  //What ? no used
+            
+			if(isDebug){
+			  logger.info("************** Start  LINE Modifier ************************************");  //What ? no used
+			}
+			
 			for (OrderLine oline : orderLines) {
 				
 				product = new MProduct().find(String.valueOf(oline.getProduct().getId()));
 				
 				// ITEM CATEGORY MODIFIER
-				logger.info("Item Category LINE Modifier.. Step by Product["+product+"]");
+				if(isDebug){
+				  logger.info("Item Category LINE Modifier.. Step by Product["+product+"]");
+				}
+				
 				sql = createSQL(  BeanParameter.getModifierItemCategory()
 						        , String.valueOf(product.getProductCategory().getId())
 						        , oline.getProduct().getId(), oline.getUom().getId()
@@ -120,7 +127,9 @@ public class ModifierProcess {
 				
 				rst = stmt.executeQuery(sql);
 				
-				logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
+				if(isDebug){
+				  logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
+				}
 				
 				processModifier(rst, oline);
 
@@ -130,18 +139,23 @@ public class ModifierProcess {
 				}
 				
 				// ITEM MODIFIER
-				logger.info("Item LINE Modifier..Step by Product["+product+"]");
+				if(isDebug){
+				  logger.info("Item LINE Modifier..Step by Product["+product+"]");
+				}
 				
 				sql = createSQL(  BeanParameter.getModifierItemNumber()
 						        , String.valueOf(product.getId()) 
 						        , oline.getProduct().getId(), oline.getUom().getId()
 						        , LEVEL_LINE, user);
 				
-				logger.info("Item LINE Modifier >>SQL[\n "+sql+"\n]");
+				if(isDebug){
+				  logger.info("Item LINE Modifier >>SQL[\n "+sql+"\n]");
+				}
 				
 				rst = stmt.executeQuery(sql);
 				processModifier(rst, oline);
 
+				logger.info("AddLines Size["+addLines.size()+"]");
 				if(rst != null) { 
 					rst.close();
 					rst = null;
@@ -149,11 +163,14 @@ public class ModifierProcess {
 
 			}// line
 
-			logger.info("************** END  LINE Modifier ************************************"); 
-			
+			if(isDebug){
+			  logger.info("************** END  LINE Modifier ************************************"); 
+			}
 			// Check Line Group Modifier
 	
-			logger.info("************ Find Product Category From OrderLine product and distinct productCategory*******"); 
+			if(isDebug){
+			  logger.info("************ Find Product Category From OrderLine product and distinct productCategory*******"); 
+			}
 			List<ProductCategory> itemCats = new ArrayList<ProductCategory>();
 			ProductCategory cat;
 			boolean bIn = false;
@@ -163,7 +180,9 @@ public class ModifierProcess {
 					cat = new MProductCategory().find(String.valueOf(oline.getProduct().getProductCategory().getId()));
 				if (cat != null) {
 					if (itemCats.size() == 0) {
-						logger.info("product_cate_id:"+cat.getId());
+						if(isDebug){
+						  logger.info("product_cate_id:"+cat.getId());
+						}
 						itemCats.add(cat);
 					}
 					bIn = false;
@@ -174,22 +193,31 @@ public class ModifierProcess {
 					}
 					//Check Duplicate 
 					if (!bIn) {
-						logger.info("product_cate_id:"+cat.getId());
+						if(isDebug){
+						  logger.info("product_cate_id:"+cat.getId());
+						}
 						itemCats.add(cat);
 					}
 				}
 			}
 			
-			logger.info("************ END Product Category From OrderLine product and distinct productCategory*******"); 
-			
-			logger.info(" Distinct ProductCategory ID >> itemCats size :"+(itemCats != null?itemCats.size():0));
-			
-			logger.info(" ************* Start  Item Category LINEGROUP Modifier *************************************");
+			if(isDebug){
+				logger.info("************ END Product Category From OrderLine product and distinct productCategory*******"); 
+				
+				logger.info(" Distinct ProductCategory ID >> itemCats size :"+(itemCats != null?itemCats.size():0));
+				
+				logger.info(" ************* Start  Item Category LINEGROUP Modifier *************************************");
+			}
 			for (ProductCategory item : itemCats) {
-				logger.info("Loop ProductCategory Step By item"+item);
+				if(isDebug){
+				  logger.info("Loop ProductCategory Step By item"+item);
+				}
+				
 				sql = createSQL(BeanParameter.getModifierItemCategory(), String.valueOf(item.getId()), 0, "",LEVEL_LINEGROUP, user);
 				
-				logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
+				if(isDebug){
+				  logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
+				}
 				
 				rst = stmt.executeQuery(sql);
 				
@@ -201,8 +229,10 @@ public class ModifierProcess {
 				}
 			}
 			
-			logger.info(" ************* End  Item Category LINEGROUP Modifier ***************************************");
-
+			if(isDebug){
+			  logger.info(" ************* End  Item Category LINEGROUP Modifier ***************************************");
+			}
+			
 			for (OrderLine line : orderLines) {
 				line.setDiscount(line.getBestDiscount());
 			}
@@ -321,7 +351,9 @@ public class ModifierProcess {
 					}
 				}
 			} else {
-				logger.debug("No Promotion..");
+				if(isDebug){
+				  logger.debug("No Promotion..");
+				}
 			}
 			if (desc.length() > 0) {
 				if (desc.startsWith("<br>")) desc = desc.substring(4);
@@ -349,7 +381,9 @@ public class ModifierProcess {
 	 * @throws Exception
 	 */
 	private void processModifier(ResultSet rst, OrderLine oline) throws Exception {
-        logger.debug("*********** processModifier***********************");
+		if(isDebug){
+		  logger.debug("*********** processModifier***********************");
+		}
 		boolean useHead = false;
 		boolean useLine = false;
 		
@@ -365,21 +399,29 @@ public class ModifierProcess {
 
 			getAllModifer(rst);
 
-			logger.info("Loop ***************************");
+			if(isDebug){
+			  logger.info("Loop ***************************");
+			}
 			// check start - end
 			// header first then line
 			useHead = DateToolsUtil.checkStartEnd(modifier.getStartDate(), modifier.getEndDate());
 			if (useHead) {
-				logger.info("useHead:"+useHead);
+				if(isDebug){
+				  logger.info("useHead:"+useHead);
+				}
 				useLine = DateToolsUtil.checkStartEnd(modifierLine.getStartDate(), modifierLine.getEndDate());
 			}
-			logger.info("useLine:"+useLine);
+			if(isDebug){
+			  logger.info("useLine:"+useLine);
+			}
 			
 			if (useLine) {
 				// double discount = 0;
-				logger.info("Modifier .." + modifier);
-				logger.info("Modifier Line.." + modifierLine);
-				logger.info("Modifier Attr.." + modifierAttr);
+				if(isDebug){
+					logger.info("Modifier .." + modifier);
+					logger.info("Modifier Line.." + modifierLine);
+					logger.info("Modifier Attr.." + modifierAttr);
+				}
 				// Discount
 				if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
 					discountProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
@@ -396,12 +438,19 @@ public class ModifierProcess {
 					promotionalGoodProcess(oline.getQty());
 				}
 			} else {
-				logger.info("No Promotion..");
+				if(isDebug){
+				  logger.info("No Promotion..");
+				}
 			}
 			
-			logger.info("End Loop ***************************");
+			if(isDebug){
+			  logger.info("End Loop ***************************");
+			}
 		}
-		 logger.info("*****************END processModifier ***********************");
+		
+		if(isDebug){
+		  logger.info("*****************END processModifier ***********************");
+		}
 	}
 	
 	private String shipDate = null;
@@ -416,7 +465,9 @@ public class ModifierProcess {
 	 */
 	private void processModifierLINEGROUP(ResultSet rst, List<OrderLine> orderLines, String attr) throws Exception {
     
-		logger.info(" ******* Start processModifierLINEGROUP****************************************");
+		if(isDebug){
+		  logger.info(" ******* Start processModifierLINEGROUP****************************************");
+		}
 		
 		boolean useHead = false;
 		boolean useLine = false;
@@ -433,9 +484,11 @@ public class ModifierProcess {
 			useHead = false;
 			getAllModifer(rst);
 
-			logger.info("Loop Modifier .." + modifier);
-			logger.info("Loop Modifier Line.." + modifierLine);
-			logger.info("Loop Modifier Attr.." + modifierAttr);
+			if(isDebug){
+				logger.info("Loop Modifier .." + modifier);
+				logger.info("Loop Modifier Line.." + modifierLine);
+				logger.info("Loop Modifier Attr.." + modifierAttr);
+			}
 			
 			// check start - end
 			// header first then line
@@ -444,8 +497,10 @@ public class ModifierProcess {
 				useLine = DateToolsUtil.checkStartEnd(modifierLine.getStartDate(), modifierLine.getEndDate());
 			}
 			if (useLine) {
-				logger.info(">> Pass Modifier ..");
-
+				if(isDebug){
+				  logger.info(">> Pass Modifier ..");
+				}
+				
 				// FIND EXCLUDE ON THISLINE
 				excludeSQL = " AND modifier_line_id = " + modifierLine.getId();
 				excludeSQL += "  AND isexclude = 'Y'";
@@ -460,23 +515,32 @@ public class ModifierProcess {
 								&& (oline.getUom().getId().equalsIgnoreCase(modifierAttr.getProductUOM().getId()))) {
 
 							// Same Category & UOM
-							logger.info("Line Same Attr :CATS : " + modifierAttr.getProductAttributeValue() + " UOM : "+ modifierAttr.getProductUOM().getId() +" FIND EXCLUDE");
-
+							if(isDebug){
+							 logger.info("Line Same Attr :CATS : " + modifierAttr.getProductAttributeValue() + " UOM : "+ modifierAttr.getProductUOM().getId() +" FIND EXCLUDE");
+							}
+							
 							// find on ISEXCLUDE
 							bExclude = false;
 							if (excludeAttrs != null) {
 								for (ModifierAttr excAttr : excludeAttrs) {
 									if (excAttr.getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
-										logger.info("EXCLUDE..IN ITEM_NUMBER");
+										if(isDebug){
+										  logger.info("EXCLUDE..IN ITEM_NUMBER");
+										}
 										if (excAttr.getProductAttributeValue().equalsIgnoreCase(String.valueOf(oline.getProduct().getId()))) {
-											logger.info(oline.getProduct() + "...IS EXCLUDED");
+											if(isDebug){
+											  logger.info(oline.getProduct() + "...IS EXCLUDED");
+											}
+											
 											bExclude = true;
 											break;
 										}
 									}
 								}
 							} else {
-								logger.info("NO EXCLUDE..");
+								if(isDebug){
+								  logger.info("NO EXCLUDE..");
+								}
 							}
 							if (!bExclude) {
 								noExcludeLines.add(oline);
@@ -511,7 +575,9 @@ public class ModifierProcess {
 			}
 		}//for
 		
-		logger.info(" ******* END processModifierLINEGROUP****************************************");
+		if(isDebug){
+		  logger.info(" ******* END processModifierLINEGROUP****************************************");
+		}
 
 	}
 
@@ -542,11 +608,15 @@ public class ModifierProcess {
 	 */
 	private double discountProcess(double sumQty, double sumAmount, List<OrderLine> useLines, boolean blineGroup)
 			throws Exception {
-		logger.info("----Start Discount Process-----");
+		if(isDebug){
+		  logger.info("----Start Discount Process-----");
+		}
 		boolean isPromotion = false;
 		double discount = 0;
 
-		logger.info("Qty["+ sumQty+"] to Get Discount.. Attr.valueFrom[" + modifierAttr.getValueFrom()+"]to["+modifierAttr.getValueTo()+"]");
+		if(isDebug){
+		  logger.info("Qty["+ sumQty+"] to Get Discount.. Attr.valueFrom[" + modifierAttr.getValueFrom()+"]to["+modifierAttr.getValueTo()+"]");
+		}
 		
 		/** OLD Code **/
 		/*if (sumQty >= modifierAttr.getValueFrom()) {
@@ -568,8 +638,10 @@ public class ModifierProcess {
 		
 		// Is Promotion
 		if (isPromotion) {
-			logger.info("Is Promotion..BreakType["+modifierLine.getBreakType()+"] App Method[" + modifierLine.getApplicationMethod() + "]Value[" + modifierLine.getValues()+"]");
-
+			if(isDebug){
+			  logger.info("Is Promotion..BreakType["+modifierLine.getBreakType()+"] App Method[" + modifierLine.getApplicationMethod() + "]Value[" + modifierLine.getValues()+"]");
+			}
+			
 			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
 				// POINT
 				if (modifierLine.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodAMT())) {
@@ -608,7 +680,9 @@ public class ModifierProcess {
 								if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
 								if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
 							}
-							logger.info("LineProduct["+line.getProduct().getCode()+"] BreakType[point] Method[AMT Percent] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+							if(isDebug){
+							  logger.info("LineProduct["+line.getProduct().getCode()+"] BreakType[point] Method[AMT Percent] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+							}
 						}//if
 					}//for
 				}
@@ -617,7 +691,10 @@ public class ModifierProcess {
 
 			// RECURRING
 			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypeRecurring())) {
-				logger.info("MLine Break Recurring");
+				if(isDebug){
+				  logger.info("MLine Break Recurring");
+				}
+				
 				// LUMSUM
 				discount = 0;
 				double lineDiscount = 0;
@@ -629,15 +706,21 @@ public class ModifierProcess {
 						if (line.getBestDiscount() == 0) line.setBestDiscount(lineDiscount);
 						if (line.getBestDiscount() < lineDiscount) line.setBestDiscount(lineDiscount);
 						
-						logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
+						if(isDebug){
+						  logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
+						}
 					}
 				}
 			}
 		} else {
-			logger.info("No Promotion..");
+			if(isDebug){
+			  logger.info("No Promotion..");
+			}
 		}
 		
-		logger.info("---- End  Discount Process---- ");
+		if(isDebug){
+		  logger.info("---- End  Discount Process---- ");
+		}
 		
 		return 0;
 
@@ -653,7 +736,10 @@ public class ModifierProcess {
 	 */
 	private double priceBreakProcess(double sumQty, double sumAmount, List<OrderLine> useLines, boolean blineGroup)
 			throws Exception {
-		logger.info("---- Start PriceBreak Process-------");
+		if(isDebug){
+		  logger.info("---- Start PriceBreak Process-------");
+		}
+		
 		boolean isPromotion = false;
 		double discount = 0;
 		ModifierLine promoLine = null;
@@ -661,8 +747,11 @@ public class ModifierProcess {
 		
 		// get relate line
 		for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
-			logger.info("Relate MLines : " + mrline);
-			logger.info("Qty["+sumQty+"] to Get Discount.. mLineTo.Attr.ValueFrom" + mrline.getAttr().getValueFrom() + " to "+ mrline.getAttr().getValueTo());
+			if(isDebug){
+			  logger.info("Relate MLines : " + mrline);
+			  logger.info("Qty["+sumQty+"] to Get Discount.. mLineTo.Attr.ValueFrom" + mrline.getAttr().getValueFrom() + " to "+ mrline.getAttr().getValueTo());
+			}
+			
 			if (sumQty >= mrline.getAttr().getValueFrom() && sumQty <= mrline.getAttr().getValueTo()) {
 				promoLine = mrline;
 				isPromotion = true;
@@ -670,10 +759,12 @@ public class ModifierProcess {
 			}
 		}
 		if (isPromotion) {
-			logger.info("Is Promotion..BreakType["+promoLine.getBreakType()+"]Application Method[" + promoLine.getApplicationMethod()+"]");
-			logger.info("ProLine.." + promoLine);
-			//logger.debug(" + " Value : "+ promoLine.getValues());
-
+			if(isDebug){
+			  logger.info("Is Promotion..BreakType["+promoLine.getBreakType()+"]Application Method[" + promoLine.getApplicationMethod()+"]");
+			  logger.info("ProLine.." + promoLine);
+			 //logger.debug(" + " Value : "+ promoLine.getValues());
+			}
+			
 			if (promoLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
 				// POINT
 				if (promoLine.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodAMT())) {
@@ -683,7 +774,9 @@ public class ModifierProcess {
 						if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
 						if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
 						
-						logger.info("BreakType[Point] Method[AMT] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+						if(isDebug){
+						  logger.info("BreakType[Point] Method[AMT] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+						}
 					}
 				} else if (promoLine.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodPercent())) {
 					// PERCENT
@@ -692,7 +785,9 @@ public class ModifierProcess {
 						if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
 						if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
 					
-						logger.info("BreakType[Point] Method[AMT Percent]:BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+						if(isDebug){
+						  logger.info("BreakType[Point] Method[AMT Percent]:BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+						}
 					}
 				}
 			}
@@ -711,15 +806,22 @@ public class ModifierProcess {
 						if (line.getBestDiscount() == 0) line.setBestDiscount(lineDiscount);
 						if (line.getBestDiscount() < lineDiscount) line.setBestDiscount(lineDiscount);
 						
-						logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
+						if(isDebug){
+						  logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
+						}
 					}//for
 				}//if
 			}
 		} else {
-			logger.info("No Promotion..");
+			if(isDebug){
+			  logger.info("No Promotion..");
+			}
 		}
 		
-		logger.info("---- End PriceBreak Process-------");
+		if(isDebug){
+		  logger.info("---- End PriceBreak Process-------");
+		}
+		
 		return 0;
 	}
 
@@ -731,7 +833,10 @@ public class ModifierProcess {
 	 * @throws Exception
 	 */
 	private double promotionalGoodProcess(double sumQty) throws Exception {
-		logger.info("---- Start Promotional Good Process ----");
+		if(isDebug){
+		  logger.info("---- Start Promotional Good Process ----");
+		}
+		
 		OrderLine oLine;
 		List<ProductPrice> pps;
 		boolean isPromotion = false;
@@ -739,10 +844,16 @@ public class ModifierProcess {
 		double discount = 0;
 		double qty = 0;
 		int round = 1;
-		logger.info("Mline Break Type[" + modifierLine.getBreakType()+"]");
+		
+		if(isDebug){
+		  logger.info("Mline Break Type[" + modifierLine.getBreakType()+"]");
+		}
 		
 		if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypeRecurring())) {
-			logger.info("Case BreakType[Recurring] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+			if(isDebug){
+			  logger.info("Case BreakType[Recurring] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+			}
+			
 			// recurring
 			if (modifierAttr.getValueTo() != 0) {
 				if (sumQty >= modifierAttr.getValueFrom() && sumQty <= modifierAttr.getValueTo()) {
@@ -759,7 +870,10 @@ public class ModifierProcess {
 		} else {
 			
 			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
-				logger.info("Case BreakType[Point] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+				if(isDebug){
+				  logger.info("Case BreakType[Point] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+				}
+				
 				if (modifierAttr.getValueTo() != 0) {
 					if (sumQty >= modifierAttr.getValueFrom() && sumQty <= modifierAttr.getValueTo()) {
 						isPromotion = true;
@@ -775,8 +889,11 @@ public class ModifierProcess {
 		}
 		// Is Promotion
 		if (isPromotion) {
-			logger.info("Is Promotion..Round[" + round+"]");
-			logger.info("Relate relate.m_line_to.MLines Size[" + modifierLine.getRelatedModifier().size()+"]");
+			if(isDebug){
+			  logger.info("Is Promotion..Round[" + round+"]");
+			  logger.info("Relate relate.m_line_to.MLines Size[" + modifierLine.getRelatedModifier().size()+"]");
+			}
+			
 			// get relate line
 			boolean baseUOM = true;
 			for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
@@ -784,12 +901,17 @@ public class ModifierProcess {
 				baseUOM = true;
 
 				oLine = new OrderLine();
-				logger.info("Attr.Product Attibute[" + mrline.getAttr().getProductAttribute()+"] Attibute Value[" + mrline.getAttr().getAttributeValueLabel()+"]");
+				if(isDebug){
+				  logger.info("Attr.Product Attibute[" + mrline.getAttr().getProductAttribute()+"] Attibute Value[" + mrline.getAttr().getAttributeValueLabel()+"]");
+				}
 				
 				if (mrline.getAttr().getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
 					// promotion in item
 					oLine.setProduct(mrline.getAttr().getProduct());
-					logger.debug(mrline.getAttr().getProduct().getUom().getId());
+					
+					if(isDebug){
+					  logger.info(mrline.getAttr().getProduct().getUom().getId());
+					}
 				}
 				if (!mrline.getAttr().getProductUOM().getId().equalsIgnoreCase(mrline.getAttr().getProduct().getUom().getId())) {
 					baseUOM = false;
@@ -804,13 +926,18 @@ public class ModifierProcess {
 					if (mrline.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
 						discount = price * mrline.getValues() * 100;
 					}
-					logger.info(" Method[AMT Percent] :result discount["+discount+"]");
+					if(isDebug){
+					  logger.info(" Method[AMT Percent] :result discount["+discount+"]");
+					}
 				}
 				if (mrline.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodAMT())) {
 					if (mrline.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
 						discount = mrline.getValues();
 					}
-					logger.info(" Method[AMT] :result discount["+discount+"]");
+					
+					if(isDebug){
+					  logger.info(" Method[AMT] :result discount["+discount+"]");
+					}
 				}
 				
 				if (mrline.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodNewPrice())) {
@@ -819,6 +946,8 @@ public class ModifierProcess {
 				
 				qty = round * mrline.getBenefitQty();
 
+				logger.info("new Promotion Qty["+ qty+"]");
+				  
 				if (baseUOM) {
 					oLine.setUom(mrline.getAttr().getProductUOM());
 					oLine.setPrice(price);
@@ -860,14 +989,23 @@ public class ModifierProcess {
 				else
 					oLine.setShippingDate(shipDate);
 
-				logger.info("new Promotion Order Line.." + oLine);
+				if(isDebug){
+				   logger.info("new Promotion Order Line.." + oLine);
+				}
+				
+				logger.info("Qty1["+oLine.getQty1()+"]qty2["+oLine.getQty2()+"]qty["+oLine.getQty()+"]");
+				
 				addLines.add(oLine);
 			}
 		} else {
-			logger.info("No Promotion..");
+			if(isDebug){
+			  logger.info("No Promotion..");
+			}
 		}
 		
-		logger.info("---- End Promotional Good Process ----");
+		if(isDebug){
+		  logger.info("---- End Promotional Good Process ----");
+		}
 		
 		return 0;
 	}

@@ -82,8 +82,10 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 				result.setSalesCode(user.getCode());
 				result.setTargetAmt(BigDecimal.valueOf(stn.getTargetAmount()));
 				result.setTargetQty(stn.getTargetQty()+"/0");
+				
 				result.setSalesQty(stn.getBaseQty()+"/"+stn.getSubQty());
 				result.setSalesAmt(BigDecimal.valueOf(stn.getSoldAmount()));
+				
 				result.setSalesCompareTargetPct(BigDecimal.valueOf(stn.getPercentCompare()));
 				
 				pos.add(result);
@@ -106,6 +108,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			.append("AND od.order_date <= ? \n")
 			.append("AND odl.IsCancel = 'N' \n")// FIXED : Not Include Cancel Line To Calculate
 			.append("AND od.Doc_STATUS = 'SV' \n")// FIXED : Not Include Order was Void To Calculate
+			//.append("AND od.ar_invoice_no is not null \n")
 			.append("AND odl.Product_ID NOT IN \n")
 			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn WHERE stn.User_ID = ? AND month(stn.Target_From) = ?) \n");
 

@@ -113,6 +113,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					item.setOrderAmt(order.getTotalAmount());
 					item.setOrderVATAmt(order.getVatAmount());
 					item.setOrderAmtIncludeVAT(order.getNetAmount());
+					item.setInvoiceNo(Utils.isNull(order.getArInvoiceNo()));
 					
 					/** Check is Header by Order_id **/
 					if( !String.valueOf(orderLine.getOrderId()).equals(orderIdTem)){

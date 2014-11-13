@@ -1,6 +1,8 @@
 package com.isecinc.pens.process.order;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,16 +13,21 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
+import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.Debug;
 
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
+import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.ReceiptMatch;
 import com.isecinc.pens.bean.TrxHistory;
+import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MProduct;
@@ -29,6 +36,8 @@ import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MTrxHistory;
+import com.isecinc.pens.model.MUOM;
+import com.isecinc.pens.model.MUOMConversion;
 
 /**
  * Order Process Class
@@ -39,7 +48,7 @@ import com.isecinc.pens.model.MTrxHistory;
  */
 public class OrderProcess {
 	private Logger logger = Logger.getLogger("PENS");
-
+    public Debug debug = new Debug(true);
 	
 
 	/**
@@ -183,6 +192,7 @@ public class OrderProcess {
 						line.setVatAmount(odLine.getVatAmount1());
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
+						
 						newLines.add(line);
 					}
 					if (odLine.getQty2() != 0) {
@@ -207,6 +217,7 @@ public class OrderProcess {
 						line.setVatAmount(odLine.getVatAmount2());
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
+						
 						newLines.add(line);
 					}
 				i++;
@@ -236,13 +247,24 @@ public class OrderProcess {
 
 			while (i < lines.size()) {
 				odLine = lines.get(i);
-				logger.debug("odLine fullUom:"+odLine.getFullUom());
+				//logger.debug("line p["+odLine.getProduct()+"]q["+odLine.getQty()+"]uom["+odLine.getUom()+"]");
+				debug.info("*** Line product["+odLine.getProduct().getCode()+"]" +
+				" fulluom["+odLine.getFullUom()+"]" +
+				" UOM["+odLine.getUom().getCode()+"]" +
+				" UOM1["+odLine.getUom1().getCode()+"]" +
+				" UOM2["+odLine.getUom2().getCode()+"]" +
+				" qty["+odLine.getQty()+"]" +
+				" qty1["+odLine.getQty1()+"]" +
+				" qty2["+odLine.getQty2()+"]***");
+				
 				// First add.
 				if (firstAdd) {
 					// Aneak.t 24/01/2011
 					if (odLine.getIscancel() != null && odLine.getIscancel().equals("Y")) {
 						continue;
 					}
+					logger.info("first Add line no["+i+"]");
+					
 					line = new OrderLine();
 					line.setId(odLine.getId());
 					line.setActiveLabel(odLine.getActiveLabel());
@@ -264,6 +286,9 @@ public class OrderProcess {
 					line.setDiscount(odLine.getDiscount());
 					line.setTotalAmount(odLine.getTotalAmount());
 					
+					
+					//debug.info("product.uom["+odLine.getProduct().getUom().getId()+"]order.uom["+odLine.getUom().getId()+"]");
+					
 					if (odLine.getProduct().getUom().getId().equals(odLine.getUom().getId())) {
 						line.setVatAmount1(odLine.getVatAmount());
 						line.setUom1(odLine.getUom());
@@ -274,9 +299,12 @@ public class OrderProcess {
 						line.setDiscount1(line.getDiscount1() + odLine.getDiscount());
 						line.setTotalAmount1(line.getTotalAmount1() + odLine.getTotalAmount());
 					} else {
+						logger.info("xxx1");
 						line.setVatAmount2(odLine.getVatAmount());
 						line.setUom2(odLine.getUom());
+						
 						odLine.setUom2(odLine.getUom());
+						
 						line.setPrice2(odLine.getPrice());
 						line.setQty2(line.getQty2() + odLine.getQty());
 						line.setLineAmount2(line.getLineAmount2() + odLine.getLineAmount());
@@ -297,12 +325,13 @@ public class OrderProcess {
 					line.setOrderDate(odLine.getOrderDate());
 					line.setStatus(odLine.getStatus());
 
+					
 					newLines.add(line);
 					firstAdd = false;
 					prvIndex = 0;
 				} else {
 					// Update previous line if repeat product code & promotion.
-
+                    logger.info("line no["+i+"]");
 					if (odLine.getIscancel() != null && odLine.getIscancel().equals("Y")) {
 						continue;
 					}
@@ -311,18 +340,31 @@ public class OrderProcess {
 							&& odLine.getPromotion().equals(lines.get(i - 1).getPromotion())
 							&& odLine.getShippingDate().equals(lines.get(i - 1).getShippingDate())
 							&& odLine.getRequestDate().equals(lines.get(i - 1).getRequestDate())) {
-						line.setId(odLine.getId());
-						line.setUom2(odLine.getUom());
-						line.setUom(odLine.getUom());
-						line.setPrice2(odLine.getPrice());
-						if (odLine.getPromotion().equals("Y")) {
+						
+						//product code== prevLine.productCode
+						if (odLine.getPromotion().equals("Y") ){
+							logger.info("xxx2");
+							logger.info("newLines.get(prvIndex).getQty()["+newLines.get(prvIndex).getQty()+"]");
+							logger.info("odLine.getQty()["+odLine.getQty()+"]");
+							
 							line.setQty(newLines.get(prvIndex).getQty() + odLine.getQty());
-							line.setQty2(newLines.get(prvIndex).getQty() + odLine.getQty());
+							
+							if( !Utils.isNull(odLine.getUom2().getCode()).equals("")){
+							   line.setQty2(newLines.get(prvIndex).getQty() + odLine.getQty());
+							  
+							}
 						} else {
+							logger.info("xxx3");
 							line.setQty(odLine.getQty());
 							line.setQty2(odLine.getQty());
 						}
 
+						line.setId(odLine.getId());
+						line.setUom2(odLine.getUom());
+						line.setUom(odLine.getUom());
+						line.setPrice2(odLine.getPrice());
+						
+						
 						line.setLineAmount2(odLine.getLineAmount());
 						line.setDiscount2(odLine.getDiscount());
 						line.setTotalAmount2(odLine.getTotalAmount());
@@ -345,21 +387,28 @@ public class OrderProcess {
 						// Set value to previous
 						line.setUom1(newLines.get(prvIndex).getUom1());
 						line.setPrice1(newLines.get(prvIndex).getPrice1());
-						line.setQty1(line.getQty1() + newLines.get(prvIndex).getQty1());
+						
+						//Edit 30/10/2557
+						//line.setQty1(line.getQty1() + newLines.get(prvIndex).getQty1()); 
+						
+						line.setQty1(newLines.get(prvIndex).getQty1()+ odLine.getQty1());
+						
 						line.setLineAmount1(newLines.get(prvIndex).getLineAmount1());
 						line.setDiscount1(newLines.get(prvIndex).getDiscount1());
 						line.setTotalAmount1(newLines.get(prvIndex).getTotalAmount1());
 						line.setVatAmount1(newLines.get(prvIndex).getVatAmount1());
 
-						if (checkFullUOM(newLines.get(prvIndex).getFullUom())) line.setFullUom(newLines.get(prvIndex)
-								.getFullUom());
+						if (checkFullUOM(newLines.get(prvIndex).getFullUom())) line.setFullUom(newLines.get(prvIndex).getFullUom());
 						else line.setFullUom(newLines.get(prvIndex).getFullUom() + odLine.getUom().getCode());
+						
 						/**option **/
 						line.setOrderNo(odLine.getOrderNo());
 						line.setCustomerName(odLine.getCustomerName());
 						line.setCustomerCode(odLine.getCustomerCode());
 						line.setOrderDate(odLine.getOrderDate());
 						line.setStatus(odLine.getStatus());
+						
+						
 						
 						newLines.set(prvIndex, line);
 					} else {
@@ -379,7 +428,6 @@ public class OrderProcess {
 						line.setPromotion(odLine.getPromotion());
 						line.setRequestDate(odLine.getRequestDate());
 						line.setShippingDate(odLine.getShippingDate());
-						// line.setVatAmount(odLine.getVatAmount());
 						line.setVatAmount(odLine.getVatAmount());
 						line.setUom(odLine.getUom());
 						line.setPrice(odLine.getPrice());
@@ -388,6 +436,7 @@ public class OrderProcess {
 						line.setLineAmount(odLine.getLineAmount());
 						line.setDiscount(odLine.getDiscount());
 						line.setTotalAmount(odLine.getTotalAmount());
+						
 						
 						if (odLine.getProduct().getUom().getId().equals(odLine.getUom().getId())) {
 							line.setVatAmount1(odLine.getVatAmount());
@@ -399,6 +448,7 @@ public class OrderProcess {
 							line.setDiscount1(line.getDiscount1() + odLine.getDiscount());
 							line.setTotalAmount1(line.getTotalAmount1() + odLine.getTotalAmount());
 						} else {
+							logger.info("xxx4");
 							line.setVatAmount2(odLine.getVatAmount());
 							line.setUom2(odLine.getUom());
 							odLine.setUom2(odLine.getUom());
@@ -414,6 +464,7 @@ public class OrderProcess {
 						} else {
 							line.setFullUom(odLine.getFullUom());
 						}
+						
 						/**option **/
 						line.setOrderNo(odLine.getOrderNo());
 						line.setCustomerName(odLine.getCustomerName());
@@ -421,20 +472,130 @@ public class OrderProcess {
 						line.setOrderDate(odLine.getOrderDate());
 						line.setStatus(odLine.getStatus());
 						
+					
 						newLines.add(line);
 						prvIndex++;
 					}
-				}
+				}//if
 				
-				logger.debug("UOM1:"+line.getUom1());
-				logger.debug("UOM2:"+line.getUom1());
-				logger.debug("productCode:"+line.getProduct().getCode());
-				logger.debug("fullUOM:"+line.getFullUom());
-				
+				debug.info("*** result product["+line.getProduct().getCode()+"]" +
+						" fullUOM["+line.getFullUom()+"]" +
+						" UOM1["+line.getUom1().getCode()+"]" +
+						" UOM2["+line.getUom2().getCode()+"]" +
+						" qty["+line.getQty()+"]" +
+						" qty1["+line.getQty1()+"]" +
+						" qty2["+line.getQty2()+"]***");
+
 				i++;
-			}
+			}//while
 		} catch (Exception e) {
 			throw e;
+		}
+		return newLines;
+	}
+	
+	private OrderLine getUOM(Connection conn,String pricelistID,String pID ){
+	
+		Statement stmt = null;
+		ResultSet rst = null;
+		String uom1 = "";
+		String uom2 = "";
+		double priceUom1 = 0;
+		double priceUom2 = 0;
+		
+		OrderLine lines = new OrderLine();
+		try{
+			String sql = "SELECT um.UOM_ID, pp.PRICE " +
+						" FROM m_product_price pp " +
+						" LEFT JOIN m_uom um ON pp.UOM_ID = um.UOM_ID " +
+						" WHERE pp.PRODUCT_ID = " + pID + 
+						" AND pp.PRICELIST_ID = " + pricelistID +
+						" AND pp.ISACTIVE = 'Y' " +
+						" AND um.ISACTIVE = 'Y' " +
+						" GROUP BY pp.UOM_ID ";
+			
+			debug.debug("UOM sql:"+sql);
+			
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			Product product = new MProduct().find(pID);
+			
+			while(rst.next()){
+				if(product.getUom().getId().equals(rst.getString("UOM_ID"))){
+					uom1 = rst.getString("UOM_ID");
+					priceUom1 = rst.getDouble("PRICE");
+				}else{
+					uom2 = rst.getString("UOM_ID");
+					priceUom2 = rst.getDouble("PRICE");
+				}
+			}
+			
+			UOM uomM1 = new UOM();
+			uomM1.setId(uom1);
+			uomM1.setCode(uom1);
+			
+			UOM uomM2 = new UOM();
+			uomM2.setId(uom2);
+			uomM2.setCode(uom2);
+			
+			lines.setUom1(uomM1);
+			lines.setUom2(uomM2);
+			lines.setPrice1(priceUom1);
+			lines.setPrice2(priceUom2);
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				rst.close();
+			}catch(Exception e2){}
+			try{
+				stmt.close();
+			}catch(Exception e2){}
+			
+		}
+		return lines;
+	}
+
+	public List<OrderLine> fillLinesShowBlankUOM(Connection conn,String pricelistID, List<OrderLine> lines){
+		List<OrderLine> newLines = new ArrayList<OrderLine>();
+		try{
+            debug.debug(" ****Start fillLinesShowBlankUOM****");
+			for(OrderLine l:lines){
+				debug.debug("uom1["+l.getUom1().getCode()+"]uom2["+Utils.isNull(l.getUom1().getCode())+"]");
+				
+				if( Utils.isNull(l.getUom1().getCode()).equals("") ||  Utils.isNull(l.getUom2().getCode()).equals("") ){
+				   debug.debug("getUom product:"+l.getProduct().getCode());
+				   
+				   OrderLine lineUom = getUOM(conn,pricelistID ,String.valueOf(l.getProduct().getId()));
+				   
+				   if(Utils.isNull(l.getUom1().getCode()).equals("")){
+					 if(lineUom != null){
+						 l.setUom1(lineUom.getUom1());
+						 l.setPrice1(lineUom.getPrice1());
+					 }
+				   }
+					
+                   if(Utils.isNull(l.getUom2().getCode()).equals("")){
+                	 if(lineUom != null){
+  						l.setUom2(lineUom.getUom2());
+  						l.setPrice2(lineUom.getPrice2());
+  					  }	
+				   }
+                    l.setFullUom(l.getUom1().getCode()+"/"+l.getUom2().getCode());
+				    newLines.add(l);
+				}else{
+					newLines.add(l);
+				}
+			}
+			
+			debug.debug(" **** end fillLinesShowBlankUOM****");
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+	
 		}
 		return newLines;
 	}

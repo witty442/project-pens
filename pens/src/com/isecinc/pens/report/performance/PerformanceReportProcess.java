@@ -51,8 +51,9 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  od.VAT_AMOUNT, od.NET_AMOUNT, cus.CODE AS CUSTOMER_CODE, cus.NAME AS CUSTOMER_NAME ");
 			
 			sql.append("\n ,( select min(t_receipt_by.cheque_no) ");
-			sql.append("\n    from t_receipt_line  ,t_receipt_match , t_receipt_by ");
+			sql.append("\n    from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
 			sql.append("\n    where od.order_id = t_receipt_line.order_id ");
+			sql.append("\n    and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
 			sql.append("\n    and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
 			sql.append("\n    and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
 			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='CH' ");
@@ -75,11 +76,13 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
 			int i = 1;
 			while (rst.next()) {
 				p = new PerformanceReport();
 				p.setId(i++);
-				p.setNo(rst.getInt("no"));
+				no++;
+				p.setNo(no);
 				p.setOrderDate(rst.getString("ORDER_DATE"));
 				p.setCode(rst.getString("CODE"));
 				p.setName(rst.getString("NAME"));
