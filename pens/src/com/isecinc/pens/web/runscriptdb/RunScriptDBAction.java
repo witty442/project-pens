@@ -59,28 +59,21 @@ public class RunScriptDBAction {
 			int day = c.get(Calendar.DATE);
 			logger.info("Check Day for PrugeMonitor Day(1,2,25,26,27) now_day:"+day);
 			
-			//Delete All Monitor 
+			//Delete All Monitor  submit_date < 1 month 
 			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
 				purgDataMonitor(conn);	
 			}
+				
 			//Delete m_sales_target_new back 2 month
 			if(day==5){
 				purgDataSalesTarget(conn);	
 			}
 			
-			//Delete all Transaction 
-			if(day==30){
-				purgDataTransaction(conn);
-			}
-			
-			
 			//clear Task running for next run
 			InterfaceDAO dao = new InterfaceDAO();
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
-			
-			
-			
+
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -101,7 +94,7 @@ public class RunScriptDBAction {
 			runManualScriptProcessAllSales(conn,prefix,user.getUserName());
 			
 			/** Run ManualScript By Sales Type VAN or Credit **/
-			logger.info("role:"+user.getRole().getKey());
+			logger.debug("role:"+user.getRole().getKey());
 			String salesType = "van";
 			if("TT".equals(user.getRole().getKey())){
 				salesType  ="credit";
@@ -144,7 +137,7 @@ public class RunScriptDBAction {
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
 				String resultStr = excUpdate(conn,Utils.isNull(scriptData));
-				logger.info("resultExeSctipt:"+resultStr);
+				logger.debug("resultExeSctipt:"+resultStr);
 			}
 			
 		}catch(Exception e){
@@ -162,17 +155,17 @@ public class RunScriptDBAction {
 	public static void runManualScriptProcessBySalesType(Connection conn,String prefix,String salesType){
 		EnvProperties env = EnvProperties.getInstance();
 		try{
-			logger.info("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql");
+			logger.debug("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql");
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql","TIS-620");
 			
-			logger.info("scriptData:"+scriptData);
+			logger.debug("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
 				String resultStr = excUpdate(conn,Utils.isNull(scriptData));
-				logger.info("resultExeSctipt:"+resultStr);
+				logger.debug("resultExeSctipt:"+resultStr);
 			}
 			
 		}catch(Exception e){
@@ -200,7 +193,7 @@ public class RunScriptDBAction {
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
 				resultStr = excUpdate(conn,Utils.isNull(scriptData));
-				logger.info("resultExeSctipt:"+resultStr);
+				logger.debug("resultExeSctipt:"+resultStr);
 			
 				// delete and Create new  File Ftp To In Processs
 				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+userName+".sql");
@@ -271,19 +264,6 @@ public class RunScriptDBAction {
 		}
 		return success;
   }
-	
-  private static boolean purgDataTransaction(Connection conn){
-		boolean success = false;
-		StringBuffer sql = new StringBuffer("");
-		try{
-			//logger.info("*** Start PurgData purgDataTransaction ***************");
-			
-			
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-		return success;
-   }
 
 	private static boolean runScriptDBUpdate(ServletContext sc ,Connection conn){
 		boolean success = false;

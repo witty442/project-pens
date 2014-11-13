@@ -9,8 +9,8 @@ public class ProductCatalog implements Comparable{
 	private String uom2;
 	private double price1;
 	private double price2;
-	private double qty1;
-	private double qty2;
+	private int qty1;
+	private int qty2;
 	private double lineNetAmt;
 
 	
@@ -86,19 +86,19 @@ public class ProductCatalog implements Comparable{
 		this.price2 = price2;
 	}
 
-	public double getQty1() {
+	public int getQty1() {
 		return qty1;
 	}
 
-	public void setQty1(double qty1) {
+	public void setQty1(int qty1) {
 		this.qty1 = qty1;
 	}
 
-	public double getQty2() {
+	public int getQty2() {
 		return qty2;
 	}
 
-	public void setQty2(double qty2) {
+	public void setQty2(int qty2) {
 		this.qty2 = qty2;
 	}
 

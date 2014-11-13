@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,7 @@ import util.ConvertNullUtil;
 import util.CustomerReceiptFilterUtils;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.Debug;
 import util.NumberToolsUtil;
 import util.ReportHelper;
 import util.ReportUtilServlet;
@@ -50,14 +52,12 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MDistrict;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MOrgRule;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MProductPrice;
-import com.isecinc.pens.model.MProvince;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MTrxHistory;
@@ -66,6 +66,7 @@ import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
+
 
 /**
  * Order Action
@@ -80,6 +81,7 @@ import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
  */
 public class OrderAction extends I_Action {
 
+	public Debug debug = new Debug(true);
 	/**
 	 * Prepare without ID
 	 */
@@ -259,11 +261,15 @@ public class OrderAction extends I_Action {
 		OrderForm orderForm = (OrderForm) form;
 		Order order = null;
 		int roundTrip = 0;
+		Connection conn = null;
         logger.info("prepare have orderId ");
 		try {
 			roundTrip = orderForm.getOrder().getRoundTrip();
 
 			order = new MOrder().find(id);
+			
+			logger.debug("OrderDate:"+order.getOrderDate());
+			
 			if (order == null) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 				return "view";
@@ -273,6 +279,11 @@ public class OrderAction extends I_Action {
 			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 			orderForm.setLines(lines);
 			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			//add Line Blank UOM (1 or 2)
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+
+
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
@@ -283,6 +294,12 @@ public class OrderAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
+		}finally{
+			try{
+				conn.close();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		if (request.getParameter("action").equalsIgnoreCase("edit")) return "prepare";
 		return "view";
@@ -298,7 +315,7 @@ public class OrderAction extends I_Action {
 		User user = (User) request.getSession(true).getAttribute("user");
 		Order order = null;
 		int roundTrip = 0;
-		logger.info("prepareEditOrder orderId["+Utils.isNull(request.getParameter("id"))+"]");
+		debug.info("prepareEditOrder orderId["+Utils.isNull(request.getParameter("id"))+"]");
 		try {
 			OrderForm orderForm = (OrderForm) form;
 			
@@ -320,10 +337,17 @@ public class OrderAction extends I_Action {
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
 
+			//wit edit VAN :default Auto receipt Cash 
+			if(User.VAN.equals(user.getType())){
+			  orderForm.getOrder().setPaymentCashNow(true);
+			}
+			
 			//Filter Check Van Can Receipt Cheque Or Credit
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
 			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+			
+			debug.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
 			
 			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
 			  orderForm.setCanReceiptMoreCash("Y");
@@ -331,6 +355,8 @@ public class OrderAction extends I_Action {
 			  orderForm.setCanReceiptMoreCash("N");
 			}
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
+			debug.debug("CanReceiptMoreCash:"+orderForm.getCanReceiptMoreCash());
 			
 			// Prepare order line to Edit
 			/** Promotion Process add add to Lines */
@@ -354,9 +380,15 @@ public class OrderAction extends I_Action {
 				line.setProduct(new MProduct().find(String.valueOf(line.getProduct().getId())));
 				line.setTotalAmount(line.getLineAmount());
 			}
-
+            
+			//Split 2 Line
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request.getSession().getAttribute("memberVIP")));
+			
+			//Merge to 1 Line show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
+
+			//add Line Blank UOM (1 or 2)
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
 
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
@@ -387,6 +419,7 @@ public class OrderAction extends I_Action {
 		OrderForm orderForm = (OrderForm) form;
 		Order order = null;
 		int roundTrip = 0;
+		User user = (User) request.getSession(true).getAttribute("user");
         logger.info("prepareEditReceipt ");
 		try {
 			roundTrip = orderForm.getOrder().getRoundTrip();
@@ -403,6 +436,10 @@ public class OrderAction extends I_Action {
 			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 			orderForm.setLines(lines);
 			
+			//add Line Blank UOM (1 or 2)
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
@@ -413,12 +450,21 @@ public class OrderAction extends I_Action {
 			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
 			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
 			
+			logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+			
 			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
 			  orderForm.setCanReceiptMoreCash("Y");
 			}else{
 			  orderForm.setCanReceiptMoreCash("N");
 			}
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			
+			logger.debug("CanReceiptMoreCash:"+orderForm.getCanReceiptMoreCash());
+			
+			//wit edit VAN :default Auto receipt Cash 
+			if(User.VAN.equals(user.getType())){
+			  orderForm.getOrder().setPaymentCashNow(true);
+			}
 			
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
@@ -452,54 +498,68 @@ public class OrderAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			User userActive = (User) request.getSession().getAttribute("user");
 			Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-			if (!userActive.getType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-				/** Promotion Process add add to Lines */
-				
-				// remove promotion line
-				List<OrderLine> promotionLine = new ArrayList<OrderLine>();
-				// Set Disply To Prepare Save Order Line
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
-                
-				// Add Promotion Line only From irderFrom to promotionLine
-				for (OrderLine line : orderForm.getLines()) {
-					if (line.getPromotion().equalsIgnoreCase("Y")) {
-						promotionLine.add(line);
-					}
+			
+			/** Promotion Process  add to Lines */
+			
+			// remove promotion line
+			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			
+			// Set Disply To Prepare Save Order Line (no promotion Lines)
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
+            
+			// Add Promotion Line only From orderFrom to promotionLine
+			for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("Y")) {
+					promotionLine.add(line);
 				}
-				
-				//remove Protion line from orderFrom
-				for (OrderLine line : promotionLine) {
-					orderForm.getLines().remove(line);
-				}
-
-				// Call Modifier Process
-				ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
-				modProcess.findModifier(orderForm.getLines(), userActive, conn);
-
-
-				// Set for web display.
-				logger.info("****** Start Set Display order ****************************************************");
-				if (!userActive.getRole().getKey().equals(User.DD)) {
-					List<OrderLine> odLines = new OrderProcess().fillLinesShow(orderForm.getLines());
-					List<OrderLine> promotionLines = new OrderProcess().fillLinesShow(modProcess.getAddLines());
-					odLines.addAll(promotionLines);
-					orderForm.setLines(odLines);
-				}
-				logger.info("****** End  Set Display order ****************************************************");
 			}
+			
+			//remove Promotion line from orderFrom
+			for (OrderLine line : promotionLine) {
+				orderForm.getLines().remove(line);
+			}
+			
+			//Recalculate lineAmount (qty*price) in Lines
+			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
+						
+			// Call Modifier Process
+			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
+			modProcess.findModifier(orderForm.getLines(), userActive, conn);
 
+			// Set for web display.
+			logger.debug("****** Start Set Display order ****************************************************");
+			
+			//Merge to 1 Line to Show
+			List<OrderLine> odLines = new OrderProcess().fillLinesShow(orderForm.getLines());
+			
+			//add Line Blank UOM (1 or 2)
+			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines);
+			
+			//add Promotion to show
+			List<OrderLine> promotionLines = new OrderProcess().fillLinesShow(modProcess.getAddLines());
+			
+			//add promotion line
+			odLines.addAll(promotionLines);
+			
+			//set to OrderLines Show
+			orderForm.setLines(odLines);
+			
+			logger.debug("****** End  Set Display order ****************************************************");
+			
 			// Save Lines
 			int i = 1;
 			for (OrderLine line : orderForm.getLines()) {
 				line.setLineNo(i++);
 			}
-			// Re-Calculate
-			// new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
+			
+			// Re-Calculate TotalAmount,vatAmount,netAmount
+			orderForm.setOrder(new MOrder().reCalculateHeadAmount(orderForm.getOrder(), orderForm.getLines()));
 
 			//Set Data to Session to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print", orderForm);
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			return mapping.findForward("prepare");
@@ -532,21 +592,19 @@ public class OrderAction extends I_Action {
 			}
 			
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
-			
-			if (!userActive.getType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-				/** Promotion Process add add to Lines */
-				// remove promotion line
-				List<OrderLine> promotionLine = new ArrayList<OrderLine>();
-				for (OrderLine line : orderForm.getLines()) {
-					if (line.getPromotion().equalsIgnoreCase("Y")) {
-						promotionLine.add(line);
-					}
-				}
-				for (OrderLine line : promotionLine) {
-					orderForm.getLines().remove(line);
+	
+			/** Promotion Process add add to Lines */
+			// remove promotion line
+			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("Y")) {
+					promotionLine.add(line);
 				}
 			}
-
+			for (OrderLine line : promotionLine) {
+				orderForm.getLines().remove(line);
+			}
+			
 			// Save Lines
 			int i = 1;
 			for (OrderLine line : orderForm.getLines()) {
@@ -557,15 +615,13 @@ public class OrderAction extends I_Action {
 				line.setTotalAmount(line.getLineAmount());
 			}
 
-			
+			//Split 2 Line for Save
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
 						.getSession().getAttribute("memberVIP")));
+			
+			//Merg to 1 Line to Show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			
-
-			// Re-Calculate
-			// new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
-
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -702,6 +758,15 @@ public class OrderAction extends I_Action {
 			// Sales Reps --current user who's create/edit record--
 			order.setSalesRepresent(userActive);
 
+			//Recalculate lineAmount (qty*price) ,total_amount = lineAmount-discount in Lines
+			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesAfterCalcPromotion(orderForm.getLines()));
+			
+			// Re-Calculate totalAmount vatAmount netAmount From lines
+			order = new MOrder().reCalculateHeadAmount(order, orderForm.getLines());
+			            
+			//For comapre after save 
+			double beforeSave_NetAmount = order.getNetAmount(); 
+			
 			// Save Order
 			if (!new MOrder().save(order, userActive.getId(), conn)) {
 				// return with duplicate Document no
@@ -716,12 +781,6 @@ public class OrderAction extends I_Action {
 			// Delete Line
 			if (ConvertNullUtil.convertToString(orderForm.getDeletedId()).trim().length() > 0){
 				new MOrderLine().delete(orderForm.getDeletedId().substring(1).trim(), conn);
-			}
-			
-			// Delete All Lines if Member Edit
-			if (order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)
-					&& ((String) request.getSession().getAttribute("memberVIP")).equals("N")) {
-				new MOrderLine().deleteAllLines(orderForm.getOrder().getId(), conn);
 			}
 			
 			// Save Lines all new
@@ -748,11 +807,17 @@ public class OrderAction extends I_Action {
 				lastShipDate = orderForm.getLines().get(orderForm.getLines().size() - 1).getShippingDate();
 			}
 
-			// Re-Calculate totalAmount vatAmount netAmount From line
-			new MOrder().reCalculate(orderForm.getOrder(), orderForm.getLines());
-
-			// Re-Save
-			new MOrder().save(order, userActive.getId(), conn);
+			//Recalculate totalAmount ,VatAmount,NetAmount from lines(from db)
+			order = new MOrder().reCalculateHeadAmountDB(conn,order);
+			//Compare before Save
+			double afterSave_NetAmount = order.getNetAmount(); 
+			
+			//case Error netAmount before <> after save  resave
+			if(beforeSave_NetAmount != afterSave_NetAmount){
+			   logger.debug("ReSave Order netAmount error: beforeSave_NetAmount["+beforeSave_NetAmount+"]afterSave_NetAmount["+afterSave_NetAmount+"]");
+			   // Re-Save
+			   new MOrder().save(order, userActive.getId(), conn);
+			}
 
 			// auto create receipt with member
 			logger.info("AutoReceiptFlag:"+orderForm.getAutoReceiptFlag());
@@ -776,6 +841,8 @@ public class OrderAction extends I_Action {
 			/** WIT Edit 20110804 ****************************************/
 			/** Case Van and User choose payCashNow -> createAutoReceipt**/
 			if (userActive.getRole().getKey().equals(User.VAN) && orderForm.getOrder().isPaymentCashNow()) {
+				 logger.debug("CreateAutoReceipt Case Van pay Cash");
+				 
 				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
 				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
 				 orderForm.getAutoReceipt().setInternalBank("002");//SCB-สาขาสาธุประดิษฐ์ 068-2-81805-7
@@ -806,10 +873,8 @@ public class OrderAction extends I_Action {
 				}
 			}
 			/** WIT Edit 20110804 ****************************************/
-			
-			if (!userActive.getRole().getKey().equals(User.DD)) {
-				orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
-			}
+            //set Merge to 1 Line to show
+			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			
 			// re org case line_no duplicate
 			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
@@ -818,7 +883,10 @@ public class OrderAction extends I_Action {
 			conn.commit();
 			// set msg save success
 			request.setAttribute("Message",msg );
-            		
+			
+			//add Line Blank UOM (1 or 2)
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			
 			/********* WIT EDIT:20110804 :case not auto receipt cash  -> popup page AutoPay *****/
 			if(userActive.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
 				request.setAttribute("popup_autoreceipt", "true");
@@ -920,6 +988,7 @@ public class OrderAction extends I_Action {
 				}
 	        }else{
 	        	//Case Van and pd_paid =N and payment method ='CR' no Create AutoReceipt actionSave ="" **/
+	        	
 	        }
 	       
 			// Set Lines to Show
@@ -1256,41 +1325,45 @@ public class OrderAction extends I_Action {
 			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
 
 			//Check Cash or Cheque
-			String pReceiptByMsg = "เงินสด ";
-			String pReportTitle = "ใบส่งสินค้า/ใบกำกับภาษี/ใบเสร็จรับเงิน"; //default
+			String pReceiptByMsg = " ";
+			String pReportTitle = ""; //default
 			List<ReceiptBy> receiptByList = new MReceiptBy().lookUp(receiptNo);
 			
 			if(receiptByList != null && receiptByList.size() >0){
-				ReceiptBy receiptBy = receiptByList.get(0);
-				if("CS".equalsIgnoreCase(receiptBy.getPaymentMethod())){
-					if("Y".equals(order.getIsCash())){
-					   pReceiptByMsg = "เงินสด";	
-					}else{
-						 pReceiptByMsg = "เงินเชื่อ";
-						 pReportTitle = "ใบส่งสินค้า"; 
-					}
-				}else if("CH".equalsIgnoreCase(receiptBy.getPaymentMethod())){
-					 pReceiptByMsg = "เช็ค เลขที่  "+receiptBy.getChequeNo();
-				}
-				if(receiptByList.size() ==2){
-					 receiptBy = receiptByList.get(1);
+				Map<String, String> paybyMap = new HashMap<String, String>();
+				String pReceiptByMsgTemp = "";
+				for(int i=0;i<receiptByList.size();i++){
+					ReceiptBy receiptBy = receiptByList.get(i);
 					if("CS".equalsIgnoreCase(receiptBy.getPaymentMethod())){
 						if("Y".equals(order.getIsCash())){
-						   pReceiptByMsg += " ,เงินสด";	
+							pReceiptByMsgTemp = "เงินสด";	
+							paybyMap.put("CS",pReceiptByMsgTemp);
 						}else{
-						   pReceiptByMsg += " ,เงินเชื่อ";	
+							pReceiptByMsgTemp = "เงินเชื่อ";
+							paybyMap.put("CR",pReceiptByMsgTemp);
 						}
 					}else if("CH".equalsIgnoreCase(receiptBy.getPaymentMethod())){
-						 pReceiptByMsg += " ,เช็ค เลขที่  "+receiptBy.getChequeNo();
+						pReceiptByMsgTemp = "เช็ค เลขที่  "+receiptBy.getChequeNo();
+						paybyMap.put("CH",pReceiptByMsgTemp);
+					}
+				}//for
+				
+				if( !paybyMap.isEmpty()){
+					Iterator<String> it = paybyMap.keySet().iterator();
+					while(it.hasNext()){
+						pReceiptByMsg +=paybyMap.get(it.next())+" ,";
+					}
+					if(pReceiptByMsg.length()> 0 && pReceiptByMsg.indexOf(",") != -1){
+						pReceiptByMsg = pReceiptByMsg.substring(0,pReceiptByMsg.length()-1);
 					}
 				}
 			}
 			
 			//original or copy report
 			if("original".equalsIgnoreCase(reportType)){
-				pReportTitle +="(ต้นฉบับ)";
+				pReportTitle ="ใบส่งสินค้า/ใบกำกับภาษี/ใบเสร็จรับเงิน";
 			}else if("copy".equalsIgnoreCase(reportType)){ 
-				pReportTitle +="(สำเนา)";
+				pReportTitle = "ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว"; //default
 			}
 			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
 
@@ -1312,11 +1385,28 @@ public class OrderAction extends I_Action {
 			if(addressTemp != null ){
 				custAddressArr = splitAddress(addressTemp);
 			}
+			//
+			String cusTaxNoMsg = "";
+			
+			//"".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo())
+			if(Utils.isNull(customer.getPrintTax()).equals("Y")){
+				cusTaxNoMsg ="เลขประจำตัวผู้เสียภาษี "+customer.getTaxNo(); 
+			}else{
+				//cusTaxNoMsg ="เลขประจำตัวผู้เสียภาษี "+BeanParameter.getPensTaxNo();
+			}
+			
+			if(Utils.isNull(customer.getPrintHeadBranchDesc()).equals("Y")){
+				if(Utils.isNull(customer.getPrintType()).equals("H")){
+				     cusTaxNoMsg +="  สำนักงานใหญ่";
+				}else if(Utils.isNull(customer.getPrintType()).equals("B")){
+					 cusTaxNoMsg +=" สาขาที่  "+NumberToolsUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberToolsUtil.format_current_five_digit);
+				}
+			}
 			
 			parameterMap.put("custName", order.getCustomerName());
 			parameterMap.put("custAddress1", custAddressArr[0]);
 			parameterMap.put("custAddress2", custAddressArr[1]);
-			parameterMap.put("p_custTaxNo", "".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo()));
+			parameterMap.put("p_custTaxNo", cusTaxNoMsg);
 			parameterMap.put("p_next_visit", visitDate);
 			
 			lstData = new ArrayList<TaxInvoiceReport>();
@@ -1368,8 +1458,10 @@ public class OrderAction extends I_Action {
 
 			String fileName = "tax_invoice_summary_report";
 			String fileJasper = BeanParameter.getReportPath() + fileName;
-            reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+           
+			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
 			
+			//reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -1393,16 +1485,15 @@ public class OrderAction extends I_Action {
 			        
 			lineString[0] = line1;
 			lineString[1] = " เขต"
-					  + (Utils.isNull(a.getDistrict().getName())) + " "
+					  + (Utils.isNull(a.getDistrict().getName())) 
 					  + " "+(Utils.isNull(a.getProvince().getName())) + " "+(Utils.isNull(a.getPostalCode()));
 			
 		} else {
-			line1 += "ตำบล" + (Utils.isNull(a.getLine3())) ;
-			
 			lineString[0] = line1;
-			lineString[1] =   "อำเภอ  "
-					 + (Utils.isNull(a.getDistrict().getName())) + " "
-					 + "จังหวัด "+(Utils.isNull(a.getProvince().getName())) + " "+(Utils.isNull(a.getPostalCode()));
+			
+			lineString[1] =  " ต." + (Utils.isNull(a.getLine3())) + " อ."
+					 + (Utils.isNull(a.getDistrict().getName())) 
+					 + " จ."+(Utils.isNull(a.getProvince().getName())) + " "+(Utils.isNull(a.getPostalCode()));
 			
 		}
 		return lineString;
