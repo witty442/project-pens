@@ -205,7 +205,11 @@ public class MoveOrderAction extends I_Action {
 			 if(m.isRequestDateDisabled()){ //Case requestDate 30-31 
 			    moveOrderForm.getMoveOrder().setShowSaveBtn(false);
 			 }else{
-				moveOrderForm.getMoveOrder().setShowSaveBtn(true); 
+				 if(Utils.convertStrToInt(m.getPrintNo()) >= 1){
+					moveOrderForm.getMoveOrder().setShowSaveBtn(false);  
+				 }else{ 
+				    moveOrderForm.getMoveOrder().setShowSaveBtn(true); 
+				 }
 			 }
 			 moveOrderForm.getMoveOrder().setShowCancelBtn(true);
 			 moveOrderForm.getMoveOrder().setShowPrintBtn(true);
@@ -404,6 +408,7 @@ public class MoveOrderAction extends I_Action {
 			 //set Btn Display
 			 moveOrderForm.getMoveOrder().setShowSaveBtn(false);
 			 moveOrderForm.getMoveOrder().setShowCancelBtn(false);
+			
 			 moveOrderForm.getMoveOrder().setShowPrintBtn(true);
 			 
 			// save token

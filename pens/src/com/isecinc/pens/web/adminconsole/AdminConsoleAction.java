@@ -3,6 +3,8 @@ package com.isecinc.pens.web.adminconsole;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import manual.cleardb.ClearDB;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -75,6 +77,7 @@ public class AdminConsoleAction extends I_Action {
 		
 				configInfo += " ----------------------  FTP Server Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
+				configInfo +="FTP IP TEMP : "+env.getProperty("ftp.ip.server.temp")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
 				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
@@ -152,9 +155,21 @@ public class AdminConsoleAction extends I_Action {
 				  } catch(Exception e) {
 				     e.printStackTrace();
 				  }
-			 }
+			}else if(currentTab.equals("tab_cleardb") && "tab_cleardb".equalsIgnoreCase(action)){
+				String resultBKDB = "";
+				  try {   
+				      
+				      
+					  StringBuffer resultClearDB = ClearDB.clearDB() ;
+					  
+					  adForm.setResultClearDB(resultClearDB.toString());
+					  
+				  } catch(Exception e) {
+				     e.printStackTrace();
+				  } 
 			
 			request.setAttribute("currentTab", currentTab);
+		   }
 			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

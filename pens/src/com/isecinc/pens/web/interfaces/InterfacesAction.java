@@ -131,6 +131,9 @@ public class InterfacesAction extends I_Action {
 		String returnText = "search";
 		InterfaceDAO dao = new InterfaceDAO();
 		try {
+			String timeInUse =interfacesForm.getMonitorBean().getTimeInUse();
+			logger.info("TimeInUse:"+timeInUse);
+			
 			InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
 			if(request.getAttribute("searchKey") != null){
 				criteria.setSearchKey((String)request.getAttribute("searchKey"));
@@ -147,6 +150,9 @@ public class InterfacesAction extends I_Action {
 			} else {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
+			
+			
+			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

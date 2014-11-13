@@ -35,7 +35,15 @@ public class AdminConsoleForm extends I_Form {
   String eSQL = "";
   String eOutput = "";
   String resultBKDB = "";
+  String resultClearDB = "";
   
+  
+public String getResultClearDB() {
+	return resultClearDB;
+}
+public void setResultClearDB(String resultClearDB) {
+	this.resultClearDB = resultClearDB;
+}
 public String getConfigInfo() {
 	return configInfo;
 }

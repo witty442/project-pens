@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 
 import util.DBCPConnectionProvider;
+import util.Debug;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -27,6 +28,8 @@ import com.isecinc.pens.process.administer.ManageOrderReceiptProcess;
 
 public class ManageOrderReceiptAction extends I_Action {
 
+	public Debug debug = new Debug(true);
+	
 	@Override
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ManageOrderReceiptForm manageOrderReceiptForm = (ManageOrderReceiptForm) form;

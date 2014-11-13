@@ -24,6 +24,7 @@ import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MContact;
@@ -59,6 +60,11 @@ public class CustomerAction extends I_Action {
 			if (customer == null) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
+			
+			if(Utils.isNull(customer.getPrintType()).equals("")){
+				customer.setPrintType("H");//Prinetype HEAD BRANCH
+			}
+			
 			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
 			customerForm.setContacts(new MContact().lookUp(customer.getId()));
 			customerForm.setCustomer(customer);
@@ -102,7 +108,9 @@ public class CustomerAction extends I_Action {
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
 			Customer customer = new Customer();
-
+			//default Print Type
+			customer.setPrintType("H");
+			
 			// Sales Rep.
 			customer.setSalesRepresent(user);
 
@@ -116,6 +124,7 @@ public class CustomerAction extends I_Action {
 			customer.setTrip(DateToolsUtil.getCurrentDateTime("dd/MM/yyyy"));
 			customer.setPaymentTerm("IM");
 
+			customer.setDistrict("-1");
 			customerForm.setCustomer(customer);
 
 			// Save Token
@@ -168,6 +177,10 @@ public class CustomerAction extends I_Action {
 			   whereCause += " AND m_customer.USER_ID = " + user.getId();
 			}
 			
+			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
+				whereCause += " AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
+			}
+			
 			if (customerForm.getCustomer().getSearchProvince() != 0) {
 				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
 				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
@@ -205,6 +218,11 @@ public class CustomerAction extends I_Action {
 			customerForm.setTotalPage(totalPage);
 			customerForm.setTotalRow(totalRow);
 			customerForm.setCurPage(currPage);
+			
+			Customer customer = customerForm.getCustomer();
+			logger.debug("customer getDistrict:"+customer.getDistrict());
+			
+			//customer.setDistrict(district)
 
 			if (results != null) {
 				customerForm.getCriteria().setSearchResult(results.length);
@@ -313,6 +331,33 @@ public class CustomerAction extends I_Action {
 		return mapping.findForward("search"); 
 	}
 	
+	
+	public ActionForward toCreateNewReqpromotion(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		logger.debug("toCreateNewReqpromotion");
+		CustomerForm customerForm = (CustomerForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+      
+		try {
+			if (request.getParameter("shotcut_customerId") != null) {
+				int customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return mapping.findForward("toCreateNewReqpromotion"); 
+	}
 	
 	protected String search_V1(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("Customer Search");
@@ -433,6 +478,26 @@ public class CustomerAction extends I_Action {
 				customer.setCodePrefix(codePrefix);
 			}
 
+			//Set Parameter printType
+			String printType = Utils.isNull(customer.getPrintType());
+			String printTax = Utils.isNull(customer.getPrintTax());
+			String printHeadBranchDesc = Utils.isNull(customer.getPrintHeadBranchDesc());
+			
+			logger.debug("printType["+printType+"]");
+			logger.debug("printTax["+printTax+"]");
+			logger.debug("printHeadBranchDesc["+printHeadBranchDesc+"]");
+			
+			if(printType.equals("H")){
+				customer.setPrintBranchDesc("");
+			}
+			if(printTax.equals("")){
+				customer.setPrintTax("N");
+			}
+			if(printHeadBranchDesc.equals("")){
+				customer.setPrintHeadBranchDesc("N");
+			}
+			
+			
 			// Save Customer
 			if (!new MCustomer().save(customer, userActive.getId(),userActive.getUserName(), conn)) {
 				// return with duplicate Document no
@@ -527,15 +592,43 @@ public class CustomerAction extends I_Action {
 			User userActive = (User) request.getSession(true).getAttribute("user");
 			Customer customer = customerForm.getCustomer();
 
+			
+			//Set Parameter printType
+			String printType = Utils.isNull(customer.getPrintType());
+			String printTax = Utils.isNull(customer.getPrintTax());
+			String printHeadBranchDesc = Utils.isNull(customer.getPrintHeadBranchDesc());
+			
+			logger.debug("printType["+printType+"]");
+			logger.debug("printTax["+printTax+"]");
+			logger.debug("printHeadBranchDesc["+printHeadBranchDesc+"]");
+			
+			if(printType.equals("H")){
+				customer.setPrintBranchDesc("");
+			}
+			if(printTax.equals("")){
+				customer.setPrintTax("N");
+			}
+			if(printHeadBranchDesc.equals("")){
+				customer.setPrintHeadBranchDesc("N");
+			}
+			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// Begin Transaction
 			conn.setAutoCommit(false);
 
-			// Save Customer tax_no only
+			
+			// Save Customer tax_no ,print only
 			new MCustomer().update(customer, userActive.getId(),userActive.getUserName(), conn);
 				
 			// Commit Transaction
 			conn.commit();
+			
+			//searh refresh data
+			customer = new MCustomer().find(String.valueOf(customerId));
+			customerForm.setCustomer(customer);
+			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
+			customerForm.setContacts(new MContact().lookUp(customer.getId()));
+			
 			//
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
 			// Save Token
