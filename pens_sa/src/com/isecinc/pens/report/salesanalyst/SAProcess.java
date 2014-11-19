@@ -787,7 +787,8 @@ public class SAProcess {
 				}	
 				
 			}else if("Salesrep_id".equalsIgnoreCase(condType)){
-				sql = "select salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
+				sql  = "select salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
+				sql += " and salesrep_code not like 'C%'  \n";
 				if(!Utils.isNull(code).equals("")){
 					if(code.indexOf(",") > -1){
 						sql += " and Salesrep_code in ("+SAUtils.converToText("Salesrep_id", code) +") \n"; 
@@ -1270,12 +1271,14 @@ public class SAProcess {
 		ResultSet rs= null;
 		List<DisplayBean> returnList = new ArrayList<DisplayBean>();
 		int no = 0;
+		boolean debug = true;
 		try{
 			//logger.debug("panrentType1:"+panrentType1+",parentCode1:"+parentCode1);
 			
 				conn = DBConnection.getInstance().getConnection();
 				
 				//แบรนด์ --> สินค้า (SKU) OK
+				//Brand_Group->Brand->Sku
 				if("inventory_item_id".equalsIgnoreCase(condType)){ // edit by tutiya r.
                     
 					if(filterBean.getCurrCondNo().equals("2")){
@@ -1286,6 +1289,23 @@ public class SAProcess {
 							" and t1.brand IN ("+SAUtils.converToText("Brand", filterBean.getCondCode1()) + ") \n";
 						} else {
 						    sql = "SELECT distinct INVENTORY_ITEM_ID,INVENTORY_ITEM_CODE,INVENTORY_ITEM_DESC from XXPENS_BI_MST_ITEM where INVENTORY_ITEM_CODE is not null \n";
+						}
+					}else if(filterBean.getCurrCondNo().equals("3")){
+						if (filterBean.getCondType1().equalsIgnoreCase("Brand_Group") && filterBean.getCondType2().equalsIgnoreCase("Brand")){
+								sql = " \n SELECT distinct u.INVENTORY_ITEM_ID,u.INVENTORY_ITEM_CODE,u.INVENTORY_ITEM_DESC "+
+								" from XXPENS_BI_MST_ITEM u, xxpens_bi_sales_analysis_v t1 \n"+
+								" where u.INVENTORY_ITEM_CODE is not null and t1.inventory_item_id=u.inventory_item_id \n"+ 
+								" and t1.brand in (  \n"+
+							    "   select brand_no from XXPENS_BI_MST_BRAND where brand_no is not null \n"+
+								"   and brand_no in ( \n" +
+										" select distinct brand_no  from XXPENS_BI_MST_BRAND_GROUP where brand_group_no is not null \n" +
+										"   and brand_group_no in ("+SAUtils.converToText("Brand_Group", filterBean.getCondCode1())+") \n"+
+										" ) \n "+
+							   "   and brand_no IN ("+SAUtils.converToText("Brand", filterBean.getCondCode2()) + ") \n"+
+								"  ) \n";
+
+						} else {
+							 sql = "SELECT distinct INVENTORY_ITEM_ID,INVENTORY_ITEM_CODE,INVENTORY_ITEM_DESC from XXPENS_BI_MST_ITEM where INVENTORY_ITEM_CODE is not null \n";
 						}
 					}else{
 						sql = "SELECT distinct INVENTORY_ITEM_ID,INVENTORY_ITEM_CODE,INVENTORY_ITEM_DESC from XXPENS_BI_MST_ITEM where INVENTORY_ITEM_CODE is not null \n";
@@ -1299,7 +1319,9 @@ public class SAProcess {
 					}
 					sql += "order by INVENTORY_ITEM_CODE \n";
 					
-					logger.debug("sql:"+sql);
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
@@ -1321,15 +1343,26 @@ public class SAProcess {
 						//Cond 1
 						 if (filterBean.getCondType1().equalsIgnoreCase("Division")){
 							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc "+
-							" from XXPENS_BI_MST_SALESREP u, xxpens_bi_sales_analysis_v t1 \n"+
-							" where u.salesrep_code is not null and t1.salesrep_id=u.salesrep_id \n"+ 
-							" and t1.division in ("+SAUtils.converToText("Division", filterBean.getCondCode1()) + ") \n";
+							      " from XXPENS_BI_MST_SALESREP u, xxpens_bi_sales_analysis_v t1 \n"+
+							      " where u.salesrep_code is not null and t1.salesrep_id=u.salesrep_id \n"+ 
+							      " and t1.division in ("+SAUtils.converToText("Division", filterBean.getCondCode1()) + ") \n";
+							sql += " and u.salesrep_code not like 'C%'  \n";
+							//Filter By Role User
+							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 							
+							//ประเภทขาย Customer_Category   ==>  พนักงานขาย Salesrep_id
+						}else if (filterBean.getCondType1().equalsIgnoreCase("Customer_Category") ){
+							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc "+
+							      " from XXPENS_BI_MST_SALESREP u, xxpens_bi_sales_analysis_v t1 \n"+
+							      " where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
+							      " and t1.Customer_Category in ("+SAUtils.converToText("Customer_Category", filterBean.getCondCode1()) + ")  \n";
+							sql += " and u.salesrep_code like '"+SAUtils.getCustomerCatagoryFlag(filterBean.getCondCode1())+"%'  \n";
+							sql += " and u.salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 						}else {
 							sql = "select distinct salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
-							
+							sql += " and salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","");
 						}	
@@ -1349,8 +1382,9 @@ public class SAProcess {
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.Customer_Category in ("+SAUtils.converToText("Customer_Category", filterBean.getCondCode1()) + ")  \n"+
 							" and t1.Sales_Channel in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ")  \n"+
-							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ")  \n";
-							
+							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ")  \n"+
+							" and u.salesrep_code like '"+SAUtils.getCustomerCatagoryFlag(filterBean.getCondCode1())+"%'  \n"+
+							" and u.salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 							
@@ -1361,8 +1395,8 @@ public class SAProcess {
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.division in ("+SAUtils.converToText("Division", filterBean.getCondCode1()) + ") \n"+
 							" and t1.Sales_Channel in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ") \n"+
-							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ")  \n";
-							
+							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode2()) + ")  \n"+
+							" and u.salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 							
@@ -1373,8 +1407,9 @@ public class SAProcess {
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.Sales_Channel in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ") \n"+
 							" and t1.Customer_Category in ("+SAUtils.converToText("Customer_Category", filterBean.getCondCode2()) + ")  \n"+
-							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ")  \n";
-							
+							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ")  \n"+
+							" and u.salesrep_code like '"+SAUtils.getCustomerCatagoryFlag(filterBean.getCondCode2())+"%'  \n"+
+							" and u.salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 						
@@ -1385,20 +1420,21 @@ public class SAProcess {
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.Sales_Channel in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ") \n"+
 							" and t1.division in ("+SAUtils.converToText("Division", filterBean.getCondCode2()) + ")  \n"+
-							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ")  \n";
-							
+							" and substr(u.salesrep_code,2,1) in ("+SAUtils.converToText("Sales_Channel", filterBean.getCondCode1()) + ")  \n"+
+							" and u.salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 							
 						}else {
 							sql = "select distinct salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
-							
+							sql +=" and salesrep_code not like 'C%'  \n";
 							//Filter By Role User
 							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","");
 						}
 					
 					}else {
-						sql = "select distinct salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
+						sql = " select distinct salesrep_id,salesrep_code,salesrep_desc from XXPENS_BI_MST_SALESREP where salesrep_code is not null \n";
+						sql +=" and salesrep_code not like 'C%'  \n";
 						//Filter By Role User
 						sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Salesrep_id","u.");
 					}
@@ -1411,6 +1447,8 @@ public class SAProcess {
 					}
 					sql += "order by salesrep_code \n";
 					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1420,18 +1458,32 @@ public class SAProcess {
 					
 				//กลุ่มร้านค้า(Customer_Group) --> ร้านค้า(Customer_id)
 				}else if("Customer_id".equalsIgnoreCase(condType)){
+					if(filterBean.getCurrCondNo().equals("2")){
+						//Cond 1
+						 if (filterBean.getCondType1().equalsIgnoreCase("Customer_Group")){
+							sql = "select distinct u.customer_id,u.customer_code,u.customer_desc "+
+							      " from XXPENS_BI_MST_CUSTOMER u, xxpens_bi_sales_analysis_v t1 \n"+
+							      " where u.customer_id is not null and t1.customer_id=u.customer_id \n"+ 
+							      " and t1.customer_group in ("+SAUtils.converToText("Customer_Group", filterBean.getCondCode1()) + ") \n";
 					
-					sql = "select customer_id,customer_code,customer_desc from XXPENS_BI_MST_CUSTOMER where customer_code is not null \n";	
+							//Filter By Role User
+							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Customer_id","u.");
+						 }else{
+							sql = "select u.customer_id,u.customer_code,u.customer_desc from XXPENS_BI_MST_CUSTOMER u where u.customer_code is not null \n";	
+						 }
+					}else{
+                        sql = "select u.customer_id,u.customer_code,u.customer_desc from XXPENS_BI_MST_CUSTOMER u where u.customer_code is not null \n";	
+					}
 					
 					if(!Utils.isNull(code).equals("")){
-						sql += " and customer_code like '"+code+"%' \n";
+						sql += " and u.customer_code like '"+code+"%' \n";
 					}
 					if(!Utils.isNull(desc).equals("")){
-						sql += " and customer_desc LIKE '%"+desc+"%' \n";
+						sql += " and u.customer_desc LIKE '%"+desc+"%' \n";
 					}
-					sql += "order by customer_code \n";
+					sql += "order by u.customer_code \n";
 					
-					logger.debug("sql:"+sql);
+					if(debug)logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
@@ -1455,7 +1507,7 @@ public class SAProcess {
 					
 					sql += "order by sales_channel_no \n";
 					
-					logger.debug("sql:"+sql);
+					if(debug)logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
@@ -1476,6 +1528,9 @@ public class SAProcess {
 					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Customer_Category","");
 					
 					sql += "order by cust_cat_no \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1495,6 +1550,8 @@ public class SAProcess {
 					
 					sql += "order by div_no \n";
 					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1502,6 +1559,7 @@ public class SAProcess {
 						returnList.add(new DisplayBean(no,rs.getString("div_no"),rs.getString("div_no"),rs.getString("div_desc")));
 					}	
 
+				//กลุ่มร้านค้า
 				}else if("Customer_Group".equalsIgnoreCase(condType)){
 					sql = "select cust_group_no,cust_group_desc from XXPENS_BI_MST_CUST_GROUP where cust_group_no is not null ";
 					if(!Utils.isNull(code).equals("")){
@@ -1511,6 +1569,9 @@ public class SAProcess {
 						sql += " and cust_group_desc LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by cust_group_no \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1519,7 +1580,23 @@ public class SAProcess {
 					}
 				
 				}else if("Brand".equalsIgnoreCase(condType)){
-					sql = "select brand_no,brand_desc from XXPENS_BI_MST_BRAND where brand_no is not null \n";
+					if(filterBean.getCurrCondNo().equals("2")){
+						//Cond 1
+						 if (filterBean.getCondType1().equalsIgnoreCase("Brand_Group")){
+							
+							sql = "select brand_no,brand_desc from XXPENS_BI_MST_BRAND where brand_no is not null \n";
+							sql += " and brand_no in ( \n" +
+									" select distinct brand_no  from XXPENS_BI_MST_BRAND_GROUP where brand_group_no is not null \n" +
+									"   and brand_group_no in ("+SAUtils.converToText("Brand_Group", filterBean.getCondCode1())+") \n"+
+									" ) \n ";
+						 }else{
+							 sql = "select brand_no,brand_desc from XXPENS_BI_MST_BRAND where brand_no is not null \n";
+						 }
+					}else{
+						sql = "select brand_no,brand_desc from XXPENS_BI_MST_BRAND where brand_no is not null \n";
+					}
+					
+					//Condition
 					if(!Utils.isNull(code).equals("")){
 						sql += " and brand_no like '"+code+"%' \n";
 					}
@@ -1528,14 +1605,47 @@ public class SAProcess {
 					}
 					//Filter By Role User
 					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Brand","");
-					
 					sql += "order by brand_no \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
 						no++;
 						returnList.add(new DisplayBean(no,rs.getString("brand_no"),rs.getString("brand_no"),rs.getString("brand_desc")));
 					}
+					
+				}else if("Brand_Group".equalsIgnoreCase(condType)){
+					
+	                sql = "select distinct brand_group_no,brand_group_desc  from XXPENS_BI_MST_BRAND_GROUP where brand_group_no is not null \n";
+					
+					if(!Utils.isNull(code).equals("")){
+						if(code.indexOf(",") > -1){
+							sql += " and brand_group_no in ("+SAUtils.converToText("Brand", code) +") \n";
+						}
+						else{
+							sql += " and brand_group_no like '"+code+"%' \n";
+						}
+					}
+					if(!Utils.isNull(desc).equals("")){
+						sql += " and brand_group_desc LIKE '%"+desc+"%' \n";
+					}
+					
+					/** filter by user **/
+					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Brand","");
+					
+					sql += "order by brand_group_no \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
+					ps = conn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					while(rs.next()){
+						no++;
+						returnList.add(new DisplayBean(no,rs.getString("brand_group_no"),rs.getString("brand_group_no"),rs.getString("brand_group_desc")));
+					}
+					
 				}else if("Invoice_Date".equalsIgnoreCase(condType)){
 					sql = "select invoice_date from XXPENS_BI_MST_INVOICE_DATE where invoice_date is not null ";
 					if(!Utils.isNull(code).equals("")){
@@ -1549,6 +1659,8 @@ public class SAProcess {
 						sql += " and invoice_date = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 					}
 					sql +="order by invoice_date \n";
+					
+					if(debug)logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
@@ -1571,7 +1683,7 @@ public class SAProcess {
 					}
 					sql +="order by ORDER_DATE \n";
 					
-					logger.debug("SQL:"+sql);
+					if(debug)logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
@@ -1589,6 +1701,9 @@ public class SAProcess {
 						sql += " and province LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by province \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1596,14 +1711,34 @@ public class SAProcess {
 						returnList.add(new DisplayBean(no,rs.getString("province"),rs.getString("province"),rs.getString("province")));
 					}
 				}else if("AMPHOR".equalsIgnoreCase(condType)){
-					sql = "select * from XXPENS_BI_MST_AMPHOR where amphor is not null \n";
+					
+					if(filterBean.getCurrCondNo().equals("2")){
+						//Cond 1
+						 if (filterBean.getCondType1().equalsIgnoreCase("Province")){
+							sql = "select distinct u.* "+
+							      " from XXPENS_BI_MST_AMPHOR u, xxpens_bi_sales_analysis_v t1 \n"+
+							      " where u.amphor is not null and t1.amphor = u.amphor \n"+ 
+							      " and t1.province in ("+SAUtils.converToText("Province", filterBean.getCondCode1()) + ") \n";
+					
+							//Filter By Role User
+							sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "AMPHOR","u.");
+						 }else{
+							 sql = "select u.* from XXPENS_BI_MST_AMPHOR u where u.amphor is not null \n";
+						 }
+					}else{
+						sql = "select u.* from XXPENS_BI_MST_AMPHOR u where u.amphor is not null \n";	
+					}
+
 					if(!Utils.isNull(code).equals("")){
-						sql += " and amphor like '"+code+"%' \n";
+						sql += " and u.amphor like '"+code+"%' \n";
 					}
 					if(!Utils.isNull(desc).equals("")){
-						sql += " and amphor LIKE '%"+desc+"%' \n";
+						sql += " and u.amphor LIKE '%"+desc+"%' \n";
 					}
-					sql += "order by amphor \n";
+					sql += "order by u.amphor \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1619,6 +1754,9 @@ public class SAProcess {
 						sql += " and tambol LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by tambol \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1636,6 +1774,9 @@ public class SAProcess {
 						sql += " and SALES_ORDER_NO LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by SALES_ORDER_NO \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1653,6 +1794,9 @@ public class SAProcess {
 						sql += " and INVOICE_NO LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by INVOICE_NO \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1672,6 +1816,9 @@ public class SAProcess {
 					}
 					sql += " and rownum <= 100 \n";
 					sql += "order by CUSTOMER_SHIP_TO_ADDRESS \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					while(rs.next()){
 						no++;
@@ -1689,6 +1836,9 @@ public class SAProcess {
 					}
 					sql += " and rownum <= 100 \n";
 					sql += "order by CUSTOMER_BILL_TO_ADDRESS \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1707,6 +1857,9 @@ public class SAProcess {
 						sql += " and Organization_code LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by Organization_code \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1725,6 +1878,9 @@ public class SAProcess {
 						sql += " and order_type_name LIKE '%"+desc+"%' \n";
 					}
 					sql += "order by order_type_name \n";
+					
+					if(debug)logger.debug("sql:"+sql);
+					
 					ps = conn.prepareStatement(sql);
 					rs = ps.executeQuery();
 					while(rs.next()){
@@ -1732,9 +1888,7 @@ public class SAProcess {
 						returnList.add(new DisplayBean(no,rs.getString("Order_type_id"),rs.getString("Order_type_id"),rs.getString("Order_type_name")+"-"+rs.getString("Order_type_cat")));
 					}
 				}
-				logger.debug("SQL:"+sql);
-				
-				
+	
 			}catch(Exception e){
 			   throw e;
 			}finally{
@@ -1751,16 +1905,35 @@ public class SAProcess {
 			return returnList;
 	}
 	
+	public static String getDesc(Connection conn,String condType,String code)throws Exception{
+		return getDescModel(conn,condType, code);
+	}
 	
-	public  String getDesc(String condType,String code)throws Exception{
-		String sql = "";
+	public  String getDescX(String condType,String code)throws Exception{
 		Connection conn = null;
+		try{
+			conn =DBConnection.getInstance().getConnection();
+			return getDescModel(conn,condType, code);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+	}
+	
+	private  static String getDescModel(Connection conn,String condType,String code)throws Exception{
+		String sql = "";
+		
 		PreparedStatement ps = null;
 		ResultSet rs= null;
 		String desc = "";
 		boolean exc = true;
 		try{
-			conn =DBConnection.getInstance().getConnection();
+			logger.debug("condType["+condType+"]");
+			
 			if("inventory_item_id".equalsIgnoreCase(condType)){
 				sql = "SELECT INVENTORY_ITEM_ID,(INVENTORY_ITEM_CODE|| '-' || INVENTORY_ITEM_DESC) as DESC_ from XXPENS_BI_MST_ITEM WHERE INVENTORY_ITEM_ID ='"+code+"'";
 			}else if("Customer_Category".equalsIgnoreCase(condType)){
@@ -1770,7 +1943,9 @@ public class SAProcess {
 			}else if("Salesrep_id".equalsIgnoreCase(condType)){
 				sql = "select salesrep_id,(salesrep_code || '-' || salesrep_code) desc_ from XXPENS_BI_MST_SALESREP  WHERE salesrep_id='"+code+"'";
 			}else if("Sales_Channel".equalsIgnoreCase(condType)){
-				sql = "select sales_channel_no,sales_channel_desc as desc_ from XXPENS_BI_MST_SALES_CHANNEL ='"+code+"'";
+				sql  = "select sales_channel_no,sales_channel_desc as desc_ from XXPENS_BI_MST_SALES_CHANNEL where ";
+				sql += "sales_channel_no in ("+SAUtils.converToText("Sales_Channel", code) +")";
+				
 			}else if("Customer_Group".equalsIgnoreCase(condType)){
 				sql = "select cust_group_no,cust_group_desc as desc_ from XXPENS_BI_MST_CUST_GROUP WHERE cust_group_no='"+code+"'";
 			}else if("Customer_id".equalsIgnoreCase(condType)){
@@ -1802,8 +1977,13 @@ public class SAProcess {
 				logger.debug("sql:"+sql);
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
-				if(rs.next()){
-					desc = rs.getString("desc_");
+				
+				while(rs.next()){
+					desc += rs.getString("desc_")+",";
+				}
+				
+				if( !Utils.isNull(desc).equals("") && Utils.isNull(desc).indexOf(",") != -1){
+					desc = desc.substring(0,Utils.isNull(desc).length()-1);
 				}
 			}
 			if("".equals(desc)){
@@ -1813,9 +1993,7 @@ public class SAProcess {
 		}catch(Exception e){
 		   throw e;
 		}finally{
-			if(conn != null){
-				conn.close();conn=null;
-			}
+			
 			if(ps != null){
 			   ps.close();ps= null;
 			}

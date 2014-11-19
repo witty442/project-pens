@@ -1,6 +1,8 @@
 package com.isecinc.pens.process.login;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,6 +26,8 @@ public class LoginProcess {
 	public User login(String userName, String password, Connection conn) throws Exception {
 		logger.debug(String.format("User Login %s", userName));
 		User user = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
 			String sql = "SELECT A.USER_GROUP_ID ,  \n";
 			sql +="   A.CATEGORY, A.ORGANIZATION, A.START_DATE,  \n";
@@ -37,11 +41,29 @@ public class LoginProcess {
                    sql +="       (START_DATE <= SYSDATE  AND END_DATE IS NULL) \n";
                    sql +="     ) \n";
                    sql +=" AND USER_NAME = ? AND PASSWORD = ? \n" ;
-			List<User> users = Database.query(sql, new Object[] { userName, password }, User.class, conn);
-			if (users.size() > 0) user = users.get(0);
+                   
+			//List<User> users = Database.query(sql, new Object[] { userName, password }, User.class, conn);
+			//if (users.size() > 0) user = users.get(0);
+                  
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, userName);
+            ps.setString(2, password);
+            
+            rs = ps.executeQuery();
+            if(rs.next()){
+            	user = new User(rs);
+            }
+            
 		} catch (Exception e) {
 			logger.error(e.toString());
 			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(rs != null){
+			   rs.close();rs=null;
+			}
 		}
 		return user;
 	}

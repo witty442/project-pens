@@ -1,29 +1,41 @@
 package com.isecinc.pens.report.salesanalyst;
 
-public class ConditionFilterBean {
+import java.io.Serializable;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+public class ConditionFilterBean implements Serializable {
 
-	}
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8302204403620233387L;
 	String currCondType;
 	String currCondNo;
+	String currCondTypeValue;
 	
 	String condType1;
 	String condCode1;
+	String condValueDisp1;
 	
 	String condType2;
 	String condCode2;
+	String condValueDisp2;
 	
 	String condType3;
 	String condCode3;
+	String condValueDisp3;
 	
 	String condType4;
 	String condCode4;
+	String condValueDisp4;
+	
+	
+	public String getCurrCondTypeValue() {
+		return currCondTypeValue;
+	}
+	public void setCurrCondTypeValue(String currCondTypeValue) {
+		this.currCondTypeValue = currCondTypeValue;
+	}
 	public String getCurrCondType() {
 		return currCondType;
 	}
@@ -83,6 +95,30 @@ public class ConditionFilterBean {
 	}
 	public void setCondCode4(String condCode4) {
 		this.condCode4 = condCode4;
+	}
+	public String getCondValueDisp1() {
+		return condValueDisp1;
+	}
+	public void setCondValueDisp1(String condValueDisp1) {
+		this.condValueDisp1 = condValueDisp1;
+	}
+	public String getCondValueDisp2() {
+		return condValueDisp2;
+	}
+	public void setCondValueDisp2(String condValueDisp2) {
+		this.condValueDisp2 = condValueDisp2;
+	}
+	public String getCondValueDisp3() {
+		return condValueDisp3;
+	}
+	public void setCondValueDisp3(String condValueDisp3) {
+		this.condValueDisp3 = condValueDisp3;
+	}
+	public String getCondValueDisp4() {
+		return condValueDisp4;
+	}
+	public void setCondValueDisp4(String condValueDisp4) {
+		this.condValueDisp4 = condValueDisp4;
 	}
 	
 

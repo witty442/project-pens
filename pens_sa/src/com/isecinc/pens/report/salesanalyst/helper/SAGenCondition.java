@@ -577,7 +577,7 @@ public class SAGenCondition {
 							
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
-					columnTop.append("(CASE WHEN "+subSelect1+" >0");
+					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
 					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
 				
@@ -601,7 +601,7 @@ public class SAGenCondition {
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
-					columnTop.append("(CASE WHEN "+subSelect1+" >0");
+					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
 					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
 				
@@ -618,10 +618,10 @@ public class SAGenCondition {
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
-					columnTop.append("(CASE WHEN "+subSelect1+" >0");
+					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
 					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
-				
+					
 					columnAll.append(" PER1_"+colGroupName+", \n");;
 				}
 			}
@@ -678,7 +678,7 @@ public class SAGenCondition {
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
-					columnTop.append("(CASE WHEN "+subSelect3+" > 0");
+					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
 					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
 				
@@ -703,7 +703,7 @@ public class SAGenCondition {
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
-					columnTop.append("(CASE WHEN "+subSelect3+" > 0");
+					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
 					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
 				
@@ -719,7 +719,7 @@ public class SAGenCondition {
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
-					columnTop.append("(CASE WHEN "+subSelect3+" > 0");
+					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
 					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
 					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
 				

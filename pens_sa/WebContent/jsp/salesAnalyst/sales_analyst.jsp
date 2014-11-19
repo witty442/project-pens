@@ -442,13 +442,15 @@ function showSearchValuePopup(path,currCondNo){
 	/** Set Fro Filter By Parent Listbox **/
 	var condType1 = document.getElementsByName("salesBean.condName1")[0].value;
 	var condCode1 = document.getElementsByName("salesBean.condCode1")[0].value;
+	var condValueDisp1 = document.getElementsByName("salesBean.condValueDisp1")[0].value;
 	
 	var condType2 = document.getElementsByName("salesBean.condName2")[0].value;
 	var condCode2 = document.getElementsByName("salesBean.condCode2")[0].value;
+	var condValueDisp2 = document.getElementsByName("salesBean.condValueDisp2")[0].value;
 	
 	var condType3 = document.getElementsByName("salesBean.condName3")[0].value;
 	var condCode3  = document.getElementsByName("salesBean.condCode3")[0].value;
-	
+	var condValueDisp3 = document.getElementsByName("salesBean.condValueDisp3")[0].value;
 
 	if(currCondNo=='1'){
 		currCondTypeValue = document.getElementsByName("salesBean.condName1")[0].value;
@@ -472,18 +474,19 @@ function showSearchValuePopup(path,currCondNo){
 			param = "&currCondNo="+currCondNo+"&currCondTypeValue="+currCondTypeValue;
 	    }else if(currCondNo=='2'){
 	    	param = "&currCondNo="+currCondNo+"&currCondTypeValue="+currCondTypeValue;
-			param += "&condType1="+condType1+"&condCode1="+condCode1;
+			param += "&condType1="+condType1+"&condCode1="+condCode1+"&condValueDisp1="+condValueDisp1;
 		}else if(currCondNo =='3'){
 			param = "&currCondNo="+currCondNo+"&currCondTypeValue="+currCondTypeValue;
-			param += "&condType1="+condType1+"&condCode1="+condCode1;
-			param += "&condType2="+condType2+"&condCode2="+condCode2;
+			param += "&condType1="+condType1+"&condCode1="+condCode1+"&condValueDisp1="+condValueDisp1;
+			param += "&condType2="+condType2+"&condCode2="+condCode2+"&condValueDisp2="+condValueDisp2;
 		}else if(currCondNo =='4'){
 			param = "&currCondNo="+currCondNo+"&currCondTypeValue="+currCondTypeValue;
-			param += "&condType1="+condType1+"&condCode1="+condCode1;
-			param += "&condType2="+condType2+"&condCode2="+condCode2;
-			param += "&condType3="+condType3+"&condCode3="+condCode3;
+			param += "&condType1="+condType1+"&condCode1="+condCode1+"&condValueDisp1="+condValueDisp1;
+			param += "&condType2="+condType2+"&condCode2="+condCode2+"&condValueDisp2="+condValueDisp2;
+			param += "&condType3="+condType3+"&condCode3="+condCode3+"&condValueDisp3="+condValueDisp3;
 		}
 		
+		param +="&decode=true&load=1";
 		//alert(param);
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
@@ -495,8 +498,7 @@ function showSearchValuePopup(path,currCondNo){
 // declare variable using in multiple selection
 var multicode ;
 var multikey ;
-var multiValueDisp
-;
+var multiValueDisp;
 function setMultiCode(p_code){
 	multicode = p_code;
 }

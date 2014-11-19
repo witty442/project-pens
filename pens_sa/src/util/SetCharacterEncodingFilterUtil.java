@@ -62,16 +62,14 @@ public class SetCharacterEncodingFilterUtil implements Filter {
         if (ignore || (request.getCharacterEncoding() == null)) {
             String encoding = selectEncoding(request);
             //encoding ="TIS-620";
-           // System.out.println("Filter Encode:"+encoding);
+            System.out.println("Filter Encode:"+encoding);
             if (encoding != null){
                 request.setCharacterEncoding(encoding);
-               // response.setCharacterEncoding(encoding);
+                response.setCharacterEncoding(encoding);
             }
         }
-        //System.out.println("Locale:"+Locale.getDefault());
-        
+        System.out.println("Locale:"+Locale.getDefault());
         chain.doFilter(request, response);
-
     }
 
  
@@ -94,7 +92,6 @@ public class SetCharacterEncodingFilterUtil implements Filter {
             this.ignore = false;
         
         this.filterConfig.getServletContext().log("Initialize Filter: "+this.filterConfig.getFilterName()+" with encoding="+encoding);
-
     }
 
 

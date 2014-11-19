@@ -133,6 +133,31 @@ public class SAUtils {
 		return false;
 	}
 	
+	/**
+	 * ORDER - BME	B'me
+	ORDER - CREDIT SALES	Credit Sales
+	ORDER - DIRECT DELIVERY	Direct Delivery
+	ORDER - EXPORT	Export
+	ORDER - MODERN TRADE	Modern Trade
+	ORDER - VAN SALES	Van Sales
+	 * @return
+	 */
+	public static String getCustomerCatagoryFlag(String cusFlag){
+		String flag = "";
+		if(cusFlag.equalsIgnoreCase("ORDER - CREDIT SALES")){
+			flag ="S";	
+		}else if(cusFlag.equalsIgnoreCase("ORDER - DIRECT DELIVERY")){
+			flag ="";
+		}else if(cusFlag.equalsIgnoreCase("ORDER - EXPORT	Export")){
+			flag ="";
+		}else if(cusFlag.equalsIgnoreCase("ORDER - MODERN TRADE")){
+			flag ="MT";
+		}else if(cusFlag.equalsIgnoreCase("ORDER - VAN SALES")){
+			flag ="V";
+		}
+			
+		return flag;
+	}
 	
 	public static String converToText(String columnName,String value){
 		if(isColumnNumberType(columnName)){

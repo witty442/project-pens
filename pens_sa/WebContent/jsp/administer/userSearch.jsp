@@ -168,8 +168,6 @@ body {
 							</c:forEach>
 							</table>
 							
-							
-							
 							<table align="center" border="0" cellpadding="3" cellspacing="0" class="result">	
 								<tr>
 									<td align="left" colspan="9" class="footer">&nbsp; 

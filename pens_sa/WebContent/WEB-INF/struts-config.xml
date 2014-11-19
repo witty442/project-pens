@@ -93,7 +93,7 @@
 		
 		<!-- SALES ANALYST -->
 		<action name="searchValuePopupForm" path="/jsp/searchValuePopupAction" forward="/jsp/popup/searchValuePopup.jsp" />
-		<action name="searchValuePopupForm" path="/jsp/searchValuePopupAction" parameter="do" scope="request"
+		<action name="searchValuePopupForm" path="/jsp/searchValuePopupAction" parameter="do" scope="session"
 			type="com.isecinc.pens.web.popup.SearchValuePopupAction">
 			<forward name="search" path="/jsp/popup/searchValuePopup.jsp" />
 			<forward name="prepare" path="/jsp/popup/searchValuePopup.jsp" />

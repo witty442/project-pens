@@ -17,7 +17,6 @@ import java.util.Map;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
 
 import util.DateToolsUtil;
 import util.Debug;
@@ -26,8 +25,6 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
-
-import fr.improve.struts.taglib.layout.RowTag;
 
 
 
@@ -410,6 +407,8 @@ public class SAGenerate {
 		boolean hideRowEnable = true;
 		
 		try{
+			debug.debug("colGroupList Size:"+colGroupList.size(),1);
+			
 			String groupBy = groupByBean.getDispText();
 			
 			Boolean isNoDisplayed = ArrayUtils.contains(arrayfldNoDisplayCode,groupBy); 
@@ -439,7 +438,10 @@ public class SAGenerate {
 				if(SAProcess.SUMMARY_TYPE_AVG.equals(summaryType)){
 					label = "ค่าเฉลี่ย";
 				}else if(SAProcess.SUMMARY_TYPE_PERCENT.equals(summaryType)){
-					label = "%";
+					ConfigBean colGroup1 = (ConfigBean)colGroupList.get(colGroupList.size()-2);
+					ConfigBean colGroup2 = (ConfigBean)colGroupList.get(colGroupList.size()-1);
+					
+					label = "เปอร์เซ็นต์  <br/> ("+colGroup2.getDispText()+" เทียบ "+colGroup1.getDispText()+")";
 				}
 				
 				htmlStr.append("<th colspan='"+colDispList.size()+"'>"+label+"</th> \n");
@@ -454,7 +456,7 @@ public class SAGenerate {
 				for(int d=0;d<colDispList.size();d++){
 					ConfigBean configBean = (ConfigBean)colDispList.get(d);
 					String columnOrder = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
-					debug.debug("ColumnOrder:"+columnOrder);
+					debug.debug("ColumnOrder:"+columnOrder,1);
 					
 					String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName()); 
 					
@@ -473,9 +475,9 @@ public class SAGenerate {
 				for(int d=0;d<colDispList.size();d++){
 					ConfigBean configBean = (ConfigBean)colDispList.get(d);
 					String columnOrder = configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName());
-					debug.debug("ColumnOrder:"+columnOrder);
+					debug.debug("ColumnOrder:"+columnOrder,1);
 					
-					String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
+					String sortIdKey = summaryType+"_"+configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
 							
 				    htmlStr.append("<th>"+configBean.getDispText()+"&nbsp;&nbsp;");
 				    htmlStr.append(" <img  style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_down.gif' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
@@ -546,9 +548,6 @@ public class SAGenerate {
 							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}
 						
-						/** Calculate 
-						
-						
 						/** Summary By Column **/						
 						if(summaryColumnMap.get(resultKey) != null){
 							BigDecimal summaryColValueAdd = (BigDecimal)summaryColumnMap.get(resultKey);
@@ -596,7 +595,6 @@ public class SAGenerate {
 						
 						debug.debug("configBean Name["+c+"]:"+configBean.getName());
 						
-						
 						String resultRowSumBean = configBean.getName();
 						BigDecimal valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
 						boolean isPct = false;
@@ -627,6 +625,7 @@ public class SAGenerate {
 						}
 						
 						if(isPercent){
+
 							ConfigBean colGroup1 = (ConfigBean)colGroupList.get(colGroupList.size()-2);
 							ConfigBean colGroup2 = (ConfigBean)colGroupList.get(colGroupList.size()-1);
 							
@@ -634,18 +633,17 @@ public class SAGenerate {
 							
 							//Sum1
 							String resultKey1 = configBeanP.getName()+"_"+reportU.getShortColName(colGroup1.getName());
-							BigDecimal summaryValue1 = rs.getBigDecimal(resultKey1);
+							BigDecimal summaryValue1 = Utils.isNullToZero(rs.getBigDecimal(resultKey1));
 							
 							//Sum2
 							String resultKey2 = configBeanP.getName()+"_"+reportU.getShortColName(colGroup2.getName());
-							BigDecimal summaryValue2 = rs.getBigDecimal(resultKey2);
-							
+							BigDecimal summaryValue2 = Utils.isNullToZero(rs.getBigDecimal(resultKey2));
 							
 							debug.debug("summaryValue1:"+summaryValue1,1);
 							debug.debug("summaryValue2:"+summaryValue2,1);
 							
 							if(summaryValue1.compareTo(bigZero) != 0){
-								valueRowSum = ((summaryValue2.subtract(summaryValue1)).divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
+								valueRowSum = (summaryValue2.divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
 								isPct = true;
 							}
 						}
@@ -658,7 +656,10 @@ public class SAGenerate {
 						//debug
 						String debug = isDebug?"RSum:":"";
 						
-						rowHtml.append("<td align='right'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</td> \n");
+						ConfigBean configGroupBean1 = (ConfigBean)colGroupList.get(0);
+						String sortIdKey = summaryType+"_"+configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
+						
+						rowHtml.append("<td align='right' class='sort_"+sortIdKey+"'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</td> \n");
 						
 						
 					}//for
@@ -672,6 +673,9 @@ public class SAGenerate {
 					ConfigBean configBean = (ConfigBean)colDispList.get(d);
 					String resultRowSumBean = configBean.getName();
 					BigDecimal valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
+					if(valueRowSum.doubleValue() <0){
+						valueRowSum = valueRowSum.multiply(new BigDecimal("-1"));
+					}
 					rowSumAll = rowSumAll.add(valueRowSum);
 					
 				}
@@ -793,7 +797,7 @@ public class SAGenerate {
 						
 						if(colValue1.compareTo(bigZero) != 0){
 							
-						    colPercent = ((colValue2.subtract(colValue1)).divide(colValue1,4,BigDecimal.ROUND_FLOOR)).multiply(big100);
+						    colPercent = (colValue2.divide(colValue1,4,BigDecimal.ROUND_FLOOR)).multiply(big100);
 						    
 						    debug.debug("Result colPercent["+colPercent+"]",1);
 						    

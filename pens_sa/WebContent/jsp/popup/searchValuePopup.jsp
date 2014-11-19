@@ -1,16 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="java.sql.Connection"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.DBConnection"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
+
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
-
+<jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="session" />
 <html>
 <head>
-<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<title>ค้นหาข้อมูล</title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag_screen.css" type="text/css" />
 <style type="text/css">
 <!--
@@ -21,54 +26,33 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
-<%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
-<jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="request" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+
 <%
-	boolean isMultiSelect = false;
+
+boolean isMultiSelect = false;
+ String load = Utils.isNull(request.getParameter("load"));
 
  String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
  String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
  String currCondNameText = Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
  String searchType = Utils.isNull(request.getParameter("searchType"));
- 
- 
- String condType1 = Utils.isNull(request.getParameter("condType1"));
- String condCode1 = Utils.isNull(request.getParameter("condCode1"));
- 
- String condType2 = Utils.isNull(request.getParameter("condType2"));
- String condCode2 = Utils.isNull(request.getParameter("condCode2"));
- 
- String condType3 = Utils.isNull(request.getParameter("condType3"));
- String condCode3 = Utils.isNull(request.getParameter("condCode3"));
- 
-// System.out.println("currCondNo:"+currCondNo+",currCondNameValue:"+currCondTypeValue);
+
+
 String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+
+System.out.println("currCondNo:"+currCondNo);
+System.out.println("currCondTypeValue:"+currCondTypeValue);
+System.out.println("currCondNameText:"+currCondNameText);
+System.out.println("searchType:"+searchType);
 System.out.println("currentPage:"+currentPage);
 
- String navigation = "";
- if(currCondNo.equals("1")){
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
- }else if(currCondNo.equals("2")){
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
- }else if(currCondNo.equals("3")){
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
- }else if(currCondNo.equals("4")){
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condCode1+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condCode2+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType3))+"["+condCode3+"]" +"->";
-	 navigation += Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)); 
- }
- 
- 
+
  if(SAProcess.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
 	 isMultiSelect = true;
  }
  
  pageContext.setAttribute("isMultiSelect", isMultiSelect, PageContext.PAGE_SCOPE);
- 
  
  /** Store Select MutilCode in each Page **/
  String codes = Utils.isNull(session.getAttribute("codes"));
@@ -77,19 +61,26 @@ System.out.println("currentPage:"+currentPage);
  
  System.out.println("codes:"+codes);
  
+ String condType1 = Utils.isNull(request.getParameter("condType1"));
+ String condType2 = Utils.isNull(request.getParameter("condType2"));
+ String condType3 = Utils.isNull(request.getParameter("condType3"));
+ String condType4 = Utils.isNull(request.getParameter("condType4"));
+
+ System.out.println("condType1:"+condType1);
+ System.out.println("condType1:"+Utils.isNull(request.getParameter("condType1")));
 %>
 <script type="text/javascript">
 
 function searchPopup(path, type) {
 
-    var condType1 = document.getElementsByName("condType1")[0].value;
-	var condCode1 = document.getElementsByName("condCode1")[0].value;
+    var condType1 = document.getElementById("condType1").value;
+	var condCode1 = document.getElementById("condCode1").value ;
 	
-	var condType2 = document.getElementsByName("condType2")[0].value;
-	var condCode2 = document.getElementsByName("condCode2")[0].value;
+	var condType2 = document.getElementById("condType2").value;
+	var condCode2 = document.getElementById("condCode2").value;
 	
-	var condType3 = document.getElementsByName("condType3")[0].value;
-	var condCode3  = document.getElementsByName("condCode3")[0].value;
+	var condType3 = document.getElementById("condType3").value;
+	var condCode3  = document.getElementById("condCode3").value;
 	
     var currCondTypeValue = document.getElementsByName("currCondTypeValue")[0].value;
     var currCondNo = document.getElementsByName("currCondNo")[0].value;
@@ -318,26 +309,79 @@ function setChkInPage(){
 
 window.onload = function(){
 	setChkInPage();
+	//loadDataFromMain();
+	loadNav();
+}
+
+function loadNav(){
+	var nav1 = document.getElementById("nav1");
+	var nav2 = document.getElementById("nav2");
+	var nav3 = document.getElementById("nav3");
+	var nav4 = document.getElementById("nav4");
+	
+	var currCondNo = document.getElementById("currCondNo");
+	//alert(<%=condType1%>);
+	if(currCondNo.value =='1'){
+	    nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+	}else if(currCondNo.value =='2'){
+		nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML = "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		
+	}else if(currCondNo.value =='3'){
+		nav1.innerHTML= "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= "3><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+	
+	}else if(currCondNo.value =='4'){
+		nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= "3><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType3))%>["+document.getElementById("condValueDisp3").value+"]";
+		nav4.innerHTML= "4><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+	}
+}
+
+function loadDataFromMain(){
+    //alert(window.opener.$("#condName1").val());
+	//alert(window.opener.$("#condCode1").val());
+	
+	//alert(document.getElementById("condValueDisp1").value);
+	
+	<% if("1".equals(load)){ %>
+		document.getElementById("condType1").value = window.opener.$("#condName1").val();
+		document.getElementById("condCode1").value = window.opener.$("#condCode1").val();
+		document.getElementById("condValueDisp1").value = window.opener.$("#condValue1").val();
+		
+		document.getElementById("condType2").value = window.opener.$("#condName2").val();
+		document.getElementById("condCode2").value = window.opener.$("#condCode2").val();
+		document.getElementById("condValueDisp2").value = window.opener.$("#condValue2").val();
+		
+		document.getElementById("condType3").value = window.opener.$("#condName3").val();
+		document.getElementById("condCode3").value = window.opener.$("#condCode3").val();
+		document.getElementById("condValueDisp3").value = window.opener.$("#condValue3").val(); 
+   <%}%>
 }
 
 </script>
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <html:form action="/jsp/searchValuePopupAction">
-<input type="hidden" name="currCondNo" value ="<%=currCondNo%>" />
-<input type="hidden" name="currCondTypeValue" value ="<%=currCondTypeValue%>" />
-<input type="hidden" name="currCondNameText" value ="<%=currCondNameText%>" />
-<input type="hidden" name="searchType" value ="<%=searchType%>" />
+<input type="hidden" name="currCondNo" id="currCondNo" value ="<%=currCondNo%>" />
+<input type="hidden" name="currCondTypeValue" id="currCondTypeValue" value ="<%=currCondTypeValue%>" />
+<input type="hidden" name="currCondNameText"  id="currCondNameText"  value ="<%=currCondNameText%>" />
+<input type="hidden" name="searchType" id="searchType" value ="<%=searchType%>" />
 <input type="hidden" name="selectcode" id="selectcode" value ="" />
 
-<input type="hidden" name="condType1" value ="<%=condType1%>" />
-<input type="hidden" name="condCode1" value ="<%=condCode1%>" />
+<html:hidden property="filterBean.condType1" styleId="condType1" />
+<html:hidden property="filterBean.condCode1" styleId="condCode1" />
+<html:hidden property="filterBean.condValueDisp1" styleId="condValueDisp1" />
 
-<input type="hidden" name="condType2" value ="<%=condType2%>" />
-<input type="hidden" name="condCode2" value ="<%=condCode2%>" />
+<html:hidden property="filterBean.condType2" styleId="condType2" />
+<html:hidden property="filterBean.condCode2" styleId="condCode2" />
+<html:hidden property="filterBean.condValueDisp2" styleId="condValueDisp2" />
 
-<input type="hidden" name="condType3" value ="<%=condType3%>" />
-<input type="hidden" name="condCode3" value ="<%=condCode3%>" />
+<html:hidden property="filterBean.condType3" styleId="condType3" />
+<html:hidden property="filterBean.condCode3" styleId="condCode3" />
+<html:hidden property="filterBean.condValueDisp3" styleId="condValueDisp3" />
 
 <input type="hidden" name="codes" size="50" value ="<%=codes%>" />
 <input type="hidden" name="keys" size="50" value ="<%=keys%>" />
@@ -346,14 +390,23 @@ window.onload = function(){
 <input type="hidden" name="currentPage" size="50" value ="<%=currentPage%>" />
 
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
-    <tr height="21px">
-		<td width="15%" >&nbsp;</td>
-		<td width="90%" class="h1"><b>ค้นหาข้อมูล :<%=navigation %></b></td>
+    <%-- <tr height="21px">
+		<td class="h1" colspan="2"><b>ค้นหาข้อมูล :${searchValuePopupForm.curNavigation}</b></td>
+	</tr> --%>
+	 <tr height="21px">
+		<td class="h1" colspan="2"><b>ค้นหาข้อมูล :<%=currCondNameText %></b></td>
 	</tr>
+	<tr height="21px">
+		<td class="h1" colspan="2"><b><span id="nav1"></span><b><span id="nav2"></span><span id="nav3"></span><span id="nav4"></span></b></td>
+	</tr>
+	<%-- <tr height="21px">
+		<td class="h1" colspan="2"><b>${searchValuePopupForm.navigation}</b></td>
+	</tr> --%>
 	<tr height="21px">
 		<td width="15%" ><b>รหัส</b>  </td>
 		<td width="90%" ><html:text property="salesBean.code"  size="30" style="height:20px"/>
-		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" name="search" class="newPosBtn1"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px">
@@ -364,14 +417,14 @@ window.onload = function(){
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
-		<td align="center">
+		<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<c:if test="${isMultiSelect}" >
-				<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
+				<input type="button" name="ok" value="OK" class="newPosBtn1"  onclick="selectMultiple()" style="width:60px;"/>
 			</c:if>
 			<c:if test="${!isMultiSelect}" >
-				<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:60px;"/>
+				<input type="button" name="ok" value="OK" class="newPosBtn1"  onclick="selectOneRadio()" style="width:60px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
+			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:60px;"/>
 		</td>
 	</tr>
 </table>
@@ -396,8 +449,10 @@ window.onload = function(){
 </display:table>	
 <!-- RESULT -->
 
-
-
+		<Script>
+		loadDataFromMain();
+		</Script>
+		
 </html:form>
 </body>
 </html>
