@@ -29,7 +29,7 @@ if(session.getAttribute("statusReqFinishList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
-	billTypeList.addAll(ConfirmReturnWacoalDAO.getRequestStatusW2List());
+	billTypeList.addAll(ConfirmReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
 	session.setAttribute("statusReqFinishList",billTypeList);
 }
 

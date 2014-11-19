@@ -170,7 +170,7 @@ function openEdit(path,requestDate,requestNo,mode){
 									<th >Request No</th>
 									<th >Status</th>
 									<th >Remark</th>
-									<th >·°È‰¢</th>						
+									<th >Action</th>						
 							   </tr>
 							<c:forEach var="results" items="${reqReturnWacoalForm.resultsSearch}" varStatus="rows">
 								<c:choose>
@@ -195,7 +195,7 @@ function openEdit(path,requestDate,requestNo,mode){
 										    ${results.remark}
 										</td>
 										
-										<td class="search_edit">
+										<td class="search_edit" align="center">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestDate}','${results.requestNo}','view')">
 											          ¥Ÿ

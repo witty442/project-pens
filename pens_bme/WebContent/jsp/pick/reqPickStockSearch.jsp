@@ -28,7 +28,7 @@ if(session.getAttribute("statusIssueReqList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
-	billTypeList.addAll(PickConstants.getRequestStatusW2List());
+	billTypeList.addAll(PickConstants.getRequestStatusW2ListInPageReqPickStock());
 	session.setAttribute("statusIssueReqList",billTypeList);
 }
 
@@ -228,10 +228,9 @@ function openConfirm(path,documentNo,issueReqStatus){
 						       <tr>
 									<th >Issue Req Date</th>
 									<th >Issue Req No</th>
-									<th >Issue Req Status</th>
-									
+									<th >Status</th>
 									<th >หมายเหตุ</th>
-									<th >แก้ไข</th>	
+									<th >Action</th>	
 									<th >ยืนยัน</th>						
 							   </tr>
 							<c:forEach var="results" items="${reqPickStockForm.resultsSearch}" varStatus="rows">

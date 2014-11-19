@@ -297,10 +297,10 @@ function resetStore(){
 	                                 <td colspan="1" align="center"> <b>รายละเอียด Job </b> </td>		
 								</tr>
 						       <tr>
-                                    <td> Open Date</td>
+                                    <td> Open Date<font color="red">*</font></td>
 									<td>					
 									    <c:if test="${jobForm.job.canEdit == true}">	
-										  <html:text property="job.openDate" styleId="openDate" size="20" /><font color="red">*</font>
+										  <html:text property="job.openDate" styleId="openDate" size="20" />
 										 </c:if>
 										 <c:if test="${jobForm.job.canEdit == false}">
 										     <html:text property="job.openDate" styleId="openDate" size="20" readonly="true" styleClass="disableText"/>

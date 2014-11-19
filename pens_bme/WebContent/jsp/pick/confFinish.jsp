@@ -175,20 +175,15 @@ function save(path){
 						       <tr>
                                     <td> Request Date</td>
 									<td>					
-										<c:choose>
-											<c:when test="${reqFinishForm.bean.canEdit == true}">
-												 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
-											</c:when>
-											<c:otherwise>
-												 <html:text property="bean.requestDate" styleId="requestDateX" size="20" styleClass="disableText" readonly="true"/>
-											</c:otherwise>
-									   </c:choose>
+										<html:text property="bean.requestDate" styleId="requestDateX" size="20" styleClass="disableText" readonly="true"/>
 									</td>
 									<td> 
 									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="disableText"/>
 									</td>
 									<td> 
-									    Confirm Date <html:text property="bean.confirmDate" styleId="confirmDate" size="20" styleClass=""/>
+									    Confirm Date
+									      <c:if test="${reqFinishForm.bean.canEdit == true}"> <font color="red">*</font></c:if>
+									     <html:text property="bean.confirmDate" styleId="confirmDate" size="20" styleClass=""/>
 									</td>
 									<td>					
 										ʶҹ�   

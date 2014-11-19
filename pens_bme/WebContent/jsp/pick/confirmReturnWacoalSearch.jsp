@@ -189,7 +189,7 @@ function openEdit(path,requestNo,returnNo,mode){
 									<th >Return Date</th>
 									<th >Return No</th>
 									<th >Return Status</th>
-									<th >·°È‰¢</th>						
+									<th >Action</th>						
 							   </tr>
 							<c:forEach var="results" items="${confirmReturnWacoalForm.resultsSearch}" varStatus="rows">
 								<c:choose>

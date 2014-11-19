@@ -514,17 +514,17 @@ function switchView(groupCode,show) {
                                   <td colspan="3" align="center"><font size="3"><b></b></font></td>
 							   </tr>
 						       <tr>
-                                    <td>Issue request Date</td>
+                                    <td>Issue Request Date</td>
                                      <td>
                                        <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20"  readonly="true" styleClass="disableText"/>
                                      </td>
-									<td align="right">Issue request No </td>
+									<td align="right">Issue Request No </td>
 									<td align="left">
 									 <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20"  readonly="true" styleClass="disableText"/>	  
 									</td>
 								</tr>
 								 <tr>
-                                    <td> Issue request status</td>
+                                    <td> Status</td>
                                       <td>
                                         <html:text property="bean.statusDesc" styleId="statusDesc" size="20" readonly="true" styleClass="disableText"/>
                                      </td>
@@ -781,12 +781,12 @@ function switchView(groupCode,show) {
 					
 					
 					<div align="right">
-						<table  border="0" cellpadding="3" cellspacing="0" >
+						<table  border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
-								<td align="right">	 <span class="pagelinks">รวมทั้งสิ้น :
-								<html:text property="bean.totalQty" styleId="totalQty" size="30" styleClass="disableNumber"/>
+								<td align="right" >	 <span class="pagelinks">รวมทั้งสิ้น :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
+								&nbsp;&nbsp;&nbsp;
 								
-								<br/>
 								<!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
 								<!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
 								<!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>

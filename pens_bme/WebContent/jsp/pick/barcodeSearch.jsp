@@ -302,7 +302,7 @@ function getJobNameModel(code){
 									<th >Store No</th>
 									<th >จำนวน</th>
 									<th >Job Status</th>
-									<th >แก้ไข</th>						
+									<th >Action</th>						
 							   </tr>
 							<c:forEach var="results" items="${barcodeForm.resultsSearch}" varStatus="rows">
 								<c:choose>

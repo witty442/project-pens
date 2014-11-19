@@ -92,7 +92,7 @@
 			</li>
 		</ul>
 	</li>
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>OLD</span></a>
+	<%-- <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>OLD</span></a>
 		<ul>
 			 <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pickStockAction.do?do=prepare2&action=new';"><span>dd6.<bean:message bundle="sysprop" key="pickStock"/></span></a>
@@ -101,7 +101,7 @@
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/renewBoxAction.do?do=prepare2&action=new';"><span>dd7.<bean:message bundle="sysprop" key="renewBox"/></span></a>
 			</li>   
 		</ul>
-	</li>
+	</li> --%>
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Pick</span></a>
 		<ul>
 			<li>

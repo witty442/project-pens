@@ -543,7 +543,7 @@ function getProductModelByMat(matObj,lineId){
 										 <html:text property="job.transactionDate" styleId="transactionDate" size="20" readonly="true" styleClass="disableText"/>
 									</td>
 									<td> 
-									           เลขที่กล่อง<html:text property="job.boxNo" styleId="boxNo" size="20" readonly="true" styleClass="disableText"/>
+									           เลขที่กล่อง <html:text property="job.boxNo" styleId="boxNo" size="20" readonly="true" styleClass="disableText"/>
 									           สถานะ  <html:text property="job.statusDesc" styleId="statusDesc" size="20" readonly="true" styleClass="disableText"/>
 									</td>
 									<td>					

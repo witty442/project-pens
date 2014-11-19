@@ -410,13 +410,13 @@ function sumTotal(chkObj){
                                     <td> New Job Id</td>
 									<td colspan="3">
 						               <html:text property="bean.newJobId" styleId="newJobId" size="20" readonly="true" styleClass="disableText"/>
-									    Job Name
+									    New Job Name
 						                 <html:text property="bean.newJobName" styleId="newJobName" size="30" /><font color="red">*</font>
 									</td>
 								</tr>	
 								
 								<tr>
-                                    <td> รับตืนจาก</td>
+                                    <td> รับคืนจาก</td>
 									<td colspan="3">
 						               <html:text property="bean.jobId" styleId="jobId" size="20"  onkeypress="getJobNameKeypress(event,this)"/> 
 						                 <font color="red">*</font>
@@ -448,7 +448,7 @@ function sumTotal(chkObj){
                                         <html:text property="bean.warehouseFrom" styleId="warehouseFrom" size="3" readonly="true" styleClass="disableText"/>-								
 									    <html:text property="bean.warehouseFromDesc" styleId="warehouseFromDesc" size="30" readonly="true" styleClass="disableText" />	
                                      </td>
-									<td align="right">Move To Warehouse </td>
+									<td align="right">Move To Warehouse <font color="red">*</font></td>
 									<td align="left">
 									  <html:select property="bean.warehouseTo" styleId="warehouseTo" >
 											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
@@ -521,12 +521,13 @@ function sumTotal(chkObj){
 									</tr>
 							  </c:forEach>
 					</table>
-					
+					     <br/>
 						 <div align="left">
-							 รวมจำนวนกล่อง     : <input type="text" size="10" id ="totalBox" name ="bean.totalBox" class="disableNumber" value="" readonly/> กล่อง
+							<b>รวมจำนวนกล่อง  </b> : <input type="text" size="10" id ="totalBox" name ="bean.totalBox" class="disableNumber" value="" readonly/> กล่อง
+							|<b> รวมจำนวนชิ้น </b> : <input type="text" size="10" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/> ชิ้น
 						</div>
 						 <div align="left">
-							 รวมจำนวนที่จะคืน : <input type="text" size="10" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/> ชิ้น
+							
 						</div>
 						
 				</c:if>

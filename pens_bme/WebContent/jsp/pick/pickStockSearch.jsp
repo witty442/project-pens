@@ -28,7 +28,7 @@ if(session.getAttribute("statusIssueReqList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
-	billTypeList.addAll(PickConstants.getRequestStatusW2List());
+	//billTypeList.addAll(PickConstants.getRequestStatusW2List());
 	session.setAttribute("statusIssueReqList",billTypeList);
 }
 

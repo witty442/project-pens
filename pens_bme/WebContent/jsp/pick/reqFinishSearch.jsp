@@ -28,7 +28,7 @@ if(session.getAttribute("statusReqReturnW2List") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
-	billTypeList.addAll(ReqReturnWacoalDAO.getRequestStatusW2List());
+	billTypeList.addAll(ReqReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
 	session.setAttribute("statusReqReturnW2List",billTypeList);
 }
 %>
@@ -170,7 +170,7 @@ function openEdit(path,requestDate,requestNo,mode){
 									<th >Request No</th>
 									<th >Status</th>
 									<th >Remark</th>
-									<th >·°È‰¢</th>						
+									<th >Action</th>						
 							   </tr>
 							<c:forEach var="results" items="${reqFinishForm.resultsSearch}" varStatus="rows">
 								<c:choose>

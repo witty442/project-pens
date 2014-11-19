@@ -204,7 +204,7 @@ function sumTotal(chkObj){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
-                                    <td> Request Date</td>
+                                    <td> Request Date<font color="red">*</font></td>
 									<td>					
 										<c:choose>
 											<c:when test="${reqFinishForm.bean.canEdit == true}">
