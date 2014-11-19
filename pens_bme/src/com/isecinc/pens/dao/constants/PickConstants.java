@@ -128,11 +128,21 @@ public class PickConstants {
 		return statusList;
 	}
 	
-	public static List<References> getRequestStatusW2List(){
+	public static List<References> getRequestStatusW2ListInPageReqFinish(){
 		List<References> statusList = new ArrayList<References>();
 		
 		statusList.add(new References(STATUS_OPEN, getStatusDesc(STATUS_OPEN)));
 		statusList.add(new References(STATUS_FINISH, getStatusDesc(STATUS_FINISH)));
+		statusList.add(new References(STATUS_CANCEL, getStatusDesc(STATUS_CANCEL)));
+		
+		return statusList;
+	}
+	
+	public static List<References> getRequestStatusW2ListInPageReqPickStock(){
+		List<References> statusList = new ArrayList<References>();
+		
+		statusList.add(new References(STATUS_OPEN, getStatusDesc(STATUS_OPEN)));
+		statusList.add(new References(STATUS_POST, getStatusDesc(STATUS_POST)));
 		statusList.add(new References(STATUS_CANCEL, getStatusDesc(STATUS_CANCEL)));
 		
 		return statusList;
