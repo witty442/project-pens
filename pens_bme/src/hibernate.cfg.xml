@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!DOCTYPE hibernate-configuration PUBLIC
+  "-//Hibernate/Hibernate Configuration DTD//EN"
+  "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+		<!-- Test Server -->
+          <property name="connection.url">jdbc:oracle:thin:@//192.168.37.186:1529/TEST</property>
+
+	   	<!-- Production Server -->
+	   	 <!-- <property name="connection.url">jdbc:oracle:thin:@//penserp.isec.com:1521/PENS</property> -->
+	   	
+		<property name="connection.username">pensbi</property>
+		<property name="connection.password">pensbi</property>
+		<property name="show_sql">true</property>
+		<property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
+		<property name="initialSize">5</property>
+		<property name="pool_maxactive">100</property>
+		<property name="pool_maxidle">5</property>
+		<property name="pool_maxwait">-1</property>
+		<property name="connectionpool">true</property>
+		
+	</session-factory>
+</hibernate-configuration>
