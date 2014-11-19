@@ -1,0 +1,81 @@
+.tableSearch {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearch TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+
+TABLE.tableSearch TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
+<!-- Search -->
+.search_no{
+	align:center;
+	height: 30px;
+	width: 5%;
+}
+.search_requestDate{
+	align:left;
+	height: 30px;
+	width: 10%;
+}
+.search_requestNo{
+	align:left;
+	height: 30px;
+	width: 10%;
+}
+.search_remark{
+	align:left;
+	height: 30px;
+	width: 30%;
+}
+.search_returnNo{
+	align:left;
+	height: 30px;
+	width: 10%;
+}
+.search_returnDate{
+	align:left;
+	height: 30px;
+	width: 10%;
+}
+.search_edit{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+
+<!-- Result -->
+.data_no{
+	align:center;
+	height: 30px;
+	width: 15%;
+}
+.data_boxNo{
+	align:center;
+	height: 30px;
+	width: 40%;
+}
+.data_groupCode{
+	align:center;
+	height: 30px;
+	width: 40%;
+}
+.data_qty{
+	align:center;
+	height: 30px;
+	width: 30%;
+}
+

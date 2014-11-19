@@ -1,0 +1,148 @@
+<!-- Pick Job Search -->
+.tableSearch {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearch TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+
+TABLE.tableSearch TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
+<!-- Search 1 -->
+.search_boxNo{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+.search_materialMaster{
+	text-align:center;
+	height: 30px;
+	width: 10%;
+}
+.search_groupCode{
+	text-align:center;
+	height: 30px;
+	width: 8%;
+}
+.search_pensItem{
+	text-align:center;
+	height: 30px;
+	width: 8%;
+}
+.search_barcode{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+.search_jobname{
+	text-align:left;
+	height: 30px;
+	width: 17%;
+}
+.search_jobId{
+	text-align:center;
+	height: 30px;
+	width: 5%;
+}
+.search_remark{
+	text-align:left;
+	height: 30px;
+	width: 17%;
+}
+.search_status{
+	text-align:center;
+	height: 30px;
+	width: 10%;
+}
+
+<!-- Search 2 -->
+.tableSearch2 {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 50%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearch2 TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+
+TABLE.tableSearch2 TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+.search2_boxNo{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+.search2_jobname{
+	text-align:left;
+	height: 30px;
+	width: 20%;
+}
+.search2_qty{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+
+<!-- Search 3 -->
+.tableSearch2 {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 50%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearch3 TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+
+TABLE.tableSearch3 TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+.search3_pensItem{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+.search3_groupCode{
+	text-align:center;
+	height: 30px;
+	width: 20%;
+}
+.search3_qty{
+	text-align:center;
+	height: 30px;
+	width: 15%;
+}
+
+
+

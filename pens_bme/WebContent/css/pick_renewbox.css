@@ -1,0 +1,107 @@
+.tableSearch {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearch TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+}
+
+TABLE.tableSearch TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
+<!-- Search -->
+.search_no{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+.search_boxNo{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+.search_jobId{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+.search_jobName{
+	text-align:left;
+	height: 30px;
+	width: 20%;
+}
+.search_qty{
+	text-align:center;
+	height: 30px;
+	width: 5%;
+}
+.search_boxNoRef{
+	text-align:center;
+	height: 30px;
+	width: 10%;
+}
+.search_link{
+	align:center;
+	height: 30px;
+	width: 15%;
+}
+
+<!-- Result -->
+.data_chk{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+.data_no{
+	align:center;
+	height: 30px;
+	width: 5%;
+}
+.data_boxNo{
+	align:center;
+	height: 30px;
+	width: 8%;
+}
+.data_jobId{
+	align:center;
+	height: 30px;
+	width: 5%;
+}
+.data_jobName{
+	text-align:left;
+	height: 30px;
+	width: 20%;
+}
+.data_qty{
+	align:right;
+	height: 30px;
+	width: 10%;
+}
+.data_remainQty{
+	align:right;
+	height: 30px;
+	width: 10%;
+}
+.data_newBoxNo{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+.data_print{
+	align:center;
+	height: 30px;
+	width: 10%;
+}
+
+

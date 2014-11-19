@@ -1,0 +1,184 @@
+/**
+ *********************************************
+ * Prototype of styles for horizontal CSS-menu
+ * @data 30.06.2009
+ *********************************************
+ * (X)HTML-scheme:
+ *  <div id="menu">
+ *      <ul class="menu">
+ *          <li><a href="#" class="parent"><span>level 1</span></a>
+ *              <div><ul>
+ *                  <li><a href="#" class="parent"><span>level 2</span></a>
+ *                      <div><ul><li><a href="#"><span>level 3</span></a></li></ul></div>
+ *                  </li>
+ *              </ul></div>
+ *          </li>
+ *          <li class="last"><a href="#"><span>level 1</span></a></li>
+ *      </ul>
+ *  </div>
+ *********************************************
+ */ /* menu::base */
+div#menu {
+	background-image: url('../images/menu/menu_m.png');
+	top: 0;
+	left: 0;
+	color: #646464;
+	font-family: Tahoma;
+	font-size: 13px;
+	font-weight: bold;
+	line-height: 150%;
+	width: 100%
+}
+
+ul.menu {
+	clear: both;
+	float: none;
+	cursor: pointer;
+	z-index: 1;
+	position: relative;
+}
+
+div#menu ul {
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+	float: left;
+	z-index: 2;
+	position: relative;
+}
+
+div#menu li {
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+	display: block;
+	overflow: visible;
+	float: left;
+	height: 30px;
+	z-index: 3;
+}
+
+/* menu::level1 */
+div#menu li a {
+	height: 30px;
+	display: block;
+	float: left;
+	line-height: 30px;
+	text-decoration: none;
+	color: #646464;
+	overflow: hidden;
+	z-index: 4;
+	position: relative;
+}
+
+div#menu li span {
+	color: #646464;
+	display: block;
+	padding: 0px 20px;
+	background-repeat: no-repeat;
+	background-position: 95% 0px;
+	z-index: 6;
+	position: relative;
+}
+
+div#menu li span.bg {
+	display: block;
+	background: transparent url('../images/menu/menu_level1_item_orange.png')
+		repeat-x scroll 0pt 100%;
+	padding: 0;
+	height: 30px;
+	z-index: 5;
+	position: relative;
+	float: left;
+}
+
+div#menu li.current {
+	font-weight: bold;
+}
+
+div#menu li.current ul {
+	font-weight: bold;
+}
+
+/* menu::level2 */
+div#menu ul.menu ul {
+	padding: 0px 0px 10px;
+	background: transparent url('../images/menu/menu_dropdown_bg.png')
+		no-repeat scroll 0pt 100%;
+	_background: transparent url('../images/menu/menu_dropdown_bg.gif')
+		no-repeat scroll 0pt 100%;
+	left: -999em;
+	width: 165px;
+	position: absolute;
+	top: 30px;
+}
+
+div#menu li:hover ul,div#menu li.sfhover ul {
+	left: 0px;
+	z-index: 100;
+	visibility: visible;
+	color: #FFFFFF;
+}
+
+div#menu li li {
+	width: 100%;
+	text-indent: 0px;
+	float: none;
+	height: auto;
+}
+
+div#menu li li a,div#menu li li span.separator {
+	margin: 0px 1px;
+	padding: 0px;
+	background: url('../images/menu/menu_level2_item.gif') no-repeat scroll
+		100% bottom;
+	height: auto;
+	float: none;
+	display: block;
+	line-height: 25px;
+	width: 163px;
+}
+
+div#menu li li a.parent {
+	background: url('../images/menu/menu_level2_item_parent.gif') no-repeat
+		scroll 100% bottom;
+}
+
+/* menu::level3 */
+div#menu li ul ul {
+	margin: -31px 0 0 164px;
+}
+
+div#menu li:hover ul ul,div#menu li.sfhover ul ul {
+	border-top: 1px solid #ccc;
+	color: #FFFFFF;
+}
+
+div#menu li:hover ul ul,div#menu li.sfhover ul ul,div#menu li:hover ul ul ul,div#menu li.sfhover ul ul ul,div#menu li:hover ul ul ul ul,div#menu li.sfhover ul ul ul ul
+	{
+	left: -999em;
+	color: #FFFFFF;
+}
+
+div#menu li li:hover ul,div#menu li li.sfhover ul,div#menu li li li:hover ul,div#menu li li li.sfhover ul,div#menu li li li li:hover ul,div#menu li li li li.sfhover ul
+	{
+	left: 0pt;
+	z-index: 100;
+	color: #FFFFFF;
+}
+
+div#menu a:hover {
+	color: #FFFFFF;
+}
+
+div#menu span:hover {
+	color: #FFFFFF;
+}
+
+div#menu li ul span:hover {
+	color: #FFFFFF;
+}
+
+#copyright {
+	display: none;
+}
