@@ -392,11 +392,8 @@ function loadMe(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
 		<td align="right"></td>
-		<td align="right" width="20%">
-			<a href="#" onclick="window.close();">
-			<!--<img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn">-->
-			<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-			</a>
+		<td align="right" width="20%">	
+			<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="window.close();">
 		</td>
 		<td width="10%">&nbsp;</td>
 	</tr>
