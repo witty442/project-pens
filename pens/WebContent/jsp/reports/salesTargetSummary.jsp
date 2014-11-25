@@ -168,14 +168,11 @@ function clearForm(path){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 							<tr>
 								<td align="center">
-									<a href="javascript:gotoReport('${pageContext.request.contextPath}')">
-			<!--						<img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="พิมพ์" class="newPosBtn">
-									</a>
-									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-			<!--						<img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="Clear" class="newNegBtn">
-									</a>
+								
+									<input type="button" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}')">
+							
+									<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
+									
 								</td>
 							</tr>
 						</table>
@@ -183,10 +180,9 @@ function clearForm(path){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 							<tr>
 								<td align="right">
-									<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
-			<!--						<img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-									</a>
+									
+									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
+								
 								</td>
 								<td width="10%">&nbsp;</td>
 							</tr>
