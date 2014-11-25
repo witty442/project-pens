@@ -106,13 +106,9 @@ function loadMe(){
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
-							<td align="center">
-								<a href="javascript:search('${pageContext.request.contextPath}')">
-								  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-								</a>
-								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-								  <input type="button" value="     Clear     " class="newPosBtnLong">
-								</a>
+							<td align="center">						
+								  <input type="button" value="    ค้นหา      " class="newPosBtnLong" onclick="search('${pageContext.request.contextPath}')"> 
+								  <input type="button" value="     Clear     " class="newPosBtnLong" onclick="clearForm('${pageContext.request.contextPath}')">
 							</td>
 						</tr>
 					</table>
