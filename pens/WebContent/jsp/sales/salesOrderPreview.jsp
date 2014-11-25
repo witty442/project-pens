@@ -459,19 +459,17 @@ function printListOrderProductReport(path,userType){
 									<!-- WIT EDIT:04/08/2554 ***************-->
 
 									<!-- OLD CODE ************************ -->
-									<a href="#" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')">
-									   <input type="button" value="บันทึก" class="newPosBtn">
-									</a>
+									
+									   <input type="button" value="บันทึก" class="newPosBtn" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')">
+									
 									<!-- OLD CODE ************************ -->
 									<%if(User.VAN.equals(user.getType())){%>
-									  <a href="#" onclick="printListOrderProductReport('${pageContext.request.contextPath}','<%=user.getType() %>')">
-									   <input type="button" value="พิมพ์ใบหยิบของ" class="newPosBtnLong">
-									  </a> 
-									<%} %>
-									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-		
-									<input type="button" value="ยกเลิก" class="newNegBtn">
-									</a>
+									 
+									   <input type="button" value="พิมพ์ใบหยิบของ" class="newPosBtnLong" onclick="printListOrderProductReport('${pageContext.request.contextPath}','<%=user.getType() %>')">
+									   
+									<%} %>		
+									<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+									
 								</td>
 							</tr>
 						</table>
