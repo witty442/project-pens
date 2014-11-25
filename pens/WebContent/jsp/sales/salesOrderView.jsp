@@ -733,10 +733,8 @@ function removeRow(){
 									</table>
 									<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 										<tr>
-											<td align="center" colspan="2">
-												<a href="#" onclick="return saveAutoReceiptVan('${pageContext.request.contextPath}');">
-												<input type="button" value="บันทึกรับเงิน" class="newPosBtn"/>
-												</a>
+											<td align="center" colspan="2">								
+												<input type="button" value="บันทึกรับเงิน" class="newPosBtn" onclick="return saveAutoReceiptVan('${pageContext.request.contextPath}');"/>
 											</td>
 										</tr>
 									</table>
@@ -1001,18 +999,18 @@ function removeRow(){
 								<td align="left">
 							  
 									<%if(!isAdd.equals("N") || ((String)session.getAttribute("memberVIP")).equalsIgnoreCase("Y")){ %>
-										<a href="#" onclick="prepare('${pageContext.request.contextPath}','add');">
-										<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong">
-										</a>
+										
+										<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','add');">
+										
 									<%} %>
 									
 								    <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.exported=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
 											<c:if test="${orderForm.order.payment=='N'}">
-												<a href="#" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
-												<input type="button" value="แก้ไขรายการ" class="newPosBtnLong">
-												</a>
+												
+												<input type="button" value="แก้ไขรายการ" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
+												
 											</c:if>
 											</c:if>
 										</c:if>
@@ -1020,17 +1018,13 @@ function removeRow(){
 									
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
-									    <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
-										  <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn">
-										</a>
-										 
-										 <a href="#" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
-										  <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn">
-										</a> 
+									 
+										  <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+				
+										  <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+
+										  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										
-										<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
-										<input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn">
-										</a>
 									</c:if>
 									<%} %>
 									
@@ -1038,17 +1032,17 @@ function removeRow(){
 								     <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.payment=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
-											<a href="#" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','<%=canReceiptMoreCash%>');">
-											    <input type="button" value="บันทึกรับเงิน" class="newPosBtn"></a>
+											
+											    <input type="button" value="บันทึกรับเงิน" class="newPosBtn" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','<%=canReceiptMoreCash%>');">
 											</c:if>
 										</c:if>
 									   </c:if>
 									<%} %>
 								</td>
 								<td align="right">
-									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-									<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-									</a>
+									
+									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+									
 								</td>
 								<td width="10%">&nbsp;</td>
 							</tr>
