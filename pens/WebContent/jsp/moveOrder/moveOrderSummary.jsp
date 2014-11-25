@@ -162,15 +162,9 @@ function loadMe(){
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
 							<td align="center">
-								<a href="javascript:search('${pageContext.request.contextPath}')">
-								  <input type="button" value="ค้นหา" class="newPosBtn"> 
-								</a>
-								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-								  <input type="button" value="Clear" class="newPosBtn">
-								</a>
-								<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
-								  <input type="button" value="Export" class="newPosBtn">
-								</a>
+								  <input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')"> 
+								  <input type="button" value="Clear" class="newPosBtn" onclick="clearForm('${pageContext.request.contextPath}')">
+								  <input type="button" value="Export" class="newPosBtn" onclick="exportExcel('${pageContext.request.contextPath}')">
 							</td>
 						</tr>
 					</table>
