@@ -152,11 +152,9 @@ pageContext.setAttribute("years",years,PageContext.PAGE_SCOPE);
 			<!-- BUTTON -->
 			<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 				<tr>
-					<td align="right">
-						<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
-<!--						<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
-						<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-						</a>
+					<td align="right">			
+
+						<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
 					</td>
 					<td width="20%">&nbsp;</td>
 				</tr>
