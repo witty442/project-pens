@@ -227,20 +227,15 @@ function loadMe(){
 							<tr>
 								<td align="center">
 								   <c:if test="${billPlanForm.billPlan.canEdit =='true'}">
-									<a href="#" onclick="return confirmBillPlan('${pageContext.request.contextPath}');">
-									  <input type="button" value="ยืนยันการรับสินค้าเข้า PD" class="newPosBtnLong">
-									</a>	
+									  <input type="button" value="ยืนยันการรับสินค้าเข้า PD" class="newPosBtnLong" onclick="return confirmBillPlan('${pageContext.request.contextPath}');">	
 								   </c:if>		
 								   
 								    <c:if test="${billPlanForm.billPlan.canCancel =='true'}">
-									<a href="#" onclick="return cancelBillPlan('${pageContext.request.contextPath}');">
-									  <input type="button" value="ยกเลิกการรับสินค้าเข้า PD" class="newCancelBtnLong">
-									</a>	
+									  <input type="button" value="ยกเลิกการรับสินค้าเข้า PD" class="newCancelBtnLong" onclick="return cancelBillPlan('${pageContext.request.contextPath}');">
 								   </c:if>										
 								
-								    <a href="#" onclick="backsearch('${pageContext.request.contextPath}','${moveOrderForm.moveOrder.moveOrderType}');">
-										<input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong">
-									</a>
+								  <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong" onclick="backsearch('${pageContext.request.contextPath}','${moveOrderForm.moveOrder.moveOrderType}');">
+
 								</td>
 							</tr>
 						</table>
