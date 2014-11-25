@@ -147,14 +147,14 @@ function loadMe(){
 						   	<display:column title="แก้ไข/ดู ข้อมูล">
 				
 						       	<c:if test="${item.canEdit =='true'}">
-							   	    <a href="#" onclick="editRequisitionProduct('${pageContext.request.contextPath}','${item.requestNumber}');">
-									  <img src="${pageContext.request.contextPath}/icons/process.gif" border="0"/>
-									</a>
+							   	   
+									  <img src="${pageContext.request.contextPath}/icons/process.gif" border="0" onclick="editRequisitionProduct('${pageContext.request.contextPath}','${item.requestNumber}');"/>
+									
 								</c:if>
 								<c:if test="${item.canEdit =='false'}">
-							   	    <a href="#" onclick="editRequisitionProduct('${pageContext.request.contextPath}','${item.requestNumber}');">
-									  <img src="${pageContext.request.contextPath}/icons/lookup.gif"  border="0"/>
-									</a>
+							   	   
+									  <img src="${pageContext.request.contextPath}/icons/lookup.gif"  border="0" onclick="editRequisitionProduct('${pageContext.request.contextPath}','${item.requestNumber}');"/>
+									
 								</c:if>
 							
 						   	</display:column>	
