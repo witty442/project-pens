@@ -159,12 +159,10 @@ body {
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
-									<a href="javascript:search('${pageContext.request.contextPath}')">
-									<input type="button" value="ค้นหา" class="newPosBtn">
-									<!-- <img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn"> --></a> 
-									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-									<input type="button" value="Clear" class="newNegBtn">
-									<!-- <img src="${pageContext.request.contextPath}/images/b_clear.gif"border="1" class="newPicBtn"> --></a>
+								
+									<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
+									<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
+									
 								</td>
 							</tr>
 						</table>
@@ -264,10 +262,9 @@ body {
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
-								<td align="right"><a href="#" onclick="backToCusotmer('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-								<!--<img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn">-->
-								<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-								</a></td>
+								<td align="right">
+								   <input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backToCusotmer('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+								</td>
 								<td width="10%">&nbsp;</td>
 							</tr>
 						</table>
