@@ -214,14 +214,9 @@ pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 	<tr>
 		<td align="center">
-			<a href="#" onclick="addRow();">
-<!--			<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
-			<input type="button" value="บันทึก" class="newPosBtn">
-			</a>
-			<a href="#" onclick="window.close();">
-<!--			<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
-			<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-			</a>
+			<input type="button" value="บันทึก" class="newPosBtn" onclick="addRow();">
+
+			<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="window.close();">
 		</td>
 	</tr>
 </table>
