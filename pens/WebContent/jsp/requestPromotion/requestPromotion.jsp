@@ -547,32 +547,26 @@ function calPrice(fieldName){
 								<td align="center">
 							
 							        <c:if test="${requestPromotionForm.requestPromotion.canCancel =='true'}">
-										<a href="#" onclick="cancelRequestPromotion('${pageContext.request.contextPath}');"">
-										  <input type="button" value="ยกเลิกรายการ"  class="newPosBtnLong">
-									    </a>
+										  <input type="button" value="ยกเลิกรายการ"  class="newPosBtnLong" onclick="cancelRequestPromotion('${pageContext.request.contextPath}');">
 								   </c:if>
 								  
 	
 	                              <c:if test="${requestPromotionForm.requestPromotion.canGenFile =='true'}">
-									     <a href="#" onclick="printRequestPromotion('${pageContext.request.contextPath}');">
-										  <input type="button" value="Gen File" class="newPosBtnLong">
-									    </a>
+										  <input type="button" value="Gen File" class="newPosBtnLong" onclick="printRequestPromotion('${pageContext.request.contextPath}');">
 							      </c:if>
                              
                                   <c:if test="${requestPromotionForm.requestPromotion.canEdit =='true'}">
-										<a href="#" onclick="return save('${pageContext.request.contextPath}');">
-										  <input type="button" value="บันทึกรายการ" class="newPosBtnLong">
-										</a>	
+										<input type="button" value="บันทึกรายการ" class="newPosBtnLong" onclick="return save('${pageContext.request.contextPath}');">	
 								   </c:if>	
 							
-								
 								<%if(session.getAttribute("shutcut_customerId") != null){ %>  
-								    <a href="#" onclick="backToCusotmer('${pageContext.request.contextPath}','<%=(String)session.getAttribute("shutcut_customerId")%>','<%=(String)session.getAttribute("fromPage")%>');">
+								  
+								    <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong" onclick="backToCusotmer('${pageContext.request.contextPath}','<%=(String)session.getAttribute("shutcut_customerId")%>','<%=(String)session.getAttribute("fromPage")%>');">
 								<%}else{ %>
-								     <a href="#" onclick="backsearch('${pageContext.request.contextPath}','');"> 
+								   
+								     <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong" onclick="backsearch('${pageContext.request.contextPath}','');">
 								<%} %>
-									  <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong">
-								    </a>
+								
 								</td>
 							</tr>
 						</table>
