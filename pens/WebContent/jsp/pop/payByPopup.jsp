@@ -268,14 +268,11 @@ function save(path){
 	<tr><td colspan="2">&nbsp;</td></tr>
 	<tr>
 		<td align="center" colspan="2">
-			<a href="#" onclick="save('${pageContext.request.contextPath}');">
 			<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
-			<input type="button" value="บันทึก" class="newPosBtn">
-			</a>
-			<a href="#" onclick="window.close();">
+			<input type="button" value="บันทึก" class="newPosBtn" onclick="save('${pageContext.request.contextPath}');">
+
 			<!--<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
-			<input type="button" value="ยกเลิก" class="newNegBtn">
-			</a>
+			<input type="button" value="ยกเลิก" class="newNegBtn" onclick="window.close();">
 		</td>
 	</tr>
 </table>
