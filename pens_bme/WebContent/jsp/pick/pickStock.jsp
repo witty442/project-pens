@@ -428,7 +428,7 @@ function resetStore(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> กลุ่มร้านค้า</td>		
+                                    <td> กลุ่มร้านค้า <font color="red">*</font></td>		
 								    <td>
 										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>

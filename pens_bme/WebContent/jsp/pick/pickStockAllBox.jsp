@@ -134,6 +134,12 @@ function save(path){
 	var storeCode =$('#storeName').val();
 	var storeNo =$('#storeNo').val();
 	var subInv =$('#subInv').val();
+	var custGroup =$('#custGroup').val();
+	
+	if(custGroup ==""){
+		alert("กรุณากรอก กลุ่มร้านค้า");
+		return false;
+	}
 	
 	if(pickUser ==""){
 		alert("กรุณากรอก ผู้เบิก");
@@ -398,7 +404,7 @@ function resetStore(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> กลุ่มร้านค้า</td>		
+                                    <td> กลุ่มร้านค้า  <font color="red">*</font></td>		
 								    <td>
 										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
@@ -445,7 +451,7 @@ function resetStore(){
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 								    <tr>
 									<!-- 	<th >No</th> -->
-										<th ><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
+										<th ><!-- <input type="checkbox" name="chkAll" onclick="checkAll(this)"/> --></th>
 										<th >เลขที่กล่อง</th>
 										<th >Qty</th>
 										<th >รับคืนจาก</th>
@@ -484,7 +490,7 @@ function resetStore(){
 												<td class="data2_qty" align="center">${results.qty}
 												   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 												</td>
-												<td class="data2_jobName" align="left">${results.jobName}
+												<td class="data2_jobName" align="left">${results.jobId}&nbsp;${results.jobName}
 												   <input type="hidden" name="jobId" value ="${results.jobId}" size="20" readonly class="disableText"/>
 												</td>
 												

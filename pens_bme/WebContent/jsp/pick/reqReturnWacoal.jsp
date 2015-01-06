@@ -217,7 +217,7 @@ function sumTotal(chkObj){
 									<td> 
 									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="disableText"/>
 									</td>
-									<td>					
+									<td nowrap>					
 										สถานะ   
 									  <html:text property="bean.statusDesc" styleId="status" size="20" styleClass="disableText"/>
 									</td>
@@ -294,7 +294,7 @@ function sumTotal(chkObj){
 					</table>
 					
 						 <div align="left">
-							 รวมจำนวนกล่อง     : <input type="text" size="10" id ="totalBox" name ="bean.totalBox" class="disableNumber" value="" readonly/> กล่อง
+							 รวมจำนวนกล่อง     &nbsp;&nbsp;: <input type="text" size="10" id ="totalBox" name ="bean.totalBox" class="disableNumber" value="" readonly/> กล่อง
 						</div>
 						 <div align="left">
 							 รวมจำนวนที่จะคืน : <input type="text" size="10" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/> ชิ้น

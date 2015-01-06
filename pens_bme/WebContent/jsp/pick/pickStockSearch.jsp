@@ -28,14 +28,14 @@ if(session.getAttribute("statusIssueReqList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
-	//billTypeList.addAll(PickConstants.getRequestStatusW2List());
+	billTypeList.addAll(PickConstants.getIssueReqStatusW3List());
 	session.setAttribute("statusIssueReqList",billTypeList);
 }
 
 if(session.getAttribute("pickTypeList") == null){
 	List<References> pickTypeList = new ArrayList();
-	References ref = new References("","");
-	pickTypeList.add(ref);
+	//References ref = new References("","");
+	//pickTypeList.add(ref);
 	pickTypeList.addAll(PickConstants.getPickTypeList());
 	session.setAttribute("pickTypeList",pickTypeList);
 }
@@ -243,22 +243,23 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
 										
-										<a href="javascript:openEdit('${pageContext.request.contextPath}','','')">
+										<%-- <a href="javascript:openEdit('${pageContext.request.contextPath}','','')">
 										  <input type="button" value="   เพิ่มรายการใหม่ (เบิกรายตัว)  " class="newPosBtnLong">
-										</a>	
+										</a>	 --%>
 										<a href="javascript:openEditAllBox('${pageContext.request.contextPath}','','')">
 										  <input type="button" value="   เพิ่มรายการใหม่ (เบิกทั้งกล่อง)  " class="newPosBtnLong">
 										</a>
+										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+										  <input type="button" value="   Clear   " class="newPosBtnLong">
+										</a>	
 									</td>
 									</tr>
 									<tr>
 									 <td align="left">
-										<a href="javascript:openEditAllPartBox('${pageContext.request.contextPath}','','')">
+										<%-- <a href="javascript:openEditAllPartBox('${pageContext.request.contextPath}','','')">
 										  <input type="button" value="เพิ่มรายการใหม่ (เบิกทั้งกล่อง (เฉพาะกล่องที่มีการเบิกบางส่วน))" class="newPosBtnLong">
-										</a>
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>						
+										</a> --%>
+															
 									</td>
 								</tr>
 							</table>

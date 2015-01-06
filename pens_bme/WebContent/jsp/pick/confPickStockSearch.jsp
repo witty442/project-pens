@@ -299,7 +299,7 @@ function resetStore(){
 								   <td align="right"></td>
 								</tr>
 								<tr>
-									<td >รหัสร้านค้า<font color="red">*</font>
+									<td >รหัสร้านค้า
 									</td>
 									<td align="left" colspan="2"> 
 									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
@@ -345,7 +345,7 @@ function resetStore(){
 									<th >รหัสร้านค้า</th>
 									<th >ชื่อร้านค้า</th>
 									<th >หมายเหตุ</th>
-									<th >.</th>					
+									<th >Action</th>					
 							   </tr>
 							<c:forEach var="results" items="${confPickStockForm.resultsSearch}" varStatus="rows">
 								<c:choose>

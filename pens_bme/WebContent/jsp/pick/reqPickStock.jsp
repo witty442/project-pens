@@ -100,23 +100,53 @@ function printPostRequest(path){
 
 function save(path){
 	var form = document.reqPickStockForm;
+	if(validateForm()){
+		var issueReqNo =$('#issueReqNo').val();
+		if(issueReqNo != ""){
+		   form.action = path + "/jsp/reqPickStockAction.do?do=save";
+		   form.submit();
+		   return true;
+		}else{
+			alert("กรุณาทำรายการเบิกอย่างน้อย 1 รายการ");
+			return false;
+		}
+	}
+	return false;
+}
+
+function searchFilter(path){
+	var form = document.reqPickStockForm;
+	//if(validateForm()){
+		var issueReqNo =$('#issueReqNo').val();
+		form.action = path + "/jsp/reqPickStockAction.do?do=searchFilter";
+	    form.submit();
+		return true;
+	//}
+	return false;
+}
+
+function validateForm(){
 	var requestor =$('#requestor').val();
 	var storeCode =$('#storeName').val();
 	var storeNo =$('#storeNo').val();
 	var subInv =$('#subInv').val();
 	var customerGroup =$('#customerGroup').val();
+	var needDate =$('#needDate').val();
 	
 	if(customerGroup ==""){
 		alert("กรุณากรอก กลุ่มร้านค้า");
+		$('#customerGroup').focus();
 		return false;
 	}
 	
 	if(requestor ==""){
 		alert("กรุณากรอก ผู้เบิก");
+		$('#requestor').focus();
 		return false;
 	}
 	if(storeCode ==""){
 		alert("กรุณากรอก รหัสร้านค้า");
+		$('#storeCode').focus();
 		return false;
 	}
 	if(subInv ==""){
@@ -127,12 +157,12 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	}
-	if(confirm("ยันยันการบันทึกข้อมูล")){
-	   form.action = path + "/jsp/reqPickStockAction.do?do=save";
-	   form.submit();
-	   return true;
+	if(needDate ==""){
+		alert("กรุณากรอก Need Date");
+		$('#needDate').focus();
+		return false;
 	}
-	return false;
+	return true;
 }
 
 function cancel(path){
@@ -178,7 +208,7 @@ function gotoPage(path,pageNumber){
    // form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber+"&prevPageNumber="+form.pageNumber.value+"&totalQtyCurPage="+document.getElementsByName("totalQtyCurPage")[0].value;
 	form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber;
 	
-   form.submit();
+    form.submit();
     return true;
 }
 
@@ -279,26 +309,61 @@ function sumQtyOnfirst(){
 	totalQtyNotInCurPage.value = parseInt(totalQtyAll.value) -sumCurPageQty;
 }
 
-function addItemPickStock(path,index,issueReqNo,groupCode,pensItem){
+function addItemPickStock(path,index,groupCode,pensItem){
 	var form = document.reqPickStockForm;
 	var storeGroup = form.custGroup.value;
 	
-    var param = "&issueReqNo="+issueReqNo;
-        param += "&groupCode="+groupCode;
-        param += "&pensItem="+pensItem;
-        param += "&index="+index;
-        
-	url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	var issueReqNo =$('#issueReqNo').val();
+	var issueReqDate =$('#issueReqDate').val();
+	var status =$('#status').val();
+	var requestor =$('#requestor').val();
+	var custGroup =$('#custGroup').val();
+	var needDate =$('#needDate').val();
+	var customerGroup =$('#customerGroup').val();
+	var remark =$('#remark').val();
+	var storeCode =$('#storeCode').val();
+	var storeNo =$('#storeNo').val();
+	var subInv =$('#subInv').val();
+	
+	//validate from
+	if(validateForm()){
+	 var param = "&issueReqDate="+issueReqDate;
+	     param += "&issueReqNo="+issueReqNo;
+		 param += "&status="+status;
+		 param += "&requestor="+requestor;
+		 param += "&custGroup="+custGroup;
+		 param += "&needDate="+needDate;
+		 param += "&storeCode="+storeCode;
+		 param += "&subInv="+subInv;
+		 param += "&storeNo="+storeNo;
+		 param += "&remark="+remark;
+	     param += "&groupCode="+groupCode;
+	     param += "&pensItem="+pensItem;
+	     param += "&index="+index;
+	        
+		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
+		window.open(encodeURI(url),"",
+				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	}
+	return false;
 }
 
-function setQtyMain(index,qty){
+function setReqPickMain(index,issueReqNo,qty,onhandQty,actionDB,path){
 	var form = document.reqPickStockForm;
 	var qtyObj = document.getElementsByName("qty");
+	var onhandQtyObj = document.getElementsByName("onhandQty");
+	
+	$('#issueReqNo').val(issueReqNo);
 	
 	qtyObj[index].value = qty;
+	onhandQtyObj[index].value = onhandQty;
+	
 	sumQty();
+	//
+	//alert(actionDB);
+	if(actionDB=="FIRST_SAVE"){
+		save(path);
+	}
 } 
 
 function openPopupCustomer(path,types,storeType){
@@ -358,6 +423,8 @@ function getCustName(custCode,fieldName){
 	var returnString = "";
 	var form = document.reqPickStockForm;
 	var storeGroup = form.custGroup.value;
+	
+	if(storeGroup != "" && custCode.value != ""){
 		var getData = $.ajax({
 				url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameWithSubInvAjax.jsp",
 				data : "custCode=" + custCode.value+"&storeGroup="+storeGroup,
@@ -398,8 +465,9 @@ function getCustName(custCode,fieldName){
 				form.subInv.value = "";
 			}
 		}
-	
+	}
 }
+
 function resetStore(){
 	var form = document.reqPickStockForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
@@ -410,62 +478,6 @@ function resetStore(){
 		form.storeNo.value = "";
 		form.subInv.value = "";
 	}
-}
-
-  function showRow(id) {
-    var row = document.getElementById(id);
-    row.style.display = '';
-  }
-
-  function hideRow(id) {
-    var row = document.getElementById(id);
-    row.style.display = 'none';
-  }
-  
-  function showDiv(id) {
-	 id.style.display = 'block';
-  }
-
-  function hideDiv(id) {
-	 id.style.display = 'none';
-  }
-  
-  if (typeof String.prototype.startsWith != 'function') {
-	  // see below for better implementation!
-	  String.prototype.startsWith = function (str){
-	    return this.indexOf(str) == 0;
-	  };
-  }
-  
-//id tr = groupCode_no 'ME1101_1'
-function switchView(groupCode,show) {
-	//alert("Hello World!".startsWith("He"));
-    var rows = document.getElementById("tblProduct").rows
-    for(var i = 0; i < rows.length; ++i) {
-       var tr = rows.item(i);
-       //alert(tr.id+":"+(tr.id).toString().startsWith(groupCode));
-       if((tr.id).toString().startsWith(groupCode)){
-    	   if(show){
-    		   if((tr.id).toString() != groupCode+"_0")
-    		      showRow(tr.id);
-    	   }else{
-    		   if((tr.id).toString() != groupCode+"_0")
-    		      hideRow(tr.id);
-    	   }
-       } //if
-    }//for
-    
-    //switchImage
-    if(show){
-    	//alert(document.getElementById(groupCode+"_0_aShow"));
-    	//alert(document.getElementById(groupCode+"_0_aHide"));
-    	
-    	hideDiv(document.getElementById(groupCode+"_0_aShow"));
-    	showDiv(document.getElementById(groupCode+"_0_aHide")); 
-    }else{
-    	showDiv(document.getElementById(groupCode+"_0_aShow"));
-    	hideDiv(document.getElementById(groupCode+"_0_aHide")); 
-    }
 }
 </script>
 
@@ -514,59 +526,42 @@ function switchView(groupCode,show) {
                                   <td colspan="3" align="center"><font size="3"><b></b></font></td>
 							   </tr>
 						       <tr>
-                                    <td>Issue Request Date</td>
-                                     <td>
+                                    <td nowrap>Issue Request Date
                                        <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20"  readonly="true" styleClass="disableText"/>
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                      </td>
-									<td align="right">Issue Request No </td>
-									<td align="left">
+									<td nowrap colspan="2">Issue Request No 
 									 <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20"  readonly="true" styleClass="disableText"/>	  
-									</td>
-								</tr>
-								 <tr>
-                                    <td> Status</td>
-                                      <td>
+									     Status
                                         <html:text property="bean.statusDesc" styleId="statusDesc" size="20" readonly="true" styleClass="disableText"/>
+                                         <html:hidden property="bean.status" styleId="status" />
                                      </td>
-									<td align="right"> ผู้เบิก  <font color="red">*</font></td>
-									<td align="left">
-									  <html:text property="bean.requestor" styleId="requestor" size="20" /><font color="red">*</font>	  
-									</td>
 								</tr>
 								<tr>
-                                    <td> กลุ่มร้านค้า  <font color="red">*</font></td>		
-								    <td>
+								    <td nowrap> กลุ่มร้านค้า  <font color="red">*</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
 						           </td>
-								   <td align="right">
-								     วันที่รับของ <font color="red">*</font>
-								   </td>
-								   <td> 
-								      <html:text property="bean.needDate" styleId="needDate" size="20"  readonly="true" styleClass=""/>
-								   </td>
-								</tr>
-								<tr>
-									<td >รหัสร้านค้า<font color="red">*</font>
-									</td>
-									<td align="left" colspan="2"> 
+									<td nowrap>รหัสร้านค้า<font color="red">*</font>
 									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
-								</tr>
-								<tr>
-                                    <td> Sub Inventory</td>
-									<td colspan="2">
+									<td nowrap> Sub Inventory
 						               <html:text property="bean.subInv" styleId="subInv" size="10" readonly="true" styleClass="disableText"/>
 						               Store No <html:text property="bean.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
-									
-								</tr>	
+								</tr>
+								
 								<tr>
-                                    <td > หมายเหตุ </td>
-                                    <td colspan="2"> 
+							     	<td nowrap> ผู้เบิก  <font color="red">*</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							     	&nbsp;&nbsp;&nbsp;&nbsp;
+									  <html:text property="bean.requestor" styleId="requestor" size="20" />
+									</td>
+									 <td nowrap colspan="2">วันที่รับของ <font color="red">*</font> 
+								      <html:text property="bean.needDate" styleId="needDate" size="20"  readonly="true" styleClass=""/>
+								              หมายเหตุ  
                                       <html:text property="bean.remark" styleId="remark" size="60" />
                                      </td>
 								</tr>	
@@ -604,7 +599,13 @@ function switchView(groupCode,show) {
 					   
 					<div align="left">
 					   <span class="pagebanner">รายการทั้งหมด  <%=totalRow %> รายการ, แสดงรายการที่  <%=start %> ถึง  <%=end %>.</span>
-					   
+					   <span class="pagelinks">ระบุ Group Code ที่ต้องการ  <html:text property="bean.groupCode" styleId="groupCode" size="10" />
+					        <c:if test="${reqPickStockForm.bean.canEdit == true}">
+								<a href="javascript:searchFilter('${pageContext.request.contextPath}')">
+									<input type="button" value="แสดงข้อมูล" class="newPosBtnLong"> 
+								 </a>
+							 </c:if>
+					   </span>
 					   <span class="pagelinks">
 						หน้าที่ 
 						 <% 
@@ -624,7 +625,7 @@ function switchView(groupCode,show) {
 						     <tr>					            
 				                    <th >GroupCode</th>
 				                    <th >PensItem</th>
-									<th >Onhand-Qty</th>
+									<th >Onhand Qty</th>
 									<th >Qty ที่จะเบิก</th>
 									<th >จำนวน</th>
 							</tr>
@@ -651,8 +652,9 @@ function switchView(groupCode,show) {
 							            <td class="data_pensItem"> <%=o.getPensItem() %> </td>
 										
 										<td class="data_onhandQty">
-										    <input tabindex="-1" type="hidden" name="onhandQty" value ="<%=o.getOnhandQty()%>"/>
-										    <%=o.getOnhandQty()%>
+										    <input tabindex="-1" type="text" name="onhandQty" value ="<%=o.getOnhandQty()%>" class="disableNumber"
+											    readonly/>
+										   
 										</td>
 										<td class="data_qty">
 											  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
@@ -663,7 +665,7 @@ function switchView(groupCode,show) {
 											  />		 
 										</td>
 										 <td class="data_groupCode">
-										      <a href="javascript:addItemPickStock('${pageContext.request.contextPath}',<%=index%>,'<%=Utils.isNull(o.getIssueReqNo())%>','<%=Utils.isNull(o.getGroupCode())%>','<%=Utils.isNull(o.getPensItem())%>')">
+										      <a href="javascript:addItemPickStock('${pageContext.request.contextPath}',<%=index%>,'<%=Utils.isNull(o.getGroupCode())%>','<%=Utils.isNull(o.getPensItem())%>')">
 											      <input type="button" value="ระบุจำนวน" class="newPosBtnLong"> 
 											   </a>
 										</td>
@@ -738,6 +740,7 @@ function switchView(groupCode,show) {
 				                    <th >Material Master</th>
 				                    <th >Barcode</th>
 									<th >Qty ที่จะเบิก</th>
+									
 							</tr>
 							<%
 							List<ReqPickStock> resultList =(List<ReqPickStock>) session.getAttribute("resultsView");
@@ -762,18 +765,13 @@ function switchView(groupCode,show) {
 							            <td class="data_pensItem"> <%=o.getPensItem() %> </td>
 										<td class="data_materialMaster"> <%=o.getMaterialMaster() %> </td>
 										<td class="data_barcode"> <%=o.getBarcode() %> </td>
-										  
-									
 										<td class="data_qty">
-											  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
+										 <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
 											    class="disableNumber"
-											    readonly
-											    onkeypress="chkQtyKeypress(this,event,<%=i%>)"
-							                    onchange="validateQty(this,<%=i%>)"
-											  />		 
+											    readonly />		 
 										</td>
-								</tr>
-								
+										
+								 </tr>
 							<% 
 							index++;
 							} %>

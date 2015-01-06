@@ -95,6 +95,7 @@ function cancel(path){
 function save(path){
 	var form = document.jobForm;
 	var openDate =$('#openDate').val();
+	var closeDate =$('#closeDate').val();
 	var name =$('#name').val();
 	var storeCode =$('#storeName').val();
 	var storeNo =$('#storeNo').val();
@@ -111,7 +112,7 @@ function save(path){
 		return false;
 	}
 	if(custGroup ==""){
-		alert("กรุณากรอก ข้อมูลกลุ่มสินค้า");
+		alert("กรุณากรอก ข้อมูลกลุ่มร้านค้า");
 		return false;
 	}
 	if(name ==""){
@@ -131,12 +132,34 @@ function save(path){
 		return false;
 	}
 	
+	if(closeDate != ""){
+		var chkDate  = checkCloseDate(openDate,closeDate);
+		if(chkDate==false){
+			alert("วันที่ CloseDate ต้องมากกว่าเท่ากับ Open Date ");
+			$('#closeDate').focus();
+			return false;
+		}
+	}
 	if(confirm("ยันยันการบันทึกข้อมูล")){
 		form.action = path + "/jsp/jobAction.do?do=save";
 		form.submit();
 		return true;
 	}
 	return false;
+}
+
+function checkCloseDate(DateFrom, DateTo){
+	if(DateFrom=='' || DateTo==''){return true;}
+	DateFrom = DateFrom.split("/");
+	starttime = new Date(DateFrom[2],DateFrom[1]-1,DateFrom[0]);
+
+	DateTo = DateTo.split("/");
+	endtime = new Date(DateTo[2],DateTo[1]-1,DateTo[0]);
+	if((endtime-starttime) < 0){
+		return false;
+	}else{
+		return true;
+	}
 }
 
 function openPopupCustomer(path,types,storeType){

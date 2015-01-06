@@ -100,7 +100,6 @@ function back(path){
 	return true;
 }
 
-
 function viewDisp(path){
 	var form = document.confFinishForm;
 	form.action = path + "/jsp/confFinishAction.do?do=viewDisp";
@@ -115,12 +114,20 @@ function printGroupCodeBoxReport(path,requestNo){
 
 function save(path){
 	var form = document.confFinishForm;
-	var returnDate =$('#returnDate').val();
+	var requestDate =$('#requestDate').val();
+	var confirmDate =$('#confirmDate').val();
 	
-	/* if(returnDate ==""){
-		alert("กรุณากรอก returnDate");
+	 if(confirmDate ==""){
+		alert("กรุณากรอก confirmDate");
+		$('#confirmDate').focus();
 		return false;
-	} */
+	} 
+	 
+	if(checkCompareDate(requestDate,confirmDate) ==false){
+		alert("วันที่ Confirm Date ต้องมากกว่า หรือเท่ากับ Request Date ");
+		$('#confirmDate').focus();
+		return false;
+	}
 	
 	if(confirm("ยันยัน Confirm To Finishing")){
 		form.action = path + "/jsp/confFinishAction.do?do=save";
@@ -129,6 +136,21 @@ function save(path){
 	}
 	return false;
 }
+
+function checkCompareDate(DateFrom, DateTo){
+	if(DateFrom=='' || DateTo==''){return true;}
+	DateFrom = DateFrom.split("/");
+	starttime = new Date(DateFrom[2],DateFrom[1]-1,DateFrom[0]);
+
+	DateTo = DateTo.split("/");
+	endtime = new Date(DateTo[2],DateTo[1]-1,DateTo[0]);
+	if((endtime-starttime) < 0){
+		return false;
+	}else{
+		return true;
+	}
+}
+
 </script>
 
 </head>		
@@ -175,19 +197,23 @@ function save(path){
 						       <tr>
                                     <td> Request Date</td>
 									<td>					
-										<html:text property="bean.requestDate" styleId="requestDateX" size="20" styleClass="disableText" readonly="true"/>
+										<html:text property="bean.requestDate" styleId="requestDate" size="20" styleClass="disableText" readonly="true"/>
 									</td>
 									<td> 
 									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="disableText"/>
 									</td>
 									<td> 
 									    Confirm Date
-									      <c:if test="${reqFinishForm.bean.canEdit == true}"> <font color="red">*</font></c:if>
-									     <html:text property="bean.confirmDate" styleId="confirmDate" size="20" styleClass=""/>
+									      <c:if test="${confFinishForm.bean.canEdit == true}">
+									          <font color="red">*</font><html:text property="bean.confirmDate" styleId="confirmDate" size="20" styleClass=""/>
+									      </c:if>
+									     <c:if test="${confFinishForm.bean.canEdit == false}">
+									         <html:text property="bean.confirmDate" styleId="confirmDate" size="20" styleClass="disableText"/>
+									      </c:if>
 									</td>
-									<td>					
+									<td nowrap>					
 										สถานะ   
-									  <html:text property="bean.statusDesc" styleId="status" size="20" styleClass="disableText"/>
+									  <html:text property="bean.statusDesc" styleId="status" size="15" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>

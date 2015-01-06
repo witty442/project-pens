@@ -49,6 +49,7 @@ function selectAll(){
 function selectMultiple(){
 	var codesAllNew = "";
 	var descsAllNew = "";
+	var chAll = document.getElementsByName("chCheckAll");
 	
 	//Add Select Muti in each page 
 	var checkInTable = document.getElementsByName("chCheck");
@@ -56,12 +57,14 @@ function selectMultiple(){
     var descInTable = document.getElementsByName("desc");
     //alert(codeInTable.length);
     
+  
 	for(var i=0;i < codeInTable.length; i++){
 		//alert(checkInTable[i].checked);
    		if(checkInTable[i].checked){
    		   codesAllNew += codeInTable[i].value +",";
 	  	   descsAllNew += descInTable[i].value +",";
    		}//if
+	    
 	}//for
 
 	if(codesAllNew.length >0){
@@ -69,6 +72,11 @@ function selectMultiple(){
 		descsAllNew = descsAllNew.substr(0,descsAllNew.length-1);
 	}
 	
+	//alert(chAll[0].checked);
+	if(chAll[0].checked){
+		codesAllNew = "ALL";
+		descsAllNew = "ALL";
+	}
 	window.opener.setStatusMainValue(codesAllNew,descsAllNew);
 	window.close();
 }
@@ -96,6 +104,8 @@ function selectMultiple(){
 					<td align="center">
 						<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
 						<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
+						
+						<input type ="checkbox" name="chCheckAll" id="chCheckAll"/>เลือกทั้งหมด
 					</td>
 				</tr>
 			</table>

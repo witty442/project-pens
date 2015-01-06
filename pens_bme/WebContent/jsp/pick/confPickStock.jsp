@@ -64,6 +64,12 @@ span.pagelinks {
 
 function loadMe(){
 }
+function print(path){
+	var form = document.confPickStockForm;
+	form.action = path + "/jsp/confPickStockAction.do?do=print";
+	form.submit();
+	return true;
+}
 
 function clearForm(path){
 	var form = document.confPickStockForm;
@@ -398,7 +404,7 @@ function sumQty(){
 									<td class="data_barcode"> <%=o.getBarcode() %> </td>
 
 									<td class="data_qty">
-										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getReqQty()) %>" size="20"  
+										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
 										    class="disableNumber"
 										   />		 
 									</td>
@@ -425,12 +431,17 @@ function sumQty(){
 					<div align="right">
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
-								<td align="right">	 <span class="pagelinks">รวมทั้งสิ้น :
-								<html:text property="bean.totalQty" styleId="totalQty" size="30" styleClass="disableNumber"/>
-								<br/>
-								<!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value="${confPickStockForm.bean.totalQtyNotInCurPage}"/>
-								<!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>
-								</span>			
+								<td align="right"><span class="pagelinks">รวมทั้งสิ้น :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>	</td>
+								<td>
+								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" styleClass="disableNumber" readonly="true"/>
+								     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
+								</td>
+								
+								<td>
+								   <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber" readonly="true"/>
+								   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								   <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value="${confPickStockForm.bean.totalQtyNotInCurPage}"/>
+								   <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>	
 								</td>
 							</tr>
 						</table>
@@ -442,7 +453,11 @@ function sumQty(){
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
-								
+								 <c:if test="${confPickStockForm.bean.canPrint == true}">
+										<a href="javascript:print('${pageContext.request.contextPath}')">
+										  <input type="button" value=" พิมพ์ ใบเบิกสินค้า  " class="newPosBtnLong"> 
+										</a>
+								 </c:if>
 								  <c:if test="${confPickStockForm.bean.canConfirm == true}">
 									<a href="javascript:confirmPick('${pageContext.request.contextPath}')">
 									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 

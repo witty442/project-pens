@@ -63,17 +63,8 @@ span.pagelinks {
 function loadMe(){
  <%if(session.getAttribute("resultItems") != null) {%>
     sumQty();
+    sumOnhandQty();
   <%}%>
-  
-  <%if(session.getAttribute("saved") !=null){%>
-       if(document.getElementsByName("bean.totalQty")[0].value =='0'){
-    	   sumQty = "";
-       }else{
-    	   sumQty = document.getElementsByName("bean.totalQty")[0].value;
-       }
-       window.opener.setQtyMain(document.getElementsByName("bean.rowIndex")[0].value,sumQty);
- 	   window.close();
- <% }%>
 }
 
 function clearForm(path){
@@ -100,9 +91,12 @@ function exportExcel(path){
 function save(path){
 	 
 	var form = document.addItemPickStockForm;
-	form.action = path + "/jsp/addItemPickStockAction.do?do=save";
-	form.submit();
-	 return true;
+	if(confirm("ยันยันการบันทึกข้อมูล")){
+	   form.action = path + "/jsp/addItemPickStockAction.do?do=save";
+	   form.submit();
+	    return true;
+	}
+	return false;
 }
 
 function isNum(obj){
@@ -149,6 +143,17 @@ function validateQty(obj,row){
 	return true;
 }
 
+function sumOnhandQty(){
+	var onhandQtyObj = document.getElementsByName("onhandQty");
+	
+	var sumCurPageQty = 0;
+	for(var i=0;i<onhandQtyObj.length;i++){
+		if(onhandQtyObj[i].value != '')
+			sumCurPageQty = sumCurPageQty + parseInt(onhandQtyObj[i].value);
+	}
+	document.getElementsByName("bean.totalOnhandQty")[0].value = sumCurPageQty 
+}
+
 function sumQty(){
 	var qtyObj = document.getElementsByName("qty");
 	var totalQtyNotInCurPage = 0;
@@ -177,15 +182,19 @@ function sumQty(){
 			<html:form action="/jsp/addItemPickStockAction">
 			<jsp:include page="../error.jsp"/>
 			
-               <html:hidden property="bean.rowIndex"/>
-                
+               <html:hidden property="bean.rowIndex" styleId="rowIndex"/>
+               <html:hidden property="bean.issueReqNo" styleId="issueReqNo"/>
+               <html:hidden property="bean.actionDB" styleId="actionDB"/>
+          
+               <input type="hidden" id="path" value="${pageContext.request.contextPath}"/>
+                 
 			   <div align="center">
 				    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 				        <tr>
-                            <td colspan="3" align="center"><font size="3"><b>บันทึกข้อมูลราย Item</b></font></td>
+                            <td colspan="3" align="center"><font size="3"><b>เบิกสินค้า ราย Item</b></font></td>
 					   </tr>
                              <tr>
-                                  <td>GroupCode</td>
+                                  <td>Group Code</td>
                                    <td>
                                      <html:text property="bean.groupCode" styleId="groupCode" size="20" readonly="true" styleClass="disableText"/>
                                    </td>
@@ -202,7 +211,7 @@ function sumQty(){
 				     <tr>
 						<th >MaterialMaster</th>
 						<th >Barcode</th>
-						<th >Onhand-Qty</th>
+						<th >Onhand Qty</th>
 						<th >Qty ที่จะเบิก</th>
 					  </tr>
 					<%
@@ -219,12 +228,10 @@ function sumQty(){
 					   }
 					%>
 					      <tr class="<%=classStyle%>" id="<%=o.getLineItemId()%>"> 
-					            
-								<td class="data_materialMaster"><%=o.getMaterialMaster() %></td>
+								<td class="data_materialMaster"><%=o.getMaterialMaster()%></td>
 								<td class="data_barcode"><%=o.getBarcode() %></td>
 								<td class="data_onhandQty">
-								    <input tabindex="-1" type="hidden" name="onhandQty" value ="<%=o.getOnhandQty()%>"/>
-								    <%=o.getOnhandQty()%>
+								    <input tabindex="-1" type="text" name="onhandQty" value ="<%=o.getOnhandQty()%>" size="20" class="disableNumber"/>
 								</td>
 								<td class="data_qty">
 									  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  class="enableNumber"
@@ -234,43 +241,58 @@ function sumQty(){
 								</td>
 						</tr>
 					<%} %>
-			</table>
-			
-			<div align="right">
-				<table  border="0" cellpadding="3" cellspacing="0" >
-					<tr>
-						<td align="right">	 <span class="pagelinks">รวมทั้งสิ้น :
-						<html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
-						<br/>
-						<input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
-						<input type="hidden" name = "curPageQty" id="curPageQty"/>
-						</span>			
-						</td>
+					
+					<tr class=""> 
+							<td class="data_barcode" colspan="2" align="right">รวมทั้งสิ้น :</td>
+							<td class="data_onhandQty">
+							   <html:text property="bean.totalOnhandQty" styleId="totalOnhandQty" size="20" styleClass="disableNumber"/>
+							</td>
+							<td class="data_qty">
+							    <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
+								 <input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
+						         <input type="hidden" name = "curPageQty" id="curPageQty"/>
+							</td>
 					</tr>
-				</table>
-			</div>	
-		<%} %>		
-
+			</table>
+		<%} %>
 			<!-- BUTTON ACTION-->
 			<div align="center">
 				<table  border="0" cellpadding="3" cellspacing="0" >
 						<tr>
 							<td align="left">
 								<a href="javascript:save('${pageContext.request.contextPath}')">
-								  <input type="button" value="  OK  " class="newPosBtnLong"> 
+								  <input type="button" value=" บันทึกข้อมูล   " class="newPosBtnLong"> 
 								</a>
 							<a href="javascript:window.close()">
 							  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
-							</a>	
-													
+							</a>					
 							</td>
 						</tr>
 				</table>
 			</div>
-
+    
 			<!-- ************************Result ***************************************************-->
 			</html:form>
 			<!-- BODY -->
-					
+					<script>
+					  <%if(session.getAttribute("saved") !=null){%>
+				           //alert($('#totalQty'));
+				           
+					       if($('#totalQty').val() =='0'){
+					    	   sumQty = "";
+					       }else{
+					    	   sumQty = $('#totalQty').val();
+					       }
+					       
+					       var rowIndex = $('#rowIndex').val(); //document.getElementsByName("bean.rowIndex")[0].value;
+					       var issueReqNo = $('#issueReqNo').val();//document.getElementsByName("bean.issueReqNo")[0].value;
+					       var actionDB = $('#actionDB').val() ;//document.getElementsByName("bean.status")[0].value;
+					       var totalOnhandQty = $('#totalOnhandQty').val();
+					       var path = $('#path').val();
+					       
+					       window.opener.setReqPickMain(rowIndex,issueReqNo,sumQty,totalOnhandQty,actionDB,path);
+					 	   window.close();
+				 <% }%>
+					</script>
 </body>
 </html>

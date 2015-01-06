@@ -1,10 +1,13 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-
+<%User user = (User)session.getAttribute("user");
+  System.out.println("Role:"+user.getRole().getKey());
+%>
 
 <ul id="nav">
-
+<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Stock Onhand B'me </span></a>
 		<ul>
 		    <li>
@@ -22,18 +25,23 @@
 			 <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/importAction.do?do=prepare&page=tops&action=new';">5.<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
 			</li>
-			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/importAction.do?do=prepare&page=physical&action=new';">6.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
+			 <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mttAction.do?do=prepare2&action=new';">6.<span><bean:message bundle="sysprop" key="mtt"/></span></a>
 			</li>
 			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/importAction.do?do=prepare&page=return_wacoal&action=new';">7.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/importAction.do?do=prepare&page=physical&action=new';">7.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
 			</li>
 			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/masterAction.do?do=prepare&action=new&page=master';">8.<span><bean:message bundle="sysprop" key="MaintainMaster"/></span></a>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/importAction.do?do=prepare&page=return_wacoal&action=new';">8.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
 			</li>
+			<li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/masterAction.do?do=prepare&action=new&page=master';">9.<span><bean:message bundle="sysprop" key="MaintainMaster"/></span></a>
+			</li>
+			
 		</ul>
 	</li>
-
+<%} %>
+<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
     <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Report</span></a>
 		<ul>
 			<li>
@@ -66,9 +74,13 @@
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/reportAction.do?do=prepare&action=new';"><span>8.<bean:message bundle="sysprop" key="Report"/></span></a>
 			</li>
+			<li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mttAction.do?do=prepareReport&action=new';"><span>9.<bean:message bundle="sysprop" key="mttReport"/></span></a>
+			</li>
 		</ul>
 	</li>
-	
+<%} %>
+<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
 	 <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Order</span></a>
 		<ul>
 			<li>
@@ -82,6 +94,9 @@
 			</li>
 		</ul>
 	</li>
+<%} %>
+
+<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
 	 <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Transaction</span></a>
 		<ul>
 			<li>
@@ -92,16 +107,11 @@
 			</li>
 		</ul>
 	</li>
-	<%-- <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>OLD</span></a>
-		<ul>
-			 <li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pickStockAction.do?do=prepare2&action=new';"><span>dd6.<bean:message bundle="sysprop" key="pickStock"/></span></a>
-			</li> 
-			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/renewBoxAction.do?do=prepare2&action=new';"><span>dd7.<bean:message bundle="sysprop" key="renewBox"/></span></a>
-			</li>   
-		</ul>
-	</li> --%>
+<%} %>
+
+
+	
+<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>	
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Pick</span></a>
 		<ul>
 			<li>
@@ -120,7 +130,10 @@
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/confFinishAction.do?do=prepare2&action=new';"><span>5.<bean:message bundle="sysprop" key="confFinish"/></span></a>
 			</li> 
 			 <li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockQueryAction.do?do=prepare&action=new';"><span>7.<bean:message bundle="sysprop" key="stockQuery"/></span></a>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockQueryAction.do?do=prepare&action=new';"><span>6.<bean:message bundle="sysprop" key="stockQuery"/></span></a>
+			</li>
+			 <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new';"><span>7.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
 			 <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/reqPickStockAction.do?do=prepare2&action=new';"><span>8.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
@@ -134,9 +147,21 @@
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/confirmReturnWacoalAction.do?do=prepare2&action=new';"><span>11.<bean:message bundle="sysprop" key="confirmReturnWacoal"/></span></a>
 			</li>
-			
-			
+			 <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pickStockAction.do?do=prepare2&action=new';"><span>12.<bean:message bundle="sysprop" key="pickStock"/></span></a>
+			</li> 
 		</ul>
 	</li>
+  <%} %>
+  
+<%if(User.ADMIN.equals(user.getRole().getKey()) || User.MC.equals(user.getRole().getKey())) {%>
+  	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>MC</span></a>
+		<ul>
+			<li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mcAction.do?do=prepare2&action=new';"><span>1.<bean:message bundle="sysprop" key="mc"/></span></a>
+			</li>   
+		</ul>
+	</li> 
+<%} %>
 </ul>
    

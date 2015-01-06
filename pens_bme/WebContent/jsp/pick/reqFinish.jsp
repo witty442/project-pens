@@ -220,7 +220,7 @@ function sumTotal(chkObj){
 									</td>
 									<td>					
 										ʶҹ�   
-									  <html:text property="bean.statusDesc" styleId="status" size="20" styleClass="disableText"/>
+									  <html:text property="bean.statusDesc" styleId="status" size="10" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>

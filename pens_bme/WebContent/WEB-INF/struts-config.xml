@@ -62,7 +62,10 @@
 		<form-bean name="confPickStockForm" type="com.isecinc.pens.web.pick.ConfPickStockForm" />
 		<form-bean name="moveWarehouseForm" type="com.isecinc.pens.web.pick.MoveWarehouseForm" />
 		<form-bean name="stockQueryForm" type="com.isecinc.pens.web.pick.StockQueryForm" />
+		<form-bean name="stockFinishGoodQueryForm" type="com.isecinc.pens.web.pick.StockFinishGoodQueryForm" />
 		
+		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
+		<form-bean name="mcForm" type="com.isecinc.pens.web.mc.MCForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 	</form-beans>
 	
@@ -162,6 +165,7 @@
 			<forward name="clear2" path="/jsp/popup/searchCustomerPopupOne.jsp" />
 			
 			<forward name="search3" path="/jsp/popup/searchCustomerPopupOneWithSubInv.jsp" />
+			<forward name="searchMC" path="/jsp/popup/searchMCStaffPopup.jsp" />
 		</action>
 		
 		<!-- POPUP -->
@@ -282,7 +286,14 @@
 			<forward name="clear" path="/jsp/pick/stockQuery.jsp" />
 			<forward name="exportExcel" path="/jsp/pick/stockQuery.jsp" />
 		</action>
-
+		
+       <action name="stockFinishGoodQueryForm" path="/jsp/stockFinishGoodQueryAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.StockFinishGoodQueryAction">
+			<forward name="search" path="/jsp/pick/stockFinishGoodQuery.jsp" />
+			<forward name="prepare" path="/jsp/pick/stockFinishGoodQuery.jsp" />
+			<forward name="clear" path="/jsp/pick/stockFinishGoodQuery.jsp" />
+			<forward name="exportExcel" path="/jsp/pick/stockFinishGoodQuery.jsp" />
+		</action>
+		
         <action name="reqReturnWacoalForm" path="/jsp/reqReturnWacoalAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ReqReturnWacoalAction">
 			<forward name="search2" path="/jsp/pick/reqReturnWacoalSearch.jsp" />
 			<forward name="prepare2" path="/jsp/pick/reqReturnWacoalSearch.jsp" />
@@ -334,6 +345,7 @@
 			<forward name="clear2" path="/jsp/pick/reqPickStockSearch.jsp" />
 			
 			<forward name="search" path="/jsp/pick/reqPickStock.jsp" />
+			<forward name="searchFilter" path="/jsp/pick/reqPickStock.jsp" />
 			<forward name="prepare" path="/jsp/pick/reqPickStock.jsp" />
 			<forward name="clear" path="/jsp/pick/reqPickStock.jsp" />
 			<forward name="addRow" path="/jsp/pick/reqPickStock.jsp" />
@@ -367,6 +379,31 @@
 			<forward name="search" path="/jsp/popup/printGroupCodeBoxPopup.jsp" />
 			<forward name="prepare" path="/jsp/popup/printGroupCodeBoxPopup.jsp" />
 			<forward name="clear" path="/jsp/popup/printGroupCodeBoxPopup.jsp" />
+		</action>
+		
+		<action name="mttForm" path="/jsp/mttAction" parameter="do" scope="session" type="com.isecinc.pens.web.mtt.MTTAction">
+			<forward name="search2" path="/jsp/main/mttSearch.jsp" />
+			<forward name="prepare2" path="/jsp/main/mttSearch.jsp" />
+			<forward name="clear2" path="/jsp/main/mttSearch.jsp" />
+			
+			<forward name="search" path="/jsp/main/mtt.jsp" />
+			<forward name="prepare" path="/jsp/main/mtt.jsp" />
+			<forward name="clear" path="/jsp/main/mtt.jsp" />
+			<forward name="addRow" path="/jsp/main/mtt.jsp" />
+			
+			<forward name="report" path="/jsp/main/mttReport.jsp" />
+		</action>
+		
+		<action name="mcForm" path="/jsp/mcAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCAction">
+			<forward name="search2" path="/jsp/mc/mcSearch.jsp" />
+			<forward name="prepare2" path="/jsp/mc/mcSearch.jsp" />
+			<forward name="clear2" path="/jsp/mc/mcSearch.jsp" />
+			
+			<forward name="search" path="/jsp/mc/mcTrans.jsp" />
+			<forward name="prepare" path="/jsp/mc/mcTrans.jsp" />
+			<forward name="clear" path="/jsp/mc/mcTrans.jsp" />
+			
+			<forward name="report" path="/jsp/mc/mcSearch.jsp" />
 		</action>
 		
 		<action name="tempForm" path="/jsp/tempAction" forward="/jsp/printPopup.jsp" />

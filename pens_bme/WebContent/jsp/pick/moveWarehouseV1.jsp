@@ -91,13 +91,12 @@ function back(path){
 
 function search(path){
 	var form = document.moveWarehouseForm;
-	var warehouseFrom =$('#warehouseFrom').val();
-	
-	 if(warehouseFrom ==""){
-		alert("กรุณากรอก  Move From Warehouse ");
-		$('#warehouseFrom').focus();
+
+	if(jobId ==""){
+		alert("กรุณากรอก  ข้อมูลรับคืน ที่จะทำการย้าย Warehouse");
+		$('#jobId').focus();
 		return false;
-	} 
+	}
 	
 	form.action = path + "/jsp/moveWarehouseAction.do?do=search&action=newsearch";
 	form.submit();
@@ -109,8 +108,8 @@ function save(path){
 	var openDate =$('#openDate').val();
 	var warehouseFrom =$('#warehouseFrom').val();
 	var warehouseTo =$('#warehouseTo').val();
-	//var jobId =$('#jobId').val();
-	//var newJobName =$('#newJobName').val();
+	var jobId =$('#jobId').val();
+	var newJobName =$('#newJobName').val();
 	
 	if(openDate ==""){
 		alert("กรุณากรอก openDate");
@@ -129,7 +128,7 @@ function save(path){
 		return false;
 	}
 	
-	/* if(jobId ==""){
+	if(jobId ==""){
 		alert("กรุณากรอก  รับคืนจาก");
 		$('#jobId').focus();
 		return false;
@@ -138,7 +137,7 @@ function save(path){
 		alert("กรุณากรอก  JobName");
 		$('#newJobName').focus();
 		return false;
-	} */
+	}
 	
 	if(warehouseFrom == warehouseTo){
 		alert("ไม่สามารถย้ายเข้าคลังเดียวกันได้");
@@ -196,8 +195,8 @@ function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHous
 		form.storeName.value = "";
 		form.storeNo.value = "";
 		form.subInv.value = "";
-		//form.warehouseFrom.value = "";
-		//form.warehouseFromDesc.value = "";
+		form.warehouseFrom.value = "";
+		form.warehouseFromDesc.value = "";
 	}else{
 		document.getElementsByName("bean.jobId")[0].value = code;
 		document.getElementsByName("bean.jobName")[0].value = desc;
@@ -206,8 +205,8 @@ function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHous
 		document.getElementsByName("bean.storeName")[0].value = storeName;
 		document.getElementsByName("bean.storeNo")[0].value = storeNo;
 		document.getElementsByName("bean.subInv")[0].value = subInv;
-		//document.getElementsByName("bean.warehouseFrom")[0].value = wareHouse;
-		//document.getElementsByName("bean.warehouseFromDesc")[0].value = wareHouseDesc;
+		document.getElementsByName("bean.warehouseFrom")[0].value = wareHouse;
+		document.getElementsByName("bean.warehouseFromDesc")[0].value = wareHouseDesc;
 	}
 }
 
@@ -253,8 +252,8 @@ function getJobNameModel(code){
 			form.storeName.value = "";
 			form.storeNo.value = "";
 			form.subInv.value = "";
-			//form.warehouseFrom.value = "";
-			//form.warehouseFromDesc.value = "";
+			form.warehouseFrom.value = "";
+			form.warehouseFromDesc.value = "";
 		}else{
 			
 			form.jobName.value = retArr[0];	
@@ -262,8 +261,8 @@ function getJobNameModel(code){
 			form.storeName.value = retArr[2];
 			form.storeNo.value = retArr[3];
 			form.subInv.value = retArr[4];
-			//form.warehouseFrom.value = retArr[5];
-			//form.warehouseFromDesc.value = retArr[6];
+			form.warehouseFrom.value = retArr[5];
+			form.warehouseFromDesc.value = retArr[6];
 		}
 		
 	}else{
@@ -275,8 +274,8 @@ function getJobNameModel(code){
 		form.storeName.value = "";
 		form.storeNo.value = "";
 		form.subInv.value = "";
-		//form.warehouseFrom.value = "";
-		//form.warehouseFromDesc.value = "";
+		form.warehouseFrom.value = "";
+		form.warehouseFromDesc.value = "";
 	}
 	
 }
@@ -386,19 +385,9 @@ function checkOpenDate(){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						        <tr>
                                   <td colspan="3" align="center"><font size="3"><b></b></font></td>
-							   </tr>
-							    <tr>
-                                    <td align="right"> Move From Warehouse<font color="red">*</font></td>
-                                      <td>
-                                        <html:select property="bean.warehouseFrom" styleId="warehouseFrom" >
-											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
-									    </html:select>
-                                     </td>
-									<td align="left"></td>
-									<td align="left"></td>
-								</tr>     			
+							   </tr>			
 								<tr>
-                                    <td align="right"> รับคืนจาก  </td>
+                                    <td align="right"> รับคืนจาก  <font color="red">*</font></td>
 									<td colspan="3">
 						               <html:text property="bean.jobId" styleId="jobId" size="20"  onkeypress="getJobNameKeypress(event,this)"/> 
 						                <input type="button" name="x1" value="..." onclick="openJobPopup('${pageContext.request.contextPath}')"/>
@@ -421,16 +410,19 @@ function checkOpenDate(){
 						               <html:text property="bean.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>	
-								<tr>
-                                    <td align="right"></td>
-                                    <td><a href="javascript:search('${pageContext.request.contextPath}')">
-										     <input type="button" value=" แสดงข้อมูล   " class="newPosBtnLong"> 
-										 </a></td>
+								 <tr>
+                                    <td align="right"> Move From Warehouse</td>
+                                      <td>
+                                        <html:text property="bean.warehouseFrom" styleId="warehouseFrom" size="3" readonly="true" styleClass="disableText"/>-								
+									    <html:text property="bean.warehouseFromDesc" styleId="warehouseFromDesc" size="30" readonly="true" styleClass="disableText" />	
+                                     </td>
 									<td align="left">
-									      	
+									      <a href="javascript:search('${pageContext.request.contextPath}')">
+										     <input type="button" value=" แสดงข้อมูล   " class="newPosBtnLong"> 
+										 </a>	
 									</td>
 									<td align="left"></td>
-								</tr>     		
+								</tr>     
 								<tr>
 									<td align="right">Move To Warehouse <font color="red">*</font></td>
 									<td align="left" colspan="3">
@@ -439,14 +431,22 @@ function checkOpenDate(){
 									    </html:select>
 									</td>
 								</tr>     
-								<tr>
-                                    <td align="right">Open Date<font color="red">*</font></td>
+								  <tr>
+                                    <td align="right">Open Date   <font color="red">*</font></td>
                                      <td colspan="3">
                                        <html:text property="bean.openDate" styleId="openDate" size="20"  styleClass="" onchange="checkOpenDate()"/>
 									Close Date 
 									 <html:text property="bean.closeDate" styleId="closeDate" size="20" readonly="true" styleClass="disableText"/>	  
 									</td>
-								</tr>
+								</tr>		
+								<tr>
+                                    <td align="right"> New Job Id</td>
+									<td colspan="3">
+						               <html:text property="bean.newJobId" styleId="newJobId" size="20" readonly="true" styleClass="disableText"/>
+									    New Job Name
+						                 <html:text property="bean.newJobName" styleId="newJobName" size="30" /><font color="red">*</font>
+									</td>
+								</tr>	  
 								<tr>
                                     <td align="right"> หมายเหตุ</td>
 									<td colspan="3">
@@ -474,12 +474,9 @@ function checkOpenDate(){
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						    <tr>
 							<!-- 	<th >No</th> -->
-								<th ><!-- <input type="checkbox" name="chkAll" onclick="checkAll(this)"/> --></th>
-								<th >Job Id</th>
+								<th ><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
 								<th >เลขที่กล่อง</th>
-								<th >Qty</th>	
-								<th >New Job Id</th>
-								<th >เลขที่กล่อง ใหม่</th>	
+								<th >Qty</th>		
 							</tr>
 							<c:forEach var="results" items="${moveWarehouseForm.results}" varStatus="rows">
 								<c:choose>
@@ -490,7 +487,9 @@ function checkOpenDate(){
 										<c:set var="tabclass" value="lineE"/>
 									</c:otherwise>
 								</c:choose>
+								
 									<tr class="<c:out value='${tabclass}'/>">
+										
 										<td class="data_chk">
 											<c:choose>
 												<c:when test="${results.selected == 'true'}">
@@ -502,20 +501,12 @@ function checkOpenDate(){
 											</c:choose>					  
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
 										</td>
-										<td class="data_boxNo" align="left">${results.jobId}&nbsp;${results.jobName}
-											<input type="hidden" name="jobIdItem" value ="${results.jobId}" size="40" readonly class="disableText"/>
-										</td>
 										<td class="data_boxNo" align="center">${results.boxNo}
 											<input type="hidden" name="boxNo" value ="${results.boxNo}" size="40" readonly class="disableText"/>
+											
 										</td>
 										<td class="data_qty" align="center">${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
-										</td>
-										<td class="data_boxNo" align="left">${results.newJobId}&nbsp;${results.newJobName}
-											<input type="hidden" name="newJobId" value ="${results.newJobId}" size="40" readonly class="disableText"/>
-										</td>
-										<td class="data_boxNo" align="center">${results.newBoxNo}
-											<input type="hidden" name="newBoxNo" value ="${results.newBoxNo}" size="40" readonly class="disableText"/>
 										</td>
 									</tr>
 							  </c:forEach>
@@ -526,6 +517,7 @@ function checkOpenDate(){
 							|<b> รวมจำนวนชิ้น </b> : <input type="text" size="10" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/> ชิ้น
 						</div>
 						 <div align="left">
+							
 						</div>
 						
 				</c:if>
@@ -554,6 +546,8 @@ function checkOpenDate(){
 					<!-- ************************Result ***************************************************-->
 					
 					<!-- hidden field -->
+			
+					
 					</html:form>
 					<!-- BODY -->
 					</td>
