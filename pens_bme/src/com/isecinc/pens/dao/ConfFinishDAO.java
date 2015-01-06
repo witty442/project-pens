@@ -311,6 +311,7 @@ public class ConfFinishDAO extends PickConstants{
 				 //Set barcode status = FINISH(F)
 			      Barcode b = (Barcode)barcodeList.get(i);
 			      b.setStatus(PickConstants.STATUS_FINISH);
+			      b.setUpdateUser(h.getUpdateUser());
 			       
 			      BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
 			      BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);

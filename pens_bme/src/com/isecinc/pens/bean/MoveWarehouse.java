@@ -28,6 +28,7 @@ public class MoveWarehouse implements Serializable{
 	//Line
 	private int lineId;
 	private String boxNo;
+	private String newBoxNo;
 	private String qty;
     private String createUser;
     private String updateUser;
@@ -41,6 +42,12 @@ public class MoveWarehouse implements Serializable{
 	private List<MoveWarehouse> items;
 	
 	
+	public String getNewBoxNo() {
+		return newBoxNo;
+	}
+	public void setNewBoxNo(String newBoxNo) {
+		this.newBoxNo = newBoxNo;
+	}
 	public String getWarehouseFromDesc() {
 		return warehouseFromDesc;
 	}

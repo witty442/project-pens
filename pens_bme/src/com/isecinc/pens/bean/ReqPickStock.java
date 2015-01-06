@@ -17,6 +17,8 @@ public class ReqPickStock implements Serializable{
 	private String requestor;
 	private String remark;
 	private int totalQty;
+	private int totalReqQty;
+	private int totalOnhandQty;
 	private String storeCode;//CustomerNo
 	private String storeName;
 	private String subInv;
@@ -34,7 +36,7 @@ public class ReqPickStock implements Serializable{
 	private String qty;
 	private String onhandQty;
 	private String issueQty;
-	private String reqQty;
+	private int issueQtyInt;
 	private int qtyInt;
 	
 	private List<ReqPickStock> items;
@@ -63,20 +65,33 @@ public class ReqPickStock implements Serializable{
 	private Map<String,String> pensItemMapAll;
 	private int totalQtyNotInCurPage;
 	
-	private Map<String,ReqPickStock> groupCodeMap;
-	private Map<String,ReqPickStock> itemsBarcodeMap;
-	
-	private Map<String,ReqPickStock> itemsBarcodeErrorMap;
-	private Map<String,ReqPickStock> groupCodeErrorMap;
-	
 	private String rowIndex;
+	private String actionDB;
 	
 	
-	public String getReqQty() {
-		return reqQty;
+	public int getIssueQtyInt() {
+		return issueQtyInt;
 	}
-	public void setReqQty(String reqQty) {
-		this.reqQty = reqQty;
+	public void setIssueQtyInt(int issueQtyInt) {
+		this.issueQtyInt = issueQtyInt;
+	}
+	public int getTotalReqQty() {
+		return totalReqQty;
+	}
+	public void setTotalReqQty(int totalReqQty) {
+		this.totalReqQty = totalReqQty;
+	}
+	public int getTotalOnhandQty() {
+		return totalOnhandQty;
+	}
+	public void setTotalOnhandQty(int totalOnhandQty) {
+		this.totalOnhandQty = totalOnhandQty;
+	}
+	public String getActionDB() {
+		return actionDB;
+	}
+	public void setActionDB(String actionDB) {
+		this.actionDB = actionDB;
 	}
 	public String getIssueQty() {
 		return issueQty;
@@ -107,32 +122,6 @@ public class ReqPickStock implements Serializable{
 	}
 	public void setNewSearch(boolean newSearch) {
 		this.newSearch = newSearch;
-	}
-	public Map<String, ReqPickStock> getGroupCodeErrorMap() {
-		return groupCodeErrorMap;
-	}
-	public void setGroupCodeErrorMap(Map<String, ReqPickStock> groupCodeErrorMap) {
-		this.groupCodeErrorMap = groupCodeErrorMap;
-	}
-	public Map<String, ReqPickStock> getItemsBarcodeErrorMap() {
-		return itemsBarcodeErrorMap;
-	}
-	public void setItemsBarcodeErrorMap(
-			Map<String, ReqPickStock> itemsBarcodeErrorMap) {
-		this.itemsBarcodeErrorMap = itemsBarcodeErrorMap;
-	}
-	
-	public Map<String, ReqPickStock> getGroupCodeMap() {
-		return groupCodeMap;
-	}
-	public void setGroupCodeMap(Map<String, ReqPickStock> groupCodeMap) {
-		this.groupCodeMap = groupCodeMap;
-	}
-	public Map<String, ReqPickStock> getItemsBarcodeMap() {
-		return itemsBarcodeMap;
-	}
-	public void setItemsBarcodeMap(Map<String, ReqPickStock> itemsBarcodeMap) {
-		this.itemsBarcodeMap = itemsBarcodeMap;
 	}
 	public boolean isLineErrorStock() {
 		return lineErrorStock;

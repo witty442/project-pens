@@ -216,14 +216,6 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			sql.append("\n and h.box_no = i.box_no ");
 			sql.append("\n and h.status = '"+JobDAO.STATUS_CLOSE+"'");
 			sql.append("\n and ( i.status = '"+JobDAO.STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
-			// and boxNo is not pick stock
-			sql.append("\n and h.box_no not in(");
-			sql.append("\n    select distinct l.box_no from " );
-			sql.append("\n    PENSBI.PENSBME_PICK_STOCK h ,PENSBI.PENSBME_PICK_STOCK_I l where 1=1 ");
-			sql.append("\n    and h.issue_req_no = l.issue_req_no ");
-			sql.append("\n    and ISSUE_REQ_STATUS <> '"+STATUS_CANCEL+"'");
-			sql.append("\n) ");
-			
 			sql.append("\n group by i.box_no ,i.job_id ,j.warehouse,j.job_name ");
 			sql.append("\n order by i.box_no asc ");
 			logger.debug("sql:"+sql);
@@ -270,7 +262,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			//check requestNo
 			if(Utils.isNull(h.getRequestNo()).equals("")){
 				//Gen requestNo
-				h.setRequestNo(genRequestNo(conn,new Date()) );
+				h.setRequestNo(genRequestNo(new Date()) );
 				h.setStatus(STATUS_NEW);
 				logger.debug("RequestNO:"+h.getRequestNo());
 				
@@ -285,6 +277,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 					   l.setRequestNo(h.getRequestNo());
 					   l.setStatus(h.getStatus());
 					   l.setRemark(h.getRemark());
+					   l.setCreateUser(h.getCreateUser());
 					   
 					   //save item req 
 				       saveItemModel(conn, l);
@@ -294,6 +287,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
 				       b.setStatus(JobDAO.STATUS_RETURN);
+				       b.setUpdateUser(h.getCreateUser());
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
 				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
@@ -312,6 +306,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
 				       b.setStatus(JobDAO.STATUS_CLOSE);
+				       b.setUpdateUser(h.getCreateUser());
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
 				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
@@ -332,6 +327,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 					   l.setRequestNo(h.getRequestNo());
 					   l.setStatus(h.getStatus());
 					   l.setRemark(h.getRemark());
+					   l.setCreateUser(h.getCreateUser());
 					   
 				       saveItemModel(conn, l);
 				       
@@ -340,6 +336,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
 				       b.setStatus(JobDAO.STATUS_RETURN);
+				       b.setUpdateUser(h.getCreateUser());
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
 				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
@@ -360,9 +357,11 @@ public class ReqReturnWacoalDAO extends PickConstants{
 	}
 	
 	// 	RQYYMMXXX  ( เช่น RQ5703001 )  			
-	 private static String genRequestNo(Connection conn,Date date) throws Exception{
+	 private static String genRequestNo(Date date) throws Exception{
        String docNo = "";
+       Connection conn = null;
 		   try{
+			   conn = DBConnection.getInstance().getConnection();
 			   
 			   String today = df.format(date);
 			   String[] d1 = today.split("/");
@@ -376,6 +375,10 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			   docNo = "RQ"+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("000").format(seq);
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn != null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return docNo;
 	}

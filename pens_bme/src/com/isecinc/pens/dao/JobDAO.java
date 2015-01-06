@@ -270,7 +270,7 @@ public class JobDAO extends PickConstants{
 			//check documentNo
 			if(Utils.isNull(h.getJobId()).equals("")){
 				//Gen JobId
-				h.setJobId(genJobId(conn)+"");
+				h.setJobId(genJobId()+"");
 				h.setStatus(STATUS_OPEN);
 				
 				logger.debug("job id:"+h.getJobId());
@@ -318,7 +318,7 @@ public class JobDAO extends PickConstants{
 			//check documentNo
 			if(Utils.isNull(h.getJobId()).equals("")){
 				//Gen JobId
-				h.setJobId(genJobId(conn)+"");
+				h.setJobId(genJobId()+"");
 				saveAllModel(conn, h);
 			}
 		
@@ -331,13 +331,19 @@ public class JobDAO extends PickConstants{
 	}
 	
 	// ( Running :  yyyymm+running  เช่น 201403001 )			
-	 private static int genJobId(Connection conn) throws Exception{
+	 private static int genJobId() throws Exception{
 		 int seq = 0;
+		 Connection conn =null;
 		   try{
+			   conn = DBConnection.getInstance().getConnection();
 			   //get Seq
 			   seq = SequenceProcess.getNextValue(conn,"JOB_ID");
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn !=null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return seq;
 	}
@@ -452,6 +458,8 @@ public class JobDAO extends PickConstants{
 				sql.append(", STORE_NO = '"+Utils.isNull(o.getStoreNo())+"' \n" );
 				sql.append(", SUB_INV = '"+Utils.isNull(o.getSubInv())+"' \n" );
 				sql.append(", WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"' \n" );
+				sql.append(", UPDATE_DATE = ? \n" );
+				sql.append(", UPDATE_USER = '"+Utils.isNull(o.getUpdateUser())+"' \n" );
 				sql.append(" WHERE JOB_ID =? \n" );
                 
 				logger.debug("sql:"+sql.toString());
@@ -460,10 +468,10 @@ public class JobDAO extends PickConstants{
 					
 				ps.setString(c++, o.getName());
 				ps.setString(c++, o.getStatus());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setInt(c++, Integer.parseInt(o.getJobId()));
-				
+
 				ps.executeUpdate();
-				
 			}catch(Exception e){
 				throw e;
 			}finally{

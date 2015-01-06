@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.DescriptorKey;
+
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Barcode;
@@ -31,7 +33,7 @@ public class PickStockDAO extends PickConstants{
 	public PickStockDAO() {
 		// TODO Auto-generated constructor stub
 	}
-
+    @Deprecated
 	public static PickStock save(Connection conn,PickStock h,Map<String, PickStock> dataSaveMapAll) throws Exception{
 		PickStock result = new PickStock();
 		result.setResultProcess(true);//default
@@ -171,7 +173,8 @@ public class PickStockDAO extends PickConstants{
 			
 		}
 	}
-	
+    
+	@Deprecated
 	public static PickStock savePartBox(Connection conn,PickStock h) throws Exception{
 		Map<String,String> pensItemMapAll = new HashMap<String, String>();
 		try{
@@ -2051,7 +2054,7 @@ public class PickStockDAO extends PickConstants{
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<PickStock> searchBarcoceItemStatusClose(Connection conn ) throws Exception {
+	public static List<PickStock> searchBarcoceItemStatusCloseW3(Connection conn ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -2062,23 +2065,27 @@ public class PickStockDAO extends PickConstants{
            
 			sql.append("\n select i.box_no,i.job_id,(select max(name) from PENSBME_PICK_JOB j where j.job_id=i.job_id )as job_name ");
 			sql.append("\n ,count(*) as qty ");
-			sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
+			sql.append("\n from PENSBME_PICK_JOB j,PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
 			sql.append("\n where 1=1  ");
+			sql.append("\n and j.job_id = h.job_id ");
 			sql.append("\n and h.job_id = i.job_id ");
 			sql.append("\n and h.box_no = i.box_no ");
-			sql.append("\n and h.status = '"+JobDAO.STATUS_CLOSE+"'");
-			sql.append("\n and ( i.status = '"+JobDAO.STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
+			sql.append("\n  and j.warehouse = 'W3'");
+			sql.append("\n and h.status = '"+STATUS_CLOSE+"'");
+			sql.append("\n and ( i.status = '"+STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
 			
 			// and boxNo is not pick stock
 			sql.append("\n and h.box_no  in(");
 			
 			sql.append("\n  select i.box_no");
-			sql.append("\n  from PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
+			sql.append("\n  from PENSBME_PICK_JOB j,PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
 			sql.append("\n  where 1=1  ");
+			sql.append("\n  and j.job_id = h.job_id ");
 			sql.append("\n  and h.job_id = i.job_id ");
 			sql.append("\n  and h.box_no = i.box_no ");
-			sql.append("\n  and h.status = '"+JobDAO.STATUS_CLOSE+"'");
-			sql.append("\n  and ( i.status = '"+JobDAO.STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
+			sql.append("\n  and j.warehouse = 'W3'");
+			sql.append("\n  and h.status = '"+STATUS_CLOSE+"'");
+			sql.append("\n  and ( i.status = '"+STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
 			
 			sql.append("\n minus ");
 			// and boxNo is not pick stock

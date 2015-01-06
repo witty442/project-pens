@@ -22,11 +22,10 @@ import com.isecinc.pens.inf.helper.Utils;
  */
 public class User extends I_PO implements Serializable {
 
-	public static final String ADMIN = "AD";
-	public static final String TT = "TT";
-	public static final String VAN = "VAN";
-	public static final String DD = "DD";
-
+	public static final String ADMIN = "ADMIN";
+	public static final String PICK = "PICK";
+	public static final String MC = "MC";
+	
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -69,6 +68,8 @@ public class User extends I_PO implements Serializable {
 		setConfirmPassword(convertToString(rst.getString("PASSWORD")));
          
 		setUserGroupId(rst.getInt("USER_GROUP_ID"));
+		
+		setRole(new References(rst.getString("ROLE"), rst.getString("ROLE")));
 		
 		// set display label
 		setDisplayLabel();
@@ -170,7 +171,6 @@ public class User extends I_PO implements Serializable {
 	
     private String newPassword;
     private String reNewPassword;
-    
     
 	public String getNewPassword() {
 		return newPassword;

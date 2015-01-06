@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +40,10 @@ public class Utils {
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	public static final String DD_MMM_YY = "dd-MMM-yy";
 	
+	//Thai date
+	public static final String MMMM_YYYY = "MMMM-yyyy";
+	public static final String MMM_YYYY = "MMM-yyyy";
+	
 	public static final Locale local_th= new Locale("th","TH");
 
 	public static final String format_current_no_disgit = "#,##0";
@@ -52,13 +57,30 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	calcTotalPage(12,10);
+	    	System.out.println(isHoliday("03012015"));
 
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
 	}
 	
+    public static boolean isHoliday(String dateString){
+	   boolean re = false;
+	   try{
+		   Calendar c = Calendar.getInstance();
+		   c.setTime(Utils.parse(dateString, Utils.DD_MM_YYYY_WITHOUT_SLASH));
+		   int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+	   
+		   if(dayOfWeek==Calendar.SATURDAY || dayOfWeek==Calendar.SUNDAY){
+			   re = true;
+		   }
+	   }catch(Exception e){
+		   e.printStackTrace();
+	   }
+		
+	   return re;
+	}
+	  
 	public static int calcTotalPage(int totalRow,int maxPerPage){
 		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
 		//System.out.println("totalPageF:"+totalPageF);

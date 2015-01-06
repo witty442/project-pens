@@ -555,7 +555,7 @@ public class BarcodeDAO extends PickConstants{
 			//check documentNo
 			if(Utils.isNull(h.getBoxNo()).equals("")){
 				//Gen JobId
-				h.setBoxNo(genBoxNo(conn,new Date()) );
+				h.setBoxNo(genBoxNo(new Date()) );
 				h.setStatus(JobDAO.STATUS_OPEN);
 				
 				logger.debug("BoxNO:"+h.getBoxNo());
@@ -608,9 +608,11 @@ public class BarcodeDAO extends PickConstants{
 	}
 	
 	// ( Running :  yymmxxxx  เช่น 57030001 )			
-	 public static String genBoxNo(Connection conn,Date date) throws Exception{
+	 public static String genBoxNo(Date date) throws Exception{
        String docNo = "";
+       Connection conn = null;
 		   try{
+			   conn = DBConnection.getInstance().getConnection(); 
 			   
 			   String today = df.format(date);
 			   String[] d1 = today.split("/");
@@ -621,8 +623,13 @@ public class BarcodeDAO extends PickConstants{
 			   int seq = SequenceProcess.getNextValue(conn,"BOX_NO","BOX_NO",date);
 			   
 			   docNo = new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("0000").format(seq);
+		  
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn !=null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return docNo;
 	}
@@ -638,7 +645,7 @@ public class BarcodeDAO extends PickConstants{
 				sql.append(" (JOB_ID,BOX_NO, TRANSACTION_DATE,   \n");
 				sql.append("  STATUS, CREATE_DATE, CREATE_USER,REMARK)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -653,6 +660,44 @@ public class BarcodeDAO extends PickConstants{
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
 				ps.setString(c++, o.getRemark());
+				
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+	 
+	 public static void saveHeadModelForMove(Connection conn,Barcode o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("Insert box_no_ref["+o.getBoxNoRef()+"]");
+			try{
+				
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_BARCODE \n");
+				sql.append(" (JOB_ID,BOX_NO, TRANSACTION_DATE,   \n");
+				sql.append("  STATUS, CREATE_DATE, CREATE_USER,REMARK,BOX_NO_REF)  \n");
+			
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?) \n");
+				
+				ps = conn.prepareStatement(sql.toString());
+					
+				Date openDate = Utils.parse( o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
+				int c =1;
+				
+				ps.setInt(c++, Integer.parseInt(o.getJobId()));
+				ps.setString(c++, o.getBoxNo());
+				ps.setTimestamp(c++, new java.sql.Timestamp(openDate.getTime()));
+				ps.setString(c++, o.getStatus());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, o.getCreateUser());
+				ps.setString(c++, o.getRemark());
+				ps.setString(c++, Utils.isNull(o.getBoxNoRef()));
 				
 				ps.executeUpdate();
 				
@@ -744,7 +789,7 @@ public class BarcodeDAO extends PickConstants{
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE SET  \n");
-				sql.append(" STATUS = ? ,BOX_NO_REF =? ,update_user =?,update_date =?   \n");
+				sql.append(" STATUS = ? ,update_user =?,update_date =?   \n");
 				
 				sql.append(" WHERE JOB_ID =? and BOX_NO = ? \n" );
 
@@ -753,7 +798,6 @@ public class BarcodeDAO extends PickConstants{
 				ps = conn.prepareStatement(sql.toString());
 					
 				ps.setString(c++, o.getStatus());
-				ps.setString(c++, Utils.isNull(o.getBoxNoRef()));
 				ps.setString(c++, o.getUpdateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setInt(c++, Integer.parseInt(o.getJobId()));
@@ -769,6 +813,7 @@ public class BarcodeDAO extends PickConstants{
 				}
 			}
 		}
+		
 		
 		public static void updateBarcodeLineStatusModelByPK(Connection conn,Barcode o) throws Exception{
 			PreparedStatement ps = null;

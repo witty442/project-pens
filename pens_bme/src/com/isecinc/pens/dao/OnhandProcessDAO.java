@@ -168,7 +168,7 @@ public class OnhandProcessDAO {
 		int r = 1;
         List<Onhand> items = new ArrayList<Onhand>();
 		try {
-			sql.append("\n select i.barcode,i.pens_item ,i.barcode,i.MATERIAL_MASTER,group_code,qty" +
+			sql.append("\n select i.barcode,i.pens_item ,i.barcode,i.MATERIAL_MASTER,group_code,issue_qty" +
 					   "\n from PENSBI.PENSBME_STOCK_ISSUE_ITEM i   ");
 			sql.append("\n where 1=1");
 			sql.append("\n and i.issue_req_no ='"+req.getIssueReqNo()+"'");
@@ -186,8 +186,7 @@ public class OnhandProcessDAO {
 			   h.setGroupCode(rst.getString("group_code"));
 			   h.setPensItem(rst.getString("pens_item"));
 			   h.setBarcode(rst.getString("barcode"));
-			   h.setQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
-			   h.setIssueQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
+			   h.setIssueQty(Utils.decimalFormat(rst.getInt("issue_qty"),Utils.format_current_no_disgit));
 			   
 			   items.add(h);
 			   r++;
@@ -219,7 +218,7 @@ public class OnhandProcessDAO {
 		Onhand h = null;
 		try {
 			sql.append("\n select barcode,MATERIAL_MASTER,group_code,pens_item,SUM(onhand_qty) as onhand_qty from ( ");
-			sql.append("\n  select barcode,MATERIAL_MASTER,group_code,pens_item,onhand_qty from PENSBI.PENSBME_STOCK_FINISHED  ");
+			sql.append("\n  select barcode,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty from PENSBI.PENSBME_STOCK_FINISHED  ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and group_code ='"+o.getGroupCode()+"'");
 			sql.append("\n  and pens_item ='"+o.getPensItem()+"'");
@@ -229,7 +228,7 @@ public class OnhandProcessDAO {
 			sql.append("\n  UNION ALL ");
 			
 			 // substract from Stock issue status = O(Open)
-			sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* qty ) as onhand_qty ");
+			sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
 			sql.append("\n  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 	WHERE 1=1  ");
 			sql.append("\n 	AND h.issue_req_no = i.issue_req_no ");
@@ -243,7 +242,7 @@ public class OnhandProcessDAO {
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
 			    sql.append("\n  UNION ALL ");
 			    
-			    sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(qty) as onhand_qty ");
+			    sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(req_qty) as onhand_qty ");
 				sql.append("\n  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 	WHERE 1=1  ");
 				sql.append("\n 	AND h.issue_req_no = i.issue_req_no ");
@@ -417,7 +416,7 @@ public class OnhandProcessDAO {
 
 			ps = conn.prepareStatement(sql.toString());
 				
-			ps.setInt(c++, Utils.convertStrToInt(o.getQty())); // issue_qty = issue_qty + qty ,
+			ps.setInt(c++, Utils.convertStrToInt(o.getIssueQty())); // issue_qty = issue_qty + qty ,
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
 			ps.setString(c++, o.getPensItem());

@@ -944,7 +944,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 				h.setRequestStatus(req.getStatus());
 				
 				//Gen requestNo
-				h.setReturnNo(genReturnNo(conn,new Date()) );
+				h.setReturnNo(genReturnNo(new Date()) );
 				h.setReturnStatus(STATUS_RETURN);
 				logger.debug("ReturnNO:"+h.getReturnNo());
 				
@@ -997,10 +997,11 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 	}
 	
 	// 	RQYYMMXXX  ( เช่น RQ5703001 )  			
-	 private static String genReturnNo(Connection conn,Date date) throws Exception{
+	 private static String genReturnNo(Date date) throws Exception{
        String docNo = "";
+       Connection conn = null;
 		   try{
-			   
+			   conn = DBConnection.getInstance().getConnection();
 			   String today = df.format(date);
 			   String[] d1 = today.split("/");
 			  // System.out.println("d1[0]:"+d1[0]);
@@ -1013,6 +1014,10 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			   docNo = "RN"+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("000").format(seq);
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn != null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return docNo;
 	}

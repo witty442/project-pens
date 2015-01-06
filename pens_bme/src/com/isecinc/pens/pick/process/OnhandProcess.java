@@ -22,7 +22,7 @@ public class OnhandProcess {
 		}
 	}
 	
-	public static void processUpdateBalanceOnhandByIssueReqNo(Connection conn,ReqPickStock req){
+	public static void processUpdateBalanceOnhandByIssueReqNo(Connection conn,ReqPickStock req) throws Exception{
 		try{
 			logger.debug("******* Start processUpdateBalanceOnhandByIssueReqNo *******************");
 			
@@ -31,6 +31,7 @@ public class OnhandProcess {
 			logger.debug("******* End processUpdateBalanceOnhandByIssueReqNo *******************");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
+			throw e;
 		}
 	}
 }

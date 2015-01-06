@@ -150,7 +150,6 @@ public class ReqFinishDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-
 			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING i \n");
 			sql.append("\n where 1=1   \n");
 			
@@ -321,14 +320,7 @@ public class ReqFinishDAO extends PickConstants{
 			sql.append("\n and h.box_no = i.box_no ");
 			sql.append("\n and h.status = '"+JobDAO.STATUS_CLOSE+"'");
 			sql.append("\n and i.status = '"+JobDAO.STATUS_CLOSE+"'");
-			// and boxNo is not pick stock
-			sql.append("\n and h.box_no not in(");
-			sql.append("\n    select distinct l.box_no from " );
-			sql.append("\n    PENSBI.PENSBME_PICK_STOCK h ,PENSBI.PENSBME_PICK_STOCK_I l where 1=1 ");
-			sql.append("\n    and h.issue_req_no = l.issue_req_no ");
-			sql.append("\n    and ISSUE_REQ_STATUS <> '"+STATUS_CANCEL+"'");
-			sql.append("\n) ");
-			
+
 			sql.append("\n group by i.box_no ,i.job_id ,j.warehouse,j.job_name ");
 			sql.append("\n order by i.box_no asc ");
 			logger.debug("sql:"+sql);
@@ -376,7 +368,7 @@ public class ReqFinishDAO extends PickConstants{
 			//check requestNo
 			if(Utils.isNull(h.getRequestNo()).equals("")){
 				//Gen requestNo
-				h.setRequestNo(genRequestNo(conn,new Date()) );
+				h.setRequestNo(genRequestNo(new Date()) );
 				h.setStatus(STATUS_OPEN);
 				logger.debug("RequestNO:"+h.getRequestNo());
 				
@@ -400,6 +392,8 @@ public class ReqFinishDAO extends PickConstants{
 				       Barcode b = new Barcode();
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
+				       b.setCreateUser(h.getCreateUser());
+				       b.setUpdateUser(h.getUpdateUser());
 				       b.setStatus(JobDAO.STATUS_WORK_IN_PROCESS);
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
@@ -407,31 +401,35 @@ public class ReqFinishDAO extends PickConstants{
 				   }
 				}
 			}else{
-				//update status barcode to close (old status)
+				
+				//step 1 update all status barcode to close (old status)  from stock_issue_item
 				List<ReqFinish> saveData = ReqFinishDAO.searchHead(h,true);
+				
 				if(saveData != null && saveData.size()>0){
 				   ReqFinish oldReq = (ReqFinish)saveData.get(0);
 				   for(int i=0;i<oldReq.getItems().size();i++){
 					   ReqFinish l = (ReqFinish)oldReq.getItems().get(i);
 					   
-					   //Set barcode status = return
+					   //Set barcode status = CLOSE
 				       Barcode b = new Barcode();
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
-				       b.setStatus(JobDAO.STATUS_WORK_IN_PROCESS);
+				       b.setCreateUser(h.getCreateUser());
+				       b.setUpdateUser(h.getUpdateUser());
+				       b.setStatus(JobDAO.STATUS_CLOSE);
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
 				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
 				   }
 				}
 				
-				//update Head req 
+				//step2 update new total Head req 
 			    updateHeadModel(conn, h);
 			    
-				//delete item req
+				//step3 delete item req
 				deleteItemModel(conn, h);
 				
-				//save line req
+				//step4 save line req
 				if(h.getItems() != null && h.getItems().size()>0){
 				   for(int i=0;i<h.getItems().size();i++){
 					   ReqFinish l = (ReqFinish)h.getItems().get(i);
@@ -445,7 +443,7 @@ public class ReqFinishDAO extends PickConstants{
 					   //pensItemMapAll.putAll(pensItemMap);
 				       
 				       
-					   //Set barcode status = W (work in process)
+					   //step4.1 Set barcode status = W (work in process)
 				       Barcode b = new Barcode();
 				       b.setJobId(l.getJobId());
 				       b.setBoxNo(l.getBoxNo());
@@ -458,6 +456,7 @@ public class ReqFinishDAO extends PickConstants{
 			}
 			
 			conn.commit();
+			
 		}catch(Exception e){
 		  conn.rollback();
 		  throw e;
@@ -470,10 +469,11 @@ public class ReqFinishDAO extends PickConstants{
 	}
 	
 	// 	RQYYMMXXX  ( เช่น RQ5703001 )  			
-	 private static String genRequestNo(Connection conn,Date date) throws Exception{
+	 private static String genRequestNo(Date date) throws Exception{
        String docNo = "";
+       Connection conn = null;
 		   try{
-			   
+			   conn = DBConnection.getInstance().getConnection();
 			   String today = df.format(date);
 			   String[] d1 = today.split("/");
 			  // System.out.println("d1[0]:"+d1[0]);
@@ -486,6 +486,10 @@ public class ReqFinishDAO extends PickConstants{
 			   docNo = "F"+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("0000").format(seq);
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn != null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return docNo;
 	}

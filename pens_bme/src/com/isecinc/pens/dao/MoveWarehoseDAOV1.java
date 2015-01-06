@@ -21,7 +21,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 
-public class MoveWarehoseDAO extends PickConstants{
+public class MoveWarehoseDAOV1 extends PickConstants{
 	
 	protected static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
@@ -50,24 +50,13 @@ public class MoveWarehoseDAO extends PickConstants{
 		int totalQty = 0;
 		int no=1;
 		try {
-			sql.append("\n SELECT j.job_id" +
-					",j.name as job_name" +
-					",b.box_no, count(*) as qty ");
-			sql.append("\n from PENSBME_PICK_JOB j,PENSBME_PICK_BARCODE_ITEM b");
+			sql.append("\n SELECT box_no, count(*) as qty ");
+			sql.append("\n from PENSBME_PICK_BARCODE_ITEM");
 			sql.append("\n where 1=1   ");
-			sql.append("\n and j.job_id = b.job_id");
-			sql.append("\n and j.status ='"+PickConstants.STATUS_CLOSE+"'");
-			sql.append("\n and b.status ='"+PickConstants.STATUS_CLOSE+"'");
-			
-			if( !Utils.isNull(o.getJobId()).equals("")){
-			  sql.append("\n and j.job_id ="+o.getJobId()+"");
-			}
-			if( !Utils.isNull(o.getWarehouseFrom()).equals("")){
-			   sql.append("\n and j.warehouse ='"+o.getWarehouseFrom()+"'");
-			}
-			
-			sql.append("\n group by j.job_id,j.name,b.box_no  ");
-			sql.append("\n order by b.box_no  ");
+			sql.append("\n and status ='"+PickConstants.STATUS_CLOSE+"'");
+			sql.append("\n and job_id ="+o.getJobId()+"");
+			sql.append("\n group by box_no  ");
+			sql.append("\n order by box_no  ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -77,12 +66,11 @@ public class MoveWarehoseDAO extends PickConstants{
 			while(rst.next()) {
 			   h = new MoveWarehouse();
 			   h.setNo(no);
-			   h.setJobId(Utils.isNull(rst.getString("job_id")));
-			   h.setJobName(Utils.isNull(rst.getString("job_name")));
 			   h.setBoxNo(Utils.isNull(rst.getString("box_no")));
 			   h.setQty(Utils.isNull(rst.getString("qty")));
 			   
 			   totalQty += Utils.convertStrToInt(h.getQty());
+			   
 			   
 			   items.add(h);
 			   totalBox++;
@@ -108,35 +96,26 @@ public class MoveWarehoseDAO extends PickConstants{
 		return o;
 	}
 	
-	public static MoveWarehouse searchHeadForNewJob(Connection conn,MoveWarehouse h ,String oldJobIdWhereSqlIn,String oldBoxNoWhereSqlIn,String newJobIdWhereSqlIn) throws Exception {
+	public static MoveWarehouse searchHeadForNewJob(MoveWarehouse h ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
 		List<MoveWarehouse> items = new ArrayList<MoveWarehouse>();
 		int totalBox = 0;
 		int totalQty = 0;
 		int no=1;
 		try {
-			
-			sql.append("\n SELECT O.*,N.* FROM (");
-			sql.append("\n 	SELECT job_id as old_job_id,box_no as old_box_no, count(*) as qty" );
-			sql.append("\n  ,(select j.name from PENSBME_PICK_JOB j where j.job_id=BL.job_id) job_name ");
-			sql.append("\n	from PENSBME_PICK_BARCODE_ITEM BL");
-			sql.append("\n 	where 1=1   ");
-			sql.append("\n 	and BL.job_id in("+oldJobIdWhereSqlIn+")");
-			sql.append("\n 	and BL.box_no in("+oldBoxNoWhereSqlIn+")");
-			sql.append("\n 	group by BL.job_id,BL.box_no ");
-			sql.append("\n )O ");
-			sql.append("\n LEFT OUTER JOIN ");
-			sql.append("\n ( SELECT BH.job_id as new_job_id,BH.box_no as new_box_no,BH.box_no_ref  ");
-			sql.append("\n	 from PENSBME_PICK_BARCODE BH ");
-			sql.append("\n 	 where 1=1   ");
-			sql.append("\n 	 and BH.job_id in("+newJobIdWhereSqlIn+")");
-			sql.append("\n )N ON O.old_box_no = N.box_no_ref ");
-			
-			sql.append("\n order by O.old_job_id, O.old_box_no  ");
+			sql.append("\n SELECT box_no, count(*) as qty ");
+			sql.append("\n from PENSBME_PICK_BARCODE_ITEM");
+			sql.append("\n where 1=1   ");
+			sql.append("\n and status ='"+PickConstants.STATUS_CLOSE+"'");
+			sql.append("\n and job_id ="+h.getNewJobId()+"");
+			sql.append("\n group by box_no  ");
+			sql.append("\n order by box_no  ");
 			logger.debug("sql:"+sql);
-
+			
+			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
@@ -144,15 +123,7 @@ public class MoveWarehoseDAO extends PickConstants{
 			   MoveWarehouse item = new MoveWarehouse();
 			   item.setNo(no);
 			   item.setSelected("true");
-			   
-			   item.setJobId(Utils.isNull(rst.getString("old_job_id")));
-			   item.setBoxNo(Utils.isNull(rst.getString("old_box_no")));
-			   item.setJobName(Utils.isNull(rst.getString("job_name")));
-			   
-			   item.setNewJobId(Utils.isNull(rst.getString("new_job_id")));
-			   item.setNewBoxNo(Utils.isNull(rst.getString("new_box_no")));
-			   item.setNewJobName(Utils.isNull(rst.getString("job_name")));
-			   
+			   item.setBoxNo(Utils.isNull(rst.getString("box_no")));
 			   item.setQty(Utils.isNull(rst.getString("qty")));
 			   
 			   totalQty += Utils.convertStrToInt(item.getQty());
@@ -172,6 +143,7 @@ public class MoveWarehoseDAO extends PickConstants{
 			try {
 				rst.close();
 				ps.close();
+				conn.close();
 			} catch (Exception e) {}
 		}
 		return h;
@@ -198,17 +170,15 @@ public class MoveWarehoseDAO extends PickConstants{
 						 //insert new barcode item
 						 Barcode newBarcodeHead = new Barcode();
 						 newBarcodeHead.setJobId(newJob.getJobId());//new job id
-						 newBarcodeHead.setBoxNo(BarcodeDAO.genBoxNo(new Date()));
+						 newBarcodeHead.setBoxNo(BarcodeDAO.genBoxNo( new Date()));
 						 newBarcodeHead.setTransactionDate(newJob.getOpenDate());
 						 newBarcodeHead.setStatus(PickConstants.STATUS_CLOSE);
 						 newBarcodeHead.setRemark(oldBarcodeHead.getRemark());
 						 newBarcodeHead.setCreateUser(newJob.getCreateUser());
 						 newBarcodeHead.setUpdateUser(newJob.getUpdateUser());
-						 newBarcodeHead.setRemark(o.getRemark());
-						 newBarcodeHead.setBoxNoRef(oldBarcodeHead.getBoxNo());//link from old barcode
 						 
 						 //insert barcode head
-						 BarcodeDAO.saveHeadModelForMove(conn,newBarcodeHead);
+						 BarcodeDAO.saveHeadModel(conn,newBarcodeHead);
 						 
 						 //insert barcode item from oldBarcode
 						 insertBarcodeItem(conn, oldBarcodeHead, newBarcodeHead);

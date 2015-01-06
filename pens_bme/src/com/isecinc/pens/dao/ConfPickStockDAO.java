@@ -454,13 +454,13 @@ public class ConfPickStockDAO extends PickConstants{
 	}
 	
 	/*** Get Total Qty in Stock issue Item **/
-	public static int getTotalQtyInStockIssueItem(Connection conn,ReqPickStock pickStock ) throws Exception {
+	public static int getTotalReqQtyInStockIssueItem(Connection conn,ReqPickStock pickStock ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		int totalRecord = 0;
 		try {
-			sql.append("\n select nvl(sum(qty),0) as qty   ");
+			sql.append("\n select nvl(sum(req_qty),0) as qty ,nvl(sum(issue_qty),0) as qty     ");
 			sql.append("\n from PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n where 1=1  ");
 			if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
@@ -487,6 +487,41 @@ public class ConfPickStockDAO extends PickConstants{
 		}
 		return totalRecord;
 	}
+	
+	public static int getTotalIssueQtyInStockIssueItem(Connection conn,ReqPickStock pickStock ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalRecord = 0;
+		try {
+			sql.append("\n select nvl(sum(issue_qty),0) as qty ,nvl(sum(issue_qty),0) as qty     ");
+			sql.append("\n from PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n where 1=1  ");
+			if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
+			   sql.append("\n and i.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
+			}
+			sql.append("\n group by i.issue_req_no");
+				
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+			   totalRecord = rst.getInt("qty");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRecord;
+	}
+	
 	
 	
 	public static List<ReqPickStock> getStockItemListByIssueReqNo(Connection conn,ReqPickStock o ) throws Exception {
@@ -665,7 +700,7 @@ public class ConfPickStockDAO extends PickConstants{
 				sql.append("\n     SELECT A.*, rownum r__ FROM ( ");//A
 				sql.append("\n        SELECT  U.*  FROM( ");//U
 				
-		                sql.append("\n 	SELECT M.* ,NVL(P.qty,0) as qty ,NVL(P.req_qty,0) as req_qty  FROM ( ");
+		                sql.append("\n 	SELECT M.* ,NVL(P.issue_qty,0) as issue_qty ,NVL(P.req_qty,0) as req_qty  FROM ( ");
 						sql.append("\n 		select group_code,pens_item,material_master,barcode  ");
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
@@ -677,7 +712,7 @@ public class ConfPickStockDAO extends PickConstants{
 
 						sql.append("\n   ) M LEFT OUTER JOIN  ");
 						
-						sql.append("\n 	 ( select group_code,pens_item,material_master,barcode ,NVL(SUM(i.qty),0) as qty,NVL(SUM(i.req_qty),0) as req_qty  ");
+						sql.append("\n 	 ( select group_code,pens_item,material_master,barcode ,NVL(SUM(i.issue_qty),0) as issue_qty,NVL(SUM(i.req_qty),0) as req_qty  ");
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
@@ -688,26 +723,6 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 	 )P ");
 						sql.append("\n 	 ON  M.pens_item = P.pens_item and M.group_code =P.group_code "  +
 								" AND M.material_master = P.material_master AND M.barcode =P.barcode   ");
-						
-						/*sql.append("\n 	 LEFT OUTER JOIN  ");
-						sql.append("\n 	 ( SELECT O2.group_code,O2.pens_item,O2.material_master,O2.barcode ,NVL(SUM(onhand_qty),0) as onhand_qty ");
-						sql.append("\n 	   FROM(   ");
-						sql.append("\n 	     SELECT group_code,pens_item,material_master,barcode ,onhand_qty  ");
-						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED ");
-						
-						sql.append("\n       UNION ALL ");
-						 // substract from Stock issue status = O(Open)
-						sql.append("\n 		  SELECT group_code,pens_item ,material_master,barcode  ,(-1* qty ) as onhand_qty ");
-						sql.append("\n 		  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
-						sql.append("\n 		  WHERE 1=1  ");
-						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
-						sql.append("\n 		  AND h.status ='"+PickConstants.STATUS_OPEN+"'");
-						sql.append("\n 	    )O2    ");
-						sql.append("\n 	    GROUP BY O2.group_code,O2.pens_item,O2.material_master,O2.barcode   ");
-						sql.append("\n 	  ) O   ");
-						sql.append("\n 	 ON M.pens_item = O.pens_item and M.group_code = O.group_code " +
-								" AND M.material_master = O.material_master AND M.barcode =O.barcode   ");*/
-				
 				sql.append("\n   	  )U ");
 			    sql.append("\n 		  order by U.group_code,U.pens_item");
 				  
@@ -735,11 +750,16 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setMaterialMaster(rst.getString("material_master"));
 			   h.setBarcode(rst.getString("barcode"));
 
-			   h.setIssueQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
-			   h.setReqQty(Utils.decimalFormat(rst.getInt("req_qty"),Utils.format_current_no_disgit));
+			   h.setIssueQty(Utils.decimalFormat(rst.getInt("issue_qty"),Utils.format_current_no_disgit));
+			   h.setQty(Utils.decimalFormat(rst.getInt("req_qty"),Utils.format_current_no_disgit));
 			   
-			   int qty =  rst.getInt("qty");//issue_qty
-			   totalQty +=qty;
+			   //display report
+			   h.setIssueQtyInt(rst.getInt("issue_qty"));
+			   h.setQtyInt(rst.getInt("req_qty"));
+			   
+			   int issueQty =  rst.getInt("issue_qty");//issue_qty
+			   
+			   totalQty +=issueQty;
 			   
 			   items.add(h);
 			   r++;
@@ -775,7 +795,7 @@ public class ConfPickStockDAO extends PickConstants{
 				sql.append("\n     SELECT A.*, rownum r__ FROM ( ");//A
 				sql.append("\n        SELECT  U.*  FROM( ");//U
 				
-		                sql.append("\n 	SELECT M.* ,NVL(P.qty,0) as qty,NVL(P.req_qty,0) as req_qty  FROM ( ");
+		                sql.append("\n 	SELECT M.* ,NVL(P.issue_qty,0) as issue_qty,NVL(P.req_qty,0) as req_qty  FROM ( ");
 						sql.append("\n 		select group_code,pens_item,material_master,barcode  ");
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
@@ -787,7 +807,7 @@ public class ConfPickStockDAO extends PickConstants{
 
 						sql.append("\n   ) M LEFT OUTER JOIN  ");
 						
-						sql.append("\n 	 ( select group_code,pens_item,material_master,barcode ,NVL(SUM(i.qty),0) as qty ,NVL(SUM(i.req_qty),0) as req_qty ");
+						sql.append("\n 	 ( select group_code,pens_item,material_master,barcode ,NVL(SUM(i.issue_qty),0) as issue_qty ,NVL(SUM(i.req_qty),0) as req_qty ");
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
@@ -798,25 +818,6 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 	 )P ");
 						sql.append("\n 	 ON  M.pens_item = P.pens_item and M.group_code =P.group_code "  +
 								" AND M.material_master = P.material_master AND M.barcode =P.barcode   ");
-						
-					/*	sql.append("\n 	 LEFT OUTER JOIN  ");
-						sql.append("\n 	 ( SELECT O2.group_code,O2.pens_item,O2.material_master,O2.barcode ,NVL(SUM(onhand_qty),0) as onhand_qty ");
-						sql.append("\n 	   FROM(   ");
-						sql.append("\n 	     SELECT group_code,pens_item,material_master,barcode ,onhand_qty  ");
-						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED ");
-						
-						sql.append("\n       UNION ALL ");
-						 // substract from Stock issue status = O(Open)
-						sql.append("\n 		  SELECT group_code,pens_item ,material_master,barcode  ,(-1* qty ) as onhand_qty ");
-						sql.append("\n 		  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
-						sql.append("\n 		  WHERE 1=1  ");
-						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
-						sql.append("\n 		  AND h.status ='"+PickConstants.STATUS_OPEN+"'");
-						sql.append("\n 	    )O2    ");
-						sql.append("\n 	    GROUP BY O2.group_code,O2.pens_item,O2.material_master,O2.barcode   ");
-						sql.append("\n 	  ) O   ");
-						sql.append("\n 	 ON M.pens_item = O.pens_item and M.group_code = O.group_code " +
-								" AND M.material_master = O.material_master AND M.barcode =O.barcode   ");*/
 				
 				sql.append("\n   	  )U ");
 			    sql.append("\n 		  order by U.group_code,U.pens_item");
@@ -844,13 +845,18 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setPensItem(rst.getString("pens_item"));
 			   h.setMaterialMaster(rst.getString("material_master"));
 			   h.setBarcode(rst.getString("barcode"));
-			   int qty =  rst.getInt("qty");
+			   int reqQty =  rst.getInt("req_qty");
+			   int issueQty =  rst.getInt("issue_qty");
 			   
-			   h.setIssueQty(Utils.decimalFormat(qty,Utils.format_current_no_disgit));
-			   h.setReqQty(Utils.decimalFormat(rst.getInt("req_qty"),Utils.format_current_no_disgit));
-			   h.setQty(Utils.decimalFormat(qty,Utils.format_current_no_disgit));
+			   //Case First access set issue_qty = qty
+			   if(issueQty==0){
+				   issueQty = reqQty;
+			   }
 			   
-			   totalQty +=qty;
+			   h.setQty(Utils.decimalFormat(reqQty,Utils.format_current_no_disgit));
+			   h.setIssueQty(Utils.decimalFormat(issueQty,Utils.format_current_no_disgit));
+			   
+			   totalQty +=issueQty;
 			   
 			   items.add(h);
 			   r++;
@@ -970,15 +976,18 @@ public class ConfPickStockDAO extends PickConstants{
 		}
 	}
 	
-	public static void updateStockIssueItem(Connection conn,ReqPickStock o) throws Exception{
+	public static void updateStockIssueItemByPK(Connection conn,ReqPickStock o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE_ITEM \n");
-			sql.append(" SET  STATUS=?,STATUS_DATE=? ,UPDATE_DATE =?,UPDATE_USER =?,REQ_QTY =?,QTY =? \n");
+			sql.append(" SET  STATUS=?,STATUS_DATE=? ,UPDATE_DATE =?,UPDATE_USER =?,REQ_QTY =?,ISSUE_QTY =? \n");
 		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
-			
+		    sql.append(" AND GROUP_CODE = ? \n");
+		    sql.append(" AND PENS_ITEM = ? \n");
+		    sql.append(" AND MATERIAL_MASTER = ? \n");
+		    sql.append(" AND BARCODE = ? \n");
 			ps = conn.prepareStatement(sql.toString());
 			
 			int c =1;
@@ -987,40 +996,14 @@ public class ConfPickStockDAO extends PickConstants{
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
-			ps.setInt(c++, Utils.convertStrToInt(o.getReqQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getIssueQty()));
+			
 			ps.setString(c++, o.getIssueReqNo());
-			
-			ps.executeUpdate();
-			
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps=null;
-			}
-		}
-	}
-	
-	public static void updateStatusStockIssueItem(Connection conn,ReqPickStock o) throws Exception{
-		PreparedStatement ps = null;
-		logger.debug("updateHeadModel");
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE_ITEM \n");
-			sql.append(" SET  STATUS=?,STATUS_DATE=? ,UPDATE_DATE =?,UPDATE_USER =? \n");
-		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
-			
-			ps = conn.prepareStatement(sql.toString());
-			
-			int c =1;
-			
-			ps.setString(c++, o.getStatus());
-			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
-			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
-			ps.setString(c++, o.getUpdateUser());
-			ps.setString(c++, o.getIssueReqNo());
-			
+			ps.setString(c++, o.getGroupCode());
+			ps.setString(c++, o.getPensItem());
+			ps.setString(c++, o.getMaterialMaster());
+			ps.setString(c++, o.getBarcode());
 			ps.executeUpdate();
 			
 		}catch(Exception e){
