@@ -39,9 +39,8 @@ public class AddItemPickStockAction extends I_Action {
 		AddItemPickStockForm aForm = (AddItemPickStockForm) form;
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
-		Map<String,ReqPickStock> groupCodeMap = new HashMap<String, ReqPickStock>();
+		//Map<String,ReqPickStock> groupCodeMap = new HashMap<String, ReqPickStock>();
 		Map<String,ReqPickStock> itemsBarcodeMap = new HashMap<String, ReqPickStock>();
-		Map<String,ReqPickStock> itemsBarcodeErrorMap = new HashMap<String, ReqPickStock>();
 		try {
             //Clear data session
 			request.getSession().setAttribute("saved", null); 
@@ -49,28 +48,32 @@ public class AddItemPickStockAction extends I_Action {
 			conn = DBConnection.getInstance().getConnection();
 			
             String issueReqNo = Utils.isNull(request.getParameter("issueReqNo"));
+            String issueReqDate = Utils.isNull(request.getParameter("issueReqDate"));
+            String status = Utils.isNull(request.getParameter("status"));
+            String requestor = new String(Utils.isNull(request.getParameter("requestor")).getBytes("ISO8859_1"), "UTF-8");  
+            String custGroup = Utils.isNull(request.getParameter("custGroup"));
+            String needDate = Utils.isNull(request.getParameter("needDate"));
+            String storeCode = Utils.isNull(request.getParameter("storeCode"));
+            String subInv = Utils.isNull(request.getParameter("subInv"));
+            String storeNo = Utils.isNull(request.getParameter("storeNo"));
+            String remark =  new String(Utils.isNull(request.getParameter("remark")).getBytes("ISO8859_1"), "UTF-8"); 
+            
             String groupCode = Utils.isNull(request.getParameter("groupCode"));
             String pensItem = Utils.isNull(request.getParameter("pensItem"));
-            int index = Utils.convertStrToInt(Utils.isNull(request.getParameter("index")));//Row of Qty
             
-          //Get itemBarcodeMap old key = groupCode
-			if(request.getSession().getAttribute("groupCodeMap") != null){
-			   groupCodeMap = (Map)request.getSession().getAttribute("groupCodeMap");
-			   String key  = groupCode;
-			   ReqPickStock itemBarcode = groupCodeMap.get(key);
-			   logger.debug("groupCode["+groupCode+"]");
-			   
-			   if(itemBarcode != null && itemBarcode.getItemsBarcodeMap() !=null){
-				   logger.debug("groupCode:"+itemBarcode.getGroupCode());
-			       itemsBarcodeMap = itemBarcode.getItemsBarcodeMap();
-			       logger.debug("itemsBarcodeMap:"+itemsBarcodeMap);
-			   }
-			}
-			
-			if(request.getSession().getAttribute("itemsBarcodeErrorMap") !=null){
-				itemsBarcodeErrorMap = (Map) request.getSession().getAttribute("itemsBarcodeErrorMap");
-			}
-			
+            int index = Utils.convertStrToInt(Utils.isNull(request.getParameter("index")));//Row of Qty
+             
+            logger.debug("issueReqNo :"+issueReqNo);
+            logger.debug("issueReqDate :"+issueReqDate);
+            logger.debug("status :"+status);
+            logger.debug("requestor :"+requestor);
+            logger.debug("custGroup :"+custGroup);
+            logger.debug("needDate :"+needDate);
+            logger.debug("storeCode :"+storeCode);
+            logger.debug("subInv :"+subInv);
+            logger.debug("storeNo :"+storeNo);
+            logger.debug("remark :"+remark);
+            
 			if( !"".equals(issueReqNo)){
 				logger.debug("prepare edit issueReqNo:"+issueReqNo);
 				request.getSession().setAttribute("resultItems", null);
@@ -87,7 +90,7 @@ public class AddItemPickStockAction extends I_Action {
 				//new search
 				p.setNewReq(false);
 				
-				ReqPickStock pNew = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap,itemsBarcodeErrorMap);
+				ReqPickStock pNew = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap);
 				List<ReqPickStock> results = pNew.getItems();
 				
 				if (results != null  && results.size() >0) {
@@ -106,6 +109,17 @@ public class AddItemPickStockAction extends I_Action {
 				request.getSession().setAttribute("resultItems", null);
 				
 				ReqPickStock p = new ReqPickStock();
+				p.setIssueReqDate(issueReqDate);
+				p.setIssueReqNo(issueReqNo);
+				p.setStatus(status);
+				p.setCustGroup(custGroup);
+				p.setRequestor(requestor);
+				p.setNeedDate(needDate);
+				p.setStoreCode(storeCode);
+				p.setSubInv(subInv);
+				p.setStoreNo(storeNo);
+				p.setRemark(remark);
+				
 				p.setGroupCode(groupCode);
 				p.setPensItem(pensItem);
 				p.setNewReq(true);
@@ -114,7 +128,7 @@ public class AddItemPickStockAction extends I_Action {
 				p.setRowIndex(index+"");
 				
 				//search by page 
-				ReqPickStock pGroupCodeItems = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap,itemsBarcodeErrorMap);
+				ReqPickStock pGroupCodeItems = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap);
                 List<ReqPickStock> results = pGroupCodeItems.getItems();
 				
 				if (results != null  && results.size() >0) {
@@ -181,34 +195,28 @@ public class AddItemPickStockAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AddItemPickStockForm aForm = (AddItemPickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		Map<String,ReqPickStock> groupCodeMap = new HashMap<String, ReqPickStock>();
-		Map<String,ReqPickStock> itemsBarcodeMap = new HashMap<String, ReqPickStock>();
-		boolean foundError =false;
+		boolean foundError = false;
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			
+			conn.setAutoCommit(false);
 			 //Data Disp in Table
 		    List<ReqPickStock> results = (List<ReqPickStock>)request.getSession().getAttribute("resultItems"); //data per page
-		    
-			// add itemBarcode to Session Map groupCodeMap
-			if(request.getSession().getAttribute("groupCodeMap") != null){
-				groupCodeMap = (Map)request.getSession().getAttribute("groupCodeMap");
-				
-				String[] qty = request.getParameterValues("qty");
-			
-				ReqPickStock itemsBarcode = aForm.getBean();
-						
-				//add value to Results
-				if(results != null && results.size() > 0 && qty != null){
-					for(int i=0;i<results.size();i++){
-						 ReqPickStock l = (ReqPickStock)results.get(i);
-						 l.setIssueReqNo(itemsBarcode.getIssueReqNo());
-						 l.setPensItem(itemsBarcode.getPensItem());
-						 
-						 //validate onhand
-						 int qtyScreen = Utils.convertStrToInt(qty[i]);//PICK
-						   
+			String[] qty = request.getParameterValues("qty");
+		
+			ReqPickStock itemsBarcode = aForm.getBean();
+					
+			//add value to Results
+			if(results != null && results.size() > 0 && qty != null){
+				for(int i=0;i<results.size();i++){
+					 ReqPickStock l = (ReqPickStock)results.get(i);
+					 l.setIssueReqNo(itemsBarcode.getIssueReqNo());
+					 l.setPensItem(itemsBarcode.getPensItem());
+					 
+					 //validate onhand
+					 int qtyScreen = Utils.convertStrToInt(qty[i]);//PICK
+					 
+					 if(qtyScreen > 0){
 						 //Step 1 validate in Stock onhand
 						 Onhand onhand = OnhandProcessDAO.getItemInStockByPKITEM(conn, l);
 						 int onhandQty = onhand!=null?Utils.convertStrToInt(onhand.getOnhandQty()):0;
@@ -218,52 +226,49 @@ public class AddItemPickStockAction extends I_Action {
 						    foundError = true;
 						    l.setLineItemStyle("lineError");
 						    l.setOnhandQty(onhandQty+"");
+						    l.setLineItemStyle("lineError");
 						 }
-						 
-						 l.setQty(qty[i]);
-						 l.setUpdateUser(user.getUserName());
-						 l.setCreateUser(user.getUserName());
-						 
-						 //set data to list disp
-						 results.set(i, l);
-						 
-						 if(foundError==false){
-							 logger.debug("GroupCode["+itemsBarcode.getGroupCode()+"]matMaster["+l.getMaterialMaster()+"]qty["+l.getQty()+"]");
-							 //Key Map  
-							 String key = l.getBarcode();
-							 //check pens_items is old record
-							 if(itemsBarcodeMap.get(key) != null){
-								 itemsBarcodeMap.put(key, l);
-							 }else{
-								 if( !Utils.isNull(l.getQty()).equals("")){
-									 itemsBarcodeMap.put(key, l);
-								 }
-							 }
-						 }//if 
-					}//for
-				}
-				
-				//set Line Item to Map(key=GroupCode)
-				itemsBarcode.setItemsBarcodeMap(itemsBarcodeMap);
-				//set line item to GroupCode Map
-				groupCodeMap.put(itemsBarcode.getGroupCode(), itemsBarcode);
+					 }
+					 
+					 l.setQty(qty[i]);
+					 l.setUpdateUser(user.getUserName());
+					 l.setCreateUser(user.getUserName());
+					 
+					 //set data to list disp
+					 results.set(i, l);
+
+				}//for
 			}
 			
+			//Display Data Screen
+			request.getSession().setAttribute("resultItems", results);
+
 			if(foundError == false){
-				//Put Date Save Session
-				request.getSession().setAttribute("groupCodeMap", groupCodeMap);
-				//Display Data Screen
-				request.getSession().setAttribute("resultItems", results);
+				ReqPickStock reqPickSave = aForm.getBean();
+				reqPickSave.setCreateUser(user.getUserName());
+				reqPickSave.setUpdateUser(user.getUserName());
 				
-				//set for pass value to Main Screen
-				request.getSession().setAttribute("saved", "saved");
+				reqPickSave.setItems(results);
+				
+				ReqPickStock result = ReqPickStockDAO.save(conn, reqPickSave);
+				if(result.isResultProcess()){
+				    conn.commit();
+				    
+				  //set for pass value to Main Screen
+					request.getSession().setAttribute("saved", "saved");
+				}else{
+					request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้ พบ ERROR");
+					conn.rollback();
+				}
+
+				request.getSession().setAttribute("resultItems", result.getItems());
 			}else{
 				request.setAttribute("Message", "ไม่สามารถเบิกยอดได้ตามจำนวนที่ต้องการ  โปรดตรวจสอบยอด onhand ");
 			}
 			
-			//clear error item by barcode
-			 request.getSession().removeAttribute("itemsBarcodeErrorMap");
-			 
+		}catch(Exception e){
+			e.printStackTrace();
+			conn.rollback();
 		} finally {
 			if(conn != null){
 				conn.close();conn=null;

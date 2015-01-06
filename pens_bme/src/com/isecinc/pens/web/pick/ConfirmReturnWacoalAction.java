@@ -252,7 +252,9 @@ public class ConfirmReturnWacoalAction extends I_Action {
 					 l.setBoxNo(Utils.isNull(boxNo[i]));
 					 l.setJobId(Utils.isNull(jobId[i]));
 					 l.setQty(Utils.convertStrToInt(qty[i]));
-					 
+					 l.setCreateUser(user.getUserName());
+					 l.setUpdateUser(user.getUserName());
+						
 					 itemList.add(l);
 					
 				}

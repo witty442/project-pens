@@ -22,6 +22,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.StockQueryDAO;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 
@@ -31,7 +32,7 @@ import com.isecinc.pens.init.InitialMessages;
  * @author WITTY
  * 
  */
-public class StockQueryAction extends I_Action {
+public class StockFinishGoodQueryAction extends I_Action {
 
 	public static int pageSize = 90;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
@@ -42,7 +43,7 @@ public class StockQueryAction extends I_Action {
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String forward = "prepare";
-		StockQueryForm aForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm aForm = (StockFinishGoodQueryForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
@@ -67,7 +68,7 @@ public class StockQueryAction extends I_Action {
 	 */
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		StockQueryForm summaryForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm summaryForm = (StockFinishGoodQueryForm) form;
 		try {
 			logger.debug("prepare 2");
 			
@@ -83,15 +84,20 @@ public class StockQueryAction extends I_Action {
 	 * Search
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		StockQueryForm aForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm aForm = (StockFinishGoodQueryForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
 			List<StockQuery> dataList = null;
 			StockQuery b = aForm.getBean();
-			
-			b = StockQueryDAO.searchStockQuery(aForm.getBean());
-			dataList = b.getItems();
+			if("Detail".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+				b =  StockQueryDAO.searchSummaryFinishGoodByDetail(aForm.getBean());
+				dataList = b.getItems();
+				
+			}else if("SummaryByPensItem".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+				b = StockQueryDAO.searchSummaryFinishGoodByPensItem(aForm.getBean());
+				dataList = b.getItems();
+			}
 			
 			if(dataList != null && dataList.size() >0){
 				aForm.setResults(dataList);
@@ -102,7 +108,6 @@ public class StockQueryAction extends I_Action {
 			aForm.setBean(b);
 			
 		} catch (Exception e) {
-			aForm.setResults(null);
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -113,12 +118,13 @@ public class StockQueryAction extends I_Action {
 		return "search";
 	}
 	
+	
 	/**
 	 * Save
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
-		StockQueryForm aForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm aForm = (StockFinishGoodQueryForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			
@@ -133,7 +139,7 @@ public class StockQueryAction extends I_Action {
 
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
-		StockQueryForm aForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm aForm = (StockFinishGoodQueryForm) form;
 		try {
 			aForm.setResults(new ArrayList<StockQuery>());
 			
@@ -163,7 +169,7 @@ public class StockQueryAction extends I_Action {
 			HttpServletResponse response) {
 		
 		logger.debug("exportExcel : ");
-		StockQueryForm reportForm = (StockQueryForm) form;
+		StockFinishGoodQueryForm reportForm = (StockFinishGoodQueryForm) form;
 		try {
 	         if(reportForm.getResults() == null || (reportForm.getResults() != null && reportForm.getResults().size() ==0)){
 	        	 request.setAttribute("Message" ,"ไม่พบข้อมูล");
@@ -193,7 +199,8 @@ public class StockQueryAction extends I_Action {
 		// return null;
 		return null;
 	}
-	private StringBuffer genHTML(HttpServletRequest request,StockQueryForm form){
+	
+	private StringBuffer genHTML(HttpServletRequest request,StockFinishGoodQueryForm form){
 		StringBuffer h = new StringBuffer("");
 		try{
 			//Header
@@ -202,17 +209,11 @@ public class StockQueryAction extends I_Action {
 			int colSpan = 0;
 			String title = "";
 			if("Detail".equalsIgnoreCase(form.getBean().getSummaryType())){
-				colSpan = 10;
-				if("W3".equalsIgnoreCase(b.getWareHouse())){
-					colSpan = 11;
-				}
-				title = "Stock Pick Query By Detail";
-			}else if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
-				colSpan = 4;
-				title = "Stock Pick Query By Box";
+				colSpan = 6;
+				title = "Stock Finish Goods Query By Detail";
 			}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
 				colSpan = 4;
-				title = "Stock Pick Query By Pens Item";
+				title = "Stock Finish Goods Query By Pens Item";
 			}
 			
 			h.append("<table border='1'> \n");
@@ -229,7 +230,7 @@ public class StockQueryAction extends I_Action {
 				h.append("</tr> \n");
 				
 				h.append("<tr> \n");
-				h.append("<td align='left' colspan='"+colSpan+"' >สถานะ :"+form.getBean().getStatus()+" </td>\n");
+				h.append("<td align='left' colspan='"+colSpan+"' >สถานะ :"+PickConstants.getStatusDesc(form.getBean().getStatus())+" </td>\n");
 				h.append("</tr> \n");
 
 			h.append("</table> \n");
@@ -240,30 +241,18 @@ public class StockQueryAction extends I_Action {
 				h.append("<tr> \n");
 
 				if("Detail".equalsIgnoreCase(form.getBean().getSummaryType())){
-					 h.append("<td>No.</td> \n");
-					 h.append("<td>WareHouse</td> \n");
+					 h.append("<td>Wacoal Mat.</td> \n");
 					 h.append("<td>Group Code</td> \n");
 					 h.append("<td>Pens Item</td> \n");
-					 h.append("<td>Wacoal Mat.</td> \n");
 					 h.append("<td>Barcode</td> \n");
-					 h.append("<td>เลขที่กล่อง</td> \n");
-					 h.append("<td>Job Id</td> \n");
-					 h.append("<td>รับคืนจาก</td> \n");
-					 if("W3".equalsIgnoreCase(b.getWareHouse())){
-					   h.append("<td>remark</td> \n");
-					 }
+					 h.append("<td>จำนวน</td> \n");
 					 h.append("<td>Status</td> \n");
-				}else if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
-					h.append("<td>เลขที่กล่อง</td> \n");
-					h.append("<td>เลขที่กล่อง</td> \n");
-					h.append("<td>รับคืนจาก.</td> \n");
-					h.append("<td>จำนวน</td> \n");
-					
+
 				}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
-					 h.append("<td>เลขที่กล่อง</td> \n");
 					h.append("<td>Pens Item</td> \n");
 					h.append("<td>Group Code.</td> \n");
 					h.append("<td>จำนวน</td> \n");
+					h.append("<td>Status</td> \n");
 				}
 
 				h.append("</tr> \n");
@@ -272,57 +261,34 @@ public class StockQueryAction extends I_Action {
 					StockQuery s = (StockQuery)dataList.get(i);
 					h.append("<tr> \n");
 					if("Detail".equalsIgnoreCase(form.getBean().getSummaryType())){
-					   h.append("<td>"+s.getNo()+"</td> \n");
-					   h.append("<td>"+s.getWareHouse()+"</td> \n");
-					   h.append("<td>"+s.getGroupCode()+"</td> \n");
-					   h.append("<td>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+					   h.append("<td>"+s.getGroupCode()+"</td> \n");
+					   h.append("<td>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getBarcode()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getBoxNo()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getJobId()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getName()+"</td> \n");
-					   if("W3".equalsIgnoreCase(b.getWareHouse())){
-						   h.append("<td>"+s.getRemark()+"</td> \n");
-						}
-					   h.append("<td>"+s.getStatusDesc()+"</td> \n");
-					}else if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
-					   h.append("<td>"+s.getWareHouse()+"</td> \n");
-					   h.append("<td>"+s.getBoxNo()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getName()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					   h.append("<td>"+s.getStatusDesc()+"</td> \n");
+	
 					}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
-					   h.append("<td>"+s.getWareHouse()+"</td> \n");
 					   h.append("<td>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					   h.append("<td>"+s.getStatusDesc()+"</td> \n");
 					}
 					h.append("</tr>");
 				}//for 
 				
-				 if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
-					  h.append("<td></td> \n");
-					  h.append("<td></td> \n");
-					  h.append("<td>Total QTY</td> \n");
-					  h.append("<td>"+b.getTotalQty()+"</td> \n");
-				}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
+				if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
+					 h.append("<td></td> \n");
+					 h.append("<td>Total QTY</td> \n");
+					 h.append("<td>"+b.getTotalQty()+"</td> \n");
+					 h.append("<td></td> \n");
+				}else{
+					 h.append("<td></td> \n");
 					 h.append("<td></td> \n");
 					 h.append("<td></td> \n");
 					 h.append("<td>Total QTY</td> \n");
 					 h.append("<td>"+b.getTotalQty()+"</td> \n");
-				}else if("Detail".equalsIgnoreCase(form.getBean().getSummaryType())){
 					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 h.append("<td></td> \n");
-					 if("W3".equalsIgnoreCase(b.getWareHouse())){
-						h.append("<td></td> \n");
-					 }
-					 h.append("<td>Total QTY</td> \n");
-					 h.append("<td>"+b.getTotalQty()+"</td> \n");
 				}
 				h.append("</table> \n");
 			}
@@ -331,15 +297,19 @@ public class StockQueryAction extends I_Action {
 		}
 		return h;
 	}
+	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		return null;
 	}
+
 	/**
 	 * Set new Criteria
 	 */
 	protected void setNewCriteria(ActionForm form) throws Exception {
 
 	}
+	
+	
 }

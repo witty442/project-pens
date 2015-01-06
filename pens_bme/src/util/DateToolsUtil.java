@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.inf.helper.Utils;
 
 public class DateToolsUtil {
 
@@ -24,6 +25,13 @@ public class DateToolsUtil {
 	private static final long ONE_HOUR = 60 * 60 * 1000L;
 	private static ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 
+	public static void main(String[] s){
+		try{
+			
+		}catch(Exception e){
+			
+		}
+	}
 	public static String getToday(Connection con, int format) throws Exception {
 		String stroutput = "";
 
@@ -361,9 +369,6 @@ public class DateToolsUtil {
 		return dateWord;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
-	}
 
 	/**
 	 * Check dateTo not over dateFrom.

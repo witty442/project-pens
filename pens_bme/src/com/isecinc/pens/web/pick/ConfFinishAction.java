@@ -1,16 +1,11 @@
 package com.isecinc.pens.web.pick;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,17 +14,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.bean.ControlReturnReport;
-import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqFinish;
-import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfFinishDAO;
 import com.isecinc.pens.dao.ReqFinishDAO;
@@ -60,7 +47,6 @@ public class ConfFinishAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				ReqFinish ad = new ReqFinish();
-				//ad.setReturnDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
@@ -147,6 +133,8 @@ public class ConfFinishAction extends I_Action {
 			if( !"".equals(requestNo) && !"".equals(requestNo)){
 			   //get Head Detail
 				c = ReqFinishDAO.searchReqFinishing(conn,c, false);
+				c.setConfirmDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
+				
 			    //Item not confirm
 			    listData.addAll(ConfFinishDAO.searchItemByGroupCode(conn, c)); 
 			}

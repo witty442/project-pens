@@ -372,7 +372,7 @@ public class ReqPickStockActionV1 extends I_Action {
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
 			
-			ReqPickStock resultProcess = ReqPickStockDAO.save(conn,h,dataSaveMapAll);
+			ReqPickStock resultProcess = null;//ReqPickStockDAO.save(conn,h,dataSaveMapAll);
 			logger.debug("result save :"+resultProcess.isResultProcess());
 			
 			if(resultProcess.isResultProcess()){

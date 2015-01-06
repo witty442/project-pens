@@ -17,7 +17,6 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
@@ -229,7 +228,6 @@ public class ReqReturnWacoalAction extends I_Action {
 		Connection conn = null;
 		ReqReturnWacoalForm aForm = (ReqReturnWacoalForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		String whereInBoxNoSql = "";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -260,9 +258,7 @@ public class ReqReturnWacoalAction extends I_Action {
 						 l.setUpdateUser(user.getUserName());
 						 
 						 itemList.add(l);
-						 
-						 //For Onhand
-						 whereInBoxNoSql +="'"+l.getBoxNo()+"',";
+	 
 					}
 				}
 			}
@@ -285,12 +281,6 @@ public class ReqReturnWacoalAction extends I_Action {
 			
 			conn.commit();
 			
-			//Process Onhand  by pens_item By BoxNo
-			if(whereInBoxNoSql.length() > 0){
-				whereInBoxNoSql = whereInBoxNoSql.substring(0,whereInBoxNoSql.length()-1);
-			}
-			OnhandDAO.processBanlanceOnhandFromBarcodeByBoxNo(conn,user.getUserName(),PickConstants.STATUS_RETURN,whereInBoxNoSql);
-
 			List<ReqReturnWacoal> allList = new ArrayList<ReqReturnWacoal>();
 			//search data
 			List<ReqReturnWacoal> saveData = ReqReturnWacoalDAO.searchHead(h,true);

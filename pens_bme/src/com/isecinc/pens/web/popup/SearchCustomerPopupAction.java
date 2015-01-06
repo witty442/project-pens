@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.MCDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -262,6 +263,64 @@ public class SearchCustomerPopupAction extends I_Action {
 		return mapping.findForward("search3");
 	}
 	
+	public ActionForward prepareSearchMC(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareSearchMC");
+		PopupForm popupForm = (PopupForm) form;
+		try {
+			 if("new".equalsIgnoreCase(request.getParameter("action"))){
+				 request.setAttribute("results", null);
+				 popupForm.setCode("");
+				 popupForm.setDesc("");
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("searchMC");
+	}
+	
+	public ActionForward searchMC(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchMC");
+		PopupForm popupForm = (PopupForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			String storeType = Utils.isNull(request.getParameter("storeType"));
+			String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
+			logger.debug("StoreType["+storeType+"]storeGroup["+storeGroup+"]");
+			
+			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,"");
+			 if(results != null && results.size() >0){
+				 request.setAttribute("CUSTOMER_LIST", results);
+			 }else{
+				 request.setAttribute("Message", "ไม่พบข่อมูล");
+			 }
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("searchMC");
+	}
+	
+	public ActionForward clearSearchMC(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearSearchMC");
+		PopupForm popupForm = (PopupForm) form;
+		try {
+             request.getSession().setAttribute("results", null);
+			 
+			 request.getSession().setAttribute("codes", null);
+			 request.getSession().setAttribute("keys", null);
+			 request.getSession().setAttribute("descs", null);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("searchMC");
+	}
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

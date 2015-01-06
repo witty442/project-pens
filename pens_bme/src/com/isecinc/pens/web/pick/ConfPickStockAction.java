@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +17,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.BeanParameter;
+import util.BundleUtil;
+import util.ReportUtilServlet;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.Onhand;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
@@ -54,6 +61,12 @@ public class ConfPickStockAction extends I_Action {
 				aForm.setBean(ad);
 				
 			}else if("back".equals(action)){
+				//clear session data
+				request.getSession().setAttribute("results", null);
+				request.getSession().setAttribute("custGroupList", null);
+				request.getSession().setAttribute("dataSaveMapAll", null);
+				request.getSession().setAttribute("totalAllQty",null);
+				
 				aForm.setBean(aForm.getBeanCriteria());
 				aForm.setResultsSearch(ConfPickStockDAO.searchHead(aForm.getBean()));
 			}
@@ -169,6 +182,7 @@ public class ConfPickStockAction extends I_Action {
 		int totalPage = 0;
 		int pageNumber = 1;
 		int totalQtyAll = 0;
+		int totalReqQtyAll = 0;
 		int totalCurPageQty = 0;
 		int totalQtyNotInCurPage = 0;
 		boolean newSearch = p.isNewSearch();
@@ -184,7 +198,14 @@ public class ConfPickStockAction extends I_Action {
 				pageNumber = 1;
 
 				totalRow = ConfPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
-				totalQtyAll =  ConfPickStockDAO.getTotalQtyInStockIssueItem(conn,p);	
+				
+				if(  Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED)){
+					totalReqQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	
+					totalQtyAll =  ConfPickStockDAO.getTotalIssueQtyInStockIssueItem(conn,p);	
+				}else{
+				       totalQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	
+				       totalReqQtyAll = totalQtyAll;
+				}
 				
 				totalPage = Utils.calcTotalPage(totalRow,PickConstants.CONF_PICK_PAGE_SIZE);
 				request.getSession().setAttribute("totalPage", totalPage);
@@ -235,10 +256,18 @@ public class ConfPickStockAction extends I_Action {
 			logger.debug("totalQtyAll["+totalQtyAll+"]");
 			
 			p.setTotalQty(totalQtyAll);
+			p.setTotalReqQty(totalReqQtyAll);
 			p.setTotalQtyNotInCurPage(totalQtyNotInCurPage);
 				
 			//set after first run = false
 			p.setNewSearch(false);
+			
+			//display canPrint
+			if(PickConstants.STATUS_ISSUED.equalsIgnoreCase(p.getStatus())){
+				p.setCanPrint(true);
+			}else{
+				p.setCanPrint(false);
+			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -436,7 +465,7 @@ public class ConfPickStockAction extends I_Action {
 					   p.setStatus(ConfPickStockDAO.STATUS_ISSUED);//ISSUE
 					   p.setUpdateUser(user.getUserName());
 						
-					   ConfPickStockDAO.updateStockIssueItem(conn, p);
+					   ConfPickStockDAO.updateStockIssueItemByPK(conn, p);
 					}
 			}
 
@@ -457,6 +486,7 @@ public class ConfPickStockAction extends I_Action {
 			request.setAttribute("Message", "ยืนยันรายการ เรียบร้อยแล้ว");
 			
 		} catch (Exception e) {
+			conn.rollback();
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}finally{
@@ -465,6 +495,64 @@ public class ConfPickStockAction extends I_Action {
 			}
 		}
 		return mapping.findForward("clear");
+	}
+	
+	public ActionForward print(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("Search for report : " + this.getClass());
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		try {
+	
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+
+			ReqPickStock h = reportForm.getBean();
+			if(h != null){
+				logger.debug("ReqPickStock:"+h);
+				//Head
+				parameterMap.put("p_title", "รายงานยืนยัน การเบิกสินค้า");
+				parameterMap.put("p_issueReqDate", h.getIssueReqDate());
+				parameterMap.put("p_issueReqNo", h.getIssueReqNo());
+				parameterMap.put("p_statusDesc", h.getStatusDesc());
+				parameterMap.put("p_requestor", h.getRequestor());
+				parameterMap.put("p_custGroupDesc", h.getCustGroup());
+				parameterMap.put("p_needDate", h.getNeedDate());
+				parameterMap.put("p_storeCode", h.getStoreCode()+"-"+h.getStoreName());
+				parameterMap.put("p_subInv", h.getSubInv());
+				parameterMap.put("p_storeNo", h.getStoreNo());
+				parameterMap.put("p_remark", h.getRemark());
+				
+				//Gen Report
+				String fileName = "conf_pick_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseNoEdit(conn, h,0,true);//
+				List items = pAllItem.getItems();
+				
+				logger.debug("items size:"+items.size());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
 	}
 	
 	

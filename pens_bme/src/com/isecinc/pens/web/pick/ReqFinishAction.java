@@ -17,14 +17,11 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
-import com.isecinc.pens.dao.OnhandDAO;
 import com.isecinc.pens.dao.ReqFinishDAO;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -233,7 +230,8 @@ public class ReqFinishAction extends I_Action {
 		Connection conn = null;
 		ReqFinishForm aForm = (ReqFinishForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-	
+	    int totalBox = 0;
+	    int totalQty = 0;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -263,6 +261,8 @@ public class ReqFinishAction extends I_Action {
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());
 						 
+						 totalBox++;
+						 totalQty +=l.getQty();
 						 itemList.add(l);
 						 
 					}
@@ -275,6 +275,9 @@ public class ReqFinishAction extends I_Action {
 			aForm.setResults(itemList);
 			
 			//save to DB
+			h.setTotalBox(totalBox);
+			h.setTotalQty(totalQty);
+			
 			ReqFinishDAO.save(h);
 			
 			//commit
@@ -375,6 +378,8 @@ public class ReqFinishAction extends I_Action {
 			
 			//update Req to cancel
 			ReqFinishDAO.updateHeadStatusModel(conn,h);
+			
+			h.setLineStatus(ReqFinishDAO.STATUS_CANCEL);
 			ReqFinishDAO.updateItemStatusModel(conn,h);
 			//conn commit
 			conn.commit();

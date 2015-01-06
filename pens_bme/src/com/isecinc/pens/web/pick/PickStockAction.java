@@ -67,12 +67,7 @@ public class PickStockAction extends I_Action {
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
 				aForm.setBean(ad);
-				
-				// Balance Onhand
-				Date startDate = new Date();
-				OnhandDAO.processBanlanceOnhandFromBarcode(user.getUserName());
-                logger.debug("processBanlanceOnhandFromBarcode>>Total Time:"+(new Date().getTime()-startDate.getTime()));
-                
+				 
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
 				aForm.setResultsSearch(PickStockDAO.searchHead(aForm.getBean()));
@@ -130,6 +125,7 @@ public class PickStockAction extends I_Action {
 	/**
 	 * Prepare without ID
 	 */
+	@Deprecated
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String forward = "prepare";
@@ -246,7 +242,7 @@ public class PickStockAction extends I_Action {
 					allList.addAll(p.getItems());
 				}else{
 					allList.addAll(p.getItems());
-					allList.addAll(PickStockDAO.searchBarcoceItemStatusClose(conn));
+					allList.addAll(PickStockDAO.searchBarcoceItemStatusCloseW3(conn));
 				}
 				
 				p.setIssueReqStatus(issueReqStatus);
@@ -266,7 +262,7 @@ public class PickStockAction extends I_Action {
 				p.setModeConfirm(false);
 				p.setModeEdit(true);
 				
-				aForm.setResults(PickStockDAO.searchBarcoceItemStatusClose(conn));
+				aForm.setResults(PickStockDAO.searchBarcoceItemStatusCloseW3(conn));
 				aForm.setBean(p);
 			}
 		} catch (Exception e) {
@@ -280,6 +276,7 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("prepareAllBox");
 	}
 	
+	@Deprecated
 	public ActionForward prepareAllPartBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareAllPartBox");
 		PickStockForm aForm = (PickStockForm) form;
@@ -518,6 +515,7 @@ public class PickStockAction extends I_Action {
 	/**
 	 * Save
 	 */
+	@Deprecated
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		PickStockForm aForm = (PickStockForm) form;
@@ -635,14 +633,14 @@ public class PickStockAction extends I_Action {
 			if(resultPick.isResultProcess()){
 			
 			    //Process Onhand
-			    OnhandDAO.processBanlanceOnhandFromStockPick(conn,user.getUserName(),OnhandDAO.getWhereCondPensItem_PickStockType2(resultPick.getPensItemMapAll()));
+			    //OnhandDAO.processBanlanceOnhandFromStockPick(conn,user.getUserName(),OnhandDAO.getWhereCondPensItem_PickStockType2(resultPick.getPensItemMapAll()));
 			      
 			    //new search
 				PickStock p = PickStockDAO.searchPickStock(conn,resultPick,true);
 				
 				List<PickStock>  allList = new ArrayList<PickStock>();
 				allList.addAll(p.getItems());
-				allList.addAll(PickStockDAO.searchBarcoceItemStatusClose(conn));
+				allList.addAll(PickStockDAO.searchBarcoceItemStatusCloseW3(conn));
 				
 				logger.debug(""+p.isCanCancel());
 				
@@ -678,6 +676,7 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("prepareAllBox");
 	}
 	
+	@Deprecated
 	public ActionForward savePartBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("Save Part Box");
 		Connection conn = null;
