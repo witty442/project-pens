@@ -207,16 +207,17 @@ public class ReqReturnWacoalDAO extends PickConstants{
         Connection conn = null;
 		try {
            
-			sql.append("\n select i.box_no,i.job_id,j.warehouse,j.job_name  ,count(*) as qty ");
+			sql.append("\n select i.box_no,i.job_id,j.job_name  ,count(*) as qty ");
 			sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i , \n");
-			sql.append("\n ( select distinct job_id,warehouse ,name as job_name from PENSBME_PICK_JOB where warehouse ='W1' ) j");
+			sql.append("\n ( select distinct job_id,warehouse ,name as job_name from PENSBME_PICK_JOB ) j");
 			sql.append("\n where 1=1  ");
 			sql.append("\n and h.job_id = j.job_id ");
 			sql.append("\n and h.job_id = i.job_id ");
 			sql.append("\n and h.box_no = i.box_no ");
 			sql.append("\n and h.status = '"+JobDAO.STATUS_CLOSE+"'");
+			sql.append("\n and h.warehouse ='W1' ");
 			sql.append("\n and ( i.status = '"+JobDAO.STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
-			sql.append("\n group by i.box_no ,i.job_id ,j.warehouse,j.job_name ");
+			sql.append("\n group by i.box_no ,i.job_id ,j.job_name ");
 			sql.append("\n order by i.box_no asc ");
 			logger.debug("sql:"+sql);
 			
@@ -226,9 +227,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
-			  
 			   h = new ReqReturnWacoal();
-		
 			   h.setJobId(rst.getString("job_id"));
 			   h.setJobName(rst.getString("job_name"));
 			   h.setBoxNo(rst.getString("box_no"));
@@ -236,7 +235,6 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			
 			   items.add(h);
 			   r++;
-			   
 			}//while
 
 		} catch (Exception e) {

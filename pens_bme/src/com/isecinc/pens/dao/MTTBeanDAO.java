@@ -69,15 +69,15 @@ public class MTTBeanDAO{
 				Date fDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
-				Date tDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = Utils.parse(o.getSaleDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
-				sql.append("\n and i.SALE_DATE >= to_date('"+fStr+"','dd/mm/yyyy') ");
-				sql.append("\n and i.SALE_DATE <= to_date('"+tStr+"','dd/mm/yyyy') ");
+				sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+				sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
 			
 			sql.append("\n group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status");
-			sql.append("\n order by doc_no,sale_date desc ");
+			sql.append("\n order by doc_no desc,GROUP_CODE desc ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();

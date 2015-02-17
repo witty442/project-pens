@@ -44,6 +44,8 @@ public class OnhandSummary implements Serializable{
     
     private String storeCode;
     private String storeName;
+    private String custNo;//oracle
+    
     private String saleInQty;
     private String saleReturnQty;
     private String saleOutQty;
@@ -52,6 +54,13 @@ public class OnhandSummary implements Serializable{
     private String stockShortQty;
     
     
+	public String getCustNo() {
+		return custNo;
+	}
+	public void setCustNo(String custNo) {
+		this.custNo = custNo;
+	}
+	
 	public String getAdjustQty() {
 		return adjustQty;
 	}

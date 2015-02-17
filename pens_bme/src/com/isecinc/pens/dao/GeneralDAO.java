@@ -238,10 +238,10 @@ public class GeneralDAO {
 			Connection conn = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n select pens_value , pens_desc  FROM ");
+				sql.append("\n select pens_value , interface_desc  FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
 				sql.append("\n and pens_value in ('020056' , '100001' ) ");
-				sql.append("\n and reference_code ='Customer' ");
+				sql.append("\n and reference_code ='Idwacoal' ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append(" and pens_value LIKE '%"+c.getCodeSearch()+"%' \n");
 				}
@@ -261,7 +261,7 @@ public class GeneralDAO {
 					no++;
 					item.setNo(no);
 					item.setCode(rst.getString("pens_value"));
-					item.setDesc(rst.getString("pens_desc"));
+					item.setDesc(rst.getString("interface_desc"));
 					
 					pos.add(item);
 					
@@ -360,5 +360,37 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return storeName;
+		}
+	 
+	 public static String getCustNoOracleMTT(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String custNo ="";
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select interface_value   ");
+				sql.append("\n FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
+				sql.append("\n AND pens_value ='"+storeCode+"' \n");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					custNo = Utils.isNull(rst.getString("interface_value"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return custNo;
 		}
 }

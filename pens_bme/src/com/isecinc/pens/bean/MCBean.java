@@ -8,6 +8,10 @@ import java.util.Map;
 
 public class MCBean implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2984706968964245517L;
 	private int lineId;
 	private int no;
 	//criteria
@@ -15,21 +19,28 @@ public class MCBean implements Serializable{
 	private String staffIdTo;
 	
 	//staff
+	private String orgStaffId;
 	private String staffId;
+	private String staffType;
 	private String mcArea;
 	private String mcAreaDesc;
+	private String mcRoute;
+	private String mcRouteDesc;
 	private String name;
 	private String sureName;
 	private String mobile;
+	private String active;
 	
 	//trans head
 	private String monthTrip;
 	private String monthTripDesc;
+	private String remark;
 	
 	//trans detail
 	private String detail;
 	private String day;
-
+	private String dayOfWeek;
+	
 	private String createUser;
 	private String updateUser;
 	private List<MCBean> items;
@@ -40,8 +51,57 @@ public class MCBean implements Serializable{
 	private int startDayOfMonth;
 	private boolean canEdit = false;
 	private boolean canCancel = false;
+	private String mode;
 	
 	
+	public String getOrgStaffId() {
+		return orgStaffId;
+	}
+	public void setOrgStaffId(String orgStaffId) {
+		this.orgStaffId = orgStaffId;
+	}
+	public String getDayOfWeek() {
+		return dayOfWeek;
+	}
+	public void setDayOfWeek(String dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+	public String getMode() {
+		return mode;
+	}
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+	public String getActive() {
+		return active;
+	}
+	public void setActive(String active) {
+		this.active = active;
+	}
+	public String getStaffType() {
+		return staffType;
+	}
+	public void setStaffType(String staffType) {
+		this.staffType = staffType;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getMcRoute() {
+		return mcRoute;
+	}
+	public void setMcRoute(String mcRoute) {
+		this.mcRoute = mcRoute;
+	}
+	public String getMcRouteDesc() {
+		return mcRouteDesc;
+	}
+	public void setMcRouteDesc(String mcRouteDesc) {
+		this.mcRouteDesc = mcRouteDesc;
+	}
 	public int getStartDayOfMonth() {
 		return startDayOfMonth;
 	}

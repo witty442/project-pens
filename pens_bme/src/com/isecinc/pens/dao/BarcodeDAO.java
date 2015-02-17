@@ -814,6 +814,70 @@ public class BarcodeDAO extends PickConstants{
 			}
 		}
 		
+		public static void updateBarcodeHeadNewJobIdModelByPK(Connection conn,String newJobId,Barcode o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("Update");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE SET  \n");
+				sql.append(" JOB_ID = ? ,update_user =?,update_date =?   \n");
+				
+				sql.append(" WHERE JOB_ID =? and BOX_NO = ? \n" );
+
+				logger.debug("sql:"+sql.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, newJobId);
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setInt(c++, Integer.parseInt(o.getJobId()));
+				ps.setString(c++, o.getBoxNo());
+				
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static void updateBarcodeLineNewJobIdModelByPK(Connection conn,String newJobId,Barcode o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("Update");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE_ITEM SET  \n");
+				sql.append(" JOB_ID = ?,update_user =?,update_date =?   \n");
+				
+				sql.append(" WHERE JOB_ID =? and BOX_NO = ? \n" );
+
+				logger.debug("sql:"+sql.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, newJobId);
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setInt(c++, Integer.parseInt(o.getJobId()));
+				ps.setString(c++, o.getBoxNo());
+				
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
 		
 		public static void updateBarcodeLineStatusModelByPK(Connection conn,Barcode o) throws Exception{
 			PreparedStatement ps = null;

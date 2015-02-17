@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.Constants;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.MasterBean;
@@ -382,6 +384,67 @@ public class ImportDAO {
 		}
 		
 	}
+	
+	public Master getStoreName(String refCode ,String storeNo,String storeType) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getStoreName(conn, refCode, storeNo,storeType);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+		
+	}
+	
+	public Master getStoreName(Connection conn ,String refCode ,String storeNo,String storeType) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Master m = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeNo+"' and reference_code ='"+refCode+"' \n");
+			
+			if( !Utils.isNull(storeType).equalsIgnoreCase("")){
+				if(storeType.equalsIgnoreCase("lotus")){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_LOTUS_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("bigc")){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_BIGC_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("tops")){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_TOPS_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("MTT")){
+					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%' ) \n");
+				}
+			}
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				m = new Master();
+				m.setPensValue(rs.getString("pens_value"));
+				m.setPensDesc(rs.getString("pens_desc"));
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return m;
+	} 
+	
 	public Master getStoreName(Connection conn ,String refCode ,String storeNo) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -412,8 +475,6 @@ public class ImportDAO {
 		}
 		return m;
 	} 
-	
-	
 	
 	public Master getStoreTypeName(Connection conn ,String storeTypeCode) throws Exception{
 		PreparedStatement ps =null;

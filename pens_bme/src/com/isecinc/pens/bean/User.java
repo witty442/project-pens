@@ -25,6 +25,8 @@ public class User extends I_PO implements Serializable {
 	public static final String ADMIN = "ADMIN";
 	public static final String PICK = "PICK";
 	public static final String MC = "MC";
+	public static final String SALE = "SALE";
+	public static final String MT_SALE = "MTSALE";
 	
 	private static final long serialVersionUID = 2247823086169174428L;
 

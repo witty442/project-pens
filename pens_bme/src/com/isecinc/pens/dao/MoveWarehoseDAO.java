@@ -108,6 +108,68 @@ public class MoveWarehoseDAO extends PickConstants{
 		return o;
 	}
 	
+	public static MoveWarehouse searchHeadForNewJob(Connection conn,MoveWarehouse h ,String oldBoxNoWhereSqlIn,String newJobIdWhereSqlIn) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<MoveWarehouse> items = new ArrayList<MoveWarehouse>();
+		int totalBox = 0;
+		int totalQty = 0;
+		int no=1;
+		try {
+			sql.append("\n SELECT O.* FROM (");
+			sql.append("\n 	SELECT job_id as old_job_id,box_no as old_box_no, count(*) as qty" );
+			sql.append("\n  ,(select j.name from PENSBME_PICK_JOB j where j.job_id=BL.job_id) job_name ");
+			sql.append("\n	from PENSBME_PICK_BARCODE_ITEM BL");
+			sql.append("\n 	where 1=1   ");
+			sql.append("\n 	and BL.job_id in("+newJobIdWhereSqlIn+")");//Case No New Box 21/01/2558
+			sql.append("\n 	and BL.box_no in("+oldBoxNoWhereSqlIn+")");
+			sql.append("\n 	group by BL.job_id,BL.box_no ");
+			sql.append("\n )O ");
+			
+			sql.append("\n order by O.old_job_id, O.old_box_no  ");
+			logger.debug("sql:"+sql);
+
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   MoveWarehouse item = new MoveWarehouse();
+			   item.setNo(no);
+			   item.setSelected("true");
+			   
+			   item.setJobId(Utils.isNull(rst.getString("old_job_id")));
+			   item.setBoxNo(Utils.isNull(rst.getString("old_box_no")));
+			   item.setJobName(Utils.isNull(rst.getString("job_name")));
+			   
+			   item.setNewJobId(Utils.isNull(rst.getString("old_job_id")));
+			   item.setNewBoxNo(Utils.isNull(rst.getString("old_box_no")));
+			   item.setNewJobName(Utils.isNull(rst.getString("job_name")));
+			   
+			   item.setQty(Utils.isNull(rst.getString("qty")));
+			   
+			   totalQty += Utils.convertStrToInt(item.getQty());
+			   
+			   items.add(item);
+			   totalBox++;
+			   no++;
+			}//while
+
+			h.setTotalBox(totalBox+"");
+			h.setTotalQty(totalQty+"");
+			h.setItems(items);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return h;
+	}
+	
 	public static MoveWarehouse searchHeadForNewJob(Connection conn,MoveWarehouse h ,String oldJobIdWhereSqlIn,String oldBoxNoWhereSqlIn,String newJobIdWhereSqlIn) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -123,7 +185,7 @@ public class MoveWarehoseDAO extends PickConstants{
 			sql.append("\n  ,(select j.name from PENSBME_PICK_JOB j where j.job_id=BL.job_id) job_name ");
 			sql.append("\n	from PENSBME_PICK_BARCODE_ITEM BL");
 			sql.append("\n 	where 1=1   ");
-			sql.append("\n 	and BL.job_id in("+oldJobIdWhereSqlIn+")");
+			sql.append("\n 	and BL.job_id in("+oldJobIdWhereSqlIn+")"); //Case New Box
 			sql.append("\n 	and BL.box_no in("+oldBoxNoWhereSqlIn+")");
 			sql.append("\n 	group by BL.job_id,BL.box_no ");
 			sql.append("\n )O ");
@@ -177,13 +239,73 @@ public class MoveWarehoseDAO extends PickConstants{
 		return h;
 	}
 	
-	public static boolean moveBarcodeToNewWarehouse(Connection conn,Job newJob,List<MoveWarehouse> boxNoList ) throws Exception {
+	public static MoveWarehouse moveBarcodeToNewWarehouseNoNewBoxNo(Connection conn,Job newJob,List<MoveWarehouse> boxNoList,int no ) throws Exception {
+		int totalQty =0;
+		int totalBox = 0;
+		MoveWarehouse re = new MoveWarehouse();
+		List<MoveWarehouse> items = new ArrayList<MoveWarehouse>();
 		try {
 			if(boxNoList != null && boxNoList.size() >0){
 				for(int i=0;i<boxNoList.size();i++){
 					 MoveWarehouse o = boxNoList.get(i);
 					 
-					 Barcode oldBarcodeHead = getBarcodeHead(conn, newJob, o);
+					 Barcode oldBarcodeHead = getOldBarcodeHead(conn, o);
+					 if(oldBarcodeHead != null){
+						 
+						 //update barcode to new JobId
+						 oldBarcodeHead.setUpdateUser(newJob.getUpdateUser());
+						 
+						 //update barcode head
+						 BarcodeDAO.updateBarcodeHeadNewJobIdModelByPK(conn,newJob.getJobId(), oldBarcodeHead);
+						 //update barcode item
+						 BarcodeDAO.updateBarcodeLineNewJobIdModelByPK(conn,newJob.getJobId(), oldBarcodeHead); 
+					 }
+					 
+					 
+				   //Set for Display
+				    MoveWarehouse item = new MoveWarehouse();
+				    no++;
+				    item.setNo(no);
+				    item.setSelected("true");
+				   
+				    item.setJobId(Utils.isNull(o.getJobId()));
+				    item.setBoxNo(Utils.isNull(o.getBoxNo()));
+				    item.setJobName(Utils.isNull(newJob.getName()));
+				   
+				    item.setNewJobId(Utils.isNull(newJob.getJobId()));
+				    item.setNewBoxNo(Utils.isNull(o.getBoxNo()));
+				    item.setNewJobName(Utils.isNull(newJob.getName()));
+				   
+				    item.setQty(Utils.isNull(o.getQty()));
+				   
+				    totalQty += Utils.convertStrToInt(item.getQty());
+				   
+				    items.add(item);
+				    totalBox++;
+				  
+				}
+				re.setNo(no);
+				re.setTotalBox(totalBox+"");
+				re.setTotalQty(totalQty+"");
+				re.setItems(items);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+			
+			} catch (Exception e) {}
+		}
+		return re;
+	}
+	
+	public static boolean moveBarcodeToNewWarehouseNewBoxNo(Connection conn,Job newJob,List<MoveWarehouse> boxNoList ) throws Exception {
+		try {
+			if(boxNoList != null && boxNoList.size() >0){
+				for(int i=0;i<boxNoList.size();i++){
+					 MoveWarehouse o = boxNoList.get(i);
+					 
+					 Barcode oldBarcodeHead = getOldBarcodeHead(conn, o);
 					 if(oldBarcodeHead != null){
 						 
 						 //update old record to Move M
@@ -226,7 +348,7 @@ public class MoveWarehoseDAO extends PickConstants{
 		return true;
 	}
 	
-	public static Barcode getBarcodeHead(Connection conn,Job newJob,MoveWarehouse o ) throws Exception {
+	public static Barcode getOldBarcodeHead(Connection conn,MoveWarehouse o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -234,19 +356,15 @@ public class MoveWarehoseDAO extends PickConstants{
 		try {
 			sql.append("\n select i.* from PENSBI.PENSBME_PICK_BARCODE i   \n");
 			sql.append("\n where 1=1   \n");
+			sql.append("\n and i.job_id = "+Utils.isNull(o.getJobId())+"");
+		    sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
 			
-			if( !Utils.isNull(o.getJobId()).equals("")){
-				sql.append("\n and i.job_id = "+Utils.isNull(o.getJobId())+"");
-			}
-			if( !Utils.isNull(o.getBoxNo()).equals("")){
-				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
-			}
 			logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
-			while(rst.next()) {
+			if(rst.next()) {
 			   h = new Barcode();
 			  
 			   h.setJobId(rst.getString("job_id"));
@@ -255,7 +373,6 @@ public class MoveWarehoseDAO extends PickConstants{
 			   h.setStatus(Utils.isNull(rst.getString("status"))); 
 			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
 
-			
 			}//while
 
 			return h;
