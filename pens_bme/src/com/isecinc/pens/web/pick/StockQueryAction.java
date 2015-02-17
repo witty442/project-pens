@@ -183,6 +183,7 @@ public class StockQueryAction extends I_Action {
 			    out.close();
 	         }
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 		} finally {
@@ -195,7 +196,17 @@ public class StockQueryAction extends I_Action {
 	}
 	private StringBuffer genHTML(HttpServletRequest request,StockQueryForm form){
 		StringBuffer h = new StringBuffer("");
+		String a= "@";
 		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
 			//Header
 			StockQuery b = form.getBean();
 			
@@ -275,11 +286,11 @@ public class StockQueryAction extends I_Action {
 					   h.append("<td>"+s.getNo()+"</td> \n");
 					   h.append("<td>"+s.getWareHouse()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
-					   h.append("<td>"+s.getPensItem()+"</td> \n");
-					   h.append("<td>"+s.getMaterialMaster()+"</td> \n");
-					   h.append("<td>"+s.getBarcode()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getBoxNo()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getJobId()+"&nbsp;</td> \n");
+					   h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					   h.append("<td class='text'>"+s.getMaterialMaster()+"</td> \n");
+					   h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+					   h.append("<td class='text'>"+s.getBoxNo()+"</td> \n");
+					   h.append("<td>"+s.getJobId()+"</td> \n");
 					   h.append("<td>"+s.getName()+"</td> \n");
 					   if("W3".equalsIgnoreCase(b.getWareHouse())){
 						   h.append("<td>"+s.getRemark()+"</td> \n");
@@ -287,12 +298,12 @@ public class StockQueryAction extends I_Action {
 					   h.append("<td>"+s.getStatusDesc()+"</td> \n");
 					}else if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
 					   h.append("<td>"+s.getWareHouse()+"</td> \n");
-					   h.append("<td>"+s.getBoxNo()+"&nbsp;</td> \n");
+					   h.append("<td class='text'>"+s.getBoxNo()+"</td> \n");
 					   h.append("<td>"+s.getName()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
 					}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
-					   h.append("<td>"+s.getWareHouse()+"</td> \n");
-					   h.append("<td>"+s.getPensItem()+"</td> \n");
+					   h.append("<td >"+s.getWareHouse()+"</td> \n");
+					   h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
 					}

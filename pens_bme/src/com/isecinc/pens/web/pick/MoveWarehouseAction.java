@@ -162,22 +162,33 @@ public class MoveWarehouseAction extends I_Action {
 						 oldJobIdWhereSqlIn +="'"+l.getJobId()+"',";
 						 oldBoxNoWhereSqlIn +="'"+l.getBoxNo()+"',";
 						 
+						 String jobIdKey = String.valueOf(l.getJobId());
+						 
+						 //First
 						 if(groupJobMap.isEmpty()){
+							 itemList = new ArrayList<MoveWarehouse>();
 							 itemList.add(l);
-							 groupJobMap.put(String.valueOf(l.getJobId()), itemList);
+							 groupJobMap.put(jobIdKey, itemList);
 						 }else{
-							 if(groupJobMap.get(l.getJobId()) != null){
+							 if(groupJobMap.get(jobIdKey) != null){
+								 itemList = groupJobMap.get(jobIdKey);
 								 itemList.add(l); 
-								 groupJobMap.put(String.valueOf(l.getJobId()), itemList);
+								 groupJobMap.put(jobIdKey, itemList);
 							 }else{
 								 itemList = new ArrayList<MoveWarehouse>();
 								 itemList.add(l); 
-								 groupJobMap.put(String.valueOf(l.getJobId()), itemList);
+								 groupJobMap.put(jobIdKey, itemList);
 							 }
 						 }
+						 
 					}//if
 				}//for
 			}//if
+			
+			int no =0;
+			int totalQty =0;
+			int totalBox = 0;
+			List<MoveWarehouse> AllItems = new ArrayList<MoveWarehouse>();
 			
 			if(groupJobMap != null ){
 				Iterator<String> its = groupJobMap.keySet().iterator();
@@ -202,9 +213,20 @@ public class MoveWarehouseAction extends I_Action {
 				    newJobIdWhereSqlIn +="'"+newJob.getJobId()+"',";
 				    
 				    itemList = groupJobMap.get(jobIdKey);
+				    
 				    //Move barcode to new job id
-				    MoveWarehoseDAO.moveBarcodeToNewWarehouse(conn,newJob, itemList);
+				    MoveWarehouse re = MoveWarehoseDAO.moveBarcodeToNewWarehouseNoNewBoxNo(conn,newJob, itemList,no);
+				    
+				    no = re.getNo();
+				    totalQty +=Utils.convertStrToInt(re.getTotalQty());
+				    totalBox +=Utils.convertStrToInt(re.getTotalBox());
+				    
+				    AllItems.addAll(re.getItems());
 				}
+				
+				h.setTotalBox(totalBox+"");
+				h.setTotalQty(totalQty+"");
+				h.setItems(AllItems);
 			}
 			
 			if(oldJobIdWhereSqlIn.length() >0){
@@ -218,8 +240,9 @@ public class MoveWarehouseAction extends I_Action {
 			if(newJobIdWhereSqlIn.length() >0){
 				newJobIdWhereSqlIn = newJobIdWhereSqlIn.substring(0,newJobIdWhereSqlIn.length()-1);
 			}
+			
 		    ///search refresh
-		    h = MoveWarehoseDAO.searchHeadForNewJob(conn,h,oldJobIdWhereSqlIn,oldBoxNoWhereSqlIn,newJobIdWhereSqlIn);
+		  //  h = MoveWarehoseDAO.searchHeadForNewJob(conn,h,oldBoxNoWhereSqlIn,newJobIdWhereSqlIn);
 		    
 		   // hide save button
 		    h.setCanEdit(false);

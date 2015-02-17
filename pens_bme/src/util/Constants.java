@@ -19,6 +19,9 @@ public class Constants {
 	public static final String STORE_TYPE_LOTUS_CODE ="020047";
 	public static final String STORE_TYPE_BIGC_CODE ="020049";
 	public static final String STORE_TYPE_TOPS_CODE ="020058";
+
+	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
+	public static final String STORE_TYPE_MTT_CODE_2 ="020056";
 	
 	public static String STORE_TYPE_LOTUS_STRING = "LotusItem";
 	public static String STORE_TYPE_BIGC_STRING = "BigCitem";

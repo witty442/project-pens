@@ -59,8 +59,8 @@ public class MCAction extends I_Action {
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
-				//aForm.setBean(MCBeanDAO.searchHead(aForm.getBeanCriteria()));
-				//aForm.setResultsSearch(aForm.getBean().getItems());
+				aForm.setBean(MCDAO.searchHead(aForm.getBeanCriteria(),false));
+				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,7 +77,7 @@ public class MCAction extends I_Action {
 		String msg = "";
 		try {
 			MCBean b = aForm.getBean();
-			aForm.setBean(MCDAO.searchHead(aForm.getBean()));
+			aForm.setBean(MCDAO.searchHead(aForm.getBean(),false));
 			aForm.setResultsSearch(aForm.getBean().getItems());
 			
 			//Calculate Max Day in Month
@@ -159,6 +159,182 @@ public class MCAction extends I_Action {
 		return mapping.findForward("report");
 	}
 	
+	public ActionForward prepareMCStaffDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareMCStaffDetail");
+		MCForm aForm = (MCForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			 if("add".equals(action)){
+			   MCBean bean = new MCBean();
+			   bean.setMode("add");
+			   bean.setCanEdit(true);
+			   aForm.setBean(bean);
+					
+			 }else if("edit".equals(action)){
+			   conn = DBConnection.getInstance().getConnection();
+			   String staffId = Utils.isNull(request.getParameter("staffId"));
+				
+			   MCBean bean = new MCBean();
+			   bean.setStaffId(staffId);
+			   MCBean results = MCDAO.searchStaff(bean);
+			   bean = results.getItems().get(0);
+			   bean.setMode("edit");
+			  //check can Edit
+			   bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getStaffId()));
+			   aForm.setBean(bean);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("prepareMCStaffDetail");
+	}
+	
+	public ActionForward saveMCStaffDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) throws Exception {
+		logger.debug("saveMCStaffDetail");
+		Connection conn = null;
+		MCForm aForm = (MCForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			MCBean h = aForm.getBean();
+			h.setCreateUser(user.getUserName());
+			h.setUpdateUser(user.getUserName());
+			
+			logger.debug("is_active:"+h.getActive());
+			if( !Utils.isNull(h.getActive()).equals("")){
+				h.setActive("Y");
+			}else{
+				h.setActive("");
+			}
+
+            if("add".equals(h.getMode())){
+            	//Validate StaffId duplicate
+    			if(MCDAO.isDuplicateStaffId(conn, h.getStaffId())){
+    				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
+    				return mapping.findForward("prepareMCStaffDetail");
+    			}
+    			
+            	MCDAO.insertMCStaffModel(conn, h);
+            }else  if("edit".equals(h.getMode())){
+            	
+            	if( !h.getOrgStaffId().equals(h.getStaffId())){
+            		
+            		//Validate new StaffId duplicate
+        			if(MCDAO.isDuplicateStaffId(conn, h.getStaffId())){
+        				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
+        				return mapping.findForward("prepareMCStaffDetail");
+        			}
+        			
+            		MCDAO.updateMCStaffModelByDummyStaffId(conn, h);
+            	}else{
+            	    MCDAO.updateMCStaffModel(conn, h);
+            	}
+            }
+			
+			//Search Again
+			MCBean bean = MCDAO.searchStaff(conn,h).getItems().get(0);
+			bean.setMode("edit");
+			//check can Edit
+			bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getStaffId()));
+		    aForm.setBean(bean);
+			
+			conn.commit();
+			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+		} catch (Exception e) {
+			conn.rollback();
+            e.printStackTrace();
+			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			try {
+				
+			} catch (Exception e2) {}
+			return mapping.findForward("prepareMCStaffDetail");
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("prepareMCStaffDetail");
+	}
+	
+	public ActionForward prepareMCStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareMCStaff");
+		MCForm aForm = (MCForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if("new".equals(action)){
+				aForm.setResultsSearch(null);
+				MCBean ad = new MCBean();
+				
+				aForm.setBean(ad);
+			}else if("back".equals(action)){
+				aForm.setBean(MCDAO.searchHead(aForm.getBeanCriteria(),false));
+				aForm.setResultsSearch(aForm.getBean().getItems());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			
+		}
+		return mapping.findForward("prepareMCStaff");
+	}
+	
+	public ActionForward searchMCStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchMCStaff");
+		MCForm aForm = (MCForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		try {
+			MCBean b = aForm.getBean();
+			aForm.setBean(MCDAO.searchStaff(aForm.getBean()));
+			aForm.setResultsSearch(aForm.getBean().getItems());
+			
+			if(aForm.getResultsSearch().size() <=0){
+			   request.setAttribute("Message", "ไม่พบข้อมูล");
+			   aForm.setResultsSearch(null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			
+		}
+		return mapping.findForward("prepareMCStaff");
+	}
+	
+	public ActionForward clearMCStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearMCStaff");
+		MCForm aForm = (MCForm) form;
+		try {
+			aForm.setResultsSearch(null);
+			aForm.setBean(new MCBean());
+			
+			MCBean ad = new MCBean();
+			//ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			aForm.setBean(ad);
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("prepareMCStaff");
+	}
+	
+	
 	public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("exportExcel");
 		MCForm aForm = (MCForm) form;
@@ -182,7 +358,7 @@ public class MCAction extends I_Action {
 			c.setMonthTrip(monthTrip);
 			c.setStaffId(staffId);
 			
-			MCBean mc = MCDAO.searchHead(c).getItems().get(0);
+			MCBean mc = MCDAO.searchHead(c,true).getItems().get(0);
 			mc.setMaxDay(Integer.parseInt(maxDayInMonth));
 			htmlTable = genExportReport(mc);
 			
@@ -199,7 +375,6 @@ public class MCAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			
 		}
 		return mapping.findForward("report");
 	}
@@ -207,6 +382,14 @@ public class MCAction extends I_Action {
 	private StringBuffer genExportReport(MCBean b){
 		StringBuffer h = new StringBuffer("");
 		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'@'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
 			
 		    String monthYearFull = "";
 		    String monthYear = "";
@@ -219,27 +402,34 @@ public class MCAction extends I_Action {
 		    monthYear = Utils.stringValue(dateObj, Utils.MMM_YYYY,Utils.local_th);
 		    
 			//Header
-			h.append("<table border='1'> \n");
+			h.append("<table border='1' width='100%'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td>&nbsp;</td> \n");
-			h.append("<td align='left' colspan='4'>รายละเอียดประจำ Trip ของเดือน "+monthYearFull+"</td> \n");
+			h.append("<td align='center' colspan='2'><b>รายละเอียดประจำ Trip ของเดือน "+monthYearFull+"</b></td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td>&nbsp;</td> \n");
-			h.append("<td align='left'>MC:"+b.getName()+" "+b.getSureName()+"</td> \n");
-			h.append("<td align='left' colspan='2'>พื้นที่รับผิดชอบ:"+b.getMcAreaDesc()+"</td> \n");
+			h.append("<td align='left' colspan='2'>");
+			h.append("<table> ");
+				h.append("<tr> \n");
+				h.append(" <td align='left' nowrap>&nbsp;"+b.getStaffType()+":&nbsp;"+b.getStaffId()+":&nbsp;"+b.getName()+" "+b.getSureName()+" </td>\n");
+				h.append(" <td align='right' nowrap>&nbsp;Route:&nbsp;"+b.getMcRouteDesc()+"\n");
+				h.append(" พื้นที่รับผิดชอบ:&nbsp;"+b.getMcAreaDesc()+"</td> \n");
+				h.append("</tr> \n");
+			h.append("</table> ");
 			h.append("</tr> \n");
 			
+			h.append("<tr> \n");
+			    h.append("<td align='left' colspan='2'>หมายเหตุ:&nbsp;"+b.getRemark()+"</b></td> \n");
+		    h.append("</tr> \n");	
+		
 			h.append("</table> \n");
 
 			if(dayMaps != null){
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				  h.append("<td>&nbsp;</td> \n");
-				  h.append("<td>วันที่</td> \n");
-				  h.append("<td colspan='2'>รายละเอียด</td> \n");
+				h.append("<td align='center'><b>วันที่</b></td> \n");
+				h.append("<td align='center'><b>รายละเอียด</b></td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=1;i<=maxDayInMonth;i++){
@@ -248,9 +438,8 @@ public class MCAction extends I_Action {
 					String detail = Utils.isNull(dayMaps.get(key));
 					
 					h.append("<tr> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>"+dayStr+"&nbsp;</td> \n");
-					  h.append("<td colspan='2'>"+detail+"</td> \n");
+					h.append("<td class='text'>"+dayStr+"</td> \n");
+					h.append("<td w>"+detail+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");
@@ -293,34 +482,31 @@ public class MCAction extends I_Action {
 			
             String staffId = Utils.isNull(request.getParameter("staffId"));
             String monthTrip = Utils.isNull(request.getParameter("monthTrip"));
-            String maxDayInMonth = Utils.isNull(request.getParameter("maxDayInMonth"));
-            
+            String maxDayInMonth = Utils.isNull(request.getParameter("maxDayInMonth")); 
             String mode = Utils.isNull(request.getParameter("mode"));
-            
-			if( !"".equals(staffId) && !"".equals(staffId)){
-				logger.debug("prepare edit staffId:"+staffId);
-				MCBean c = new MCBean();
-				c.setMonthTrip(monthTrip);
-				c.setStaffId(staffId);
-				
-				MCBean bean = MCDAO.searchHead(c).getItems().get(0);
-				//aForm.setResults(bean.getItems());
-				
-				//step  01 what day of week
-				Calendar cDay = Calendar.getInstance(Utils.local_th);
-				cDay.setTime(Utils.parse("01"+monthTrip, Utils.DD_MM_YYYY_WITHOUT_SLASH));
-				int startDayOfMonth = cDay.get(Calendar.DAY_OF_WEEK);
-				bean.setStartDayOfMonth(startDayOfMonth);
-				
-				logger.debug("startDayOfMonth:"+startDayOfMonth);
-				logger.debug("maxDayInMonth:"+maxDayInMonth);
-				
-				bean.setMaxDay(Utils.convertStrToInt(maxDayInMonth));
-				
-				
-				aForm.setBean(bean);
-				aForm.setMode(mode);//Mode Edit
-			}
+		
+			logger.debug("prepare edit staffId:"+staffId);
+			MCBean c = new MCBean();
+			c.setMonthTrip(monthTrip);
+			c.setStaffId(staffId);
+			
+			MCBean bean = MCDAO.searchHead(c,true).getItems().get(0);
+			
+			//step  01 what day of week
+			Calendar cDay = Calendar.getInstance(Utils.local_th);
+			cDay.setTime(Utils.parse("01"+monthTrip, Utils.DD_MM_YYYY_WITHOUT_SLASH));
+			int startDayOfMonth = cDay.get(Calendar.DAY_OF_WEEK);
+			bean.setStartDayOfMonth(startDayOfMonth);
+			
+			logger.debug("startDayOfMonth:"+startDayOfMonth);
+			logger.debug("maxDayInMonth:"+maxDayInMonth);
+			
+			bean.setMaxDay(Utils.convertStrToInt(maxDayInMonth));
+			
+			
+			aForm.setBean(bean);
+			aForm.setMode(mode);//Mode Edit
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", "err:"+ e.getMessage());
@@ -390,39 +576,45 @@ public class MCAction extends I_Action {
 			MCBean headTrans = new MCBean();
 			headTrans.setMonthTrip(h.getMonthTrip());
 			headTrans.setStaffId(h.getStaffId());
+			headTrans.setStaffType(h.getStaffType());
+			headTrans.setMcRoute(h.getMcRoute());
 			headTrans.setMcArea(h.getMcArea());
 			headTrans.setName(h.getName());
+			headTrans.setRemark(h.getRemark());
 			headTrans.setSureName(h.getSureName());
 			headTrans.setCreateUser(user.getUserName());
 			headTrans.setUpdateUser(user.getUserName());
 			
-			int update = MCDAO.updateHeadModel(conn, headTrans);
+			int update = MCDAO.updateMCTransModel(conn, headTrans);
 			if(update==0){
-			   MCDAO.saveHeadModel(conn, headTrans);
+			   MCDAO.insertMCTransModel(conn, headTrans);
 			}
 			
 			//get value
 			for(int d=1;d<=h.getMaxDay();d++) {
 				String key = String.valueOf(d).length()==1?"0"+d:String.valueOf(d);
 				String detail = request.getParameter(key+h.getMonthTrip());
+				String dayOfWeek = request.getParameter("week_"+key+h.getMonthTrip());
+				
 				
 				MCBean item = new MCBean();
 				item.setMonthTrip(h.getMonthTrip());
 				item.setStaffId(h.getStaffId());
 				item.setDay(key);
 				item.setDetail(detail);
+				item.setDayOfWeek(dayOfWeek);
 				item.setCreateUser(user.getUserName());
 				item.setUpdateUser(user.getUserName());
 				
 				//save line DB
-				update = MCDAO.updateItemModel(conn, item);
+				update = MCDAO.updateMCTransDetailModel(conn, item);
 				if(update==0){
-				   MCDAO.saveItemModel(conn, item);
+				   MCDAO.insertMCTransDetail(conn, item);
 				}
 			}
 
 			//Search Again
-			MCBean bean = MCDAO.searchHead(conn,h).getItems().get(0);
+			MCBean bean = MCDAO.searchHead(conn,h,true).getItems().get(0);
 		    bean.setStartDayOfMonth(h.getStartDayOfMonth());
 		    bean.setMaxDay(h.getMaxDay());
 		    
@@ -448,6 +640,92 @@ public class MCAction extends I_Action {
 		return "search";
 	}
 	
+	public ActionForward copyDataFromLastMonth(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("copyDataFromLastMonth");
+		MCForm aForm = (MCForm) form;
+		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			//Step 1 Save Blank Data
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			MCBean h = aForm.getBean();
+	  
+			//head 
+			MCBean headTrans = new MCBean();
+			headTrans.setMonthTrip(h.getMonthTrip());
+			headTrans.setStaffId(h.getStaffId());
+			headTrans.setStaffType(h.getStaffType());
+			headTrans.setMcRoute(h.getMcRoute());
+			headTrans.setMcArea(h.getMcArea());
+			headTrans.setName(h.getName());
+			headTrans.setRemark(h.getRemark());
+			headTrans.setSureName(h.getSureName());
+			headTrans.setCreateUser(user.getUserName());
+			headTrans.setUpdateUser(user.getUserName());
+			
+			int update = MCDAO.updateMCTransModel(conn, headTrans);
+			if(update==0){
+			   MCDAO.insertMCTransModel(conn, headTrans);
+			}
+			
+			//get value
+			for(int d=1;d<=h.getMaxDay();d++) {
+				String key = String.valueOf(d).length()==1?"0"+d:String.valueOf(d);
+				String detail = request.getParameter(key+h.getMonthTrip());
+				String dayOfWeek = request.getParameter("week_"+key+h.getMonthTrip());
+				
+				
+				MCBean item = new MCBean();
+				item.setMonthTrip(h.getMonthTrip());
+				item.setStaffId(h.getStaffId());
+				item.setDay(key);
+				item.setDetail(detail);
+				item.setDayOfWeek(dayOfWeek);
+				item.setCreateUser(user.getUserName());
+				item.setUpdateUser(user.getUserName());
+				
+				//save line DB
+				update = MCDAO.updateMCTransDetailModel(conn, item);
+				if(update==0){
+				   MCDAO.insertMCTransDetail(conn, item);
+				}
+			}
+			
+			//Step2 Update Trans Detail by day_of_week
+			MCBean cri = aForm.getBean();
+			String currentMonth = cri.getMonthTrip();//012015
+			String prevMonth = ""+(Integer.parseInt(currentMonth.substring(0,2))-1);
+			String prevMonthTrip = (prevMonth.length()==1?"0"+prevMonth:prevMonth)+currentMonth.substring(2,6); 
+			
+			logger.debug("prevMonthTrip["+prevMonthTrip+"]");
+			
+			//Update Detail
+			MCDAO.copyFromLastMonthModel(conn, cri.getStaffId(), currentMonth, prevMonthTrip);
+			
+			//Search Again
+			MCBean bean = MCDAO.searchHead(conn,h,true).getItems().get(0);
+		    bean.setStartDayOfMonth(h.getStartDayOfMonth());
+		    bean.setMaxDay(h.getMaxDay());
+		    
+		    aForm.setBean(bean);
+			
+			conn.commit();
+			request.setAttribute("Message", "Copy ข้อมูลเรียบร้อยแล้ว");
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message",e.toString());
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("search");
+	}
 
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");

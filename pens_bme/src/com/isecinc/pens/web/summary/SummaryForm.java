@@ -27,6 +27,7 @@ public class SummaryForm extends I_Form {
 
 	private List<OnhandSummary> onhandSummaryResults;
 	private List<OnhandSummary> onhandSummaryLotusResults;
+	private List<OnhandSummary> onhandSummaryMTTResults;
 	private List<OnhandSummary> onhandBigCResults;
 	private List<OnhandSummary> onhandSummaryLotusPeriodResults;
 	private List<TransactionSummary> lotusSummaryResults;
@@ -39,6 +40,7 @@ public class SummaryForm extends I_Form {
 	
 	private int onhandSummaryResultsSize;
 	private int onhandSummaryLotusResultsSize;
+	private int onhandSummaryMTTResultsSize;
 	private int onhandBigCResultsSize;
 	private int onhandSummaryLotusPeriodResultsSize;
 	private int lotusSummaryResultsSize;
@@ -49,6 +51,19 @@ public class SummaryForm extends I_Form {
 	
 
 	
+	public List<OnhandSummary> getOnhandSummaryMTTResults() {
+		return onhandSummaryMTTResults;
+	}
+	public void setOnhandSummaryMTTResults(
+			List<OnhandSummary> onhandSummaryMTTResults) {
+		this.onhandSummaryMTTResults = onhandSummaryMTTResults;
+	}
+	public int getOnhandSummaryMTTResultsSize() {
+		return getOnhandSummaryMTTResults().size();
+	}
+	public void setOnhandSummaryMTTResultsSize(int onhandSummaryMTTResultsSize) {
+		this.onhandSummaryMTTResultsSize = onhandSummaryMTTResultsSize;
+	}
 	public int getTopsSummaryResultsSize() {
 		return topsSummaryResults != null?topsSummaryResults.size():0;
 	}

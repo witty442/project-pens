@@ -3,6 +3,10 @@ package com.isecinc.pens.web.mc;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionMapping;
+
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.bean.MCBean;
 import com.isecinc.pens.bean.MTTBean;
@@ -48,6 +52,11 @@ public class MCForm extends I_Form {
 		this.beanCriteria = beanCriteria;
 	}
 	
-    
+	@Override
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		// reset properties
+		if(bean !=null)
+		  bean.setActive("");
+	}
    
 }

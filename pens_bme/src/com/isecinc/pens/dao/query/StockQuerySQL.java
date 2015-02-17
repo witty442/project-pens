@@ -40,7 +40,7 @@ public class StockQuerySQL extends PickConstants{
 	public static StringBuffer genFromPickBarcode(StockQuery o,String statusAll){
 		StringBuffer sql = new StringBuffer("");
 		
-		sql.append("\n select j.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
+		sql.append("\n select h.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 		sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty,'' as remark ");
 		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBME_PICK_JOB j ");
 		sql.append("\n where h.job_id = l.job_id and h.box_no = l.box_no ");
@@ -62,11 +62,11 @@ public class StockQuerySQL extends PickConstants{
 			sql.append("\n and h.job_id = "+Utils.isNull(o.getJobId())+"");
 		}
 		if( !Utils.isNull(o.getWareHouse()).equals("")){
-			sql.append("\n and j.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+			sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 		}
 		sql.append("\n and l.status in("+statusAll+")");//RESERVE
 		
-		sql.append("\n group by j.warehouse,j.job_id,j.name ,l.box_no,l.line_id, " );
+		sql.append("\n group by h.warehouse,j.job_id,j.name ,l.box_no,l.line_id, " );
 		sql.append("\n          l.material_master ,l.group_code,l.pens_item,l.barcode,l.status ");
 		return sql;
 	}
@@ -163,7 +163,7 @@ public class StockQuerySQL extends PickConstants{
     public static StringBuffer genFromStockPick(StockQuery o,String statusAll){
 		StringBuffer sql = new StringBuffer("");
 		
-		sql.append("\n select j.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
+		sql.append("\n select h.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 		sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty ");
 		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBME_PICK_JOB j ");
 		sql.append("\n where h.job_id = l.job_id and h.box_no = l.box_no ");
@@ -185,11 +185,11 @@ public class StockQuerySQL extends PickConstants{
 			sql.append("\n and h.job_id = "+Utils.isNull(o.getJobId())+"");
 		}
 		if( !Utils.isNull(o.getWareHouse()).equals("")){
-			sql.append("\n and j.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+			sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 		}
 		sql.append("\n and l.status in("+statusAll+")");//RESERVE
 		
-		sql.append("\n group by j.warehouse,j.job_id,j.name ,l.box_no,l.line_id, " );
+		sql.append("\n group by h.warehouse,j.job_id,j.name ,l.box_no,l.line_id, " );
 		sql.append("\n          l.material_master ,l.group_code,l.pens_item,l.barcode,l.status ");
 		return sql;
 	}

@@ -202,7 +202,17 @@ public class StockFinishGoodQueryAction extends I_Action {
 	
 	private StringBuffer genHTML(HttpServletRequest request,StockFinishGoodQueryForm form){
 		StringBuffer h = new StringBuffer("");
+		String a= "@";
 		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
 			//Header
 			StockQuery b = form.getBean();
 			
@@ -263,13 +273,13 @@ public class StockFinishGoodQueryAction extends I_Action {
 					if("Detail".equalsIgnoreCase(form.getBean().getSummaryType())){
 					   h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
-					   h.append("<td>"+s.getPensItem()+"</td> \n");
-					   h.append("<td>"+s.getBarcode()+"&nbsp;</td> \n");
-					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					   h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					   h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+					   h.append("<td >"+s.getOnhandQty()+"</td> \n");
 					   h.append("<td>"+s.getStatusDesc()+"</td> \n");
 	
 					}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
-					   h.append("<td>"+s.getPensItem()+"</td> \n");
+					   h.append("<td  class='text'>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
 					   h.append("<td>"+s.getStatusDesc()+"</td> \n");

@@ -176,6 +176,8 @@ public class MTTAction extends I_Action {
 		}
 		return mapping.findForward("report");
 	}
+	
+	
 	private StringBuffer genExportReport(HttpServletRequest request,MTTForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		try{
@@ -183,7 +185,7 @@ public class MTTAction extends I_Action {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11'>รายงานข้อมูลรายละเอียดขาย B'me จาก MTT</td> \n");
+			h.append("<td align='left' colspan='11'>รายงานข้อมูลขาย Sale-Out ของ MTT</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
@@ -571,14 +573,14 @@ public class MTTAction extends I_Action {
 				//parameterMap.put("p_remark", Utils.isNull(h.getRemark()));
 	
 				//Gen Report
-				String fileName = "boxno_pdf_report";
-				String fileJasper = BeanParameter.getReportPath() + fileName;
+				//String fileName = "boxno_pdf_report";
+				//String fileJasper = BeanParameter.getReportPath() + fileName;
 				
-				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, h.getItems());
+				//reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, h.getItems());
 				
 			}else{
 				
-				request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
+				//request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {

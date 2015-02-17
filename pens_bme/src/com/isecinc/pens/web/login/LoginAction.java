@@ -14,6 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.web.managepath.ManagePath;
 
@@ -59,6 +60,26 @@ public class LoginAction extends DispatchAction {
 			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession(true).setAttribute("username", user.getUserName());
+			
+			
+			String role = user.getRole().getKey();
+			logger.debug("role:"+role);
+			if(User.MC.equalsIgnoreCase(role) || User.MT_SALE.equalsIgnoreCase(role)){
+				forwordStr = "pass_user_mc";
+			}
+			logger.debug("forwordStr:"+forwordStr);
+			
+			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			if(screenWidth.equals("")){
+				screenWidth ="0";
+			}
+			logger.debug("Before ScreenWidth["+screenWidth+"]");
+			if(Integer.parseInt(screenWidth) < 600){
+				screenWidth = "0";
+			}
+			logger.debug("After Calc ScreenWidth:"+screenWidth);
+			
+			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());

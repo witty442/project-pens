@@ -77,7 +77,6 @@ public class Utils {
 	   }catch(Exception e){
 		   e.printStackTrace();
 	   }
-		
 	   return re;
 	}
 	  
@@ -557,7 +556,7 @@ public class Utils {
 		if (str ==null || isNull(str).equals("")){
 			return new Double(0);
 		}
-		logger.debug("str:"+str);
+		//logger.debug("str:"+str);
 		return ((Double)str);
 	}
 	
@@ -566,7 +565,7 @@ public class Utils {
 			return new Double(0);
 		}
 		str = str.replaceAll(",", "");
-		logger.debug("str:"+str);
+		//logger.debug("str:"+str);
 		return (new Double(str));
 	}
 	

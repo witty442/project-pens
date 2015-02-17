@@ -63,6 +63,8 @@ public class SummaryAction extends I_Action {
 				 summaryForm.setDiffStockSummary(new DiffStockSummary());
 				 
 				 summaryForm.setOnhandBigCResults(null);
+				 
+				 summaryForm.setOnhandSummaryMTTResults(null);
 			 }
 			
 		} catch (Exception e) {
@@ -102,6 +104,8 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandSummaryLotusPeriodResults(null);
 				 summaryForm.setOnhandBigCResults(null);
+				 
+				 summaryForm.setOnhandSummaryMTTResults(null);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -128,7 +132,7 @@ public class SummaryAction extends I_Action {
 					summaryForm.getOnhandSummary().setAsOfDate(cc.getAsOfDate());
 					summaryForm.getOnhandSummary().setFileName(cc.getFileName());
 					
-					logger.debug("results:"+summaryForm.getOnhandSummaryResults());
+					//logger.debug("results:"+summaryForm.getOnhandSummaryResults());
 					
 				} else {
 					summaryForm.setOnhandSummaryResults(null);
@@ -142,7 +146,7 @@ public class SummaryAction extends I_Action {
 					
 					OnhandSummary cc = (OnhandSummary)results.get(0);
 					
-					logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
+					//logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					if(m != null)
@@ -153,6 +157,22 @@ public class SummaryAction extends I_Action {
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
 				
+			}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				
+				List<OnhandSummary> results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),user);
+				if (results != null  && results.size() >0) {
+					summaryForm.setOnhandSummaryMTTResults(results);
+					
+					ImportDAO importDAO = new ImportDAO();
+					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+					if(m != null)
+					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+					
+				} else {
+					summaryForm.setOnhandSummaryMTTResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
+				
 			}else if("onhandBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				List<OnhandSummary> results = new SummaryDAO().searchOnhandBigC(summaryForm.getOnhandSummary(),user);
 				if (results != null  && results.size() >0) {
@@ -160,7 +180,7 @@ public class SummaryAction extends I_Action {
 					
 					OnhandSummary cc = (OnhandSummary)results.get(0);
 					
-					logger.debug("results:"+summaryForm.getOnhandBigCResults());
+					//logger.debug("results:"+summaryForm.getOnhandBigCResults());
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					if(m != null)
@@ -178,7 +198,7 @@ public class SummaryAction extends I_Action {
 					
 					OnhandSummary cc = (OnhandSummary)results.get(0);
 					
-					logger.debug("results:"+summaryForm.getOnhandSummaryLotusPeriodResults());
+					//logger.debug("results:"+summaryForm.getOnhandSummaryLotusPeriodResults());
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					if(m != null)
@@ -196,7 +216,7 @@ public class SummaryAction extends I_Action {
 						PhysicalSummary cc = (PhysicalSummary)results.get(0);
 						summaryForm.getOnhandSummary().setFileName(cc.getFileName());
 						
-						logger.debug("results:"+summaryForm.getPhysicalSummaryResults());
+						//logger.debug("results:"+summaryForm.getPhysicalSummaryResults());
 						
 					} else {
 						summaryForm.setPhysicalSummaryResults(null);
@@ -207,7 +227,7 @@ public class SummaryAction extends I_Action {
 				List<TransactionSummary> results = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"lotus");
 				if (results != null  && results.size() >0) {
 					summaryForm.setLotusSummaryResults(results);
-					logger.debug("results:"+summaryForm.getLotusSummaryResults());
+					//logger.debug("results:"+summaryForm.getLotusSummaryResults());
 					
 				} else {
 					summaryForm.setLotusSummaryResults(null);
@@ -217,7 +237,7 @@ public class SummaryAction extends I_Action {
 				List<TransactionSummary> results = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"bigc");
 				if (results != null  && results.size() >0) {
 					summaryForm.setBigcSummaryResults(results);
-					logger.debug("results:"+summaryForm.getBigcSummaryResults());
+					//logger.debug("results:"+summaryForm.getBigcSummaryResults());
 					
 				} else {
 					summaryForm.setBigcSummaryResults(null);
@@ -228,7 +248,7 @@ public class SummaryAction extends I_Action {
 				List<TransactionSummary> results = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"tops");
 				if (results != null  && results.size() >0) {
 					summaryForm.setTopsSummaryResults(results);
-					logger.debug("results:"+summaryForm.getTopsSummaryResults());
+					//logger.debug("results:"+summaryForm.getTopsSummaryResults());
 					
 				} else {
 					summaryForm.setTopsSummaryResults(null);
@@ -238,7 +258,7 @@ public class SummaryAction extends I_Action {
 				List<DiffStockSummary> results = new SummaryDAO().searchDiffStock(summaryForm.getDiffStockSummary(),user);
 				if (results != null  && results.size() >0) {
 					summaryForm.setDiffStockSummaryLists(results);
-					logger.debug("results:"+summaryForm.getDiffStockSummaryLists());
+					//logger.debug("results:"+summaryForm.getDiffStockSummaryLists());
 					
 				} else {
 					summaryForm.setDiffStockSummaryLists(null);
@@ -285,6 +305,14 @@ public class SummaryAction extends I_Action {
 				 fileName ="Report Bme Stock on-hand at Lotus(As of).xls";
 			     if(summaryForm.getOnhandSummaryLotusResults() != null && summaryForm.getOnhandSummaryLotusResults().size() > 0){
 					htmlTable = genOnhandLotusHTML(request,summaryForm,user);	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				 fileName ="Report Bme Stock on-hand MTT.xls";
+			     if(summaryForm.getOnhandSummaryMTTResults() != null && summaryForm.getOnhandSummaryMTTResults().size() > 0){
+					htmlTable = genOnhandMTTHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -483,6 +511,83 @@ public class SummaryAction extends I_Action {
 					  h.append("<td>"+s.getStockShortQty()+"</td> \n");
 					  h.append("<td>"+s.getOnhandQty()+"</td> \n");
 					  
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	private StringBuffer genOnhandMTTHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String a= "@";
+		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='9'>รายงาน B'me Stock on-hand MTT</td> \n");
+			
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='9' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='9' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='9' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='9' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(form.getOnhandSummaryMTTResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummaryMTTResults();
+			 	    
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td>CustNo(Oracle)</td> \n");
+				  h.append("<td>ชื่อร้านค้า</td> \n");
+				  h.append("<td>Group</td> \n");
+				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Sale In Qty</td> \n");
+				  h.append("<td>Sale Out Qty</td> \n");
+				  h.append("<td>Return Qty </td> \n");
+				  h.append("<td>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getCustNo()+"</td> \n");
+					  h.append("<td>"+s.getStoreName()+"</td> \n");
+					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");

@@ -180,7 +180,7 @@ public class ImportAction extends I_Action {
 	 * Import To DB
 	 */
 	public ActionForward importExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Import :Excel");
+		logger.debug("Import :Excel page:"+Utils.isNull(request.getParameter("page")));
 		ImportForm importForm = (ImportForm) form;
 		importForm.setImported(true);
 		
@@ -2451,24 +2451,24 @@ public class ImportAction extends I_Action {
 					         }
 					         
 					         /** Validate RetailPriceBF **/
-					         BigDecimal retailPriceBFOracle = importDAO.getRetailPriceBFFromOracle(conn, itemCodeValid);
+					         //BigDecimal retailPriceBFOracle = importDAO.getRetailPriceBFFromOracle(conn, itemCodeValid);
 					    
-					         if(retailPriceBFOracle.compareTo(bigZero) ==0){ // =0
+					         //if(retailPriceBFOracle.compareTo(bigZero) ==0){ // =0
 					        	 //Not found Add Fail Msg
-					        	 Message m = new Message();
-						         m.setMessage("ไม่พบข้อมูลราคาขายปลีกนี้ในระบบ Oracle");
-						         errorMsgList.add(m);
-						         lineError = true;
-					         }else if( retailPriceBFOracle.compareTo(bigZero) != 0){
+					        	 //Message m = new Message();
+						         //m.setMessage("ไม่พบข้อมูลราคาขายปลีกนี้ในระบบ Oracle");
+						         //errorMsgList.add(m);
+						         //lineError = true;
+					        // }else if( retailPriceBFOracle.compareTo(bigZero) != 0){
 					        	 //Found but no equals
-					        	 BigDecimal reatilPriceBFWacoal =  new BigDecimal(retailPriceBF+"."+retailPriceBF2Digit);
-					        	 if(reatilPriceBFWacoal.compareTo(bigZero) != 0 && retailPriceBFOracle.compareTo(reatilPriceBFWacoal) != 0){
-					        		 Message m = new Message();
-							         m.setMessage("ราคาขายปลีก  Wacoal["+reatilPriceBFWacoal+"] กับ Oracle["+retailPriceBFOracle+"] ไม่ตรงกัน");
-							         errorMsgList.add(m);
-							         lineError = true;
-					        	 }
-					         }
+					        	 //BigDecimal reatilPriceBFWacoal =  new BigDecimal(retailPriceBF+"."+retailPriceBF2Digit);
+					        	 //if(reatilPriceBFWacoal.compareTo(bigZero) != 0 && retailPriceBFOracle.compareTo(reatilPriceBFWacoal) != 0){
+					        		 //Message m = new Message();
+							         //m.setMessage("ราคาขายปลีก  Wacoal["+reatilPriceBFWacoal+"] กับ Oracle["+retailPriceBFOracle+"] ไม่ตรงกัน");
+							         //errorMsgList.add(m);
+							         //lineError = true;
+					        	 //}
+					         //}
 					         
 				         }else{//if onhand qty != 0
 				        	 //Case QTY =0  no validate item

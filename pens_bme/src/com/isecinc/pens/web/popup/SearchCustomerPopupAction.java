@@ -288,11 +288,13 @@ public class SearchCustomerPopupAction extends I_Action {
 		PopupForm popupForm = (PopupForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			String storeType = Utils.isNull(request.getParameter("storeType"));
-			String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
-			logger.debug("StoreType["+storeType+"]storeGroup["+storeGroup+"]");
+			String mcArea = Utils.isNull(request.getParameter("mcArea"));
+			String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
+			String staffType = Utils.isNull(request.getParameter("staffType"));
 			
-			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,"");
+			logger.debug("mcArea["+mcArea+"]mcRoute["+mcRoute+"]staffType["+staffType+"]");
+			
+			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,"",mcArea,mcRoute,staffType);
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
