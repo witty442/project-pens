@@ -12,6 +12,9 @@
 <%
 
 String custCode = Utils.isNull(request.getParameter("custCode"));
+String mcArea = Utils.isNull(request.getParameter("mcArea"));
+String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
+String staffType = Utils.isNull(request.getParameter("staffType"));
 String outputText = "";
 try{
 
@@ -20,7 +23,7 @@ try{
 		PopupForm cri = new PopupForm();
 		cri.setCodeSearch(custCode);
 		
-		List<PopupForm> ret = MCDAO.searchStaffList(cri,"equals");
+		List<PopupForm> ret = MCDAO.searchStaffList(cri,"equals",mcArea,mcRoute,staffType);
 		if(ret != null &&  ret.size() >0){
 			PopupForm p = ret.get(0);
 			outputText = p.getDesc()+"|"+p.getStoreNo()+"|"+p.getSubInv();

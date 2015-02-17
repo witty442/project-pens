@@ -85,6 +85,13 @@ function clearForm(path){
 	return true;
 }
 
+function exportExcel(path){
+	var form = document.mttForm;
+	form.action = path + "/jsp/mttAction.do?do=exportReport&action=newsearch";
+	form.submit();
+	return true;
+}
+
 function search(path){
 	var form = document.mttForm;
 	 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
@@ -411,6 +418,13 @@ function resetStore(){
 									<td class=""></td>
 							</tr>
 					</table>
+					
+					<div align="center">
+						<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
+						   <input type="button" value="    Export      " class="newPosBtnLong"> 
+						</a>
+					</div>	
+									
 				</c:if>
 					<!-- ************************Result ***************************************************-->
 					

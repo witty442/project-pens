@@ -7,7 +7,7 @@
 %>
 
 <ul id="nav">
-<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey()) || User.SALE.equalsIgnoreCase(user.getRole().getKey())) {%>
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Stock Onhand B'me </span></a>
 		<ul>
 		    <li>
@@ -41,7 +41,7 @@
 		</ul>
 	</li>
 <%} %>
-<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey()) || User.PICK.equalsIgnoreCase(user.getRole().getKey()) || User.SALE.equalsIgnoreCase(user.getRole().getKey())) {%>
     <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Report</span></a>
 		<ul>
 			<li>
@@ -77,10 +77,13 @@
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mttAction.do?do=prepareReport&action=new';"><span>9.<bean:message bundle="sysprop" key="mttReport"/></span></a>
 			</li>
+			 <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTT';"><span>10.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTT"/></span></a>
+			</li>  
 		</ul>
 	</li>
 <%} %>
-<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey()) || User.SALE.equalsIgnoreCase(user.getRole().getKey()) ) {%>
 	 <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Order</span></a>
 		<ul>
 			<li>
@@ -96,7 +99,7 @@
 	</li>
 <%} %>
 
-<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey()) || User.PICK.equalsIgnoreCase(user.getRole().getKey()) ) {%>
 	 <li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Transaction</span></a>
 		<ul>
 			<li>
@@ -111,7 +114,7 @@
 
 
 	
-<%if(User.ADMIN.equals(user.getRole().getKey()) ) {%>	
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey()) || User.PICK.equalsIgnoreCase(user.getRole().getKey())) {%>	
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Pick</span></a>
 		<ul>
 			<li>
@@ -153,13 +156,35 @@
 		</ul>
 	</li>
   <%} %>
-  
-<%if(User.ADMIN.equals(user.getRole().getKey()) || User.MC.equals(user.getRole().getKey())) {%>
-  	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>MC</span></a>
+
+
+ <%if( User.SALE.equalsIgnoreCase(user.getRole().getKey())) {%>	
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>Pick</span></a>
+		<ul>
+		    <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new';"><span>1.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
+			</li>
+			 <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/reqPickStockAction.do?do=prepare2&action=new';"><span>2.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
+			</li> 
+	   </ul>  
+   </li>
+ <%} %>
+ 			
+<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey())
+	|| User.MC.equalsIgnoreCase(user.getRole().getKey())
+	|| User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())) {%>
+  	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span>MC/PC</span></a>
 		<ul>
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mcAction.do?do=prepare2&action=new';"><span>1.<bean:message bundle="sysprop" key="mc"/></span></a>
 			</li>   
+			<%if(User.ADMIN.equalsIgnoreCase(user.getRole().getKey())
+				|| User.MC.equalsIgnoreCase(user.getRole().getKey())) {%>
+				<li>
+					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mcAction.do?do=prepareMCStaff&action=new';"><span>2.<bean:message bundle="sysprop" key="mcStaff"/></span></a>
+				</li>   
+			<%} %>
 		</ul>
 	</li> 
 <%} %>

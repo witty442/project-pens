@@ -109,6 +109,15 @@ function confirmAction(path){
 	}
 	return false;
 }
+function cancelIssueAction(path){
+	var form = document.pickStockForm;
+	if(confirm("ยันยันการ Cancel Issue รายการนี้")){
+		 form.action = path + "/jsp/pickStockAction.do?do=cancelIssueAllBoxAction";
+		 form.submit();
+		 return true;
+	}
+	return false;
+}
 
 function search(path){
 	var form = document.pickStockForm;
@@ -515,6 +524,12 @@ function resetStore(){
 									<tr>
 										<td align="left">
 					 
+					                      <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">
+											 <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')">
+											   <input type="button" value="    Cancel Issue     " class="newPosBtnLong"> 
+											 </a>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										   </c:if>	
+										 
 									      <c:if test="${pickStockForm.bean.canConfirm == true}">
 											<a href="javascript:confirmAction('${pageContext.request.contextPath}')">
 											  <input type="button" value="ยืนยัน issue" class="newPosBtnLong"> 

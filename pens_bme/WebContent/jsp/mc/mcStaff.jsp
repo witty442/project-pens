@@ -48,19 +48,6 @@ if(session.getAttribute("areaList") == null){
 	session.setAttribute("areaList",billTypeList);
 }
 
-if(session.getAttribute("mcTripList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchMcTripList(new PopupForm(),""));
-	
-	session.setAttribute("mcTripList",billTypeList);
-}
-
-String screenWidth = "";
-if(session.getAttribute("screenWidth") != null){ 
-	screenWidth = (String)session.getAttribute("screenWidth");
-}
 %>
 
 <html>
@@ -95,42 +82,13 @@ span.pagelinks {
 	font-size: 15px;
 }
 
+.day {
+  width: 14%;
+}
 .holiday {
+  width: 14%;
   background-color: #F78181;
 }
-
-#scroll {
-<%if(!"0".equals(screenWidth)){%>
-    width:<%=screenWidth%>px;
-    background:#A3CBE0;
-	border:1px solid #000;
-	overflow:auto;
-	/*white-space:nowrap;*/
-	box-shadow:0 0 25px #000;
-<%}%>
-}
-
-.wrapper1, .wrapper2{
-	width:<%=screenWidth%>px;
-	border: none 0px RED;
-	overflow-x: scroll; 
-	overflow-y:hidden;
-}
-.wrapper1{
-  height: 20px; 
- }
-.wrapper2{
-   /*height: 200px; */
-}
-.div1 {
-   width:2500px;
-   height: 20px; 
-  }
-.div2 {
-   width:2500px;
-   background-color: #88FF88;
-   overflow: auto;
- }
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
@@ -151,120 +109,53 @@ function loadMe(){
 }
 function clearForm(path){
 	var form = document.mcForm;
-	form.action = path + "/jsp/mcAction.do?do=clear2";
+	form.action = path + "/jsp/mcAction.do?do=clearMCStaff";
 	form.submit();
 	return true;
 }
 
-function search(path){
+function back(path){
+	var form = document.mcForm;
+	form.action = path + "/jsp/mcAction.do?do=prepareMCStaff&action=back";
+	form.submit();
+	return true;
+}
+
+function save(path){
 	var form = document.mcForm;
 	if( $('#mcArea').val()==""){
 		alert("กรุณาระบุ เขตพื้นที่");
 		return false;
 	}
-	/* if( $('#staffType').val()==""){
+	if( $('#staffType').val()==""){
 		alert("กรุณาระบุ ประเภท");
 		return false;
-	} */
-	if( $('#monthTrip').val()==""){
-		alert("กรุณาระบุ  เดือน");
+	}
+	if( $('#mcRoute').val()==""){
+		alert("กรุณาระบุ  Route เส้นทาง");
 		return false;
 	}
-	
-	form.action = path + "/jsp/mcAction.do?do=search2&action=newsearch";
+	if( $('#staffId').val()==""){
+		alert("กรุณาระบุ  Staff ID");
+		return false;
+	}
+	if( $('#name').val()==""){
+		alert("กรุณาระบุ  ชื่อ");
+		return false;
+	}
+	if( $('#sureName').val()==""){
+		alert("กรุณาระบุ  นามสกุล");
+		return false;
+	}
+	if( $('#mobile').val()==""){
+		alert("กรุณาระบุ  เบอร์โทรศัพท์");
+		return false;
+	}
+	form.action = path + "/jsp/mcAction.do?do=saveMCStaffDetail&action=newsearch";
 	form.submit();
 	return true;
 }
 
-function exportExcel(path,staffId,monthTrip,maxDayInMonth){
-	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
-	
-	form.action = path + "/jsp/mcAction.do?do=exportExcel"+param;
-	form.submit();
-	return true;
-}
-
-function openEdit(path,staffId,monthTrip,maxDayInMonth){
-	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
-	form.action = path + "/jsp/mcAction.do?do=prepare"+param;
-	form.submit();
-	return true;
-}
-
-function openPopupCustomer(path){
-	var form = document.mcForm;
-	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
-	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
-	
-    var param = "&mcArea="+mcArea;
-        param += "&mcRoute="+mcRoute;
-        param += "&staffType="+staffType;
-    
-	url = path + "/jsp/searchCustomerPopupAction.do?do=prepareSearchMC&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-}
-
-function setStoreMainValue(code,desc){
-	var form = document.mcForm;
-	//alert(form);
-	form.staffId.value = code;
-	form.name.value = desc;
-
-	if(staffId==''){
-	  alert("ไม่พบข้อมูล  staffId");
-	  form.staffId.value = '';
-	  form.name.value = "";
-	}
-} 
-
-function getStaffNameKeypress(e,custCode){
-	var form = document.mcForm;
-	if(e != null && e.keyCode == 13){
-		if(custCode.value ==''){
-			form.staffId.value = '';
-			form.name.value = "";
-		}else{
-		  getStaffName(custCode);
-		}
-	}
-}
-
-function getStaffName(custCode){
-	var returnString = "";
-	var form = document.mcForm;
-	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
-	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
-	
-    var param  = "mcArea="+mcArea;
-        param += "&mcRoute="+mcRoute;
-        param += "&custCode=" + custCode.value;
-        param += "&staffType="+staffType;
-        
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/getStaffMCAjax.jsp",
-			data : param,
-			async: false,
-			cache: false,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-
-	if(returnString !=''){
-		var retArr = returnString.split("|");
-		form.name.value = retArr[0];
-	}else{
-		alert("ไม่พบข้อมูล");
-		form.staffId.focus();
-		form.staffId.value ="";
-		form.name.value = "";
-	}
-}
 
 function loadRoute(){
 	var cboDistrict = document.getElementsByName('bean.mcRoute')[0];
@@ -281,17 +172,23 @@ function loadRoute(){
 	});
 }
 
+function genDummyStaffID(){
+	var returnString = "";
+	var form = document.mcForm;
+	
+    var param  = "";
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/genDummyStaffIdAjax.jsp",
+			data : param,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
 
-/* $(function(){
-    $(".wrapper1").scroll(function(){
-        $(".wrapper2")
-            .scrollLeft($(".wrapper1").scrollLeft());
-    });
-    $(".wrapper2").scroll(function(){
-        $(".wrapper1")
-            .scrollLeft($(".wrapper2").scrollLeft());
-    });
-}); */
+	form.staffId.value = returnString;
+}
 
 </script>
 
@@ -317,7 +214,7 @@ function loadRoute(){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="mc"/>
+				<jsp:param name="function" value="mcStaff"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -345,7 +242,7 @@ function loadRoute(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> ประเภท<font color="red"></font></td>
+                                    <td> ประเภท<font color="red">*</font></td>
 									<td>		
 										 <html:select property="bean.staffType" styleId="staffType">
 											<html:options collection="staffTypeList" property="code" labelProperty="desc"/>
@@ -353,26 +250,45 @@ function loadRoute(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> Route เส้นทาง <font color="red"></font></td>
+                                    <td> Route เส้นทาง <font color="red">*</font></td>
 									<td>		
-										 <html:select property="bean.mcRoute" styleId="mcArea"> </html:select>
+										 <html:select property="bean.mcRoute" styleId="mcRoute"> </html:select>
 									</td>
 								</tr>
 								<tr>
-									<td >เจ้าหน้าที่  Staff
+									<td >รหัสพนักงาน <font color="red">*</font>
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.staffId" styleId="staffId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
-									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
-									  <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
+									   <c:if test="${mcForm.bean.canEdit==true }">
+									      <html:hidden property="bean.orgStaffId" styleId="orgStaffId"/>	
+										  <html:text property="bean.staffId" styleId="staffId" size="20" />	
+										  <a href="javascript:genDummyStaffID('${pageContext.request.contextPath}')">
+											  <input type="button" value="   Gen Dummy Staff ID   " class="newPosBtnLong"> 
+										  </a>
+										</c:if>
+										 <c:if test="${mcForm.bean.canEdit==false }">
+										  <html:text property="bean.staffId" styleId="staffId" size="20" readonly="true" styleClass="disableText"/>	
+										</c:if>
 									</td>
 								</tr>
 								<tr>
-                                    <td>เดือน <font color="red">*</font></td>
+                                    <td> ชื่อ <font color="red">*</font></td>
 									<td>		
-										 <html:select property="bean.monthTrip" styleId="monthTrip" >
-											<html:options collection="mcTripList" property="code" labelProperty="desc"/>
-									    </html:select>
+										 <html:text property="bean.name" styleId="name"> </html:text>
+										  นามสกุล<font color="red">*</font>
+										   <html:text property="bean.sureName" styleId="sureName"> </html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td> เบอร์โทรศัพท์<font color="red">*</font></td>
+									<td>		
+										 <html:text property="bean.mobile" styleId="mobile"> </html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td></td>
+									<td>		
+										 <html:checkbox property="bean.active" styleId="active"/>Active
 									</td>
 								</tr>
 						   </table>
@@ -380,92 +296,20 @@ function loadRoute(){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
-										<a href="javascript:search('${pageContext.request.contextPath}')">
-										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+							
+										<a href="javascript:save('${pageContext.request.contextPath}')">
+										  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
 										</a>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>						
+										</a>
+										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
+										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
+										</a>							
 									</td>
 								</tr>
 							</table>
 					  </div>
-
-            <c:if test="${mcForm.resultsSearch != null}">
-                <!--   <div class="wrapper1">
-				    <div class="div1"></div>
-				 </div>
-				 <div class="wrapper2">
-				    <div class="div2"> -->
-						<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
-						      <tr>
-					            <th >No.</th>
-								<th >แก้ไข</th>
-								<th >พิมพ์</th>
-								<th >PC/MC</th>
-								<th >Route</th>
-								<th >Name\Day</th>
-								<%
-								int maxDay = mcForm.getBean().getMaxDay();
-								for(int i=1;i<=maxDay;i++) {%>
-								   <th><%=i%></th>
-								<%} %>
-							</tr> 
-							<% 
-							
-							String tabclass ="lineE";
-							List<MCBean> resultList = mcForm.getResultsSearch();//(List<MCBean>) session.getAttribute("resultsSearch");
-							
-							for(int n=0;n<resultList.size();n++){
-								MCBean mc = (MCBean)resultList.get(n);
-								
-								if(n%2==0){
-									tabclass="lineO";
-								}
-								%>
-								
-									<tr class="<%=tabclass%>">
-										<td class="td_text_center" width="5%"><%=mc.getNo() %></td>
-										<td class="td_text_center" width="5%">
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'edit')">
-											  <%if(User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      
-											        View 
-											   <%}else{ %>
-											                            แก้ไข
-											   <%} %>
-											 </a>
-										</td>
-										<td class="td_text_center" width="5%">
-											  <a href="javascript:exportExcel('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'view')">
-											        พิมพ์
-											 </a>
-										</td>
-										<td class="td_text_center" width="5%"><%=mc.getStaffType()%></td>
-									    <td class="td_text" width="5%"><%=mc.getMcRoute() %>:<%=mc.getMcRouteDesc()%></td>
-										<td class="td_text" width="5%"><%=mc.getName() %>&nbsp;<%=mc.getSureName()%></td>
-										
-										<%for(int i=1;i<=maxDay;i++) {
-										  Map<String,String> dayMapDetail = mc.getDaysMap();
-										  String key = ((i+"").length()==1?"0"+i:i)+ mc.getMonthTrip();
-										  String dayDetail = Utils.isNull(dayMapDetail.get(key));
-										  String tdClass ="td_text";
-										  if(Utils.isHoliday(key)){
-											  tdClass="holiday";
-										  }
-										  //System.out.println("key["+key+"]value["+dayDetail+"]");
-										%>
-											  <td class="<%=tdClass%>" width="5%"><%=dayDetail %></td>
-										  <%} %>
-									</tr>
-							<%} %> 
-					   </table>
-					<!--   </div>
-				   </div> -->
-				</c:if>
-				
-		<!-- ************************Result ***************************************************-->
-					
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->

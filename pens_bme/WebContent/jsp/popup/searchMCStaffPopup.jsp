@@ -23,8 +23,9 @@
 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
-	String types = Utils.isNull(request.getParameter("types"));
-    String storeType = Utils.isNull(request.getParameter("storeType"));
+	String mcArea = Utils.isNull(request.getParameter("mcArea"));
+    String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
+    String staffType = Utils.isNull(request.getParameter("staffType"));
     String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
     
     /** Store Select MutilCode in each Page **/
@@ -48,7 +49,7 @@ function selectAll(){
 
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
-	var types = document.getElementsByName("types")[0].value;// alert(types);
+	//var types = document.getElementsByName("types")[0].value;// alert(types);
 	var idx = 2;
 	//Add Select Muti in each page 
 	var retCode = document.getElementsByName("codes")[0].value;
@@ -62,10 +63,10 @@ function selectMultiple(){
 	//alert("idx:"+idx);
 	if(idx ==1){
 		//alert(currCondNo+","+retCode+":"+retKey+":"+retDesc);
-		window.opener.setStoreMainValue(retCode,retDesc,types);
+		window.opener.setStoreMainValue(retCode,retDesc);
 	}else{
 		//alert(currCondNo+":"+retCode+":"+retKey+":"+retDesc);
-		window.opener.setStoreMainValue(retCode,retDesc,types);
+		window.opener.setStoreMainValue(retCode,retDesc);
 	}
 	
 	/** Clear Value in Session **/
@@ -216,8 +217,9 @@ window.onload = function(){
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <html:form action="/jsp/searchCustomerPopupAction">
-<input type="hidden" name="types" value="<%=types %>"/>
-<input type="hidden" name="storeType" value="<%=storeType %>"/>
+<input type="hidden" name="mcArea" value="<%=mcArea %>"/>
+<input type="hidden" name="mcRoute" value="<%=mcRoute %>"/>
+<input type="hidden" name="staffType" value="<%=staffType %>"/>
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />

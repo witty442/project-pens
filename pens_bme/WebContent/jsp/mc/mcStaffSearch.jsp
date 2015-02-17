@@ -48,19 +48,6 @@ if(session.getAttribute("areaList") == null){
 	session.setAttribute("areaList",billTypeList);
 }
 
-if(session.getAttribute("mcTripList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchMcTripList(new PopupForm(),""));
-	
-	session.setAttribute("mcTripList",billTypeList);
-}
-
-String screenWidth = "";
-if(session.getAttribute("screenWidth") != null){ 
-	screenWidth = (String)session.getAttribute("screenWidth");
-}
 %>
 
 <html>
@@ -95,42 +82,13 @@ span.pagelinks {
 	font-size: 15px;
 }
 
+.day {
+  width: 14%;
+}
 .holiday {
+  width: 14%;
   background-color: #F78181;
 }
-
-#scroll {
-<%if(!"0".equals(screenWidth)){%>
-    width:<%=screenWidth%>px;
-    background:#A3CBE0;
-	border:1px solid #000;
-	overflow:auto;
-	/*white-space:nowrap;*/
-	box-shadow:0 0 25px #000;
-<%}%>
-}
-
-.wrapper1, .wrapper2{
-	width:<%=screenWidth%>px;
-	border: none 0px RED;
-	overflow-x: scroll; 
-	overflow-y:hidden;
-}
-.wrapper1{
-  height: 20px; 
- }
-.wrapper2{
-   /*height: 200px; */
-}
-.div1 {
-   width:2500px;
-   height: 20px; 
-  }
-.div2 {
-   width:2500px;
-   background-color: #88FF88;
-   overflow: auto;
- }
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
@@ -151,7 +109,7 @@ function loadMe(){
 }
 function clearForm(path){
 	var form = document.mcForm;
-	form.action = path + "/jsp/mcAction.do?do=clear2";
+	form.action = path + "/jsp/mcAction.do?do=clearMCStaff";
 	form.submit();
 	return true;
 }
@@ -166,31 +124,27 @@ function search(path){
 		alert("กรุณาระบุ ประเภท");
 		return false;
 	} */
-	if( $('#monthTrip').val()==""){
-		alert("กรุณาระบุ  เดือน");
-		return false;
-	}
 	
-	form.action = path + "/jsp/mcAction.do?do=search2&action=newsearch";
+	
+	form.action = path + "/jsp/mcAction.do?do=searchMCStaff&action=newsearch";
 	form.submit();
 	return true;
 }
 
-function exportExcel(path,staffId,monthTrip,maxDayInMonth){
-	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
-	
-	form.action = path + "/jsp/mcAction.do?do=exportExcel"+param;
+function newStaff(path){
+	 var form = document.mcForm;
+	var param ="";
+	form.action = path + "/jsp/mcAction.do?do=prepareMCStaffDetail&action=add"+param;
 	form.submit();
-	return true;
+	return true; 
 }
 
-function openEdit(path,staffId,monthTrip,maxDayInMonth){
-	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
-	form.action = path + "/jsp/mcAction.do?do=prepare"+param;
+function openEdit(path,staffId){
+	 var form = document.mcForm;
+	var param ="&staffId="+staffId;
+	form.action = path + "/jsp/mcAction.do?do=prepareMCStaffDetail&action=edit"+param;
 	form.submit();
-	return true;
+	return true; 
 }
 
 function openPopupCustomer(path){
@@ -281,18 +235,6 @@ function loadRoute(){
 	});
 }
 
-
-/* $(function(){
-    $(".wrapper1").scroll(function(){
-        $(".wrapper2")
-            .scrollLeft($(".wrapper1").scrollLeft());
-    });
-    $(".wrapper2").scroll(function(){
-        $(".wrapper1")
-            .scrollLeft($(".wrapper2").scrollLeft());
-    });
-}); */
-
 </script>
 
 </head>		
@@ -317,7 +259,7 @@ function loadRoute(){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="mc"/>
+				<jsp:param name="function" value="mcStaff"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -367,14 +309,6 @@ function loadRoute(){
 									  <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
 									</td>
 								</tr>
-								<tr>
-                                    <td>เดือน <font color="red">*</font></td>
-									<td>		
-										 <html:select property="bean.monthTrip" styleId="monthTrip" >
-											<html:options collection="mcTripList" property="code" labelProperty="desc"/>
-									    </html:select>
-									</td>
-								</tr>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -383,6 +317,9 @@ function loadRoute(){
 									   
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+										</a>
+										<a href="javascript:newStaff('${pageContext.request.contextPath}')">
+										  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
 										</a>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
@@ -393,33 +330,25 @@ function loadRoute(){
 					  </div>
 
             <c:if test="${mcForm.resultsSearch != null}">
-                <!--   <div class="wrapper1">
-				    <div class="div1"></div>
-				 </div>
-				 <div class="wrapper2">
-				    <div class="div2"> -->
-						<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
-						      <tr>
-					            <th >No.</th>
-								<th >แก้ไข</th>
-								<th >พิมพ์</th>
-								<th >PC/MC</th>
-								<th >Route</th>
-								<th >Name\Day</th>
-								<%
-								int maxDay = mcForm.getBean().getMaxDay();
-								for(int i=1;i<=maxDay;i++) {%>
-								   <th><%=i%></th>
-								<%} %>
-							</tr> 
+                  	
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
+						       <tr>
+						            <th >No.</th>
+									<th >เขตพื้นที่</th>
+									<th >ประเภท</th>
+									<th >Route เส้นทาง</th>
+									<th >Staff ID</th>
+									<th >ชื่อ</th>
+									<th >นามสกุล</th>
+									<th >เบอร์มือถือ</th>
+									<th >แก้ไข</th>
+							   </tr>
 							<% 
-							
 							String tabclass ="lineE";
-							List<MCBean> resultList = mcForm.getResultsSearch();//(List<MCBean>) session.getAttribute("resultsSearch");
+							List<MCBean> resultList = mcForm.getResultsSearch();
 							
 							for(int n=0;n<resultList.size();n++){
 								MCBean mc = (MCBean)resultList.get(n);
-								
 								if(n%2==0){
 									tabclass="lineO";
 								}
@@ -427,41 +356,22 @@ function loadRoute(){
 								
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="5%"><%=mc.getNo() %></td>
-										<td class="td_text_center" width="5%">
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'edit')">
-											  <%if(User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      
-											        View 
-											   <%}else{ %>
-											                            แก้ไข
-											   <%} %>
+										<td class="td_text" width="15%"><%=mc.getMcArea()+":"+mc.getMcAreaDesc()%></td>
+										<td class="td_text" width="5%"><%=mc.getStaffType()%></td>
+									    <td class="td_text" width="15%"><%=mc.getMcRoute() %>:<%=mc.getMcRouteDesc()%></td>
+									    <td class="td_text" width="5%"><%=mc.getStaffId() %></td>
+										<td class="td_text" width="10%"><%=mc.getName() %></td>
+										<td class="td_text" width="10%"><%=mc.getSureName()%></td>
+										<td class="td_text" width="10%"><%=mc.getMobile()%></td>
+										<td class="td_text_center" width="25%">
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getStaffId()%>')">
+											             แก้ไข
 											 </a>
 										</td>
-										<td class="td_text_center" width="5%">
-											  <a href="javascript:exportExcel('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'view')">
-											        พิมพ์
-											 </a>
-										</td>
-										<td class="td_text_center" width="5%"><%=mc.getStaffType()%></td>
-									    <td class="td_text" width="5%"><%=mc.getMcRoute() %>:<%=mc.getMcRouteDesc()%></td>
-										<td class="td_text" width="5%"><%=mc.getName() %>&nbsp;<%=mc.getSureName()%></td>
-										
-										<%for(int i=1;i<=maxDay;i++) {
-										  Map<String,String> dayMapDetail = mc.getDaysMap();
-										  String key = ((i+"").length()==1?"0"+i:i)+ mc.getMonthTrip();
-										  String dayDetail = Utils.isNull(dayMapDetail.get(key));
-										  String tdClass ="td_text";
-										  if(Utils.isHoliday(key)){
-											  tdClass="holiday";
-										  }
-										  //System.out.println("key["+key+"]value["+dayDetail+"]");
-										%>
-											  <td class="<%=tdClass%>" width="5%"><%=dayDetail %></td>
-										  <%} %>
 									</tr>
-							<%} %> 
-					   </table>
-					<!--   </div>
-				   </div> -->
+							<%} %>
+							 
+					</table>
 				</c:if>
 				
 		<!-- ************************Result ***************************************************-->

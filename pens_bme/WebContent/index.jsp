@@ -52,16 +52,10 @@ function gologin(e){
 		login('${pageContext.request.contextPath}');
 	}
 }
-
-function popupChangePassword(path){
-	var url = path + "/jsp/userAction.do?do=changePassword&action=init";
-	window.open(url,"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=260px,status=no,left="+ 50 + ",top=" + 0);
-}
 </script>
 </head>
 <body onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_login2.png','${pageContext.request.contextPath}/images2/button_forgotpwd2.png')" topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0">
-<table width="939" height="371" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
+<table width="939" height="517" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
   <tr>
     <td background="${pageContext.request.contextPath}/images2/loginbox_all.png" valign="top">
     	<table width="939" border="0" align="center" cellpadding="0" cellspacing="0">
@@ -94,7 +88,6 @@ function popupChangePassword(path){
 		              <td width="101" rowspan="3"></td>
 		              <td width="7" rowspan="3">&nbsp;</td>
 		            </tr>
-		           
 		            <tr>
 		              <td><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="5" /></td>
 		              <td><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="5" /></td>
@@ -102,10 +95,6 @@ function popupChangePassword(path){
 		            <tr>
 		              <td><html:text property="userName" size="10"/></td>
 		              <td><html:password property="password" size="10" onkeypress="gologin(event);"/></td>
-		            </tr>
-		             <tr>
-<!--		              <td><a href="javascript:popupChangePassword('${pageContext.request.contextPath}')">เปลี่ยนรหัสผ่านใหม่</a></td>-->
-		              <td></td>
 		            </tr>
 		            <tr>
 		            	<td colspan="2">
@@ -119,6 +108,7 @@ function popupChangePassword(path){
 		            	</td>
 		            </tr>
 		        </table>
+		          <input type="hidden" id = "screenWidth" name="screenWidth" />
 		        </html:form>
 			</td>
         	<td width="523">&nbsp;</td>

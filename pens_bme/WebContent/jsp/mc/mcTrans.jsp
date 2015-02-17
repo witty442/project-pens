@@ -28,6 +28,7 @@
 <jsp:useBean id="mcForm" class="com.isecinc.pens.web.mc.MCForm" scope="session" />
 
 <%
+User user = (User) request.getSession().getAttribute("user");
 %>
 
 <html>
@@ -107,8 +108,6 @@ textarea {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateFrom'));
-	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateTo'));
 }
 function clearForm(path){
 	var form = document.mcForm;
@@ -130,6 +129,15 @@ function save(path){
 	form.submit();
 	return true;
 }
+function copyDataFromLastMonth(path){
+	var form = document.mcForm;
+	if(confirm("ยืนยันการ Copy ข้อมูลจากเดือนก่อนหน้านี้")){
+		form.action = path + "/jsp/mcAction.do?do=copyDataFromLastMonth";
+		form.submit();
+		return true;
+	}
+	return false;
+}
 
 </script>
 
@@ -137,7 +145,7 @@ function save(path){
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
-		<td colspan="3"><jsp:include page="../header.jsp"/></td>
+		<td colspan="3"><jsp:include page="../headerMC.jsp"/></td>
 	</tr>
   	<tr id="framerow">
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
@@ -174,36 +182,41 @@ function save(path){
 
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
-								
 								<tr>
-									<td >เจ้าหน้าที่ MC Staff
+									<td >เจ้าหน้าที่  Staff
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.staffId" styleId="staffId" size="10" readonly="true" />
-									  <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="25" />
-									  <html:text property="bean.sureName" styleId="sureName" readonly="true" styleClass="disableText" size="25" />
+									  <html:text property="bean.staffId" styleId="staffId" size="10" readonly="true" styleClass="disableText"/>
+									  <input type="text" readonly class="disableText" size="40" value="${mcForm.bean.name} ${mcForm.bean.sureName}" />
+									  
+									  <html:hidden property="bean.name" styleId="name"  />
+									  <html:hidden property="bean.sureName" styleId="sureName" />
+									   เบอร์โทรศัพท์ <html:text property="bean.mobile" styleId="mobile" size="20" readonly="true" styleClass="disableText"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td>ประเเภท</td>
+									<td>	
+									<html:text property="bean.staffType" styleId="staffType" size="10"  readonly="true" styleClass="disableText"/>
+									เขตพื้นที่ 	
+										 <html:hidden property="bean.mcArea" styleId="mcArea" />
+										  <html:text property="bean.mcAreaDesc" styleId="mcAreaDesc" size="20"  readonly="true" styleClass="disableText"/>
+									 Route 
+									 <html:hidden property="bean.mcRoute" styleId="mcRoute" /> 
+									 <html:text property="bean.mcRouteDesc" styleId="mcRouteDesc" size="38" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>
                                     <td>เดือน </td>
 									<td>		
-										 <html:text property="bean.monthTrip" styleId="monthTrip" size="10" readonly="true" styleClass="disableText"/>
-										 <html:text property="bean.monthTripDesc" styleId="monthTripDesc" size="50" readonly="true" styleClass="disableText"/>
-									</td>
-								</tr>
-								<tr>
-                                    <td>เขตพื้นที่ </td>
-									<td>		
-										 <html:text property="bean.mcArea" styleId="mcArea" size="10"  readonly="true" styleClass="disableText"/>
-										  <html:text property="bean.mcAreaDesc" styleId="mcAreaDesc" size="50"  readonly="true" styleClass="disableText"/>
+										 <html:hidden property="bean.monthTrip" styleId="monthTrip" />
+										 <html:text property="bean.monthTripDesc" styleId="monthTripDesc" size="20" readonly="true" styleClass="disableText"/>
+										  Remark 
+									     <html:text property="bean.remark" styleId="remark" size="59" styleClass="normalText"/>
 									</td>
 								</tr>
 						   </table>
-						   
-						  
 					  </div>
-
-              
 				  <table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" width="100%">
 				       <tr>
 				            <td class="head">จันทร์</td><!-- 2 -->
@@ -216,14 +229,20 @@ function save(path){
 					   </tr> 
 					   
 					   <%
+					   
 						int maxDay = mcForm.getBean().getMaxDay();
 					    int startDayOfMonth  = mcForm.getBean().getStartDayOfMonth();
 					    Map<String,String> daysMap = mcForm.getBean().getDaysMap();
 					    int row = 0;
 					    int i=0;
+					    
 					    //System.out.println("maxDay:"+maxDay);
 					    //System.out.println("startDayOfMonth:"+startDayOfMonth);
+					    
 					    int rows = (maxDay/7)+1;
+					    if(startDayOfMonth==Calendar.SUNDAY && mcForm.getBean().getMaxDay() > 28){
+					    	rows = rows+1;
+					    }
 					    
 						for(row=1;row<=rows;row++) {
 			                if(row==1){
@@ -233,6 +252,7 @@ function save(path){
 							    boolean found= false;
 							    for(int w=1;w<=7;w++){ 
 							    //System.out.println("w["+w+"],i:"+i);
+							    
 							    %>
 							      <% if(startDayOfMonth==Calendar.MONDAY && w==1){ 
 							    	   i++; String key = (String.valueOf(i).length()==1?"0"+i:String.valueOf(i))+mcForm.getBean().getMonthTrip();
@@ -240,6 +260,7 @@ function save(path){
 							      %>
 							          <td class="calendar1" align="right">
 							             <span class="textCalendar"><%=i %></span>
+							             <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%> </textarea>
 							           </td>
@@ -248,6 +269,7 @@ function save(path){
 							    	  found = true;
 							    	  %>
 							           <td class="calendar1" align="right">
+							              <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <span class="textCalendar"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"> <%=Utils.isNull(daysMap.get(key))%></textarea>
@@ -257,6 +279,7 @@ function save(path){
 							    	  found = true;
 							    	  %>
 							          <td class="calendar1" align="right">
+							              <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <span class="textCalendar"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"> <%=Utils.isNull(daysMap.get(key))%> </textarea>
@@ -266,6 +289,7 @@ function save(path){
 							    	  found = true;
 							      %>
 							           <td class="calendar1" align="right">
+							             <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <span class="textCalendar"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%></textarea>
@@ -275,6 +299,7 @@ function save(path){
 							    	  found = true;
 							      %>
 							           <td class="calendar1" align="right">
+							              <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <span class="textCalendar"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%></textarea>
@@ -284,6 +309,7 @@ function save(path){
 							    	  found = true;
 							      %>
 							           <td class="calendarHoliday" align="right">
+							               <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							              <span class="textCalendarHoliday"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%></textarea>
@@ -293,6 +319,7 @@ function save(path){
 							    	  found = true;
 							       %>
 							          <td class="calendarHoliday" align="right">
+							              <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							             <span class="textCalendarHoliday"><%=i %></span>
 							             <br>
 							             <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%> </textarea>
@@ -313,6 +340,7 @@ function save(path){
 							        	   }
 							        	   %>
 							            <td class="<%=tdClass%>" align="right">
+							                <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							                <span class="<%=textClass%>"><%=i %></span>
 							                <br>
 							                <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%></textarea>
@@ -342,15 +370,14 @@ function save(path){
 								    if(i<=maxDay){
 								    %>
 								       <td class="<%=tdClass %>" align="right">
+								           <input type="hidden" value="<%=w %>" name="week_<%=key%>"/>
 							               <span class="<%=textClass%>"><%=i %></span>
 							                <br>
 							                <textarea rows="5" cols="10" name="<%=key%>"><%=Utils.isNull(daysMap.get(key))%></textarea>
 							           </td>
 								    <%}else{ %>
 								       <td class="calendar1" align="right">
-							              
-							                <br>
-							                
+							               <br>
 							           </td>
 								  <%} 
 							    }//for %>
@@ -368,10 +395,17 @@ function save(path){
 					 <table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
-								   
-									<a href="javascript:save('${pageContext.request.contextPath}')">
-									  <input type="button" value="   บันทึก      " class="newPosBtnLong"> 
-									</a>
+								   <%if( !User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      		  
+										<a href="javascript:copyDataFromLastMonth('${pageContext.request.contextPath}')">
+										  <input type="button" value="Copy Data From Last Month" class="newPosBtnLong"> 
+										</a>
+									<%} %>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								    <%if( !User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      		  
+										<a href="javascript:save('${pageContext.request.contextPath}')">
+										  <input type="button" value="   บันทึก      " class="newPosBtnLong"> 
+										</a>
+									 <%} %>
 									<a href="javascript:back('${pageContext.request.contextPath}')">
 									  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 									</a>						
