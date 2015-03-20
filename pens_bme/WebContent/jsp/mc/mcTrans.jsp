@@ -192,18 +192,17 @@ function copyDataFromLastMonth(path){
 									  <html:hidden property="bean.name" styleId="name"  />
 									  <html:hidden property="bean.sureName" styleId="sureName" />
 									   เบอร์โทรศัพท์ <html:text property="bean.mobile" styleId="mobile" size="20" readonly="true" styleClass="disableText"/>
+									ประเภท <html:text property="bean.staffType" styleId="staffType" size="10"  readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>
-                                    <td>ประเเภท</td>
+                                    <td>เขตพื้นที่ </td>
 									<td>	
-									<html:text property="bean.staffType" styleId="staffType" size="10"  readonly="true" styleClass="disableText"/>
-									เขตพื้นที่ 	
 										 <html:hidden property="bean.mcArea" styleId="mcArea" />
 										  <html:text property="bean.mcAreaDesc" styleId="mcAreaDesc" size="20"  readonly="true" styleClass="disableText"/>
 									 Route 
 									 <html:hidden property="bean.mcRoute" styleId="mcRoute" /> 
-									 <html:text property="bean.mcRouteDesc" styleId="mcRouteDesc" size="38" readonly="true" styleClass="disableText"/>
+									 <html:text property="bean.mcRouteDesc" styleId="mcRouteDesc" size="100" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>

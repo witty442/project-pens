@@ -61,6 +61,33 @@ public class ImportDAO {
 		return lastFileName;
 	} 
 	
+	public String getLastFileNameImportFriday(Connection conn) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String lastFileName ="";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select max(file_name)as last_file_name  from PENSBME_ONHAND_BME_FRIDAY \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				lastFileName = rs.getString("last_file_name");
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return lastFileName;
+	} 
 	
 	public Boolean importLotusFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
 		PreparedStatement ps =null;
@@ -748,6 +775,39 @@ public class ImportDAO {
 				item.setBarcode(Utils.isNull(rs.getString("interface_desc")));
 				item.setGroup(Utils.isNull(rs.getString("pens_desc2")));
 				
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return item;
+	} 
+	
+	public MasterBean getMasterBeanByBarcode(Connection conn ,String storeType,String barcode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		MasterBean item = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select interface_desc,pens_value,pens_desc,pens_desc2 " +
+					" from PENSBME_MST_REFERENCE WHERE reference_code ='"+storeType+"' and interface_desc ='"+barcode+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){
+				item = new MasterBean();
+				item.setItem(Utils.isNull(rs.getString("pens_value")));
+				item.setBarcode(Utils.isNull(rs.getString("interface_desc")));
+				item.setGroup(Utils.isNull(rs.getString("pens_desc2")));
 			}
 		
 		}catch(Exception e){

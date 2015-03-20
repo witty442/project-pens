@@ -53,9 +53,13 @@ public class MoveWarehoseDAO extends PickConstants{
 			sql.append("\n SELECT j.job_id" +
 					",j.name as job_name" +
 					",b.box_no, count(*) as qty ");
-			sql.append("\n from PENSBME_PICK_JOB j,PENSBME_PICK_BARCODE_ITEM b");
+			sql.append("\n from PENSBME_PICK_JOB j,PENSBME_PICK_BARCODE h,PENSBME_PICK_BARCODE_ITEM b");
 			sql.append("\n where 1=1   ");
 			sql.append("\n and j.job_id = b.job_id");
+			
+			sql.append("\n and h.job_id = b.job_id");
+			sql.append("\n and h.box_no = b.box_no");
+			
 			sql.append("\n and j.status ='"+PickConstants.STATUS_CLOSE+"'");
 			sql.append("\n and b.status ='"+PickConstants.STATUS_CLOSE+"'");
 			
@@ -63,7 +67,7 @@ public class MoveWarehoseDAO extends PickConstants{
 			  sql.append("\n and j.job_id ="+o.getJobId()+"");
 			}
 			if( !Utils.isNull(o.getWarehouseFrom()).equals("")){
-			   sql.append("\n and j.warehouse ='"+o.getWarehouseFrom()+"'");
+			   sql.append("\n and h.warehouse ='"+o.getWarehouseFrom()+"'");
 			}
 			
 			sql.append("\n group by j.job_id,j.name,b.box_no  ");
@@ -108,7 +112,7 @@ public class MoveWarehoseDAO extends PickConstants{
 		return o;
 	}
 	
-	public static MoveWarehouse searchHeadForNewJob(Connection conn,MoveWarehouse h ,String oldBoxNoWhereSqlIn,String newJobIdWhereSqlIn) throws Exception {
+	public static MoveWarehouse searchBarcodeUpdateWarehouse(Connection conn,MoveWarehouse h ,String oldBoxNoWhereSqlIn,String oldJobIdWhereSqlIn) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -118,16 +122,16 @@ public class MoveWarehoseDAO extends PickConstants{
 		int no=1;
 		try {
 			sql.append("\n SELECT O.* FROM (");
-			sql.append("\n 	SELECT job_id as old_job_id,box_no as old_box_no, count(*) as qty" );
+			sql.append("\n 	SELECT job_id, box_no, count(*) as qty" );
 			sql.append("\n  ,(select j.name from PENSBME_PICK_JOB j where j.job_id=BL.job_id) job_name ");
 			sql.append("\n	from PENSBME_PICK_BARCODE_ITEM BL");
 			sql.append("\n 	where 1=1   ");
-			sql.append("\n 	and BL.job_id in("+newJobIdWhereSqlIn+")");//Case No New Box 21/01/2558
+			sql.append("\n 	and BL.job_id in("+oldJobIdWhereSqlIn+")");
 			sql.append("\n 	and BL.box_no in("+oldBoxNoWhereSqlIn+")");
 			sql.append("\n 	group by BL.job_id,BL.box_no ");
 			sql.append("\n )O ");
 			
-			sql.append("\n order by O.old_job_id, O.old_box_no  ");
+			sql.append("\n order by O.job_id, O.box_no  ");
 			logger.debug("sql:"+sql);
 
 			ps = conn.prepareStatement(sql.toString());
@@ -138,13 +142,9 @@ public class MoveWarehoseDAO extends PickConstants{
 			   item.setNo(no);
 			   item.setSelected("true");
 			   
-			   item.setJobId(Utils.isNull(rst.getString("old_job_id")));
-			   item.setBoxNo(Utils.isNull(rst.getString("old_box_no")));
+			   item.setJobId(Utils.isNull(rst.getString("job_id")));
+			   item.setBoxNo(Utils.isNull(rst.getString("box_no")));
 			   item.setJobName(Utils.isNull(rst.getString("job_name")));
-			   
-			   item.setNewJobId(Utils.isNull(rst.getString("old_job_id")));
-			   item.setNewBoxNo(Utils.isNull(rst.getString("old_box_no")));
-			   item.setNewJobName(Utils.isNull(rst.getString("job_name")));
 			   
 			   item.setQty(Utils.isNull(rst.getString("qty")));
 			   

@@ -2097,7 +2097,7 @@ public class PickStockDAO extends PickConstants{
 			sql.append("\n and h.status = '"+STATUS_CLOSE+"'");
 			sql.append("\n and ( i.status = '"+STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
 			
-			sql.append("\n group by i.box_no ,i.job_id ");
+			sql.append("\n group by i.box_no ,i.job_id,j.name ");
 			sql.append("\n order by i.box_no asc ");
 			logger.debug("sql:"+sql);
 			

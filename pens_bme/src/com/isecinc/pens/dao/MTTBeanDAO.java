@@ -47,7 +47,7 @@ public class MTTBeanDAO{
 					"     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 					"     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
-					" from PENSBME_SALE_FROM_MTT S");
+					" from PENSBME_SALES_OUT S");
 			
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
@@ -69,10 +69,13 @@ public class MTTBeanDAO{
 				Date fDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
+				sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			}
+			
+			if( !Utils.isNull(o.getSaleDateTo()).equals("")){
 				Date tDate  = Utils.parse(o.getSaleDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				
-				sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+
 				sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
 			
@@ -164,7 +167,7 @@ public class MTTBeanDAO{
 			sql.append("\n  select line_id,doc_no,sale_date ,cust_group,cust_no,barcode," +
 					"\n MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF" +
 		            "\n ,status"+
-					" from PENSBME_SALE_FROM_MTT ");
+					" from PENSBME_SALES_OUT ");
 			
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
@@ -228,7 +231,7 @@ public class MTTBeanDAO{
 		Connection conn = null;
         int maxLineId= 0;
 		try {
-			sql.append("\n select max(line_id) as max_line_id from PENSBME_SALE_FROM_MTT ");
+			sql.append("\n select max(line_id) as max_line_id from PENSBME_SALES_OUT ");
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 			logger.debug("sql:"+sql);
@@ -439,7 +442,7 @@ public class MTTBeanDAO{
 			logger.debug("Insert");
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" INSERT INTO PENSBI.PENSBME_SALE_FROM_MTT \n");
+				sql.append(" INSERT INTO PENSBI.PENSBME_SALES_OUT \n");
 				sql.append(" (SALE_DATE,DOC_NO, LINE_ID,   \n");
 				sql.append("  CUST_GROUP, CUST_NO, BARCODE,MATERIAL_MASTER, ");
 				sql.append("  GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,STATUS,CREATE_DATE,CREATE_USER)  \n");
@@ -484,7 +487,7 @@ public class MTTBeanDAO{
 			int  c = 1;
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE PENSBI.PENSBME_SALE_FROM_MTT SET  \n");
+				sql.append(" UPDATE PENSBI.PENSBME_SALES_OUT SET  \n");
 				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
 				
 				sql.append(" WHERE DOC_NO = ? and LINE_ID = ? \n" );
@@ -517,7 +520,7 @@ public class MTTBeanDAO{
 			int  c = 1;
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE PENSBI.PENSBME_SALE_FROM_MTT SET  \n");
+				sql.append(" UPDATE PENSBI.PENSBME_SALES_OUT SET  \n");
 				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
 				
 				sql.append(" WHERE DOC_NO = ? \n" );

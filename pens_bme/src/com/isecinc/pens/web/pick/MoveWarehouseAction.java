@@ -17,9 +17,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MoveWarehouse;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveWarehoseDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -124,10 +126,8 @@ public class MoveWarehouseAction extends I_Action {
 		Connection conn = null;
 		MoveWarehouseForm aForm = (MoveWarehouseForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		Map<String, List<MoveWarehouse>> groupJobMap = new HashMap<String, List<MoveWarehouse>>();
-		String oldJobIdWhereSqlIn = "";
+	    String oldJobIdWhereSqlIn = "";
 		String oldBoxNoWhereSqlIn = "";
-		String newJobIdWhereSqlIn = "";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -136,7 +136,6 @@ public class MoveWarehouseAction extends I_Action {
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
 			
-			List<MoveWarehouse> itemList = new ArrayList<MoveWarehouse>();
 			//Set Item
 			String[] lineId = request.getParameterValues("lineId");
 			String[] jobId = request.getParameterValues("jobIdItem");
@@ -149,87 +148,29 @@ public class MoveWarehouseAction extends I_Action {
 			if(boxNo != null && boxNo.length > 0){
 				for(int i=0;i<boxNo.length;i++){
 					if( !Utils.isNull(lineId[i]).equals("")){
-						 MoveWarehouse l = new MoveWarehouse();
+						 Barcode l = new Barcode();
+						 
 						 l.setLineId(i+1);
 						 l.setBoxNo(Utils.isNull(boxNo[i]));
 						 l.setJobId(jobId[i]);
-						 l.setQty(qty[i]);
+						
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());
 						 l.setRemark(h.getRemark());
 						 
-						//For Search 
+						 //For Search 
 						 oldJobIdWhereSqlIn +="'"+l.getJobId()+"',";
 						 oldBoxNoWhereSqlIn +="'"+l.getBoxNo()+"',";
 						 
-						 String jobIdKey = String.valueOf(l.getJobId());
-						 
-						 //First
-						 if(groupJobMap.isEmpty()){
-							 itemList = new ArrayList<MoveWarehouse>();
-							 itemList.add(l);
-							 groupJobMap.put(jobIdKey, itemList);
-						 }else{
-							 if(groupJobMap.get(jobIdKey) != null){
-								 itemList = groupJobMap.get(jobIdKey);
-								 itemList.add(l); 
-								 groupJobMap.put(jobIdKey, itemList);
-							 }else{
-								 itemList = new ArrayList<MoveWarehouse>();
-								 itemList.add(l); 
-								 groupJobMap.put(jobIdKey, itemList);
-							 }
-						 }
+						 //Update new Warehouse
+						 BarcodeDAO.updateBarcodeNewWarehouseByPK(conn, h.getWarehouseTo(), l);
 						 
 					}//if
 				}//for
 			}//if
-			
-			int no =0;
-			int totalQty =0;
-			int totalBox = 0;
-			List<MoveWarehouse> AllItems = new ArrayList<MoveWarehouse>();
-			
-			if(groupJobMap != null ){
-				Iterator<String> its = groupJobMap.keySet().iterator();
-				while(its.hasNext()){
-					String jobIdKey = its.next();
-					
-					//Copy some data to new job
-					Job oldJob = new Job();
-					oldJob.setJobId(jobIdKey);
-					Job newJob = JobDAO.search(conn,oldJob);
-					
-				    //Set new Data new job
-					newJob.setJobId("");
-					newJob.setOpenDate(h.getOpenDate());
-					newJob.setCloseDate(h.getCloseDate());
-				    newJob.setWareHouse(h.getWarehouseTo());//new warehouse 
-				    newJob.setCreateUser(user.getUserName());
-				    newJob.setUpdateUser(user.getUserName());
-                    //save new job
-				    newJob = JobDAO.saveCaseMoveWarehouse(conn,newJob, user);
-				    //For Search 
-				    newJobIdWhereSqlIn +="'"+newJob.getJobId()+"',";
-				    
-				    itemList = groupJobMap.get(jobIdKey);
-				    
-				    //Move barcode to new job id
-				    MoveWarehouse re = MoveWarehoseDAO.moveBarcodeToNewWarehouseNoNewBoxNo(conn,newJob, itemList,no);
-				    
-				    no = re.getNo();
-				    totalQty +=Utils.convertStrToInt(re.getTotalQty());
-				    totalBox +=Utils.convertStrToInt(re.getTotalBox());
-				    
-				    AllItems.addAll(re.getItems());
-				}
-				
-				h.setTotalBox(totalBox+"");
-				h.setTotalQty(totalQty+"");
-				h.setItems(AllItems);
-			}
-			
-			if(oldJobIdWhereSqlIn.length() >0){
+
+
+            if(oldJobIdWhereSqlIn.length() >0){
 				oldJobIdWhereSqlIn = oldJobIdWhereSqlIn.substring(0,oldJobIdWhereSqlIn.length()-1);
 			}
 			
@@ -237,13 +178,9 @@ public class MoveWarehouseAction extends I_Action {
 				oldBoxNoWhereSqlIn = oldBoxNoWhereSqlIn.substring(0,oldBoxNoWhereSqlIn.length()-1);
 			}
 			
-			if(newJobIdWhereSqlIn.length() >0){
-				newJobIdWhereSqlIn = newJobIdWhereSqlIn.substring(0,newJobIdWhereSqlIn.length()-1);
-			}
-			
-		    ///search refresh
-		  //  h = MoveWarehoseDAO.searchHeadForNewJob(conn,h,oldBoxNoWhereSqlIn,newJobIdWhereSqlIn);
-		    
+			///search refresh
+		    h = MoveWarehoseDAO.searchBarcodeUpdateWarehouse(conn,h,oldBoxNoWhereSqlIn,oldJobIdWhereSqlIn);
+		   
 		   // hide save button
 		    h.setCanEdit(false);
 		    

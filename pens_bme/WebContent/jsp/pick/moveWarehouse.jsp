@@ -40,7 +40,7 @@ if(session.getAttribute("wareHouseList") == null){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/conf_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 
 <style type="text/css">
 span.pagebanner {
@@ -149,10 +149,10 @@ function save(path){
 		alert("กรุณาเลือกข้อมูลอย่างน้อย 1 รายการ");
 		return false;
 	}
-	if(checkOpenDate()==false){
+	/* if(checkOpenDate()==false){
 		alert("วันที่ Open Date ต้องน้อยกว่า หรือเท่ากับวันที่ Close Date");
 		return false;
-	}
+	} */
 	
 	form.action = path + "/jsp/moveWarehouseAction.do?do=save";
 	form.submit();
@@ -397,7 +397,7 @@ function checkOpenDate(){
 									<td align="left"></td>
 									<td align="left"></td>
 								</tr>     			
-								<tr>
+								<%-- <tr>
                                     <td align="right"> รับคืนจาก  </td>
 									<td colspan="3">
 						               <html:text property="bean.jobId" styleId="jobId" size="20"  onkeypress="getJobNameKeypress(event,this)"/> 
@@ -420,7 +420,7 @@ function checkOpenDate(){
 									 Store No
 						               <html:text property="bean.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
-								</tr>	
+								</tr>	 --%>
 								<tr>
                                     <td align="right"></td>
                                     <td><a href="javascript:search('${pageContext.request.contextPath}')">
@@ -439,14 +439,14 @@ function checkOpenDate(){
 									    </html:select>
 									</td>
 								</tr>     
-								<tr>
+								<%-- <tr>
                                     <td align="right">Open Date<font color="red">*</font></td>
                                      <td colspan="3">
                                        <html:text property="bean.openDate" styleId="openDate" size="20"  styleClass="" onchange="checkOpenDate()"/>
 									Close Date 
 									 <html:text property="bean.closeDate" styleId="closeDate" size="20" readonly="true" styleClass="disableText"/>	  
 									</td>
-								</tr>
+								</tr> --%>
 								<tr>
                                     <td align="right"> หมายเหตุ</td>
 									<td colspan="3">
@@ -478,8 +478,6 @@ function checkOpenDate(){
 								<th >Job Id</th>
 								<th >เลขที่กล่อง</th>
 								<th >Qty</th>	
-								<th >New Job Id</th>
-								<th >เลขที่กล่อง ใหม่</th>	
 							</tr>
 							<c:forEach var="results" items="${moveWarehouseForm.results}" varStatus="rows">
 								<c:choose>
@@ -491,7 +489,7 @@ function checkOpenDate(){
 									</c:otherwise>
 								</c:choose>
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="data_chk">
+										<td class="td_text_center" width="10%">
 											<c:choose>
 												<c:when test="${results.selected == 'true'}">
 													 <input type="checkbox" name="linechk"  onclick="sumTotal()" checked/>		
@@ -502,21 +500,16 @@ function checkOpenDate(){
 											</c:choose>					  
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
 										</td>
-										<td class="data_boxNo" align="left">${results.jobId}&nbsp;${results.jobName}
+										<td class="td_text" align="left"  width="15%">${results.jobId}&nbsp;${results.jobName}
 											<input type="hidden" name="jobIdItem" value ="${results.jobId}" size="40" readonly class="disableText"/>
 										</td>
-										<td class="data_boxNo" align="center">${results.boxNo}
+										<td class="td_text" align="center"  width="15%">${results.boxNo}
 											<input type="hidden" name="boxNo" value ="${results.boxNo}" size="40" readonly class="disableText"/>
 										</td>
-										<td class="data_qty" align="center">${results.qty}
+										<td class="td_text" align="center"  width="5%">${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 										</td>
-										<td class="data_boxNo" align="left">${results.newJobId}&nbsp;${results.newJobName}
-											<input type="hidden" name="newJobId" value ="${results.newJobId}" size="40" readonly class="disableText"/>
-										</td>
-										<td class="data_boxNo" align="center">${results.newBoxNo}
-											<input type="hidden" name="newBoxNo" value ="${results.newBoxNo}" size="40" readonly class="disableText"/>
-										</td>
+										
 									</tr>
 							  </c:forEach>
 					</table>

@@ -1,5 +1,6 @@
 package com.isecinc.pens.inf.helper;
 
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,12 +27,22 @@ public class DBConnection {
 	public  Connection getConnection(){		
 		Connection _instanceInf =null;
 		try{
-		_instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+		   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+		}catch(SocketException e){
+			// Retry count 1
+			try{
+				logger.info("Retry Conn 1 time");
+			   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+			}catch(Exception ee){
+				logger.error(ee.getMessage(),ee);
+			}
+			
 		}catch(Exception e){
 		  logger.error(e.getMessage(),e);
 		}
 		return _instanceInf;
 	}
+	
 	public  Connection getConnection1(){		
 		Connection _instanceInf =null;
 		try {	

@@ -9,7 +9,7 @@
           <property name="connection.url">jdbc:oracle:thin:@//192.168.37.186:1529/TEST</property>
 
 	   	<!-- Production Server -->
-	   	 <!-- <property name="connection.url">jdbc:oracle:thin:@//penserp.isec.com:1521/PENS</property> -->
+	    <!-- <property name="connection.url">jdbc:oracle:thin:@//penserp.isec.com:1521/PENS</property>  -->
 	   	
 		<property name="connection.username">pensbi</property>
 		<property name="connection.password">pensbi</property>

@@ -93,6 +93,75 @@ public class LoginAction extends DispatchAction {
 		return mapping.findForward(forwordStr);
 	}
 	
+	public ActionForward loginCrossServer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		LoginForm loginForm = null;
+		String forwordStr = "pass_user";
+		try {
+			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
+			
+			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
+			//payAction|prepare2|new
+			String pathRedirect = Utils.isNull(request.getParameter("pathRedirect"));
+			String url = "";
+		    if( !pathRedirect.equals("")){
+		    	String[] p = pathRedirect.split("\\|");
+		    	url  ="/jsp/"+p[0]+".do?do="+p[1]+"&action="+p[2];
+		    	request.setAttribute("url",url );
+		    }
+			
+			String userName = Utils.isNull(request.getParameter("userName"));
+			String password = Utils.isNull(request.getParameter("password"));
+			
+			logger.debug("serverForm:"+serverForm);
+			logger.debug("pathRedirect:"+pathRedirect +",url:"+url);
+			
+			request.getSession(true).removeAttribute("user");
+			loginForm = (LoginForm) form;
+			User user = null;
+			conn = DBConnection.getInstance().getConnection();
+			user = new LoginProcess().login(userName, password, conn);
+            
+			if (user == null) {
+				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
+				return mapping.findForward("fail");
+			}
+			
+			request.getSession(true).setAttribute("user", user);
+			request.getSession(true).setAttribute("username", user.getUserName());
+			
+			String role = user.getRole().getKey();
+			logger.debug("role:"+role);
+			
+			forwordStr = "pathRedirect";
+			
+			logger.debug("forwordStr:"+forwordStr);
+			
+			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			if(screenWidth.equals("")){
+				screenWidth ="0";
+			}
+			logger.debug("Before ScreenWidth["+screenWidth+"]");
+			if(Integer.parseInt(screenWidth) < 600){
+				screenWidth = "0";
+			}
+			logger.debug("After Calc ScreenWidth:"+screenWidth);
+			
+			request.getSession(true).setAttribute("screenWidth", screenWidth);
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			request.setAttribute("errormsg", e.getMessage());
+			return mapping.findForward("fail");
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward(forwordStr);
+	}
+	
 	public ActionForward logoff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		String forwordStr = "logoff";

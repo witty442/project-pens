@@ -480,9 +480,10 @@ public class ReportUtilServlet extends HttpServlet {
 			IOException, JRException {
 		File rptFile = null;
 		boolean defaultPrinter = false;
-		
+		User user = (User) request.getSession().getAttribute("user");
 		logger.debug("Print to PRINTER " + fileJasper);
 		String printerInvoiceName = "EPSON LQ-300+ /II ESC/P 2 (PENS_A5)";
+		
 		try {
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = createDataSource(lstData);
@@ -495,33 +496,26 @@ public class ReportUtilServlet extends HttpServlet {
 			logger.debug("RTF Print " + rtfPrint);
 
 			PrintService pService = PrintServiceLookup.lookupDefaultPrintService();
-		
 			PrintServiceAttributeSet printServiceDefaultAttributeSet = pService.getAttributes();//default printer
 			
 			logger.debug("default printerName:"+pService.getName());
 			
 			/** Set property printer and Report **/
 			HashMap fontMap = new HashMap();
-			/*FontKey key = new FontKey("Angsana New", false, false);
-			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
-			fontMap.put(key, font);
-
-			FontKey key2 = new FontKey("Angsana New", true, false);
-			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			Print
-			fontMap.put(key2, font2);*/
-
-			/** Case print Tax Invoice **/
-			if("tax_invoice_report".equalsIgnoreCase(fileName)){
+			
+			if("pay_in_report".equalsIgnoreCase(fileName)){
+		
+				String printerPayInName = user.getPrinterName();//"HP LaserJet Professional P1606dn";
+				
 				PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
-				printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));
+				printServiceAttributeSetManual.add(new PrinterName(printerPayInName, Locale.getDefault()));
 		        
 		        //check Printer PENS_A5 is Exist
-		        logger.debug("Case tax_invoice_report :new printerName:"+printerInvoiceName);
+		        logger.debug("Case pay_in_report :new printerName:"+printerPayInName);
 		        
-		        logger.debug("Step 1 Check Printer PENS_A5 is Exist");
+		        logger.debug("Step 1 Check Printer "+printerPayInName+" is Exist");
 		        try{
-		        	logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5");
+		        	logger.debug("pay_in_report Step 1 Fix printer "+printerPayInName+"");
 
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
@@ -531,68 +525,27 @@ public class ReportUtilServlet extends HttpServlet {
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
 		
-					logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5 Start exported...");
+					logger.debug("pay_in_report Step 1 Fix printer "+printerPayInName+" Start exported...");
 					exporter.exportReport();
-					logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5 End exported");
+					logger.debug("pay_inreport Step 1 Fix printer "+printerPayInName+" End exported");
 					
 		        }catch(Exception e){
 		        	
-                    logger.debug("print tax_invoice_report Error not found printer name:"+printerInvoiceName);
-		        	logger.debug("tax_invoice_report Step 2 User Printer defalut ");
-		        	
-
+                    logger.debug("print pay_in_report Error not found printer name:"+printerPayInName);
+		        	//logger.debug("tax_invoice_report Step 2 User Printer defalut ");
+/*
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
 					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
-					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
+					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);*/
 		
-					logger.debug("tax_invoice_report Step 2 User Printer defalut  Start exported...");
-					exporter.exportReport();
-					logger.debug("tax_invoice_report Step 2 User Printer defalut  End exported");
+					//logger.debug("pay_in_report Step 2 User Printer defalut  Start exported...");
+					//exporter.exportReport();
+					//logger.debug("pay_in_report Step 2 User Printer defalut  End exported");
 		        }
-		   
-			}else if("list_order_product_report".equalsIgnoreCase(fileName) || "tax_invoice_summary_report".equalsIgnoreCase(fileName)){
-				try{
-					PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-					if (services == null || services.length < 1) {
-						  throw new  Exception("printer Exception");
-					}
-					
-					int selectedService = 0;
-					/* Scan found services to see if anyone suits our needs */
-					for(int i = 0; i < services.length;i++){
-					   if(services[i].getName().toUpperCase().contains("ZDesigner MZ 320".toUpperCase())){
-					      logger.debug("Sleected Printer Name["+services[i].getName().toUpperCase()+"]");
-						  /*If the service is named as what we are querying we select it */
-					      selectedService = i;
-					   }
-					}
-					
-					printServiceDefaultAttributeSet = services[selectedService].getAttributes();
-					logger.info("PrinterName:"+services[selectedService].getName());
-							
-					//PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
-					//printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));//Hardcode 
-					
-					JRExporter exporter = new JRPrintServiceExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
-	
-					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
-					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
-					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
-		
-					logger.debug("Start Printer Normal exported...");
-			
-					exporter.exportReport();
-		
-					logger.debug("End printer Normal exported");
-				}catch(Exception e){
-				   e.printStackTrace();
-				}
 		     /** Normal **/
 			}else{
 

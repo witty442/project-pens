@@ -19,6 +19,8 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
+
 /**
  *	General utilities.
  *	@author Witty
@@ -53,15 +55,34 @@ public class Utils {
 	
 	private static String DECIMAL_FORMAT ="#.00000000000000000000";
 	private static String CURRENCY_FORMAT ="#,##0.00";
+	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
 	private static String NUMBER_FORMAT ="#,##0";
 	
 	public static void main(String[] args){
-	    try{	   
-	    	System.out.println(isHoliday("03012015"));
-
+	    try{	
+	    	String url =  "/jsp/mcAction.do?do=prepareMCStaff&action=new";
+	    	String pageAction = url.substring(url.indexOf("jsp")+4,url.indexOf(".do"));
+	    	String doAction = url.substring(url.indexOf("do=")+3,url.indexOf("&"));
+	    	String action = url.substring(url.indexOf("action")+7,url.length());
+	    	
+	    	System.out.println("pageAction:"+pageAction);
+	    	System.out.println("doAction:"+doAction);
+	    	System.out.println("action:"+action);
+	    	
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
+	}
+	
+	public static boolean userInRole(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			if( (user.getRole().getKey()).toLowerCase().indexOf(String.valueOf(roles[i]).toLowerCase()) != -1){
+				r =  true;
+				break;
+			}
+		}
+		return r;
 	}
 	
     public static boolean isHoliday(String dateString){
@@ -151,6 +172,15 @@ public class Utils {
 		return currencyStr;
 	}
 	
+	public static String convertToStr(double s) {
+		String str = "0";
+		try{
+			str = String.valueOf(s);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return str;
+	}
 	public static String convertToNumberStr(double s) {
 		String currencyStr = "0";
 		try{
@@ -178,6 +208,25 @@ public class Utils {
 		}
 		return currencyStr;
 	}
+	
+	public static String convertToCurrencyNoDigitStr(String s) {
+		String currencyStr = "0.00";
+		try{
+			if( !Utils.isNull(s).equals("")){
+				if(s.indexOf(",") != -1){
+					s = s.replaceAll(",", "");
+				}
+				 Double d = new Double(Utils.isNull(s));
+				 DecimalFormat dc=new DecimalFormat();
+			     dc.applyPattern(CURRENCY_NODIGIT_FORMAT);
+			     currencyStr =dc.format(d);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
 	
 	public static String convertToCurrencyStr(BigDecimal s) {
 		String currencyStr = "0.00";
@@ -538,6 +587,14 @@ public class Utils {
 	}
 	
 	public static double convertStrToDouble(String str){
+		if(isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new Double(str).doubleValue();
+	}
+	
+	public static double convertStrToDouble2Digit(String str){
 		if(isNull(str).equals("")){
 			return 0;
 		}

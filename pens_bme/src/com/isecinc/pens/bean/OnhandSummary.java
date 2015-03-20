@@ -22,6 +22,7 @@ public class OnhandSummary implements Serializable{
 	private String salesDate;
 	private String pensCustCodeFrom;
 	private String pensCustNameFrom;
+	private String location;
 	
 	//results
 	private String subInv;
@@ -52,8 +53,21 @@ public class OnhandSummary implements Serializable{
     private String transInQty;
     private String adjustQty;
     private String stockShortQty;
+    private String initSaleQty;
     
     
+	public String getInitSaleQty() {
+		return initSaleQty;
+	}
+	public void setInitSaleQty(String initSaleQty) {
+		this.initSaleQty = initSaleQty;
+	}
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String location) {
+		this.location = location;
+	}
 	public String getCustNo() {
 		return custNo;
 	}

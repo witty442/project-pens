@@ -70,6 +70,9 @@ public class BarcodeDAO extends PickConstants{
 			if( !Utils.isNull(o.getStatus()).equals("")){
 				sql.append("\n and i.status = '"+Utils.isNull(o.getStatus())+"'");
 			}
+			if( !Utils.isNull(o.getCreateUser()).equals("")){
+				sql.append("\n and i.create_user LIKE '%"+Utils.isNull(o.getCreateUser())+"%'");
+			}
 			
 			sql.append("\n order by i.box_no desc ");
 			logger.debug("sql:"+sql);
@@ -94,6 +97,7 @@ public class BarcodeDAO extends PickConstants{
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code"))); 
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
+			   h.setCreateUser(Utils.isNull(rst.getString("create_user"))); 
 			   
 			   if(Utils.isNull(rst.getString("job_status")).equals(JobDAO.STATUS_CLOSE)){
 				   h.setCanEdit(false);  
@@ -238,12 +242,12 @@ public class BarcodeDAO extends PickConstants{
 		int c = 1;
 		try {
 
-			sql.append("\n select i.*,j.warehouse,j.name,j.status as job_status");
+			sql.append("\n select i.*,i.warehouse,j.name,j.status as job_status");
 			sql.append("\n  ,j.store_code,j.store_no,j.sub_inv ");
 			sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
 			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = j.store_code) as STORE_NAME ");
 			sql.append("\n  ,(SELECT m.pens_desc from PENSBME_MST_REFERENCE m ");
-			sql.append("\n    where 1=1  and j.warehouse = m.pens_value and m.reference_code ='Warehouse') as warehouse_desc ");
+			sql.append("\n    where 1=1  and i.warehouse = m.pens_value and m.reference_code ='Warehouse') as warehouse_desc ");
 			sql.append("\n from PENSBI.PENSBME_PICK_BARCODE i  ");
 			sql.append("\n INNER JOIN ( ");
 			sql.append("\n    select distinct warehouse,job_id,name,status,store_code,store_no,sub_inv  from PENSBME_PICK_JOB ");
@@ -643,9 +647,9 @@ public class BarcodeDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_BARCODE \n");
 				sql.append(" (JOB_ID,BOX_NO, TRANSACTION_DATE,   \n");
-				sql.append("  STATUS, CREATE_DATE, CREATE_USER,REMARK)  \n");
+				sql.append("  STATUS, CREATE_DATE, CREATE_USER,REMARK,WAREHOUSE)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? , ?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -660,6 +664,7 @@ public class BarcodeDAO extends PickConstants{
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
 				ps.setString(c++, o.getRemark());
+				ps.setString(c++, o.getWareHouse());
 				
 				ps.executeUpdate();
 				
@@ -830,6 +835,39 @@ public class BarcodeDAO extends PickConstants{
 				ps = conn.prepareStatement(sql.toString());
 					
 				ps.setString(c++, newJobId);
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setInt(c++, Integer.parseInt(o.getJobId()));
+				ps.setString(c++, o.getBoxNo());
+				
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static void updateBarcodeNewWarehouseByPK(Connection conn,String warehouse,Barcode o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("Update");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE SET  \n");
+				sql.append(" remark =?,warehouse = ? ,update_user =?,update_date =?   \n");
+				
+				sql.append(" WHERE JOB_ID =? and BOX_NO = ? \n" );
+
+				logger.debug("sql:"+sql.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+				
+				ps.setString(c++, Utils.isNull(o.getRemark()));
+				ps.setString(c++, warehouse);
 				ps.setString(c++, o.getUpdateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setInt(c++, Integer.parseInt(o.getJobId()));

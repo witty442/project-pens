@@ -23,13 +23,13 @@
 <jsp:useBean id="barcodeForm" class="com.isecinc.pens.web.pick.BarcodeForm" scope="session" />
 
 <%
-//if(session.getAttribute("barcodeStatusList") == null){
+if(session.getAttribute("barcodeStatusList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
 	billTypeList.add(ref);
 	billTypeList.addAll(JobDAO.getBarcodeStatusList());
 	session.setAttribute("barcodeStatusList",billTypeList);
-//}
+}
 %>
 
 <html>
@@ -280,6 +280,8 @@ function getJobNameModel(code){
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
 						               <html:text property="job.remark" styleId="remark" size="80" />
+						              Scan By User
+						               <html:text property="job.createUser" styleId="createUser" size="20" />
 									</td>
 								</tr>	
 						   </table>
@@ -319,6 +321,7 @@ function getJobNameModel(code){
 									<th >Store No</th>
 									<th >จำนวน</th>
 									<th >Job Status</th>
+									<th >User Created</th>
 									<th >Action</th>						
 							   </tr>
 							<c:forEach var="results" items="${barcodeForm.resultsSearch}" varStatus="rows">
@@ -357,6 +360,9 @@ function getJobNameModel(code){
 										</td>
 										<td class="search_status">
 										    ${results.statusDesc}
+										</td>
+										<td class="search_status">
+										    ${results.createUser}
 										</td>
 										<td class="search_edit">
 										 <c:if test="${results.canEdit == false}">

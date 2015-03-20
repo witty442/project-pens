@@ -35,7 +35,7 @@ public class SummaryForm extends I_Form {
 	private List<TransactionSummary> topsSummaryResults;
 	private List<PhysicalSummary> physicalSummaryResults;
 	private List<DiffStockSummary> diffStockSummaryLists;
-	
+	private List<TransactionSummary> summaryByGroupCodeResults;
 	
 	
 	private int onhandSummaryResultsSize;
@@ -48,9 +48,20 @@ public class SummaryForm extends I_Form {
 	private int topsSummaryResultsSize;
 	private int physicalSummaryResultsSize;
 	private int diffStockSummaryResultsSize;
-	
+	private int summaryByGroupCodeResultsSize;
 
 	
+	public List<TransactionSummary> getSummaryByGroupCodeResults() {
+		return summaryByGroupCodeResults;
+	}
+	public void setSummaryByGroupCodeResults(
+			List<TransactionSummary> summaryByGroupCodeResults) {
+		this.summaryByGroupCodeResults = summaryByGroupCodeResults;
+	}
+	public int getSummaryByGroupCodeResultsSize() {
+		return summaryByGroupCodeResults !=null?summaryByGroupCodeResults.size():0;
+	}
+
 	public List<OnhandSummary> getOnhandSummaryMTTResults() {
 		return onhandSummaryMTTResults;
 	}

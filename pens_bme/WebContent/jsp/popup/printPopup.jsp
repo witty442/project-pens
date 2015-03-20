@@ -38,6 +38,7 @@ function loadMe(_path){
     String reportName = request.getParameter("report_name");
     String typeReport  ="";
     String boxNo = "";
+    String docNo ="";
     
 	if("ControlReturnReport".equals(reportName)){
 		typeReport = Utils.isNull(request.getParameter("typeReport"));
@@ -53,7 +54,16 @@ function loadMe(_path){
 
       document.tempForm.action = _path + "/jsp/confirmReturnWacoalAction.do?do=printReturnBoxReport&typeReport=<%=typeReport%>&boxNo=<%=boxNo%>";
 	  document.tempForm.submit();
-  <%} %>
+		
+  <%}else if("PayInReport".equals(reportName)){ 
+		  typeReport = Utils.isNull(request.getParameter("typeReport"));
+		  docNo = Utils.isNull(request.getParameter("docNo"));
+	  %>
+
+	      document.tempForm.action = _path + "/jsp/payAction.do?do=printReport&typeReport=<%=typeReport%>&docNo=<%=docNo%>";
+		  document.tempForm.submit();
+	  <%} %>
+  
 }
 
 
@@ -65,6 +75,7 @@ function loadMe(_path){
 <body onload="loadMe('${pageContext.request.contextPath}');" topmargin="0" bottommargin="0" leftmargin="100" rightmargin="150" class="popbody">
 <!-- BODY -->
 <html:form action="/jsp/tempAction">
+
 <input type="hidden" name="load" value="">
 <input type="hidden" name="report_name" value="<%=reportName%>">
 <input type="hidden" name="typeReport" value="<%=typeReport%>">

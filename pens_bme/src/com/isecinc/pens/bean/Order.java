@@ -19,6 +19,7 @@ public class Order implements Serializable{
 	private String region;
 	private String storeCode;
 	private String groupCode;
+	private String groupCodeDesc;
 	private String item;
 	private String itemDesc;
 	private String itemDisp;
@@ -46,8 +47,42 @@ public class Order implements Serializable{
 //option Order History
 	private String pensCustCodeFrom;
 	private String pensCustNameFrom;
+	private String salesDateFrom;
+	private String salesDateTo;
+	private String size;
+    private String color;
 	
 	
+	public String getSize() {
+		return size;
+	}
+	public void setSize(String size) {
+		this.size = size;
+	}
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
+	}
+	public String getGroupCodeDesc() {
+		return groupCodeDesc;
+	}
+	public void setGroupCodeDesc(String groupCodeDesc) {
+		this.groupCodeDesc = groupCodeDesc;
+	}
+	public String getSalesDateFrom() {
+		return salesDateFrom;
+	}
+	public void setSalesDateFrom(String salesDateFrom) {
+		this.salesDateFrom = salesDateFrom;
+	}
+	public String getSalesDateTo() {
+		return salesDateTo;
+	}
+	public void setSalesDateTo(String salesDateTo) {
+		this.salesDateTo = salesDateTo;
+	}
 	public String getPensCustNameFrom() {
 		return pensCustNameFrom;
 	}

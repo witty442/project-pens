@@ -20,8 +20,29 @@ public class StoreBean implements Serializable{
 	private String billType;
 	private String validFrom;
 	private String validTo;
+	private String groupCode;
+	private String size;
+	private String color;
 	
 	
+	public String getGroupCode() {
+		return groupCode;
+	}
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+	public String getSize() {
+		return size;
+	}
+	public void setSize(String size) {
+		this.size = size;
+	}
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
+	}
 	public String getBarOnBox() {
 		return barOnBox;
 	}

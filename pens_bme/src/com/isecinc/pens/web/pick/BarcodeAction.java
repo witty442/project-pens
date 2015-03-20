@@ -356,6 +356,8 @@ public class BarcodeAction extends I_Action {
 			ad.setStoreNo(aForm.getJob().getStoreNo());
 			ad.setSubInv(aForm.getJob().getSubInv());
 			ad.setRemark(aForm.getJob().getRemark());
+			ad.setWareHouse(aForm.getJob().getWareHouse());
+			ad.setWareHouseDesc(aForm.getJob().getWareHouseDesc());
 			
 			ad.setCanEdit(true);
 			
@@ -491,20 +493,26 @@ public class BarcodeAction extends I_Action {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		StringBuffer h = new StringBuffer("");
-		int colSpan = 10;
+		int colSpan = 11;
 		String title = "Stock Pick Query By Detail";
 		int totalQty = 0;
 		int no = 0;
+		String a= "@";
+		
 		try{
-			sql.append("\n select j.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
+			sql.append("\n select h.warehouse,j.job_id,h.create_user,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 			sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty,'' as remark ");
 			sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBME_PICK_JOB j ");
 			sql.append("\n where h.job_id = l.job_id and h.box_no = l.box_no ");
 			sql.append("\n and  h.job_id = j.job_id");
 
 			if( !Utils.isNull(o.getBoxNo()).equals("")){
-				sql.append("\n and h.box_no = '"+Utils.isNull(o.getBoxNoFrom())+"'");
+				sql.append("\n and h.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
 			}
+			if( !Utils.isNull(o.getCreateUser()).equals("")){
+				sql.append("\n and h.create_user LIKE '%"+Utils.isNull(o.getCreateUser())+"%'");
+			}
+			
 			if( !Utils.isNull(o.getJobId()).equals("")){
 				sql.append("\n and h.job_id = "+Utils.isNull(o.getJobId())+"");
 			}
@@ -514,7 +522,7 @@ public class BarcodeAction extends I_Action {
 			if( !Utils.isNull(o.getStatus()).equals("")){
 			   sql.append("\n and l.status ='"+o.getStatus()+"'");//RESERVE
 			}
-			sql.append("\n group by j.warehouse,j.job_id,j.name ,l.box_no,l.line_id, " );
+			sql.append("\n group by h.warehouse,j.job_id,h.create_user,j.name ,l.box_no,l.line_id, " );
 			sql.append("\n          l.material_master ,l.group_code,l.pens_item,l.barcode,l.status ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -528,6 +536,16 @@ public class BarcodeAction extends I_Action {
 			}
 			
 			rs = ps.executeQuery();
+			
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
 			
 			h.append("<table border='1'> \n");
 			h.append("<tr> \n");
@@ -560,6 +578,7 @@ public class BarcodeAction extends I_Action {
 			h.append("<td>Job Id</td> \n");
 			h.append("<td>รับคืนจาก</td> \n");
 			h.append("<td>Status</td> \n");
+			h.append("<td>User Created</td> \n");
 			h.append("</tr>");
 			
 			while(rs.next()){
@@ -571,11 +590,12 @@ public class BarcodeAction extends I_Action {
 			   h.append("<td>"+Utils.isNull(rs.getString("group_code"))+"</td> \n");
 			   h.append("<td>"+Utils.isNull(rs.getString("pens_item"))+"</td> \n");
 			   h.append("<td>"+Utils.isNull(rs.getString("material_master"))+"</td> \n");
-			   h.append("<td>"+Utils.isNull(rs.getString("barcode"))+"&nbsp;</td> \n");
-			   h.append("<td>"+Utils.isNull(rs.getString("box_no"))+"&nbsp;</td> \n");
-			   h.append("<td>"+Utils.isNull(rs.getString("job_id"))+"&nbsp;</td> \n");
+			   h.append("<td class='text'>"+Utils.isNull(rs.getString("barcode"))+"</td> \n");
+			   h.append("<td class='text'>"+Utils.isNull(rs.getString("box_no"))+"</td> \n");
+			   h.append("<td class='text'>"+Utils.isNull(rs.getString("job_id"))+"</td> \n");
 			   h.append("<td>"+Utils.isNull(rs.getString("job_name"))+"</td> \n");
 			   h.append("<td>"+PickConstants.getStatusDesc(Utils.isNull(rs.getString("status")))+"</td> \n");
+			   h.append("<td>"+Utils.isNull(rs.getString("create_user"))+"</td> \n");
 			   h.append("</tr>");
 			}
 			

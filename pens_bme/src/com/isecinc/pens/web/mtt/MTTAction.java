@@ -367,7 +367,9 @@ public class MTTAction extends I_Action {
 		MTTForm aForm = (MTTForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-
+            //save for search back criteria
+			aForm.setBeanCriteria(aForm.getBean());
+			
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			

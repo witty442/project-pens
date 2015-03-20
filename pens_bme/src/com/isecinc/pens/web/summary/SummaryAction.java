@@ -3,6 +3,7 @@ package com.isecinc.pens.web.summary;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -158,21 +159,36 @@ public class SummaryAction extends I_Action {
 				}
 				
 			}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				//Validate Initial Date
+				Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date initDate = new SummaryDAO().searchInitDateMTT(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 				
-				List<OnhandSummary> results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),user);
-				if (results != null  && results.size() >0) {
-					summaryForm.setOnhandSummaryMTTResults(results);
-					
-					ImportDAO importDAO = new ImportDAO();
-					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
-					if(m != null)
-					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-					
-				} else {
-					summaryForm.setOnhandSummaryMTTResults(null);
-					request.setAttribute("Message", "ไม่พบข่อมูล");
+				logger.debug("initDate:"+initDate);
+				logger.debug("asOfDate:"+asOfDate);
+				
+				boolean pass = true;
+				if(initDate !=null){
+					if(asOfDate.before(initDate)){
+						summaryForm.setOnhandSummaryMTTResults(null);
+						request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
+						pass = false;
+					}
 				}
-				
+				if(pass){
+					List<OnhandSummary> results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
+					if (results != null  && results.size() >0) {
+						summaryForm.setOnhandSummaryMTTResults(results);
+						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+						
+					} else {
+						summaryForm.setOnhandSummaryMTTResults(null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}
+				}
 			}else if("onhandBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				List<OnhandSummary> results = new SummaryDAO().searchOnhandBigC(summaryForm.getOnhandSummary(),user);
 				if (results != null  && results.size() >0) {
@@ -209,19 +225,19 @@ public class SummaryAction extends I_Action {
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
 			}else if("physical".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-					List<PhysicalSummary> results = new SummaryDAO().search(summaryForm.getPhysicalSummary(),user);
-					if (results != null && results.size() >0) {
-						summaryForm.setPhysicalSummaryResults(results);
-						
-						PhysicalSummary cc = (PhysicalSummary)results.get(0);
-						summaryForm.getOnhandSummary().setFileName(cc.getFileName());
-						
-						//logger.debug("results:"+summaryForm.getPhysicalSummaryResults());
-						
-					} else {
-						summaryForm.setPhysicalSummaryResults(null);
-						request.setAttribute("Message", "ไม่พบข่อมูล");
-					}
+				List<PhysicalSummary> results = new SummaryDAO().search(summaryForm.getPhysicalSummary(),user);
+				if (results != null && results.size() >0) {
+					summaryForm.setPhysicalSummaryResults(results);
+					
+					PhysicalSummary cc = (PhysicalSummary)results.get(0);
+					summaryForm.getOnhandSummary().setFileName(cc.getFileName());
+					
+					//logger.debug("results:"+summaryForm.getPhysicalSummaryResults());
+					
+				} else {
+					summaryForm.setPhysicalSummaryResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
 					
 			}else if("lotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				List<TransactionSummary> results = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"lotus");
@@ -264,7 +280,20 @@ public class SummaryAction extends I_Action {
 					summaryForm.setDiffStockSummaryLists(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
+				
+			}else if("sumByGroupCode".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				
+				List<TransactionSummary> results = new SummaryDAO().searchByGroupCode(summaryForm.getTransactionSummary(),user,"lotus");
+				if (results != null  && results.size() >0) {
+					summaryForm.setLotusSummaryResults(results);
+					//logger.debug("results:"+summaryForm.getLotusSummaryResults());
+					
+				} else {
+					summaryForm.setLotusSummaryResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -538,24 +567,24 @@ public class SummaryAction extends I_Action {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9'>รายงาน B'me Stock on-hand MTT</td> \n");
+			h.append("<td align='left' colspan='10'>รายงาน B'me Stock on-hand MTT</td> \n");
 			
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("<td align='left' colspan='10' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("<td align='left' colspan='10' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("<td align='left' colspan='10' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("<td align='left' colspan='10' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -570,6 +599,7 @@ public class SummaryAction extends I_Action {
 				  h.append("<td>ชื่อร้านค้า</td> \n");
 				  h.append("<td>Group</td> \n");
 				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Initial Stock</td> \n");
 				  h.append("<td>Sale In Qty</td> \n");
 				  h.append("<td>Sale Out Qty</td> \n");
 				  h.append("<td>Return Qty </td> \n");
@@ -584,6 +614,7 @@ public class SummaryAction extends I_Action {
 					  h.append("<td>"+s.getStoreName()+"</td> \n");
 					  h.append("<td>"+s.getGroup()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");

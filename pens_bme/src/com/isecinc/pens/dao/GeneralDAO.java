@@ -230,6 +230,40 @@ public class GeneralDAO {
 			return pos;
 		}
 	 
+	 public static String searchCustGroupDesc(String custCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			String custDesc = "";
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select pens_value , Interface_desc  ");
+				sql.append("\n FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Idwacoal' ");
+				sql.append(" and pens_value = '"+custCode+"' \n");
+				
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					custDesc = Utils.isNull(rst.getString("Interface_desc"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return custDesc;
+		}
+	 
 	 public static List<PopupForm> searchCustGroupMTT(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -240,7 +274,7 @@ public class GeneralDAO {
 				sql.delete(0, sql.length());
 				sql.append("\n select pens_value , interface_desc  FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
-				sql.append("\n and pens_value in ('020056' , '100001' ) ");
+				sql.append("\n and pens_value in ('020056' , '100001','020049','020047' ) ");
 				sql.append("\n and reference_code ='Idwacoal' ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append(" and pens_value LIKE '%"+c.getCodeSearch()+"%' \n");
@@ -258,6 +292,61 @@ public class GeneralDAO {
 				int no = 0;
 				while (rst.next()) {
 					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("pens_value"));
+					item.setDesc(rst.getString("interface_desc"));
+					
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchCustGroupInSaleOutPage(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select pens_value , interface_desc  FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and pens_value in ('100001','020049','020047' ) ");
+				sql.append("\n and reference_code ='Idwacoal' ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and pens_value LIKE '%"+c.getCodeSearch()+"%' \n");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append(" and Interface_desc LIKE '%"+c.getDescSearch()+"%' \n");
+				}
+				sql.append("\n  ORDER BY Interface_value asc \n");
+				
+				logger.debug("sql:"+sql);
+
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				
+				PopupForm item = new PopupForm();
+				item.setCode("");
+				item.setDesc("");
+				pos.add(item);
+				
+				while (rst.next()) {
+					item = new PopupForm();
 					no++;
 					item.setNo(no);
 					item.setCode(rst.getString("pens_value"));

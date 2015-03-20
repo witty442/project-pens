@@ -66,7 +66,11 @@
 		
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
 		<form-bean name="mcForm" type="com.isecinc.pens.web.mc.MCForm" />
+		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
+		
+		<form-bean name="sumGroupCodeForm" type="com.isecinc.pens.web.summary.groupCode.SummaryForm" />
+		
 	</form-beans>
 	
 	<global-forwards>
@@ -78,6 +82,8 @@
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
 			 <forward name="pass_admin" path="/jsp/mainpage.jsp" redirect="true" />
              <forward name="pass_user" path="/jsp/mainpage.jsp" redirect="true" /> 
+             <forward name="pass_user_mc" path="/jsp/mainpageMC.jsp" redirect="true" /> 
+             <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 			 <forward name="logoff" path="/index.jsp" /> 
 		</action>
@@ -404,6 +410,14 @@
 			<forward name="clear" path="/jsp/mc/mcTrans.jsp" />
 			
 			<forward name="report" path="/jsp/mc/mcSearch.jsp" />
+			<forward name="prepareMCStaff" path="/jsp/mc/mcStaffSearch.jsp" />
+            <forward name="prepareMCStaffDetail" path="/jsp/mc/mcStaff.jsp" />
+		</action>
+		
+		<action name="payForm" path="/jsp/payAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayAction">
+			<forward name="search" path="/jsp/pay/paySearch.jsp" />
+			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
+
 		</action>
 		
 		<action name="tempForm" path="/jsp/tempAction" forward="/jsp/printPopup.jsp" />
@@ -411,6 +425,13 @@
 			<forward name="search" path="/jsp/printPopup.jsp" />
 			<forward name="prepare" path="/jsp/printPopup.jsp" />
 			<forward name="clear" path="/jsp/printPopup.jsp" />
+		</action>
+		
+		<action name="sumGroupCodeForm" path="/jsp/sumGroupCodeAction" parameter="do" scope="session" type="com.isecinc.pens.web.summary.groupCode.SummaryByGroupCodeAction" >
+			<forward name="search" path="/jsp/main/sumByGroupCode.jsp"/>
+			<forward name="prepare" path="/jsp/main/sumByGroupCode.jsp" />
+			<forward name="clear" path="/jsp/main/sumByGroupCode.jsp" />
+			<forward name="export" path="/jsp/main/sumByGroupCode.jsp" />
 		</action>
 		
 	</action-mappings>

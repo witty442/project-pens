@@ -77,12 +77,21 @@ function loadStoreList(){
 	});
 }
 
+
+	
 function importExcel(path,noCheckError){
 	var form = document.importForm;
 	var extension = '';
+	var startFileName = '';
 	if(form.dataFile.value.indexOf(".") > 0){
 		extension = form.dataFile.value.substring(form.dataFile.value.lastIndexOf(".") + 1).toLowerCase();
 		//alert(extension);
+	}
+	if(form.dataFile.value.indexOf("_") > 0){
+		var pathFileName = form.dataFile.value;
+		//alert(pathFileName +","+pathFileName.lastIndexOf("\\"));
+		startFileName = pathFileName.substring(pathFileName.lastIndexOf("\\")+1,pathFileName.indexOf("_")).toLowerCase();
+		//alert(startFileName);
 	}
 	
 	<% if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -132,9 +141,23 @@ function importExcel(path,noCheckError){
 	<%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
 		if(form.dataFile.value == '' || extension != "txt"){
 			alert("กรุณาเลือกไฟล์นามสกุล .txt");
-			return;
+			return true;
+		}else{
+			if( startFileName !='lotus'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย LOTUS เท่านั้น");
+				return false;
+			}
 		}
-		
+	<%}else if("onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
+		if(form.dataFile.value == '' || extension != "txt"){
+			alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			return true;
+		}else{
+			if( startFileName !='friday'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย FRIDAY เท่านั้น");
+				return false;
+			}
+		}
 	<%}else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 		var boxNo = form.boxNo;
 	 
@@ -204,6 +227,10 @@ function clearForm(path){
 	    	<%if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromWacoal"/>
+				</jsp:include>
+			<%}else if("onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMEFridayFromWacoal"/>
 				</jsp:include>
 			<%}else if("master".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
@@ -302,7 +329,7 @@ function clearForm(path){
 								<td align="center">
 									<input type="button" value="  Upload  " class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','')">
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
-								    <% if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
+								    <% if("onhand".equalsIgnoreCase(request.getParameter("page")) || "onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
 								       <input type="button" value="ยืนยัน Upload รวมข้อมูลที่ ERROR" class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','NO_CHECK_ERROR')">
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 								        <input type="button" value="Export to Excel" class="newPosBtnLong" onclick="javascript:exportReturnWacoal('${pageContext.request.contextPath}')">
@@ -529,7 +556,7 @@ function clearForm(path){
 						<!-- ************************* Physical From ******************************************* -->
 						
 						
-						<!-- ************************* Wacoal From ******************************************* -->
+						<!-- ************************* Wacoal and friday From ******************************************* -->
 						<c:if test="${importForm.summaryWacoalListErrorSize > 0}">
 							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr>

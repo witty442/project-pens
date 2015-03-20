@@ -27,6 +27,7 @@ public class User extends I_PO implements Serializable {
 	public static final String MC = "MC";
 	public static final String SALE = "SALE";
 	public static final String MT_SALE = "MTSALE";
+	public static final String REDDOC = "REDDOC";
 	
 	private static final long serialVersionUID = 2247823086169174428L;
 
@@ -73,6 +74,7 @@ public class User extends I_PO implements Serializable {
 		
 		setRole(new References(rst.getString("ROLE"), rst.getString("ROLE")));
 		
+		setPrinterName(Utils.isNull(rst.getString("PRINTER_NAME")));
 		// set display label
 		setDisplayLabel();
 
@@ -108,6 +110,7 @@ public class User extends I_PO implements Serializable {
 				getCustomerType().getKey(), getOrderType().getKey(), getSalesGroup().getKey());
 	}
 
+	private String printerName;
 	/** ID */
 	private int id;
 
@@ -174,6 +177,15 @@ public class User extends I_PO implements Serializable {
     private String newPassword;
     private String reNewPassword;
     
+    
+	public String getPrinterName() {
+		return printerName;
+	}
+
+	public void setPrinterName(String printerName) {
+		this.printerName = printerName;
+	}
+
 	public String getNewPassword() {
 		return newPassword;
 	}

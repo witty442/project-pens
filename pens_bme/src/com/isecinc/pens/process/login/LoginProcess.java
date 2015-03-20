@@ -30,7 +30,7 @@ public class LoginProcess {
 			sql +="   A.END_DATE, A.NAME, A.SOURCE_NAME,  \n";
 			sql +="   A.ID_CARD_NO, A.USER_NAME, A.PASSWORD,  \n";
 			sql +="   A.CODE, A.UPDATED, A.UPDATED_BY,  \n";
-			sql +="   A.TERRITORY, A.USER_ID ,A.ROLE      \n";  
+			sql +="   A.TERRITORY, A.USER_ID ,A.ROLE ,A.PRINTER_NAME     \n";  
 			sql +="  FROM pensbme_c_user_info A WHERE 1=1 \n";
 			sql +=" AND(  ( START_DATE <= SYSDATE and END_DATE >= SYSDATE AND END_DATE IS NOT NULL) \n";
                    sql +="      OR  \n";

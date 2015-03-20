@@ -283,7 +283,7 @@ public class MCDAO {
 	   }
 	}
    
-	 public static MCBean searchHeadModel(Connection conn,MCBean o ,boolean getTrans) throws Exception {
+	public static MCBean searchHeadModel(Connection conn,MCBean o ,boolean getTrans) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -292,31 +292,57 @@ public class MCDAO {
 			List<MCBean> items = new ArrayList<MCBean>();
 			int r = 1;
 			try {
-				sql.append("\n select M.* \n" +
-						",(select A.pens_desc from mc_mst_reference A where A.pens_value=M.mc_area and reference_code='MCarea')as mc_area_desc \n" +
-						",(select A.route_name from mc_route A where A.route_id= M.mc_route and A.mc_area=M.mc_area)as mc_route_desc \n" +
-						"from MC_STAFF M ");
-				sql.append("\n where 1=1  \n");
+				sql.append("select M.* ");
+				sql.append("\n,(select A.pens_desc from mc_mst_reference A where A.pens_value=M.mc_area and reference_code='MCarea')as mc_area_desc" );
+				sql.append("\n,(select A.route_name from mc_route A where A.route_id= M.mc_route and A.mc_area=M.mc_area)as mc_route_desc" );
+				sql.append("\n from ("); 
 				
-				if( !Utils.isNull(o.getStaffId()).equals("") && !Utils.isNull(o.getStaffId()).equalsIgnoreCase("ALL")){
-					String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getStaffId()));
-					sql.append("\n and M.staff_id in( "+sqlIn+")");
-				}
-				if( !Utils.isNull(o.getMcArea()).equals("")){
-					sql.append("\n and M.mc_area = "+Utils.isNull(o.getMcArea())+"");
-				}
-				if( !Utils.isNull(o.getMcRoute()).equals("")){
-					sql.append("\n and M.mc_route = "+Utils.isNull(o.getMcRoute())+"");
-				}
-				if( !Utils.isNull(o.getStaffType()).equals("")){
-					sql.append("\n and M.staff_type = '"+Utils.isNull(o.getStaffType())+"'");
-				}
-			/*	if( !Utils.isNull(o.getMonthTrip()).equals("")){
-					sql.append("\n and T.month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
-				}*/
-				
+				   sql.append(" \n select S.staff_id,S.staff_type,S.name,S.surname,S.mc_area,S.mc_route,S.mobile from MC_STAFF S WHERE 1=1");
+				   sql.append("\n and S.staff_id not in(  "); 
+				   sql.append("\n   select staff_id from MC_TRANS WHERE  month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
+				   sql.append("\n )");
+				   
+				   if( !Utils.isNull(o.getStaffId()).equals("") && !Utils.isNull(o.getStaffId()).equalsIgnoreCase("ALL")){
+						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getStaffId()));
+						sql.append("\n and S.staff_id in( "+sqlIn+")");
+					}
+					if( !Utils.isNull(o.getMcArea()).equals("")){
+						sql.append("\n and S.mc_area = "+Utils.isNull(o.getMcArea())+"");
+					}
+					if( !Utils.isNull(o.getMcRoute()).equals("")){
+						sql.append("\n and S.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+					}
+					if( !Utils.isNull(o.getStaffType()).equals("")){
+						sql.append("\n and S.staff_type = '"+Utils.isNull(o.getStaffType())+"'");
+					}
+
+				   sql.append(" \n UNION ALL ");
+				   
+				   sql.append(" \n select S.staff_id,S.staff_type,S.name,S.surename,S.mc_area,S.mc_route" +
+				   		     "  \n  ,(select A.mobile from MC_STAFF A WHERE A.staff_id = S.staff_id) as mobile" +
+				   		     "  \n  from MC_TRANS S WHERE 1=1 \n");
+				   if( !Utils.isNull(o.getStaffId()).equals("") && !Utils.isNull(o.getStaffId()).equalsIgnoreCase("ALL")){
+						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getStaffId()));
+						sql.append("\n and S.staff_id in( "+sqlIn+")");
+					}
+					if( !Utils.isNull(o.getMcArea()).equals("")){
+						sql.append("\n and S.mc_area = "+Utils.isNull(o.getMcArea())+"");
+					}
+					if( !Utils.isNull(o.getMcRoute()).equals("")){
+						sql.append("\n and S.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+					}
+					if( !Utils.isNull(o.getStaffType()).equals("")){
+						sql.append("\n and S.staff_type = '"+Utils.isNull(o.getStaffType())+"'");
+					}
+					if( !Utils.isNull(o.getMonthTrip()).equals("")){
+						sql.append("\n and S.month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
+					}
+			    sql.append(" ) M WHERE 1=1");
+
 				sql.append("\n order by M.staff_id asc ");
+				
 				logger.debug("sql:"+sql);
+				
 				ps = conn.prepareStatement(sql.toString());
 				rst = ps.executeQuery();
 				
@@ -1064,7 +1090,7 @@ public class MCDAO {
 					sql.append(" and mc_area ="+mcArea+" \n");
 				}
 				if( !Utils.isNull(isActive).equals("")){
-					sql.append(" and is_active ='"+isActive+"' \n");
+					sql.append(" and (is_active ='"+isActive+"' or is_active is null) \n");
 				}
 				
 				//sql.append("\n  ORDER BY pens_value asc \n");

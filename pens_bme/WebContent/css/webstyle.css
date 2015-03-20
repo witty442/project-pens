@@ -154,7 +154,13 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 }
-
+.disableTextBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-weight: bold;
+}
 .enableNumber {
 	border: 1px solid;
 	border-color: #BEBEBE;
@@ -167,6 +173,14 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 	text-align: right;
+}
+.disableNumberBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
 }
 .recordfound {
 	text-align: left;
