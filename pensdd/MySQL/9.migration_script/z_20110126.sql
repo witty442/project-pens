@@ -1,0 +1,17 @@
+CREATE TABLE `t_member_trip_comment` (
+  `TRIP_COMMENT_ID` int(11) NOT NULL,
+  `TRIP_NO` int(11) default NULL,
+  `ORDER_ID` int(11) default NULL,
+  `TRIP_COMMENT` varchar(1000) default NULL,
+  PRIMARY KEY  (`TRIP_COMMENT_ID`),
+  UNIQUE KEY `XPKT_MEMBER_TRIP_COMMENT` (`TRIP_COMMENT_ID`),
+  KEY `XIF1T_MEMBER_TRIP_COMMENT` (`ORDER_ID`),
+  CONSTRAINT `t_member_trip_comment_ibfk_1` FOREIGN KEY (`ORDER_ID`) REFERENCES `t_order` (`ORDER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=tis620;
+
+ALTER TABLE `t_member_trip_comment`
+  ADD COLUMN `CREATED` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  ADD COLUMN `CREATED_BY` int(11) default NULL,
+  ADD COLUMN `UPDATED` timestamp NULL,
+  ADD COLUMN `UPDATED_BY` int(11) default NULL;
+

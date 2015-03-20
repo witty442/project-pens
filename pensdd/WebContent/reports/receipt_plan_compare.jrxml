@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="receipt_plan_compare" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="461"/>
+	<property name="ireport.y" value="82"/>
+	<parameter name="logo" class="java.lang.String"/>
+	<field name="shippingDateFrom" class="java.lang.String"/>
+	<field name="shippingDateTo" class="java.lang.String"/>
+	<field name="confirmDateFrom" class="java.lang.String"/>
+	<field name="confirmDateTo" class="java.lang.String"/>
+	<field name="custCode" class="java.lang.String"/>
+	<field name="custName" class="java.lang.String"/>
+	<field name="memberTel" class="java.lang.String"/>
+	<field name="tripNo" class="java.lang.Integer"/>
+	<field name="shipDate" class="java.sql.Timestamp"/>
+	<field name="orderNo" class="java.lang.String"/>
+	<field name="paymentMethod" class="java.lang.String"/>
+	<field name="planBillAmt" class="java.math.BigDecimal"/>
+	<field name="confirmBillAmt" class="java.math.BigDecimal"/>
+	<field name="diffBillAmt" class="java.math.BigDecimal"/>
+	<field name="creditCardNo" class="java.lang.String"/>
+	<field name="creditCardExpireDate" class="java.lang.String"/>
+	<field name="creditCardBank" class="java.lang.String"/>
+	<field name="paymentMethodCode" class="java.lang.String"/>
+	<field name="creditCardName" class="java.lang.String"/>
+	<variable name="v_sum_planAmt_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA[$F{planBillAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_planAmt_all" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{planBillAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_confirmAmt_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA[$F{confirmBillAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_confirmAmt_all" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{confirmBillAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_diffAmt_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA[$F{diffBillAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_diffAmt_all" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{diffBillAmt}]]></variableExpression>
+	</variable>
+	<group name="paymentMethod" keepTogether="true">
+		<groupExpression><![CDATA[$F{paymentMethod}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="265" height="18"/>
+					<box topPadding="2" leftPadding="4"/>
+					<textElement verticalAlignment="Top">
+						<font fontName="Angsana New" size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{paymentMethod}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="18">
+				<staticText>
+					<reportElement x="0" y="0" width="20" height="18"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="true">
+					<reportElement stretchType="RelativeToTallestObject" x="20" y="0" width="252" height="18"/>
+					<box topPadding="2" leftPadding="4" rightPadding="5">
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Angsana New" size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["\u0e23\u0e27\u0e21\u0e08\u0e33\u0e19\u0e27\u0e19\u0e40\u0e07\u0e34\u0e19\u0e17\u0e35\u0e48\u0e0a\u0e33\u0e23\u0e30\u0e14\u0e49\u0e27\u0e22"+$F{paymentMethod}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="272" y="0" width="40" height="18"/>
+					<box topPadding="2" leftPadding="2" rightPadding="2">
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Angsana New" size="8" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_planAmt_gp}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="497" y="0" width="29" height="18"/>
+					<box topPadding="2" leftPadding="2" rightPadding="2">
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Angsana New" size="8" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_confirmAmt_gp}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+					<reportElement x="526" y="0" width="29" height="18"/>
+					<box topPadding="2" leftPadding="2" rightPadding="2">
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="Angsana New" size="8" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_diffAmt_gp}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="312" y="0" width="185" height="18"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="120">
+			<image hAlign="Center" vAlign="Top">
+				<reportElement x="0" y="0" width="555" height="72"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logo}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="72" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ รายงานเปรียบเทียบแผนรับเงิน/การรับเงินจริง]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="92" width="555" height="22"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["\u0e27\u0e31\u0e19\u0e17\u0e35\u0e48\u0e23\u0e31\u0e1a\u0e0a\u0e33\u0e23\u0e30 \u0e15\u0e31\u0e49\u0e07\u0e41\u0e15\u0e48 "+$F{shippingDateFrom}+" \u0e16\u0e36\u0e07 "+$F{shippingDateTo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="32">
+			<staticText>
+				<reportElement x="0" y="0" width="20" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ลำดับที่]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="0" width="40" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[รหัสสมาชิก]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="0" width="70" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ชื่อ-นามสกุล]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="35" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[เบอร์โทรศัพท์]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="0" width="42" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[วันที่
+กำหนดชำระ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="247" y="0" width="25" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ครั้งที่]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="207" y="0" width="40" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[เลขที่รายการขาย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="0" width="40" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[จำนวนเงิน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="60" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[หมายเลข
+บัตรเครดิต]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="25" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[วันที่
+หมดอายุ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="447" y="0" width="50" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ธนาคารเจ้าของบัตร]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="372" y="0" width="50" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ชื่อบัตรเครดิต]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="497" y="0" width="29" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ยอดรับเงินจริง]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="526" y="0" width="29" height="32"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<text><![CDATA[ส่วนต่าง]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="20" y="0" width="40" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{custCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="70" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{custName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="130" y="0" width="35" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{memberTel}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy">
+				<reportElement stretchType="RelativeToTallestObject" x="165" y="0" width="42" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{shipDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="207" y="0" width="40" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{orderNo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="272" y="0" width="40" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{planBillAmt}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="312" y="0" width="60" height="18">
+					<printWhenExpression><![CDATA["CR".equals($F{paymentMethodCode})]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{creditCardNo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="422" y="0" width="25" height="18">
+					<printWhenExpression><![CDATA["CR".equals($F{paymentMethodCode})]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{creditCardExpireDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="447" y="0" width="50" height="18">
+					<printWhenExpression><![CDATA["CR".equals($F{paymentMethodCode})]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{creditCardBank}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="372" y="0" width="50" height="18">
+					<printWhenExpression><![CDATA["CR".equals($F{paymentMethodCode})]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{creditCardName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="497" y="0" width="29" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{confirmBillAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="526" y="0" width="29" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{diffBillAmt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="247" y="0" width="25" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{tripNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="20" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Angsana New" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{paymentMethod_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="15"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18">
+			<staticText>
+				<reportElement x="0" y="0" width="20" height="18"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="272" y="0" width="40" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="8" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_planAmt_all}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="0" width="252" height="18"/>
+				<box topPadding="2" leftPadding="4" rightPadding="5">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ยอดรวมทั้งหมด]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="0" width="185" height="18"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="497" y="0" width="29" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="8" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_confirmAmt_all}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+				<reportElement x="526" y="0" width="29" height="18"/>
+				<box topPadding="2" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="8" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_diffAmt_all}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

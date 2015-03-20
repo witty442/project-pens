@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="receipt_summary" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="4"/>
+	<field name="receiptDateFrom" class="java.lang.String"/>
+	<field name="receiptDateTo" class="java.lang.String"/>
+	<field name="paymentMethod" class="java.lang.String"/>
+	<field name="receiptType" class="java.lang.String"/>
+	<field name="receiptDate" class="java.lang.String"/>
+	<field name="receiptNo" class="java.lang.String"/>
+	<field name="customerCode" class="java.lang.String"/>
+	<field name="customerName" class="java.lang.String"/>
+	<field name="taxBaseAmt" class="java.math.BigDecimal"/>
+	<field name="vatAmt" class="java.math.BigDecimal"/>
+	<field name="totalAmt" class="java.math.BigDecimal"/>
+	<variable name="v_sum_taxBaseAmt_A_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["A".equals($F{receiptType})?$F{taxBaseAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_vatAmt_A_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["A".equals($F{receiptType})?$F{vatAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_totalAmt_A_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["A".equals($F{receiptType})?$F{totalAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_taxBaseAmt_B_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["B".equals($F{receiptType})?$F{taxBaseAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_vatAmt_B_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["B".equals($F{receiptType})?$F{vatAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_totalAmt_B_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["B".equals($F{receiptType})?$F{totalAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_taxBaseAmt_C_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["C".equals($F{receiptType})?$F{taxBaseAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_vatAmt_C_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["C".equals($F{receiptType})?$F{vatAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_totalAmt_C_method_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="paymentMethod" calculation="Sum">
+		<variableExpression><![CDATA["C".equals($F{receiptType})?$F{totalAmt}:java.math.BigDecimal.ZERO]]></variableExpression>
+	</variable>
+	<variable name="v_sum_taxBaseAmt_receiptType_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="receiptType_gp" calculation="Sum">
+		<variableExpression><![CDATA[$F{taxBaseAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_vatAmt_receiptType_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="receiptType_gp" calculation="Sum">
+		<variableExpression><![CDATA[$F{vatAmt}]]></variableExpression>
+	</variable>
+	<variable name="v_sum_totalAmt_receiptType_gp" class="java.math.BigDecimal" resetType="Group" resetGroup="receiptType_gp" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalAmt}]]></variableExpression>
+	</variable>
+	<group name="paymentMethod">
+		<groupExpression><![CDATA[$F{paymentMethod}]]></groupExpression>
+		<groupHeader>
+			<band height="80">
+				<textField>
+					<reportElement x="0" y="0" width="381" height="20"/>
+					<box>
+						<topPen lineWidth="1.0"/>
+					</box>
+					<textElement>
+						<font fontName="Angsana New" size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["CS".equals($F{paymentMethod})?"\u0e40\u0e07\u0e34\u0e19\u0e2a\u0e14":"CR".equals($F{paymentMethod})?"\u0e40\u0e04\u0e23\u0e14\u0e34\u0e15\u0e01\u0e32\u0e23\u0e4c\u0e14":"\u0e40\u0e0a\u0e47\u0e04"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="232" y="20" width="149" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมรับเงินปกติ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="232" y="40" width="149" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมรับเงินล่วงหน้า]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="232" y="60" width="149" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมตัดเงินรับล่วงหน้า]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="232" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="40" width="232" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="60" width="232" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="381" y="20" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_taxBaseAmt_A_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="443" y="20" width="50" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_vatAmt_A_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="493" y="20" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_totalAmt_A_method_gp}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="20" width="232" height="20"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="381" y="0" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมก่อนภาษี]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="443" y="0" width="50" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ภาษี]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="493" y="0" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมทั้งหมด]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="443" y="40" width="50" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_vatAmt_B_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="493" y="40" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_totalAmt_B_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="381" y="40" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_taxBaseAmt_B_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="443" y="60" width="50" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_vatAmt_C_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="493" y="60" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_totalAmt_C_method_gp}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="paymentMethod" pattern="#,##0.00;-#,##0.00">
+					<reportElement x="381" y="60" width="62" height="20"/>
+					<box rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_taxBaseAmt_C_method_gp}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="receiptType_gp">
+		<groupExpression><![CDATA[$F{receiptType}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<textField>
+					<reportElement x="0" y="0" width="555" height="20"/>
+					<textElement>
+						<font fontName="Angsana New" size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["A".equals($F{receiptType})?"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e40\u0e07\u0e34\u0e19\u0e1b\u0e01\u0e15\u0e34":"B".equals($F{receiptType})?"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e40\u0e07\u0e34\u0e19\u0e25\u0e48\u0e27\u0e07\u0e2b\u0e19\u0e49\u0e32":"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e15\u0e31\u0e14\u0e0a\u0e33\u0e23\u0e30\u0e23\u0e31\u0e1a\u0e40\u0e07\u0e34\u0e19\u0e23\u0e31\u0e1a\u0e25\u0e48\u0e27\u0e07\u0e2b\u0e19\u0e49\u0e32"]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="381" y="20" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมก่อนภาษี]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="443" y="20" width="50" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ภาษี]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="493" y="20" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวมทั้งหมด]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="29" y="20" width="55" height="20"/>
+					<box rightPadding="0">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[วันที่เอกสาร]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="20" width="29" height="20"/>
+					<box rightPadding="0">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ลำดับ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="84" y="20" width="86" height="20"/>
+					<box rightPadding="0">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[เลขที่เอกสาร]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="170" y="20" width="62" height="20"/>
+					<box rightPadding="0">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[รหัสสมาชิก]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="232" y="20" width="149" height="20"/>
+					<box rightPadding="0">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ชื่อสมาชิก]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<staticText>
+					<reportElement x="0" y="0" width="381" height="20"/>
+					<box rightPadding="4">
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<text><![CDATA[ยอดรวม]]></text>
+				</staticText>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="381" y="0" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_taxBaseAmt_receiptType_gp}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="443" y="0" width="50" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_vatAmt_receiptType_gp}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;-#,##0.00">
+					<reportElement x="493" y="0" width="62" height="20"/>
+					<box rightPadding="3">
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Angsana New" size="12"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{v_sum_totalAmt_receiptType_gp}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="67" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="32"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รายงานสรุปรับเงินประจำวัน]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="32" width="555" height="35"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["\u0e27\u0e31\u0e19\u0e17\u0e35\u0e48\u0e23\u0e31\u0e1a\u0e40\u0e07\u0e34\u0e19\u0e15\u0e31\u0e49\u0e07\u0e41\u0e15\u0e48 "+$F{receiptDateFrom}+" \u0e16\u0e36\u0e07 "+$F{receiptDateTo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="29" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{receiptType_gp_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="29" y="0" width="55" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{receiptDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="84" y="0" width="86" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{receiptNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="170" y="0" width="62" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerCode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="232" y="0" width="149" height="20"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="381" y="0" width="62" height="20"/>
+				<box leftPadding="0" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{taxBaseAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="443" y="0" width="50" height="20"/>
+				<box leftPadding="0" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{vatAmt}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="493" y="0" width="62" height="20"/>
+				<box leftPadding="0" rightPadding="3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{totalAmt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

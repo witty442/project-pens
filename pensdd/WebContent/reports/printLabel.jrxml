@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="printSticker" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="name1" class="java.lang.String"/>
+	<field name="code1" class="java.lang.String"/>
+	<field name="address1" class="java.lang.String"/>
+	<field name="address11" class="java.lang.String"/>
+	<field name="address12" class="java.lang.String"/>
+	<field name="name2" class="java.lang.String"/>
+	<field name="code2" class="java.lang.String"/>
+	<field name="address2" class="java.lang.String"/>
+	<field name="address21" class="java.lang.String"/>
+	<field name="address22" class="java.lang.String"/> 
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="120" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="49" y="15" width="114" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="55" y="36" width="222" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="27" y="15" width="22" height="21" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[คุณ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="163" y="15" width="30" height="21" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[( HB]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="193" y="15" width="30" height="21"/>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{code1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="223" y="15" width="10" height="21" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="36" width="28" height="21" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[ที่อยู่ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="512" y="15" width="10" height="21" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{name2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="344" y="36" width="222" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="316" y="36" width="28" height="21" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{name2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[ที่อยู่ ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="338" y="15" width="114" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="482" y="15" width="30" height="21"/>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{code2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="316" y="15" width="22" height="21" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{name2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[คุณ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="15" width="30" height="21" forecolor="#000000">
+					<printWhenExpression><![CDATA[$F{name2} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[( HB]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="27" y="60" width="250" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address11}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="316" y="60" width="250" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address21}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="27" y="82" width="250" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address12}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="316" y="82" width="250" height="21"/>
+				<textElement>
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address22}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

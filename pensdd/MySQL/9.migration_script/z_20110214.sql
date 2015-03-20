@@ -1,0 +1,1 @@
+alter table t_order add column remark varchar(1000) default null;

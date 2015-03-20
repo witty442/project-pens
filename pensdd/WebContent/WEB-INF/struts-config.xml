@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<!DOCTYPE struts-config PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+<!-- Default configuration file for examples application. Each module also 
+	has its own struts-config under: /WEB-INF/$MODULE/ @version $Revision: 1.9 
+	$ $Date: 2006-12-03 11:32:52 -0600 (Sun, 03 Dec 2006) $ -->
+<struts-config>
+	<form-beans>
+		<!-- LOGIN -->
+		<form-bean name="loginForm" type="com.isecinc.pens.web.login.LoginForm" />
+		<!-- USER -->
+		<form-bean name="userForm" type="com.isecinc.pens.web.user.UserForm" />
+		<!-- SYS CONFIG -->
+		<form-bean name="sysConfigForm" type="com.isecinc.pens.web.admin.SysConfigForm" />
+		<!-- DOC SEQ -->
+		<form-bean name="docSeqForm" type="com.isecinc.pens.web.admin.DocSequenceForm" />
+		<!-- PRODUCT -->
+		<form-bean name="productForm" type="com.isecinc.pens.web.product.ProductForm" />
+		<!-- PRICELIST -->
+		<form-bean name="pricelistForm"
+			type="com.isecinc.pens.web.pricelist.PriceListForm" />
+		<!-- CUSTOMER -->
+		<form-bean name="customerForm" type="com.isecinc.pens.web.customer.CustomerForm" />
+		<!-- CUSTOMER VISIT -->
+		<form-bean name="customervisitForm"
+			type="com.isecinc.pens.web.customervisit.VisitForm" />
+		<!-- SALES TARGET -->
+		<form-bean name="salestargetForm"
+			type="com.isecinc.pens.web.salestarget.SalesTargetForm" />
+		<!-- INVENTORY -->
+		<form-bean name="inventoryForm"
+			type="com.isecinc.pens.web.inventory.InventoryForm" />
+		<!-- INVENTORY TRANSACTION -->
+		<form-bean name="inventoryTransactionForm"
+			type="com.isecinc.pens.web.inventorytransaction.InventoryTransactionForm" />
+		<!-- MEMBER -->
+		<form-bean name="memberForm" type="com.isecinc.pens.web.member.MemberForm" />
+		<!-- SALES ORDER -->
+		<form-bean name="orderForm" type="com.isecinc.pens.web.sales.OrderForm" />
+		<!-- SHIPTMENT -->
+		<form-bean name="shipmentForm" type="com.isecinc.pens.web.shipment.ShipmentForm" />
+		<!-- RECEIPTALL -->
+		<form-bean name="receiptAllForm" type="com.isecinc.pens.web.receiptAll.ReceiptAllForm" />
+		<!-- TRIP -->
+		<form-bean name="tripForm" type="com.isecinc.pens.web.trip.TripForm" />
+		<!-- MODIFIER -->
+		<form-bean name="modifierForm" type="com.isecinc.pens.web.modifier.ModifierForm" />
+		<!-- RECEIPT -->
+		<form-bean name="receiptForm" type="com.isecinc.pens.web.receipt.ReceiptForm" />
+		<!-- MEMBER RENEW -->
+		<form-bean name="memberRenewForm"
+			type="com.isecinc.pens.web.memberrenew.MemberRenewForm" />
+		<!-- MEMBER FOLLOW -->
+		<form-bean name="memberFollowForm"
+			type="com.isecinc.pens.web.memberfollow.MemberFollowForm" />
+		<!-- MEMBER IMPORT -->
+		<form-bean name="memberImportForm"
+			type="com.isecinc.pens.web.dataimports.member.MemberImportForm" />
+		<!-- SHIPMENT REPORT -->
+		<form-bean name="shipmentReportForm"
+			type="com.isecinc.pens.web.report.shipment.ShipmentReportForm" />
+		<!-- SHIPMENT TEMPORARY REPORT -->
+		<form-bean name="shipmentTempReportForm"
+			type="com.isecinc.pens.web.report.shipmenttemp.ShipmentTempReportForm" />
+		<!-- PERFORMANCE REPORT -->
+		<form-bean name="performanceReportForm"
+			type="com.isecinc.pens.web.report.performance.PerformanceReportForm" />
+		<!-- INVOICE PAYMENT REPORT -->
+		<form-bean name="invoicePaymentReportForm"
+			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm" />
+		<!-- SHIPMENT BENECOL REPORT -->
+		<form-bean name="shipmentBenecolReportForm"
+			type="com.isecinc.pens.web.report.shipmentbenecol.ShipmentBenecolReportForm" />
+		<!-- RECEIVE BENECOL REPORT -->
+		<form-bean name="receiveBenecolReportForm"
+			type="com.isecinc.pens.web.report.receivebenecol.ReceiveBenecolReportForm" />
+		<!-- RECEIVE BAG REPORT -->
+		<form-bean name="receiveBagReportForm"
+			type="com.isecinc.pens.web.report.receivebag.ReceiveBagReportForm" />
+		<!-- ORDER 3 MONTHS REPORT -->
+		<form-bean name="orderThreeMonthsReportForm"
+			type="com.isecinc.pens.web.report.salesorder.OrderThreeMonthsReportForm" />
+		<!-- RECEIPT TEMPORARY REPORT -->
+		<form-bean name="receiptTempReportForm"
+			type="com.isecinc.pens.web.report.receipttemp.ReceiptTempReportForm" />
+		<!-- REMITTANCE REPORT -->
+		<form-bean name="remittanceReportForm"
+			type="com.isecinc.pens.web.report.remittance.RemittanceReportForm" />
+		<!-- DETAILED SALES REPORT -->
+		<form-bean name="detailedSalesReportForm"
+			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportForm" />
+		<!-- Interfaces -->
+		<form-bean name="interfacesForm"
+			type="com.isecinc.pens.web.interfaces.InterfacesForm" />
+		<!-- Sales Analyst -->
+		<form-bean name="salesAnalystReportForm"
+			type="com.isecinc.pens.web.report.salesanalyst.SalesAnalystReportForm" />
+		<!-- Member Order Import -->
+		<form-bean name="memberOrderImportForm"
+			type="com.isecinc.pens.web.dataimports.memberorder.MemberOrderImportForm" />
+		<!-- Manage Order Receipt -->
+		<form-bean name="manageOrderReceiptForm"
+			type="com.isecinc.pens.web.admin.ManageOrderReceiptForm" />
+		<!-- Manage Order Receipt By User -->
+		<form-bean name="manageOrderReceiptByUserForm"
+			type="com.isecinc.pens.web.admin.ManageOrderReceiptByUserForm" />
+		<!-- Call Before Send -->
+		<form-bean name="callBeforeReportForm"
+			type="com.isecinc.pens.web.report.callbefore.CallBeforeReportForm" />
+		<!-- Tax Invoice DD -->
+		<form-bean name="taxInvoiceDDReportForm"
+			type="com.isecinc.pens.web.report.taxinvoice.TaxInvoiceDDReportForm" />
+		<!-- Manual Update Address -->
+		<form-bean name="manualUpdateAddressForm"
+			type="com.isecinc.pens.web.manual.ManualUpdateAddressForm" />
+		<!-- BackUp DataBase -->
+		<form-bean name="dbManagementForm" type="com.isecinc.pens.web.db.DBManagementForm" />
+		<!-- INVOICE PAYMENT ALL REPORT -->
+		<form-bean name="invoicePaymentAllReportForm"
+			type="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportForm" />
+		<!-- INVOICE DETAIL REPORT -->
+		<form-bean name="invoiceDetailReportForm"
+			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportForm" />
+
+		<!-- Sales Target Summary REPORT -->
+		<form-bean name="salesTargetSummaryForm"
+			type="com.isecinc.pens.web.report.salestargetsummary.SalesTargetSummaryForm" />
+			
+		<!-- Member Report -->
+		<form-bean name="memberReportForm"
+			type="com.isecinc.pens.web.report.member.MemberReportForm" />
+			
+		<!-- Receipt Plan Report -->
+		<form-bean name="receiptPlanReportForm"
+			type="com.isecinc.pens.web.report.receiptplan.ReceiptPlanReportForm" />
+		
+		<!-- Receipt Plan Compare Report -->
+		<form-bean name="receiptPlanCompareReportForm"
+			type="com.isecinc.pens.web.report.receiptplancompare.ReceiptPlanCompareReportForm" />
+		
+		<!-- Shipment Summary Report -->
+		<form-bean name="shipmentSummaryReportForm"
+			type="com.isecinc.pens.web.report.shipmentsummary.ShipmentSummaryReportForm" />
+				
+		<!-- SHIPMENT DETAIL REPORT -->
+		<form-bean name="shipmentDetailReportForm"
+			type="com.isecinc.pens.web.report.shipment.ShipmentDetailReportForm" />
+			
+		<!-- Sales VAT Report -->
+		<form-bean name="salesVATReportForm"
+			type="com.isecinc.pens.web.report.vat.SalesVATReportForm" />
+			
+		<!-- Summary Daily Receipt Report -->
+		<form-bean name="receiptSummaryReportForm"
+			type="com.isecinc.pens.web.report.receiptsummary.ReceiptSummaryReportForm" />
+			
+		<!-- Shipment Form Form -->
+		<form-bean name="shipmentFormForm"
+			type="com.isecinc.pens.web.report.shipment.ShipmentFormForm" />
+			
+		<!-- Shipment / Tax Invoice -->
+		<form-bean name="taxShipmentForm"
+			type="com.isecinc.pens.web.report.shipment.TaxShipmentForm" />
+			
+		<!-- Receipt -->
+		<form-bean name="formReceiptForm"
+			type="com.isecinc.pens.web.report.receipt.FormReceiptForm" />
+		
+		<!-- Tax Receipt -->
+		<form-bean name="taxReceiptForm"
+			type="com.isecinc.pens.web.report.receipt.TaxReceiptForm" />
+	</form-beans>
+
+	<action-mappings>
+		<!-- LOGIN -->
+		<action name="loginForm" path="/login" parameter="do" scope="request"
+			type="com.isecinc.pens.web.login.LoginAction">
+			<forward name="pass" path="/jsp/mainpage.jsp" redirect="true" />
+			<forward name="fail" path="/index.jsp" />
+		</action>
+
+		<!-- USER -->
+		<action name="userForm" path="/jsp/profile" forward="/jsp/userAction.do?do=profile" />
+		<action name="userForm" path="/jsp/user" forward="/jsp/administer/userSearch.jsp" />
+		<action name="userForm" path="/jsp/userAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.user.UserAction">
+			<forward name="search" path="/jsp/administer/userSearch.jsp" />
+			<forward name="prepare" path="/jsp/administer/user.jsp" />
+			<forward name="re-search" path="/jsp/userAction.do?do=search" />
+			<forward name="clearform" path="/jsp/administer/userSearch.jsp" />
+			<forward name="profile" path="/jsp/administer/profile.jsp" />
+		</action>
+
+		<!-- SYS CONFIG -->
+		<action name="sysConfigForm" path="/jsp/sysconfig"
+			forward="/jsp/sysconfigAction.do?do=prepare" />
+		<action name="sysConfigForm" path="/jsp/sysconfigAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.admin.SysConfigAction">
+			<forward name="prepare" path="/jsp/administer/sysconfig.jsp" />
+		</action>
+
+		<!-- DOC SEQ -->
+		<action name="docSeqForm" path="/jsp/docseq" forward="/jsp/docseqAction.do?do=search" />
+		<action name="docSeqForm" path="/jsp/docseqAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.admin.DocSequenceAction">
+			<forward name="search" path="/jsp/administer/docSeqSearch.jsp" />
+			<forward name="prepare" path="/jsp/administer/docSeq.jsp" />
+			<forward name="re-search" path="/jsp/docseqAction.do?do=search" />
+		</action>
+
+		<!-- PRODUCT -->
+		<action name="productForm" path="/jsp/product" forward="/jsp/product/productSearch.jsp" />
+		<action name="productForm" path="/jsp/productAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.product.ProductAction">
+			<forward name="search" path="/jsp/product/productSearch.jsp" />
+			<forward name="prepare" path="/jsp/product/product.jsp" />
+			<forward name="viewprice" path="/jsp/product/priceProduct.jsp" />
+			<forward name="re-search" path="/jsp/product/productSearch.jsp" />
+			<forward name="clearform" path="/jsp/product/productSearch.jsp" />
+		</action>
+
+		<!-- PRICELIST -->
+		<action name="pricelistForm" path="/jsp/pricelist"
+			forward="/jsp/pricePromotion/pricelistSearch.jsp" />
+		<action name="pricelistForm" path="/jsp/pricelistAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.pricelist.PriceListAction">
+			<forward name="search" path="/jsp/pricePromotion/pricelistSearch.jsp" />
+			<forward name="prepare" path="/jsp/pricePromotion/pricelist.jsp" />
+			<forward name="viewprice" path="/jsp/pricePromotion/productPrice.jsp" />
+			<forward name="re-search" path="/jsp/pricePromotion/pricelistSearch.jsp" />
+			<forward name="clearform" path="/jsp/pricePromotion/pricelistSearch.jsp" />
+		</action>
+
+		<!-- CUSTOMER -->
+		<action name="customerForm" path="/jsp/customer"
+			forward="/jsp/customer/customerSearch.jsp" />
+		<action name="customerForm" path="/jsp/customerAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.customer.CustomerAction">
+			<forward name="search" path="/jsp/customer/customerSearch.jsp" />
+			<forward name="prepare" path="/jsp/customer/customer.jsp" />
+			<forward name="re-search" path="/jsp/customer/customerSearch.jsp" />
+			<forward name="clearform" path="/jsp/customer/customerSearch.jsp" />
+			<forward name="view" path="/jsp/customer/customerView.jsp" />
+		</action>
+
+		<!-- CUSTOMER VISIT -->
+		<action name="customervisitForm" path="/jsp/customervisit"
+			forward="/jsp/customer/customerVisitSearch.jsp" />
+		<action name="customervisitForm" path="/jsp/customervisitAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.customervisit.VisitAction">
+			<forward name="search" path="/jsp/customer/customerVisitSearch.jsp" />
+			<forward name="prepare_1" path="/jsp/customer/customerVisit.jsp" />
+			<forward name="prepare_2" path="/jsp/customer/customerVisitSearch.jsp" />
+			<forward name="re-search" path="/jsp/customer/customerVisitSearch.jsp" />
+			<forward name="clearform" path="/jsp/customer/customerVisitSearch.jsp" />
+			<forward name="view" path="/jsp/customer/customerVisitView.jsp" />
+		</action>
+
+		<!-- SALES TARGET -->
+		<action name="salestargetForm" path="/jsp/salestarget"
+			forward="/jsp/salesTarget/salesTargetSearch.jsp" />
+		<action name="salestargetForm" path="/jsp/salestargetAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.salestarget.SalesTargetAction">
+			<forward name="search" path="/jsp/salesTarget/salesTargetSearch.jsp" />
+			<forward name="prepare" path="/jsp/salesTarget/salesTargetView.jsp" />
+			<forward name="re-search" path="/jsp/salesTarget/salesTargetSearch.jsp" />
+			<forward name="clearform" path="/jsp/salesTarget/salesTargetSearch.jsp" />
+		</action>
+		<action path="/jsp/salestargetnew" forward="/jsp/salesTarget/salesTargetNew.jsp" />
+
+		<!-- INVENTORY -->
+		<action name="inventoryForm" path="/jsp/inventory"
+			forward="/jsp/product/productOnHandSearch.jsp" />
+		<action name="inventoryForm" path="/jsp/subInventory"
+			forward="/jsp/product/subInventoryOnHandSearch.jsp" />
+		<action name="inventoryForm" path="/jsp/inventoryAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.inventory.InventoryAction">
+			<forward name="search" path="/jsp/product/productOnHandSearch.jsp" />
+			<forward name="re-search" path="/jsp/product/productOnHandSearch.jsp" />
+			<forward name="clearform" path="/jsp/product/productOnHandSearch.jsp" />
+			<forward name="sub-search" path="/jsp/product/subInventoryOnHandSearch.jsp" />
+		</action>
+
+		<!-- INVENTORY TRANSACTION -->
+		<action name="inventoryTransactionForm" path="/jsp/inventoryTransaction"
+			forward="/jsp/productMovement/productMovementSearch.jsp" />
+		<action name="inventoryTransactionForm" path="/jsp/inventoryTransactionAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.inventorytransaction.InventoryTransactionAction">
+			<forward name="search"
+				path="/jsp/productMovement/productMovementSearch.jsp" />
+			<forward name="re-search"
+				path="/jsp/productMovement/productMovementSearch.jsp" />
+			<forward name="clearform"
+				path="/jsp/productMovement/productMovementSearch.jsp" />
+		</action>
+
+		<!-- MEMBER -->
+		<action name="memberForm" path="/jsp/member" forward="/jsp/member/memberSearch.jsp" />
+		<action name="memberForm" path="/jsp/memberAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.member.MemberAction">
+			<forward name="search" path="/jsp/member/memberSearch.jsp" />
+			<forward name="prepare" path="/jsp/member/member.jsp" />
+			<forward name="re-search" path="/jsp/member/memberSearch.jsp" />
+			<forward name="clearform" path="/jsp/member/memberSearch.jsp" />
+			<forward name="view" path="/jsp/member/memberView.jsp" />
+			<forward name="cancel-member" path="/jsp/pop/cancelMemberPopup.jsp" />
+		</action>
+
+		<!-- MEMBER RENEW -->
+		<action name="memberRenewForm" path="/jsp/memberrenew"
+			forward="/jsp/member/memberRenewSearch.jsp" />
+		<action name="memberRenewForm" path="/jsp/memberRenewAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.memberrenew.MemberRenewAction">
+			<forward name="search" path="/jsp/member/memberRenewSearch.jsp" />
+			<forward name="re-search" path="/jsp/member/memberRenewSearch.jsp" />
+			<forward name="clearform" path="/jsp/member/memberRenewSearch.jsp" />
+			<forward name="view" path="/jsp/member/memberView.jsp" />
+			<forward name="show" path="/jsp/mainpage.jsp" />
+			<forward name="add" path="/jsp/pop/memberRenewPopup.jsp" />
+		</action>
+
+		<!-- MEMBER FOLLOW -->
+		<action name="memberFollowForm" path="/jsp/memberfollow"
+			forward="/jsp/pop/memberFollowPopup.jsp" />
+		<action name="memberFollowForm" path="/jsp/memberFollowAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.memberfollow.MemberFollowAction">
+			<forward name="search" path="/jsp/pop/memberFollowPopup.jsp" />
+			<forward name="re-search" path="/jsp/memberFollowAction.do?do=search" />
+		</action>
+
+		<!-- MEMBER IMPORT -->
+		<action name="memberImportForm" path="/jsp/memberimport"
+			forward="/jsp/dataimports/memberImport.jsp" />
+		<action name="memberImportForm" path="/jsp/memberImportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.dataimports.member.MemberImportAction">
+			<forward name="clearform" path="/jsp/dataimports/memberImport.jsp" />
+			<forward name="view" path="/jsp/dataimports/memberImportView.jsp" />
+			<!-- for paging -->
+			<forward name="paging" path="/jsp/dataimports/memberImportView.jsp" />
+			<!-- for paging -->
+		</action>
+
+		<!-- SALES ORDER -->
+		<action name="orderForm" path="/jsp/saleOrder" forward="/jsp/sales/salesOrderSearch.jsp" />
+		<action name="orderForm" path="/jsp/saleOrderAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.sales.OrderAction">
+			<forward name="search" path="/jsp/sales/salesOrderSearch.jsp" />
+			<forward name="prepare" path="/jsp/sales/salesOrder.jsp" />
+			<forward name="re-search" path="/jsp/sales/salesOrderSearch.jsp" />
+			<forward name="clearform" path="/jsp/sales/salesOrderSearch.jsp" />
+			<forward name="view" path="/jsp/sales/salesOrderView.jsp" />
+			<forward name="pre-save" path="/jsp/sales/salesOrderPreview.jsp" />
+			<forward name="viewPopup" path="/jsp/sales/salesOrderViewPopup.jsp" />
+			<forward name="cancelOrderPopup" path="/jsp/pop/cancelOrderPopup.jsp" />
+		</action>
+
+	
+		
+		<!-- TRIP -->
+		<action name="tripForm" path="/jsp/usertrip" forward="/jsp/trip/tripSearch.jsp" />
+		<action name="tripForm" path="/jsp/tripAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.trip.TripAction">
+			<forward name="search_1" path="/jsp/trip/tripSearch.jsp" />
+			<forward name="search_2" path="/jsp/trip/trip.jsp" />
+			<forward name="prepare_1" path="/jsp/trip/tripSearch.jsp" />
+			<forward name="prepare_2" path="/jsp/trip/trip.jsp" />
+			<forward name="add" path="/jsp/trip/trip.jsp" />
+			<forward name="view" path="/jsp/trip/trip.jsp" />
+			<forward name="re-search" path="/jsp/tripAction.do?do=search" />
+		</action>
+
+		<!-- MODIFIER -->
+		<action name="modifierForm" path="/jsp/modifier"
+			forward="/jsp/pricePromotion/promotionSearch.jsp" />
+		<action name="modifierForm" path="/jsp/modifierAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.modifier.ModifierAction">
+			<forward name="search" path="/jsp/pricePromotion/promotionSearch.jsp" />
+			<forward name="prepare" path="/jsp/pricePromotion/promotion.jsp" />
+			<forward name="re-search" path="/jsp/pricePromotion/promotionSearch.jsp" />
+			<forward name="clearform" path="/jsp/pricePromotion/promotionSearch.jsp" />
+		</action>
+
+		<!-- RECEIPT -->
+		<action name="receiptForm" path="/jsp/receipt"
+			forward="/jsp/receipt/receiptSearch.jsp" />
+		<action name="receiptForm" path="/jsp/receiptAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.receipt.ReceiptAction">
+			<forward name="search" path="/jsp/receipt/receiptSearch.jsp" />
+			<forward name="prepare" path="/jsp/receipt/receipt.jsp" />
+			<forward name="re-search" path="/jsp/receipt/receiptSearch.jsp" />
+			<forward name="clearform" path="/jsp/receipt/receiptSearch.jsp" />
+			<forward name="view" path="/jsp/receipt/receiptView.jsp" />
+			<forward name="cancelReceiptPopup" path="/jsp/pop/cancelReceiptPopup.jsp" />
+		</action>
+
+		<!-- SHIPMENT REPORT -->
+		<action name="shipmentReportForm" path="/jsp/shipmentReport"
+			forward="/jsp/reports/shipmentReport.jsp" />
+		<action name="shipmentReportForm" path="/jsp/shipmentReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipment.ShipmentReportAction">
+			<forward name="report" path="/jsp/reports/shipmentReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentReport.jsp" />
+		</action>
+		
+		<!-- SHIPMENT Detail REPORT -->
+		<action name="shipmentDetailReportForm" path="/jsp/shipmentDetailReport"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipment.ShipmentDetailReportAction">
+			<forward name="report" path="/jsp/reports/shipmentDetailReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentDetailReport.jsp" />
+		</action>
+
+		<!-- CALL BEFORE SEND REPORT -->
+		<action name="callBeforeReportForm" path="/jsp/callBeforeReport"
+			forward="/jsp/reports/callBeforeReport.jsp" />
+		<action name="callBeforeReportForm" path="/jsp/callBeforeReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.callbefore.CallBeforeReportAction">
+			<forward name="report" path="/jsp/reports/callBeforeReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/callBeforeReport.jsp" />
+		</action>
+			
+		<!-- TAX INVOICE DD REPORT -->
+		<action name="taxInvoiceDDReportForm" path="/jsp/taxInvoiceDDReport"
+			forward="/jsp/reports/taxInvoiceDDReport.jsp" />
+		<action name="taxInvoiceDDReportForm" path="/jsp/taxInvoiceDDReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.taxinvoice.TaxInvoiceDDReportAction">
+			<forward name="report" path="/jsp/reports/taxInvoiceDDReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/taxInvoiceDDReport.jsp" />
+		</action>
+		
+		<!-- DETAILED SALES REPORT -->
+		<action name="detailedSalesReportForm" path="/jsp/detailedSalesReport"
+			forward="/jsp/reports/detailedSalesReport.jsp" />
+		<action name="detailedSalesReportForm" path="/jsp/detailedSalesReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportAction">
+			<forward name="report" path="/jsp/reports/detailedSalesReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/detailedSalesReport.jsp" />
+		</action>
+
+		<!-- SHIPMENT TEMPORARY REPORT -->
+		<action name="shipmentTempReportForm" path="/jsp/shipmentTempReport"
+			forward="/jsp/reports/shipmentTempReport.jsp" />
+		<action name="shipmentTempReportForm" path="/jsp/shipmentTempReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipmenttemp.ShipmentTempReportAction">
+			<forward name="report" path="/jsp/reports/shipmentTempReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentTempReport.jsp" />
+		</action>
+
+		<!-- PERFORMANCE REPORT -->
+		<action name="performanceReportForm" path="/jsp/performanceReport"
+			forward="/jsp/reports/performanceReport.jsp" />
+		<action name="performanceReportForm" path="/jsp/performanceReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.performance.PerformanceReportAction">
+			<forward name="report" path="/jsp/reports/performanceReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/performanceReport.jsp" />
+		</action>
+
+		<!-- INVOICE PAYMENT REPORT -->
+		<action name="invoicePaymentReportForm" path="/jsp/invoicePaymentReport"
+			forward="/jsp/reports/invoicePaymentReport.jsp" />
+		<action name="invoicePaymentReportForm" path="/jsp/invoicePaymentReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportAction">
+			<forward name="report" path="/jsp/reports/invoicePaymentReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/invoicePaymentReport.jsp" />
+		</action>
+
+		<!-- INVOICE PAYMENT ALL REPORT -->
+		<action name="invoicePaymentAllReportForm" path="/jsp/invoicePaymentAllReport"
+			forward="/jsp/reports/invoicePaymentAllReport.jsp" />
+		<action name="invoicePaymentAllReportForm" path="/jsp/invoicePaymentAllReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportAction">
+			<forward name="report" path="/jsp/reports/invoicePaymentAllReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/invoicePaymentAllReport.jsp" />
+		</action>
+
+		<!-- SHIPMENT BENECOL REPORT -->
+		<action name="shipmentBenecolReportForm" path="/jsp/shipmentBenecolReport"
+			forward="/jsp/reports/shipmentBenecolReport.jsp" />
+		<action name="shipmentBenecolReportForm" path="/jsp/shipmentBenecolAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipmentbenecol.ShipmentBenecolReportAction">
+			<forward name="report" path="/jsp/reports/shipmentBenecolReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentBenecolReport.jsp" />
+		</action>
+
+		<!-- RECEIVE BENECOL REPORT -->
+		<action name="receiveBenecolReportForm" path="/jsp/receiveBenecolReport"
+			forward="/jsp/reports/receiveBenecolReport.jsp" />
+		<action name="receiveBenecolReportForm" path="/jsp/receiveBenecolAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receivebenecol.ReceiveBenecolReportAction">
+			<forward name="report" path="/jsp/reports/receiveBenecolReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiveBenecolReport.jsp" />
+		</action>
+
+		<!-- RECEIVE BAG REPORT -->
+		<action name="receiveBagReportForm" path="/jsp/receiveBagReport"
+			forward="/jsp/reports/receiveBagReport.jsp" />
+		<action name="receiveBagReportForm" path="/jsp/receiveBagAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receivebag.ReceiveBagReportAction">
+			<forward name="report" path="/jsp/reports/receiveBagReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiveBagReport.jsp" />
+		</action>
+
+		<!-- ORDER 3 MONTHS REPORT -->
+		<action name="orderThreeMonthsReportForm" path="/jsp/orderThreeMonthsReport"
+			forward="/jsp/reports/orderThreeMonthsReport.jsp" />
+		<action name="orderThreeMonthsReportForm" path="/jsp/orderThreeMonthsReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.salesorder.OrderThreeMonthsReportAction">
+			<forward name="report" path="/jsp/reports/orderThreeMonthsReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/orderThreeMonthsReport.jsp" />
+		</action>
+
+		<!-- RECEIPT TEMPORARY REPORT -->
+		<action name="receiptTempReportForm" path="/jsp/receiptTempReport"
+			forward="/jsp/reports/receiptTempReport.jsp" />
+		<action name="receiptTempReportForm" path="/jsp/receiptTempAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receipttemp.ReceiptTempReportAction">
+			<forward name="report" path="/jsp/reports/receiptTempReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiptTempReport.jsp" />
+		</action>
+
+		<!-- REMITTANCE REPORT -->
+		<action name="remittanceReportForm" path="/jsp/remittanceReport"
+			forward="/jsp/reports/remittanceReport.jsp" />
+		<action name="remittanceReportForm" path="/jsp/remittanceReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.remittance.RemittanceReportAction">
+			<forward name="report" path="/jsp/reports/remittanceReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/remittanceReport.jsp" />
+		</action>
+
+		<!-- Interfaces History Report -->
+		<action path="/jsp/interfacesHistoryReport" forward="/jsp/reports/interfacesHistoryReport.jsp" />
+
+		<!-- Transaction Summary Report -->
+		<action path="/jsp/transactionSummaryReport" forward="/jsp/reports/transactionSummaryReport.jsp" />
+
+		<!-- Interfaces -->
+		<action name="interfacesForm" path="/jsp/interfacesAction"
+			forward="/jsp/interfaces/interfaces.jsp" />
+		<action name="interfacesForm" path="/jsp/interfacesAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.interfaces.InterfacesAction">
+			<forward name="search" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="prepare" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="detail" path="/jsp/interfaces/interfaces_detail.jsp" />
+			<forward name="success" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="clearform" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="getLog" path="/jsp/interfaces/dispLogs.jsp"></forward>
+			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
+		</action>
+		<!-- Monitor Interfaces -->
+		<action name="interfacesForm" path="/jsp/monitorInterfacesAction"
+			forward="/jsp/interfaces/interfaces.jsp" />
+		<action name="interfacesForm" path="/jsp/monitorInterfacesAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.interfaces.MonitorInterfacesAction">
+			<forward name="search" path="/jsp/interfaces/monitor_interfaces.jsp" />
+			<forward name="prepare" path="/jsp/interfaces/monitor_interfaces.jsp" />
+			<forward name="success" path="/jsp/interfaces/monitor_interfaces.jsp" />
+			<forward name="clearform" path="/jsp/interfaces/monitor_interfaces.jsp" />
+			<forward name="getLog" path="/jsp/interfaces/dispLogs.jsp"></forward>
+			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
+		</action>
+
+		<!-- SALES ANALYST -->
+		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction"
+			forward="/jsp/salesAnalyst/sales_analyst.jsp" />
+		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.salesanalyst.SalesAnalystReportAction">
+			<forward name="search" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+			<forward name="prepare" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+			<forward name="clearform" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+		</action>
+
+		<!-- Member Order Import -->
+		<action name="memberOrderImportForm" path="/jsp/memberOrderImport"
+			forward="/jsp/memberOrderImportAction.do?do=prepare" />
+		<action name="memberOrderImportForm" path="/jsp/memberOrderImportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.dataimports.memberorder.MemberOrderImportAction">
+			<forward name="import" path="/jsp/dataimports/memberOrderImport.jsp" />
+			<forward name="importOrder" path="/jsp/dataimports/memberOrderImportResult.jsp" />
+		</action>
+
+		<!-- Member Order Modifier -->
+		<action name="orderForm" path="/jsp/memberOrder"
+			forward="/jsp/memberorder/memberOrderSearch.jsp" />
+		<action name="orderForm" path="/jsp/memberOrderAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.sales.MemberOrderAction">
+			<forward name="mosearch" path="/jsp/memberorder/memberOrderSearch.jsp" />
+			<forward name="clearform" path="/jsp/memberorder/memberOrderSearch.jsp" />
+			<forward name="prepare" path="/jsp/memberorder/memberOrderEdit.jsp" />
+		</action>
+		
+		<!-- Shipment Confirm -->
+		<action name="shipmentForm" path="/jsp/shipmentAction" parameter="do" scope="request"
+			type="com.isecinc.pens.web.shipment.ShipmentAction" >
+			<forward name="prepare" path="/jsp/shipment/shipmentSearch.jsp" />
+			<forward name="search" path="/jsp/shipment/shipmentSearch.jsp" />
+			<forward name="clearform" path="/jsp/shipment/shipmentSearch.jsp" />
+			<forward name="cancel" path="/jsp/shipment/cancelShipment.jsp" />
+			<forward name="clearCancelForm" path="/jsp/shipment/cancelShipment.jsp" />
+			<forward name="searchCancel" path="/jsp/shipment/cancelShipment.jsp" />
+			<forward name="summary" path="/jsp/shipment/shipmentSummary.jsp" />
+			<forward name="summaryCancel" path="/jsp/shipment/shipmentSummary.jsp?page=cancel" />
+		</action>
+		
+		<action name="receiptAllForm" path="/jsp/receiptAllAction" parameter="do" scope="request"
+			type="com.isecinc.pens.web.receiptAll.ReceiptAllAction" >
+			<forward name="prepare" path="/jsp/receiptAll/receiptAllSearch.jsp" />
+			<forward name="search" path="/jsp/receiptAll/receiptAllSearch.jsp" />
+			<forward name="clearform" path="/jsp/receiptAll/receiptAllSearch.jsp" />
+			<forward name="summary" path="/jsp/receiptAll/receiptAllSum.jsp" />
+		</action>
+		
+		<!-- Manage Order Receipt -->
+		<action name="manageOrderReceiptForm" path="/jsp/manageOrderReceipt"
+			forward="/jsp/administer/manage/manageOrderReceipt.jsp" />
+		<action name="manageOrderReceiptForm" path="/jsp/manageOrderReceiptAction"
+			    parameter="do" scope="request"
+			    type="com.isecinc.pens.web.admin.ManageOrderReceiptAction">
+			<forward name="search" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
+			<forward name="clearform" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
+			<forward name="prepare" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
+			<forward name="summaryCancel" path="/jsp/receiptAll/receiptAllCancelSum.jsp" />
+		</action>
+		
+		<!-- Member Receipt -->
+		<action name="receiptForm" path="/jsp/memberReceiptAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.receipt.MemberReceiptAction">
+			<forward name="prepareMR" path="/jsp/receipt/memberReceipt.jsp" />
+			<forward name="viewMR" path="/jsp/receipt/memberReceiptView.jsp" />
+		</action>
+
+		<!-- BENECOL SUMMARY REPORT -->
+		<action path="/jsp/benecolSummaryReport" forward="/jsp/reports/benecolSummaryReport.jsp" />
+		<action path="/jsp/benecolSummaryReportAction" parameter="do"
+			scope="request"
+			type="com.isecinc.pens.web.report.summary.BenecolSummaryReportAction">
+			<forward name="report" path="/jsp/reports/benecolSummaryReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/benecolSummaryReport.jsp" />
+		</action>
+
+		<!-- Manage Order Receipt By User -->
+		<action name="manageOrderReceiptByUserForm" path="/jsp/manageOrderReceiptByUser"
+			forward="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
+		<action name="manageOrderReceiptByUserForm" path="/jsp/manageOrderReceiptByUserAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.admin.ManageOrderReceiptByUserAction">
+			<forward name="search"
+				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
+			<forward name="clearform"
+				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
+			<forward name="prepare"
+				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
+		</action>
+		<!-- Manual Update Address -->
+		<action name="manualUpdateAddressForm" path="/jsp/manualUpdateAddressAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.manual.ManualUpdateAddressAction">
+			<forward name="search" path="/jsp/manual/manualUpdateAddress.jsp" />
+			<forward name="clearform" path="/jsp/manual/manualUpdateAddress.jsp" />
+			<forward name="prepare" path="/jsp/manual/manualUpdateAddress.jsp" />
+		</action>
+
+		<!-- DB Management -->
+		<action name="dbManagementForm" path="/jsp/dbManagementAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.db.DBManagementAction">
+			<forward name="backup" path="/jsp/dbManagement/db_management.jsp" />
+			<forward name="search" path="/jsp/dbManagement/db_management.jsp" />
+			<forward name="clearform" path="/jsp/dbManagement/db_management.jsp" />
+			<forward name="prepare" path="/jsp/dbManagement/db_management.jsp" />
+		</action>
+
+		<!-- INVOICE DETAIL REPORT -->
+		<action name="invoiceDetailReportForm" path="/jsp/invoiceDetailReport"
+			forward="/jsp/reports/invoiceDetailReport.jsp" />
+		<action name="invoiceDetailReportForm" path="/jsp/invoiceDetailReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportAction">
+			<forward name="report" path="/jsp/reports/invoiceDetailReport.jsp" />
+		</action>
+
+		<action name="salesTargetSummaryForm" path="/jsp/salesTargetSummary"
+			forward="/jsp/reports/salesTargetSummary.jsp"  >
+			<forward name="report" path="/jsp/reports/salesTargetSummary.jsp" />
+		</action>
+		
+		<action name="salesTargetSummaryForm" path="/jsp/salesTargetSummaryAction"
+			parameter="do" scope="request" 
+			type="com.isecinc.pens.web.report.salestargetsummary.SalesTargetSummaryAction">
+			<forward name="report" path="/jsp/reports/salesTargetSummary.jsp" />
+			<forward name="clearform" path="/jsp/reports/salesTargetSummary.jsp" />
+		</action>
+		
+		<!-- Member Expiration Report -->
+		<action name="memberReportForm" path="/jsp/memberReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.member.MemberReportAction" >
+			<forward name="prepare" path="/jsp/reports/memberExpiration.jsp" />
+			<forward name="report" path="/jsp/reports/memberExpiration.jsp" />
+			<forward name="clearform" path="/jsp/reports/memberExpiration.jsp" />
+		</action>
+		
+		<!-- Receipt Plan Report -->
+		<action name="receiptPlanReportForm" path="/jsp/receiptPlanReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receiptplan.ReceiptPlanReportAction" >
+			<forward name="prepare" path="/jsp/reports/receiptPlan.jsp" />
+			<forward name="report" path="/jsp/reports/receiptPlan.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiptPlan.jsp" />
+		</action>
+		
+		<!-- Sales VAT Report -->
+		<action name="salesVATReportForm" path="/jsp/salesVATReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.vat.SalesVATReportAction" >
+			<forward name="report" path="/jsp/reports/salesVATReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/salesVATReport.jsp" />
+		</action>
+		
+		<!-- Summary Daily Receipt Report -->
+		<action name="receiptSummaryReportForm" path="/jsp/receiptSummaryReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receiptsummary.ReceiptSummaryReportAction" >
+			<forward name="report" path="/jsp/reports/receiptSummaryReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiptSummaryReport.jsp" />
+		</action>
+		
+		<!-- Shipment Form Report -->
+		<action name="shipmentFormForm" path="/jsp/shipmentForm"
+			forward="/jsp/reports/shipmentForm.jsp" />
+		<action name="shipmentFormForm" path="/jsp/shipmentFormAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipment.ShipmentFormAction">
+			<forward name="report" path="/jsp/reports/shipmentForm.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentForm.jsp" />
+		</action>
+		
+		<!-- Receipt Plan Compare Report -->
+		<action name="receiptPlanCompareReportForm" path="/jsp/receiptPlanCompareReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receiptplancompare.ReceiptPlanCompareReportAction" >
+			<forward name="prepare" path="/jsp/reports/receiptPlanCompare.jsp" />
+			<forward name="report" path="/jsp/reports/receiptPlanCompare.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiptPlanCompare.jsp" />
+		</action>
+		
+		<!-- Shipment Summary Report -->
+		<action name="shipmentSummaryReportForm" path="/jsp/shipmentSummaryReport" parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipmentsummary.ShipmentSummaryReportAction" >
+			<forward name="prepare" path="/jsp/reports/shipmentSummary.jsp" />
+			<forward name="report" path="/jsp/reports/shipmentSummary.jsp" />
+			<forward name="clearform" path="/jsp/reports/shipmentSummary.jsp" />
+		</action>
+		
+		<!-- Tax Shipment -->
+		<action name="taxShipmentForm" path="/jsp/taxShipment"
+			forward="/jsp/reports/taxShipment.jsp" />
+		<action name="taxShipmentForm" path="/jsp/taxShipmentAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.shipment.TaxShipmentAction">
+			<forward name="report" path="/jsp/reports/taxShipment.jsp" />
+			<forward name="clearform" path="/jsp/reports/taxShipment.jsp" />
+		</action>
+		
+		<!-- Receipt -->
+		<action name="formReceiptForm" path="/jsp/formReceipt"
+			forward="/jsp/reports/receiptForm.jsp" />
+		<action name="formReceiptForm" path="/jsp/formReceiptAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receipt.FormReceiptAction">
+			<forward name="report" path="/jsp/reports/receiptForm.jsp" />
+			<forward name="clearform" path="/jsp/reports/receiptForm.jsp" />
+		</action>
+		
+		<!-- Tax Receipt -->
+		<action name="taxReceiptForm" path="/jsp/taxReceipt"
+			forward="/jsp/reports/taxReceipt.jsp" />
+		<action name="taxReceiptForm" path="/jsp/taxReceiptAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.receipt.TaxReceiptAction">
+			<forward name="report" path="/jsp/reports/taxReceipt.jsp" />
+			<forward name="clearform" path="/jsp/reports/taxReceipt.jsp" />
+		</action>
+	</action-mappings>
+
+	<message-resources key="sysprop" parameter="SystemProperties" />
+	<message-resources key="sysele" parameter="SystemElements" />
+	<message-resources key="sysmsg" parameter="SystemMessages" />
+</struts-config>

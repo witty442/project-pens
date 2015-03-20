@@ -1,0 +1,15 @@
+ALTER TABLE t_order_line CHANGE PRICE PRICE DECIMAL(15,5);
+ALTER TABLE t_order_line CHANGE LINE_AMOUNT LINE_AMOUNT DECIMAL(15,5);
+ALTER TABLE t_order_line CHANGE DISCOUNT DISCOUNT DECIMAL(10,2);
+ALTER TABLE t_order_line CHANGE VAT_AMOUNT VAT_AMOUNT DECIMAL(15,5);
+ALTER TABLE t_order_line CHANGE TOTAL_AMOUNT TOTAL_AMOUNT DECIMAL(15,5);
+
+
+ALTER TABLE t_order CHANGE TOTAL_AMOUNT TOTAL_AMOUNT DECIMAL(15,5);
+ALTER TABLE t_order CHANGE VAT_AMOUNT VAT_AMOUNT DECIMAL(15,5);
+ALTER TABLE t_order CHANGE NET_AMOUNT NET_AMOUNT DECIMAL(15,5);
+
+
+alter table t_order_line add column NEED_EXPORT char(1) not null default 'N';
+alter table t_order_line add column EXPORTED char(1) not null default 'N';
+alter table t_order_line add column INTERFACES char(1) not null default 'N';
