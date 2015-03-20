@@ -434,6 +434,9 @@ public class SAGenCondition {
 		ss.append("      \t "+genSqlWhereCondition(salesBean,"c."));
 		ss.append("      \t "+genSqlWhereCondByGroup(salesBean,"INVOICE","c.",colGroupName));
 		
+		//Case No Count Promotion Product (invoiced_amt = 0)
+		ss.append("      \t AND c.invoiced_amt <> 0");
+		
 		if( !Utils.isNull(sqlNotInCaseCall).equals(""))
 		   ss.append("       \n "+sqlNotInCaseCall);
 		ss.append("\n   ) c ");
@@ -453,6 +456,10 @@ public class SAGenCondition {
 		ss.append("\n \t      WHERE 1=1 " );
 		ss.append("      \t "+genSqlWhereCondition(salesBean,"c."));
 		ss.append("      \t "+genSqlWhereCondByGroup(salesBean,"INVOICE","c.",colGroupName));
+		
+		//Case No Count Promotion Product (invoiced_amt = 0)
+		ss.append("      \t AND c.invoiced_amt <> 0");
+				
 		ss.append("\n   ) c ");
 		ss.append("\n   WHERE c."+groupBy+" = SS."+groupBy );
 		ss.append("\n ) ");
