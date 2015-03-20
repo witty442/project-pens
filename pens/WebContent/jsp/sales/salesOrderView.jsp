@@ -1018,11 +1018,17 @@ function removeRow(){
 									
 									<%if(role.equals(User.VAN)){ %>
 									<c:if test="${orderForm.order.docStatus=='SV'}">
-									 
-										  <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
-				
-										  <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
-
+									
+									     <c:if test="${orderForm.order.isCash=='Y'}">
+										    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+				                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+                                          </c:if>
+                                          
+                                          <c:if test="${orderForm.order.isCash=='N'}">
+										    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','tax');">
+				                            <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill');">
+                                          </c:if>
+                                          
 										  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
 										
 									</c:if>
@@ -1077,7 +1083,7 @@ function removeRow(){
 						<div id="productList" style="display: none;"></div>
 						<div id="ByList" style="display: none;"></div>
 						
-						 <input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
+						<input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
 						 
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 						<jsp:include page="../trxhist.jsp">

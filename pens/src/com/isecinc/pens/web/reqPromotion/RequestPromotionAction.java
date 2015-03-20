@@ -322,7 +322,7 @@ public class RequestPromotionAction extends I_Action {
 				RequestPromotion p = mResultList.get(0);
 				
 				String logopath =   context.getRealPath("/images/pens_logo_fit.jpg");//
-				logger.debug("logoPath:"+logopath);
+				//logger.debug("logoPath:"+logopath);
 	            
 				parameterMap.put("pens_logo_fit",logopath);
 				parameterMap.put("requestDate",p.getRequestDate());
@@ -353,7 +353,7 @@ public class RequestPromotionAction extends I_Action {
 					 Map<String, RequestPromotionCost> costTableMap = new HashMap<String, RequestPromotionCost>();
 					 for(int i=0;i<p.getCostLineList().size();i++){
 						 RequestPromotionCost c = p.getCostLineList().get(i);
-						 logger.debug("lineNo["+c.getLineNo()+"]");
+						 //logger.debug("lineNo["+c.getLineNo()+"]");
 						 
 						 costTableMap.put(c.getLineNo()+"", c);
 					 }
@@ -371,7 +371,7 @@ public class RequestPromotionAction extends I_Action {
 						
 				 }
 				
-				String fileNameExport = p.getRequestNo()+"_"+p.getPrintDate();
+				String fileNameExport = p.getRequestNo()+"_"+p.getPrintDate()+".pdf";
 				//Set Lines
 				lstData = p.getPromotionLineList();
 				

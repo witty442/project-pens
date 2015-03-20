@@ -667,7 +667,6 @@ public class MRequestPromotion {
 						  }
 					  }
 					  
-					  
 					  //get product Line
 					  m.setPromotionLineList(getPromotionLineList(conn,mCriteria.getRequestNo()));
 					 //file table to 7 row
@@ -687,7 +686,6 @@ public class MRequestPromotion {
 							  m.getPromotionLineList().add(newCostLine);
 						  }
 					  }
-					  
 				  }
 					  
 				  list.add(m);
@@ -740,7 +738,13 @@ public class MRequestPromotion {
 					line.setBorrowQty(rst.getBigDecimal("borrow_qty"));
 					line.setBorrowAmount(rst.getBigDecimal("borrow_amount"));
 					
-					line.setProductName(Utils.isNull(rst.getString("name")));
+					String productName =Utils.isNull(rst.getString("name"));
+					logger.debug("productName length:"+productName.length());
+					if(productName.length() >70){
+						productName = productName.substring(0,35) +" "+productName.substring(35,70)+"...";
+					}
+					
+					line.setProductName(productName);
 					line.setProductId(Utils.isNull(rst.getString("product_id")));
 					
 					//line.setUom1(Utils.isNull(uom1[i]));

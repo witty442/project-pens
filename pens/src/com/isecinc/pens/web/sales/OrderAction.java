@@ -1310,7 +1310,8 @@ public class OrderAction extends I_Action {
 		List<Address> addresses = new ArrayList<Address>();
 		try {
 			boolean baddr = false;
-			String fileType = request.getParameter("fileType");
+			String fileType =  request.getParameter("fileType");
+			
 			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
 			String reportType = request.getParameter("reportType");
@@ -1364,6 +1365,11 @@ public class OrderAction extends I_Action {
 				pReportTitle ="ใบส่งสินค้า/ใบกำกับภาษี/ใบเสร็จรับเงิน";
 			}else if("copy".equalsIgnoreCase(reportType)){ 
 				pReportTitle = "ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว"; //default
+				
+			}else if("tax".equalsIgnoreCase(reportType)){ 
+				pReportTitle = "ใบส่งของ/ใบกำกับภาษี"; //พิมพ์ใบส่งของ/ใบกำกับภาษี
+			}else if("bill".equalsIgnoreCase(reportType)){ 
+				pReportTitle = "ใบเสร็จรับเงิน"; //พิมพ์ใบเสร็จรับเงิน
 			}
 			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
 
