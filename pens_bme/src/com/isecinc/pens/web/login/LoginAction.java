@@ -57,10 +57,11 @@ public class LoginAction extends DispatchAction {
 				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
 				return mapping.findForward("fail");
 			}
-			
+			//"Login", "User", "userName", "UserName", "Utilisateur" };
 			request.getSession(true).setAttribute("user", user);
-			request.getSession(true).setAttribute("username", user.getUserName());
-			
+		
+			//request.getSession().setAttribute("UserName", user.getUserName());
+			request.getSession().setAttribute("User", user.getUserName());
 			
 			String role = user.getRole().getKey();
 			logger.debug("role:"+role);

@@ -96,7 +96,8 @@ function loadMe(){
 function search(path){
 	var form = document.sumGroupCodeForm;
 	var groupCode =$('#groupCode').val();
-	var storeType =$('#storeType').val();
+	var storeType =document.getElementById("storeType").value;
+	//alert(storeType);
 	if(storeType ==""){
 	    alert("กรุณากรอก กลุ่มร้านค้า");
 		return false;
@@ -115,7 +116,7 @@ function gotoPage(path,pageNumber){
 	
 	//if(confirm("ข้อมูลในหน้านี้ จะถูกบันทึก กรุณากดปุ่มเพื่อยืนยันการบันทึก และไปหน้าถัดไป ")){
 	var groupCode =$('#groupCode').val();
-	var storeType =$('#storeType').val();
+	var storeType = document.getElementById("storeType").value;
 	if(storeType ==""){
 	    alert("กรุณากรอก กลุ่มร้านค้า");
 		return false;
@@ -125,13 +126,12 @@ function gotoPage(path,pageNumber){
 	    alert("กรุณากรอก groupCode");
 		return false;
 	}
-		form.action = path + "/jsp/sumGroupCodeAction.do?do=search&pageNumber="+pageNumber;
-		form.submit();
-		return true;
-	//}
-	//return false;
+	
+	form.action = path + "/jsp/sumGroupCodeAction.do?do=search&pageNumber="+pageNumber;
+	form.submit();
+	return true;
+	
 }
-
 
 function exportToExcel(path){
 	var form = document.sumGroupCodeForm;
@@ -156,7 +156,7 @@ function openPopupGroup(path){
 function setGroupMainValue(code,desc,types){
 	var form = document.sumGroupCodeForm;
 	form.groupCode.value = code;
-	form.groupDesc.value = desc;
+	//form.groupDesc.value = desc;
 }
 </script>
 </head>
@@ -210,7 +210,7 @@ function setGroupMainValue(code,desc,types){
 								</tr>
 								<tr>
 									<td>กลุ่มร้านค้า <font color="red" >*</font>&nbsp;&nbsp;&nbsp;&nbsp;
-									   <html:select property="order.storeType">
+									   <html:select property="order.storeType" styleId="storeType">
 										  <html:options collection="storeTypeList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>

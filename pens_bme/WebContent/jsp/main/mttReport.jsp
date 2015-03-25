@@ -318,7 +318,7 @@ function resetStore(){
 									<th >Material Master</th>
 									<th >Pens Item</th>
 									<th >จำนวนชิ้นที่ขาย</th>		
-									<th >ราคาปลีก (InVat)</th>	
+									<th >ราคาปลีกรวม Vat</th>	
 													
 							   </tr>
 							<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">

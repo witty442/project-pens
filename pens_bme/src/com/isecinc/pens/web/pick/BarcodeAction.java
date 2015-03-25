@@ -498,7 +498,6 @@ public class BarcodeAction extends I_Action {
 		int totalQty = 0;
 		int no = 0;
 		String a= "@";
-		
 		try{
 			sql.append("\n select h.warehouse,j.job_id,h.create_user,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 			sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty,'' as remark ");

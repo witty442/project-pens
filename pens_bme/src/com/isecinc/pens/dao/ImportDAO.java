@@ -449,7 +449,7 @@ public class ImportDAO {
 				}
 			}
 			
-		    logger.debug("SQL:"+sql.toString());
+		   // logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -480,7 +480,7 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeNo+"' and reference_code ='"+refCode+"' \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		   // logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -511,7 +511,7 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeTypeCode+"' and reference_code ='Customer' \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		   // logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -544,7 +544,7 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeTypeCode+"' and reference_code ='Logistic' \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		   // logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -999,7 +999,7 @@ public class ImportDAO {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return getStoreTypeList(conn);
+			return getStoreTypeListModel(conn,"");
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -1008,7 +1008,31 @@ public class ImportDAO {
 			}
 		}
 	}
-	public List<References> getStoreTypeList(Connection conn) throws Exception{
+	public List<References> getStoreTypeList(String notInCustCode) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getStoreTypeListModel(conn,notInCustCode);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+	}
+	
+	public List<References> getStoreTypeList(Connection conn,String notInCustCode) throws Exception{
+		try{
+			return getStoreTypeListModel(conn,notInCustCode);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+	}
+	
+	public List<References> getStoreTypeListModel(Connection conn,String notInCustCode) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		List<References> storeList = new ArrayList<References>();
@@ -1016,6 +1040,40 @@ public class ImportDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select pens_value ,pens_desc  from PENSBME_MST_REFERENCE WHERE Reference_code ='Customer' \n");
+			if( !Utils.isNull(notInCustCode).equals("")){
+			  sql.append(" and pens_value <> '"+notInCustCode+"' \n");
+			}
+		    logger.debug("SQL:"+sql.toString());
+		    
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				References r = new References(rs.getString("pens_value"), rs.getString("pens_desc"));
+				storeList.add(r);
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return storeList;
+	} 
+	
+	public List<References> getStoreTypeFridayList(Connection conn) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		List<References> storeList = new ArrayList<References>();
+	
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select pens_value ,pens_desc  from PENSBME_MST_REFERENCE WHERE Reference_code ='Customer' " +
+					"and pens_value='"+Constants.STORE_TYPE_FRIDAY_CODE+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    

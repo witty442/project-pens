@@ -23,6 +23,9 @@ public class Constants {
 	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
 	public static final String STORE_TYPE_MTT_CODE_2 ="020056";
 	
-	public static String STORE_TYPE_LOTUS_STRING = "LotusItem";
-	public static String STORE_TYPE_BIGC_STRING = "BigCitem";
+	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
+	
+	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
+	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";
+	public static String STORE_TYPE_FRIDAY_ITEM = "FridayItem";
 }

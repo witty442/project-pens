@@ -19,25 +19,18 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
 import util.BundleUtil;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MTTBean;
-import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BarcodeDAO;
-import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MTTBeanDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.summary.SummaryForm;
 
 /**
  * Summary Action
@@ -180,12 +173,22 @@ public class MTTAction extends I_Action {
 	
 	private StringBuffer genExportReport(HttpServletRequest request,MTTForm form,User user){
 		StringBuffer h = new StringBuffer("");
+		String a= "@";
 		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11'>รายงานข้อมูลขาย Sale-Out ของ MTT</td> \n");
+			h.append("<td align='left' colspan='11'>รายงานข้อมูลขาย Sale-Out</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
@@ -220,8 +223,8 @@ public class MTTAction extends I_Action {
 				  h.append("<td>GroupCode</td> \n");
 				  h.append("<td>Material Master </td> \n");
 				  h.append("<td>Pens Item </td> \n");
-				  h.append("<td>จำนวนชิ้นที่ชาย</td> \n");
-				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
+				  h.append("<td>จำนวนชิ้นที่ขาย</td> \n");
+				  h.append("<td>ราคาขายปลีกรวม VAT</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -232,12 +235,12 @@ public class MTTAction extends I_Action {
 					  h.append("<td>"+s.getDocNo()+"</td> \n");
 					  h.append("<td>"+s.getCustGroup()+"&nbsp;"+s.getCustGroupName()+"</td> \n");
 					  h.append("<td>"+s.getStoreCode()+"&nbsp;"+s.getStoreName()+"</td> \n");
-					  h.append("<td>&nbsp;"+s.getBarcode()+"</td> \n");
+					  h.append("<td class='num'>"+s.getBarcode()+"</td> \n");
 					  h.append("<td>"+s.getGroupCode()+"</td> \n");
 					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
-					  h.append("<td>"+s.getQty()+"</td> \n");
-					  h.append("<td>"+s.getRetailPriceBF()+"</td> \n");
+					  h.append("<td class='num'>"+s.getQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getRetailPriceBF()+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");

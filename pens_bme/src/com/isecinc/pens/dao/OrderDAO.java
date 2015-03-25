@@ -37,11 +37,11 @@ public class OrderDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
 	public int MAX_ORDER_SPLIT_ORDER_NO = 450;//default 450
 	
-	public List<Order> prepareNewOrder(Order o,List<StoreBean> storeList,User user) throws Exception {
+	public List<Order> prepareNewOrder(Order o,List<StoreBean> storeList,User user,String tableName) throws Exception {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return prepareNewOrder(conn, o, storeList, user);
+			return prepareNewOrder(conn, o, storeList, user,tableName);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -49,13 +49,14 @@ public class OrderDAO {
 		}
 	}
 	
-	public int getTotalRowBMEItem(Connection conn,Order o ) throws Exception {
+	public int getTotalRowBMEItem(Connection conn,Order o,String tableName ) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
         int totalRow = 0;
 		StringBuilder sql = new StringBuilder();
+		
 		try {
-			sql.append("\n SELECT count(*) as total_row  from PENSBME_ONHAND_BME    \n");
+			sql.append("\n SELECT count(*) as total_row  from "+tableName+"    \n");
 			sql.append("\n where 1=1 AND onhand_qty <> 0 and status <> 'ERROR'  \n");
 			
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
@@ -81,7 +82,9 @@ public class OrderDAO {
 		return totalRow;
 	}
 	
-	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user) throws Exception {
+	
+	
+	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,String tableName) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		
@@ -166,7 +169,8 @@ public class OrderDAO {
 		return pos;
 	}
 	
-	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize) throws Exception {
+	
+	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize,String tableName,String itemType) throws Exception {
 		logger.debug("prepareNewOrder");
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -187,10 +191,10 @@ public class OrderDAO {
 				sql.append("\n  ) as remain_onhand_qty ");
 						
 				sql.append("\n ,(SELECT max(m.pens_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='LotusItem' and m.interface_desc = h.barcode) as item_oracle ");
+				sql.append("\n   where m.reference_code ='"+itemType+"' and m.interface_desc = h.barcode) as item_oracle ");
 				sql.append("\n ,(SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='LotusItem' and m.interface_desc = h.barcode) as item_style ");
-				sql.append("\n from PENSBME_ONHAND_BME h   \n");
+				sql.append("\n   where m.reference_code ='"+itemType+"' and m.interface_desc = h.barcode) as item_style ");
+				sql.append("\n from "+tableName+" h   \n");
 				sql.append("\n where 1=1 AND onhand_qty <> 0 and status <> 'ERROR'  ");
 				
 				if( !Utils.isNull(o.getGroupCode()).equals("")){
@@ -294,7 +298,8 @@ public class OrderDAO {
 		return pos;
 	}
 	
-	public int getTotalRowBMEItemHistory(Connection conn,Order o ) throws Exception {
+	
+	public int getTotalRowBMEItemHistory(Connection conn,Order o) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
         int totalRow = 0;
@@ -308,7 +313,9 @@ public class OrderDAO {
 				
 				sql.append(" and order_date = to_date('"+dateStr+"','dd/mm/yyyy')  \n");
 			}
-			
+			if( !Utils.isNull(o.getStoreType()).equals("")){
+				sql.append(" and store_type = '"+Utils.isNull(o.getStoreType())+"'  \n");
+			}
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append(" and group_code = '"+Utils.isNull(o.getGroupCode())+"'  \n");
 			}
@@ -331,7 +338,7 @@ public class OrderDAO {
 		}
 		return totalRow;
 	}
-	public Order prepareNewOrderHistory(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize) throws Exception {
+	public Order prepareNewOrderHistory(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize,String tableName,String itemType) throws Exception {
 		logger.debug("prepareNewOrder");
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -353,9 +360,9 @@ public class OrderDAO {
 				sql.append("\n ,0 as remain_onhand_qty ");
 						
 				sql.append("\n ,(SELECT max(m.pens_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='LotusItem' and m.interface_desc = h.barcode) as item_oracle ");
+				sql.append("\n   where m.reference_code ='"+itemType+"' and m.interface_desc = h.barcode) as item_oracle ");
 				sql.append("\n ,(SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='LotusItem' and m.interface_desc = h.barcode) as item_style ");
+				sql.append("\n   where m.reference_code ='"+itemType+"'  and m.interface_desc = h.barcode) as item_style ");
 				sql.append("\n  from PENSBME_ORDER h  ");
 				sql.append("\n  where 1=1  ");
 				
@@ -364,7 +371,9 @@ public class OrderDAO {
 					
 					sql.append(" and h.order_date = to_date('"+dateStr+"','dd/mm/yyyy')  \n");
 				}
-				
+				if( !Utils.isNull(o.getStoreType()).equals("")){
+					sql.append(" and h.store_type = '"+Utils.isNull(o.getStoreType())+"'  \n");
+				}
 				if( !Utils.isNull(o.getGroupCode()).equals("")){
 					sql.append("\n and h.group_code = '"+Utils.isNull(o.getGroupCode())+"'  ");
 				}
@@ -1711,6 +1720,54 @@ public class OrderDAO {
 	
 	
 	private Map<String,StoreBean> getStoreBeanOrderMap(Connection conn,String storeType,Date orderDate) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Map<String,StoreBean> map = new HashMap<String,StoreBean>();
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select order_no,bar_on_box,store_code,item,barcode,bill_type, qty from PENSBME_ORDER WHERE trunc(order_date) =? and store_type= ?  \n");
+			
+		    //logger.debug("SQL:"+sql.toString());
+		    
+		   /* logger.debug("orderDate["+orderDate+"]");
+		    logger.debug("storeCode["+storeCode+"]");
+		    logger.debug("item["+item+"]");*/
+		    
+			ps = conn.prepareStatement(sql.toString());
+			
+			ps.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime()));
+			ps.setString(2, storeType);
+			
+			rs = ps.executeQuery();
+			String keyMap = "";
+			while(rs.next()){
+				StoreBean m = new StoreBean();
+				m.setOrderNo(Utils.isNull(rs.getString("order_no")));
+				m.setBarOnBox(Utils.isNull(rs.getString("bar_on_box")));
+				m.setStoreCode(Utils.isNull(rs.getString("store_code")));
+				m.setItem(Utils.isNull(rs.getString("item")));
+				m.setQty(Utils.isNull(rs.getString("qty")));
+				m.setBarcode(rs.getString("barcode"));
+				m.setBillType(rs.getString("bill_type"));
+				
+				keyMap = m.getBarcode()+"_"+m.getStoreCode()+"_"+m.getBillType();
+				map.put(keyMap, m);
+			}
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return map;
+	} 
+	
+	private Map<String,StoreBean> getStoreBeanOrderMapFriday(Connection conn,String storeType,Date orderDate) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Map<String,StoreBean> map = new HashMap<String,StoreBean>();

@@ -84,7 +84,7 @@ public class SummaryByGroupCodeAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn);
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"");
 				 request.getSession().setAttribute("storeTypeList",storeTypeList);
 				
 				 List<References> regionList = importDAO.getRegionList(conn);

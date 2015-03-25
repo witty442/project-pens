@@ -401,7 +401,7 @@ function getProductModel(barcodeObj,lineId){
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcodeMTT.jsp",
 			data : "itemCode=" + barcodeObj.value,
 			async: false,
-			cache: false,
+			cache: true,
 			success: function(getData){
 			  returnString = jQuery.trim(getData);
 			}
@@ -487,7 +487,7 @@ function getProductModelByMat(matObj,lineId){
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
 			data : "matCode="+matObj.value,
 			async: false,
-			cache: false,
+			cache: true,
 			success: function(getData){
 			  returnString = jQuery.trim(getData);
 			}

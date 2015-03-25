@@ -18,6 +18,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.Constants;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
@@ -87,7 +89,7 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn);
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,Constants.STORE_TYPE_FRIDAY_CODE);
 				 request.getSession().setAttribute("storeTypeList",storeTypeList);
 				
 				 List<References> regionList = importDAO.getRegionList(conn);
@@ -140,7 +142,15 @@ public class OrderAction extends I_Action {
 		int pageNumber = 1;
 		List<StoreBean> storeList = null;
 		String action = "";
+		String tableName = "PENSBME_ONHAND_BME";
+		String itemType ="LotusItem";
 		try {
+			Order orderCri = orderForm.getOrder();
+			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
+				tableName = "PENSBME_ONHAND_BME_FRIDAY";
+				itemType ="FridayItem";
+			}
+			
 			conn = DBConnection.getInstance().getConnection();
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("action:"+action);
@@ -255,7 +265,7 @@ public class OrderAction extends I_Action {
 				logger.debug("request.getSession().totalPage["+request.getSession().getAttribute("totalPage")+"]");
 				
 				if(request.getSession().getAttribute("totalPage") ==null){
-					totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder());
+					totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder(),tableName);
 					totalPage = (totalRow/ pageSize)+1;
 					request.getSession().setAttribute("totalPage", totalPage);
 					request.getSession().setAttribute("totalRow", totalRow);
@@ -278,7 +288,7 @@ public class OrderAction extends I_Action {
 				
 				//Case newsearch Recale page
 				pageNumber = 1;
-				totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder());
+				totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder(),tableName);
 				totalPage = (totalRow/ pageSize)+1;
 				request.getSession().setAttribute("totalPage", totalPage);
 				request.getSession().setAttribute("totalRow", totalRow);
@@ -290,7 +300,7 @@ public class OrderAction extends I_Action {
 			//logger.debug("CustType["+orderForm.getOrder().getCustType()+"]");
 			
             //** Search Data and Display **/
-			List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize);
+			List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize,tableName,itemType);
 			if (results != null  && results.size() >0) {
 				request.getSession().setAttribute("results", results);
 			} else {
@@ -322,6 +332,7 @@ public class OrderAction extends I_Action {
 		int col = 0;
 		boolean haveError = false;
 		OrderDAO orderDAO = new OrderDAO();
+		String tableName = "PENSBME_ONHAND_BME";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			//conn.setAutoCommit(false);
@@ -465,7 +476,7 @@ public class OrderAction extends I_Action {
 			}else{
 				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้");
 				 //Research 
-			    List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user);
+			    List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,tableName);
 		        request.getSession().setAttribute("results", results);
 		        request.getSession().setAttribute("itemErrorMap", itemErrorMap);
 			}
@@ -544,7 +555,6 @@ public class OrderAction extends I_Action {
 		}
 		return mapping.findForward("export");
 	}
-	
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("export ToExcel");
@@ -754,7 +764,7 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn);
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"");
 				 request.getSession().setAttribute("storeTypeList",storeTypeList);
 				
 				 List<References> regionList = importDAO.getRegionList(conn);
@@ -805,7 +815,7 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn);
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"");
 				 request.getSession().setAttribute("storeTypeList",storeTypeList);
 				
 				 List<References> regionList = importDAO.getRegionList(conn);
@@ -841,7 +851,15 @@ public class OrderAction extends I_Action {
 		int pageNumber = 1;
 		List<StoreBean> storeList = null;
 		String action = "";
+		String tableName = "PENSBME_ONHAND_BME";
+		String itemType ="LotusItem";
 		try {
+			Order orderCri = orderForm.getOrder();
+			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
+				tableName = "PENSBME_ONHAND_BME_FRIDAY";
+				itemType ="FridayItem";
+			}
+			
 			conn = DBConnection.getInstance().getConnection();
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("searchView action:"+action);
@@ -855,7 +873,7 @@ public class OrderAction extends I_Action {
 				request.getSession().setAttribute("results", null);
 				request.getSession().setAttribute("storeList",null);
 				
-				totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder());
+				totalRow = orderDAO.getTotalRowBMEItem(conn,orderForm.getOrder(),tableName);
 				totalPage = (totalRow/ pageSize)+1;
 				request.getSession().setAttribute("totalPage", totalPage);
 				request.getSession().setAttribute("totalRow", totalRow);
@@ -878,7 +896,7 @@ public class OrderAction extends I_Action {
 			logger.debug("totalRow["+totalRow+"]totalPage["+totalPage+"]pageNumber["+pageNumber+"]");
 			
             //** Search Data and Display **/
-			List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize);
+			List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize,tableName,itemType);
 			if (results != null  && results.size() >0) {
 				request.getSession().setAttribute("results", results);
 			} else {
@@ -909,7 +927,15 @@ public class OrderAction extends I_Action {
 		int pageNumber = 1;
 		List<StoreBean> storeList = null;
 		String action = "";
+		String tableName = "PENSBME_ONHAND_BME";
+		String itemType ="LotusItem";
 		try {
+			Order orderCri = orderForm.getOrder();
+			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
+				tableName = "PENSBME_ONHAND_BME_FRIDAY";
+				itemType ="FridayItem";
+			}
+			
 			conn = DBConnection.getInstance().getConnection();
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("searchHistory action:"+action);
@@ -947,7 +973,7 @@ public class OrderAction extends I_Action {
 			logger.debug("totalRow["+totalRow+"]totalPage["+totalPage+"]pageNumber["+pageNumber+"]");
 			
             //** Search Data and Display **/
-			Order orderResult = new OrderDAO().prepareNewOrderHistory(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize);
+			Order orderResult = new OrderDAO().prepareNewOrderHistory(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize,tableName,itemType);
 			List<Order> results = orderResult.getOrderItemList();
 			
 			if (results != null  && results.size() >0) {

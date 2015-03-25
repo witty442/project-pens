@@ -32,6 +32,7 @@
 		<form-bean name="masterForm" type="com.isecinc.pens.web.master.MasterForm" />
 		
 		<form-bean name="orderForm" type="com.isecinc.pens.web.order.OrderForm" />
+		<form-bean name="orderFridayForm" type="com.isecinc.pens.web.order.OrderForm" />
 		
 		<form-bean name="reportForm" type="com.isecinc.pens.web.report.ReportForm" />
 		
@@ -138,6 +139,9 @@
 			
 			<forward name="history" path="/jsp/order/orderHistory.jsp"/>
 			
+		</action>
+		<action name="orderFridayForm" path="/jsp/orderFridayAction" parameter="do" scope="session" type="com.isecinc.pens.web.order.OrderFridayAction" >
+			<forward name="search" path="/jsp/order/orderFriday.jsp"/>
 		</action>
 		
 		<action name="memberImportForm" path="/jsp/memberimport" forward="/jsp/dataimports/memberImport.jsp" />

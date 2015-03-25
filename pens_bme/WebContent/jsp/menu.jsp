@@ -76,18 +76,23 @@
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=bigc&action=new');">4.<span><bean:message bundle="sysprop" key="ImportBMEFromBigC"/></span></a>
 			</li>
-			 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=tops&action=new');">5.<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
-			</li>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+				 <li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=tops&action=new');">5.<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
+				</li>
+			<%} %>
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mttAction.do?do=prepare2&action=new');">6.<span><bean:message bundle="sysprop" key="mtt"/></span></a>
 			</li>
-			<li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=physical&action=new');">7.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
-			</li>
-			<li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=return_wacoal&action=new');">8.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
-			</li>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+				
+				<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=physical&action=new');">7.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
+				</li>
+				<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=return_wacoal&action=new');">8.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
+				</li>
+			<%} %>
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/masterAction.do?do=prepare&action=new&page=master');">9.<span><bean:message bundle="sysprop" key="MaintainMaster"/></span></a>
 			</li>
@@ -113,9 +118,11 @@
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span>4.<bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
 			</li>
-					 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=tops');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromTops"/></span></a>
-			</li>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+				<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=tops');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromTops"/></span></a>
+				</li>
+			<%} %>
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigC');"><span>6.<bean:message bundle="sysprop" key="SummaryBMEOnhandBigC"/></span></a>
 			</li>  
@@ -154,11 +161,15 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepare&action=new');"><span><bean:message bundle="sysprop" key="Order"/></span></a>
 			</li>
 			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderFridayAction.do?do=prepare&action=new');"><span><bean:message bundle="sysprop" key="OrderFriday"/></span></a>
+			</li>
+			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareView&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiry"/></span></a>
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareHistory&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiryHistory"/></span></a>
 			</li>
+			
 		</ul>
 	</li>
 <%} %>

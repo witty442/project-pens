@@ -1194,11 +1194,11 @@ public class ImportAction extends I_Action {
 					     } 
 				         
 			         }else{
-				         pensItem = importDAO.getItemByInterfaceValueTypeLotusCase1(conn, Constants.STORE_TYPE_LOTUS_STRING, lotusItem);
+				         pensItem = importDAO.getItemByInterfaceValueTypeLotusCase1(conn, Constants.STORE_TYPE_LOTUS_ITEM, lotusItem);
 	
 				         if(Utils.isNull(pensItem).equals("")){
 				        	 lotusItem = lotusItem.substring(0,6);
-				        	 pensItem = importDAO.getItemByInterfaceValueTypeLotusCase2(conn, Constants.STORE_TYPE_LOTUS_STRING, lotusItem);
+				        	 pensItem = importDAO.getItemByInterfaceValueTypeLotusCase2(conn, Constants.STORE_TYPE_LOTUS_ITEM, lotusItem);
 				         }
 
 				         if(mStore != null && mGroup != null && !Utils.isNull(pensItem).equals("")){
@@ -2736,7 +2736,7 @@ public class ImportAction extends I_Action {
 				         oh.setBarcode(Utils.isNull(barcode));
 				         oh.setMaterialMaster(Utils.isNull(materialMaster));
 				         //Find pens_item **/
-				         pensItem = importDAO.getItemByBarcode(conn,"FridayItem", oh.getBarcode());//
+				         pensItem = importDAO.getItemByBarcode(conn,Constants.STORE_TYPE_FRIDAY_ITEM, oh.getBarcode());//
 				         oh.setPensItem(Utils.isNull(pensItem));
 				         
 				         s.setOnhandSummary(oh);
@@ -2746,7 +2746,7 @@ public class ImportAction extends I_Action {
 				         if(onhandQtyValid.compareTo(bigZero) != 0 ){
 				         
 					         /** Validate Barcode **/
-					         MasterBean mb = importDAO.getMasterBeanByBarcode(conn,"FridayItem", barcode);
+					         MasterBean mb = importDAO.getMasterBeanByBarcode(conn,Constants.STORE_TYPE_FRIDAY_ITEM, barcode);
 					         String itemCodeValid = mb!=null?mb.getItem():"";
 					         groupItem = mb!=null?mb.getGroup():"";
 					         
@@ -2811,20 +2811,18 @@ public class ImportAction extends I_Action {
 					         
 				         }else{//if onhand qty != 0
 				        	 //Case QTY =0  no validate item
-				        	 MasterBean mb = importDAO.getMasterBeanByBarcode(conn, barcode);
+				        	 MasterBean mb = importDAO.getMasterBeanByBarcode(conn,Constants.STORE_TYPE_FRIDAY_ITEM, barcode);
 					         groupItem = mb!=null?mb.getGroup():"";
 					         
 				         }
-				         
-				        
+
 				         message = "";
 				         
 				         if(lineError){
 				        	 importError = true;
 				        	 s.setErrorMsgList(errorMsgList);
 				        	 errorList.add(s);
-				        	 
-				        	 
+
 				        	 /** set Message TO Save **/
 				        	 for(int e=0;e<errorMsgList.size();e++){
 				        		 Message me = (Message)errorMsgList.get(e);
