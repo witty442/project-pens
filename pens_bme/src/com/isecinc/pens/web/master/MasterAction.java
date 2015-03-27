@@ -110,6 +110,20 @@ public class MasterAction extends I_Action {
 	}
 	
 	
+	public ActionForward prepareQuery(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareQuery");
+		MasterForm summaryForm = (MasterForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("query");
+	}
+	
 	
 	/**
 	 * Save

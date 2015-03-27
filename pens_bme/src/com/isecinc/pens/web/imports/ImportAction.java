@@ -2769,7 +2769,7 @@ public class ImportAction extends I_Action {
 					         }*/
 					         
 					         /** Validate WholePriceBF **/
-					         BigDecimal wholePriceBFOracle = importDAO.getWholePriceBFFromOracle(conn, itemCodeValid);
+					        /* BigDecimal wholePriceBFOracle = importDAO.getWholePriceBFFromOracle(conn, itemCodeValid);
 					    
 					         if(wholePriceBFOracle.compareTo(bigZero) ==0){//== 0
 					        	 //Not found Add Fail Msg
@@ -2787,7 +2787,7 @@ public class ImportAction extends I_Action {
 							         errorMsgList.add(m);
 							         lineError = true;
 					        	 }
-					         }
+					         }*/
 					         
 					         /** Validate RetailPriceBF **/
 					         //BigDecimal retailPriceBFOracle = importDAO.getRetailPriceBFFromOracle(conn, itemCodeValid);

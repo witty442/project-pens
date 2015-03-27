@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="/pens_sa/js/jquery-1.3.2.min.js"></script>
+
+<script type="text/javascript">
+function isNumber(value){
+	var numberRegex = /^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+	var str = value;
+	str = ReplaceAll(str,",","",false);
+	//alert(str);
+	if(numberRegex.test(str)) {
+		//alert(value+':'+str+'>>I am  a number');
+	   return true;
+	}else{
+		//alert(value+':'+str+'>>I am not a number');
+		return false;
+	}
+	return false;
+}
+
+function isNumber2(){
+	var numberRegex = /^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+	var str = $("#myTextBox").val();
+	str = ReplaceAll(str,",","",false);
+	//alert(str);
+	if(numberRegex.test(str)) {
+		alert($("#myTextBox").val()+':'+str+'>>I am  a number:'+parseFloat(str)+':'+parseFloat($("#myTextBox").val()));
+	    return true;
+	}else{
+		alert($("#myTextBox").val()+':'+str+'>>I am not a number'+parseFloat(str));
+		return false;
+	}
+	return false;
+}
+
+function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
+    var searchFrom = 0;
+    var offset = 0;
+    var outText = "";
+    var searchText = "";
+    if ( inCaseSensitive == null ) {
+       inCaseSensitive = false;
+    }
+    if ( inCaseSensitive ) {
+       searchText = inText.toLowerCase();
+       inFindStr = inFindStr.toLowerCase();
+    } else {
+       searchText = inText;
+    }
+    offset = searchText.indexOf( inFindStr, searchFrom );
+    while ( offset != -1 ) {
+       outText += inText.substring( searchFrom, offset );
+       outText += inReplStr;
+       searchFrom = offset + inFindStr.length;
+       offset = searchText.indexOf( inFindStr, searchFrom );
+    }
+    outText += inText.substring( searchFrom, inText.length );
+
+    return ( outText );
+ }
+ 
+$(document).ready(function() {
+	
+	$('.link-sort').click(function(e) {
+		var $sort = this;
+		var $table = $('#sort-table');
+		var $rows = $('tbody > tr',$table);
+		var id = $(this).attr("id");
+		//alert(id);
+		
+		$rows.sort(function(a, b){
+			var keyA = 0;
+			var keyB = 0;
+			
+			//alert($('td.sort_'+id,a).text());
+			if($('td.sort_'+id,a).text() != '' && $('td.sort_'+id,b).text()){
+				
+				if(isNumber($('td.sort_'+id,a).text()) && isNumber($('td.sort_'+id,b).text())){
+					keyA = parseFloat(ReplaceAll($('td.sort_'+id,a).text(),",","",false));
+					keyB = parseFloat(ReplaceAll($('td.sort_'+id,b).text(),",","",false));
+				}else{
+				    keyA = $('td.sort_'+id,a).text();
+				    keyB = $('td.sort_'+id,b).text();
+				}
+				//alert(keyA+":"+keyB);
+				if($($sort).hasClass('asc')){
+					//alert("asc");
+					return (keyA > keyB) ? 1 : -1;
+				} else {
+					//alert("desc");
+					return (keyA < keyB) ? 1 : -1;
+				}
+			}
+		});
+		
+		var no =1;
+		$.each($rows, function(index, row){
+			//alert(row[0].cells);
+			row.cells[0].innerHTML = no;
+			$table.append(row);
+			no++;
+		}); 
+		
+		e.preventDefault();
+	});
+	
+});
+</script>
+</head>
+<body>
+<input type="text" name="myTextBox" id="myTextBox"  onchange="isNumber2();"/>
+
+<!-- RESULT -->
+<table border='1' width='100%' class='result2' id='sort-table'>
+<thead> 
+<tr> 
+ <th rowspan='2'>ลำดับ</th>  
+ <th rowspan='2'>ร้านค้า-ที่ส่งบิล</th>  
+<th colspan='2'>01/08/2555</th> 
+</tr>
+<tr> 
+<th>ยอดขาย(บาท)&nbsp;&nbsp; <img style="cursor:pointer" src='/pens_sa/icons/arrow_down.gif' href='#' class='link-sort asc' id='INVOICED_AMT_1_BL_TO'/> &nbsp;&nbsp; <img style="cursor:pointer" src='/pens_sa/icons/arrow_up.gif' href='#' class='link-sort desc' id='INVOICED_AMT_1_BL_TO'/></th> 
+<th>CALL&nbsp;&nbsp; <img style="cursor:pointer" src='/pens_sa/icons/arrow_down.gif' href='#' class='link-sort asc' id='CALL_AMT_2_BL_TO'/> &nbsp;&nbsp; <img style="cursor:pointer" src='/pens_sa/icons/arrow_up.gif' href='#' class='link-sort desc' id='CALL_AMT_2_BL_TO'/></th> 
+</tr>  </thead> 
+<tbody> 
+  <tr> 
+ <td>1</td>  
+ <td align='left'>777 ช็อป-135786_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>366.26</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>2</td>  
+ <td align='left'>J.L. มินิมาร์ท-41126_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>1,168.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>3</td> 
+</tr>
+  <tr> 
+ <td>3</td>  
+ <td align='left'>J.R. มินิมาร์ท-127496_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>260.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>4</td>  
+ <td align='left'>Kเยาว์-130720_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>307.28</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>5</td>  
+ <td align='left'>KแอนMฟิชโฮม-126522_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>635.92</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>5</td> 
+</tr>
+  <tr> 
+ <td>6</td>  
+ <td align='left'>M.R.มินิมาร์ท-40950_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>908.66</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>7</td>  
+ <td align='left'>Positive leapning-137910_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>1,988.64</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>7</td> 
+</tr>
+  <tr> 
+ <td>8</td>  
+ <td align='left'>SKมินิมาร์ท-18126_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>3,900.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>9</td>  
+ <td align='left'>ก.การบินไทย-104994_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>476.64</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>9</td> 
+</tr>
+  <tr> 
+ <td>10</td>  
+ <td align='left'>กมล-145458_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>532.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>10</td> 
+</tr>
+  <tr> 
+ <td>11</td>  
+ <td align='left'>กล้วยหอม-35838_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>532.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>12</td>  
+ <td align='left'>กวดวิชาสยาม-145312_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>381.60</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>13</td>  
+ <td align='left'>กองทุน ม 3-123758_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>93.60</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>14</td>  
+ <td align='left'>กองร้อยบริการกองพันนักเรียน-145444_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>8,536.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>15</td>  
+ <td align='left'>กองร้อยปฎิบัติกางสื่อสารสนาม-145446_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>1,330.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>16</td>  
+ <td align='left'>กองแพง-88590_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>425.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>17</td>  
+ <td align='left'>กาญดามินิมาร์ท-145324_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>378.93</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>18</td>  
+ <td align='left'>กานต์-36589_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>280.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>19</td>  
+ <td align='left'>การ์ฟลิส์-53828_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>375.33</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+  <tr> 
+ <td>20</td>  
+ <td align='left'>กำไร-145462_ (Bill-To)</td>  
+<td align='right' class='sort_INVOICED_AMT_1_BL_TO'>1,800.00</td> 
+<td align='right' class='sort_CALL_AMT_2_BL_TO'>1</td> 
+</tr>
+ 
+</tbody> 
+<tfoot> <tr> 
+ <td colspan='2' align='right'>ยอดรวม  483 รายการ</td>  
+<td align='right'>5,155,951.33</td> 
+<td align='right'>483</td> 
+</tr> </tfoot> 
+</table>
+
+<table id="sort-table2" cellpadding="5" cellspacing="2" border="1">
+ 
+  <thead>
+    <tr>
+      <th>No.</th>
+       <th>sort 0<a href="#" class="link-sort asc" id="0">A-Z</a> <a href="#" class="link-sort desc" id="0">Z-A</a></th>
+       <th>sort 1<a href="#" class="link-sort asc" id="1">A-Z</a> <a href="#" class="link-sort desc" id="1">Z-A</a></th>
+       <th>sort 2<a href="#" class="link-sort asc" id="2">A-Z</a> <a href="#" class="link-sort desc" id="2">Z-A</a></th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td class="sort_0">Thailand</td>
+      <td class="sort_1">45</td>
+      <td class="sort_2">5.00</td>
+    </tr>
+    <tr>
+       <td>2</td>
+      <td class="sort_0">Chad</td>
+      <td class="sort_1">245</td>
+       <td class="sort_2">41.38</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="sort_0">Liberia</td>
+      <td class="sort_1">543</td>
+      <td class="sort_2">100.25</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="sort_0">Guyana</td>
+      <td class="sort_1">67</td>
+      <td class="sort_2">21.75</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="sort_0">United States of America</td>
+      <td class="sort_1">22</td>
+      <td class="sort_2">1,480,929.00</td>
+    </tr>
+   
+  </tbody>
+ </table>
+ 
+
+</body>
+</html>

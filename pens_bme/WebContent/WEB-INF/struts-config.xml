@@ -162,6 +162,7 @@
 			<forward name="clear" path="/jsp/master/master.jsp" />
 			<forward name="exportToText" path="/jsp/master/master.jsp" />
 			<forward name="exportToExcel" path="/jsp/master/master.jsp" />
+			<forward name="query" path="/jsp/master/masterQuery.jsp" />
 		</action>
 		
 		<!-- POPUP -->
