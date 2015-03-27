@@ -23,16 +23,14 @@
         
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 		
-		<form-bean name="searchValuePopupForm" type="com.isecinc.pens.web.popup.SearchValuePopupForm" />
-
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
 		
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 		<!-- Admin Console -->
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 		<!-- Interfaces -->
-		<form-bean name="interfacesForm"
-			type="com.isecinc.pens.web.interfaces.InterfacesForm" />
+		<form-bean name="interfacesForm" type="com.isecinc.pens.web.interfaces.InterfacesForm" />
+	
 	</form-beans>
 	
 	<global-forwards>

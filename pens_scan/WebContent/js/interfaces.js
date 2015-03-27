@@ -55,8 +55,35 @@ function updateSalesTransaction(path, type) {
 	return false;
 }
 
+function importWebMember(path, type) {
+	var confirmText = "ยืนยันการ Import Web Member";
+	var requestUserName =document.getElementsByName("monitorBean.requestImportWebMemberUserName")[0];
+	var requestUpdateSalesTable =document.getElementsByName("monitorBean.requestWebMemberTable")[0];
+	var chImportAll = document.getElementsByName("monitorBean.importAll")[0];
+	if(type =='admin'){
+		if(requestUserName.value ==''){
+			requestUserName.focus();
+		    alert("กรุณาระบุ User ที่ต้องการ Import")	;
+		    return false;
+		}
+		confirmText += " TableName:"+requestUpdateSalesTable.value +" User Name :"+requestUserName.value;
+		if(chImportAll.checked){
+			confirmText += " นำข้อมูลเข้าใหม่ทั้งหมด (ALL) "; 
+		}
+	}
+	if(confirm(confirmText)){
+		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=importWebMember&action=submited";
+		document.interfacesForm.submit();
+		return true;
+	}
+	return false;
+}
+
+
 function syschronizeToOracle(path, type) {
 	var confirmText = "ยืนยันการ Export";
+	var importText = "ท่านต้องการ ดึงข้อมูลจากส่วนกลาง ด้วยหรือไม่";
+	
 	if(type =='admin'){
 	  var requestTable =document.getElementsByName("monitorBean.requestExportTable")[0];
 	  var requestExportUserName =document.getElementsByName("monitorBean.requestExportUserName")[0];
@@ -73,7 +100,8 @@ function syschronizeToOracle(path, type) {
 	  
 	}
 	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeToOracle&rf=N&";
+		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeToOracle&rf=N&import=N";
+		
 		document.interfacesForm.submit();
 		return true;
 	}

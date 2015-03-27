@@ -4,12 +4,23 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
+<%@page import="com.isecinc.pens.inf.helper.ImportHelper"%>
+<%@page import="com.isecinc.pens.inf.helper.ExportHelper"%>
 
 <jsp:useBean id="interfacesForm" class="com.isecinc.pens.web.interfaces.InterfacesForm" scope="request" />
+
 <%
 User user = (User) session.getAttribute("user");
-String role = ((User)session.getAttribute("user")).getType();
+System.out.println("User:"+user.getUserName());
+String role = user.getRole().getName();
 
+System.out.println("role:"+role);
 
 List<References> importList = ImportHelper.readConfigTableImport();
 pageContext.setAttribute("importList",importList,PageContext.PAGE_SCOPE);
@@ -20,15 +31,7 @@ pageContext.setAttribute("importUpdateSalesList",importSalesUpdateList,PageConte
 List<References> exportList = ExportHelper.readConfigTableExport();
 pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 %>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="com.isecinc.pens.inf.helper.ImportHelper"%>
-<%@page import="com.isecinc.pens.inf.helper.ExportHelper"%>
-<jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" />
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -247,7 +250,6 @@ body {
 						<!-- CRITERIA  Submit-->
 						<% if( request.getAttribute("action") == null){ %>  
 
-						 <%if( !role.equalsIgnoreCase(User.ADMIN)){ %>
 						     <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 								<tr>
 									<td align="right" width ="50%"><b>Import ข้อมูลจากส่วนกลาง<font color="red">*</font> </b></td>
@@ -262,91 +264,7 @@ body {
 				                  </td>
 							  </tr>
 							</table>
-						   <%}else{ %>
-						     <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-						        <tr>
-									<td align="right" width ="50%"> </td>
-									<td align="left" width ="50%"><html:checkbox property="monitorBean.importAll">นำเข้าใหม่ทั้งหมด</html:checkbox></td>
-								</tr>
-							</table>
-							 <fieldset>
-                             <legend>Import</legend>
-								 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							        <tr>
-										<td align="right" width ="50%">เลือกรายการนำเข้าข้อมูล (Master and  Transaction)<font color="red">*</font></td>
-										<td align="left" width ="50%">
-										    <html:select property="monitorBean.requestTable">
-											   <html:options collection="importList" property="key" labelProperty="name"/>
-										    </html:select>
-										</td>
-									</tr>
-									<tr>
-										<td align="right" width ="50%"> โปรดระบุ User Name ที่ต้องการ Import:<font color="red">*</font></td>
-										<td align="left" width ="50%">
-										   <html:text property="monitorBean.requestImportUserName"></html:text>(Ex.,SOMCHAI,LERTCHAI, SOMBOON)
-										</td>
-									</tr>
-									<tr>
-										<td align="right" width ="50%"></td>
-										<td align="left" width ="50%">
-										<input type="button" name ="import" value="Import" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','admin')">	
-										</td>
-									</tr>
-								</table>
-							</fieldset>
-							
-							 <fieldset>
-                             <legend>Import Update Sales Transaction</legend>
-								 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-									<tr>
-										<td align="right" width ="50%">เลือกรายการนำเข้าข้อมูล (Update Sales Transaction)<font color="red">*</font></td>
-										<td align="left" width ="50%">
-										    <html:select property="monitorBean.requestUpdateSalesTable">
-											   <html:options collection="importUpdateSalesList" property="key" labelProperty="name"/>
-										    </html:select>
-										</td>
-									</tr>
-									<tr>
-										<td align="right" width ="50%"> โปรดระบุ User Name ที่ต้องการ Import:<font color="red">*</font></td>
-										<td align="left" width ="50%">
-										   <html:text property="monitorBean.requestImportUpdateUserName"></html:text>(Ex.,SOMCHAI,LERTCHAI, SOMBOON)
-										</td>
-									</tr>
-									<tr>
-										<td align="right" width ="50%"></td>
-										<td align="left" width ="50%">
-										<input type="button" name ="importTrans" value="Import Update Sales Transaction" class="newPosBtnLong" style="width: 280px;" onClick="javascript:updateSalesTransaction('${pageContext.request.contextPath}','admin')">
-										</td>
-									</tr>
-								</table>
-							</fieldset>
-							
-							 <fieldset>
-                             <legend>Export</legend>
-								 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-									 <tr>
-										<td align="right" width ="50%">เลือกรายการนำออกข้อมูล <font color="red">*</font></td>
-										<td align="left" width ="50%">
-										    <html:select property="monitorBean.requestExportTable">
-											   <html:options collection="exportList" property="key" labelProperty="name"/>
-										    </html:select>   
-									</tr>
-									<tr>
-										<td align="right" width ="50%"> โปรดระบุ User Name ที่ต้องการ Export:<font color="red">*</font></td>
-										<td align="left" width ="50%">
-										   <html:text property="monitorBean.requestExportUserName"></html:text>(Ex.,SOMCHAI,LERTCHAI, SOMBOON)
-										</td>
-									</tr>
-									<tr>
-										<td align="right" width ="50%"></td>
-										<td align="left" width ="50%">
-										    <input type="button" name ="export" value="Export" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','admin')">
-										    
-										</td>
-									</tr>
-							   </table>
-							</fieldset>
-						   <%} %>
+						 
 					    <%} %>
 				
 						<!-- BUTTON -->

@@ -12,8 +12,6 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.MCDAO;
-import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 
@@ -87,12 +85,12 @@ public class SearchCustomerPopupAction extends I_Action {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
 			logger.debug("StoreType["+storeType+"]");
 			
-			 List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,"");
+			 /*List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,"");
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
-			 }
+			 }*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,12 +171,12 @@ public class SearchCustomerPopupAction extends I_Action {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
 			logger.debug("StoreType["+storeType+"]");
 			
-			 List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,"");
+			 /*List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,"");
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
-			 }
+			 }*/
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -233,12 +231,12 @@ public class SearchCustomerPopupAction extends I_Action {
 			String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
 			logger.debug("StoreType["+storeType+"]storeGroup["+storeGroup+"]");
 			
-			 List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,storeGroup,"");
+			/* List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,storeGroup,"");
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
-			 }
+			 }*/
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -294,12 +292,12 @@ public class SearchCustomerPopupAction extends I_Action {
 			
 			logger.debug("mcArea["+mcArea+"]mcRoute["+mcRoute+"]staffType["+staffType+"]");
 			
-			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,"",mcArea,mcRoute,staffType);
+			 /*List<PopupForm> results = MCDAO.searchStaffList(popupForm,"",mcArea,mcRoute,staffType);
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
-			 }
+			 }*/
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

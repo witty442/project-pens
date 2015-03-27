@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
 
-import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 
@@ -62,7 +61,7 @@ public class ReUpdateLotus {
 		PreparedStatement psUpdate = null;
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
-		ImportDAO importDAO = new ImportDAO();
+		
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			sql.append("\n  select SALES_DATE,STYLE_NO,description,PENS_CUST_CODE from PENSBME_SALES_FROM_LOTUS  WHERE PENS_ITEM IS NULL ");

@@ -81,26 +81,12 @@ public class InterfacesAction extends I_Action {
 		logger.debug("Interfaces Prepare Form without ID");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		String returnText = "prepare";
+		User user = (User) request.getSession().getAttribute("user");
 		//Connection conn = null;
 		try {
+			logger.debug("User:"+user.getUserName());
 			
 			interfacesForm.setResults(null);
-			//for test
-			/*
-			 *  SOMBOON   VAN
-				WANCHAI   DD
-				SOMCHAI   TT
-			 */
-			/*User user = new User();
-		
-			user.setUserName("SOMCHAI");
-	        user.setPassword("1234");
-			
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			user = new LoginProcess().login(user.getUserName(), user.getPassword(), conn);
-			
-			request.getSession().setAttribute("user",user);*/
-			
 			interfacesForm.setMonitorBean(new MonitorBean());
 			
 			//clear Task running for next run

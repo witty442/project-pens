@@ -76,7 +76,7 @@ public class User extends I_PO implements Serializable {
 		setConfirmPassword(convertToString(rst.getString("PASSWORD")));
          
 		setUserGroupId(rst.getInt("USER_GROUP_ID"));
-		
+	
 		setRole(new References(rst.getString("ROLE"), rst.getString("ROLE")));
 		
 		setPrinterName(Utils.isNull(rst.getString("PRINTER_NAME")));
@@ -111,8 +111,7 @@ public class User extends I_PO implements Serializable {
 	 * To String
 	 */
 	public String toString() {
-		return String.format("User[%s-%s] Customer Type[%s] Order Type[%s] Sales Group[%s]", getId(), getName(),
-				getCustomerType().getKey(), getOrderType().getKey(), getSalesGroup().getKey());
+		return "";
 	}
 
 	private String printerName;
