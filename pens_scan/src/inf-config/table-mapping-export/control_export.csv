@@ -1,0 +1,3 @@
+#SeqNo ,TABLENAME,FILE_FTP_NAME,SOURCE,DESTINATION,TRANS_TYPE,AUTHEN
+#-- Export To ORCL ****************************#,,,,,,
+1,pensbme_barcode_scan,barcode,SALES,ORACLE,TRANSACTION,AD|TT|VAN

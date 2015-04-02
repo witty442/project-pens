@@ -1,0 +1,99 @@
+HTML,BODY {
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 13;
+	height: 100%;
+	min-height: 100%;
+	background-color: #FFFFFF;
+}
+
+TD {
+	FONT-FAMILY: Tahoma;
+}
+
+LI {
+	FONT-WEIGHT: normal;
+	FONT-VARIANT: normal;
+}
+
+INPUT {
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 13;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
+
+button {
+	/*width: 150px;*/
+}
+
+SELECT {
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 13;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
+
+TEXTAREA {
+	FONT-FAMILY: Tahoma;
+	FONT-SIZE: 13;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
+
+TABLE {
+	font-family: Tahoma;
+	FONT-SIZE: 13;
+}
+
+LEGEND {
+	font-family: Tahoma;
+	FONT-SIZE: 13;
+}
+
+div mainpanel {
+	width: 800px;
+}
+
+a:link {
+	color: #1E90FF;
+	TEXT-DECORATION: none;
+}
+
+a:visited {
+	color: #1E90FF;
+	TEXT-DECORATION: none;
+}
+A:hover {
+	COLOR: #B22222;
+	TEXT-DECORATION: none;
+}
+
+span.red {
+	color: #FF0000;
+}
+
+span.errormsg {
+	color: #FF0000;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+BR.list BR {
+	LINE-HEIGHT: 100px
+}
+
+.searchResult {
+	color: red;
+}
+
+.disableText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+}
+
+
+INPUT:FOCUS {
+	border-width: 2px solid;
+}
