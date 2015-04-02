@@ -149,6 +149,9 @@
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/sumGroupCodeAction.do?do=prepare&action=new');"><span>11.<bean:message bundle="sysprop" key="SummaryBMEByGroupCode"/></span></a>
 			</li>  
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>12.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>

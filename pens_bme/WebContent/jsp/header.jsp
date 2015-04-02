@@ -20,7 +20,7 @@
         </td>
         <td width="31px;"><img src="${pageContext.request.contextPath}/images2/header_right.png" border="0"/></td>
 	</tr>
-</table>
+</table> 
 <%
 if(session.getAttribute("user")!=null){ 
 		//Insert Path

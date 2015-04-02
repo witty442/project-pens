@@ -22,6 +22,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import util.Constants;
+
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
@@ -782,13 +784,14 @@ public class OrderDAO {
 			sql.append("  ( SELECT max(m.pens_desc) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name_real, \n ");
 			sql.append("  ( SELECT m.pens_desc2 FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name, \n ");
 			sql.append("  ( SELECT m.pens_desc3 FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_address, \n ");
-			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='LotusItem' and m.interface_desc = o.barcode) as material_master, ");
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='LotusItem' and m.interface_desc = o.barcode) as material_master_lotus, ");
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='FridayItem' and m.interface_desc = o.barcode) as material_master_friday, ");
 			sql.append("  o.whole_price_bf,o.retail_price_bf,o.create_date \n ");
 			sql.append("  from PENSBME_ORDER o \n ");
 			sql.append("  WHERE 1=1  \n ");
 			sql.append("  and trunc(order_date) = ?  \n ");
 			
-			sql.append(" )A order by A.order_lot_no,A.bar_on_box,A.order_date, A.material_master asc \n ");
+			sql.append(" )A order by A.order_lot_no,A.bar_on_box,A.order_date, A.material_master_lotus , A.material_master_friday asc \n ");
 			
 			logger.debug("sql:"+sql);
 			
@@ -801,11 +804,17 @@ public class OrderDAO {
 				String orderNo = Utils.isNull(rst.getString("order_lot_no"));
 				String barOnBox = Utils.isNull(rst.getString("bar_on_box"));
 				String orderDateSS = Utils.isNull(rst.getString("order_date"));
-				String materialMaster = Utils.isNull(rst.getString("material_master"));
+				String store_code = Utils.isNull(rst.getString("store_code"));
+				
+				String materialMaster = Utils.isNull(rst.getString("material_master_lotus"));
+				
+				if(store_code.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
+				   materialMaster = Utils.isNull(rst.getString("material_master_friday"));
+				}
 				String barcode = Utils.isNull(rst.getString("barcode"));
 				String qty = Utils.isNull(rst.getString("qty"));
 				String uom = Utils.isNull(rst.getString("uom"));
-				String store_code = Utils.isNull(rst.getString("store_code"));
+				
 				String store_name = Utils.isNull(rst.getString("store_name"));
 				String store_name_real = Utils.isNull(rst.getString("store_name_real"));
 				String store_address = Utils.isNull(rst.getString("store_address"));

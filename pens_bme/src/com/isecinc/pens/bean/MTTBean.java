@@ -39,11 +39,26 @@ public class MTTBean {
 	private String status;
 	private String statusDesc;
 	private List<MTTBean> items;
+	
+	private String docDate;
+	private String dispType;
 	//optional
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	
 	
+	public String getDocDate() {
+		return docDate;
+	}
+	public void setDocDate(String docDate) {
+		this.docDate = docDate;
+	}
+	public String getDispType() {
+		return dispType;
+	}
+	public void setDispType(String dispType) {
+		this.dispType = dispType;
+	}
 	public String getCustGroupName() {
 		return custGroupName;
 	}

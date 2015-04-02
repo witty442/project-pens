@@ -545,6 +545,190 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("clear");
 	}
 	
+	public ActionForward prepareScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareScanReport");
+		MTTForm aForm = (MTTForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if("new".equals(action)){
+				aForm.setResultsSearch(null);
+				MTTBean ad = new MTTBean();	
+				aForm.setBean(ad);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			
+		}
+		return mapping.findForward("scanReport");
+	}
+	
+	public ActionForward searchScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchReport");
+		MTTForm aForm = (MTTForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		try {
+			MTTBean b = aForm.getBean();
+			aForm.setBean(MTTBeanDAO.searchScanReport(aForm.getBean()));
+			aForm.setResultsSearch(aForm.getBean().getItems());
+			
+			if(aForm.getResultsSearch().size() <=0){
+			   request.setAttribute("Message", "ไม่พบข้อมูล");
+			   aForm.setResultsSearch(null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			
+		}
+		return mapping.findForward("scanReport");
+	}
+	
+	public ActionForward exportScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportScanReport");
+		MTTForm aForm = (MTTForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		StringBuffer htmlTable = new StringBuffer("");
+		String fileName ="data.xls";
+		try {
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+			response.setContentType("application/vnd.ms-excel");
+			
+			htmlTable = genExportScanReport(request,aForm,user);
+			
+			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+			w.write(htmlTable.toString());
+		    w.flush();
+		    w.close();
+
+		    out.flush();
+		    out.close(); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			
+		}
+		return mapping.findForward("scanReport");
+	}
+	
+	
+	private StringBuffer genExportScanReport(HttpServletRequest request,MTTForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String a= "@";
+		int colSpan =7;
+		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
+			 if("barcode".equalsIgnoreCase(form.getBean().getDispType())){
+				 colSpan = 9;
+			 }
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงาน ผล Scan ยอดสต๊อกคงเหลือ</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ทำรายการ:"+form.getBean().getDocDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >Group Code:"+form.getBean().getGroupCode()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >แสดงผลตาม:"+form.getBean().getDispType()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(form.getResultsSearch() != null){
+			    List<MTTBean> list = (List<MTTBean>)form.getResultsSearch();
+			    
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				 h.append("<td>เลขที่เอกสาร</td> \n");
+				 h.append("<td>วันที่ทำรายการ</td> \n");
+				 h.append("<td>Cust Group</td> \n");
+				 h.append("<td>Cust No</td> \n");
+				 h.append("<td>GroupCode</td> \n");
+				 h.append("<td>Pens Item </td> \n");
+				 if("barcode".equalsIgnoreCase(form.getBean().getDispType())){
+				   h.append("<td>Material Master </td> \n");
+				   h.append("<td>Barcode </td> \n");
+				 }
+				 h.append("<td>QTY</td> \n");
+				
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					MTTBean s = (MTTBean)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getDocNo()+"</td> \n");
+					  h.append("<td>"+s.getDocDate()+"</td> \n");
+					  h.append("<td>"+s.getCustGroup()+"&nbsp;"+s.getCustGroupName()+"</td> \n");
+					  h.append("<td>"+s.getStoreCode()+"&nbsp;"+s.getStoreName()+"</td> \n");
+					  h.append("<td>"+s.getGroupCode()+"</td> \n");
+					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  if("barcode".equalsIgnoreCase(form.getBean().getDispType())){
+						  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+						  h.append("<td class='num'>"+s.getBarcode()+"</td> \n");
+					  }
+					  h.append("<td class='num'>"+s.getQty()+"</td> \n");
+					
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	public ActionForward clearScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearScanReport");
+		MTTForm aForm = (MTTForm) form;
+		try {
+			aForm.setResults(new ArrayList<MTTBean>());
+			
+			MTTBean ad = new MTTBean();
+			ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setCanEdit(true);
+			aForm.setBean(ad);
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("scanReport");
+	}
+	
 	/**
 	 * Print Report
 	 * 
@@ -561,33 +745,9 @@ public class MTTAction extends I_Action {
 		logger.debug("Search for report : " + this.getClass());
 		MTTForm reportForm = (MTTForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		ReportUtilServlet reportServlet = new ReportUtilServlet();
-		HashMap parameterMap = new HashMap();
-		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
 		try {
 	
-			String fileType = SystemElements.PDF;//request.getParameter("fileType");
-			logger.debug("fileType:"+fileType);
-			
-			MTTBean h = MTTBeanDAO.searchReport(reportForm.getBean());
-			if(h != null){
-				//Head
-				//parameterMap.put("p_boxno", h.getBoxNo());
-				//parameterMap.put("p_jobname", h.getJobId()+"-"+h.getName());
-				//parameterMap.put("p_remark", Utils.isNull(h.getRemark()));
-	
-				//Gen Report
-				//String fileName = "boxno_pdf_report";
-				//String fileJasper = BeanParameter.getReportPath() + fileName;
-				
-				//reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, h.getItems());
-				
-			}else{
-				
-				//request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
-				return  mapping.findForward("prepare");
-			}
 		} catch (Exception e) {
 			request.setAttribute("Message", e.getMessage());
 		} finally {

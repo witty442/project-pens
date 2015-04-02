@@ -403,6 +403,7 @@
 			<forward name="addRow" path="/jsp/main/mtt.jsp" />
 			
 			<forward name="report" path="/jsp/main/mttReport.jsp" />
+			<forward name="scanReport" path="/jsp/main/scanReport.jsp" />
 		</action>
 		
 		<action name="mcForm" path="/jsp/mcAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCAction">

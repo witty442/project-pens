@@ -139,6 +139,111 @@ public class MTTBeanDAO{
 		return o;
 	}
 	
+	public static MTTBean searchScanReport(MTTBean o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		MTTBean h = null;
+		List<MTTBean> items = new ArrayList<MTTBean>();
+		int r = 1;
+		int c = 1;
+		int totalQty = 0;
+		try {
+			if("groupCode".equalsIgnoreCase(o.getDispType())){
+				sql.append("\n  select S.doc_no,S.doc_date ,S.cust_group,S.cust_no,I.GROUP_CODE, I.PENS_ITEM " +
+			               "\n ,count(*) as qty"+
+						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						   "     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
+						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						   "     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+						   " from PENSBME_BARCODE_SCAN S ,PENSBME_BARCODE_SCAN_ITEM I");
+			}else{
+				sql.append("\n  select S.doc_no,S.doc_date ,S.cust_group,S.cust_no,I.GROUP_CODE, I.PENS_ITEM,MATERIAL_MASTER,BARCODE " +
+			               "\n ,count(*) as qty"+
+						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						   "     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
+						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						   "     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+						   " from PENSBME_BARCODE_SCAN S ,PENSBME_BARCODE_SCAN_ITEM I");
+			}
+			
+			sql.append("\n where 1=1   \n");
+			sql.append("\n and S.doc_no = I.doc_no \n");
+			//sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
+			
+			if( !Utils.isNull(o.getDocNo()).equals("")){
+				sql.append("\n and S.doc_no = '"+Utils.isNull(o.getDocNo())+"'");
+			}
+			if( !Utils.isNull(o.getCustGroup()).equals("")){
+				sql.append("\n and S.cust_group = '"+Utils.isNull(o.getCustGroup())+"'  ");
+			}
+			if( !Utils.isNull(o.getStoreCode()).equals("")){
+				sql.append("\n and S.cust_no = '"+Utils.isNull(o.getStoreCode())+"'  ");
+			}
+			if( !Utils.isNull(o.getGroupCode()).equals("")){
+				sql.append("\n and I.group_code = '"+Utils.isNull(o.getGroupCode())+"'  ");
+			}
+			
+			if( !Utils.isNull(o.getDocDate()).equals("")){
+				Date fDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append("\n and trunc(DOC_DATE) = to_date('"+fStr+"','dd/mm/yyyy') ");
+			}
+			
+			if("groupCode".equalsIgnoreCase(o.getDispType())){
+				sql.append("\n group by S.doc_no,S.doc_date,S.cust_group,S.cust_no,I.GROUP_CODE,I.PENS_ITEM");
+				sql.append("\n order by S.doc_no,S.doc_date,S.cust_group,S.cust_no,I.GROUP_CODE,I.PENS_ITEM ");
+			}else{
+				sql.append("\n group by S.doc_no,S.doc_date,S.cust_group,S.cust_no,I.GROUP_CODE,I.PENS_ITEM ,I.PENS_ITEM,MATERIAL_MASTER,BARCODE");
+				sql.append("\n order by S.doc_no,S.doc_date,S.cust_group,S.cust_no,I.GROUP_CODE,I.PENS_ITEM,I.PENS_ITEM,MATERIAL_MASTER,BARCODE ");
+			}
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new MTTBean();
+			   h.setNo(r);
+			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
+			   h.setCustGroup(rst.getString("cust_group"));
+			   h.setCustGroupName(rst.getString("cust_group_name"));
+			   h.setDocDate(Utils.stringValue(rst.getTimestamp("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
+			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+               h.setGroupCode(Utils.isNull(rst.getString("GROUP_CODE")));
+               h.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+               if("barcode".equalsIgnoreCase(o.getDispType())){
+            	 h.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));  
+            	 h.setBarcode(Utils.isNull(rst.getString("BARCODE")));  
+               }
+               h.setQty(rst.getInt("qty"));
+             
+               totalQty += h.getQty();
+			   items.add(h);
+			   r++;
+			   
+			}//while
+
+			//set Result 
+			o.setItems(items);
+			o.setTotalQty(totalQty);
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return o;
+	}
+	
 	public static MTTBean searchItem(MTTBean o) throws Exception {
 		Connection conn = null;
 		try{
