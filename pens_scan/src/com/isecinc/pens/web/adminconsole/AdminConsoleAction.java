@@ -102,6 +102,8 @@ public class AdminConsoleAction extends I_Action {
 			   
 			   logger.debug(configInfo);
 				
+			   logger.debug("adForm:"+adForm);
+			   
 			   adForm.setConfigInfo(configInfo);
 			   adForm.setConfigInfoTest(configInfoTest);
 			   
@@ -172,8 +174,7 @@ public class AdminConsoleAction extends I_Action {
 		   }
 			
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			e.printStackTrace();
 			throw e;
 		}
 		return mapping.findForward("process");

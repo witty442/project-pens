@@ -1,21 +1,9 @@
 package com.isecinc.pens.web.adminconsole;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.collections.Factory;
-import org.apache.commons.collections.list.LazyList;
-
 import com.isecinc.core.web.I_Form;
 
 
-/**
- * Customer Form
- * 
- * @author Aneak.t
- * @version $Id: CustomerForm.java,v 1.0 07/10/2010 00:00:00 aneak.t Exp $
- * 
- */
+
 
 public class AdminConsoleForm extends I_Form {
 

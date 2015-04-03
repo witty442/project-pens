@@ -1,10 +1,15 @@
 package com.isecinc.pens.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class MTTBean {
+public class MTTBean implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1247001659520325608L;
 	private int lineId;
 	private int no;
 	private String saleDateFrom;
@@ -42,13 +47,21 @@ public class MTTBean {
 	private String exportDesc;
 	private String remark;
 	
+	private String dispType;
+	
 	private List<MTTBean> items;
 	//optional
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	private boolean canClose = false;
 	
-
+    
+	public String getDispType() {
+		return dispType;
+	}
+	public void setDispType(String dispType) {
+		this.dispType = dispType;
+	}
 	public boolean isCanClose() {
 		return canClose;
 	}

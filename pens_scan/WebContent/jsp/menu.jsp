@@ -4,8 +4,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@page import="com.isecinc.pens.bean.User"%>
-
-
 <%
 String role = ((User)session.getAttribute("user")).getType();
 User user = (User)session.getAttribute("user");
@@ -19,7 +17,7 @@ User user = (User)session.getAttribute("user");
       </ul>
   </li>
   
-  <%-- <li class="parent"><a href="#"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
+   <li class="parent"><a href="#"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
   		<ul>
           	<li>
           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
@@ -29,7 +27,16 @@ User user = (User)session.getAttribute("user");
           	</li>
           	
       </ul>
-  </li> --%>
+  </li> 
+  
+   <li class="parent"><a href="#"><span>รายงาน</span></a>
+      <ul>
+	    <li>
+			<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mttAction.do?do=prepareScanReport&action=new'"><span>1.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
+		</li>
+	  </ul>
+   </li>
+	
   </ul>
   
   

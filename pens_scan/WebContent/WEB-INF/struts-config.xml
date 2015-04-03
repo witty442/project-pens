@@ -30,7 +30,7 @@
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 		
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
-		
+		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -108,6 +108,7 @@
 			<forward name="addRow" path="/jsp/main/mtt.jsp" />
 			
 			<forward name="report" path="/jsp/main/mttReport.jsp" />
+			<forward name="scanReport" path="/jsp/main/scanReport.jsp" />
 		</action>
 		
 			<!-- POPUP -->

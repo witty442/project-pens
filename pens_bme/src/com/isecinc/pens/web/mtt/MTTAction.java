@@ -718,7 +718,7 @@ public class MTTAction extends I_Action {
 			aForm.setResults(new ArrayList<MTTBean>());
 			
 			MTTBean ad = new MTTBean();
-			ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			aForm.setBean(ad);
 			

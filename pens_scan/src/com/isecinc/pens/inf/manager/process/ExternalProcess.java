@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import util.AppversionVerify;
-import util.MonitorSales;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
@@ -43,11 +42,6 @@ public class ExternalProcess {
 		 logger.info("--- 1.Run Script export_before ---");
 		 RunScriptDBAction.runManualScriptProcess("export_before",userLogin);
 		 
-		 //Generate Receipt case User:Van ,have order and not Gen Receipt (default cash receipt)
-		 if("VAN".equalsIgnoreCase(userLogin.getType())){
-			logger.info("--- 2.Run genAutoReceiptCash ---");
-		    //GenerateAutoReceiptVan.genAutoReceiptCash(userLogin);
-		 }
 	}
 	
 	public void processExportAfter(HttpServletRequest request,User userLogin){
