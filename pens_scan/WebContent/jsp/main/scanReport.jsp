@@ -305,8 +305,14 @@ function setGroupMainValue(code,desc,types){
 										 <html:select property="bean.dispType" styleId="dispType" >
 											<html:option value="groupCode">Group Code</html:option>
 											<html:option value="barcode">Barcode</html:option>
+									    </html:select> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+									   Status
+									    <html:select property="bean.status" styleId="status" >
+									        <html:option value="C">CLOSE</html:option>
+											<html:option value="O">OPEN</html:option>
+											<html:option value="AB">CANCEL</html:option>
+											<html:option value="">ALL</html:option>
 									    </html:select>
-									   
 									</td>
 								</tr>
 						   </table>

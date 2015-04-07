@@ -40,9 +40,12 @@ import com.isecinc.pens.bean.Message;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
+import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
 
@@ -181,6 +184,7 @@ public class ImportAction extends I_Action {
 		logger.debug("Import :Excel page:"+Utils.isNull(request.getParameter("page")));
 		ImportForm importForm = (ImportForm) form;
 		importForm.setImported(true);
+		User user = (User) request.getSession().getAttribute("user");
 		
         if("lotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
@@ -212,6 +216,21 @@ public class ImportAction extends I_Action {
         }else if("onhandFriday".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	return importFridayFromWacoal(mapping, importForm, request, response);
         	
+        }else if("ftp_file_scan_barcode".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	
+        	EnvProperties env = EnvProperties.getInstance();
+        	FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+        	String path = env.getProperty("path.transaction.sales.out");
+        	
+        	List<FTPFileBean> ftpFileBeanList = ftpManager.downloadFileFromFTP(user, path);
+        	
+        	boolean result = importFileScanBarcode(user, ftpFileBeanList);
+        	if(result){
+        		//move file to SaleOut Result
+        		
+        	}
+        	
+        	return mapping.findForward("success");
         }else{
         	return null;
         }
@@ -2912,6 +2931,115 @@ public class ImportAction extends I_Action {
 				  }
 		    }
 		return mapping.findForward("success");
+	}
+	
+	
+	public boolean importFileScanBarcode(User user,List<FTPFileBean> ftpFileBeanList)  throws Exception {
+		logger.debug("importFileScanBarcode :Text");
+		int i=0;
+		int l=0;
+		int lineId = 0;
+		int allCount = 0;
+		int successCount = 0;
+		int failCount = 0;
+	    Connection conn = null;
+	    PreparedStatement psH = null;
+	    PreparedStatement psL = null;
+	
+	    List<ImportSummary> successList = new ArrayList<ImportSummary>();
+	    List<ImportSummary> errorList = new ArrayList<ImportSummary>();
+	    List<Message> errorMsgList = new ArrayList<Message>();
+	    boolean importError = false;
+	    boolean lineError = false;
+	    BigDecimal bigZero = new BigDecimal("0");
+		try {
+			logger.debug("Start insert scan barcode DB");
+			conn = DBConnection.getInstance().getConnection();
+            conn.setAutoCommit(false);
+
+			 StringBuffer sql = new StringBuffer("");
+			 sql.append("INSERT INTO pensbme_barcode_scan(doc_no, Doc_date, Cust_Group, Cust_no, Remark, Status, FILE_NAME,Create_date, Create_user)");
+			 sql.append("VALUES(?,?,?, ?,?,?, ?,?,?)");
+			  
+			 psH = conn.prepareStatement(sql.toString());
+			 
+			 StringBuffer sqlLine = new StringBuffer("");
+			 sqlLine.append("INSERT INTO pensbme_barcode_scan_item(doc_no, LINE_ID, Barcode, Material_master, Group_code, Pens_item, Create_date, Create_user)");
+			 sqlLine.append("VALUES( ?,?,?, ?,?,? ,?,?)");
+			  
+			 psL = conn.prepareStatement(sqlLine.toString());
+			 
+			 if(ftpFileBeanList != null && ftpFileBeanList.size() >0){
+				 for(i=0;i<ftpFileBeanList.size();i++){
+					FTPFileBean fileBean = ftpFileBeanList.get(i);
+					String[] dataLineTextArr = fileBean.getDataLineText();
+					for(l=0;l<dataLineTextArr.length;l++){
+						logger.debug("dataLineTextArr[l]:"+dataLineTextArr[l]);
+						
+						String[] lineStrArrPipe =  dataLineTextArr[l].split("\\|");
+						
+						if(lineStrArrPipe[0].startsWith("H")){
+							lineId = 0;//reset lineId by Head
+							//H020047-99-201504-001|02042015|020047|020047-99||C|20150403095903-admin-barcode.txt
+							logger.debug("0:"+lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));
+							logger.debug("1:"+lineStrArrPipe[1]);
+							logger.debug("2:"+lineStrArrPipe[2]);
+							logger.debug("3:"+lineStrArrPipe[3]);
+							logger.debug("4:"+lineStrArrPipe[4]);
+							logger.debug("5:"+lineStrArrPipe[5]);
+							logger.debug("6:"+lineStrArrPipe[6]);
+							
+							psH.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//docNo
+							
+							Date docDate = Utils.parse(lineStrArrPipe[1], Utils.DD_MM_YYYY_WITHOUT_SLASH);
+							psH.setDate(2, new java.sql.Date(docDate.getTime()));
+							psH.setString(3,lineStrArrPipe[2]);//custGroup
+							psH.setString(4,lineStrArrPipe[3]);//custNo
+							psH.setString(5,lineStrArrPipe[4]);//remark
+							psH.setString(6,lineStrArrPipe[5]);//status
+							psH.setString(7,lineStrArrPipe[6]);//fileName
+							psH.setDate(8, new java.sql.Date(new Date().getTime()));//createDate
+							psH.setString(9, user.getUserName());//createUser
+							
+							psH.execute();
+						}else{
+							lineId++;
+							//D020047-99-201504-001|8850009385309|ME1106A4VI|ME1106|835057
+                            psL.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//DocNo
+                            psL.setInt(2,lineId);//Barcode
+                            psL.setString(3,lineStrArrPipe[1]);//Barcode
+                            psL.setString(4,lineStrArrPipe[2]);//Material
+                            psL.setString(5,lineStrArrPipe[3]);//GroupCode
+                            psL.setString(6,lineStrArrPipe[4]);//PENSITEM
+                            psL.setDate(7, new java.sql.Date(new Date().getTime()));
+                            psL.setString(8, user.getUserName());//createUser
+							
+                            psL.execute();
+						}
+					}
+				 }
+			 }
+			 
+		    conn.commit();
+		    
+		    logger.debug("End insert Scan barcode DB");
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			
+		}finally{
+		    	// dispose all the resources after using them.
+			      if(conn != null){
+			    	 conn.close();conn=null;
+			      }
+			      if(psH != null){
+			    	  psH.close();psH=null;
+			      }
+			      if(psL != null){
+			    	  psL.close();psL=null;
+				  }
+		    }
+		return true;
 	}
 	
 	/** Export ReturnWacoal **/

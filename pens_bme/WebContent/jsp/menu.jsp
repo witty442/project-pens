@@ -99,6 +99,10 @@
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=onhandFriday');">10.<span><bean:message bundle="sysprop" key="ImportBMEFridayFromWacoal"/></span></a>
 			</li>
+			
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>

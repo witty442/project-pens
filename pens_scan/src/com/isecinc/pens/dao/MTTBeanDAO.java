@@ -42,7 +42,7 @@ public class MTTBeanDAO{
 						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 						   "     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-						   "     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+						   "     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
 						   " from PENSBME_BARCODE_SCAN S ,PENSBME_BARCODE_SCAN_ITEM I");
 			}else{
 				sql.append("\n  select S.doc_no,S.doc_date ,S.cust_group,S.cust_no,I.GROUP_CODE, I.PENS_ITEM,MATERIAL_MASTER,BARCODE " +
@@ -50,14 +50,16 @@ public class MTTBeanDAO{
 						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 						   "     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 						   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-						   "     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+						   "     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
 						   " from PENSBME_BARCODE_SCAN S ,PENSBME_BARCODE_SCAN_ITEM I");
 			}
 			
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and S.doc_no = I.doc_no \n");
-			//sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
-			
+
+			if( !Utils.isNull(o.getStatus()).equals("")){
+				sql.append("\n and S.status ='"+Utils.isNull(o.getStatus())+"' \n");
+			}
 			if( !Utils.isNull(o.getDocNo()).equals("")){
 				sql.append("\n and S.doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 			}
@@ -144,7 +146,7 @@ public class MTTBeanDAO{
 					   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 					   "\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 					   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-					   "\n     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+					   "\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
 					   "\n from PENSBME_BARCODE_SCAN S");
 			
 			sql.append("\n where 1=1   \n");

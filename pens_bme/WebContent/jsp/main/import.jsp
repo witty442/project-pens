@@ -77,6 +77,13 @@ function loadStoreList(){
 	});
 }
 
+function importFTP(path,noCheckError){
+	var form = document.importForm;
+	form.action = path + "/jsp/importAction.do?do=importExcel&page=<%=request.getParameter("page")%>&NO_CHECK_ERROR="+noCheckError;
+	form.submit();
+	return true;
+}
+
 function importExcel(path,noCheckError){
 	var form = document.importForm;
 	var extension = '';
@@ -250,6 +257,10 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportReturnWacoal"/>
 				</jsp:include>
+			<%}else if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportScanBarcode"/>
+				</jsp:include>
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
@@ -313,18 +324,26 @@ function clearForm(path){
 								</td>
 							</tr>
 						<%} %>
+						<%  if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
+							
+						<%}else{ %>
 							<tr>
 								<td align="right" width="40%">àÅ×Í¡ä¿Åì&nbsp;&nbsp;</td>
 								<td valign="top" align="left">
 									<html:file property="dataFile" styleClass="" style="width:300px;height:21px"/>
 								</td>
 							</tr>
+						<%} %>
 						</table>
 						<br>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
+								  <% if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
+							        <input type="button" value="  Import  " class="newPosBtnLong" onclick="javascript:importFTP('${pageContext.request.contextPath}','')">
+									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
+						          <%}else{ %>
 									<input type="button" value="  Upload  " class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','')">
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
 								    <% if("onhand".equalsIgnoreCase(request.getParameter("page")) || "onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -332,6 +351,7 @@ function clearForm(path){
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 								        <input type="button" value="Export to Excel" class="newPosBtnLong" onclick="javascript:exportReturnWacoal('${pageContext.request.contextPath}')">
 								    <%} %>
+								  <%} %>
 								</td>
 							</tr>
 						</table>
