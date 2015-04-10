@@ -161,6 +161,15 @@ UL {
 	color: #000000;
 	font-weight: bold;
 }
+.disableTextBigBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-weight: bold;
+	font-family: tahoma;
+	font-size: 18px;
+}
 .enableNumber {
 	border: 1px solid;
 	border-color: #BEBEBE;

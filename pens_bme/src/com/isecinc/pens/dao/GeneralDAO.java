@@ -1,6 +1,7 @@
 package com.isecinc.pens.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
+import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -482,4 +484,39 @@ public class GeneralDAO {
 			}
 			return custNo;
 		}
+	 
+	 public static Master getMasterIdwacoal(Connection conn ,String type ,String custGroup) throws Exception{
+			PreparedStatement ps =null;
+			ResultSet rs = null;
+			Master m = null;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" select *  from PENSBME_MST_REFERENCE WHERE Reference_code ='"+type+"' and pens_value ='"+custGroup+"' \n");
+				
+			    logger.debug("SQL:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					m = new Master();
+					m.setReferenceCode(rs.getString("reference_code"));
+					m.setPensValue(rs.getString("pens_value"));
+					m.setPensDesc(Utils.isNull(rs.getString("pens_desc")));
+					m.setInterfaceDesc(Utils.isNull(rs.getString("interface_desc")));
+					m.setInterfaceValue(Utils.isNull(rs.getString("interface_value")));
+					m.setPensDesc2(Utils.isNull(rs.getString("pens_desc2")));
+				}
+			
+			}catch(Exception e){
+		      throw e;
+			}finally{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				if(rs != null){
+				   rs.close();rs = null;
+				}
+				
+			}
+			return m;
+		} 
 }

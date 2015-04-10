@@ -27,6 +27,11 @@ public class SequenceProcess {
 		return getNextValueModel(conn, sequenceType, code,orderDateObj);
 	}
 	
+	public static Integer getNextValueByYear(Connection conn,String sequenceType,String code,Date orderDateObj) throws Exception {
+		return getNextValueByYearModel(conn, sequenceType, code,orderDateObj);
+	}
+	
+	
 	public static Integer getNextValue(Connection conn,String sequenceType) throws Exception {
 		return getNextValueModel(conn, sequenceType);
 	}
@@ -82,13 +87,52 @@ public class SequenceProcess {
 		return nextValue;
 	}
 	
+	public static Integer getNextValueByYearModel(Connection conn,String sequenceType,String code,Date orderDateObj) throws Exception {
+		Integer nextValue = 0;
+		Statement stmt = null;
+		ResultSet rst = null;
+		try {
+			String today = df.format(orderDateObj);
+			String[] d1 = today.split("/");
+			String curYear = d1[0].substring(2,4);
+			String curMonth = "00";
+			logger.debug("curYear["+curYear+"]");
+			logger.debug("curMonth["+curMonth+"]");
+			
+			StringBuilder sql = new StringBuilder();
+			sql.append("SELECT seq  FROM PENSBME_C_SEQUENCE WHERE SEQUENCE_TYPE ='"+sequenceType+"' AND CODE ='"+code+"' AND MONTH='"+curMonth+"' AND YEAR='"+curYear+"'");
+			stmt = conn.createStatement();
+			logger.debug(sql.toString());
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				nextValue = rst.getInt("seq");
+				
+				//update nextValue
+				stmt = conn.createStatement();
+				stmt.executeUpdate("UPDATE PENSBME_C_SEQUENCE SET SEQ ="+(nextValue+1)+" WHERE SEQUENCE_TYPE ='"+sequenceType+"' AND CODE ='"+code+"' AND MONTH='"+curMonth+"' AND YEAR='"+curYear+"'");
+			} else{
+				//not found -> insert
+				stmt = conn.createStatement();
+				stmt.executeUpdate("INSERT INTO PENSBME_C_SEQUENCE(SEQUENCE_TYPE,MONTH,YEAR,CODE,SEQ)VALUES('"+sequenceType+"','"+curMonth+"','"+curYear+"','"+code+"',"+(nextValue+1)+")");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		return nextValue;
+	}
+	
 	public static Integer getNextValueModel(Connection conn,String sequenceType) throws Exception {
 		Integer nextValue = 0;
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-		
-			
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT seq  FROM PENSBME_C_SEQUENCE_ALL WHERE SEQUENCE_TYPE ='"+sequenceType+"'");
 			stmt = conn.createStatement();

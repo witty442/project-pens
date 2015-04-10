@@ -46,7 +46,7 @@ public class MTTBeanDAO{
 					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 					"     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-					"     and M.reference_code = 'Customer' and M.pens_value = S.cust_group) as cust_group_name  "+
+					"     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
 					" from PENSBME_SALES_OUT S");
 			
 			sql.append("\n where 1=1   \n");

@@ -68,9 +68,12 @@
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
 		<form-bean name="mcForm" type="com.isecinc.pens.web.mc.MCForm" />
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
+		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 		
 		<form-bean name="sumGroupCodeForm" type="com.isecinc.pens.web.summary.groupCode.SummaryForm" />
+		<!-- Admin Console -->
+		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 		
 	</form-beans>
 	
@@ -423,7 +426,12 @@
 		<action name="payForm" path="/jsp/payAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayAction">
 			<forward name="search" path="/jsp/pay/paySearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
-
+		</action>
+		
+		<action name="rtForm" path="/jsp/rtAction" parameter="do" scope="session" type="com.isecinc.pens.web.rt.RTAction">
+			<forward name="search" path="/jsp/rt/rtSearch.jsp" />
+			<forward name="detail" path="/jsp/rt/rtDetail.jsp" />
+			<forward name="detailPic" path="/jsp/rt/rtDetailPic.jsp" />
 		</action>
 		
 		<action name="tempForm" path="/jsp/tempAction" forward="/jsp/printPopup.jsp" />
@@ -438,6 +446,11 @@
 			<forward name="prepare" path="/jsp/main/sumByGroupCode.jsp" />
 			<forward name="clear" path="/jsp/main/sumByGroupCode.jsp" />
 			<forward name="export" path="/jsp/main/sumByGroupCode.jsp" />
+		</action>
+		
+		<!-- AdminConsole -->
+		<action name="adminConsoleForm" path="/jsp/adminConsole" parameter="do" scope="request" type="com.isecinc.pens.web.adminconsole.AdminConsoleAction" >
+			<forward name="process" path="/jsp/adminConsole/adminConsole.jsp" />
 		</action>
 		
 	</action-mappings>

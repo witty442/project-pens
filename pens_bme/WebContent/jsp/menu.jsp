@@ -100,9 +100,9 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=onhandFriday');">10.<span><bean:message bundle="sysprop" key="ImportBMEFridayFromWacoal"/></span></a>
 			</li>
 			
-			<li>
+			<%-- <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
-			</li>
+			</li> --%>
 		</ul>
 	</li>
 <%} %>
@@ -298,5 +298,22 @@
 		</ul>
 	</li> 
 <%} %>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.MT_SALE}) ){%>
+  	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Other</span></a>
+		<ul>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MT_SALE}) ){%>
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/rtAction.do?do=prepare2&action=new&page=sale');"><span>1.<bean:message bundle="sysprop" key="rt"/></span></a>
+			</li>   
+		<%} %>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/rtAction.do?do=prepare2&action=new&page=pic');"><span>1.<bean:message bundle="sysprop" key="picRT"/></span></a>
+			</li>   
+		<%} %>
+		</ul>
+	</li> 
+<%} %>
+
 </ul>
    
