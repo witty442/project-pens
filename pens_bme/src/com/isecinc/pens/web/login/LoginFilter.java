@@ -46,7 +46,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
-		 logger.debug("do filter...");
+		// logger.debug("do filter...");
 		response.setContentType("text/html;charset=TIS620");
 
 		HttpServletRequest req = (HttpServletRequest) request;
@@ -64,7 +64,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 		}
 		//logger.debug("logoff["+req.getParameter("logoff")+"]");
 		if (!logoff.equals("")) {
-			logger.debug("login off...");
+			//logger.debug("login off...");
 
 			// for logoff link
 			// do when logoff is not null
@@ -72,11 +72,11 @@ public class LoginFilter extends HttpServlet implements Filter {
 			RequestDispatcher rd = config.getServletContext().getRequestDispatcher("/index.jsp");
 			rd.forward(req, res);
 		} else if (session.getAttribute("user") != null) {
-			logger.debug("have user...");
+			//logger.debug("have user...");
 			// have user
 			chain.doFilter(request, response);
 		} else {
-			logger.debug("no user...");
+			//logger.debug("no user...");
 			// no user in session
 			req.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.CREDENTIAL_REQUIRE, Locale
 					.getDefault()));

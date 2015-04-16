@@ -109,7 +109,7 @@ public class User extends I_PO implements Serializable {
 		return String.format("User[%s-%s] Customer Type[%s] Order Type[%s] Sales Group[%s]", getId(), getName(),
 				getCustomerType().getKey(), getOrderType().getKey(), getSalesGroup().getKey());
 	}
-
+    private String type;
 	private String printerName;
 	/** ID */
 	private int id;
@@ -178,6 +178,14 @@ public class User extends I_PO implements Serializable {
     private String reNewPassword;
     
     
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public String getPrinterName() {
 		return printerName;
 	}

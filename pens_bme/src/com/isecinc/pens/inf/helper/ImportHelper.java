@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import meter.MonitorTime;
+
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
@@ -14,6 +16,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
+import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.isecinc.pens.inf.manager.FTPManager;
 
 public class ImportHelper {
 	
@@ -47,7 +51,7 @@ public class ImportHelper {
 	public static  int initImportConfig(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,String transType,User userBean ,String requestTable,boolean importAll) throws Exception {
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
 		EnvProperties env = EnvProperties.getInstance();
-		ImportDAO dao = new ImportDAO();
+		InterfaceDAO dao = new InterfaceDAO();
 		try {
 			
 			String lineStr = null;
@@ -85,8 +89,23 @@ public class ImportHelper {
 				}//if 1
 			}//while
 			
-	        return 0;
-		  
+
+			//monitorTime.debugUsedTime();
+			
+			//monitorTime = new MonitorTime("initImportConfig>>Select Table Last import:[mapFileNameLastImportToTableMap]");
+			/** Map Table and last File Name Import **/
+			tableMap = dao.mapFileNameLastImportToTableMap(conn,tableMap,userBean,importAll);
+			//monitorTime.debugUsedTime();
+			
+			//monitorTime = new MonitorTime("initImportConfig>>Download file from Ftp Server");
+			/** Load File From FTP Server To Table Map By Table**/
+		    FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+	        int countFileMap = ftpManager.downloadFileMappingToTable(userBean,tableMap,pathImport,userBean,transType,importAll);
+	        
+	       // monitorTime.debugUsedTime();
+	        return countFileMap;
+	        
+	
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -179,7 +198,7 @@ public class ImportHelper {
 							col.setColumnType(Utils.isNull(p[3]));
 							col.setDefaultValue(Utils.isNull(p[4]));
 							col.setExternalFunction(Utils.isNull(p[5]));
-							col.setKey(Utils.isNull(p[6]));
+							/*col.setKey(Utils.isNull(p[6]));
                             if(p.length >=8){
                             	col.setRoleAction(Utils.isNull(p[7]));
 							}
@@ -193,7 +212,7 @@ public class ImportHelper {
 							
 							if(col.getTextPosition() !=99){
 							   columnTableAll += col.getColumnName()+",";
-							}
+							}*/
 						} catch (Exception e) {
 							//log.debug(lineStr);
 							throw e;

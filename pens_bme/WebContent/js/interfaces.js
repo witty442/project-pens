@@ -3,8 +3,8 @@ function reGen(path, type) {
 	document.interfacesForm.submit();
 	return true;
 }
-function syschronizeFromOracle(path, type) {
-	var confirmText = "ยืนยันการ Import เข้าระบบ Sales";
+function importData(path, type) {
+	var confirmText = "ยืนยันการ Import เข้าระบบ ";
 	var chImportAll = document.getElementsByName("monitorBean.importAll")[0];
 	var requestTable =document.getElementsByName("monitorBean.requestTable")[0];
 	var requestUserName =document.getElementsByName("monitorBean.requestImportUserName")[0];
@@ -24,56 +24,7 @@ function syschronizeFromOracle(path, type) {
 		}
 	}
 	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeFromOracle&rf=N&action=submited";
-		document.interfacesForm.submit();
-		return true;
-	}
-	return false;
-}
-
-function updateSalesTransaction(path, type) {
-	var confirmText = "ยืนยันการ Update Sales Transaction";
-	var requestUserName =document.getElementsByName("monitorBean.requestImportUpdateUserName")[0];
-	var requestUpdateSalesTable =document.getElementsByName("monitorBean.requestUpdateSalesTable")[0];
-	var chImportAll = document.getElementsByName("monitorBean.importAll")[0];
-	if(type =='admin'){
-		if(requestUserName.value ==''){
-			requestUserName.focus();
-		    alert("กรุณาระบุ User ที่ต้องการ update")	;
-		    return false;
-		}
-		confirmText += " TableName:"+requestUpdateSalesTable.value +" User Name :"+requestUserName.value;
-		if(chImportAll.checked){
-			confirmText += " นำข้อมูลเข้าใหม่ทั้งหมด (ALL) "; 
-		}
-	}
-	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=updateSalesTransaction&rf=N&action=submited";
-		document.interfacesForm.submit();
-		return true;
-	}
-	return false;
-}
-
-function syschronizeToOracle(path, type) {
-	var confirmText = "ยืนยันการ Export";
-	if(type =='admin'){
-	  var requestTable =document.getElementsByName("monitorBean.requestExportTable")[0];
-	  var requestExportUserName =document.getElementsByName("monitorBean.requestExportUserName")[0];
-	 
-	  if(   requestTable.value == 'm_customer|MASTER' || requestTable.value == 't_order|TRANSACTION'
-		 || requestTable.value == 't_receipt|TRANSACTION' || requestTable.value == 't_visit|TRANSACTION' ){
-			if(requestExportUserName.value ==''){
-				requestExportUserName.focus();
-			    alert("กรุณาระบุ User Name ที่ต้องการ Export");
-			    return false;
-			}
-			confirmText += " Export TableName:"+requestTable.value+ " UserName :"+requestExportUserName.value;
-	   }
-	  
-	}
-	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeToOracle&rf=N&";
+		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=importData&rf=N&action=submited";
 		document.interfacesForm.submit();
 		return true;
 	}

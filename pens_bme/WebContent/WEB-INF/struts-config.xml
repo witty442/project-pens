@@ -74,6 +74,8 @@
 		<form-bean name="sumGroupCodeForm" type="com.isecinc.pens.web.summary.groupCode.SummaryForm" />
 		<!-- Admin Console -->
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
+		<!-- Interfaces -->
+		<form-bean name="interfacesForm" type="com.isecinc.pens.web.interfaces.InterfacesForm" />
 		
 	</form-beans>
 	
@@ -92,6 +94,21 @@
 			 <forward name="logoff" path="/index.jsp" /> 
 		</action>
 
+	<!-- Interfaces -->
+		<action name="interfacesForm" path="/jsp/interfacesAction"
+			forward="/jsp/interfaces/interfaces.jsp" />
+		<action name="interfacesForm" path="/jsp/interfacesAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.interfaces.InterfacesAction">
+			<forward name="search" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="prepare" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="detail" path="/jsp/interfaces/interfaces_detail.jsp" />
+			<forward name="success" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="clearform" path="/jsp/interfaces/interfaces.jsp" />
+			<forward name="getLog" path="/jsp/interfaces/dispLogs.jsp"></forward>
+			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
+		</action>
+		
         <!-- USER -->
 
 		<action name="userForm" path="/jsp/userAction" parameter="do" scope="request" type="com.isecinc.pens.web.user.UserAction">

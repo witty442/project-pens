@@ -1,0 +1,7 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+RECORD_TYPE,N,0,CHAR,,N           
+DOC_NO,N,1,CHAR,,N
+BARCODE,N,2,CHAR,,N
+Material_master,N,3,CHAR,,N
+Group_code,N,4,CHAR,,N
+PENS_ITEM,N,5,CHAR,,N

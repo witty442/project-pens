@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 
 /**
@@ -36,6 +37,19 @@ public class SequenceProcess {
 		return getNextValueModel(conn, sequenceType);
 	}
 	
+	public static Integer getNextValue(String sequenceType) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+		    return getNextValueModel(conn, sequenceType);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+	}
 	
 	/**
 	 * Get Next Value
@@ -112,6 +126,7 @@ public class SequenceProcess {
 				stmt.executeUpdate("UPDATE PENSBME_C_SEQUENCE SET SEQ ="+(nextValue+1)+" WHERE SEQUENCE_TYPE ='"+sequenceType+"' AND CODE ='"+code+"' AND MONTH='"+curMonth+"' AND YEAR='"+curYear+"'");
 			} else{
 				//not found -> insert
+				nextValue = 1;
 				stmt = conn.createStatement();
 				stmt.executeUpdate("INSERT INTO PENSBME_C_SEQUENCE(SEQUENCE_TYPE,MONTH,YEAR,CODE,SEQ)VALUES('"+sequenceType+"','"+curMonth+"','"+curYear+"','"+code+"',"+(nextValue+1)+")");
 			}

@@ -24,6 +24,7 @@ public class TableBean implements Serializable{
     private String actionDB;
     private String preFunction;
     private String postFunction;
+    private String checkDupFile;
     
     private String columnTableAll;
     private List<ColumnBean> columnBeanList;
@@ -61,6 +62,12 @@ public class TableBean implements Serializable{
     
 	
 	
+	public String getCheckDupFile() {
+		return checkDupFile;
+	}
+	public void setCheckDupFile(String checkDupFile) {
+		this.checkDupFile = checkDupFile;
+	}
 	public String getPreFunction() {
 		return preFunction;
 	}

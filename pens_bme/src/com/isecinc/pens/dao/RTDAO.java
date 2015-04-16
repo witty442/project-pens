@@ -58,9 +58,6 @@ public class RTDAO {
 							"     and M.reference_code = 'Idwacoal' and M.pens_value = h.cust_group) as cust_group_name  "+
 				    		"\n from PENSBME_RTN_CONTROL h where 1=1 ");
 				   
-					if( !Utils.isNull(o.getCreateUser()).equals("")){
-						sql.append("\n and h.create_user = '"+Utils.isNull(o.getCreateUser())+"'");
-					}
 					if( !Utils.isNull(o.getDocNo()).equals("")){
 						sql.append("\n and h.Authorize_no = '"+Utils.isNull(o.getDocNo())+"'");
 					}
@@ -302,9 +299,12 @@ public class RTDAO {
 			   Master m = GeneralDAO.getMasterIdwacoal(conn,"Idwacoal",custGroup);
 			   prefix = m!= null?m.getPensDesc():"XX";
 			   
-			   int seq = SequenceProcess.getNextValueByYear(conn,"RT_CONTROL","AUTHORIZE_NO", date);
+			   int seq = SequenceProcess.getNextValueByYear(conn,"AUTHORIZE_NO",custGroup, date);
 			   
 			   docNo = prefix +"-"+curYear+new DecimalFormat("0000").format(seq);
+			   
+			   /*logger.debug("seq:"+seq);
+			   logger.debug("docNo:"+docNo);*/
 		  
 		   }catch(Exception e){
 			   throw e;

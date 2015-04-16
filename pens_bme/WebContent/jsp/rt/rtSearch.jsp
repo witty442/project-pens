@@ -314,9 +314,11 @@ function resetStore(){
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
-										<a href="javascript:newDoc('${pageContext.request.contextPath}')">
-										  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
-										</a>
+										<%if( !Utils.isNull(request.getParameter("page")).equalsIgnoreCase("PIC") ){%>
+											<a href="javascript:newDoc('${pageContext.request.contextPath}')">
+											  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
+											</a>
+										<%} %>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -371,8 +373,11 @@ function resetStore(){
 										
 										<td class="td_text_center" width="10%">
 										<%if ( Utils.isNull(request.getParameter("page")).equalsIgnoreCase("PIC") ){%>
-										    <% if(mc.getStatus().equals(RTConstant.STATUS_COMPLETE)){
-										     %>
+										    <% if(mc.getStatus().equals(RTConstant.STATUS_COMPLETE)){%>
+											 <a href="javascript:openPicEdit('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
+											             แก้ไข
+											 </a>
+											 <% }else if(mc.getStatus().equals(RTConstant.STATUS_RECEIVED)){ %>
 											 <a href="javascript:openPicEdit('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
 											             แก้ไข
 											 </a>

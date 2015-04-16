@@ -1,0 +1,9 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,KEY_UPDATE_OR_DELETE,Role in Action Column,Require Field,ValidFunc
+RECORD_TYPE,N,0,CHAR,,N           ,,,,
+DOC_NO,N,1,CHAR,,N,,,,
+DOC_DATE,N,2,DATE,,N,,,,
+CUST_GROUP,N,3,CHAR,,N,,,,
+CUST_NO,N,4,CHAR,,N,,,,
+REMARK,N,5,CHAR,,N,,,,
+STATUS,N,6,CHAR,,N,,,,
+FILE_NAME,N,7,CHAR,,N,,,,

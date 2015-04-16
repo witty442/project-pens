@@ -1,18 +1,23 @@
 package com.isecinc.pens.inf.manager.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ImportSummary;
+import com.isecinc.pens.bean.Message;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
@@ -47,7 +52,7 @@ public class ImportProcess {
         String errorCode = "";
         String[] dataTextLineArr = null;
         String[] results = new String[3];
-
+        int lineId =0;
 	    try {
 	    	 //Debug Time
 	    	  
@@ -63,8 +68,8 @@ public class ImportProcess {
 			  logger.debug("sqlInsert:"+tableBean.getPrepareSqlIns());
 			  logger.debug("sqlUpd:"+tableBean.getPrepareSqlUpd());
 			  
-			  psInsert = conn.prepareStatement(tableBean.getPrepareSqlIns());
-			  psUpdate = conn.prepareStatement(tableBean.getPrepareSqlUpd());
+			 // psInsert = conn.prepareStatement(tableBean.getPrepareSqlIns());
+			 // psUpdate = conn.prepareStatement(tableBean.getPrepareSqlUpd());
 			 
 			  if(tableBean.getActionDB().indexOf("D") != -1){
 				 logger.debug("sqlDelete:"+tableBean.getPrepareSqlDelete());
@@ -79,82 +84,13 @@ public class ImportProcess {
 					  lineStr = Utils.isNull(dataTextLineArr[line]);   	  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 			    		  
-			    		  /** Case Table m_inventory_onhand Delete by User_id and Insert new **/
-			    		  if("m_inventory_onhand".equalsIgnoreCase(tableBean.getTableName())){
-			    			  /** Delete form m_inventory_onhand where user_id =''   1 Transaction **/
-			    			  if(tableBean.getActionDB().indexOf("D") != -1 && line ==0){
-					    		  //logger.debug("**********Start Delete ******************");
-					    		  psDelete = ImportHelper.spiltLineArrayToDeleteStatement(conn, tableBean, lineStr, psDelete,userBean);
-						    	  canExc = psDelete.executeUpdate();
-						    	  //logger.debug("canDelete:"+canExc);
-				    		  }
-			    			  if(tableBean.getActionDB().indexOf("I") != -1){
-					    		  //logger.debug("**********Start Insert ******************");
-					    		  psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
-						    	  canExc = psInsert.executeUpdate();
-					    	      //logger.debug("canIns:"+canExc);
-			    			  }
-			    			  
-			    		  }else if("m_pd".equalsIgnoreCase(tableBean.getTableName())){
-				    			  /** Delete form m_pd where user_id =''   1 Transaction **/
-				    			  if(tableBean.getActionDB().indexOf("D") != -1 && line ==0){
-						    		  //logger.debug("**********Start Delete ******************");
-						    		  psDelete = ImportHelper.spiltLineArrayToDeleteStatement(conn, tableBean, lineStr, psDelete,userBean);
-							    	  canExc = psDelete.executeUpdate();
-							    	  //logger.debug("canDelete:"+canExc);
-					    		  }
-				    			  if(tableBean.getActionDB().indexOf("I") != -1){
-						    		  //logger.debug("**********Start Insert line By SalesCode (V203)******************");
-				    				  if(lineStr.indexOf(userBean.getUserName()) != -1){
-						    		     psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
-							    	     canExc = psInsert.executeUpdate();
-						    	         //logger.debug("canIns:"+canExc);
-				    				  }else{
-				    					  canExc = -1;//case no import SalesCode no match
-				    				  }
-				    			  }
-
-				    	  /** case Import SalesRep update or insert record = userLogin only **/
-			    		  }else if("ad_user".equalsIgnoreCase(tableBean.getTableName())){
-			    			  
-			    			  if(tableBean.getActionDB().indexOf("U") != -1){
-			    				//logger.debug("**********Start Insert line By SalesCode (V203)******************");
-			    				  if(lineStr.indexOf(userBean.getUserName()) != -1){
-			    					  psUpdate = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
-							    	  canExc = psUpdate.executeUpdate();
-							    	  //logger.debug("canUpdate:"+canExc);
-						    	     
-						    	     if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
-							    		//logger.debug("**********Start Insert line By SalesCode (V203)******************");
-					    				 if(lineStr.indexOf(userBean.getUserName()) != -1){
-							    		     psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
-								    	     canExc = psInsert.executeUpdate();
-							    	         //logger.debug("canIns:"+canExc);
-					    				 }else{
-					    					 canExc = -1;//case no import SalesCode no match
-					    				 }
-								     }
-			    				  }else{
-			    					  canExc = -1;//case no import SalesCode no match
-			    				  }
-				    		  }
-
+			    		  if(lineStr.startsWith("H")){
+			    			lineId = 0;
 			    		  }else{
-				    		  if(tableBean.getActionDB().indexOf("U") != -1){
-					    		  //logger.debug("**********Start Update ******************");
-					    		  psUpdate = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
-						    	  canExc = psUpdate.executeUpdate();
-						    	  logger.debug("canUpdate:"+canExc);
-				    		  }
-	               
-					    	  if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
-					    		  //logger.debug("**********Start Insert ******************");
-					    		  psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
-						    	  canExc = psInsert.executeUpdate();
-					    	      logger.debug("canIns:"+canExc);
-					    	  }
+			    		    lineId++;
 			    		  }
-
+			    		  canExc = insertScanBarcodeTable(conn,userBean,lineStr,lineId);
+			    		  
 				    	  //stamp log result
 				    	  if(canExc == 0){
 				    		 errorMsg ="NO UPDATE KEY NOT FOUND";
@@ -176,12 +112,10 @@ public class ImportProcess {
 		    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:"+e.getMessage()+"]").append(Constants.newLine);
 		    		  
 		    		  /** Case Debug No Rollback ALL**/
-		    		  if(EnvProperties.getInstance().getProperty("conversion.master.transaction.rollback.all").equals("true")){
+		    		  if("true".equals("true")){
 			    		    break;
 			    	  }
-		    		  if(EnvProperties.getInstance().getProperty("conversion.trans.transaction.rollback.all").equals("true")){
-			    		    break;
-			    	  }
+		    		 
 		    	  }
 		    	  
 			  }//for
@@ -242,6 +176,87 @@ public class ImportProcess {
 		    }
 	    }
 	    return results;
+	}
+	
+	public static int insertScanBarcodeTable(Connection conn,User user,String dataLineText,int lineId)  throws Exception {
+		logger.debug("importFileScanBarcode :Text");
+		int i=0;
+		int l=0;
+        int r = 1;
+	    PreparedStatement psH = null;
+	    PreparedStatement psL = null;
+		try {
+			logger.debug("Start insert scan barcode DB");
+			
+			 StringBuffer sql = new StringBuffer("");
+			 sql.append("INSERT INTO pensbme_barcode_scan(doc_no, Doc_date, Cust_Group, Cust_no, Remark, Status, FILE_NAME,Create_date, Create_user)");
+			 sql.append("VALUES(?,?,?, ?,?,?, ?,?,?)");
+			  
+			 psH = conn.prepareStatement(sql.toString());
+			 
+			 StringBuffer sqlLine = new StringBuffer("");
+			 sqlLine.append("INSERT INTO pensbme_barcode_scan_item(doc_no, LINE_ID, Barcode, Material_master, Group_code, Pens_item, Create_date, Create_user)");
+			 sqlLine.append("VALUES( ?,?,?, ?,?,? ,?,?)");
+			  
+			 psL = conn.prepareStatement(sqlLine.toString());
+			 
+			String[] lineStrArrPipe =  dataLineText.split("\\|");
+			
+			if(lineStrArrPipe[0].startsWith("H")){
+				logger.debug("Insert H dataLineText:"+dataLineText);
+				//H020047-99-201504-001|02042015|020047|020047-99||C|20150403095903-admin-barcode.txt
+				/*logger.debug("0:"+lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));
+				logger.debug("1:"+lineStrArrPipe[1]);
+				logger.debug("2:"+lineStrArrPipe[2]);
+				logger.debug("3:"+lineStrArrPipe[3]);
+				logger.debug("4:"+lineStrArrPipe[4]);
+				logger.debug("5:"+lineStrArrPipe[5]);
+				logger.debug("6:"+lineStrArrPipe[6]);*/
+				
+				Date docDate = Utils.parse(lineStrArrPipe[1], Utils.DD_MM_YYYY_WITHOUT_SLASH);
+				
+				psH.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//docNo
+				psH.setDate(2, new java.sql.Date(docDate.getTime()));//docDate
+				psH.setString(3,lineStrArrPipe[2]);//custGroup
+				psH.setString(4,lineStrArrPipe[3]);//custNo
+				psH.setString(5,lineStrArrPipe[4]);//remark
+				psH.setString(6,lineStrArrPipe[5]);//status
+				psH.setString(7,lineStrArrPipe[6]);//fileName
+				psH.setDate(8, new java.sql.Date(new Date().getTime()));//createDate
+				psH.setString(9, user.getUserName());//createUser
+				
+				psH.execute();
+			}else{
+				logger.debug("Insert L dataLineText:"+dataLineText);
+				logger.debug("lineId:"+lineId);
+				
+				//D020047-99-201504-001|8850009385309|ME1106A4VI|ME1106|835057
+                psL.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//DocNo
+                psL.setInt(2,lineId);//lineId
+                psL.setString(3,lineStrArrPipe[1]);//Barcode
+                psL.setString(4,lineStrArrPipe[2]);//Material
+                psL.setString(5,lineStrArrPipe[3]);//GroupCode
+                psL.setString(6,lineStrArrPipe[4]);//PENSITEM
+                psL.setDate(7, new java.sql.Date(new Date().getTime()));
+                psL.setString(8, user.getUserName());//createUser
+				
+                psL.execute();
+			}
+
+		    logger.debug("End insert Scan barcode DB");
+		} catch (Exception e) {
+			r = 0;
+			throw e;
+		}finally{
+		    	
+			      if(psH != null){
+			    	  psH.close();psH=null;
+			      }
+			      if(psL != null){
+			    	  psL.close();psL=null;
+				  }
+		    }
+		return r;
 	}
 	
 	

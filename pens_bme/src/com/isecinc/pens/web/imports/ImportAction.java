@@ -218,7 +218,7 @@ public class ImportAction extends I_Action {
         	
         }else if("ftp_file_scan_barcode".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
-        	EnvProperties env = EnvProperties.getInstance();
+        	/*EnvProperties env = EnvProperties.getInstance();
         	FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
         	String path = env.getProperty("path.transaction.sales.out");
         	
@@ -228,7 +228,7 @@ public class ImportAction extends I_Action {
         	if(result){
         		//move file to SaleOut Result
         		
-        	}
+        	}*/
         	
         	return mapping.findForward("success");
         }else{

@@ -103,6 +103,14 @@
 			<%-- <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
 			</li> --%>
+			
+			 <%--  <li>
+          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
+          	</li>  --%>
+          	
+         	<%-- <li>
+          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/monitorInterfacesAction.do?do=prepare';"><span><bean:message key="MonitorInterfaces" bundle="sysprop"/></span></a>
+          	</li>  --%>
 		</ul>
 	</li>
 <%} %>
@@ -298,10 +306,10 @@
 		</ul>
 	</li> 
 <%} %>
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.MT_SALE}) ){%>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.SALE}) ){%>
   	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Other</span></a>
 		<ul>
-		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MT_SALE}) ){%>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/rtAction.do?do=prepare2&action=new&page=sale');"><span>1.<bean:message bundle="sysprop" key="rt"/></span></a>
 			</li>   

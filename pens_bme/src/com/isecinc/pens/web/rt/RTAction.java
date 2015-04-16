@@ -131,12 +131,12 @@ public class RTAction extends I_Action {
 			logger.debug("prepare edit docNo:"+docNo +",mode:"+mode);
 		
 			RTBean c = new RTBean();
-			c.setDocNo(docNo);
 			if( !Utils.isNull(docNo).equals("")){
-			  RTBean bean = RTDAO.searchHead(c,true).getItems().get(0);
-			 
-			  aForm.setBean(bean);
+			   c.setDocNo(docNo);
+			   RTBean bean = RTDAO.searchHead(c,true).getItems().get(0);
+			   aForm.setBean(bean);
 			}else{
+			   c.setDocNo("");
 			   c.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   c.setCanSave(true);
 			   aForm.setBean(c);
@@ -350,8 +350,8 @@ public class RTAction extends I_Action {
 			c.setDocNo(docNo);
 			if( !Utils.isNull(docNo).equals("")){
 			  RTBean bean = RTDAO.searchHead(c,true).getItems().get(0);
-			  if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE)){
-				  bean.setCanPicSave(true);
+			  if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
+				bean.setCanPicSave(true);
 			  }
 			  aForm.setBean(bean);
 			}
@@ -388,8 +388,8 @@ public class RTAction extends I_Action {
 			
 			//Search Again
 			RTBean bean = RTDAO.searchHead(conn,h,true).getItems().get(0);
-			if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE)){
-				 bean.setCanSave(true);
+			if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
+				 bean.setCanPicSave(true);
 			}
 		    aForm.setBean(bean);
 			
