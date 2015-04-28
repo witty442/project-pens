@@ -574,6 +574,41 @@ function removeRow(){
 
 // *********************************************************************************
 
+function stampPrint(){
+	var orderId = document.getElementsByName('order.id')[0].value;
+	
+	var printDateTimePick = document.getElementsByName("order.printDateTimeRcp")[0];
+	var printCountPick = document.getElementsByName("order.printCountRcp")[0];
+	
+	printCountPick.value = parseInt(printCountPick.value)+1;
+	var d = new Date(); 
+	var dd =d.getDate()
+	var MM = (d.getMonth()+1);
+	    MM = MM.toString().length==1?"0"+MM:MM;
+	var year = (d.getFullYear()+543).toString();
+	var hours = (d.getHours()).toString();
+	    hours = hours.toString().length==1?"0"+hours:hours;
+	var minite = (d.getMinutes()).toString();
+	    minite = minite.toString().length==1?"0"+minite:minite;
+	    
+	    //ddMMyyyyHHmm
+	var currentDateStr = dd+""+MM+""+year+""+hours+""+minite;
+	//alert(currentDateStr);
+	printDateTimePick.value = currentDateStr;
+	
+	//update db
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoStampPrint.jsp",
+			data : "orderId="+orderId+"&dateStr="+printDateTimePick.value +"&count="+printCountPick.value,
+			async: false,
+			success: function(getData){
+			}
+		}).responseText;
+	});
+	
+}
+
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -1020,12 +1055,12 @@ function removeRow(){
 									<c:if test="${orderForm.order.docStatus=='SV'}">
 									
 									     <c:if test="${orderForm.order.isCash=='Y'}">
-										    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+										    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy');">
 				                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
                                           </c:if>
                                           
                                           <c:if test="${orderForm.order.isCash=='N'}">
-										    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','tax');">
+										    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax');">
 				                            <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill');">
                                           </c:if>
                                           
@@ -1084,7 +1119,18 @@ function removeRow(){
 						<div id="ByList" style="display: none;"></div>
 						
 						<input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
-						 
+						
+						<html:hidden property="order.printDateTimePick"/><br/>
+						<html:hidden property="order.printCountPick"/><br/>
+						<html:hidden property="order.printDateTimeRcp"/><br/>
+						<html:hidden property="order.printCountRcp"/>
+						
+						<!-- ForTest -->
+						<%-- printDateTimePick:<html:text property="order.printDateTimePick"/><br/>
+						printCountPick:<html:text property="order.printCountPick"/><br/>
+						printDateTimeRcp:<html:text property="order.printDateTimeRcp"/><br/>
+						printCountRcp:<html:text property="order.printCountRcp"/> --%>
+						
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 						<jsp:include page="../trxhist.jsp">
 							<jsp:param name="module" value="<%=TrxHistory.MOD_ORDER%>"/>

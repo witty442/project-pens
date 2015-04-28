@@ -20,20 +20,9 @@ public class ExceptionHandle {
     	ERROR_MAPPING.put("FTPException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E15\u0E34\u0E14\u0E15\u0E48\u0E2D FTP Server \u0E44\u0E14\u0E49");
     	ERROR_MAPPING.put("NullPointerException","\u0E21\u0E35\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E40\u0E1B\u0E47\u0E19 NULL ");
     	ERROR_MAPPING.put("DataTruncationException","\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E17\u0E35\u0E48\u0E19\u0E33\u0E40\u0E02\u0E49\u0E32\u0E21\u0E32\u0E21\u0E35\u0E02\u0E19\u0E32\u0E14\u0E21\u0E32\u0E01\u0E01\u0E27\u0E48\u0E32 \u0E02\u0E19\u0E32\u0E14\u0E02\u0E2D\u0E07 Field \u0E17\u0E35\u0E48\u0E01\u0E33\u0E2B\u0E19\u0E14\u0E44\u0E27\u0E49");
-    	ERROR_MAPPING.put("MasterException","\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E1E\u0E37\u0E49\u0E19\u0E10\u0E32\u0E19\u0E1A\u0E32\u0E07\u0E2A\u0E48\u0E27\u0E19\u0E21\u0E35\u0E1B\u0E31\u0E0D\u0E2B\u0E32 \u0E01\u0E23\u0E38\u0E13\u0E32\u0E15\u0E23\u0E27\u0E08\u0E2A\u0E2D\u0E1A\u0E41\u0E25\u0E30 Import  \u0E43\u0E2B\u0E21\u0E48\u0E2D\u0E35\u0E01\u0E04\u0E23\u0E31\u0E49\u0E07");
-    	ERROR_MAPPING.put("FindCustomerException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Customer ID ");
-    	ERROR_MAPPING.put("FindProductException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Product ID ");
-    	ERROR_MAPPING.put("FindUOMException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 UOM ID ");
-    	ERROR_MAPPING.put("FindUserException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 User ID");
-    	ERROR_MAPPING.put("FindOrderIDException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Order ID ");
-    	ERROR_MAPPING.put("FindAddressException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Address ID ");
-    	ERROR_MAPPING.put("FindAddressShipToException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Ship To Address ID");
-    	ERROR_MAPPING.put("FindAddressBillToException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Bill To Address ID");
-    	ERROR_MAPPING.put("FindReceiptIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Receipt ID");
-    	ERROR_MAPPING.put("FindVisitIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Visit ID");
-    	ERROR_MAPPING.put("FindModifierIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Modifier ID");
-    	ERROR_MAPPING.put("FindPriceListIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 PriceList ID");
-    	ERROR_MAPPING.put("FindModifierLineIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Modifier Line ID");
+    	
+    	ERROR_MAPPING.put("UniqueConstraintException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E14\u0E49 Key Duplicate");
+    
     }
 	public static void main (String[] f){
 //		System.out.println(Utils.toUnicodeChar("UNKNOW"));
@@ -55,39 +44,22 @@ public class ExceptionHandle {
 	public static String getExceptionCode(Exception e){
 		String exceptionCode = "";
 		try{
+			// e.printStackTrace();
+			 String errMsg = e.getMessage();
+			 System.out.println("errMsg: \n"+errMsg);
+			 
 			 if( e instanceof FTPException){
 				exceptionCode = "FTPException";
 			}else if( e instanceof NullPointerException){
 				exceptionCode = "NullPointerException";
-			}else if( e instanceof FindCustomerException){
-				exceptionCode = "FindCustomerException";
-			}else if( e instanceof FindProductException){
-				exceptionCode = "FindProductException";
-			}else if( e instanceof FindUOMException){
-				exceptionCode = "FindUOMException";
 			}else if( e instanceof FindUserException){
-				exceptionCode = "FindUserException";
-			}else if( e instanceof FindOrderIDException){
-				exceptionCode = "FindOrderIDException";
-			}else if( e instanceof FindAddressException){
-				exceptionCode = "FindAddressException";
-			}else if( e instanceof FindAddressShipToException){
-				exceptionCode = "FindAddressShipToException";
-			}else if( e instanceof FindAddressBillToException){
-				exceptionCode = "FindAddressBillToException";
-			}else if( e instanceof FindReceiptIdException){
-				exceptionCode = "FindReceiptIdException";
-			}else if( e instanceof FindVisitIdException){
-				exceptionCode = "FindVisitIdException";
-			}else if( e instanceof FindModifierIdException){
-				exceptionCode = "FindModifierIdException";	
-			}else if( e instanceof FindPriceListIdException){
-				exceptionCode = "FindPriceListIdException";		
-			}else if( e instanceof FindModifierLineIdException){
-				exceptionCode = "FindModifierLineIdException";	
-				
+				exceptionCode = "FindUserException";         
+			}else if( e instanceof java.sql.SQLIntegrityConstraintViolationException
+					|| errMsg.indexOf("unique constraint") != -1 
+					){
+				exceptionCode = "UniqueConstraintException";
 			}else if( e instanceof SQLException){
-				String errMsg = e.getMessage();
+				
 				if(errMsg.indexOf("Data truncation") != -1){
 					exceptionCode ="DataTruncationException";
 				}else{
@@ -97,6 +69,7 @@ public class ExceptionHandle {
   		    	exceptionCode ="UNKNOW";
   		    }
 
+			 System.out.println("exceptionCode:"+exceptionCode);
 		}catch(Exception ee){
 			ee.printStackTrace();
 		}
@@ -170,32 +143,10 @@ public class ExceptionHandle {
 	}
 	
 	public static void throwExceptionClass(String classException ,String value,String colName) throws Exception{
-		if(classException.equals("FindCustomerException")){
-			 throw new FindCustomerException("ColName["+colName+"] Value["+value+"]: Cannot find Customer_id ");
-		}else if(classException.equals("FindProductException")){
-			 throw new FindProductException("ColName["+colName+"] Value["+value+"]: Cannot find Product ID ");
-		}else if(classException.equals("FindUOMException")){
-			 throw new FindUOMException("ColName["+colName+"] Value["+value+"]: Cannot find UOM ID ");
+		if(classException.equals("UniqueConstraintException")){
+			 throw new java.sql.SQLIntegrityConstraintViolationException("ColName["+colName+"] Value["+value+"]: Duplicate Primary Key ");
 		}else if(classException.equals("FindUserException")){
 			 throw new FindUserException("ColName["+colName+"] Value["+value+"]: Cannot find User ID ");
-		}else if(classException.equals("FindOrderIDException")){
-			 throw new FindOrderIDException("ColName["+colName+"] Value["+value+"]: Cannot find Order ID ");
-		}else if(classException.equals("FindAddressException")){
-			 throw new FindAddressException("ColName["+colName+"] Value["+value+"]: Cannot find Address ID ");
-		}else if(classException.equals("FindAddressShipToException")){
-			 throw new FindAddressShipToException("ColName["+colName+"] Value["+value+"]: Cannot find Ship To Address ID ");
-		}else if(classException.equals("FindAddressBillToException")){
-			 throw new FindAddressBillToException("ColName["+colName+"] Value["+value+"]: Cannot find Bill To Address ID ");
-		}else if(classException.equals("FindReceiptIdException")){
-			 throw new FindReceiptIdException("ColName["+colName+"] Value["+value+"]: Cannot find Receipt ID ");
-		}else if(classException.equals("FindVisitIdException")){
-			 throw new FindVisitIdException("ColName["+colName+"] Value["+value+"]: Cannot find Visit ID ");
-		}else if(classException.equals("FindModifierIdException")){
-			 throw new FindModifierIdException("ColName["+colName+"] Value["+value+"]: Cannot find Modifier ID ");
-		}else if(classException.equals("FindPriceListIdException")){
-			 throw new FindPriceListIdException("ColName["+colName+"] Value["+value+"]: Cannot find PriceList ID ");
-		}else if(classException.equals("FindModifierLineIdException")){
-			 throw new FindModifierLineIdException("ColName["+colName+"] Value["+value+"]: Cannot find Modifier Line ID ");
 		}
 		
 	}

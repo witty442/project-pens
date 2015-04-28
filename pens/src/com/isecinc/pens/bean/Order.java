@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import util.ConvertNullUtil;
@@ -8,6 +9,7 @@ import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.model.MOrgRule;
@@ -85,6 +87,14 @@ public class Order extends I_PO implements Serializable {
 		if( !"".equals(ConvertNullUtil.convertToString(getOrg()))){
 		   setPlaceOfBilled(new MOrgRule().getOrgRule(getOrg()).getName());
 		}
+		//System.out.println("print_datetime_pick:"+rst.getBigDecimal("print_datetime_pick"));
+		//System.out.println("print_datetime_rcp:"+rst.getBigDecimal("print_datetime_rcp"));
+		
+		setPrintDateTimePick(Utils.stringValueSpecial2(rst.getLong("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+		setPrintCountPick(rst.getInt("print_count_pick"));
+		
+		setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+		setPrintCountRcp(rst.getInt("print_count_rcp"));
 		
 	}
 
@@ -234,7 +244,45 @@ public class Order extends I_PO implements Serializable {
 	private String placeOfBilled;
 	private String org;
 	
+	private String printDateTimePick;
+	private int printCountPick;
 	
+	private String printDateTimeRcp;
+	private int printCountRcp;
+	
+	
+	public String getPrintDateTimePick() {
+		return printDateTimePick;
+	}
+
+	public void setPrintDateTimePick(String printDateTimePick) {
+		this.printDateTimePick = printDateTimePick;
+	}
+
+	public int getPrintCountPick() {
+		return printCountPick;
+	}
+
+	public void setPrintCountPick(int printCountPick) {
+		this.printCountPick = printCountPick;
+	}
+
+	public String getPrintDateTimeRcp() {
+		return printDateTimeRcp;
+	}
+
+	public void setPrintDateTimeRcp(String printDateTimeRcp) {
+		this.printDateTimeRcp = printDateTimeRcp;
+	}
+
+	public int getPrintCountRcp() {
+		return printCountRcp;
+	}
+
+	public void setPrintCountRcp(int printCountRcp) {
+		this.printCountRcp = printCountRcp;
+	}
+
 	public String getPlaceOfBilled() {
 		return placeOfBilled;
 	}

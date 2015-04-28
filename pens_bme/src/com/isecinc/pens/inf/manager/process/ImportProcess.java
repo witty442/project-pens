@@ -105,7 +105,7 @@ public class ImportProcess {
 			    	  }
 			       
 		    	  }catch(Exception e){
-		    		  logger.error(e.getMessage(),e);
+		    		  logger.error("ERROR: \n"+e.getMessage(),e);
 		    		  errorMsg ="Error:Line{"+lineNo+"}:{LineText:"+lineStr+"}{ErrorMsg:"+e.getMessage()+"}";
 		    		  errorCode = ExceptionHandle.getExceptionCode(e);
 		    		  errorRow++;
@@ -248,14 +248,13 @@ public class ImportProcess {
 			r = 0;
 			throw e;
 		}finally{
-		    	
-			      if(psH != null){
-			    	  psH.close();psH=null;
-			      }
-			      if(psL != null){
-			    	  psL.close();psL=null;
-				  }
-		    }
+		      if(psH != null){
+		    	  psH.close();psH=null;
+		      }
+		      if(psL != null){
+		    	  psL.close();psL=null;
+			  }
+	    }
 		return r;
 	}
 	

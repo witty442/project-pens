@@ -12,6 +12,7 @@
 <%@page import="java.util.List"%>
 <%
 String itemCode = Utils.isNull((String) request.getParameter("itemCode"));
+String storeCode = Utils.isNull((String) request.getParameter("storeCode"));
 String matCode = Utils.isNull((String) request.getParameter("matCode"));
 
 String outputText = "";
@@ -22,7 +23,8 @@ try{
 		PopupForm popupForm = new PopupForm();
 		popupForm.setCodeSearch(itemCode);
 		popupForm.setMatCodeSearch(matCode);
-		Barcode b = GeneralDAO.searchProductByBarcode(popupForm);
+		
+		Barcode b = GeneralDAO.searchProductByBarcode(popupForm,storeCode);
 		
 		if(b != null ){
 		    outputText = b.getBarcode()+"|"+b.getMaterialMaster()+"|"+b.getGroupCode()+"|"+b.getPensItem()+"|"+b.getWholePriceBF()+"|"+b.getRetailPriceBF();

@@ -274,6 +274,7 @@ public class RTDAO {
 			ps.setString(c++, Utils.isNull(o.getDocNo()));
 
 			int r =ps.executeUpdate();
+			
 			return r;
 		}catch(Exception e){
 			throw e;
@@ -305,7 +306,7 @@ public class RTDAO {
 			   
 			   /*logger.debug("seq:"+seq);
 			   logger.debug("docNo:"+docNo);*/
-		  
+		    
 		   }catch(Exception e){
 			   throw e;
 		   }finally{

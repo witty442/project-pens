@@ -31,6 +31,7 @@ public class Utils {
 	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
+	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyyHHmm";
 	
 	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
@@ -244,11 +245,25 @@ public class Utils {
 		String dateStr = null;		
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
 		try {
-			//logger.debug("date Long>>"+dateBigdecimal.doubleValue());
-			//logger.debug("date Long>>"+dateBigdecimal.doubleValue());
 			Timestamp ti = new Timestamp(dateBigdecimal);
 			logger.debug("date timestamp>>"+ti);
 			dateStr = ft.format(ti);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	
+	//Case null retun ""
+	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {
+		String dateStr = "";		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			logger.debug("dateBigdecimal:"+dateBigdecimal);
+			if(dateBigdecimal != 0.0){
+			   Timestamp ti = new Timestamp(dateBigdecimal);
+			   logger.debug("date timestamp>>"+ti);
+			   dateStr = ft.format(ti);
+			}
 		} catch (Exception e) {
 		}
 		return dateStr;

@@ -1,9 +1,12 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,8 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
 
@@ -40,7 +45,7 @@ public class MOrder extends I_Model<Order> {
 			"BILL_ADDRESS_ID", "SHIP_ADDRESS_ID", "PRICELIST_ID", "PAYMENT_TERM", "VAT_CODE", "VAT_RATE",
 			"PAYMENT_METHOD", "SHIPPING_DAY", "SHIPPING_TIME", "TOTAL_AMOUNT", "VAT_AMOUNT", "NET_AMOUNT",
 			"INTERFACES", "PAYMENT", "SALES_ORDER_NO", "AR_INVOICE_NO", "USER_ID", "DOC_STATUS", "CREATED_BY",
-			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID","ORA_SHIP_ADDRESS_ID","org" };
+			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID","ORA_SHIP_ADDRESS_ID","org"};
 
 	/**
 	 * Find
@@ -541,6 +546,69 @@ public class MOrder extends I_Model<Order> {
 		} finally {
 			if(ps != null){
 				ps.close();ps = null;
+			}
+		}
+	}
+	/**
+    
+	 * @param conn
+	 * @param order
+	 */
+	public void updatePrintPickStamp(Connection conn ,Order order) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updatePrintPickStamp ");
+		try{
+			String sql = "UPDATE "+TABLE_NAME+" SET print_DateTime_Pick = ? ,print_Count_Pick = ? WHERE order_id = ? ";
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			
+		    java.util.Date pickDate = Utils.isNull(order.getPrintDateTimePick()).equals("")?null:Utils.parse(order.getPrintDateTimePick(), Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH, Utils.local_th);
+			BigDecimal pickDateBig = new BigDecimal(pickDate.getTime());
+			logger.debug("orderId:"+order.getId()+",pickDateBig:"+pickDateBig);
+		  
+		    ps.setBigDecimal(++index, pickDateBig.setScale(6));//updated
+			ps.setInt(++index, order.getPrintCountPick());
+			ps.setInt(++index, order.getId());
+				
+			ps.execute();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public void updatePrintRcpStamp(int orderId,String dateStr,int count)  throws Exception{
+		PreparedStatement ps = null;
+		Connection conn =null;
+		logger.debug("updatePrintRcpStamp ");
+		try{
+			String sql = "UPDATE "+TABLE_NAME+" SET print_DateTime_Rcp = ? ,print_Count_rcp = ? WHERE order_id = ? ";
+			int index = 0;
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql);
+			
+			java.util.Date pickDate = null;
+			pickDate = Utils.isNull(dateStr).equals("")?null:Utils.parse(dateStr, Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH, Utils.local_th);
+            BigDecimal pickDateBig = new BigDecimal(pickDate.getTime());
+            
+            logger.debug("pickDateBig:"+pickDateBig);
+            
+		    ps.setBigDecimal(++index, pickDateBig.setScale(6));//updated
+			ps.setInt(++index, count);
+			ps.setInt(++index, orderId);
+				
+			ps.execute();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(conn != null){
+				conn.close();conn=null;
 			}
 		}
 	}

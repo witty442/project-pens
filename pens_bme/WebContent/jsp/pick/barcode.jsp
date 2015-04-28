@@ -373,7 +373,7 @@ function getProductModel(barcodeObj,lineId){
 	var form = document.barcodeForm;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
-			data : "itemCode=" + barcodeObj.value,
+			data : "itemCode=" + barcodeObj.value+"&storeCode="+form.storeCode.value,
 			async: false,
 			cache: false,
 			success: function(getData){
@@ -459,7 +459,7 @@ function getProductModelByMat(matObj,lineId){
 	var form = document.barcodeForm;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
-			data : "matCode="+matObj.value,
+			data : "matCode="+matObj.value+"&storeCode="+form.storeCode.value,
 			async: false,
 			cache: false,
 			success: function(getData){

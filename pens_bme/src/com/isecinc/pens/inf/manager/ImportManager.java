@@ -263,7 +263,7 @@ public class ImportManager {
 								//Task ALL False
 								taskStatusInt = Constants.STATUS_FAIL;
 								fileTransImportErrorList.add(ftpBean);//Add For Delete file and Move to In Processed
-								//rollBackFlag = true;
+								rollBackFlag = true;
 							}else{
 								fileTransImportSuccessList.add(ftpBean);//Add For Delete file and Move to In Processed
 							}
@@ -326,13 +326,9 @@ public class ImportManager {
 				monitorModel.setStatus(taskStatusInt);
 				monitorModel.setFileCount(countFileMap);
 				monitorModel.setTransactionType(transType);
-				if(transType.equals(Constants.TRANSACTION_MASTER_TYPE)){
-					monitorModel.setErrorCode("MasterException");
-				}else if(transType.equals(Constants.TRANSACTION_TRANS_TYPE)){
-					monitorModel.setErrorCode("TransactionException");
-				}else{
-					monitorModel.setErrorCode("UpdateSalesException");
-				}
+				
+				monitorModel.setErrorCode("TransactionException");
+				
 				dao.updateMonitor(connMonitor,monitorModel);
 			}else{
 				logger.debug("Transaction commit");

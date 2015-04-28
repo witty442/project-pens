@@ -95,6 +95,26 @@ function printListOrderProductReport(path,userType){
 	window.open(path + "/jsp/pop/printPopup.jsp?report_name=list_order_product&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
 }
 
+function stampPrint(){
+	var printDateTimePick = document.getElementsByName("order.printDateTimePick")[0];
+	var printCountPick = document.getElementsByName("order.printCountPick")[0];
+	
+	printCountPick.value = parseInt(printCountPick.value)+1;
+	var d = new Date(); 
+	var dd =d.getDate()
+	var MM = (d.getMonth()+1);
+	    MM = MM.toString().length==1?"0"+MM:MM;
+	var year = (d.getFullYear()+543).toString();
+	var hours = (d.getHours()).toString();
+	    hours = hours.toString().length==1?"0"+hours:hours;
+	var minite = (d.getMinutes()).toString();
+	    minite = minite.toString().length==1?"0"+minite:minite;
+	    
+	var currentDateStr = dd+""+MM+""+year+""+hours+""+minite;
+	//alert(currentDateStr);
+	printDateTimePick.value = currentDateStr;
+	
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -465,7 +485,7 @@ function printListOrderProductReport(path,userType){
 									<!-- OLD CODE ************************ -->
 									<%if(User.VAN.equals(user.getType())){%>
 									 
-									   <input type="button" value="¾ÔÁ¾ìãºËÂÔº¢Í§" class="newPosBtnLong" onclick="printListOrderProductReport('${pageContext.request.contextPath}','<%=user.getType() %>')">
+									   <input type="button" value="¾ÔÁ¾ìãºËÂÔº¢Í§" class="newPosBtnLong" onclick="stampPrint();printListOrderProductReport('${pageContext.request.contextPath}','<%=user.getType() %>')">
 									   
 									<%} %>		
 									<input type="button" value="Â¡àÅÔ¡" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
@@ -492,6 +512,14 @@ function printListOrderProductReport(path,userType){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported"/>
 						<html:hidden property="order.isCash"/>
+						
+						<html:hidden property="order.printDateTimePick"/>
+						<html:hidden property="order.printCountPick"/>
+						
+						<!-- ForTest -->
+					<%-- 	printDateTimePick:<html:text property="order.printDateTimePick"/><br/>
+						printCountPick:<html:text property="order.printCountPick"/> --%>
+						
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						<div id="productList" style="display: none;"></div>
 						<div id="ByList" style="display: none;"></div>

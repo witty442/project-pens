@@ -227,6 +227,17 @@ public class PayAction extends I_Action {
 			h.setUpdateUser(user.getUserName());
 			h.setStatus(STATUS_SAVE);
 			
+			logger.debug("cashFlag ="+Utils.isNull(h.getCashFlag()));
+			logger.debug("chequeFlag ="+Utils.isNull(h.getChequeFlag()));
+			
+			if( !Utils.isNull(h.getCashFlag()).equals("")){
+				h.setPaymethod("C");
+			}
+			
+			if( !Utils.isNull(h.getChequeFlag()).equals("")){
+				h.setPaymethod("CH");
+			}
+			
 			if( !Utils.isNull(h.getDocNo()).equals("")){
 				int update = PayDAO.updateDocTran(conn, h);
 				if(update==0){
@@ -274,6 +285,11 @@ public class PayAction extends I_Action {
 			
 			conn.commit();
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			
+			String actionFlag = Utils.isNull(request.getParameter("actionFlag"));
+			if(actionFlag.equals("saveAndPrint")){
+				request.setAttribute("saveAndPrint", "saveAndPrint");
+			}
 		} catch (Exception e) {
 			conn.rollback();
             e.printStackTrace();
@@ -291,8 +307,6 @@ public class PayAction extends I_Action {
 		}
 		return "detail";
 	}
-	
-	
 
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
@@ -323,8 +337,7 @@ public class PayAction extends I_Action {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
+	public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
 		
 		logger.debug("Search for report ");
 		PayForm reportForm = (PayForm) form;
@@ -335,6 +348,7 @@ public class PayAction extends I_Action {
 		Connection conn = null;
 		 
 		try {
+			
 			conn = DBConnection.getInstance().getConnection();
 			PayForm aForm = (PayForm) form;
 			String fileType = SystemElements.PRINTER;//SystemElements.PDF;//request.getParameter("fileType");
@@ -380,6 +394,60 @@ public class PayAction extends I_Action {
 				}else{
 					parameterMap.put("totalAmount2Digit", "");
 				}
+				
+				//*********************DR***************************************//
+				parameterMap.put("DR_AC_NO", Utils.isNull(h.getDR_AC_NO()));
+				parameterMap.put("DR_DESC", Utils.isNull(h.getDR_DESC()));
+				
+				String[] temp = Utils.isNull(h.getDR_AMOUNT()).split("\\.");
+				parameterMap.put("DR_AMOUNT", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("DR_AMOUNT_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("DR_AMOUNT_DIGIT", "");
+				}
+				
+				temp = Utils.isNull(h.getDR_INPUT_TAX_AMOUNT()).split("\\.");
+				parameterMap.put("DR_INPUT_TAX_AMOUNT", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("DR_INPUT_TAX_AMOUNT_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("DR_INPUT_TAX_AMOUNT_DIGIT", "");
+				}
+				temp = Utils.isNull(h.getDR_TOTAL()).split("\\.");
+				parameterMap.put("DR_TOTAL", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("DR_TOTAL_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("DR_TOTAL_DIGIT", "");
+				}
+				//********************CR*************************************//
+				parameterMap.put("CR_AC_NO", Utils.isNull(h.getCR_AC_NO()));
+				parameterMap.put("CR_DESC", Utils.isNull(h.getCR_DESC()));
+				
+				temp = Utils.isNull(h.getCR_AMOUNT()).split("\\.");
+				parameterMap.put("CR_AMOUNT", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("CR_AMOUNT_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("CR_AMOUNT_DIGIT", "");
+				}
+				
+				temp = Utils.isNull(h.getCR_ACC_WT_TAX_AMOUNT()).split("\\.");
+				parameterMap.put("CR_ACC_WT_TAX_AMOUNT", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("CR_ACC_WT_TAX_AMOUNT_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("CR_ACC_WT_TAX_AMOUNT_DIGIT", "");
+				}
+				temp = Utils.isNull(h.getCR_TOTAL()).split("\\.");
+				parameterMap.put("CR_TOTAL", Utils.isNull(temp[0]));
+				if(temp.length > 1){
+					parameterMap.put("CR_TOTAL_DIGIT", Utils.isNull(temp[1]));
+				}else{
+					parameterMap.put("CR_TOTAL_DIGIT", "");
+				}
+			
 				
 				//Items
 				if(h.getItems() != null &&  h.getItems().size() >0){

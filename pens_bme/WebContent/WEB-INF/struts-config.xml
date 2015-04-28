@@ -159,6 +159,8 @@
 			
 			<forward name="history" path="/jsp/order/orderHistory.jsp"/>
 			
+			<forward name="reportOrder" path="/jsp/order/reportOrder.jsp" />
+			
 		</action>
 		<action name="orderFridayForm" path="/jsp/orderFridayAction" parameter="do" scope="session" type="com.isecinc.pens.web.order.OrderFridayAction" >
 			<forward name="search" path="/jsp/order/orderFriday.jsp"/>

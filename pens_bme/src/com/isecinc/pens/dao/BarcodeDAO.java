@@ -74,6 +74,10 @@ public class BarcodeDAO extends PickConstants{
 				sql.append("\n and i.create_user LIKE '%"+Utils.isNull(o.getCreateUser())+"%'");
 			}
 			
+			if( Utils.isNull(o.getIncludeCancel()).equals("")){
+				sql.append("\n and i.status <> '"+PickConstants.STATUS_CANCEL+"'");
+			}
+			
 			sql.append("\n order by i.box_no desc ");
 			logger.debug("sql:"+sql);
 			

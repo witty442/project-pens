@@ -471,9 +471,7 @@ body {
 									 <div id="progress" style="height:40px;width:100%;">
 						                    <div id="percent"></div>     
 											<div id="bar"></div>  
-						              </div>   
-						              
-						                 
+						              </div>    
 									 </td>
 								</tr>
 							   </table>   
@@ -482,7 +480,9 @@ body {
 					
 						<br><br>
 						<!-- BODY -->
-						Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"></html:text> Seconds
+						<div align="center">
+						    Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"></html:text> Seconds
+						</div>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form>
 					<!-- BODY -->

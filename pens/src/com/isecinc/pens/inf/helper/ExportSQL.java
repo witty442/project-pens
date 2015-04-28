@@ -77,7 +77,7 @@ public class ExportSQL {
 				"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
 				"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
 				"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
-				"   t.org as ORG ,t.created \n"+
+				"   t.org as ORG ,t.created, t.print_datetime_pick \n"+
 				"	FROM t_order t ,m_customer m	\n"+
 				"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
 				"   and  m.user_id = "+userBean.getId()+" \n"+

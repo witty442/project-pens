@@ -1199,9 +1199,18 @@ public class SummaryDAO {
 				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");
 				sql.append("\n , NVL(SALE_OUT.SALE_OUT_QTY,0) AS SALE_OUT_QTY");
 				sql.append("\n , NVL(SALE_RETURN.SALE_RETURN_QTY,0) AS SALE_RETURN_QTY");
-				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) - (NVL(SALE_OUT.SALE_OUT_QTY,0)+NVL(SALE_RETURN.SALE_RETURN_QTY,0)) ONHAND_QTY");
 				sql.append("\n , NVL(STOCK_ISSUE.ISSUE_QTY,0)+NVL(STOCK_RECEIPT.RECEIPT_QTY,0) as ADJUST_QTY ");
 				sql.append("\n , NVL(STOCK_SHORT.STOCK_SHORT_QTY,0) as STOCK_SHORT_QTY ");
+				
+				sql.append("\n , (NVL(SALE_IN.SALE_IN_QTY,0) " + //SaleIn
+								"\n -(" +
+								"\n    NVL(SALE_OUT.SALE_OUT_QTY,0)  " +//SaleOut
+								"\n  + NVL(SALE_RETURN.SALE_RETURN_QTY,0) " +//Return
+								"\n  )" +
+								"\n  + ( NVL(STOCK_ISSUE.ISSUE_QTY,0)+NVL(STOCK_RECEIPT.RECEIPT_QTY,0) )" + //Adjust
+								"\n  + NVL(STOCK_SHORT.STOCK_SHORT_QTY,0) " +//Short
+						   "\n  ) ONHAND_QTY");
+				
 				sql.append("\n FROM(  ");
 						sql.append("\n SELECT DISTINCT ");
 						sql.append("\n C.customer_code,P.inventory_item_code as pens_item,   ");
@@ -1352,7 +1361,8 @@ public class SummaryDAO {
 				sql.append("\n L.store_code as customer_code,L.item_issue as pens_item,L.item_issue_desc as group_type, ");
 				sql.append("\n (NVL(SUM(ITEM_ISSUE_QTY),0)*-1) AS ISSUE_QTY ");
 				sql.append("\n FROM ");
-				sql.append("\n PENSBI.PENSBME_ADJUST_INVENTORY L WHERE L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
+				sql.append("\n PENSBI.PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
+				// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
                     sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
@@ -1379,7 +1389,8 @@ public class SummaryDAO {
 				sql.append("\n L.STORE_CODE as customer_code,L.item_receipt as pens_item,L.item_receipt_desc as group_type, ");
 				sql.append("\n NVL(SUM(ITEM_RECEIPT_QTY),0) AS RECEIPT_QTY ");
 				sql.append("\n FROM ");
-				sql.append("\n PENSBI.PENSBME_ADJUST_INVENTORY L  WHERE L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
+				sql.append("\n PENSBI.PENSBME_ADJUST_INVENTORY L  WHERE 1=1 ");
+				//L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
                     sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}

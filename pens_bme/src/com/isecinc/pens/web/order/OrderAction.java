@@ -19,6 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.Constants;
+import util.ExcelHeader;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
@@ -46,6 +47,7 @@ import com.isecinc.pens.web.managepath.ManagePath;
 public class OrderAction extends I_Action {
 
 	public static int pageSize = 90;
+	public static int reportOrderPageSize = 90;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	/**
@@ -1033,6 +1035,186 @@ public class OrderAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("history");
+	}
+	
+	public ActionForward prepareReportOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		OrderForm orderForm = (OrderForm) form;
+		OrderForm summaryForm = (OrderForm) form;
+		Connection conn = null;
+		try {
+			 logger.debug("prepareReportOrder");
+			 if("new".equalsIgnoreCase(request.getParameter("action"))){
+				 request.getSession().setAttribute("results", null);
+				 
+				 request.getSession().removeAttribute("totalPage");
+				 request.getSession().removeAttribute("totalPage"); 
+				 
+				 //init store type
+				 new OrderDAO().initStoreTypeMap();
+				 
+				 Order order = new Order();
+				 //Old OrderDate set to next billDate
+				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 
+				 //new set to Current Date
+				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 summaryForm.setOrder(order);
+				 
+				 ImportDAO importDAO = new ImportDAO();
+				 conn = DBConnection.getInstance().getConnection();
+				 
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"");
+				 request.getSession().setAttribute("storeTypeList",storeTypeList);
+				
+				 List<References> regionList = importDAO.getRegionList(conn);
+				 request.getSession().setAttribute("regionList",regionList);
+				 
+				 List<References> billTypeList = importDAO.getBillTypeList();
+				 request.getSession().setAttribute("billTypeList",billTypeList);
+
+			 }
+			
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+			  conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("reportOrder");
+	}
+	
+	public ActionForward searchReportOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		OrderForm orderForm = (OrderForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		OrderDAO orderDAO = new OrderDAO();
+		Connection conn = null;
+		int totalRow = 0;
+		int totalPage = 0;
+		int pageNumber = 1;
+		List<StoreBean> storeList = null;
+		String action = "";
+		try {
+			Order orderCri = orderForm.getOrder();
+
+			conn = DBConnection.getInstance().getConnection();
+			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
+			logger.debug("searchHistory action:"+action);
+	
+			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+
+			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
+			if("newsearch".equals(action)){
+				pageNumber = 1;
+				request.setAttribute("action", "newsearch");
+				request.getSession().setAttribute("results", null);
+				request.getSession().setAttribute("storeList",null);
+				
+				totalRow = orderDAO.getTotalRowReportOrder(conn,orderForm.getOrder());
+				totalPage = (totalRow/ pageSize)+1;
+				request.getSession().setAttribute("totalPage", totalPage);
+				request.getSession().setAttribute("totalRow", totalRow);
+				
+			}else{
+				totalRow = (Integer)request.getSession().getAttribute("totalRow");
+				totalPage = (Integer)request.getSession().getAttribute("totalPage");
+				
+			    pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+			}
+			
+			logger.debug("totalRow["+totalRow+"]totalPage["+totalPage+"]pageNumber["+pageNumber+"]");
+			
+            //** Search Data and Display **/
+			Order orderResult = new OrderDAO().prepareReportOrder(conn,orderForm.getOrder(), user,pageNumber,pageSize);
+			List<Order> results = orderResult.getOrderItemList();
+			
+			if (results != null  && results.size() >0) {
+				request.getSession().setAttribute("results", results);
+			} else {
+				request.getSession().setAttribute("results", null);
+				request.setAttribute("Message", "ไม่พบข่อมูล");
+			}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("reportOrder");
+	}
+	
+	public ActionForward exportReportOrderToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportReportOrderToExcel");
+		OrderForm orderForm = (OrderForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		StringBuffer h = new StringBuffer("");
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			
+			Order orderResult = new OrderDAO().prepareReportOrder(conn,orderForm.getOrder(),user,1,999999999);
+			if(orderResult != null){
+				logger.debug("header:"+ExcelHeader.EXCEL_HEADER.toString());
+				
+				h.append(ExcelHeader.EXCEL_HEADER.toString());
+				
+				h.append("<table border='1'>");
+				h.append("<tr>");
+				   h.append("<td>Store Code </td>");
+				   h.append("<td>Order Date</td>");
+				   h.append("<td>Pens Item</td>");
+				   h.append("<td>Group Code </td>");
+				   h.append("<td>Barcode</td>");
+				   h.append("<td>QTY </td>");
+				   h.append("<td>Whole Price</td>");
+				   h.append("<td>Retail Price</td>");
+	            h.append("</tr>");    
+	            
+	            if(orderResult.getOrderItemList() != null && orderResult.getOrderItemList().size() > 0){
+	            	for(int i=0;i<orderResult.getOrderItemList().size();i++){
+	            		Order o = orderResult.getOrderItemList().get(i);
+	            		h.append("<tr> \n");    
+		            		h.append("<td>"+o.getStoreCode()+"</td>");
+		  				    h.append("<td>"+o.getOrderDate()+"</td>");
+		  				    h.append("<td>"+o.getItem()+"</td>");
+		  				    h.append("<td>"+o.getGroupCode()+"</td>");
+		  				    h.append("<td class='text'>"+o.getBarcode()+"</td>");
+		  				    h.append("<td class='num'>"+o.getQty()+"</td>");
+		  				    h.append("<td>"+o.getWholePriceBF()+"</td>");
+		  				    h.append("<td>"+o.getRetailPriceBF()+"</td>");
+	  				    h.append("</tr> "); 
+	            	}
+	            }
+	            h.append("</table> \n"); 
+	            
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(h.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("reportOrder");
 	}
 	
 	@Override

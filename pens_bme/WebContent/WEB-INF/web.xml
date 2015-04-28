@@ -37,6 +37,15 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
+	<servlet>
+      <servlet-name>PrintPayInReport</servlet-name>
+      <servlet-class>com.isecinc.pens.web.PrintPayInServlet</servlet-class>
+    </servlet>
+	<servlet-mapping>
+       <servlet-name>PrintPayInReport</servlet-name>
+       <url-pattern>/printPayInReport</url-pattern>
+    </servlet-mapping>
+
   <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
@@ -52,7 +61,7 @@
   </servlet-mapping>
   
   <session-config>
-    <session-timeout>60</session-timeout>
+    <session-timeout>40</session-timeout>
   </session-config>
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>

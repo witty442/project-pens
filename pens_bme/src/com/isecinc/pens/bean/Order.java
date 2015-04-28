@@ -18,6 +18,10 @@ public class Order implements Serializable{
 	private String billType;
 	private String region;
 	private String storeCode;
+	private String storeName;
+	private String subInv;
+	private String storeNo;
+	private String custGroup;
 	private String groupCode;
 	private String groupCodeDesc;
 	private String item;
@@ -53,6 +57,30 @@ public class Order implements Serializable{
     private String color;
 	
 	
+	public String getStoreName() {
+		return storeName;
+	}
+	public void setStoreName(String storeName) {
+		this.storeName = storeName;
+	}
+	public String getSubInv() {
+		return subInv;
+	}
+	public void setSubInv(String subInv) {
+		this.subInv = subInv;
+	}
+	public String getStoreNo() {
+		return storeNo;
+	}
+	public void setStoreNo(String storeNo) {
+		this.storeNo = storeNo;
+	}
+	public String getCustGroup() {
+		return custGroup;
+	}
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
 	public String getSize() {
 		return size;
 	}

@@ -879,6 +879,9 @@ public class OrderAction extends I_Action {
 			// re org case line_no duplicate
 			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
 			
+			//save print pick date
+			new MOrder().updatePrintPickStamp(conn, order);
+			
 			// Commit Transaction
 			conn.commit();
 			// set msg save success

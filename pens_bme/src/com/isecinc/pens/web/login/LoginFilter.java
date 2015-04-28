@@ -78,8 +78,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 		} else {
 			//logger.debug("no user...");
 			// no user in session
-			req.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.CREDENTIAL_REQUIRE, Locale
-					.getDefault()));
+			req.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.CREDENTIAL_REQUIRE, Locale.getDefault()));
 			RequestDispatcher rd = config.getServletContext().getRequestDispatcher("/index.jsp");
 			rd.forward(req, res);
 		}

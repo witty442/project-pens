@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
 <%@page import="com.isecinc.pens.web.pay.PayForm"%>
 <%@page import="com.isecinc.pens.bean.PayBean"%>
 <%@page import="com.isecinc.pens.dao.PayDAO"%>
@@ -14,15 +17,12 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="payForm" class="com.isecinc.pens.web.pay.PayForm" scope="session" />
 
@@ -87,8 +87,8 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
-function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
+function loadMe(path){
+	//new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
 	
 	document.getElementsByName('bean.deptId')[0].value = '${payForm.bean.deptId}';
 	
@@ -98,7 +98,19 @@ function loadMe(){
 	<% } %>
 	
 	sumTotal();
+	
+	//popup print case print and save
+	<%if(request.getAttribute("saveAndPrint") != null) {%>
+	   printReportPopup(path);
+	<%}%>
 }
+
+function printReportPopup(path){
+	var docNo = document.getElementsByName("bean.docNo");
+   // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/popup/printPopup.jsp?report_name=PayInReport&docNo="+docNo[0].value, "Print2", "width=200,height=200,location=No,resizable=No");
+}
+
 function clearForm(path){
 	var form = document.payForm;
 	form.action = path + "/jsp/payAction.do?do=clear";
@@ -115,18 +127,14 @@ function back(path){
 
 function save(path){
 	var form = document.payForm;
-	if( $('#docDate').val()==""){
-		alert("กรุณาระบุ วันที่");
-		return false;
-	}
-	if( $('#deptId').val()==""){
-		alert("กรุณาระบุ แผนก");
-		return false;
-	}
-	if( $('#sectionId').val()==""){
-		alert("กรุณาระบุ  ฝ่าย");
-		return false;
-	}
+	form.action = path + "/jsp/payAction.do?do=save&action=newsearch";
+	form.submit();
+	return true;
+}
+
+function printReport(path){
+	var form = document.payForm;
+	form.actionFlag.value ="saveAndPrint";
 	
 	form.action = path + "/jsp/payAction.do?do=save&action=newsearch";
 	form.submit();
@@ -178,16 +186,23 @@ function loadSection(){
 	});
 }
 
-function printReport(path){
-	var docNo = document.getElementsByName("bean.docNo");
-   // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=PayInReport&docNo="+docNo[0].value, "Print2", "width=200,height=200,location=No,resizable=No");
+function switchFlag(obj,name){
+	if(name =='cashFlag'){
+		if(obj.checked){
+			document.getElementsByName('bean.chequeFlag')[0].checked = false;
+		}
+	}else{
+		if(obj.checked){
+			document.getElementsByName('bean.cashFlag')[0].checked = false;
+		}	
+	}
+	
 }
 
 </script>
 
 </head>		
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
+<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
 		<td colspan="3"><jsp:include page="../headerDoc.jsp"/></td>
@@ -228,7 +243,7 @@ function printReport(path){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						        <tr>
-                                    <td>วันที่<font color="red">*</font></td>
+                                    <td>วันที่<font color="red"></font></td>
 									<td>		
 										 <html:text property="bean.docDate" styleId="docDate" styleClass="disableText" readonly="true"> </html:text>
 										  Doc No
@@ -236,13 +251,13 @@ function printReport(path){
 									</td>
 								</tr>
 								<tr>
-                                    <td> จ่าย<font color="red">*</font></td>
+                                    <td> จ่าย<font color="red"></font></td>
 									<td>		
-										 <html:text property="bean.payToName" styleId="payToName" size="50"  maxlength="30"> </html:text>
+										 <html:text property="bean.payToName" styleId="payToName" size="50"  maxlength="40"> </html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td> ฝ่าย<font color="red">*</font></td>
+                                    <td> ฝ่าย<font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.deptId" styleId="deptId" onchange="loadSection()">
 											<html:options collection="deptList" property="code" labelProperty="desc"/>
@@ -250,7 +265,7 @@ function printReport(path){
 									</td>
 								</tr>
 								<tr>
-                                    <td> แผนก <font color="red">*</font></td>
+                                    <td> แผนก <font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.sectionId" styleId="sectionId">
 										
@@ -260,8 +275,10 @@ function printReport(path){
 								<tr>
                                     <td></td>
 									<td>		
-										 <html:radio property="bean.paymethod" styleId="paymethod" value="C"/>เงินสด
-										 <html:radio property="bean.paymethod" styleId="paymethod" value="CH"/>เช็ค 
+										<%--  <html:radio property="bean.paymethod" styleId="paymethod" value="C"/>เงินสด
+										 <html:radio property="bean.paymethod" styleId="paymethod" value="CH"/>เช็ค --%> 
+										 <html:checkbox property="bean.cashFlag" styleId="cashFlag" onclick="switchFlag(this,'cashFlag');">เงินสด</html:checkbox>
+										 <html:checkbox property="bean.chequeFlag" styleId="chequeFlag" onclick="switchFlag(this,'chequeFlag');">เช็ค</html:checkbox>
 									</td>
 								</tr>
 						   </table>
@@ -289,9 +306,9 @@ function printReport(path){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="25%">
 										  <input type="hidden" name="lineId" id="lineId" >
-										  <input type="text" name="accountName" id="accountName" size="30" maxlength="18" tabindex="<%out.print(tabindex);tabindex++;%>">
+										  <input type="text" name="accountName" id="accountName" size="30" maxlength="15" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
-										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" maxlength="100" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
+										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" maxlength="56" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
 										<td class="td_text" width="20%"> 
 										   <input type="text" name="amount" id="amount" size="30" tabindex="<%out.print(tabindex);tabindex++;%>"
 										    onblur="isNum2Digit(this);sumTotal();"  class="enableNumber">
@@ -311,11 +328,11 @@ function printReport(path){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="15%">
 										  <input type="hidden" name="lineId" id="lineId" value="<%=item.getLineId()%>">
-										  <input type="text" name="accountName" id="accountName" size="30" maxlength="18"
+										  <input type="text" name="accountName" id="accountName" size="30" maxlength="15"
 										    value="<%=Utils.isNull(item.getAccountName())%>" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
 										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" 
-										     maxlength="100" value="<%=Utils.isNull(item.getDescription())%>" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
+										     maxlength="56" value="<%=Utils.isNull(item.getDescription())%>" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
 										<td class="td_text" width="15%">
                                           <input type="text" name="amount" id="amount" size="30" value="<%=Utils.isNull(item.getAmount())%>" 
                                           onblur="isNum2Digit(this);sumTotal();" class="enableNumber" tabindex="<%out.print(tabindex);tabindex++;%>">
@@ -336,13 +353,66 @@ function printReport(path){
 							</tr>
 					</table>
 						   <!-- Items -->
+						   <p></p>
+						 <%--  <table id="tblProduct" align="center" width="75%" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth">
+						        <tr>
+                                    <th class="td_text_center">DR</th>
+									<th class="td_text_center">Amount</th>
+									<th>&nbsp;--------</th>
+									<th class="td_text_center">CR</th>
+									<th class="td_text_center">Amount</th>
+								</tr>
+								<tr  class="lineO">
+                                    <td>A/C No. <html:text property="bean.DR_AC_NO" styleId="DR_AC_NO" size="30"  maxlength="25"> </html:text></td>
+									<td> </td>
+									<td>&nbsp;</td>
+									<td>A/C No. <html:text property="bean.CR_AC_NO" styleId="CR_AC_NO" size="30"  maxlength="25"> </html:text></td>
+									<td></td>
+								</tr>
+								<tr  class="lineO"> 
+                                    <td>Desc. &nbsp;&nbsp;&nbsp;<html:text property="bean.DR_DESC" styleId="DR_DESC" size="30"  maxlength="25"> </html:text></td>
+									<td>
+									   <html:text property="bean.DR_AMOUNT" styleId="DR_AMOUNT" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+									<td>&nbsp;</td>
+									<td>Desc. &nbsp;&nbsp;&nbsp;<html:text property="bean.CR_DESC" styleId="CR_DESC" size="30"  maxlength="25"> </html:text></td>
+									<td>
+									   <html:text property="bean.CR_AMOUNT" styleId="CR_AMOUNT" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+								</tr>
+								<tr  class="lineO">
+                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INPUT TAX</td>
+									<td>
+									   <html:text property="bean.DR_INPUT_TAX_AMOUNT" styleId="DR_INPUT_TAX_AMOUNT" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ACCRUE W/T</td>
+									<td>
+									   <html:text property="bean.CR_ACC_WT_TAX_AMOUNT" styleId="CR_ACC_WT_TAX_AMOUNT" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+								</tr>
+								<tr  class="lineO">
+                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOTAL</td>
+									<td>
+									   <html:text property="bean.DR_TOTAL" styleId="DR_TOTAL" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOTAL</td>
+									<td>
+									   <html:text property="bean.CR_TOTAL" styleId="CR_TOTAL" size="20"  maxlength="20" onblur="isNum2Digit(this);"  styleClass="enableNumber"> </html:text>
+									</td>
+								</tr>
+						   </table> --%>
+						   
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
+									 <c:if test="${payForm.bean.canPrint == true}"> 
 							            <a href="javascript:printReport('${pageContext.request.contextPath}')">
 										  <input type="button" value="   พิมพ์   " class="newPosBtnLong">
 										</a>
+									</c:if>
 										<a href="javascript:save('${pageContext.request.contextPath}')">
 										  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
 										</a>
@@ -359,6 +429,7 @@ function printReport(path){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="actionFlag" value=""/>
 					</html:form>
 					<!-- BODY -->
 					</td>

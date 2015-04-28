@@ -55,8 +55,15 @@ public class Barcode implements Serializable{
 	private String subInv;
 	private String storeNo;
 	private List<BoxRef> boxRefItems;
+	private String includeCancel;
 	
 	
+	public String getIncludeCancel() {
+		return includeCancel;
+	}
+	public void setIncludeCancel(String includeCancel) {
+		this.includeCancel = includeCancel;
+	}
 	public String getWareHouseDesc() {
 		return wareHouseDesc;
 	}

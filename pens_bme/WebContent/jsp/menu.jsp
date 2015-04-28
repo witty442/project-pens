@@ -104,13 +104,9 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
 			</li> --%>
 			
-			 <%--  <li>
+			 <li>
           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
-          	</li>  --%>
-          	
-         	<%-- <li>
-          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/monitorInterfacesAction.do?do=prepare';"><span><bean:message key="MonitorInterfaces" bundle="sysprop"/></span></a>
-          	</li>  --%>
+          	</li>
 		</ul>
 	</li>
 <%} %>
@@ -164,6 +160,9 @@
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>12.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
 			</li>
+			 <li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareReportOrder&action=new');"><span>13.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>
@@ -202,7 +201,7 @@
 	</li>
 <%} %>
 
- <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE,User.PICK}) ){%>
 	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Pick</span></a>
 		<ul>
 	     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
@@ -243,8 +242,8 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span>12.<bean:message bundle="sysprop" key="pickStock"/></span></a>
 			</li> 
 		</ul>
-	<%}else if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
-	    <ul>
+	<%}else if ( Utils.userInRole(user,new String[]{User.SALE}) ){%>
+	  
 		    <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
@@ -279,29 +278,8 @@
   	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Document Menu</span></a>
 		<ul>
 			<li>
-			    <%
-			    System.out.println("LocalhostAddre:"+request.getLocalAddr());
-			    System.out.println("LocalName:"+request.getLocalName());
-			    if(request.getLocalAddr().equals("192.168.202.244")){
-			    %>
-			       <a href="#" onclick="window.location='<%=webPath%>/jsp/payAction.do?do=prepare2&action=new'"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
-			   <%
-			    }else if(request.getLocalName().equals("0.0.0.0")){
-			    %>
-			       <a href="#" onclick="window.location='<%=webPath%>/jsp/payAction.do?do=prepare2&action=new'"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
-			 
-			   <%}else{ 
-				 //For test at localhost
-			    if(request.getLocalAddr().equals("0.0.0.0")){
-			    	contextPath ="/pens_bme_test";
-			    }
-			   %>
-			   
-			       <a href="#" onclick="javascrupt:linkToDD('http://dd-server:8081<%=contextPath%>/login.do?do=loginCrossServer&pathRedirect=payAction|prepare2|new');">
-			         <span>1.<bean:message bundle="sysprop" key="pay"/></span>
-			       </a>
-  
-			    <%}%>
+			  <a href="#" onclick="javascript:link('<%=contextPath%>/jsp/payAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
+			  
 			</li> 
 		</ul>
 	</li> 

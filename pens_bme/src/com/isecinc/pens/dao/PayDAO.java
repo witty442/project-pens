@@ -90,6 +90,41 @@ public class PayDAO {
 					   h.setStatus(Utils.isNull(rst.getString("status")));
 					   h.setPaymethod(Utils.isNull(rst.getString("pay_method")));
 					   
+					   h.setDR_AC_NO(Utils.isNull(rst.getString("DR_AC_NO")));
+					   h.setDR_DESC(Utils.isNull(rst.getString("DR_DESC")));
+
+						if( Utils.isNull(h.getPaymethod()).equals("C")){
+							h.setCashFlag("on");
+						}
+						
+						if( Utils.isNull(h.getPaymethod()).equals("CH")){
+							h.setChequeFlag("on");
+						}
+						
+					   if(rst.getDouble("DR_AMOUNT") !=0.00){
+					     h.setDR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_AMOUNT"))));
+					   }
+					   
+					   if(rst.getDouble("DR_INPUT_TAX_AMOUNT") !=0.00){
+					      h.setDR_INPUT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_INPUT_TAX_AMOUNT"))));
+					   }
+					   if(rst.getDouble("DR_TOTAL") !=0.00){
+					      h.setDR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_TOTAL"))));
+					   }
+					   
+					   h.setCR_AC_NO(Utils.isNull(rst.getString("CR_AC_NO")));
+					   h.setCR_DESC(Utils.isNull(rst.getString("CR_DESC")));
+					   if(rst.getDouble("CR_AMOUNT") !=0.00){
+					      h.setCR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_AMOUNT"))));
+					   }
+					   if(rst.getDouble("CR_ACC_WT_TAX_AMOUNT") !=0.00){
+					      h.setCR_ACC_WT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_ACC_WT_TAX_AMOUNT"))));
+					   }
+					   if(rst.getDouble("CR_TOTAL") !=0.00){
+					      h.setCR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_TOTAL"))));
+					   }
+					   h.setCanPrint(true);
+					  
 		               //get Trans head
 		               if(getTrans){
 		            	   PayBean itemBean = searchTranDetailList(conn, h);
@@ -171,9 +206,12 @@ public class PayDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.DOC_TRAN \n");
-			sql.append(" (DOC_NO, DOC_DATE, PAY_TO_NAME, DEPT_ID, SECTION_ID, PAY_METHOD, STATUS, CREATE_DATE, CREATE_USER) \n");
+			sql.append(" (DOC_NO, DOC_DATE, PAY_TO_NAME, DEPT_ID, SECTION_ID," +
+					" PAY_METHOD, STATUS, CREATE_DATE, CREATE_USER" +
+					" ,DR_AC_NO,DR_DESC,DR_AMOUNT,DR_INPUT_TAX_AMOUNT,DR_TOTAL" +
+					" ,CR_AC_NO,CR_DESC,CR_AMOUNT,CR_ACC_WT_TAX_AMOUNT,CR_TOTAL) \n");
 			sql.append(" VALUES \n"); 
-			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?) \n");
+			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -190,6 +228,18 @@ public class PayDAO {
 			ps.setString(c++, Utils.isNull(o.getStatus()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getCreateUser());
+			
+			ps.setString(c++, Utils.isNull(o.getDR_AC_NO()));
+			ps.setString(c++, Utils.isNull(o.getDR_DESC()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_INPUT_TAX_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_TOTAL()));
+			
+			ps.setString(c++, Utils.isNull(o.getCR_AC_NO()));
+			ps.setString(c++, Utils.isNull(o.getCR_DESC()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_ACC_WT_TAX_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_TOTAL()));
 			
 			ps.executeUpdate();
 			
@@ -240,7 +290,9 @@ public class PayDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.DOC_TRAN SET Pay_to_name = ? ,DEPT_ID=?,SECTION_ID =?,PAY_METHOD =?,  \n");
-			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?  " );
+			sql.append(" ,DR_AC_NO = ? ,DR_DESC = ? ,DR_AMOUNT = ? ,DR_INPUT_TAX_AMOUNT = ? ,DR_TOTAL = ?  \n" );
+			sql.append(" ,CR_AC_NO = ? ,CR_DESC = ? ,CR_AMOUNT = ? ,CR_ACC_WT_TAX_AMOUNT = ? ,CR_TOTAL = ?  \n");
 			
 			sql.append(" WHERE DOC_NO = ?  \n" );
 
@@ -253,6 +305,18 @@ public class PayDAO {
 			ps.setString(c++, o.getUpdateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 
+			ps.setString(c++, Utils.isNull(o.getDR_AC_NO()));
+			ps.setString(c++, Utils.isNull(o.getDR_DESC()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_INPUT_TAX_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getDR_TOTAL()));
+			
+			ps.setString(c++, Utils.isNull(o.getCR_AC_NO()));
+			ps.setString(c++, Utils.isNull(o.getCR_DESC()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_ACC_WT_TAX_AMOUNT()));
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_TOTAL()));
+			
 			ps.setString(c++, Utils.isNull(o.getDocNo()));
 
 			int r =ps.executeUpdate();

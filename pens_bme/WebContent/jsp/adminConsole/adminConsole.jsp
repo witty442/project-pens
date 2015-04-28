@@ -126,7 +126,7 @@ function submitBT(path){
 	var currentTab  = document.getElementsByName("currentTab")[0].value;
 	var queryStr ="&curentTab="+currentTab;
 	
-	if(currentTab =='tab_config_info'){
+	if(currentTab =='tab_config_info' || currentTab==''){
 		queryStr +="&action=tab_config_info";
 	}
 	if(currentTab =='tab_execute'){
@@ -188,7 +188,7 @@ function submitBT(path){
 	  
 	   <div id="div_query"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <BR>
-		   <span class="h1_style"> Quary Tab </span> :
+		   <span class="h1_style"> Query Tab </span> :
 	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
 	        <BR><br>
 		    Please enter your text SQL 1:<BR>

@@ -35,6 +35,12 @@ public class DBConnection {
 			   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
 			}catch(Exception ee){
 				logger.error(ee.getMessage(),ee);
+				logger.info("Retry Conn 2 time");
+				try{
+				   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+				}catch(Exception eee){
+					logger.error(eee.getMessage(),eee);
+				}
 			}
 			
 		}catch(Exception e){

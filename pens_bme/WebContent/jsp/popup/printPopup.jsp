@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -13,7 +14,8 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%
-	
+User user = (User) session.getAttribute("user");
+EnvProperties env = EnvProperties.getInstance();
 %>
 <html>
 <head>
@@ -56,13 +58,19 @@ function loadMe(_path){
 	  document.tempForm.submit();
 		
   <%}else if("PayInReport".equals(reportName)){ 
-		  typeReport = Utils.isNull(request.getParameter("typeReport"));
+		  typeReport = "PayInReport";
 		  docNo = Utils.isNull(request.getParameter("docNo"));
+		   if(request.getLocalAddr().equals("192.168.202.244") 
+			|| request.getLocalName().equals("0.0.0.0")
+				   ){
 	  %>
-
-	      document.tempForm.action = _path + "/jsp/payAction.do?do=printReport&typeReport=<%=typeReport%>&docNo=<%=docNo%>";
-		  document.tempForm.submit();
-	  <%} %>
+	       document.tempForm.action = _path + "/jsp/payAction.do?do=printReport&typeReport=<%=typeReport%>&docNo=<%=docNo%>";
+	       document.tempForm.submit();
+	  <%}else{ %>
+	    
+	       document.tempForm.action = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?typeReport=<%=typeReport%>&docNo=<%=docNo%>&userName=<%=user.getUserName()%>";
+		   document.tempForm.submit();
+	  <%}  }%>
   
 }
 

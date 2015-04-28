@@ -282,6 +282,8 @@ function getJobNameModel(code){
 						               <html:text property="job.remark" styleId="remark" size="80" />
 						              Scan By User
 						               <html:text property="job.createUser" styleId="createUser" size="20" />
+						               
+						               <html:checkbox property="job.includeCancel">แสดงรายการที่ยกเลิกด้วย</html:checkbox>
 									</td>
 								</tr>	
 						   </table>

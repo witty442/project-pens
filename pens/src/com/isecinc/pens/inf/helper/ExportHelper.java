@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -428,6 +429,12 @@ public class ExportHelper {
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
 				       dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
 					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_LONG_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+				}else{
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
 				}
 			}else{
 				 dataConvertStr = Utils.isNull(rs.getString(Utils.removeStringEnter(colBean.getColumnName())));

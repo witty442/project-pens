@@ -18,16 +18,7 @@
 <%
 User user = (User) session.getAttribute("user");
 String role = ((User)session.getAttribute("user")).getType();
-
-/* List<References> importList = ImportHelper.readConfigTableImport();
-pageContext.setAttribute("importList",importList,PageContext.PAGE_SCOPE);
-
-List<References> importSalesUpdateList = ImportHelper.readConfigTableUpdateSalesImport();
-pageContext.setAttribute("importUpdateSalesList",importSalesUpdateList,PageContext.PAGE_SCOPE);
- */
 %>
-
-
 
 <html>
 <head>
@@ -42,9 +33,8 @@ pageContext.setAttribute("importUpdateSalesList",importSalesUpdateList,PageConte
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/interfaces.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery1.3.2.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
-
 
 <!-- Calendar -->
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />

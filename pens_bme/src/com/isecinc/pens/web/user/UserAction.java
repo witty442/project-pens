@@ -220,14 +220,14 @@ public class UserAction extends I_Action {
 			logger.debug("whereClause:"+whereCause);
 			String orderBy = "user_group_id,user_id";
 			
-			User[] results = new MUser().searchM(whereCause,orderBy);
+			//User[] results = new MUser().searchM(whereCause,orderBy);
 			
-			userForm.setResults(results);
+			/*userForm.setResults(results);
 			if (results != null) {
 				userForm.getCriteria().setSearchResult(results.length);
 			} else {
 				request.setAttribute("Message", "Not found data");
-			}
+			}*/
 		} catch (Exception e) {
 			request.setAttribute("Message",  e.getMessage());
 			throw e;

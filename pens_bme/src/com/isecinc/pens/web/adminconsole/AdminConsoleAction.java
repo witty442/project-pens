@@ -36,6 +36,7 @@ public class AdminConsoleAction extends I_Action {
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		logger.debug("prepare2");
+		//process(mapping, form, request, response);
 		return "process";
 	}
 
@@ -53,7 +54,7 @@ public class AdminConsoleAction extends I_Action {
 			}
 			String action = Utils.isNull(request.getParameter("action"));
 			
-			System.out.println("Servlet:currentTab:"+request.getParameter("currentTab"));
+			//System.out.println("Servlet:currentTab:"+request.getParameter("currentTab") +"action:"+action);
 
 			if(currentTab.equals("tab_config_info") || "".equals(currentTab)){
 				String configInfo  ="";

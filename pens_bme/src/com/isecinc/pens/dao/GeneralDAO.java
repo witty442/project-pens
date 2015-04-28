@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.Constants;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Master;
@@ -87,6 +89,116 @@ public class GeneralDAO {
 	 
 	 
 	 public static Barcode searchProductByBarcode(PopupForm c) throws Exception {
+		 
+		 return searchProductByBarcodeModelBMELocked(c);
+	 }
+	 
+    public static Barcode searchProductByBarcode(PopupForm c,String storeCode) throws Exception {
+		 if(storeCode.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
+			 return searchProductByBarcodeModelFriday(c);
+		 }
+		 return searchProductByBarcodeModelBMELocked(c);
+	 }
+    
+    public static Barcode searchProductByBarcodeModelFriday(PopupForm c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		Barcode b = null;
+		try {
+			sql.append("\n select * FROM ");
+			sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+			sql.append("\n and reference_code ='FridayItem' ");
+			
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append(" and Interface_desc = '"+c.getCodeSearch()+"' \n");
+			}
+			if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
+				   sql.append("\n and interface_value ='"+c.getMatCodeSearch()+"'");
+			}
+		
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			
+			if (rst.next()) {
+				b = new Barcode();
+				b.setBarcode(rst.getString("Interface_desc"));
+				b.setMaterialMaster(rst.getString("interface_value"));
+				b.setGroupCode(rst.getString("pens_desc2"));
+				b.setPensItem(Utils.isNull(rst.getString("pens_value")));
+				
+				Barcode bLock = getRetailPriceByPensItem(conn,b.getPensItem());
+				if(bLock != null){
+				  b.setWholePriceBF(bLock.getWholePriceBF());
+				  b.setRetailPriceBF(bLock.getRetailPriceBF());
+				}else{
+				  b.setWholePriceBF("");
+				  b.setRetailPriceBF("");	
+				}
+				
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return b;
+	}
+	 
+    public static Barcode getRetailPriceByPensItem(Connection conn,String pensItem) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Barcode b = null;
+		try {
+
+			sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
+			sql.append("\n  from pensbi.PENSBME_ONHAND_BME M   ");
+			sql.append("\n  where 1=1 ");
+			sql.append("\n  and M.PENS_ITEM ='"+pensItem+"'");
+			
+			sql.append("\n  UNION ALL ");
+			sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
+			sql.append("\n  from pensbi.PENSBME_ONHAND_BME_LOCKED M   ");
+			sql.append("\n  where 1=1 ");
+			sql.append("\n  and M.PENS_ITEM ='"+pensItem+"'");
+			
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			
+			if (rst.next()) {
+				b = new Barcode();
+				b.setBarcode(rst.getString("barcode"));
+				b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+				b.setGroupCode(rst.getString("group_item"));
+				b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+				b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+				b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				
+			} catch (Exception e) {}
+		}
+		return b;
+	}
+    
+	 public static Barcode searchProductByBarcodeModelBMELocked(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -298,6 +410,54 @@ public class GeneralDAO {
 					item.setNo(no);
 					item.setCode(rst.getString("pens_value"));
 					item.setDesc(rst.getString("interface_desc"));
+					
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchCustGroupByCustomer(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select pens_value , pens_desc  FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and reference_code ='Customer' ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and pens_value LIKE '%"+c.getCodeSearch()+"%' \n");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append(" and Interface_desc LIKE '%"+c.getDescSearch()+"%' \n");
+				}
+				sql.append("\n  ORDER BY Interface_value asc \n");
+				
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("pens_value"));
+					item.setDesc(rst.getString("pens_desc"));
 					
 					pos.add(item);
 					

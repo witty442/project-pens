@@ -340,6 +340,61 @@ public class OrderDAO {
 		}
 		return totalRow;
 	}
+	
+	public int getTotalRowReportOrder(Connection conn,Order o) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+        int totalRow = 0;
+		StringBuilder sql = new StringBuilder();
+		try {
+			sql.append(" SELECT count(*) as total_row  from PENSBME_ORDER    \n");
+			sql.append(" where 1=1  \n");
+			
+			if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
+				&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
+				
+				Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				Date orderToDate = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateToStr = Utils.stringValue(orderToDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append(" and order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
+				sql.append(" and order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
+				
+			}else{
+				Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append(" and order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
+				
+			}
+			if( !Utils.isNull(o.getCustGroup()).equals("")){
+				sql.append(" and store_type = '"+Utils.isNull(o.getCustGroup())+"'  \n");
+			}
+			if( !Utils.isNull(o.getStoreCode()).equals("")){
+				sql.append(" and store_code = '"+Utils.isNull(o.getStoreCode())+"'  \n");
+			}
+			
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+		
+			if (rst.next()) {
+				totalRow = rst.getInt("total_row");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				
+			} catch (Exception e) {}
+		}
+		return totalRow;
+	}
+	
 	public Order prepareNewOrderHistory(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize,String tableName,String itemType) throws Exception {
 		logger.debug("prepareNewOrder");
 		PreparedStatement ps = null;
@@ -470,6 +525,91 @@ public class OrderDAO {
 			orderResult.setOrderItemList(orderItemList);
 			orderResult.setStoreItemList(storeListFoundInOrder);
 			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				if(rst !=null){
+				  rst.close();rst=null;
+				}
+				if(ps != null){
+				  ps.close();ps=null;
+				}
+			} catch (Exception e) {}
+		}
+		return orderResult;
+	}
+	
+	public Order prepareReportOrder(Connection conn,Order o,User user,int pageNumber,int pageSize) throws Exception {
+		logger.debug("prepareReportOrder");
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		Order orderResult = new Order();
+		List<Order> orderItemList = new ArrayList<Order>();
+		StringBuilder sql = new StringBuilder();
+		try {
+			sql.append("\n SELECT * FROM( ");
+			sql.append("\n SELECT a.*, rownum r__ ");
+			sql.append("\n FROM ( ");
+			sql.append("\n  SELECT s.* FROM( ");
+				sql.append("\n  SELECT h.store_code,h.order_date,h.item,h.group_code,h.barcode" +
+						"      ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");		
+				sql.append("\n  from PENSBME_ORDER h where 1=1  ");
+				
+				if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
+						&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
+						
+					Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					Date orderToDate = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateToStr = Utils.stringValue(orderToDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append(" and h.order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
+					sql.append(" and h.order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
+						
+				}else{
+					Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					sql.append(" and h.order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
+					
+				}
+				if( !Utils.isNull(o.getCustGroup()).equals("")){
+					sql.append(" and h.store_type = '"+Utils.isNull(o.getCustGroup())+"'  \n");
+				}
+				if( !Utils.isNull(o.getStoreCode()).equals("")){
+					sql.append(" and h.store_code = '"+Utils.isNull(o.getStoreCode())+"'  \n");
+				}
+				sql.append("group by h.store_code,h.order_date,h.item,h.group_code,h.barcode,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF");
+				sql.append("\n  ) s  ");
+				sql.append("\n order by s.store_code,s.order_date,s.item,s.group_code,s.barcode asc  ");
+				sql.append("\n ) a  ");
+			sql.append("\n  WHERE rownum < (("+pageNumber+" * "+pageSize+") + 1 )  ");
+			sql.append("\n )  ");
+			sql.append("\n WHERE r__ >= ((("+pageNumber+"-1) * "+pageSize+") + 1)  ");
+					
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			
+			rst = ps.executeQuery();
+			int n=0;
+			while (rst.next()) {
+				Order item = new Order();
+				item.setStoreCode(rst.getString("STORE_CODE"));
+				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setGroupCode(rst.getString("GROUP_CODE"));
+				item.setItem(rst.getString("item"));
+				item.setBarcode(rst.getString("BARCODE"));
+				item.setQty(rst.getString("QTY"));
+				
+				item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+" ");
+				item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("Retail_Price_BF"),Utils.format_current_2_disgit)+" ");
+				
+				orderItemList.add(item);
+			}//while
+
+			orderResult.setOrderItemList(orderItemList);
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -2094,6 +2234,109 @@ public class OrderDAO {
 		}
 		return storeList;
 	} 
+	
+	public StringBuffer genReportOrder(Connection conn,User user,String storeType,String orderDateStr) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuffer h = new StringBuffer("");
+		StringBuilder sql = new StringBuilder();
+		try {
+			
+			 h.append("<table align='center' border='1' cellpadding='3' cellspacing='0' class='result'> \n");
+		     h.append("<tbody> \n");
+			   h.append("<td>no \n </td>");
+			   h.append("<td>orderNo \n </td>");
+			   h.append("<td>orderDateSS \n </td>");
+			   h.append("<td>materialMaster \n </td>");
+			   h.append("<td>barcode \n </td>");
+			   h.append("<td>qty \n </td>");
+			   h.append("<td>uom \n </td>");
+			   h.append("<td>store_code \n </td>");
+			   h.append("<td>store_name \n </td>");
+			   h.append("<td>store_address \n </td>");
+			   h.append("<td>TSC_ID \n </td>");
+			   h.append("<td>TSC_NAME \n </td>");
+			   h.append("<td>whole_price_bf \n </td>");
+			   h.append("<td>retail_price_bf \n </td>");
+            h.append("</tbody> \n");    
+	            
+			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			sql.append("  select o.order_no,TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, b.material_master, \n ");
+			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,\n ");
+			sql.append("  ( SELECT s.pens_desc2 FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Store' and s.pens_value = o.store_code ) as  store_name, \n ");
+			sql.append("  ( SELECT s.pens_desc3 FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Store' and s.pens_value = o.store_code ) as  store_address, \n ");
+			sql.append("  'T1' as TSC_ID , \n ");
+			sql.append("  ( SELECT s.interface_desc FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Logistic' and s.interface_value ='T1' ) as TSC_NAME, \n ");
+			sql.append("  b.whole_price_bf,b.retail_price_bf \n ");
+			sql.append("  from PENSBME_ORDER o,PENSBME_ONHAND_BME b \n ");
+			sql.append("  WHERE 1=1 and o.barcode = b.barcode \n ");
+			sql.append("  and trunc(order_date) = ?  \n ");
+			sql.append("  and store_type= ? \n ");
+			sql.append("  order by o.order_no,o.order_date, b.material_master asc \n ");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			ps.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime()));
+			ps.setString(2, storeType);
+			
+			rst = ps.executeQuery();
+	        int no = 0;
+			while (rst.next()) {
+				no++;
+				String orderNo = Utils.isNull(rst.getString("order_no"));
+				String orderDateSS = Utils.isNull(rst.getString("order_date"));
+				String materialMaster = Utils.isNull(rst.getString("material_master"));
+				String barcode = Utils.isNull(rst.getString("barcode"));
+				String qty = Utils.isNull(rst.getString("qty"));
+				String uom = Utils.isNull(rst.getString("uom"));
+				String store_code = Utils.isNull(rst.getString("store_code"));
+				String store_name = Utils.isNull(rst.getString("store_name"));
+				String store_address = Utils.isNull(rst.getString("store_address"));
+				String TSC_ID = Utils.isNull(rst.getString("TSC_ID"));
+				String TSC_NAME = Utils.isNull(rst.getString("TSC_NAME"));
+				
+				String whole_price_bf = Utils.isNull(rst.getString("whole_price_bf"));
+				//String whole_price_bf_1 = whole_price_bf.substring(0,whole_price_bf.indexOf("."));
+		    	//String whole_price_bf_2 = whole_price_bf.substring(whole_price_bf.indexOf(".")+1,whole_price_bf.length());
+		    	
+				String retail_price_bf = Utils.isNull(rst.getString("retail_price_bf"));
+				//String retail_price_bf_1 = retail_price_bf.substring(0,retail_price_bf.indexOf("."));
+		    	//String retail_price_bf_2 = retail_price_bf.substring(retail_price_bf.indexOf(".")+1,retail_price_bf.length());
+		    	
+		    	 h.append("<tr> \n");
+				   h.append("<td>"+no+" \n </td>");
+				   h.append("<td>"+orderNo+" \n </td>");
+				   h.append("<td>"+orderDateSS+" \n </td>");
+				   h.append("<td>"+materialMaster+" \n </td>");
+				   h.append("<td>&nbsp;"+barcode+" \n </td>");
+				   h.append("<td>"+qty+" \n </td>");
+				   h.append("<td>"+uom+" \n </td>");
+				   h.append("<td>"+store_code+" \n </td>");
+				   h.append("<td>"+store_name+" \n </td>");
+				   h.append("<td>"+store_address+" \n </td>");
+				   h.append("<td>"+TSC_ID+" \n </td>");
+				   h.append("<td>"+TSC_NAME+" \n </td>");
+				   h.append("<td>&nbsp;"+whole_price_bf+" \n </td>");
+				   h.append("<td>&nbsp;"+retail_price_bf+" \n </td>");
+				 h.append("</tr> \n"); 
+			
+				//i++;
+				//if(i==1){break;}
+			}//while
+			
+			h.append("</table> \n");
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+                ps.close();
+				
+			} catch (Exception e) {}
+		}
+		return h;
+	}
 	
 	public static void initStoreTypeMap() throws Exception{
 		PreparedStatement ps =null;

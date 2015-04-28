@@ -33,10 +33,104 @@ public class PayBean implements Serializable{
 	private String totalAmount;
 	private double totalAmountDouble;
 	private String totalAmountLetter;
+
+	private String cashFlag = "";
+	private String chequeFlag = "";
 	
+	private String DR_AC_NO ;
+	private String DR_DESC ;
+	private String DR_AMOUNT;
+	private String DR_INPUT_TAX_AMOUNT ;
+	private String DR_TOTAL ;
+	
+	private String CR_AC_NO ;
+	private String CR_DESC ;
+	private String CR_AMOUNT ;
+	private String CR_ACC_WT_TAX_AMOUNT;
+	private String CR_TOTAL;
+
+	private boolean canPrint;
 	private List<PayBean> items;
 	
 	
+	public String getCashFlag() {
+		return cashFlag;
+	}
+	public void setCashFlag(String cashFlag) {
+		this.cashFlag = cashFlag;
+	}
+	public String getChequeFlag() {
+		return chequeFlag;
+	}
+	public void setChequeFlag(String chequeFlag) {
+		this.chequeFlag = chequeFlag;
+	}
+	public boolean isCanPrint() {
+		return canPrint;
+	}
+	public void setCanPrint(boolean canPrint) {
+		this.canPrint = canPrint;
+	}
+	public String getDR_AC_NO() {
+		return DR_AC_NO;
+	}
+	public void setDR_AC_NO(String dR_AC_NO) {
+		DR_AC_NO = dR_AC_NO;
+	}
+	public String getDR_DESC() {
+		return DR_DESC;
+	}
+	public void setDR_DESC(String dR_DESC) {
+		DR_DESC = dR_DESC;
+	}
+	public String getDR_AMOUNT() {
+		return DR_AMOUNT;
+	}
+	public void setDR_AMOUNT(String dR_AMOUNT) {
+		DR_AMOUNT = dR_AMOUNT;
+	}
+	public String getDR_INPUT_TAX_AMOUNT() {
+		return DR_INPUT_TAX_AMOUNT;
+	}
+	public void setDR_INPUT_TAX_AMOUNT(String dR_INPUT_TAX_AMOUNT) {
+		DR_INPUT_TAX_AMOUNT = dR_INPUT_TAX_AMOUNT;
+	}
+	public String getDR_TOTAL() {
+		return DR_TOTAL;
+	}
+	public void setDR_TOTAL(String dR_TOTAL) {
+		DR_TOTAL = dR_TOTAL;
+	}
+	public String getCR_AC_NO() {
+		return CR_AC_NO;
+	}
+	public void setCR_AC_NO(String cR_AC_NO) {
+		CR_AC_NO = cR_AC_NO;
+	}
+	public String getCR_DESC() {
+		return CR_DESC;
+	}
+	public void setCR_DESC(String cR_DESC) {
+		CR_DESC = cR_DESC;
+	}
+	public String getCR_AMOUNT() {
+		return CR_AMOUNT;
+	}
+	public void setCR_AMOUNT(String cR_AMOUNT) {
+		CR_AMOUNT = cR_AMOUNT;
+	}
+	public String getCR_ACC_WT_TAX_AMOUNT() {
+		return CR_ACC_WT_TAX_AMOUNT;
+	}
+	public void setCR_ACC_WT_TAX_AMOUNT(String cR_ACC_WT_TAX_AMOUNT) {
+		CR_ACC_WT_TAX_AMOUNT = cR_ACC_WT_TAX_AMOUNT;
+	}
+	public String getCR_TOTAL() {
+		return CR_TOTAL;
+	}
+	public void setCR_TOTAL(String cR_TOTAL) {
+		CR_TOTAL = cR_TOTAL;
+	}
 	public double getTotalAmountDouble() {
 		return totalAmountDouble;
 	}
