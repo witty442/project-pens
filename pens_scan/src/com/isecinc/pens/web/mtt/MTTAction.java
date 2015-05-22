@@ -65,7 +65,7 @@ public class MTTAction extends I_Action {
 		}finally{
 			
 		}
-		return mapping.findForward("prepare2");
+		return mapping.findForward("search");
 	}
 	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -90,7 +90,7 @@ public class MTTAction extends I_Action {
 		}finally{
 			
 		}
-		return mapping.findForward("search2");
+		return mapping.findForward("search");
 	}
 	
 	
@@ -207,7 +207,7 @@ public class MTTAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear2");
+		return mapping.findForward("search");
 	}
 	
 	/**
@@ -215,7 +215,7 @@ public class MTTAction extends I_Action {
 	 */
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		String forward = "prepare";
+		String forward = "mttDetail";
 		MTTForm aForm = (MTTForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
@@ -224,6 +224,8 @@ public class MTTAction extends I_Action {
 		
             String docNo = Utils.isNull(request.getParameter("docNo"));
             String mode = Utils.isNull(request.getParameter("mode"));
+            String pageType = Utils.isNull(request.getParameter("pageType"));
+           
             
 			if( !"".equals(docNo) && !"".equals(docNo)){
 				logger.debug("prepare edit docNo:"+docNo);
@@ -238,6 +240,7 @@ public class MTTAction extends I_Action {
 				
 				aForm.setBean(bean);
 				aForm.setMode(mode);//Mode Edit
+				aForm.setPageType(pageType);
 			}else{
 				
 				logger.debug("prepare new docNo");
@@ -248,8 +251,9 @@ public class MTTAction extends I_Action {
 				aForm.setBean(ad);
 				
 				aForm.setMode(mode);//Mode Add new
-				
+				aForm.setPageType(pageType);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", "err:"+ e.getMessage());
@@ -274,7 +278,7 @@ public class MTTAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}
-		return "prepare";
+		return "mttDetail";
 	}
 
 	/**
@@ -335,9 +339,9 @@ public class MTTAction extends I_Action {
 			//add value to Results
 			if(barcode != null && barcode.length > 0){
 				for(int i=0;i<barcode.length;i++){
-					if( !Utils.isNull(barcode[i]).equals("") 
+					if(    !Utils.isNull(barcode[i]).equals("") 
 						&& !Utils.isNull(materialMaster[i]).equals("")
-						&& !Utils.isNull(lineId[i]).equals("-1")){
+						){
 						
 						 MTTBean l = new MTTBean();
 						 maxLineId++;
@@ -383,7 +387,7 @@ public class MTTAction extends I_Action {
 			try {
 				
 			} catch (Exception e2) {}
-			return "prepare";
+			return "mttDetail";
 		} finally {
 			try {
 				if(conn != null){
@@ -391,7 +395,7 @@ public class MTTAction extends I_Action {
 				}
 			} catch (Exception e2) {}
 		}
-		return "search";
+		return "mttDetail";
 	}
 	
 
@@ -410,7 +414,7 @@ public class MTTAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear");
+		return mapping.findForward("mttDetail");
 	}
 
 	
@@ -445,7 +449,7 @@ public class MTTAction extends I_Action {
 			   conn.close();conn=null;
 			}
 		}
-		return mapping.findForward("clear");
+		return mapping.findForward("mttDetail");
 	}
 	
 	public ActionForward closeJob(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -481,7 +485,7 @@ public class MTTAction extends I_Action {
 			   conn.close();conn=null;
 			}
 		}
-		return mapping.findForward("clear");
+		return mapping.findForward("mttDetail");
 	}
 	
 	public ActionForward prepareScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -630,7 +634,7 @@ public class MTTAction extends I_Action {
 					h.append("<tr> \n");
 					  h.append("<td>"+s.getDocNo()+"</td> \n");
 					  h.append("<td>"+s.getDocDate()+"</td> \n");
-					  h.append("<td>"+s.getCustGroup()+"&nbsp;"+s.getCustGroupName()+"</td> \n");
+					  h.append("<td>"+s.getCustGroup()+"</td> \n");
 					  h.append("<td>"+s.getStoreCode()+"&nbsp;"+s.getStoreName()+"</td> \n");
 					  h.append("<td>"+s.getGroupCode()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");

@@ -28,9 +28,8 @@
 
 <%
 User user = (User) request.getSession().getAttribute("user");
-
-
 %>
+
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -287,12 +286,48 @@ function resetStore(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> จำนวนหีบ<font color="red"></font></td>
+                                    <td> จำนวนหีบตาม RTN<font color="red"></font></td>
 									<td>		
 										<html:text property="bean.rtnQtyCTN" styleId="rtnQtyCTN" styleClass="disableText" readonly="true" size="30"></html:text>
 									</td>
-									<td>จำนวนชิ้น&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<td>จำนวนชิ้นตาม RTN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										<html:text property="bean.rtnQtyEA" styleId="rtnQtyEA" styleClass="disableText" readonly="true" size="30"></html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td> ชื่อขนส่งที่ไปรับจากห้าง<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.deliveryBy" styleId="deliveryBy" styleClass="disableText" readonly="true" size="50"/>
+										
+										วันที่นัดมาส่งของที่ PD
+										<html:text property="bean.deliveryDate" styleId="deliveryDate" styleClass="disableText" readonly="true" size="10" />
+									       จำนวนหีบสินค้าที่จัดส่ง
+									    <html:text property="bean.deliveryQty" styleId="deliveryQty" styleClass="disableText" readonly="true"size="20" />
+									</td>
+								</tr>
+					
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 1<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.attach1" styleId="attach1" styleClass="disableText" readonly="true" size="100" />
+									</td>
+								</tr>
+								<tr>
+                                    <td>สิ่งอื่นที่ส่งมาเพิ่มเติม 2<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.attach2" styleId="attach2" styleClass="disableText" readonly="true" size="100" />
+									</td>
+								</tr>
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 3<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.attach3" styleId="attach3" styleClass="disableText" readonly="true" size="100"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 4<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.attach4" styleId="attach4" styleClass="disableText" readonly="true"size="100" />
 									</td>
 								</tr>
 								<tr>
@@ -303,12 +338,17 @@ function resetStore(){
 								</tr>
 								<tr>
                                     <td> จำนวนหีบ<font color="red"></font></td>
-									<td>		
+									<td  colspan="2">		
 										<html:text property="bean.picRcvQtyCTN" styleId="picRcvQtyCTN" styleClass="normalText" size="30" onkeydown="return inputNum(event);"></html:text>
-									</td>
-									<td> จำนวนชิ้น <font color="red"></font>
+									 จำนวนชิ้น <font color="red"></font>
 								
 										<html:text property="bean.picRcvQtyEA" styleId="picRcvQtyEA" styleClass="normalText" size="30"  onkeydown="return inputNum(event);"></html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td> หมายเหตุของทีม Pic<font color="red"></font></td>
+									<td  colspan="2">		
+										<html:text property="bean.remarkTeamPic" styleId="remarkTeamPic" styleClass="normalText" size="100" maxlength="200"/>
 									</td>
 								</tr>
 						   </table>

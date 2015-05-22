@@ -2,7 +2,6 @@ package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,10 +23,8 @@ import util.ReportUtilServlet;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.bean.Onhand;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.OnhandProcessDAO;
 import com.isecinc.pens.dao.ConfPickStockDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -182,7 +179,7 @@ public class ConfPickStockAction extends I_Action {
 		int totalPage = 0;
 		int pageNumber = 1;
 		int totalQtyAll = 0;
-		int totalReqQtyAll = 0;
+		//int totalReqQtyAll = 0;
 		int totalCurPageQty = 0;
 		int totalQtyNotInCurPage = 0;
 		boolean newSearch = p.isNewSearch();
@@ -192,6 +189,13 @@ public class ConfPickStockAction extends I_Action {
 			logger.debug("newReq["+p.isNewReq()+"]");
 			
 			if(p.isNewSearch()){
+				logger.debug("new search:"+p.isNewSearch());
+				
+				//init all to dataMap
+				initDataSaveMapAllInFirstTimeSearch(conn,request,p);
+				//init totalAllReq
+				p.setTotalReqQty(ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p));
+				//clear session List
 				request.getSession().setAttribute("resultsView", null);
 				
 				//Case newsearch Recalc page
@@ -200,11 +204,11 @@ public class ConfPickStockAction extends I_Action {
 				totalRow = ConfPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
 				
 				if(  Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED)){
-					totalReqQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	
-					totalQtyAll =  ConfPickStockDAO.getTotalIssueQtyInStockIssueItem(conn,p);	
+					//totalReqQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);//Req qty	
+					totalQtyAll =  ConfPickStockDAO.getTotalIssueQtyInStockIssueItem(conn,p);//Real Qty	
 				}else{
-				       totalQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	
-				       totalReqQtyAll = totalQtyAll;
+				    totalQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	//Real qty = req qty (first time)
+				   // totalReqQtyAll = totalQtyAll;
 				}
 				
 				totalPage = Utils.calcTotalPage(totalRow,PickConstants.CONF_PICK_PAGE_SIZE);
@@ -222,6 +226,7 @@ public class ConfPickStockAction extends I_Action {
 			p.setNewSearch(newSearch);
 			
 			if(  Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED)){
+				
 				 ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseNoEdit(conn, p,pageNumber,false);//
 				 results = pAllItem.getItems();
 				    
@@ -245,7 +250,8 @@ public class ConfPickStockAction extends I_Action {
 			}
 			
 			if (results != null  && results.size() >0) {
-				request.getSession().setAttribute("results", results);
+				request.getSession(true).setAttribute("results", results);
+
 			} else {
 				request.getSession().setAttribute("results", null);
 				request.setAttribute("Message", "ไม่พบข่อมูล");
@@ -256,7 +262,6 @@ public class ConfPickStockAction extends I_Action {
 			logger.debug("totalQtyAll["+totalQtyAll+"]");
 			
 			p.setTotalQty(totalQtyAll);
-			p.setTotalReqQty(totalReqQtyAll);
 			p.setTotalQtyNotInCurPage(totalQtyNotInCurPage);
 				
 			//set after first run = false
@@ -267,6 +272,12 @@ public class ConfPickStockAction extends I_Action {
 				p.setCanPrint(true);
 			}else{
 				p.setCanPrint(false);
+			}
+			//canCancel
+			if(PickConstants.STATUS_POST.equalsIgnoreCase(p.getStatus())){
+				p.setCanCancel(true);
+			}else{
+				p.setCanCancel(false);
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -307,8 +318,10 @@ public class ConfPickStockAction extends I_Action {
 			//set Disp nextPage
 			ReqPickStock p = searchBypage(conn, aForm.getBean(), request);
 			
-			//setDisp result
-			setDispResults(request, aForm);
+			//setDisp result  Case Issue not set issueQty
+			if(  !Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED)){
+		  	   setDispResults(request, aForm);
+			}
 			
 			//set to form
 			aForm.setBean(p);
@@ -329,6 +342,41 @@ public class ConfPickStockAction extends I_Action {
 		return "search";
 	}
 
+	private void initDataSaveMapAllInFirstTimeSearch(Connection conn,HttpServletRequest request,ReqPickStock p){
+	    User user = (User) request.getSession().getAttribute("user");
+	    try{
+		    //dataSaveMap All
+		    Map<String, ReqPickStock> dataSaveMapAll = new HashMap<String, ReqPickStock>();
+		    if(request.getSession().getAttribute("dataSaveMapAll")!= null ){
+		       dataSaveMapAll = (Map<String,ReqPickStock>)request.getSession().getAttribute("dataSaveMapAll");
+		    }
+		    
+			logger.debug("dataSaveMapAll Size:"+(dataSaveMapAll!=null?dataSaveMapAll.size():0));
+			 
+			ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseEdit(conn, p,0,true);//
+		    List<ReqPickStock> results = pAllItem.getItems();
+		     
+			//add all item to dataSaveMapAll
+			if(results != null && results.size() > 0){
+				for(int i=0;i<results.size();i++){
+					 ReqPickStock l = (ReqPickStock)results.get(i);
+					 l.setUpdateUser(user.getUserName());
+					 l.setCreateUser(user.getUserName());
+					
+					 //Key Map  
+					 String key = l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
+					 if( !Utils.isNull(l.getIssueQty()).equals("")){
+						 dataSaveMapAll.put(key, l);
+					 }
+					 
+				}//for
+			}//if
+	
+			request.getSession().setAttribute("dataSaveMapAll",dataSaveMapAll);
+	    }catch(Exception e){
+	    	logger.error(e.getMessage(),e);
+	    }
+	}
 	
 	private Map<String, ReqPickStock> setDataSaveMap(HttpServletRequest request,ConfPickStockForm aForm){
 	    User user = (User) request.getSession().getAttribute("user");
@@ -376,7 +424,7 @@ public class ConfPickStockAction extends I_Action {
 
 	private Map<String, ReqPickStock> setDispResults(HttpServletRequest request,ConfPickStockForm aForm){
 	    //Data Disp Per Page
-	    List<ReqPickStock> results = (List<ReqPickStock>)request.getSession().getAttribute("results"); //data per page
+	    List<ReqPickStock> results = (List<ReqPickStock>)request.getSession(true).getAttribute("results"); //data per page
 		
 	    //dataSaveMap All
 	    Map<String, ReqPickStock> dataSaveMapAll = new HashMap<String, ReqPickStock>();
@@ -395,6 +443,7 @@ public class ConfPickStockAction extends I_Action {
 				 String key = l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
 				 if(dataSaveMapAll.get(key) != null){
 					 ReqPickStock pOld = (ReqPickStock) dataSaveMapAll.get(key); 
+					 logger.debug("pOld.getIssueQty():"+pOld.getIssueQty());
 				     l.setIssueQty(pOld.getIssueQty());
 				 }
 				 //set data to list disp
@@ -484,6 +533,49 @@ public class ConfPickStockAction extends I_Action {
 			aForm.setBean(h);
 				
 			request.setAttribute("Message", "ยืนยันรายการ เรียบร้อยแล้ว");
+			
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("clear");
+	}
+	
+	public ActionForward cancelAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("cancelAction");
+		ConfPickStockForm aForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			ReqPickStock h = aForm.getBean();
+			h.setStatus(ConfPickStockDAO.STATUS_CANCEL);//ISSUE
+			h.setUpdateUser(user.getUserName());
+		
+			//update status stock_issue head
+			ConfPickStockDAO.updateStausStockIssue(conn, h);
+			//update line
+			ConfPickStockDAO.updateStatusStockIssueItemByIssueReqNo(conn, h);
+	
+			conn.commit();
+			
+			//new search
+			h.setNewReq(false);
+			h.setNewSearch(true);
+	        h = searchBypage(conn, h, request);
+	        
+			request.getSession().setAttribute("results", h.getItems());
+			
+			aForm.setBean(h);
+				
+			request.setAttribute("Message", "ยกเลิกรายการ เรียบร้อยแล้ว");
 			
 		} catch (Exception e) {
 			conn.rollback();

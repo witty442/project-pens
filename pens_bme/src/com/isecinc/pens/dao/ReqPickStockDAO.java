@@ -1148,7 +1148,7 @@ public class ReqPickStockDAO extends PickConstants{
 			
 			pickStock.setCanPrint(true);
 			pickStock.setItems(items);
-			pickStock.setTotalQty(totalQty);
+			//pickStock.setTotalQty(totalQty);
 			
 		} catch (Exception e) {
 			throw e;
@@ -1185,9 +1185,8 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
 						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
-						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-						   sql.append("\n 		and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-						}
+					    sql.append("\n 	    and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+						sql.append("\n 		and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						   sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}
@@ -1200,6 +1199,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				select BARCODE,MATERIAL_MASTER,group_code,pens_item  ,SUM(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty ");
 						sql.append("\n 				from PENSBME_STOCK_FINISHED   ");
 						sql.append("\n 				WHERE group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+						sql.append("\n 				and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n 				group by BARCODE, MATERIAL_MASTER,group_code,pens_item  ");
 						sql.append("\n 				UNION ALL ");
 						sql.append("\n 				select i.BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1*SUM(i.req_qty)) as onhand_qty ");
@@ -1208,6 +1208,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				and h.issue_req_no = i.issue_req_no  ");
 						sql.append("\n 		        and i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 						sql.append("\n 				and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+						sql.append("\n 				and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n 				and h.issue_req_no <> '"+pickStock.getIssueReqNo()+"'");
 						sql.append("\n 				group by i.BARCODE, MATERIAL_MASTER,group_code,pens_item  ");
 						sql.append("\n 			) GROUP BY BARCODE, MATERIAL_MASTER,group_code,pens_item ");
@@ -1222,9 +1223,8 @@ public class ReqPickStockDAO extends PickConstants{
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						   sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}
-						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-						  sql.append("\n        and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-						}
+					    sql.append("\n       and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+					    sql.append("\n 		 and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n 		 group by i.BARCODE, MATERIAL_MASTER,group_code,pens_item ");
 						sql.append("\n 	 )P ");
 						sql.append("\n 	 ON M.BARCODE = P.BARCODE and M.pens_item = P.pens_item  " +
@@ -1235,9 +1235,8 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	   FROM(   ");
 						sql.append("\n 	     SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
 						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED ");
-						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-							sql.append("\n 		 WHERE group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-						}
+						sql.append("\n 		 WHERE group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+						sql.append("\n 		 and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n       UNION ALL ");
 						 // substract from Stock issue status = O(Open)
 						sql.append("\n 		  SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
@@ -1245,9 +1244,9 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		  WHERE 1=1  ");
 						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
 						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
-						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-							   sql.append("\n 		and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-						}
+					    sql.append("\n 		  AND i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+					    sql.append("\n 		  AND i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
+					    
 						sql.append("\n 	    )O2    ");
 						sql.append("\n 	    GROUP BY O2.BARCODE,O2.MATERIAL_MASTER,O2.group_code,O2.pens_item  ");
 						sql.append("\n 	  ) O   ");
@@ -1270,9 +1269,8 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n  	select BARCODE,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
 					sql.append("\n  	from PENSBME_STOCK_FINISHED ");
 					sql.append("\n  	where 1=1   ");
-					if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-						sql.append("\n 		and group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-					}
+					sql.append("\n 		and group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+					sql.append("\n 		and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 					sql.append("\n      UNION ALL ");
 					 // substract from Stock issue status = O(Open)
 					sql.append("\n 		SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
@@ -1280,9 +1278,9 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n 		WHERE 1=1  ");
 					sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
 					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
-					if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-						  sql.append("\n 		and group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
-					}
+					sql.append("\n 		and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+					sql.append("\n 	    and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
+					
 					sql.append("\n    )M  ");
 					sql.append("\n    GROUP BY M.group_code,M.pens_item,M.MATERIAL_MASTER,M.BARCODE");
 					sql.append("\n  )M2  WHERE M2.onhand_qty > 0");

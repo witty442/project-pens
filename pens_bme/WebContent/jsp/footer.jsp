@@ -1,4 +1,5 @@
-<%@page import="org.hibernate.cfg.Configuration"%>
+
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -25,9 +26,8 @@
 			  </font>
 			   
 			  <%
-			    Configuration hibernateConfig = new Configuration();
-				hibernateConfig.configure();
-				String url = hibernateConfig.getProperty("connection.url");
+			    
+				String url = EnvProperties.getInstance().getProperty("db.url");
 			  %>
 			  DB[<%=url%>]
 		</td>

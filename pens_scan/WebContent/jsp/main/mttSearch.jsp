@@ -102,7 +102,7 @@ function search(path){
 	return true;
 }
 
-function openEdit(path,docNo,mode){
+function openEdit(path,docNo,mode,pageType){
 	var form = document.mttForm;
 	/* var param ="&docNo="+$('#docNo').val();
 	param +="&custGroup="+$('#custGroup').val();
@@ -112,7 +112,7 @@ function openEdit(path,docNo,mode){
 	param +="&materialMaster="+$('#materialMaster').val();
 	param +="&pensItem="+$('#pensItem').val(); */
 	
-	var param ="&docNo="+docNo+"&mode="+mode;
+	var param ="&docNo="+docNo+"&mode="+mode+"&pageType="+pageType;
 	form.action = path + "/jsp/mttAction.do?do=prepare"+param;
 	form.submit();
 	return true;
@@ -305,9 +305,10 @@ function resetStore(){
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
 										
-										<a href="javascript:openEdit('${pageContext.request.contextPath}','','add')">
+										<a href="javascript:openEdit('${pageContext.request.contextPath}','','add','')">
 										  <input type="button" value="   เพิ่มรายการใหม่   " class="newPosBtnLong">
-										</a>	
+										</a>
+										
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						

@@ -20,7 +20,8 @@ public class RTBean implements Serializable{
 	private String custGroupName;
 	private String storeCode;
 	private String storeName;
-
+	private String storeFullName;
+	
 	private String refDoc;
 	private String rtnNo;
 	private String rtnQtyCTN;
@@ -31,16 +32,137 @@ public class RTBean implements Serializable{
 	private String picRcvQtyEA;
 	private String status;
 	private String statusDesc;
+	private String remark;
 
+	private String deliveryBy	;
+	private String deliveryDate;
+	private String deliveryQty;
+	private String attach1	;
+	private String attach2	;
+	private String attach3	;
+	private String attach4	;
+	private String remarkTeamPic;
+	
 	private boolean canSave;
 	private boolean canPicSave;
 	private boolean canCancel;
 	private boolean canComplete;
 	private String noPicRcv;
+	private String orderType;
 	
 	private List<RTBean> items;
 
-    
+	
+	public String getOrderType() {
+		return orderType;
+	}
+
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+
+
+	public String getStoreFullName() {
+		return storeFullName;
+	}
+
+
+	public void setStoreFullName(String storeFullName) {
+		this.storeFullName = storeFullName;
+	}
+
+
+	public String getDeliveryBy() {
+		return deliveryBy;
+	}
+
+   
+	public String getRemarkTeamPic() {
+		return remarkTeamPic;
+	}
+
+
+	public void setRemarkTeamPic(String remarkTeamPic) {
+		this.remarkTeamPic = remarkTeamPic;
+	}
+
+
+	public void setDeliveryBy(String deliveryBy) {
+		this.deliveryBy = deliveryBy;
+	}
+
+
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
+
+
+	public String getDeliveryQty() {
+		return deliveryQty;
+	}
+
+
+	public void setDeliveryQty(String deliveryQty) {
+		this.deliveryQty = deliveryQty;
+	}
+
+
+	public String getAttach1() {
+		return attach1;
+	}
+
+
+	public void setAttach1(String attach1) {
+		this.attach1 = attach1;
+	}
+
+
+	public String getAttach2() {
+		return attach2;
+	}
+
+
+	public void setAttach2(String attach2) {
+		this.attach2 = attach2;
+	}
+
+
+	public String getAttach3() {
+		return attach3;
+	}
+
+
+	public void setAttach3(String attach3) {
+		this.attach3 = attach3;
+	}
+
+
+	public String getAttach4() {
+		return attach4;
+	}
+
+
+	public void setAttach4(String attach4) {
+		this.attach4 = attach4;
+	}
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
 	public boolean isCanPicSave() {
 		return canPicSave;
 	}

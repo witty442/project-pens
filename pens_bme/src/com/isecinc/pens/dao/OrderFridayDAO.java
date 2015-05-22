@@ -176,6 +176,7 @@ public class OrderFridayDAO {
 				sql.append("\n ,h.item as item_wacoal ");
 				sql.append("\n ,( h.onhand_qty - (select nvl(sum(o.qty),0)  from pensbme_order o  where 1=1  "); 
 			    sql.append("\n    and o.order_date = ?  ");
+			    sql.append("\n    and o.store_type ='"+Constants.STORE_TYPE_FRIDAY_CODE+"'");
 				sql.append("\n    and o.barcode = h.barcode ) ");
 				sql.append("\n  ) as remain_onhand_qty ");
 						
@@ -1079,8 +1080,6 @@ public class OrderFridayDAO {
 		 //Color 
         XSSFColor myColor = new XSSFColor(new java.awt.Color(141,180,226));
 		try {
-			String refCode = "LotusItem";	
-			
 			// Create Sheet.
            xssfWorkbook = new XSSFWorkbook();
            XSSFSheet sheet = xssfWorkbook.createSheet("SampleExcelSheet");
@@ -1174,8 +1173,13 @@ public class OrderFridayDAO {
 			sql.append("  ,o.order_date \n");
 			sql.append("  ,o.group_code \n");
 			sql.append("  ,o.item \n");
-			sql.append("  ,( SELECT max(m.pens_desc) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='"+refCode+"' and m.pens_value = o.item ) as  item_desc \n");
-			sql.append("  ,(SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+refCode+"' and m.interface_desc = o.barcode) as item_style ");
+			
+			//sql.append("  ,( SELECT max(m.pens_desc) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='"+refCode+"' and m.pens_value = o.item ) as  item_desc \n");
+			//sql.append("  ,(SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+refCode+"' and m.interface_desc = o.barcode) as item_style ");
+			
+			sql.append("  ,( SELECT max(m.item_desc) FROM PENSBME_ONHAND_BME_FRIDAY m WHERE  m.pens_item = o.item ) as  item_desc \n");
+			sql.append("  ,(SELECT max(m.material_master) from PENSBME_ONHAND_BME_FRIDAY m  where  m.barcode = o.barcode) as item_style ");
+			
 			sql.append("  ,o.whole_price_bf,o.retail_price_bf \n");
 			sql.append("  ,o.qty \n");
 			sql.append("  from PENSBME_ORDER o  \n");

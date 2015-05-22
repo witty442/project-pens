@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -50,6 +51,21 @@ public class Utils {
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
+	}
+	
+	public static String[] getCurrentDatebuddhistSplitDDMMYYYY(){
+		String[] d = new String[3];
+		Calendar c = Calendar.getInstance(Locale.US);
+		logger.debug("currentYear:"+String.valueOf(c.get(Calendar.YEAR)));
+		try{
+			d[0] = String.valueOf(c.get(Calendar.DATE)).length()==1?"0"+String.valueOf(c.get(Calendar.DATE)):String.valueOf(c.get(Calendar.DATE));
+			d[1] = String.valueOf(c.get(Calendar.MONTH)).length()==1?"0"+String.valueOf(c.get(Calendar.MONTH)+1):String.valueOf(c.get(Calendar.MONTH)+1);
+			d[2] = String.valueOf(c.get(Calendar.YEAR)).length()==1?"0"+String.valueOf(c.get(Calendar.YEAR)+543):String.valueOf(c.get(Calendar.YEAR)+543);
+			
+		}catch(Exception e){
+			
+		}
+		return d;
 	}
 	
 	public static void reconveryReport(String[] args){

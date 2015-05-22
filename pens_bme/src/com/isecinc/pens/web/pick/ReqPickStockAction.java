@@ -1,5 +1,8 @@
 package com.isecinc.pens.web.pick;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +20,7 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
+import util.ExcelHeader;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
@@ -172,9 +176,11 @@ public class ReqPickStockAction extends I_Action {
 				p.setStatus(issueReqStatus);
 				p.setModeConfirm(false);
 				p.setModeEdit(false);
+				p.setCanExport(true);
 				
 				//Get Item and set data to session dataGroupCodeMapAll
 				p = searchBypageCaseView(conn, p, request);
+				logger.debug("totalQty:"+p.getTotalQty());
 				aForm.setBean(p);	
 				
             }else{
@@ -191,6 +197,7 @@ public class ReqPickStockAction extends I_Action {
 					p.setNewSearch(true);//new search
 					p.setNewReq(false);
 					p.setStatus(issueReqStatus);
+					p.setCanExport(true);
 					
 					if("confirm".equalsIgnoreCase(process)){
 						p.setModeConfirm(true);
@@ -202,6 +209,7 @@ public class ReqPickStockAction extends I_Action {
 					
 					//Get Item and set data to session dataGroupCodeMapAll
 					p = searchBypage(conn, p, request);
+					
 					aForm.setBean(p);
 					
 				}else{
@@ -350,7 +358,6 @@ public class ReqPickStockAction extends I_Action {
 		boolean newSearch = p.isNewSearch();
 		List<ReqPickStock> results = new ArrayList<ReqPickStock>();
 		try{
-
 			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
 			logger.debug("newReq["+p.isNewReq()+"]");
 			
@@ -362,6 +369,7 @@ public class ReqPickStockAction extends I_Action {
 
 				totalRow = ReqPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
 				totalQtyAll =  ReqPickStockDAO.getTotalQtyInStockIssueItem(conn,p);	
+				p.setTotalQty(totalQtyAll);
 				
 				totalPage = (totalRow/ PickConstants.REQ_PICK_PAGE_SIZE)+1;
 				request.getSession().setAttribute("totalPage", totalPage);
@@ -376,9 +384,10 @@ public class ReqPickStockAction extends I_Action {
             //** Search Data and Display **/
 			p = ReqPickStockDAO.searchReqPickStock(conn,p,false);//head only
 			p.setNewSearch(newSearch);
-			
+
 			ReqPickStock  pAllItem = ReqPickStockDAO.getStockIssueItemCaseNoEdit(conn, p,pageNumber,false);//
 			results = pAllItem.getItems();
+
 			
 			if (results != null  && results.size() >0) {
 				request.getSession().setAttribute("resultsView", results);
@@ -387,9 +396,6 @@ public class ReqPickStockAction extends I_Action {
 				request.setAttribute("Message", "ไม่พบข่อมูล");
 			}
 			
-			logger.debug("totalQtyAll["+totalQtyAll+"]");
-			
-			p.setTotalQty(totalQtyAll);
 			p.setTotalQtyNotInCurPage(totalQtyNotInCurPage);
 				
 			//Validate Button
@@ -500,7 +506,7 @@ public class ReqPickStockAction extends I_Action {
 		return mapping.findForward("search");
 	}
 	
-	protected String searchCaseView(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward searchCaseView(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ReqPickStockForm aForm = (ReqPickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
@@ -527,7 +533,7 @@ public class ReqPickStockAction extends I_Action {
 			   conn.close();conn = null;
 			}
 		}
-		return "search";
+		return mapping.findForward("search");
 	}
 
 	/**
@@ -684,6 +690,114 @@ public class ReqPickStockAction extends I_Action {
 				
 				logger.debug("items size:"+items.size());
 				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
+	
+	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("exportToExcel: ");
+		ReqPickStockForm reportForm = (ReqPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		StringBuffer h = new StringBuffer("");
+		int colSpan = 6;
+		try {
+	
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+
+			ReqPickStock bean = reportForm.getBean();
+			if(bean != null){
+				//logger.debug("ReqPickStock:"+h);
+				
+				h.append(ExcelHeader.EXCEL_HEADER);
+				
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colSpan+"'>รายงานยืนยัน การเบิกสินค้า </td> \n");
+				h.append("</tr> \n");
+				
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colSpan+"' >Issue Request Date:"+bean.getIssueReqDate()+
+						" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+						" วันที่รับของ :"+bean.getNeedDate()+
+						"</td> \n");
+				h.append("</tr> \n");
+
+				h.append("<td align='left' colspan='"+colSpan+"' >Issue Request No:"+bean.getIssueReqNo()+
+						" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+						" ผู้เบิก :"+bean.getRequestor()+
+						"</td> \n");
+				h.append("</tr> \n");
+				
+				h.append("<td align='left' colspan='"+colSpan+"' >กลุ่มร้านค้า:"+bean.getCustGroup()+
+						" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+						" ร้านค้า :"+bean.getStoreCode()+"-"+bean.getStoreName()+
+						"</td> \n");
+				h.append("</tr> \n");
+				
+				h.append("<td align='left' colspan='"+colSpan+"' >Sub inventory:"+bean.getSubInv()+
+						" &nbsp;&nbsp;&nbsp;"+
+						" Store :"+bean.getStoreNo()+"&nbsp;&nbsp;&nbsp; สถานะ:"+bean.getStatusDesc()+
+						"</td> \n");
+				h.append("</tr> \n");
+
+			    h.append("</table> \n");
+			    
+				//Gen Report
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock pAllItem = ReqPickStockDAO.getStockIssueItemCaseNoEdit(conn, bean,0,true);//
+				List<ReqPickStock> items = pAllItem.getItems();
+
+				if(items != null && items.size() >0){
+					h.append("<table border='1'> \n");
+					h.append("<tr> \n");
+						h.append("<td>GroupCode.</td> \n");
+						h.append("<td>PensItem.</td> \n");
+						h.append("<td>MaterialMaster</td> \n");
+						h.append("<td>Barcode</td> \n");
+						h.append("<td>Qty ที่จะเบิก.</td> \n");
+						h.append("<td>Qty ที่เบิกได้จริง.</td> \n");
+					h.append("</tr>");
+					for(int i=0 ;i<items.size();i++){
+						ReqPickStock item = items.get(i);
+						h.append("<tr> \n");
+							h.append("<td>"+item.getGroupCode()+"</td> \n");
+							h.append("<td>"+item.getPensItem()+"</td> \n");
+							h.append("<td>"+item.getMaterialMaster()+"</td> \n");
+							h.append("<td class='text'>"+item.getBarcode()+"</td> \n");
+							h.append("<td>"+item.getQty()+"</td> \n");
+							h.append("<td>"+Utils.isNull(item.getIssueQty())+"</td> \n");
+					    h.append("</tr>");
+					}
+					
+					java.io.OutputStream out = response.getOutputStream();
+					response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+					response.setContentType("application/vnd.ms-excel");
+					
+					Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+					w.write(h.toString());
+				    w.flush();
+				    w.close();
+	
+				    out.flush();
+				    out.close();
+				}
 				
 			}else{
 				

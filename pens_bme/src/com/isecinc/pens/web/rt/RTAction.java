@@ -1,5 +1,8 @@
 package com.isecinc.pens.web.rt;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,17 +21,23 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
+import util.ExcelHeader;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.RTBean;
+import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.RTDAO;
+import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.pick.ReqPickStockForm;
 
 /**
  * Summary Action
@@ -220,7 +229,11 @@ public class RTAction extends I_Action {
 			}
 			
 			//Search Again
-			RTBean bean = RTDAO.searchHead(conn,h,true).getItems().get(0);
+			
+			RTBean result = RTDAO.searchHead(conn,h,true);
+			logger.debug("Size:"+result.getItems().size());
+			
+			RTBean bean = result.getItems().get(0);
 		
 		    aForm.setBean(bean);
 			
@@ -291,7 +304,7 @@ public class RTAction extends I_Action {
 			RTBean h = aForm.getBean();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
-			h.setStatus(RTConstant.STATUS_COMPLETE);
+			h.setStatus(RTConstant.STATUS_COOMFIRM);
 			RTDAO.updateStatusRTNControl(conn, h);
 			
 			//Search Again
@@ -350,7 +363,7 @@ public class RTAction extends I_Action {
 			c.setDocNo(docNo);
 			if( !Utils.isNull(docNo).equals("")){
 			  RTBean bean = RTDAO.searchHead(c,true).getItems().get(0);
-			  if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
+			  if(bean.getStatus().equals(RTConstant.STATUS_COOMFIRM) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
 				bean.setCanPicSave(true);
 			  }
 			  aForm.setBean(bean);
@@ -384,11 +397,13 @@ public class RTAction extends I_Action {
 			h.setUpdateUser(user.getUserName());
 			h.setStatus(RTConstant.STATUS_RECEIVED);
 			
+			logger.debug("remarkTeamPic:"+Utils.isNull(h.getRemarkTeamPic()));
+			
 			RTDAO.updateRTNControlByPic(conn, h);
 			
 			//Search Again
 			RTBean bean = RTDAO.searchHead(conn,h,true).getItems().get(0);
-			if(bean.getStatus().equals(RTConstant.STATUS_COMPLETE) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
+			if(bean.getStatus().equals(RTConstant.STATUS_COOMFIRM) || bean.getStatus().equals(RTConstant.STATUS_RECEIVED)){
 				 bean.setCanPicSave(true);
 			}
 		    aForm.setBean(bean);
@@ -429,9 +444,25 @@ public class RTAction extends I_Action {
 		HashMap parameterMap = new HashMap();
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
-		 
 		try {
-		
+			String fileType = SystemElements.PDF;//request.getParameter("fileType");
+			logger.debug("fileType:"+fileType);
+			
+			conn = DBConnection.getInstance().getConnection();
+			RTBean bean = RTDAO.searchHead(conn,reportForm.getBean(),true);
+		   
+			if(bean != null && bean.getItems() != null && bean.getItems().size() >0){
+				//Gen Report
+				String fileName = "rt_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, bean.getItems());
+				
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+				return  mapping.findForward("prepare");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", e.getMessage());
@@ -442,9 +473,107 @@ public class RTAction extends I_Action {
 				
 			}
 		}
-		// return null;
 		return null;
 	}
+	
+	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("exportToExcel: ");
+		RTForm reportForm = (RTForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		StringBuffer h = new StringBuffer("");
+		int colSpan = 6;
+		try {
+			//logger.debug("ReqPickStock:"+h);
+			List<RTBean> resultList = reportForm.getResultsSearch();
+				
+			if(resultList != null && resultList.size()>0){
+					
+			  h.append(ExcelHeader.EXCEL_HEADER);
+			  h.append("<table border='1'> \n");
+			  h.append("<tr> \n");
+					h.append("<th >Authorize return No</th >");
+					h.append("<th >เล่มที่/เลขที่</th >");
+					h.append("<th >วันที่บันทึก</th >");
+					h.append("<th >กลุ่มร้านค้า</th >");
+					h.append("<th >รหัสร้านค้า</th >");
+					h.append("<th >ชื่อร้านค้า</th >");
+					h.append("<th >RTN NO</th >");
+					h.append("<th >จำนวนหีบใน RTN</th >");
+					h.append("<th >จำนวนชิ้นใน RTN</th >");
+					h.append("<th >วันที่ PIC รับสินค้า</th >");
+					h.append("<th >จำนวนหีบ ที่ PIC รับ</th >");
+					h.append("<th >จำนวนชิ้นที่ Scan จริง</th >");
+					h.append("<th >Status</th >");
+					h.append("<th >หมายเหตุ</th >");
+					h.append("<th >ชื่อขนส่งที่ไปรับจากห้าง</th >");
+					h.append("<th >วันที่นัดมาส่งของที่ PD</th >");
+					h.append("<th >จำนวนหีบที่จัดส่ง</th >");
+					h.append("<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 1</th >");
+					h.append("<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 2</th >");
+					h.append("<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 3</th >");
+					h.append("<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 4</th >");
+			h.append("</tr> \n");
+
+			  for(int n=0;n<resultList.size();n++){
+				RTBean mc = (RTBean)resultList.get(n);
+					h.append("<tr> \n");
+					h.append("<td>"+mc.getDocNo() +"</td>");
+					h.append("<td>"+mc.getRefDoc() +"</td>");
+					h.append("<td>"+mc.getDocDate()+"</td>");
+				    h.append("<td>"+mc.getCustGroup() +":"+mc.getCustGroupName()+"</td>");
+				    h.append("<td>"+mc.getStoreCode() +"</td>");
+				    h.append("<td>"+mc.getStoreName()+"</td>");
+					h.append("<td>"+mc.getRtnNo()+"</td>");
+					h.append("<td>"+mc.getRtnQtyCTN()+"</td>");
+					h.append("<td>"+mc.getRtnQtyEA()+"</td>");
+					h.append("<td>"+mc.getPicRcvDate()+"</td>");
+					h.append("<td>"+mc.getPicRcvQtyCTN()+"</td>");
+					h.append("<td>"+mc.getPicRcvQtyEA()+"</td>");
+					h.append("<td>"+mc.getStatusDesc()+"</td>"); 
+					
+					h.append("<td>"+mc.getRemark()+"</td>"); 
+					h.append("<td>"+mc.getDeliveryBy()+"</td>"); 
+					h.append("<td>"+mc.getDeliveryDate()+"</td>"); 
+					h.append("<td>"+mc.getDeliveryQty()+"</td>");  
+					h.append("<td>"+mc.getAttach1()+"</td>"); 
+					h.append("<td>"+mc.getAttach2()+"</td>"); 
+					h.append("<td>"+mc.getAttach3()+"</td>"); 
+					h.append("<td>"+mc.getAttach4()+"</td>"); 
+				    h.append("</tr>");
+				}
+				
+			  h.append("</table>");
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(h.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+				
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("search");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
+	
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

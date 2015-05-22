@@ -41,7 +41,7 @@ public class PrintPayInServlet extends HttpServlet {
 		logger.debug("Initial PENS...");
 		Connection conn = null;
 		try {
-			logger.info("Init ");
+			//logger.info("Init ");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
@@ -56,12 +56,15 @@ public class PrintPayInServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException{
 		logger.debug("DoPost ");
 		try{
+			String docNo = Utils.isNull(request.getParameter("docNo"));
 			String userName = Utils.isNull(request.getParameter("userName"));
 			User user = new MUser().findByUserName(userName);
 			
 			request.getSession().setAttribute("user", user);
-			
+			logger.info("Start PrintPayIn UserName["+user.getUserName()+"]docNo["+docNo+"]");
 			printReport(request, response);
+			logger.info("End PrintPayIn UserName["+user.getUserName()+"]docNo["+docNo+"]");
+			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -82,7 +85,6 @@ public class PrintPayInServlet extends HttpServlet {
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			String fileType = SystemElements.PRINTER;
-			logger.debug("fileType:"+fileType);
 			
 			//Search Again
 			String docNo = Utils.isNull(request.getParameter("docNo"));

@@ -563,7 +563,10 @@ public class MOrder extends I_Model<Order> {
 			ps = conn.prepareStatement(sql);
 			
 		    java.util.Date pickDate = Utils.isNull(order.getPrintDateTimePick()).equals("")?null:Utils.parse(order.getPrintDateTimePick(), Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH, Utils.local_th);
-			BigDecimal pickDateBig = new BigDecimal(pickDate.getTime());
+			BigDecimal pickDateBig = new BigDecimal(0);
+			if(pickDate !=null){
+				pickDateBig = new BigDecimal(pickDate.getTime()); 
+			}
 			logger.debug("orderId:"+order.getId()+",pickDateBig:"+pickDateBig);
 		  
 		    ps.setBigDecimal(++index, pickDateBig.setScale(6));//updated

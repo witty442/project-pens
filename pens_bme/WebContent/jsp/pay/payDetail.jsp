@@ -88,7 +88,9 @@ span.pagelinks {
 <script type="text/javascript">
 
 function loadMe(path){
-	//new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
+	<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDEDIT}) ){%>
+	   new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
+	<%}%>
 	
 	document.getElementsByName('bean.deptId')[0].value = '${payForm.bean.deptId}';
 	
@@ -245,7 +247,11 @@ function switchFlag(obj,name){
 						        <tr>
                                     <td>วันที่<font color="red"></font></td>
 									<td>		
-										 <html:text property="bean.docDate" styleId="docDate" styleClass="disableText" readonly="true"> </html:text>
+									<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDEDIT}) ){%>
+										 <html:text property="bean.docDate" styleId="docDate" styleClass="normalText"  readonly="true"> </html:text>
+									<%}else{ %>
+									    <html:text property="bean.docDate" styleId="docDate" styleClass="disableText" readonly="true"> </html:text>
+									<%} %>
 										  Doc No
 										 <html:text property="bean.docNo" styleId="docNo" styleClass="disableText" readonly="true"> </html:text>
 									</td>

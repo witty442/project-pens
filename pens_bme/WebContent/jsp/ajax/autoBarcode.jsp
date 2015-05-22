@@ -17,7 +17,7 @@ String matCode = Utils.isNull((String) request.getParameter("matCode"));
 
 String outputText = "";
 try{
-	System.out.println("itemCode:"+itemCode);
+	//System.out.println("itemCode:"+itemCode);
 	if( !"".equals(Utils.isNull(itemCode)) || !"".equals(Utils.isNull(matCode))){
 		
 		PopupForm popupForm = new PopupForm();
@@ -32,7 +32,7 @@ try{
 		    outputText ="";
 		}
 		
-		System.out.println("returnText["+outputText+"]");
+		//System.out.println("returnText["+outputText+"]");
 	}
 }catch(Exception e){
 	e.printStackTrace();

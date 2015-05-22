@@ -344,6 +344,8 @@ function resetStore(){
 									<th >Issue Req Status</th>
 									<th >รหัสร้านค้า</th>
 									<th >ชื่อร้านค้า</th>
+									<th >Request Qty</th>
+									<th >วันที่รับของ</th>
 									<th >หมายเหตุ</th>
 									<th >Action</th>					
 							   </tr>
@@ -370,6 +372,12 @@ function resetStore(){
 										</td>
 										 <td class="search_storeName">
 										  ${results.storeName}
+										</td>
+										<td class="search_storeCode">
+										  ${results.totalReqQty}
+										</td>
+										<td class="search_storeCode">
+										  ${results.needDate}
 										</td>
 									    <td class="search_remark">
 										  ${results.remark}

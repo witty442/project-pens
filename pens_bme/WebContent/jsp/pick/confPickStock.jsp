@@ -84,6 +84,16 @@ function back(path){
 	return true;
 }
 
+function cancelAction(path){
+	if(confirm("ยืนยันยกเลิก Request นี้")){
+		var form = document.confPickStockForm;
+		form.action = path + "/jsp/confPickStockAction.do?do=cancelAction";
+		form.submit();
+		return true;
+	}
+	return false;
+}
+
 function exportExcel(path){
 	var form = document.confPickStockForm;
 	form.action = path + "/jsp/confPickStockAction.do?do=exportExcel";
@@ -388,7 +398,7 @@ function sumQty(){
 							int index = 0;
 							for(int i=0;i<resultList.size();i++){
 							   ReqPickStock o = (ReqPickStock) resultList.get(i);
-							   //System.out.println("getLineItemStyle:"+o.getLineItemStyle());
+							   //System.out.println("issueQty:"+o.getIssueQty());
 							   
 							   String classStyle = (i%2==0)?"lineO":"lineE";
 							   if( !"".equals(Utils.isNull(o.getLineItemStyle()))){
@@ -453,10 +463,16 @@ function sumQty(){
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
+								 <c:if test="${confPickStockForm.bean.canCancel == true}">
+									<a href="javascript:cancelAction('${pageContext.request.contextPath}')">
+									  <input type="button" value=" ยกเลิก Request นี้" class="newPosBtnLong"> 
+									</a>
+								 </c:if> 
+								 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockForm.bean.canPrint == true}">
-										<a href="javascript:print('${pageContext.request.contextPath}')">
-										  <input type="button" value=" พิมพ์ ใบเบิกสินค้า  " class="newPosBtnLong"> 
-										</a>
+									<a href="javascript:print('${pageContext.request.contextPath}')">
+									  <input type="button" value=" พิมพ์ ใบเบิกสินค้า  " class="newPosBtnLong"> 
+									</a>
 								 </c:if>
 								  <c:if test="${confPickStockForm.bean.canConfirm == true}">
 									<a href="javascript:confirmPick('${pageContext.request.contextPath}')">

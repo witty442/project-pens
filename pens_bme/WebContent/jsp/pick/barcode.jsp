@@ -265,12 +265,10 @@ function addRow(){
 	//alert("lineId["+lineId+"]");
 	
 	var rowData ="<tr class='"+className+"'>"+
-	
-	   // "<td class='data_no'> <input type='text' tabindex ='-1' name='no' size='5' readonly class='disableText' value='"+lineId+"'/></td>"+
 	    "<td class='data_linechk'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
 	    "<td class='data_barcode'> <input type='text' name='barcode' size='30'  "+
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
-	  //  " onchange='getProductModel(this,"+lineId+")' "+
+	
 	    " />  </td>"+
 	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='30' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='data_groupCode'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+

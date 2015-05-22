@@ -23,6 +23,7 @@
 
 <%
  String mode = mttForm.getMode();
+ int totalRowPerPage = 1;
 System.out.println("mode:"+mode);
 %>
 
@@ -247,44 +248,42 @@ function addRow(){
 	}
 
 	var lineId = rows+1;
-	
 	//alert("lineId["+lineId+"]");
 	
 	var rowData ="<tr class='"+className+"'>"+
-	
-	   // "<td class='data_no'> <input type='text' tabindex ='-1' name='no' size='5' readonly class='disableText' value='"+lineId+"'/></td>"+
 	    "<td class='td_text_center' width='5%'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/>"+
-	    "  <input type='hidden' tabindex ='-1' name='lineId' />"+
+	   // "  <input type='hidden' tabindex ='-1' name='lineId' />"+
 	    "</td>"+
-	    "<td class='td_text_center' width='10%'> <input type='text' name='barcode' size='25'  "+
-	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
-	  //  " onchange='getProductModel(this,"+lineId+")' "+
-	    " />  </td>"+
+	    "<td class='td_text_center' width='10%'> "+
+	    "  <input type='text' name='barcode' size='25' onkeypress='getProductKeypress(event,this,"+lineId+")' autocomplete='off' />"+
+	    "</td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='materialMaster' class='normalTextCenter'  size='20' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='td_text_center' width='5%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableTextCenter' size='15' /></td>"+
 	    "<td class='td_text_center' width='5%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableTextCenter' size='15' /> </td>"+
 	    "</tr>";
-
-    $('#tblProduct').append(rowData);
+   
+    $('#tblProduct tr:last').after(rowData);
+    
     //set focus default
     var barcode = document.getElementsByName("barcode");
     barcode[lineId-1].focus();
+    
+    //clear garbage collection
+    rowData.length = 0;
+ 
 }
 
-
 function calcTotalRow(){
-    var count = 0;
-	var rows = document.getElementsByName("barcode").length; //alert(barcodeLastRow);
-	for(var i=0;i<rows;i++){
-		var bCheck = document.getElementsByName("barcode")[i].value;
-		var lineId = document.getElementsByName("lineId")[i].value;
-		if(bCheck != "" && lineId != "-1"){
-			count = count+1;
-		}
+	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
+	var barcodeLastRow = document.getElementsByName("barcode")[rows-1]; //alert(barcodeLastRow.value);
+	if(barcodeLastRow.value ==''){
+		rows = rows-1;// blank row
 	}
-	
 	//Calc Row
-    document.getElementsByName("totalRow")[0].value = count;
+    var totalRow = document.getElementsByName("totalRow");
+    totalRow[0].value = rows;
+    
+    return rows;
 }
 
 function removeRow(path){
@@ -323,8 +322,8 @@ function removeRowUpdate(path,drow,index){
 	
 	document.getElementsByName("lineId")[index].value ='-1';
 	
-	//update db
-	//save(path);
+	//update delete line db
+	save(path);
 }
 	
 function removeRowBlank(drow){
@@ -339,38 +338,53 @@ function checkAll(chkObj){
 	}
 }
 
+function getProductKeypressOnTop(e,barcodeObj){
+	var rows = $('#tblProduct tr').length-1;
+	//alert(rows);
+	var lineId = rows;
+	
+	getProductKeypress(e,barcodeObj,lineId);
+	
+}
+
 function getProductKeypress(e,barcodeObj,lineId){
 	//materialMaster groupCode pensItem wholePriceBF retailPriceBF
 	//alert(barcode.value);
+	var totalRowPerPage = <%=totalRowPerPage%>;
 	
 	var barcode = document.getElementsByName("barcode");
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	var totalRows = 0;
 	
+	//alert("keyCode:"+e.keyCode);
 	if(e != null && e.keyCode == 13){
-	
 		if(barcodeObj.value ==''){
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
 		
 		}else{
+			 
 			var found = getProductModel(barcodeObj,lineId);
-			if(found){
-				calcTotalRow();
-				
-				//Add New Row Auto
-				addRow();
-				
-				barcode[lineId].focus();
+
+			if(found ){
+				totalRows = calcTotalRow();
 				
 				//Set Prev row readonly 
 				barcode[lineId-1].className ="disableText";
 				barcode[lineId-1].readOnly = true;
-			}
+
+			} 
 		}
 	}
+	
+	//clear garbage collection
+	barcode.length=0;
+	materialMaster.length=0;
+	groupCode.length=0;
+	pensItem.length=0;
 }
 
 function getProductModel(barcodeObj,lineId){
@@ -382,37 +396,48 @@ function getProductModel(barcodeObj,lineId){
 	
 	var returnString = "";
 	var form = document.mttForm;
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcodeMTT.jsp",
+	 $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
 			data : "itemCode=" + barcodeObj.value,
 			async: false,
-			cache: true,
+			cache: false,
 			success: function(getData){
 			  returnString = jQuery.trim(getData);
+			  
+			  if(returnString==''){
+					alert("ไม่พบข้อมูลสินค้า  "+barcodeObj.value);
+					barcodeObj.focus();
+					
+					barcode[lineId-1].value = '';
+					materialMaster[lineId-1].value = '';
+					groupCode[lineId-1].value = '';
+					pensItem[lineId-1].value = '';
+					
+				}else{
+					var s = returnString.split("|");
+					
+					//barcode[lineId-1].value = s[0];
+					materialMaster[lineId-1].value = s[1];
+					groupCode[lineId-1].value = s[2];
+					pensItem[lineId-1].value = s[3];
+					
+					found = true;
+					barcode[lineId-1].readonly = true;
+					barcode[lineId-1].className ="disableText";
+					
+					addRow();
+		            barcode[lineId].focus();
+				}
 			}
 		}).responseText;
-
-	   // alert("x:"+returnString);
-	    
-		if(returnString==''){
-			alert("ไม่พบข้อมูลสินค้า  "+barcodeObj.value);
-			barcodeObj.focus();
-			
-			barcode[lineId-1].value = '';
-			materialMaster[lineId-1].value = '';
-			groupCode[lineId-1].value = '';
-			pensItem[lineId-1].value = '';
-			
-		}else{
-			var s = returnString.split("|");
-			
-			barcode[lineId-1].value = s[0];
-			materialMaster[lineId-1].value = s[1];
-			groupCode[lineId-1].value = s[2];
-			pensItem[lineId-1].value = s[3];
-			
-			found = true;
-		}
+	 
+	//clear garbage collection
+	barcode.length=0;
+	materialMaster.length=0;
+	groupCode.length=0;
+	pensItem.length=0;
+	returnString.length =0;
+	
 	return found;
 }
 
@@ -442,13 +467,19 @@ function getProductKeypressByMat(e,matObj,lineId){
 				addRow();
 				
 				barcode[lineId].focus();
-				
+
 				//Set Prev row readonly 
 				materialMaster[lineId-1].className ="disableText";
 				materialMaster[lineId-1].readOnly = true;
 			}
 		}
 	}
+	//clear garbage collection
+	barcode.length=0;
+	materialMaster.length=0;
+	groupCode.length=0;
+	pensItem.length=0;
+
 }
 
 function getProductModelByMat(matObj,lineId){
@@ -491,6 +522,14 @@ function getProductModelByMat(matObj,lineId){
 			
 			found = true;
 		}
+		
+	//clear garbage collection
+	barcode.length=0;
+	materialMaster.length=0;
+	groupCode.length=0;
+	pensItem.length=0;
+	returnString =null;
+	
 	return found;
 }
 
@@ -568,13 +607,14 @@ function getProductModelByMat(matObj,lineId){
 						   </table>
 						   
 				 <!-- Table Data -->
-				<c:if test="${mttForm.results != null}">
+				
 					   <%if( !mode.equals("view")){ %>
 		                      <div align="left">
 								<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow();"/>	
-								<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow();"/>	
+								<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
 						    </div>
 				       	<%} %>
+												  
 						<table id="tblProduct" align="center" border="0" cellpadding="1" cellspacing="1" class="tableSearch">
 						    <tr>
 							<!-- 	<th >No</th> -->
@@ -585,50 +625,52 @@ function getProductModelByMat(matObj,lineId){
 								<th >PENS Item</th>
 												
 							</tr>
-							<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
+							<%if(mttForm.getResults() != null && mttForm.getResults().size() > 0 ){ %>
+								<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
+									<c:choose>
+										<c:when test="${rows.index %2 == 0}">
+											<c:set var="tabclass" value="lineO"/>
+										</c:when>
+										<c:otherwise>
+											<c:set var="tabclass" value="lineE"/>
+										</c:otherwise>
+									</c:choose>
+									
+										<tr class="<c:out value='${tabclass}'/>">
+											<td class="td_text_center"  width="5%" nowrap>
+											  <input type="checkbox" name="linechk" value="${results.lineId}"/>
+											</td>
+											
+											<td class="td_text_center"  width="10%">
+											    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="25" 
+												    onkeydown="getProductKeypress(event,this,${results.lineId})"
+												    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
+												   <%--  onchange="getProductModel(this,${results.lineId})" --%>
+												    />
+	                                        </td>
+											<td class="td_text_center"  width="10%">
+												<input  onkeydown="getProductKeypressByMat(event,this,${results.lineId})" type="text" 
+	                                                    name="materialMaster" value ="${results.materialMaster}" size="20"
+	                                                    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" />
+											</td>
+											<td class="td_text_center"  width="10%">
+											   <input type="text" name="groupCode" value ="${results.groupCode}" size="15" readonly class="disableTextCenter"/>
+											</td>
+											<td class="td_text_center"  width="10%">                                                     
+											   <input type="text" name="pensItem" value ="${results.pensItem}" size="15" readonly class="disableTextCenter"/>
+											</td>
+										</tr>
 								
-									<tr class="<c:out value='${tabclass}'/>">
-										
-										<td class="td_text_center"  width="5%" nowrap>
-										  <input type="checkbox" name="linechk" value="${results.lineId}"/>
-										  <input type="hidden" name="lineId" value="${results.lineId}" />
-										</td>
-										
-										<td class="td_text_center"  width="10%">
-										    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="25" 
-											    onkeypress="getProductKeypress(event,this,${results.lineId})"
-											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
-											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
-											    />
-                                        </td>
-										<td class="td_text_center"  width="10%">
-											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" 
-                                                    name="materialMaster" value ="${results.materialMaster}" size="20"
-                                                    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" />
-										</td>
-										<td class="td_text_center"  width="10%">
-										   <input type="text" name="groupCode" value ="${results.groupCode}" size="15" readonly class="disableTextCenter"/>
-										</td>
-										<td class="td_text_center"  width="10%">                                                     
-										   <input type="text" name="pensItem" value ="${results.pensItem}" size="15" readonly class="disableTextCenter"/>
-										</td>
-									</tr>
-							
-							  </c:forEach>
+								  </c:forEach>
+						    <% } %> 
+				 
 					</table>
 						 <div align="left">
 							<font size="2"> <b>สรุปยอดจำนวนตัว <input type="text" name ="totalRow" class="disableTextCenter" value="" readonly size="20"/></b>	</font>
 							 
 						</div>
-				</c:if>
+						<!-- <textarea rows="50" cols="20"></textarea> -->
+			
 						   <!-- Table Data -->
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
@@ -681,6 +723,8 @@ function getProductModelByMat(matObj,lineId){
 					<!-- ************************Result ***************************************************-->
 					
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
+					
+					
 					
 					<!-- hidden field -->
 					</html:form>

@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
+import com.isecinc.pens.inf.helper.DBConnection;
 
 public class TestCustomerSeq {
 
@@ -52,7 +52,7 @@ public class TestCustomerSeq {
 		ResultSet rst = null;
 		String sql;
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			System.out.println("---------------------------");
 			System.out.println("begin!");
 			conn.setAutoCommit(false);

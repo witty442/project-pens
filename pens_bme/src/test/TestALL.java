@@ -3,8 +3,6 @@ package test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import org.hibernate.cfg.Configuration;
-
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
 
@@ -15,13 +13,11 @@ public class TestALL {
 	 String output = "";
 	 Connection conn = null;
 	 try{
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			
-			String driver = hibernateConfig.getProperty("connection.driver_class");
-			String url = hibernateConfig.getProperty("connection.url");
-			String username = hibernateConfig.getProperty("connection.username");
-			String password = hibernateConfig.getProperty("connection.password");
+		    EnvProperties env = EnvProperties.getInstance();
+			String driver = env.getProperty("db.driver_class");
+			String url = env.getProperty("db.url");
+			String username = env.getProperty("db.username");
+			String password = env.getProperty("db.password");
 			
 			output +="DB IP  : "+url+"\n";
 			output +="DB User : "+username+"\n";

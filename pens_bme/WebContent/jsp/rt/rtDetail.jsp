@@ -81,7 +81,7 @@ span.pagelinks {
 <script type="text/javascript">
 
 function loadMe(){
-	//new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
+	new Epoch('epoch_popup', 'th', document.getElementById('deliveryDate'));
 }
 function clearForm(path){
 	var form = document.rtForm;
@@ -123,7 +123,7 @@ function cancelAction(path){
 }
 function completeAction(path){
 	var form = document.rtForm;
-	if(confirm("กรุณายืนยันการ Complete ข้อมูล  จะแก้ไขไม่ได้อีกแล้ว")){
+	if(confirm("กรุณายืนยันการ Confirm ข้อมูล  จะแก้ไขไม่ได้อีกแล้ว")){
 		form.action = path + "/jsp/rtAction.do?do=completeAction";
 		form.submit();
 		return true;
@@ -286,13 +286,13 @@ function resetStore(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> จำนวนหีบ<font color="red"></font></td>
+                                    <td> จำนวนหีบตาม RTN<font color="red"></font></td>
 									<td>		
 										<html:text property="bean.rtnQtyCTN" styleId="rtnQtyCTN" styleClass="normalText" size="30" onkeydown="return inputNum(event);"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td>จำนวนชิ้น<font color="red"></font></td>
+                                    <td>จำนวนชิ้นตาม RTN<font color="red"></font></td>
 									<td>		
 										<html:text property="bean.rtnQtyEA" styleId="rtnQtyEA" styleClass="normalText" size="30" onkeydown="return inputNum(event);"></html:text>
 									</td>
@@ -300,9 +300,58 @@ function resetStore(){
 								<tr>
                                     <td> RTN No ของห้าง<font color="red"></font></td>
 									<td>		
-										<html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30"></html:text>
+										<html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30" maxlength="20"></html:text>
 									</td>
 								</tr>
+								<tr>
+                                    <td> หมายเหตุ<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.remark" styleId="remark" styleClass="normalText" size="100" maxlength="200"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> ชื่อขนส่งที่ไปรับจากห้าง<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.deliveryBy" styleId="deliveryBy" styleClass="normalText" size="50" maxlength="50"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> วันที่นัดมาส่งของที่ PD<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.deliveryDate" styleId="deliveryDate" styleClass="normalText" size="10" readonly="true"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> จำนวนหีบสินค้าที่จัดส่ง<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.deliveryQty" styleId="deliveryQty" styleClass="normalText" size="20" onkeydown="return inputNum(event);"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 1<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.attach1" styleId="attach1" styleClass="normalText" size="100" maxlength="200"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td>สิ่งอื่นที่ส่งมาเพิ่มเติม 2<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.attach2" styleId="attach2" styleClass="normalText" size="100" maxlength="200"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 3<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.attach3" styleId="attach3" styleClass="normalText" size="100" maxlength="200"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> สิ่งอื่นที่ส่งมาเพิ่มเติม 4<font color="red"></font></td>
+									<td>		
+										<html:text property="bean.attach4" styleId="attach4" styleClass="normalText" size="100" maxlength="200"/>
+									</td>
+								</tr>
+								
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -310,7 +359,7 @@ function resetStore(){
 									<td align="left">
 								    	<c:if test="${rtForm.bean.canComplete == true}">
 								           <a href="javascript:completeAction('${pageContext.request.contextPath}')">
-											  <input type="button" value="    Complete   " class="newPosBtnLong"> 
+											  <input type="button" value="    Confirm   " class="newPosBtnLong"> 
 											</a>
 										</c:if>
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

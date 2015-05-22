@@ -189,6 +189,7 @@ public class OrderDAO {
 				sql.append("\n ,h.item as item_wacoal ");
 				sql.append("\n ,( h.onhand_qty - (select nvl(sum(o.qty),0)  from pensbme_order o  where 1=1  "); 
 			    sql.append("\n    and o.order_date = ?  ");
+			    sql.append("\n    and o.store_type <> '"+Constants.STORE_TYPE_FRIDAY_CODE+"'");
 				sql.append("\n    and o.barcode = h.barcode ) ");
 				sql.append("\n  ) as remain_onhand_qty ");
 						

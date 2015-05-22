@@ -11,13 +11,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.UploadXLSUtil;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 
 
@@ -72,7 +72,7 @@ public class MemberImportAction extends I_Action {
 		try {
 			request.getSession().removeAttribute("PAGINATOR");
 			User user = (User) request.getSession(true).getAttribute("user");
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 
 			FormFile dataFile = actionForm.getMemberFile();

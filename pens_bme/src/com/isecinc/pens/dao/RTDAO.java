@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -62,32 +63,63 @@ public class RTDAO {
 						sql.append("\n and h.Authorize_no = '"+Utils.isNull(o.getDocNo())+"'");
 					}
 					if( !Utils.isNull(o.getDocDate()).equals("")){
-						sql.append("\n and h.tran_date = ?");
-					    docDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						docDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						sql.append("\n and h.tran_date = to_date('"+dateStr+"','dd/mm/yyyy')");
+					    
 					}
 					if( !Utils.isNull(o.getNoPicRcv()).equals("")){
 						sql.append("\n and h.PIC_RCV_DATE IS NULL ");
 					}
-					sql.append("\n order by h.Authorize_no desc ");
+					if( !Utils.isNull(o.getStoreCode()).equals("")){
+						sql.append("\n and h.cust_no ='"+o.getStoreCode()+"'");
+					}
+					if( !Utils.isNull(o.getRefDoc()).equals("")){
+						sql.append("\n and h.ref_doc ='"+o.getRefDoc()+"'");
+					}
+					if( !Utils.isNull(o.getRtnNo()).equals("")){
+						sql.append("\n and h.rtn_no ='"+o.getRtnNo()+"'");
+					}
+					if( !Utils.isNull(o.getCustGroup()).equals("")){
+						sql.append("\n and h.cust_group ='"+o.getCustGroup()+"'");
+					}
+					
+					if( !Utils.isNull(o.getStatus()).equals("") && !Utils.isNull(o.getStatus()).equals("ALL")){
+						sql.append("\n and h.status ='"+o.getStatus()+"'");
+					}
+					
+					if( !Utils.isNull(o.getDeliveryDate()).equals("")){
+						docDate  = Utils.parse(o.getDeliveryDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						sql.append("\n and h.delivery_date = to_date('"+dateStr+"','dd/mm/yyyy')");
+					    
+					}
+					if( !Utils.isNull(o.getDeliveryBy()).equals("")){
+						sql.append("\n and h.delivery_by ='"+o.getDeliveryBy()+"'");
+					}
+					
+					if(Utils.isNull(o.getOrderType()).equals("docDate")){
+						sql.append("\n order by h.TRAN_DATE desc ");
+					}else if(Utils.isNull(o.getOrderType()).equals("docNo")){
+						sql.append("\n order by h.Authorize_no desc ");
+					}
+					
 					logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql.toString());
-					
-					if( !Utils.isNull(o.getDocDate()).equals("") ){
-						ps.setDate(1, new java.sql.Date(docDate.getTime()));
-					}
 					
 					rst = ps.executeQuery();
 					while(rst.next()) {
 					   h = new RTBean();
 					   h.setDocNo(Utils.isNull(rst.getString("Authorize_no")));
 					   h.setDocDate(Utils.stringValue(rst.getDate("tran_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					   
+
 					   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
 					   h.setCustGroup(Utils.isNull(rst.getString("Cust_group")));
 					   h.setCustGroupName(Utils.isNull(rst.getString("Cust_group_name")));
 					   h.setStoreCode(Utils.isNull(rst.getString("Cust_no")));
 					   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+					   h.setStoreFullName(h.getStoreCode()+":"+h.getStoreName());
 					   
 					   h.setRtnNo(Utils.isNull(rst.getString("RTN_no")));
 					   h.setRtnQtyCTN(Utils.isNull(rst.getString("RTN_Qty_CTN")));
@@ -102,14 +134,27 @@ public class RTDAO {
 					   h.setPicRcvQtyEA(Utils.isNull(rst.getString("PIC_rcv_Qty_EA")));
 					   h.setStatus(Utils.isNull(rst.getString("Status")));
 					   h.setStatusDesc(RTConstant.getDesc(h.getStatus()));
-					   
+					   h.setRemark(Utils.isNull(rst.getString("remark")));
+					    
+					   h.setDeliveryBy(Utils.isNull(rst.getString("delivery_by")));
+					   if(rst.getDate("delivery_date") != null){
+					     h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   }else{
+						 h.setDeliveryDate("");
+					   }
+					   h.setDeliveryQty(Utils.isNull(rst.getString("delivery_qty")));
+					   h.setAttach1(Utils.isNull(rst.getString("attach1")));
+					   h.setAttach2(Utils.isNull(rst.getString("attach2")));
+					   h.setAttach3(Utils.isNull(rst.getString("attach3")));
+					   h.setAttach4(Utils.isNull(rst.getString("attach4")));
+					   h.setRemarkTeamPic(Utils.isNull(rst.getString("Remark_team_Pic")));
 					   
 					  //
 					  if(RTConstant.STATUS_OPEN.equals(h.getStatus())){
 						  h.setCanSave(true);
 						  h.setCanComplete(true);
 						  h.setCanCancel(true);
-					  }else  if(RTConstant.STATUS_COMPLETE.equals(h.getStatus())){
+					  }else  if(RTConstant.STATUS_COOMFIRM.equals(h.getStatus())){
 						  h.setCanSave(false);
 						  h.setCanComplete(false);
 						  h.setCanCancel(false);
@@ -121,9 +166,7 @@ public class RTDAO {
 						  h.setCanSave(false);
 						  h.setCanComplete(false);
 						  h.setCanCancel(false);
-					  }
-						  
-						  
+					  } 
 					   items.add(h);
 					   r++;
 					}//while
@@ -150,9 +193,11 @@ public class RTDAO {
 			sql.append(" INSERT INTO PENSBI.PENSBME_RTN_CONTROL \n");
 			sql.append(" (AUTHORIZE_NO, TRAN_DATE, REF_DOC, CUST_GROUP, \n");
 			sql.append(" CUST_NO, RTN_NO, RTN_QTY_CTN, RTN_QTY_EA,  \n");
-			sql.append(" STATUS, CREATE_DATE, CREATE_USER) \n");
+			sql.append(" STATUS, CREATE_DATE, CREATE_USER,REMARK  \n");
+			sql.append(" ,delivery_by,delivery_date ,delivery_qty \n");
+			sql.append(" ,attach1 ,attach2,attach3,attach4 ) ");
 			sql.append(" VALUES \n"); 
-			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?) \n");
+			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -160,7 +205,7 @@ public class RTDAO {
 			
 			int c =1;
 			ps.setString(c++, o.getDocNo());
-			ps.setTimestamp(c++, new java.sql.Timestamp(docDate.getTime()));
+			ps.setDate(c++, new java.sql.Date(docDate.getTime()));
 			ps.setString(c++, Utils.isNull(o.getRefDoc()));
 			ps.setString(c++, Utils.isNull(o.getCustGroup()));
 			ps.setString(c++, Utils.isNull(o.getStoreCode()));
@@ -172,6 +217,20 @@ public class RTDAO {
 			ps.setString(c++, Utils.isNull(o.getStatus()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getCreateUser());
+			ps.setString(c++, Utils.isNull(o.getRemark()));
+			
+			ps.setString(c++, Utils.isNull(o.getDeliveryBy()));
+			if( !Utils.isNull(o.getDeliveryDate()).equals("")){
+			   Date d = Utils.parse(Utils.isNull(o.getDeliveryDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   ps.setDate(c++, new java.sql.Date(d.getTime()));
+			}else{
+			   ps.setDate(c++,null);
+			}
+			ps.setString(c++, Utils.isNull(o.getDeliveryQty()));
+			ps.setString(c++, Utils.isNull(o.getAttach1()));
+			ps.setString(c++, Utils.isNull(o.getAttach2()));
+			ps.setString(c++, Utils.isNull(o.getAttach3()));
+			ps.setString(c++, Utils.isNull(o.getAttach4()));
 			
 			ps.executeUpdate();
 			
@@ -217,9 +276,11 @@ public class RTDAO {
 		PreparedStatement ps = null;
 		int  c = 1;
 		try{
+			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_RTN_CONTROL SET CUST_NO =? ,REF_DOC = ? ,RTN_NO=?,RTN_QTY_CTN =?,RTN_QTY_EA =?,  \n");
-			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =? ,delivery_by=?,delivery_date=? ,delivery_qty=?, \n");
+			sql.append(" attach1 =?,attach2=?,attach3=?,attach4=? ");
 			
 			sql.append(" WHERE AUTHORIZE_NO = ?  \n" );
 
@@ -232,6 +293,21 @@ public class RTDAO {
 			ps.setString(c++, Utils.isNull(o.getRtnQtyEA()));
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, Utils.isNull(o.getRemark()));
+			
+			ps.setString(c++, Utils.isNull(o.getDeliveryBy()));
+			if( !Utils.isNull(o.getDeliveryDate()).equals("")){
+			   Date d = Utils.parse(Utils.isNull(o.getDeliveryDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   ps.setDate(c++, new java.sql.Date(d.getTime()));
+			}else{
+			   ps.setDate(c++,null);
+			}
+			ps.setString(c++, Utils.isNull(o.getDeliveryQty()));
+			ps.setString(c++, Utils.isNull(o.getAttach1()));
+			ps.setString(c++, Utils.isNull(o.getAttach2()));
+			ps.setString(c++, Utils.isNull(o.getAttach3()));
+			ps.setString(c++, Utils.isNull(o.getAttach4()));
+			
 			ps.setString(c++, Utils.isNull(o.getDocNo()));
 
 			int r =ps.executeUpdate();
@@ -250,10 +326,10 @@ public class RTDAO {
 		int  c = 1;
 		Date picRcvDate = null;
 		try{
+			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_RTN_CONTROL SET STATUS =? ,PIC_RCV_DATE =?, PIC_RCV_QTY_CTN =?, PIC_RCV_QTY_EA=?,  \n");
-			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-			
+			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK_TEAM_PIC =?   \n");
 			sql.append(" WHERE AUTHORIZE_NO = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -270,6 +346,7 @@ public class RTDAO {
 			ps.setString(c++, Utils.isNull(o.getPicRcvQtyEA()));
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, Utils.isNull(o.getRemarkTeamPic()));
 			
 			ps.setString(c++, Utils.isNull(o.getDocNo()));
 

@@ -1,20 +1,13 @@
 package com.isecinc.pens.model;
 
-import static util.ConvertNullUtil.convertToString;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import util.ConvertNullUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 
 /**

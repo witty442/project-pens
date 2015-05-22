@@ -2,7 +2,7 @@ package test;
 
 import java.sql.Connection;
 
-import util.DBCPConnectionProvider;
+import com.isecinc.pens.inf.helper.DBConnection;
 
 public class TestConnection {
 
@@ -12,7 +12,7 @@ public class TestConnection {
 	public static void main(String[] args) {
 		Connection conn = null;
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = new DBConnection().getInstance().getConnection();
 			if (conn != null) System.out.println("s");
 			else System.out.println("f");
 			conn.close();

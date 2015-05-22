@@ -101,7 +101,8 @@ function stampPrint(){
 	
 	printCountPick.value = parseInt(printCountPick.value)+1;
 	var d = new Date(); 
-	var dd =d.getDate()
+	var dd = d.getDate();
+	    dd = dd.toString().length==1?"0"+dd:dd;
 	var MM = (d.getMonth()+1);
 	    MM = MM.toString().length==1?"0"+MM:MM;
 	var year = (d.getFullYear()+543).toString();
@@ -517,7 +518,7 @@ function stampPrint(){
 						<html:hidden property="order.printCountPick"/>
 						
 						<!-- ForTest -->
-					<%-- 	printDateTimePick:<html:text property="order.printDateTimePick"/><br/>
+					 	<%-- printDateTimePick:<html:text property="order.printDateTimePick"/><br/>
 						printCountPick:<html:text property="order.printCountPick"/> --%>
 						
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>

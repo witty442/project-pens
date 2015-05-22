@@ -34,4 +34,17 @@ public class OnhandProcess {
 			throw e;
 		}
 	}
+	
+	public static void processUpdateBalanceOnhandByIssueReqNoCaseCancel(Connection conn,ReqPickStock req) throws Exception{
+		try{
+			logger.debug("******* Start processUpdateBanlanceOnhandFromStockIssueCaseCancelReq *******************");
+			
+			OnhandProcessDAO.processUpdateBanlanceOnhandFromStockIssueCaseCancelReq(conn,req);
+			
+			logger.debug("******* End processUpdateBanlanceOnhandFromStockIssueCaseCancelReq *******************");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			throw e;
+		}
+	}
 }

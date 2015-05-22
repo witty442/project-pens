@@ -11,8 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
@@ -278,7 +276,7 @@ public class UserAction extends I_Action {
 		UserForm userForm = (UserForm) form;
 		try {
 			User userActive = (User) request.getSession(true).getAttribute("user");
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			// Begin Transaction
 			conn.setAutoCommit(false);
 			//
@@ -314,7 +312,7 @@ public class UserAction extends I_Action {
 		UserForm userForm = (UserForm) form;
 		try {
 			User userActive = (User) request.getSession(true).getAttribute("user");
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			// Begin Transaction
 			conn.setAutoCommit(false);
 			//

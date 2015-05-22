@@ -79,8 +79,7 @@
 			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
 		</action>
 		<!-- Monitor Interfaces -->
-		<action name="interfacesForm" path="/jsp/monitorInterfacesAction"
-			forward="/jsp/interfaces/interfaces.jsp" />
+		<action name="interfacesForm" path="/jsp/monitorInterfacesAction" forward="/jsp/interfaces/interfaces.jsp" />
 		<action name="interfacesForm" path="/jsp/monitorInterfacesAction"
 			parameter="do" scope="request"
 			type="com.isecinc.pens.web.interfaces.MonitorInterfacesAction">
@@ -98,14 +97,9 @@
 		</action>
 		
 		<action name="mttForm" path="/jsp/mttAction" parameter="do" scope="session" type="com.isecinc.pens.web.mtt.MTTAction">
-			<forward name="search2" path="/jsp/main/mttSearch.jsp" />
-			<forward name="prepare2" path="/jsp/main/mttSearch.jsp" />
-			<forward name="clear2" path="/jsp/main/mttSearch.jsp" />
-			
-			<forward name="search" path="/jsp/main/mtt.jsp" />
-			<forward name="prepare" path="/jsp/main/mtt.jsp" />
-			<forward name="clear" path="/jsp/main/mtt.jsp" />
-			<forward name="addRow" path="/jsp/main/mtt.jsp" />
+			<forward name="search" path="/jsp/main/mttSearch.jsp" />	
+			<forward name="mttDetail" path="/jsp/main/mtt.jsp" />
+			<forward name="mttDetail2" path="/jsp/main/mtt2.jsp" />
 			
 			<forward name="report" path="/jsp/main/mttReport.jsp" />
 			<forward name="scanReport" path="/jsp/main/scanReport.jsp" />

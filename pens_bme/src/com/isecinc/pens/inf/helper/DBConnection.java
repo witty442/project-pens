@@ -1,6 +1,5 @@
 package com.isecinc.pens.inf.helper;
 
-import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,14 +7,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.Configuration;
-
-import util.DBCPConnectionProvider;
 
 public class DBConnection {
    
 	private static Logger logger = Logger.getLogger("PENS");
-	
+	EnvProperties env = EnvProperties.getInstance();
 	private static DBConnection _instance;
 	
 	public static DBConnection getInstance(){
@@ -27,29 +23,47 @@ public class DBConnection {
 	public  Connection getConnection(){		
 		Connection _instanceInf =null;
 		try{
-		   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
-		}catch(SocketException e){
+		   _instanceInf = getConnection1();
+		}catch(Exception e){
 			// Retry count 1
 			try{
 				logger.info("Retry Conn 1 time");
-			   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+			   _instanceInf = getConnection1();
 			}catch(Exception ee){
 				logger.error(ee.getMessage(),ee);
 				logger.info("Retry Conn 2 time");
 				try{
-				   _instanceInf = new  DBCPConnectionProvider().getConnection(_instanceInf);
+				   _instanceInf = getConnection1();
 				}catch(Exception eee){
 					logger.error(eee.getMessage(),eee);
 				}
 			}
-			
-		}catch(Exception e){
-		  logger.error(e.getMessage(),e);
 		}
 		return _instanceInf;
 	}
 	
 	public  Connection getConnection1(){		
+		Connection _instanceInf =null;
+		try {	
+
+			String driver = env.getProperty("db.driver_class");
+			String url = env.getProperty("db.url");
+			String username = env.getProperty("db.username");
+			String password = env.getProperty("db.password");
+			
+			logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			
+			Class.forName(driver);
+			_instanceInf = DriverManager.getConnection(url,username,password);
+			logger.debug("Connection:"+_instanceInf);
+			
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);			
+		}
+		return _instanceInf;	
+	}
+	
+	/*public  Connection getConnectionX(){		
 		Connection _instanceInf =null;
 		try {	
 
@@ -63,18 +77,15 @@ public class DBConnection {
 			
 			logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			
-			 Class.forName(driver);
-			//DriverManager.setLoginTimeout(600);
+			Class.forName(driver);
 			_instanceInf = DriverManager.getConnection(url,username,password);
-			
-			//_instanceInf = new DBCPConnectionProvider().getConnection(_instanceInf);
 			logger.debug("Connection:"+_instanceInf);
 			
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);			
 		}
 		return _instanceInf;	
-	}
+	}*/
 
 	public static void close(Connection conn,PreparedStatement ps,ResultSet rs){
 		try{

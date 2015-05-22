@@ -880,7 +880,9 @@ public class OrderAction extends I_Action {
 			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
 			
 			//save print pick date
-			new MOrder().updatePrintPickStamp(conn, order);
+			if (userActive.getRole().getKey().equals(User.VAN)){
+			  new MOrder().updatePrintPickStamp(conn, order);
+			}
 			
 			// Commit Transaction
 			conn.commit();

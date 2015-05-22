@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.hibernate.cfg.Configuration;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -61,12 +60,12 @@ public class AdminConsoleAction extends I_Action {
 				String configInfoTest ="";
 				
 				EnvProperties env = EnvProperties.getInstance();
-				Configuration hibernateConfig = new Configuration();
-				hibernateConfig.configure();
+				
 		
-				String url = hibernateConfig.getProperty("connection.url");
-				String username = hibernateConfig.getProperty("connection.username");
-				String password = hibernateConfig.getProperty("connection.password");
+		
+				String url = env.getProperty("db.url");
+				String username = env.getProperty("db.username");
+				String password = env.getProperty("db.password");
 		
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
@@ -81,6 +80,10 @@ public class AdminConsoleAction extends I_Action {
 				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
+				configInfo += " ----------------------  Host PayIn Server AtPens ---------------------------------------------------------------------- \n";
+				configInfo +="Host PayInReport : "+env.getProperty("host.payinreport ")+"\n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
 			    configInfoTest = " ";
 			   if("tab_config_info".equalsIgnoreCase(action)){
 					configInfoTest += "\n ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";

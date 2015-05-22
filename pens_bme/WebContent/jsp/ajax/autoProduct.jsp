@@ -12,7 +12,7 @@
 String itemCode = (String) request.getParameter("itemCode");
 String outputText = "";
 try{
-	System.out.println("itemCode:"+itemCode);
+	//System.out.println("itemCode:"+itemCode);
 	if( !"".equals(Utils.isNull(itemCode)) ){
 		PopupForm popupForm = new PopupForm();
 		popupForm.setCodeSearch(itemCode);

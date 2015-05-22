@@ -95,15 +95,9 @@ public class RunScriptDBAction {
 			
 			/** Run ManualScript By Sales Type VAN or Credit **/
 			logger.debug("role:"+user.getRole().getKey());
-			String salesType = "van";
-			if("TT".equals(user.getRole().getKey())){
-				salesType  ="credit";
-			}
-			runManualScriptProcessBySalesType(conn,prefix,salesType);
 			
-			/** Run ManualScript By SalesCode **/
-			runManualScriptProcessBySalesCode(conn,prefix,user.getUserName());
-			
+			/** Run ManualScript By UserName **/
+			runManualScriptProcessByUserName(conn,prefix,user.getUserName());
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -127,12 +121,12 @@ public class RunScriptDBAction {
 	public static void runManualScriptProcessAllSales(Connection conn,String prefix,String userName){
 		EnvProperties env = EnvProperties.getInstance();
 		try{
-			logger.info("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.AllSales")+prefix+"_script.sql");
+			logger.debug("Start runManualScriptProcessAllSale: "+env.getProperty("path.manual.AllSales")+prefix+"_script.sql");
 			//read data from FTP /Manual_script 
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.AllSales")+prefix+"_script.sql","TIS-620");
 			
-			//logger.info("scriptData:"+scriptData);
+			logger.debug("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){
@@ -179,7 +173,7 @@ public class RunScriptDBAction {
 	 * process : run In BatchExportManager : run manaul script db by SalesCode
 	 * ex fileName : /BySales/script_V107.sql  >success move to /BySales/In-Processed/
 	 */
-	public static void runManualScriptProcessBySalesCode(Connection conn,String prefix,String userName){
+	public static void runManualScriptProcessByUserName(Connection conn,String prefix,String userName){
 		EnvProperties env = EnvProperties.getInstance();
 		String resultStr ="";
 		try{

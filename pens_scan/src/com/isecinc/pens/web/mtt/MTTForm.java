@@ -13,6 +13,7 @@ public class MTTForm extends I_Form {
     private List<MTTBean> resultsSearch = new ArrayList<MTTBean>();
 
     private String mode;
+    private String pageType;
     private MTTBean bean ;
     private MTTBean beanCriteria ;
     
@@ -45,6 +46,12 @@ public class MTTForm extends I_Form {
 	}
 	public void setBeanCriteria(MTTBean beanCriteria) {
 		this.beanCriteria = beanCriteria;
+	}
+	public String getPageType() {
+		return pageType;
+	}
+	public void setPageType(String pageType) {
+		this.pageType = pageType;
 	}
 	
     

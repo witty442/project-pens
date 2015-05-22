@@ -289,7 +289,7 @@ public class PayDAO {
 		int  c = 1;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBI.DOC_TRAN SET Pay_to_name = ? ,DEPT_ID=?,SECTION_ID =?,PAY_METHOD =?,  \n");
+			sql.append(" UPDATE PENSBI.DOC_TRAN SET DOC_DATE =? ,Pay_to_name = ? ,DEPT_ID=?,SECTION_ID =?,PAY_METHOD =?,  \n");
 			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?  " );
 			sql.append(" ,DR_AC_NO = ? ,DR_DESC = ? ,DR_AMOUNT = ? ,DR_INPUT_TAX_AMOUNT = ? ,DR_TOTAL = ?  \n" );
 			sql.append(" ,CR_AC_NO = ? ,CR_DESC = ? ,CR_AMOUNT = ? ,CR_ACC_WT_TAX_AMOUNT = ? ,CR_TOTAL = ?  \n");
@@ -297,6 +297,10 @@ public class PayDAO {
 			sql.append(" WHERE DOC_NO = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
+			
+            Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+
+			ps.setTimestamp(c++, new java.sql.Timestamp(docDate.getTime()));
 			
 			ps.setString(c++, Utils.isNull(o.getPayToName()));
 			ps.setString(c++, Utils.isNull(o.getDeptId()));

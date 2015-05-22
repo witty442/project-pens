@@ -1,5 +1,4 @@
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="org.hibernate.cfg.Configuration"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -243,12 +242,14 @@
 			</li> 
 		</ul>
 	<%}else if ( Utils.userInRole(user,new String[]{User.SALE}) ){%>
-	  
+	        <li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockQueryAction.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="stockQuery"/></span></a>
+			</li>
 		    <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>2.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new');"><span>3.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
 			</li> 
 	    </ul>  
 	<%} %>
@@ -273,7 +274,7 @@
 	</li> 
 <%} %>
 
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDDOC}) ){%>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDDOC,User.REDEDIT}) ){%>
 	
   	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Document Menu</span></a>
 		<ul>

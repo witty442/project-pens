@@ -85,9 +85,9 @@ function back(path){
 	return true;
 }
 
-function exportExcel(path){
+function exportToExcel(path){
 	var form = document.reqPickStockForm;
-	form.action = path + "/jsp/reqPickStockAction.do?do=exportExcel";
+	form.action = path + "/jsp/reqPickStockAction.do?do=exportToExcel";
 	form.submit();
 	return true;
 }
@@ -777,7 +777,6 @@ function resetStore(){
 							} %>
 						</table>
 					
-					
 					<div align="right">
 						<table  border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
@@ -798,38 +797,43 @@ function resetStore(){
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >
-									<tr>
-										<td align="left">
-					 
-					                     <c:if test="${reqPickStockForm.bean.canPrint == true}">
-											<a href="javascript:printPostRequest('${pageContext.request.contextPath}')">
-											  <input type="button" value="พิมพ์  Post Request" class="newPosBtnLong"> 
-											</a>
-										 </c:if>
-									      <c:if test="${reqPickStockForm.bean.canConfirm == true}">
-											<a href="javascript:confirmAction('${pageContext.request.contextPath}')">
-											  <input type="button" value="ยืนยัน  Post Request" class="newPosBtnLong"> 
-											</a>
-										 </c:if>	
-										 
-										  <c:if test="${reqPickStockForm.bean.canEdit == true}">
-											<a href="javascript:save('${pageContext.request.contextPath}')">
-											  <input type="button" value="บันทึก request issue" class="newPosBtnLong"> 
-											 </a>
-										 </c:if>
-										 
-										 <c:if test="${reqPickStockForm.bean.canCancel == true}">
-											 <a href="javascript:cancel('${pageContext.request.contextPath}')">
-											   <input type="button" value="    ยกเลิก     " class="newPosBtnLong"> 
-											 </a>  
-										 </c:if>
-										 
-										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
-										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
-										</a>	
-																
-										</td>
-									</tr>
+								<tr>
+									<td align="left">
+				                     <c:if test="${reqPickStockForm.bean.canExport == true}">
+										<a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
+										  <input type="button" value="ExportToExcel" class="newPosBtnLong"> 
+										</a>
+									 </c:if>
+									 
+				                     <c:if test="${reqPickStockForm.bean.canPrint == true}">
+										<a href="javascript:printPostRequest('${pageContext.request.contextPath}')">
+										  <input type="button" value="พิมพ์  Post Request" class="newPosBtnLong"> 
+										</a>
+									 </c:if>
+								      <c:if test="${reqPickStockForm.bean.canConfirm == true}">
+										<a href="javascript:confirmAction('${pageContext.request.contextPath}')">
+										  <input type="button" value="ยืนยัน  Post Request" class="newPosBtnLong"> 
+										</a>
+									 </c:if>	
+									 
+									  <c:if test="${reqPickStockForm.bean.canEdit == true}">
+										<a href="javascript:save('${pageContext.request.contextPath}')">
+										  <input type="button" value="บันทึก request issue" class="newPosBtnLong"> 
+										 </a>
+									 </c:if>
+									 
+									 <c:if test="${reqPickStockForm.bean.canCancel == true}">
+										 <a href="javascript:cancel('${pageContext.request.contextPath}')">
+										   <input type="button" value="    ยกเลิก     " class="newPosBtnLong"> 
+										 </a>  
+									 </c:if>
+									 
+									<a href="javascript:back('${pageContext.request.contextPath}','','add')">
+									  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
+									</a>	
+															
+									</td>
+								</tr>
 						</table>
 					</div>
 		

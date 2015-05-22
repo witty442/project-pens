@@ -15,6 +15,7 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MDocSequence;
 
@@ -57,16 +58,23 @@ public class DocSequenceAction extends I_Action {
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		DocSequenceForm docSequenceForm = (DocSequenceForm) form;
+		String[] currentDateStrArr = Utils.getCurrentDatebuddhistSplitDDMMYYYY();
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
 			String whereCause = "";
-			if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
+			/*if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
 				whereCause = "AND SALES_CODE = '" + user.getCode().trim() + "' ";
 			}
 			if (user.getType().equalsIgnoreCase(User.DD)) {
 				whereCause = "AND SALES_CODE = '' ";
-			}
+			}*/
+			whereCause += "AND CURRENT_MONTH ='"+currentDateStrArr[1]+"'";
+			whereCause += "AND CURRENT_YEAR ='"+currentDateStrArr[2]+"'";
+			
 			whereCause += " ORDER BY SALES_CODE, DOCTYPE_ID, CURRENT_YEAR DESC, CURRENT_MONTH DESC";
+			
+			logger.debug("sql:"+whereCause);
+			
 			DocSequence[] results = new MDocSequence().search(whereCause);
 			docSequenceForm.setResults(results);
 			if (results != null) {

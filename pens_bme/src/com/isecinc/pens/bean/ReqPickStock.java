@@ -48,6 +48,7 @@ public class ReqPickStock implements Serializable{
 	private boolean canCancel;
 	private boolean canConfirm;
 	private boolean canPrint;
+	private boolean canExport;
 	private boolean newReq;
 	private boolean newSearch;
 	private boolean noSearch;
@@ -69,6 +70,12 @@ public class ReqPickStock implements Serializable{
 	private String actionDB;
 	
 	
+	public boolean isCanExport() {
+		return canExport;
+	}
+	public void setCanExport(boolean canExport) {
+		this.canExport = canExport;
+	}
 	public int getIssueQtyInt() {
 		return issueQtyInt;
 	}

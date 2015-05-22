@@ -3,8 +3,6 @@ package com.isecinc.pens.inf.helper;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import org.hibernate.cfg.Configuration;
-
 /**
  * @author WITTY
  *
@@ -223,9 +221,8 @@ public class ConvertUtils {
 		String str = "";
 		EnvProperties env= EnvProperties.getInstance();
 		try{
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			String url = hibernateConfig.getProperty("connection.url");
+			
+			String url = env.getProperty("db.url");
 			
 			str += "DataBase:"+url +" \n";
 			str += " ,FTP Server:"+env.getProperty("ftp.ip.server")+" ,UserFTP:"+env.getProperty("ftp.username")+"";

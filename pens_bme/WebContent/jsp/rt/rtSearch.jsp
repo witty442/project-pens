@@ -39,6 +39,8 @@ if(session.getAttribute("custGroupList") == null){
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
+
+
 %>
 
 <html>
@@ -81,8 +83,8 @@ span.pagelinks {
 <script type="text/javascript">
 
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('dateFrom'));
-	 new Epoch('epoch_popup', 'th', document.getElementById('dateTo'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('docDate'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('deliveryDate'));
 }
 function clearForm(path){
 	var form = document.rtForm;
@@ -93,17 +95,24 @@ function clearForm(path){
 
 function search(path){
 	var form = document.rtForm;
-	if( $('#mcArea').val()==""){
-		alert("กรุณาระบุ เขตพื้นที่");
-		return false;
-	}
-	/* if( $('#staffType').val()==""){
-		alert("กรุณาระบุ ประเภท");
-		return false;
-	} */
-	
 	
 	form.action = path + "/jsp/rtAction.do?do=search2&action=newsearch";
+	form.submit();
+	return true;
+}
+
+function printReport(path){
+	var form = document.rtForm;
+	
+	form.action = path + "/jsp/rtAction.do?do=printReport";
+	form.submit();
+	return true;
+}
+
+function exportToExcel(path){
+	var form = document.rtForm;
+	
+	form.action = path + "/jsp/rtAction.do?do=exportToExcel";
 	form.submit();
 	return true;
 }
@@ -132,17 +141,6 @@ function openPicEdit(path,docNo){
 	return true; 
 }
 
-function openCopy(path,docNo){
-	 var form = document.rtForm;
-	var param ="&docNo="+docNo;
-	form.action = path + "/jsp/rtAction.do?do=prepare&mode=copy"+param;
-	form.submit();
-	return true; 
-}
-
-function printReport(path,docNo){
-    window.open(path + "/jsp/popup/printPopup.jsp?report_name=PayInReport&docNo="+docNo, "Print2", "width=200,height=200,location=No,resizable=No");
-}
 
 function openPopupCustomer(path,types,storeType){
 	var form = document.rtForm;
@@ -266,43 +264,68 @@ function resetStore(){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 								<tr>
-                                    <td> วันที่<font color="red"></font></td>
-									<td>		
-										 <html:text property="bean.docDate" styleClass="" styleId="docDate"></html:text>
-										 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <td> วันที่ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                       <font color="red"></font>
+                                        <html:text property="bean.docDate" styleClass="" styleId="docDate"></html:text>
+                                    </td>
+									<td>	 
 										 <font size="2"><b>Authorize Return No</b></font>
 										 <html:text property="bean.docNo" styleClass="normalText" styleId="docNo"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td> กลุ่มร้านค้า </td>
-									<td>		
-										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
+                                    <td> กลุ่มร้านค้า  
+                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                     <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
-								</tr>
-								<tr>
-									<td >รหัสร้านค้า
-									</td>
-									<td align="left"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									<td nowrap>		
+										รหัสร้านค้า <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
 								</tr>
+								
 								<tr>
-                                    <td> เล่ม/เลขที่<font color="red"></font></td>
+                                    <td> เล่ม/เลขที่
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <html:text property="bean.refDoc" styleId="refDoc" styleClass="normalText" size="30"></html:text></td>
 									<td>		
-										<html:text property="bean.refDoc" styleId="refDoc" styleClass="normalText" size="30"></html:text>
+										RTN No ของห้าง <html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td> RTN No ของห้าง<font color="red"></font></td>
+                                    <td> ชื่อขนส่งที่ไปรับจากห้าง &nbsp;&nbsp;<html:text property="bean.deliveryBy" styleId="deliveryBy" styleClass="normalText" size="30"></html:text></td>
 									<td>		
-										<html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30"></html:text>
-										
+										วันที่นัดมาส่งของที่ PD <html:text property="bean.deliveryDate" styleId="deliveryDate" styleClass="normalText" size="30" readonly="true"></html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td> 
+                                                                                                                                      จัดเรียงข้อมูลตาม&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+                                        <html:select property="bean.orderType" styleId="orderType" >
+											<html:option value="docDate">เรียงตามวันที่บันทึกรายการ</html:option>
+											<html:option value="docNo">เรียงตาม Authorize Return no</html:option>
+									    </html:select>
+                                    </td>
+									<td>	
 										<html:checkbox property="bean.noPicRcv">แสดงเฉพาะรายการทาง PIC ยังไม่ได้รับคืน</html:checkbox>
+										
+										 <%if("PIC".equalsIgnoreCase(request.getParameter("page"))) {%>
+										 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;Status &nbsp;
+											  <html:select property="bean.status" styleId="status" >
+												<html:option value="<%=RTConstant.STATUS_COOMFIRM %>">Confirm</html:option>
+												<html:option value="<%=RTConstant.STATUS_RECEIVED %>">Received</html:option>
+												<html:option value="<%=RTConstant.STATUS_OPEN %>">Open</html:option>
+												<html:option value="<%=RTConstant.STATUS_CANCEL %>">Cancel</html:option>
+												<html:option value="ALL">ALL</html:option>
+										      </html:select>
+										 <%} %>
 									</td>
 								</tr>
 						   </table>
@@ -310,7 +333,15 @@ function resetStore(){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
+									 <%if("PIC".equalsIgnoreCase(request.getParameter("page"))) {%>
+									   <a href="javascript:printReport('${pageContext.request.contextPath}')">
+										  <input type="button" value="   พิมพ์ใบตรวจรับ    " class="newPosBtnLong"> 
+										</a>
+									<%}else{ %>
+									   <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
+										  <input type="button" value="   ExportToExcel    " class="newPosBtnLong"> 
+										</a>
+									<%} %>
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
@@ -331,6 +362,7 @@ function resetStore(){
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
 						       <tr>
+						            <th >Action</th>
 						            <th >Authorize return No</th>
 									<th >เล่มที่/เลขที่</th>
 									<th >วันที่บันทึก</th>
@@ -344,7 +376,14 @@ function resetStore(){
 									<th >จำนวนหีบ ที่ PIC รับ</th>
 									<th >จำนวนชิ้นที่ Scan จริง</th>
 									<th >Status</th>
-									<th >Action</th>
+									<th >หมายเหตุ</th>
+									<th >ชื่อขนส่งที่ไปรับจากห้าง</th>
+									<th >วันที่นัดมาส่งของที่ PD</th>
+									<th >จำนวนหีบที่จัดส่ง</th>
+									<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 1</th>
+									<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 2</th>
+									<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 3</th>
+									<th >สิ่งอื่นที่ส่งมาเพิ่มเติม 4</th>
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -357,23 +396,9 @@ function resetStore(){
 								}
 								%>
 									<tr class="<%=tabclass%>">
-										<td class="td_text_center" width="10%"><%=mc.getDocNo() %></td>
-										<td class="td_text_center" width="10%"><%=mc.getRefDoc() %></td>
-										<td class="td_text_center" width="10%"><%=mc.getDocDate()%></td>
-									    <td class="td_text" width="10%"><%=mc.getCustGroup() %>:<%=mc.getCustGroupName()%></td>
-									    <td class="td_text" width="10%"><%=mc.getStoreCode() %></td>
-									    <td class="td_text" width="15%"><%=mc.getStoreName()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getRtnNo()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getRtnQtyCTN()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getRtnQtyEA()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getPicRcvDate()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getPicRcvQtyCTN()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getPicRcvQtyEA()%></td>
-										<td class="td_text_center" width="10%"><%=mc.getStatusDesc()%></td> 
-										
-										<td class="td_text_center" width="10%">
+									<td class="td_text_center" width="10%">
 										<%if ( Utils.isNull(request.getParameter("page")).equalsIgnoreCase("PIC") ){%>
-										    <% if(mc.getStatus().equals(RTConstant.STATUS_COMPLETE)){%>
+										    <% if(mc.getStatus().equals(RTConstant.STATUS_COOMFIRM)){%>
 											 <a href="javascript:openPicEdit('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
 											             แก้ไข
 											 </a>
@@ -401,6 +426,30 @@ function resetStore(){
 									      }
 									     %>
 										</td>
+										<td class="td_text_center" width="10%" nowrap><%=mc.getDocNo() %></td>
+										<td class="td_text_center" width="10%"  nowrap><%=mc.getRefDoc() %></td>
+										<td class="td_text_center" width="10%" nowrap><%=mc.getDocDate()%></td>
+									    <td class="td_text" width="10%" nowrap><%=mc.getCustGroup() %>:<%=mc.getCustGroupName()%></td>
+									    <td class="td_text" width="10%" nowrap><%=mc.getStoreCode() %></td>
+									    <td class="td_text" width="15%" nowrap><%=mc.getStoreName()%></td>
+										<td class="td_text_center" width="7%"><%=mc.getRtnNo()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getRtnQtyCTN()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getRtnQtyEA()%></td>
+										<td class="td_text_center" width="10%"><%=mc.getPicRcvDate()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getPicRcvQtyCTN()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getPicRcvQtyEA()%></td>
+										<td class="td_text_center" width="10%"><%=mc.getStatusDesc()%></td> 
+										
+										<td class="td_text_center" width="10%"><%=mc.getRemark()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getDeliveryBy()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getDeliveryDate()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getDeliveryQty()%></td>  
+										<td class="td_text_center" width="10%"><%=mc.getAttach1()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getAttach2()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getAttach3()%></td> 
+										<td class="td_text_center" width="10%"><%=mc.getAttach4()%></td> 
+										
+										
 										
 									</tr>
 							<%} %>

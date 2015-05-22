@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rt_report" language="groovy" pageWidth="381" pageHeight="594" columnWidth="377" leftMargin="2" rightMargin="2" topMargin="2" bottomMargin="2">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="docNo" class="java.lang.String"/>
+	<field name="refDoc" class="java.lang.String"/>
+	<field name="rtnNo" class="java.lang.String"/>
+	<field name="storeFullName" class="java.lang.String"/>
+	<field name="rtnQtyCTN" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String"/>
+	<field name="deliveryBy" class="java.lang.String"/>
+	<field name="deliveryDate" class="java.lang.String"/>
+	<field name="deliveryQty" class="java.lang.String"/>
+	<field name="attach1" class="java.lang.String"/>
+	<field name="attach2" class="java.lang.String"/>
+	<field name="attach3" class="java.lang.String"/>
+	<field name="attach4" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="16">
+			<staticText>
+				<reportElement x="144" y="0" width="91" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ใบตรวจรับ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="140" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Authorize Return No:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="0" width="42" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เล่ม / เลขที่  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="55" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RTN No ของห้าง:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="12" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ร้านค้า:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="24" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวนหีบตาม RTN :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="36" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[หมายเหตุ :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="48" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ชื่อขนส่งที่ไปรับจากห้าง :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[วันที่นัดมาส่งของที่ PD :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="72" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวนหีบสินค้าที่จัดส่ง :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="84" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สิ่งอื่นที่ส่งมาเพิ่มเติม 1 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="96" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สิ่งอื่นที่ส่งมาเพิ่มเติม 2 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="108" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สิ่งอื่นที่ส่งมาเพิ่มเติม 3 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="120" width="79" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สิ่งอื่นที่ส่งมาเพิ่มเติม 4 :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="88" y="0" width="53" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{docNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="187" y="0" width="62" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{refDoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="308" y="0" width="70" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{rtnNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="12" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{storeFullName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="24" width="71" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{rtnQtyCTN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="36" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{remark}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="48" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{deliveryBy}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="60" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{deliveryDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="72" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{deliveryQty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="84" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{attach1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="96" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{attach2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="108" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{attach3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="88" y="120" width="280" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{attach4}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

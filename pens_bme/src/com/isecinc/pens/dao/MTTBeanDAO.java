@@ -568,7 +568,7 @@ public class MTTBeanDAO{
 				ps.setString(c++, o.getMaterialMaster());
 				ps.setString(c++, o.getGroupCode());
 				ps.setString(c++, o.getPensItem());
-				ps.setDouble(c++, new Double(o.getRetailPriceBF()));
+				ps.setDouble(c++, Utils.convertStrToDouble(o.getRetailPriceBF()));
 				ps.setString(c++, o.getStatus());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());

@@ -111,6 +111,31 @@ public class OnhandProcessDAO {
 		}finally{
 		}
 	}
+	//Action :after cancel Confirm by dept
+	public static void processUpdateBanlanceOnhandFromStockIssueCaseCancelReq(Connection conn,ReqPickStock req) throws Exception{
+		try{
+			Date startDate = new Date();
+			List<Onhand> onhandItemList = searchItemFormStockIssueItem(conn, req);
+			logger.debug("onhandItemList>>Total Time:"+(new Date().getTime()-startDate.getTime()) +",Result :"+onhandItemList.size());
+			 
+			startDate =new Date();
+			if(onhandItemList != null && onhandItemList.size() >0){
+				for(int i=0;i<onhandItemList.size();i++){
+					Onhand itemOnhand = (Onhand)onhandItemList.get(i);
+					itemOnhand.setCreateUser(req.getUpdateUser());
+					itemOnhand.setUpdateUser(req.getUpdateUser());
+					
+					int rUpdate = updateOnhandQtyModelCaseCancelConfirmByDept(conn, itemOnhand);
+					logger.debug("result update:"+rUpdate);
+					
+				}
+			}
+			logger.debug("insertOrUpdateOnhand>>Total Time:"+(new Date().getTime()-startDate.getTime()));
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+		}
+	}
 	
 	public static List<Onhand> searchItemFormReqFinishing(Connection conn) throws Exception {
 		PreparedStatement ps = null;
@@ -417,6 +442,36 @@ public class OnhandProcessDAO {
 			ps = conn.prepareStatement(sql.toString());
 				
 			ps.setInt(c++, Utils.convertStrToInt(o.getIssueQty())); // issue_qty = issue_qty + qty ,
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
+			ps.setString(c++, o.getPensItem());
+			ps.setString(c++, o.getMaterialMaster());
+			ps.setString(c++, o.getGroupCode());
+			ps.setString(c++, o.getBarcode());
+			
+			r = ps.executeUpdate();
+			return r;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static int updateOnhandQtyModelCaseCancelConfirmByDept(Connection conn,Onhand o) throws Exception{
+		PreparedStatement ps = null;
+		int r = 0;
+		int c =1;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ISSUE_QTY=(NVl(ISSUE_QTY,0) - ?) ,UPDATE_DATE=?,UPDATE_USER = ? \n");
+			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? \n" );
+
+			ps = conn.prepareStatement(sql.toString());
+				
+			ps.setInt(c++, Utils.convertStrToInt(o.getIssueQty())); // issue_qty = issue_qty - qty ,
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
 			ps.setString(c++, o.getPensItem());

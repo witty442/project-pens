@@ -14,7 +14,7 @@ String code = Utils.isNull(request.getParameter("code"));
 String status = Utils.isNull(request.getParameter("status"));
 String outputText = "";
 try{
-	System.out.println("code:"+code);
+	//System.out.println("code:"+code);
 	if( !"".equals(Utils.isNull(code)) ){
 		PopupForm popupForm = new PopupForm();
 		popupForm.setCodeSearch(code);

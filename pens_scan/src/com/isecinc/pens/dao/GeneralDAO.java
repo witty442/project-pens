@@ -137,7 +137,27 @@ public class GeneralDAO {
 			return b;
 		}
 	 
-	 public static Barcode searchProductByBarcodeMTT(PopupForm c) throws Exception {
+	 public static Barcode searchProductByBarcodeTest(PopupForm c) throws Exception {
+			
+			Barcode b = null;
+			try {
+					b = new Barcode();
+					b.setBarcode(c.getCodeSearch());
+					b.setMaterialMaster("ME1100XL");
+					b.setGroupCode("ME110");
+					b.setPensItem("81103");
+					
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					
+				} catch (Exception e) {}
+			}
+			return b;
+		}
+	 
+	 public static Barcode searchProductByBarcodeBMELOCKED(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();

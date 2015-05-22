@@ -1,10 +1,15 @@
 package com.isecinc.pens.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class MTTBean {
+public class MTTBean implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6417937422949598232L;
 	private int lineId;
 	private int no;
 	private String saleDateFrom;
