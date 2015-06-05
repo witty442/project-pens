@@ -830,10 +830,11 @@ public class ImportDAO {
 		BigDecimal wholePriceBFOracle = new BigDecimal("0");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select list_price_per_unit from xxpens_bi_mst_price_list where item_code ='"+itemCode+"' and header_name='MT-Price List-Standard' and uom_code ='EA' \n");
+			sql.append(" select list_price_per_unit from xxpens_bi_mst_price_list where item_code ='"+itemCode+"'  and uom_code ='EA' \n");
 			sql.append(" and ( ( line_end_date is null) \n" );
 			sql.append("       or \n");
 			sql.append("       ( line_end_date is not null and line_end_date <= sysdate)  ) \n");
+			sql.append(" order by nvl(line_end_date,sysdate) desc ");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
@@ -863,10 +864,11 @@ public class ImportDAO {
 		BigDecimal wholePriceBFOracle = new BigDecimal("0");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select price from xxpens_bi_mst_price_list where item_code ='"+itemCode+"' and header_name='MT-Price List-Standard' and uom_code ='EA' \n");
+			sql.append(" select price from xxpens_bi_mst_price_list where item_code ='"+itemCode+"' and uom_code ='EA' \n");
 			sql.append(" and ( ( line_end_date is null) \n" );
 			sql.append("       or \n");
 			sql.append("       ( line_end_date is not null and line_end_date <= sysdate)  ) \n");
+			sql.append(" order by nvl(line_end_date,sysdate) desc ");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
@@ -1120,7 +1122,7 @@ public class ImportDAO {
 			sql.append(" select interface_value,pens_value  from PENSBME_MST_REFERENCE \n" +
 					" WHERE Reference_code ='Cust_type' \n" +
 					" and status ='A' \n" +
-					" order by interface_value desc \n");
+					" order by pens_value asc \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    

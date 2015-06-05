@@ -60,13 +60,13 @@ public class RunScriptDBAction {
 			logger.info("Check Day for PrugeMonitor Day(1,2,25,26,27) now_day:"+day);
 			
 			//Delete All Monitor  submit_date < 1 month 
-			if(day==1 || day ==2 || day ==25 || day==26 || day==27){
+			if( day ==25 || day==26 || day==27){
 				purgDataMonitor(conn);	
 			}
 				
 			//Delete m_sales_target_new back 2 month
 			if(day==5){
-				purgDataSalesTarget(conn);	
+				//purgDataSalesTarget(conn);	
 			}
 			
 			//clear Task running for next run

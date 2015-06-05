@@ -30,7 +30,6 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
-import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
@@ -38,7 +37,6 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * Summary Action

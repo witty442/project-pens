@@ -326,6 +326,7 @@ function resetStore(){
 									<th >วันที่ทำรายการ</th>
 									<th >กลุ่มร้านค้า</th>
 									<th >รหัสร้านค้า</th>
+									<th> รวมจำนวนชิ้น</th>
 									<th >Status</th>		
 									<th >สถานะส่งข้อมูล</th>
 									<th >Action</th>					
@@ -354,7 +355,7 @@ function resetStore(){
 										<td class="td_text" width="25%">${results.storeCode}&nbsp;${results.storeName}
 										   <input type="hidden" name ="storeCode" id ="storeCode"  value="${results.storeCode}" class="disableText" size="15">
 										</td>
-										
+										<td class="td_text_center" width="10%">${results.totalQty}</td>
 					                 	<td class="td_text_center" width="10%">${results.statusDesc}</td>
 										<td class="td_text_center" width="10%">${results.exportDesc}</td>
 										

@@ -113,133 +113,133 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{docDateYYYY}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="31" y="134" width="95" height="17"/>
+				<reportElement x="31" y="132" width="95" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="129" y="134" width="348" height="17"/>
+				<reportElement x="129" y="132" width="348" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{description1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="493" y="133" width="65" height="17"/>
+				<reportElement x="493" y="132" width="65" height="17"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="567" y="133" width="16" height="17"/>
+				<reportElement x="567" y="132" width="16" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit1}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="31" y="153" width="95" height="17"/>
+				<reportElement x="31" y="150" width="95" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName2}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="129" y="153" width="348" height="17"/>
+				<reportElement x="129" y="150" width="348" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{description2}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="493" y="152" width="65" height="17"/>
+				<reportElement x="493" y="150" width="65" height="17"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="567" y="152" width="16" height="17"/>
+				<reportElement x="567" y="150" width="16" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit2}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="31" y="172" width="95" height="17"/>
+				<reportElement x="31" y="167" width="95" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName3}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="129" y="172" width="348" height="17"/>
+				<reportElement x="129" y="167" width="348" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{description3}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="493" y="171" width="65" height="17"/>
+				<reportElement x="493" y="167" width="65" height="17"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount3}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="567" y="171" width="16" height="17"/>
+				<reportElement x="567" y="167" width="16" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit3}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="31" y="190" width="95" height="17"/>
+				<reportElement x="31" y="186" width="95" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName4}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="129" y="190" width="348" height="17"/>
+				<reportElement x="129" y="186" width="348" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{description4}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="493" y="189" width="65" height="17"/>
+				<reportElement x="493" y="186" width="65" height="17"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount4}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="567" y="189" width="16" height="17"/>
+				<reportElement x="567" y="186" width="16" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit4}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="101" y="207" width="376" height="17"/>
+				<reportElement x="101" y="204" width="376" height="17"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmountLetter}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="493" y="206" width="65" height="17"/>
+				<reportElement x="493" y="203" width="65" height="17"/>
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="567" y="206" width="16" height="17"/>
+				<reportElement x="567" y="203" width="16" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="11"/>
 				</textElement>

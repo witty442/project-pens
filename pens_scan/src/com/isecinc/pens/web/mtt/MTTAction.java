@@ -417,8 +417,7 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("mttDetail");
 	}
 
-	
-	@Deprecated
+
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("cancel");
 		MTTForm aForm = (MTTForm) form;
@@ -432,7 +431,7 @@ public class MTTAction extends I_Action {
 			h.setUpdateUser(user.getUserName());
 			h.setStatus(Constants.STATUS_CANCEL);
 			
-			//MTTBeanDAO.updateMTTStatusByDocNo(conn, h);
+			MTTBeanDAO.updateStatusByDocNo(conn, h);
 			
 			conn.commit();
 			

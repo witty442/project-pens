@@ -98,7 +98,7 @@ function closeJob(path){
 }
 
 function cancel(path){
-	if(confirm("กรุณายืนยัน การลบข้อมูลขายทั้งเอกสาร")){
+	if(confirm("กรุณายืนยัน ยกเลิกรายการนี้")){
 		var form = document.mttForm;
 		form.action = path + "/jsp/mttAction.do?do=cancel";
 		form.submit();
@@ -676,7 +676,15 @@ function getProductModelByMat(matObj,lineId){
 								<tr>
 									<td align="left">
 									   
-									  
+									  <c:if test="${mttForm.bean.canCancel == true}"> 
+											 <a href="javascript:cancel('${pageContext.request.contextPath}')">
+											  <input type="button" value="   ยกเลิกรายการ   " class="newPosBtnLong">
+											</a>
+										</c:if>
+										
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										
 									    <a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 										   <input type="button" value=" ExportToExcel " class="newPosBtnLong"> 
 									     </a>
@@ -706,16 +714,7 @@ function getProductModelByMat(matObj,lineId){
 											</a>	
 										</c:if>
 										
-										 <%--<c:if test="${mttForm.bean.canCancel == true}"> 
-											 <a href="javascript:removeRow('${pageContext.request.contextPath}')">
-											  <input type="button" value="   ลบรายการ   " class="newPosBtnLong">
-											</a>
-											
-											<a href="javascript:cancel('${pageContext.request.contextPath}')">
-											  <input type="button" value="   ลบทั้งเอกสาร " class="newPosBtnLong">
-											</a> 
-											
-										</c:if>--%>
+										 
 									</td>
 								</tr>
 							</table>

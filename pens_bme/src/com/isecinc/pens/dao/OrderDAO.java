@@ -923,10 +923,10 @@ public class OrderDAO {
 			sql.append("  select o.order_lot_no,o.bar_on_box, TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,o.bill_type ,o.valid_from,o.valid_to, \n ");
 			sql.append("  ( SELECT max(m.pens_desc) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name_real, \n ");
-			sql.append("  ( SELECT m.pens_desc2 FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name, \n ");
-			sql.append("  ( SELECT m.pens_desc3 FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_address, \n ");
-			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='LotusItem' and m.interface_desc = o.barcode) as material_master_lotus, ");
-			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='FridayItem' and m.interface_desc = o.barcode) as material_master_friday, ");
+			sql.append("  ( SELECT max(m.pens_desc2) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name, \n ");
+			sql.append("  ( SELECT max(m.pens_desc3) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_address, \n ");
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='LotusItem' and m.interface_desc = o.barcode) as material_master_lotus, \n");
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='FridayItem' and m.interface_desc = o.barcode) as material_master_friday, \n");
 			sql.append("  o.whole_price_bf,o.retail_price_bf,o.create_date \n ");
 			sql.append("  from PENSBME_ORDER o \n ");
 			sql.append("  WHERE 1=1  \n ");
@@ -2168,13 +2168,13 @@ public class OrderDAO {
 		    sql.append("  from PENSBME_MST_REFERENCE m WHERE 1=1 and m.reference_code ='Store' \n");
 			sql.append("  and m.status ='Active'  \n");
 			sql.append("  and substr(m.pens_value, 0, 6) ='"+storeType+"' \n");
-			//sql.append("  and m.pens_value LIKE '"+storeType+"%' \n");
+			
 			if( !Utils.isNull(region).equals("")){
 			  sql.append("\n  and m.sequence = "+region);
 			}
-			if( !Utils.isNull(billType).equals("N")){
-			  sql.append("\n and m.pens_desc4 ='"+billType+"'");
-			}
+			
+			sql.append("\n and m.pens_desc4 ='"+billType+"'");
+			
 			if( !Utils.isNull(storeCodeWhereIn).equals("''") ){
 				 sql.append("\n  and m.pens_value in( "+storeCodeWhereIn+")");
 			}

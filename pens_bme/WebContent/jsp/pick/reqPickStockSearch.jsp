@@ -56,7 +56,7 @@ if(session.getAttribute("custGroupList") == null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/req_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -229,6 +229,9 @@ function openConfirm(path,documentNo,issueReqStatus){
 									<th >Issue Req Date</th>
 									<th >Issue Req No</th>
 									<th >Status</th>
+									<th >Cust No</th>
+									<th >Cust Name</th>
+									<th >Total Request</th>
 									<th >หมายเหตุ</th>
 									<th >Action</th>	
 									<th >ยืนยัน</th>						
@@ -244,18 +247,26 @@ function openConfirm(path,documentNo,issueReqStatus){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_issueReqDate">
+										<td class="td_text_center" width="8%">
 										   ${results.issueReqDate}
 										</td>
-										<td class="search_issueReqNo">${results.issueReqNo}</td>
-										<td class="search_issueReqStatus">
+										<td class="td_text_center" width="8%">${results.issueReqNo}</td>
+										<td class="td_text_center" width="10%">
 											${results.statusDesc}
 										</td>
-										
-									    <td class="search_remark">
+										<td class="td_text" width="8%">
+											${results.storeCode}
+										</td>
+										<td class="td_text" width="20%">
+											${results.storeName}
+										</td>
+										<td class="td_text_right" width="8%">
+											${results.totalReqQty}
+										</td>
+									    <td class="td_text_center" width="20%">
 										  ${results.remark}
 										</td>
-										<td class="search_edit">
+										<td class="td_text_center"  width="8%">
 											 <c:if test="${results.canEdit == false}">
 												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
 												          ดู
@@ -268,7 +279,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 											  </c:if>
 		
 											</td>
-											<td class="search_edit2">
+											<td class="td_text_center"  width="8%">
 												<c:if test="${results.canConfirm == true}">
 												  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
 												          ยืนยัน

@@ -224,7 +224,7 @@ public class MTTAction extends I_Action {
 				  h.append("<td>Material Master </td> \n");
 				  h.append("<td>Pens Item </td> \n");
 				  h.append("<td>จำนวนชิ้นที่ขาย</td> \n");
-				  h.append("<td>ราคาขายปลีกรวม VAT</td> \n");
+				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){

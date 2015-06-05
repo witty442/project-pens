@@ -224,21 +224,21 @@ function submitBT(path){
 	  </div>
 	  
 	  <div id="div_backupdb" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-		  <BR>
+		  <%-- <BR>
 		  <span class="h1_style"> Backup DB Tab </span> :
 		   <INPUT class="button2_style" TYPE="button" name ="B_BackUpDB"  VALUE="Submit Backup DB" onclick="submitBT('<%=request.getContextPath()%>');">
 		  <BR>
 		   <html:textarea property="resultBKDB" style=" width :100%;" rows="40"/>
-		  <br>
+		  <br> --%>
 	  </div>
 	  
 	   <div id="div_cleardb" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-		  <BR>
+		<%--   <BR>
 		  <span class="h1_style"> Clear DB Tab </span> :
 		   <INPUT class="button2_style" TYPE="button" name ="B_ClearDB"  VALUE="Submit Clear DB" onclick="submitBT('<%=request.getContextPath()%>');">
 		  <BR>
 		   <html:textarea property="resultClearDB" style=" width :100%;" rows="40"/>
-		  <br>
+		  <br> --%>
 	  </div>
   
 </html:form>

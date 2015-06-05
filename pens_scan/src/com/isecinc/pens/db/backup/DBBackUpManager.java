@@ -124,6 +124,7 @@ public class DBBackUpManager {
 
 			conn = DBConnection.getInstance().getConnection();
 			String exceptTable = "'pensbme_mst_reference','pensbme_onhand_bme_locked'";
+			
 			/** Step 1 **/
 			allList = listTableBackUp(schema,conn,exceptTable);
 			tableList = (List<DBBean>)allList.get(0);

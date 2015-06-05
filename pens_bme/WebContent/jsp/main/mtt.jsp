@@ -348,6 +348,7 @@ function checkAll(chkObj){
 	}
 }
 
+
 function getProductKeypress(e,barcodeObj,lineId){
 	//materialMaster groupCode pensItem wholePriceBF retailPriceBF
 	//alert(barcode.value);
@@ -358,6 +359,12 @@ function getProductKeypress(e,barcodeObj,lineId){
 	var pensItem = document.getElementsByName("pensItem");
 	var wholePriceBF = document.getElementsByName("wholePriceBF");
 	var retailPriceBF = document.getElementsByName("retailPriceBF");
+	
+	var storeCode =$('#storeName').val();
+	if(storeCode =="" ){
+		alert("กรุณากรอก รหัสร้านค้า ");
+		return false;
+	}
 	
 	if(e != null && e.keyCode == 13){
 	
@@ -398,8 +405,8 @@ function getProductModel(barcodeObj,lineId){
 	var returnString = "";
 	var form = document.mttForm;
 	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcodeMTT.jsp",
-			data : "itemCode=" + barcodeObj.value,
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
+			data : "itemCode=" + barcodeObj.value+"&storeCode="+form.storeCode.value,
 			async: false,
 			cache: true,
 			success: function(getData){
@@ -485,7 +492,7 @@ function getProductModelByMat(matObj,lineId){
 	var form = document.mttForm;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
-			data : "matCode="+matObj.value,
+			data : "matCode="+matObj.value+"&storeCode="+form.storeCode.value,
 			async: false,
 			cache: true,
 			success: function(getData){

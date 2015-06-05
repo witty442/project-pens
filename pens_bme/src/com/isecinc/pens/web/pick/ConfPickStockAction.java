@@ -647,6 +647,61 @@ public class ConfPickStockAction extends I_Action {
 		return null;
 	}
 	
+	public ActionForward printByGroupCode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("printByGroupCode: " + this.getClass());
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		try {
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+
+			ReqPickStock h = reportForm.getBean();
+			if(h != null){
+				logger.debug("ReqPickStock:"+h);
+				//Head
+				parameterMap.put("p_title", "รายงานยืนยัน การเบิกสินค้า");
+				parameterMap.put("p_issueReqDate", h.getIssueReqDate());
+				parameterMap.put("p_issueReqNo", h.getIssueReqNo());
+				parameterMap.put("p_statusDesc", h.getStatusDesc());
+				parameterMap.put("p_requestor", h.getRequestor());
+				parameterMap.put("p_custGroupDesc", h.getCustGroup());
+				parameterMap.put("p_needDate", h.getNeedDate());
+				parameterMap.put("p_storeCode", h.getStoreCode()+"-"+h.getStoreName());
+				parameterMap.put("p_subInv", h.getSubInv());
+				parameterMap.put("p_storeNo", h.getStoreNo());
+				parameterMap.put("p_remark", h.getRemark());
+				
+				//Gen Report
+				String fileName = "conf_pick_groupcode_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseNoEdit(conn, h,0,true);//
+				List items = pAllItem.getItems();
+				
+				logger.debug("items size:"+items.size());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
 	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");

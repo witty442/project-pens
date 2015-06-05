@@ -60,9 +60,7 @@ public class AdminConsoleAction extends I_Action {
 				String configInfoTest ="";
 				
 				EnvProperties env = EnvProperties.getInstance();
-				
-		
-		
+
 				String url = env.getProperty("db.url");
 				String username = env.getProperty("db.username");
 				String password = env.getProperty("db.password");
@@ -75,13 +73,12 @@ public class AdminConsoleAction extends I_Action {
 		
 				configInfo += " ----------------------  FTP Server Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
-				configInfo +="FTP IP TEMP : "+env.getProperty("ftp.ip.server.temp")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
 				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
-				configInfo += " ----------------------  Host PayIn Server AtPens ---------------------------------------------------------------------- \n";
-				configInfo +="Host PayInReport : "+env.getProperty("host.payinreport ")+"\n";
+				configInfo += " ----------------------  Host PayInReport Server @Pens ---------------------------------------------------------------------- \n";
+				configInfo +="Host PayInReport : "+env.getProperty("host.payinreport")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
 			    configInfoTest = " ";

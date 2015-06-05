@@ -147,6 +147,7 @@ public class MTTBeanDAO{
 					   "\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
 					   "\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 					   "\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
+					   "\n ,(select count(*) as c from PENSBME_BARCODE_SCAN_ITEM i where i.doc_no = S.doc_no) as total_qty "+
 					   "\n from PENSBME_BARCODE_SCAN S");
 			
 			sql.append("\n where 1=1   \n");
@@ -190,7 +191,7 @@ public class MTTBeanDAO{
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
                h.setStatus(Utils.isNull(rst.getString("status")));
                h.setExport(Utils.isNull(rst.getString("export_flag")));
-               
+               h.setTotalQty(rst.getInt("total_qty"));
                
                if("AB".equalsIgnoreCase(h.getStatus())){
             	   h.setStatusDesc("CANCEL");
@@ -512,6 +513,37 @@ public class MTTBeanDAO{
 		}
 		
 		public static int updateHeadModelCaseCloseJob(Connection conn,MTTBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("Update");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBME_BARCODE_SCAN SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				
+				sql.append(" WHERE DOC_NO = ? \n" );
+
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				
+				ps.setString(c++, Utils.isNull(o.getDocNo()));
+	
+				c = ps.executeUpdate();
+				
+				return c;
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static int updateStatusByDocNo(Connection conn,MTTBean o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("Update");
 			int  c = 1;

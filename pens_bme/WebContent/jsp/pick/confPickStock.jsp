@@ -70,6 +70,12 @@ function print(path){
 	form.submit();
 	return true;
 }
+function printByGroupCode(path){
+	var form = document.confPickStockForm;
+	form.action = path + "/jsp/confPickStockAction.do?do=printByGroupCode";
+	form.submit();
+	return true;
+}
 
 function clearForm(path){
 	var form = document.confPickStockForm;
@@ -478,12 +484,10 @@ function sumQty(){
 									<a href="javascript:confirmPick('${pageContext.request.contextPath}')">
 									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 
 									 </a>
-								 </c:if>					
-								 
+								 </c:if>	
 								<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 								  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
-								</a>	
-														
+								</a>						
 								</td>
 							</tr>
 						</table>

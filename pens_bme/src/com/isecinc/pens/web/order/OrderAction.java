@@ -92,8 +92,8 @@ public class OrderAction extends I_Action {
 				 conn = DBConnection.getInstance().getConnection();
 				 
 				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,Constants.STORE_TYPE_FRIDAY_CODE);
-				 request.getSession().setAttribute("storeTypeList",storeTypeList);
-				
+			     request.getSession().setAttribute("storeTypeList",storeTypeList);
+			     
 				 List<References> regionList = importDAO.getRegionList(conn);
 				 request.getSession().setAttribute("regionList",regionList);
 				 
@@ -103,8 +103,7 @@ public class OrderAction extends I_Action {
 			 }
 			
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			e.printStackTrace();
 			throw e;
 		}finally{
 			if(conn != null){
@@ -143,6 +142,7 @@ public class OrderAction extends I_Action {
 		int totalPage = 0;
 		int pageNumber = 1;
 		List<StoreBean> storeList = null;
+		ImportDAO importDAO = new ImportDAO();
 		String action = "";
 		String tableName = "PENSBME_ONHAND_BME";
 		String itemType ="LotusItem";
@@ -195,6 +195,11 @@ public class OrderAction extends I_Action {
 			    				o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
+				    			
+		    				}else if("S".equalsIgnoreCase(orderForm.getOrder().getBillType())){
+			    				o.setBillType(store.getBillType());
+			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
+				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
 			    			}else{
 			    				o.setBillType("N");	
 			    				o.setValidFrom("00000000");
@@ -239,7 +244,7 @@ public class OrderAction extends I_Action {
 	                        	}
 	                        }else{
 	                        	//update 
-	                        	logger.debug("Update OrderNo:"+orderNoLine+"BarOnBoxLine:"+barOnBoxLine);
+	                        	logger.debug("Update OrderNo:"+orderNoLine+",BarOnBoxLine:"+barOnBoxLine);
 	                        	if( "".equals(o.getQty())){
 	                        	  o.setQty("0");	
 	                        	}
@@ -248,8 +253,10 @@ public class OrderAction extends I_Action {
 	                        	o.setUpdateUser(user.getUserName());
 	                        	
 	                        	if("0".equals(o.getQty())){
+	                        		logger.debug("delete");
 	                        	   OrderDAO.deleteOrder(conn, o);
 	                        	}else{
+	                        		logger.debug("update");
 	                        	   OrderDAO.updateOrder(conn, o);
 	                        	}
 		                        
@@ -399,7 +406,10 @@ public class OrderAction extends I_Action {
 		    					o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
-				    			
+		    				}else if("S".equalsIgnoreCase(orderForm.getOrder().getBillType())){
+			    				o.setBillType(store.getBillType());
+			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
+				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));	
 			    			}else{
 			    				o.setBillType("N");	
 			    				o.setValidFrom("00000000");

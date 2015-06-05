@@ -77,11 +77,22 @@ public class Utils {
 	public static boolean userInRole(User user,String[] roles){
 		boolean r = false;
 		for(int i=0;i<roles.length;i++){
-			if( (user.getRole().getKey()).toLowerCase().indexOf(String.valueOf(roles[i]).toLowerCase()) != -1){
-				r =  true;
-				break;
-			}
-		}
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRole().getKey().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
 		return r;
 	}
 	

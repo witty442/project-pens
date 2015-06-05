@@ -113,26 +113,34 @@ public class ReqPickStockDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n SELECT * ");
-			sql.append("\n from PENSBME_STOCK_ISSUE \n");
+			sql.append("\n SELECT H.* ");
+			
+			sql.append("\n  ,(select NVL(SUM(req_qty),0) from PENSBI.PENSBME_STOCK_ISSUE_ITEM i ");
+			sql.append("\n   where  status <>'"+STATUS_CANCEL+"'" );
+			sql.append("\n   and H.issue_req_no = i.issue_req_no group by i.issue_req_no) as total_req_qty \n");
+			
+			sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
+			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = H.customer_no) as STORE_NAME ");
+			
+			sql.append("\n from PENSBME_STOCK_ISSUE H \n");
 			sql.append("\n where 1=1   \n");
 			
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
-				sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
+				sql.append("\n and H.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
 			}
 			
 			if( !Utils.isNull(o.getStatus()).equals("")){
-				sql.append("\n and status = '"+Utils.isNull(o.getStatus())+"'  ");
+				sql.append("\n and H.status = '"+Utils.isNull(o.getStatus())+"'  ");
 			}
 			
 			if( !Utils.isNull(o.getIssueReqDate()).equals("")){
 				Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
-				sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+				sql.append("\n and H.ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
 			}
 			
-			sql.append("\n order by issue_req_no DESC ");
+			sql.append("\n order by H.issue_req_no DESC ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -147,7 +155,11 @@ public class ReqPickStockDAO extends PickConstants{
 			   h.setStatusDesc(getStatusDesc(h.getStatus()));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
 			   h.setRequestor(Utils.isNull(rst.getString("requestor")));
-			  
+			   h.setTotalReqQty(rst.getInt("total_req_qty"));
+			   
+			   h.setStoreCode(Utils.isNull(rst.getString("customer_no")));
+			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+			   
 			   if(Utils.isNull(rst.getString("status")).equals(STATUS_OPEN)){
 				   h.setCanEdit(true);
 			   }else{
@@ -968,7 +980,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n   	  WHERE (U.onhand_qty > 0 OR U.qty > 0)");
 				
 				
-			    sql.append("\n 		  ORDER BY U.group_code,U.pens_item ");
+			    sql.append("\n 		  ORDER BY U.group_code,U.pens_item");
 				  
 				sql.append("\n      )A  ");
 				if( !allRec){
@@ -1103,7 +1115,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	 ON  M.pens_item = P.pens_item and M.group_code = P.group_code "  +
 								       " AND M.material_master = P.material_master AND M.barcode =P.barcode   ");
 				sql.append("\n   	  )U ");
-			    sql.append("\n 		  order by U.group_code,U.pens_item");
+			    sql.append("\n 		  order by U.group_code,U.pens_item, U.material_master");
 				  
 				sql.append("\n      )A  ");
 				if( !allRec){

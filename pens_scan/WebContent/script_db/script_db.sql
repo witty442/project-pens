@@ -1,0 +1,1 @@
+alter table pensbme_barcode_scan modify Status varchar(2);

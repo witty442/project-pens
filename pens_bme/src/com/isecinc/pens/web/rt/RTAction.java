@@ -307,8 +307,13 @@ public class RTAction extends I_Action {
 			h.setStatus(RTConstant.STATUS_COOMFIRM);
 			RTDAO.updateStatusRTNControl(conn, h);
 			
+			
 			//Search Again
-			RTBean bean = RTDAO.searchHead(conn,h,true).getItems().get(0);
+			RTBean cri = new RTBean();
+			cri.setDocNo(h.getDocNo());
+			cri.setDocDate(h.getDocDate());
+			
+			RTBean bean = RTDAO.searchHead(conn,cri,true).getItems().get(0);
 		    aForm.setBean(bean);
 			
 			conn.commit();
