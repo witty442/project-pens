@@ -260,6 +260,7 @@ function addRow(){
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='materialMaster' class='normalTextCenter'  size='20' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='td_text_center' width='5%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableTextCenter' size='15' /></td>"+
 	    "<td class='td_text_center' width='5%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableTextCenter' size='15' /> </td>"+
+	    "<td class='td_text_center' width='5%'> <input type='text' tabindex ='-1' name='wholePriceBF' readonly class='disableTextCenter' size='15' /> </td>"+
 	    "</tr>";
    
     $('#tblProduct tr:last').after(rowData);
@@ -356,6 +357,7 @@ function getProductKeypress(e,barcodeObj,lineId){
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	var wholePriceBF=document.getElementsByName("wholePriceBF");
 	var totalRows = 0;
 	
 	//alert("keyCode:"+e.keyCode);
@@ -364,7 +366,7 @@ function getProductKeypress(e,barcodeObj,lineId){
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
-		
+			wholePriceBF[lineId-1].value = '';
 		}else{
 			 
 			var found = getProductModel(barcodeObj,lineId);
@@ -385,6 +387,7 @@ function getProductKeypress(e,barcodeObj,lineId){
 	materialMaster.length=0;
 	groupCode.length=0;
 	pensItem.length=0;
+	wholePriceBF.length=0;
 }
 
 function getProductModel(barcodeObj,lineId){
@@ -393,6 +396,7 @@ function getProductModel(barcodeObj,lineId){
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	var wholePriceBF=document.getElementsByName("wholePriceBF");
 	
 	var returnString = "";
 	var form = document.mttForm;
@@ -412,7 +416,7 @@ function getProductModel(barcodeObj,lineId){
 					materialMaster[lineId-1].value = '';
 					groupCode[lineId-1].value = '';
 					pensItem[lineId-1].value = '';
-					
+					wholePriceBF[lineId-1].value = '';
 				}else{
 					var s = returnString.split("|");
 					
@@ -420,6 +424,7 @@ function getProductModel(barcodeObj,lineId){
 					materialMaster[lineId-1].value = s[1];
 					groupCode[lineId-1].value = s[2];
 					pensItem[lineId-1].value = s[3];
+					wholePriceBF[lineId-1].value = s[4];
 					
 					found = true;
 					barcode[lineId-1].readonly = true;
@@ -449,6 +454,7 @@ function getProductKeypressByMat(e,matObj,lineId){
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	var wholePriceBF=document.getElementsByName("wholePriceBF");
 	
 	if(e != null && e.keyCode == 13){
 	
@@ -457,7 +463,7 @@ function getProductKeypressByMat(e,matObj,lineId){
 			barcode[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
-		
+			wholePriceBF[lineId-1].value = '';
 		}else{
 			var found = getProductModelByMat(matObj,lineId);
 			if(found){
@@ -488,6 +494,7 @@ function getProductModelByMat(matObj,lineId){
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	var wholePriceBF=document.getElementsByName("wholePriceBF");
 	
 	var returnString = "";
 	var form = document.mttForm;
@@ -511,7 +518,7 @@ function getProductModelByMat(matObj,lineId){
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
-			
+			wholePriceBF[lineId-1].value = '';
 		}else{
 			var s = returnString.split("|");
 			
@@ -519,7 +526,7 @@ function getProductModelByMat(matObj,lineId){
 			materialMaster[lineId-1].value = s[1];
 			groupCode[lineId-1].value = s[2];
 			pensItem[lineId-1].value = s[3];
-			
+			wholePriceBF[lineId-1].value = s[4];
 			found = true;
 		}
 		
@@ -528,6 +535,7 @@ function getProductModelByMat(matObj,lineId){
 	materialMaster.length=0;
 	groupCode.length=0;
 	pensItem.length=0;
+	wholePriceBF.length =0;
 	returnString =null;
 	
 	return found;
@@ -623,7 +631,7 @@ function getProductModelByMat(matObj,lineId){
 								<th >Wacoal Mat.</th>
 								<th >Group Code</th>
 								<th >PENS Item</th>
-												
+								<th >Whole Price BF</th>				
 							</tr>
 							<%if(mttForm.getResults() != null && mttForm.getResults().size() > 0 ){ %>
 								<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
@@ -658,6 +666,9 @@ function getProductModelByMat(matObj,lineId){
 											</td>
 											<td class="td_text_center"  width="10%">                                                     
 											   <input type="text" name="pensItem" value ="${results.pensItem}" size="15" readonly class="disableTextCenter"/>
+											</td>
+											<td class="td_text_center"  width="10%">                                                     
+											   <input type="text" name="wholePriceBF" value ="${results.wholePriceBF}" size="15" readonly class="disableTextCenter"/>
 											</td>
 										</tr>
 								

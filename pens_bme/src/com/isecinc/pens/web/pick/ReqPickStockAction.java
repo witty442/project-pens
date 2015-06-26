@@ -282,7 +282,7 @@ public class ReqPickStockAction extends I_Action {
 					|| Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_CANCEL)
 					|| p.isModeConfirm()){
 					 
-					 totalRow = ReqPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
+					 totalRow = ReqPickStockDAO.getTotalRowInStockIssueItemCaseNoEditByGroupCode(conn, p);
 				 }else{ 
 					 totalRow = ReqPickStockDAO.getTotalRowInStockFinishGroupByGroupCode(conn,p);
 				 }
@@ -367,7 +367,7 @@ public class ReqPickStockAction extends I_Action {
 				//Case newsearch Recalc page
 				pageNumber = 1;
 
-				totalRow = ReqPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
+				totalRow = ReqPickStockDAO.getTotalRowInStockIssueItemCaseNoEditByItem(conn, p);
 				totalQtyAll =  ReqPickStockDAO.getTotalQtyInStockIssueItem(conn,p);	
 				p.setTotalQty(totalQtyAll);
 				

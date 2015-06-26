@@ -106,6 +106,11 @@
 			 <li>
           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
           	</li>
+          	<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+          	 <li>
+          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare';"><span>12.<bean:message key="genCN" bundle="sysprop"/></span></a>
+          	</li>
+          	<%} %>
 		</ul>
 	</li>
 <%} %>

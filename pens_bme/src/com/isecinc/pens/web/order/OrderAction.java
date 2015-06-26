@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.OrderDAO;
+import com.isecinc.pens.dao.StockLimitDAO;
 import com.isecinc.pens.gendate.OrderDateUtils;
 import com.isecinc.pens.inf.exception.LogisticException;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -49,6 +51,8 @@ public class OrderAction extends I_Action {
 	public static int pageSize = 90;
 	public static int reportOrderPageSize = 90;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
+	
+	public boolean chkStoreCreditLimit = false;//for chk creditLimti
 	
 	/**
 	 * Prepare without ID
@@ -141,11 +145,14 @@ public class OrderAction extends I_Action {
 		int totalRow = 0;
 		int totalPage = 0;
 		int pageNumber = 1;
+		int prevPageNumber = 0;
 		List<StoreBean> storeList = null;
-		ImportDAO importDAO = new ImportDAO();
 		String action = "";
 		String tableName = "PENSBME_ONHAND_BME";
 		String itemType ="LotusItem";
+		Date orderDate = null;
+		String barcodeInPage = "";
+		String validateStore = "true";
 		try {
 			Order orderCri = orderForm.getOrder();
 			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
@@ -157,6 +164,7 @@ public class OrderAction extends I_Action {
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("action:"+action);
 			
+		
 			if("save".equalsIgnoreCase(action)){
 				logger.debug("Search and Save");
 				storeList = (List<StoreBean>)request.getSession().getAttribute("storeList");
@@ -167,12 +175,11 @@ public class OrderAction extends I_Action {
 				String[] wholePriceBFArr = request.getParameterValues("wholePriceBF");
 				String[] retailPriceBFArr = request.getParameterValues("retailPriceBF");
 				
-				Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				  
-                Map<String,OrderKeyBean> mapOrderNoByStoreMap = new HashMap<String, OrderKeyBean>();
 				/** Get OrderNoInDB key by StoreCode   **/
-                mapOrderNoByStoreMap = orderDAO.getOrderNoMap(conn, orderForm.getOrder().getStoreType(),orderDate);
-                
+				Map<String,OrderKeyBean> mapOrderNoByStoreMap = orderDAO.getOrderNoMap(conn, orderForm.getOrder().getStoreType(),orderDate);
+	
 				if(storeList != null && storeList.size()>0){ 
 		        	for(int col=0;col<storeList.size();col++){
 		               StoreBean store = (StoreBean)storeList.get(col);
@@ -191,7 +198,7 @@ public class OrderAction extends I_Action {
 		    				o.setStoreType(orderForm.getOrder().getStoreType());
 		    				o.setStoreCode(store.getStoreCode());
 		    				
-		    				if("G".equalsIgnoreCase(orderForm.getOrder().getBillType())){
+		    				/*if("G".equalsIgnoreCase(orderForm.getOrder().getBillType())){
 			    				o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
@@ -200,15 +207,20 @@ public class OrderAction extends I_Action {
 			    				o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
-			    			}else{
+			    			}else{*/
 			    				o.setBillType("N");	
 			    				o.setValidFrom("00000000");
 				    			o.setValidTo("00000000");
-			    			}
+			    			//}
 		    				
+				    		//Set For Delete Case Error
+				    	   if(col==0){
+				    		   barcodeInPage += "'"+barcodeArr[row]+"',";
+				    	   }
+				    			
 	                        String keyQty = "qty_"+col+"_"+row;
 	                        String qty = Utils.isNull(request.getParameter(keyQty));
-	                        //System.out.println(keyQty+"["+qty+"]");
+	                        //System.out.println(keyQty+"["+qty+"]")3;
 	                        
 	                        String keyOrderNo = "orderNo_"+col+"_"+row;
 	                        String keyBarOnBox = "barOnBox_"+col+"_"+row;
@@ -266,7 +278,44 @@ public class OrderAction extends I_Action {
 				}//if
 	      
 				logger.debug("Save and Search Success");
-	
+				
+				// Validate Store Limit
+				if(chkStoreCreditLimit==true){
+					String msg ="";
+					List<StoreBean> storeChkList = new ArrayList<StoreBean>();
+					if(StockLimitDAO.isCustGroupChkCreditLimit(conn,orderCri.getStoreType())){
+						if(storeList != null && storeList.size()>0){ 
+				        	for(int col=0;col<storeList.size();col++){
+				               StoreBean store = (StoreBean)storeList.get(col);
+				               
+				               if(StockLimitDAO.isStoreChkCreditLimit(conn, store.getStoreCode())){
+					               if(StockLimitDAO.isStoreOverCreditLimit(conn, store.getStoreCode(), orderDate )){
+					            	   store.setStoreStyle("storeError");
+					            	   validateStore = "false";
+					            	   msg += store.getStoreDisp()+",";
+					               }else{
+					            	   store.setStoreStyle("");
+					               }
+				               }
+				               storeChkList.add(store);
+				        	}
+				        	
+				        	if( !Utils.isNull(barcodeInPage).equals("")){
+				        		barcodeInPage = barcodeInPage.substring(0,barcodeInPage.length()-1);
+				        	}
+				        	
+				        	request.getSession().setAttribute("storeList",storeChkList);
+				        	request.getSession().setAttribute("barcodeInPage",barcodeInPage);
+				        	
+				        	request.setAttribute("validateStore",validateStore);
+				        	if( !Utils.isNull(msg).equals("")){
+				        		msg = msg.substring(0,msg.length()-1);
+				        		msg = "ไม่สามรถบันทึกข้อมูลได้ ["+msg +"]  เนื่องจากร้านค้า Over Credit Limit";
+				        	    request.setAttribute("Message", msg);
+				        	}
+						}
+					}
+				 }
 			}else{
 			
 				//Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -279,12 +328,15 @@ public class OrderAction extends I_Action {
 					request.getSession().setAttribute("totalPage", totalPage);
 					request.getSession().setAttribute("totalRow", totalRow);
 				}
-				
 			}
 			
 			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
 			if("newsearch".equals(action)){
+				//Call runProcedureStoreLimit
+				StockLimitDAO.runProcedureStoreLimit(conn, orderForm.getOrder().getStoreType(),orderForm.getOrder().getRegion());
 				
+				request.getSession().setAttribute("barcodeInPage","");
+	        	
 				request.setAttribute("action", "newsearch");
 				request.getSession().setAttribute("results", null);
 				request.getSession().setAttribute("storeList",null);
@@ -306,6 +358,15 @@ public class OrderAction extends I_Action {
 			    pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
 			}
 			
+			//For case Error OverLimit goto PrevPage
+			prevPageNumber = !Utils.isNull(request.getParameter("prevPageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("prevPageNumber")):1;
+			if(validateStore.equals("false")){
+				pageNumber = prevPageNumber;
+			}
+			request.setAttribute("prevPageNumber", prevPageNumber+"");
+			
+			logger.debug("pageNumber:"+pageNumber);
+	
 			//logger.debug("CustType["+orderForm.getOrder().getCustType()+"]");
 			
             //** Search Data and Display **/
@@ -342,7 +403,17 @@ public class OrderAction extends I_Action {
 		boolean haveError = false;
 		OrderDAO orderDAO = new OrderDAO();
 		String tableName = "PENSBME_ONHAND_BME";
+		Date orderDate = null;
+		String barcodeInPage = "";
+		String validateStore = "true";
+		String itemType ="LotusItem";
 		try {
+			Order orderCri = orderForm.getOrder();
+			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
+				tableName = "PENSBME_ONHAND_BME_FRIDAY";
+				itemType ="FridayItem";
+			}
+			
 			conn = DBConnection.getInstance().getConnection();
 			//conn.setAutoCommit(false);
 			List<StoreBean> storeList = (List<StoreBean>)request.getSession().getAttribute("storeList");
@@ -356,30 +427,9 @@ public class OrderAction extends I_Action {
 			
 			/** Validate Qty in Store not over Onhand QTY by Item **/
 			Map<String,String> itemErrorMap = new HashMap<String, String>();
-			/*for(row=0;row<groupArr.length;row++ ){
-				BigDecimal onhandQty = new BigDecimal(onhandQtyArr[row]);
-				String item = itemArr[row];
-				 
-				if(storeList != null && storeList.size()>0){ 
-				   BigDecimal sumQtyInRow = new BigDecimal("0");
-		        	for(col=0;col<storeList.size();col++){
-		               //StoreBean store = (StoreBean)storeList.get(col);
-	                   String keyQty = "qty_"+col+"_"+row;
-	                   String qty = Utils.isNull(request.getParameter(keyQty));
-	                   if( !"".equals(qty)){
-	                     sumQtyInRow =  sumQtyInRow.add(new BigDecimal(qty));
-	                   }
-		        	}//for 2
-		        	
-		        	if(sumQtyInRow.longValue() > onhandQty.longValue() ){
-		        		itemErrorMap.put(item, "lineError");
-		        		haveError = true;
-		        	}
-				}
-			}//for 1
-*/			
+			
 			if(haveError == false){
-				Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				Map<String,OrderKeyBean> mapOrderNoByStoreMap = new HashMap<String, OrderKeyBean>();
 				/** Get OrderNoInDB key by StoreCode   **/
                 mapOrderNoByStoreMap = orderDAO.getOrderNoMap(conn, orderForm.getOrder().getStoreType(),orderDate);
@@ -402,7 +452,7 @@ public class OrderAction extends I_Action {
 		    				o.setStoreType(orderForm.getOrder().getStoreType());
 		    				o.setStoreCode(store.getStoreCode());
 		    				
-		    				if("G".equalsIgnoreCase(orderForm.getOrder().getBillType())){
+		    				/*if("G".equalsIgnoreCase(orderForm.getOrder().getBillType())){
 		    					o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));
@@ -410,12 +460,16 @@ public class OrderAction extends I_Action {
 			    				o.setBillType(store.getBillType());
 			    				o.setValidFrom("".equals(Utils.isNull(store.getValidFrom()))?"00000000":Utils.isNull(store.getValidFrom()));
 				    			o.setValidTo("".equals(Utils.isNull(store.getValidTo()))?"00000000":Utils.isNull(store.getValidTo()));	
-			    			}else{
+			    			}else{*/
 			    				o.setBillType("N");	
 			    				o.setValidFrom("00000000");
 				    			o.setValidTo("00000000");
-			    			}
-
+			    			//}
+				    		//Set For Delete Case Error
+						    if(col==0){
+						       barcodeInPage += "'"+barcodeArr[row]+"',";
+						    }
+						    	   
 	                        String keyQty = "qty_"+col+"_"+row;
 	                        String qty = Utils.isNull(request.getParameter(keyQty));
 	                        //System.out.println(keyQty+"["+qty+"]");
@@ -474,17 +528,73 @@ public class OrderAction extends I_Action {
 		        	}//for storeList
 				}//for
 	
-				logger.debug("Connection commit");
-				//conn.commit();
+				// Validate Store Limit
+				if(chkStoreCreditLimit==true){
+					String msg ="";
+					List<StoreBean> storeChkList = new ArrayList<StoreBean>();
+					if(StockLimitDAO.isCustGroupChkCreditLimit(conn,orderForm.getOrder().getStoreType())){
+						if(storeList != null && storeList.size()>0){ 
+				        	for(col=0;col<storeList.size();col++){
+				               StoreBean store = (StoreBean)storeList.get(col);
+				               
+				               if(StockLimitDAO.isStoreChkCreditLimit(conn, store.getStoreCode())){
+					               if(StockLimitDAO.isStoreOverCreditLimit(conn, store.getStoreCode(), orderDate )){
+					            	   store.setStoreStyle("storeError");
+					            	   validateStore = "false";
+					            	   msg += store.getStoreDisp()+",";
+					               }else{
+					            	   store.setStoreStyle("");
+					               }
+				               }
+				               storeChkList.add(store);
+				        	}
+				        	
+				        	if( !Utils.isNull(barcodeInPage).equals("")){
+				        		barcodeInPage = barcodeInPage.substring(0,barcodeInPage.length()-1);
+				        	}
+				        	
+				        	request.getSession().setAttribute("storeList",storeChkList);
+				        	request.getSession().setAttribute("barcodeInPage",barcodeInPage);
+				        	
+				        	request.setAttribute("validateStore",validateStore);
+				        	if( !Utils.isNull(msg).equals("")){
+				        		msg = msg.substring(0,msg.length()-1);
+				        		msg = "ไม่สามรถบันทึกข้อมูลได้  ["+msg +"]  เนื่องจากร้านค้า Over Credit Limit";
+				        	    request.setAttribute("Message", msg);
+				        	}
+						}
+					}
+				 }
 				
-				request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
-				 //Research 
-			    //List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user);
-		        //request.getSession().setAttribute("results", results);
-		       // request.getSession().setAttribute("itemErrorMap", null);
 				
-				request.setAttribute("action", "newsearch");
-				search(orderForm, request, response);
+				if(validateStore.equals("false")){
+					int pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+					
+					request.setAttribute("prevPageNumber", pageNumber+"");
+					logger.debug("pageNumber:"+pageNumber);
+			
+				     //** Search Data and Display **/
+					List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user,pageNumber,pageSize,tableName,itemType);
+					if (results != null  && results.size() >0) {
+						request.getSession().setAttribute("results", results);
+					} else {
+						request.getSession().setAttribute("results", null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}
+			        
+				}else{
+					logger.debug("Connection commit");
+					//conn.commit();
+					
+					request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+					 //Research 
+				    //List<Order> results = new OrderDAO().prepareNewOrder(conn,orderForm.getOrder(),storeList, user);
+			        //request.getSession().setAttribute("results", results);
+			       // request.getSession().setAttribute("itemErrorMap", null);
+					
+					request.setAttribute("action", "newsearch");
+					search(orderForm, request, response);
+				}
 			}else{
 				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้");
 				 //Research 

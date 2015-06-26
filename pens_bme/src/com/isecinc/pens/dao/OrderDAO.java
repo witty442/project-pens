@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -222,6 +223,12 @@ public class OrderDAO {
 			rst = ps.executeQuery();
 			int n=0;
 			List<StoreBean> storeItemList = null;
+			StoreBean s = null;
+			String keyMap = "";
+			StoreBean store = null;
+			String keyMapLimit = "";
+			String limitAmt = "0";
+			   
 			while (rst.next()) {
 				Order item = new Order();
 				item.setBarcode(rst.getString("BARCODE"));
@@ -247,32 +254,28 @@ public class OrderDAO {
 				if(storeList != null && storeList.size() >0){
 					storeItemList = new ArrayList<StoreBean>();
 					for(int c =0;c<storeList.size();c++){
-						StoreBean s = (StoreBean)storeList.get(c);
-						
-						//Find Order 
-						//StoreBean order = getOrderByStoreNo(conn,o.getStoreType(),orderDate, s.getStoreCode(), item.getItem());
-						
-						String keyMap = item.getBarcode()+"_"+s.getStoreCode()+"_"+item.getBillType();
+						s = (StoreBean)storeList.get(c);
+						keyMap = item.getBarcode()+"_"+s.getStoreCode()+"_"+item.getBillType();
 						//logger.debug("KeyMap["+keyMap+"]");
-						
-						
-						StoreBean order = storeBeanOrderMap.get(keyMap)!=null?(StoreBean)storeBeanOrderMap.get(keyMap):null;
-						if(order!= null){
-							order.setStoreDisp(s.getStoreDisp());
-							order.setStoreName(s.getStoreName());
+						store = storeBeanOrderMap.get(keyMap)!=null?(StoreBean)storeBeanOrderMap.get(keyMap):null;
+						if(store!= null){
+							store.setStoreDisp(s.getStoreDisp());
+							store.setStoreName(s.getStoreName());
 							//System.out.println("StoreCode["+order.getStoreCode()+"]OrderNo["+order.getOrderNo()+"]item["+order.getItem()+"]qty["+order.getQty()+"]");
 
-							lineQty += Utils.convertStrToInt(order.getQty());
+							lineQty += Utils.convertStrToInt(store.getQty());
 						}else{
-							order = s;
-							order.setQty("");
+							store = s;
+							store.setQty("");
 						}
-						storeItemList.add(order);
+						store.setStoreStyle(s.getStoreStyle());
+						
+						storeItemList.add(store);
 
 					}//for
 					
 					//RemainOmhandQty + lineQty display
-					item.setOnhandQty((Utils.convertStrToInt(item.getOnhandQty())+lineQty)+"");
+					item.setOnhandQty((Utils.convertStrToInt(item.getOnhandQty())+lineQty)+"");	
 					
 				}//if
 				
@@ -1869,7 +1872,7 @@ public class OrderDAO {
 	} 
 	
 	
-	private Map<String,StoreBean> getStoreBeanOrderMap(Connection conn,String storeType,Date orderDate) throws Exception{
+	public static Map<String,StoreBean> getStoreBeanOrderMap(Connection conn,String storeType,Date orderDate) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Map<String,StoreBean> map = new HashMap<String,StoreBean>();
@@ -2161,6 +2164,7 @@ public class OrderDAO {
 		List<StoreBean> storeList = new ArrayList<StoreBean>();
 		ImportDAO importDAO = new ImportDAO();
 		try{
+			
 			StringBuffer sql = new StringBuffer("");
 			sql.append("select a.* from( \n");
 			sql.append(" select m.* \n");

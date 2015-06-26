@@ -32,6 +32,10 @@ public class PickConstants {
 	public static int REQ_PICK_PAGE_SIZE = 10;
 	public static int CONF_PICK_PAGE_SIZE = 10;
 	
+	public static String WAREHOUSE_W1 ="W1";//Move
+	public static String WAREHOUSE_W2 ="W2";//Move
+	public static String WAREHOUSE_W3 ="W3";//Move
+	
 	@Deprecated
 	public static String PICK_TYPE_ITEM ="ITEM";
 	public static String PICK_TYPE_BOX ="BOX";

@@ -330,6 +330,24 @@ public class JobDAO extends PickConstants{
 		}
 	}
 	
+	public static Job saveCaseGenCn(Connection conn,Job h,User user) throws Exception{
+		try{
+
+			//check documentNo
+			if(Utils.isNull(h.getJobId()).equals("")){
+				//Gen JobId
+				h.setJobId(genJobId()+"");
+				saveAllModel(conn, h);
+			}
+		
+			return h;
+		}catch(Exception e){
+		
+		  throw e;
+		}finally{
+		}
+	}
+	
 	// ( Running :  yyyymm+running  เช่น 201403001 )			
 	 private static int genJobId() throws Exception{
 		 int seq = 0;

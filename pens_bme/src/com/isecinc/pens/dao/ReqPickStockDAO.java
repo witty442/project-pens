@@ -9,13 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Onhand;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -417,7 +415,7 @@ public class ReqPickStockDAO extends PickConstants{
 		return totalRecord;
 	}
 	
-	public static int getTotalRowInStockIssueItemCaseNoEdit(Connection conn,ReqPickStock p) throws Exception {
+	public static int getTotalRowInStockIssueItemCaseNoEditByGroupCode(Connection conn,ReqPickStock p) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -425,13 +423,51 @@ public class ReqPickStockDAO extends PickConstants{
 		try {
 			// substract from Stock issue status = O(Open)
 			sql.append("\n  select count(*) as total_row FROM( ");
-			sql.append("\n 	  SELECT distinct group_code ,pens_item ,material_master,barcode ");
+			sql.append("\n 	  SELECT distinct group_code ,pens_item  ");
 			sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 	  WHERE 1=1  ");
 			sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
 			sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
 			if( !Utils.isNull(p.getGroupCode()).equals("")){
-				sql.append("\n 		   AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
+				sql.append("\n 	AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
+			}
+			sql.append("\n )");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+			   totalRecord = rst.getInt("total_row");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRecord;
+	}
+	
+	public static int getTotalRowInStockIssueItemCaseNoEditByItem(Connection conn,ReqPickStock p) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalRecord = 0;
+		try {
+			// substract from Stock issue status = O(Open)
+			sql.append("\n  select count(*) as total_row FROM( ");
+			sql.append("\n 	  SELECT distinct group_code ,pens_item,material_master,barcode  ");
+			sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 	  WHERE 1=1  ");
+			sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
+			if( !Utils.isNull(p.getGroupCode()).equals("")){
+				sql.append("\n 	AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
 			}
 			sql.append("\n )");
 			
@@ -464,30 +500,31 @@ public class ReqPickStockDAO extends PickConstants{
 			//Edit
 			if( !p.isNewReq()){
 				sql.append("\n SELECT count(*) as total_row FROM(");
-				sql.append("\n    SELECT distinct group_code FROM( ");
-				sql.append("\n       SELECT group_code, sum(onhand_qty) as onhand_qty FROM( ");
-				sql.append("\n         SELECT group_code ,sum(onhand_qty) as onhand_qty");
+				sql.append("\n    SELECT M2.group_code,M2.pens_item FROM( ");
+				sql.append("\n       SELECT group_code,pens_item, sum(onhand_qty) as onhand_qty FROM( ");
+				sql.append("\n         SELECT group_code,pens_item ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
 				sql.append("\n  	   from PENSBME_STOCK_FINISHED ");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		   WHERE group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
-				sql.append("\n  	   GROUP BY group_code ");
+				sql.append("\n  	   GROUP BY group_code,pens_item ");
 				sql.append("\n         UNION ALL ");
-				sql.append("\n 		   SELECT group_code ,( (-1) * sum(req_qty) )as onhand_qty");
+				sql.append("\n 		   SELECT group_code ,pens_item,( (-1) * sum(req_qty) )as onhand_qty");
 				sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 		   WHERE 1=1  ");
 				sql.append("\n 		   AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 		   AND h.issue_req_no <> '"+p.getIssueReqNo()+"'");
+				sql.append("\n 		   AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		   AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
-				sql.append("\n  	   GROUP BY group_code ");
-				sql.append("\n       ) GROUP BY group_code ");
-				sql.append("\n    ) WHERE onhand_qty > 0 ");
+				sql.append("\n  	   GROUP BY group_code,pens_item ");
+				sql.append("\n       ) GROUP BY group_code ,pens_item ");
+				sql.append("\n    )M2 WHERE onhand_qty > 0 ");
 				
 				sql.append("\n    UNION  ");
 				 // substract from Stock issue status = O(Open)
-				sql.append("\n 	  SELECT distinct group_code ");
+				sql.append("\n 	  SELECT distinct group_code ,pens_item ");
 				sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 	  WHERE 1=1  ");
 				sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
@@ -499,13 +536,12 @@ public class ReqPickStockDAO extends PickConstants{
 				
 			}else{
 				//Case Add new check onhand_qty > 0
-				sql.append("\n SELECT count(*) as total_row from(");
-				sql.append("\n  SELECT distinct M2.group_code from( ");
+				sql.append("\n SELECT count(*) as total_row from( ");
+				sql.append("\n  SELECT M2.* from( ");
 				sql.append("\n    SELECT M.group_code,M.pens_item,NVL(SUM(onhand_qty),0) as onhand_qty,0 as qty FROM ( ");
-				sql.append("\n  	 select group_code,pens_item,onhand_qty  ");
+				sql.append("\n  	 select group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty ");
 				sql.append("\n  	 from PENSBME_STOCK_FINISHED ");
 				sql.append("\n  	 where 1=1   ");
-				sql.append("\n  	 and onhand_qty <> 0 ");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		   AND group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
@@ -517,12 +553,12 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n 		 AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 		 AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
-					sql.append("\n 		   AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
+					sql.append("\n 		AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
 				sql.append("\n     )M  ");
 				sql.append("\n    GROUP BY M.group_code,M.pens_item");
 				sql.append("\n   )M2 WHERE M2.ONHAND_QTY > 0");
-				sql.append("\n )");
+				sql.append("\n ) ");
 			}
 		
 			logger.debug("sql:"+sql);

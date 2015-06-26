@@ -267,14 +267,14 @@ public class MTTBeanDAO{
 		int c = 1;
 		int totalQty = 0;
 		try {
-			sql.append("\n select line_id,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM ,count(*) as qty" +
+			sql.append("\n select line_id,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,Whole_Price_BF ,count(*) as qty" +
 					" from PENSBME_BARCODE_SCAN_ITEM ");
 			
 			sql.append("\n where 1=1   \n");
 			if( !Utils.isNull(o.getDocNo()).equals("")){
 				sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 			}
-            sql.append("\n group by line_id,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM");
+            sql.append("\n group by line_id,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,Whole_Price_BF");
 			sql.append("\n order by doc_no,line_id ");
 			logger.debug("sql:"+sql);
 			
@@ -290,6 +290,7 @@ public class MTTBeanDAO{
                h.setGroupCode(Utils.isNull(rst.getString("GROUP_CODE")));
                h.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
                h.setQty(rst.getInt("qty"));
+               h.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"), Utils.format_current_2_disgit));
                
                totalQty += h.getQty();
                
@@ -453,9 +454,9 @@ public class MTTBeanDAO{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBME_BARCODE_SCAN_ITEM \n");
 				sql.append(" (DOC_NO, LINE_ID,BARCODE,MATERIAL_MASTER, ");
-				sql.append("  GROUP_CODE,PENS_ITEM,CREATE_DATE,CREATE_USER)  \n");
+				sql.append("  GROUP_CODE,PENS_ITEM,CREATE_DATE,CREATE_USER,Whole_Price_BF)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 				int c =1;
@@ -468,6 +469,7 @@ public class MTTBeanDAO{
 				ps.setString(c++, o.getPensItem());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
+				ps.setDouble(c++, Utils.convertStrToDouble(o.getWholePriceBF()));
 				
 				ps.executeUpdate();
 				

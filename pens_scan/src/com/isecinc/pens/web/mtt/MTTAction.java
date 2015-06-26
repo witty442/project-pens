@@ -143,19 +143,19 @@ public class MTTAction extends I_Action {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='5'>Scan Barcode</td> \n");
+			h.append("<td align='left' colspan='6'>Scan Barcode</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='5' >วันที่ทำรายการ:"+form.getBean().getDocDate()+"</td> \n");
+			h.append("<td align='left' colspan='6' >วันที่ทำรายการ:"+form.getBean().getDocDate()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='5' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
+			h.append("<td align='left' colspan='6' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='5' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
+			h.append("<td align='left' colspan='6' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -170,6 +170,7 @@ public class MTTAction extends I_Action {
 				  h.append("<td>Wacoal Mat.</td> \n");
 				  h.append("<td>GroupCode</td> \n");
 				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Whole Proce BF</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -177,11 +178,11 @@ public class MTTAction extends I_Action {
 					h.append("<tr> \n");
 					  h.append("<td>"+s.getNo()+"</td> \n");
 					  
-					  h.append("<td class='num'>"+s.getBarcode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
 					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 					  h.append("<td>"+s.getGroupCode()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
-					  
+					  h.append("<td class='num'>"+s.getWholePriceBF()+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");
@@ -332,6 +333,7 @@ public class MTTAction extends I_Action {
 			String[] materialMaster = request.getParameterValues("materialMaster");
 			String[] groupCode = request.getParameterValues("groupCode");
 			String[] pensItem = request.getParameterValues("pensItem");
+			String[] wholePriceBF = request.getParameterValues("wholePriceBF");
 			
 			logger.debug("barcode:"+barcode.length);
 			int maxLineId = 0;
@@ -351,7 +353,7 @@ public class MTTAction extends I_Action {
 						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
 						 l.setGroupCode(Utils.isNull(groupCode[i]));
 						 l.setPensItem(Utils.isNull(pensItem[i]));
-						
+						 l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());
 						 itemList.add(l);

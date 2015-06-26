@@ -19,6 +19,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 
 /**
@@ -60,15 +61,14 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	String url =  "/jsp/mcAction.do?do=prepareMCStaff&action=new";
-	    	String pageAction = url.substring(url.indexOf("jsp")+4,url.indexOf(".do"));
-	    	String doAction = url.substring(url.indexOf("do=")+3,url.indexOf("&"));
-	    	String action = url.substring(url.indexOf("action")+7,url.length());
-	    	
-	    	System.out.println("pageAction:"+pageAction);
-	    	System.out.println("doAction:"+doAction);
-	    	System.out.println("action:"+action);
-	    	
+	    	String dateStr = "01/10/2558";
+			// dd/mm/yyyy
+		    String dd = dateStr.substring(0,2);
+		    String mm = dateStr.substring(3,5);
+		    String yyyy = dateStr.substring(6,10);
+		    
+		    System.out.println(dd+","+mm+","+yyyy);
+		    
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -268,6 +268,20 @@ public class Utils {
 		return currencyStr;
 	}
 	
+	public static String convertToCurrencyStr(int s) {
+		String currencyStr = "0.00";
+		try{
+			 Double d = new Double(s);
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(CURRENCY_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+
 	public static int convertToYearBushdish(int christYear){
 		return christYear+543;
 	}
@@ -641,6 +655,7 @@ public class Utils {
 		if (str ==null || "".equals(str)){
 			return 0;
 		}
+		str= str.replaceAll("\\,", "");
 		return Integer.parseInt(str);
 	}
 	
@@ -944,4 +959,15 @@ public class Utils {
 		return StringUtils.join(valuesText, ","); 
 	}
 	
+   public static String converToTextSqlIn(List<StoreBean> value){
+		List<String> valuesText = new ArrayList<String>() ;
+		
+		if(value != null && value.size() >0){
+			for(int i=0;i<value.size();i++){
+				StoreBean s= value.get(i);
+				valuesText.add("'"+s.getStoreCode()+"'");
+			}
+		}
+		return StringUtils.join(valuesText, ","); 
+	}
 }

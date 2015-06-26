@@ -5,6 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Properties;
+
+import oracle.jdbc.driver.OracleConnection;
 
 import org.apache.log4j.Logger;
 
@@ -41,6 +44,32 @@ public class DBConnection {
 		}
 		return _instanceInf;
 	}
+	
+/*	public  Connection getConnection1(){		
+		Connection _instanceInf =null;
+		try {	
+
+			//String driver = env.getProperty("db.driver_class");
+			String url = env.getProperty("db.url");
+			String username = env.getProperty("db.username");
+			String password = env.getProperty("db.password");
+			
+			logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			
+			Properties props = new Properties();
+			props.setProperty("user", username);
+			props.setProperty("password", password);
+			props.setProperty(OracleConnection.CONNECTION_PROPERTY_THIN_NET_CONNECT_TIMEOUT, "2000");
+
+			_instanceInf = DriverManager.getConnection(url, props);
+			
+			logger.debug("Connection:"+_instanceInf);
+			
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);			
+		}
+		return _instanceInf;	
+	}*/
 	
 	public  Connection getConnection1(){		
 		Connection _instanceInf =null;

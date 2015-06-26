@@ -402,6 +402,7 @@ function sumQty(){
 							int no= start;
 							String titleDisp ="";
 							int index = 0;
+							
 							for(int i=0;i<resultList.size();i++){
 							   ReqPickStock o = (ReqPickStock) resultList.get(i);
 							   //System.out.println("issueQty:"+o.getIssueQty());

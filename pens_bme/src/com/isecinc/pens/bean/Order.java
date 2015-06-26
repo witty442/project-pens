@@ -38,7 +38,7 @@ public class Order implements Serializable{
     private String wholePriceBF;
     private String retailPriceBF;
     
-
+    private double creditLimit;
 	private String exported;
 	private String createDate;
 	private String createUser;
@@ -57,6 +57,12 @@ public class Order implements Serializable{
     private String color;
 	
 	
+	public double getCreditLimit() {
+		return creditLimit;
+	}
+	public void setCreditLimit(double creditLimit) {
+		this.creditLimit = creditLimit;
+	}
 	public String getStoreName() {
 		return storeName;
 	}

@@ -364,10 +364,8 @@ public class ConfPickStockAction extends I_Action {
 					 l.setCreateUser(user.getUserName());
 					
 					 //Key Map  
-					 String key = l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
-					 if( !Utils.isNull(l.getIssueQty()).equals("")){
-						 dataSaveMapAll.put(key, l);
-					 }
+					 String key = p.getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
+					 dataSaveMapAll.put(key, l);
 					 
 				}//for
 			}//if
@@ -407,10 +405,8 @@ public class ConfPickStockAction extends I_Action {
 				 results.set(i, l);
 				 
 				 //Key Map  
-				 String key = l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
-				 if( !Utils.isNull(l.getIssueQty()).equals("")){
-					 dataSaveMapAll.put(key, l);
-				 }
+				 String key = aForm.getBean().getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
+				 dataSaveMapAll.put(key, l); 
 				 
 			}//for
 		}//if
@@ -440,7 +436,7 @@ public class ConfPickStockAction extends I_Action {
 			for(int i=0;i<results.size();i++){
 				ReqPickStock l = (ReqPickStock)results.get(i);
 				//Key Map  
-				 String key = l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
+				 String key = aForm.getBean().getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
 				 if(dataSaveMapAll.get(key) != null){
 					 ReqPickStock pOld = (ReqPickStock) dataSaveMapAll.get(key); 
 					 logger.debug("pOld.getIssueQty():"+pOld.getIssueQty());
@@ -489,6 +485,7 @@ public class ConfPickStockAction extends I_Action {
 		ConfPickStockForm aForm = (ConfPickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		Connection conn = null;
+		boolean validate = true;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -510,6 +507,11 @@ public class ConfPickStockAction extends I_Action {
 					while(its.hasNext()){
 					   String key = (String)its.next();
 					   ReqPickStock p = (ReqPickStock)dataSaveMapAll.get(key);
+					   
+					   //Check case Exception
+					   if(Utils.convertStrToInt(p.getIssueQty()) > Utils.convertStrToInt(p.getQty())){
+						  // validate = false;
+					   }                              
 
 					   p.setStatus(ConfPickStockDAO.STATUS_ISSUED);//ISSUE
 					   p.setUpdateUser(user.getUserName());
@@ -518,22 +520,26 @@ public class ConfPickStockAction extends I_Action {
 					}
 			}
 
-			//Balance Onhand
-			OnhandProcess.processUpdateBalanceOnhandByIssueReqNo(conn,h);
-			
-			conn.commit();
-			
-			//new search
-			h.setNewReq(false);
-			h.setNewSearch(true);
-	        h = searchBypage(conn, h, request);
-	        
-			request.getSession().setAttribute("results", h.getItems());
-			
-			aForm.setBean(h);
+			if(validate){
+				//Balance Onhand
+				OnhandProcess.processUpdateBalanceOnhandByIssueReqNo(conn,h);
 				
-			request.setAttribute("Message", "ยืนยันรายการ เรียบร้อยแล้ว");
-			
+				conn.commit();
+				
+				//new search
+				h.setNewReq(true);
+				h.setNewSearch(true);
+		        h = searchBypage(conn, h, request);
+		        
+				request.getSession().setAttribute("results", h.getItems());
+				
+				aForm.setBean(h);
+					
+				request.setAttribute("Message", "ยืนยันรายการ เรียบร้อยแล้ว");
+			}else{
+				//error 
+				
+			}
 		} catch (Exception e) {
 			conn.rollback();
 			logger.error(e.getMessage(),e);

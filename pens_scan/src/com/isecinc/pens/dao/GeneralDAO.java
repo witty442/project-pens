@@ -164,7 +164,7 @@ public class GeneralDAO {
 			Connection conn = null;
 			Barcode b = null;
 			try {
-				sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM  ");
+				sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF  ");
 				sql.append("\n  from PENSBME_ONHAND_BME_LOCKED M   ");
 				sql.append("\n  where 1=1 ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
@@ -184,7 +184,7 @@ public class GeneralDAO {
 					b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
 					b.setGroupCode(rst.getString("group_item"));
 					b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
-					//b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+					b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
 					//b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_invat"), Utils.format_current_2_disgit));
 				}//while
 

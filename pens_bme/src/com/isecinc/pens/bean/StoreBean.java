@@ -23,8 +23,36 @@ public class StoreBean implements Serializable{
 	private String groupCode;
 	private String size;
 	private String color;
+	private double limitAmt;
+	private String custGroup;
+	private String storeNo;
+	private String storeStyle;
 	
 	
+	public String getStoreStyle() {
+		return storeStyle;
+	}
+	public void setStoreStyle(String storeStyle) {
+		this.storeStyle = storeStyle;
+	}
+	public String getStoreNo() {
+		return storeNo;
+	}
+	public void setStoreNo(String storeNo) {
+		this.storeNo = storeNo;
+	}
+	public String getCustGroup() {
+		return custGroup;
+	}
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+	public double getLimitAmt() {
+		return limitAmt;
+	}
+	public void setLimitAmt(double limitAmt) {
+		this.limitAmt = limitAmt;
+	}
 	public String getGroupCode() {
 		return groupCode;
 	}

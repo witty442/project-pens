@@ -255,6 +255,9 @@ TABLE.result TD {
 	background-color: #FFBBFF;
 }
 
+.storeError {
+	background-color: #FF0000;
+}
 <!--Line Group By -->
 
 .lineGroupBy {

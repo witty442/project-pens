@@ -70,6 +70,7 @@
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
+		<form-bean name="genCNForm" type="com.isecinc.pens.web.cn.GenCNForm" />
 		
 		<form-bean name="sumGroupCodeForm" type="com.isecinc.pens.web.summary.groupCode.SummaryForm" />
 		<!-- Admin Console -->
@@ -406,6 +407,12 @@
 			<forward name="search" path="/jsp/pick/moveWarehouse.jsp" />
 			<forward name="prepare" path="/jsp/pick/moveWarehouse.jsp" />
 			<forward name="clear" path="/jsp/pick/moveWarehouse.jsp" />
+		</action>
+		
+		<action name="genCNForm" path="/jsp/genCNAction" parameter="do" scope="session" type="com.isecinc.pens.web.cn.GenCNAction">
+			<forward name="search" path="/jsp/main/genCN.jsp" />
+			<forward name="prepare" path="/jsp/main/genCN.jsp" />
+			<forward name="clear" path="/jsp/main/genCN.jsp" />
 		</action>
 		
 		 <action name="tempForm" path="/jsp/printGroupCodeBoxAction" parameter="do" scope="request" type="com.isecinc.pens.web.popup.PrintGroupCodeAction">

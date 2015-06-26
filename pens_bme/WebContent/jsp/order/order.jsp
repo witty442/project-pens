@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -11,10 +14,8 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
@@ -95,6 +96,24 @@ function loadMe(){
 	 <%if(request.getAttribute("Message") != null){ %>
 		 alert("<%=Utils.isNull(request.getAttribute("Message"))%>");
 	 <%} %>
+	 
+	 <%if( Utils.isNull(request.getAttribute("validateStore")).equals("false")){ %>
+        //alert("ร้านค้า  Over Credit Limit ");
+        deleteOrderInPage();
+     <%} %>
+}
+
+function deleteOrderInPage(){
+	var orderDate =$('#orderDate').val();
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/ajax/deleteOrderInPageAjax.jsp",
+		data : "orderDate="+orderDate,
+		async: true,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
 }
 
 function search(path){
@@ -112,12 +131,14 @@ function search(path){
 function save(path){
 	var form = document.orderForm;
 	var orderDate =$('#orderDate').val();
+	var pageNumber =$('#pageNumber').val();
+	
 	if(orderDate ==""){
 		alert("กรุณากรอกวันที่ Order");
 		return false;
 	}
 	
-	form.action = path + "/jsp/orderAction.do?do=save";
+	form.action = path + "/jsp/orderAction.do?do=save&pageNumber="+pageNumber;
 	form.submit();
 	return true;
 }
@@ -127,12 +148,14 @@ function gotoPage(path,pageNumber){
 	
 	//if(confirm("ข้อมูลในหน้านี้ จะถูกบันทึก กรุณากดปุ่มเพื่อยืนยันการบันทึก และไปหน้าถัดไป ")){
 		var orderDate =$('#orderDate').val();
+		var prevPageNumber =$('#pageNumber').val();
+
 		if(orderDate ==""){
 			alert("กรุณากรอกวันที่ Order");
 			return false;
 		}
 		
-		form.action = path + "/jsp/orderAction.do?do=search&action=save&pageNumber="+pageNumber;
+		form.action = path + "/jsp/orderAction.do?do=search&action=save&pageNumber="+pageNumber+"&prevPageNumber="+prevPageNumber;
 		form.submit();
 		return true;
 	//}
@@ -189,13 +212,41 @@ function chkQtyKeypress(obj,e,col,row){
 }
 
 function validateQty(obj,col,row){
+	var sumInRow = sumQtyInRow(row);
+	validateQtyModel(obj,col,row,sumInRow);
+}
+
+function validateLimit(obj,col,row,sumInRow){
+	
+	var r = isNum(obj);
+	var wholePriceBF  = parseFloat($('#wholePriceBF_'+row).val());
+	var limitAmt = parseFloat($('#limit_'+col+"_"+row).val());
+	
+	if(r && limitAmt >= 0){
+		//validate Onhand Qty
+		var currQty = parseInt(obj.value);
+		var curAmt = wholePriceBF*currQty;
+		
+		//alert("onhandQty["+onhandQty+"],currQty["+currQty+"],sumInRowNotCurr["+sumInRowNotCurr+"],remainQty["+remainQty+"]");
+		
+		if(curAmt > limitAmt){
+			alert("ข้อมูลเกิน Credit Limit");
+			//obj.value = "";	
+			
+			obj.focus();
+			return false;
+		}
+	}
+	return true;
+}
+
+function validateQtyModel(obj,col,row,sumInRow){
 	
 	var r = isNum(obj);
 	var onhandQty =$('#onhandQty_'+row).val();
 	if(r){
 		//validate Onhand Qty
 		var currQty = parseInt(obj.value);
-		var sumInRow = sumQtyInRow(row);
 		var sumInRowNotCurr = sumInRow - currQty;
 		var remainQty = onhandQty - sumInRowNotCurr;
 		var remainCalcQty = 0;
@@ -440,7 +491,12 @@ function isNum(obj){
 					   if(Utils.isNull(request.getAttribute("action")).equalsIgnoreCase("newsearch")){
 						  pageNumber = 1;
 					   }else{
-					      pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+						   //Case Validate Error 
+						   if( Utils.isNull(request.getAttribute("validateStore")).equals("false")){
+							   pageNumber = Utils.convertStrToInt((String)request.getAttribute("prevPageNumber")); 
+						   }else{
+							   pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+						   }
 					   }
 					   
 					   start = ((pageNumber-1)*pageSize)+1;
@@ -481,8 +537,9 @@ function isNum(obj){
 		                if(storeList != null && storeList.size()>0){ 
 		               	  for(int k=0;k<storeList.size();k++){
 		                        StoreBean s = (StoreBean)storeList.get(k);
+		                        String storeColumnClass = s.getStoreStyle();
 		                %>
-		                         <th width="5%"><%=s.getStoreDisp() %></th>
+		                         <th width="5%" class="<%=storeColumnClass%>"><%=s.getStoreDisp() %></th>
 		                <%
 		                       }//for 2
 		                   }//if 
@@ -521,8 +578,9 @@ function isNum(obj){
 					                if(storeList != null && storeList.size()>0){ 
 					               	  for(int k=0;k<storeList.size();k++){
 					                        StoreBean s = (StoreBean)storeList.get(k);
+					                        String storeColumnClass = s.getStoreStyle();
 					                %>
-					                         <th  width="5%"><%=s.getStoreDisp() %></th>
+					                         <th  width="5%" class="<%=storeColumnClass%>"><%=s.getStoreDisp() %></th>
 					                <%
 					                       }//for 2
 					                   }//if 
@@ -538,7 +596,7 @@ function isNum(obj){
 						       <td><input type="text" name="onhandQty_<%=i%>" id="onhandQty_<%=i%>"  readonly value="<%=o.getOnhandQty()%>" size="3" class="disableText"></td>	
 						       <td><input type="text" name="retailPriceBF" value="<%=o.getRetailPriceBF()%>" readonly size="5" class="disableText">
 						       
-						       <input type="hidden" name="wholePriceBF" value="<%=o.getWholePriceBF()%>" readonly size="5" class="disableText">
+						       <input type="hidden" name="wholePriceBF" id="wholePriceBF_<%=i%>" value="<%=o.getWholePriceBF()%>" readonly size="5" class="disableText">
 						       <input type="hidden" name="barcode" value="<%=o.getBarcode()%>" readonly size="12" class="disableText">
 						       <!-- Hidden For get value -->
 						       <input type="hidden" name="onhandQty"  value="<%=o.getOnhandQty()%>">
@@ -548,21 +606,26 @@ function isNum(obj){
 						        <%if(o.getStoreItemList() != null && o.getStoreItemList().size()>0){ 
 						        	for(int c=0;c<o.getStoreItemList().size();c++){
 						              StoreBean storeItem = (StoreBean)o.getStoreItemList().get(c);
-						             
+						              
+						              String storeColumnClass = storeItem.getStoreStyle();
+						              
+						             // System.out.println("Barcocde:"+o.getBarcode()+",storeCode:"+storeItem.getStoreCode()+",LimitAmt:"+storeItem.getLimitAmt());
+						              
 						              tabindex++;
 						              //disp
-						              StoreBean storeDisp = (StoreBean)storeList.get(c);
+						              //StoreBean storeDisp = (StoreBean)storeList.get(c);
 						              
 						         %>
-						              <td>  
+						              <td  class="<%=storeColumnClass%>">  
 						                 <input type="text" name="qty_<%=c%>_<%=i%>" id="qty_<%=c%>_<%=i%>" 
 						                        value="<%=Utils.isNull(storeItem.getQty())%>" tabindex="<%=tabindex%>" size="3" 
 						                        onkeypress="chkQtyKeypress(this,event,'<%=c%>','<%=i%>')"
 						                        onchange="validateQty(this,'<%=c%>','<%=i%>')"
 						                        title="<%=titleDisp %>"
 						                        />
-						                      <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getOrderNo())%>">
-						                      <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getBarOnBox())%>">
+						                  
+						                   <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getOrderNo())%>">
+						                   <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getBarOnBox())%>">
 						             </td>
 						         <%
 						             }//for 2
@@ -588,9 +651,12 @@ function isNum(obj){
 					
 					<!-- hidden field -->
 					<input type="hidden" name="maxColumns" id="maxColumns" value="<%=storeList!=null?storeList.size():0%>"/>
-					<input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
+					PageNumber:<input type="text" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
+					
+					
 					</html:form>
 					<!-- BODY -->
+					
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>

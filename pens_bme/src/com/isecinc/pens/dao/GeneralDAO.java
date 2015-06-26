@@ -13,7 +13,9 @@ import util.Constants;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
+import com.isecinc.pens.bean.GenCNBean;
 import com.isecinc.pens.bean.Master;
+import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -244,7 +246,45 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return b;
-		}
+	}
+	 
+	 public static Barcode searchProductByPensItemModelBMELocked(Connection conn,String pensItem) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Barcode b = null;
+			try {
+				sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
+				sql.append("\n  from pensbi.PENSBME_ONHAND_BME_LOCKED M   ");
+				sql.append("\n  where 1=1 ");
+				sql.append("\n  and M.PENS_ITEM ='"+pensItem+"'");
+                sql.append("\n  order by BARCODE desc");
+                
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					b = new Barcode();
+					b.setBarcode(rst.getString("barcode"));
+					b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+					b.setGroupCode(rst.getString("group_item"));
+					b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+					b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+					b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				
+				} catch (Exception e) {}
+			}
+			return b;
+	}
 	 
 	 public static Barcode searchProductByBarcodeMTT(PopupForm c) throws Exception {
 			Statement stmt = null;
@@ -606,6 +646,45 @@ public class GeneralDAO {
 			}
 			return storeName;
 		}
+	 
+	 public static StoreBean getStoreBeanModel(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			StoreBean s = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select *  ");
+				sql.append("\n FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
+				sql.append("\n AND pens_value ='"+storeCode+"' \n");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					s = new StoreBean();
+					s.setStoreCode(Utils.isNull(rst.getString("pens_value")));
+					s.setStoreName(Utils.isNull(rst.getString("pens_desc")));
+					s.setStoreNo(Utils.isNull(rst.getString("interface_value")));
+					//CustGroup
+					//020049-1
+					s.setCustGroup(s.getStoreCode().substring(0,6));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return s;
+		}
+	 
 	 
 	 public static String getCustNoOracleMTT(Connection conn,String storeCode) throws Exception {
 			Statement stmt = null;
