@@ -157,6 +157,21 @@ public class SummaryAction extends I_Action {
 					summaryForm.setOnhandSummaryLotusResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
+			}else if("bmeTrans".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				List<OnhandSummary> results = new SummaryDAO().searchBmeTrans(summaryForm.getOnhandSummary(),user);
+				if (results != null  && results.size() >0) {
+					summaryForm.setOnhandSummaryBmeTransResults(results);
+					
+					//logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
+					ImportDAO importDAO = new ImportDAO();
+					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+					if(m != null)
+					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+					
+				} else {
+					summaryForm.setOnhandSummaryBmeTransResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
 				
 			}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				//Validate Initial Date

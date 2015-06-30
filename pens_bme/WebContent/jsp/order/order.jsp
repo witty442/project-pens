@@ -651,7 +651,7 @@ function isNum(obj){
 					
 					<!-- hidden field -->
 					<input type="hidden" name="maxColumns" id="maxColumns" value="<%=storeList!=null?storeList.size():0%>"/>
-					PageNumber:<input type="text" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
+				    <input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
 					
 					
 					</html:form>

@@ -556,8 +556,10 @@ public class OrderDAO {
 			sql.append("\n SELECT a.*, rownum r__ ");
 			sql.append("\n FROM ( ");
 			sql.append("\n  SELECT s.* FROM( ");
-				sql.append("\n  SELECT h.store_code,h.order_date,h.item,h.group_code,h.barcode" +
-						"      ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");		
+				sql.append("\n  SELECT h.store_code,h.order_date,h.item,h.group_code,h.barcode" );
+				sql.append("\n       ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");	
+				sql.append("\n       ,(select max(L.material_master) from PENSBME_ONHAND_BME_LOCKED L ");
+				sql.append("\n         where L.barcode = h.barcode) as material_master ");
 				sql.append("\n  from PENSBME_ORDER h where 1=1  ");
 				
 				if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
@@ -606,7 +608,7 @@ public class OrderDAO {
 				item.setItem(rst.getString("item"));
 				item.setBarcode(rst.getString("BARCODE"));
 				item.setQty(rst.getString("QTY"));
-				
+				item.setMaterialMaster(rst.getString("material_master"));
 				item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+" ");
 				item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("Retail_Price_BF"),Utils.format_current_2_disgit)+" ");
 				

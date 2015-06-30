@@ -337,6 +337,7 @@ function resetStore(){
 		                  <th width="4%">Order Date</th>
 		                  <th width="3%">Pens Item</th>
 		                  <th width="5%">Group Code</th>
+		                  <th width="5%">Material Master</th>
 		                  <th width="3%">Barcode</th>
 		                  <th width="3%">QTY</th>
 		                  <th width="3%">Whole Price</th>
@@ -359,10 +360,11 @@ function resetStore(){
 						%>
 					
 						<tr class="<%=classStyle%>">
-						     <td><%=o.getStoreCode()%></td>
-						     <td><%=o.getOrderDate()%></td>
+						    <td><%=o.getStoreCode()%></td>
+						    <td><%=o.getOrderDate()%></td>
 							<td><%=o.getItem()%></td>
 							<td><%=o.getGroupCode()%></td>
+							<td><%=o.getMaterialMaster()%></td>
 							<td><%=o.getBarcode()%></td>
 							<td><%=o.getQty()%></td>
 							<td><%=o.getWholePriceBF()%></td>

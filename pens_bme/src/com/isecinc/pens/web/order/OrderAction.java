@@ -1291,6 +1291,7 @@ public class OrderAction extends I_Action {
 				   h.append("<td>Order Date</td>");
 				   h.append("<td>Pens Item</td>");
 				   h.append("<td>Group Code </td>");
+				   h.append("<td>Material Master</td>");
 				   h.append("<td>Barcode</td>");
 				   h.append("<td>QTY </td>");
 				   h.append("<td>Whole Price</td>");
@@ -1305,6 +1306,7 @@ public class OrderAction extends I_Action {
 		  				    h.append("<td>"+o.getOrderDate()+"</td>");
 		  				    h.append("<td>"+o.getItem()+"</td>");
 		  				    h.append("<td>"+o.getGroupCode()+"</td>");
+		  				    h.append("<td>"+o.getMaterialMaster()+"</td>");
 		  				    h.append("<td class='text'>"+o.getBarcode()+"</td>");
 		  				    h.append("<td class='num'>"+o.getQty()+"</td>");
 		  				    h.append("<td>"+o.getWholePriceBF()+"</td>");

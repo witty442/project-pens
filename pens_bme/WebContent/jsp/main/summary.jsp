@@ -74,8 +74,10 @@ function loadMe(){
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
      <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
-	 <%} %>
-	 
+	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
+	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
+	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
+	 <%}%>
 }
 
 function search(path){
@@ -156,6 +158,20 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   } 
+	  
+   <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
+	   var asOfDateFrom = form.asOfDateFrom.value;
+	   var asOfDateTo = form.asOfDateTo.value;
+	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
+	   if(asOfDateFrom =="" || asOfDateTo==""){ 
+		   alert("กรุณากรอกข้อมูลวันที่  From-To");
+		   return false;
+	   }
+	    if(pensCustCodeFrom ==""){ 
+		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+		   return false;
+	   }   
    <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
 		   var asOfDateFrom = form.salesDate.value;
 		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
@@ -393,6 +409,10 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEByGroupCode"/>
 				</jsp:include>
+			<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMETransaction"/>
+				</jsp:include>
 			<%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -619,6 +639,43 @@ function getCustName(custCode,fieldName,storeType){
 									<td align="left" width="30%">&nbsp;</td>
 							   </tr>
 							   
+						<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {
+							    storeType ="";
+								%>
+						        <tr>
+									<td align="right">จาก วันที่ <font color="red">*</font>&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
+									</td>
+									<td align="left" width="30%">ถึง วันที่&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateTo" styleId="asOfDateTo"/></td>
+								</tr>
+						       <tr>
+									<td align="right">รหัสร้านค้า<font color="red">*</font>
+									  &nbsp;&nbsp;
+									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
+									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>')"/>
+									</td>
+									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
+								</tr>
+								<tr>
+									<td align="right" width="30%">
+									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
+									     &nbsp;
+									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
+									</td>
+									<td align="left" width="30%">
+									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
+									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									    <html:text property="onhandSummary.group" styleId="group" />
+									    &nbsp;
+									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
+									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
+									     
+									  </td>
+									<td align="left" width="30%">&nbsp;</td>
+							   </tr>
 						<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 						
 						        <tr>
@@ -713,6 +770,25 @@ function getCustName(custCode,fieldName,storeType){
 
 						<br/>
 							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryLotusResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+							    
+							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
+							    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
+							    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
+							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
+							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
+							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
+							    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="lotus_adjustQty"/>	
+							    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="lotus_stockShortQty"/>	
+							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
+							    				
+							</display:table>
+                    </c:if>
+                    
+                     <c:if test="${summaryForm.onhandSummaryBmeTransResults != null}">
+
+						<br/>
+							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryBmeTransResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
 							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
 							    
 							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
