@@ -435,7 +435,12 @@ public class ModifierProcess {
 					shipDate = oline.getShippingDate();
 					requestDate = oline.getRequestDate();
 					
-					promotionalGoodProcess(oline.getQty());
+					//if(ModifierControl.getMethodPromotiomGoodsControl().equalsIgnoreCase(ModifierControl.METHOD_PROMOTION_GOODS_2)){
+						 //promotionalGoodProcess2(oline.getQty());
+					//}else{
+					     //default 1
+					     promotionalGoodProcess(oline.getQty());
+					//}
 				}
 			} else {
 				if(isDebug){
@@ -897,12 +902,13 @@ public class ModifierProcess {
 			// get relate line
 			boolean baseUOM = true;
 			for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
+				
 				price = 0;discount = 0;qty = 0;
 				baseUOM = true;
 
 				oLine = new OrderLine();
 				if(isDebug){
-				  logger.info("Attr.Product Attibute[" + mrline.getAttr().getProductAttribute()+"] Attibute Value[" + mrline.getAttr().getAttributeValueLabel()+"]");
+				  logger.info("Attr.mid["+mrline.getId()+"]Product Attibute[" + mrline.getAttr().getProductAttribute()+"] Attibute Value[" + mrline.getAttr().getAttributeValueLabel()+"]");
 				}
 				
 				if (mrline.getAttr().getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
@@ -910,7 +916,194 @@ public class ModifierProcess {
 					oLine.setProduct(mrline.getAttr().getProduct());
 					
 					if(isDebug){
-					  logger.info(mrline.getAttr().getProduct().getUom().getId());
+					  logger.info("Promotion Type:"+mrline.getAttr().getProduct().getUom().getId());
+					}
+				}
+				if (!mrline.getAttr().getProductUOM().getId().equalsIgnoreCase(mrline.getAttr().getProduct().getUom().getId())) {
+					baseUOM = false;
+				}
+
+				pps = new MProductPrice().getCurrentPrice(String.valueOf(oLine.getProduct().getId()), String.valueOf(mrline.getPricelistId()), mrline.getAttr().getProductUOM().getId());
+				for (ProductPrice pp : pps){
+					price = pp.getPrice();
+				}
+				
+				if (mrline.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodPercent())) {
+					if (mrline.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
+						discount = price * mrline.getValues() * 100;
+					}
+					if(isDebug){
+					  logger.info(" Method[AMT Percent] :result discount["+discount+"]");
+					}
+				}
+				if (mrline.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodAMT())) {
+					if (mrline.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
+						discount = mrline.getValues();
+					}
+					
+					if(isDebug){
+					  logger.info(" Method[AMT] :result discount["+discount+"]");
+					}
+				}
+				
+				if (mrline.getApplicationMethod().equalsIgnoreCase(BeanParameter.getAppMethodNewPrice())) {
+					price = mrline.getValues();
+				}
+				
+				qty = round * mrline.getBenefitQty();
+
+				logger.info("new Promotion Qty["+ qty+"]");
+				  
+				if (baseUOM) {
+					oLine.setUom(mrline.getAttr().getProductUOM());
+					oLine.setPrice(price);
+					oLine.setQty(qty);
+					oLine.setLineAmount(price * qty);
+					oLine.setDiscount(discount);
+					oLine.setTotalAmount(oLine.getLineAmount() - discount);
+
+					oLine.setUom1(mrline.getAttr().getProductUOM());
+					oLine.setPrice1(price);
+					oLine.setQty1(qty);
+					oLine.setLineAmount1(price * qty);
+					oLine.setDiscount1(discount);
+					oLine.setTotalAmount1(oLine.getLineAmount() - discount);
+				} else {
+					oLine.setUom(mrline.getAttr().getProductUOM());
+					oLine.setPrice(price);
+					oLine.setQty(qty);
+					oLine.setLineAmount(price * qty);
+					oLine.setDiscount(discount);
+					oLine.setTotalAmount(oLine.getLineAmount() - discount);
+
+					oLine.setUom2(mrline.getAttr().getProductUOM());
+					oLine.setPrice2(price);
+					oLine.setQty2(qty);
+					oLine.setLineAmount2(price * qty);
+					oLine.setDiscount2(discount);
+					oLine.setTotalAmount2(oLine.getLineAmount() - discount);
+				}
+				oLine.setPromotion("Y");
+				
+				if(this.requestDate == null)
+					oLine.setRequestDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
+				else
+					oLine.setRequestDate(requestDate);
+				
+				if(this.shipDate == null)
+					oLine.setShippingDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
+				else
+					oLine.setShippingDate(shipDate);
+
+				if(isDebug){
+				   logger.info("new Promotion Order Line.." + oLine);
+				}
+				
+				logger.info("Qty1["+oLine.getQty1()+"]qty2["+oLine.getQty2()+"]qty["+oLine.getQty()+"]");
+				
+				addLines.add(oLine);
+			}
+		} else {
+			if(isDebug){
+			  logger.info("No Promotion..");
+			}
+		}
+		
+		if(isDebug){
+		  logger.info("---- End Promotional Good Process ----");
+		}
+		
+		return 0;
+	}
+	
+	
+	/**
+	 * Promotion Good Process
+	 * 
+	 * @param orline
+	 * @return promotion good discount & add lines
+	 * @throws Exception
+	 */
+	private double promotionalGoodProcess2(double sumQty) throws Exception {
+		if(isDebug){
+		  logger.info("---- Start Promotional Good (2) Process ----");
+		}
+		
+		OrderLine oLine;
+		List<ProductPrice> pps;
+		boolean isPromotion = false;
+		double price = 0;
+		double discount = 0;
+		double qty = 0;
+		int round = 1;
+		
+		if(isDebug){
+		  logger.info("Mline Break Type[" + modifierLine.getBreakType()+"]");
+		}
+		
+		if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypeRecurring())) {
+			if(isDebug){
+			  logger.info("Case BreakType[Recurring] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+			}
+			
+			// recurring
+			if (modifierAttr.getValueTo() != 0) {
+				if (sumQty >= modifierAttr.getValueFrom() && sumQty <= modifierAttr.getValueTo()) {
+					isPromotion = true;
+					round = new Double(sumQty / modifierAttr.getValueFrom()).intValue();
+				}
+			} else {
+				if (sumQty >= modifierAttr.getValueFrom()) {
+					isPromotion = true;
+					round = new Double(sumQty / modifierAttr.getValueFrom()).intValue();
+				}
+			}
+			
+		} else {
+			
+			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
+				if(isDebug){
+				  logger.info("Case BreakType[Point] -> Qty["+sumQty+"] Check Qty In Promotion Attr.valueFrom["+ modifierAttr.getValueFrom()+"] to ["+modifierAttr.getValueTo()+"]");
+				}
+				
+				if (modifierAttr.getValueTo() != 0) {
+					if (sumQty >= modifierAttr.getValueFrom() && sumQty <= modifierAttr.getValueTo()) {
+						isPromotion = true;
+						round = 1;
+					}
+				} else {
+					if (sumQty >= modifierAttr.getValueFrom()) {
+						isPromotion = true;
+						round = 1;
+					}
+				}
+			}
+		}
+		// Is Promotion
+		if (isPromotion) {
+			if(isDebug){
+			  logger.info("Is Promotion..Round[" + round+"]");
+			  logger.info("Relate relate.m_line_to.MLines Size[" + modifierLine.getRelatedModifier().size()+"]");
+			}
+			
+			// get relate line
+			boolean baseUOM = true;
+			for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
+				
+				price = 0;discount = 0;qty = 0;
+				baseUOM = true;
+
+				oLine = new OrderLine();
+				if(isDebug){
+				  logger.info("Attr.mid["+mrline.getId()+"]Product Attibute[" + mrline.getAttr().getProductAttribute()+"] Attibute Value[" + mrline.getAttr().getAttributeValueLabel()+"]");
+				}
+				
+				if (mrline.getAttr().getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
+					// promotion in item
+					oLine.setProduct(mrline.getAttr().getProduct());
+					
+					if(isDebug){
+					  logger.info("Promotion Type:"+mrline.getAttr().getProduct().getUom().getId());
 					}
 				}
 				if (!mrline.getAttr().getProductUOM().getId().equalsIgnoreCase(mrline.getAttr().getProduct().getUom().getId())) {

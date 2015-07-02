@@ -37,7 +37,7 @@ totalPage = r.intValue();
 
 
 /// Find Total Page
-System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
+//System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
 
 if(productCatL != null && productCatL.size() > 0){
 %>
@@ -47,7 +47,7 @@ if(productCatL != null && productCatL.size() > 0){
 <%  int id = 1 ;
 	for(int no = 0 ; no < totalPage;no++ ) {  
 		int id_param = id-1;
-		System.out.println("id:"+id);
+		//System.out.println("id:"+id);
 		String className = "currPageBtn";
 		if(id_param == pageId)
 			className = "currPageActiveBtn";

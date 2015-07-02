@@ -11,7 +11,7 @@
 User user = ((User)session.getAttribute("user"));
 String custId = request.getParameter("custId");
 Basket basket = (Basket)session.getAttribute(custId);
-System.out.println("basket session:"+basket);
+//System.out.println("basket session:"+basket);
 
 if(basket == null ){
 	basket = new Basket();	
@@ -84,7 +84,7 @@ for(ProductCatalog catalog:catalogs) {
 		lineClass  ="pop_lineE";
 	}
 
-	System.out.println("item:"+item+",qty1:"+qty1+",qty2:"+qty2);
+	//System.out.println("item:"+item+",qty1:"+qty1+",qty2:"+qty2);
 %>
 
 <tr class="<%=lineClass%>">

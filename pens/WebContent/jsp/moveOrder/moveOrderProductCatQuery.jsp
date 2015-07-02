@@ -36,7 +36,7 @@ r = r.setScale(0,BigDecimal.ROUND_UP);
 totalPage = r.intValue();
 
 /// Find Total Page
-System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
+//System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
 
 if(productCatL != null && productCatL.size() > 0){
 %>
