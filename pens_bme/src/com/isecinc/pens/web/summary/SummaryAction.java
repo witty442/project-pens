@@ -348,7 +348,15 @@ public class SummaryAction extends I_Action {
 			}else if("onhandLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				 fileName ="Report Bme Stock on-hand at Lotus(As of).xls";
 			     if(summaryForm.getOnhandSummaryLotusResults() != null && summaryForm.getOnhandSummaryLotusResults().size() > 0){
-					htmlTable = genOnhandLotusHTML(request,summaryForm,user);	
+					htmlTable = genOnhandLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getOnhandSummaryLotusResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("bmeTrans".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				 fileName ="Report Transaction Bme.xls";
+			     if(summaryForm.getOnhandSummaryBmeTransResults() != null && summaryForm.getOnhandSummaryBmeTransResults().size() > 0){
+					htmlTable = genOnhandLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getOnhandSummaryBmeTransResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -495,19 +503,26 @@ public class SummaryAction extends I_Action {
 		return h;
 	}
 	
-	private StringBuffer genOnhandLotusHTML(HttpServletRequest request,SummaryForm form,User user){
+	private StringBuffer genOnhandLotusHTML(String page,HttpServletRequest request,SummaryForm form,User user,List<OnhandSummary> list){
 		StringBuffer h = new StringBuffer("");
 		try{
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9'>รายงาน B'me Stock on-hand at Lotus(As Of)</td> \n");
-			
+			if(form.getOnhandSummaryBmeTransResults() != null){
+			    h.append("<td align='left' colspan='9'>รายงาน  Transaction B'me </td> \n");
+			}else{
+				h.append("<td align='left' colspan='9'>รายงาน B'me Stock on-hand at Lotus(As Of)</td> \n");
+			}
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			if("bmeTrans".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				h.append("<td align='left' colspan='9' >จากวันที่:"+form.getOnhandSummary().getAsOfDateFrom()+"ถึง"+form.getOnhandSummary().getAsOfDateTo() +"</td> \n");
+			}else{
+				h.append("<td align='left' colspan='9' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			}
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
@@ -524,10 +539,7 @@ public class SummaryAction extends I_Action {
 			
 			h.append("</table> \n");
 
-			if(form.getOnhandSummaryLotusResults() != null){
-			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummaryLotusResults();
-			    
-			 	    
+			if(list != null){
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
 				  h.append("<td>รหัสสาขา</td> \n");

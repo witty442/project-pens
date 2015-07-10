@@ -539,7 +539,7 @@ function isNum(obj){
 		                        StoreBean s = (StoreBean)storeList.get(k);
 		                        String storeColumnClass = s.getStoreStyle();
 		                %>
-		                         <th width="5%" class="<%=storeColumnClass%>"><%=s.getStoreDisp() %></th>
+		                         <th width="5%" class="<%=storeColumnClass%>"><%=s.getStoreCode() %> : <%=s.getStoreDisp() %></th>
 		                <%
 		                       }//for 2
 		                   }//if 
@@ -623,9 +623,14 @@ function isNum(obj){
 						                        onchange="validateQty(this,'<%=c%>','<%=i%>')"
 						                        title="<%=titleDisp %>"
 						                        />
-						                  
-						                   <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getOrderNo())%>">
-						                   <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getBarOnBox())%>">
+						                        
+						                 <%if( "storeError".equalsIgnoreCase(storeColumnClass)){ %>
+						                   <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="">
+						                   <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="">
+						                 <%}else{ %>
+						                    <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getOrderNo())%>">
+						                    <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getBarOnBox())%>">
+						                 <%} %>
 						             </td>
 						         <%
 						             }//for 2

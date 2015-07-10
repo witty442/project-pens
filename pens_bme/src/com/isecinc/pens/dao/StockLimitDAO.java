@@ -74,7 +74,7 @@ public class StockLimitDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append("select pens_desc2 from pensbi.PENSBME_MST_REFERENCE where reference_code = 'Customer' and pens_value='"+storeType+"'\n");	
 
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -106,7 +106,7 @@ public class StockLimitDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append("select interface_desc from pensbi.PENSBME_MST_REFERENCE where reference_code = 'LimitAmt' and pens_value='"+storeCode+"'\n");	
 
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -136,7 +136,7 @@ public class StockLimitDAO {
 		try{
 			String sql = "{call PENSBME_STOCK_STORE_LIMIT_PROC(?,?)}";
 	
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			cs = conn.prepareCall(sql);
 			cs.setString(1,custGroup);
 			if( !Utils.isNull(region).equals("")){

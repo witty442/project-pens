@@ -297,7 +297,7 @@
 		</ul>
 	</li> 
 <%} %>
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.SALE}) ){%>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.SALE,User.NISSINTEAM,User.PENSTEAM}) ){%>
   	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Other</span></a>
 		<ul>
 		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
@@ -308,6 +308,16 @@
 		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/rtAction.do?do=prepare2&action=new&page=pic');"><span>1.<bean:message bundle="sysprop" key="picRT"/></span></a>
+			</li>   
+		<%} %>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.NISSINTEAM}) ){%>
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/nsAction.do?do=prepare2&action=new&page=nissin');"><span>1.<bean:message bundle="sysprop" key="ns"/></span></a>
+			</li>   
+		<%} %>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PENSTEAM}) ){%>
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/nsAction.do?do=prepare2&action=new&page=pens');"><span>1.<bean:message bundle="sysprop" key="nsPens"/></span></a>
 			</li>   
 		<%} %>
 		</ul>

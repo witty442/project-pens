@@ -255,6 +255,7 @@ public class OrderDAO {
 					storeItemList = new ArrayList<StoreBean>();
 					for(int c =0;c<storeList.size();c++){
 						s = (StoreBean)storeList.get(c);
+						
 						keyMap = item.getBarcode()+"_"+s.getStoreCode()+"_"+item.getBillType();
 						//logger.debug("KeyMap["+keyMap+"]");
 						store = storeBeanOrderMap.get(keyMap)!=null?(StoreBean)storeBeanOrderMap.get(keyMap):null;
@@ -2039,7 +2040,7 @@ public class OrderDAO {
 
 	public static void updateOrder(Connection conn,Order o) throws Exception{
 		PreparedStatement ps = null;
-		logger.debug("Update");
+	//	logger.debug("Update");
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_ORDER \n");

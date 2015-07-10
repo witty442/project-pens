@@ -69,6 +69,7 @@
 		<form-bean name="mcForm" type="com.isecinc.pens.web.mc.MCForm" />
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
+		<form-bean name="nsForm" type="com.isecinc.pens.web.nissin.NSForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
 		<form-bean name="genCNForm" type="com.isecinc.pens.web.cn.GenCNForm" />
 		
@@ -458,6 +459,12 @@
 			<forward name="search" path="/jsp/rt/rtSearch.jsp" />
 			<forward name="detail" path="/jsp/rt/rtDetail.jsp" />
 			<forward name="detailPic" path="/jsp/rt/rtDetailPic.jsp" />
+		</action>
+		
+		<action name="nsForm" path="/jsp/nsAction" parameter="do" scope="session" type="com.isecinc.pens.web.nissin.NSAction">
+			<forward name="search" path="/jsp/nissin/nsSearch.jsp" />
+			<forward name="detail" path="/jsp/nissin/nsDetail.jsp" />
+			<forward name="detailPens" path="/jsp/nissin/nsDetailPens.jsp" />
 		</action>
 		
 		<action name="tempForm" path="/jsp/tempAction" forward="/jsp/printPopup.jsp" />
