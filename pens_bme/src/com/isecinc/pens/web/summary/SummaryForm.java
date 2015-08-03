@@ -35,6 +35,7 @@ public class SummaryForm extends I_Form {
 	private List<TransactionSummary> lotusSummaryResults;
 	private List<TransactionSummary> bigcSummaryResults;
 	private List<TransactionSummary> topsSummaryResults;
+	private List<TransactionSummary> kingSummaryResults;
 	private List<PhysicalSummary> physicalSummaryResults;
 	private List<DiffStockSummary> diffStockSummaryLists;
 	private List<TransactionSummary> summaryByGroupCodeResults;
@@ -55,6 +56,12 @@ public class SummaryForm extends I_Form {
 
 	
 	
+	public List<TransactionSummary> getKingSummaryResults() {
+		return kingSummaryResults;
+	}
+	public void setKingSummaryResults(List<TransactionSummary> kingSummaryResults) {
+		this.kingSummaryResults = kingSummaryResults;
+	}
 	public List<OnhandSummary> getOnhandSummaryBmeTransResults() {
 		return onhandSummaryBmeTransResults;
 	}

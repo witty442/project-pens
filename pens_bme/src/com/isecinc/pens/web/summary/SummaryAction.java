@@ -13,6 +13,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.Constants;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.DiffStockSummary;
@@ -55,6 +57,7 @@ public class SummaryAction extends I_Action {
 				 summaryForm.setLotusSummaryResults(null);
 				 summaryForm.setBigcSummaryResults(null);
 				 summaryForm.setTopsSummaryResults(null);
+				 summaryForm.setKingSummaryResults(null);
 				 summaryForm.setTransactionSummary(new TransactionSummary());
 				 
 				 summaryForm.setPhysicalSummaryResults(null);
@@ -95,6 +98,7 @@ public class SummaryAction extends I_Action {
 				 summaryForm.setLotusSummaryResults(null);
 				 summaryForm.setBigcSummaryResults(null);
 				 summaryForm.setTopsSummaryResults(null);
+				 summaryForm.setKingSummaryResults(null);
 				 summaryForm.setTransactionSummary(new TransactionSummary());
 				 
 				 summaryForm.setPhysicalSummaryResults(null);
@@ -190,7 +194,12 @@ public class SummaryAction extends I_Action {
 					}
 				}
 				if(pass){
-					List<OnhandSummary> results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
+					List<OnhandSummary> results = null;
+					if( Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_MTT_CODE_2)){
+						results = new SummaryDAO().searchOnhandMTT_King(summaryForm.getOnhandSummary(),initDate,user);
+					}else{
+					   results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
+					}
 					if (results != null  && results.size() >0) {
 						summaryForm.setOnhandSummaryMTTResults(results);
 						
@@ -283,6 +292,17 @@ public class SummaryAction extends I_Action {
 					
 				} else {
 					summaryForm.setTopsSummaryResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}	
+	        }else if("king".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				
+				List<TransactionSummary> results = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"king");
+				if (results != null  && results.size() >0) {
+					summaryForm.setKingSummaryResults(results);
+					//logger.debug("results:"+summaryForm.getTopsSummaryResults());
+					
+				} else {
+					summaryForm.setKingSummaryResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}	
 			}else if("diff_stock".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
@@ -397,6 +417,14 @@ public class SummaryAction extends I_Action {
 				fileName="ReportSalesDetailBmeTops.xls";
 				if(summaryForm.getTopsSummaryResults() != null && summaryForm.getTopsSummaryResults().size() > 0){
 					htmlTable = genTopsHTML(request,summaryForm,user);	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("king".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				fileName="ReportSalesDetailBmeKingPower.xls";
+				if(summaryForm.getKingSummaryResults() != null && summaryForm.getKingSummaryResults().size() > 0){
+					htmlTable = genKingHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -1124,6 +1152,89 @@ public class SummaryAction extends I_Action {
 						h.append("<td>"+Utils.isNull(s.getFileName())+"</td>\n");
 						h.append("<td>"+Utils.isNull(s.getCreateDate())+"</td>  \n");
 						h.append("<td>"+Utils.isNull(s.getCreateUser())+"</td>\n");
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	//wait
+	private StringBuffer genKingHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		try{
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='17'>รายงานข้อมูลรายละเอียดขาย B'ME จาก  King Power</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='17' >จากวันที่ขาย:"+form.getTransactionSummary().getSalesDateFrom()+"  ถึง วันที่ขาย:"+form.getTransactionSummary().getSalesDateTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='17' >รหัสร้านค้า:"+form.getTransactionSummary().getPensCustCodeFrom());
+			h.append("</tr> \n");
+
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='17' >File Name:"+form.getTransactionSummary().getFileName()+"</td>\n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(form.getKingSummaryResults() != null){
+			    List<TransactionSummary> list = (List<TransactionSummary>)form.getKingSummaryResults();
+			    
+				h.append("<table border='1'> \n");
+				h.append("<thead>\n");
+				h.append("<tr> \n");
+					h.append("<th>Sales Date</th>\n");
+					h.append("<th>Cust Group</th>\n");
+					h.append("<th>Cust No</th> \n");
+					h.append("<th>Cust Name</th>\n");
+					h.append("<th>Code</th> \n");
+					h.append("<th>Description/th> \n");
+					h.append("<th>Reference</th> \n");
+					h.append("<th>Unit Price</th> \n");
+					h.append("<th>Unit Cost</th> \n");
+					h.append("<th>QTY</th> \n");
+					h.append("<th>Amount</th> \n");
+					h.append("<th>Cost Amount</th> \n");
+					h.append("<th>Pens Item</th> \n");
+					h.append("<th>Group Code</th> \n");
+					h.append("<th>File Name</th> \n");
+					h.append("<th>Create date</th> \n");
+					h.append("<th>Create by</th> \n");
+				h.append("</tr> \n");
+				h.append("</thead> \n");
+				
+				for(int i=0;i<list.size();i++){
+					TransactionSummary s = (TransactionSummary)list.get(i);
+					h.append("<tr> \n");
+						h.append("<td>"+Utils.isNull(s.getSalesDate())+"</td>\n");
+						h.append("<td>"+Utils.isNull(s.getCustGroup())+"</td>\n");
+						h.append("<td>"+Utils.isNull(s.getStoreNo())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getStoreName())+"</td>\n");
+						h.append("<td>"+Utils.isNull(s.getKingCode())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getKingDescription())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getKingReference())+"</td> \n");
+						
+						h.append("<td>"+Utils.isNull(s.getKingUnitPrice())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getKingUnitCost())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getQty())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getKingAmount())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getKingCostAmt())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getPensItem())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getGroupCode())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getFileName())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getCreateDate())+"</td> \n");
+						h.append("<td>"+Utils.isNull(s.getCreateUser())+"</td> \n");
+						
 					h.append("</tr>");
 				}
 				h.append("</table> \n");

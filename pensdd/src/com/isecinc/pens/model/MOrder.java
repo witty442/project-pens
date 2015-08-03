@@ -22,8 +22,10 @@ import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
+import com.isecinc.pens.process.order.OrderProcess;
 
 /**
  * MOrder Class
@@ -475,6 +477,69 @@ public class MOrder extends I_Model<Order> {
 		return orderL.toArray(ret);
 	}
 
+	public List<OrderLine> saveNewLineAuto(Order orders,User user,Connection conn) throws Exception  {
+		PreparedStatement ppstmt = null;
+		ResultSet rs = null;
+		String sql = "\n select * from t_order_line where  order_id = "+orders.getId()+
+		 "\n   and trip_no = ("+
+		 "\n     select max(trip_no) from t_order_line"+
+		 "\n     where order_id = "+orders.getId()+") order by line_no";
+		
+		int lineNo = 0;
+		List<OrderLine> orderLineList = new ArrayList<OrderLine>();
+		try {
+			if(orders != null){
+				Member member = new MMember().find(String.valueOf(orders.getCustomerId()));
+				OrderProcess o = new OrderProcess() ;
+				
+				ppstmt = conn.prepareStatement(sql);
+				rs = ppstmt.executeQuery();
+				while(rs.next()){
+					OrderLine line = new OrderLine(rs);
+					if(lineNo ==0){
+					  lineNo = line.getLineNo();
+					}
+					lineNo++;
+					line.setId(0);
+					line.setLineNo(lineNo);
+					line.setTripNo(line.getTripNo()+1);
+					
+					//no
+					line.setPayment("N");
+					line.setActualQty(0);
+					line.setNeedBill(0);
+					line.setActNeedBill(0);
+					line.setExported("N");
+					line.setInterfaces("N");
+					
+					//date
+					String date = o.addDate(line.getShippingDate(),7 * o.calWeekByRoundtrip(member.getRoundTrip()));
+					line.setShippingDate(date);
+					line.setRequestDate(date);
+					
+					orderLineList.add(line);
+					
+					new MOrderLine().save(line,user.getId() , conn);
+				}
+				
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				if(ppstmt != null){
+					ppstmt.close();
+					ppstmt = null;
+				}
+				if(rs != null){
+				   rs.close();
+				   rs=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return orderLineList;
+	}
+	
 	public int reSchedule(int orderLineId, Timestamp newScheduleDate, Connection conn,int userId) throws Exception {
 		if(conn == null || conn.isClosed())
 			new Exception("No DB Connection Available");

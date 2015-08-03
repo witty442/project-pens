@@ -175,6 +175,8 @@ public class StockQueryAction extends I_Action {
 				response.setContentType("application/vnd.ms-excel");
 				
 				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				//Writer w = new BufferedWriter(new OutputStreamWriter(out,"TIS-620")); 
+				
 				w.write(htmlTable.toString());
 			    w.flush();
 			    w.close();
@@ -259,7 +261,7 @@ public class StockQueryAction extends I_Action {
 					 h.append("<td>Barcode</td> \n");
 					 h.append("<td>เลขที่กล่อง</td> \n");
 					 h.append("<td>Job Id</td> \n");
-					 h.append("<td>รับคืนจาก</td> \n");
+					 h.append("<td>รับคืนจาก.</td> \n");
 					 if("W3".equalsIgnoreCase(b.getWareHouse())){
 					   h.append("<td>remark</td> \n");
 					 }

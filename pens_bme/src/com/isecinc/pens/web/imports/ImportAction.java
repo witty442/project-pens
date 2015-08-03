@@ -39,6 +39,7 @@ import com.isecinc.pens.bean.MasterBean;
 import com.isecinc.pens.bean.Message;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -193,7 +194,9 @@ public class ImportAction extends I_Action {
         }else  if("tops".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
         	return importFromTops(mapping, importForm, request, response);
+        }else  if("king".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
+        	return importFromKing(mapping, importForm, request, response);
         }else if("bigc".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
             return importFromBigc(mapping, importForm, request, response);	
@@ -1893,6 +1896,328 @@ public class ImportAction extends I_Action {
 		return mapping.findForward("success");
 	}
 	
+	public ActionForward importFromKing(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		StringBuffer whereCause = null;
+		String errorDesc = null;
+		int id = 0;
+		int allCount = 0;
+		int successCount = 0;
+	    int errorCount = 0;
+		String forward = "view";
+		ImportForm importForm = (ImportForm) form;
+        UploadXLSUtil xslUtils = new UploadXLSUtil();
+	    PreparedStatement ps = null;
+	    PreparedStatement psDelete = null;
+	    User user = (User) request.getSession().getAttribute("user");
+	    String fileName = "";
+	    String fileType = "";
+	    ImportDAO importDAO = new ImportDAO();
+	    List<ImportSummary> successList = new ArrayList<ImportSummary>();
+	    List<ImportSummary> errorList = new ArrayList<ImportSummary>();
+	 
+	    Map<String, ImportSummary> successMap = new HashMap<String, ImportSummary>();
+	    Map<String, ImportSummary> errorMap = new HashMap<String, ImportSummary>();
+	    boolean importError = false;
+		try {
+
+			FormFile dataFile = importForm.getDataFile();
+			if (dataFile != null) {
+				fileName = dataFile.getFileName();
+				fileType = fileName.substring(fileName.indexOf(".")+1,fileName.length());
+				conn = DBConnection.getInstance().getConnection();
+				
+				/** cehck FileName duplicate **/
+				boolean dup = importDAO.importKingFileNameIsDuplicate(conn, fileName);
+				if(dup){
+					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  Upload ไปแล้ว");
+					return mapping.findForward("success");
+				}
+				logger.debug("contentType: " + dataFile.getContentType());
+				logger.debug("fileName: " + dataFile.getFileName());
+
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" INSERT INTO PENSBME_SALES_FROM_KING( \n");
+				
+				sql.append(" Code, Description, Reference, Unit_Price,  \n");//1-4
+				sql.append(" Unit_cost, Qty, Amount, Cost_amt, \n");//5-8
+				sql.append(" SALE_DATE, CUST_GROUP, CUST_NO, File_name,  \n");//
+				sql.append(" GROUP_CODE,PENS_ITEM,CREATE_DATE,CREATE_USER  ) \n");//
+				
+				sql.append(" VALUES(?,?,?,?" +
+						",?,?,?,?" +
+						",?,?,?,?" +
+						",?,?,?,?)");
+
+				conn.setAutoCommit(false);
+				ps = conn.prepareStatement(sql.toString());
+				  
+				int sheetNo = 0; // xls sheet no. or name
+				int rowNo = 1; // row of begin data
+				int maxColumnNo = 8; // max column of data per row
+				
+				Workbook wb1 = null;
+				XSSFWorkbook wb2 = null;
+				Sheet sheet = null;
+				
+				if("xls".equalsIgnoreCase(fileType)){
+				   wb1 = new HSSFWorkbook(dataFile.getInputStream());//97-2003
+				   sheet = wb1.getSheetAt(sheetNo);
+				   logger.debug("number of sheet: " + wb1.getNumberOfSheets());
+				}else{
+				   OPCPackage pkg = OPCPackage.open(dataFile.getInputStream());
+				   wb2 = new XSSFWorkbook(pkg);
+				   sheet = wb2.getSheetAt(sheetNo);
+				   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
+				}
+				
+				Row row = null;
+				Cell cell = null;
+				String salesDate = importForm.getImportDate();
+				String storeNo = "020056-1";
+				String storeName = "020056-1";
+				String qty = "";
+				String groupCode ="";
+	
+				int index = 0;
+	            int no = 0;
+				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
+	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
+	            
+				for (int i = rowNo; i < sheet.getLastRowNum()+1; i++) {
+					row = sheet.getRow(i);
+					
+					/** Check Row is null **/
+					Cell cellCheck = row.getCell((short) 0);
+					Object cellCheckValue = xslUtils.getCellValue(0, cellCheck);
+					
+					//java.util.Date rowCheck =  (java.util.Date) cellCheckValue;
+					logger.debug("cellCheckValue["+cellCheckValue+"]");
+					
+					if(cellCheckValue == null ){
+						break;
+					}
+					
+					//initial
+					index = 1;
+					qty = "";
+					groupCode = "";
+
+					for (int colNo = 0; colNo < maxColumnNo; colNo++) {
+						cell = row.getCell((short) colNo);
+						logger.debug("row["+i+"]col[("+colNo+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
+						
+						Object cellValue = xslUtils.getCellValue(colNo, cell);
+						///Reference, Unit_Price
+						//code
+						if(colNo==0){
+							ps.setString(index++, Utils.isNull(cellValue));
+						}else if(colNo==1){
+						   //Desc
+						    ps.setString(index++, Utils.isNull(cellValue));
+						   
+						}else if(colNo==2){
+						   //Reference
+						   groupCode = Utils.isNull(cellValue);
+						   ps.setString(index++, groupCode);
+						   
+						}else if(colNo==3){
+						  //Unit_Price
+						  ps.setDouble(index++,Utils.isDoubleNull(cellValue));
+							    
+						  //Unit_cost, Qty, Amount, Cost_amt, \
+						}else if(colNo==4){
+						  //Unit_cost 
+						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));
+						   
+						}else if(colNo==5){
+						  //qty
+						   qty = Utils.isDoubleNull(cellValue)+"";
+						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));
+						  
+						}else if(colNo==6){
+						  //amount
+						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));
+						   
+						}else if(colNo==7){
+						   //cost_amt
+						  ps.setDouble(index++, Utils.isDoubleNull(cellValue));
+						}
+						 
+					}//for column
+					
+				    logger.debug("index:"+index);
+
+			         //Find pens_item,groupType
+				     String pensItem = GeneralDAO.searchPensItemByGroupCode(conn,groupCode);
+			         
+			         /** case Start with  'W' no check "WB7805D4BL"**/
+			         if(pensItem.startsWith("W")){
+			        	  //Add Success Msg No Check PensItem
+				         ImportSummary s = new ImportSummary();
+				         s.setRow(i+1);
+				         s.setSalesDate(salesDate);
+				         s.setStoreNo(storeNo);
+				         s.setStoreName(storeName);
+				         s.setDescription(storeNo);
+				         s.setQty(qty);
+				         s.setMessage("Success :No Validate Pens Item");
+				         successMap.put(i+"", s); 
+				          
+			         }else{
+				         if( !Utils.isNull(pensItem).equals("")){
+				        	   //Add Success Msg
+					         ImportSummary s = new ImportSummary();
+					         s.setRow(i+1);
+					         s.setSalesDate(salesDate);
+					         s.setStoreNo(storeNo);
+					         s.setStoreName(storeName);
+					         s.setDescription(storeNo);
+					         s.setQty(qty);
+					         s.setMessage("Success");
+					         successMap.put(i+"", s);
+				         }
+				         
+				         if(Utils.isNull(pensItem).equals("")){
+				        	 //Add Error Msg
+					         importError = true;
+					         ImportSummary s = new ImportSummary();
+					         s.setRow(i+1);
+					         s.setSalesDate(salesDate);
+					         s.setStoreNo(storeNo);
+					         s.setStoreName(storeName);
+					         s.setDescription(storeNo);
+					         s.setQty(qty);
+					         
+					         String ms = "";
+					         if(Utils.isNull(pensItem).equals("")){
+					        	 ms +="ไม่พบข้อมูล Pens Item"; 
+					         }
+					         s.setMessage(ms);
+					         errorMap.put(i+"", s);
+				         }  
+			         }
+
+			         //SALES_DATE
+			         ps.setDate(index++, new java.sql.Date(Utils.parse(salesDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			         //CUST_GROUP
+			         ps.setString(index++, "020056");
+			         //CUST_NO
+			         ps.setString(index++, "020056-1");
+			         
+			         // File_name VARCHAR2(100),
+			         ps.setString(index++, fileName);
+			         
+			         ps.setString(index++, groupCode);
+			         //PENS_ITEM
+			         ps.setString(index++, pensItem);
+			         
+			        //CREATE_DATE
+					 ps.setTimestamp(index++, new java.sql.Timestamp(new java.util.Date().getTime()));
+					 //CREATE_USER
+			         ps.setString(index++, user.getUserName());
+			         
+			         logger.debug("index:"+index);
+			         
+					 ps.executeUpdate();
+				}//for Row
+			}
+			
+			if(importError){
+			   request.setAttribute("Message","Upload ไฟล์ "+fileName+" ไม่สำเร็จ กรุณาแก้ไขข้อมูลแล้วทำการ Import ใหม่");
+			   
+			   /** Success List **/
+				 Iterator it = successMap.keySet().iterator();
+				 while(it.hasNext()){
+					  String key = (String)it.next();
+					  //logger.debug("key:"+key);
+					  ImportSummary mm = (ImportSummary)successMap.get(key);
+					  successList.add(mm);
+				  }
+				 
+				 //Sort
+				  Collections.sort(successList, new Comparator<ImportSummary>() {
+					  public int compare(ImportSummary a, ImportSummary b) {
+					        return a.getRow()- b.getRow();
+					    }
+					});
+				  
+				  /** Error List **/
+				  it = errorMap.keySet().iterator();
+					 while(it.hasNext()){
+						  String key = (String)it.next();
+						 // logger.debug("key:"+key);
+						  ImportSummary mm = (ImportSummary)errorMap.get(key);
+						  errorList.add(mm);
+					  }
+					 
+					 //Sort
+					  Collections.sort(errorList, new Comparator<ImportSummary>() {
+						  public int compare(ImportSummary a, ImportSummary b) {
+						        return a.getRow()- b.getRow();
+						    }
+						});
+					  
+				  
+				  importForm.setSummaryErrorList(errorList);
+				  importForm.setSummarySuccessList(successList);
+				  
+				  importForm.setTotalSize(errorList.size()+successList.size());
+				  importForm.setSummaryLotusErrorSize(errorList!=null?errorList.size():0);
+				  importForm.setSummaryLotusSuccessSize(successList!=null?successList.size():0);
+				  
+			      conn.rollback();
+			}else{
+				 /** Success List **/
+				 Iterator it = successMap.keySet().iterator();
+				 while(it.hasNext()){
+					  String key = (String)it.next();
+					  //logger.debug("key:"+key);
+					  ImportSummary mm = (ImportSummary)successMap.get(key);
+					  successList.add(mm);
+				  }
+				 
+				 //Sort
+				  Collections.sort(successList, new Comparator<ImportSummary>() {
+					  public int compare(ImportSummary a, ImportSummary b) {
+					        return a.getRow()- b.getRow();
+					    }
+					});
+				
+			   importForm.setSummaryErrorList(errorList);
+			   importForm.setSummarySuccessList(successList);
+			   
+			   importForm.setTotalSize(errorList.size()+successList.size());
+			   importForm.setSummaryLotusErrorSize(errorList!=null?errorList.size():0);
+			   importForm.setSummaryLotusSuccessSize(successList!=null?successList.size():0);
+				  
+			   request.setAttribute("Message","Upload ไฟล์ "+fileName+" สำเร็จ");
+			   conn.commit();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message","ข้อมูลไฟล์ไม่ถูกต้อง:"+e.toString());
+			try {
+				conn.rollback();
+			} catch (Exception e2) {}
+		} finally {
+			try {
+				if(conn != null){
+			    	 conn.close();conn=null;
+			      }
+			      if(ps != null){
+			    	 ps.close();ps=null;
+			      }
+			      if(psDelete != null){
+				     psDelete.close();psDelete=null;
+				  }
+			} catch (Exception e2) {}
+		}
+
+		return mapping.findForward("success");
+	}
+
 	/**
 	 * 
 	 * @param mapping

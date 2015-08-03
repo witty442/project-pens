@@ -36,6 +36,14 @@ pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
 
 List<References> actives= InitialReferences.getReferenes().get(InitialReferences.ACTIVE);
 pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
+
+
+String[] msg4 = new String[2];
+if(request.getSession().getAttribute("appVersionCheckMsg") != null){
+	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
+}else{
+	msg4 = AppversionVerify.checkAppVersion(request);
+}
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
 <%@page import="com.isecinc.pens.model.MProvince"%><html>
@@ -417,7 +425,8 @@ $(function() {
 
 <div id="dialog" title="คำแนะนำ" style="display:none">
     <p align="center"><b>
-     <font color="red"><%=AppversionVerify.checkAppVersion(request) %></font></b>
+     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=msg4[0]%></a> 
+     OR <%=msg4[1] %></font></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
 	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>

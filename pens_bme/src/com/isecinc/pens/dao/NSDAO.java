@@ -21,6 +21,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.nissin.NSConstant;
+import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.rt.RTConstant;
 
 
@@ -53,10 +54,16 @@ public class NSDAO {
 				int r = 1;
 				Date docDate=null;
 				try {
-				    sql.append("\n select h.* from NISSIN_ORDER h where 1=1 ");
+				    sql.append("\n select h.* " +
+				            "\n ,(select a.channel_name from pens_sales_channel a where a.channel_id = h.channel_id) as channel_name"+
+				            "\n ,(select a.province_name from pens_province a where a.channel_id = h.channel_id and a.province_id = h.province_id) as province_name"+
+				    		"\n from NISSIN_ORDER h where 1=1 ");
 				   
 					if( !Utils.isNull(o.getOrderId()).equals("")){
 						sql.append("\n and h.order_id = '"+Utils.isNull(o.getOrderId())+"'");
+					}
+					if( !Utils.isNull(o.getStatus()).equals("")){
+						sql.append("\n and h.status = '"+Utils.isNull(o.getStatus())+"'");
 					}
 					
 					if( !Utils.isNull(o.getOrderDateFrom()).equals("") &&  !Utils.isNull(o.getOrderDateTo()).equals("")){
@@ -84,7 +91,7 @@ public class NSDAO {
 					}
 					
 				
-					sql.append("\n order by h.order_id desc ");
+					sql.append("\n order by to_number(h.order_id) desc");
 
 					logger.debug("sql:"+sql);
 					
@@ -95,35 +102,43 @@ public class NSDAO {
 					   h = new NSBean();
 					   h.setOrderId(Utils.isNull(rst.getString("order_id")));
 					   h.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 					   h.setCustomerType(Utils.isNull(rst.getString("customer_type")));
 					   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 					   h.setAddressLine1(Utils.isNull(rst.getString("address_line1")));
 					   h.setAddressLine2(Utils.isNull(rst.getString("address_line2")));
 					   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no")));
 					   h.setSaleCode(Utils.isNull(rst.getString("sale_code")));
-					   h.setPhone(Utils.isNull(rst.getString("phone")));
+					   h.setChannelName(Utils.isNull(rst.getString("channel_name")));
+					   h.setProvinceName(Utils.isNull(rst.getString("province_name")));
 					   
+					   h.setPhone(Utils.isNull(rst.getString("phone")));
+					   h.setChannelId(Utils.isNull(rst.getString("channel_id")));
+					   h.setProvinceId(Utils.isNull(rst.getString("province_id")));
+					    
 					   if( rst.getDate("invoice_date") !=null){
 					     h.setInvoiceDate(Utils.stringValue(rst.getDate("invoice_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					   }else{
 						   h.setInvoiceDate("");
 					   }
-					   h.setCupQty(Utils.isNull(rst.getString("CUP_QTY")));
-					   h.setPacQty(Utils.isNull(rst.getString("PAC_QTY")));
-					   h.setPoohQty(Utils.isNull(rst.getString("POOH_QTY")));
+					   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
+					   h.setPacQty(Utils.isNull(rst.getInt("PAC_QTY")));
+					   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
+					   
+					   h.setCupNQty(Utils.isNull(rst.getInt("CUP_QTY_N")));
+					   h.setPacNQty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+					   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
 						   
 					   h.setStatus(Utils.isNull(rst.getString("Status")));
 					   h.setStatusDesc(NSConstant.getDesc(h.getStatus()));
 					   h.setRemark(Utils.isNull(rst.getString("remark")));
+					   h.setPendingReason(Utils.isNull(rst.getString("pending_Reason")));
 					  
 					  if(page.equalsIgnoreCase("nissin")){
 						  if(NSConstant.STATUS_OPEN.equals(h.getStatus())){
 							  h.setCanSave(true);
 							  h.setCanCancel(true);
 						  }else  if(NSConstant.STATUS_COMPLETE.equals(h.getStatus())){
-							  h.setCanSave(false);
-							  h.setCanCancel(false);
-						  }else  if(NSConstant.STATUS_CANCEL.equals(h.getStatus())){
 							  h.setCanSave(false);
 							  h.setCanCancel(false);
 						  }
@@ -135,9 +150,9 @@ public class NSDAO {
 						  }else  if(NSConstant.STATUS_COMPLETE.equals(h.getStatus())){
 							  h.setCanSave(false);
 							  h.setCanCancel(false);
-						  }else  if(NSConstant.STATUS_CANCEL.equals(h.getStatus())){
-							  h.setCanSave(false);
-							  h.setCanCancel(false);
+						  }else  if(NSConstant.STATUS_PENDING.equals(h.getStatus())){
+							  h.setCanSave(true);
+							  h.setCanCancel(true);
 						  }
 					  }
 					   items.add(h);
@@ -167,9 +182,9 @@ public class NSDAO {
 			sql.append(" INSERT INTO PENSBI.NISSIN_ORDER \n");
 			sql.append(" (order_id, order_date, customer_type, customer_name, \n");
 			sql.append(" address_line1, address_line2, phone, remark,  \n");
-			sql.append(" STATUS, CREATE_DATE, CREATE_USER ) ");
+			sql.append(" STATUS, CREATE_DATE, CREATE_USER,channel_id,province_id ) ");
 			sql.append(" VALUES \n"); 
-			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?) \n");
+			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -186,6 +201,8 @@ public class NSDAO {
 			ps.setString(c++, Utils.isNull(o.getStatus()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getCreateUser());
+			ps.setString(c++, Utils.isNull(o.getChannelId()));
+			ps.setString(c++, Utils.isNull(o.getProvinceId()));
 			
 			ps.executeUpdate();
 			
@@ -205,7 +222,7 @@ public class NSDAO {
 
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE NISSIN_ORDER SET order_date =? ,customer_type = ? ,customer_name=?,address_line1 =?,address_line2 =?,  \n");
-			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =? ,phone=? \n");
+			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =? ,phone=? ,channel_id =?,province_id = ? \n");
 			sql.append(" WHERE order_id = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -222,6 +239,8 @@ public class NSDAO {
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, Utils.isNull(o.getRemark()));
 			ps.setString(c++, Utils.isNull(o.getPhone()));
+			ps.setString(c++, Utils.isNull(o.getChannelId()));
+			ps.setString(c++, Utils.isNull(o.getProvinceId()));
 			
 			ps.setString(c++, Utils.isNull(o.getOrderId()));
 
@@ -273,8 +292,9 @@ public class NSDAO {
 		try{
 			
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?, CUP_QTY=?,PAC_QTY = ?,POOH_QTY =?  \n");
-			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =?  \n");
+			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?, CUP_QTY=?,CUP_QTY_N=?" +
+					",PAC_QTY = ?, PAC_QTY_N = ?, POOH_QTY =?,POOH_QTY_N =?   \n");
+			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ,CUSTOMER_CODE =? ,PENDING_REASON =? \n");
 			sql.append(" WHERE ORDER_ID = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -291,12 +311,16 @@ public class NSDAO {
 			}
 			ps.setString(c++, Utils.isNull(o.getInvoiceNo()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getCupQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getCupNQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPacQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getPacNQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPoohQty()));
-			
+			ps.setInt(c++, Utils.convertStrToInt(o.getPoohNQty()));
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, Utils.isNull(o.getSaleCode()));
+			ps.setString(c++, Utils.isNull(o.getCustomerCode()));
+			ps.setString(c++, Utils.isNull(o.getPendingReason()));
 			
 			ps.setString(c++, Utils.isNull(o.getOrderId()));
 
@@ -343,4 +367,90 @@ public class NSDAO {
 		   }
 		  return docNo;
 	}
+	 
+	 public static List<PopupForm> searchChannelList(PopupForm c,String operation) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT M.* \n");
+				sql.append("\n  from pens_sales_channel M");
+				
+				sql.append("\n  where 1=1  ");
+			
+				sql.append("\n  ORDER BY channel_id asc \n");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("Channel_id")));
+					item.setDesc(Utils.isNull(rst.getString("Channel_name")));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchProvinceList(String channelId,String operation) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT M.* ");
+				sql.append("\n  from pens_province M");
+				sql.append("\n  where 1=1  ");
+			    
+				if( !Utils.isNull(channelId).equals("")){
+					sql.append("\n  and M.channel_id = "+Utils.isNull(channelId));	
+				}
+				sql.append("\n  ORDER BY province_id asc ");
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("province_id")));
+					item.setDesc(Utils.isNull(rst.getString("province_name")));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 }

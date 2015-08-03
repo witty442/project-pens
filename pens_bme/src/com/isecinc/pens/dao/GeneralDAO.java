@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import util.Constants;
+import util.DBCPConnectionProvider;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
@@ -121,7 +122,10 @@ public class GeneralDAO {
 			}
 		
 			logger.debug("sql:"+sql);
-			conn = DBConnection.getInstance().getConnection();
+			
+			//conn = DBConnection.getInstance().getConnection();
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			
@@ -222,7 +226,10 @@ public class GeneralDAO {
 					   sql.append("\n and M.MATERIAL_MASTER ='"+c.getMatCodeSearch()+"'");
 				}
 				logger.debug("sql:"+sql);
-				conn = DBConnection.getInstance().getConnection();
+				
+				//conn = DBConnection.getInstance().getConnection();
+				conn = new DBCPConnectionProvider().getConnection(conn);
+				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				
@@ -752,4 +759,37 @@ public class GeneralDAO {
 			}
 			return m;
 		} 
+	 
+	 public static String searchPensItemByGroupCode(Connection conn,String groupCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String pensItem = "";
+			try {
+				sql.append("\n select pens_value FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and reference_code ='LotusItem' ");
+				sql.append("\n and pens_desc2 = '"+groupCode+"' \n");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					pensItem = Utils.isNull(rst.getString("pens_value"));
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				
+				} catch (Exception e) {}
+			}
+			return pensItem;
+		}
 }

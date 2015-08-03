@@ -78,7 +78,7 @@
 				</li>
 				<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
 					 <li>
-						<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=tops&action=new');">5.<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
+						<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&page=king&action=new');">5.<span><bean:message bundle="sysprop" key="ImportBMEFromKing"/></span></a>
 					</li>
 				<%} %>
 				 <li>
@@ -134,7 +134,7 @@
 			</li>
 			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 				<li>
-					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=tops');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromTops"/></span></a>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=king');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromKing"/></span></a>
 				</li>
 			<%} %>
 			<li>

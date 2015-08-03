@@ -18,13 +18,19 @@ public class NSBean implements Serializable{
 	
 	private String createUser;
 	private String updateUser;
+	private String channelId;
+	private String provinceId;
+	private String channelName;
+	private String provinceName;
 	
+	private String customerCode;
 	private String customerType;
 	private String customerName;
 	private String addressLine1;
 	private String addressLine2;
 	private String phone;
 	private String remark;
+	private String pendingReason;
 	
 	private String invoiceDate;
 	private String invoiceNo;
@@ -33,6 +39,11 @@ public class NSBean implements Serializable{
 	private String cupQty;
 	private String pacQty;
 	private String poohQty;
+	
+	private String cupNQty;
+	private String pacNQty;
+	private String poohNQty;
+	
 	private String status;
 	private String statusDesc;
 
@@ -46,6 +57,78 @@ public class NSBean implements Serializable{
 	private List<NSBean> items;
 
 	
+	public String getChannelName() {
+		return channelName;
+	}
+
+	public void setChannelName(String channelName) {
+		this.channelName = channelName;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public String getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(String channelId) {
+		this.channelId = channelId;
+	}
+
+	public String getProvinceId() {
+		return provinceId;
+	}
+
+	public void setProvinceId(String provinceId) {
+		this.provinceId = provinceId;
+	}
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public String getPendingReason() {
+		return pendingReason;
+	}
+
+	public void setPendingReason(String pendingReason) {
+		this.pendingReason = pendingReason;
+	}
+
+	public String getCupNQty() {
+		return cupNQty;
+	}
+
+	public void setCupNQty(String cupNQty) {
+		this.cupNQty = cupNQty;
+	}
+
+	public String getPacNQty() {
+		return pacNQty;
+	}
+
+	public void setPacNQty(String pacNQty) {
+		this.pacNQty = pacNQty;
+	}
+
+	public String getPoohNQty() {
+		return poohNQty;
+	}
+
+	public void setPoohNQty(String poohNQty) {
+		this.poohNQty = poohNQty;
+	}
+
 	public String getMode() {
 		return mode;
 	}

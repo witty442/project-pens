@@ -496,6 +496,50 @@ TD.createUser {
 <!-- Transaction Summary -->
 
 
+<!-- King-->
+TD.king_salesDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_custGroup {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_storeNo {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+
+TD.king_createDate {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+TD.king_createUser {
+	color: #000000;height: 25px;
+	font-size: 13px;width:5%;
+}
+<!-- ***************************************** -->
+
 th.sorted {
     background-color: orange;
     color: orange;

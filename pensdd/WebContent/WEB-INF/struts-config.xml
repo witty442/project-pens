@@ -179,6 +179,9 @@
 		<!-- Tax Receipt -->
 		<form-bean name="taxReceiptForm"
 			type="com.isecinc.pens.web.report.receipt.TaxReceiptForm" />
+			
+		<!-- Admin Console -->
+		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -808,6 +811,12 @@
 			<forward name="report" path="/jsp/reports/taxReceipt.jsp" />
 			<forward name="clearform" path="/jsp/reports/taxReceipt.jsp" />
 		</action>
+		
+			<!-- AdminConsole -->
+		<action name="adminConsoleForm" path="/jsp/adminConsole" parameter="do" scope="request" type="com.isecinc.pens.web.adminconsole.AdminConsoleAction" >
+			<forward name="process" path="/jsp/adminConsole/adminConsole.jsp" />
+		</action>
+		
 	</action-mappings>
 
 	<message-resources key="sysprop" parameter="SystemProperties" />

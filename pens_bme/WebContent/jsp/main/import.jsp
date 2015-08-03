@@ -49,6 +49,8 @@ body {
 function loadMe(){
 <% if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
    new Epoch('epoch_popup','th',document.getElementById('countDate'));
+<%}if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+   new Epoch('epoch_popup','th',document.getElementById('importDate'));
 <%}if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
    new Epoch('epoch_popup','th',document.getElementById('importDate'));
    
@@ -176,7 +178,20 @@ function importExcel(path,noCheckError){
 			alert("กรุณาเลือกไฟล์นามสกุล  xls หรือ  xlsx ");
 			return;
 		}
-	    
+	 <%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+		var importDate = form.importDate;
+	 
+	     if(importDate.value ==''){
+	    	alert("กรุณาระบุ Sale Date");
+	    	boxNo.focus();
+	    	return false;
+	    } 
+	     
+	    if(form.dataFile.value != '' && (extension == "xls" || extension == "xlsx") ){
+		}else{
+			alert("กรุณาเลือกไฟล์นามสกุล  xls หรือ  xlsx ");
+			return;
+		}
      <%}else{ %>
        if(form.dataFile.value != '' && (extension == "xls" || extension == "xlsx") ){
 		}else{
@@ -206,9 +221,6 @@ function clearForm(path){
 }
 
 </script>
-
-
-
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe(); MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -252,6 +264,10 @@ function clearForm(path){
 			<%}else if("tops".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromTops"/>
+				</jsp:include>
+		   <%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMEFromKing"/>
 				</jsp:include>
 		   <%}else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
@@ -323,7 +339,17 @@ function clearForm(path){
 								    <html:text property="boxNo" styleId="boxNo"/>
 								</td>
 							</tr>
+						<% }else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+						  
+							<tr>
+								<td align="right" width="40%">Sale Date<font color="red">*</font></td>
+								<td valign="top" align="left">
+								      <html:text property="importDate" styleId="importDate"/>
+								</td>
+							</tr>
+		
 						<%} %>
+						
 						<%  if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
 							
 						<%}else{ %>
@@ -343,6 +369,8 @@ function clearForm(path){
 								  <% if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
 							        <input type="button" value="  Import  " class="newPosBtnLong" onclick="javascript:importFTP('${pageContext.request.contextPath}','')">
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
+						          
+						     
 						          <%}else{ %>
 									<input type="button" value="  Upload  " class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','')">
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">

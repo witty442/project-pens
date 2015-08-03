@@ -94,6 +94,10 @@
              <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 			 <forward name="logoff" path="/index.jsp" /> 
+			 
+			 <forward name="passRoleNissin" path="/jsp/nsAction.do?do=prepare2&amp;action=new&amp;page=nissin" redirect="true" />
+			 <forward name="passRolePensTeam" path="/jsp/nsAction.do?do=prepare2&amp;action=new&amp;page=pens" redirect="true" />
+			
 		</action>
 
 	<!-- Interfaces -->

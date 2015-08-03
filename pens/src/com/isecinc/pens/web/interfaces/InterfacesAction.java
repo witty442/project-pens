@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.AppversionVerify;
 import util.MonitorSales;
 
 import com.isecinc.core.bean.Messages;
@@ -153,6 +154,10 @@ public class InterfacesAction extends I_Action {
 			
 			
 			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
+			
+			//check version
+			request.getSession().setAttribute("appVersionCheckMsg",null);
+			AppversionVerify.checkAppVersion(request);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

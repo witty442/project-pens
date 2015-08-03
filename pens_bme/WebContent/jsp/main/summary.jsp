@@ -60,6 +60,9 @@ function loadMe(){
     <%}else if("tops".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
+   <%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
+	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
 	<%} else if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
         new Epoch('epoch_popup', 'th', document.getElementById('countDateFrom'));
         new Epoch('epoch_popup', 'th', document.getElementById('countDateTo'));
@@ -115,6 +118,18 @@ function search(path){
 		   return false;
 	   }
    <%}else if("tops".equalsIgnoreCase(request.getParameter("page"))) {%>
+	   var salesDateFrom = form.salesDateFrom.value;
+	   var salesDateTo = form.salesDateTo.value;
+	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   //var pensCustCodeTo = form.pensCustCodeTo.value;
+	   var fileName = form.fileName.value;
+	   
+	   if(salesDateFrom =="" && salesDateTo =="" && pensCustCodeFrom ==""  &&fileName ==""){
+		   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
+		   return false;
+	   } 
+	   
+   <%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
 	   var salesDateFrom = form.salesDateFrom.value;
 	   var salesDateTo = form.salesDateTo.value;
 	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
@@ -401,6 +416,10 @@ function getCustName(custCode,fieldName,storeType){
 			   <jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEFromTops"/>
 				</jsp:include>
+			<%}else if("king".equalsIgnoreCase(request.getParameter("page"))){ %>
+			   <jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEFromKing"/>
+				</jsp:include>
 			<%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandMTT"/>
@@ -484,7 +503,7 @@ function getCustName(custCode,fieldName,storeType){
 									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
-						<%}else if("tops".equalsIgnoreCase(request.getParameter("page"))) {%>
+						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) || "king".equalsIgnoreCase(request.getParameter("page"))) {%>
 								 <tr>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
@@ -944,6 +963,32 @@ function getCustName(custCode,fieldName,storeType){
 							    <display:column  title="file Name" property="fileName"  sortable="false" class="tops_fileName"/>				
 							    <display:column  title="Create date" property="createDate"  sortable="false" class="tops_createDate"/>	
 							    <display:column  title="Create by" property="createUser"  sortable="false" class="tops_createUser"/>	
+							    	
+							</display:table>
+                    </c:if>
+                     <c:if test="${summaryForm.kingSummaryResults != null}">
+						        
+						
+							<display:table id="item" name="sessionScope.summaryForm.kingSummaryResults" defaultsort="0" defaultorder="descending"  class="resultTrans"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
+							    
+							    <display:column  title="Sales Date" property="salesDate" width="20%" sortable="false" class="king_salesDate"/>
+							    <display:column  title="Cust Group" property="custGroup" width="10%" sortable="false" class="king_custGroup"/>
+							    <display:column  title="Cust No" nowrap="false" property="storeNo"  sortable="false" class="king_storeNo"/>	
+							    <display:column  title="Cust Name" nowrap="false" property="storeName"  sortable="false" class="king_storeName"/>	
+							    <display:column  title="Code" property="kingCode" width="20%" sortable="false" class="king_kingCode"/>	
+							    <display:column  title="Description" property="kingDescription" width="10" sortable="false" class="kingDescription"/>	
+							    <display:column  title="Reference" property="kingReference"  sortable="false" class="kingReference"/>	
+                                <display:column  title="Unit Price" property="kingUnitPrice"  sortable="false" class="kingUnitPrice"/>	
+                                <display:column  title="Unit Cost" property="kingUnitCost"  sortable="false" class="kingUnitCost"/>	
+                                <display:column  title="QTY" property="qty"  sortable="false" class="king_qty"/>
+                                <display:column  title="Amount" property="kingAmount"  sortable="false" class="kingAmount"/>	
+                                <display:column  title="Cost Amount" property="kingCostAmt"  sortable="false" class="kingCostAmt"/>	
+							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="king_pensItem"/>	
+							    <display:column  title="Group Code" property="groupCode"  sortable="false" class="king_groupCode"/>	
+							    <display:column  title="file Name" property="fileName"  sortable="false" class="king_fileName"/>				
+							    <display:column  title="Create date" property="createDate"  sortable="false" class="king_createDate"/>	
+							    <display:column  title="Create by" property="createUser"  sortable="false" class="king_createUser"/>	
 							    	
 							</display:table>
                     </c:if>

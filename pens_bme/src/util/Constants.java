@@ -21,7 +21,7 @@ public class Constants {
 	public static final String STORE_TYPE_TOPS_CODE ="020058";
 
 	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
-	public static final String STORE_TYPE_MTT_CODE_2 ="020056";
+	public static final String STORE_TYPE_MTT_CODE_2 ="020056";//King Power
 	
 	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
 	

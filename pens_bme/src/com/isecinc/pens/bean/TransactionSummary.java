@@ -77,8 +77,79 @@ public class TransactionSummary implements Serializable{
 	private String updateDate;
 	private String updateUser;
 	
+	/** King **/
+	private String custGroup;
+	private String groupCode;
+	private String kingCode;
+	private String kingDescription;		
+	private String kingReference;		
+	private String kingUnitPrice;	
+	private String kingUnitCost;			
+	private String kingQty ;		
+	private String kingAmount;		
+	private String kingCostAmt;
 	
 	
+	public String getCustGroup() {
+		return custGroup;
+	}
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+	public String getGroupCode() {
+		return groupCode;
+	}
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+	public String getKingCode() {
+		return kingCode;
+	}
+	public void setKingCode(String kingCode) {
+		this.kingCode = kingCode;
+	}
+	public String getKingDescription() {
+		return kingDescription;
+	}
+	public void setKingDescription(String kingDescription) {
+		this.kingDescription = kingDescription;
+	}
+	public String getKingReference() {
+		return kingReference;
+	}
+	public void setKingReference(String kingReference) {
+		this.kingReference = kingReference;
+	}
+	public String getKingUnitPrice() {
+		return kingUnitPrice;
+	}
+	public void setKingUnitPrice(String kingUnit_Price) {
+		this.kingUnitPrice = kingUnit_Price;
+	}
+	public String getKingUnitCost() {
+		return kingUnitCost;
+	}
+	public void setKingUnitCost(String kingUnit_cost) {
+		this.kingUnitCost = kingUnit_cost;
+	}
+	public String getKingQty() {
+		return kingQty;
+	}
+	public void setKingQty(String kingQty) {
+		this.kingQty = kingQty;
+	}
+	public String getKingAmount() {
+		return kingAmount;
+	}
+	public void setKingAmount(String kingAmount) {
+		this.kingAmount = kingAmount;
+	}
+	public String getKingCostAmt() {
+		return kingCostAmt;
+	}
+	public void setKingCostAmt(String kingCostAmt) {
+		this.kingCostAmt = kingCostAmt;
+	}
 	public String getSupplier() {
 		return supplier;
 	}

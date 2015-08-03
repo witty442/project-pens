@@ -401,14 +401,20 @@ public class NSAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String page = Utils.isNull(request.getParameter("page"));
+			String action = Utils.isNull(request.getParameter("action"));
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			NSBean h = aForm.getBean();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
-			h.setStatus(NSConstant.STATUS_COMPLETE);
 			
+			if("pending".equals(action)){
+				h.setStatus(NSConstant.STATUS_PENDING);
+			}else{
+				h.setStatus(NSConstant.STATUS_COMPLETE);
+				h.setPendingReason("");
+			}
 			
 			NSDAO.updateNissinOrderByPens(conn, h);
 			
@@ -505,29 +511,42 @@ public class NSAction extends I_Action {
 			  h.append("<table border='1'> \n");
 			  h.append("<tr> \n");
 				    h.append("<th>ID</th>\n");
+					h.append("<th>Status</th>\n");
 					h.append("<th>วันที่บันทึก</th>\n");
 					h.append("<th>ประเภท</th>\n");
+					h.append("<th>รหัสร้านค้า</th>\n");
 					h.append("<th>ชื่อร้านค้า</th>\n");
+					h.append("<th>ภาค</th>\n");
+					h.append("<th>จังหวัด</th>\n");
 					h.append("<th>ที่อยู่ Line1</th>\n");
 					h.append("<th>ที่อยู่ Line2</th>\n");
 					h.append("<th>เบอร์โทรศัพท์</th>\n");
 					h.append("<th>Invoice No</th>\n");
 					h.append("<th>Invoice Date</th>\n");
-					h.append("<th>รหัส Sale Code</th>\n");
-					h.append("<th>Cup36</th>\n");
-					h.append("<th>ซอง</th>\n");
-					h.append("<th>Pooh</th>\n");
-					h.append("<th>Status</th>\n");
+					h.append("<th>รหัส Sale</th>\n");
+					
+					h.append("<th>Cup72 (หีบ)</th>\n");
+					h.append("<th>Cup72 (ถ้วย)</th>\n");
+					h.append("<th>ซอง (หีบ)</th>\n");
+					h.append("<th>ซอง  (ซอง)</th>\n");
+					h.append("<th>Pooh72 (หีบ)</th>\n");
+					h.append("<th>Pooh72 (ถ้วย)</th>\n");
+					
 					h.append("<th>Remark1</th>\n");
+					h.append("<th>Pending reason</th>\n");
 			h.append("</tr> \n");
 
 			  for(int n=0;n<resultList.size();n++){
 				NSBean mc = (NSBean)resultList.get(n);
 					h.append("<tr> \n");
 					h.append("<td>"+mc.getOrderId() +"</td>");
+					h.append("<td>"+mc.getStatusDesc()+"</td>"); 
 					h.append("<td>"+mc.getOrderDate() +"</td>");
 					h.append("<td>"+mc.getCustomerType()+"</td>");
+					h.append("<td>"+mc.getCustomerCode()+"</td>");
 				    h.append("<td>"+mc.getCustomerName()+"</td>");
+				    h.append("<td>"+mc.getChannelName()+"</td>");
+				    h.append("<td>"+mc.getProvinceName()+"</td>");
 				    h.append("<td>"+mc.getAddressLine1() +"</td>");
 				    h.append("<td>"+mc.getAddressLine2()+"</td>");
 					h.append("<td>"+mc.getPhone()+"</td>");
@@ -535,10 +554,14 @@ public class NSAction extends I_Action {
 					h.append("<td>"+mc.getInvoiceDate()+"</td>");
 					h.append("<td>"+mc.getSaleCode()+"</td>");
 					h.append("<td>"+mc.getCupQty()+"</td>");
+					h.append("<td>"+mc.getCupNQty()+"</td>");
 					h.append("<td>"+mc.getPacQty()+"</td>");
+					h.append("<td>"+mc.getPacNQty()+"</td>");
 					h.append("<td>"+mc.getPoohQty()+"</td>"); 
-					h.append("<td>"+mc.getStatusDesc()+"</td>"); 
+					h.append("<td>"+mc.getPoohNQty()+"</td>"); 
+					
 					h.append("<td>"+mc.getRemark()+"</td>"); 
+					h.append("<td>"+mc.getPendingReason()+"</td>"); 
 				    h.append("</tr>");
 				}
 				

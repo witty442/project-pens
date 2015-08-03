@@ -202,6 +202,56 @@ public class MOrder extends I_Model<Order> {
 		return order;
 	}
 	
+	public String validateProductIngroup(Connection conn,List<OrderLine> lines) throws Exception {
+		String productCodeInvalid ="";
+		String productGroupTemp = "";
+		String productGroup = "";
+		int i = 0;
+		for (OrderLine l : lines) {
+			if( !"Y".equalsIgnoreCase(l.getPromotion())){
+				productGroup = getProductGroup(conn, l.getProduct().getCode());
+				
+				if(productGroup.equals("")){
+					productGroup = "ALL"; 
+				}
+				
+				if( !productGroupTemp.equals("") &&!productGroup.equals("") && !productGroupTemp.equals(productGroup)){
+					productCodeInvalid += l.getProduct().getCode()+",";
+					//break;
+				}
+				//First line to checkAll 
+				if(i==0){
+					productGroupTemp = productGroup;
+				}
+				i++;
+			}
+		}
+		
+		return productCodeInvalid;
+	}
+	public String getProductGroup(Connection conn,String productCode) throws Exception {
+		String productGroup = "";
+		ResultSet rs= null;
+		PreparedStatement ps = null;
+		try{
+			ps =conn.prepareStatement("select group_code from m_product_special where code ='"+productCode+"'");
+			rs = ps.executeQuery();
+			if(rs.next()){
+				productGroup = Utils.isNull(rs.getString("group_code"));
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(rs != null){
+				rs.close();rs=null;
+			}
+		}
+		return productGroup;
+	}
 	
 	public Order reCalculateHeadAmountDB(Connection conn, Order order) {
 		try{
@@ -227,7 +277,6 @@ public class MOrder extends I_Model<Order> {
 		return order;
 	}
 	
-
 	public List<OrderLine> reCalculateLineAmountInLinesBeforeCalcPromotion(List<OrderLine> lines) throws Exception {
 		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
 		for (OrderLine l : lines) {
@@ -238,7 +287,6 @@ public class MOrder extends I_Model<Order> {
 		}
 		return newRecallines;
 	}
-
 	
 	public List<OrderLine> reCalculateLineAmountInLinesAfterCalcPromotion(List<OrderLine> lines) throws Exception {
 		List<OrderLine> newRecallines = new ArrayList<OrderLine>();

@@ -181,10 +181,8 @@ public class OrderProcess {
 						}
 					}
 				} else {
-					orderLine.setShippingDate(addDate(listOrderLine.get(j).getShippingDate(),
-							7 * calWeekByRoundtrip(member.getRoundTrip())));
-					orderLine.setRequestDate(addDate(listOrderLine.get(j).getRequestDate(),
-							7 * calWeekByRoundtrip(member.getRoundTrip())));
+					orderLine.setShippingDate(addDate(listOrderLine.get(j).getShippingDate(),7 * calWeekByRoundtrip(member.getRoundTrip())));
+					orderLine.setRequestDate(addDate(listOrderLine.get(j).getRequestDate(),7 * calWeekByRoundtrip(member.getRoundTrip())));
 				}
 				orderLine.setLineNo(lineNo++);
 				listOrderLine.add(orderLine);
@@ -226,7 +224,7 @@ public class OrderProcess {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("deprecation")
-	private String calShippingDate(String day, String registerDate, int week) throws Exception {
+	public String calShippingDate(String day, String registerDate, int week) throws Exception {
 		String shippingDate = "";
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"));
 		int shipDay = 0;
@@ -283,7 +281,7 @@ public class OrderProcess {
 	 * @return
 	 * @throws Exception
 	 */
-	private int calWeekByRoundtrip(String roundTrip) throws Exception {
+	public int calWeekByRoundtrip(String roundTrip) throws Exception {
 		int numRoundTrip = 0;
 		int week = 0;
 		numRoundTrip = (new Double(roundTrip).intValue());
@@ -300,7 +298,7 @@ public class OrderProcess {
 	 * @return
 	 * @throws Exception
 	 */
-	private String addDate(String date, int dayOfDate) throws Exception {
+	public String addDate(String date, int dayOfDate) throws Exception {
 		String newDate = "";
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"));
 

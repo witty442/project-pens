@@ -145,6 +145,34 @@ public class ImportDAO {
 		return dup;
 	} 
 	
+	public Boolean importKingFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		boolean dup = false;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from PENSBME_SALES_FROM_KING WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				dup = true;
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return dup;
+	} 
+	
 	public boolean importPhyFileNameIsDuplicate(String fileName) throws Exception{
 		Connection conn= null;
 		boolean dup = false;

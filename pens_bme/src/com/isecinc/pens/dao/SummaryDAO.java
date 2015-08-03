@@ -228,7 +228,9 @@ public class SummaryDAO {
 	    		   summaryList = searchBigC(c,conn,user);	
 	    		}else if("tops".equalsIgnoreCase(type)){
 		    	   summaryList = searchTops(c,conn,user);	
-		    	}
+	    		}else if("king".equalsIgnoreCase(type)){
+			       summaryList = searchKing(c,conn,user);	
+			    }
 	    	}catch(Exception e){
 	    		logger.error(e.getMessage(),e);
 	    	}finally{
@@ -671,6 +673,88 @@ public class SummaryDAO {
 			}
 			return pos;
 		}
+	  
+	  public List<TransactionSummary> searchKing(TransactionSummary c,Connection conn,User user) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			List<TransactionSummary> pos = new ArrayList<TransactionSummary>();
+			StringBuilder sql = new StringBuilder();
+			boolean salesDateFlag = false;
+			Date salesDateFromParam = null;
+			Date salesDateToParam = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT h.* " );
+				sql.append("\n  ,(SELECT pens_desc from PENSBME_MST_REFERENCE m where h.cust_no = m.pens_value and m.reference_code ='Store') as store_name " );
+				sql.append("\n from PENSBME_SALES_FROM_KING h");
+				sql.append("\n  where 1=1  ");
+				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
+					salesDateFlag = true;
+					
+					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					
+					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append(" and trunc(sale_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
+					sql.append(" and trunc(sale_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
+				}
+				
+				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("")){
+					sql.append(" and CUST_GROUP IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") \n");
+				}
+				
+				if(!Utils.isNull(c.getFileName()).equals("")){
+					sql.append(" and file_name LIKE '%"+c.getFileName()+"%' \n");
+				}
+				
+				sql.append("\n  ORDER BY sale_date ,CUST_GROUP asc \n");
+				
+				logger.debug("sql:"+sql);
+				
+				ps = conn.prepareStatement(sql.toString());
+				logger.debug("salesDateFromParam:"+salesDateFromParam);
+				logger.debug("salesDateToParam:"+salesDateToParam);
+				
+				rst = ps.executeQuery(sql.toString());
+				while (rst.next()) {
+					TransactionSummary item = new TransactionSummary();
+					
+					item.setSalesDate(Utils.stringValue(rst.getDate("SALE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCustGroup(Utils.isNull(rst.getString("CUST_GROUP")));
+					item.setStoreNo(Utils.isNull(rst.getString("CUST_NO")));
+					item.setStoreName(Utils.isNull(rst.getString("STORE_NAME")));
+					item.setPensItem(rst.getString("PENS_ITEM"));
+					item.setFileName(rst.getString("File_name"));
+					item.setGroupCode(rst.getString("group_code"));
+					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateUser(rst.getString("create_user"));
+					
+					item.setKingCode(rst.getString("code"));
+					item.setKingDescription(rst.getString("description"));
+					item.setKingReference(rst.getString("reference"));
+					item.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_2_disgit));
+					item.setKingUnitPrice(Utils.decimalFormat(rst.getDouble("unit_price"),Utils.format_current_2_disgit));
+					item.setKingUnitCost(Utils.decimalFormat(rst.getDouble("unit_cost"),Utils.format_current_2_disgit));
+					item.setKingAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
+					item.setKingCostAmt(Utils.decimalFormat(rst.getDouble("cost_amt"),Utils.format_current_2_disgit));
+				
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	  
 	  
 	  public List<Master> searchMasterList(String referenceCode,String orderBy) throws Exception {
 			Statement stmt = null;
@@ -2084,6 +2168,293 @@ public class SummaryDAO {
 						sql.append("\n  GROUP BY ");
 						sql.append("\n  L.CUST_NO,L.PENS_ITEM, ");
 						sql.append("\n  L.GROUP_CODE ");
+						sql.append("\n )SALE_OUT ");
+						sql.append("\n ON  M.customer_code = SALE_OUT.customer_code and M.pens_item = SALE_OUT.pens_item ");	 
+						sql.append("\n AND M.group_type = SALE_OUT.group_type ");
+		
+				sql.append("\n LEFT OUTER JOIN( ");
+						sql.append("\n SELECT  ");
+						sql.append("\n M.customer_code ,P.inventory_item_code as pens_item,  ");
+						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
+						sql.append("\n NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
+						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n ,( ");
+						sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc from ");
+						sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+						sql.append("\n   WHERE 1=1 and ( pens_value like  '100001%' OR pens_value like '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+						sql.append("\n   AND M.reference_code ='Store' ");
+				        sql.append("\n  ) M ");
+						sql.append("\n WHERE 1=1   ");
+						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
+						sql.append("\n AND V.customer_id = C.customer_id  ");
+						sql.append("\n AND M.cust_no = C.customer_code  ");
+						sql.append("\n AND V.Customer_id IS NOT NULL   ");
+						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
+						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						
+						if(initDate != null){
+							 sql.append("\n AND V.invoice_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND V.invoice_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}else{
+							 sql.append("\n AND V.invoice_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+							
+						sql.append("\n GROUP BY ");
+						sql.append("\n M.customer_code,P.inventory_item_code,  ");
+						sql.append("\n substr(P.inventory_item_desc,0,6) ");
+				sql.append("\n )SALE_IN ");
+				sql.append("\n ON  M.customer_code = SALE_IN.customer_code and M.pens_item = SALE_IN.pens_item ");
+				sql.append("\n AND M.group_type  = SALE_IN.group_type ");
+				sql.append("\n LEFT OUTER JOIN ( ");
+						sql.append("\n SELECT  ");
+						sql.append("\n M.customer_code,P.inventory_item_code as pens_item,  ");
+						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
+						sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
+						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n ,( ");
+						sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc from ");
+						sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+						sql.append("\n   WHERE 1=1 and ( pens_value like  '100001%' OR pens_value like '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+						sql.append("\n   AND M.reference_code ='Store' ");
+				        sql.append("\n  ) M ");
+						sql.append("\n WHERE 1=1   ");
+						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
+						sql.append("\n AND V.customer_id = C.customer_id  ");
+						sql.append("\n AND M.cust_no = C.customer_code  ");
+						sql.append("\n AND V.Customer_id IS NOT NULL   ");
+						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
+						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						
+						if(initDate != null){
+							 sql.append("\n AND V.invoice_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND V.invoice_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}else{
+							 sql.append("\n AND V.invoice_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						sql.append("\n GROUP BY ");
+						sql.append("\n M.customer_code ,P.inventory_item_code,  ");
+						sql.append("\n substr(P.inventory_item_desc,0,6)" );
+				sql.append("\n )SALE_RETURN ");
+				sql.append("\n  ON  M.customer_code = SALE_RETURN.customer_code and M.pens_item = SALE_RETURN.pens_item ");
+				sql.append("\n  AND M.group_type   = SALE_RETURN.group_type ");
+				sql.append("\n ) A ");
+				sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					OnhandSummary item = new OnhandSummary();
+					
+					item.setStoreCode(rst.getString("customer_code"));
+					item.setCustNo(rst.getString("cust_no"));
+					item.setStoreName(rst.getString("customer_desc"));
+					
+					item.setPensItem(rst.getString("pens_item"));
+					
+					item.setGroup(rst.getString("group_type"));
+					item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("init_sale_qty"),Utils.format_current_no_disgit));
+					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
+					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+					
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+	    }
+	  
+	  public List<OnhandSummary> searchOnhandMTT_King(OnhandSummary c,Date initDate,User user) throws Exception{
+		   Statement stmt = null;
+			ResultSet rst = null;
+			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+		
+				//prepare parameter
+				String christSalesDateStr ="";
+				if( !Utils.isNull(c.getSalesDate()).equals("")){
+					Date d = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStr = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+				}
+				String initDateStr ="";
+				if( initDate != null){
+					initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				}
+				
+				sql.append("\n SELECT A.* FROM(");
+				sql.append("\n SELECT M.*");
+				
+				sql.append("\n , NVL(INIT_MTT.INIT_SALE_QTY,0) AS INIT_SALE_QTY");
+				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");
+				sql.append("\n , NVL(SALE_OUT.SALE_OUT_QTY,0) AS SALE_OUT_QTY");
+				sql.append("\n , NVL(SALE_RETURN.SALE_RETURN_QTY,0) AS SALE_RETURN_QTY");
+				sql.append("\n , (NVL(INIT_MTT.INIT_SALE_QTY,0) + NVL(SALE_IN.SALE_IN_QTY,0)) - (NVL(SALE_OUT.SALE_OUT_QTY,0)+NVL(SALE_RETURN.SALE_RETURN_QTY,0)) ONHAND_QTY");
+				
+				sql.append("\n FROM(  ");
+				   sql.append("\n SELECT DISTINCT AA.* FROM(");
+						sql.append("\n SELECT DISTINCT ");
+						sql.append("\n M.customer_code,M.customer_desc,M.cust_no,P.inventory_item_code as pens_item,   ");
+						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type ");
+						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n ,( ");
+						sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
+						sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+						sql.append("\n   WHERE 1=1 and ( pens_value like  '100001%' OR pens_value like '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+						sql.append("\n   AND M.reference_code ='Store' ");
+				        sql.append("\n  ) M ");
+						sql.append("\n WHERE 1=1   ");
+						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
+						sql.append("\n AND V.customer_id = C.customer_id ");
+						sql.append("\n AND M.cust_no = C.customer_code  ");
+						sql.append("\n AND V.Customer_id IS NOT NULL   ");
+						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
+						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						
+						if(initDate != null){
+							 sql.append("\n AND V.invoice_date > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}else{
+							 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						sql.append("\n UNION ALL");
+						
+						sql.append("\n SELECT ");
+      				    sql.append("\n DISTINCT L.CUST_NO as customer_code ,M.customer_desc,M.cust_no,L.PENS_ITEM, ");
+						sql.append("\n L.GROUP_CODE as group_type ");
+						sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+						sql.append("\n ,( ");
+						sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
+						sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+						sql.append("\n   WHERE 1=1 and ( pens_value like  '100001%' OR pens_value like '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+						sql.append("\n   AND M.reference_code ='Store' ");
+				        sql.append("\n  ) M ");
+						sql.append("\n WHERE 1=1 ");
+						sql.append("\n AND H.cust_no = L.cust_no  ");
+						sql.append("\n AND M.customer_code = H.cust_no  ");
+						
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+							sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						sql.append("\n )AA");
+						
+              sql.append("\n )M ");
+              sql.append("\n LEFT OUTER JOIN(	 ");
+		            /** INIT MTT STOCK **/
+	      		    sql.append("\n SELECT ");
+					    sql.append("\n L.CUST_NO as customer_code,L.PENS_ITEM, ");
+					sql.append("\n L.GROUP_CODE as group_type, ");
+					sql.append("\n SUM(QTY) AS INIT_SALE_QTY ");
+					sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+					sql.append("\n WHERE 1=1 ");
+					sql.append("\n and H.cust_no = L.cust_no  ");
+					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					if( !Utils.isNull(c.getGroup()).equals("")){
+						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					}
+					sql.append("\n  GROUP BY ");
+					sql.append("\n  L.CUST_NO,L.PENS_ITEM, ");
+					sql.append("\n  L.GROUP_CODE ");
+					sql.append("\n )INIT_MTT ");
+					sql.append("\n ON  M.customer_code = INIT_MTT.customer_code and M.pens_item = INIT_MTT.pens_item ");	 
+					sql.append("\n AND M.group_type = INIT_MTT.group_type ");		
+				
+      		   sql.append("\n LEFT OUTER JOIN(	 ");
+      				sql.append("\n SELECT ");
+      				    sql.append("\n L.CUST_NO as customer_code,L.PENS_ITEM, ");
+						sql.append("\n L.GROUP_CODE as group_type, ");
+						sql.append("\n NVL(SUM(L.qty),0) AS SALE_OUT_QTY ");
+						sql.append("\n FROM PENSBI.pensbme_sales_from_king L");
+						sql.append("\n WHERE 1=1 ");
+						
+						if(initDate != null){
+							 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}else{
+							 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+							sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						sql.append("\n  GROUP BY ");
+						sql.append("\n  L.CUST_NO,L.PENS_ITEM, ");
+						sql.append("\n  L.GROUP_CODE ");
+						
 						sql.append("\n )SALE_OUT ");
 						sql.append("\n ON  M.customer_code = SALE_OUT.customer_code and M.pens_item = SALE_OUT.pens_item ");	 
 						sql.append("\n AND M.group_type = SALE_OUT.group_type ");

@@ -1,13 +1,22 @@
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.AppversionVerify"%>
+<%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 String role = ((User)session.getAttribute("user")).getType();
 User user = (User)session.getAttribute("user");
+
+String[] msg2 = new String[2];
+if(request.getSession().getAttribute("appVersionCheckMsg") != null){
+	msg2 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
+}else{
+	msg2 = AppversionVerify.checkAppVersion(request);
+}
+
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
 <title>PENS SALESYSTEM</title>
@@ -67,7 +76,7 @@ body {
 
 <div id="dialog" title="คำแนะนำ">
     <p align="center"><b>
-     <font color="red"><%=AppversionVerify.checkAppVersion(request) %></font></b>
+     <font color="red"><%=msg2[0] %></font> OR <%=msg2[1] %></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
 	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>

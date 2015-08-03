@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import util.AppversionVerify;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 
@@ -68,6 +69,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("appVersionCheckMsg",null);
 			request.getSession().setAttribute("massageToSales",null);
 			
+			AppversionVerify.checkAppVersion(request);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

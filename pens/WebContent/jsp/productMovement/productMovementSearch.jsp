@@ -34,7 +34,7 @@ function loadMe(){
 <body topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" style="height: 100%;" onload="loadMe();">
 <table id="maintab" align="center" border="0" cellpadding="0" cellspacing="0" style="buttom:0;" class="body">
 	<tr>
-		<td bgcolor="#FFFFFF"><jsp:include page="../../header.jsp"/></td>
+		<td bgcolor="#FFFFFF"><jsp:include page="../header.jsp"/></td>
 	</tr>
 	<tr id="framerow">
 		<td valign="top" align="center">
@@ -144,7 +144,7 @@ function loadMe(){
 		</td>
 	</tr>
 	<tr>
-		<td bgcolor="#FFFFFF"><jsp:include page="../../footer.jsp"/></td>
+		<td bgcolor="#FFFFFF"><jsp:include page="../footer.jsp"/></td>
 	</tr>
 </table>
 </body>

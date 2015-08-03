@@ -554,6 +554,13 @@ public class Utils {
 		return str.trim();
 	}
 	
+	public static String isNull(int str) {
+		if (str ==0){
+			return "";
+		}
+		return String.valueOf(str);
+	}
+	
 	public static String isNull(Object str) {
 		if (str ==null){
 			return "";

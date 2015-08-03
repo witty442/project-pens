@@ -51,6 +51,14 @@ if(request.getAttribute("orderForm") != null){
 }
 System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
+System.out.println("Message:"+request.getAttribute("Message"));
+
+String saveBtnDisable = "";
+String saveBtnStyle ="newPosBtn";
+if(request.getAttribute("do_not_save") != null){
+	saveBtnDisable = "disabled";
+	//saveBtnStyle ="newPosBtnDisable";
+}
 %>
 
 <%@page import="java.util.List"%>
@@ -87,6 +95,9 @@ body {
 function loadMe(){
 	calculatePrice();	
 	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
+	<%if(request.getAttribute("Message") != null){%>
+	  alert("<%=request.getAttribute("Message")%>");
+	<%} %>
 }
 
 function printListOrderProductReport(path,userType){
@@ -480,9 +491,9 @@ function stampPrint(){
 									<!-- WIT EDIT:04/08/2554 ***************-->
 
 									<!-- OLD CODE ************************ -->
-									
-									   <input type="button" value="บันทึก" class="newPosBtn" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')">
-									
+									<% if(request.getAttribute("do_not_save") == null){%>
+									   <input type="button" value="บันทึก" class="<%=saveBtnStyle %>" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')" <%=saveBtnDisable %>>
+									<%} %>
 									<!-- OLD CODE ************************ -->
 									<%if(User.VAN.equals(user.getType())){%>
 									 

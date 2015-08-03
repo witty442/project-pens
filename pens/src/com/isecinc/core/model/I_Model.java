@@ -43,6 +43,8 @@ public abstract class I_Model<T> implements Serializable {
 		try {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String sql = "SELECT * FROM " + tableName + " WHERE " + columnID + " = ? ";
+			logger.debug("sql:"+sql+",id:"+id);
+			
 			List<T> ts = Database.query(sql, new Object[] { id }, classes, conn);
 			if (ts.size() > 0) {
 				t = ts.get(0);
@@ -74,7 +76,7 @@ public abstract class I_Model<T> implements Serializable {
 		try {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String sql = "SELECT * FROM " + tableName + " WHERE 1 = 1 " + (whereCause.length() > 0 ? whereCause : "");
-			
+			logger.debug("sql:"+sql);
 			List<T> ts = Database.query(sql, null, classes, conn);
 			return ts;
 		} catch (Exception e) {

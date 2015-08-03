@@ -973,6 +973,53 @@ public class MemberOrderAction extends OrderAction {
 		return mapping.findForward("prepare");
 	}
 
+	public ActionForward saveNewLineAuto(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		try {
+			OrderForm orderForm = (OrderForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+
+			Order order = new MOrder().find(String.valueOf(orderForm.getOrder().getId()));
+			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
+
+			if (!isTokenValid(request)) {
+				orderForm.setOrder(order);
+				orderForm.setLines(lstLines);
+				resetToken(request);
+				saveToken(request);
+				return mapping.findForward("prepare");
+			}
+
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn.setAutoCommit(false);
+
+			lstLines.addAll(new MOrder().saveNewLineAuto(order, user, conn));
+			
+			conn.commit();
+
+			//request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+		
+			orderForm.setLines(lstLines);
+
+			saveToken(request);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			try {
+				conn.rollback();
+			} catch (Exception e2) {}
+		} finally {
+			try {
+				conn.setAutoCommit(true);
+			} catch (Exception e2) {}
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("prepare");
+	}
 	/**
 	 * Re-Expire Date
 	 * 

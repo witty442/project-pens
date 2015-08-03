@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.bean.NSBean"%>
+<%@page import="com.isecinc.pens.dao.NSDAO"%>
 <%@page import="com.isecinc.pens.dao.RTDAO"%>
 <%@page import="com.isecinc.pens.bean.RTBean"%>
 <%@page import="com.isecinc.pens.web.nissin.NSForm"%>
@@ -29,6 +31,8 @@
 <%
 User user = (User) request.getSession().getAttribute("user");
 
+NSBean bean = ((NSForm)session.getAttribute("nsForm")).getBean();
+System.out.println("Bean:"+bean.getChannelId());
 
 %>
 <html>
@@ -81,7 +85,13 @@ span.pagelinks {
 <script type="text/javascript">
 
 function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('orderDate'));
+	//new Epoch('epoch_popup', 'th', document.getElementById('orderDate'));
+	
+	<%if( !"".equals(bean.getChannelId())) { %>
+       document.getElementsByName('bean.channelId')[0].value = <%=bean.getChannelId()%>;
+	   loadProvince();
+	   document.getElementsByName('bean.provinceId')[0].value = <%=bean.getProvinceId()%>;
+	<% } %>
 }
 function clearForm(path){
 	var form = document.nsForm;
@@ -99,12 +109,28 @@ function back(path){
 
 function save(path){
 	var form = document.nsForm;
+	if( $('#customerType').val()==""){
+		alert("กรุณาระบุ ประเภทร้านค้า");
+		return false;
+	}
+	if( $('#channelId').val()==""){
+		alert("กรุณาระบุ ภาค");
+		return false;
+	}
+	if( $('#provinceId').val()==""){
+		alert("กรุณาระบุ จังหวัด");
+		return false;
+	}
 	if( $('#customerName').val()==""){
 		alert("กรุณาระบุ ร้านค้า");
 		return false;
 	}
 	if( $('#orderDate').val()==""){
 		alert("กรุณาระบุ วันทีบันทึก");
+		return false;
+	}
+	if( $('#phone').val()==""){
+		alert("กรุณาระบุ หมายเลขโทรศัพท์");
 		return false;
 	}
 	
@@ -130,6 +156,20 @@ function completeAction(path){
 	}
 	return false;
 }
+function loadProvince(){
+	var cboDistrict = document.getElementsByName('bean.provinceId')[0];
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/provinceListBoxAjax.jsp",
+			data : "channelId=" + document.getElementsByName('bean.channelId')[0].value,
+			async: false,
+			success: function(getData){
+				var returnString = jQuery.trim(getData);
+				cboDistrict.innerHTML=returnString;
+			}
+		}).responseText;
+	});
+}
 
 </script>
 
@@ -137,7 +177,7 @@ function completeAction(path){
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
-		<td colspan="3"><jsp:include page="../headerMC.jsp"/></td>
+		<td colspan="3"><jsp:include page="../headerSP.jsp"/></td>
 	</tr>
   	<tr id="framerow">
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
@@ -196,14 +236,23 @@ function completeAction(path){
                                     <td align="right"> วันที่บันทึก
                                       
                                     </td>
-									<td align="left"><html:text property="bean.orderDate" styleClass="" styleId="orderDate"></html:text>
-									    ประเภท
+									<td align="left"><html:text property="bean.orderDate" styleClass="disableText" readonly="true" styleId="orderDate"/>
+									
+									    ประเภท <font color="red">*</font>
 										 <html:select property="bean.customerType" styleId="customerType" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
 										    <html:option value="Mini">Mini</html:option>
 											<html:option value="Shop">Shop</html:option>
 										   </html:select>
+								    ภาค <font color="red">*</font>
+										  <html:select property="bean.channelId" styleId="channelId" onchange="loadProvince();">
+											<html:options collection="channelList" property="code" labelProperty="desc"/>
+									    </html:select>
+									    
+									    จังหวัด  <font color="red">*</font>
+									      <html:select property="bean.provinceId" styleId="provinceId" >
+									    </html:select> 
 									</td>
 								</tr>
 								<tr>
@@ -228,7 +277,7 @@ function completeAction(path){
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> เบอร์โทรศัพท์
+                                    <td  align="right"> เบอร์โทรศัพท์ <font color="red">*</font>
 									</td>
 									<td align="left">
 									  <html:text property="bean.phone" styleClass="" styleId="phone" size="20"></html:text>

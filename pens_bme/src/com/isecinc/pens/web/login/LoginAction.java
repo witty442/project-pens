@@ -68,7 +68,6 @@ public class LoginAction extends DispatchAction {
 			if(User.MC.equalsIgnoreCase(role) || User.MT_SALE.equalsIgnoreCase(role)){
 				forwordStr = "pass_user_mc";
 			}
-			logger.debug("forwordStr:"+forwordStr);
 			
 			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
 			if(screenWidth.equals("")){
@@ -81,6 +80,13 @@ public class LoginAction extends DispatchAction {
 			logger.debug("After Calc ScreenWidth:"+screenWidth);
 			
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
+			
+			if(role.equalsIgnoreCase(User.NISSINTEAM)){
+				forwordStr = "passRoleNissin";
+			}else if(role.equalsIgnoreCase(User.PENSTEAM)){
+				forwordStr = "passRolePensTeam";
+			}
+			logger.debug("forwordStr:"+forwordStr);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());

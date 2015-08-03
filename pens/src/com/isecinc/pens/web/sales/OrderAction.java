@@ -554,7 +554,18 @@ public class OrderAction extends I_Action {
 			
 			// Re-Calculate TotalAmount,vatAmount,netAmount
 			orderForm.setOrder(new MOrder().reCalculateHeadAmount(orderForm.getOrder(), orderForm.getLines()));
-
+			
+			//Validate Case Credit don't have product in different group
+			if(User.TT.equals(userActive.getType()) ){
+				String productInvalid = new MOrder().validateProductIngroup(conn, orderForm.getLines());
+				if(productInvalid.length() >0){
+					productInvalid = productInvalid.substring(0,productInvalid.length()-1);
+					
+					request.setAttribute("Message","ไม่สามารถยันทึกข้อมูลได้     มีบางสินค้าที่ระบุ ต้องบันทึกแยก Order" );
+					request.setAttribute("do_not_save", "true");
+				}
+			}
+			
 			//Set Data to Session to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print", orderForm);
 			
@@ -1313,6 +1324,9 @@ public class OrderAction extends I_Action {
 		Customer customer = null;
 		Address address = null;
 		List<Address> addresses = new ArrayList<Address>();
+		
+		String caseReport ="2";//for 
+		
 		try {
 			boolean baddr = false;
 			String fileType =  request.getParameter("fileType");
@@ -1468,6 +1482,13 @@ public class OrderAction extends I_Action {
 			}
 
 			String fileName = "tax_invoice_summary_report";
+			/*if("copy".equalsIgnoreCase(reportType)){
+				if("2".equalsIgnoreCase(caseReport)){
+				  fileName = "tax_invoice_summary_2_report";
+				}
+			}*/
+			logger.info("Report Name:"+fileName);
+			
 			String fileJasper = BeanParameter.getReportPath() + fileName;
            
 			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);

@@ -88,6 +88,8 @@ public class MProductPrice extends I_Model<ProductPrice> {
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id = '" + uomId + "' ";
 		whereCause += "  and isactive = 'Y' ";
+		logger.debug("sql:"+whereCause);
+		
 		List<ProductPrice> pp = super.search(TABLE_NAME, COLUMN_ID, whereCause, ProductPrice.class);
 		if (pp.size() > 0) return pp.get(0);
 		else return null;

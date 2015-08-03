@@ -14,7 +14,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.login.LoginProcess;
-import com.isecinc.pens.report.salesanalyst.SAConstants;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
@@ -75,6 +74,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			
 			request.getSession(true).setAttribute("user", user);
+			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

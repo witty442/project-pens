@@ -41,7 +41,7 @@ List<String> cannotEditTrips = new ArrayList<String>();
 <%@page import="com.isecinc.pens.model.MProductPrice"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<title>XX<bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <style type="text/css">
@@ -226,6 +226,13 @@ function saveCallBeforeLine(id, chks){
 	document.orderForm.action = "${pageContext.request.contextPath}/jsp/memberOrderAction.do?do=saveCallBeforeLine&needCall="+call+"&lineId="+id;
 	document.orderForm.submit();
 }
+
+function saveNewLineAuto(){
+	document.orderForm.action = "${pageContext.request.contextPath}/jsp/memberOrderAction.do?do=saveNewLineAuto";
+	document.orderForm.submit();
+	return true;
+}
+
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -286,6 +293,7 @@ function saveCallBeforeLine(id, chks){
 	<tr>
 		<td colspan="4">
 			<jsp:include page="memberNewProduct.jsp"></jsp:include>
+			<input type="button" value="เพิ่มรายการใหม่อัตโนมัติ" id="addNewGroupBtn" onclick="saveNewLineAuto();">
 		</td>
 	</tr>
 	<tr>

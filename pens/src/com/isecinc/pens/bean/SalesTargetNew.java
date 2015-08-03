@@ -41,11 +41,16 @@ public class SalesTargetNew extends I_PO implements Serializable {
 		setTargetTo("");
 		if (rst.getTimestamp("TARGET_TO") != null)
 			setTargetTo(DateToolsUtil.convertToString(rst.getTimestamp("TARGET_TO")));
+		
+		System.out.println("productId:"+rst.getString("PRODUCT_ID")); 
+		
 		setProduct(new MProduct().find(rst.getString("PRODUCT_ID")));
+		
 		setUom(new MUOM().find(rst.getString("UOM_ID")));
 		setTargetQty(rst.getInt("TARGET_QTY"));
 		setUserId(rst.getInt("USER_ID"));
 
+		//System.
 		setDisplayLabel();
 	}
 
@@ -54,16 +59,26 @@ public class SalesTargetNew extends I_PO implements Serializable {
 	 */
 	protected void setDisplayLabel() throws Exception {
 		// Calculate Price...
-		calculateTargetAmount();
+		try{
+		  calculateTargetAmount();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	public void calculateTargetAmount() throws Exception {
+		try{
 		User u = new MUser().find(String.valueOf(getUserId()));
 		PriceList priceList = new MPriceList().getPriceList(u.getOrderType().getKey(), getTargetFrom(), getTargetTo());
 		ProductPrice pp = new MProductPrice().lookUp(getProduct().getId(), priceList.getId(), getUom().getId());
+		
 		if (pp != null) setTargetAmount(pp.getPrice() * getTargetQty());
 		else setTargetAmount(0);
+				
 		setPriceList(priceList);
+		}catch(Exception e){
+			
+		}
 	}
 
 	@Override

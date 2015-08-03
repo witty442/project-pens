@@ -135,10 +135,8 @@ public class OrderAction extends I_Action {
 				logger.debug("priceListId:"+orderForm.getOrder().getPriceListId());
 				
 			}else{
-				orderForm.getOrder().setPriceListId(
-						new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId());
+				orderForm.getOrder().setPriceListId(new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId());
 			}
-			
 			
 			// user
 			orderForm.getOrder().setSalesRepresent(user);
@@ -199,9 +197,7 @@ public class OrderAction extends I_Action {
 					lines.setFullUom(ConvertNullUtil.convertToString(lines.getUom1().getCode()) + "/"
 							+ ConvertNullUtil.convertToString(lines.getUom2().getCode()));
 					lines.setPromotion("N");
-					lines
-							.setShippingDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH"))
-									.format(new Date()));
+					lines.setShippingDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
 					lines.setRequestDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
 					orderForm.getLines().add(lines);
 					i++;

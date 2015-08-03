@@ -740,7 +740,9 @@ public class ReportUtilServlet extends HttpServlet {
 					logger.debug("tax_invoice_report Step 2 User Printer defalut  End exported");
 		        }
 		   
-			}else if("list_order_product_report".equalsIgnoreCase(fileName) || "tax_invoice_summary_report".equalsIgnoreCase(fileName)){
+			}else if("list_order_product_report".equalsIgnoreCase(fileName)
+					|| "tax_invoice_summary_report".equalsIgnoreCase(fileName)
+					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)){
 				try{
 					PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
 					if (services == null || services.length < 1) {

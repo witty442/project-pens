@@ -11,3 +11,10 @@ INSERT INTO pens.c_reference
 	(REFERENCE_ID, CODE, NAME, DESCRIPTION, VALUE, ISACTIVE)
 VALUES 
 	(2401, 'C4_PROM_GOODS', 'C4_PROM_GOODS', 'C4_PROM_GOODS Method(1[old],2[NEW])', '2', 'Y');
+	
+create table pens.m_product_special(
+ group_code varchar(30) not null,
+ code varchar(30) not null,
+ create_date timestamp,
+ PRIMARY KEY (code)
+);

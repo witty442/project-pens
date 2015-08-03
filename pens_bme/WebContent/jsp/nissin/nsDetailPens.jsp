@@ -28,8 +28,6 @@
 
 <%
 User user = (User) request.getSession().getAttribute("user");
-
-
 %>
 <html>
 <head>
@@ -63,13 +61,16 @@ span.pagelinks {
 	font-size: 15px;
 }
 
-.day {
-  width: 14%;
+fieldset
+{
+    border: 1px solid #ddd;
+    padding: 0 1.4em 1.4em 1.4em;
+    margin: 0 0 1.5em 0;
+    border-radius: 8px;
+    margin: 0 5px;
+    height: 180px;
 }
-.holiday {
-  width: 14%;
-  background-color: #F78181;
-}
+
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
@@ -82,6 +83,24 @@ span.pagelinks {
 
 function loadMe(){
 	new Epoch('epoch_popup', 'th', document.getElementById('invoiceDate'));
+	
+	document.getElementsByName('bean.channelId')[0].value = ${nsForm.bean.channelId};
+	loadProvince();
+	document.getElementsByName('bean.provinceId')[0].value = ${nsForm.bean.provinceId};
+}
+function loadProvince(){
+	var cboDistrict = document.getElementsByName('bean.provinceId')[0];
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/provinceListBoxAjax.jsp",
+			data : "channelId=" + document.getElementsByName('bean.channelId')[0].value,
+			async: false,
+			success: function(getData){
+				var returnString = jQuery.trim(getData);
+				cboDistrict.innerHTML=returnString;
+			}
+		}).responseText;
+	});
 }
 function clearForm(path){
 	var form = document.nsForm;
@@ -99,11 +118,47 @@ function back(path){
 
 function savePens(path){
 	var form = document.nsForm;
-	if(confirm("กรุณายืนยันการ บันทึกข้อมูล")){
-		form.action = path + "/jsp/nsAction.do?do=savePens&action=newsearch";
-		form.submit();
-		return true;
+
+	
+	if( $('#status').val()=="P"){
+		if( $('#customerCode').val() !="" || $('#saleCode').val() !="" || $('#invoiceDate').val() !=""){
+			alert("มีการระบุข้อมูล รหัสร้านค้า รหัส Sale วันที่ Invoice Date ไม่สามารถ เปลี่ยนสถานะเป็น PENDING ได้");
+			return false;
+		}
+		if( $('#pendingReason').val() ==""){
+			alert("กรุณาระบุ เหตุผลในการ Pending");
+			$('#pendingReason').focus();
+			return false;
+		}
+		if(confirm("กรุณายืนยันการ PENDING ข้อมูล  ")){
+			form.action = path + "/jsp/nsAction.do?do=savePens&action=pending";
+			form.submit();
+			return true;
+		}
+		
+	}else{
+		if( $('#customerCode').val()==""){
+			alert("กรุณาระบุ รหัสร้านค้า");
+			$('#customerCode').focus();
+			return false;
+		}
+		if( $('#saleCode').val()==""){
+			alert("กรุณาระบุ รหัส SaleCode");
+			$('#saleCode').focus();
+			return false;
+		}
+		if( $('#invoiceDate').val()==""){
+			alert("กรุณาระบุ Invoice Date");
+			$('#invoiceDate').focus();
+			return false;
+		}
+		if(confirm("กรุณายืนยันการ บันทึกข้อมูล")){
+			form.action = path + "/jsp/nsAction.do?do=savePens&action=newsearch";
+			form.submit();
+			return true;
+		}
 	}
+	
 	return false
 }
 function cancelAction(path){
@@ -115,15 +170,7 @@ function cancelAction(path){
 	}
 	return false;
 }
-function completeAction(path){
-	var form = document.nsForm;
-	if(confirm("กรุณายืนยันการ Confirm ข้อมูล  จะแก้ไขไม่ได้อีกแล้ว")){
-		form.action = path + "/jsp/nsAction.do?do=completeAction";
-		form.submit();
-		return true;
-	}
-	return false;
-}
+
 
 </script>
 
@@ -131,7 +178,7 @@ function completeAction(path){
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
-		<td colspan="3"><jsp:include page="../headerMC.jsp"/></td>
+		<td colspan="3"><jsp:include page="../headerSP.jsp"/></td>
 	</tr>
   	<tr id="framerow">
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
@@ -197,6 +244,14 @@ function completeAction(path){
 										    <html:option value="Mini">Mini</html:option>
 											<html:option value="Shop">Shop</html:option>
 										   </html:select>
+										      ภาค 
+										  <html:select property="bean.channelId" styleId="channelId" disabled="true">
+											<html:options collection="channelList" property="code" labelProperty="desc"/>
+									    </html:select>
+									    
+									    จังหวัด  
+									      <html:select property="bean.provinceId" styleId="provinceId" disabled="true">
+									    </html:select> 
 									</td>
 								</tr>
 								<tr>
@@ -225,50 +280,97 @@ function completeAction(path){
 									</td>
 									<td align="left">
 									  <html:text property="bean.phone" styleClass="disableText" styleId="phone" size="20"></html:text>
+									  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+									    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+									    &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
+									
+									   
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Remark1 </td>
 									<td align="left">
-									   <html:text property="bean.remark" styleClass="disableText" styleId="remark" size="150" maxlength="200"></html:text>
+									   <html:text property="bean.remark" styleClass="disableText" styleId="remark" size="60" maxlength="200"></html:text>
+									   &nbsp; &nbsp;
+									  
+									   
 									</td>
 								</tr>
+								 <tr>
+                                    <td  align="center" colspan="2"><hr> </td>
+								</tr> 
+								 
 								<tr>
-                                    <td  align="center" colspan="2"> ------------------------------------------------------------------------ </td>
-								</tr>
-								<tr>
-									<td align="center" colspan="2">
-									    Invoice Date 
-									   <html:text property="bean.invoiceDate" styleClass="" styleId="invoiceDate" size="10" readonly="true" ></html:text>
-									   Invoice No
-									   <html:text property="bean.invoiceNo" styleClass="" styleId="invoiceNo" size="30" maxlength="30"></html:text>
-									</td>
-								</tr>
-								<tr>
-									<td align="center" colspan="2">
-									    รหัส Sale Code
-									   <html:text property="bean.saleCode" styleClass="" styleId="saleCode" size="20" ></html:text>
-									   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-									    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-									</td>
-								</tr>
-								<tr>
-                                    <td  align="left" colspan="2" >
-                                    <table align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
-	                                    <tr>
-	                                      <th colspan="3" align="center">จำนวน / หีบ</th>
+                                    <td  align="left" colspan="2">
+                                      
+	                                     <table align="left" border="0" cellpadding="3" cellspacing="2" >
+	                                       <tr>
+	                                         <td>
+	                                          <fieldset>
+		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" >
+		                                         <tr><td>
+				                                                                                                                                    รหัสร้านค้า<font color="red">*</font>  
+													   <html:text property="bean.customerCode" styleClass="" styleId="customerCode" size="20" readonly="" ></html:text>
+													       รหัส Sale <font color="red">*</font> 
+													    <html:text property="bean.saleCode" styleClass="" styleId="saleCode" size="20" ></html:text>
+												 </td></tr>
+												 <tr><td>
+												   
+												   Invoice Date<font color="red">*</font> 
+												   <html:text property="bean.invoiceDate" styleClass="" styleId="invoiceDate" size="20" readonly="true" ></html:text>
+												   Invoice No
+												   <html:text property="bean.invoiceNo" styleClass="" styleId="invoiceNo" size="30" maxlength="30"></html:text>
+												    </td></tr>
+											   </table>
+											   
+		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
+			                                    <tr>
+			                                      <th colspan="2">CUP 72</th>
+			                                      <th colspan="2">ซอง</th>
+			                                      <th colspan="2">POOH</th>
+			                                    </tr>
+			                                    <tr>
+			                                      <th>หีบ</th>
+			                                      <th>ถ้วย</th>
+			                                      <th>หีบ</th>
+			                                      <th>ซอง</th>
+			                                      <th>หีบ</th>
+			                                      <th>ถ้วย</th>
+			                                    </tr>
+			                                    <tr>
+			                                       <td><html:text property="bean.cupQty" styleClass="" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.cupNQty" styleClass="" styleId="cupNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.pacQty" styleClass="" styleId="pacQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.pacNQty" styleClass="" styleId="pacNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.poohQty" styleClass="" styleId="poohQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.poohNQty" styleClass="" styleId="poohNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                    </tr>
+		                                      </table>
+		                                    </fieldset>
+		                                </td>
+		                                 
+	                                    <td align="right">
+	                                       <fieldset >
+			                                    <table align="right" border="0" cellpadding="3" cellspacing="2" >
+				                                    <tr>
+				                                       <td>เปลี่ยนสถานะเป็น PENDING 
+					                                       <html:select property="bean.status" styleId="status" >
+					                                          <html:option value=""></html:option>
+					                                       	   <html:option value="P">PENDING</html:option>
+														   </html:select></td>
+				                                    </tr>
+				                                    <tr>
+				                                       <td nowrap>เหตุผลที่ PENDING
+				                                        <html:text property="bean.pendingReason" styleClass="" styleId="pendingReason" size="60" maxlength="200"></html:text>
+				                                       </td>
+				                                      
+				                                    </tr>
+			                                    </table>
+		                                     </fieldset>
+	                                     </td>
 	                                    </tr>
-	                                    <tr>
-	                                      <th>CUP 36</th>
-	                                      <th>ซอง</th>
-	                                      <th>POOH</th>
-	                                    </tr>
-	                                    <tr>
-	                                      <td><html:text property="bean.cupQty" styleClass="" styleId="cupQty" size="20" onkeydown="return inputNum(event);"/> </td>
-	                                      <td><html:text property="bean.pacQty" styleClass="" styleId="pacQty" size="20" onkeydown="return inputNum(event);"/> </td>
-	                                      <td><html:text property="bean.poohQty" styleClass="" styleId="poohQty" size="20" onkeydown="return inputNum(event);"/> </td>
-	                                    </tr>
-                                    </table>
+                                     </table>
+                                   
 								</tr>
 						   </table>
 						   

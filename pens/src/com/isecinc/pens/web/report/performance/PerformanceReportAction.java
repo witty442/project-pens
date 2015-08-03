@@ -31,36 +31,40 @@ public class PerformanceReportAction extends I_ReportAction<PerformanceReport> {
 	@SuppressWarnings("unchecked")
 	protected List<PerformanceReport> searchReport(ActionForm form, HttpServletRequest request,
 			HttpServletResponse response, HashMap parameterMap, Connection conn) throws Exception {
+		
 
 		PerformanceReportProcess process = new PerformanceReportProcess();
 		PerformanceReportForm reportForm = (PerformanceReportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-
-		// get sum all.
-		PerformanceReport p = process.getSumAll(reportForm.getPerformanceReport(), user, conn);
-		if (p != null) {
-			parameterMap.put("order_date", DateToolsUtil.dateNumToWord(reportForm.getPerformanceReport().getOrderDate()));
-			parameterMap.put("total_discount", p.getAllDiscount());
-			parameterMap.put("total_amount", p.getAllCashAmount());
-			parameterMap.put("total_receipt", p.getAllReceiptAmount());
-			parameterMap.put("total_vat", p.getAllVatAmount());
-			parameterMap.put("total_net", p.getAllNetAmount());
-			parameterMap.put("target_amount", p.getAllTargetAmount());
-			parameterMap.put("total_vat_cash", p.getAllVatCashAmount());
-			parameterMap.put("total_vat_receipt", p.getAllVatReceiptAmount());
-			parameterMap.put("total_cancel_amount", p.getTotalCancelAmountToday());
+		try{
+		   // get sum all.
+			PerformanceReport p = process.getSumAll(reportForm.getPerformanceReport(), user, conn);
+			if (p != null) {
+				parameterMap.put("order_date", DateToolsUtil.dateNumToWord(reportForm.getPerformanceReport().getOrderDate()));
+				parameterMap.put("total_discount", p.getAllDiscount());
+				parameterMap.put("total_amount", p.getAllCashAmount());
+				parameterMap.put("total_receipt", p.getAllReceiptAmount());
+				parameterMap.put("total_vat", p.getAllVatAmount());
+				parameterMap.put("total_net", p.getAllNetAmount());
+				parameterMap.put("target_amount", p.getAllTargetAmount());
+				parameterMap.put("total_vat_cash", p.getAllVatCashAmount());
+				parameterMap.put("total_vat_receipt", p.getAllVatReceiptAmount());
+				parameterMap.put("total_cancel_amount", p.getTotalCancelAmountToday());
+				
+			}
+			parameterMap.put("total_visit", process.getCountVisit(reportForm.getPerformanceReport(), user, conn));
+			parameterMap.put("total_customer", process.getCountCustomer(reportForm.getPerformanceReport(), user, conn));
 			
-		}
-		parameterMap.put("total_visit", process.getCountVisit(reportForm.getPerformanceReport(), user, conn));
-		parameterMap.put("total_customer", process.getCountCustomer(reportForm.getPerformanceReport(), user, conn));
-		
-		int countRecord[] = process.getCountOrderItem(reportForm.getPerformanceReport(), user, conn);
-		parameterMap.put("total_record_item",countRecord[0] );
-		parameterMap.put("total_record_cancel",countRecord[1] );
-		
-		setFileType(reportForm.getCriteria().getFileType());
-		setFileName("performance_report");
+			int countRecord[] = process.getCountOrderItem(reportForm.getPerformanceReport(), user, conn);
+			parameterMap.put("total_record_item",countRecord[0] );
+			parameterMap.put("total_record_cancel",countRecord[1] );
+			
+			setFileType(reportForm.getCriteria().getFileType());
+			setFileName("performance_report");
 
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return process.doReport(reportForm.getPerformanceReport(), user, conn);
 	}
 
