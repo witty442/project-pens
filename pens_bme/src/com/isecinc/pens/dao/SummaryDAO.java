@@ -702,7 +702,7 @@ public class SummaryDAO {
 				}
 				
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("")){
-					sql.append(" and CUST_GROUP IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") \n");
+					sql.append(" and CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") \n");
 				}
 				
 				if(!Utils.isNull(c.getFileName()).equals("")){
@@ -864,6 +864,8 @@ public class SummaryDAO {
 					}else if(storeType.equalsIgnoreCase("MTT")){
 						sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%' ) \n");
+					}else if(storeType.equalsIgnoreCase("king")){
+						sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%' \n");
 					}
 				}
 				

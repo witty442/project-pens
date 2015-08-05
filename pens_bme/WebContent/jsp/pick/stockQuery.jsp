@@ -67,9 +67,12 @@ span.pagelinks {
 function loadMe(){
 	// new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
 
-	if(document.getElementsByName('bean.wareHouse')[0].checked==false 
-			&& document.getElementsByName('bean.wareHouse')[1].checked ==false 
-			&& document.getElementsByName('bean.wareHouse')[2].checked ==false){
+	if(   document.getElementsByName('bean.wareHouse')[0].checked==false 
+	   && document.getElementsByName('bean.wareHouse')[1].checked ==false 
+	   && document.getElementsByName('bean.wareHouse')[2].checked ==false
+	   && document.getElementsByName('bean.wareHouse')[3].checked ==false){
+		
+		
 		document.getElementsByName('bean.wareHouse')[0].checked =true;//default W1
 	}
 	
@@ -169,6 +172,9 @@ function swithWareHouse(){
 	}else if(document.getElementsByName('bean.wareHouse')[2].checked){//W3{
 		loadStatusList('W3');
 		loadSummaryTypeList('W3');
+	}else if(document.getElementsByName('bean.wareHouse')[3].checked){//W4{
+		loadStatusList('W4');
+		loadSummaryTypeList('W4');
 	}
 	
 	loadSummaryTypeListW2(document.getElementsByName('bean.status')[0]);
@@ -271,6 +277,7 @@ function loadSummaryTypeListW2(status){
 										<html:radio property="bean.wareHouse" value="W1" onclick="swithWareHouse()">W1-คลังคืนโรงงานวาโก้</html:radio>
 										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-คลังสต็อก B'me สำหรับโอน</html:radio>
 										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-เบิกสินค้าจากคลังขายสด-เบิกทั้งกล่อง</html:radio>
+										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-คลังสินค้า HIS&HER</html:radio>
 									</td>
 								</tr>
 						       <tr>
@@ -279,11 +286,9 @@ function loadSummaryTypeListW2(status){
 										 <html:text property="bean.pensItemFrom" styleId="pensItemFrom" size="20"/>
 									</td>
 									<td> 
-									    PensItem To       
+									    PensItem To    <html:text property="bean.pensItemTo" styleId="pensItemTo" size="20"/>   
 									</td>
-									<td>					
-										<html:text property="bean.pensItemTo" styleId="pensItemTo" size="20"/>
-									</td>
+									<td></td>
 								</tr>
 								 <tr>
                                     <td> Group Code From</td>
@@ -291,11 +296,9 @@ function loadSummaryTypeListW2(status){
 										 <html:text property="bean.groupCodeFrom" styleId="GroupCodeFrom" size="20"/>
 									</td>
 									<td> 
-									    Group Code To     
+									    Group Code To  <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20"/>	   
 									</td>
-									<td>					
-										 <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20"/>									
-									</td>
+									<td></td>
 								</tr>
 								<tr>
                                     <td> จากเลขที่กล่อง</td>
@@ -303,11 +306,9 @@ function loadSummaryTypeListW2(status){
 										 <html:text property="bean.boxNoFrom" styleId="GroupCodeFrom" size="20"/>
 									</td>
 									<td> 
-									    ถึงเลขที่กล่อง    
+									    ถึงเลขที่กล่อง    <html:text property="bean.boxNoTo" styleId="GroupCodeTo" size="20"/>	 
 									</td>
-									<td>					
-										 <html:text property="bean.boxNoTo" styleId="GroupCodeTo" size="20"/>									
-									</td>
+									<td></td>
 								</tr>
 								<tr>
                                     <td>รับคืนจาก </td>
@@ -417,6 +418,9 @@ function loadSummaryTypeListW2(status){
 									</c:if>
 									
 									<c:if test="${stockQueryForm.bean.wareHouse =='W3'}">
+										<td align="right" colspan="10"><b>Total QTY</b></td>	
+									</c:if>
+									<c:if test="${stockQueryForm.bean.wareHouse =='W4'}">
 										<td align="right" colspan="10"><b>Total QTY</b></td>	
 									</c:if>
 								    <td align="center"><b>${stockQueryForm.bean.totalQty}</b></td>					

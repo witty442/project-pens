@@ -503,7 +503,7 @@ function getCustName(custCode,fieldName,storeType){
 									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
-						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) || "king".equalsIgnoreCase(request.getParameter("page"))) {%>
+						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) ) {%>
 								 <tr>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
@@ -512,6 +512,23 @@ function getCustName(custCode,fieldName,storeType){
 									<td align="left">รหัสร้านค้า
 									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','tops')"/>
+									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
+									</td>
+								</tr>
+								<tr>
+									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
+									<td align="left"></td>
+								</tr>
+							<%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+								 <tr>
+									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
+									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
+								</tr>
+								<tr>
+									<td align="left">รหัสร้านค้า
+									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
+									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','king')"/>
 									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
 									</td>
 								</tr>

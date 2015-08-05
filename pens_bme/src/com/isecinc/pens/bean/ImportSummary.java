@@ -24,8 +24,23 @@ public class ImportSummary implements Serializable{
 	private String boxNo;
 	private Date importDate;
 	
+	//option
+	private String groupCode;
+	private String pensItem;
 	
 	
+	public String getGroupCode() {
+		return groupCode;
+	}
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+	public String getPensItem() {
+		return pensItem;
+	}
+	public void setPensItem(String pensItem) {
+		this.pensItem = pensItem;
+	}
 	public String getStoreType() {
 		return storeType;
 	}

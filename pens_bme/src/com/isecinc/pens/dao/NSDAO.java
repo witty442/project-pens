@@ -89,6 +89,9 @@ public class NSDAO {
 					if( !Utils.isNull(o.getCustomerType()).equals("")){
 						sql.append("\n and h.customer_type ='"+o.getCustomerType()+"'");
 					}
+					if( !Utils.isNull(o.getChannelId()).equals("")){
+						sql.append("\n and h.channel_id ='"+o.getChannelId()+"'");
+					}
 					
 				
 					sql.append("\n order by to_number(h.order_id) desc");

@@ -41,6 +41,9 @@ public class ImportForm extends I_Form {
 	private int summaryLotusSuccessSize;
 	private int summaryLotusErrorSize;
 	
+	private int summaryKingSuccessSize;
+	private int summaryKingErrorSize;
+	
 	private int summaryBigCSuccessSize;
 	private int summaryBigCErrorSize;
 	
@@ -64,6 +67,22 @@ public class ImportForm extends I_Form {
 	
 	
 	
+	public int getSummaryKingSuccessSize() {
+		return summaryKingSuccessSize;
+	}
+
+	public void setSummaryKingSuccessSize(int summaryKingSuccessSize) {
+		this.summaryKingSuccessSize = summaryKingSuccessSize;
+	}
+
+	public int getSummaryKingErrorSize() {
+		return summaryKingErrorSize;
+	}
+
+	public void setSummaryKingErrorSize(int summaryKingErrorSize) {
+		this.summaryKingErrorSize = summaryKingErrorSize;
+	}
+
 	public String getStoreCodeTemp() {
 		return storeCodeTemp;
 	}

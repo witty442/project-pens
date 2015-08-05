@@ -158,6 +158,18 @@ public class StockQueryDAO extends PickConstants{
 			}else if("ISSUED".equals(o.getStatus())){
 				groupFromStockPick = "'"+STATUS_ISSUED+"'";
 			}
+        }else if(o.getWareHouse().equals("W4")){
+			
+			if("ALL".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_RETURN+"'"; 
+				 groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}else if("SCANNING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_OPEN+"'";
+			}else if("ONHAND".equals(o.getStatus())){
+				groupFromBarcode = "'"+STATUS_CLOSE+"'";
+			}else if("ISSUED".equals(o.getStatus())){
+				groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}
 		}
 		
 		logger.debug("groupFromBarcode:"+groupFromBarcode);
@@ -181,7 +193,7 @@ public class StockQueryDAO extends PickConstants{
 			if( !Utils.isNull(groupFromBarcode).equals("")){
 			  sql.append("\n UNION ALL");
 			}
-			sql.append(StockQuerySQL.genSQLByStatusW3(o,groupFromStockPick));
+			sql.append(StockQuerySQL.genSQLByStatusW3andW4(o,groupFromStockPick));
 		}
 		sql.append("\n )AA ");
 

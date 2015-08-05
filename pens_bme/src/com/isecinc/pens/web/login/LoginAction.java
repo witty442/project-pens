@@ -61,8 +61,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).setAttribute("user", user);
 		
 			//request.getSession().setAttribute("UserName", user.getUserName());
-			request.getSession().setAttribute("User", user.getUserName());
-			
+		
 			String role = user.getRole().getKey();
 			logger.debug("role:"+role);
 			if(User.MC.equalsIgnoreCase(role) || User.MT_SALE.equalsIgnoreCase(role)){
@@ -79,6 +78,7 @@ public class LoginAction extends DispatchAction {
 			}
 			logger.debug("After Calc ScreenWidth:"+screenWidth);
 			
+			request.getSession().setAttribute("User", user.getUserName()+"_"+role);
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			
 			if(role.equalsIgnoreCase(User.NISSINTEAM)){

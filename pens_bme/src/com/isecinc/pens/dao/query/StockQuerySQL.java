@@ -25,7 +25,7 @@ public class StockQuerySQL extends PickConstants{
 		return sql;
 	}
 	
-	public static StringBuffer genSQLByStatusW3(StockQuery o,String statusAll){
+	public static StringBuffer genSQLByStatusW3andW4(StockQuery o,String statusAll){
 		
 		StringBuffer sql = new StringBuffer();
 		sql.append("\n select S.*, ");

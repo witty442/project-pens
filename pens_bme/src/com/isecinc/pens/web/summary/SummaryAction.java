@@ -23,6 +23,7 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.PhysicalSummary;
 import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.inf.helper.Utils;
@@ -305,6 +306,8 @@ public class SummaryAction extends I_Action {
 					summaryForm.setKingSummaryResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}	
+				summaryForm.getTransactionSummary().setPensCustNameFrom(GeneralDAO.getStoreName(summaryForm.getTransactionSummary().getPensCustCodeFrom()));
+				
 			}else if("diff_stock".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				List<DiffStockSummary> results = new SummaryDAO().searchDiffStock(summaryForm.getDiffStockSummary(),user);
 				if (results != null  && results.size() >0) {

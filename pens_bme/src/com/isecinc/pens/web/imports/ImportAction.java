@@ -43,10 +43,8 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
 
@@ -1954,7 +1952,7 @@ public class ImportAction extends I_Action {
 				ps = conn.prepareStatement(sql.toString());
 				  
 				int sheetNo = 0; // xls sheet no. or name
-				int rowNo = 1; // row of begin data
+				int rowNo = 10; // row of begin data
 				int maxColumnNo = 8; // max column of data per row
 				
 				Workbook wb1 = null;
@@ -1979,6 +1977,8 @@ public class ImportAction extends I_Action {
 				String storeName = "020056-1";
 				String qty = "";
 				String groupCode ="";
+				String pensItem = "";
+				String desc = "";
 	
 				int index = 0;
 	            int no = 0;
@@ -1991,11 +1991,13 @@ public class ImportAction extends I_Action {
 					/** Check Row is null **/
 					Cell cellCheck = row.getCell((short) 0);
 					Object cellCheckValue = xslUtils.getCellValue(0, cellCheck);
-					
-					//java.util.Date rowCheck =  (java.util.Date) cellCheckValue;
 					logger.debug("cellCheckValue["+cellCheckValue+"]");
 					
-					if(cellCheckValue == null ){
+					String rowCheck =  cellCheckValue.toString();
+					logger.debug("rowCheck["+rowCheck+"]");
+					
+					
+					if(cellCheckValue == null  || Utils.isNumeric(rowCheck)==false ){
 						break;
 					}
 					
@@ -2003,7 +2005,9 @@ public class ImportAction extends I_Action {
 					index = 1;
 					qty = "";
 					groupCode = "";
-
+					pensItem = "";
+					desc = "";
+					
 					for (int colNo = 0; colNo < maxColumnNo; colNo++) {
 						cell = row.getCell((short) colNo);
 						logger.debug("row["+i+"]col[("+colNo+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
@@ -2015,7 +2019,8 @@ public class ImportAction extends I_Action {
 							ps.setString(index++, Utils.isNull(cellValue));
 						}else if(colNo==1){
 						   //Desc
-						    ps.setString(index++, Utils.isNull(cellValue));
+							desc = Utils.isNull(cellValue);
+						    ps.setString(index++, desc);
 						   
 						}else if(colNo==2){
 						   //Reference
@@ -2050,7 +2055,7 @@ public class ImportAction extends I_Action {
 				    logger.debug("index:"+index);
 
 			         //Find pens_item,groupType
-				     String pensItem = GeneralDAO.searchPensItemByGroupCode(conn,groupCode);
+				     pensItem = GeneralDAO.searchPensItemByGroupCode(conn,groupCode);
 			         
 			         /** case Start with  'W' no check "WB7805D4BL"**/
 			         if(pensItem.startsWith("W")){
@@ -2059,8 +2064,9 @@ public class ImportAction extends I_Action {
 				         s.setRow(i+1);
 				         s.setSalesDate(salesDate);
 				         s.setStoreNo(storeNo);
-				         s.setStoreName(storeName);
-				         s.setDescription(storeNo);
+				         s.setPensItem(pensItem);
+				         s.setDescription(desc);
+				         s.setGroupCode(groupCode);
 				         s.setQty(qty);
 				         s.setMessage("Success :No Validate Pens Item");
 				         successMap.put(i+"", s); 
@@ -2072,8 +2078,9 @@ public class ImportAction extends I_Action {
 					         s.setRow(i+1);
 					         s.setSalesDate(salesDate);
 					         s.setStoreNo(storeNo);
-					         s.setStoreName(storeName);
-					         s.setDescription(storeNo);
+					         s.setPensItem(pensItem);
+					         s.setDescription(desc);
+					         s.setGroupCode(groupCode);
 					         s.setQty(qty);
 					         s.setMessage("Success");
 					         successMap.put(i+"", s);
@@ -2085,9 +2092,9 @@ public class ImportAction extends I_Action {
 					         ImportSummary s = new ImportSummary();
 					         s.setRow(i+1);
 					         s.setSalesDate(salesDate);
-					         s.setStoreNo(storeNo);
-					         s.setStoreName(storeName);
-					         s.setDescription(storeNo);
+					         s.setPensItem(pensItem);
+					         s.setDescription(desc);
+					         s.setGroupCode(groupCode);
 					         s.setQty(qty);
 					         
 					         String ms = "";
@@ -2164,8 +2171,8 @@ public class ImportAction extends I_Action {
 				  importForm.setSummarySuccessList(successList);
 				  
 				  importForm.setTotalSize(errorList.size()+successList.size());
-				  importForm.setSummaryLotusErrorSize(errorList!=null?errorList.size():0);
-				  importForm.setSummaryLotusSuccessSize(successList!=null?successList.size():0);
+				  importForm.setSummaryKingErrorSize(errorList!=null?errorList.size():0);
+				  importForm.setSummaryKingSuccessSize(successList!=null?successList.size():0);
 				  
 			      conn.rollback();
 			}else{
@@ -2189,8 +2196,8 @@ public class ImportAction extends I_Action {
 			   importForm.setSummarySuccessList(successList);
 			   
 			   importForm.setTotalSize(errorList.size()+successList.size());
-			   importForm.setSummaryLotusErrorSize(errorList!=null?errorList.size():0);
-			   importForm.setSummaryLotusSuccessSize(successList!=null?successList.size():0);
+			   importForm.setSummaryKingErrorSize(errorList!=null?errorList.size():0);
+			   importForm.setSummaryKingSuccessSize(successList!=null?successList.size():0);
 				  
 			   request.setAttribute("Message","Upload ไฟล์ "+fileName+" สำเร็จ");
 			   conn.commit();

@@ -219,6 +219,11 @@ function openPensEdit(path,orderId){
 										    <html:option value="C">COMPLETE</html:option>
 											<html:option value="P">PENDING</html:option>
 										   </html:select>
+										   
+										       ภาค <font color="red"></font>
+										  <html:select property="bean.channelId" styleId="channelId">
+											<html:options collection="channelList" property="code" labelProperty="desc"/>
+									    </html:select>
 									</td>
 								</tr>
 								<tr>

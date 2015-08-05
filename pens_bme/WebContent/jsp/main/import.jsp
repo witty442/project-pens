@@ -468,6 +468,84 @@ function clearForm(path){
 						</c:if>
 						<!-- ************************* Transaction From Lotus**************************************** -->
 						
+						<!-- ************************* Transaction From KingPower**************************************** -->
+						<c:if test="${importForm.summaryKingErrorSize > 0}">
+							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<tr>
+								<th colspan="8"  align="left"><font color="red">จำนวนรายการที่ไม่สามารถ import ได้   ${importForm.summaryKingErrorSize} รายการ </font></th>
+							</tr>
+							<tr>
+								<th width="5%">Row In Excel</th>
+								<th width="10%">Sales Date</th>
+								<th width="10%">Store No</th>
+								<th width="10%">Group Code</th>
+								<th width="20%">Description</th>
+								<th width="10%">PensItem</th>
+								<th width="5%">QTY</th>
+								<th width="30%">Message </th>
+							</tr>
+							<c:forEach var="results" items="${importForm.summaryErrorList}" varStatus="rows">
+								<c:choose>
+									<c:when test="${rows.index %2 == 0}">
+										<c:set var="tabclass" value="lineO" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineE" />
+									</c:otherwise>
+								</c:choose>
+								<tr class="<c:out value='${tabclass}'/>">
+									<td>${results.row}</td>
+									<td align="center">${results.salesDate}</td>
+									<td align="left">${results.storeNo}</td>
+									<td align="left">${results.groupCode}</td>
+									<td align="left">${results.description}</td>
+									<td align="left">${results.pensItem}</td>
+									<td align="right">${results.qty}</td>
+									<td align="left">${results.message}</td>
+								</tr>
+							</c:forEach>
+							</table>
+						</c:if>
+						
+                        <c:if test="${importForm.summaryKingSuccessSize > 0}">
+							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<tr>
+								<th colspan="8"  align="left">จำนวนรายการที่สามารถ import ได้   ${importForm.summaryKingSuccessSize} รายการ</th>
+							</tr>
+							<tr>
+								<th width="5%">Row In Excel</th>
+								<th width="10%">Sales Date</th>
+								<th width="10%">Store No</th>
+								<th width="10%">Group Code</th>
+								<th width="20%">Description</th>
+								<th width="10%">PensItem</th>
+								<th width="5%">QTY</th>
+								<th width="30%">Message </th>
+							</tr>
+							<c:forEach var="results" items="${importForm.summarySuccessList}" varStatus="rows">
+								<c:choose>
+									<c:when test="${rows.index %2 == 0}">
+										<c:set var="tabclass" value="lineO" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineE" />
+									</c:otherwise>
+								</c:choose>
+								<tr class="<c:out value='${tabclass}'/>">
+									<td>${results.row}</td>
+									<td align="center">${results.salesDate}</td>
+									<td align="left">${results.storeNo}</td>
+									<td align="left">${results.groupCode}</td>
+									<td align="left">${results.description}</td>
+									<td align="left">${results.pensItem}</td>
+									<td align="right">${results.qty}</td>
+									<td align="left">${results.message}</td>
+								</tr>
+							</c:forEach>
+							</table>
+						</c:if>
+						<!-- ************************* Transaction From King Power**************************************** -->
+						
 						<!-- ************************* Transaction From BigC**************************************** -->
 						<c:if test="${importForm.summaryBigCErrorSize > 0}">
 							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">

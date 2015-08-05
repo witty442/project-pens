@@ -74,6 +74,7 @@ public class Utils {
 	    }
 	}
 	
+	
 	public static boolean userInRole(User user,String[] roles){
 		boolean r = false;
 		for(int i=0;i<roles.length;i++){

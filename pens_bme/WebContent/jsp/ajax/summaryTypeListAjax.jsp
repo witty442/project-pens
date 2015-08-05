@@ -6,7 +6,7 @@
  String wareHouse = request.getParameter("wareHouse");
  String status = request.getParameter("status");
 
-if("W1".equals(wareHouse) || "W3".equals(wareHouse) || ( "W2".equals(wareHouse) && ( "SCANNING".equals(status) || "ONHAND".equals(status)) || "FINISHING".equals(status) || "FINISHGOODS".equals(status) ) ){
+if("W1".equals(wareHouse) || "W3".equals(wareHouse) || "W4".equals(wareHouse)  || ( "W2".equals(wareHouse) && ( "SCANNING".equals(status) || "ONHAND".equals(status)) || "FINISHING".equals(status) || "FINISHGOODS".equals(status) ) ){
 %>
 	<option value="Detail">Detail</option>
 	<option value="SummaryByBox">Summary ตามกล่อง</option>
