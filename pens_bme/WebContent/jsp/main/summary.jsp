@@ -75,7 +75,7 @@ function loadMe(){
 	<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
-     <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
+     <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
@@ -187,7 +187,7 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   }   
-   <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
+   <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
 		   var asOfDateFrom = form.salesDate.value;
 		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
 		   
@@ -424,6 +424,10 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandMTT"/>
 				</jsp:include>
+			<%}else if("onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEOnhandMTTDetail"/>
+				</jsp:include>
 			<%}else if("sumbyGroupCode".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEByGroupCode"/>
@@ -628,12 +632,15 @@ function getCustName(custCode,fieldName,storeType){
 						<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandMTT".equalsIgnoreCase(request.getParameter("page"))
+								|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 								) {
 								
 							    storeType ="lotus";
 								if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))){
 									storeType="bigc";
 								}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))){
+									storeType="MTT";
+								}else if("onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))){
 									storeType="MTT";
 								}
 								%>
@@ -857,6 +864,29 @@ function getCustName(custCode,fieldName,storeType){
 							      
 							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
 							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
+							    				
+							</display:table>
+                    </c:if>
+                    
+                      <c:if test="${summaryForm.onhandSummaryMTTDetailResults != null}">
+
+						<br/>
+							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryMTTDetailResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+							    
+							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false"  width="10"/>
+							    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" />
+							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
+							    <display:column  title="Group" property="group"  sortable="false"/>	
+							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
+							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
+							    <display:column  title="Barcode" property="barcode"  sortable="false" />
+							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
+							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" />	
+							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
+							      
+							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
+							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
 							    				
 							</display:table>
                     </c:if>

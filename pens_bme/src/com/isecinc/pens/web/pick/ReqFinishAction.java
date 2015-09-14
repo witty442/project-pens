@@ -143,7 +143,7 @@ public class ReqFinishAction extends I_Action {
  
 				if(!"view".equalsIgnoreCase(mode)){
 					// All barcode status CLOSE
-					List<ReqFinish> allData = ReqFinishDAO.searchBarcoceItemW2();
+					List<ReqFinish> allData = ReqFinishDAO.searchBarcoceItemW2_W4(h.getWareHouse());
 					allList.addAll(h.getItems());
 					allList.addAll(allData);
 				}else{
@@ -160,14 +160,11 @@ public class ReqFinishAction extends I_Action {
 				ad.setCanEdit(true);
 				ad.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
-				aForm.setResults(ReqFinishDAO.searchBarcoceItemW2());
+				aForm.setResults(null);
 				aForm.setBean(ad);
 				
 				aForm.setMode(mode);//Mode Add new
-				
-				if(aForm.getResults().size()==0){
-					request.setAttribute("Message", "ไม่พบข้อมูล");
-				}
+			
 				
 			}
 		} catch (Exception e) {
@@ -263,8 +260,7 @@ public class ReqFinishAction extends I_Action {
 						 
 						 totalBox++;
 						 totalQty +=l.getQty();
-						 itemList.add(l);
-						 
+						 itemList.add(l); 
 					}
 				}
 			}
@@ -290,7 +286,7 @@ public class ReqFinishAction extends I_Action {
 			h = (ReqFinish)saveData.get(0);
 			   
 			// All barcode status CLOSE
-			List<ReqFinish> allData = ReqFinishDAO.searchBarcoceItemW2();
+			List<ReqFinish> allData = ReqFinishDAO.searchBarcoceItemW2_W4(h.getWareHouse());
 			  
 			allList.addAll(h.getItems());//add data save
 			allList.addAll(allData);//add all data can be save
@@ -318,6 +314,19 @@ public class ReqFinishAction extends I_Action {
 		return "search";
 	}
 	
+	public ActionForward searchItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchItem");
+		ReqFinishForm aForm = (ReqFinishForm) form;
+		try {
+			
+			aForm.setResults(ReqFinishDAO.searchBarcoceItemW2_W4(aForm.getBean().getWareHouse()));
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("prepare");
+	}
 
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
@@ -338,8 +347,6 @@ public class ReqFinishAction extends I_Action {
 		return mapping.findForward("clear");
 	}
 
-
-	
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("cancel");
 		ReqFinishForm aForm = (ReqFinishForm) form;

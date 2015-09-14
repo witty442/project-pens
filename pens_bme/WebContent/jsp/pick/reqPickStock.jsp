@@ -324,6 +324,7 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	var storeCode =$('#storeCode').val();
 	var storeNo =$('#storeNo').val();
 	var subInv =$('#subInv').val();
+	var wareHouse =$('#wareHouse').val();
 	
 	//validate from
 	if(validateForm()){
@@ -339,6 +340,7 @@ function addItemPickStock(path,index,groupCode,pensItem){
 		 param += "&remark="+remark;
 	     param += "&groupCode="+groupCode;
 	     param += "&pensItem="+pensItem;
+	     param += "&wareHouse="+wareHouse;
 	     param += "&index="+index;
 	        
 		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
@@ -503,7 +505,7 @@ function resetStore(){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="reqPickStock"/>
+				<jsp:param name="function" value="reqPickStockW2"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -522,8 +524,10 @@ function resetStore(){
 
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
+						     <tr>
+								</tr>
 						        <tr>
-                                  <td colspan="3" align="center"><font size="3"><b></b></font></td>
+                                  <td colspan="3" align="center"><font size="3"><b>Request เบิกสินค้าจากคลัง  ${reqPickStockForm.bean.wareHouse}</b></font></td>
 							   </tr>
 						       <tr>
                                     <td nowrap>Issue Request Date
@@ -841,6 +845,7 @@ function resetStore(){
 					
 					<!-- hidden field -->
 					<input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
+				    <html:hidden property="bean.wareHouse" styleId="wareHouse"/>
 					
 					</html:form>
 					<!-- BODY -->

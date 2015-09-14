@@ -76,6 +76,19 @@ function clearForm(path){
 	return true;
 }
 
+function search(path){
+	var form = document.reqFinishForm;
+   var requestDate =$('#wareHouse').val();
+	
+	if(requestDate ==""){
+		alert("กรุณากรอก wareHouse");
+		return false;
+	}
+	form.action = path + "/jsp/reqFinishAction.do?do=searchItem";
+	form.submit();
+	return true;
+}
+
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
 		var form = document.reqFinishForm;
@@ -218,10 +231,27 @@ function sumTotal(chkObj){
 									<td> 
 									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="disableText"/>
 									</td>
+									<td></td>
+								</tr>
+								  <tr>
+                                    <td> สถานะ  </td>
 									<td>					
-										สถานะ   
-									  <html:text property="bean.statusDesc" styleId="status" size="10" styleClass="disableText"/>
+										 <html:text property="bean.statusDesc" styleId="status" size="10" styleClass="disableText"/>
 									</td>
+									<td> 
+									     Warehouse<font color="red">*</font>
+									      <c:if test="${reqFinishForm.mode == 'add'}">
+										      <html:select property="bean.wareHouse" styleId="wareHouse" >
+												<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+										    </html:select>
+										  </c:if>
+										    <c:if test="${reqFinishForm.mode != 'add'}">
+										      <html:select property="bean.wareHouse" styleId="wareHouse" disabled="true">
+												<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+										    </html:select>
+										  </c:if>
+									</td>
+									<td></td>
 								</tr>
 								<tr>
                                     <td> หมายเหตุ</td>
@@ -238,6 +268,17 @@ function sumTotal(chkObj){
 									</td>
 								</tr>	
 								
+								<tr>
+                                    <td></td>
+									<td colspan="3">
+									   <c:if test="${reqFinishForm.mode == 'add'}">
+										    <a href="javascript:search('${pageContext.request.contextPath}')">
+											  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+											</a>
+									  </c:if>
+									</td>
+								</tr>	
+								
 						   </table>
 						   
 				 <!-- Table Data -->
@@ -245,7 +286,6 @@ function sumTotal(chkObj){
 		
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						    <tr>
-							<!-- 	<th >No</th> -->
 								<th ><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
 								<th >เลขที่กล่อง</th>
 								<th >Qty</th>
@@ -285,7 +325,7 @@ function sumTotal(chkObj){
 										<td class="data_qty" align="center">${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 										</td>
-										<td class="data_jobName" align="center">${results.jobName}
+										<td class="data_jobName" align="center">${results.jobId}-${results.jobName}
 										   <input type="hidden" name="jobId" value ="${results.jobId}" size="20" readonly class="disableText"/>
 										</td>
 										
@@ -308,19 +348,20 @@ function sumTotal(chkObj){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
-										 <c:if test="${reqFinishForm.bean.canEdit == true}">
-											<a href="javascript:save('${pageContext.request.contextPath}')">
-											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
-											 </a>
-										 </c:if>	
-										<c:if test="${reqFinishForm.bean.canEdit == true}">
-										   <c:if test="${reqFinishForm.mode == 'edit'}">
-											 <a href="javascript:cancel('${pageContext.request.contextPath}')">
-											   <input type="button" value="    ยกเลิก     " class="newPosBtnLong"> 
-											 </a>
-										   </c:if>
-										 </c:if>		
+									   	<c:if test="${reqFinishForm.results != null}">
+											 <c:if test="${reqFinishForm.bean.canEdit == true}">
+												<a href="javascript:save('${pageContext.request.contextPath}')">
+												  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
+												 </a>
+											 </c:if>	
+											<c:if test="${reqFinishForm.bean.canEdit == true}">
+											   <c:if test="${reqFinishForm.mode == 'edit'}">
+												 <a href="javascript:cancel('${pageContext.request.contextPath}')">
+												   <input type="button" value="    ยกเลิก     " class="newPosBtnLong"> 
+												 </a>
+											   </c:if>
+											 </c:if>	
+										</c:if>	
 										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 										</a>	

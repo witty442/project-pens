@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.PickStockDAO;
+import com.isecinc.pens.dao.PickStockGroupDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -212,7 +214,6 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("prepareAllBox");
 	}
 	
-	
 	private PickStock searchBypage(Connection conn,PickStock p, HttpServletRequest request) {
 		int totalRow = 0;
 		int totalPage = 0;
@@ -396,6 +397,7 @@ public class PickStockAction extends I_Action {
 		Connection conn = null;
 		PickStockForm aForm = (PickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		Map<String,String> boxNoMapAll = new HashMap<String, String>();
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -426,11 +428,11 @@ public class PickStockAction extends I_Action {
 						 l.setQty(qty[i]);
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());
-						 
+					       
 						 itemList.add(l);
-					}
-				}
-			}
+					}//if
+				}//for
+			}//if
 			
 			h.setItems(itemList);
 			
@@ -439,7 +441,20 @@ public class PickStockAction extends I_Action {
 			logger.debug("result save :"+resultPick.isResultProcess());
 			
 			if(resultPick.isResultProcess()){
-			    
+				boxNoMapAll = resultPick.getBoxNoMapAll();
+				
+				/** Check all item ==ISSUE and Update Head == ISSUE **/
+				if( !boxNoMapAll.isEmpty()){
+					logger.debug("Validate Barcode Item amd update barcode Head");
+					
+					Iterator<String> its = boxNoMapAll.keySet().iterator();
+					String boxNoTemp = "";
+					while(its.hasNext()){
+						boxNoTemp = its.next(); 
+					    PickStockGroupDAO.processUpdateStatusBarcodeHead(conn,boxNoTemp,h.getCreateUser());
+					}
+				}
+				
 			    //new search
 				PickStock p = PickStockDAO.searchPickStock(conn,resultPick,true);
 				
@@ -468,6 +483,7 @@ public class PickStockAction extends I_Action {
             logger.error(e.getMessage(),e);
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			try {
+				
 				
 			} catch (Exception e2) {}
 			return mapping.findForward("prepareAllBox");
@@ -529,15 +545,13 @@ public class PickStockAction extends I_Action {
 		logger.debug("cancelAllBox");
 		PickStockForm aForm = (PickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		Map<String,String> boxNoMapAll = new HashMap<String, String>();
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			PickStock h = aForm.getBean();
-			//Step1 get Data From pickStockItem 
-			List<PickStock> pickStockItemList = PickStockDAO.searchPickStockItemByIssueReqNoGroupByBoxNo(conn, h);
-			logger.debug("pickStockItemList:"+pickStockItemList.size());
 			  
 			//update status stock Pick to cancel
 			h.setIssueReqStatus(PickStockDAO.STATUS_CANCEL);
@@ -545,27 +559,20 @@ public class PickStockAction extends I_Action {
 			PickStockDAO.updatePickStockHeadModel(conn, h);
 			PickStockDAO.updatePickStockItemModel(conn,h);
 			 
-			 if(pickStockItemList !=null && pickStockItemList.size() >0){
-				 for(int k=0;k<pickStockItemList.size();k++){
-					 PickStock p = (PickStock)pickStockItemList.get(k);
-					 p.setCreateUser(user.getUserName());
-					 p.setUpdateUser(user.getUserName());
-					 
-					 logger.debug("update status barcode item:"+p.getPensItem()+",boxNo["+p.getBoxNo()+"]lineId:"+p.getLineId());
-
-					 //Set barcode status = CLOSE
-				      Barcode b = new Barcode();
-				      b.setJobId(p.getJobId());
-				      b.setBoxNo(p.getBoxNo());
-				      b.setStatus(PickConstants.STATUS_CLOSE);
-				      b.setUpdateUser(h.getUpdateUser());
-				       
-				      //update barcode_item DB
-				      BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				      BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
-				       
-				  }//for 2
-			  }//if 
+			//Step2 update barcode to close 
+			boxNoMapAll = PickStockDAO.updateBarcodeToCloseFromStockPickItem(conn,h);
+			
+			/** Check all item ==ISSUE and Update Head == ISSUE **/
+			if( !boxNoMapAll.isEmpty()){
+				logger.debug("Validate Barcode Item amd update barcode Head");
+				
+				Iterator<String> its = boxNoMapAll.keySet().iterator();
+				String boxNo = "";
+				while(its.hasNext()){
+				   boxNo = its.next(); 
+				   PickStockGroupDAO.processUpdateStatusBarcodeHead(conn,boxNo,h.getCreateUser());
+				}
+			}
 	
 			//new search
 			PickStock p = PickStockDAO.searchPickStock(conn,h,true);
@@ -830,6 +837,8 @@ public class PickStockAction extends I_Action {
 		}
 		return h;
 	}
+	
+	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

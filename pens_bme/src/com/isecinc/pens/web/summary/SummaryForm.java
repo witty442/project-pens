@@ -28,6 +28,7 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> onhandSummaryResults;
 	private List<OnhandSummary> onhandSummaryLotusResults;
 	private List<OnhandSummary> onhandSummaryMTTResults;
+	private List<OnhandSummary> onhandSummaryMTTDetailResults;
 	private List<OnhandSummary> onhandBigCResults;
 	private List<OnhandSummary> onhandSummaryLotusPeriodResults;
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
@@ -56,6 +57,13 @@ public class SummaryForm extends I_Form {
 
 	
 	
+	public List<OnhandSummary> getOnhandSummaryMTTDetailResults() {
+		return onhandSummaryMTTDetailResults;
+	}
+	public void setOnhandSummaryMTTDetailResults(
+			List<OnhandSummary> onhandSummaryMTTDetailResults) {
+		this.onhandSummaryMTTDetailResults = onhandSummaryMTTDetailResults;
+	}
 	public List<TransactionSummary> getKingSummaryResults() {
 		return kingSummaryResults;
 	}

@@ -40,6 +40,14 @@ if(session.getAttribute("custGroupList") == null){
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
+if(session.getAttribute("wareHouseList2") == null){
+	List<References> wareHouseList = new ArrayList();
+	References ref1 = new References("","");
+	wareHouseList.add(ref1);
+	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W4+"'"));
+	
+	session.setAttribute("wareHouseList2",wareHouseList);
+}
 %>
 
 <html>
@@ -316,7 +324,11 @@ function resetStore(){
 								    <td>
 								      <html:text property="bean.statusDate" styleId="statusDate" size="20" />	  
 						           </td>
-								   <td align="right"></td>
+								   <td align="right"> Warehouse
+									      <html:select property="bean.wareHouse" styleId="wareHouse" >
+											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+									    </html:select>
+									    </td>
 								   <td align="right"></td>
 								</tr>
 						   </table>
@@ -340,6 +352,7 @@ function resetStore(){
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >Issue Req Date</th>
+									<th >WareHouse</th>
 									<th >Issue Req No</th>
 									<th >Issue Req Status</th>
 									<th >รหัสร้านค้า</th>
@@ -363,6 +376,7 @@ function resetStore(){
 										<td class="search_issueReqDate">
 										   ${results.issueReqDate}
 										</td>
+										<td class="search_issueReqDate">${results.wareHouse}</td>
 										<td class="search_issueReqNo">${results.issueReqNo}</td>
 										<td class="search_issueReqStatus">
 											${results.statusDesc}

@@ -30,7 +30,7 @@ public final class EnvProperties extends Properties{
 	private static final int END_VAR_PATTERN_CHAR_COUNT = 1;
 	private static final Pattern pat = Pattern.compile(VAR_PATTERN);
 	private static final String propName ="inf-config/inf-env.properties";
-	
+
 	private EnvProperties() throws IOException {
 		reload();
 	}
@@ -86,10 +86,11 @@ public final class EnvProperties extends Properties{
 	 *	@throws IOException if an error occurred when reading from the file
 	 */
 	public synchronized void reload() throws IOException {
+		InputStream is = null;
 		try{
 			ClassLoader cl = FileUtil.class.getClassLoader();
-			InputStream is = cl.getResourceAsStream(propName);
-
+		    is = cl.getResourceAsStream(propName);
+		    
 			load(is);
 //			is.close();
 			fillUpVariable();

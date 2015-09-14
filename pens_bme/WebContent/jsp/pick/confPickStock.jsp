@@ -330,6 +330,11 @@ function sumQty(){
 									<td colspan="3">
 						               <html:text property="bean.subInv" styleId="subInv" size="10" readonly="true" styleClass="disableText"/>
 						               Store No <html:text property="bean.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
+									
+									 Warehouse
+									      <html:select property="bean.wareHouse" styleId="wareHouse" disabled="true" styleClass="disableText">
+											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+									    </html:select>
 									</td>
 									
 								</tr>	

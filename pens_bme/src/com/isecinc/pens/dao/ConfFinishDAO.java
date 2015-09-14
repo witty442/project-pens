@@ -84,6 +84,9 @@ public class ConfFinishDAO extends PickConstants{
 			if( !Utils.isNull(o.getRequestNo()).equals("")){
 				sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
 			}
+			if( !Utils.isNull(o.getWareHouse()).equals("")){
+				sql.append("\n and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
+			}
 			
 			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
@@ -110,6 +113,7 @@ public class ConfFinishDAO extends PickConstants{
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
 				   h.setRemark(Utils.isNull(rst.getString("remark"))); 
+				   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
 				   

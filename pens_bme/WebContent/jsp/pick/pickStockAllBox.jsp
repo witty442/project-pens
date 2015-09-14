@@ -525,9 +525,9 @@ function resetStore(){
 										<td align="left">
 					 
 					                      <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">
-											 <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')">
-											   <input type="button" value="    Cancel Issue     " class="newPosBtnLong"> 
-											 </a>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											<%--  <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')"> --%>
+											   <input type="button" value="    Cancel Issue     " class="" disabled> 
+											 <!-- </a> -->  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										   </c:if>	
 										 
 									      <c:if test="${pickStockForm.bean.canConfirm == true}">
@@ -542,9 +542,9 @@ function resetStore(){
 											</a>
 										</c:if>
 										 <c:if test="${pickStockForm.bean.canCancel == true}">
-											 <a href="javascript:cancel('${pageContext.request.contextPath}')">
-											   <input type="button" value="    ยกเลิก     " class="newPosBtnLong"> 
-											 </a>  
+											<%--  <a href="javascript:cancel('${pageContext.request.contextPath}')"> --%>
+											   <input type="button" value="    ยกเลิก     " class=""  disabled> 
+											<!--  </a>   -->
 										 </c:if>
 										 
 										  <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">

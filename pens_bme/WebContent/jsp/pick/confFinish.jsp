@@ -217,7 +217,7 @@ function checkCompareDate(DateFrom, DateTo){
 									</td>
 								</tr>
 								<tr>
-                                    <td colspan="4">การแสดงข้อมูล 
+                                    <td colspan="3">การแสดงข้อมูล 
                                        <html:select property="bean.typeDisp">
 											<html:options collection="typeDispList" property="key" labelProperty="name"/>
 									    </html:select>
@@ -226,6 +226,12 @@ function checkCompareDate(DateFrom, DateTo){
                                         <a href="javascript:viewDisp('${pageContext.request.contextPath}')">
 										  <input type="button" value="   แสดง   " class="newPosBtnLong">
 										</a>
+                                    </td>
+                                    <td align="left">
+                                        Warehouse
+										      <html:select property="bean.wareHouse" styleId="wareHouse" disabled="true">
+												<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+										    </html:select>
                                     </td>
                                 </tr>
 						   </table>

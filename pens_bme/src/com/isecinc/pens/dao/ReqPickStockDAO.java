@@ -122,6 +122,7 @@ public class ReqPickStockDAO extends PickConstants{
 			
 			sql.append("\n from PENSBME_STOCK_ISSUE H \n");
 			sql.append("\n where 1=1   \n");
+			sql.append("\n and warehouse ='"+o.getWareHouse()+"' \n");
 			
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
 				sql.append("\n and H.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
@@ -426,6 +427,7 @@ public class ReqPickStockDAO extends PickConstants{
 			sql.append("\n 	  SELECT distinct group_code ,pens_item  ");
 			sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 	  WHERE 1=1  ");
+			sql.append("\n 	  AND h.warehouse ='"+p.getWareHouse()+"'");
 			sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
 			sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
 			if( !Utils.isNull(p.getGroupCode()).equals("")){
@@ -464,6 +466,7 @@ public class ReqPickStockDAO extends PickConstants{
 			sql.append("\n 	  SELECT distinct group_code ,pens_item,material_master,barcode  ");
 			sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 	  WHERE 1=1  ");
+			sql.append("\n 	  AND h.warehouse ='"+p.getWareHouse()+"'");
 			sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
 			sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
 			if( !Utils.isNull(p.getGroupCode()).equals("")){
@@ -503,15 +506,18 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n    SELECT M2.group_code,M2.pens_item FROM( ");
 				sql.append("\n       SELECT group_code,pens_item, sum(onhand_qty) as onhand_qty FROM( ");
 				sql.append("\n         SELECT group_code,pens_item ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
-				sql.append("\n  	   from PENSBME_STOCK_FINISHED ");
+				sql.append("\n  	   from PENSBME_STOCK_FINISHED WHERE 1=1 ");
+				
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
-					sql.append("\n 		   WHERE group_code LIKE '%"+p.getGroupCode()+"%'");
+					sql.append("\n 		AND group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
+				sql.append("\n 	       AND warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n  	   GROUP BY group_code,pens_item ");
 				sql.append("\n         UNION ALL ");
 				sql.append("\n 		   SELECT group_code ,pens_item,( (-1) * sum(req_qty) )as onhand_qty");
 				sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 		   WHERE 1=1  ");
+				sql.append("\n 	       AND h.warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n 		   AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 		   AND h.issue_req_no <> '"+p.getIssueReqNo()+"'");
 				sql.append("\n 		   AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
@@ -527,6 +533,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n 	  SELECT distinct group_code ,pens_item ");
 				sql.append("\n 	  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 	  WHERE 1=1  ");
+				sql.append("\n 	  AND h.warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
@@ -545,11 +552,13 @@ public class ReqPickStockDAO extends PickConstants{
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		   AND group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
+				sql.append("\n 	     AND warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n       UNION ALL ");
 				 // substract from Stock issue status = O(Open)
 				sql.append("\n 		 SELECT group_code,pens_item  ,(-1* req_qty ) as onhand_qty ");
 				sql.append("\n 		 FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 		 WHERE 1=1  ");
+				sql.append("\n 	     AND h.warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n 		 AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 		 AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
@@ -729,6 +738,7 @@ public class ReqPickStockDAO extends PickConstants{
 			sql.append("\n    where 1=1  and j.customer_no = m.pens_value and m.reference_code ='Store') as store_name ");
 			sql.append("\n from PENSBME_STOCK_ISSUE j ");
 			sql.append("\n where 1=1   ");
+			sql.append("\n AND warehouse ='"+h.getWareHouse()+"'");
 			sql.append("\n and issue_req_no = '"+h.getIssueReqNo()+"'");
 
 			ps = conn.prepareStatement(sql.toString());
@@ -756,7 +766,8 @@ public class ReqPickStockDAO extends PickConstants{
 			   h.setStoreName(Utils.isNull(rst.getString("store_name"))); 
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
-
+               h.setWareHouse(Utils.isNull(rst.getString("warehouse")));
+               
 			   if(h.isModeEdit()){
 				   //can edit
 				   if( Utils.isNull(h.getStatus()).equals(STATUS_ISSUED)
@@ -939,6 +950,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		select group_code,pens_item  ");
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
+						sql.append("\n 	    AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						  sql.append("\n    and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
@@ -955,6 +967,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				SELECT  group_code,pens_item  ");
 						sql.append("\n 				FROM PENSBME_STOCK_FINISHED ");  
 						sql.append("\n 				WHERE 1=1 ");    
+						sql.append("\n 	            AND warehouse ='"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
 							sql.append("\n 		    and group_code LIKE '%"+pickStock.getGroupCode()+"%'");
 						}
@@ -962,6 +975,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				SELECT group_code,pens_item");
 						sql.append("\n 				FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  "); 
 						sql.append("\n 				WHERE 1=1   ");
+						sql.append("\n 	            AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 				AND h.issue_req_no = i.issue_req_no  ");
 						sql.append("\n 				AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
@@ -978,6 +992,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	 ( select group_code,pens_item,NVL(SUM(i.req_qty),0) as qty  ");
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
+						sql.append("\n 	     AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						   sql.append("\n 		 and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
@@ -993,15 +1008,17 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	 ( SELECT O2.group_code,O2.pens_item,NVL(SUM(onhand_qty),0) as onhand_qty ");
 						sql.append("\n 	   FROM(   ");
 						sql.append("\n 	     SELECT group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
-						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED ");
+						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED WHERE 1=1");
+						sql.append("\n 	     AND warehouse ='"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
-							sql.append("\n 	 WHERE group_code LIKE '%"+pickStock.getGroupCode()+"%'");
+							sql.append("\n 	 AND group_code LIKE '%"+pickStock.getGroupCode()+"%'");
 						}
 						sql.append("\n       UNION ALL ");
 						 // substract from Stock issue status = O(Open)
 						sql.append("\n 		  SELECT group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
 						sql.append("\n 		  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		  WHERE 1=1  ");
+						sql.append("\n 	      AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
 						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
@@ -1037,6 +1054,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n  	select group_code,pens_item,(nvl(onhand_qty,0)-(nvl(issue_qty,0))) as onhand_qty  ");
 					sql.append("\n  	from PENSBME_STOCK_FINISHED ");
 					sql.append("\n  	where 1=1   ");
+					sql.append("\n 	    AND warehouse ='"+pickStock.getWareHouse()+"'");
 					if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
 						sql.append("\n 	and group_code LIKE '%"+pickStock.getGroupCode()+"%'");
 					}
@@ -1045,6 +1063,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n 		SELECT group_code,pens_item  ,(-1* nvl(req_qty,0)) as onhand_qty ");
 					sql.append("\n 		FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 					sql.append("\n 		WHERE 1=1  ");
+					sql.append("\n 	    AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 					sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
 					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 					if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
@@ -1076,7 +1095,8 @@ public class ReqPickStockDAO extends PickConstants{
 			   h.setPensItem(rst.getString("pens_item"));
 			   h.setNewReq(pickStock.isNewReq());
 			   h.setNewSearch(pickStock.isNewSearch());
-
+               h.setWareHouse(pickStock.getWareHouse());
+               
 			   //Case Edit 
 			   int onhandQty = rst.getInt("onhand_qty");
 			   int qty =  rst.getInt("qty");
@@ -1233,6 +1253,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
 						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n      and h.warehouse ='"+pickStock.getWareHouse()+"'");
 					    sql.append("\n 	    and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 						sql.append("\n 		and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
@@ -1248,12 +1269,14 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				from PENSBME_STOCK_FINISHED   ");
 						sql.append("\n 				WHERE group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 						sql.append("\n 				and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
+						sql.append("\n              and warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 				group by BARCODE, MATERIAL_MASTER,group_code,pens_item  ");
 						sql.append("\n 				UNION ALL ");
 						sql.append("\n 				select i.BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1*SUM(i.req_qty)) as onhand_qty ");
 						sql.append("\n 				from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i   ");
 						sql.append("\n 				where 1=1   ");
 						sql.append("\n 				and h.issue_req_no = i.issue_req_no  ");
+						sql.append("\n              and h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		        and i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 						sql.append("\n 				and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 						sql.append("\n 				and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
@@ -1267,6 +1290,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	 ( select  i.BARCODE,MATERIAL_MASTER,group_code,pens_item,NVL(SUM(i.req_qty),0) as qty  ");
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
+						sql.append("\n       and h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						   sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
@@ -1284,12 +1308,14 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 	     SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
 						sql.append("\n 	     FROM PENSBME_STOCK_FINISHED ");
 						sql.append("\n 		 WHERE group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
+						sql.append("\n       and warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		 and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n       UNION ALL ");
 						 // substract from Stock issue status = O(Open)
 						sql.append("\n 		  SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
 						sql.append("\n 		  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		  WHERE 1=1  ");
+						sql.append("\n        and h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
 						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 					    sql.append("\n 		  AND i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
@@ -1317,6 +1343,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n  	select BARCODE,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
 					sql.append("\n  	from PENSBME_STOCK_FINISHED ");
 					sql.append("\n  	where 1=1   ");
+					sql.append("\n      and warehouse ='"+pickStock.getWareHouse()+"'");
 					sql.append("\n 		and group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 					sql.append("\n 		and pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 					sql.append("\n      UNION ALL ");
@@ -1324,6 +1351,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n 		SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
 					sql.append("\n 		FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 					sql.append("\n 		WHERE 1=1  ");
+					sql.append("\n      and h.warehouse ='"+pickStock.getWareHouse()+"'");
 					sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
 					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 					sql.append("\n 		and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
@@ -1850,8 +1878,8 @@ public class ReqPickStockDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_STOCK_ISSUE \n");
 			sql.append(" (ISSUE_REQ_NO, ISSUE_REQ_DATE, STATUS,STATUS_DATE, REQUESTOR,REMARK ," +
-					"CREATE_DATE,CREATE_USER,CUST_GROUP,CUSTOMER_NO,STORE_NO,SUB_INV,NEED_DATE)  \n");
-		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?) \n");
+					"CREATE_DATE,CREATE_USER,CUST_GROUP,CUSTOMER_NO,STORE_NO,SUB_INV,NEED_DATE,WAREHOUSE)  \n");
+		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -1872,7 +1900,8 @@ public class ReqPickStockDAO extends PickConstants{
 			ps.setString(c++, o.getStoreNo());
 			ps.setString(c++, o.getSubInv());
 			ps.setTimestamp(c++, new java.sql.Timestamp(needDate.getTime()));
-
+			ps.setString(c++, o.getWareHouse());
+			
 			ps.executeUpdate();
 			
 		}catch(Exception e){

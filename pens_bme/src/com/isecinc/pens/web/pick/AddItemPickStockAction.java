@@ -60,6 +60,7 @@ public class AddItemPickStockAction extends I_Action {
             
             String groupCode = Utils.isNull(request.getParameter("groupCode"));
             String pensItem = Utils.isNull(request.getParameter("pensItem"));
+            String wareHouse = Utils.isNull(request.getParameter("wareHouse"));
             
             int index = Utils.convertStrToInt(Utils.isNull(request.getParameter("index")));//Row of Qty
              
@@ -73,6 +74,7 @@ public class AddItemPickStockAction extends I_Action {
             logger.debug("subInv :"+subInv);
             logger.debug("storeNo :"+storeNo);
             logger.debug("remark :"+remark);
+            logger.debug("wareHouse :"+wareHouse);
             
 			if( !"".equals(issueReqNo)){
 				logger.debug("prepare edit issueReqNo:"+issueReqNo);
@@ -81,6 +83,8 @@ public class AddItemPickStockAction extends I_Action {
 				
 				ReqPickStock p = new ReqPickStock();
 				p.setIssueReqNo(issueReqNo);
+				p.setWareHouse(wareHouse);
+				
 				//Search by issue_req_no
 				p = ReqPickStockDAO.searchReqPickStock(conn,p,false);//head only
 				
@@ -126,6 +130,7 @@ public class AddItemPickStockAction extends I_Action {
 				p.setModeConfirm(false);
 				p.setModeEdit(true);
 				p.setRowIndex(index+"");
+				p.setWareHouse(wareHouse);
 				
 				//search by page 
 				ReqPickStock pGroupCodeItems = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap);
@@ -212,6 +217,7 @@ public class AddItemPickStockAction extends I_Action {
 					 ReqPickStock l = (ReqPickStock)results.get(i);
 					 l.setIssueReqNo(itemsBarcode.getIssueReqNo());
 					 l.setPensItem(itemsBarcode.getPensItem());
+					 l.setWareHouse(itemsBarcode.getWareHouse());
 					 
 					 //validate onhand
 					 int qtyScreen = Utils.convertStrToInt(qty[i]);//PICK
@@ -282,6 +288,7 @@ public class AddItemPickStockAction extends I_Action {
 		AddItemPickStockForm aForm = (AddItemPickStockForm) form;
 		try {
 			ReqPickStock ad = new ReqPickStock();
+			ad.setWareHouse(aForm.getBean().getWareHouse());
 			aForm.setBean(ad);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

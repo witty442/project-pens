@@ -145,7 +145,13 @@ function exportExcel(path){
 
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
-						       
+						       <tr>
+                                    <td> Warehouse</td>
+									<td colspan="3">	
+										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-คลังสต็อก B'me สำหรับโอน</html:radio>
+										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-คลังสินค้า HIS&HER</html:radio>
+									</td>
+								</tr>
 						       <tr>
                                     <td> PensItem From</td>
 									<td>					

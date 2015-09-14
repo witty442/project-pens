@@ -160,18 +160,21 @@
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTT');"><span>10.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTT"/></span></a>
 			</li>  
+			 <li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTTDetail');"><span>11.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTTDetail"/></span></a>
+			</li>
 			<li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/sumGroupCodeAction.do?do=prepare&action=new');"><span>11.<bean:message bundle="sysprop" key="SummaryBMEByGroupCode"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/sumGroupCodeAction.do?do=prepare&action=new');"><span>12.<bean:message bundle="sysprop" key="SummaryBMEByGroupCode"/></span></a>
 			</li>  
 			<li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>12.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>13.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareReportOrder&action=new');"><span>13.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareReportOrder&action=new');"><span>14.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
 			</li>
 			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 				<li>
-					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=bmeTrans');"><span>14.<bean:message bundle="sysprop" key="SummaryBMETransaction"/></span></a>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/summaryAction.do?do=prepare&action=new&page=bmeTrans');"><span>15.<bean:message bundle="sysprop" key="SummaryBMETransaction"/></span></a>
 				</li>
 			<%} %>
 		</ul>
@@ -238,7 +241,7 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>7.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new');"><span>8.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W2');"><span>8.<bean:message bundle="sysprop" key="reqPickStockW2"/></span></a>
 			</li> 
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>9.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
@@ -252,6 +255,12 @@
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span>12.<bean:message bundle="sysprop" key="pickStock"/></span></a>
 			</li> 
+			 <li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/pickStockGroupAction.do?do=prepare2&action=new');"><span>13.<bean:message bundle="sysprop" key="pickStockGroup"/></span></a>
+			</li> 
+			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');"><span>14.<bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
+			</li>
 		</ul>
 	<%}else if ( Utils.userInRole(user,new String[]{User.SALE}) ){%>
 	        <li>
@@ -261,7 +270,10 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>2.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new');"><span>3.<bean:message bundle="sysprop" key="reqPickStock"/></span></a>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqPickStockAction.do?do=prepare2&action=new');"><span>3.<bean:message bundle="sysprop" key="reqPickStockW2"/></span></a>
+			</li> 
+			 <li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/pickStockGroupAction.do?do=prepare2&action=new');"><span>4.<bean:message bundle="sysprop" key="pickStockGroup"/></span></a>
 			</li> 
 	    </ul>  
 	<%} %>

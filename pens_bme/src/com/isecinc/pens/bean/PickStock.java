@@ -25,6 +25,7 @@ public class PickStock implements Serializable{
 	private String pickTypeDesc;
 	private String remark;
 	private int totalQty;
+	private int totalIssueQty;
 	private String storeCode;
 	private String storeName;
 	private String subInv;
@@ -42,6 +43,8 @@ public class PickStock implements Serializable{
 	private String groupCode;
 	private String onhandQty;
 	private String qty;
+	private String issueQty;
+	private String orgQty;
 	private String totalBoxQty;
 	private int qtyInt;
 	private String wholePriceBF;
@@ -64,10 +67,78 @@ public class PickStock implements Serializable{
 	private boolean modeEdit;
 	private String selected ;
 	private Map<String,String> pensItemMapAll;
+	private Map<String,String> boxNoMapAll;
 	private int totalQtyNotInCurPage;
 	
+	//pickStock By Group
+	private String boxNoFrom;
+	private String boxNoTo;
+	private String groupCodeFrom;
+	private String groupCodeTo;
+	private String orderBy;
+	private String pickRefKey;
 	
 	
+	public int getTotalIssueQty() {
+		return totalIssueQty;
+	}
+	public void setTotalIssueQty(int totalIssueQty) {
+		this.totalIssueQty = totalIssueQty;
+	}
+	public String getIssueQty() {
+		return issueQty;
+	}
+	public void setIssueQty(String issueQty) {
+		this.issueQty = issueQty;
+	}
+	public Map<String, String> getBoxNoMapAll() {
+		return boxNoMapAll;
+	}
+	public void setBoxNoMapAll(Map<String, String> boxNoMapAll) {
+		this.boxNoMapAll = boxNoMapAll;
+	}
+	public String getOrgQty() {
+		return orgQty;
+	}
+	public void setOrgQty(String orgQty) {
+		this.orgQty = orgQty;
+	}
+	public String getPickRefKey() {
+		return pickRefKey;
+	}
+	public void setPickRefKey(String pickRefKey) {
+		this.pickRefKey = pickRefKey;
+	}
+	public String getBoxNoFrom() {
+		return boxNoFrom;
+	}
+	public void setBoxNoFrom(String boxNoFrom) {
+		this.boxNoFrom = boxNoFrom;
+	}
+	public String getBoxNoTo() {
+		return boxNoTo;
+	}
+	public void setBoxNoTo(String boxNoTo) {
+		this.boxNoTo = boxNoTo;
+	}
+	public String getGroupCodeFrom() {
+		return groupCodeFrom;
+	}
+	public void setGroupCodeFrom(String groupCodeFrom) {
+		this.groupCodeFrom = groupCodeFrom;
+	}
+	public String getGroupCodeTo() {
+		return groupCodeTo;
+	}
+	public void setGroupCodeTo(String groupCodeTo) {
+		this.groupCodeTo = groupCodeTo;
+	}
+	public String getOrderBy() {
+		return orderBy;
+	}
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
 	public int getTotalQtyNotInCurPage() {
 		return totalQtyNotInCurPage;
 	}

@@ -20,6 +20,7 @@ public class ReqFinish implements Serializable{
 	private String remark;
 	private int totalBox;
 	private int totalQty;
+	private String wareHouse;
 
 	private String createUser;
 	private String updateUser;
@@ -49,6 +50,14 @@ public class ReqFinish implements Serializable{
     private String typeDisp;
 	
     
+	public String getWareHouse() {
+		return wareHouse;
+	}
+
+	public void setWareHouse(String wareHouse) {
+		this.wareHouse = wareHouse;
+	}
+
 	public String getBarcode() {
 		return barcode;
 	}

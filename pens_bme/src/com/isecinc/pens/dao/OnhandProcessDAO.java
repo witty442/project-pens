@@ -51,14 +51,14 @@ public class OnhandProcessDAO {
 	}
 	
 	//Action : After Confirm Finishing
-	public static void processBanlanceOnhandFromConfirmFinishing(String userName) throws Exception{
+	public static void processBanlanceOnhandFromConfirmFinishing(String warehouse,String userName) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			Date startDate = new Date();
-			List<Onhand> onhandItemList = searchItemFormReqFinishing(conn);
+			List<Onhand> onhandItemList = searchItemFormReqFinishing(conn,warehouse);
 			logger.debug("searchBarcodeItemInStock>>Total Time:"+(new Date().getTime()-startDate.getTime()) +",Result :"+onhandItemList.size());
 			 
 			startDate =new Date();
@@ -97,6 +97,7 @@ public class OnhandProcessDAO {
 			if(onhandItemList != null && onhandItemList.size() >0){
 				for(int i=0;i<onhandItemList.size();i++){
 					Onhand itemOnhand = (Onhand)onhandItemList.get(i);
+					itemOnhand.setWareHouse(req.getWareHouse());
 					itemOnhand.setCreateUser(req.getUpdateUser());
 					itemOnhand.setUpdateUser(req.getUpdateUser());
 					
@@ -122,6 +123,7 @@ public class OnhandProcessDAO {
 			if(onhandItemList != null && onhandItemList.size() >0){
 				for(int i=0;i<onhandItemList.size();i++){
 					Onhand itemOnhand = (Onhand)onhandItemList.get(i);
+					itemOnhand.setWareHouse(req.getWareHouse());
 					itemOnhand.setCreateUser(req.getUpdateUser());
 					itemOnhand.setUpdateUser(req.getUpdateUser());
 					
@@ -137,7 +139,7 @@ public class OnhandProcessDAO {
 		}
 	}
 	
-	public static List<Onhand> searchItemFormReqFinishing(Connection conn) throws Exception {
+	public static List<Onhand> searchItemFormReqFinishing(Connection conn,String warehouse) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -151,6 +153,7 @@ public class OnhandProcessDAO {
 			sql.append("\n and h.request_no = i.request_no  ");
 			sql.append("\n and h.status ='"+PickConstants.STATUS_FINISH+"' ");
 			sql.append("\n and i.status ='"+PickConstants.STATUS_FINISH+"'");
+			sql.append("\n and h.warehouse ='"+warehouse+"'");
 			
 			sql.append("\n group by i.barcode,pens_item,MATERIAL_MASTER,group_code ");
 			
@@ -160,7 +163,6 @@ public class OnhandProcessDAO {
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
-			  
 			   h = new Onhand();
 			   h.setBarcode(Utils.isNull(rst.getString("BARCODE")));
 			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
@@ -168,7 +170,8 @@ public class OnhandProcessDAO {
 			   h.setPensItem(rst.getString("pens_item"));
 			   h.setBarcode(rst.getString("barcode"));
 			   h.setOnhandQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
-				
+			   h.setWareHouse(warehouse);
+			   
 			   items.add(h);
 			   r++;
 			   
@@ -243,8 +246,10 @@ public class OnhandProcessDAO {
 		Onhand h = null;
 		try {
 			sql.append("\n select barcode,MATERIAL_MASTER,group_code,pens_item,SUM(onhand_qty) as onhand_qty from ( ");
-			sql.append("\n  select barcode,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty from PENSBI.PENSBME_STOCK_FINISHED  ");
+			sql.append("\n  select barcode,MATERIAL_MASTER,group_code,pens_item,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty " );
+			sql.append("\n  from PENSBI.PENSBME_STOCK_FINISHED  ");
 			sql.append("\n  where 1=1 ");
+			sql.append("\n  and warehouse ='"+o.getWareHouse()+"'");
 			sql.append("\n  and group_code ='"+o.getGroupCode()+"'");
 			sql.append("\n  and pens_item ='"+o.getPensItem()+"'");
 			sql.append("\n  and barcode ='"+o.getBarcode()+"'");
@@ -256,6 +261,7 @@ public class OnhandProcessDAO {
 			sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(-1* nvl(req_qty,0) ) as onhand_qty ");
 			sql.append("\n  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 	WHERE 1=1  ");
+			sql.append("\n  and h.warehouse ='"+o.getWareHouse()+"'");
 			sql.append("\n 	AND h.issue_req_no = i.issue_req_no ");
 			sql.append("\n 	AND h.status ='"+PickConstants.STATUS_OPEN+"'");
 			sql.append("\n  and i.group_code ='"+o.getGroupCode()+"'");
@@ -270,6 +276,7 @@ public class OnhandProcessDAO {
 			    sql.append("\n 	SELECT BARCODE,MATERIAL_MASTER,group_code,pens_item  ,(req_qty) as onhand_qty ");
 				sql.append("\n  FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 	WHERE 1=1  ");
+				sql.append("\n  and h.warehouse ='"+o.getWareHouse()+"'");
 				sql.append("\n 	AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 	AND h.status ='"+PickConstants.STATUS_OPEN+"'");
 				sql.append("\n  and i.issue_req_no ='"+o.getIssueReqNo()+"'");
@@ -288,6 +295,7 @@ public class OnhandProcessDAO {
 
 			if(rst.next()) {
 			   h = new Onhand();
+			   h.setWareHouse(o.getWareHouse());
 			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
 			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
 			   h.setGroupCode(rst.getString("group_code"));
@@ -376,8 +384,8 @@ public class OnhandProcessDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_STOCK_FINISHED \n");
-			sql.append(" (BARCODE,PENS_ITEM,material_Master,group_code,ONHAND_QTY ,CREATE_DATE,CREATE_USER)  \n");
-		    sql.append(" VALUES (?,?, ?, ? , ? ,? ,?) \n");
+			sql.append(" (BARCODE,PENS_ITEM,material_Master,group_code,ONHAND_QTY ,CREATE_DATE,CREATE_USER,WAREHOUSE)  \n");
+		    sql.append(" VALUES (?,?, ?, ? , ? ,? ,?, ?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -389,6 +397,7 @@ public class OnhandProcessDAO {
 			ps.setInt(c++, Utils.convertStrToInt(o.getOnhandQty()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getCreateUser());
+			ps.setString(c++, o.getWareHouse());
 			
 			ps.executeUpdate();
 			
@@ -407,7 +416,7 @@ public class OnhandProcessDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ONHAND_QTY =?,UPDATE_DATE=?,UPDATE_USER = ? \n");
-			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? \n" );
+			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? and warehouse=? \n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -418,6 +427,7 @@ public class OnhandProcessDAO {
 			ps.setString(5, o.getMaterialMaster());
 			ps.setString(6, o.getGroupCode());
 			ps.setString(7, o.getBarcode());
+			ps.setString(8, o.getWareHouse());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -437,7 +447,7 @@ public class OnhandProcessDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ISSUE_QTY=(NVl(ISSUE_QTY,0) + ?) ,UPDATE_DATE=?,UPDATE_USER = ? \n");
-			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? \n" );
+			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? and warehouse= ? \n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -448,6 +458,7 @@ public class OnhandProcessDAO {
 			ps.setString(c++, o.getMaterialMaster());
 			ps.setString(c++, o.getGroupCode());
 			ps.setString(c++, o.getBarcode());
+			ps.setString(c++, o.getWareHouse());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -467,7 +478,7 @@ public class OnhandProcessDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ISSUE_QTY=(NVl(ISSUE_QTY,0) - ?) ,UPDATE_DATE=?,UPDATE_USER = ? \n");
-			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? \n" );
+			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? and warehouse = ? \n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -478,6 +489,7 @@ public class OnhandProcessDAO {
 			ps.setString(c++, o.getMaterialMaster());
 			ps.setString(c++, o.getGroupCode());
 			ps.setString(c++, o.getBarcode());
+			ps.setString(c++, o.getWareHouse());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -496,7 +508,7 @@ public class OnhandProcessDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" DELETE PENSBI.PENSBME_STOCK_FINISHED \n");
-			sql.append(" WHERE PENS_ITEM =? and material_Master = ? and group_code = ? and BARCODE =?  \n" );
+			sql.append(" WHERE PENS_ITEM =? and material_Master = ? and group_code = ? and BARCODE =? and warehouse =? \n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -504,6 +516,7 @@ public class OnhandProcessDAO {
 			ps.setString(2, o.getMaterialMaster());
 			ps.setString(3, o.getGroupCode());
 			ps.setString(4, o.getBarcode());
+			ps.setString(5, o.getWareHouse());
 			
 			ps.executeUpdate();
 			

@@ -77,6 +77,7 @@ span.pagelinks {
 }
 #scroll {
     width:1200px;
+    height:550px;
     background:#A3CBE0;
 	border:1px solid #000;
 	overflow:auto;

@@ -57,7 +57,6 @@ public class MemberRenewAction extends I_Action {
 
 			List<MemberRenew> renews = new MMemberRenew().lookUp(Integer.parseInt(id));
 			
-
 			if (renews.size() > 0) {
 				memberRenewForm.getMemberRenew().setAppliedDate(renews.get(0).getRenewedDate());
 			} else {
@@ -66,19 +65,25 @@ public class MemberRenewAction extends I_Action {
 			
 			//Case no Expire get last renew_id for update
 			String currentDateStr = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String lastExpireDateStr = renews.get(0).getExpiredDate();
 			
 			Date currentDate = Utils.parse(currentDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			Date lastExpireDate = Utils.parse(lastExpireDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			
+			Date lastExpireDate = null;
+
+			String lastExpireDateStr = "";
+			if (renews.size() > 0) {
+				lastExpireDateStr = renews.get(0).getExpiredDate();
+				lastExpireDate = Utils.parse(lastExpireDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
+				if( currentDate.before(lastExpireDate)){
+					memberRenewForm.getMemberRenew().setId(renews.get(0).getId());
+				}
+				
+				logger.debug("renew date:"+renews.get(0).getRenewedDate());
+			}
+        	
 			logger.debug("currentDate:"+currentDate);
 			logger.debug("lastExpireDate:"+lastExpireDate);
 			
-			if( currentDate.before(lastExpireDate)){
-				memberRenewForm.getMemberRenew().setId(renews.get(0).getId());
-			}
-			
-			logger.debug("renew date:"+renews.get(0).getRenewedDate());
 
 			// get back search key
 			if (memberRenewForm.getCriteria().getSearchKey() == null) {

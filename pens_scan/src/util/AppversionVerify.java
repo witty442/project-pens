@@ -53,6 +53,7 @@ public class AppversionVerify {
 			
 			String appVersionLatest = Utils.isNull(getLatestSalesVersion("Lastest-app-version.txt"));
 			String msgToSales = ftpManager.getDownloadFTPFileByName("/BME/Manual-script/message-to-sales.txt");
+			
 			logger.info("appVersionLatest :"+appVersionLatest);
 			logger.info("msgToSales :"+msgToSales);
 			
@@ -76,8 +77,9 @@ public class AppversionVerify {
 	}
 	
 	/** process run mainpage.jsp footer.jsp */
-	public static String checkAppVersion(HttpServletRequest request){
-		String msg = "";
+	public static String[] checkAppVersion(HttpServletRequest request){
+		//String msg = "";
+		String[] msg = new String[2];
 		try{
 			if(request.getSession().getAttribute("appVersionCheckMsg") == null){
 			    String localSalesAppPath = getLocalPathSalesApp();
@@ -86,21 +88,24 @@ public class AppversionVerify {
 				String appVersionLatest = Utils.isNull(FileUtil.readFile(localSalesAppPath+"Lastest-app-version.txt", "UTF-8"));
 
 				String appVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
+				
 				logger.debug("appVersionLatest :"+appVersionLatest);
 				logger.debug("CurrentAppVersion :"+appVersion);
 				
 				if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
 					//appVersion not match
-					msg = ""+SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th")) +"-><a href='https://dl.dropboxusercontent.com/u/24337336/pens/BME/pens_scan.war'>Download</a>";
+					msg[0] = ""+SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th")) ; 
+					msg[1] ="<a href='https://dl.dropboxusercontent.com/u/24337336/pens/BME/pens_scan.war'>Download</a>";
 				}else{
-					msg = "";
+					msg[0] = "";
+					msg[1] = "";
 				}
 				request.getSession().setAttribute("appVersionCheckMsg",msg);
 				
 				logger.debug("new msg :"+msg);
 			}else{
-				msg = Utils.isNull(request.getSession().getAttribute("appVersionCheckMsg"));
-				logger.debug("old msg :"+msg);
+				msg = (String[])request.getSession().getAttribute("appVersionCheckMsg");
+				logger.debug("old msg :"+msg[0]+":"+msg[1]);
 			}
 			
 		}catch(Exception e){
@@ -317,7 +322,7 @@ public class AppversionVerify {
         String appVersion = "";
         try{
         	String str = URL_DROPBOX_+name+"";
-        	logger.info("url:"+str);
+        	logger.debug("url:"+str);
             URL url = new URL(str);
             url.openConnection();
             InputStream inStream = url.openStream();

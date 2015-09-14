@@ -228,8 +228,8 @@ public class ConfFinishAction extends I_Action {
 				aForm.setResults(ConfFinishDAO.searchItemByGroupCode(conn, h));
 			}
 			
-			//Step 2 Balance onhand from REQ_FINISHING
-			OnhandProcess.processBalanceOnhand(user.getUserName());
+			//Step 2 Balance onhand from REQ_FINISHING by warehouse
+			OnhandProcess.processBalanceOnhand(h.getWareHouse(),user.getUserName());
 			
 		} catch (Exception e) {
 			logger.error("RollBack:"+e.getMessage(),e);

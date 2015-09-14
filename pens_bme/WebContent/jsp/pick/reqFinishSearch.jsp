@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
@@ -22,7 +23,6 @@
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqFinishForm" class="com.isecinc.pens.web.pick.ReqFinishForm" scope="session" />
-
 <%
 if(session.getAttribute("statusReqReturnW2List") == null){
 	List<References> billTypeList = new ArrayList();
@@ -31,8 +31,15 @@ if(session.getAttribute("statusReqReturnW2List") == null){
 	billTypeList.addAll(ReqReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
 	session.setAttribute("statusReqReturnW2List",billTypeList);
 }
+if(session.getAttribute("wareHouseList2") == null){
+	List<References> wareHouseList = new ArrayList();
+	References ref1 = new References("","");
+	wareHouseList.add(ref1);
+	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W4+"'"));
+	
+	session.setAttribute("wareHouseList2",wareHouseList);
+}
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -41,9 +48,8 @@ if(session.getAttribute("statusReqReturnW2List") == null){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_reqReturnWacoal.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<style type="text/css"></style>
 
-<style type="text/css">
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
@@ -75,9 +81,7 @@ function openEdit(path,requestDate,requestNo,mode){
 	form.submit();
 	return true;
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -128,10 +132,24 @@ function openEdit(path,requestDate,requestNo,mode){
 									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20"/>
 									</td>
 									<td>					
-										ʶҹ�   
-										<html:select property="bean.status">
+										
+									</td>
+								</tr>
+								 <tr>
+                                    <td>	ʶҹ�   </td>
+									<td align="left">					
+										 <html:select property="bean.status">
 											<html:options collection="statusReqReturnW2List" property="key" labelProperty="name"/>
 									    </html:select>
+									</td>
+									<td > 
+									     Warehouse
+									      <html:select property="bean.wareHouse" styleId="wareHouse" >
+											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+									    </html:select>
+									</td>
+									<td align="left">	
+									    
 									</td>
 								</tr>
 								<tr>

@@ -48,7 +48,9 @@ public class StockFinishGoodQueryAction extends I_Action {
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equalsIgnoreCase(action)){
-				aForm.setBean(new StockQuery());
+				StockQuery bean = new StockQuery();
+				bean.setWareHouse("W2");
+				aForm.setBean(bean);
 			}else{
 				
 			}
@@ -242,7 +244,11 @@ public class StockFinishGoodQueryAction extends I_Action {
 				h.append("<tr> \n");
 				h.append("<td align='left' colspan='"+colSpan+"' >ʶҹ� :"+PickConstants.getStatusDesc(form.getBean().getStatus())+" </td>\n");
 				h.append("</tr> \n");
-
+				
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colSpan+"' >Warehouse :"+PickConstants.getWareHouseDesc(form.getBean().getWareHouse())+" </td>\n");
+				h.append("</tr> \n");
+				
 			h.append("</table> \n");
 
 			if(form.getResults() != null){

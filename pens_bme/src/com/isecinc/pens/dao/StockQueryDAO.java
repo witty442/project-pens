@@ -229,7 +229,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n 		and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n 		and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
-				
+				sql.append("\n 		    and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n 			group by l.material_master ,l.group_code,l.pens_item,l.barcode");
 				
 				sql.append("\n 			UNION ALL ");
@@ -239,6 +239,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n 		and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -272,6 +273,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
+				sql.append("\n and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				
 				sql.append("\n group by l.material_master ,l.group_code,l.pens_item,l.barcode");
 				sql.append("\n )A ");
@@ -283,6 +285,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -300,6 +303,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status ='"+STATUS_ISSUED+"'");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -331,6 +335,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n 		and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n 		and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
+				sql.append("\n 		    and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n 			group by l.material_master ,l.group_code,l.pens_item,l.barcode");
 				
 				sql.append("\n 			UNION ALL ");
@@ -340,6 +345,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n 		and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -361,6 +367,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -379,6 +386,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status ='"+STATUS_ISSUED+"'");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -457,7 +465,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n 		and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n 		and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
-				
+				sql.append("\n 		    and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n 			group by l.group_code,l.pens_item");
 				
 				sql.append("\n 			UNION ALL ");
@@ -467,6 +475,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n 		and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -500,7 +509,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
-				
+				sql.append("\n and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n group by l.group_code,l.pens_item");
 				sql.append("\n )A ");
 				sql.append("\n group by A.group_code,A.pens_item,A.status ");
@@ -511,6 +520,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -528,6 +538,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status ='"+STATUS_ISSUED+"'");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -559,6 +570,7 @@ public class StockQueryDAO extends PickConstants{
 					sql.append("\n 		and l.group_code >= '"+Utils.isNull(o.getGroupCodeFrom())+"'");
 					sql.append("\n 		and l.group_code <= '"+Utils.isNull(o.getGroupCodeTo())+"'");
 				}
+				sql.append("\n 		    and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n 			group by l.group_code,l.pens_item");
 				
 				sql.append("\n 			UNION ALL ");
@@ -568,6 +580,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n 		and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -589,6 +602,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");
@@ -607,6 +621,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 				sql.append("\n and h.status ='"+STATUS_ISSUED+"'");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
 					sql.append("\n and l.pens_item <= '"+Utils.isNull(o.getPensItemTo())+"'");

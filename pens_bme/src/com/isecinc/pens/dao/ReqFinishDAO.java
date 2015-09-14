@@ -104,6 +104,7 @@ public class ReqFinishDAO extends PickConstants{
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
 				   h.setRemark(Utils.isNull(rst.getString("remark"))); 
+				   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
 				   
@@ -164,6 +165,9 @@ public class ReqFinishDAO extends PickConstants{
 			if( !Utils.isNull(o.getRequestNo()).equals("")){
 				sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
 			}
+			if( !Utils.isNull(o.getWareHouse()).equals("")){
+				sql.append("\n and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
+			}
 			
 			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
@@ -189,6 +193,8 @@ public class ReqFinishDAO extends PickConstants{
 				   h.setRemark(Utils.isNull(rst.getString("remark"))); 
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
+				   
+				   h.setWareHouse(Utils.isNull(rst.getString("WAREHOUSE"))); 
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_OPEN) ){
 					   h.setCanEdit(true);
@@ -301,7 +307,7 @@ public class ReqFinishDAO extends PickConstants{
 	}
 	
 	
-	public static List<ReqFinish> searchBarcoceItemW2() throws Exception {
+	public static List<ReqFinish> searchBarcoceItemW2_W4(String wareHouse) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -318,7 +324,9 @@ public class ReqFinishDAO extends PickConstants{
 			sql.append("\n and h.job_id = j.job_id ");
 			sql.append("\n and h.job_id = i.job_id ");
 			sql.append("\n and h.box_no = i.box_no ");
-			sql.append("\n and h.warehouse ='W2' ");
+			if( !Utils.isNull(wareHouse).equals("")){
+			  sql.append("\n and h.warehouse ='"+Utils.isNull(wareHouse)+"' ");
+			}
 			sql.append("\n and h.status = '"+JobDAO.STATUS_CLOSE+"'");
 			sql.append("\n and i.status = '"+JobDAO.STATUS_CLOSE+"'");
 
@@ -504,8 +512,8 @@ public class ReqFinishDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_REQ_FINISHING \n");
 				sql.append(" ( REQUEST_DATE,REQUEST_NO ,TOTAL_BOX,TOTAL_QTY \n");
-				sql.append("  ,CREATE_DATE ,CREATE_USER,STATUS,REMARK) \n");
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?) \n");
+				sql.append("  ,CREATE_DATE ,CREATE_USER,STATUS,REMARK,WAREHOUSE) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 				
@@ -519,6 +527,7 @@ public class ReqFinishDAO extends PickConstants{
 				ps.setString(c++, o.getCreateUser());
 				ps.setString(c++, o.getStatus());
 				ps.setString(c++, o.getRemark());
+				ps.setString(c++, Utils.isNull(o.getWareHouse()));
 				
 				ps.executeUpdate();
 				
@@ -539,7 +548,7 @@ public class ReqFinishDAO extends PickConstants{
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" UPDATE PENSBI.PENSBME_REQ_FINISHING SET  \n");
-				sql.append(" remark =? ,request_date =? ,update_user =?,update_date =?,total_box =? ,total_qty =?   \n");
+				sql.append(" remark =? ,request_date =? ,update_user =?,update_date =?,total_box =? ,total_qty =? ,WAREHOUSE =?   \n");
 				sql.append(" WHERE  REQUEST_NO = ?  \n" );
 
 				ps = conn.prepareStatement(sql.toString());
@@ -551,6 +560,7 @@ public class ReqFinishDAO extends PickConstants{
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setInt(c++, o.getTotalBox());
 				ps.setInt(c++, o.getTotalQty());
+				ps.setString(c++, Utils.isNull(o.getWareHouse()));
 				
 				ps.setString(c++, Utils.isNull(o.getRequestNo()));
 				

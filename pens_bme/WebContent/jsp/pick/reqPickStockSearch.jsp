@@ -158,7 +158,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 	    
 	      	<jsp:include page="../program.jsp">
 	      	
-				<jsp:param name="function" value="reqPickStock"/>
+				<jsp:param name="function" value="reqPickStockW2"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -177,8 +177,13 @@ function openConfirm(path,documentNo,issueReqStatus){
 
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
+						         <tr>
+                                    <td colspan="2" align="center"> 
+                                      <font size="3"><b>Request เบิกสินค้าจากคลัง  ${reqPickStockForm.bean.wareHouse}</b></font>
+                                     </td>
+								</tr>
 						       <tr>
-                                    <td>
+                                    <td> ${reqPickStockForm.bean.wareHouse}
                                       Issue request Date <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
                                      </td>
 									<td>						

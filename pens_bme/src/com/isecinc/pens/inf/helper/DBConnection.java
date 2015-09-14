@@ -80,11 +80,11 @@ public class DBConnection {
 			String username = env.getProperty("db.username");
 			String password = env.getProperty("db.password");
 			
-			logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			
 			Class.forName(driver);
 			_instanceInf = DriverManager.getConnection(url,username,password);
-			logger.debug("Connection:"+_instanceInf);
+			//logger.debug("Connection:"+_instanceInf);
 			
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);			

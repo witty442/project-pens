@@ -667,6 +667,14 @@ public class Utils {
 		return Integer.parseInt(str);
 	}
 	
+	public static int convertStrToInt(String str,int defaultInt) {
+		if (str ==null || "".equals(str)){
+			return defaultInt;
+		}
+		str= str.replaceAll("\\,", "");
+		return Integer.parseInt(str);
+	}
+	
 	public static boolean isBlank(Object o) {
 		boolean r = false;
 		if (o == null) {

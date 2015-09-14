@@ -395,7 +395,16 @@ function escapeParameter(param){
 						<jsp:include page="../error.jsp"/>
 		
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							
+							<tr>
+								<td colspan="4" align="center">
+								 <c:if test="${moveOrderForm.moveOrder.moveOrderType =='MoveOrderRequisition'}">
+							        <font color="blue" size="7"> <b> รายการเบิกสินค้า</b> </font>
+							       </c:if>
+							        <c:if test="${moveOrderForm.moveOrder.moveOrderType =='MoveOrderReturn'}">
+							          <font color="red" size="7"> <b>รายการคืนสินค้า  </b></font>
+							       </c:if>
+							    </td>
+							</tr>
 							<tr>
 								<td colspan="4" align="center">
 								   <table align="center" border="0" cellpadding="3" cellspacing="0" width="80%">

@@ -483,7 +483,9 @@ public class MOrder extends I_Model<Order> {
 		String sql = "\n select * from t_order_line where  order_id = "+orders.getId()+
 		 "\n   and trip_no = ("+
 		 "\n     select max(trip_no) from t_order_line"+
-		 "\n     where order_id = "+orders.getId()+") order by line_no";
+		 "\n     where order_id = "+orders.getId()+"  and iscancel <> 'Y')  \n and iscancel <> 'Y' order by line_no";
+		
+		logger.debug("sql:"+sql);
 		
 		int lineNo = 0;
 		List<OrderLine> orderLineList = new ArrayList<OrderLine>();
@@ -512,6 +514,7 @@ public class MOrder extends I_Model<Order> {
 					line.setExported("N");
 					line.setInterfaces("N");
 					
+					logger.debug("getShippingDate:"+line.getShippingDate());
 					//date
 					String date = o.addDate(line.getShippingDate(),7 * o.calWeekByRoundtrip(member.getRoundTrip()));
 					line.setShippingDate(date);

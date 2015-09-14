@@ -34,9 +34,7 @@ if(session.getAttribute("statusIssueReqList") == null){
 
 if(session.getAttribute("pickTypeList") == null){
 	List<References> pickTypeList = new ArrayList();
-	//References ref = new References("","");
-	//pickTypeList.add(ref);
-	pickTypeList.addAll(PickConstants.getPickTypeList());
+	pickTypeList.add(new References(PickConstants.PICK_TYPE_BOX, PickConstants.getStatusDesc(PickConstants.PICK_TYPE_BOX)));
 	session.setAttribute("pickTypeList",pickTypeList);
 }
 

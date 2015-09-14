@@ -22,10 +22,29 @@ public class Constants {
 
 	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
 	public static final String STORE_TYPE_MTT_CODE_2 ="020056";//King Power
+	public static final String STORE_TYPE_MTT_CODE_3 ="020051";
 	
 	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
 	
 	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
 	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";
 	public static String STORE_TYPE_FRIDAY_ITEM = "FridayItem";
+	
+	
+	public static String getStoreGroupName(String storeGroup){
+		if(storeGroup.equals(STORE_TYPE_LOTUS_CODE)){
+			return "LOTUS";
+		}else 	if(storeGroup.equals(STORE_TYPE_BIGC_CODE)){
+			return "BIGC";
+		}else 	if(storeGroup.equals(STORE_TYPE_TOPS_CODE)){
+			return "TOPS";		
+		}else 	if(storeGroup.equals(STORE_TYPE_FRIDAY_CODE)){
+			return "FRIDAY";
+		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_1)){
+			return "MTT";
+		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_2)){
+			return "MTT";
+		}
+		return "";
+	}
 }

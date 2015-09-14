@@ -83,7 +83,8 @@ public class PickStockDAO extends PickConstants{
 	}
 	
 	public static PickStock saveBox(Connection conn,PickStock h) throws Exception{
-		Map<String,String> pensItemMapAll = new HashMap<String, String>();
+		//Map<String,String> pensItemMapAll = new HashMap<String, String>();
+		Map<String,String> boxNoMapAll = new HashMap<String, String>();
 		try{
 			
 			Date tDate  = Utils.parse(h.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -108,20 +109,13 @@ public class PickStockDAO extends PickConstants{
 					   l.setUpdateUser(h.getUpdateUser());
 					   l.setIssueReqStatus(h.getIssueReqStatus());
 					   
-					   //save item 
-					   Map<String,String> pensItemMap = insertPickStockLineFromBarcodeItem(conn,l);
-					   pensItemMapAll.putAll(pensItemMap);
+					   //set 4 check update barcode head
+					   boxNoMapAll.put(l.getBoxNo(), l.getBoxNo());
 					   
-				       //Set barcode status = ISSUE
-				       Barcode b = new Barcode();
-				       b.setJobId(l.getJobId());
-				       b.setBoxNo(l.getBoxNo());
-				       b.setStatus(PickConstants.STATUS_ISSUED);
-				       b.setUpdateUser(h.getUpdateUser());
-				       
-				       //update barcode_item DB
-				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
+					   //save item 
+					    insertPickStockLineFromBarcodeItem(conn,l);
+					  // pensItemMapAll.putAll(pensItemMap);
+					   
 				   }//for
 				}//if
 				
@@ -133,8 +127,8 @@ public class PickStockDAO extends PickConstants{
 				//save head
 				updatePickStockHeadModel(conn, h);
 				
-				//delete pickStockItem and update barcode item status='CLOSE'
-				deletePickStockItemAndUpdateBarcodeToClose(conn,h);
+				//delete pick Stock Item and update barcode item status='CLOSE'
+				boxNoMapAll = deletePickStockItemAndUpdateBarcodeToClose(conn,h);
 				
 				//save line
 				if(h.getItems() != null && h.getItems().size()>0){
@@ -144,28 +138,30 @@ public class PickStockDAO extends PickConstants{
 					   l.setCreateUser(h.getCreateUser());
 					   l.setUpdateUser(h.getUpdateUser());
 					  
-					 
+					   //set 4 check update barcode head
+					   boxNoMapAll.put(l.getBoxNo(), l.getBoxNo());
+					     
 					   //save item 
-					   Map<String,String> pensItemMap = insertPickStockLineFromBarcodeItem(conn,l);
-					   pensItemMapAll.putAll(pensItemMap);
-				       
-				       //Set barcode status = ISSUE
-				       Barcode b = new Barcode();
-				       b.setJobId(l.getJobId());
-				       b.setBoxNo(l.getBoxNo());
-				       b.setStatus(PickConstants.STATUS_ISSUED);
-				       b.setUpdateUser(h.getUpdateUser());
-				       
-				       
-				       //update barcode_item DB
-				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
+					  insertPickStockLineFromBarcodeItem(conn,l);
+					   //pensItemMapAll.putAll(pensItemMap);   
 				   }//for
 				}//if
 			}
 			
+			/** Check all item ==ISSUE and Update Head == ISSUE **/
+			if( !boxNoMapAll.isEmpty()){
+				logger.debug("Validate Barcode Item amd update barcode Head");
+				
+				Iterator<String> its = boxNoMapAll.keySet().iterator();
+				String boxNo = "";
+				while(its.hasNext()){
+				   boxNo = its.next(); 
+				   PickStockGroupDAO.processUpdateStatusBarcodeHead(conn,boxNo,h.getCreateUser());
+				}
+			}
+			
 			h.setResultProcess(true);//default
-			h.setPensItemMapAll(pensItemMapAll);
+			h.setBoxNoMapAll(boxNoMapAll);
 			
 			return h;
 		}catch(Exception e){
@@ -193,6 +189,8 @@ public class PickStockDAO extends PickConstants{
 			if( !Utils.isNull(o.getBoxNo()).equals("")){
 				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
 			}
+			//** Status = CLOSE ONLY  For case Pick by group part of Box*/
+			sql.append("\n and i.status = '"+PickConstants.STATUS_CLOSE+"'");
 	
 			sql.append("\n order by line_id asc ");
 			
@@ -222,8 +220,14 @@ public class PickStockDAO extends PickConstants{
 			   //save pick_stock_line
 			   savePickStockLineModel(conn, h);
 			   
-			   pensItemMap.put(h.getPensItem(), h.getPensItem());
-			   r++;
+			   // Update barcode item status=issue
+			   // WHERE  BOX_NO = ? and  material_master =? and group_code =? and pens_item = ? and job_id = ? and line_id =?;
+				h.setBarcodeItemStatus(PickConstants.STATUS_ISSUED);
+				h.setUpdateUser(h.getUpdateUser());
+				
+			    updateStatusBarcodeItemModel(conn, h);
+			       
+			    r++;
 			   
 			}//while
 
@@ -237,74 +241,7 @@ public class PickStockDAO extends PickConstants{
 		}
 		return pensItemMap;
 	}
-	
-	//get barcode item status=close ,insert pick stock item ,update barcode item =issue
-	private static Map<String ,String> insertPickStockLineAndUpdateBarcodeItemToIssue(Connection conn,PickStock o ) throws Exception {
-		PreparedStatement ps = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-		PickStock h = null;
-		int r = 1;
-        Map<String ,String> pensItemMap = new HashMap<String, String>();
-		try {
-			sql.append("\n select i.* from PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
-			sql.append("\n where 1=1 \n");
-			sql.append("\n and  i.status ='"+PickConstants.STATUS_CLOSE+"' \n");
-			if( !Utils.isNull(o.getJobId()).equals("")){
-				sql.append("\n and i.job_id = "+Utils.isNull(o.getJobId())+"");
-			}
-			if( !Utils.isNull(o.getBoxNo()).equals("")){
-				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
-			}
-	
-			sql.append("\n order by line_id asc ");
-			
-			logger.debug("sql:"+sql);
-			
-			ps = conn.prepareStatement(sql.toString());
-			rst = ps.executeQuery();
 
-			while(rst.next()) {
-			  
-			   h = new PickStock();
-			   h.setIssueReqNo(o.getIssueReqNo());
-			   h.setLineId(rst.getInt("line_id"));
-			   h.setJobId(rst.getString("job_id"));
-			   h.setBoxNo(rst.getString("box_no"));
-			  
-			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
-			   h.setGroupCode(rst.getString("group_code"));
-			   h.setPensItem(rst.getString("pens_item"));
-			   h.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
-			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
-			   
-			   h.setCreateUser(o.getCreateUser());
-			   h.setUpdateUser(o.getUpdateUser());
-			   
-			   //save pick_stock_line
-			   savePickStockLineModel(conn, h);
-			   
-			   //Update barcode item status=issue
-		      //sql.append(" WHERE  BOX_NO = ? and  material_master =? and group_code =? and pens_item = ? and job_id = ? and line_id =? \n" );
-			   h.setBarcodeItemStatus(PickConstants.STATUS_ISSUED);
-			   h.setUpdateUser(h.getUpdateUser());
-		       updateStatusBarcodeItemModel(conn, h);
-			   
-			   pensItemMap.put(h.getPensItem(), h.getPensItem());
-			   r++;
-			   
-			}//while
-
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			try {
-				rst.close();
-				ps.close();
-			} catch (Exception e) {}
-		}
-		return pensItemMap;
-	}
 	
 	/**
 	 * 
@@ -412,11 +349,11 @@ public class PickStockDAO extends PickConstants{
 	}
 	
 	//1-delete pickStockLine 2, update status barcode item and head
-	private static void deletePickStockItemAndUpdateBarcodeToClose(Connection conn,PickStock h) throws Exception{
+	private static Map<String,String> deletePickStockItemAndUpdateBarcodeToClose(Connection conn,PickStock h) throws Exception{
 		int no = 1;
-	    Map<String,PickStock> boxNoMap = new HashMap<String, PickStock>();
+		Map<String,String> boxNoMapAll = new HashMap<String, String>();
 		try{
-			  List<PickStock> pickStockItemList = searchPickStockItem(conn, h);
+			  List<PickStock> pickStockItemList = searchPickStockItemListByIssueReqNo(conn, h.getIssueReqNo());
 			  logger.debug("pickStockItemList:"+pickStockItemList.size());
 			   
 			  if(pickStockItemList !=null && pickStockItemList.size() >0){
@@ -434,31 +371,15 @@ public class PickStockDAO extends PickConstants{
 				       //update barcode item (status = C)
 				       p.setBarcodeItemStatus(PickConstants.STATUS_CLOSE);
 				       updateStatusBarcodeItemModel(conn, p);
-				       
-				       //set 4 update barcode head
-				       boxNoMap.put(p.getBoxNo(), p);
 					   no++;
+					   
+					   //Set BoxNoMap
+					   boxNoMapAll.put(p.getBoxNo(), p.getBoxNo());
 				   }//for 2
 				   
-				   //update barcode head
-				   if( !boxNoMap.isEmpty()){
-					   Iterator it = boxNoMap.keySet().iterator();
-					   while(it.hasNext()){
-						   String key = (String)it.next();
-						   PickStock pBoxNo = (PickStock)boxNoMap.get(key);
-						   
-						   Barcode b = new Barcode();
-					       b.setJobId(pBoxNo.getJobId());
-					       b.setBoxNo(pBoxNo.getBoxNo());
-					       b.setStatus(PickConstants.STATUS_CLOSE);
-					       b.setUpdateUser(h.getUpdateUser());
-						  
-						   BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-					     
-						   
-					   }
-				   }
 			   }//if 
+			  
+			 return boxNoMapAll;
 		}catch(Exception e){
 			throw e;
 		}
@@ -498,7 +419,6 @@ public class PickStockDAO extends PickConstants{
 		}
 	}
 
-	
 	public static List<PickStock> searchHead(PickStock o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -2127,6 +2047,94 @@ public class PickStockDAO extends PickConstants{
 		return items;
 	}
 	
+	public static List<PickStock> searchBarcoceItemStatusCloseW3ByGroup(Connection conn,PickStock p ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		PickStock h = null;
+		int r = 1;
+        List<PickStock> items = new ArrayList<PickStock>();
+		try {
+           
+			sql.append("\n select i.box_no,i.job_id, j.name as job_name,i.group_code ");
+			sql.append("\n ,count(*) as qty ");
+			sql.append("\n from PENSBME_PICK_JOB j,PENSBI.PENSBME_PICK_BARCODE h, PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
+			sql.append("\n where 1=1  ");
+			sql.append("\n and j.job_id = h.job_id ");
+			sql.append("\n and h.job_id = i.job_id ");
+			sql.append("\n and h.box_no = i.box_no ");
+			sql.append("\n and h.warehouse = 'W3'");
+			sql.append("\n and h.status = '"+STATUS_CLOSE+"'");
+			sql.append("\n and ( i.status = '"+STATUS_CLOSE+"' OR i.status ='' OR i.status is null)");
+			
+			if( !Utils.isNull(p.getJobId()).equals("")){
+				sql.append("\n and j.job_id = "+Utils.isNull(p.getJobId()));
+			}
+			
+			if( !Utils.isNull(p.getBoxNoFrom()).equals("") && !Utils.isNull(p.getBoxNoTo()).equals("")){
+				sql.append("\n and h.box_no >= '"+Utils.isNull(p.getBoxNoFrom())+"'");
+				sql.append("\n and h.box_no <= '"+Utils.isNull(p.getBoxNoTo())+"'");
+				
+			}else if( !Utils.isNull(p.getBoxNoFrom()).equals("") || !Utils.isNull(p.getBoxNoTo()).equals("")){
+				if( !Utils.isNull(p.getBoxNoFrom()).equals("")){
+					sql.append("\n and h.box_no = '"+Utils.isNull(p.getBoxNoFrom())+"'");
+				}else{
+					sql.append("\n and h.box_no = '"+Utils.isNull(p.getBoxNoTo())+"'");
+				}
+			}
+			
+			if( !Utils.isNull(p.getGroupCodeFrom()).equals("") && !Utils.isNull(p.getGroupCodeTo()).equals("")){
+				sql.append("\n and i.group_code >= '"+Utils.isNull(p.getGroupCodeFrom())+"'");
+				sql.append("\n and i.group_code <= '"+Utils.isNull(p.getGroupCodeTo())+"'");
+				
+			}else if( !Utils.isNull(p.getGroupCodeFrom()).equals("") || !Utils.isNull(p.getGroupCodeTo()).equals("")){
+				if( !Utils.isNull(p.getGroupCodeFrom()).equals("")){
+					sql.append("\n and i.group_code = '"+Utils.isNull(p.getGroupCodeFrom())+"'");
+				}else{
+					sql.append("\n and i.group_code = '"+Utils.isNull(p.getGroupCodeTo())+"'");
+				}
+			}
+			
+			if( !Utils.isNull(p.getJobId()).equals("")){
+				sql.append("\n and j.job_id = "+Utils.isNull(p.getJobId()));
+			}
+			
+			sql.append("\n group by i.box_no ,i.job_id,j.name,i.group_code ");
+			
+			if( Utils.isNull(p.getOrderBy()).equals("box")){
+			   sql.append("\n order by i.box_no asc ");
+			}else {
+			   sql.append("\n order by i.box_no,i.group_code asc ");
+			}
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new PickStock();
+			   h.setJobId(rst.getString("job_id"));
+			   h.setJobName(rst.getString("job_name"));
+			   h.setGroupCode(rst.getString("group_code"));
+			   h.setBoxNo(rst.getString("box_no"));
+			   h.setOnhandQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
+			
+			   items.add(h);
+			   r++;
+			   
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
     //TEst	
 	public static List<PickStock> searchBarcoceItemInBoxCasePickSomeItem(Connection conn ,String boxNoSqlPick) throws Exception {
 		PreparedStatement ps = null;
@@ -2194,6 +2202,82 @@ public class PickStockDAO extends PickConstants{
 			   h.setBoxNo(rst.getString("box_no"));
 			   h.setQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
 			   h.setTotalBoxQty(Utils.decimalFormat(rst.getInt("total_box_qty"),Utils.format_current_no_disgit));
+			   
+			   items.add(h);
+			   r++;
+			   
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
+	public static Map<String,String> updateBarcodeToCloseFromStockPickItem(Connection conn,PickStock h) throws Exception{
+		logger.debug("--cancelPickStockItemAndUpdateBarcodeToClose--");
+		Map<String,String> boxNoMapAll = new HashMap<String, String>();
+		int no = 1;
+		try{
+		    List<PickStock> pickStockItemByGroupList = searchPickStockItemListByIssueReqNo(conn, h.getIssueReqNo());
+			
+		    if(pickStockItemByGroupList !=null && pickStockItemByGroupList.size() >0){
+			   logger.debug("pickStockItemList:"+pickStockItemByGroupList.size());
+				
+			   for(int k=0;k<pickStockItemByGroupList.size();k++){
+				   PickStock p = (PickStock)pickStockItemByGroupList.get(k);
+				   p.setCreateUser(h.getCreateUser());
+				   p.setUpdateUser(h.getUpdateUser());
+				   
+			       //update barcode item (status = C)
+			       p.setBarcodeItemStatus(PickConstants.STATUS_CLOSE);
+			       updateStatusBarcodeItemModel(conn, p);
+			       
+			       boxNoMapAll.put(p.getBoxNo(), p.getBoxNo());
+				   no++;
+			   }//for 2
+			}
+			return boxNoMapAll;
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	
+	public static List<PickStock> searchPickStockItemListByIssueReqNo(Connection conn,String issueReqNo) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		PickStock h = null;
+		int r = 1;
+        List<PickStock> items = new ArrayList<PickStock>();
+		try {
+			sql.append("\n select i.* from PENSBI.PENSBME_PICK_STOCK_I i ");
+			sql.append("\n where 1=1   \n");
+			sql.append("\n and i.issue_req_no = '"+Utils.isNull(issueReqNo)+"'");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			  
+			   h = new PickStock();
+			   h.setIssueReqNo(rst.getString("issue_req_no"));
+			   h.setLineId(rst.getInt("line_id"));//Line_id(Barcode by boxNo)
+			   h.setJobId(rst.getString("job_id"));
+			   h.setBoxNo(rst.getString("box_no"));
+			   
+			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+			   h.setGroupCode(rst.getString("group_code"));
+			   h.setPensItem(rst.getString("pens_item"));
+			   
+			   h.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
 			   
 			   items.add(h);
 			   r++;

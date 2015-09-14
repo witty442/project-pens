@@ -572,6 +572,14 @@ public class GeneralDAO {
 		}
 	 
 	 public static List<References> searchWareHouseList() throws Exception {
+		 try{
+			 return searchWareHouseList("");
+		 }catch(Exception e){
+			throw e;
+		 }
+	 }
+	 
+	 public static List<References> searchWareHouseList(String codeSqlIn) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			List<References> pos = new ArrayList<References>();
@@ -582,6 +590,9 @@ public class GeneralDAO {
 				sql.append("\n select pens_value , pens_desc  ");
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Warehouse' ");
+				if( !Utils.isNull(codeSqlIn).equals("")){
+					sql.append("\n AND PENS_VALUE IN ("+codeSqlIn+")");
+				}
 				sql.append("\n  ORDER BY pens_desc asc \n");
 				
 				logger.debug("sql:"+sql);
@@ -622,6 +633,7 @@ public class GeneralDAO {
 		 }
 		 
 	 }
+	 
 	 public static String getStoreNameModel(Connection conn,String storeCode) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -641,6 +653,38 @@ public class GeneralDAO {
 				rst = stmt.executeQuery(sql.toString());
 				if (rst.next()) {
 					storeName = Utils.isNull(rst.getString("pens_desc"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return storeName;
+		}
+	 
+	 public static String getCustNoOracleModel(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String storeName ="";
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select interface_value  ");
+				sql.append("\n FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
+				sql.append("\n AND pens_value ='"+storeCode+"' \n");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					storeName = Utils.isNull(rst.getString("interface_value"));
 				}//while
 
 			} catch (Exception e) {

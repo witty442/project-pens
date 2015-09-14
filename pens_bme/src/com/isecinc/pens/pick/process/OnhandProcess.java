@@ -10,18 +10,19 @@ import com.isecinc.pens.dao.OnhandProcessDAO;
 public class OnhandProcess {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static void processBalanceOnhand(String userName){
+	//Action :after confirm req finishing
+	public static void processBalanceOnhand(String warehouse,String userName){
 		try{
 			logger.debug("******* Start processBalanceOnhand *******************");
 			
-			OnhandProcessDAO.processBanlanceOnhandFromConfirmFinishing(userName);
+			OnhandProcessDAO.processBanlanceOnhandFromConfirmFinishing(warehouse,userName);
 			
 			logger.debug("******* End processBalanceOnhand *******************");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
 	}
-	
+	//Action :after req pick stock
 	public static void processUpdateBalanceOnhandByIssueReqNo(Connection conn,ReqPickStock req) throws Exception{
 		try{
 			logger.debug("******* Start processUpdateBalanceOnhandByIssueReqNo *******************");

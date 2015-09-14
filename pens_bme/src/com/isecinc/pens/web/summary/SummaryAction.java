@@ -13,8 +13,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.Constants;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.DiffStockSummary;
@@ -70,6 +68,7 @@ public class SummaryAction extends I_Action {
 				 summaryForm.setOnhandBigCResults(null);
 				 
 				 summaryForm.setOnhandSummaryMTTResults(null);
+				 summaryForm.setOnhandSummaryMTTDetailResults(null);
 			 }
 			
 		} catch (Exception e) {
@@ -112,6 +111,7 @@ public class SummaryAction extends I_Action {
 				 summaryForm.setOnhandBigCResults(null);
 				 
 				 summaryForm.setOnhandSummaryMTTResults(null);
+				 summaryForm.setOnhandSummaryMTTDetailResults(null);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -196,11 +196,8 @@ public class SummaryAction extends I_Action {
 				}
 				if(pass){
 					List<OnhandSummary> results = null;
-					if( Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_MTT_CODE_2)){
-						results = new SummaryDAO().searchOnhandMTT_King(summaryForm.getOnhandSummary(),initDate,user);
-					}else{
-					   results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
-					}
+					results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
+					
 					if (results != null  && results.size() >0) {
 						summaryForm.setOnhandSummaryMTTResults(results);
 						
@@ -211,6 +208,39 @@ public class SummaryAction extends I_Action {
 						
 					} else {
 						summaryForm.setOnhandSummaryMTTResults(null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}
+				}
+			}else if("onhandMTTDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				//Validate Initial Date
+				Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date initDate = new SummaryDAO().searchInitDateMTT(summaryForm.getOnhandSummary().getPensCustCodeFrom());
+				
+				logger.debug("initDate:"+initDate);
+				logger.debug("asOfDate:"+asOfDate);
+				
+				boolean pass = true;
+				if(initDate !=null){
+					if(asOfDate.before(initDate)){
+						summaryForm.setOnhandSummaryMTTResults(null);
+						request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
+						pass = false;
+					}
+				}
+				if(pass){
+					List<OnhandSummary> results = null;
+					results = new SummaryDAO().searchOnhandMTTDetail(summaryForm.getOnhandSummary(),initDate,user);
+					
+					if (results != null  && results.size() >0) {
+						summaryForm.setOnhandSummaryMTTDetailResults(results);
+						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+						
+					} else {
+						summaryForm.setOnhandSummaryMTTDetailResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
 				}
@@ -388,6 +418,14 @@ public class SummaryAction extends I_Action {
 				 fileName ="Report Bme Stock on-hand MTT.xls";
 			     if(summaryForm.getOnhandSummaryMTTResults() != null && summaryForm.getOnhandSummaryMTTResults().size() > 0){
 					htmlTable = genOnhandMTTHTML(request,summaryForm,user);	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("onhandMTTDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				 fileName ="Report Bme Stock on-hand MTT Detail.xls";
+			     if(summaryForm.getOnhandSummaryMTTDetailResults() != null && summaryForm.getOnhandSummaryMTTDetailResults().size() > 0){
+					htmlTable = genOnhandMTTDetailHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -672,6 +710,89 @@ public class SummaryAction extends I_Action {
 					  h.append("<td>"+s.getStoreName()+"</td> \n");
 					  h.append("<td>"+s.getGroup()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	private StringBuffer genOnhandMTTDetailHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String a= "@";
+		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='12'>รายงาน Stock B'me Stock onhand - MTT ( ระดับสี/ไซร์ ) </td> \n");
+			
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='12' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='12' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='12' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='12' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(form.getOnhandSummaryMTTDetailResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummaryMTTDetailResults();
+			 	    
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td>CustNo(Oracle)</td> \n");
+				  h.append("<td>ชื่อร้านค้า</td> \n");
+				  h.append("<td>Group</td> \n");
+				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Materila Master</td> \n");
+				  h.append("<td>Barcode</td> \n");
+				  h.append("<td>Initial Stock</td> \n");
+				  h.append("<td>Sale In Qty</td> \n");
+				  h.append("<td>Sale Out Qty</td> \n");
+				  h.append("<td>Return Qty </td> \n");
+				  h.append("<td>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getCustNo()+"</td> \n");
+					  h.append("<td>"+s.getStoreName()+"</td> \n");
+					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getBarcode())+"</td> \n");
 					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");

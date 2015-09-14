@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.dao.GeneralDAO;
+import com.isecinc.pens.inf.helper.Utils;
 
 public class PickConstants {
 
@@ -35,15 +36,19 @@ public class PickConstants {
 	public static String WAREHOUSE_W1 ="W1";//Move
 	public static String WAREHOUSE_W2 ="W2";//Move
 	public static String WAREHOUSE_W3 ="W3";//Move
+	public static String WAREHOUSE_W4 ="W4";//Move
 	
 	@Deprecated
 	public static String PICK_TYPE_ITEM ="ITEM";
 	public static String PICK_TYPE_BOX ="BOX";
+	public static String PICK_TYPE_GROUP ="GROUP";
+	
 	@Deprecated
 	public static String SUB_PICK_TYPE_PART_BOX ="PBOX";
 	
 	public static String getStatusDesc(String status){
 		String d = "";
+		status = Utils.isNull(status);
 		if(STATUS_OPEN.equals(status)){
 			d ="OPEN";
 		}else if(STATUS_CLOSE.equals(status)){
@@ -80,18 +85,45 @@ public class PickConstants {
 			d = "Available";
 		}else if(STATUS_STOCK.equals(status)){
 			d = "Stock";
+		}else if(PICK_TYPE_GROUP.equals(status)){
+			d = "GROUP";
+		}
+		return d;
+	}
+	
+	public static String getWareHouseDesc(String status){
+		String d = "";
+		status = Utils.isNull(status);
+		if(WAREHOUSE_W1.equals(status)){
+			d ="W1-คลังคืนโรงงานวาโก้";
+		}else if(WAREHOUSE_W2.equals(status)){
+			d = "W2-คลังสต็อก B'me สำหรับโอน ";
+		}else if(WAREHOUSE_W3.equals(status)){
+			d = "W3-เบิกสินค้าจากคลังขายสด-เบิกทั้งกล่อง";
+		}else if(WAREHOUSE_W4.equals(status)){
+			d = "W4-คลังสินค้า HIS&HER";
 		}
 		return d;
 	}
 	
 	public static List<References> getWareHouseList() {
 		try{
-		    return GeneralDAO.searchWareHouseList();
+		    return GeneralDAO.searchWareHouseList("");
 		}catch(Exception e){
 			
 		}
 		return null;
 	}
+	
+	public static List<References> getWareHouseList(String codeSqlIn) {
+		try{
+		    return GeneralDAO.searchWareHouseList(codeSqlIn);
+		}catch(Exception e){
+			
+		}
+		return null;
+	}
+	
 	
 	public static List<References> getJobStatusList(){
 		List<References> statusList = new ArrayList<References>();
@@ -198,7 +230,9 @@ public class PickConstants {
 	public static List<References> getPickTypeList(){
 		List<References> statusList = new ArrayList<References>();
 		//statusList.add(new References(PICK_TYPE_ITEM, getStatusDesc(PICK_TYPE_ITEM)));
+		
 		statusList.add(new References(PICK_TYPE_BOX, getStatusDesc(PICK_TYPE_BOX)));
+		statusList.add(new References(PICK_TYPE_GROUP, getStatusDesc(PICK_TYPE_GROUP)));
 		
 		return statusList;
 	}

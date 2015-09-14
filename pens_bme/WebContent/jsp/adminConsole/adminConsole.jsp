@@ -20,6 +20,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <style type="text/css">
 .tab_style {
@@ -151,6 +152,19 @@ function submitBT(path){
 	document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
     document.adminConsoleForm.submit();
 }
+
+function clearCach1(){
+	var returnString = "";
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/adminConsole/clearCachAjax.jsp",
+			data : "",
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+}
 </script>
 
 </head>
@@ -177,6 +191,8 @@ function submitBT(path){
     </div>
 
 	  <div id="div_config_info"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
+	      <input type="button" name="clearCach"  value=" Clear Cach "  onclick="clearCach1()"/>
+	      
 		  <BR><span class="h1_style">Configuration Tab </span><br> 
 		       <html:textarea property="configInfo" style=" width :100%;" rows="14"/>
 		     <br><br>

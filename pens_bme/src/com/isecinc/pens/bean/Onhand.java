@@ -17,6 +17,7 @@ public class Onhand implements Serializable{
 	private String issueQty;
 	private String wholePriceBF;
 	private String retailPriceBF;
+	private String wareHouse;
 	
 	private List<Onhand> items;
 	private String createUser;
@@ -27,6 +28,12 @@ public class Onhand implements Serializable{
 	private boolean canCancel;
 	
 	
+	public String getWareHouse() {
+		return wareHouse;
+	}
+	public void setWareHouse(String wareHouse) {
+		this.wareHouse = wareHouse;
+	}
 	public String getBarcode() {
 		return barcode;
 	}

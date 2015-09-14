@@ -1,3 +1,4 @@
+<%@page import="util.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -28,9 +29,10 @@
 	String types = Utils.isNull(request.getParameter("types"));
     String storeType = Utils.isNull(request.getParameter("storeType"));
     String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
+    String methodName = Utils.isNull(request.getParameter("methodName"));
+    System.out.println("methodName="+methodName);
 %>
 <script type="text/javascript">
-
 function searchPopup(path, type) {
     document.popupForm.action = path + "/jsp/searchCustomerPopupAction.do?do=search3";
     document.popupForm.submit();
@@ -47,15 +49,17 @@ function selectOneRadio(){
 	
 	for(var i=0;i<chRadio.length;i++){
         if(chRadio[i].checked){
-        	//alert(i+":"+code[i+1].value);
-            window.opener.setStoreMainValue(code[i].value,desc[i].value,storeNo[i].value,subInv[i].value ,types);
+        	//alert(i+":"+storeNo[i+1].value);
+        	<% if(methodName.equals("pickStockGroup")){ %>
+        	   window.opener.setStoreMainValuePickStockGroup(code[i].value,desc[i].value,storeNo[i].value,subInv[i].value ,types);
+        	<%}else{ %>
+               window.opener.setStoreMainValue(code[i].value,desc[i].value,storeNo[i].value,subInv[i].value ,types);
+            <%}%>
         	window.close();
             break;
         }
 	}
 }
-
-
 </script>
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -63,21 +67,22 @@ function selectOneRadio(){
 <input type="hidden" name="types" value="<%=types %>"/>
 <input type="hidden" name="storeType" value="<%=storeType %>"/>
 <input type="hidden" name="storeGroup" value="<%=storeGroup %>"/>
+<input type="hidden" name="methodName" value="<%=methodName %>"/>
 
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px" class="txt1">
 		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูลร้านค้า</b></td>
+		<td width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=Constants.getStoreGroupName(storeGroup)%>)</b></td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td width="15%" ><b>รหัส</b>  </td>
+		<td width="20%" ><b>รหัส</b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
 		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td ><b>รายละเอียด</b></td>
-		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
+		<td width="20%" ><b>รายละเอียด</b></td>
+		<td width="90%" ><html:text property="descSearch"  size="60" style="height:20px"/></td>
 	</tr>
 </table>
 

@@ -3,6 +3,16 @@
 <%@page import="util.AppversionVerify"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 
+<%
+ String[] msg3 = new String[2];
+if(request.getSession().getAttribute("appVersionCheckMsg") != null){
+	msg3 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
+}else{
+	msg3 = AppversionVerify.checkAppVersion(request);
+}
+
+%>
+
 <script type="text/javascript">
 
 function openPopup(path){
@@ -32,10 +42,13 @@ function openDBBackupPopup(path){
 		<td width="44px;"><img src="${pageContext.request.contextPath}/images2/footer_left2.png" border="0"/></td>
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
         	Application Version
-			 <a href ="javascript:openPopup('${pageContext.request.contextPath}');">
+        	<a href ="javascript:openPopup('${pageContext.request.contextPath}');">
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			 </a>&nbsp;&nbsp;
-			  <font color="red"><blink><%=AppversionVerify.checkAppVersion(request) %> </blink></font>&nbsp;&nbsp;
+			 
+			<%--  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> --%>
+			  <font color="red"><%=msg3[0] %></font> OR <%=msg3[1] %>
+			&nbsp;&nbsp;
 			  <font color="black">| วันที่ปัจจุบัน 
 			   <script>
 			  var currentdate = new Date(); 

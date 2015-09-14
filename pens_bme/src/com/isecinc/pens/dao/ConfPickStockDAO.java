@@ -89,6 +89,10 @@ public class ConfPickStockDAO extends PickConstants{
 			sql.append("\n from PENSBME_STOCK_ISSUE j ");
 			sql.append("\n where 1=1   ");
 			sql.append("\n and status in('"+PickConstants.STATUS_POST+"','"+PickConstants.STATUS_ISSUED+"')");
+			
+			if( !Utils.isNull(o.getWareHouse()).equals("")){
+				sql.append("\n and warehouse = '"+Utils.isNull(o.getWareHouse())+"'  ");
+			}
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
 				sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
 			}
@@ -130,7 +134,7 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
 			   h.setRequestor(Utils.isNull(rst.getString("requestor")));
 			   h.setStoreCode(Utils.isNull(rst.getString("customer_no")));
-			   
+			   h.setWareHouse(Utils.isNull(rst.getString("warehouse")));
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   
 			   if(rst.getDate("need_date") != null){
@@ -671,6 +675,7 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setStoreName(Utils.isNull(rst.getString("store_name"))); 
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
+			   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 
 			  if( Utils.isNull(h.getStatus()).equals(STATUS_POST)){
 				 h.setCanConfirm(true);
@@ -712,6 +717,7 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
 						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		and h.warehouse = '"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}
@@ -723,6 +729,7 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		 and h.warehouse = '"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						sql.append("\n 		 and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}
@@ -810,6 +817,7 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		where 1=1  ");
 						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		and h.warehouse = '"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}
@@ -821,6 +829,7 @@ public class ConfPickStockDAO extends PickConstants{
 						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 						sql.append("\n 		 where 1=1  ");
 						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		 and h.warehouse = '"+pickStock.getWareHouse()+"'");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						sql.append("\n 		 and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
 						}

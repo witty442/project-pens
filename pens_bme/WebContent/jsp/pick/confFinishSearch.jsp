@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.ConfirmReturnWacoalDAO"%>
 <%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
@@ -32,7 +33,14 @@ if(session.getAttribute("statusReqFinishList") == null){
 	billTypeList.addAll(ConfirmReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
 	session.setAttribute("statusReqFinishList",billTypeList);
 }
-
+if(session.getAttribute("wareHouseList2") == null){
+	List<References> wareHouseList = new ArrayList();
+	References ref1 = new References("","");
+	wareHouseList.add(ref1);
+	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W4+"'"));
+	
+	session.setAttribute("wareHouseList2",wareHouseList);
+}
 %>
 
 <html>
@@ -134,13 +142,28 @@ function openEdit(path,requestNo,mode){
 									    Confirm Date <html:text property="bean.confirmDate" styleId="confirmDate" size="20"/>
 									</td>
 									<td>					
-										Status   
+										
+									</td>
+								</tr>
+								 <tr>
+                                    <td> Status</td>
+									<td>					
 										<html:select property="bean.status">
 											<html:options collection="statusReqFinishList" property="key" labelProperty="name"/>
 									    </html:select>
 									</td>
+									<td> 
+									    Warehouse
+									      <html:select property="bean.wareHouse" styleId="wareHouse" >
+											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
+									    </html:select>
+									</td>
+									<td> 
+									   
+									</td>
+									<td>	
+									</td>
 								</tr>
-								
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -168,6 +191,7 @@ function openEdit(path,requestNo,mode){
 									<th >Request No</th>
 									<th >Confirm Date</th>
 									<th >Status</th>
+									<th >Warehouse</th>
 									<th >Remark</th>
 									<th >Action</th>						
 							   </tr>
@@ -192,6 +216,9 @@ function openEdit(path,requestNo,mode){
 										</td>
 										<td class="search_status">
 											${results.statusDesc}
+										</td>
+										<td class="search_status">
+											${results.wareHouse}
 										</td>
 										<td class="search_remark">
 										    ${results.remark}

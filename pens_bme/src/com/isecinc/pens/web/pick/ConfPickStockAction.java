@@ -565,9 +565,9 @@ public class ConfPickStockAction extends I_Action {
 			h.setStatus(ConfPickStockDAO.STATUS_CANCEL);//ISSUE
 			h.setUpdateUser(user.getUserName());
 		
-			//update status stock_issue head
+			//update status=cancel stock_issue head
 			ConfPickStockDAO.updateStausStockIssue(conn, h);
-			//update line
+			//update status=cancel stock item
 			ConfPickStockDAO.updateStatusStockIssueItemByIssueReqNo(conn, h);
 	
 			conn.commit();

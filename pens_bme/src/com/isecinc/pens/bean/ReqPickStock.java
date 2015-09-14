@@ -26,6 +26,7 @@ public class ReqPickStock implements Serializable{
 	private String custGroup;
 	private String custGroupDesc;
 	private String needDate;
+	private String wareHouse;
 	
 	//Line
 	private int lineId;
@@ -70,6 +71,12 @@ public class ReqPickStock implements Serializable{
 	private String actionDB;
 	
 	
+	public String getWareHouse() {
+		return wareHouse;
+	}
+	public void setWareHouse(String wareHouse) {
+		this.wareHouse = wareHouse;
+	}
 	public boolean isCanExport() {
 		return canExport;
 	}

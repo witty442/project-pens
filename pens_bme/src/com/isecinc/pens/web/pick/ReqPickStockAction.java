@@ -48,7 +48,9 @@ public class ReqPickStockAction extends I_Action {
 		Connection conn = null;
 		//User user = (User) request.getSession().getAttribute("user");
 		try {
+			String wareHouse = Utils.isNull(request.getParameter("wareHouse"));
 			String action = Utils.isNull(request.getParameter("action"));
+			
 			if("new".equals(action)){
 				request.getSession().setAttribute("results", null);
 				request.getSession().setAttribute("resultsView", null);
@@ -59,6 +61,7 @@ public class ReqPickStockAction extends I_Action {
 				
 				aForm.setResultsSearch(null);
 				ReqPickStock ad = new ReqPickStock();
+				ad.setWareHouse(wareHouse);
 				aForm.setBean(ad);
 
 			}else if("back".equals(action)){
@@ -112,6 +115,7 @@ public class ReqPickStockAction extends I_Action {
 		try {
 			aForm.setResultsSearch(null);
 			ReqPickStock ad = new ReqPickStock();
+			ad.setWareHouse(aForm.getBean().getWareHouse());
 			aForm.setBean(ad);
 			
 		} catch (Exception e) {
@@ -157,6 +161,7 @@ public class ReqPickStockAction extends I_Action {
 				p.setStatus(issueReqStatus);
 				p.setModeConfirm(true);
 				p.setModeEdit(false);
+				p.setWareHouse(aForm.getBean().getWareHouse());
 				
 				//Get Item and set data to session dataGroupCodeMapAll
 				p = searchBypageCaseView(conn, p, request);
@@ -177,6 +182,7 @@ public class ReqPickStockAction extends I_Action {
 				p.setModeConfirm(false);
 				p.setModeEdit(false);
 				p.setCanExport(true);
+				p.setWareHouse(aForm.getBean().getWareHouse());
 				
 				//Get Item and set data to session dataGroupCodeMapAll
 				p = searchBypageCaseView(conn, p, request);
@@ -198,6 +204,7 @@ public class ReqPickStockAction extends I_Action {
 					p.setNewReq(false);
 					p.setStatus(issueReqStatus);
 					p.setCanExport(true);
+					p.setWareHouse(aForm.getBean().getWareHouse());
 					
 					if("confirm".equalsIgnoreCase(process)){
 						p.setModeConfirm(true);
@@ -221,6 +228,7 @@ public class ReqPickStockAction extends I_Action {
 					request.getSession().setAttribute("groupCodeErrorMap", null);
 					
 					ReqPickStock p = new ReqPickStock();
+					p.setWareHouse(aForm.getBean().getWareHouse());
 					p.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					//Test value

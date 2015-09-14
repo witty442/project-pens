@@ -16,9 +16,6 @@ public class PickStockForm extends I_Form {
     private PickStock bean ;
     private PickStock beanCriteria ;
     
-  
-
-    
 	public List<PickStock> getResults() {
 		return results;
 	}

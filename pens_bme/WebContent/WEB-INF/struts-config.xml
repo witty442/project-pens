@@ -54,6 +54,8 @@
 		
 		<form-bean name="pickStockForm" type="com.isecinc.pens.web.pick.PickStockForm" />
 		
+		<form-bean name="pickStockGroupForm" type="com.isecinc.pens.web.pick.PickStockForm" />
+		
 		<form-bean name="renewBoxForm" type="com.isecinc.pens.web.pick.RenewBoxForm" />
 		
 		<form-bean name="reqFinishForm" type="com.isecinc.pens.web.pick.ReqFinishForm" />
@@ -273,9 +275,14 @@
 			<forward name="search" path="/jsp/pick/pickStock.jsp" />
 			<forward name="prepare" path="/jsp/pick/pickStock.jsp" />
 			<forward name="prepareAllBox" path="/jsp/pick/pickStockAllBox.jsp" />
-			<forward name="prepareAllPartBox" path="/jsp/pick/pickStockAllPartBox.jsp" />
 			<forward name="clear" path="/jsp/pick/pickStock.jsp" />
 			<forward name="addRow" path="/jsp/pick/pickStock.jsp" />
+		</action>
+		
+		<action name="pickStockGroupForm" path="/jsp/pickStockGroupAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickStockGroupAction">
+			<forward name="search" path="/jsp/pick/pickStockGroupSearch.jsp" />
+			<forward name="prepareByGroup" path="/jsp/pick/pickStockByGroup.jsp" />
+			
 		</action>
 		
 		<action name="renewBoxForm" path="/jsp/renewBoxAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.RenewBoxAction">

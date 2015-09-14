@@ -102,6 +102,16 @@ function loadMe(){
 								</td>
 							</tr>
 							<tr>
+								<td colspan="2" align="center">
+							       <c:if test="${moveOrderForm.moveOrder.moveOrderType =='MoveOrderRequisition'}">
+							        <font color="blue" size="7"> <b> รายการเบิกสินค้า</b> </font>
+							       </c:if>
+							        <c:if test="${moveOrderForm.moveOrder.moveOrderType =='MoveOrderReturn'}">
+							          <font color="red" size="7"> <b>รายการคืนสินค้า  </b></font>
+							       </c:if>
+							    </td>
+							</tr>
+							<tr>
 								<td align="right">จาก วันทีรายการ&nbsp;&nbsp; <html:text property="moveOrder.requestDateFrom" styleId="requestDateFrom" readonly="true"/></td>
 								<td align="left">ถึง วันที่รายการ&nbsp;&nbsp; <html:text property="moveOrder.requestDateTo" styleId="requestDateTo"/></td>
 							</tr>
