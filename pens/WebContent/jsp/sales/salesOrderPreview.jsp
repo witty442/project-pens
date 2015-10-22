@@ -317,6 +317,7 @@ function stampPrint(){
 													<c:choose>
 														<c:when test="${(lines1.product.uom.id==lines1.uom1.id && lines1.product.uom.id==lines1.uom2.id) || (lines1.product.uom.id!=lines1.uom1.id && lines1.product.uom.id!=lines1.uom2.id)}">
 															<fmt:formatNumber pattern="#,##0" value="${lines1.qty1 + lines1.qty2}"/>
+														
 														</c:when>
 														<c:otherwise>
 															<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>/

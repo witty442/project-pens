@@ -100,6 +100,9 @@ public class PickStockGroupDAO extends PickConstants{
 				}//if
 			}
 			
+			/** update Pick Stock Head Form Sum(pickStockItem) **/
+			updateTotalReqQtyPickStockBySumItem(conn, h);
+			
 			/** Check all item ==ISSUE and Update Head == ISSUE **/
 			if( !boxNoMapAll.isEmpty()){
 				logger.debug("Validate Barcode Item amd update barcode Head");
@@ -129,7 +132,7 @@ public class PickStockGroupDAO extends PickConstants{
 			logger.debug("Confirm Update IssueReqNo:"+h.getIssueReqNo());
 			
 			//save head
-			updatePickStockHeadModel(conn, h);
+			updatePickStockHeadCaseConfirm(conn, h);
 			
 			//delete pickStockItem and update barcode item status='CLOSE'
 			deletePickStockItemAndUpdateBarcodeToClose(conn,h);
@@ -150,6 +153,9 @@ public class PickStockGroupDAO extends PickConstants{
 				   boxNoMapAll.put(l.getBoxNo(),l.getBoxNo());
 			   }//for
 			}//if
+			
+			/** update Pick Stock Head Form Sum(pickStockItem) **/
+			updateTotalIssueQtyPickStockBySumItem(conn, h);
 			
 			/** Check all item ==ISSUE and Update Head == ISSUE **/
 			if( !boxNoMapAll.isEmpty()){
@@ -543,34 +549,78 @@ public class PickStockGroupDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n SELECT * ");
-			sql.append("\n from PENSBME_PICK_STOCK    \n");
-			sql.append("\n where 1=1   \n");
+			sql.append(" SELECT S.* " +
+					",(select max(M.pens_desc) from PENSBME_MST_REFERENCE M WHERE M.reference_code = 'Store' and M.pens_value =S.store_code)as store_name " +
+					"from PENSBME_PICK_STOCK S where 1=1  ");
 			
-			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
-				sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getIssueReqStatus()).equals("")){
-				sql.append("\n and issue_req_status = '"+Utils.isNull(o.getIssueReqStatus())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getIssueReqDate()).equals("")){
-				Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			if(o.getPage().equalsIgnoreCase("req")){
+				if( !Utils.isNull(o.getIssueReqNo()).equals("")){
+					sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
+				}
 				
-				sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
-			}
-			
-			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
-				Date tDate  = Utils.parse(o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				if( !Utils.isNull(o.getIssueReqStatus()).equals("")){
+					sql.append("\n and issue_req_status = '"+Utils.isNull(o.getIssueReqStatus())+"'  ");
+				}
 				
-				sql.append("\n and CONFIRM_ISSUE_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+				if( !Utils.isNull(o.getIssueReqDate()).equals("")){
+					Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+				}
+				
+				if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
+					Date tDate  = Utils.parse(o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and CONFIRM_ISSUE_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+				}
+				
+				if( !Utils.isNull(o.getPickType()).equals("")){
+					sql.append("\n and pick_type= '"+Utils.isNull(o.getPickType())+"'  ");
+				}
+				if( !Utils.isNull(o.getRemark()).equals("")){
+					sql.append("\n and remark LIKE '%"+Utils.isNull(o.getRemark())+"$'  ");
+				}
+			}else{
+				if( !Utils.isNull(o.getIssueReqDateFrom()).equals("") && !Utils.isNull(o.getIssueReqDateTo()).equals("") ){
+					Date dateFrom  = Utils.parse(o.getIssueReqDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					Date dateTo  = Utils.parse(o.getIssueReqDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and ISSUE_REQ_DATE >= to_date('"+dateFromStr+"','dd/mm/yyyy') ");
+					sql.append("\n and ISSUE_REQ_DATE <= to_date('"+dateToStr+"','dd/mm/yyyy') ");
+					
+				}else if(!Utils.isNull(o.getIssueReqDateFrom()).equals("") && Utils.isNull(o.getIssueReqDateTo()).equals("") ){
+					Date dateFrom  = Utils.parse(o.getIssueReqDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and ISSUE_REQ_DATE = to_date('"+dateFromStr+"','dd/mm/yyyy') ");
+				}
+				
+				if( !Utils.isNull(o.getIssueReqNoFrom()).equals("") && !Utils.isNull(o.getIssueReqNoTo()).equals("") ){
+					sql.append("\n and ISSUE_REQ_NO >= '"+Utils.isNull(o.getIssueReqNoFrom())+"'");
+					sql.append("\n and ISSUE_REQ_NO <= '"+Utils.isNull(o.getIssueReqNoTo())+"'");
+					
+				}else if(!Utils.isNull(o.getIssueReqNoFrom()).equals("") && Utils.isNull(o.getIssueReqNoTo()).equals("") ){
+					sql.append("\n and ISSUE_REQ_NO = '"+Utils.isNull(o.getIssueReqNoFrom())+"'");
+				}
+				
+				if( !Utils.isNull(o.getCustGroup()).equals("")){
+					sql.append("\n and cust_group = '"+Utils.isNull(o.getCustGroup())+"'");
+				}
+				if( !Utils.isNull(o.getStoreCode()).equals("")){
+					sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'");
+				}
+				if( !Utils.isNull(o.getWorkStep()).equals("")){
+					sql.append("\n and work_step= '"+Utils.isNull(o.getWorkStep())+"'");
+				}
 			}
 			
-			if( !Utils.isNull(o.getPickType()).equals("")){
-				sql.append("\n and pick_type= '"+Utils.isNull(o.getPickType())+"'  ");
+			if( !Utils.isNull(o.getPickUser()).equals("")){
+				sql.append("\n and pick_user LIKE '%"+Utils.isNull(o.getPickUser())+"%'  ");
 			}
 			
 			sql.append("\n order by issue_req_no DESC ");
@@ -581,9 +631,7 @@ public class PickStockGroupDAO extends PickConstants{
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
-			  
 				   h = new PickStock();
-				  
 				   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 				   h.setIssueReqStatus(Utils.isNull(rst.getString("issue_req_status")));
@@ -595,6 +643,13 @@ public class PickStockGroupDAO extends PickConstants{
 				   h.setPickType(Utils.isNull(rst.getString("pick_type")));
 				   h.setPickTypeDesc(getStatusDesc(h.getPickType()));
 				   h.setSubPickType(Utils.isNull(rst.getString("sub_pick_type")));
+				   h.setWorkStep(Utils.isNull(rst.getString("work_step")));
+				   
+				   h.setTotalQty(rst.getInt("total_req_qty"));
+				   h.setTotalIssueQty(rst.getInt("total_issue_qty"));
+				   
+				   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
+				   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 				   
 				   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_ISSUED) || Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_CANCEL) ){
 					   h.setCanEdit(false);
@@ -604,6 +659,12 @@ public class PickStockGroupDAO extends PickConstants{
 				   
 				   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_OPEN) ){
 					   h.setCanConfirm(true);
+				   }
+				   
+				   if(Utils.isNull(rst.getString("work_step")).equals("Post by Sale") ){
+					   h.setCanComplete(true);
+				   }else{
+					   h.setCanComplete(false);
 				   }
  
 			   items.add(h);
@@ -953,12 +1014,22 @@ public class PickStockGroupDAO extends PickConstants{
 			   }else{
 				   h.setCanConfirm(false);  
 			   }
+			   
+			   if(h.isModeComplete()){
+				   if("Post by Sale".equalsIgnoreCase(Utils.isNull(rst.getString("WORK_STEP")))){
+					   h.setCanComplete(true);
+				   }else{
+					   h.setCanComplete(false);
+				   }
+			   }
 			}//while
 			
 			if(h != null){
 				if(getItems){
 				  if( Utils.isNull(h.getIssueReqStatus()).equals(STATUS_ISSUED)
-					|| Utils.isNull(h.getIssueReqStatus()).equals(STATUS_CANCEL)){
+					|| Utils.isNull(h.getIssueReqStatus()).equals(STATUS_CANCEL)
+					
+						  ){
 					  
 					  if(PickConstants.PICK_TYPE_GROUP.equals(h.getPickType())){
 						  h = searchPickStockItemByPKGroupByGroupNoEdit(conn,h);
@@ -1976,13 +2047,94 @@ public class PickStockGroupDAO extends PickConstants{
 		}
 	}
 	
+	/**
+	 * Update TotalReqQty Sum From PiclStockItem 
+	 * @param conn
+	 * @param o
+	 * @throws Exception
+	 */
+	public static void updateTotalReqQtyPickStockBySumItem(Connection conn,PickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBME_PICK_STOCK \n");
+			sql.append(" SET TOTAL_REQ_QTY = (SELECT COUNT(*) FROM PENSBME_PICK_STOCK_I WHERE ISSUE_REQ_NO = ? GROUP BY ISSUE_REQ_NO) \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			int c =1;
+			ps.setString(c++, o.getIssueReqNo());
+			ps.setString(c++, o.getIssueReqNo());
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static void updateTotalIssueQtyPickStockBySumItem(Connection conn,PickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBME_PICK_STOCK \n");
+			sql.append(" SET TOTAL_ISSUE_QTY = (SELECT COUNT(*) FROM PENSBME_PICK_STOCK_I WHERE ISSUE_REQ_NO = ? GROUP BY ISSUE_REQ_NO) \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			int c =1;
+			ps.setString(c++, o.getIssueReqNo());
+			ps.setString(c++, o.getIssueReqNo());
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static void updateWorkStepPickStock(Connection conn,PickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
+			sql.append(" SET UPDATE_DATE =?,UPDATE_USER =? ,WORK_STEP = ? \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			int c =1;
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
+			ps.setString(c++, Utils.isNull(o.getWorkStep()));
+			ps.setString(c++, o.getIssueReqNo());
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
 	public static void updatePickStockHeadModel(Connection conn,PickStock o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
-			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? \n");
+			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_REQ_QTY = ? \n");
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				sql.append(" ,confirm_issue_date =? \n ");
 			}
@@ -1996,6 +2148,47 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setString(c++, o.getRemark());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
+			ps.setInt(c++, o.getTotalQty());
+			
+			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
+				Date confrimDate = Utils.parse( o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    ps.setTimestamp(c++, new java.sql.Timestamp(confrimDate.getTime()));
+			}
+			
+			ps.setString(c++, o.getIssueReqNo());
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static void updatePickStockHeadCaseConfirm(Connection conn,PickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
+			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? ,WORK_STEP = ? \n");
+			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
+				sql.append(" ,confirm_issue_date =? \n ");
+			}
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			int c =1;
+			
+			ps.setString(c++, o.getIssueReqStatus());
+			ps.setString(c++, o.getPickUser());
+			ps.setString(c++, o.getRemark());
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
+			ps.setString(c++, Utils.isNull(o.getWorkStep()));
 			
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				Date confrimDate = Utils.parse( o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

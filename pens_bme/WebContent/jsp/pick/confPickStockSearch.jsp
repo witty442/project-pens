@@ -56,7 +56,7 @@ if(session.getAttribute("wareHouseList2") == null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/conf_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -113,16 +113,22 @@ function search(path){
 	return true;
 }
 
-function openView(path,documentNo,issueReqStatus){
+function openView(path,documentNo,issueReqStatus,wareHouse){
 	var form = document.confPickStockForm;
-	form.action = path + "/jsp/confPickStockAction.do?do=prepare&mode=view&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
+	form.action = path + "/jsp/confPickStockAction.do?do=prepare&mode=view&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus+"&wareHouse="+wareHouse;
 	form.submit();
 	return true;
 }
 
-function openConfirm(path,documentNo,issueReqStatus){
+function openEdit(path,documentNo,issueReqStatus,wareHouse){
 	var form = document.confPickStockForm;
-	form.action = path + "/jsp/confPickStockAction.do?do=prepare&mode=confirm&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
+	form.action = path + "/jsp/confPickStockAction.do?do=prepare&mode=edit&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus+"&wareHouse="+wareHouse;
+	form.submit();
+	return true;
+}
+function openConfirm(path,documentNo,issueReqStatus,wareHouse){
+	var form = document.confPickStockForm;
+	form.action = path + "/jsp/confPickStockAction.do?do=prepare&mode=confirm&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus+"&wareHouse="+wareHouse;
 	form.submit();
 	return true;
 }
@@ -285,11 +291,10 @@ function resetStore(){
                                     <td>
                                       Issue request Date 
                                      </td>
-                                     <td><html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" /></td>
-									<td>						
+                                     <td colspan="3">
+                                     <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
 									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
-									</td>
-									 <td>
+									
                                       Issue request status
                                       <html:select property="bean.status">
 											<html:options collection="statusIssueReqList2" property="key" labelProperty="name"/>
@@ -312,7 +317,7 @@ function resetStore(){
 									<td align="left" colspan="2"> 
 									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
-									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
 									
 									 <html:hidden property="bean.subInv" styleId="subInv" />
 						             <html:hidden property="bean.storeNo" styleId="storeNo" />
@@ -321,10 +326,9 @@ function resetStore(){
 								</tr>
 								<tr>
                                     <td> Status Date  </td>		
-								    <td>
+								    <td colspan="2">
 								      <html:text property="bean.statusDate" styleId="statusDate" size="20" />	  
-						           </td>
-								   <td align="right"> Warehouse
+						            Warehouse
 									      <html:select property="bean.wareHouse" styleId="wareHouse" >
 											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
 									    </html:select>
@@ -349,7 +353,7 @@ function resetStore(){
 
             <c:if test="${confPickStockForm.resultsSearch != null}">
                   	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
 									<th >Issue Req Date</th>
 									<th >WareHouse</th>
@@ -358,9 +362,11 @@ function resetStore(){
 									<th >รหัสร้านค้า</th>
 									<th >ชื่อร้านค้า</th>
 									<th >Request Qty</th>
+									<th >Issued Qty</th>
 									<th >วันที่รับของ</th>
 									<th >หมายเหตุ</th>
-									<th >Action</th>					
+								    <th >Action</th>	
+									<th >Confrim</th>				
 							   </tr>
 							<c:forEach var="results" items="${confPickStockForm.resultsSearch}" varStatus="rows">
 								<c:choose>
@@ -373,37 +379,49 @@ function resetStore(){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_issueReqDate">
+										<td class="td_text_center" width="8%">
 										   ${results.issueReqDate}
 										</td>
-										<td class="search_issueReqDate">${results.wareHouse}</td>
-										<td class="search_issueReqNo">${results.issueReqNo}</td>
-										<td class="search_issueReqStatus">
+										<td class="td_text_center" width="8%">${results.wareHouse}</td>
+										<td class="td_text_center" width="8%">${results.issueReqNo}</td>
+										<td class="td_text_center" width="8%">
 											${results.statusDesc}
 										</td>
-										 <td class="search_storeCode">
+										 <td class="td_text_center" width="8%">
 										  ${results.storeCode}
 										</td>
-										 <td class="search_storeName">
+										 <td class="td_text_center" width="15%">
 										  ${results.storeName}
 										</td>
-										<td class="search_storeCode">
+										<td class="td_text_center" width="5%">
 										  ${results.totalReqQty}
 										</td>
-										<td class="search_storeCode">
+										<td class="td_text_center" width="5%">
+										  ${results.totalIssueQty}
+										</td>
+										<td class="td_text_center" width="8%">
 										  ${results.needDate}
 										</td>
-									    <td class="search_remark">
+									    <td class="td_text_center" width="20%">
 										  ${results.remark}
 										</td>
-										<td class="search_edit">
-											 <c:if test="${results.canConfirm == false}">
-												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
-												          ดู
+										
+										<td class="td_text_center" width="15%">
+											 <c:if test="${results.canEdit == false}">
+												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
+												          รายละเอียด
 												  </a>
 											  </c:if>
+											  <c:if test="${results.canEdit == true}">
+												  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
+												     แก้ไข
+												  </a>
+											  </c:if>
+										</td>
+										<td class="td_text_center" width="15%">
+											
 											  <c:if test="${results.canConfirm == true}">
-												  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
+												  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
 												     Confirm
 												  </a>
 											  </c:if>

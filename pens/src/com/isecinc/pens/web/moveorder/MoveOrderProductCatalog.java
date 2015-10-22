@@ -14,7 +14,26 @@ public class MoveOrderProductCatalog implements Comparable{
 	private double lineNetAmt;
 	private double pacQty2;
    
+	private String createDate;
+	private String expireDate;
 	
+	
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getExpireDate() {
+		return expireDate;
+	}
+
+	public void setExpireDate(String expireDate) {
+		this.expireDate = expireDate;
+	}
+
 	public String getTarget() {
 		return target;
 	}

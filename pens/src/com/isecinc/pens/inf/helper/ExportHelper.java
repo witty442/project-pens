@@ -277,7 +277,8 @@ public class ExportHelper {
 			    tableBean.getTableName().equalsIgnoreCase("m_member_health") || 
 			    tableBean.getTableName().equalsIgnoreCase("t_move_order") ||
 			    tableBean.getTableName().equalsIgnoreCase("t_bill_plan") ||
-			    tableBean.getTableName().equalsIgnoreCase("t_requisition_product")
+			    tableBean.getTableName().equalsIgnoreCase("t_requisition_product") ||
+			    tableBean.getTableName().equalsIgnoreCase("t_stock")
 			    ) {
 					
 				selectSql = ExportSQL.genSpecialSQL(tableBean,userBean);

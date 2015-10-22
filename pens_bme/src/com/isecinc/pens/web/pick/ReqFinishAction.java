@@ -373,21 +373,24 @@ public class ReqFinishAction extends I_Action {
 			       
 			       logger.debug("update barcode job_id["+b.getJobId()+"]boxNo["+b.getBoxNo()+"]");
 			       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-			       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
-			     
+			      
 			   }
 			}
+			 
+		    //Update ReqFinishingItem and Barcode Item to Close
+			ReqFinishDAO.updateBarcodeToCloseFromReqFinishingItem(conn,h);
 			
 			//Set Data to Cancel
 			h.setUpdateUser(user.getUserName());
 			h.setStatus(ReqFinishDAO.STATUS_CANCEL);
 			h.setStatusDesc(ReqFinishDAO.getStatusDesc(ReqFinishDAO.STATUS_CANCEL));
 			
-			//update Req to cancel
+			//update Head Req to cancel
 			ReqFinishDAO.updateHeadStatusModel(conn,h);
-			
+			//Update Line Status
 			h.setLineStatus(ReqFinishDAO.STATUS_CANCEL);
-			ReqFinishDAO.updateItemStatusModel(conn,h);
+			ReqFinishDAO.updateReqFinishingItemStatusModel(conn,h);
+			
 			//conn commit
 			conn.commit();
 			

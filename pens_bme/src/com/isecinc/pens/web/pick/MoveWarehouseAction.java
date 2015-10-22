@@ -1,12 +1,7 @@
 package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,11 +13,9 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MoveWarehouse;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
-import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveWarehoseDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;

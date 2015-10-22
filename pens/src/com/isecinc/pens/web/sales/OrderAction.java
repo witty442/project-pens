@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -528,15 +530,37 @@ public class OrderAction extends I_Action {
 
 			// Set for web display.
 			logger.debug("****** Start Set Display order ****************************************************");
-			
+	
 			//Merge to 1 Line to Show
+			logger.info("fillLinesShow LINE NORMAL");
 			List<OrderLine> odLines = new OrderProcess().fillLinesShow(orderForm.getLines());
-			
+
 			//add Line Blank UOM (1 or 2)
 			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines);
 			
+			//logger.info("Debug before promotion");
+			//new OrderProcess().debug(modProcess.getAddLines());
+			
 			//add Promotion to show
-			List<OrderLine> promotionLines = new OrderProcess().fillLinesShow(modProcess.getAddLines());
+			logger.info("fillLinesShow LINE Promotion");
+			List<OrderLine> promotionLines = new OrderProcess().fillLinesShowPromotion(modProcess.getAddLines());
+			
+			logger.info("Debug after promotion");
+			new OrderProcess().debug(promotionLines);
+			
+			//Sort by product
+			try{
+				Comparator<OrderLine> comparator = new Comparator<OrderLine>() {
+				    public int compare(OrderLine c1, OrderLine c2) {
+				        return c2.getProduct().getCode().compareTo(c2.getProduct().getCode()); // use your logic
+				    }
+				};
+				Collections.sort(promotionLines, comparator); 
+				logger.info("Debug after Sort Promotion");
+				new OrderProcess().debug(promotionLines);
+			}catch(Exception e){
+				logger.error(e.getMessage()+":Sort Error",e);
+			}
 			
 			//add promotion line
 			odLines.addAll(promotionLines);

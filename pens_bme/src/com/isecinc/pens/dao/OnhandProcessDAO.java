@@ -51,14 +51,14 @@ public class OnhandProcessDAO {
 	}
 	
 	//Action : After Confirm Finishing
-	public static void processBanlanceOnhandFromConfirmFinishing(String warehouse,String userName) throws Exception{
+	public static void processBanlanceOnhandFromConfirmFinishing(String warehouse,String requestNo,String userName) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			Date startDate = new Date();
-			List<Onhand> onhandItemList = searchItemFormReqFinishing(conn,warehouse);
+			List<Onhand> onhandItemList = searchItemFormReqFinishing(conn,warehouse,requestNo);
 			logger.debug("searchBarcodeItemInStock>>Total Time:"+(new Date().getTime()-startDate.getTime()) +",Result :"+onhandItemList.size());
 			 
 			startDate =new Date();
@@ -68,9 +68,9 @@ public class OnhandProcessDAO {
 					itemOnhand.setCreateUser(userName);
 					itemOnhand.setUpdateUser(userName);
 					
-					int rUpdate = updateModel(conn, itemOnhand);
+					int rUpdate = updateOnhandQtyModel(conn, itemOnhand);
 					if(rUpdate==0){
-						insertModel(conn, itemOnhand);
+						insertOnhandQtyModel(conn, itemOnhand);
 					}
 				}
 			}
@@ -139,7 +139,7 @@ public class OnhandProcessDAO {
 		}
 	}
 	
-	public static List<Onhand> searchItemFormReqFinishing(Connection conn,String warehouse) throws Exception {
+	public static List<Onhand> searchItemFormReqFinishing(Connection conn,String warehouse,String requestNo) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -147,15 +147,16 @@ public class OnhandProcessDAO {
 		int r = 1;
         List<Onhand> items = new ArrayList<Onhand>();
 		try {
-			sql.append("\n select  i.barcode,i.pens_item ,i.barcode,i.MATERIAL_MASTER,group_code,count(*) as qty " +
+			sql.append("\n select  h.warehouse,i.barcode,i.pens_item ,i.barcode,i.MATERIAL_MASTER,group_code,count(*) as qty " +
 					   "\n from PENSBI.PENSBME_REQ_FINISHING h ,PENSBI.PENSBME_REQ_FINISHING_BARCODE i   ");
 			sql.append("\n where 1=1");
 			sql.append("\n and h.request_no = i.request_no  ");
+			sql.append("\n and h.request_no = '"+requestNo+"'");
 			sql.append("\n and h.status ='"+PickConstants.STATUS_FINISH+"' ");
 			sql.append("\n and i.status ='"+PickConstants.STATUS_FINISH+"'");
 			sql.append("\n and h.warehouse ='"+warehouse+"'");
 			
-			sql.append("\n group by i.barcode,pens_item,MATERIAL_MASTER,group_code ");
+			sql.append("\n group by i.barcode,pens_item,MATERIAL_MASTER,group_code ,h.warehouse");
 			
 			logger.debug("sql:"+sql);
 			
@@ -378,7 +379,7 @@ public class OnhandProcessDAO {
 	}
 	
 	
-	private static void insertModel(Connection conn,Onhand o) throws Exception{
+	private static void insertOnhandQtyModel(Connection conn,Onhand o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("Insert");
 		try{
@@ -410,12 +411,12 @@ public class OnhandProcessDAO {
 		}
 	}
 
-	public static int updateModel(Connection conn,Onhand o) throws Exception{
+	public static int updateOnhandQtyModel(Connection conn,Onhand o) throws Exception{
 		PreparedStatement ps = null;
 		int r = 0;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ONHAND_QTY =?,UPDATE_DATE=?,UPDATE_USER = ? \n");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY + ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
 			sql.append(" WHERE PENS_ITEM =?  and material_Master = ? and group_code = ?  and barcode = ? and warehouse=? \n" );
 
 			ps = conn.prepareStatement(sql.toString());

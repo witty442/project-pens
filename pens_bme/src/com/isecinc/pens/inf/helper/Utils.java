@@ -61,14 +61,10 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	String dateStr = "01/10/2558";
-			// dd/mm/yyyy
-		    String dd = dateStr.substring(0,2);
-		    String mm = dateStr.substring(3,5);
-		    String yyyy = dateStr.substring(6,10);
-		    
-		    System.out.println(dd+","+mm+","+yyyy);
-		    
+	    	System.out.println(200/200);
+		    System.out.println(201/200);
+		    System.out.println(399/200);
+		    System.out.println(400/200);
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }

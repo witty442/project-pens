@@ -59,11 +59,11 @@ public class OrderFridayAction extends I_Action {
 			 logger.debug("prepare");
 			 
 			 //Validate Page Order can access 1 user;
-			 String userLastAccessPath = ManagePath.canAccessPath(user, request.getServletPath());
-			 logger.debug("userLastAccessPath:"+userLastAccessPath);
-			 if( !userLastAccessPath.equals("")){
+			// String userLastAccessPath = ManagePath.canAccessPath(user, request.getServletPath());
+			 //logger.debug("userLastAccessPath:"+userLastAccessPath);
+			// if( !userLastAccessPath.equals("")){
 				// request.setAttribute("Message", "หน้า Order B'me to Wacoal มี  User ["+userLastAccessPath+"] กำลังใช้งานอยู่  ท่านแน่ใจที่จะทำรายการต่อไป หรือตรวจสอบกับ Userที่ใช้งานอยู่ ว่าออกจากหน้านี้หรือยัง");
-			 }
+			 //}
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 request.getSession().setAttribute("results"+pos_fix_session, null);

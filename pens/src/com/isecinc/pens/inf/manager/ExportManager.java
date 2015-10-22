@@ -234,6 +234,7 @@ public class ExportManager {
 						}
 						
 						logger.info("--End Export t_order --");
+						
 					/** T_MOVE_ORDER **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_move_order")){
 						logger.info("--Start Export t_move_order --");
@@ -245,6 +246,19 @@ public class ExportManager {
 						}
 						
 						logger.info("--Start Export t_move_order --");
+						
+					/** T_STOCK **/	
+					}else if(tableBean.getTableName().equalsIgnoreCase("t_stock")){
+						logger.info("--Start Export t_stock --");
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+						   tableBean = exProcess.exportStock(conn,tableBean,userRequest);	
+						}
+						
+						logger.info("--Start Export t_stock --");
+						
 					/** T_REQUISITION_PRODUCT **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_requisition_product")){
 						logger.info("--Start Export t_requisition_product --");

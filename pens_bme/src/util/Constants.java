@@ -21,14 +21,20 @@ public class Constants {
 	public static final String STORE_TYPE_TOPS_CODE ="020058";
 
 	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
-	public static final String STORE_TYPE_MTT_CODE_2 ="020056";//King Power
-	public static final String STORE_TYPE_MTT_CODE_3 ="020051";
+	public static final String STORE_TYPE_KING_POWER ="020056";//King Power
 	
 	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
+	public static final String STORE_TYPE_HISHER_CODE = "020051";
+	
+	public static final String STORE_TYPE_PENS = "020999";
+	public static final String STORE_TYPE_GRAND_SALE = "000023";
+	public static final String STORE_TYPE_WIENNA = "020064";
+
 	
 	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
 	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";
 	public static String STORE_TYPE_FRIDAY_ITEM = "FridayItem";
+	
 	
 	
 	public static String getStoreGroupName(String storeGroup){
@@ -42,8 +48,16 @@ public class Constants {
 			return "FRIDAY";
 		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_1)){
 			return "MTT";
-		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_2)){
-			return "MTT";
+		}else 	if(storeGroup.equals(STORE_TYPE_KING_POWER)){
+			return "KING Power";
+		}else 	if(storeGroup.equals(STORE_TYPE_HISHER_CODE)){
+			return "HIS-HER";
+		}else 	if(storeGroup.equals(STORE_TYPE_PENS)){
+			return "กลุ่มภายใน PENS";
+		}else 	if(storeGroup.equals(STORE_TYPE_GRAND_SALE)){
+			return "Grand Sale";
+		}else 	if(storeGroup.equals(STORE_TYPE_WIENNA)){
+			return "Wienna - เวียนนา";
 		}
 		return "";
 	}

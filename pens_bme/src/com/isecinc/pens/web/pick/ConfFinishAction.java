@@ -211,7 +211,7 @@ public class ConfFinishAction extends I_Action {
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
 			
-			//Step 1 update status REQ_FINISHING ,REQ_FINISHING_BARCODE ,PICK_BARCODE,PICK_BARCODE_ITEM to to FINISH(F)
+			//Step 1 update status REQ_FINISHING ,REQ_FINISHING_BARCODE ,PICK_BARCODE,PICK_BARCODE_ITEM to FINISH(F)
 			ConfFinishDAO.save(conn, h);
 						
 			//logger.debug("returnStatusDesc:"+h.getReturnStatusDesc());
@@ -229,7 +229,7 @@ public class ConfFinishAction extends I_Action {
 			}
 			
 			//Step 2 Balance onhand from REQ_FINISHING by warehouse
-			OnhandProcess.processBalanceOnhand(h.getWareHouse(),user.getUserName());
+			OnhandProcess.processBalanceOnhand(h.getWareHouse(),h.getRequestNo(),user.getUserName());
 			
 		} catch (Exception e) {
 			logger.error("RollBack:"+e.getMessage(),e);

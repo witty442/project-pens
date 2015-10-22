@@ -1663,6 +1663,64 @@ public class ExportProcess {
 		}
 	}
 	
+	public  TableBean exportStock(Connection conn,TableBean tableBean,User userBean) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+		try{
+            logger.debug("Select:"+tableBean.getPrepareSqlSelect());
+			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				//Add Order Header
+				for(i=0;i<tableBean.getColumnBeanList().size();i++){
+					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+					if(i==tableBean.getColumnBeanList().size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					//logger.debug("colName["+colBean.getColumnName()+"]");
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}	
+				}//for
+				/** Add New Line **/
+				dataAppend.append(Constants.newLine);//new line
+				/** add Order Line Detail */
+				dataAppend.append(exportStockLine(conn,rs.getString("request_number"),sqlUpdateExportFlagList));
+				
+				
+				/** Set Data For Update InterfacesFlag **/
+				sqlUpdateExportFlagList.add("update t_stock set exported ='Y' WHERE request_number = '"+rs.getString("request_number")+"'");
+				
+			}//while
+			logger.debug("totalRows:"+totalRows);
+
+			tableBean.setExportCount(totalRows);
+			tableBean.setDataStrExport(dataAppend);
+			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+		
+			return tableBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
 	public  TableBean exportRequisitionProduct(Connection conn,TableBean tableBean,User userBean) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1845,6 +1903,67 @@ public class ExportProcess {
 		}
 	}
 	
+	private   StringBuffer exportStockLine(Connection conn,String requestNumber,List<String> sqlUpdateExportFlagList) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+		try{
+            /** Get Column Detail Order **/
+            TableBean orderDBean = new TableBean();
+            orderDBean.setTableName("t_stock_line");
+            List colOrderList = ExportHelper.initColumn(orderDBean);
+            String sql = "select 'D' AS	RECORD_TYPE, \n"+
+                "   REQUEST_NUMBER, \n"+
+            	"	@rownum:=@rownum+1 	LINE_NUMBER,	\n"+
+	            "	INVENTORY_ITEM_ID,	\n"+
+	            "	QTY,	\n"+
+	            "	UOM,	\n"+
+	            "	CREATE_DATE,	\n"+
+	            "	EXPIRE_DATE \n"+
+	            "   FROM t_stock_line l ," +
+	            "   (SELECT @rownum:=0) a" +
+	            "   where request_number ='"+requestNumber+"' and status ='SV' ";
+  
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				for(i=0;i<colOrderList.size();i++){
+					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
+					if(i==colOrderList.size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}		
+				}//for
+				/** Gen New Line **/
+				dataAppend.append(Constants.newLine);
+				
+				/** Set Data For Update Exported Flag ='Y' **/
+				sqlUpdateExportFlagList.add("UPDATE t_move_order_line set exported ='Y' WHERE request_number ='"+rs.getString("request_number")+"'");
+				
+			}//while
+			logger.debug("totalRows:"+totalRows);	
+			return dataAppend;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
 	private   StringBuffer exportRequisitionProductLine(Connection conn,String requestNumber,List<String> sqlUpdateExportFlagList) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;

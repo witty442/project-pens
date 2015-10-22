@@ -19,11 +19,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-
 <jsp:useBean id="confPickStockForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
-<%
 
-%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -102,7 +99,7 @@ function cancelAction(path){
 
 function exportExcel(path){
 	var form = document.confPickStockForm;
-	form.action = path + "/jsp/confPickStockAction.do?do=exportExcel";
+	form.action = path + "/jsp/confPickStockAction.do?do=exportToExcel";
 	form.submit();
 	return true;
 }
@@ -111,6 +108,16 @@ function confirmPick(path){
 	var form = document.confPickStockForm;
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
 	   form.action = path + "/jsp/confPickStockAction.do?do=confirmAction";
+	   form.submit();
+	   return true;
+	}
+	return false;
+}
+
+function savePick(path){
+	var form = document.confPickStockForm;
+	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
+	   form.action = path + "/jsp/confPickStockAction.do?do=saveAction";
 	   form.submit();
 	   return true;
 	}
@@ -218,9 +225,14 @@ function sumQty(){
 	
 	//alert(totalQtyNotCurPage);
 	var sumCurPageQty = 0;
+	var qtyInt = 0;
 	for(var i=0;i<qtyObj.length;i++){
-		if(qtyObj[i].value != '')
-			sumCurPageQty = sumCurPageQty + parseInt(qtyObj[i].value);
+		if(qtyObj[i].value == '' || qtyObj[i].value == '0'){
+			qtyInt = 0;
+		}else{
+			qtyInt =parseInt(qtyObj[i].value);
+		}
+		sumCurPageQty = sumCurPageQty + qtyInt;
 	}
 	//cur Page
 	document.getElementsByName("curPageQty")[0].value = sumCurPageQty;
@@ -322,7 +334,7 @@ function sumQty(){
 									</td>
 									<td align="left" colspan="3"> 
 									  <html:text property="bean.storeCode" styleId="storeCode" size="20" readonly="true" styleClass="disableText"/>-
-									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
 									</td>
 								</tr>
 								<tr>
@@ -431,17 +443,18 @@ function sumQty(){
 										   />		 
 									</td>
 									<td class="data_issueQty">
-									   <c:if test="${confPickStockForm.bean.canConfirm == true}">
-										  <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-										    class="enableNumber"
-										    onkeypress="chkQtyKeypress(this,event,<%=i%>)"
-						                    onchange="validateQty(this,<%=i%>)"
-										  />	
-										</c:if>	 
-										 <c:if test="${confPickStockForm.bean.canConfirm == false}">
-										    <input tabindex="-1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-										    class="disableNumber"/>
-										 </c:if>
+									  <c:choose>
+									     <c:when test="${confPickStockForm.bean.canEdit == true}">
+										      <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
+											    class="enableNumber"
+											    onkeypress="chkQtyKeypress(this,event,<%=i%>)"
+							                    onchange="validateQty(this,<%=i%>)"/>	
+									     </c:when>
+									     <c:otherwise>
+										       <input tabindex="-1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
+											    class="disableNumber"/>
+									     </c:otherwise>
+									  </c:choose>
 									</td>
 							  </tr>
 							<% 
@@ -486,9 +499,19 @@ function sumQty(){
 									  <input type="button" value=" พิมพ์ ใบเบิกสินค้า  " class="newPosBtnLong"> 
 									</a>
 								 </c:if>
+								  <c:if test="${confPickStockForm.bean.canPrint == true}">
+									<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
+									  <input type="button" value="  Export  " class="newPosBtnLong"> 
+									</a>
+								 </c:if>
+								  <c:if test="${confPickStockForm.bean.canEdit == true}">
+									<a href="javascript:savePick('${pageContext.request.contextPath}')">
+									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 
+									 </a>
+								 </c:if>
 								  <c:if test="${confPickStockForm.bean.canConfirm == true}">
 									<a href="javascript:confirmPick('${pageContext.request.contextPath}')">
-									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 
+									  <input type="button" value=" ยืนยัน    " class="newPosBtnLong"> 
 									 </a>
 								 </c:if>	
 								<a href="javascript:back('${pageContext.request.contextPath}','','add')">

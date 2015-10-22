@@ -27,7 +27,62 @@ public class ReqReturnWacoal implements Serializable{
 	private String jobId;
 	private String jobName;
 	private int qty;
+	private String pensItem;
+	private String materialMaster;
+	private String groupCode;
+	private String wholePriceBF;
+	private String retailPriceBF;
+	private String barcodeItemStatus;
 	
+	
+	public String getBarcodeItemStatus() {
+		return barcodeItemStatus;
+	}
+
+	public void setBarcodeItemStatus(String barcodeItemStatus) {
+		this.barcodeItemStatus = barcodeItemStatus;
+	}
+
+	public String getWholePriceBF() {
+		return wholePriceBF;
+	}
+
+	public void setWholePriceBF(String wholePriceBF) {
+		this.wholePriceBF = wholePriceBF;
+	}
+
+	public String getRetailPriceBF() {
+		return retailPriceBF;
+	}
+
+	public void setRetailPriceBF(String retailPriceBF) {
+		this.retailPriceBF = retailPriceBF;
+	}
+
+	public String getPensItem() {
+		return pensItem;
+	}
+
+	public void setPensItem(String pensItem) {
+		this.pensItem = pensItem;
+	}
+
+	public String getMaterialMaster() {
+		return materialMaster;
+	}
+
+	public void setMaterialMaster(String materialMaster) {
+		this.materialMaster = materialMaster;
+	}
+
+	public String getGroupCode() {
+		return groupCode;
+	}
+
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+
 	//optional
 	private boolean canEdit = false;
     private String selected ;

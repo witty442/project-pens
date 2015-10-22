@@ -25,6 +25,7 @@ if("W1".equals(wareHouse)){
 <%}else if("W4".equals(wareHouse)){ %>
     <option value="SCANNING">SCANNING</option>
 	<option value="ONHAND">ONHAND</option>
-	<option value="ISSUED">ISSUED</option>
+	<option value="FINISHING">FINISHING</option>
+	<option value="FINISHGOODS">FINISH GOODS</option>
 	<option value="ALL">ALL</option>
 <%}%>

@@ -146,7 +146,7 @@ public class MCustomer extends I_Model<Customer> {
 			}
 			
 			
-			String sql = "select m_customer.*  \n";
+			String sql = "select distinct m_customer.*  \n";
 			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
 				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
 				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
@@ -246,6 +246,188 @@ public class MCustomer extends I_Model<Customer> {
 				// Order Amount
 				m.setOrderAmount(rst.getInt("order_amount"));
 
+				// set display label
+				m.setDisplayLabel();
+				
+				//Show or Display Column
+				
+				//Disp Column Edit Customer
+				m.setDisplayActionEditCust(displayActionEditCust);//disp
+				
+				//Can Edit Dust
+				if(role.equalsIgnoreCase(User.ADMIN)){
+					m.setCanActionEditCust(true);
+				}else if(role.equalsIgnoreCase(User.VAN)){
+					if (m.getOrderAmount()== 0){
+					   if (!m.getExported().equalsIgnoreCase("Y")){
+						  m.setCanActionEditCust(true);
+						  m.setCanActionEditCust2(false);
+					   }else{
+						 // m.setDisplayActionEditCust("");
+						   if( role.equalsIgnoreCase(User.VAN)){
+						     m.setCanActionEditCust2(true);
+						   }
+					   }
+					}else{
+						if( role.equalsIgnoreCase(User.VAN)){
+						  m.setCanActionEditCust2(true);
+						}
+					}
+				}
+				
+				//logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
+				
+				//displayActionReceipt
+				m.setDisplayActionReceipt(displayActionReceipt);
+				
+				custList.add(m);
+			}
+			
+			//convert to Obj
+			if(custList != null && custList.size() >0){
+				array = new Customer[custList.size()];
+				array = custList.toArray(array);
+			}else{
+				array = null;
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+			
+		}
+		
+		return array;
+	}
+	
+	public Customer[] searchOptForStockCustomer(Connection conn,String whereCause,User user,int start) throws Exception {
+		return searchOptForStockCustomerModel(conn,whereCause,user,start);
+	}
+	
+    public Customer[] searchOptForStockCustomer(String whereCause,User user,int start) throws Exception {
+	   Connection conn = null;
+	   try{
+		   conn = new DBCPConnectionProvider().getConnection(conn);
+		   return searchOptForStockCustomerModel(conn,whereCause,user,start);
+	   }catch(Exception e){
+		   throw e;
+	   }finally{
+			conn.close();
+	   }
+	}
+    
+   private Customer[] searchOptForStockCustomerModel(Connection conn,String whereCause,User user,int start) throws Exception {
+		
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Customer> custList = new ArrayList<Customer>();
+		Customer[] array = null;
+		try {
+			//Filter display Column
+			String displayActionReceipt ="";
+			String displayActionEditCust  ="";
+			String role = user.getType();
+			if( !role.equalsIgnoreCase(User.TT)){
+				displayActionReceipt ="none";
+			}
+			if( role.equalsIgnoreCase(User.TT)){
+				displayActionEditCust ="none";
+			}
+			
+			String sql = "select distinct m_customer.*  \n";
+			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
+				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
+				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
+			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
+                   sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
+                   sql+=" ad_user.ROLE,ad_user.ISACTIVE,ad_user.CODE,ad_user.UPDATED,ad_user.UPDATED_BY,ad_user.TERRITORY, \n";
+                   sql+= " ( select count(*) as tot from t_order od where od.customer_id = m_customer.customer_id)  as order_amount \n";
+                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX ";
+                   sql+= "from m_customer ,m_address ,ad_user " ;
+                   sql+=" where m_customer.user_id = ad_user.user_id \n";
+                   sql+= "and m_customer.customer_id = m_address.customer_id  " ;
+                   sql+= "and m_address.purpose ='B' \n";
+			       sql+= whereCause;
+			       
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				start++;
+				Customer m = new Customer();
+				m.setNo(start);
+				// Mandatory
+				m.setId(rst.getInt("CUSTOMER_ID"));
+				m.setReferencesID(rst.getInt("REFERENCE_ID"));
+				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
+				m.setCode(rst.getString("CODE").trim());
+				m.setName(rst.getString("NAME").trim());
+				m.setName2(ConvertNullUtil.convertToString(rst.getString("NAME2")).trim());
+				m.setTaxNo(ConvertNullUtil.convertToString(rst.getString("TAX_NO")).trim());
+				m.setWebsite(ConvertNullUtil.convertToString(rst.getString("WEBSITE")).trim());
+				m.setTerritory(ConvertNullUtil.convertToString(rst.getString("TERRITORY")).trim());
+				m.setBusinessType(ConvertNullUtil.convertToString(rst.getString("BUSINESS_TYPE")).trim());
+				// System.out.println(rst.getString("PARENT_CUSTOMER_ID"));
+				if (rst.getInt("PARENT_CUSTOMER_ID") != 0 && rst.getString("PARENT_CUSTOMER_ID") != null) {
+					Customer c = new MCustomer().find(rst.getString("PARENT_CUSTOMER_ID"));
+					m.setParentID(c.getId());
+					m.setParentCode(c.getCode());
+					m.setParentName((c.getName() + " " + c.getName2()).trim());
+				}
+				m.setBirthDay("");
+				if (rst.getTimestamp("BIRTHDAY") != null) {
+					m.setBirthDay(DateToolsUtil.convertToString(rst.getTimestamp("BIRTHDAY")));
+				}
+				m.setCreditCheck(ConvertNullUtil.convertToString(rst.getString("CREDIT_CHECK")).trim());
+				m.setPaymentTerm(ConvertNullUtil.convertToString(rst.getString("PAYMENT_TERM")).trim());
+				m.setVatCode(ConvertNullUtil.convertToString(rst.getString("VAT_CODE")).trim());
+				m.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
+				m.setShippingMethod(ConvertNullUtil.convertToString(rst.getString("SHIPPING_METHOD")).trim());
+				m.setShippingRoute(ConvertNullUtil.convertToString(rst.getString("SHIPPING_ROUTE")).trim());
+				m.setTransitName(ConvertNullUtil.convertToString(rst.getString("TRANSIT_NAME")).trim());
+				
+				/** **/
+				User u = new User();
+				u.setId(rst.getInt("USER_ID"));
+				u.setCode(rst.getString("CODE").trim());
+				u.setName(rst.getString("NAME").trim());
+				u.setType(convertToString(rst.getString("ROLE")).trim());
+				u.setActive(rst.getString("ISACTIVE").trim());
+
+				// oracle fields
+				u.setCategory(convertToString(rst.getString("CATEGORY")).trim());
+				u.setOrganization(convertToString(rst.getString("ORGANIZATION")).trim());
+				u.setSourceName(convertToString(rst.getString("SOURCE_NAME")).trim());
+				u.setIdCardNo(convertToString(rst.getString("ID_CARD_NO")).trim());
+				u.setStartDate(convertToString(rst.getString("START_DATE")).trim());
+				u.setEndDate(convertToString(rst.getString("END_DATE")).trim());
+				u.setTerritory(convertToString(rst.getString("TERRITORY")).trim());
+
+				// sales online fields
+				u.setUserName(convertToString(rst.getString("USER_NAME")).trim());
+				u.setPassword(convertToString(rst.getString("PASSWORD")).trim());
+				u.setConfirmPassword(convertToString(rst.getString("PASSWORD")).trim());
+				
+				u.activeRoleInfo();
+				m.setSalesRepresent(u);
+				/** **/
+				
+				m.setCreditLimit(rst.getDouble("CREDIT_LIMIT"));
+				m.setIsActive(rst.getString("ISACTIVE").trim());
+				m.setInterfaces(rst.getString("INTERFACES").trim());
+				m.setPartyType(ConvertNullUtil.convertToString(rst.getString("PARTY_TYPE")).trim());
+				m.setExported(rst.getString("EXPORTED"));
+
+				String addressSummary  = Utils.isNull(rst.getString("line1"))+" "+Utils.isNull(rst.getString("line2"))+" "+Utils.isNull(rst.getString("line3"));
+				       addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
+				m.setAddressSummary(addressSummary);
+				
 				// set display label
 				m.setDisplayLabel();
 				

@@ -91,6 +91,10 @@ public class Utils {
 		//System.out.println("dateLong:"+dateLong+",BigDecimal["+(new BigDecimal(dateLong))+"]");
 		return new BigDecimal(curr);
 	}
+	
+	public static java.sql.Date getCurrentSqlDate() throws Exception{
+		return new java.sql.Date(new Date().getTime());
+	}
 	/**
 	 * 
 	 * @param provinceName  Exception Chrecter "¨."

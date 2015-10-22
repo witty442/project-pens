@@ -69,8 +69,15 @@ public class ReqPickStock implements Serializable{
 	
 	private String rowIndex;
 	private String actionDB;
+	private int totalIssueQty;
 	
 	
+	public int getTotalIssueQty() {
+		return totalIssueQty;
+	}
+	public void setTotalIssueQty(int totalIssueQty) {
+		this.totalIssueQty = totalIssueQty;
+	}
 	public String getWareHouse() {
 		return wareHouse;
 	}

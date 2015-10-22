@@ -234,11 +234,11 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n 			UNION ALL ");
 				
-				//** Stock ISSUE  substract status OPEN(O) ,P POST**/
+				//** Stock ISSUE  substract status OPEN(O) ,P POST ,B BEF**/
 				sql.append("\n 			select  l.material_master ,l.group_code,l.pens_item,l.barcode,'A' as status ,(-1*sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -280,11 +280,11 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n group by A.material_master ,A.group_code,A.pens_item,A.barcode,A.status ");
 				sql.append("\n order by A.group_code,A.pens_item, A.material_master ,A.barcode asc ");
 					
-			}else if(o.getStatus().equals(STATUS_RESERVE)){ //O ,P
+			}else if(o.getStatus().equals(STATUS_RESERVE)){ //O ,P ,B
 				sql.append("\n select l.material_master ,l.group_code,l.pens_item,l.barcode,'RE' as status ,(sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -340,11 +340,11 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n 			UNION ALL ");
 				
-				//** Stock ISSUE  substract status OPEN(O) ,P POST**/
+				//** Stock ISSUE  substract status OPEN(O) ,P POST B BEF**/
 				sql.append("\n 			select  l.material_master ,l.group_code,l.pens_item,l.barcode,'A' as status ,(-1*sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -366,7 +366,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n select l.material_master ,l.group_code,l.pens_item,l.barcode,'RE' as status ,(sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -470,11 +470,11 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n 			UNION ALL ");
 				
-				//** Stock ISSUE  substract status OPEN(O) ,P POST**/
+				//** Stock ISSUE  substract status OPEN(O) ,P POST ,B BEF**/
 				sql.append("\n 			select l.group_code,l.pens_item,'A' as status ,(-1*sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -515,11 +515,11 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n group by A.group_code,A.pens_item,A.status ");
 				sql.append("\n order by A.group_code,A.pens_item asc ");
 					
-			}else if(o.getStatus().equals(STATUS_RESERVE)){ //O ,P
+			}else if(o.getStatus().equals(STATUS_RESERVE)){ //O ,P ,B
 				sql.append("\n select l.group_code,l.pens_item,'RE' as status ,(sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -575,11 +575,11 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n 			UNION ALL ");
 				
-				//** Stock ISSUE  substract status OPEN(O) ,P POST**/
+				//** Stock ISSUE  substract status OPEN(O) ,P POST ,B BEF**/
 				sql.append("\n 			select  l.group_code,l.pens_item,'A' as status ,(-1*sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 			and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n 		    and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n 		and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -601,7 +601,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n select l.group_code,l.pens_item,'RE' as status ,(sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
-				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n and h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 					sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");

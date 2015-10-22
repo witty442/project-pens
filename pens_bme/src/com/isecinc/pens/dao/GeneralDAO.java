@@ -166,13 +166,12 @@ public class GeneralDAO {
 		Barcode b = null;
 		try {
 			sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
-			sql.append("\n  from pensbi.PENSBME_ONHAND_BME_LOCKED M   ");
+			sql.append("\n  from PENSBME_ONHAND_BME_LOCKED M   ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and M.PENS_ITEM ='"+pensItem+"'");
 			sql.append("\n  ORDER BY  M.RETAIL_PRICE_BF DESC ");
 			
 			logger.debug("sql:"+sql);
-			conn = DBConnection.getInstance().getConnection();
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			

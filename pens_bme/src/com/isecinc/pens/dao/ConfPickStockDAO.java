@@ -86,9 +86,10 @@ public class ConfPickStockDAO extends PickConstants{
 			sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
 			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = j.customer_no) as STORE_NAME ");
 			sql.append("\n  ,(select sum(s.req_qty) from PENSBME_STOCK_ISSUE_ITEM s Where s.issue_req_no=j.issue_req_no )as total_req_qty");
+			sql.append("\n  ,(select sum(s.issue_qty) from PENSBME_STOCK_ISSUE_ITEM s Where s.issue_req_no=j.issue_req_no )as total_issue_qty");
 			sql.append("\n from PENSBME_STOCK_ISSUE j ");
 			sql.append("\n where 1=1   ");
-			sql.append("\n and status in('"+PickConstants.STATUS_POST+"','"+PickConstants.STATUS_ISSUED+"')");
+			sql.append("\n and status in('"+PickConstants.STATUS_POST+"','"+PickConstants.STATUS_ISSUED+"','"+PickConstants.STATUS_BEF+"')");
 			
 			if( !Utils.isNull(o.getWareHouse()).equals("")){
 				sql.append("\n and warehouse = '"+Utils.isNull(o.getWareHouse())+"'  ");
@@ -141,11 +142,19 @@ public class ConfPickStockDAO extends PickConstants{
 			     h.setNeedDate(Utils.stringValue(rst.getDate("need_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   }
 			   h.setTotalReqQty(rst.getInt("total_req_qty"));
+			   h.setTotalIssueQty(rst.getInt("total_issue_qty"));
 			   
-			   if(Utils.isNull(rst.getString("status")).equals(STATUS_POST)){
+			   if(Utils.isNull(rst.getString("status")).equals(STATUS_BEF)){
 				   h.setCanConfirm(true);
 			   }else{
 				   h.setCanConfirm(false); 
+			   }
+			   
+			   if(Utils.isNull(rst.getString("status")).equals(STATUS_POST) 
+					   || Utils.isNull(rst.getString("status")).equals(STATUS_BEF)){
+				   h.setCanEdit(true);
+			   }else{
+				   h.setCanEdit(false); 
 			   }
 
 			   items.add(h);
@@ -677,12 +686,7 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 			   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 
-			  if( Utils.isNull(h.getStatus()).equals(STATUS_POST)){
-				 h.setCanConfirm(true);
-			  }else{
-				 h.setCanConfirm(false); 
-			  }
-
+			 
 			}//while
 		} catch (Exception e) {
 			throw e;
@@ -1045,6 +1049,43 @@ public class ConfPickStockDAO extends PickConstants{
 			ps.setString(c++, o.getUpdateUser());
 			ps.setInt(c++, Utils.convertStrToInt(o.getQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getIssueQty()));
+			
+			ps.setString(c++, o.getIssueReqNo());
+			ps.setString(c++, o.getGroupCode());
+			ps.setString(c++, o.getPensItem());
+			ps.setString(c++, o.getMaterialMaster());
+			ps.setString(c++, o.getBarcode());
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static void updateStatusStockIssueItemByPK(Connection conn,ReqPickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE_ITEM \n");
+			sql.append(" SET  STATUS=?,STATUS_DATE=? ,UPDATE_DATE =?,UPDATE_USER =? \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+		    sql.append(" AND GROUP_CODE = ? \n");
+		    sql.append(" AND PENS_ITEM = ? \n");
+		    sql.append(" AND MATERIAL_MASTER = ? \n");
+		    sql.append(" AND BARCODE = ? \n");
+			ps = conn.prepareStatement(sql.toString());
+			
+			int c =1;
+			
+			ps.setString(c++, o.getStatus());
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
 			
 			ps.setString(c++, o.getIssueReqNo());
 			ps.setString(c++, o.getGroupCode());

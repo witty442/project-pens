@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqFinish;
+import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -384,7 +385,7 @@ public class ReqFinishDAO extends PickConstants{
 				//save Head req 
 			    saveHeadModel(conn, h);
 				
-				//save line
+			    //step insert new req finishing item
 				if(h.getItems() != null && h.getItems().size()>0){
 				   for(int i=0;i<h.getItems().size();i++){
 					   ReqFinish l = (ReqFinish)h.getItems().get(i);
@@ -394,7 +395,7 @@ public class ReqFinishDAO extends PickConstants{
 					   l.setRemark(h.getRemark());
 					   
 					   //save item from barcode by job_id box_no
-					   Map<String,String> pensItemMap = insertFinishBarcodeFromBarcodeItem(conn,l);
+					   Map<String,String> pensItemMap = insertFinishBarcodeFromBarcodeItemAndUpdateBarcodeItem(conn,l);
 					   //pensItemMapAll.putAll(pensItemMap);
 				       
 				       //Set barcode status = W (work in process)
@@ -406,39 +407,18 @@ public class ReqFinishDAO extends PickConstants{
 				       b.setStatus(JobDAO.STATUS_WORK_IN_PROCESS);
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
+				       
 				   }
 				}
 			}else{
-				
-				//step 1 update all status barcode to close (old status)  from stock_issue_item
-				List<ReqFinish> saveData = ReqFinishDAO.searchHead(h,true);
-				
-				if(saveData != null && saveData.size()>0){
-				   ReqFinish oldReq = (ReqFinish)saveData.get(0);
-				   for(int i=0;i<oldReq.getItems().size();i++){
-					   ReqFinish l = (ReqFinish)oldReq.getItems().get(i);
-					   
-					   //Set barcode status = CLOSE
-				       Barcode b = new Barcode();
-				       b.setJobId(l.getJobId());
-				       b.setBoxNo(l.getBoxNo());
-				       b.setCreateUser(h.getCreateUser());
-				       b.setUpdateUser(h.getUpdateUser());
-				       b.setStatus(JobDAO.STATUS_CLOSE);
-				       
-				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
-				   }
-				}
-				
-				//step2 update new total Head req 
+
+				//step1 update new total Head req 
 			    updateHeadModel(conn, h);
 			    
-				//step3 delete item req
-				deleteItemModel(conn, h);
-				
-				//step4 save line req
+				//Step2 delete reqFiishingItem and update barcode item status='CLOSE'
+				deleteReqFinishingItemItemAndUpdateBarcodeToClose(conn,h);
+			
+				//step3 insert new req finishing item
 				if(h.getItems() != null && h.getItems().size()>0){
 				   for(int i=0;i<h.getItems().size();i++){
 					   ReqFinish l = (ReqFinish)h.getItems().get(i);
@@ -448,9 +428,8 @@ public class ReqFinishDAO extends PickConstants{
 					   l.setRemark(h.getRemark());
 					   
 					   //save item from barcode by job_id box_no
-					   Map<String,String> pensItemMap = insertFinishBarcodeFromBarcodeItem(conn,l);
+					   Map<String,String> pensItemMap = insertFinishBarcodeFromBarcodeItemAndUpdateBarcodeItem(conn,l);
 					   //pensItemMapAll.putAll(pensItemMap);
-				       
 				       
 					   //step4.1 Set barcode status = W (work in process)
 				       Barcode b = new Barcode();
@@ -459,7 +438,7 @@ public class ReqFinishDAO extends PickConstants{
 				       b.setStatus(JobDAO.STATUS_WORK_IN_PROCESS);
 				       
 				       BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-				       BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
+				     
 				   }
 				}
 			}
@@ -477,6 +456,121 @@ public class ReqFinishDAO extends PickConstants{
 		return h;
 	}
 	
+	//1-delete ReqFinishing Item 2, update status barcode item and head
+	private static void deleteReqFinishingItemItemAndUpdateBarcodeToClose(Connection conn,ReqFinish h) throws Exception{
+		logger.debug("--deleteReqFinishingItemItemAndUpdateBarcodeToClose--");
+		int no = 1;
+		try{
+		    List<ReqFinish> reqFinishingItemList = searchreqFinishingItemListByRequestNo(conn, h);
+		    
+		    //delete req finishing item all
+			 deleteReqFinishingItemModel(conn, h);
+			   
+			logger.debug("reqFinishingItemList:"+reqFinishingItemList.size());
+			   
+			  if(reqFinishingItemList !=null && reqFinishingItemList.size() >0){
+				  
+				   for(int k=0;k<reqFinishingItemList.size();k++){
+					   ReqFinish p = (ReqFinish)reqFinishingItemList.get(k);
+					   p.setCreateUser(h.getCreateUser());
+					   p.setUpdateUser(h.getUpdateUser());
+
+				       //update barcode item (status = C)
+				       p.setLineStatus(PickConstants.STATUS_CLOSE);
+				       updateStatusBarcodeItemModel(conn, p);
+				       
+					   no++;
+				   }//for 2
+			   }//if 
+		}catch(Exception e){
+			throw e;
+		}
+	}
+		
+	public static List<ReqFinish> searchreqFinishingItemListByRequestNo(Connection conn,ReqFinish o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ReqFinish h = null;
+		int r = 1;
+        List<ReqFinish> items = new ArrayList<ReqFinish>();
+		try {
+
+			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING_BARCODE i   \n");
+			sql.append("\n where 1=1   \n");
+			sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+			
+			//sql.append("\n order by line_id asc ");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new ReqFinish();
+			   h.setRequestNo(rst.getString("request_no"));
+			   
+			   h.setLineId(rst.getInt("line_id"));//Line_id(Barcode by boxNo)
+			   h.setJobId(rst.getString("job_id"));
+			   h.setBoxNo(rst.getString("box_no"));
+			   
+			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+			   h.setGroupCode(rst.getString("group_code"));
+			   h.setPensItem(rst.getString("pens_item"));
+			   
+			   h.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+			   
+			   items.add(h);
+			   r++;
+			   
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+
+	
+	public static void updateBarcodeToCloseFromReqFinishingItem(Connection conn,ReqFinish h) throws Exception{
+		logger.debug("--updateBarcodeToCloseFromReqFinishingItem--");
+		int no = 1;
+		try{
+		    List<ReqFinish> reqFinishingItemList = searchreqFinishingItemListByRequestNo(conn, h);
+		       
+			logger.debug("reqFinishingItemList:"+reqFinishingItemList.size());
+			   
+			  if(reqFinishingItemList !=null && reqFinishingItemList.size() >0){
+				  
+				   for(int k=0;k<reqFinishingItemList.size();k++){
+					   ReqFinish p = (ReqFinish)reqFinishingItemList.get(k);
+					   p.setCreateUser(h.getCreateUser());
+					   p.setUpdateUser(h.getUpdateUser());
+
+					   //delete Pick Stock Line
+					   logger.debug("no["+(no)+"]update barcode item:"+p.getPensItem()+",boxNo["+p.getBoxNo()+"]lineId:"+p.getLineId());
+
+				       //update barcode item (status = C)
+				       p.setLineStatus(PickConstants.STATUS_CLOSE);
+				       updateStatusBarcodeItemModel(conn, p);
+				       
+					   no++;
+				   }//for 2
+			   }//if 
+					  
+			
+		}catch(Exception e){
+			throw e;
+		}
+	}
+		
 	// 	RQYYMMXXX  ( เช่น RQ5703001 )  			
 	 private static String genRequestNo(Date date) throws Exception{
        String docNo = "";
@@ -576,7 +670,7 @@ public class ReqFinishDAO extends PickConstants{
 		}
 	 
 	 
-	 private static Map<String ,String> insertFinishBarcodeFromBarcodeItem(Connection conn,ReqFinish o ) throws Exception {
+	 private static Map<String ,String> insertFinishBarcodeFromBarcodeItemAndUpdateBarcodeItem(Connection conn,ReqFinish o ) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -586,7 +680,7 @@ public class ReqFinishDAO extends PickConstants{
 			try {
 				sql.append("\n select i.* from PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
 				sql.append("\n where 1=1 \n");
-				
+				sql.append("\n and i.status ='"+PickConstants.STATUS_CLOSE+"'");
 				if( !Utils.isNull(o.getJobId()).equals("")){
 					sql.append("\n and i.job_id = "+Utils.isNull(o.getJobId())+"");
 				}
@@ -620,8 +714,12 @@ public class ReqFinishDAO extends PickConstants{
 				   h.setCreateUser(o.getCreateUser());
 				   h.setUpdateUser(o.getUpdateUser());
 				   
-				   //save pick_stock_line
+				   /** save pick_stock_line **/
 				   saveReqFinishingBarcodeModel(conn, h);
+				   
+				   /** update Barcode Item to W **/
+			       h.setLineStatus(JobDAO.STATUS_WORK_IN_PROCESS);
+				   updateStatusBarcodeItemModel(conn,h);
 				   
 				   pensItemMap.put(h.getPensItem(), h.getPensItem());
 				   r++;
@@ -639,6 +737,39 @@ public class ReqFinishDAO extends PickConstants{
 			return pensItemMap;
 		}
 	 
+	 public static void updateStatusBarcodeItemModel(Connection conn,ReqFinish o) throws Exception{
+			PreparedStatement ps = null;
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE_ITEM SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				
+				sql.append(" WHERE  BOX_NO = ? and  material_master =? and group_code =? and pens_item = ? and job_id = ? and line_id =? \n" );
+
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getLineStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, Utils.isNull(o.getBoxNo()));
+				ps.setString(c++, Utils.isNull(o.getMaterialMaster()));
+				ps.setString(c++, Utils.isNull(o.getGroupCode()));
+				ps.setString(c++, Utils.isNull(o.getPensItem()));
+				ps.setString(c++, Utils.isNull(o.getJobId()));
+				ps.setInt(c++, o.getLineId());
+				
+				int r = ps.executeUpdate();
+				logger.debug("Update:"+r);
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
 	 
 	 private static void saveReqFinishingBarcodeModel(Connection conn,ReqFinish o) throws Exception{
 			PreparedStatement ps = null;
@@ -709,7 +840,7 @@ public class ReqFinishDAO extends PickConstants{
 			}
 		}
 	
-	public static void updateItemStatusModel(Connection conn,ReqFinish o) throws Exception{
+	public static void updateReqFinishingItemStatusModel(Connection conn,ReqFinish o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("Update");
 		int  c = 1;
@@ -738,29 +869,28 @@ public class ReqFinishDAO extends PickConstants{
 		}
 	}
 		
-		public static void deleteItemModel(Connection conn,ReqFinish o) throws Exception{
-			PreparedStatement ps = null;
-			logger.debug("Update");
-			int  c = 1;
-			try{
-				StringBuffer sql = new StringBuffer("");
-				sql.append(" DELETE FROM PENSBI.PENSBME_REQ_FINISHING_BARCODE  \n");
-				sql.append(" WHERE  REQUEST_NO = ?  \n" );
+	public static void deleteReqFinishingItemModel(Connection conn,ReqFinish o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("Update");
+		int  c = 1;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" DELETE FROM PENSBI.PENSBME_REQ_FINISHING_BARCODE  \n");
+			sql.append(" WHERE  REQUEST_NO = ?  \n" );
 
-				ps = conn.prepareStatement(sql.toString());
-					
-				ps.setString(c++, Utils.isNull(o.getRequestNo()));
+			ps = conn.prepareStatement(sql.toString());
 				
-				ps.executeUpdate();
-				
-			}catch(Exception e){
-				throw e;
-			}finally{
-				if(ps != null){
-					ps.close();ps=null;
-				}
+			ps.setString(c++, Utils.isNull(o.getRequestNo()));
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
 			}
 		}
-		
+	}
 	
 }

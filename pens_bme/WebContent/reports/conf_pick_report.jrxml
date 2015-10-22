@@ -14,6 +14,7 @@
 	<parameter name="p_subInv" class="java.lang.String"/>
 	<parameter name="p_storeNo" class="java.lang.String"/>
 	<parameter name="p_remark" class="java.lang.String"/>
+	<parameter name="p_wareHouse" class="java.lang.String"/>
 	<field name="groupCode" class="java.lang.String"/>
 	<field name="pensItem" class="java.lang.String"/>
 	<field name="materialMaster" class="java.lang.String"/>
@@ -222,7 +223,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["ร้านค้า :"+$P{p_storeCode}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
-				<reportElement x="158" y="22" width="208" height="15"/>
+				<reportElement x="158" y="22" width="109" height="15"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="12" isBold="false"/>
 				</textElement>
@@ -263,6 +264,13 @@
 				</textElement>
 				<text><![CDATA[QTY ที่จะเบิก]]></text>
 			</staticText>
+			<textField isBlankWhenNull="false">
+				<reportElement x="278" y="22" width="88" height="15"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Warehouse: "+$P{p_wareHouse}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<detail>

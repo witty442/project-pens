@@ -59,12 +59,14 @@ public class PickStock implements Serializable{
 	private boolean canCancel;
 	private boolean canConfirm;
 	private boolean newReq;
+	private boolean canComplete;
 	
 	private String barcodeItemStatus;
 	private String lineItemErrorStyle ;
 	private boolean resultProcess;
 	private boolean modeConfirm;
 	private boolean modeEdit;
+	private boolean modeComplete;
 	private String selected ;
 	private Map<String,String> pensItemMapAll;
 	private Map<String,String> boxNoMapAll;
@@ -77,8 +79,64 @@ public class PickStock implements Serializable{
 	private String groupCodeTo;
 	private String orderBy;
 	private String pickRefKey;
+	private String workStep;
+    private String page;
+	
+    //optional search criteria
+    private String issueReqDateFrom;
+    private String issueReqDateTo;
+	private String issueReqNoFrom;
+	private String issueReqNoTo;
 	
 	
+	public String getIssueReqDateFrom() {
+		return issueReqDateFrom;
+	}
+	public void setIssueReqDateFrom(String issueReqDateFrom) {
+		this.issueReqDateFrom = issueReqDateFrom;
+	}
+	public String getIssueReqDateTo() {
+		return issueReqDateTo;
+	}
+	public void setIssueReqDateTo(String issueReqDateTo) {
+		this.issueReqDateTo = issueReqDateTo;
+	}
+	public String getIssueReqNoFrom() {
+		return issueReqNoFrom;
+	}
+	public void setIssueReqNoFrom(String issueReqNoFrom) {
+		this.issueReqNoFrom = issueReqNoFrom;
+	}
+	public String getIssueReqNoTo() {
+		return issueReqNoTo;
+	}
+	public void setIssueReqNoTo(String issueReqNoTo) {
+		this.issueReqNoTo = issueReqNoTo;
+	}
+	public boolean isModeComplete() {
+		return modeComplete;
+	}
+	public void setModeComplete(boolean modeComplete) {
+		this.modeComplete = modeComplete;
+	}
+	public boolean isCanComplete() {
+		return canComplete;
+	}
+	public void setCanComplete(boolean canComplete) {
+		this.canComplete = canComplete;
+	}
+	public String getPage() {
+		return page;
+	}
+	public void setPage(String page) {
+		this.page = page;
+	}
+	public String getWorkStep() {
+		return workStep;
+	}
+	public void setWorkStep(String workStep) {
+		this.workStep = workStep;
+	}
 	public int getTotalIssueQty() {
 		return totalIssueQty;
 	}

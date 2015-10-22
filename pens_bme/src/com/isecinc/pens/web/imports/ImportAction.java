@@ -74,6 +74,9 @@ public class ImportAction extends I_Action {
 				importForm.setCountDate(null);
 				importForm.setCustCode(null);
 				importForm.setDataFile(null);
+				importForm.setStoreCode("");
+				importForm.setStoreName("");
+				importForm.setImportDate("");
 				
 				importForm.setSummary(new OnhandSummary());
 				importForm.setSummarySuccessList(null);
@@ -122,6 +125,9 @@ public class ImportAction extends I_Action {
 				importForm.setCountDate(null);
 				importForm.setCustCode(null);
 				importForm.setDataFile(null);
+				importForm.setImportDate("");
+				importForm.setStoreCode("");
+				importForm.setStoreName("");
 				
 				importForm.setSummary(new OnhandSummary());
 				importForm.setSummarySuccessList(null);
@@ -1973,8 +1979,9 @@ public class ImportAction extends I_Action {
 				Row row = null;
 				Cell cell = null;
 				String salesDate = importForm.getImportDate();
-				String storeNo = "020056-1";
-				String storeName = "020056-1";
+				String storeGroup = "020056";
+				String storeNo = importForm.getStoreCode();//"020056-1";
+				//String storeName = "020056-1";
 				String qty = "";
 				String groupCode ="";
 				String pensItem = "";
@@ -2109,9 +2116,9 @@ public class ImportAction extends I_Action {
 			         //SALES_DATE
 			         ps.setDate(index++, new java.sql.Date(Utils.parse(salesDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			         //CUST_GROUP
-			         ps.setString(index++, "020056");
+			         ps.setString(index++, storeGroup);
 			         //CUST_NO
-			         ps.setString(index++, "020056-1");
+			         ps.setString(index++, storeNo);
 			         
 			         // File_name VARCHAR2(100),
 			         ps.setString(index++, fileName);

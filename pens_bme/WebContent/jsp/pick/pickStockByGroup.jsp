@@ -23,7 +23,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="pickStockGroupForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <%
-
+String pageName = pickStockGroupForm.getBean().getPage();
 %>
 <html>
 <head>
@@ -32,7 +32,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 
 <style type="text/css">
 span.pagebanner {
@@ -129,6 +129,17 @@ function confirmAction(path){
 	}
 	return false;
 }
+
+function completeAction(path){
+	var form = document.pickStockGroupForm;
+	if(confirm("ยันยันการ Complete ข้อมูล")){
+		 form.action = path + "/jsp/pickStockGroupAction.do?do=completeAction";
+		 form.submit();
+		 return true;
+	}
+	return false;
+}
+
 function cancelIssueAction(path){
 	var form = document.pickStockGroupForm;
 	if(confirm("ยันยันการ Cancel Issue รายการนี้")){
@@ -490,9 +501,15 @@ function isNum(obj){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	    
-	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="pickStockGroup"/>
-			</jsp:include>
+	     <%if("complete".equalsIgnoreCase(pageName)){ %>
+	      	     <jsp:include page="../program.jsp">
+				   <jsp:param name="function" value="pickStockGroupComplete"/>
+			     </jsp:include>
+			 <%}else{ %>
+				 <jsp:include page="../program.jsp">
+				   <jsp:param name="function" value="pickStockGroup"/>
+			     </jsp:include>
+			 <%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -616,7 +633,7 @@ function isNum(obj){
 								</tr>	
 								
 								<tr>
-                                    <td > Confrim Issue Date</td>
+                                    <td > Confirm Issue Date</td>
                                     <td>
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20" readonly="true" styleClass="disableText"/>
 									</td>
@@ -634,9 +651,9 @@ function isNum(obj){
                      <!-- Table Content -->					
 						<c:if test="${pickStockGroupForm.results != null}">
 				
-								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="90%">
 								    <tr>
-										<th ><!-- <input type="checkbox" name="chkAll" onclick="checkAll(this)"/> --></th>
+										
 										<th >เลขที่กล่อง</th>
 										<th >Group Code</th>
 										 <%if(   PickConstants.STATUS_OPEN.equals(pickStockGroupForm.getBean().getIssueReqStatus())
@@ -665,31 +682,22 @@ function isNum(obj){
 									    tabindex++;
 							        %>
 											<tr class="<%=classStyle%>">
-												
-											   <td class="data2_chk">
-												   <%if( "true".equals(o.getSelected())){ %>
-												       <!-- <input type="checkbox" name="linechk"  onclick="sumTotal()" checked/>		 -->
-												   <%}else{ %>
-												      <!--  <input type="checkbox" name="linechk"  onclick="sumTotal()"/>	 -->
-												   <%} %>
-															  
-												  <input type="hidden" name="lineId" value="<%=o.getLineId() %>" />
-												</td>
-												<td class="data2_boxNo" align="center">
+												<td class="td_text_center" width="10%">
+												 <input type="hidden" name="lineId" value="<%=o.getLineId() %>" />
 													 <input type="text" name="boxNo" value ="<%=o.getBoxNo() %>" size="20" readonly class="disableText" tabindex="-1"/>
 												
 												</td>
-												<td class="data2_boxNo" align="center">
+												<td class="td_text_center" width="10%">
 													 <input type="text" name="groupCode" value ="<%=o.getGroupCode() %>" size="20" readonly class="disableText" tabindex="-1"/>
 													
 												</td>
 												<%if(   PickConstants.STATUS_OPEN.equals(pickStockGroupForm.getBean().getIssueReqStatus())
 									                 || "".equals(Utils.isNull(pickStockGroupForm.getBean().getIssueReqStatus())) ){%>
-													<td class="data2_qty" align="center">
+													<td class="data2_qty" align="center"  width="10%">
 													  <input type="text" name="onhandQty" value ="<%=o.getOnhandQty() %>" size="20" readonly class="disableNumber" tabindex="-1"/> 
 													</td>
 												<%} %>
-												<td class="data2_qty" align="center">
+												<td class="td_number" width="10%">
 													<%if( pickStockGroupForm.getBean().isCanConfirm() ==false){%>
 													    <%if(   PickConstants.STATUS_OPEN.equals(pickStockGroupForm.getBean().getIssueReqStatus())
 										                     || "".equals(Utils.isNull(pickStockGroupForm.getBean().getIssueReqStatus())) 
@@ -708,7 +716,7 @@ function isNum(obj){
 							                           <input type="hidden" name="orgQty" value ="<%=o.getOrgQty()%>"/>
 												</td>
 												<c:if test="${pickStockGroupForm.bean.canConfirm == true}">
-													<td>
+													<td  class="td_number"  width="10%">
 													    <input type="text" name="issueQty" value ="<%=o.getIssueQty()%>" size="20" 
 													     onkeypress="chkIssueQtyKeypress(this,event,<%=i%>)"
 								                         onchange="validateIssueQty(this,<%=i%>)" class="enableNumber"
@@ -716,7 +724,7 @@ function isNum(obj){
 													</td>
 												</c:if>
 												
-												<td class="data2_jobName" align="left"> <%out.print(o.getJobId()+" "+o.getJobName());%>
+												<td class="td_text" width="25%"> <%out.print(o.getJobId()+" "+o.getJobName());%>
 												    <input type="hidden" name="jobId" value ="<%=o.getJobId() %>" size="20" readonly class="disableText"/>
 												</td>
 												
@@ -728,23 +736,21 @@ function isNum(obj){
 									  <tr>
 									   <%if(   PickConstants.STATUS_OPEN.equals(pickStockGroupForm.getBean().getIssueReqStatus())
 									         || "".equals(Utils.isNull(pickStockGroupForm.getBean().getIssueReqStatus())) ){%>
-									        <td colspan="4" align="right">
+									        <td colspan="3" align="right">
 									     <%}else{ %>
-									         <td colspan="3" align="right">
+									         <td colspan="2" align="right">
 									     <%} %>
 									     <b> รวมจำนวน :</b>
 									     </td>
 									     <c:choose>
 										    <c:when test="${pickStockGroupForm.bean.canConfirm == true}">
-										        <td align="left" >&nbsp;&nbsp;&nbsp;<input type="text" size="20" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/></td>
+										        <td align="left" ><input type="text" size="20" id ="totalQty" name ="bean.totalQty" class="disableNumber" value="" readonly/></td>
 										        <td align="left" colspan="2" ><input type="text" size="20" id ="totalIssueQty" name ="bean.totalQty" class="disableNumber" value="" readonly/>  <b>ชิ้น</b></td>
 										    </c:when>
 										    <c:otherwise>
-										       <td align="left" colspan="2" >&nbsp;&nbsp;&nbsp;<input type="text" size="20" id ="totalQty" name ="bean.totalIssueQty" class="disableNumber" value="" readonly/>  <b>ชิ้น</b></td>
+										       <td align="left" colspan="2"   width="10%">&nbsp;&nbsp;&nbsp;<input type="text" size="20" id ="totalQty" name ="bean.totalIssueQty" class="disableNumber" value="" readonly/>  <b>ชิ้น</b></td>
 										    </c:otherwise>
 										</c:choose>
-									   
-									     
 									  </tr>
 									  
 							</table>
@@ -767,6 +773,12 @@ function isNum(obj){
 											   <input type="button" value="    Cancel Issue     " class="" disabled> 
 											 <!-- </a> -->  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										   </c:if>	
+										   
+										 <c:if test="${pickStockGroupForm.bean.canComplete == true}">
+											<a href="javascript:completeAction('${pageContext.request.contextPath}')">
+											  <input type="button" value="Pick Complete" class="newPosBtnLong"> 
+											 </a>
+										 </c:if>	
 										 
 									      <c:if test="${pickStockGroupForm.bean.canConfirm == true}">
 											<a href="javascript:confirmAction('${pageContext.request.contextPath}')">

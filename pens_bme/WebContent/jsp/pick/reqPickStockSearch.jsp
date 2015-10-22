@@ -1,3 +1,4 @@
+<%@page import="util.Constants"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
@@ -24,6 +25,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <% 
+String wareHouse = reqPickStockForm.getBean().getWareHouse();
 if(session.getAttribute("statusIssueReqList") == null){
 	List<References> billTypeList = new ArrayList();
 	References ref = new References("","");
@@ -40,14 +42,19 @@ if(session.getAttribute("pickTypeList") == null){
 	session.setAttribute("pickTypeList",pickTypeList);
 }
 
-if(session.getAttribute("custGroupList") == null){
+//if(session.getAttribute("custGroupList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
-	
+	 if("W2".equalsIgnoreCase(wareHouse)){
+	     billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+	 }else{
+		 PopupForm cri = new PopupForm();
+		 cri.setCodeSearch(Constants.STORE_TYPE_HISHER_CODE);
+		 billTypeList.addAll(GeneralDAO.searchCustGroup(cri)); 
+	 }
 	session.setAttribute("custGroupList",billTypeList);
-}
+//}
 %>
 
 <html>
@@ -156,10 +163,17 @@ function openConfirm(path,documentNo,issueReqStatus){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	    
-	      	<jsp:include page="../program.jsp">
 	      	
-				<jsp:param name="function" value="reqPickStockW2"/>
-			</jsp:include>
+	      	   <%if("W2".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW2"/>
+				 </jsp:include>
+				<%}else{ %>
+				  <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW4"/>
+				 </jsp:include>
+				<%} %>
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -184,25 +198,29 @@ function openConfirm(path,documentNo,issueReqStatus){
 								</tr>
 						       <tr>
                                     <td> ${reqPickStockForm.bean.wareHouse}
-                                      Issue request Date <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
+                                      Issue request Date 
                                      </td>
-									<td>						
+									<td>	
+									<html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />		
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;			
 									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
 									</td>
 								</tr>
 								 <tr>
                                     <td>
                                       Issue request status
-                                      <html:select property="bean.status">
-											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
-									    </html:select>
                                      </td>
-									<td>						
+									<td>	
+									 <html:select property="bean.status">
+											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
+									  </html:select>	
+									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;				
 									 ผู้เบิก <html:text property="bean.requestor" styleId="requestor" size="20" />	  
 									</td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> หมายเหตุ
+                                    <td> หมายเหตุ </td>
+                                    <td>
 						               <html:text property="bean.remark" styleId="remark" size="50" />
 									</td>
 								</tr>

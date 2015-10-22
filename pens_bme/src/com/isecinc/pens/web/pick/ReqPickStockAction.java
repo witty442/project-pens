@@ -334,7 +334,7 @@ public class ReqPickStockAction extends I_Action {
 			} else {
 				request.getSession().setAttribute("results", null);
 				request.setAttribute("Message", "ไม่พบข่อมูล");
-				p.setCanEdit(false);
+				//p.setCanEdit(false);
 			}
 			
 			logger.debug("totalQtyAll["+totalQtyAll+"]");
@@ -481,6 +481,9 @@ public class ReqPickStockAction extends I_Action {
 		logger.debug("** SearchFilter **");
 		try {
 			List<ReqPickStock> reqPickListOld = (List)request.getSession().getAttribute("results");
+			int oldtotalPage = ((Integer)request.getSession().getAttribute("totalPage")).intValue();
+			int oldtotalRow = ((Integer)request.getSession().getAttribute("totalRow")).intValue();
+			   
 			
 			conn = DBConnection.getInstance().getConnection();
 
@@ -495,9 +498,13 @@ public class ReqPickStockAction extends I_Action {
 		    }else{
 		    	
 		    	msg ="ไม่พบสินค้าคงเหลือใน GroupCode["+p.getGroupCode()+"]";
+		    	p.setGroupCode("");
 		    	aForm.setBean(p);
 		    	
 		    	request.getSession().setAttribute("results", reqPickListOld);
+		    	request.getSession().setAttribute("totalPage", oldtotalPage);
+				request.getSession().setAttribute("totalRow", oldtotalRow);
+				
 		    }
 
 			request.setAttribute("Message", msg);
@@ -669,7 +676,6 @@ public class ReqPickStockAction extends I_Action {
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
 		try {
-	
 			String fileType = SystemElements.PDF;
 			logger.debug("fileType:"+fileType);
 
@@ -688,6 +694,7 @@ public class ReqPickStockAction extends I_Action {
 				parameterMap.put("p_subInv", h.getSubInv());
 				parameterMap.put("p_storeNo", h.getStoreNo());
 				parameterMap.put("p_remark", h.getRemark());
+				parameterMap.put("p_wareHouse", h.getWareHouse());
 				
 				//Gen Report
 				String fileName = "post_request_report";

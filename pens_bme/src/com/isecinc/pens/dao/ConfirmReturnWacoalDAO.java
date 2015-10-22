@@ -26,7 +26,13 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 	protected static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 	
-
+	static int maxRowOnePage = 40;
+	static int maxRowMorePage = 47;
+	static int maxRowMorePage2 = 51;
+	static int maxColumn = 5;
+	static int maxCountPerPage = maxRowMorePage * maxColumn;
+	static int maxCountPerPage2 = maxRowMorePage2 * maxColumn;
+	
 	public static void main(String[] s){
 		try{
 			String today = df.format(new Date());
@@ -676,81 +682,184 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 		return items;
 	}
 	
+	public static int calcMaxPageReportControlReturn(Connection conn,ConfirmReturnWacoal o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalPage = 0;
+		try {
+			sql.append("\n select count(*) as c " );
+		    sql.append("\n from PENSBME_PICK_CONF_RETURN h ,PENSBME_PICK_CONF_RETURN_I i ");
+			sql.append("\n where 1=1 and h.return_no = i.return_no  \n");
+		    sql.append("\n and h.return_no = '"+Utils.isNull(o.getReturnNo())+"' group by h.return_no ");
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+				totalPage =  Utils.calcTotalPage(rst.getInt("c"), maxCountPerPage);
+		
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalPage;
+	}
+	
 	public static List<ControlReturnReport> searchItemForReportControlReturn(Connection conn,ConfirmReturnWacoal o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		ConfirmReturnWacoal h = null;
-		int maxRow = 40;
-		int r = 1;
-		int p = 1;
+	    int totalPage = 0;
+		int row = 1;
+		int column = 1;
+		int pageNumber = 1;
+		int maxRowInpage = 0;
+		int no=1;
+		int startSplitPage = 0;
+		int maxRowCase = maxRowMorePage;
         List<ControlReturnReport> items = new ArrayList<ControlReturnReport>();
+        int startRow = 0;
 		try {
-			sql.append("\n select i.line_Id,i.qty " +
-					  "\n from PENSBI.PENSBME_PICK_CONF_RETURN h ,PENSBI.PENSBME_PICK_CONF_RETURN_I i ");
+			sql.append("\n select i.line_Id,i.qty " );
+		    sql.append("\n from PENSBME_PICK_CONF_RETURN h ,PENSBME_PICK_CONF_RETURN_I i ");
 			sql.append("\n where 1=1 and h.return_no = i.return_no  \n");
-			if( !Utils.isNull(o.getReturnNo()).equals("")){
-				sql.append("\n and h.return_no = '"+Utils.isNull(o.getReturnNo())+"'");
-			}
-			
+		    sql.append("\n and h.return_no = '"+Utils.isNull(o.getReturnNo())+"'");
 			sql.append("\n order by i.line_Id asc  ");
+			
 			logger.debug("sql:"+sql);
+			totalPage = calcMaxPageReportControlReturn(conn, o);
+			logger.debug("totalPage:"+totalPage);
 			
 			ps = conn.prepareStatement(sql.toString());
 
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
-			  
-			   //page
-			   if(r > maxRow){
-				  p++;
-				  r = 1;
-			   }
-			   logger.debug("r["+r+"]r%maxRow["+(r%maxRow)+"]p["+p+"]");
+			    
+				if(totalPage==1){
+				  //one page
+				   if(row > maxRowOnePage){
+					  column++;//Column
+					  row = 1; //reset Row =1
+				   }
+				}else{
+					
+				   //2 page
+					if((pageNumber-1) ==1){
+					   startSplitPage = maxCountPerPage * (pageNumber-1); //40
+					}else if((pageNumber-1) ==2){
+					   startSplitPage = maxCountPerPage + maxCountPerPage2;
+					}else{
+					   startSplitPage = maxCountPerPage + (maxCountPerPage2 * (pageNumber-2));//47
+					}
+					
+					if(no > startSplitPage){
+						column = 1;//reset Column
+						if(pageNumber == 1){
+							maxRowCase = maxRowMorePage;//47 Row
+							startRow =((pageNumber-1)*maxRowCase )+1; //start row= 1;
+							
+							 maxRowInpage = pageNumber*maxRowCase; //reset Row = 40
+						}
+						if(pageNumber ==2){
+							maxRowCase = maxRowMorePage2;//51 Row
+							startRow =((pageNumber-1)*maxRowMorePage )+1; //start row= 41,;
+							
+							 maxRowInpage = maxRowMorePage +maxRowMorePage2; //reset Row = 87
+						}
+                        if(pageNumber > 2){
+                        	maxRowCase = maxRowMorePage2;//51 Row
+                        	startRow = maxRowMorePage2 + ((pageNumber-2)*maxRowCase )+1; //start row= 88;
+							
+							maxRowInpage = maxRowMorePage2 +(pageNumber-1)*maxRowCase; //reset Row = 134,..n
+						}
+						
+                        row = startRow;
+                       
+						pageNumber++;//Next Page
+					}
+					//reset
+					if(row > maxRowInpage){
+						column++;//Column
+						row = startRow;
+					}
+					 
+				}
+
+			   logger.debug("No["+no+"]startSplitPage["+startSplitPage+"]pageNumber["+(pageNumber-1)+"]row["+row+"]maxRowInpage["+maxRowInpage+"]column["+column+"]");
 			   
-			   if(p==1){
+			   if(column==1){
 				  ControlReturnReport item = new ControlReturnReport();
-			      item.setLineId1(rst.getString("line_Id"));
+			      item.setLineId1(no+"");
 			      item.setQty1(rst.getString("qty"));
 			      items.add(item);
-			   }else if(p==2){
-				   ControlReturnReport item = items.get(r-1);
-				   item.setLineId2(rst.getString("line_Id"));
+			      //logger.debug("lastitem size["+items.size()+"]");
+			   }else if(column==2){
+				   ControlReturnReport item = items.get(row-1);
+				   item.setLineId2(no+"");
 				   item.setQty2(rst.getString("qty"));
-				   items.set(r-1,item);  
+				   items.set(row-1,item);  
 				   
-			   }else if(p==3){
-				   ControlReturnReport item = items.get(r-1);
-				   item.setLineId3(rst.getString("line_Id"));
+			   }else if(column==3){
+				   ControlReturnReport item = items.get(row-1);
+				   item.setLineId3(no+"");
 				   item.setQty3(rst.getString("qty"));
-				   items.set(r-1,item);   
-			   }else if(p==4){
-				   ControlReturnReport item = items.get(r-1);
-				   item.setLineId4(rst.getString("line_Id"));
+				   items.set(row-1,item);   
+			   }else if(column==4){
+				   ControlReturnReport item = items.get(row-1);
+				   item.setLineId4(no+"");
 				   item.setQty4(rst.getString("qty"));
-				   items.set(r-1,item);  
-			   }else if(p==5){
-				   ControlReturnReport item = items.get(r-1);
-				   item.setLineId5(rst.getString("line_Id"));
+				   items.set(row-1,item);  
+			   }else if(column==5){
+				   ControlReturnReport item = items.get(row-1);
+				   item.setLineId5(no+"");
 				   item.setQty5(rst.getString("qty"));
-				   items.set(r-1,item); 
+				   items.set(row-1,item); 
 			   }
-
-			   r++;
 			   
+              row++;
+              no++;
 			}//while
 			
-			if(items != null && items.size() < maxRow){
-				int diffRow = new Double(maxRow).intValue() - items.size();
-				for(int i=0;i<diffRow;i++){
-					ControlReturnReport item = new ControlReturnReport();
-					item.setLineId1("");
-				    item.setQty1("");
-				    items.add(item);
+			logger.debug("items Size:"+items.size());
+			//Add blank Column
+			if(totalPage==1){
+				if(items != null && items.size() < maxRowOnePage){
+					int diffRow = new Double(maxRowOnePage).intValue() - items.size();
+					for(int i=0;i<diffRow;i++){
+						ControlReturnReport item = new ControlReturnReport();
+						item.setLineId1("");
+					    item.setQty1("");
+					    items.add(item);
+					}
+				}
+			}else{
+				//More than one page
+				logger.debug("lastRow["+row+"]maxZRowInPage["+maxRowInpage+"]");
+				if(items != null && items.size() > 0 ){
+					if((maxRowInpage - row) > 6){
+						int diffRow = (maxRowInpage - row)-6;
+						for(int i=0;i<diffRow;i++){
+							ControlReturnReport item = new ControlReturnReport();
+							item.setLineId1("");
+						    item.setQty1("");
+						    items.add(item);
+						}
+					}
 				}
 			}
-
+			
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -842,6 +951,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			sql.append("\n  and bh.box_no = bi.box_no ");
 			sql.append("\n  and bi.job_id = j.job_id ");
 			sql.append("\n  and bh.status = '"+PickConstants.STATUS_RETURN+"'");
+			sql.append("\n  and bi.status = '"+PickConstants.STATUS_RETURN+"'");
 			sql.append("\n  and bh.box_no = '"+Utils.isNull(boxNo)+"'");
 			
 			sql.append("\n  group by   j.job_id,j.name,j.cust_group,bi.group_code, ");

@@ -1790,7 +1790,9 @@ public class OrderFridayDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			
+			if(conn !=null){
+				conn.close();conn=null;
+			}
 		}
 	
 	} 

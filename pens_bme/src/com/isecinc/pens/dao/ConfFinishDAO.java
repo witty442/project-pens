@@ -318,8 +318,10 @@ public class ConfFinishDAO extends PickConstants{
 			      b.setUpdateUser(h.getUpdateUser());
 			       
 			      BarcodeDAO.updateBarcodeHeadStatusModelByPK(conn, b);
-			      BarcodeDAO.updateBarcodeLineStatusModelByPK(conn, b);
+			     
 				}
+				//update barcode item to Finish
+				updateBarcodeToFinishFromReqFinishingItem(conn,h);
 			}
 			
 		}catch(Exception e){
@@ -328,6 +330,123 @@ public class ConfFinishDAO extends PickConstants{
 		}
 		return h;
 	}
+	
+	public static void updateBarcodeToFinishFromReqFinishingItem(Connection conn,ReqFinish h) throws Exception{
+		logger.debug("--updateBarcodeToFinishFromReqFinishingItem--");
+		int no = 1;
+		try{
+		    List<ReqFinish> reqFinishingItemList = searchreqFinishingItemListByRequestNo(conn, h);
+		       
+			logger.debug("reqFinishingItemList:"+reqFinishingItemList.size());
+			   
+			  if(reqFinishingItemList !=null && reqFinishingItemList.size() >0){
+				  
+				   for(int k=0;k<reqFinishingItemList.size();k++){
+					   ReqFinish p = (ReqFinish)reqFinishingItemList.get(k);
+					   p.setCreateUser(h.getCreateUser());
+					   p.setUpdateUser(h.getUpdateUser());
+
+					   //delete Pick Stock Line
+					   logger.debug("no["+(no)+"]update barcode item:"+p.getPensItem()+",boxNo["+p.getBoxNo()+"]lineId:"+p.getLineId());
+
+				       //update barcode item (status = F)
+				       p.setLineStatus(PickConstants.STATUS_FINISH);
+				       updateStatusBarcodeItemModel(conn, p);
+				       
+					   no++;
+				   }//for 2
+			   }//if 
+					  
+			
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	
+	public static List<ReqFinish> searchreqFinishingItemListByRequestNo(Connection conn,ReqFinish o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ReqFinish h = null;
+		int r = 1;
+        List<ReqFinish> items = new ArrayList<ReqFinish>();
+		try {
+
+			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING_BARCODE i   \n");
+			sql.append("\n where 1=1   \n");
+			sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+			
+			//sql.append("\n order by line_id asc ");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new ReqFinish();
+			   h.setRequestNo(rst.getString("request_no"));
+			   
+			   h.setLineId(rst.getInt("line_id"));//Line_id(Barcode by boxNo)
+			   h.setJobId(rst.getString("job_id"));
+			   h.setBoxNo(rst.getString("box_no"));
+			   
+			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+			   h.setGroupCode(rst.getString("group_code"));
+			   h.setPensItem(rst.getString("pens_item"));
+			   
+			   h.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+			   
+			   items.add(h);
+			   r++;
+			   
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
+	 public static void updateStatusBarcodeItemModel(Connection conn,ReqFinish o) throws Exception{
+			PreparedStatement ps = null;
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBI.PENSBME_PICK_BARCODE_ITEM SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				
+				sql.append(" WHERE  BOX_NO = ? and  material_master =? and group_code =? and pens_item = ? and job_id = ? and line_id =? \n" );
+
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getLineStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, Utils.isNull(o.getBoxNo()));
+				ps.setString(c++, Utils.isNull(o.getMaterialMaster()));
+				ps.setString(c++, Utils.isNull(o.getGroupCode()));
+				ps.setString(c++, Utils.isNull(o.getPensItem()));
+				ps.setString(c++, Utils.isNull(o.getJobId()));
+				ps.setInt(c++, o.getLineId());
+				
+				int r = ps.executeUpdate();
+				logger.debug("Update:"+r);
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
 	
 	public static List<Barcode> searchReqFinishingBarcodeItemList(Connection conn,ReqFinish o ) throws Exception {
 		PreparedStatement ps = null;

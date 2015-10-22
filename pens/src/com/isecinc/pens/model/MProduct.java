@@ -99,6 +99,7 @@ public class MProduct extends I_Model<Product>{
         sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
 		
         logger.debug("sql:"+sql);
+        
 		conn = new DBCPConnectionProvider().getConnection(conn);
 		try {
 			stmt = conn.createStatement();
@@ -128,6 +129,73 @@ public class MProduct extends I_Model<Product>{
 	}
 	
 	public List<MoveOrderProductCatalog> getMoveOrderProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId,User u) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		
+		List<MoveOrderProductCatalog> productL = new ArrayList<MoveOrderProductCatalog>();
+		
+		StringBuffer sql = new StringBuffer("");
+		sql.append("\n SELECT A.* FROM( ");
+		sql.append(" \n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN '0' ELSE '1' end )as target_sort ");
+		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN 'Y' ELSE '' end )as target ");
+		sql.append(" \n FROM M_Product pd ");
+		sql.append(" \n INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID ");
+		sql.append(" \n LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+		sql.append(" \n LEFT OUTER JOIN m_sales_target_new st ON  st.Product_ID = pp1.Product_ID AND DATE_FORMAT(st.target_from, '%Y%m') = DATE_FORMAT(NOW(), '%Y%m')");
+		sql.append(" \n WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+productCatCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" ");
+			
+		sql.append("\n AND ( ");
+		sql.append("\n    pp1.UOM_ID IN ( ");
+		sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+		sql.append("\n     ) ");
+		sql.append("\n     OR");
+		sql.append("\n     pp2.UOM_ID IN ( ");
+		sql.append("\n        SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+		sql.append("\n      ) ");
+		sql.append("\n   )");
+				
+		sql.append(" \n AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') ");
+		sql.append("\n )A");
+	    sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
+
+		logger.debug("sql:"+sql);
+		
+		conn = new DBCPConnectionProvider().getConnection(conn);
+		try {
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while(rst.next()){
+				MoveOrderProductCatalog catalog = new MoveOrderProductCatalog();
+				catalog.setProductId(rst.getInt("PRODUCT_ID"));
+				catalog.setTarget(rst.getString("target"));
+				catalog.setProductName(rst.getString("PRODUCT_NAME"));
+				catalog.setProductCode( rst.getString("PRODUCT_CODE"));
+				catalog.setPrice1(rst.getDouble("PRICE1"));
+				catalog.setPrice2(rst.getDouble("PRICE2"));
+				catalog.setUom1(rst.getString("UOM1"));
+				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+				
+				//find PacQty2
+				if(!"".equals(catalog.getUom2())){
+					catalog.setPacQty2(new MUOMConversion().getCapacity(catalog.getProductId(), catalog.getUom1(), catalog.getUom2()));
+				}
+				
+				productL.add(catalog);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return productL;
+	}
+	
+	public List<MoveOrderProductCatalog> getStockProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId,User u) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;

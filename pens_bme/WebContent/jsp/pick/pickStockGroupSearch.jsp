@@ -46,6 +46,8 @@ if(session.getAttribute("custGroupList") == null){
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
+
+String pageName = pickStockGroupForm.getBean().getPage();
 %>
 
 <html>
@@ -54,7 +56,7 @@ if(session.getAttribute("custGroupList") == null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -88,8 +90,13 @@ span.pagelinks {
 <script type="text/javascript">
 
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('issueReqDate'));
-	 new Epoch('epoch_popup', 'th', document.getElementById('confirmIssueDate'));
+	<%if("req".equalsIgnoreCase(pageName)){ %>
+	   new Epoch('epoch_popup', 'th', document.getElementById('issueReqDate'));
+	   new Epoch('epoch_popup', 'th', document.getElementById('confirmIssueDate'));
+	<%}else{ %>
+	   new Epoch('epoch_popup', 'th', document.getElementById('issueReqDateFrom'));
+	   new Epoch('epoch_popup', 'th', document.getElementById('issueReqDateTo'));
+    <%}%>
 }
 function clearForm(path){
 	var form = document.pickStockGroupForm;
@@ -124,6 +131,95 @@ function openConfirm(path,documentNo,issueReqStatus){
 	form.submit();
 	return true;
 }
+function openComplete(path,documentNo,issueReqStatus){
+	var form = document.pickStockGroupForm;
+	form.action = path + "/jsp/pickStockGroupAction.do?do=prepareByGroup&process=complete&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
+	form.submit();
+	return true;
+}
+
+function openPopupCustomer(path,types,storeType){
+	var form = document.pickStockGroupForm;
+	var storeGroup = form.custGroup.value;
+	
+    var param = "&types="+types;
+        param += "&storeType="+storeType;
+        param += "&storeGroup="+storeGroup;
+        param += "&methodName=pickStockGroup";
+        
+	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+
+function setStoreMainValuePickStockGroup(code,desc,storeNo,subInv,types){
+	var form = document.pickStockGroupForm;
+	//alert(form);
+	form.storeCode.value = code;
+	form.storeName.value = desc;
+
+	form.storeNo.value = storeNo;
+	form.subInv.value = subInv;
+} 
+
+function getCustNameKeypress(e,custCode,fieldName){
+	var form = document.pickStockGroupForm;
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			if("storeCode" == fieldName){
+				form.storeCode.value = '';
+				form.storeName.value = "";
+				form.storeNo.value = "";
+				form.subInv.value = "";
+			}
+		}else{
+		  getCustName(custCode,fieldName);
+		}
+	}
+}
+
+function getCustName(custCode,fieldName){
+	var returnString = "";
+	var form = document.pickStockGroupForm;
+	var storeGroup = form.custGroup.value;
+		var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameWithSubInvAjax.jsp",
+				data : "custCode=" + custCode.value+"&storeGroup="+storeGroup,
+				async: false,
+				cache: false,
+				success: function(getData){
+				  returnString = jQuery.trim(getData);
+				}
+			}).responseText;
+		
+		if("storeCode" == fieldName){
+			if(returnString !=''){
+				var retArr = returnString.split("|");
+				form.storeName.value = retArr[0];
+			    form.storeNo.value = retArr[1];
+				form.subInv.value = retArr[2];
+			}else{
+				alert("ไม่พบข้อมูล");
+				form.storeCode.focus();
+				form.storeCode.value ="";
+				form.storeName.value = "";
+				form.storeNo.value = "";
+				form.subInv.value = "";
+			}
+		}
+}
+
+function resetStore(){
+	var form = document.pickStockGroupForm;
+	var storeGrouptext = $("#custGroup option:selected").text();
+	
+	if(storeGrouptext != ''){
+		form.storeCode.value = "";
+		form.storeName.value = "";
+		form.storeNo.value = "";
+		form.subInv.value = "";
+	}
+}
 
 </script>
 
@@ -147,11 +243,15 @@ function openConfirm(path,documentNo,issueReqStatus){
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	    
-	      	<jsp:include page="../program.jsp">
-	      	
-				<jsp:param name="function" value="pickStockGroup"/>
-			</jsp:include>
+	    	  <%if("complete".equalsIgnoreCase(pageName)){ %>
+	      	     <jsp:include page="../program.jsp">
+				   <jsp:param name="function" value="pickStockGroupComplete"/>
+			     </jsp:include>
+			 <%}else{ %>
+				 <jsp:include page="../program.jsp">
+				   <jsp:param name="function" value="pickStockGroup"/>
+			     </jsp:include>
+			 <%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -166,8 +266,8 @@ function openConfirm(path,documentNo,issueReqStatus){
 						<!-- BODY -->
 						<html:form action="/jsp/pickStockGroupAction">
 						<jsp:include page="../error.jsp"/>
-
-						   <div align="center">
+                        <div align="center">
+						<%if("req".equalsIgnoreCase(pageName)){ %>
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
                                     <td>
@@ -204,7 +304,61 @@ function openConfirm(path,documentNo,issueReqStatus){
 									</td>
 								</tr>
 						   </table>
-						   
+						 <%} %>
+						 <%if("complete".equalsIgnoreCase(pageName)){ %>
+						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
+						       <tr>
+                                    <td>
+                                      Issue request Date From
+                                     </td>
+                                     <td>
+                                      <html:text property="bean.issueReqDateFrom" styleId="issueReqDateFrom" size="20" />
+                                     </td>
+									<td>						
+									 Issue request Date To<html:text property="bean.issueReqDateTo" styleId="issueReqDateTo" size="20" />	  
+									</td>
+								</tr>
+								<tr>
+                                    <td>Issue request No From</td>
+                                     <td>
+                                      <html:text property="bean.issueReqNoFrom" styleId="issueReqNoFrom" size="20" />
+                                     </td>
+									<td>						
+									 Issue request No To<html:text property="bean.issueReqNoTo" styleId="issueReqNoTo" size="20" />	  
+									</td>
+								</tr>
+								<tr>
+                                    <td> กลุ่มร้านค้า</td>
+                                     <td> 
+                                       <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
+											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+									    </html:select>
+                                    </td>		
+								    <td>
+									    รหัสร้านค้า  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+									  
+									   <html:hidden property="bean.subInv" styleId="subInv" />
+						               <html:hidden property="bean.storeNo" styleId="storeNo"/>
+						           </td>
+								</tr>
+								<tr>
+                                    <td > ผู้เบิก </td>
+                                     <td>
+						               <html:text property="bean.pickUser" styleId="pickUser" size="20"/>
+									</td>
+									<td> Work Step
+									    <html:select property="bean.workStep">
+											<html:option value="<%=PickConstants.WORK_STEP_POST_BYSALE%>"><%=PickConstants.WORK_STEP_POST_BYSALE %></html:option>
+											<html:option value="<%=PickConstants.WORK_STEP_PICK_COMPLETE%>"><%=PickConstants.WORK_STEP_PICK_COMPLETE %></html:option>
+									    </html:select>
+									  </td>
+								</tr>
+								
+						   </table>
+						 <%} %>
+						 
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
@@ -216,9 +370,11 @@ function openConfirm(path,documentNo,issueReqStatus){
 										<%-- <a href="javascript:openEdit('${pageContext.request.contextPath}','','')">
 										  <input type="button" value="   เพิ่มรายการใหม่ (เบิกรายตัว)  " class="newPosBtnLong">
 										</a>	 --%>
-										<a href="javascript:openEdit('${pageContext.request.contextPath}','','')">
-										  <input type="button" value="   เพิ่มรายการใหม่ (เป็นรุ่น)  " class="newPosBtnLong">
-										</a>
+										  <%if("req".equalsIgnoreCase(pageName)){ %>
+											<a href="javascript:openEdit('${pageContext.request.contextPath}','','')">
+											  <input type="button" value="   เพิ่มรายการใหม่ (เป็นรุ่น)  " class="newPosBtnLong">
+											</a>
+										   <%} %>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>	
@@ -237,16 +393,19 @@ function openConfirm(path,documentNo,issueReqStatus){
 
             <c:if test="${pickStockGroupForm.resultsSearch != null}">
                   	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+                  	<%if("req".equalsIgnoreCase(pageName)){ %>
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
 									<th >Issue Req Date</th>
 									<th >Issue Req No</th>
 									<th >Issue Req Status</th>
 									<th >Confirm Issue Date</th>
-									<th >Pick Type</th>
+								 	<th >Work Step</th>
+									<th >Qty ที่จะเบิก</th>
+									<th >Qty ที่เบิกได้จริง</th>
 									<th >หมายเหตุ</th>
 									<th >แก้ไข</th>	
-									<th >ยืนยัน</th>						
+									 <th >ยืนยัน</th>				
 							   </tr>
 							<c:forEach var="results" items="${pickStockGroupForm.resultsSearch}" varStatus="rows">
 								<c:choose>
@@ -259,24 +418,30 @@ function openConfirm(path,documentNo,issueReqStatus){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_issueReqDate">
+										<td class="td_text_center">
 										   ${results.issueReqDate}
 										</td>
-										<td class="search_issueReqNo">${results.issueReqNo}</td>
-										<td class="search_issueReqStatus">
+										<td class="td_text_center">${results.issueReqNo}</td>
+										<td class="td_text_center">
 											${results.issueReqStatusDesc}
 										</td>
-										<td class="search_confirmIssueDate">
+										<td class="td_text_center">
 										    ${results.confirmIssueDate}
 										</td>
-										
-										<td class="search_pickType">
-										  ${results.pickTypeDesc}
+										 <td class="td_text">
+										  ${results.workStep}
 										</td>
-									    <td class="search_remark">
+									
+										<td class="td_text_center">
+										  ${results.totalQty}
+										</td>
+										<td class="td_text_center">
+										  ${results.totalIssueQty}
+										</td>
+									    <td class="td_text">
 										  ${results.remark}
 										</td>
-										<td class="search_edit">
+										<td class="td_text_center">
 										    <c:if test="${results.pickType == 'GROUP'}">
 											    <c:if test="${results.canEdit == false}">
 													  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
@@ -290,7 +455,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 												  </c:if>
 										    </c:if>  
 										</td>
-										<td class="search_edit2">
+										<td class="td_text_center">
 										    <c:if test="${results.pickType == 'GROUP'}">			    
 											     <c:if test="${results.canConfirm == true}">
 													<a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
@@ -302,18 +467,76 @@ function openConfirm(path,documentNo,issueReqStatus){
 									</tr>
 							
 							  </c:forEach>
-					</table>
+					</table>		
+					<%} %>
+					
+					<%if("complete".equalsIgnoreCase(pageName)){ %>
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
+						       <tr>
+						            <th >Issue Req No</th>
+									<th >Issue Req Date</th>
+								 	<th >Work Step</th>
+								 	<th >ผู้เบิก</th>
+								 	<th >รหัสร้านค้า</th>
+								 	<th >ชื่อร้านค้า</th>
+									<th >Qty ที่จะเบิก</th>
+									<th >Qty ที่เบิกได้จริง</th>
+									<th >หมายเหตุ</th>
+									<th >แก้ไข</th>			
+							   </tr>
+							<c:forEach var="results" items="${pickStockGroupForm.resultsSearch}" varStatus="rows">
+								<c:choose>
+									<c:when test="${rows.index %2 == 0}">
+										<c:set var="tabclass" value="lineO"/>
+									</c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineE"/>
+									</c:otherwise>
+								</c:choose>
 								
-								
-					<!-- BUTTON ACTION-->
-					<div align="center">
-						<table  border="0" cellpadding="3" cellspacing="0" >
-							<tr><td>
-														
-								</td>
-							</tr>
-						</table>
-					</div>
+									<tr class="<c:out value='${tabclass}'/>">
+									    <td class="td_text_center" width="8%">${results.issueReqNo}</td>
+										<td class="td_text_center" width="8%">
+										   ${results.issueReqDate}
+										</td>
+										 <td class="td_text" width="10%">
+										  ${results.workStep}
+										</td>
+										<td class="td_text_center" width="10%" >
+										  ${results.pickUser}
+										</td>
+										<td class="td_text_center" width="10%">
+										  ${results.storeCode}
+										</td>
+										<td class="td_text" width="15%">
+										  ${results.storeName}
+										</td>
+										<td class="td_text_center" width="8%">
+										  ${results.totalQty}
+										</td>
+										<td class="td_text_center" width="8%">
+										  ${results.totalIssueQty}
+										</td>
+									    <td class="td_text" width="15%">
+										  ${results.remark}
+										</td>
+										<td class="td_text_center" width="10%">
+									       <c:if test="${results.canComplete == false}">
+												  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
+												          ดู
+												  </a>
+											  </c:if>
+											  <c:if test="${results.canComplete == true}">
+												  <a href="javascript:openComplete('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
+												          แก้ไข
+												  </a>
+											  </c:if>
+										</td>
+									</tr>
+							
+							  </c:forEach>
+					</table>		
+					<%} %>
 				</c:if>
 				
 				<!-- ************************Result ***************************************************-->

@@ -24,7 +24,7 @@ try{
 		popupForm.setCodeSearch(itemCode);
 		popupForm.setMatCodeSearch(matCode);
 		
-		Barcode b = GeneralDAO.searchProductByBarcode(popupForm,storeCode);
+		Barcode b = GeneralDAO.searchProductByBarcode(popupForm,storeCode); 
 		
 		if(b != null ){
 		    outputText = b.getBarcode()+"|"+b.getMaterialMaster()+"|"+b.getGroupCode()+"|"+b.getPensItem()+"|"+b.getWholePriceBF()+"|"+b.getRetailPriceBF();

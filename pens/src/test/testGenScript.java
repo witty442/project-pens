@@ -18,7 +18,7 @@ public class testGenScript {
 		" select receipt_no from t_receipt where 1=1  \n"+
 		" ); \n";*/
 	
-	static String dataSql = "update t_order \n"+
+	/*static String dataSql = "update t_order \n"+
 			"  set payment = 'Y' \n"+
 			" ,remark ='BugLineNoPayment' \n"+
 			" where 1=1 \n"+
@@ -27,7 +27,9 @@ public class testGenScript {
 			" and exported ='Y'  \n"+
 			" and ar_invoice_no is not null  \n"+
 			" and payment ='N'  \n"+
-			" and order_date >= '2014-03-01' and order_date <= '2014-03-03'\n";
+			" and order_date >= '2014-03-01' and order_date <= '2014-03-03'\n";*/
+	
+	static String dataSql = "delete from m_sales_target_new;";
 			
 	
 	static List<String> vanList = new ArrayList<String>();
@@ -78,20 +80,62 @@ public class testGenScript {
 		vanList.add("V407");
 
 	}
-	static String path = "D:/Work_ISEC/A-TEMP-DB-C4/GenScript/Script/";
+	
+	static List<String> creditList = new ArrayList<String>();
+	static{
+		creditList.add("S001");
+		creditList.add("S002");
+		creditList.add("S003");
+		creditList.add("S004");
+		creditList.add("S005");
 		
+		creditList.add("S101");
+		creditList.add("S102"); 
+		creditList.add("S103");
+		creditList.add("S104");
+		
+		creditList.add("S201");
+		creditList.add("S202");
+		creditList.add("S203");
+		creditList.add("S204");
+		creditList.add("S205");
+	
+		creditList.add("S301");
+		creditList.add("S302");
+		creditList.add("S303");
+		creditList.add("S304");
+	
+		creditList.add("S401");
+		creditList.add("S402");
+		creditList.add("S403");
+		creditList.add("S404");
+
+	}
+	static String pathVan = "D:/Work_ISEC/A-TEMP-DB-C4/GenScript/ScriptVan/";
+	static String pathCredit = "D:/Work_ISEC/A-TEMP-DB-C4/GenScript/ScriptCredit/";
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		genScriptFile();
+		
+		genVanScriptFile();
+		//genCreditScriptFile();
+		
 	}
 	
-	public static void genScriptFile(){
+	public static void genVanScriptFile(){
 		for(int i=0;i<vanList.size();i++){
 			String saleCode = (String)vanList.get(i);
-			FileUtil.writeFile(path+"script_"+saleCode+".sql",dataSql);
+			FileUtil.writeFile(pathVan+"script_"+saleCode+".sql",dataSql);
+		}
+	}
+	
+	public static void genCreditScriptFile(){
+		for(int i=0;i<creditList.size();i++){
+			String saleCode = (String)creditList.get(i);
+			FileUtil.writeFile(pathCredit+"script_"+saleCode+".sql",dataSql);
 		}
 	}
 

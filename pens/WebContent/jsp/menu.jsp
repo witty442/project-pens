@@ -208,17 +208,20 @@ User user = (User)session.getAttribute("user");
 	            </li>
 	     </ul>
      </li>
-   <%if(role.equalsIgnoreCase(User.TT)){ %>
+
     <li><a href="#" class="parent"><span>รายการทั่วไป</span></a>
     	<ul>
+    	   <%if(role.equalsIgnoreCase(User.TT)){ %>
     		<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requestPromotionAction.do?do=prepare';"><span>บันทึกใบอนุมัติจัดรายการร้านค้า</span></a>
             </li>
-           
+            <%} %>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareCustomer&action=new';"><span><bean:message key="Stock" bundle="sysprop"/> </span></a>
+            </li>
          </ul>
       </li>
-     <%} %>
-     
+    
 	 <%if(role.equalsIgnoreCase(User.VAN)){ %>
 	     <li><a href="#" onclick="" class="parent"><span>รายการ เบิก/คืน</span></a>
 		     <ul>

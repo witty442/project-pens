@@ -1277,7 +1277,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				where 1=1   ");
 						sql.append("\n 				and h.issue_req_no = i.issue_req_no  ");
 						sql.append("\n              and h.warehouse ='"+pickStock.getWareHouse()+"'");
-						sql.append("\n 		        and i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+						sql.append("\n 		        and i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 						sql.append("\n 				and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 						sql.append("\n 				and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 						sql.append("\n 				and h.issue_req_no <> '"+pickStock.getIssueReqNo()+"'");
@@ -1317,7 +1317,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		  WHERE 1=1  ");
 						sql.append("\n        and h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
-						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 					    sql.append("\n 		  AND i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 					    sql.append("\n 		  AND i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 					    
@@ -1353,7 +1353,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n 		WHERE 1=1  ");
 					sql.append("\n      and h.warehouse ='"+pickStock.getWareHouse()+"'");
 					sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
-					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 					sql.append("\n 		and i.group_code ='"+Utils.isNull(pickStock.getGroupCode())+"'");
 					sql.append("\n 	    and i.pens_item ='"+Utils.isNull(pickStock.getPensItem())+"'");
 					

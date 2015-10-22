@@ -100,17 +100,17 @@ function exportExcel(path){
 }
 
 function printControlReturnReport(path){
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ControlReturnReport&typeReport=org", "PrintOriginal", "width=400,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ControlReturnReport&typeReport=copy", "PrintCopy", "width=400,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ControlReturnReport&typeReport=org", "PrintOriginal", "width=400,height=100,location=No,resizable=No");
+	//window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ControlReturnReport&typeReport=copy", "PrintCopy", "width=400,height=100,location=No,resizable=No");
 }
 
 function printControlReturnBox(path){
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ReturnBoxReport&typeReport=org", "PrintOriginal", "width=400,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ReturnBoxReport&typeReport=copy", "PrintCopy", "width=400,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ReturnBoxReport&typeReport=org", "PrintOriginal", "width=400,height=100,location=No,resizable=No");
+	//window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ReturnBoxReport&typeReport=copy", "PrintCopy", "width=400,height=100,location=No,resizable=No");
 }
 function printControlReturnBoxByBox(path,boxNo){
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ReturnBoxReport&typeReport=org&boxNo="+boxNo, "PrintOriginal", "width=400,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=ReturnBoxReport&typeReport=copy&boxNo="+boxNo, "PrintCopy", "width=400,height=100,location=No,resizable=No");
+	window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ReturnBoxReport&typeReport=org&boxNo="+boxNo, "PrintOriginal", "width=400,height=100,location=No,resizable=No");
+	//window.open(path + "/jsp/popup/printPopupWacoal.jsp?report_name=ReturnBoxReport&typeReport=copy&boxNo="+boxNo, "PrintCopy", "width=400,height=100,location=No,resizable=No");
 }
 
 

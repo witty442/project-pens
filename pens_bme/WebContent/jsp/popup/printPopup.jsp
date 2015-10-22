@@ -46,7 +46,7 @@ function loadMe(_path){
 		typeReport = Utils.isNull(request.getParameter("typeReport"));
 		%>
 	
-		document.tempForm.action = _path + "/jsp/confirmReturnWacoalAction.do?do=printControlReturnReport&typeReport=<%=typeReport%>";
+		document.tempForm.action = _path + "/jsp/confirmReturnAction.do?do=printControlReturnReport&typeReport=<%=typeReport%>";
 		document.tempForm.submit();
 		
   <%}else if("ReturnBoxReport".equals(reportName)){ 
@@ -54,7 +54,7 @@ function loadMe(_path){
 	  boxNo = Utils.isNull(request.getParameter("boxNo"));
   %>
 
-      document.tempForm.action = _path + "/jsp/confirmReturnWacoalAction.do?do=printReturnBoxReport&typeReport=<%=typeReport%>&boxNo=<%=boxNo%>";
+      document.tempForm.action = _path + "/jsp/confirmReturnAction.do?do=printReturnBoxReport&typeReport=<%=typeReport%>&boxNo=<%=boxNo%>";
 	  document.tempForm.submit();
 		
   <%}else if("PayInReport".equals(reportName)){ 

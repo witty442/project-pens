@@ -124,13 +124,12 @@ public class ModifierProcess {
 						        , String.valueOf(product.getProductCategory().getId())
 						        , oline.getProduct().getId(), oline.getUom().getId()
 						        ,LEVEL_LINE, user);
-				
-				rst = stmt.executeQuery(sql);
-				
+
 				if(isDebug){
 				  logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
 				}
 				
+				rst = stmt.executeQuery(sql);
 				processModifier(rst, oline);
 
 				if(rst != null) { 
@@ -138,7 +137,7 @@ public class ModifierProcess {
 					rst = null;
 				}
 				
-				// ITEM MODIFIER
+				// ITEM NUMBER MODIFIER
 				if(isDebug){
 				  logger.info("Item LINE Modifier..Step by Product["+product+"]");
 				}
@@ -440,7 +439,7 @@ public class ModifierProcess {
 					//}else{
 					     //default 1
 					     promotionalGoodProcess(oline.getQty());
-					//}
+				    //}
 				}
 			} else {
 				if(isDebug){
@@ -1059,6 +1058,7 @@ public class ModifierProcess {
 				}
 			}
 			
+			
 		} else {
 			
 			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
@@ -1077,6 +1077,7 @@ public class ModifierProcess {
 						round = 1;
 					}
 				}
+				
 			}
 		}
 		// Is Promotion

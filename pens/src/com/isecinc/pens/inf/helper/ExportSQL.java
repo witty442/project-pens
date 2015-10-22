@@ -216,6 +216,18 @@ public class ExportSQL {
 				"	from t_bill_plan \n"+
 				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
 				"   and bill_plan_request_date <= now() \n";
+				
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_stock")){
+				str ="select \n"+
+					"	'H'	AS 	RECORD_TYPE,	\n"+
+					"	t.REQUEST_NUMBER  , \n"+
+					"	t.REQUEST_DATE ,\n"+
+					"	'"+userBean.getCode()+"' as SALE_CODE ,\n"+
+					"	(SELECT M.CODE FROM m_customer M where M.customer_id = t.customer_id) as CUSTOMER_CODE , \n"+
+					"   t.description,\n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME	\n"+
+				"	from t_stock t \n"+
+				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') and t.status ='SV' \n";
 			}
 			return str;
 		}catch(Exception e){

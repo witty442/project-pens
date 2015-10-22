@@ -14,6 +14,8 @@ public class PickConstants {
 	public static String STATUS_CANCEL ="AB";
 	public static String STATUS_RETURN ="R";
 	public static String STATUS_ISSUED ="I";
+	public static String STATUS_BEF ="B";
+	
 	@Deprecated
 	public static String STATUS_RENEW ="RN";
 	
@@ -37,6 +39,9 @@ public class PickConstants {
 	public static String WAREHOUSE_W2 ="W2";//Move
 	public static String WAREHOUSE_W3 ="W3";//Move
 	public static String WAREHOUSE_W4 ="W4";//Move
+	
+	public static String WORK_STEP_POST_BYSALE = "Post by Sale";
+	public static String WORK_STEP_PICK_COMPLETE = "Pick Complete";
 	
 	@Deprecated
 	public static String PICK_TYPE_ITEM ="ITEM";
@@ -87,6 +92,8 @@ public class PickConstants {
 			d = "Stock";
 		}else if(PICK_TYPE_GROUP.equals(status)){
 			d = "GROUP";
+		}else if(STATUS_BEF.equals(status)){
+			d = "BEF";
 		}
 		return d;
 	}
@@ -197,6 +204,7 @@ public class PickConstants {
 	public static List<References> getRequestStatusW2ListInPageConfPickStock(){
 		List<References> statusList = new ArrayList<References>();
 		statusList.add(new References(STATUS_POST, getStatusDesc(STATUS_POST)));
+		statusList.add(new References(STATUS_BEF, getStatusDesc(STATUS_BEF)));
 		statusList.add(new References(STATUS_ISSUED, getStatusDesc(STATUS_ISSUED)));
 		return statusList;
 	}

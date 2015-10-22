@@ -339,7 +339,7 @@
 			<forward name="clear" path="/jsp/pick/stockFinishGoodQuery.jsp" />
 			<forward name="exportExcel" path="/jsp/pick/stockFinishGoodQuery.jsp" />
 		</action>
-		
+	
         <action name="reqReturnWacoalForm" path="/jsp/reqReturnWacoalAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ReqReturnWacoalAction">
 			<forward name="search2" path="/jsp/pick/reqReturnWacoalSearch.jsp" />
 			<forward name="prepare2" path="/jsp/pick/reqReturnWacoalSearch.jsp" />
@@ -361,6 +361,16 @@
 			<forward name="prepare" path="/jsp/pick/confirmReturnWacoal.jsp" />
 			<forward name="clear" path="/jsp/pick/confirmReturnWacoal.jsp" />
 			<forward name="addRow" path="/jsp/pick/confirmReturnWacoal.jsp" />
+		</action>
+		
+		 <action name="reqReturnWacoalForm" path="/jsp/reqReturnAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ReqReturnAction">
+			<forward name="prepare2" path="/jsp/pick/reqReturnSearch.jsp" />
+			<forward name="prepare" path="/jsp/pick/reqReturn.jsp" />
+		</action>
+		<action name="confirmReturnWacoalForm" path="/jsp/confirmReturnAction" forward="/jsp/pick/confirmReturnSearch.jsp" />
+		 <action name="confirmReturnWacoalForm" path="/jsp/confirmReturnAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ConfirmReturnAction">
+			<forward name="prepare2" path="/jsp/pick/confirmReturnSearch.jsp" />
+			<forward name="prepare" path="/jsp/pick/confirmReturn.jsp" />
 		</action>
 		
 		 <action name="reqFinishForm" path="/jsp/reqFinishAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ReqFinishAction">

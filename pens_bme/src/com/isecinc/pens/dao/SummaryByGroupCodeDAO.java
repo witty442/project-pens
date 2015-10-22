@@ -205,8 +205,8 @@ public class SummaryByGroupCodeDAO {
 			}else if(Constants.STORE_TYPE_LOTUS_CODE.equals(o.getStoreType())){
 				sql.append("\n and h.cust_no LIKE '"+Constants.STORE_TYPE_LOTUS_CODE+"%'  ");
 			}else if(Constants.STORE_TYPE_MTT_CODE_1.equals(o.getStoreType()) 
-				|| Constants.STORE_TYPE_MTT_CODE_2.equals(o.getStoreType())){
-				sql.append("\n and ( h.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' OR  h.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+				|| Constants.STORE_TYPE_KING_POWER.equals(o.getStoreType())){
+				sql.append("\n and ( h.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' OR  h.cust_no LIKE '"+Constants.STORE_TYPE_KING_POWER+"%')");
 			}
 			
 			sql.append("\n  GROUP BY h.cust_no,h.group_code,h.material_master ");
@@ -331,8 +331,8 @@ public class SummaryByGroupCodeDAO {
 			}else if(Constants.STORE_TYPE_LOTUS_CODE.equals(o.getStoreType())){
 				sql.append("\n and m.cust_no LIKE '"+Constants.STORE_TYPE_LOTUS_CODE+"%'  ");
 			}else if(Constants.STORE_TYPE_MTT_CODE_1.equals(o.getStoreType()) 
-				|| Constants.STORE_TYPE_MTT_CODE_2.equals(o.getStoreType())){
-				sql.append("\n and ( m.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' OR  m.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%')");
+				|| Constants.STORE_TYPE_KING_POWER.equals(o.getStoreType())){
+				sql.append("\n and ( m.cust_no LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' OR  m.cust_no LIKE '"+Constants.STORE_TYPE_KING_POWER+"%')");
 			}
 			sql.append("order by m.cust_no \n");
 			

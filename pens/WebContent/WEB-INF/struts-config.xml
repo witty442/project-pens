@@ -172,6 +172,9 @@
 		<form-bean name="requisitionProductForm" type="com.isecinc.pens.web.requisitionProduct.RequisitionProductForm" />
 		
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
+		
+		<!-- Stock Form -->
+		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -617,6 +620,19 @@
 			<forward name="edit" path="/jsp/moveOrder/moveOrder.jsp"/>
 			<forward name="preview" path="/jsp/moveOrder/moveOrder.jsp" />
 			<forward name="popupPrint" path="/jsp/moveOrder/moveOrder.jsp" />
+		</action>
+		
+		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="request" type="com.isecinc.pens.web.stock.StockAction" >
+		    <forward name="prepareCustomer" path="/jsp/stock/stockCustomerSearch.jsp" />
+		
+			<forward name="prepare" path="/jsp/stock/stockSearch.jsp" />
+			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
+			<forward name="clear" path="/jsp/stock/stockSearch.jsp" />
+			
+			<forward name="new" path="/jsp/stock/stock.jsp"/>
+			<forward name="edit" path="/jsp/stock/stock.jsp"/>
+			<forward name="preview" path="/jsp/stock/stock.jsp" />
+			<forward name="popupPrint" path="/jsp/stock/stock.jsp" />
 		</action>
 		
 			<!-- MoveOrder -->

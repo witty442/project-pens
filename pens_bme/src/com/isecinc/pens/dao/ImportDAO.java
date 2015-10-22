@@ -473,8 +473,8 @@ public class ImportDAO {
 					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_TOPS_CODE+"%' \n");
 				}else if(storeType.equalsIgnoreCase("MTT")){
 					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
-					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_2+"%'  \n");
-					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_3+"%' ) \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%' ) \n");
 				}
 			}
 			

@@ -11,14 +11,15 @@ public class ConfirmReturnWacoal implements Serializable{
 	private static final long serialVersionUID = -4852725376802405340L;
 	private String requestDate;
 	private String requestNo;
-	private String requestStatus;
-	private String requestStatusDesc;
+	
 	private String remark;
 	private String returnDate;
 	private String returnNo;
-	private String returnStatus;
-	private String returnStatusDesc;
+
 	private String cnNo;
+	
+	private String status;
+	private String statusDesc;
 	
 	private String createUser;
 	private String updateUser;
@@ -38,9 +39,25 @@ public class ConfirmReturnWacoal implements Serializable{
 	private boolean canPrint = false;
 	private boolean canCancel = false;
     private String selected ;
-
     
+    //Desprecate
+	private String requestStatus;
+	private String requestStatusDesc;
+	private String returnStatus;
+	private String returnStatusDesc;
     
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getStatusDesc() {
+		return statusDesc;
+	}
+	public void setStatusDesc(String statusDesc) {
+		this.statusDesc = statusDesc;
+	}
 	public boolean isCanCancel() {
 		return canCancel;
 	}

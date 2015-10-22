@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.CustomerReceiptFilterUtils;
 import util.DBCPConnectionProvider;
 
 import com.isecinc.pens.bean.Order;
@@ -28,7 +29,98 @@ public class GenerateAutoReceiptVan {
 
 	}
 	
+	//Case Van :PD_PAID = N ->No generate Auto Receipt(Cash)
 	public static void genAutoReceiptCash(User user){
+		if("Y".equalsIgnoreCase(user.getPdPaid())){
+		    genAutoReceiptCashModel(user);
+		}else{
+			//New Case Van Bangkok
+			genAutoReceiptCashModelValidate(user);
+		}
+	}
+	
+	//PD_PAID = N
+	public static void genAutoReceiptCashModelValidate(User user){
+		Connection conn = null;
+		int i = 0;
+		try{
+			logger.debug("genAutoReceiptCashModelValidate");
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn.setAutoCommit(false);
+			
+			 //Get Order not receipt 
+			List<Order> orderList = new MOrder().getOrderVanNotReceipt(conn, user) ;
+			if(orderList != null && orderList.size() >0){
+			  for(i=0;i<orderList.size();i++){
+					 Order order = (Order)orderList.get(i);
+					 
+					 //Validate Gen Auto Receipt 
+					String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,order.getCustomerId());
+					String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,order.getCustomerId());
+						
+					if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+						 /** orderForm.setCanReceiptMoreCash("Y"); **/
+					}else{
+						 /** orderForm.setCanReceiptMoreCash("N"); **/
+						//Case Customer No Cheque ,No Credit Gen AutoReceipt
+	
+						 //Set Receipt
+						 Receipt autoReceipt = new Receipt();
+						 autoReceipt.setReceiptNo(order.getOrderNo());
+						 autoReceipt.setReceiptAmount(order.getNetAmount());
+						 autoReceipt.setInternalBank("002");//SCB-ÊÒ¢ÒÊÒ¸Ø»ÃÐ´ÔÉ°ì 068-2-81805-7
+						 autoReceipt.setReceiptDate(order.getOrderDate());
+						 
+						// Get Lines to Create Receipt
+						 List<OrderLine> orderLines = new MOrderLine().lookUp(conn,order.getId());
+							
+						 /** Set ReceiptBy Manual **/
+						 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
+						 ReceiptBy receiptBy = new ReceiptBy();
+						 receiptBy.setId(0);
+						 //receiptBy.setPaymentMethod("PD");
+						 receiptBy.setPaymentMethod("CS");
+						 receiptBy.setCreditCardType("");
+						 receiptBy.setBank("");
+						 receiptBy.setChequeNo("");
+						 receiptBy.setChequeDate("");
+						 receiptBy.setReceiptAmount(order.getNetAmount());
+						 receiptBy.setSeedId("");
+						 receiptBy.setAllBillId(String.valueOf(order.getId()));
+						 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
+						 receiptByList.add(receiptBy);
+						 
+						 //process auto receipt cash
+						 new OrderProcess().createAutoReceipt(autoReceipt, order, orderLines, receiptByList, null, user, conn);
+						 
+						 //Case Cancel Receipt payment ='N'  ->update payment ='Y'
+						 new MOrder().updatePaymentByOrderId(conn, order.getId(), "Y");
+					}
+			  }
+			  
+			  conn.commit();
+			}
+		}catch(Exception e){
+			try{
+				e.printStackTrace();
+				logger.error(e.getMessage(),e);
+				conn.rollback();
+			}catch(Exception ee){
+				
+			}
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}catch(Exception ee){
+				
+			}
+		}
+	}
+	
+	public static void genAutoReceiptCashModel(User user){
 		Connection conn = null;
 		int i = 0;
 		try{
@@ -42,7 +134,7 @@ public class GenerateAutoReceiptVan {
 			if(orderList != null && orderList.size() >0){
 			  for(i=0;i<orderList.size();i++){
 					 Order order = (Order)orderList.get(i);
-					 
+					
 					 //Set Receipt
 					 Receipt autoReceipt = new Receipt();
 					 autoReceipt.setReceiptNo(order.getOrderNo());

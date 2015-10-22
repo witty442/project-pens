@@ -43,6 +43,8 @@ public class PickStockGroupAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
+			String page = Utils.isNull(request.getParameter("page"));
+			
 			if("new".equals(action)){
 				request.getSession().setAttribute("results", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
@@ -56,6 +58,7 @@ public class PickStockGroupAction extends I_Action {
 				aForm.setResultsSearch(null);
 				PickStock ad = new PickStock();
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setPage(page);
 				
 				aForm.setBean(ad);
 				 
@@ -103,6 +106,7 @@ public class PickStockGroupAction extends I_Action {
 			aForm.setResultsSearch(null);
 			
 			PickStock ad = new PickStock();
+			ad.setPage(aForm.getBean().getPage());
 			//ad.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setBean(ad);
 			
@@ -163,9 +167,15 @@ public class PickStockGroupAction extends I_Action {
 				if("confirm".equalsIgnoreCase(process)){
 					p.setModeConfirm(true);
 					p.setModeEdit(false);
+					p.setModeComplete(false);
+				}else if("complete".equalsIgnoreCase(process)){
+					p.setModeConfirm(false);
+					p.setModeEdit(false);
+					p.setModeComplete(true);
 				}else{
 					p.setModeConfirm(false);
 					p.setModeEdit(true);
+					p.setModeComplete(false);
 				}
 				
 				getItems = true;
@@ -293,6 +303,7 @@ public class PickStockGroupAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		boolean getItems = true;
 		boolean getOldDataOnly = false;
+		int totalReqQty = 0;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -331,10 +342,13 @@ public class PickStockGroupAction extends I_Action {
 						 l.setUpdateUser(user.getUserName());
 						 
 						 itemList.add(l);
+						 
+						// totalReqQty += Utils.convertStrToInt(qty[i], 0);
 					}
 				}
 			}
 			
+			//h.setTotalQty(totalReqQty);
 			h.setItems(itemList);
 			
 			//Save DB
@@ -393,6 +407,7 @@ public class PickStockGroupAction extends I_Action {
 		Connection conn = null;
 		boolean getItems = true;
 		boolean getOldDataOnly = false;
+		int totalIssueQty = 0;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -404,6 +419,7 @@ public class PickStockGroupAction extends I_Action {
 			h.setUpdateUser(user.getUserName());
 			h.setConfirmIssueDate(curDateStr);
 			h.setIssueReqStatus(PickStockGroupDAO.STATUS_ISSUED);
+			h.setWorkStep(PickConstants.WORK_STEP_POST_BYSALE);
 			
 			//Set Items
 			List<PickStock> itemList = new ArrayList<PickStock>();
@@ -436,11 +452,14 @@ public class PickStockGroupAction extends I_Action {
 						 l.setUpdateUser(user.getUserName());
 						 
 						 itemList.add(l);
+						 
+						 totalIssueQty += Utils.convertStrToInt(issueQty[i], 0);
 					}
 				}
 			}
 			
 			h.setItems(itemList);
+			h.setTotalIssueQty(totalIssueQty);
 			
 			PickStockGroupDAO.confirmByGroup(conn, h);
 			
@@ -529,6 +548,38 @@ public class PickStockGroupAction extends I_Action {
 			aForm.setResults(allList);
 				
 			request.setAttribute("Message", "ยกเลิกรายการ เรียบร้อยแล้ว");
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("prepareByGroup");
+	}
+	
+	public ActionForward completeAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("completeAction");
+		PickStockForm aForm = (PickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		boolean getItems = true;
+		boolean getOldDataOnly = false;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			PickStock h = aForm.getBean();
+			h.setUpdateUser(user.getUserName());
+			h.setWorkStep(PickConstants.WORK_STEP_PICK_COMPLETE);
+			
+			PickStockGroupDAO.updateWorkStepPickStock(conn,h);
+            h.setCanComplete(false);
+			
+			aForm.setBean(h);
+			request.setAttribute("Message", "Pick Complete เรียบร้อยแล้ว");
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -654,6 +705,7 @@ public class PickStockGroupAction extends I_Action {
 		PickStockForm aForm = (PickStockForm) form;
 		try {
 			PickStock ad = aForm.getBean();
+			ad.setPage(aForm.getBean().getPage());
 			ad.setJobId("");
 			ad.setJobName("");
 			ad.setBoxNoFrom("");

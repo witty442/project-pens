@@ -385,7 +385,7 @@ public class ReqReturnWacoalAction extends I_Action {
 			if(whereInBoxNoSql.length() > 0){
 				whereInBoxNoSql = whereInBoxNoSql.substring(0,whereInBoxNoSql.length()-1);
 			}
-			OnhandDAO.processBanlanceOnhandFromBarcodeByBoxNo(conn,user.getUserName(),PickConstants.STATUS_CLOSE,whereInBoxNoSql);
+		//	OnhandDAO.processBanlanceOnhandFromBarcodeByBoxNo(conn,user.getUserName(),PickConstants.STATUS_CLOSE,whereInBoxNoSql);
 			
 			
 			//Search Data

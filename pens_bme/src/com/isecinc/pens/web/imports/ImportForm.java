@@ -62,11 +62,20 @@ public class ImportForm extends I_Form {
 	private String storeType;
 	private String storeCodeTemp;
 	private String storeCode;
+	private String storeName;
 	private String importDate;
 	private String boxNo;
 	
 	
 	
+	public String getStoreName() {
+		return storeName;
+	}
+
+	public void setStoreName(String storeName) {
+		this.storeName = storeName;
+	}
+
 	public int getSummaryKingSuccessSize() {
 		return summaryKingSuccessSize;
 	}

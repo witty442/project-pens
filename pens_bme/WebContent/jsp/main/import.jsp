@@ -180,12 +180,17 @@ function importExcel(path,noCheckError){
 		}
 	 <%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
 		var importDate = form.importDate;
-	 
+		var storeCode = form.storeCode;
 	     if(importDate.value ==''){
 	    	alert("กรุณาระบุ Sale Date");
 	    	boxNo.focus();
 	    	return false;
 	    } 
+	     if(storeCode.value ==''){
+	    	alert("กรุณาระบุ สาขา");
+	    	storeCode.focus();
+	    	return false;
+		  } 
 	     
 	    if(form.dataFile.value != '' && (extension == "xls" || extension == "xlsx") ){
 		}else{
@@ -218,6 +223,68 @@ function clearForm(path){
 	form.action = path + "/jsp/importAction.do?do=prepare&action=new&page=<%=request.getParameter("page")%>";
 	form.submit();
 	return true;
+}
+
+function openPopupCustomer(path,types,storeType){
+	var form = document.importForm;
+	var storeGroup = "020056";
+	
+    var param = "&types="+types;
+        param += "&storeType="+storeType;
+        param += "&storeGroup="+storeGroup;
+    
+	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+
+function setStoreMainValue(code,desc,storeNo,subInv,types){
+	var form = document.importForm;
+	//alert(form);
+	form.storeCode.value = code;
+	form.storeName.value = desc;
+} 
+
+function getCustNameKeypress(e,custCode,fieldName){
+	var form = document.importForm;
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			if("storeCode" == fieldName){
+				form.storeCode.value = '';
+				form.storeName.value = "";
+			}
+		}else{
+		  getCustName(custCode,fieldName);
+		}
+	}
+}
+
+function getCustName(custCode,fieldName){
+	var returnString = "";
+	var form = document.importForm;
+	var storeGroup = "020056";
+		var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameWithSubInvAjax.jsp",
+				data : "custCode=" + custCode.value+"&storeGroup="+storeGroup,
+				async: false,
+				cache: false,
+				success: function(getData){
+				  returnString = jQuery.trim(getData);
+				}
+			}).responseText;
+		
+		if("storeCode" == fieldName){
+			if(returnString !=''){
+				var retArr = returnString.split("|");
+				form.storeName.value = retArr[0];
+			}else{
+				alert("ไม่พบข้อมูล");
+				form.storeCode.focus();
+				form.storeCode.value ="";
+				form.storeName.value = "";
+				;
+			}
+		}
 }
 
 </script>
@@ -346,7 +413,17 @@ function clearForm(path){
 								<td valign="top" align="left">
 								      <html:text property="importDate" styleId="importDate"/>
 								</td>
+								
 							</tr>
+							<tr>
+								<td align="right" width="40%">รหัสร้านค้า<font color="red">*</font></td>
+									<td align="left"> 
+									  <html:text property="storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  <html:text property="storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+
+									</td>
+								</tr>
 		
 						<%} %>
 						

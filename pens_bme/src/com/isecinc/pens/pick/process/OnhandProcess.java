@@ -11,17 +11,18 @@ public class OnhandProcess {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
 	//Action :after confirm req finishing
-	public static void processBalanceOnhand(String warehouse,String userName){
+	public static void processBalanceOnhand(String warehouse,String requestNo,String userName){
 		try{
 			logger.debug("******* Start processBalanceOnhand *******************");
 			
-			OnhandProcessDAO.processBanlanceOnhandFromConfirmFinishing(warehouse,userName);
+			OnhandProcessDAO.processBanlanceOnhandFromConfirmFinishing(warehouse,requestNo,userName);
 			
 			logger.debug("******* End processBalanceOnhand *******************");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
 	}
+	
 	//Action :after req pick stock
 	public static void processUpdateBalanceOnhandByIssueReqNo(Connection conn,ReqPickStock req) throws Exception{
 		try{
