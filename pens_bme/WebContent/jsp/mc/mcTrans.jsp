@@ -186,13 +186,14 @@ function copyDataFromLastMonth(path){
 									<td >‡®È“ÀπÈ“∑’Ë  Staff
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.staffId" styleId="staffId" size="10" readonly="true" styleClass="disableText"/>
-									  <input type="text" readonly class="disableText" size="40" value="${mcForm.bean.name} ${mcForm.bean.sureName}" />
+									  <html:text property="bean.empId" styleId="empId" size="10" readonly="true" styleClass="disableText"/>
+									  <input type="text" readonly class="disableText" size="40" value="${mcForm.bean.name} ${mcForm.bean.surName}" />
 									  
 									  <html:hidden property="bean.name" styleId="name"  />
-									  <html:hidden property="bean.sureName" styleId="sureName" />
-									   ‡∫Õ√Ï‚∑√»—æ∑Ï <html:text property="bean.mobile" styleId="mobile" size="20" readonly="true" styleClass="disableText"/>
-									ª√–‡¿∑ <html:text property="bean.staffType" styleId="staffType" size="10"  readonly="true" styleClass="disableText"/>
+									  <html:hidden property="bean.surName" styleId="surName" />
+									   ‡∫Õ√Ï‚∑√»—æ∑Ï  #1:<html:text property="bean.mobile1" styleId="mobile1" size="15" readonly="true" styleClass="disableText"/>
+									   ‡∫Õ√Ï‚∑√»—æ∑Ï  #2:<html:text property="bean.mobile2" styleId="mobile2" size="15" readonly="true" styleClass="disableText"/>
+									ª√–‡¿∑ <html:text property="bean.empType" styleId="empType" size="8"  readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>

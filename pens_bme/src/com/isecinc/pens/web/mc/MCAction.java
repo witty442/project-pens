@@ -167,21 +167,24 @@ public class MCAction extends I_Action {
 			String action = Utils.isNull(request.getParameter("action"));
 			 if("add".equals(action)){
 			   MCBean bean = new MCBean();
+			   bean.setActive("Y");//default
 			   bean.setMode("add");
 			   bean.setCanEdit(true);
 			   aForm.setBean(bean);
 					
 			 }else if("edit".equals(action)){
 			   conn = DBConnection.getInstance().getConnection();
-			   String staffId = Utils.isNull(request.getParameter("staffId"));
+			   String emRefId = Utils.isNull(request.getParameter("emRefId"));
 				
 			   MCBean bean = new MCBean();
-			   bean.setStaffId(staffId);
-			   MCBean results = MCDAO.searchStaff(bean);
+			   bean.setEmpRefId(emRefId);
+			   
+			   MCBean results = MCDAO.searchStaff(bean);//find by emp_ref_id
 			   bean = results.getItems().get(0);
 			   bean.setMode("edit");
+			   
 			  //check can Edit
-			   bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getStaffId()));
+			   bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getEmpRefId()));
 			   aForm.setBean(bean);
 			}
 		} catch (Exception e) {
@@ -208,43 +211,22 @@ public class MCAction extends I_Action {
 			MCBean h = aForm.getBean();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
-			
 			logger.debug("is_active:"+h.getActive());
-			if( !Utils.isNull(h.getActive()).equals("")){
-				h.setActive("Y");
-			}else{
-				h.setActive("");
-			}
-
+			
             if("add".equals(h.getMode())){
-            	//Validate StaffId duplicate
-    			if(MCDAO.isDuplicateStaffId(conn, h.getStaffId())){
-    				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
-    				return mapping.findForward("prepareMCStaffDetail");
-    			}
-    			
-            	MCDAO.insertMCStaffModel(conn, h);
-            }else  if("edit".equals(h.getMode())){
+            	int update =  MCDAO.updateMCStaffModel(conn, h);
+            	if(update ==0)
+            	  MCDAO.insertMCStaffModel(conn, h);
             	
-            	if( !h.getOrgStaffId().equals(h.getStaffId())){
-            		
-            		//Validate new StaffId duplicate
-        			if(MCDAO.isDuplicateStaffId(conn, h.getStaffId())){
-        				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
-        				return mapping.findForward("prepareMCStaffDetail");
-        			}
-        			
-            		MCDAO.updateMCStaffModelByDummyStaffId(conn, h);
-            	}else{
-            	    MCDAO.updateMCStaffModel(conn, h);
-            	}
+            }else  if("edit".equals(h.getMode())){
+        	    MCDAO.updateMCStaffModel(conn, h);
             }
 			
 			//Search Again
 			MCBean bean = MCDAO.searchStaff(conn,h).getItems().get(0);
 			bean.setMode("edit");
 			//check can Edit
-			bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getStaffId()));
+			bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getEmpRefId()));
 		    aForm.setBean(bean);
 			
 			conn.commit();
@@ -279,7 +261,7 @@ public class MCAction extends I_Action {
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
-				aForm.setBean(MCDAO.searchHead(aForm.getBeanCriteria(),false));
+				aForm.setBean(MCDAO.searchStaff(aForm.getBeanCriteria()));
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
@@ -296,7 +278,9 @@ public class MCAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			MCBean b = aForm.getBean();
+			//save Criteria Search
+			aForm.setBeanCriteria(aForm.getBean());
+			
 			aForm.setBean(MCDAO.searchStaff(aForm.getBean()));
 			aForm.setResultsSearch(aForm.getBean().getItems());
 			
@@ -355,7 +339,7 @@ public class MCAction extends I_Action {
             
             MCBean c = new MCBean();
 			c.setMonthTrip(monthTrip);
-			c.setStaffId(staffId);
+			c.setEmpId(staffId);
 			
 			MCBean mc = MCDAO.searchHead(c,true).getItems().get(0);
 			mc.setMaxDay(Integer.parseInt(maxDayInMonth));
@@ -411,7 +395,7 @@ public class MCAction extends I_Action {
 			h.append("<td align='left' colspan='2'>");
 			h.append("<table> ");
 				h.append("<tr> \n");
-				h.append(" <td align='left' nowrap>&nbsp;"+b.getStaffType()+":&nbsp;"+b.getStaffId()+":&nbsp;"+b.getName()+" "+b.getSureName()+" </td>\n");
+				h.append(" <td align='left' nowrap>&nbsp;"+b.getEmpType()+":&nbsp;"+b.getEmpId()+":&nbsp;"+b.getName()+" "+b.getSurName()+" </td>\n");
 				h.append(" <td align='right' nowrap>&nbsp;Route:&nbsp;"+b.getMcRouteDesc()+"\n");
 				h.append(" พื้นที่รับผิดชอบ:&nbsp;"+b.getMcAreaDesc()+"</td> \n");
 				h.append("</tr> \n");
@@ -479,15 +463,15 @@ public class MCAction extends I_Action {
 			//save old criteria
 			aForm.setBeanCriteria(aForm.getBean());
 			
-            String staffId = Utils.isNull(request.getParameter("staffId"));
+            String empId = Utils.isNull(request.getParameter("empId"));
             String monthTrip = Utils.isNull(request.getParameter("monthTrip"));
             String maxDayInMonth = Utils.isNull(request.getParameter("maxDayInMonth")); 
             String mode = Utils.isNull(request.getParameter("mode"));
 		
-			logger.debug("prepare edit staffId:"+staffId);
+			logger.debug("prepare edit empId:"+empId);
 			MCBean c = new MCBean();
 			c.setMonthTrip(monthTrip);
-			c.setStaffId(staffId);
+			c.setEmpId(empId);
 			
 			MCBean bean = MCDAO.searchHead(c,true).getItems().get(0);
 			
@@ -573,14 +557,15 @@ public class MCAction extends I_Action {
 	  
 			//head 
 			MCBean headTrans = new MCBean();
+			headTrans.setEmpRefId(h.getEmpRefId());
 			headTrans.setMonthTrip(h.getMonthTrip());
-			headTrans.setStaffId(h.getStaffId());
-			headTrans.setStaffType(h.getStaffType());
+			headTrans.setEmpId(h.getEmpId());
+			headTrans.setEmpType(h.getEmpType());
 			headTrans.setMcRoute(h.getMcRoute());
 			headTrans.setMcArea(h.getMcArea());
 			headTrans.setName(h.getName());
 			headTrans.setRemark(h.getRemark());
-			headTrans.setSureName(h.getSureName());
+			headTrans.setSurName(h.getSurName());
 			headTrans.setCreateUser(user.getUserName());
 			headTrans.setUpdateUser(user.getUserName());
 			
@@ -597,8 +582,9 @@ public class MCAction extends I_Action {
 				
 				
 				MCBean item = new MCBean();
+				item.setEmpRefId(h.getEmpRefId());
 				item.setMonthTrip(h.getMonthTrip());
-				item.setStaffId(h.getStaffId());
+				item.setEmpId(h.getEmpId());
 				item.setDay(key);
 				item.setDetail(detail);
 				item.setDayOfWeek(dayOfWeek);
@@ -653,14 +639,15 @@ public class MCAction extends I_Action {
 	  
 			//head 
 			MCBean headTrans = new MCBean();
+			headTrans.setEmpRefId(h.getEmpRefId());
 			headTrans.setMonthTrip(h.getMonthTrip());
-			headTrans.setStaffId(h.getStaffId());
-			headTrans.setStaffType(h.getStaffType());
+			headTrans.setEmpId(h.getEmpId());
+			headTrans.setEmpType(h.getEmpType());
 			headTrans.setMcRoute(h.getMcRoute());
 			headTrans.setMcArea(h.getMcArea());
 			headTrans.setName(h.getName());
 			headTrans.setRemark(h.getRemark());
-			headTrans.setSureName(h.getSureName());
+			headTrans.setSurName(h.getSurName());
 			headTrans.setCreateUser(user.getUserName());
 			headTrans.setUpdateUser(user.getUserName());
 			
@@ -677,8 +664,9 @@ public class MCAction extends I_Action {
 				
 				
 				MCBean item = new MCBean();
+				item.setEmpRefId(h.getEmpRefId());
 				item.setMonthTrip(h.getMonthTrip());
-				item.setStaffId(h.getStaffId());
+				item.setEmpId(h.getEmpId());
 				item.setDay(key);
 				item.setDetail(detail);
 				item.setDayOfWeek(dayOfWeek);
@@ -701,7 +689,7 @@ public class MCAction extends I_Action {
 			logger.debug("prevMonthTrip["+prevMonthTrip+"]");
 			
 			//Update Detail
-			MCDAO.copyFromLastMonthModel(conn, cri.getStaffId(), currentMonth, prevMonthTrip);
+			MCDAO.copyFromLastMonthModel(conn, cri.getEmpId(),cri.getEmpId(), currentMonth, prevMonthTrip);
 			
 			//Search Again
 			MCBean bean = MCDAO.searchHead(conn,h,true).getItems().get(0);

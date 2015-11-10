@@ -15,22 +15,23 @@ String custCode = Utils.isNull(request.getParameter("custCode"));
 String mcArea = Utils.isNull(request.getParameter("mcArea"));
 String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
 String staffType = Utils.isNull(request.getParameter("staffType"));
+String active = Utils.isNull(request.getParameter("active"));
+
 String outputText = "";
 try{
-
-	if( !"".equals(Utils.isNull(custCode)) ){
-		//condCode = new String(condCode.getBytes("ISO8859_1"), "UTF-8");
-		PopupForm cri = new PopupForm();
-		cri.setCodeSearch(custCode);
-		
-		List<PopupForm> ret = MCDAO.searchStaffList(cri,"equals",mcArea,mcRoute,staffType);
-		if(ret != null &&  ret.size() >0){
-			PopupForm p = ret.get(0);
-			outputText = p.getDesc()+"|"+p.getStoreNo()+"|"+p.getSubInv();
-		}else{
-		   outputText ="";
-		}
+if( !"".equals(Utils.isNull(custCode)) ){
+	//condCode = new String(condCode.getBytes("ISO8859_1"), "UTF-8");
+	PopupForm cri = new PopupForm();
+	cri.setCodeSearch(custCode); 
+	
+	List<PopupForm> ret = MCDAO.searchStaffList(cri,"equals",mcArea,mcRoute,staffType,active);
+	if(ret != null &&  ret.size() >0){
+		PopupForm p = ret.get(0);
+		outputText = p.getDesc()+"|"+p.getMcEmpBean().getEmpType()+"|"+p.getMcEmpBean().getMobile1()+"|"+p.getMcEmpBean().getMobile2()+"|"+p.getMcEmpBean().getEmpRefId()+"|"+p.getMcEmpBean().getEmpTypeDesc();
+	}else{
+	   outputText ="";
 	}
+}
 }catch(Exception e){
 	e.printStackTrace();
 }

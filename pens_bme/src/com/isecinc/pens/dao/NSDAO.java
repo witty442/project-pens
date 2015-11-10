@@ -292,12 +292,13 @@ public class NSDAO {
 		PreparedStatement ps = null;
 		int  c = 1;
 		Date picRcvDate = null;
+		logger.debug("updateNissinOrderByPens");
 		try{
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?, CUP_QTY=?,CUP_QTY_N=?" +
 					",PAC_QTY = ?, PAC_QTY_N = ?, POOH_QTY =?,POOH_QTY_N =?   \n");
-			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ,CUSTOMER_CODE =? ,PENDING_REASON =? \n");
+			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ,CUSTOMER_CODE =? ,PENDING_REASON =?,CUSTOMER_NAME =? ,ADDRESS_LINE1 =?,ADDRESS_LINE2 =? \n");
 			sql.append(" WHERE ORDER_ID = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -324,6 +325,10 @@ public class NSDAO {
 			ps.setString(c++, Utils.isNull(o.getSaleCode()));
 			ps.setString(c++, Utils.isNull(o.getCustomerCode()));
 			ps.setString(c++, Utils.isNull(o.getPendingReason()));
+			
+			ps.setString(c++, Utils.isNull(o.getCustomerName()));
+			ps.setString(c++, Utils.isNull(o.getAddressLine1()));
+			ps.setString(c++, Utils.isNull(o.getAddressLine2()));
 			
 			ps.setString(c++, Utils.isNull(o.getOrderId()));
 

@@ -108,6 +108,22 @@ public class Utils {
 	   }
 	   return re;
 	}
+    
+    public static boolean isHoliday(String dateString,String dateFormat,Locale locale){
+ 	   boolean re = false;
+ 	   try{
+ 		   Calendar c = Calendar.getInstance();
+ 		   c.setTime(Utils.parse(dateString, dateFormat,locale));
+ 		   int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+ 	   
+ 		   if(dayOfWeek==Calendar.SATURDAY || dayOfWeek==Calendar.SUNDAY){
+ 			   re = true;
+ 		   }
+ 	   }catch(Exception e){
+ 		   e.printStackTrace();
+ 	   }
+ 	   return re;
+ 	}
 	  
 	public static int calcTotalPage(int totalRow,int maxPerPage){
 		double totalPageF = new Double(totalRow)/new Double(maxPerPage);

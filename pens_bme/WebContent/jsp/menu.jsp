@@ -247,12 +247,12 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>9.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
 			</li> 
 			<!-- OLD -->
-			 <li>
+			<%--  <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqReturnWacoalAction.do?do=prepare2&action=new');"><span>(OLD)10.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
 			</li>  
 			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/confirmReturnWacoalAction.do?do=prepare2&action=new');"><span>(OLD)11.<bean:message bundle="sysprop" key="confirmReturnWacoal"/></span></a>
-			</li>
+			</li> --%>
 			
 			 <li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/reqReturnAction.do?do=prepare2&action=new');"><span>10.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
@@ -295,16 +295,30 @@
 	</li>
   <%} %>
  			
- <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MC,User.MT_SALE}) ){%>
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MC,User.MT_SALE,User.HR,User.MCQUERY}) ){%>
   	<li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>MC/PC</span></a>
 		<ul>
-			<li>
-				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mcAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="mc"/></span></a>
-			</li>   
-				<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MC}) ){%>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HR}) ){%>
+			    <li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mcEmpAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="mcEmp"/></span></a>
+				</li>
+			<%} %> 
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MT_SALE,User.MC}) ){%>
+				<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mcAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="mc"/></span></a>
+				</li>   
+			<%} %>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MC}) ){%>
 				<li>
 					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mcAction.do?do=prepareMCStaff&action=new');">
-					  <span>2.<bean:message bundle="sysprop" key="mcStaff"/></span>
+					  <span>3.<bean:message bundle="sysprop" key="mcStaff"/></span>
+					</a>
+				</li>   
+			<%} %>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MC,User.MCQUERY}) ){%>
+				<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/mcTimeAction.do?do=prepareSearch&action=new');">
+					  <span>4.<bean:message bundle="sysprop" key="mcTime"/></span>
 					</a>
 				</li>   
 			<%} %>

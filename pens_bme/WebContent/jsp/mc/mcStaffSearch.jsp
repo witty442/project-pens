@@ -34,7 +34,7 @@ if(session.getAttribute("staffTypeList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchStaffTypeList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","staffType"));
 	
 	session.setAttribute("staffTypeList",billTypeList);
 }
@@ -43,7 +43,7 @@ if(session.getAttribute("areaList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchAreaList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","MCarea"));
 	
 	session.setAttribute("areaList",billTypeList);
 }
@@ -139,9 +139,9 @@ function newStaff(path){
 	return true; 
 }
 
-function openEdit(path,staffId){
+function openEdit(path,emRefId){
 	 var form = document.mcForm;
-	var param ="&staffId="+staffId;
+	var param ="&emRefId="+emRefId;
 	form.action = path + "/jsp/mcAction.do?do=prepareMCStaffDetail&action=edit"+param;
 	form.submit();
 	return true; 
@@ -151,7 +151,7 @@ function openPopupCustomer(path){
 	var form = document.mcForm;
 	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
 	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
+	var staffType = document.getElementsByName('bean.empType')[0].value;
 	
     var param = "&mcArea="+mcArea;
         param += "&mcRoute="+mcRoute;
@@ -162,16 +162,22 @@ function openPopupCustomer(path){
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 }
 
-function setStoreMainValue(code,desc){
+function setStoreMainValue(code,desc,empType,mobile1,mobile2,empRefId){
 	var form = document.mcForm;
 	//alert(form);
-	form.staffId.value = code;
+	form.empId.value = code;
 	form.name.value = desc;
+	//form.empType.value = empType;
+	form.mobile1.value = mobile1;
+	form.mobile2.value = mobile2;
 
-	if(staffId==''){
-	  alert("ไม่พบข้อมูล  staffId");
-	  form.staffId.value = '';
+	if(code==''){
+	  alert("ไม่พบข้อมูล  Employee Id");
+	  form.empId.value = '';
 	  form.name.value = "";
+	 // form.empType.value = "";
+	  form.mobile1.value = "";
+	  form.mobile2.value = "";
 	}
 } 
 
@@ -179,8 +185,11 @@ function getStaffNameKeypress(e,custCode){
 	var form = document.mcForm;
 	if(e != null && e.keyCode == 13){
 		if(custCode.value ==''){
-			form.staffId.value = '';
+			form.empId.value = '';
 			form.name.value = "";
+			//form.empType.value = "";
+			form.mobile1.value = "";
+			form.mobile2.value = "";
 		}else{
 		  getStaffName(custCode);
 		}
@@ -192,7 +201,7 @@ function getStaffName(custCode){
 	var form = document.mcForm;
 	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
 	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
+	var staffType = document.getElementsByName('bean.empType')[0].value;
 	
     var param  = "mcArea="+mcArea;
         param += "&mcRoute="+mcRoute;
@@ -212,11 +221,17 @@ function getStaffName(custCode){
 	if(returnString !=''){
 		var retArr = returnString.split("|");
 		form.name.value = retArr[0];
+		//form.empType.value = retArr[1];
+		form.mobile1.value = retArr[2];
+		form.mobile2.value = retArr[3];
 	}else{
 		alert("ไม่พบข้อมูล");
 		form.staffId.focus();
 		form.staffId.value ="";
 		form.name.value = "";
+		//form.empType.value = "";
+		form.mobile1.value = "";
+		form.mobile2.value = "";
 	}
 }
 
@@ -289,7 +304,7 @@ function loadRoute(){
 								<tr>
                                     <td> ประเภท<font color="red"></font></td>
 									<td>		
-										 <html:select property="bean.staffType" styleId="staffType">
+										 <html:select property="bean.empType" styleId="empType">
 											<html:options collection="staffTypeList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
@@ -304,9 +319,22 @@ function loadRoute(){
 									<td >เจ้าหน้าที่  Staff
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.staffId" styleId="staffId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
+									  <html:text property="bean.empId" styleId="empId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
 									  <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
+									  
+									   <%--  <html:hidden property="bean.empType" styleId="empType" /> --%>
+									  <html:hidden property="bean.mobile1" styleId="mobile1" />
+									  <html:hidden property="bean.mobile2" styleId="mobile2" />
+									</td>
+								</tr>
+								<tr>
+                                    <td> สถานะ<font color="red"></font></td>
+									<td>		
+										 <html:select property="bean.active" styleId="active">
+											<html:option value="Y">ใช้งาน</html:option>
+											<html:option value="N">ไม่ใช้งาน</html:option>
+									    </html:select>
 									</td>
 								</tr>
 						   </table>
@@ -337,10 +365,11 @@ function loadRoute(){
 									<th >เขตพื้นที่</th>
 									<th >ประเภท</th>
 									<th >Route เส้นทาง</th>
-									<th >Staff ID</th>
+									<th >Employee ID</th>
 									<th >ชื่อ</th>
 									<th >นามสกุล</th>
 									<th >เบอร์มือถือ</th>
+									<th >สถานะ</th>
 									<th >แก้ไข</th>
 							   </tr>
 							<% 
@@ -357,14 +386,15 @@ function loadRoute(){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="5%"><%=mc.getNo() %></td>
 										<td class="td_text" width="15%"><%=mc.getMcArea()+":"+mc.getMcAreaDesc()%></td>
-										<td class="td_text" width="5%"><%=mc.getStaffType()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getEmpTypeDesc()%></td>
 									    <td class="td_text" width="15%"><%=mc.getMcRoute() %>:<%=mc.getMcRouteDesc()%></td>
-									    <td class="td_text" width="5%"><%=mc.getStaffId() %></td>
-										<td class="td_text" width="10%"><%=mc.getName() %></td>
-										<td class="td_text" width="10%"><%=mc.getSureName()%></td>
-										<td class="td_text" width="10%"><%=mc.getMobile()%></td>
-										<td class="td_text_center" width="25%">
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getStaffId()%>')">
+									    <td class="td_text_center" width="8%"><%=mc.getEmpId() %></td>
+										<td class="td_text" width="12%"><%=mc.getName() %></td>
+										<td class="td_text" width="12%"><%=mc.getSurName()%></td>
+										<td class="td_text" width="15%"><%=mc.getMobile1()%>,<%=mc.getMobile2()%></td>
+										<td class="td_text" width="8%"><%=(Utils.isNull(mc.getActive()).equalsIgnoreCase("Y")?"ใช้งาน":"ไม่ใช้งาน")%></td>
+										<td class="td_text_center" width="15%">
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpRefId()%>')">
 											             แก้ไข
 											 </a>
 										</td>

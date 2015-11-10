@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.apache.struts.action.ActionForm;
 
 import com.isecinc.pens.bean.Barcode;
+import com.isecinc.pens.bean.MCEmpBean;
 
 /**
  * PopupForm Class
@@ -36,6 +37,9 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String wareHouse;
 	private String wareHouseDesc;
 	
+	//MC EMPOLYEE
+	private MCEmpBean mcEmpBean;
+	
 	public PopupForm(){
 	}
 	
@@ -45,6 +49,14 @@ public class PopupForm extends ActionForm implements Serializable{
 	}
 	
 	
+	public MCEmpBean getMcEmpBean() {
+		return mcEmpBean;
+	}
+
+	public void setMcEmpBean(MCEmpBean mcEmpBean) {
+		this.mcEmpBean = mcEmpBean;
+	}
+
 	public String getWareHouse() {
 		return wareHouse;
 	}

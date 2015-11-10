@@ -73,6 +73,10 @@ public class MemberRenewAction extends I_Action {
 			if (renews.size() > 0) {
 				lastExpireDateStr = renews.get(0).getExpiredDate();
 				lastExpireDate = Utils.parse(lastExpireDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+
+				logger.debug("currentDate:"+currentDate);
+				logger.debug("lastExpireDateStr:"+lastExpireDateStr);
+				logger.debug("lastExpireDate:"+lastExpireDate);
 				
 				if( currentDate.before(lastExpireDate)){
 					memberRenewForm.getMemberRenew().setId(renews.get(0).getId());
@@ -81,8 +85,8 @@ public class MemberRenewAction extends I_Action {
 				logger.debug("renew date:"+renews.get(0).getRenewedDate());
 			}
         	
-			logger.debug("currentDate:"+currentDate);
-			logger.debug("lastExpireDate:"+lastExpireDate);
+			//logger.debug("currentDate:"+currentDate);
+			//logger.debug("lastExpireDate:"+lastExpireDate);
 			
 
 			// get back search key

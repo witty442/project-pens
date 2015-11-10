@@ -1,3 +1,6 @@
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.pens.dao.MCDAO"%>
+<%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -24,8 +27,16 @@
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
 	String mcArea = Utils.isNull(request.getParameter("mcArea"));
+
+    //Get Region Desc
+    PopupForm pCri = new PopupForm();
+    pCri.setCodeSearch(mcArea);
+    List dList = MCDAO.searchMCRefList(pCri,"equals","MCarea");
+    String mcAreaDesc = dList != null?((PopupForm)dList.get(0)).getDesc():"";	
+    		
     String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
     String staffType = Utils.isNull(request.getParameter("staffType"));
+    String active = Utils.isNull(request.getParameter("active"));
     String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
     
     /** Store Select MutilCode in each Page **/
@@ -37,180 +48,34 @@
 <script type="text/javascript">
 
 function searchPopup(path, type) {
-    document.popupForm.action = path + "/jsp/searchCustomerPopupAction.do?do=searchMC";
+    document.popupForm.action = path + "/jsp/searchCustomerPopupAction.do?do=searchMC&operation=equals";
     document.popupForm.submit();
    return true;
 }
 
-function selectAll(){
-	document.getElementsByName("codes")[0].value = 'ALL,';
-	document.getElementsByName("descs")[0].value = 'ALL,';
-}
 
 function selectMultiple(){
-	var chk = document.getElementsByName("chCheck");
-	//var types = document.getElementsByName("types")[0].value;// alert(types);
-	var idx = 2;
-	//Add Select Muti in each page 
-	var retCode = document.getElementsByName("codes")[0].value;
-	var retDesc = document.getElementsByName("descs")[0].value;
+	var chRadio = document.getElementsByName("chRadio");
+
+	var retCode = document.getElementsByName("code");
+	var retDesc = document.getElementsByName("desc");
 	
-	retCode = retCode.substring(0,retCode.length-1);
-	retDesc = retDesc.substring(0,retDesc.length-1);
+	var empType = document.getElementsByName("empType");
+	var mobile1 = document.getElementsByName("mobile1");
+	var mobile2 = document.getElementsByName("mobile2");
+	var empRefId = document.getElementsByName("empRefId");
+	var empTypeDesc = document.getElementsByName("empTypeDesc");
 	
-	//alert(retCode);
-	
-	//alert("idx:"+idx);
-	if(idx ==1){
-		//alert(currCondNo+","+retCode+":"+retKey+":"+retDesc);
-		window.opener.setStoreMainValue(retCode,retDesc);
-	}else{
-		//alert(currCondNo+":"+retCode+":"+retKey+":"+retDesc);
-		window.opener.setStoreMainValue(retCode,retDesc);
+	for(var i=0;i<chRadio.length;i++){
+		//alert(chRadio[i].checked);
+        if(chRadio[i].checked){
+          // alert(i+":"+retCode[i].value);
+           window.opener.setStoreMainValue(retCode[i].value,retDesc[i].value,empType[i].value,mobile1[i].value,mobile2[i].value,empRefId[i].value,empTypeDesc[i].value);
+           window.close();
+           break;
+        }
 	}
-	
-	/** Clear Value in Session **/
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/setValueSelected.jsp",
-			data : "codes=" + encodeURIComponent('') +
-			       "&keys=" + encodeURIComponent('') +
-			       "&descs=" + encodeURIComponent(''),
-			//async: false,
-			cache: true,
-			success: function(){
-			}
-		}).responseText;
-	});
-	
-	window.close();
-}
-function saveSelectedInPage(no){
-	//alert(no);
-	var chk = document.getElementsByName("chCheck");
-	var currentPage = document.getElementsByName("currentPage")[0].value;
-	var code = document.getElementsByName("code_temp");
-	var desc = document.getElementsByName("desc");
-	
-	var retCode = '';
-	var retDesc = '';
-	
-	var codesAllNew = "";
-	var descsAllNew = "";
 
-	if(no >= 21){
-	   no = no - ( (currentPage-1) *20);
-	}
-	//alert(currentPage+":"+no);
-	no = no -1;
-	
-	//alert("no["+no+"]checked:"+chk[no].checked);
-    if(chk[no].checked){
-    	//Add 
-        retCode = code[no].value;
-		retDesc = desc[no].value;
-		
-		//alert("code["+no+"]="+retCode);
-	    codesAllNew = document.getElementsByName("codes")[0].value;
-		descsAllNew = document.getElementsByName("descs")[0].value;
-		
-	    var found = chekCodeDupInCodesAll(retCode);
-
-	    if(found == false){
-	  	   codesAllNew += retCode +",";
-	  	   descsAllNew += retDesc +",";
-	    }
-	    document.getElementsByName("codes")[0].value =  codesAllNew;
-	    document.getElementsByName("descs")[0].value =  descsAllNew;
-	    
-	    //alert(no+":found["+found+"]"+document.getElementsByName("codes")[0].value);
-    }else{
-    	
-    	//remove
-    	retCode = code[no].value;
-		retDesc = desc[no].value;
-		
-		//alert(retCode);
-	    codesAllNew = document.getElementsByName("codes")[0].value;
-		descsAllNew = document.getElementsByName("descs")[0].value;
-		
-	    removeUnSelected(retCode);
-    }
-	
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/setValueSelected.jsp",
-			data : "codes=" + encodeURIComponent(document.getElementsByName("codes")[0].value) +
-			       "&keys=" + encodeURIComponent('') +
-			       "&descs=" + encodeURIComponent(document.getElementsByName("descs")[0].value),
-			//async: false,
-			cache: true,
-			success: function(){
-			}
-		}).responseText;
-	});
-}
-
-function chekCodeDupInCodesAll(codeCheck){
-	var codesAll = document.getElementsByName("codes")[0].value;
-	var codesAllArray = codesAll.split(",");
-	var found = false;;
-	for(var i=0;i < codesAllArray.length; i++){
-   		if(codesAllArray[i] == codeCheck){
-   			found = true;
-   			break;
-   		}//if
-	}//for
-	return found;
-}
-
-function removeUnSelected(codeCheck){
-	var codesAll = document.getElementsByName("codes")[0].value;
-	var descsAll = document.getElementsByName("descs")[0].value;
-	
-	var codesAllArray = codesAll.split(",");
-	var descsAllArray = descsAll.split(",");
-	
-	var codesAllNew  = "";
-	var descsAllNew  = "";
-	
-	for(var i=0;i < codesAllArray.length; i++){
-   		if(codesAllArray[i] != codeCheck){
-   		   codesAllNew += codesAllArray[i] +",";
-	  	   descsAllNew += descsAllArray[i] +",";
-   		}//if
-	}//for
-	
-	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
-	descsAllNew = descsAllNew.substring(0,descsAllNew.length-1);
-	
-	document.getElementsByName("codes")[0].value =  codesAllNew;
-	document.getElementsByName("descs")[0].value =  descsAllNew;
-}
-
-function setChkInPage(){
-	var chk = document.getElementsByName("chCheck");
-	var code = document.getElementsByName("code_temp");
-	//alert("Code Size:"+code.length);
-	
-	var codes = document.getElementsByName("codes")[0].value;
-	var codesChk = codes.split(",");
-	//alert(codesChk);
-	
-	if(codesChk != ''){
-		for(var i=0;i<chk.length;i++){
-			for(var c=0;c<codesChk.length;c++){
-				if(code[i].value == codesChk[c]){
-					chk[i].checked = true;
-					break;
-				}//if equals
-			} //for 2
-		}//for 1
-  }//if
-}
-
-window.onload = function(){
-	setChkInPage();
 }
 
 </script>
@@ -220,6 +85,7 @@ window.onload = function(){
 <input type="hidden" name="mcArea" value="<%=mcArea %>"/>
 <input type="hidden" name="mcRoute" value="<%=mcRoute %>"/>
 <input type="hidden" name="staffType" value="<%=staffType %>"/>
+<input type="hidden" name="active" value="<%=active %>"/>
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
@@ -227,10 +93,10 @@ window.onload = function(){
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px" class="txt1">
 		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูล  MC Staff</b></td>
+		<td width="90%" ><b>ค้นหาข้อมูล  MC Staff (<%=mcAreaDesc%>)</b></td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td width="15%" ><b>รหัส</b>  </td>
+		<td width="15%" ><b>Employee ID</b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
 		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
@@ -244,9 +110,9 @@ window.onload = function(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
-			<input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด
+			<input type="button" name="ok" value="  OK  " onclick="selectMultiple()" style="width:60px;"/>
+			<input type="button" name="close" value=" Close " onclick="javascript:window.close();" style="width:60px;"/>
+			<!-- <input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด -->
 		</td>
 	</tr>
 </table>
@@ -254,13 +120,20 @@ window.onload = function(){
 <display:table width="100%" id="item" name="requestScope.CUSTOMER_LIST" 
     defaultsort="0" defaultorder="descending" requestURI="../jsp/searchCustomerPopupAction.do?do=searchMC" sort="list" pagesize="20" class="resultDisp">	
     	
-    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
-		<input type ="checkbox" name="chCheck" id="chCheck" onclick="saveSelectedInPage(${item.no})"  />
-		<input type ="hidden" name="code_temp" value="<bean:write name="item" property="code"/>" />
+    <display:column align="center" title="เลือกข้อมูล" sortable="false" class="chk" width="20">
+		<input type ="radio" name="chRadio" />
+		<input type ="hidden" name="code" value="<bean:write name="item" property="code"/>" />
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="desc"/>" />
+		
+	    <input type ="hidden" name="empRefId" value="${item.mcEmpBean.empRefId}" />
+		<input type ="hidden" name="empType" value="${item.mcEmpBean.empType}" />
+		<input type ="hidden" name="empTypeDesc" value="${item.mcEmpBean.empTypeDesc}" />
+		<input type ="hidden" name="mobile1" value="<bean:write name="item" property="mcEmpBean.mobile1"/>" />
+		<input type ="hidden" name="mobile2" value="<bean:write name="item" property="mcEmpBean.mobile2"/>" /> 
+		
 	 </display:column>
-    											    
-    <display:column align="left" title="รหัส" property="code"  nowrap="false" sortable="false" class="code"/>
+    <display:column align="left" title="ID" property="mcEmpBean.empRefId"  nowrap="false" sortable="false" class="code"/>			    
+    <display:column align="left" title="Employee ID" property="code"  nowrap="false" sortable="false" class="code"/>
     <display:column align="left" title="รายละเอียด" property="desc" nowrap="false" sortable="false" class="desc"/>								
 </display:table>	
 <!-- RESULT -->

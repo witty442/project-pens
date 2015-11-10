@@ -258,21 +258,21 @@ function cancelAction(path){
                                     <td  align="right"> ชื่อร้านค้า <font color="red">*</font>
 									</td>
 									<td align="left">
-									    <html:text property="bean.customerName" styleClass="disableText" styleId="customerName"  size="150" maxlength="200"></html:text>
+									    <html:text property="bean.customerName" styleClass="normalText" styleId="customerName"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td align="right"> ที่อยู่ Line1 
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine1" styleClass="disableText" styleId="addressLine1"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine1" styleClass="normalText" styleId="addressLine1"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> ที่อยู่ Line2  
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine2" styleClass="disableText" styleId="addressLine2"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine2" styleClass="normalText" styleId="addressLine2"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
@@ -327,7 +327,7 @@ function cancelAction(path){
 			                                    <tr>
 			                                      <th colspan="2">CUP 72</th>
 			                                      <th colspan="2">ซอง</th>
-			                                      <th colspan="2">POOH</th>
+			                                      <th colspan="2">POOH 72</th>
 			                                    </tr>
 			                                    <tr>
 			                                      <th>หีบ</th>

@@ -34,7 +34,7 @@ if(session.getAttribute("staffTypeList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchStaffTypeList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","StaffType"));
 	
 	session.setAttribute("staffTypeList",billTypeList);
 }
@@ -43,7 +43,7 @@ if(session.getAttribute("areaList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchAreaList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","MCarea"));
 	
 	session.setAttribute("areaList",billTypeList);
 }
@@ -52,7 +52,7 @@ if(session.getAttribute("mcTripList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchMcTripList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","MCmonthlytrip"));
 	
 	session.setAttribute("mcTripList",billTypeList);
 }
@@ -178,7 +178,7 @@ function search(path){
 
 function exportExcel(path,staffId,monthTrip,maxDayInMonth){
 	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
+	var param ="&empId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
 	
 	form.action = path + "/jsp/mcAction.do?do=exportExcel"+param;
 	form.submit();
@@ -187,7 +187,7 @@ function exportExcel(path,staffId,monthTrip,maxDayInMonth){
 
 function openEdit(path,staffId,monthTrip,maxDayInMonth){
 	var form = document.mcForm;
-	var param ="&staffId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
+	var param ="&empId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
 	form.action = path + "/jsp/mcAction.do?do=prepare"+param;
 	form.submit();
 	return true;
@@ -197,10 +197,10 @@ function openPopupCustomer(path){
 	var form = document.mcForm;
 	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
 	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
+	var staffType = document.getElementsByName('bean.empType')[0].value;
 	
     var param = "&mcArea="+mcArea;
-        param += "&mcRoute="+mcRoute;
+        param += "&active=A";
         param += "&staffType="+staffType;
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepareSearchMC&action=new"+param;
@@ -208,16 +208,22 @@ function openPopupCustomer(path){
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 }
 
-function setStoreMainValue(code,desc){
+function setStoreMainValue(code,desc,empType,mobile1,mobile2,empRefId){
 	var form = document.mcForm;
 	//alert(form);
-	form.staffId.value = code;
+	form.empId.value = code;
 	form.name.value = desc;
+	//form.empType.value = empType;
+	form.mobile1.value = mobile1;
+	form.mobile2.value = mobile2;
 
-	if(staffId==''){
-	  alert("ไม่พบข้อมูล  staffId");
-	  form.staffId.value = '';
+	if(code==''){
+	  alert("ไม่พบข้อมูล  Employee Id");
+	  form.empId.value = '';
 	  form.name.value = "";
+	  //form.empType.value = "";
+	  form.mobile1.value = "";
+	  form.mobile2.value = "";
 	}
 } 
 
@@ -225,8 +231,11 @@ function getStaffNameKeypress(e,custCode){
 	var form = document.mcForm;
 	if(e != null && e.keyCode == 13){
 		if(custCode.value ==''){
-			form.staffId.value = '';
+			form.empId.value = '';
 			form.name.value = "";
+			//form.empType.value = "";
+			form.mobile1.value = "";
+			form.mobile2.value = "";
 		}else{
 		  getStaffName(custCode);
 		}
@@ -238,7 +247,7 @@ function getStaffName(custCode){
 	var form = document.mcForm;
 	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
 	var mcRoute = document.getElementsByName('bean.mcRoute')[0].value;
-	var staffType = document.getElementsByName('bean.staffType')[0].value;
+	var staffType = document.getElementsByName('bean.empType')[0].value;
 	
     var param  = "mcArea="+mcArea;
         param += "&mcRoute="+mcRoute;
@@ -258,11 +267,17 @@ function getStaffName(custCode){
 	if(returnString !=''){
 		var retArr = returnString.split("|");
 		form.name.value = retArr[0];
+		//form.empType.value = retArr[1];
+		form.mobile1.value = retArr[2];
+		form.mobile2.value = retArr[3];
 	}else{
 		alert("ไม่พบข้อมูล");
 		form.staffId.focus();
 		form.staffId.value ="";
 		form.name.value = "";
+		//form.empType.value = "";
+		form.mobile1.value = "";
+		form.mobile2.value = "";
 	}
 }
 
@@ -347,7 +362,7 @@ function loadRoute(){
 								<tr>
                                     <td> ประเภท<font color="red"></font></td>
 									<td>		
-										 <html:select property="bean.staffType" styleId="staffType">
+										 <html:select property="bean.empType" styleId="empType">
 											<html:options collection="staffTypeList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
@@ -362,9 +377,12 @@ function loadRoute(){
 									<td >เจ้าหน้าที่  Staff
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.staffId" styleId="staffId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
+									  <html:text property="bean.empId" styleId="empId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
 									  <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
+									 <%--  <html:hidden property="bean.empType" styleId="empType" /> --%>
+									  <html:hidden property="bean.mobile1" styleId="mobile1" />
+									  <html:hidden property="bean.mobile2" styleId="mobile2" />
 									</td>
 								</tr>
 								<tr>
@@ -428,7 +446,7 @@ function loadRoute(){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="5%"><%=mc.getNo() %></td>
 										<td class="td_text_center" width="5%">
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'edit')">
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'edit')">
 											  <%if(User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      
 											        View 
 											   <%}else{ %>
@@ -437,13 +455,13 @@ function loadRoute(){
 											 </a>
 										</td>
 										<td class="td_text_center" width="5%">
-											  <a href="javascript:exportExcel('${pageContext.request.contextPath}','<%=mc.getStaffId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'view')">
+											  <a href="javascript:exportExcel('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'view')">
 											        พิมพ์
 											 </a>
 										</td>
-										<td class="td_text_center" width="5%"><%=mc.getStaffType()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getEmpTypeDesc()%></td>
 									    <td class="td_text" width="5%"><%=mc.getMcRoute() %>:<%=mc.getMcRouteDesc()%></td>
-										<td class="td_text" width="5%"><%=mc.getName() %>&nbsp;<%=mc.getSureName()%></td>
+										<td class="td_text" width="5%"><%=mc.getName() %>&nbsp;<%=mc.getSurName()%></td>
 										
 										<%for(int i=1;i<=maxDay;i++) {
 										  Map<String,String> dayMapDetail = mc.getDaysMap();

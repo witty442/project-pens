@@ -269,8 +269,8 @@ public class SearchCustomerPopupAction extends I_Action {
 		try {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 request.setAttribute("results", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -291,10 +291,12 @@ public class SearchCustomerPopupAction extends I_Action {
 			String mcArea = Utils.isNull(request.getParameter("mcArea"));
 			String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
 			String staffType = Utils.isNull(request.getParameter("staffType"));
+			String active = Utils.isNull(request.getParameter("active"));
+			String operation =Utils.isNull(request.getParameter("operation"));
 			
 			logger.debug("mcArea["+mcArea+"]mcRoute["+mcRoute+"]staffType["+staffType+"]");
 			
-			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,"",mcArea,mcRoute,staffType);
+			 List<PopupForm> results = MCDAO.searchStaffList(popupForm,operation,mcArea,mcRoute,staffType,active);
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{

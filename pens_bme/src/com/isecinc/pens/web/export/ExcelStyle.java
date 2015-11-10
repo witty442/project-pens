@@ -20,6 +20,7 @@ public class ExcelStyle {
 	
 	public  XSSFCellStyle headerStyle;
 	public  XSSFCellStyle headerStyle2;
+	public  XSSFCellStyle headerStyleLeft2;
 	public  XSSFCellStyle styleHeader;
 	public  XSSFCellStyle styleHeaderCenter;
 	public  XSSFCellStyle styleHeadButtomLine;
@@ -88,6 +89,10 @@ public class ExcelStyle {
         headerStyle2.setFont(fontHead2);
         headerStyle2.setAlignment(HorizontalAlignment.CENTER);
         
+        headerStyleLeft2 = xssfWorkbook.createCellStyle();
+        headerStyleLeft2.setFont(fontHead2);
+        headerStyleLeft2.setAlignment(HorizontalAlignment.LEFT);
+        
         // Create Styles for sheet2.
         styleHeader = xssfWorkbook.createCellStyle();
         styleHeader.setFont(font);
@@ -140,7 +145,7 @@ public class ExcelStyle {
         dataLineStyleRight.setBorderLeft(BorderStyle.THIN);
         dataLineStyleRight.setBorderRight(BorderStyle.THIN);
         dataLineStyleRight.setFont(fontData);
-        dataLineStyle.setAlignment(HorizontalAlignment.RIGHT);
+        dataLineStyleRight.setAlignment(HorizontalAlignment.RIGHT);
         
         dataLineBoldStyle = xssfWorkbook.createCellStyle();
         dataLineBoldStyle.setFont(fontDataBold);
@@ -148,6 +153,7 @@ public class ExcelStyle {
         dataLineBoldStyle.setBorderBottom(BorderStyle.THIN);
         dataLineBoldStyle.setBorderLeft(BorderStyle.THIN);
         dataLineBoldStyle.setBorderRight(BorderStyle.THIN);
+   
         
         dataLineBoldStyleRight = xssfWorkbook.createCellStyle();
         dataLineBoldStyleRight.setFont(fontDataBold);

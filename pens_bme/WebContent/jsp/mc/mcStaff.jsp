@@ -34,7 +34,7 @@ if(session.getAttribute("staffTypeList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchStaffTypeList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","StaffType"));
 	
 	session.setAttribute("staffTypeList",billTypeList);
 }
@@ -43,7 +43,7 @@ if(session.getAttribute("areaList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchAreaList(new PopupForm(),""));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","MCarea"));
 	
 	session.setAttribute("areaList",billTypeList);
 }
@@ -127,7 +127,7 @@ function save(path){
 		alert("กรุณาระบุ เขตพื้นที่");
 		return false;
 	}
-	if( $('#staffType').val()==""){
+	if( $('#empType').val()==""){
 		alert("กรุณาระบุ ประเภท");
 		return false;
 	}
@@ -135,19 +135,19 @@ function save(path){
 		alert("กรุณาระบุ  Route เส้นทาง");
 		return false;
 	}
-	if( $('#staffId').val()==""){
-		alert("กรุณาระบุ  Staff ID");
-		return false;
-	}
+	//if( $('#empId').val()==""){
+	//	alert("กรุณาระบุ  EmployeeId");
+	//	return false;
+	//}
 	if( $('#name').val()==""){
 		alert("กรุณาระบุ  ชื่อ");
 		return false;
 	}
-	if( $('#sureName').val()==""){
+	if( $('#surName').val()==""){
 		alert("กรุณาระบุ  นามสกุล");
 		return false;
 	}
-	if( $('#mobile').val()==""){
+	if( $('#mobile1').val()==""){
 		alert("กรุณาระบุ  เบอร์โทรศัพท์");
 		return false;
 	}
@@ -155,7 +155,6 @@ function save(path){
 	form.submit();
 	return true;
 }
-
 
 function loadRoute(){
 	var cboDistrict = document.getElementsByName('bean.mcRoute')[0];
@@ -190,6 +189,88 @@ function genDummyStaffID(){
 	form.staffId.value = returnString;
 }
 
+function openPopupCustomer(path){
+	var form = document.mcForm;
+	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
+	
+    var param = "&mcArea="+mcArea;
+        param += "&active=A";
+      
+	url = path + "/jsp/searchCustomerPopupAction.do?do=prepareSearchMC&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+
+function setStoreMainValue(code,desc,empType,mobile1,mobile2,empRefId,empTypeDesc){
+	var form = document.mcForm;
+	//alert(form);
+	form.empId.value = code;
+	form.name.value = desc;
+	form.empType.value = empType;
+	form.mobile1.value = mobile1;
+	form.mobile2.value = mobile2;
+	form.empRefId.value = empRefId;
+	form.empTypeDesc.value = empTypeDesc;
+
+} 
+
+function getStaffNameKeypress(e,custCode){
+	var form = document.mcForm;
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			form.empId.value = '';
+			form.name.value = "";
+			form.empType.value = "";
+			form.mobile1.value = "";
+			form.mobile2.value = "";
+			form.empRefId.value = "";
+			form.empTypeDesc.value = "";
+		}else{
+		  getStaffName(custCode);
+		}
+	}
+}
+
+function getStaffName(custCode){
+	var returnString = "";
+	var form = document.mcForm;
+	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
+	var empId = document.getElementsByName('bean.empId')[0].value;
+
+    var param  = "mcArea="+mcArea;
+        param  = "custCode="+empId;
+        param += "&active=A";
+   
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/getStaffMCAjax.jsp",
+			data : param,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+
+	if(returnString !=''){
+		var retArr = returnString.split("|");
+		form.name.value = retArr[0];
+		form.empType.value = retArr[1];
+		form.mobile1.value = retArr[2];
+		form.mobile2.value = retArr[3];
+		form.empRefId.value = retArr[4];
+		form.empTypeDesc.value = retArr[5];
+	}else{
+		alert("ไม่พบข้อมูล");
+		form.empId.focus();
+		form.empId.value ="";
+		form.name.value = "";
+		form.empType.value = "";
+		form.mobile1.value = "";
+		form.mobile2.value = "";
+		form.empRefId.value = "";
+		form.empTypeDesc.value = "";
+	}
+}
 </script>
 
 </head>		
@@ -234,61 +315,54 @@ function genDummyStaffID(){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 								<tr>
-                                    <td> เขตพื้นที่ <font color="red">*</font></td>
+                                    <td  align="right"> เขตพื้นที่ <font color="red">*</font></td>
 									<td>		
 										 <html:select property="bean.mcArea" styleId="mcArea" onchange="loadRoute();">
 											<html:options collection="areaList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
-								</tr>
-								<tr>
-                                    <td> ประเภท<font color="red">*</font></td>
-									<td>		
-										 <html:select property="bean.staffType" styleId="staffType">
-											<html:options collection="staffTypeList" property="code" labelProperty="desc"/>
-									    </html:select>
+									<td  align="right"> รหัสพนักงาน<font color="red"></font></td>
+									<td>
+									  <html:text property="bean.empId" styleId="empId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
+									  <html:hidden property="bean.empRefId" styleId="empRefId"/>
 									</td>
 								</tr>
 								<tr>
-                                    <td> Route เส้นทาง <font color="red">*</font></td>
+                                    <td  align="right"> ประเภท<font color="red">*</font></td>
+									<td colspan="3">		
+										 <html:hidden property="bean.empType" styleId="empType"/>
+										 <html:text property="bean.empTypeDesc" styleId="empTypeDesc" readonly="true" styleClass="disableText"/>
+									</td>
+								</tr>
+								<tr>
+									<td  align="right"> ชื่อ-นามสกุล<font color="red"></font></td>
+									<td colspan="3">	
+										 <html:text property="bean.name" styleId="name"  readonly="true" styleClass="disableText" size="60"> </html:text>
+									</td>
+								</tr>
+								
+								<tr>
+                                    <td  align="right"> เบอร์โทรศัพท์ #2<font color="red"></font></td>
 									<td>		
+										 <html:text property="bean.mobile1" styleId="mobile1"  readonly="true" styleClass="disableText"> </html:text>
+									</td>
+									 <td  align="right"> เบอร์โทรศัพท์ #1<font color="red"></font></td>
+									<td>		
+										 <html:text property="bean.mobile2" styleId="mobile2" readonly="true" styleClass="disableText"> </html:text>
+									</td>
+								</tr>
+								<tr>
+                                    <td  align="right"> Route เส้นทาง <font color="red">*</font></td>
+									<td colspan="3">		
 										 <html:select property="bean.mcRoute" styleId="mcRoute"> </html:select>
 									</td>
 								</tr>
 								<tr>
-									<td >รหัสพนักงาน <font color="red">*</font>
-									</td>
-									<td align="left"> 
-									   <c:if test="${mcForm.bean.canEdit==true }">
-									      <html:hidden property="bean.orgStaffId" styleId="orgStaffId"/>	
-										  <html:text property="bean.staffId" styleId="staffId" size="20" />	
-										  <a href="javascript:genDummyStaffID('${pageContext.request.contextPath}')">
-											  <input type="button" value="   Gen Dummy Staff ID   " class="newPosBtnLong"> 
-										  </a>
-										</c:if>
-										 <c:if test="${mcForm.bean.canEdit==false }">
-										  <html:text property="bean.staffId" styleId="staffId" size="20" readonly="true" styleClass="disableText"/>	
-										</c:if>
-									</td>
-								</tr>
-								<tr>
-                                    <td> ชื่อ <font color="red">*</font></td>
-									<td>		
-										 <html:text property="bean.name" styleId="name"> </html:text>
-										  นามสกุล<font color="red">*</font>
-										   <html:text property="bean.sureName" styleId="sureName"> </html:text>
-									</td>
-								</tr>
-								<tr>
-                                    <td> เบอร์โทรศัพท์<font color="red">*</font></td>
-									<td>		
-										 <html:text property="bean.mobile" styleId="mobile"> </html:text>
-									</td>
-								</tr>
-								<tr>
-                                    <td></td>
-									<td>		
-										 <html:checkbox property="bean.active" styleId="active"/>Active
+                                    <td  align="right">สถานะ</td>
+									<td colspan="3">		
+										 <html:radio property="bean.active" styleId="active" value="Y"/>ใช้งาน
+										 <html:radio property="bean.active" styleId="active" value="N"/>ไม่ใช้งาน
 									</td>
 								</tr>
 						   </table>

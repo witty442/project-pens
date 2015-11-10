@@ -69,6 +69,8 @@
 		
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
 		<form-bean name="mcForm" type="com.isecinc.pens.web.mc.MCForm" />
+		<form-bean name="mcEmpForm" type="com.isecinc.pens.web.mc.MCEmpForm" />
+		<form-bean name="mcTimeForm" type="com.isecinc.pens.web.mc.MCTimeForm" />
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="nsForm" type="com.isecinc.pens.web.nissin.NSForm" />
@@ -471,6 +473,14 @@
             <forward name="prepareMCStaffDetail" path="/jsp/mc/mcStaff.jsp" />
 		</action>
 		
+		<action name="mcEmpForm" path="/jsp/mcEmpAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCEmpAction">
+			<forward name="search" path="/jsp/mc/mcEmpSearch.jsp" />
+			<forward name="detail" path="/jsp/mc/mcEmp.jsp" />
+		</action>
+		<action name="mcTimeForm" path="/jsp/mcTimeAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCTimeAction">
+			<forward name="search" path="/jsp/mc/mcTimeSearch.jsp" />
+			<forward name="detail" path="/jsp/mc/mcTime.jsp" />
+		</action>
 		<action name="payForm" path="/jsp/payAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayAction">
 			<forward name="search" path="/jsp/pay/paySearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
