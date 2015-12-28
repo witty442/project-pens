@@ -74,7 +74,7 @@ public class OrderFridayAction extends I_Action {
 				 request.getSession().removeAttribute("totalPage"); 
 				 
 				 //init store type
-				 new OrderFridayDAO().initStoreTypeFridayMap();
+				 STORE_TYPE_MAP = OrderFridayDAO.initStoreTypeFridayMap();
 				 
 				 Order order = new Order();
 				 //Old OrderDate set to next billDate

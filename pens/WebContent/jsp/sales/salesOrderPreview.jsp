@@ -518,6 +518,7 @@ function stampPrint(){
 						<!--  Can Receipt Credit (VAN)-->
 						<html:hidden property="canReceiptMoreCash"/>
 						<html:hidden property="canReceiptCredit"/>
+						<html:hidden property="canAirpay"/>
 					
 						<html:hidden property="deletedId"/>
 						<html:hidden property="order.orderType"/>

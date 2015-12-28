@@ -54,6 +54,7 @@ public class Utils {
     public static final String format_current_5_digit = "#,##0.00000";
 	public static final String format_current_6_digit = "#,##0.000000";
 	
+	
 	private static String DECIMAL_FORMAT ="#.00000000000000000000";
 	private static String CURRENCY_FORMAT ="#,##0.00";
 	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
@@ -61,10 +62,10 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	System.out.println(200/200);
-		    System.out.println(201/200);
-		    System.out.println(399/200);
-		    System.out.println(400/200);
+	    	String str = "0001";
+			
+	    	System.out.println(new BigDecimal(str));
+	    
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -679,11 +680,20 @@ public class Utils {
 		return Integer.parseInt(str);
 	}
 	
+	public static BigDecimal convertStrToBigDecimal(String str) {
+		if (str ==null || "".equals(str)){
+			return new BigDecimal("0");
+		}
+		str= str.replaceAll("\\,", "");
+		return new BigDecimal(str.trim());
+	}
+	
 	public static int convertStrToInt(String str,int defaultInt) {
 		if (str ==null || "".equals(str)){
 			return defaultInt;
 		}
 		str= str.replaceAll("\\,", "");
+	
 		return Integer.parseInt(str);
 	}
 	
@@ -998,4 +1008,20 @@ public class Utils {
 		}
 		return StringUtils.join(valuesText, ","); 
 	}
+   
+ //Case null retun ""
+ 	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {
+ 		String dateStr = "";		
+ 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+ 		try {
+ 			logger.debug("dateBigdecimal:"+dateBigdecimal);
+ 			if(dateBigdecimal != 0.0){
+ 			   Timestamp ti = new Timestamp(dateBigdecimal);
+ 			   logger.debug("date timestamp>>"+ti);
+ 			   dateStr = ft.format(ti);
+ 			}
+ 		} catch (Exception e) {
+ 		}
+ 		return dateStr;
+ 	}
 }

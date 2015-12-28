@@ -32,6 +32,15 @@
 <%
 User user = (User) request.getSession().getAttribute("user");
 
+if(session.getAttribute("empRegionList") == null){
+	List<PopupForm> billTypeList = new ArrayList();
+	PopupForm ref = new PopupForm("",""); 
+	billTypeList.add(ref);
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","MCarea"));
+	
+	session.setAttribute("empRegionList",billTypeList);
+}
+
 if(session.getAttribute("empTypeList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
@@ -41,14 +50,14 @@ if(session.getAttribute("empTypeList") == null){
 	session.setAttribute("empTypeList",billTypeList);
 }
 
-//if(session.getAttribute("empStatusList") == null){
+if(session.getAttribute("empStatusList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
 	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","EmpStatus"));
 	
 	session.setAttribute("empStatusList",billTypeList);
-//}
+}
 
 %>
 
@@ -286,6 +295,13 @@ function getStaffName(custCode){
 										 <html:text property="bean.surName" styleId="surName" size="20"/>
 									</td>
 								</tr>
+								<tr>
+								    <td  align="right">Region<font color="red"></font></td>    
+									<td colspan="3">
+									     <html:select property="bean.region" styleId="region">
+											<html:options collection="empRegionList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -344,10 +360,10 @@ function getStaffName(custCode){
 										<td class="td_text" width="8%"><%=mc.getMobile2() %></td>
 										<td class="td_text_center" width="3%"><%=mc.getEmpTypeDesc()%></td>
 										<td class="td_text_center" width="8%"><%=mc.getRegionDesc()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getStatus()%></td>
+										<td class="td_text_center" width="4%"><%=mc.getStatusDesc()%></td>
 										<td class="td_text_center" width="7%"><%=mc.getStartDate()%></td>
 										<td class="td_text" width="8%"><%=mc.getEndDate()%></td>
-										<td class="td_text" width="10%"><%=mc.getReasonLeave()%></td>
+										<td class="td_text" width="10%"><%=mc.getReasonLeaveDesc()%></td>
 										<td class="td_text" width="10%"><%=mc.getNote()%></td>
 										<td class="td_text_center" width="12%">
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpRefId()%>')">

@@ -1302,8 +1302,8 @@ public class ExportProcess {
             "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
             "	    null as order_number, \n"+
             
-            
             "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)  AS PAYMENT_METHOD ,\n"+
+            
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
             /******** new Requirement ************************************/
@@ -1371,13 +1371,28 @@ public class ExportProcess {
             "		t_receipt_line.DESCRIPTION	AS	DESCRIPTION	, 	\n"+
             "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
             "	    t_order.order_no as order_number, \n"+
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)  AS PAYMENT_METHOD ,\n"+
+            
+		    /** if(PD_PAID ==Y){
+		     *   if(T_RECEIPT.ISPDPAID ==null){
+		     *      payment_method ='PD_CR'
+		     *   }
+		     *  }else{
+		     *    if(t_receipt_by.PAYMENT_METHOD=='AP'){ //Airpay = CS
+		     *       payment_method = 'CS'
+		     *    }else{
+		     *      payment_method =t_receipt_by.PAYMENT_METHOD
+		     *    }
+		     *  }
+		     * 
+		     * **/
+            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),IF(t_receipt_by.PAYMENT_METHOD='AP','CS',t_receipt_by.PAYMENT_METHOD))  AS PAYMENT_METHOD ,\n"+
+            
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
             /******** new Requirement ************************************/
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
             "       ''	AS	BANK_BRANCH, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_no)	AS	CHEQUE_NO, \n"+	
+            "       IF(AD_USER.PD_PAID='Y',null,IF(t_receipt_by.PAYMENT_METHOD='AP',null,t_receipt_by.cheque_no) )	AS	CHEQUE_NO, \n"+	
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.credit_card_type)	AS	CREDIT_CARD_TYPE ,	 \n"+
             /******** new Requirement ************************************/
@@ -1424,9 +1439,6 @@ public class ExportProcess {
 				dataAppend.append(Constants.newLine);
 				
 			}//while
-			
-			
-			
 			
 			countTrans += totalRows;
 			logger.debug("countTrans:"+countTrans);	

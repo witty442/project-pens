@@ -434,12 +434,12 @@ public class ModifierProcess {
 					shipDate = oline.getShippingDate();
 					requestDate = oline.getRequestDate();
 					
-					//if(ModifierControl.getMethodPromotiomGoodsControl().equalsIgnoreCase(ModifierControl.METHOD_PROMOTION_GOODS_2)){
-						 //promotionalGoodProcess2(oline.getQty());
-					//}else{
+					if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
+						 promotionalGoodProcess2(oline.getQty());
+					}else{
 					     //default 1
 					     promotionalGoodProcess(oline.getQty());
-				    //}
+				    }
 				}
 			} else {
 				if(isDebug){
@@ -568,9 +568,17 @@ public class ModifierProcess {
 					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPricebreakheader())) {
 						priceBreakProcess(sumQty, sumAmount, noExcludeLines, true);
 					}
+					
 					// Promotional Good
 					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPromotiongood())) {
-						promotionalGoodProcess(sumQty);
+						
+						if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
+						    promotionalGoodProcess2(sumQty);
+						}else{
+						     //default 1
+							promotionalGoodProcess(sumQty);
+					    }
+						
 					}
 					
 				}//if
@@ -1015,8 +1023,7 @@ public class ModifierProcess {
 		return 0;
 	}
 	
-	
-	/**
+	/** Wait for Edit Now no change
 	 * Promotion Good Process
 	 * 
 	 * @param orline
@@ -1025,7 +1032,7 @@ public class ModifierProcess {
 	 */
 	private double promotionalGoodProcess2(double sumQty) throws Exception {
 		if(isDebug){
-		  logger.info("---- Start Promotional Good (2) Process ----");
+		  logger.info("---- Start Promotional Good Process ----");
 		}
 		
 		OrderLine oLine;
@@ -1058,7 +1065,6 @@ public class ModifierProcess {
 				}
 			}
 			
-			
 		} else {
 			
 			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypePoint())) {
@@ -1077,7 +1083,6 @@ public class ModifierProcess {
 						round = 1;
 					}
 				}
-				
 			}
 		}
 		// Is Promotion
@@ -1203,6 +1208,7 @@ public class ModifierProcess {
 		
 		return 0;
 	}
+	
 
 	/**
 	 * Create SQL

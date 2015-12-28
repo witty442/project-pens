@@ -9,7 +9,7 @@
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
         	Application Version
 			
-			<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process','','width=800px,height=600px')" title="Configuration">
+			<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process','','width=800px,height=700px')" title="Configuration">
 			  <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			</a>
 			<font color="black">วันที่ปัจจุบัน

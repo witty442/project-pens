@@ -13,6 +13,7 @@ import util.ReportHelper;
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MSalesTargetNew;
 
 /**
@@ -37,6 +38,14 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 
 		try {
 			sql.delete(0, sql.length());
+			sql.append("\n SELECT A.* ");
+			sql.append("\n,CASE WHEN A.airpay_no IS NULL THEN A.CASH_AMOUNT ELSE 0 END AS CASH_AMOUNT_N");
+			sql.append("\n,CASE WHEN A.airpay_no IS NULL THEN A.VAT_CASH ELSE 0 END AS VAT_CASH_N ");
+			
+			sql.append("\n,CASE WHEN A.airpay_no <> '' THEN A.CASH_AMOUNT ELSE 0 END AS AIRPAY_AMOUNT_N");
+			sql.append("\n,CASE WHEN A.airpay_no <> '' THEN A.VAT_CASH ELSE 0 END AS AIRPAY_CASH_N ");
+			sql.append("\n FROM(");
+			
 			sql.append("\n  SELECT @rownum:=@rownum+1 as no , od.ORDER_DATE, us.CODE, us.NAME, od.ORDER_NO, ");
 			sql.append("\n  (SELECT SUM(DISCOUNT) FROM t_order_line ,(SELECT @rownum:=0) r ");
 			sql.append("\n  WHERE t_order_line.ORDER_ID = od.ORDER_ID AND t_order_line.ISCANCEL ='N' ) AS DISCOUNT, ");
@@ -59,6 +68,15 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='CH' ");
 			sql.append("\n  ) as cheque_no ");
 			
+			sql.append("\n ,( select min(t_receipt_by.cheque_no) ");
+			sql.append("\n    from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
+			sql.append("\n    where od.order_id = t_receipt_line.order_id ");
+			sql.append("\n    and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
+			sql.append("\n    and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
+			sql.append("\n    and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
+			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='AP' ");
+			sql.append("\n  ) as airpay_no ");
+			
 			sql.append("\n  ,od.doc_status as status ");
 			sql.append("\n  FROM t_order od ");
 			sql.append("\n  INNER JOIN ad_user us ON od.USER_ID = us.USER_ID ");
@@ -71,9 +89,9 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			//sql.append("\n  AND od.DOC_STATUS = 'SV' ");
 			sql.append("\n  AND us.USER_ID = " + user.getId());
 			sql.append("\n  ORDER BY od.ORDER_ID ASC ");
-			sql.append("\n ");
+			sql.append("\n ) A ");
             
-			logger.debug("sql:"+sql);
+			logger.info("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			int no = 0;
@@ -88,15 +106,23 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setName(rst.getString("NAME"));
 				p.setOrderNo(ReportHelper.convertOrderNoForReport(rst.getString("ORDER_NO")));
 				p.setDiscount(rst.getDouble("DISCOUNT"));
-				p.setCashAmount(rst.getDouble("CASH_AMOUNT"));
+				p.setCashAmount(rst.getDouble("CASH_AMOUNT_N"));
 				p.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));
 				p.setVatAmount(rst.getDouble("VAT_AMOUNT"));
 				p.setNetAmount(rst.getDouble("NET_AMOUNT"));
 				p.setCustomerCode(rst.getString("CUSTOMER_CODE"));
 				p.setCustomerName(rst.getString("CUSTOMER_NAME"));
-				p.setVatCash(rst.getDouble("VAT_CASH"));
+				p.setVatCash(rst.getDouble("VAT_CASH_N"));
 				p.setVatReceipt(rst.getDouble("VAT_RECEIPT"));
-                p.setChequeNo(rst.getString("cheque_no"));
+				
+				p.setAirpayAmount(rst.getDouble("AIRPAY_AMOUNT_N"));
+				
+				if( !Utils.isNull(rst.getString("cheque_no")).equals("")){
+                   p.setChequeNo(rst.getString("cheque_no"));
+				}else{
+				   p.setChequeNo(rst.getString("airpay_no"));
+				}
+                p.setAirpayNo(rst.getString("airpay_no"));
                 p.setStatus(rst.getString("status"));
 				pos.add(p);
 			}

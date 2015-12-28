@@ -839,6 +839,7 @@ function escapeParameter(param){
 						<!--  Can Receipt Credit (VAN)-->
 						<html:hidden property="canReceiptMoreCash"/>
 						<html:hidden property="canReceiptCredit"/>
+						<html:hidden property="canAirpay"/>
 							
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>

@@ -29,6 +29,7 @@ public class InvoicePaymentReport implements Serializable{
 	private String chequeNo;
 	private String chequeDate;
 	private double chequeAmt;
+	private double airpayAmt;
 	private double cashWriteOff;
 	
 	// Add Payment Method To Use In Report for Filter
@@ -43,6 +44,13 @@ public class InvoicePaymentReport implements Serializable{
 	private String endDate;
 	private String isCurrent;
 	
+	
+	public double getAirpayAmt() {
+		return airpayAmt;
+	}
+	public void setAirpayAmt(double airpayAmt) {
+		this.airpayAmt = airpayAmt;
+	}
 	public int getId() {
 		return id;
 	}

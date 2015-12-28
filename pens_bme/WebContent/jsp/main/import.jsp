@@ -165,6 +165,16 @@ function importExcel(path,noCheckError){
 				return false;
 			}
 		}
+	<%}else if("onhandOShopping".equalsIgnoreCase(request.getParameter("page"))) {%>
+		if(form.dataFile.value == '' || extension != "txt"){
+			alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			return true;
+		}else{
+			if( startFileName !='o-shopping'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย O-SHOPPING เท่านั้น");
+				return false;
+			}
+		}
 	<%}else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 		var boxNo = form.boxNo;
 	 
@@ -205,6 +215,7 @@ function importExcel(path,noCheckError){
 		}
      
      <% } %>
+     
 	form.action = path + "/jsp/importAction.do?do=importExcel&page=<%=request.getParameter("page")%>&NO_CHECK_ERROR="+noCheckError;
 	form.submit();
 	return true;
@@ -344,6 +355,10 @@ function getCustName(custCode,fieldName){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportScanBarcode"/>
 				</jsp:include>
+			<%}else if("onhandOShopping".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMEOShopping"/>
+				</jsp:include>
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
@@ -451,7 +466,9 @@ function getCustName(custCode,fieldName){
 						          <%}else{ %>
 									<input type="button" value="  Upload  " class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','')">
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
-								    <% if("onhand".equalsIgnoreCase(request.getParameter("page")) || "onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
+								    <% if("onhand".equalsIgnoreCase(request.getParameter("page")) 
+								    		|| "onhandFriday".equalsIgnoreCase(request.getParameter("page"))
+								    		|| "onhandOShopping".equalsIgnoreCase(request.getParameter("page"))) {%>
 								       <input type="button" value="ยืนยัน Upload รวมข้อมูลที่ ERROR" class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','NO_CHECK_ERROR')">
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 								        <input type="button" value="Export to Excel" class="newPosBtnLong" onclick="javascript:exportReturnWacoal('${pageContext.request.contextPath}')">
@@ -848,6 +865,97 @@ function getCustName(custCode,fieldName){
 						
 						<!-- ************************* Wacoal From ******************************************* -->
 	
+	                   <!-- ************************* O SHOPPING From ******************************************* -->
+						<c:if test="${importForm.shoppingListErrorSize > 0}">
+							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<tr>
+								<th colspan="9"  align="left"> <font color="red">จำนวนรายการที่ไม่สามารถ import ได้  : ${importForm.shoppingListErrorSize} รายการ </font> </th>
+							</tr>
+							<tr>
+							    <th width="5%">Row</th>
+								<th width="8%">materialMaster</th>
+								<th width="8%">barcode </th>
+								<th width="10%">onhandQty </th>
+								<th width="10%">wholePriceBF </th>
+								<th width="10%">retailPriceBF </th>
+								<th width="10%">item </th>
+								<th width="15%">itemDesc </th>
+								<th width="24%">Message </th>
+							</tr>
+							<c:forEach var="results" items="${importForm.summaryErrorList}" varStatus="rows">
+								<c:choose>
+									<c:when test="${rows.index %2 == 0}">
+										<c:set var="tabclass" value="lineO" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineE" />
+									</c:otherwise>
+								</c:choose>
+								<tr class="<c:out value='${tabclass}'/>">
+									<td>${results.row}</td>		
+									<td align="left">${results.onhandSummary.materialMaster}</td>
+									<td align="left">${results.onhandSummary.barcode}</td>
+									<td align="left">${results.onhandSummary.onhandQty}</td>
+									<td align="left">${results.onhandSummary.wholePriceBF}</td>
+									<td align="left">${results.onhandSummary.retailPriceBF}</td>
+									<td align="left">${results.onhandSummary.item}</td>
+									<td align="left">${results.onhandSummary.itemDesc}</td>
+									<td align="left">
+									  <c:forEach var="results2" items="${results.errorMsgList}" varStatus="rows2">
+									    ${rows2.index}:${results2.message}<br/>
+									 </c:forEach>
+									</td>
+								</tr>
+							</c:forEach>
+							</table>
+						</c:if>
+						
+						<c:if test="${importForm.shoppingListSuccessSize > 0}">
+							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<tr>
+								<th colspan="9"  align="left">จำนวนรายการที่สามารถ import ได้  : ${importForm.shoppingListSuccessSize} รายการ  </th>
+							</tr>
+							<tr>
+							    <th width="5%">Row</th>
+								<th width="8%">materialMaster</th>
+								<th width="8%">barcode </th>
+								<th width="10%">onhandQty </th>
+								<th width="10%">wholePriceBF </th>
+								<th width="10%">retailPriceBF </th>
+								<th width="10%">item </th>
+								<th width="15%">itemDesc </th>
+								<th width="24%">Message </th>
+							</tr>
+							<c:forEach var="results" items="${importForm.summarySuccessList}" varStatus="rows">
+								<c:choose>
+									<c:when test="${rows.index %2 == 0}">
+										<c:set var="tabclass" value="lineO" />
+									</c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineE" />
+									</c:otherwise>
+								</c:choose>
+								<tr class="<c:out value='${tabclass}'/>">
+									<td>${results.row}</td>		
+									<td align="left">${results.onhandSummary.materialMaster}</td>
+									<td align="left">${results.onhandSummary.barcode}</td>
+									<td align="left">${results.onhandSummary.onhandQty}</td>
+									<td align="left">${results.onhandSummary.wholePriceBF}</td>
+									<td align="left">${results.onhandSummary.retailPriceBF}</td>
+									<td align="left">${results.onhandSummary.item}</td>
+									<td align="left">${results.onhandSummary.itemDesc}</td>
+									<td align="left">
+									 <c:forEach var="results2" items="${results.errorMsgList}" varStatus="rows2">
+									    ${rows2.index}:${results2.message}<br/>
+									 </c:forEach>
+									</td>
+								</tr>
+							</c:forEach>
+							</table>
+						</c:if>
+						
+						<!-- ************************* OSHOPPING From ******************************************* -->
+						
 	                   <!-- ************************* Return Wacoal  From ******************************************* -->
 						<c:if test="${importForm.summaryReturnWacoalListErrorSize > 0}">
 							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">

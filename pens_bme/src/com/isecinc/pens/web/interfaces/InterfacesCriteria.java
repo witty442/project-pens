@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.interfaces;
 
 import com.isecinc.core.web.I_Criteria;
+import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
 
 /**
@@ -18,7 +19,6 @@ public class InterfacesCriteria extends I_Criteria{
 
 	private MonitorBean monitorBean = new MonitorBean();
 	
-
 	public MonitorBean getMonitorBean() {
 		return monitorBean;
 	}
@@ -26,6 +26,6 @@ public class InterfacesCriteria extends I_Criteria{
 	public void setMonitorBean(MonitorBean monitorBean) {
 		this.monitorBean = monitorBean;
 	}
-   
+
 
 }

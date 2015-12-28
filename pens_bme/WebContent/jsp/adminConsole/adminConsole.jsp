@@ -182,9 +182,9 @@ function clearCach1(){
     <INPUT TYPE="button" class="tab_style" id ="id_config_info" name ="tab_config_info" VALUE="Configuration Info" onclick ="switchTab('<%=request.getContextPath()%>','tab_config_info')" />
 	<INPUT TYPE="button" class="tab_style" id ="id_query" name ="tab_query" VALUE="Query DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_query')"> 
 	<INPUT TYPE="button" class="tab_style" id ="id_execute" name ="tab_execute"  VALUE="Execute DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_execute')">
-	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
+	<%-- <INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
-	
+	 --%>
     <div id="div_msg" style="display:none"> 
 		    <br/><br/>
 		  <font size="3" color="red">กรุณารอสักครู่ กำลังทำรายการอยู่................ </font>  
@@ -194,7 +194,7 @@ function clearCach1(){
 	      <input type="button" name="clearCach"  value=" Clear Cach "  onclick="clearCach1()"/>
 	      
 		  <BR><span class="h1_style">Configuration Tab </span><br> 
-		       <html:textarea property="configInfo" style=" width :100%;" rows="14"/>
+		       <html:textarea property="configInfo" style=" width :100%;" rows="16"/>
 		     <br><br>
 		   <INPUT TYPE="button" class="button2_style" name ="B_TEST_INFO" VALUE="Submit Test Connection" onclick="submitBT('<%=request.getContextPath()%>');"><br><br>
 		   <span class="text_style">Result Test Connection </span><br>

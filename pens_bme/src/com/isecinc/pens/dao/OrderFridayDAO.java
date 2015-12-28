@@ -1767,10 +1767,11 @@ public class OrderFridayDAO {
 		return storeList;
 	} 
 	
-	public static void initStoreTypeFridayMap() throws Exception{
+	public static Map<String,String> initStoreTypeFridayMap() throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Connection conn = null;
+		Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 		try{
 			StringBuffer sql = new StringBuffer("");
 			conn = DBConnection.getInstance().getConnection();
@@ -1779,8 +1780,9 @@ public class OrderFridayDAO {
 			rs = ps.executeQuery();
 			
 			while(rs.next()){
-				OrderAction.STORE_TYPE_MAP.put(rs.getString("pens_value"), rs.getString("pens_desc"));
+				STORE_TYPE_MAP.put(rs.getString("pens_value"), rs.getString("pens_desc"));
 			}
+			return STORE_TYPE_MAP;
 		}catch(Exception e){
 	      throw e;
 		}finally{

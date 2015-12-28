@@ -214,14 +214,22 @@ public class MCAction extends I_Action {
 			logger.debug("is_active:"+h.getActive());
 			
             if("add".equals(h.getMode())){
-            	int update =  MCDAO.updateMCStaffModel(conn, h);
+            	int update = 0;
+            	//case insert only
+            	if( !Utils.isNull(h.getOrgEmpRefId()).equals("")){
+            	   update =  MCDAO.updateMCStaffModelByOrgEmpRefId(conn, h);
+                }else{
+                   update =  MCDAO.updateMCStaffModelByEmpRefId(conn, h);
+                }
+            	logger.debug("update result:"+update);
+            	
             	if(update ==0)
             	  MCDAO.insertMCStaffModel(conn, h);
             	
             }else  if("edit".equals(h.getMode())){
-        	    MCDAO.updateMCStaffModel(conn, h);
+        	    MCDAO.updateMCStaffModelByOrgEmpRefId(conn, h);
             }
-			
+            
 			//Search Again
 			MCBean bean = MCDAO.searchStaff(conn,h).getItems().get(0);
 			bean.setMode("edit");
@@ -229,7 +237,8 @@ public class MCAction extends I_Action {
 			bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getEmpRefId()));
 		    aForm.setBean(bean);
 			
-			conn.commit();
+		    conn.commit();
+            
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
@@ -689,7 +698,7 @@ public class MCAction extends I_Action {
 			logger.debug("prevMonthTrip["+prevMonthTrip+"]");
 			
 			//Update Detail
-			MCDAO.copyFromLastMonthModel(conn, cri.getEmpId(),cri.getEmpId(), currentMonth, prevMonthTrip);
+			MCDAO.copyFromLastMonthModel(conn, cri.getEmpRefId(),cri.getEmpId(), currentMonth, prevMonthTrip);
 			
 			//Search Again
 			MCBean bean = MCDAO.searchHead(conn,h,true).getItems().get(0);

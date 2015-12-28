@@ -19,19 +19,22 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
+import com.isecinc.pens.inf.bean.MonitorItemResultBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * @author WITTY
  *
  */
-public class InterfaceDAO {
+public class InterfaceDAO extends InterfaceUtils{
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	/**
@@ -41,27 +44,7 @@ public class InterfaceDAO {
 		// TODO Auto-generated method stub
 
 	}
-	
-	 /** c_monitor **/
-    public void updateControlMonitor(BigDecimal transactionId,String type) {
-    	Connection conn = null;
-    	try {
-           InterfaceDAO dao = new InterfaceDAO();
-           conn = DBConnection.getInstance().getConnection();
-           dao.updateControlMonitor(conn,transactionId,type);
-        } catch (Exception e) {
-        	e.printStackTrace();
-        }finally{
-        	try{
-	        	if(conn != null){
-	        		conn.close();conn=null;
-	        	}
-        	}catch(Exception e){
-        		e.printStackTrace();
-        	}
-        }
-    }
-	
+
 	public MonitorBean insertMonitor(Connection conn ,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -137,8 +120,9 @@ public class InterfaceDAO {
 			" error_msg," +
 			" group_name," +
 			" file_size ," +
-			" success_count)"+
-			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+			" success_count," +
+			" fail_count)"+
+			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 			  
 			logger.debug("SQL:"+sql);
 			logger.debug("SucessCound:"+model.getSuccessCount());
@@ -162,6 +146,7 @@ public class InterfaceDAO {
 			ps.setString(++index, model.getGroupName());
 			ps.setString(++index, model.getFileSize());
 			ps.setInt(++index, model.getSuccessCount());
+			ps.setInt(++index, model.getFailCount());
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -357,6 +342,57 @@ public class InterfaceDAO {
 		return status;
 	} 
 	
+	/** c_monitor **/
+    public void updateControlMonitor(BigDecimal transactionId,String type) {
+    	Connection conn = null;
+    	try {
+           InterfaceDAO dao = new InterfaceDAO();
+           conn = DBConnection.getInstance().getConnection();
+           dao.updateControlMonitor(conn,transactionId,type);
+           
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }finally{
+        	try{
+	        	if(conn != null){
+	        		conn.close();conn=null;
+	        	}
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        }
+    }
+    
+    public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
+		PreparedStatement ps = null;
+		try {
+			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
+			//logger.info("SQL:"+sql);
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			ps.setBigDecimal(++index, transactionId);
+			ps.setString(++index,type);
+			
+			int r = ps.executeUpdate();
+			if(r==0){
+				//insert 
+				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
+				index = 0;
+				ps = conn.prepareStatement(sql);
+				ps.setString(++index,type);
+				ps.setBigDecimal(++index, transactionId);
+				ps.executeUpdate();
+				
+			}
+		
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+	}
 	public  String findControlMonitor(String action) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -422,36 +458,7 @@ public class InterfaceDAO {
 		}
 	}
 	
-	public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
-		PreparedStatement ps = null;
-		try {
-			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
-			//logger.info("SQL:"+sql);
-			int index = 0;
-			ps = conn.prepareStatement(sql);
-			ps.setBigDecimal(++index, transactionId);
-			ps.setString(++index,type);
-			
-			int r = ps.executeUpdate();
-			if(r==0){
-				//insert 
-				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
-				index = 0;
-				ps = conn.prepareStatement(sql);
-				ps.setString(++index,type);
-				ps.setBigDecimal(++index, transactionId);
-				ps.executeUpdate();
-				
-			}
-		
-		} catch (Exception ex) {
-			throw ex;
-		} finally {
-			if(ps != null){
-				ps.close();ps = null;
-			}
-		}
-	}
+	
 	
 	
 	public  String findMonitorStatusBK(Connection conn,String id,String transaction_count) throws Exception{
@@ -565,14 +572,7 @@ public class InterfaceDAO {
 		return m;
 	} 
 	
-	/**
-	 * 
-	 * @param conn
-	 * @param model
-	 * @return
-	 * @throws Exception
-	 */
-	public  MonitorBean[] findMonitorList(User user) throws Exception{
+	public  MonitorBean[] findMonitorListNew(User user,String type) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Connection conn = null;
@@ -588,8 +588,95 @@ public class InterfaceDAO {
 			sql.append(" ( select max(transaction_id) as transaction_id  \n");
 			sql.append("   from monitor  \n");
 			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
+			sql.append("   and type ='"+type+"'\n");
 			sql.append("  ) s  \n");
 			sql.append("  on  monitor.transaction_id = s.transaction_id \n");
+			if( !Utils.isNull(type).equals("")){
+			   sql.append(" where type ='"+type+"'\n");
+			}
+			sql.append("  order by monitor.submit_date \n");
+	
+		    logger.debug("SQL:"+sql.toString());
+		    conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				MonitorBean m = new MonitorBean();
+				m.setTransactionId(rs.getBigDecimal("transaction_id"));
+				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
+				m.setMonitorId(rs.getBigDecimal("monitor_id"));
+				m.setName(rs.getString("name"));
+				m.setType(rs.getString("type"));
+				m.setStatus(rs.getInt("status"));
+				m.setStatusDesc(getStatDesc(rs.getInt("status")));
+				m.setCreateUser(rs.getString("create_user"));
+				m.setCreateDate(rs.getDate("create_date"));
+				m.setSubmitDate(rs.getTimestamp("submit_date"));
+	            m.setFileCount(rs.getInt("file_count"));
+	            m.setSuccessCount(rs.getInt("success_count"));
+	            m.setErrorMsg(rs.getString("error_disp"));
+	            
+	            if(Utils.isNull(m.getErrorMsg()).equals("")){
+	            	logger.debug("errorCode:"+rs.getString("error_code"));
+	            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
+	            	logger.debug("errorMsg:"+errorMsg);
+	            	 if( !Utils.isNull(errorMsg).equals("")){
+	            	    ExceptionHandle.insertErrorCode(rs.getString("error_code"),errorMsg );
+	            	    m.setErrorMsg(errorMsg);
+	            	 }
+	            }
+	            //
+				monitorList.add(m);
+			}
+			
+			monitorBean = new MonitorBean[monitorList.size()];
+			monitorBean = monitorList.toArray(monitorBean);
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return monitorBean;
+	} 
+	
+	/**
+	 * 
+	 * @param conn
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	public  MonitorBean[] findMonitorList(User user,String type) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Connection conn = null;
+		MonitorBean[] monitorBean = null;
+		List<MonitorBean> monitorList = new ArrayList<MonitorBean> ();
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select monitor.*  \n");
+			sql.append(" , (select count(*) from monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
+			sql.append(" from monitor  \n");
+			sql.append(" inner join  \n");
+			sql.append(" ( select max(transaction_id) as transaction_id  \n");
+			sql.append("   from monitor  \n");
+			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
+			sql.append("   and type ='"+type+"'\n");
+			sql.append("  ) s  \n");
+			sql.append("  on  monitor.transaction_id = s.transaction_id \n");
+			if( !Utils.isNull(type).equals("")){
+			   sql.append(" where type ='"+type+"'\n");
+			}
 			sql.append("  order by monitor.submit_date \n");
 	
 		    logger.debug("SQL:"+sql.toString());
@@ -620,6 +707,7 @@ public class InterfaceDAO {
 	            	    m.setErrorMsg(errorMsg);
 	            	 }
 	            }
+	            //
 				monitorList.add(m);
 			}
 			
@@ -757,98 +845,41 @@ public class InterfaceDAO {
 		return monitorBean;
 	} 
 	
-	public  List findMonitorDetailListTEST(User user ,MonitorBean mc,String orderBy) throws Exception{
+	public  MonitorItemBean findMonitorItemBean(User user, MonitorBean mc) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
+		MonitorItemBean item = new  MonitorItemBean();
 		Connection conn = null;
-		MonitorBean[] monitorBean = null;
-		List<MonitorBean> monitorList = new ArrayList<MonitorBean> ();
+	
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select monitor.transaction_id,monitor.TRANSACTION_TYPE, monitor.monitor_id \n");
-			sql.append(" , monitor.name, monitor.type \n");
-			sql.append(" , monitor.create_user, monitor.create_date \n");
-			sql.append(" , monitor.submit_date,monitor_item.* \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
-			sql.append(" from monitor ,monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
-			
-			if(mc.getMonitorId() != null){
-			   sql.append(" and monitor.monitor_id ="+mc.getMonitorId() +"\n");
-			}
-			if( !Utils.isNull(mc.getUserName()).equals("")){
-			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
-			}
-            if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
-			}
-            if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
-			}
-            if( !Utils.isNull(mc.getRequestTable()).equals("")){
-            	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");
-			}
-            if( !Utils.isNull(mc.getTransactionType()).equals("")){
-            	sql.append(" and monitor.transaction_type LIKE '%"+mc.getTransactionType()+"%' \n");
-			}
-            if( !Utils.isNull(mc.getType()).equals("")){
-            	sql.append(" and monitor.type LIKE '%"+mc.getType()+"%' \n");
-			}
-            if( mc.getStatus() != 0){
-            	if(mc.getStatus() == Constants.STATUS_SUCCESS){
-            	   sql.append(" and monitor.status ="+mc.getStatus()+" \n");
-            	   sql.append(" and monitor_item.status ="+mc.getStatus()+" \n");
-            	}else{
-            	
-              	    sql.append(" and monitor_item.status ="+mc.getStatus()+"  \n");
-            	}
-			}
-            
-            /** Case No Admin  Default Sales Login */
-			if( !User.ADMIN.equalsIgnoreCase(user.getType())){
-				 sql.append(" and monitor.create_user LIKE '%"+user.getUserName()+"%' \n");
-			}
-			
-			if(Utils.isNull(orderBy).equals("")){
-			   sql.append(" order by monitor.monitor_id ,monitor_item.id \n");
-			}else{
-			   sql.append(" order by "+orderBy+" \n");
-			}
+			sql.append(" select monitor_item.* \n");
+			sql.append(" from monitor_item where 1=1 \n");
+			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
+
 		    logger.debug("SQL:"+sql.toString());
-		    conn = DBConnection.getInstance().getConnection();
+            conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			
-			while(rs.next()){
-				MonitorBean m = new MonitorBean();
-				m.setTransactionId(rs.getBigDecimal("transaction_id"));
-				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
-				m.setMonitorId(rs.getBigDecimal("monitor_id"));
-				m.setName(rs.getString("name"));
-				m.setType(rs.getString("type"));
-				m.setCreateUser(rs.getString("create_user"));
-				m.setCreateDate(rs.getDate("create_date"));
-				m.setSubmitDate(rs.getTimestamp("submit_date"));
-
-				
-				MonitorItemBean item = new  MonitorItemBean();
+			if(rs.next()){
 				item.setId(rs.getBigDecimal("id"));
 				item.setTableName(rs.getString("table_name"));
 				item.setFileName(rs.getString("file_name"));
 				item.setSource(rs.getString("source"));
 				item.setDestination(rs.getString("destination"));
 				item.setStatus(rs.getInt("status"));
-				item.setDataCount(rs.getInt("data_count"));
 				item.setSuccessCount(rs.getInt("success_count"));
-                item.setFileSize(rs.getString("file_size"));
-				item.setErrorMsg(rs.getString("error_disp"));
+				item.setFailCount(rs.getInt("fail_count"));
+				item.setErrorCode(rs.getString("error_code"));
+				item.setErrorMsg(rs.getString("error_msg"));
 				
-				m.setMonitorItemBean(item);
-				
-				monitorList.add(m);
+			    //SuccessList
+				item.setSuccessList(findMonitorItemResultList(conn,item.getId(),"SUCCESS"));
+				//FailList
+				item.setFailList(findMonitorItemResultList(conn,item.getId(),"FAIL"));
 			}
 			
-			//monitorBean = new MonitorBean[monitorList.size()];
-			//monitorBean = monitorList.toArray(monitorBean);
 		}catch(Exception e){
 	      throw e;
 		}finally{
@@ -858,12 +889,109 @@ public class InterfaceDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			if(conn != null){
-			   conn.close();conn=null;
+			if(conn !=null){
+				conn.close();conn=null;
 			}
 		}
-		return monitorList;
+		return item;
 	} 
+	
+	public  List<MonitorItemBean> findMonitorItemList(User user, MonitorBean mc) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		MonitorItemBean item = null;
+		Connection conn = null;
+		List<MonitorItemBean> monitorItemList = null;
+		int row = 0;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select monitor_item.* \n");
+			sql.append(" from monitor_item where 1=1 \n");
+			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
+
+		    logger.debug("SQL:"+sql.toString());
+            conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				row++;
+				if(row==1){
+					monitorItemList = new ArrayList<MonitorItemBean>();
+				}
+				item = new  MonitorItemBean();
+				item.setRow(row);
+				item.setId(rs.getBigDecimal("id"));
+				item.setTableName(rs.getString("table_name"));
+				item.setFileName(rs.getString("file_name"));
+				item.setSource(rs.getString("source"));
+				item.setDestination(rs.getString("destination"));
+				item.setStatus(rs.getInt("status"));
+				item.setStatusDesc(getStatDesc(item.getStatus()));
+				item.setDataCount(rs.getInt("data_count"));
+				item.setSuccessCount(rs.getInt("success_count"));
+				item.setFailCount(rs.getInt("fail_count"));
+				item.setErrorCode(rs.getString("error_code"));
+				item.setErrorMsg(rs.getString("error_msg"));
+				
+				monitorItemList.add(item);
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+		return monitorItemList;
+	} 
+	
+	public  List<MonitorItemResultBean> findMonitorItemResultList(Connection conn ,BigDecimal monitorIItemId,String statusDesc) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		List<MonitorItemResultBean> resultItemList = new ArrayList<MonitorItemResultBean> ();
+		int row = 0;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from monitor_item_result where 1=1 \n");
+			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
+			sql.append(" and status ='"+statusDesc+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				MonitorItemResultBean item = new  MonitorItemResultBean();
+				row++;
+				item.setRow(row);
+				item.setMonitorItemId(rs.getBigDecimal("monitor_item_id"));
+				item.setStatus(rs.getString("status"));
+				item.setMsg(rs.getString("message"));
+				resultItemList.add(item);
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return resultItemList;
+	} 
+	
 	
 	public  MonitorItemDetailBean[] findMonitorItemDetailBeanList(BigDecimal monitorItemId) throws Exception{
 		PreparedStatement ps =null;
@@ -925,7 +1053,7 @@ public class InterfaceDAO {
 			
 			logger.debug("SQL:"+sql);
 
-			logger.debug("monitor_id:"+model.getMonitorId()+",transType:"+model.getTransactionType());
+			logger.debug("monitor_id:"+model.getMonitorId()+",transId:"+model.getTransactionId());
 		
 			int index = 0;
 			ps = conn.prepareStatement(sql);

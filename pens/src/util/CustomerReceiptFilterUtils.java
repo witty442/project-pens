@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 
 
 public class CustomerReceiptFilterUtils {
@@ -76,6 +77,40 @@ public class CustomerReceiptFilterUtils {
 			rs = ps.executeQuery();
 			if(rs.next()){
 				if(rs.getInt("x") > 0){
+					canFlag = "Y";
+				}
+			}
+			
+			logger.debug("canFlag:"+canFlag);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(rs !=null){
+				   rs.close();rs=null;
+				}
+				if(ps !=null ){
+				  ps.close();ps=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return canFlag;
+	}
+	
+	public  static String canAirpay(Connection conn,int customerId){
+		String canFlag = "N";
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try{
+			String sql = "select airpay_flag from m_customer c \n" +
+					" where c.customer_id ="+customerId+" \n";
+
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				if(Utils.isNull(rs.getString("airpay_flag")).equals("Y")){
 					canFlag = "Y";
 				}
 			}

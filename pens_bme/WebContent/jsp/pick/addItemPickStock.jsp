@@ -123,13 +123,14 @@ function validateQty(obj,row){
 	var table = document.getElementById('tblProduct');
 	var rows = table.getElementsByTagName("tr"); 
 	
+	obj.value = currencyToNum(obj.value);
 	var r = isNum(obj);
 	var onhandQtyObj = document.getElementsByName("onhandQty");
 	//alert(onhandQtyObj[row].value);
 	if(r){
 		//validate Onhand Qty
-		var onhandQty = parseInt(onhandQtyObj[row].value);
-		var currQty = parseInt(obj.value);
+		var onhandQty = currencyToNum(onhandQtyObj[row].value);
+		var currQty = currencyToNum(obj.value);
 		if(currQty > onhandQty){
 			alert("จำนวนรวม QTY("+currQty+") มีมากว่า  Onhand QTY("+onhandQty+")");
 			//rows[row+1].className ="lineError";
@@ -137,7 +138,6 @@ function validateQty(obj,row){
 			obj.focus();
 			return false;
 		}
-		
 		sumQty();
 	}
 	return true;
@@ -149,32 +149,41 @@ function sumOnhandQty(){
 	var sumCurPageQty = 0;
 	for(var i=0;i<onhandQtyObj.length;i++){
 		if(onhandQtyObj[i].value != '')
-			sumCurPageQty = sumCurPageQty + parseInt(onhandQtyObj[i].value);
+			sumCurPageQty = sumCurPageQty + currencyToNum(onhandQtyObj[i].value);
 	}
-	document.getElementsByName("bean.totalOnhandQty")[0].value = sumCurPageQty 
+	document.getElementsByName("bean.totalOnhandQty")[0].value = currencyToNum(sumCurPageQty) ;
 }
 
 function sumQty(){
 	var qtyObj = document.getElementsByName("qty");
 	var totalQtyNotInCurPage = 0;
 	if(document.getElementsByName("totalQtyNotInCurPage")[0].value !=""){
-		totalQtyNotInCurPage = parseInt(document.getElementsByName("totalQtyNotInCurPage")[0].value);
+		totalQtyNotInCurPage = currencyToNum(document.getElementsByName("totalQtyNotInCurPage")[0].value);
 	}
 	
 	//alert(totalQtyNotCurPage);
 	var sumCurPageQty = 0;
 	for(var i=0;i<qtyObj.length;i++){
 		if(qtyObj[i].value != '')
-			sumCurPageQty = sumCurPageQty + parseInt(qtyObj[i].value);
+			sumCurPageQty = sumCurPageQty + currencyToNum(qtyObj[i].value);
 	}
 	//cur Page
-	document.getElementsByName("curPageQty")[0].value = sumCurPageQty;
+	document.getElementsByName("curPageQty")[0].value = currencyToNum(sumCurPageQty);
 	//total All show
 	//alert(totalQtyNotInCurPage +","+ sumCurPageQty);
 	
-	document.getElementsByName("bean.totalQty")[0].value = totalQtyNotInCurPage + sumCurPageQty ;
+	document.getElementsByName("bean.totalQty")[0].value = currencyToNum(totalQtyNotInCurPage + sumCurPageQty) ;
 	
 }
+
+function currencyToNum(str){
+	str = str+"";
+	var temp =  str.replace(/\,/g,''); //alert(r);
+	return parseInt(temp);
+}
+
+
+
 </script>
 </head>		
    <body onload="loadMe()">         
@@ -289,6 +298,8 @@ function sumQty(){
 					       var actionDB = $('#actionDB').val() ;//document.getElementsByName("bean.status")[0].value;
 					       var totalOnhandQty = $('#totalOnhandQty').val();
 					       var path = $('#path').val();
+					       
+					      // alert(totalOnhandQty);
 					       
 					       window.opener.setReqPickMain(rowIndex,issueReqNo,sumQty,totalOnhandQty,actionDB,path);
 					 	   window.close();

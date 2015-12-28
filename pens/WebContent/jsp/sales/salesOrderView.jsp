@@ -58,6 +58,11 @@ if(request.getAttribute("orderForm") != null){
 }
 System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
+String canAirpay = "N";
+if(request.getAttribute("orderForm") != null){
+	canAirpay = orderForm.getCanAirpay();
+}
+System.out.println("canAirpay:"+canAirpay);
 /* -- Auto Receipt --> */
 %>
 
@@ -162,6 +167,7 @@ function loadAutoReceipt(){
 	//CS - CS ->> default check box
 	pt = document.getElementsByName('order.paymentTerm')[0].value;
 	pm = document.getElementsByName('order.paymentMethod')[0].value;
+	
 	//alert("pt["+pt+"]pm["+pm+"]");
 	
 	if(pt=='IM'&&pm=='CS'){
@@ -172,6 +178,10 @@ function loadAutoReceipt(){
 		//default radio CH
 		document.getElementsByName('autoReceipt.paymentType')[1].checked=true;
 		changePayType('CH');
+	}else if(pm=='AP'){
+		//default radio CH
+		document.getElementsByName('autoReceipt.paymentType')[4].checked=true;
+		changePayType('AP');
 	}else{
 		//Wit Edit 26/07/2556 display Credit Pay
 		//document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
@@ -179,6 +189,60 @@ function loadAutoReceipt(){
 		
 		document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
 		changePayType('CS');
+	}
+}
+
+function changePayType(type){
+	if(type=='CS'){
+		//new line with CS one line
+		showPayBy(true,type);
+	}else if(type=='CH'){
+		//new line with CH one line
+		showPayBy(true,type);	
+	}else if(type=='AP'){
+		//new line with CH one line
+		showPayBy(true,type);	
+	}else if(type=='MIX'){
+		//new line & ready for multiline
+		showPayBy(true,type);
+	}else {
+		//hide line...
+		showPayBy(false,type);
+	}
+}
+
+function showPayBy(bshow,type){
+	if(bshow)
+		$('#tblPayBy').show();
+	else
+		$('#tblPayBy').hide();
+	//...
+	if(type=='CS'){
+		//new line with CS one line
+		$('#divAddBtn').hide();
+		$('#paymentMethod').val('CS');
+		change_payment();
+		removeRow();
+	}else if(type=='CH'){
+		//new line with CH one line
+		$('#divAddBtn').hide();
+		$('#paymentMethod').val('CH');
+		change_payment();
+		removeRow();
+		new Epoch('epoch_popup','th',document.getElementById('bys.chqDate_'+rowseed));
+	}else if(type=='AP'){
+		//new line with CH one line
+		$('#divAddBtn').hide();
+		$('#paymentMethod').val('AP');
+		change_payment();
+		removeRow();
+		new Epoch('epoch_popup','th',document.getElementById('bys.chqDate_'+rowseed));
+	}else if(type=='MIX'){
+		//new line & ready for multiline
+		$('#divAddBtn').show();
+		$('#paymentMethod').val('CS');
+		change_payment();
+		removeRow();
 	}
 }
 
@@ -222,6 +286,28 @@ function change_payment(){
 			wof[i].checked=false;
 			wof[i].disabled=true;
 			wof[i].className='disableText';
+			
+		}else if(val=='AP'){
+			bank[i].value='';
+			bank[i].disabled=true;
+			bank[i].className='disableText';
+
+			chqNo[i].value='';
+			chqNo[i].readOnly=false;
+			chqNo[i].className='';
+
+			chqDate[i].value='';
+			chqDate[i].readOnly=true;
+			chqDate[i].disabled=true;
+			chqDate[i].className='disableText';
+
+			cct[i].value='';
+			cct[i].disabled=true;
+			cct[i].className='disableText';
+
+			wof[i].disabled=true;
+			wof[i].className='disableText';
+		
 		}else if(val=='CS'){
 			bank[i].value='';
 			bank[i].disabled=true;
@@ -281,6 +367,14 @@ function saveAutoReceiptVan(path){
 				//alert('กรุณากรอกข้อมูลให้ครบถ้วน');
 				//recAmt[i].focus();
 				//return false;
+			}
+			if(method[i].value=='AP'){
+
+				if(chqNo[i].value==''){
+					alert('กรุณาระบุข้อมูล เลขที่ชำระแอร์เพย์ ให้ครบถ้วน');
+					chqNo[i].focus();
+					return false;
+				}
 			}
 			if(method[i].value=='CH'){
 				if(bank[i].value==''){
@@ -517,50 +611,6 @@ function deleteRecpBy(path){
 	}
 }
 
-function changePayType(type){
-	if(type=='CS'){
-		//new line with CS one line
-		showPayBy(true,type);
-	}else if(type=='CH'){
-		//new line with CH one line
-		showPayBy(true,type);	
-	}else if(type=='MIX'){
-		//new line & ready for multiline
-		showPayBy(true,type);
-	}else {
-		//hide line...
-		showPayBy(false,type);
-	}
-}
-
-function showPayBy(bshow,type){
-	if(bshow)
-		$('#tblPayBy').show();
-	else
-		$('#tblPayBy').hide();
-	//...
-	if(type=='CS'){
-		//new line with CS one line
-		$('#divAddBtn').hide();
-		$('#paymentMethod').val('CS');
-		change_payment();
-		removeRow();
-	}else if(type=='CH'){
-		//new line with CH one line
-		$('#divAddBtn').hide();
-		$('#paymentMethod').val('CH');
-		change_payment();
-		removeRow();
-		new Epoch('epoch_popup','th',document.getElementById('bys.chqDate_'+rowseed));
-	}else if(type=='MIX'){
-		//new line & ready for multiline
-		$('#divAddBtn').show();
-		$('#paymentMethod').val('CS');
-		change_payment();
-		removeRow();
-	}
-}
-
 function removeRow(){
 	var chk = document.getElementsByName("recpbyids");
 	var haveRow=false;
@@ -679,8 +729,12 @@ function stampPrint(){
 											    <%if(vanAllowCredit){%>
 											      <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" /> เงินเชื่อ<br> 	
 											    <%}else{ %>
-											      <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" disabled="true"/> ...<br> 							
-											    <%} %>						
+											      <html:radio property="autoReceipt.paymentType" value="CR" onclick="changePayType(this.value);" disabled="true"/> <font color="#FFFFFF">เงินเชื่อ </font><br> 							
+											    <%} %>		
+											    <%if("Y".equalsIgnoreCase(canAirpay)){%>
+											      <html:radio property="autoReceipt.paymentType" value="AP" onclick="changePayType(this.value);"/> ชำระผ่านแอร์เพย์ (Air Pay)<br>				
+											    <%} %>
+											    
 											</td>
 										</tr>
 									</table>
@@ -703,6 +757,7 @@ function stampPrint(){
 										</tr>
 										<tr>
 											<td align="center" colspan="2">
+											 
 												<table id="tblRecpBy" align="center" border="0" cellpadding="3" cellspacing="1" class="result" width="100%">
 													<tr>
 														<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
@@ -712,7 +767,7 @@ function stampPrint(){
 														<th><bean:message key="Profile.PaymentMethod" bundle="sysele"/></th>
 														<th style="display: none;"><bean:message key="Receipt.Amount" bundle="sysele"/></th>
 														<th><bean:message key="Bank" bundle="sysele"/> </th>
-														<th><bean:message key="Check.No" bundle="sysele"/>/<bean:message key="CreditCardNo" bundle="sysele"/></th>
+														<th>เลขที่เช็ค/หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์</th>
 														<th><bean:message key="Check.Date" bundle="sysele"/></th>
 														<th><bean:message key="CreditCardType" bundle="sysele"/></th>
 														<th><bean:message key="Receipt.Paid" bundle="sysele"/></th>
@@ -739,7 +794,9 @@ function stampPrint(){
 																<%} %>
 															</select>
 														</td>
-														<td align="center"><input type="text" name="bys.chequeNo" size="20" maxlength="20"/></td>
+														<td align="center">
+														<input type="text" name="bys.chequeNo" size="20" maxlength="20"/>
+														</td>
 														<td align="center"><input type="text" name="bys.chequeDate" id="bys.chqDate_1" size="15" readonly="readonly" maxlength="10"/></td>
 														<td align="center">
 															<select name="bys.creditCardType">
@@ -1102,6 +1159,7 @@ function stampPrint(){
 						<!--  Can Receipt Credit (VAN)-->
 						<html:hidden property="canReceiptMoreCash"/>
 						<html:hidden property="canReceiptCredit"/>
+						<html:hidden property="canAirpay"/>
 						
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>

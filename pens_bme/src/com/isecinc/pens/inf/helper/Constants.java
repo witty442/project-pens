@@ -18,16 +18,19 @@ public class Constants {
 	public static final String COLUMN_BLANK = "BLANK";
 	public static final String INSERT_STR_DEFAULT_BLANK = " ";
 	
-	public static Calendar calendarTH = Calendar.getInstance(new Locale("th","TH"));
-	public static Calendar calendarUS = Calendar.getInstance(Locale.US);
-	
 	public static final String TRANSACTION_MASTER_TYPE = "MASTER";
 	public static final String TRANSACTION_TRANS_TYPE = "TRANSACTION";
 	public static final String TRANSACTION_UTS_TRANS_TYPE = "UPDATE-TRANS-SALES";
 	public static final String TRANSACTION_WEB_MEMBER_TYPE = "WEB-MEMBER";
+	public static final String TRANSACTION_BME_TYPE = "BME";
 	
 	public static final String TYPE_IMPORT = "IMPORT";
 	public static final String TYPE_EXPORT = "EXPORT";
+	
+	public static final String TYPE_IMPORT_BMESCAN = "IMPORT_BMESCAN";
+	public static final String TYPE_GEN_HISHER = "GEN_HISHER";
+	public static final String TYPE_IMPORT_BILL_ICC = "IMPORT_BILL_ICC";
+	public static final String TYPE_EXPORT_BILL_ICC = "EXPORT_BILL_ICC";
 	
 	public static final String TYPE_SALES = "SALES";
 	public static final String TYPE_CENTER = "CENTER";

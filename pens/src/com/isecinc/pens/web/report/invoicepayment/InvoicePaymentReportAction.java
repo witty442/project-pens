@@ -97,7 +97,7 @@ public class InvoicePaymentReportAction extends I_ReportAction<InvoicePaymentRep
 		parameterMap.put("receipt_date", reportForm.getInvoicePaymentReport().getReceiptDate());
 		
 		setFileType(reportForm.getCriteria().getFileType());
-		setFileName("invoice_payment_report");
+		setFileName("invoice_payment_report");  
 
 		return lstReport;
 	}

@@ -201,17 +201,19 @@ function openPopupCustomer(path){
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 }
 
-function setStoreMainValue(code,desc,empType,mobile1,mobile2,empRefId,empTypeDesc){
+function setStoreMainValue(code,desc,empType,mobile1,mobile2,empRefId,empTypeDesc,region){
 	var form = document.mcForm;
 	//alert(form);
 	form.empId.value = code;
-	form.name.value = desc;
+	form.fullName.value = desc;
 	form.empType.value = empType;
 	form.mobile1.value = mobile1;
 	form.mobile2.value = mobile2;
 	form.empRefId.value = empRefId;
 	form.empTypeDesc.value = empTypeDesc;
-
+	form.mcArea.value = region;
+	
+	loadRoute();
 } 
 
 function getStaffNameKeypress(e,custCode){
@@ -219,12 +221,13 @@ function getStaffNameKeypress(e,custCode){
 	if(e != null && e.keyCode == 13){
 		if(custCode.value ==''){
 			form.empId.value = '';
-			form.name.value = "";
+			form.fullName.value = "";
 			form.empType.value = "";
 			form.mobile1.value = "";
 			form.mobile2.value = "";
 			form.empRefId.value = "";
 			form.empTypeDesc.value = "";
+			form.mcArea.value = "";
 		}else{
 		  getStaffName(custCode);
 		}
@@ -253,22 +256,26 @@ function getStaffName(custCode){
 
 	if(returnString !=''){
 		var retArr = returnString.split("|");
-		form.name.value = retArr[0];
+		form.fullName.value = retArr[0];
 		form.empType.value = retArr[1];
 		form.mobile1.value = retArr[2];
 		form.mobile2.value = retArr[3];
 		form.empRefId.value = retArr[4];
 		form.empTypeDesc.value = retArr[5];
+		form.mcArea.value = retArr[6];
+		
+		loadRoute();
 	}else{
 		alert("ไม่พบข้อมูล");
 		form.empId.focus();
 		form.empId.value ="";
-		form.name.value = "";
+		form.fullName.value = "";
 		form.empType.value = "";
 		form.mobile1.value = "";
 		form.mobile2.value = "";
 		form.empRefId.value = "";
 		form.empTypeDesc.value = "";
+		form.mcArea.value = "";
 	}
 }
 </script>
@@ -317,7 +324,7 @@ function getStaffName(custCode){
 								<tr>
                                     <td  align="right"> เขตพื้นที่ <font color="red">*</font></td>
 									<td>		
-										 <html:select property="bean.mcArea" styleId="mcArea" onchange="loadRoute();">
+										 <html:select property="bean.mcArea" styleId="mcArea" >
 											<html:options collection="areaList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
@@ -326,6 +333,7 @@ function getStaffName(custCode){
 									  <html:text property="bean.empId" styleId="empId" size="20" onkeypress="getStaffNameKeypress(event,this)"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
 									  <html:hidden property="bean.empRefId" styleId="empRefId"/>
+									   <html:hidden property="bean.orgEmpRefId" styleId="orgEmpRefId"/>
 									</td>
 								</tr>
 								<tr>
@@ -338,7 +346,8 @@ function getStaffName(custCode){
 								<tr>
 									<td  align="right"> ชื่อ-นามสกุล<font color="red"></font></td>
 									<td colspan="3">	
-										 <html:text property="bean.name" styleId="name"  readonly="true" styleClass="disableText" size="60"> </html:text>
+									     <html:text property="bean.fullName" styleId="fullName"  readonly="true" styleClass="disableText" size="60"> </html:text>
+										<%--  <html:text property="bean.name" styleId="name"  readonly="true" styleClass="disableText" size="60"> </html:text> --%>
 									</td>
 								</tr>
 								

@@ -34,7 +34,7 @@ if(session.getAttribute("staffTypeList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","staffType"));
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","StaffType"));
 	
 	session.setAttribute("staffTypeList",billTypeList);
 }
@@ -365,7 +365,7 @@ function loadRoute(){
 									<th >เขตพื้นที่</th>
 									<th >ประเภท</th>
 									<th >Route เส้นทาง</th>
-									<th >Employee ID</th>
+									<th >Emp ID</th>
 									<th >ชื่อ</th>
 									<th >นามสกุล</th>
 									<th >เบอร์มือถือ</th>

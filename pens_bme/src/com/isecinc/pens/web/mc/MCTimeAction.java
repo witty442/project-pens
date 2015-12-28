@@ -39,6 +39,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.export.Excel;
+import com.isecinc.pens.web.export.ExcelResultBean;
 import com.isecinc.pens.web.export.ExcelStyle;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
 import com.isecinc.pens.web.export.ExportTimeSheetGroup;
@@ -207,6 +208,8 @@ public class MCTimeAction extends I_Action {
 			bean.setName(empBean.getName());
 			bean.setSurName(empBean.getSurName());
 			bean.setFullName(empBean.getName()+" "+empBean.getSurName());
+			bean.setRegionDesc(empBean.getRegionDesc());
+			bean.setEmpTypeDesc(empBean.getEmpTypeDesc());
 			bean.setStaffMonth(staffMonth);
 			bean.setStaffYear(staffYear);
 			
@@ -303,17 +306,21 @@ public class MCTimeAction extends I_Action {
 		MCTimeForm aForm = (MCTimeForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			 XSSFWorkbook xssfWorkbookDta = ExportTimeSheetGroup.genExportToExcel(user,aForm.getBean());
-				
-			response.setHeader("Content-Disposition", "attachment; filename=TimeSheet.xlsx");
-			response.setContentType("application/vnd.ms-excel; charset=windows-874");
-			java.io.OutputStream out = response.getOutputStream();
-
-			xssfWorkbookDta.write(out);
-
-		    out.flush();
-		    out.close();
-			    
+			ExcelResultBean excelResultBean =  ExportTimeSheetGroup.genExportToExcel(user,aForm.getBean());
+			if(excelResultBean.isFound()){
+			    XSSFWorkbook xssfWorkbookDta =excelResultBean.getXssfWorkbook();
+		
+				response.setHeader("Content-Disposition", "attachment; filename=TimeSheet.xlsx");
+				response.setContentType("application/vnd.ms-excel; charset=windows-874");
+				java.io.OutputStream out = response.getOutputStream();
+	
+				xssfWorkbookDta.write(out);
+	
+			    out.flush();
+			    out.close();
+			 }else{
+				 request.setAttribute("Message","ไม่พบข้อมูล");
+			 }
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -321,7 +328,7 @@ public class MCTimeAction extends I_Action {
 			throw e;
 		}finally{
 		}
-		return mapping.findForward("report");
+		return mapping.findForward("search");
 	}
 	
 	public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -329,17 +336,21 @@ public class MCTimeAction extends I_Action {
 		MCTimeForm aForm = (MCTimeForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			 XSSFWorkbook xssfWorkbookDta = ExportTimeSheetGroup.genExportToExcel(user,aForm.getBean());
-				
-			response.setHeader("Content-Disposition", "attachment; filename=TimeSheet.xlsx");
-			response.setContentType("application/vnd.ms-excel; charset=windows-874");
-			java.io.OutputStream out = response.getOutputStream();
-
-			xssfWorkbookDta.write(out);
-
-		    out.flush();
-		    out.close();
-			    
+			ExcelResultBean excelResultBean =  ExportTimeSheetGroup.genExportToExcel(user,aForm.getBean());
+			if(excelResultBean.isFound()){
+			    XSSFWorkbook xssfWorkbookDta =excelResultBean.getXssfWorkbook();
+				response.setHeader("Content-Disposition", "attachment; filename=TimeSheet.xlsx");
+				response.setContentType("application/vnd.ms-excel; charset=windows-874");
+				java.io.OutputStream out = response.getOutputStream();
+	
+				xssfWorkbookDta.write(out);
+	
+			    out.flush();
+			    out.close();
+			 }else{
+				 request.setAttribute("Message","ไม่พบข้อมูล");
+			 }
+			 
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -347,7 +358,7 @@ public class MCTimeAction extends I_Action {
 			throw e;
 		}finally{
 		}
-		return mapping.findForward("report");
+		return mapping.findForward("detail");
 	}
 	
 	

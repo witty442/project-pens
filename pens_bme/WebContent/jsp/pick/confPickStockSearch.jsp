@@ -356,7 +356,7 @@ function resetStore(){
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
 									<th >Issue Req Date</th>
-									<th >WareHouse</th>
+									<th >W/H</th>
 									<th >Issue Req No</th>
 									<th >Issue Req Status</th>
 									<th >รหัสร้านค้า</th>
@@ -365,8 +365,10 @@ function resetStore(){
 									<th >Issued Qty</th>
 									<th >วันที่รับของ</th>
 									<th >หมายเหตุ</th>
+									<th >วันที่พร้อมจัดส่ง</th>
+									<th >รวมจำนวนหีบ</th>
 								    <th >Action</th>	
-									<th >Confrim</th>				
+									<th >Confirm</th>				
 							   </tr>
 							<c:forEach var="results" items="${confPickStockForm.resultsSearch}" varStatus="rows">
 								<c:choose>
@@ -382,15 +384,15 @@ function resetStore(){
 										<td class="td_text_center" width="8%">
 										   ${results.issueReqDate}
 										</td>
-										<td class="td_text_center" width="8%">${results.wareHouse}</td>
+										<td class="td_text_center" width="5%">${results.wareHouse}</td>
 										<td class="td_text_center" width="8%">${results.issueReqNo}</td>
-										<td class="td_text_center" width="8%">
+										<td class="td_text_center" width="5%">
 											${results.statusDesc}
 										</td>
 										 <td class="td_text_center" width="8%">
 										  ${results.storeCode}
 										</td>
-										 <td class="td_text_center" width="15%">
+										 <td class="td_text" width="15%">
 										  ${results.storeName}
 										</td>
 										<td class="td_text_center" width="5%">
@@ -402,10 +404,17 @@ function resetStore(){
 										<td class="td_text_center" width="8%">
 										  ${results.needDate}
 										</td>
-									    <td class="td_text_center" width="20%">
+									    <td class="td_text_center" width="15%">
 										  ${results.remark}
 										</td>
-										
+										<td class="td_text_center" width="6%">
+										  ${results.deliveryDate}
+										</td>
+										<td class="td_text_center" width="5%">
+										<c:if test="${results.totalCtn != 0}">
+										  ${results.totalCtn}
+										  </c:if>
+										</td>
 										<td class="td_text_center" width="15%">
 											 <c:if test="${results.canEdit == false}">
 												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">

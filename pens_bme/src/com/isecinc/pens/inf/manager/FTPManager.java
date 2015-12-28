@@ -37,7 +37,8 @@ import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.ImportHelper;
+import com.isecinc.pens.inf.helper.InterfaceHelper;
+import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
 
 /**
@@ -327,6 +328,130 @@ public class FTPManager {
 			}
 			
 			logger.debug("End init FTP File Total Add To Map:"+countFileMap);
+
+			return countFileMap;
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
+	
+	public int downloadFileMappingToTableICC(User user,LinkedHashMap<String,TableBean> controlTableMap ,String path,String transDate) throws Exception
+	{
+		FTPClient ftp = null;
+		String ftpResponse = "";
+		int i = 0;
+		int countFileMap = 0;
+		String fileNameFixByDate  ="";
+		try {			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			
+			ftp.changeWorkingDirectory(path);
+			logger.debug("Ftp changeWorkingDirectory response :"+ftp.getReplyString());
+			FTPFile[] ftpFiles = ftp.listFiles();
+			ftpResponse = ftp.getReplyString();
+            logger.debug("Ftp listFiles response :"+ftpResponse);
+            
+			if (ftpFiles != null && ftpResponse.startsWith("226")) {
+				logger.debug("PathImport:"+path);
+				logger.debug("Start Load FTP File ");
+				
+				List<FTPFileBean> outStreamList = null;
+                for(i=0;i<ftpFiles.length;i++){
+                	FTPFile file = (FTPFile)ftpFiles[i];
+                	logger.debug("FTP fileName:"+file.getName());
+                	
+                	Set s = controlTableMap.keySet();
+    				Iterator it = s.iterator();
+    				boolean canGetFtpFile = false;
+    				for (int j = 1; it.hasNext(); j++) {
+    					fileNameFixByDate = "";
+    					canGetFtpFile = false; 
+    					String tableName = (String) it.next();
+    					//logger.debug("tableName:"+tableName);
+    					TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+                        String ftpFileName = Utils.isNull(file.getName());
+                        
+    					if(!ftpFileName.equals(".") && !ftpFileName.equals("..")){
+    					   fileNameFixByDate = InterfaceUtils.getImportNameICC(tableName, transDate);
+    					   // Fix File Name
+    					   
+    					   if(ftpFileName.toLowerCase().startsWith(fileNameFixByDate.toLowerCase())){
+    					       canGetFtpFile = true;
+    					   }
+    					}
+    					
+    					if(canGetFtpFile==true){
+    						logger.debug("Get File Table["+tableName+"]fileNameFixByDate["+fileNameFixByDate+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+    						
+    						countFileMap++;
+	                		/** Set Full File Name **/
+	                		tableBean.setFileFtpNameFull(ftpFileName);
+	                		logger.debug("canGetFtpFile No["+countFileMap+"]put FtpName:"+tableBean.getFileFtpNameFull());
+		                	//ByteArrayOutputStream out = new ByteArrayOutputStream();
+		                    
+		                	/** 1 Write file to Path */
+		                	//ftp.retrieveFile(file.getName(),out);
+		                	//String dataStreamStr =  out.toString();
+		                	
+		                	/** 2 **/
+		                	String dataStreamStr = convertStreamToString(ftp.retrieveFileStream(ftpFileName),tableName,user);
+		                	ftp.completePendingCommand();
+		                	//logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+
+		                	//logger.debug("dataStreamStrXX:"+dataStreamStr);
+		                	
+		                    /** Store DataStream in TableBean **/
+
+		                	String[] dataLineTextArr =  new String(dataStreamStr).split(Constants.newLine);
+		                	/** Case one table have more one file **/
+		                	if(tableBean.getDataLineList() ==null){
+		                		outStreamList = new ArrayList<FTPFileBean>();
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length-1);
+		                		outStreamList.add(ftpBean);
+		                		tableBean.setDataLineList(outStreamList);
+		                	}else{
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length-1);
+		                		tableBean.getDataLineList().add(ftpBean);
+		                	}
+		                	
+		                	/** put to Map Main **/
+		                	controlTableMap.put(tableBean.getTableName(), tableBean);
+		                	
+		                	//out.flush();
+		                	//out.close();
+	                	}//if
+    				}//for 2
+                }//for 1
+			}
+			
+			logger.debug("End Load FTP File Total Add To Map:"+countFileMap);
 
 			return countFileMap;
 		} catch (SocketException e) {
@@ -642,6 +767,109 @@ public class FTPManager {
 				
 			}
 				
+		}
+
+		/** Process Work on Window 8(tablet not work V107(tablet) **/
+		public void uploadAllFileToFTP_OPT2_BY_FILE(String path,String pathFull,StringBuffer data) throws Exception{
+			FTPClient ftp = null;
+			String reply = "";
+			Writer w = null;
+			OutputStream out = null;
+			logger.info("uploadAllFileToFTP_OPT2_BY_FILE");
+			try {		
+				ftp = new FTPClient();
+				ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+				ftp.connect(server);
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				
+				//ftp.setConnectTimeout(connectTimeout);
+
+				//logger.info("connection timeout:"+ftp.getConnectTimeout());
+				
+				if(!ftp.login(userFtp, passwordFtp)){
+					throw new FTPException("FTP Username or password invalid! ");
+				}
+				 
+				if(data != null && data.toString().length() >0){		
+						logger.info("Path:"+path);
+						logger.info("Write To pathFull:"+pathFull);
+						
+						ftp.changeWorkingDirectory(path);
+						logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+						out = ftp.storeFileStream(pathFull);
+					    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    
+					    /** new Code ******************************************************/
+					    logger.info("Start Write OutputStreamWriter data:");
+					    w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
+					    w.write(data.toString());
+					    w.flush();
+					    w.close();
+					    
+					    logger.info("End Write OutputStreamWriter data:");
+					    
+					    out.flush();
+					    out.close();
+						/******************************************************************/
+				         
+					    //Test Write File Local
+					  /*  String fileTemp = "D:/temp/"+tableBean.getFileFtpNameFull();
+					    logger.info("Write File To Temp Test:"+fileTemp);
+					    FileUtil.writeFile(fileTemp, tableBean.getDataStrExport().toString());*/
+					    /******************************************************************/
+					    
+					    /** Close Command FTP **/
+					    try{
+						    logger.info(" Start completePendingCommand ");
+							boolean completed = ftp.completePendingCommand();
+							String ftpResponse = ftp.getReplyString();
+							logger.info("ftpResponse["+ftpResponse+"]");
+						    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					        logger.error(e.getMessage(),e);
+					    }
+					    
+					    //SITE CHMOD 777 201011101437-SALESREP.txt
+					    /** Set Permission File ***/
+					    try{
+						    logger.info(" Start CHMOD 777 ");
+						    ftp.sendSiteCommand("CHMOD 777 "+pathFull);
+						    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					    	logger.error(e.getMessage(),e);	
+					    }
+					}else{
+						// Data not Found
+						logger.info("Data not found");
+					}
+		
+			} catch (SocketException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (UnknownHostException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (IOException e) {
+				throw new FTPException(e.getLocalizedMessage());
+			} catch (Exception e) {
+				throw new FTPException(e.getMessage());
+			} finally {
+				if(w != null){
+					//w.close();
+				}
+				if(out != null){
+				  // out.close();
+				}
+				if(ftp != null && ftp.isConnected()) {
+					try{
+						ftp.logout();
+						ftp.disconnect();
+						//logger.info("ftp disconnect : "+ftp.getReplyString());
+						ftp = null;
+					}catch(Exception e){
+						logger.error(e.getMessage(),e);
+					}
+				}
+			}	
 		}
 		
 }

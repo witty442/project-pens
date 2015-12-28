@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.process.SequenceProcessAll;
 
 
 public class ExceptionHandle {
@@ -20,26 +21,19 @@ public class ExceptionHandle {
     	ERROR_MAPPING.put("FTPException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E15\u0E34\u0E14\u0E15\u0E48\u0E2D FTP Server \u0E44\u0E14\u0E49");
     	ERROR_MAPPING.put("NullPointerException","\u0E21\u0E35\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E40\u0E1B\u0E47\u0E19 NULL ");
     	ERROR_MAPPING.put("DataTruncationException","\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E17\u0E35\u0E48\u0E19\u0E33\u0E40\u0E02\u0E49\u0E32\u0E21\u0E32\u0E21\u0E35\u0E02\u0E19\u0E32\u0E14\u0E21\u0E32\u0E01\u0E01\u0E27\u0E48\u0E32 \u0E02\u0E19\u0E32\u0E14\u0E02\u0E2D\u0E07 Field \u0E17\u0E35\u0E48\u0E01\u0E33\u0E2B\u0E19\u0E14\u0E44\u0E27\u0E49");
-    	
+    	ERROR_MAPPING.put("DataNotFoundException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E17\u0E35\u0E48\u0E08\u0E30 Generate");
+    	ERROR_MAPPING.put("DataFailException","\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E21\u0E48\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07");
     	ERROR_MAPPING.put("UniqueConstraintException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E14\u0E49 Key Duplicate");
-    
+    	ERROR_MAPPING.put("DuplicateImportFileException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16 import file \u0E19\u0E35\u0E49\u0E44\u0E14\u0E49\u0E40\u0E19\u0E37\u0E48\u0E2D\u0E07\u0E08\u0E32\u0E01 \u0E21\u0E35\u0E01\u0E32\u0E23 import\u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27 ");
+    	ERROR_MAPPING.put("FileNotFoundException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E44\u0E1F\u0E25\u0E4C");
+    	ERROR_MAPPING.put("DuplicateImportFileException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16 import file \u0E19\u0E35\u0E49\u0E44\u0E14\u0E49\u0E40\u0E19\u0E37\u0E48\u0E2D\u0E07\u0E08\u0E32\u0E01 \u0E21\u0E35\u0E01\u0E32\u0E23 import\u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27");
+    	ERROR_MAPPING.put("DuplicateExportFileException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16 Export file \u0E19\u0E35\u0E49\u0E44\u0E14\u0E49\u0E40\u0E19\u0E37\u0E48\u0E2D\u0E07\u0E08\u0E32\u0E01 \u0E21\u0E35\u0E01\u0E32\u0E23 Export\u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27");
+    	ERROR_MAPPING.put("OracleInvoiceNoEmtpyException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16 Export file \u0E19\u0E35\u0E49\u0E44\u0E14\u0E49\u0E40\u0E19\u0E37\u0E48\u0E2D\u0E07\u0E08\u0E32\u0E01 \u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35\u0E01\u0E32\u0E23\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01 oracle invoice no");
     }
 	public static void main (String[] f){
-//		System.out.println(Utils.toUnicodeChar("UNKNOW"));
-//		System.out.println(Utils.toUnicodeChar("ไม่สามารถ Update ข้อมูลได้เนื่องจากหา Key ไม่พบ "));
-//		System.out.println(Utils.toUnicodeChar("ไม่สามารถบันทึกลงฐานข้อมูลนี้ เนื่องจาก Key ที่เกี่ยวข้องไม่มี"));
-//		System.out.println(Utils.toUnicodeChar("ไม่สามารถติดต่อ FTP Server ได้"));
-//		System.out.println(Utils.toUnicodeChar("มีข้อมูลเป็น NULL "));
-//		System.out.println(Utils.toUnicodeChar("ข้อมูลที่นำเข้ามามีขนาดมากกว่า ขนาดของ Field ที่กำหนดไว้"));
-//		System.out.println(Utils.toUnicodeChar("ข้อมูลพื้นฐานบางส่วนมีปัญหา กรุณาตรวจสอบและ Import  ใหม่อีกครั้ง"));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Customer ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Product ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล UOM ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล User ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Order ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Address ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Ship To Address ID "));
-//		System.out.println(Utils.toUnicodeChar("ไม่พบข้อมูล Bill To Address ID "));
+
+		System.out.println(Utils.toUnicodeChar("ไม่สามารถ Export file นี้ได้เนื่องจาก ยังไม่มีการบันทึก oracle invoice no"));
+
 	}
 	public static String getExceptionCode(Exception e){
 		String exceptionCode = "";
@@ -52,6 +46,8 @@ public class ExceptionHandle {
 				exceptionCode = "FTPException";
 			}else if( e instanceof NullPointerException){
 				exceptionCode = "NullPointerException";
+			}else if( e instanceof DataFailException){
+				exceptionCode = "DataFailException";
 			}else if( e instanceof FindUserException){
 				exceptionCode = "FindUserException";         
 			}else if( e instanceof java.sql.SQLIntegrityConstraintViolationException
@@ -121,7 +117,8 @@ public class ExceptionHandle {
 				//System.out.println("Insert Error Msg");
 				if( !Utils.isNull(errorMsg).equals("")){
 				   stInsert = conn.createStatement();
-				   stInsert.execute(" INSERT INTO monitor_error_mapping(error_code,error_msg)values('"+errorCode+"','"+errorMsg+"')");
+				   int errorId = SequenceProcessAll.getNextValue(conn, "m_error_mapping");
+				   stInsert.execute(" INSERT INTO monitor_error_mapping(error_id,error_code,error_msg)values("+errorId+",'"+errorCode+"','"+errorMsg+"')");
 				}
 			}
 			

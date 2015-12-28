@@ -43,7 +43,7 @@ public class MCustomer extends I_Model<Customer> {
 	private String[] columns = { COLUMN_ID, "CODE", "NAME", "NAME2", "CUSTOMER_TYPE", "TAX_NO", "TERRITORY", "WEBSITE",
 			"BUSINESS_TYPE", "BIRTHDAY", "CREDIT_CHECK", "PAYMENT_TERM", "VAT_CODE", "PAYMENT_METHOD",
 			"SHIPPING_METHOD", "USER_ID", "ISACTIVE", "CREATED_BY", "UPDATED_BY", "PARENT_CUSTOMER_ID", "PARTY_TYPE",
-			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC"};
+			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC","AIRPAY_FLAG"};
 
 	/**
 	 * Find
@@ -526,7 +526,8 @@ public class MCustomer extends I_Model<Customer> {
 				activeUserID, customer.getIsActive() != null ? customer.getIsActive() : "N",
 				activeUserID, activeUserID, customer.getParentID(),
 				ConvertNullUtil.convertToString(customer.getPartyType()).trim(),
-				customer.getPrintTax(),customer.getPrintType(),customer.getPrintBranchDesc(),customer.getPrintHeadBranchDesc()
+				customer.getPrintTax(),customer.getPrintType(),customer.getPrintBranchDesc(),customer.getPrintHeadBranchDesc(),
+				Utils.isNull(customer.getAirpayFlag())
 		      };
 		if (super.save(TABLE_NAME, columns, values, customer.getId(), conn)) {
 			customer.setId(id);
@@ -537,10 +538,11 @@ public class MCustomer extends I_Model<Customer> {
 	public boolean update(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 		PreparedStatement ps = null;
 		try{
-			// ps = conn.prepareStatement("update m_customer set tax_no ='"+customer.getTaxNo()+"' where customer_id ="+ customer.getId());
+		
 			String sql = "update m_customer set tax_no ='"+customer.getTaxNo()+"' " +
 			        "\n ,print_type ='"+customer.getPrintType()+"',print_tax='"+customer.getPrintTax()+"'"+
 			        "\n ,PRINT_BRANCH_DESC ='"+customer.getPrintBranchDesc()+"',PRINT_HEAD_BRANCH_DESC='"+customer.getPrintHeadBranchDesc()+"'"+
+			        "\n ,airpay_flag ='"+customer.getAirpayFlag()+"' ,updated = sysdate() ,updated_by="+activeUserID+
 					"\n  where customer_id ="+ customer.getId();
 			
 			 logger.debug("sql:"+sql);
@@ -556,6 +558,7 @@ public class MCustomer extends I_Model<Customer> {
 			}
 		}
 	}
+	
 	/**
 	 * Get Invoice Amount
 	 * 

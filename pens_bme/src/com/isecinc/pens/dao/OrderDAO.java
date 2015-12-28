@@ -931,8 +931,11 @@ public class OrderDAO {
 			sql.append("  ( SELECT max(m.pens_desc) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name_real, \n ");
 			sql.append("  ( SELECT max(m.pens_desc2) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_name, \n ");
 			sql.append("  ( SELECT max(m.pens_desc3) FROM PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' and m.pens_value = o.store_code and m.status='Active') as  store_address, \n ");
+			
 			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='LotusItem' and m.interface_desc = o.barcode) as material_master_lotus, \n");
 			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='FridayItem' and m.interface_desc = o.barcode) as material_master_friday, \n");
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+Constants.STORE_TYPE_OSHOPPING_ITEM+"' and m.interface_desc = o.barcode) as material_master_oshopping, \n");
+			
 			sql.append("  o.whole_price_bf,o.retail_price_bf,o.create_date \n ");
 			sql.append("  from PENSBME_ORDER o \n ");
 			sql.append("  WHERE 1=1  \n ");
@@ -957,7 +960,10 @@ public class OrderDAO {
 				
 				if(store_code.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
 				   materialMaster = Utils.isNull(rst.getString("material_master_friday"));
+				}else if(store_code.startsWith(Constants.STORE_TYPE_OSHOPPING_CODE)){
+				   materialMaster = Utils.isNull(rst.getString("material_master_oshopping"));
 				}
+				
 				String barcode = Utils.isNull(rst.getString("barcode"));
 				String qty = Utils.isNull(rst.getString("qty"));
 				String uom = Utils.isNull(rst.getString("uom"));
@@ -2346,10 +2352,11 @@ public class OrderDAO {
 		return h;
 	}
 	
-	public static void initStoreTypeMap() throws Exception{
+	public  Map<String,String> initStoreTypeMap() throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Connection conn = null;
+		Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 		try{
 			StringBuffer sql = new StringBuffer("");
 			conn = DBConnection.getInstance().getConnection();
@@ -2358,8 +2365,10 @@ public class OrderDAO {
 			rs = ps.executeQuery();
 			
 			while(rs.next()){
-				OrderAction.STORE_TYPE_MAP.put(rs.getString("pens_value"), rs.getString("pens_desc"));
+				STORE_TYPE_MAP.put(rs.getString("pens_value"), rs.getString("pens_desc"));
 			}
+			return STORE_TYPE_MAP;
+			
 		}catch(Exception e){
 	      throw e;
 		}finally{

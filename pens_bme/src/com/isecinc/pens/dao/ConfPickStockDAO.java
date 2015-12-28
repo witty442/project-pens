@@ -141,8 +141,16 @@ public class ConfPickStockDAO extends PickConstants{
 			   if(rst.getDate("need_date") != null){
 			     h.setNeedDate(Utils.stringValue(rst.getDate("need_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   }
+			   if(rst.getDate("delivery_date") != null){
+				   h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				}
+			   h.setTotalCtn(rst.getInt("total_ctn"));
+			   h.setExported(Utils.isNull(rst.getString("exported")));
+			  
 			   h.setTotalReqQty(rst.getInt("total_req_qty"));
 			   h.setTotalIssueQty(rst.getInt("total_issue_qty"));
+			   
+		
 			   
 			   if(Utils.isNull(rst.getString("status")).equals(STATUS_BEF)){
 				   h.setCanConfirm(true);
@@ -685,6 +693,12 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 			   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
+			   
+			   if(rst.getDate("delivery_date") != null){
+				   h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				}
+			   h.setTotalCtn(rst.getInt("total_ctn"));
+			   h.setExported(Utils.isNull(rst.getString("exported")));
 
 			 
 			}//while
@@ -998,6 +1012,76 @@ public class ConfPickStockDAO extends PickConstants{
 			}
 		}
 	}
+	
+	public static void confirmStausStockIssue(Connection conn,ReqPickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("confirmStausStockIssue");
+		Date deliveryDate = null;
+		try{
+			deliveryDate = Utils.parse(o.getDeliveryDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th); 
+					
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE \n");
+			sql.append(" SET  STATUS=?,STATUS_DATE=? ,UPDATE_DATE =?,UPDATE_USER =? ,DELIVERY_DATE = ?,TOTAL_CTN = ? \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			
+			int c =1;
+			
+			ps.setString(c++, o.getStatus());
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
+			ps.setTimestamp(c++, new java.sql.Timestamp(deliveryDate.getTime()));
+			ps.setInt(c++, o.getTotalCtn());
+			ps.setString(c++, o.getIssueReqNo());
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	public static void confirmDeliveryStockIssue(Connection conn,ReqPickStock o) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("confirmDeliveryStockIssue");
+		Date deliveryDate = null;
+		try{
+			deliveryDate = Utils.parse(o.getDeliveryDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th); 
+					
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE \n");
+			sql.append(" SET  UPDATE_DATE =?,UPDATE_USER =? ,DELIVERY_DATE = ?,TOTAL_CTN = ? \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			
+			int c =1;
+			
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, o.getUpdateUser());
+			ps.setTimestamp(c++, new java.sql.Timestamp(deliveryDate.getTime()));
+			ps.setInt(c++, o.getTotalCtn());
+			
+			ps.setString(c++, o.getIssueReqNo());
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
 	public static void updateStatusStockIssueItemByIssueReqNo(Connection conn,ReqPickStock o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");

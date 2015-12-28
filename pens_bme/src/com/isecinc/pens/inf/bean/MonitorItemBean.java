@@ -3,6 +3,7 @@ package com.isecinc.pens.inf.bean;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author WITTY
@@ -12,23 +13,69 @@ import java.util.Date;
 
 
 public class MonitorItemBean implements Serializable{
+   /**
+	 * 
+	 */
+   private static final long serialVersionUID = -5543198782059403439L;
+   private int row;
    private   BigDecimal id;
    private   BigDecimal monitorId;
    private   String tableName;
    private   String fileName;
    private   Date submitDate ;
    private   int status ;
+   private String statusDesc;
    private   String errorMsg ;
    private   String errorCode ;
    private String source;
    private String destination;
    private int dataCount ;
    private int successCount ;
+   private int failCount ;
    private String fileSize;
    private String groupName;
+   private StringBuffer outputFile;   
+   private List<MonitorItemResultBean> successList;
+   private List<MonitorItemResultBean> failList;
    
-
    
+   
+public String getStatusDesc() {
+	return statusDesc;
+}
+public void setStatusDesc(String statusDesc) {
+	this.statusDesc = statusDesc;
+}
+public int getRow() {
+	return row;
+}
+public void setRow(int row) {
+	this.row = row;
+}
+public List<MonitorItemResultBean> getSuccessList() {
+	return successList;
+}
+public void setSuccessList(List<MonitorItemResultBean> successList) {
+	this.successList = successList;
+}
+public List<MonitorItemResultBean> getFailList() {
+	return failList;
+}
+public void setFailList(List<MonitorItemResultBean> failList) {
+	this.failList = failList;
+}
+public StringBuffer getOutputFile() {
+	return outputFile;
+}
+public void setOutputFile(StringBuffer outputFile) {
+	this.outputFile = outputFile;
+}
+public int getFailCount() {
+	return failCount;
+}
+public void setFailCount(int failCount) {
+	this.failCount = failCount;
+}
 public String getErrorCode() {
 	return errorCode;
 }

@@ -1,0 +1,13 @@
+#ColName,PK,TEXT POSITION,LENGTH,TYPES,DefaultValue,EXTERNAL,KEY_UPDATE_OR_DELETE,Role in Action Column,Require Field,ValidFunc
+Bill_date,N,0,8,CHAR,,N           ,N,,,
+Bill_no,N,1,14,CHAR,,N,N,,,
+Fact_id,N,2,5,CHAR,,N,N,,,
+bus_code  ,N,3,1,CHAR,,N,N,,,
+dept_code  ,N,4,1,CHAR,,N,N,,,
+product_code  ,N,5,1,CHAR,,N,N,,,
+spd_code ,N,6,1,CHAR,,N,N,,,
+Total_Amt ,N,7,13,DECIMAL,,N,N,,,
+Vat_Amt,N,8,13,DECIMAL,,N,N,,,
+Wh_SyStem,N,9,1,CHAR,,N,N,,,
+Site_id,N,10,3,CHAR,,N,N,,,
+Discount_Baht,N,11,13,CHAR,,N,N,,,

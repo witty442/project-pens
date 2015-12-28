@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
+import util.ExcelHeader;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
@@ -32,6 +33,7 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -495,7 +497,7 @@ public class BarcodeAction extends I_Action {
 		String title = "Stock Pick Query By Detail";
 		int totalQty = 0;
 		int no = 0;
-		String a= "@";
+		String jobName = "";
 		try{
 			sql.append("\n select h.warehouse,j.job_id,h.create_user,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 			sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty,'' as remark ");
@@ -527,6 +529,7 @@ public class BarcodeAction extends I_Action {
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 	
+		
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(1,new java.sql.Date(tDate.getTime()));
@@ -534,52 +537,51 @@ public class BarcodeAction extends I_Action {
 			
 			rs = ps.executeQuery();
 			
-			h.append("<style> \n");
-			h.append(" .num { \n");
-			h.append("  mso-number-format:General; \n");
-			h.append(" } \n");
-			h.append(" .text{ \n");
-			h.append("   mso-number-format:'"+a+"'; \n");
-			h.append(" } \n");
-			h.append("</style> \n");
+			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			
-			h.append("<table border='1'> \n");
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"'>"+title+" </td> \n");
-			h.append("</tr> \n");
-			
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"' >Transaction Date:"+o.getTransactionDate()+"</td> \n");
-			h.append("</tr> \n");
-
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"' >Job Id:"+o.getJobId()+"-"+o.getName()+"</td> \n");
-			h.append("</tr> \n");
-			
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"' >สถานะ :"+PickConstants.getStatusDesc(o.getStatus())+" </td>\n");
-			h.append("</tr> \n");
-
-		    h.append("</table> \n");
-
-			h.append("<table border='1'> \n");
-			h.append("<tr> \n");
-			h.append("<td>No.</td> \n");
-			h.append("<td>WareHouse</td> \n");
-			h.append("<td>Group Code</td> \n");
-			h.append("<td>Pens Item</td> \n");
-			h.append("<td>Wacoal Mat.</td> \n");
-			h.append("<td>Barcode</td> \n");
-			h.append("<td>เลขที่กล่อง</td> \n");
-			h.append("<td>Job Id</td> \n");
-			h.append("<td>รับคืนจาก</td> \n");
-			h.append("<td>Status</td> \n");
-			h.append("<td>User Created</td> \n");
-			h.append("</tr>");
 			
 			while(rs.next()){
 			   no++;
+			   if(no==1){
+					h.append("<table border='1'> \n");
+					h.append("<tr> \n");
+					h.append("<td align='left' colspan='"+colSpan+"'>"+title+" </td> \n");
+					h.append("</tr> \n");
+					
+					h.append("<tr> \n");
+					h.append("<td align='left' colspan='"+colSpan+"' >Transaction Date:"+o.getTransactionDate()+"</td> \n");
+					h.append("</tr> \n");
+	
+					/*h.append("<tr> \n");
+					h.append("<td align='left' colspan='"+colSpan+"' >Job Id:"+o.getJobId()+":"+Utils.isNull(rs.getString("job_name"))+"</td> \n");
+					h.append("</tr> \n");*/
+					
+					h.append("<tr> \n");
+					h.append("<td align='left' colspan='"+colSpan+"' class='text'>เลขที่ Job "+o.getJobId()+" "+Utils.isNull(rs.getString("job_name"))+"</td> \n");
+					h.append("</tr> \n");
+					
+					h.append("<tr> \n");
+					h.append("<td align='left' colspan='"+colSpan+"' >สถานะ :"+PickConstants.getStatusDesc(o.getStatus())+" </td>\n");
+					h.append("</tr> \n");
+	
+				    h.append("</table> \n");
+	
+					h.append("<table border='1'> \n");
+					h.append("<tr> \n");
+					h.append("<td>No.</td> \n");
+					h.append("<td>WareHouse</td> \n");
+					h.append("<td>Group Code</td> \n");
+					h.append("<td>Pens Item</td> \n");
+					h.append("<td>Wacoal Mat.</td> \n");
+					h.append("<td>Barcode</td> \n");
+					h.append("<td>เลขที่กล่อง</td> \n");
+					h.append("<td>Job Id</td> \n");
+					h.append("<td>รับคืนจาก</td> \n");
+					h.append("<td>Status</td> \n");
+					h.append("<td>User Created</td> \n");
+					h.append("</tr>");
+			   }
 			   
 			   h.append("<tr> \n");
 			   h.append("<td>"+no+"</td> \n");

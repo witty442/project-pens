@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author WITTY
@@ -33,27 +34,42 @@ private static final long serialVersionUID = -990650039740579753L;
    private String errorCode;
    private String errorMsg;
    private String timeInUse;
+   private String statusDesc;
    
    private MonitorItemBean monitorItemBean;
    private List monitorItemList;
   
-/** Optional For Search **/
-private String userName;
-private String submitDateFrom;
-private String submitDateTo;
-private String requestTable;
-private String requestExportTable;
-private boolean importAll;
-private String requestUpdateSalesTable;
-private String requestImportUserName;
-private String requestImportUpdateUserName;
-private String requestExportUserName;
+	/** Optional For Search **/
+	private String userName;
+	private String submitDateFrom;
+	private String submitDateTo;
+	private String requestTable;
+	private String requestExportTable;
+	private boolean importAll;
+	private String requestUpdateSalesTable;
+	private String requestImportUserName;
+	private String requestImportUpdateUserName;
+	private String requestExportUserName;
+	
+	private String requestWebMemberTable;
+	private String requestImportWebMemberUserName;
 
-private String requestWebMemberTable;
-private String requestImportWebMemberUserName;
+    /** Parameter for Run Batch **/
+	private Map<String, String> batchParamMap;
 
-
-
+	
+public String getStatusDesc() {
+		return statusDesc;
+	}
+	public void setStatusDesc(String statusDesc) {
+		this.statusDesc = statusDesc;
+	}
+public Map<String, String> getBatchParamMap() {
+		return batchParamMap;
+	}
+	public void setBatchParamMap(Map<String, String> batchParamMap) {
+		this.batchParamMap = batchParamMap;
+	}
 public String getTimeInUse() {
 	return timeInUse;
 }

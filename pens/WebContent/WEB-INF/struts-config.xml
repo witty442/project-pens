@@ -79,6 +79,8 @@
 		<form-bean name="invoicePaymentReportForm"
 			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm" />
 			
+		<form-bean name="invoicePaymentNewReportForm"
+			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentNewReportForm" />
 		<!-- RECEIVE BAG REPORT -->
 		<form-bean name="receiveBagReportForm"
 			type="com.isecinc.pens.web.report.receivebag.ReceiveBagReportForm" />
@@ -408,7 +410,17 @@
 			<forward name="report" path="/jsp/reports/invoicePaymentReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/invoicePaymentReport.jsp" />
 		</action>
-
+		
+        <!-- INVOICE PAYMENT NEW REPORT -->
+		<action name="invoicePaymentNewReportForm" path="/jsp/invoicePaymentNewReport"
+			forward="/jsp/reports/invoicePaymentNewReport.jsp" />
+		<action name="invoicePaymentNewReportForm" path="/jsp/invoicePaymentNewReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentNewReportAction">
+			<forward name="report" path="/jsp/reports/invoicePaymentNewReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/invoicePaymentNewReport.jsp" />
+		</action>
+		
 		<!-- INVOICE PAYMENT ALL REPORT -->
 		<action name="invoicePaymentAllReportForm" path="/jsp/invoicePaymentAllReport"
 			forward="/jsp/reports/invoicePaymentAllReport.jsp" />

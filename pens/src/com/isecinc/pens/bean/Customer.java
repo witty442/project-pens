@@ -100,6 +100,8 @@ public class Customer extends I_PO implements Serializable {
 		setPrintBranchDesc(Utils.isNull(rst.getString("PRINT_BRANCH_DESC")));//สาขาที่
 		setPrintHeadBranchDesc(Utils.isNull(rst.getString("PRINT_HEAD_BRANCH_DESC"))); //"พิมพ์สนญ./สาขาที่"
 		setPrintType(Utils.isNull(rst.getString("PRINT_TYPE")));//Y or N
+		
+		setAirpayFlag(Utils.isNull(rst.getString("AIRPAY_FLAG")));
 	}
 
 	/**
@@ -247,8 +249,16 @@ public class Customer extends I_PO implements Serializable {
 	private String printBranchDesc;
 	private String printHeadBranchDesc;
 	private String printTax;
-	
+	private String airpayFlag;
 
+    
+	public String getAirpayFlag() {
+		return airpayFlag;
+	}
+
+	public void setAirpayFlag(String airpayFlag) {
+		this.airpayFlag = airpayFlag;
+	}
 
 	public String getPrintType() {
 		return printType;

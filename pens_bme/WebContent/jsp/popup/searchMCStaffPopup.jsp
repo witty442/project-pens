@@ -27,13 +27,16 @@
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
 	String mcArea = Utils.isNull(request.getParameter("mcArea"));
-
+    String mcAreaDesc = "";
+    
     //Get Region Desc
-    PopupForm pCri = new PopupForm();
-    pCri.setCodeSearch(mcArea);
-    List dList = MCDAO.searchMCRefList(pCri,"equals","MCarea");
-    String mcAreaDesc = dList != null?((PopupForm)dList.get(0)).getDesc():"";	
-    		
+    if( !Utils.isNull(mcArea).equals("")){
+	    PopupForm pCri = new PopupForm();
+	    pCri.setCodeSearch(mcArea);
+	    List dList = MCDAO.searchMCRefList(pCri,"equals","MCarea");
+	    mcAreaDesc = dList != null?((PopupForm)dList.get(0)).getDesc():"";	
+    }
+    
     String mcRoute = Utils.isNull(request.getParameter("mcRoute"));
     String staffType = Utils.isNull(request.getParameter("staffType"));
     String active = Utils.isNull(request.getParameter("active"));
@@ -65,12 +68,13 @@ function selectMultiple(){
 	var mobile2 = document.getElementsByName("mobile2");
 	var empRefId = document.getElementsByName("empRefId");
 	var empTypeDesc = document.getElementsByName("empTypeDesc");
+	var region = document.getElementsByName("region");
 	
 	for(var i=0;i<chRadio.length;i++){
 		//alert(chRadio[i].checked);
         if(chRadio[i].checked){
           // alert(i+":"+retCode[i].value);
-           window.opener.setStoreMainValue(retCode[i].value,retDesc[i].value,empType[i].value,mobile1[i].value,mobile2[i].value,empRefId[i].value,empTypeDesc[i].value);
+           window.opener.setStoreMainValue(retCode[i].value,retDesc[i].value,empType[i].value,mobile1[i].value,mobile2[i].value,empRefId[i].value,empTypeDesc[i].value,region[i].value);
            window.close();
            break;
         }
@@ -127,6 +131,7 @@ function selectMultiple(){
 		
 	    <input type ="hidden" name="empRefId" value="${item.mcEmpBean.empRefId}" />
 		<input type ="hidden" name="empType" value="${item.mcEmpBean.empType}" />
+		<input type ="hidden" name="region" value="${item.mcEmpBean.region}" />
 		<input type ="hidden" name="empTypeDesc" value="${item.mcEmpBean.empTypeDesc}" />
 		<input type ="hidden" name="mobile1" value="<bean:write name="item" property="mcEmpBean.mobile1"/>" />
 		<input type ="hidden" name="mobile2" value="<bean:write name="item" property="mcEmpBean.mobile2"/>" /> 

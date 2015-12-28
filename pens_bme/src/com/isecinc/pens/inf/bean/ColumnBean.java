@@ -16,6 +16,7 @@ public class ColumnBean implements Serializable{
 	private String columnValue;
 	private String defaultValue;
 	private int textPosition;
+	private int textLength;
 	private String externalFunction;
 	private String key;
     private String action;
@@ -27,6 +28,12 @@ public class ColumnBean implements Serializable{
 	private String validateFunc;
 	
 	
+	public int getTextLength() {
+		return textLength;
+	}
+	public void setTextLength(int textLength) {
+		this.textLength = textLength;
+	}
 	public String getValidateFunc() {
 		return validateFunc;
 	}

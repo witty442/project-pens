@@ -19,6 +19,7 @@ public class MCBean implements Serializable{
 	private String empIdTo;
 	
 	//staff
+	private String orgEmpRefId;//For edit Staff Setup
 	private String empRefId;
 	private String orgEmpId;
 	private String empId;
@@ -74,14 +75,27 @@ public class MCBean implements Serializable{
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	private String mode;
-	private long totalSecond = 0;
+	private int totalHH = 0;
+	private int totalMM = 0;
 	
-	
-	public long getTotalSecond() {
-		return totalSecond;
+	public String getOrgEmpRefId() {
+		return orgEmpRefId;
 	}
-	public void setTotalSecond(long totalSecond) {
-		this.totalSecond = totalSecond;
+	public void setOrgEmpRefId(String orgEmpRefId) {
+		this.orgEmpRefId = orgEmpRefId;
+	}
+	
+	public int getTotalHH() {
+		return totalHH;
+	}
+	public void setTotalHH(int totalHH) {
+		this.totalHH = totalHH;
+	}
+	public int getTotalMM() {
+		return totalMM;
+	}
+	public void setTotalMM(int totalMM) {
+		this.totalMM = totalMM;
 	}
 	public String getEmpTypeDesc() {
 		return empTypeDesc;

@@ -24,6 +24,7 @@ public class PerformanceReport implements Serializable {
 	private double netAmount;
 	private double cashAmount;
 	private double receiptAmount;
+	private double airpayAmount;
 	private double vatAmount;
 	private String customerCode;
 	private String customerName;
@@ -31,6 +32,7 @@ public class PerformanceReport implements Serializable {
 	private double vatReceipt;
 	private String chequeNo;
 	private String status;
+	private String airpayNo;
 
 	/** For sum all start month to date selected. **/
 	private double allDiscount;
@@ -45,6 +47,22 @@ public class PerformanceReport implements Serializable {
 
 	
 	
+	public double getAirpayAmount() {
+		return airpayAmount;
+	}
+
+	public void setAirpayAmount(double airpayAmount) {
+		this.airpayAmount = airpayAmount;
+	}
+
+	public String getAirpayNo() {
+		return airpayNo;
+	}
+
+	public void setAirpayNo(String airpayNo) {
+		this.airpayNo = airpayNo;
+	}
+
 	public String getStatus() {
 		return status;
 	}

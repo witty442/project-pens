@@ -44,11 +44,16 @@ function searchDetail(path, type,value) {
 }
 
 function clearForm(path, type) {
-	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=prepare&type="+type;
+	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=prepare&pageAction=new&type="+type;
 	document.interfacesForm.submit();
 	return true;
 }
 
+function backToMainpage(path, type) {
+	document.interfacesForm.action = path + "/jsp/mainpage.jsp";
+	document.interfacesForm.submit();
+	return true;
+}
 function save(path){
 	
 	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=save";

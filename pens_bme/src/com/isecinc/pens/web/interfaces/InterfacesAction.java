@@ -2,6 +2,9 @@ package com.isecinc.pens.web.interfaces;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,15 +17,19 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.constants.PickConstants;
+import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.ImportManager;
+import com.isecinc.pens.inf.manager.ProcessManager;
+import com.isecinc.pens.inf.manager.process.GenerateHISHER;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 
@@ -42,23 +49,8 @@ public class InterfacesAction extends I_Action {
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		logger.debug("Interfaces Prepare Form");
-		InterfacesForm conversionForm = (InterfacesForm) form;
 		String returnText = "prepare";
 		try {
-			
-			//for test
-			/*User user = new User();
-			com.isecinc.core.bean.References ref = new com.isecinc.core.bean.References("AD","AD","AD");
-			user.setUserName("ADMIN");
-			user.setRole(ref);
-			request.getSession().setAttribute("user",user);*/
-			
-			conversionForm.setMonitorBean(new MonitorBean());
-			
-			//clear Task running for next run
-			InterfaceDAO dao = new InterfaceDAO();
-			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
-			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,7 +58,6 @@ public class InterfacesAction extends I_Action {
 					+ e.toString());
 			throw e;
 		}
-		
 		return returnText;
 	}
 
@@ -78,32 +69,59 @@ public class InterfacesAction extends I_Action {
 		logger.debug("Interfaces Prepare Form without ID");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		String returnText = "prepare";
-		//Connection conn = null;
+		InterfaceDAO dao = new InterfaceDAO();
 		try {
+			logger.debug("pageName:"+Utils.isNull(request.getParameter("pageName")) +",pageAction:"+Utils.isNull(request.getParameter("pageAction")));
 			
-			interfacesForm.setResults(null);
-			//for test
-			/*
-			 *  SOMBOON   VAN
-				WANCHAI   DD
-				SOMCHAI   TT
-			 */
-			/*User user = new User();
-		
-			user.setUserName("SOMCHAI");
-	        user.setPassword("1234");
-			
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			user = new LoginProcess().login(user.getUserName(), user.getPassword(), conn);
-			
-			request.getSession().setAttribute("user",user);*/
-			
-			interfacesForm.setMonitorBean(new MonitorBean());
-			
-			//clear Task running for next run
-			InterfaceDAO dao = new InterfaceDAO();
-			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
-			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
+			if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_HISHER)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				//default value
+				InterfaceBean bean =new InterfaceBean();
+				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
+				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
+				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    bean.setTextFileName("");
+				bean.setOutputPath("d://BME/");//Gen
+				
+				interfacesForm.setBean(bean);
+				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
+				
+				
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_HISHER);
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BILL_ICC)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_BILL_ICC);
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BMESCAN)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_BMESCAN);
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_EXPORT_BILL_ICC)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT_BILL_ICC);
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -124,27 +142,112 @@ public class InterfacesAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "search";
 		InterfaceDAO dao = new InterfaceDAO();
+		String type = "";
 		try {
 			String timeInUse =interfacesForm.getMonitorBean().getTimeInUse();
 			logger.info("TimeInUse:"+timeInUse);
 			
-			InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
-			if(request.getAttribute("searchKey") != null){
-				criteria.setSearchKey((String)request.getAttribute("searchKey"));
-			}
-			interfacesForm.setCriteria(criteria);
-			/** Set Condition Search **/
-			MonitorBean[] results = dao.findMonitorList(user);
+			logger.info("pageName:"+Utils.isNull(request.getParameter("pageName")));
 			
-			if (results != null && results.length > 0) {
-				interfacesForm.getCriteria().setSearchResult(results.length);
-				interfacesForm.setResults(results);
-				criteria.setMonitorBean(new MonitorBean());
+			if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_HISHER)){
+				type = Constants.TYPE_GEN_HISHER;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
 				interfacesForm.setCriteria(criteria);
-			} else {
-				request.setAttribute("Message", "Data not found");
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+				
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BILL_ICC)){
+				type = Constants.TYPE_IMPORT_BILL_ICC;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					interfacesForm.setMonitorItemList(dao.findMonitorItemList(user,results[0]));
+				
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
+				
+			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BMESCAN)){
+				type = Constants.TYPE_IMPORT;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorList(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_EXPORT_BILL_ICC)){
+				type = Constants.TYPE_EXPORT_BILL_ICC;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					interfacesForm.setMonitorItemList(dao.findMonitorItemList(user,results[0]));
+				
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
 			}
-			
 			
 			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
 			
@@ -214,8 +317,9 @@ public class InterfacesAction extends I_Action {
 		try {
 			boolean canRunBatch = false;
 			InterfaceDAO dao = new InterfaceDAO();
-			String status = dao.findControlMonitor(Constants.TYPE_IMPORT);
+			String status = dao.findControlMonitor(Constants.TYPE_IMPORT_BMESCAN);
 			logger.info("status["+status+"]");
+			
 			if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
 			    canRunBatch = true;
 			}
@@ -246,7 +350,7 @@ public class InterfacesAction extends I_Action {
 			    logger.debug("requestTable:"+interfacesForm.getMonitorBean().getRequestTable());
 				logger.debug("User Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
 				     
-				MonitorBean m = importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
+				MonitorBean m = importManager.importTxt(Constants.TYPE_IMPORT_BMESCAN,userLogin,userRequest,request,interfacesForm.getMonitorBean().isImportAll());
 			   
 				/** Set for Progress Bar Opoup **/
 				request.setAttribute("action", "submited");
@@ -263,80 +367,153 @@ public class InterfacesAction extends I_Action {
 		return mapping.findForward("success");
 	}
 	
-	
-	
-
-	public ActionForward getTextFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("getLog");
+	 
+	public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		
+		logger.debug("IrunBatch");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		int i = 0;
+		User userLogin = (User) request.getSession().getAttribute("user");
+		ProcessManager processManager =  new ProcessManager();
+		InterfaceDAO dao = new InterfaceDAO();
+		boolean canRunBatch = false;
+		String textFileName = "";
 		EnvProperties env = EnvProperties.getInstance();
-		String pathFull = "";
 		try {
-			 String fileName = request.getParameter("fileName");;
-			 String transType = request.getParameter("transType");
-			 String type = request.getParameter("type");
-			 String status = request.getParameter("status");
-			 if(Constants.TRANSACTION_MASTER_TYPE.equals(transType)){
-				 if(type.equals(Constants.TYPE_EXPORT)){
-					 if(fileName.indexOf("TRIP") != -1 
-					   || fileName.indexOf("AUTHEN") != -1
-					   || fileName.indexOf("SALES_INVENTORY") != -1){
-						 pathFull =  env.getProperty("path.master.sales.in")+fileName;
-					 }else{
-				         pathFull =  env.getProperty("path.master.sales.out")+fileName;
-					 }
-				 }else{
-					 //import 
-					 if(fileName.indexOf("TRIP") != -1 
-					   || fileName.indexOf("CUST") != -1
-					   || fileName.indexOf("CUSTADDR") != -1
-					   || fileName.indexOf("CUSTCONTACT") != -1
-							 ){
-						 if(status.equals("1")){ //success
-							 pathFull =  env.getProperty("path.master.sales.in.processed")+fileName; 
-						 }else{
-							 pathFull =  env.getProperty("path.master.sales.in")+fileName; 
-						 }
-					 }else{
-					    pathFull =  env.getProperty("path.master.sales.in")+fileName; 
-					 }
-				 }
-			 }else if(Constants.TRANSACTION_TRANS_TYPE.equals(transType)){
-				 if(type.equals(Constants.TYPE_EXPORT)){
-					 pathFull =  env.getProperty("path.transaction.sales.out")+fileName; 
-				 }else{
-					 if((Constants.STATUS_SUCCESS+"").equals(status)){
-					     pathFull =  env.getProperty("path.transaction.sales.in.processed")+fileName;
-					 }else{
-						 pathFull =  env.getProperty("path.transaction.sales.in")+fileName; 
-					 }
-				 }
-			 }else if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
-				 if(type.equals(Constants.TYPE_EXPORT)){
-					 pathFull =  env.getProperty("path.transaction.sales.out")+fileName; 
-				 }else{
-					 if((Constants.STATUS_SUCCESS+"").equals(status)){
-					     pathFull =  env.getProperty("path.transaction.sales.in.processed")+fileName;
-					 }else{
-						 pathFull =  env.getProperty("path.transaction.sales.in")+fileName; 
-					 }
-				 }
-			 }
-			 logger.debug("fileName:"+fileName);
-			 logger.debug("transaType:"+transType);
-			 logger.debug("pathFull:"+pathFull);
-			 
-			 FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-		     //DISPLAY CSV FILE 
-			// ftpManager.getDownloadFTPFileByName(pathFull,response);
+			
+			if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_HISHER)){
+				String status = dao.findControlMonitor(Constants.TYPE_GEN_HISHER);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Generate His &Her");
+					monitorModel.setType(Constants.TYPE_GEN_HISHER);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Gen FileName **/
+					textFileName = InterfaceUtils.getHisHerTextFileName(interfacesForm.getBean().getTransactionDate());//Gen
+				
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					logger.debug("Output path:"+interfacesForm.getBean().getOutputPath());
+					
+					batchParamMap.put(GenerateHISHER.PARAM_OUTPUT_PATH,"");
+					batchParamMap.put(GenerateHISHER.PARAM_FILE_NAME,textFileName);
+					batchParamMap.put(GenerateHISHER.PARAM_CUST_GROUP,interfacesForm.getBean().getCustGroup());
+					batchParamMap.put(GenerateHISHER.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+					
+					interfacesForm.getBean().setTextFileName(textFileName);
+					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export"));
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BILL_ICC)){
+				String status = dao.findControlMonitor(Constants.TYPE_IMPORT_BILL_ICC);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Import Bill ICC");
+					monitorModel.setType(Constants.TYPE_IMPORT_BILL_ICC);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Gen FileName **/
+					textFileName = InterfaceUtils.getHisHerTextFileName(interfacesForm.getBean().getTransactionDate());//Gen
+				
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					logger.debug("Output path:"+interfacesForm.getBean().getOutputPath());
+					batchParamMap.put(GenerateHISHER.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_EXPORT_BILL_ICC)){
+				String status = dao.findControlMonitor(Constants.TYPE_EXPORT_BILL_ICC);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Export Bill ICC");
+					monitorModel.setType(Constants.TYPE_EXPORT_BILL_ICC);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Gen FileName **/
+					textFileName = InterfaceUtils.getHisHerTextFileName(interfacesForm.getBean().getTransactionDate());//Gen
+				
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					batchParamMap.put(GenerateHISHER.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+			}
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("getLog");
+		return mapping.findForward("success");
 	}
 	
 	/**
@@ -371,10 +548,7 @@ public class InterfacesAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		InterfacesForm tripForm = (InterfacesForm) form;
-
-		
 		try {
-
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
@@ -392,7 +566,6 @@ public class InterfacesAction extends I_Action {
 		}
 		return "re-search";
 	}
-
 	
 	@Override
 	protected void setNewCriteria(ActionForm form) {

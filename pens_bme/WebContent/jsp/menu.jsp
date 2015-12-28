@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -105,7 +106,7 @@
 				</li> --%>
 				
 				 <li>
-	          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
+	          		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_BMESCAN%>';"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
 	          	</li>
           	<%} %>
           	<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
@@ -113,6 +114,9 @@
           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare';"><span>12.<bean:message key="genCN" bundle="sysprop"/></span></a>
           	</li>
           	<%} %>
+          		<li>
+					<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/importAction.do?do=prepare&action=new&page=onhandOShopping');">13.<span><bean:message bundle="sysprop" key="ImportBMEOShopping"/></span></a>
+				</li>
 		</ul>
 	</li>
 <%} %>
@@ -192,6 +196,9 @@
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderFridayAction.do?do=prepare&action=new');"><span><bean:message bundle="sysprop" key="OrderFriday"/></span></a>
 			</li>
 			<li>
+				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAllAction.do?do=prepare&action=new&pageName=OShopping');"><span><bean:message bundle="sysprop" key="OrderOShopping"/></span></a>
+			</li>
+			<li>
 				<a href="#" onclick="javascript:link('<%=contextPath%>/jsp/orderAction.do?do=prepareView&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiry"/></span></a>
 			</li>
 			<li>
@@ -201,7 +208,24 @@
 		</ul>
 	</li>
 <%} %>
-
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){%>
+	 <li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Interfaces</span></a>
+		<ul>
+			 <li>
+	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_GEN_HISHER%>';"><span>1.<bean:message key="InterfaceHisHer" bundle="sysprop"/></span></a>
+	         </li>
+	          <li>
+	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_BILL_ICC%>';"><span>2.<bean:message key="ImportBillICC" bundle="sysprop"/></span></a>
+	         </li>
+	         <li>
+	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/saveInvoiceAction.do?do=prepare2&action=new';"><span>3.<bean:message key="SaveInvoice" bundle="sysprop"/></span></a>
+	         </li>
+	           <li>
+	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_EXPORT_BILL_ICC%>';"><span>4.<bean:message key="ExportBillICC" bundle="sysprop"/></span></a>
+	         </li>
+		</ul>
+	</li>
+<%} %>
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 	 <li><a href="#" class="parent" onclick="window.location='<%=contextPath%>/jsp/mainpage.jsp';"><span>Transaction</span></a>
 		<ul>

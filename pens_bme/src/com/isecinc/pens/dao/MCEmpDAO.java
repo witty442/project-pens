@@ -75,7 +75,7 @@ public class MCEmpDAO {
 				sql.append(" EMPLOYEE_ID =? ,EMP_TYPE = ?,TITLE =?,  \n");
 				sql.append(" NAME =? ,SURNAME = ?,MOBILE1 =?,   \n");
 				sql.append(" MOBILE2 =? , NOTE =? ,REGION = ?,  \n");
-				sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,START_DATE =? ,END_DATE = ? ,REASON_LEAVE =?  \n");
+				sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,START_DATE =? ,END_DATE = ? ,REASON_LEAVE =?,STATUS = ?  \n");
 				sql.append(" WHERE EMP_REF_ID = ?  \n" );
 
 				ps = conn.prepareStatement(sql.toString());
@@ -102,6 +102,7 @@ public class MCEmpDAO {
 				    ps.setTimestamp(c++,null);	
 				}
 				ps.setString(c++, Utils.isNull(o.getReasonLeave()));
+				ps.setString(c++, Utils.isNull(o.getStatus()));
 				
 				ps.setInt(c++, Utils.convertStrToInt(o.getEmpRefId()));
 				
@@ -144,21 +145,31 @@ public class MCEmpDAO {
 			try {
 			   sql.append(" \n select S.*" );
 			   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='MCarea' and M.pens_value=S.region ) as region_desc");
-			   sql.append("\n ,(SELECT M.pens_desc from MC_MST_REFERENCE M");
-			   sql.append("\n   where 1=1 and reference_code ='StaffType' ");
-			   sql.append("\n   and M.pens_value =S.emp_type ) emp_type_desc");
-			   
+			   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='EmpStatus' and M.pens_value=S.status ) as status_desc");
+			   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='LeaveReason' and M.pens_value=S.reason_leave ) as reason_leave_desc");
+			   sql.append("\n ,(SELECT M.pens_desc from MC_MST_REFERENCE M where 1=1 and reference_code ='StaffType' and M.pens_value =S.emp_type ) emp_type_desc");
 			   sql.append("\n  from MC_EMPLOYEE S WHERE 1=1");
-			   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
-					String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
-					sql.append("\n and S.employee_id in( "+sqlIn+")");
+			   
+			   if( !Utils.isNull(o.getEmpId()).equals("") ){
+					sql.append("\n and S.employee_id ="+Utils.isNull(o.getEmpId())+"");
 			   }
 			   if( !Utils.isNull(o.getEmpRefId()).equals("")){
 					sql.append("\n and S.emp_ref_id ="+o.getEmpRefId());
 				}
-			   
 				if( !Utils.isNull(o.getEmpType()).equals("")){
 					sql.append("\n and S.emp_type = '"+Utils.isNull(o.getEmpType())+"'");
+				}
+				if( !Utils.isNull(o.getRegion()).equals("")){
+					sql.append("\n and S.region = '"+Utils.isNull(o.getRegion())+"'");
+				}
+				if( !Utils.isNull(o.getName()).equals("")){
+					sql.append("\n and S.name LIKE '%"+Utils.isNull(o.getName())+"%'");
+				}
+				if( !Utils.isNull(o.getStatus()).equals("")){
+					sql.append("\n and S.STATUS = '"+Utils.isNull(o.getStatus())+"'");
+				}
+				if( !Utils.isNull(o.getSurName()).equals("")){
+					sql.append("\n and S.surname LIKE '%"+Utils.isNull(o.getSurName())+"%'");
 				}
 				sql.append("\n order by S.EMP_REF_ID asc ");
 				
@@ -186,7 +197,9 @@ public class MCEmpDAO {
 				   h.setMobile1(Utils.isNull(rst.getString("mobile1")));
 				   h.setMobile2(Utils.isNull(rst.getString("mobile2")));
 				   h.setStatus(Utils.isNull(rst.getString("status")));
+				   h.setStatusDesc(Utils.isNull(rst.getString("status_desc")));
 				   h.setReasonLeave(Utils.isNull(rst.getString("reason_leave")));
+				   h.setReasonLeaveDesc(Utils.isNull(rst.getString("reason_leave_desc")));
 				   h.setNote(Utils.isNull(rst.getString("note")));
 				   h.setRegion(Utils.isNull(rst.getString("region")));
 				   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));

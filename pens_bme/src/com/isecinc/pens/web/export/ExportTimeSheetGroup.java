@@ -20,15 +20,18 @@ public class ExportTimeSheetGroup extends Excel{
 	
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static XSSFWorkbook genExportToExcel(User user,MCBean o) throws Exception {
+	public static ExcelResultBean genExportToExcel(User user,MCBean o) throws Exception {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
+		ExcelResultBean excelResutlBean = new ExcelResultBean();
 		XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
 		int sheet = 0;
 		MCBean h = null;
-		long totalSeconds = 0;
+		boolean found = false;
+		int totalHH = 0;
+		int totalMM = 0;
 		try{
 			conn = DBConnection.getInstance().getConnection();
 		
@@ -36,7 +39,11 @@ public class ExportTimeSheetGroup extends Excel{
 			 
 		   sql.append(" \n SELECT S.emp_ref_id ,s.employee_id,S.emp_type,S.title,S.name,S.surname,S.mobile1,S.mobile2 ");
 		   sql.append(" \n,S.status,S.reason_leave, S.note,S.region  " );
-		
+		   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='MCarea' and M.pens_value=S.region ) as region_desc");
+		   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='EmpStatus' and M.pens_value=S.status ) as status_desc");
+		   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='LeaveReason' and M.pens_value=S.reason_leave ) as reason_leave_desc");
+		   sql.append("\n ,(SELECT M.pens_desc from MC_MST_REFERENCE M where 1=1 and reference_code ='StaffType' and M.pens_value =S.emp_type ) emp_type_desc");
+		 
 		   sql.append(" \n from MC_EMPLOYEE S " );
 		   sql.append(" \n,(select distinct emp_ref_id from MC_STAFF_TIME T");
 		   sql.append("\n    where 1=1 " );
@@ -55,15 +62,14 @@ public class ExportTimeSheetGroup extends Excel{
 				sql.append("\n and S.emp_type = '"+Utils.isNull(o.getEmpType())+"'");
 		   }
 		   if( !Utils.isNull(o.getName()).equals("")){
-				sql.append("\n and S.name = '"+Utils.isNull(o.getName())+"'");
+				sql.append("\n and S.name like '%"+Utils.isNull(o.getName())+"%'");
 		   }
 
 		   sql.append("\n order by S.EMP_REF_ID DESC ");
 			
-			logger.debug("sql:"+sql.toString());
+		   logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
-		
 			rst = ps.executeQuery();
 			
 			while (rst.next()) {
@@ -75,6 +81,7 @@ public class ExportTimeSheetGroup extends Excel{
 				   h.setEmpId(""); 
 				}
 			   h.setEmpType(Utils.isNull(rst.getString("emp_type")));
+			   h.setEmpTypeDesc(Utils.isNull(rst.getString("emp_type_desc")));
 			   h.setTitle(Utils.isNull(rst.getString("title")));
 			   h.setName(Utils.isNull(rst.getString("name")));
 			   h.setSurName(Utils.isNull(rst.getString("surname")));
@@ -84,29 +91,32 @@ public class ExportTimeSheetGroup extends Excel{
 			   h.setReasonLeave(Utils.isNull(rst.getString("reason_leave")));
 			   h.setNote(Utils.isNull(rst.getString("note")));
 			   h.setRegion(Utils.isNull(rst.getString("region")));
-				
+			   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
+			   
 			   h.setStaffMonth(o.getStaffMonth());
 			   h.setStaffYear(o.getStaffYear());
 			   
 			   logger.debug("Gen Excel EMP_REF_ID:"+rst.getString("EMP_REF_ID"));
 			   h = genExportToExcelModel(conn,user,xssfWorkbook,h);
-			   totalSeconds += h.getTotalSecond();
 			   
-			   sheet++;
-			}
-			
-			 //Calc Second to Hourse :minute
-			  long hours = totalSeconds/3600; 
+			   totalMM = h.getTotalMM();
+			   totalHH = h.getTotalHH();
+			   
+			  //TotalTimeALL Calc Second to Hourse :minute
+			  long minutes = (totalMM % 60);
+			  String minutesStr = minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes);
+	            
+			  long hours = totalHH +(totalMM/60);
 			  String hoursStr = hours < 10 ? "0" + String.valueOf(hours) : String.valueOf(hours);
 			   
-			  long minutes =  ((totalSeconds/3600) % 1 *60);
-			  String minutesStr = minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes);
-              
+			  
 			  String totalTimeAll = hoursStr+":"+minutesStr;
-			  
 			  ExcelStyle style = new ExcelStyle(xssfWorkbook);
-			  
 			  genSummary(xssfWorkbook.getSheet("EMPID_"+h.getEmpId()), xssfWorkbook, style,totalTimeAll,xssfWorkbook.getSheet("EMPID_"+h.getEmpId()).getLastRowNum()+1);
+			
+			  sheet++;
+			  found = true;
+			}
 			
 			 //adjust width of the column
 			  for(int s=0;s<sheet;s++){
@@ -117,8 +127,11 @@ public class ExportTimeSheetGroup extends Excel{
 			       sheet2.setColumnWidth(3, 5300);
 			       sheet2.setColumnWidth(4, 4300);
 			       sheet2.setColumnWidth(5, 6300);
-			  }   
-			
+			  }  
+			  
+			  excelResutlBean.setXssfWorkbook(xssfWorkbook);
+			  excelResutlBean.setFound(found);
+			  
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -128,7 +141,7 @@ public class ExportTimeSheetGroup extends Excel{
 				conn.close();conn = null;
 			} catch (Exception e) {}
 		}
-		return xssfWorkbook;
+		return excelResutlBean;
 	}
 	
 	public static MCBean genExportToExcelModel(Connection conn,User user,XSSFWorkbook xssfWorkbook ,MCBean h) throws Exception {
@@ -136,7 +149,8 @@ public class ExportTimeSheetGroup extends Excel{
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		int row = 0;
-		long totalSecond = 0;
+		int totalHH = 0;
+		int totalMM = 0;
 		try {
 		   // Create Sheet.
            XSSFSheet sheet = xssfWorkbook.createSheet("EMPID_"+h.getEmpId());
@@ -149,8 +163,9 @@ public class ExportTimeSheetGroup extends Excel{
            /*******************DATA ********************************/
            String christYear = (Integer.parseInt(h.getStaffYear())-543)+"";
            
-           sql.append(" \n select * " );
-		   sql.append(" \n from MC_STAFF_TIME  " );
+           sql.append(" \n select S.* " );
+           sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='DayoffReason' and M.pens_value=S.reason_leave ) as dayoffReason_desc");
+		   sql.append(" \n from MC_STAFF_TIME  S" );
 		   sql.append(" \n WHERE 1=1  ");
 		   sql.append(" \n and EXTRACT(year FROM staff_date) = '"+christYear+"'");
 		   sql.append(" \n and EXTRACT(month FROM staff_date) = '"+Utils.isNull(h.getStaffMonth())+"'");
@@ -187,7 +202,7 @@ public class ExportTimeSheetGroup extends Excel{
 	           
 	           XSSFCell cell5 = dataRow.createCell(4);
 	           cell5.setCellStyle(style.dataLineStyle);
-	           cell5.setCellValue(Utils.isNull(rst.getString("REASON_LEAVE")));
+	           cell5.setCellValue(Utils.isNull(rst.getString("dayoffReason_desc")));
 	           
 	           XSSFCell cell6 = dataRow.createCell(5);
 	           cell6.setCellStyle(style.dataLineStyle);
@@ -195,12 +210,13 @@ public class ExportTimeSheetGroup extends Excel{
 	           
 	           if( !Utils.isNull(rst.getString("TOTAL_TIME")).equals("")){
 	             String[] totalTime = Utils.isNull(rst.getString("TOTAL_TIME")).split("\\:");
-	             totalSecond += hoursToSeconds(Integer.parseInt(totalTime[0]));
-	             totalSecond += minuteToSeconds(Integer.parseInt(totalTime[1]));
+	             totalHH += Integer.parseInt(totalTime[0]);
+	             totalMM += Integer.parseInt(totalTime[1]);
 	           }
 
 			}
-			h.setTotalSecond(totalSecond);
+			h.setTotalHH(totalHH);
+			h.setTotalMM(totalMM);
 		   
 		} catch (Exception e) {
 			throw e;
@@ -264,7 +280,7 @@ public class ExportTimeSheetGroup extends Excel{
            //Header Row 0
            headerCell1 = headerRow.createCell(0);
            headerCell1.setCellStyle(style.headerStyleLeft2);
-           headerCell1.setCellValue("ใบส่งสินค้าคืนจากร้านค้า");
+           headerCell1.setCellValue("ประเภท :"+b.getEmpTypeDesc() +"  ภาค:"+b.getRegionDesc());
 
            sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
 
@@ -344,21 +360,4 @@ public class ExportTimeSheetGroup extends Excel{
 		return row;
 	}
 	
-	public static int hoursToSeconds(int hours){
-	    int seconds = 0;
-	    if ( (hours >= 0 && hours < 24) ){
-	        seconds += (hours*3600);
-	        return seconds;
-	    }
-	    return seconds;
-	}
-
-	public static int minuteToSeconds(int minutes){
-	    int seconds = 0;
-	    if ( (minutes >= 0 && minutes < 60)){
-	        seconds +=  (minutes*60);
-	        return seconds;
-	    }
-	    return seconds;
-	}
 }

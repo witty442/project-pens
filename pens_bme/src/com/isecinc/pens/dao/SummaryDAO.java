@@ -42,6 +42,8 @@ public class SummaryDAO {
 					tableName = "PENSBME_ONHAND_BME";
 				}else if(Utils.isNull(c.getLocation()).equalsIgnoreCase("StockFriday")){
 					tableName = "PENSBME_ONHAND_BME_FRIDAY";
+				}else if(Utils.isNull(c.getLocation()).equalsIgnoreCase("StockOShopping")){
+					tableName = "PENSBME_ONHAND_BME_OSHOPPING";
 				}
 				
 				sql.delete(0, sql.length());
@@ -1370,7 +1372,31 @@ public class SummaryDAO {
 						if( !Utils.isNull(c.getGroup()).equals("")){
 							sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 						}
-					
+						
+                        sql.append("UNION ");
+						
+                        sql.append("\n SELECT distinct ");
+        				sql.append("\n  L.PENS_CUST_CODE as customer_code");
+        				sql.append("\n ,L.PENS_ITEM ");
+        				sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+        				sql.append("\n   M.pens_value = L.PENS_CUST_CODE AND M.reference_code ='Store') as customer_desc ");
+						sql.append("\n ,L.PENS_GROUP_TYPE as group_type ");
+						sql.append("\n  FROM PENSBME_SALES_FROM_LOTUS L ");
+						
+						sql.append("\n WHERE 1=1 ");
+						if( !Utils.isNull(c.getSalesDate()).equals("")){
+	                        sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+							sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
 						
                 sql.append("\n )M ");
         		sql.append("\n LEFT OUTER JOIN(	 ");
@@ -1380,15 +1406,8 @@ public class SummaryDAO {
 						sql.append("\n NVL(SUM(QTY),0) AS SALE_OUT_QTY ");
 						sql.append("\n FROM ");
 						sql.append("\n PENSBI.PENSBME_SALES_FROM_LOTUS L ");
-						sql.append("\n,( ");
-								sql.append("\n select distinct pens_value,pens_desc2 from ");
-								sql.append("\n PENSBI.PENSBME_MST_REFERENCE M ");
-								sql.append("\n WHERE 1=1 ");
-								sql.append("\n AND M.reference_code ='LotusItem' ");
-						sql.append("\n ) M ");
 						sql.append("\n WHERE 1=1 ");
-						sql.append("\n AND M.pens_desc2 = L.pens_group_type ");
-								 
+							 
 						if( !Utils.isNull(c.getSalesDate()).equals("")){
 	                        sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
@@ -1396,8 +1415,8 @@ public class SummaryDAO {
 							sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-							sql.append("\n AND M.pens_value >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-							sql.append("\n AND M.pens_value <='"+Utils.isNull(c.getPensItemTo())+"' ");
+							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
 							sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");

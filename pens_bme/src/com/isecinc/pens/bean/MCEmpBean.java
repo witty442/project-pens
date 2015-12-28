@@ -32,7 +32,9 @@ public class MCEmpBean implements Serializable{
 	private String endDate;
 	private String note;
 	private String reasonLeave;
+	private String reasonLeaveDesc;
 	private String status;
+	private String statusDesc;
 	
 	private String createUser;
 	private String updateUser;
@@ -44,6 +46,18 @@ public class MCEmpBean implements Serializable{
 	private String mode;
 	
 	
+	public String getReasonLeaveDesc() {
+		return reasonLeaveDesc;
+	}
+	public void setReasonLeaveDesc(String reasonLeaveDesc) {
+		this.reasonLeaveDesc = reasonLeaveDesc;
+	}
+	public String getStatusDesc() {
+		return statusDesc;
+	}
+	public void setStatusDesc(String statusDesc) {
+		this.statusDesc = statusDesc;
+	}
 	public String getEmpTypeDesc() {
 		return empTypeDesc;
 	}

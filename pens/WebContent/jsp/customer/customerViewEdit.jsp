@@ -198,9 +198,13 @@ function switchPrintType(){
 							</tr>
 							<tr>
 								<td colspan="2">&nbsp;</td>
-								<td colspan="3">
+								<td colspan="2">
 									<html:text property="customer.parentName" size="77" readonly="true" styleClass="disableText"/>
 									<html:hidden property="customer.parentID"/>
+								</td>
+								<td align="left">
+									<html:checkbox property="customer.airpayFlag" value="Y" styleClass="normalText"/>
+									ให้ชำระผ่านระบบแอร์เพย์ (Air Pay)
 								</td>
 							</tr>
 							<%} %>

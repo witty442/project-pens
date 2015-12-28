@@ -63,6 +63,7 @@ import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MTrxHistory;
+import com.isecinc.pens.process.modifier.ModifierControl;
 import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
@@ -127,14 +128,17 @@ public class OrderAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,customerId);
 			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,customerId);
+			String canAirpayFlag = CustomerReceiptFilterUtils.canAirpay(conn,customerId);
 			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)
+				||  "Y".equalsIgnoreCase(canAirpayFlag)){
 			  orderForm.setCanReceiptMoreCash("Y");
 			}else{
 			  orderForm.setCanReceiptMoreCash("N");
 			}
 			
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			orderForm.setCanAirpay(canAirpayFlag);
 			
 			
 			orderForm.setOrder(new Order());
@@ -143,7 +147,11 @@ public class OrderAction extends I_Action {
 			
 			//wit edit VAN :default Auto receipt Cash 
 			if(User.VAN.equals(user.getType())){
-			  orderForm.getOrder().setPaymentCashNow(true);
+				if("Y".equalsIgnoreCase(canAirpayFlag)){
+					orderForm.getOrder().setPaymentCashNow(false);
+				}else{
+			      orderForm.getOrder().setPaymentCashNow(true);
+				}
 			}
 			
 			// default date time
@@ -339,24 +347,31 @@ public class OrderAction extends I_Action {
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
 
-			//wit edit VAN :default Auto receipt Cash 
-			if(User.VAN.equals(user.getType())){
-			  orderForm.getOrder().setPaymentCashNow(true);
-			}
-			
 			//Filter Check Van Can Receipt Cheque Or Credit
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
 			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+			String canAirpayFlag = CustomerReceiptFilterUtils.canAirpay(conn,orderForm.getOrder().getCustomerId());
 			
-			debug.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+			logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag+",canAirpay:"+canAirpayFlag);
 			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) 
+					||  "Y".equalsIgnoreCase(canAirpayFlag)){
 			  orderForm.setCanReceiptMoreCash("Y");
 			}else{
 			  orderForm.setCanReceiptMoreCash("N");
 			}
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
+			orderForm.setCanAirpay(canAirpayFlag);
+
+			//wit edit VAN :default Auto receipt Cash 
+			if(User.VAN.equals(user.getType())){
+			  if(Utils.isNull(canAirpayFlag).equalsIgnoreCase("Y")){
+				orderForm.getOrder().setPaymentCashNow(false);
+			  }else{
+			     orderForm.getOrder().setPaymentCashNow(true);
+			  }
+			}
 			
 			debug.debug("CanReceiptMoreCash:"+orderForm.getCanReceiptMoreCash());
 			
@@ -543,8 +558,18 @@ public class OrderAction extends I_Action {
 			
 			//add Promotion to show
 			logger.info("fillLinesShow LINE Promotion");
-			List<OrderLine> promotionLines = new OrderProcess().fillLinesShowPromotion(modProcess.getAddLines());
+			List<OrderLine> promotionLines = null;
 			
+			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
+			logger.info("CalcC4 Method:"+ModifierControl.getCalcC4Control());
+			
+			if("2".equalsIgnoreCase(ModifierControl.getCalcC4Control()) ){
+				promotionLines = new OrderProcess().fillLinesShowPromotion(modProcess.getAddLines());
+		    }else{
+		        // default 1
+		        promotionLines = new OrderProcess().fillLinesShow(modProcess.getAddLines());
+		    }
+		
 			logger.info("Debug after promotion");
 			new OrderProcess().debug(promotionLines);
 			

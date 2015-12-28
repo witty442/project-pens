@@ -27,7 +27,10 @@ public class ReqPickStock implements Serializable{
 	private String custGroupDesc;
 	private String needDate;
 	private String wareHouse;
-	
+	private String deliveryDate;
+	private int totalCtn;
+	private String exported;
+
 	//Line
 	private int lineId;
 	private String pensItem;
@@ -50,6 +53,7 @@ public class ReqPickStock implements Serializable{
 	private boolean canConfirm;
 	private boolean canPrint;
 	private boolean canExport;
+	private boolean canEditDeliveryDate;
 	private boolean newReq;
 	private boolean newSearch;
 	private boolean noSearch;
@@ -72,6 +76,30 @@ public class ReqPickStock implements Serializable{
 	private int totalIssueQty;
 	
 	
+	public boolean isCanEditDeliveryDate() {
+		return canEditDeliveryDate;
+	}
+	public void setCanEditDeliveryDate(boolean canEditDeliveryDate) {
+		this.canEditDeliveryDate = canEditDeliveryDate;
+	}
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
+	public int getTotalCtn() {
+		return totalCtn;
+	}
+	public void setTotalCtn(int totalCtn) {
+		this.totalCtn = totalCtn;
+	}
+	public String getExported() {
+		return exported;
+	}
+	public void setExported(String exported) {
+		this.exported = exported;
+	}
 	public int getTotalIssueQty() {
 		return totalIssueQty;
 	}

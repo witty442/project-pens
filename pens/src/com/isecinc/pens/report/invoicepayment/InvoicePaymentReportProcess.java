@@ -578,21 +578,30 @@ public class InvoicePaymentReportProcess extends I_ReportProcess<InvoicePaymentR
 	public List<InvoicePaymentReport> searchReport(InvoicePaymentReport report, User user,Connection conn)throws Exception 
 	{ 
 		StringBuffer reportSql = new StringBuffer(); 
-		reportSql = reportSql.append("SELECT inv.name as inv_name , inv.description , rcb.BANK , rcb.CHEQUE_NO, rcb.CHEQUE_DATE , us.CODE, us.NAME ")
-						  	.append(", cus.NAME AS CUSTOMER_NAME, cus.CODE AS CUSTOMER_CODE, rch.receipt_no  , od.ORDER_NO, rch.receipt_date ")
-						  	.append(", od.ORDER_DATE, rcb.receipt_amount, IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rcb.payment_method , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD, IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ")
-						  	.append("FROM t_receipt rch ")
-						  	.append("INNER JOIN t_receipt_line rcl ON rch.receipt_id = rcl.receipt_id ")
-						  	.append("INNER JOIN t_receipt_by rcb ON rch.receipt_id = rcb.receipt_id ")
-						  	.append("INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ")
-						  	.append("INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ")
-						  	.append("INNER JOIN ad_user us ON rch.USER_ID = us.USER_ID ")
-						  	.append("LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ")
-						  	.append("WHERE rch.DOC_STATUS = 'SV' ")
-						  	.append("AND rcb.write_off = 'N' ")
-						  	.append("AND rch.user_id = ? ")
-						  	.append("AND IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ")
-						  	.append("ORDER BY payment_term ");
+		reportSql = reportSql.append("\n SELECT inv.name as inv_name , inv.description , rcb.BANK , rcb.CHEQUE_NO, rcb.CHEQUE_DATE , us.CODE, us.NAME ")
+						  	.append("\n, cus.NAME AS CUSTOMER_NAME, cus.CODE AS CUSTOMER_CODE, rch.receipt_no  , od.ORDER_NO, rch.receipt_date ")
+						  	.append("\n, od.ORDER_DATE, rcb.receipt_amount" +
+						  			" ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID =''" +
+						  			",rcb.payment_method " +
+						  			", rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD" +
+						  			", IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID =''" +
+						  			",IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term" +
+						  			" ,rch.ISPDPAID " +
+						  			", rch.PD_PAYMENTMETHOD ")
+						  	.append("\n FROM t_receipt rch ")
+						  	.append("\n INNER JOIN t_receipt_line rcl ON rch.receipt_id = rcl.receipt_id ")
+						  	.append("\n INNER JOIN t_receipt_by rcb ON rch.receipt_id = rcb.receipt_id ")
+						  	.append("\n INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ")
+						  	.append("\n INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ")
+						  	.append("\n INNER JOIN ad_user us ON rch.USER_ID = us.USER_ID ")
+						  	.append("\n LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ")
+						  	.append("\n WHERE rch.DOC_STATUS = 'SV' ")
+						  	.append("\n AND rcb.write_off = 'N' ")
+						  	.append("\n AND rch.user_id = ? ")
+						  	.append("\n AND IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ")
+						  	.append("\n ORDER BY payment_term ");
+		
+		logger.debug("sql:\n"+reportSql.toString());
 		
 		PreparedStatement ppstmt = conn.prepareStatement(reportSql.toString());
 		ResultSet rset = null;

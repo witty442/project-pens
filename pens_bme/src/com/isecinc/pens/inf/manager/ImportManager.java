@@ -26,7 +26,7 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.ImportHelper;
+import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
 import com.isecinc.pens.inf.manager.process.ImportProcess;
@@ -42,12 +42,7 @@ public class ImportManager {
 	public static String PATH_CONTROL ="inf-config/table-mapping-import/";
 	public static String FILE_CONTROL_NAME ="control_import.csv";
 
-	public MonitorBean importMain(User userLogin,User userRequest,String requestTable,HttpServletRequest request,boolean importAll,String requestTableTransType) throws Exception{
-		if(requestTable != null && !requestTable.equals("")){
-			return importByRequestTable(userLogin,userRequest, requestTable, request,importAll,requestTableTransType);
-		}
-		return importTxt(userLogin,userLogin, request,importAll);
-	}
+
 	
 	/**
 	 * 
@@ -58,46 +53,7 @@ public class ImportManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public MonitorBean importByRequestTable(User userLogin,User userRequest,String requestTable,HttpServletRequest request,boolean importAll,String transType) throws Exception{
-		Connection connMonitor = null;
-		MonitorBean monitorModel = null;
-		InterfaceDAO dao = new InterfaceDAO();
-		try{
-			connMonitor = DBConnection.getInstance().getConnection();
-			
-			/** insert to monitor_interface **/
-			monitorModel = new MonitorBean();
-			monitorModel.setName("INF-"+request.getRemoteAddr()+"-"+request.getRemotePort());
-			monitorModel.setType(Constants.TYPE_IMPORT);
-			monitorModel.setStatus(Constants.STATUS_START);
-			monitorModel.setCreateUser(userLogin.getUserName());
-	        monitorModel.setTransactionType(transType);
-		    
-			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
-			
-		    //start Thread
-			new BatchImportWorker(monitorModel.getTransactionId(),monitorModel.getMonitorId(),monitorModel.getTransactionType(),userLogin,userRequest, requestTable, request,importAll).start();
-			
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}finally{
-			if(connMonitor != null){
-				connMonitor.close();
-				connMonitor=null;
-			}
-		}
-	    return monitorModel;
-	}
-	/**
-	 * 
-	 * @param transType
-	 * @param userBean
-	 * @param requestTable
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	public MonitorBean importTxt(User userLogin,User userRequest,HttpServletRequest request ,boolean importAll) throws Exception{
+	public MonitorBean importTxt(String type,User userLogin,User userRequest,HttpServletRequest request ,boolean importAll) throws Exception{
 		Connection connMonitor = null;
 		MonitorBean monitorModel = null;
 		InterfaceDAO dao = new InterfaceDAO();
@@ -107,7 +63,7 @@ public class ImportManager {
 			/** insert to monitor_interface **/
 			monitorModel = new MonitorBean();
 			monitorModel.setName("UTS-"+request.getRemoteAddr()+"-"+request.getRemotePort());
-			monitorModel.setType(Constants.TYPE_IMPORT);
+			monitorModel.setType(type);
 			monitorModel.setStatus(Constants.STATUS_START);
 			monitorModel.setCreateUser(userLogin.getUserName());
 			monitorModel.setTransactionType(Constants.TRANSACTION_TRANS_TYPE);
@@ -219,7 +175,7 @@ public class ImportManager {
 			monitorTime = new MonitorTime("initImportConfig");
 			
 			/** Init Config and Get Ftp File */
-			countFileMap = ImportHelper.initImportConfig(PATH_CONTROL,FILE_CONTROL_NAME,initConfigMap,conn,patheImport,transType,userRequest,requestTable,importAll);
+			countFileMap = InterfaceHelper.initImportConfig(PATH_CONTROL,FILE_CONTROL_NAME,initConfigMap,conn,patheImport,transType,userRequest,requestTable,importAll);
 			
 			monitorTime.debugUsedTime();
 			

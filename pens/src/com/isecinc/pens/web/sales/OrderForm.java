@@ -49,11 +49,20 @@ public class OrderForm extends I_Form {
 	
 	private String canReceiptMoreCash;
 	private String canReceiptCredit;
+	private String canAirpay;
 	
 	private String mode ="";
 	
 	
     
+	public String getCanAirpay() {
+		return canAirpay;
+	}
+
+	public void setCanAirpay(String canAirpay) {
+		this.canAirpay = canAirpay;
+	}
+
 	public String getCanReceiptCredit() {
 		return canReceiptCredit;
 	}

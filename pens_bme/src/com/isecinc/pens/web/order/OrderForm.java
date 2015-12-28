@@ -15,6 +15,15 @@ public class OrderForm extends I_Form {
 	private static final long serialVersionUID = 8932109820314224488L;
 
 	private OrderCriteria criteria = new OrderCriteria();
+    private String pageName;
+    
+	public String getPageName() {
+		return pageName;
+	}
+
+	public void setPageName(String pageName) {
+		this.pageName = pageName;
+	}
 
 	public OrderCriteria getCriteria() {
 		return criteria;

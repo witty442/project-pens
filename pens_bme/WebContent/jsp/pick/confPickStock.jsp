@@ -55,12 +55,17 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
+	<%if(confPickStockForm.getBean().isCanEditDeliveryDate()){%>
+	   new Epoch('epoch_popup','th',document.getElementById('deliveryDate'));
+	<%}%>
 }
+
 function print(path){
 	var form = document.confPickStockForm;
 	form.action = path + "/jsp/confPickStockAction.do?do=print";
@@ -106,8 +111,45 @@ function exportExcel(path){
 
 function confirmPick(path){
 	var form = document.confPickStockForm;
+	//validate delivery date
+	var deliveryDate =$('#deliveryDate').val();
+	var totalCtn =$('#totalCtn').val();
+	
+	if(deliveryDate ==""){
+		alert("กรุณากรอกวันที่  พร้อมจัดส่ง");
+		return false;
+	}
+	if(totalCtn ==""){
+		alert("กรุณากรอก รวมจำนวนหีย");
+		return false;
+	}
+	
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
 	   form.action = path + "/jsp/confPickStockAction.do?do=confirmAction";
+	   form.submit();
+	   return true;
+	}
+	return false;
+}
+
+function saveDeliveryDate(path){
+	var form = document.confPickStockForm;
+	
+	//validate delivery date
+	var deliveryDate =$('#deliveryDate').val();
+	var totalCtn =$('#totalCtn').val();
+	
+	if(deliveryDate ==""){
+		alert("กรุณากรอกวันที่  พร้อมจัดส่ง");
+		return false;
+	}
+	if(totalCtn ==""){
+		alert("กรุณากรอก รวมจำนวนหีย");
+		return false;
+	}
+	
+	if(confirm("กรุณายันยัน บันทึกข้อมูล วันที่จัดส่ง ")){
+	   form.action = path + "/jsp/confPickStockAction.do?do=saveDeliveryDateAction";
 	   form.submit();
 	   return true;
 	}
@@ -348,7 +390,6 @@ function sumQty(){
 											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>
 									    </html:select>
 									</td>
-									
 								</tr>	
 								<tr>
                                     <td > หมายเหตุ </td>
@@ -356,6 +397,28 @@ function sumQty(){
                                       <html:text property="bean.remark" styleId="remark" size="60" readonly="true" styleClass="disableText"/>
                                      </td>
 								</tr>	
+								  <c:if test="${confPickStockForm.bean.canEditDeliveryDate == true}">
+									<tr>
+	                                    <td> วันที่พร้อมจัดส่ง <font color="red">*</font></td>
+										<td colspan="3">
+							               <html:text property="bean.deliveryDate" styleId="deliveryDate" size="10" />
+							              
+										 รวมจำนวนหีบ  <font color="red">*</font>
+										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15" onblur="isNum(this)" onchange="isNum(this)"/>
+										</td>
+									</tr>	
+								</c:if>
+								<c:if test="${confPickStockForm.bean.canEditDeliveryDate == false}">
+									<tr>
+	                                    <td> วันที่พร้อมจัดส่ง <font color="red"></font></td>
+										<td colspan="3">
+							               <html:text property="bean.deliveryDate" styleId="deliveryDate" size="10" readonly="true" styleClass="disableText"/>
+							              
+										 รวมจำนวนหีบ  <font color="red"></font>
+										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15"  readonly="true" styleClass="disableText"/>
+										</td>
+									</tr>	
+								</c:if>
 						   </table>
 					  </div>
 
@@ -509,6 +572,15 @@ function sumQty(){
 									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 
 									 </a>
 								 </c:if>
+								 
+								   <c:if test="${confPickStockForm.bean.canConfirm == false}">
+									  <c:if test="${confPickStockForm.bean.canEditDeliveryDate == true}">
+										<a href="javascript:saveDeliveryDate('${pageContext.request.contextPath}')">
+										  <input type="button" value=" บันทึก(ข้อมูลวันที่จัดส่ง)" class="newPosBtnLong"> 
+										 </a>
+									 </c:if>
+								  </c:if>
+								  
 								  <c:if test="${confPickStockForm.bean.canConfirm == true}">
 									<a href="javascript:confirmPick('${pageContext.request.contextPath}')">
 									  <input type="button" value=" ยืนยัน    " class="newPosBtnLong"> 

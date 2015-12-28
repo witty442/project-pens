@@ -1,0 +1,156 @@
+package com.isecinc.pens.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.isecinc.pens.bean.Barcode;
+import com.isecinc.pens.bean.PayBean;
+import com.isecinc.pens.bean.SaveInvoiceBean;
+import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
+
+public class SaveInvoiceDAO {
+
+	 private static Logger logger = Logger.getLogger("PENS");
+
+	 public static List<SaveInvoiceBean> search(Connection conn,SaveInvoiceBean o,boolean getTrans ) throws Exception {
+		  return searchModel(conn, o,getTrans);
+		}
+	   
+	   public static List<SaveInvoiceBean> search(SaveInvoiceBean o ,boolean getTrans) throws Exception {
+		   Connection conn = null;
+		   try{
+			  conn = DBConnection.getInstance().getConnection();
+			  return searchModel(conn, o,getTrans);
+		   }catch(Exception e){
+			   throw e;
+		   }finally{
+			   conn.close();
+		   }
+		}
+	   
+		public static List<SaveInvoiceBean> searchModel(Connection conn,SaveInvoiceBean o ,boolean getTrans) throws Exception {
+				PreparedStatement ps = null;
+				ResultSet rs = null;
+				StringBuilder sql = new StringBuilder();
+				SaveInvoiceBean m = null;
+				List<SaveInvoiceBean> items = new ArrayList<SaveInvoiceBean>();
+				int r = 1;
+				try {
+				   sql.append("\n select h.* , m.pens_value as CUST_CODE, m.pens_desc2 as CUST_DESC" );
+				   sql.append("\n from pensbme_icc_head h ,PENSBME_MST_REFERENCE m" );
+				   sql.append("\n where 1=1 ");
+				   sql.append("\n and m.reference_code = 'Store' and m.interface_value = h.CUST_ID ");
+				   
+				   if( !Utils.isNull(o.getBILL_DATE()).equals("")){
+					   String billDate = o.getBILL_DATE().replaceAll("/", "");
+						sql.append("\n and h.bill_date = '"+billDate+"'");
+					    logger.debug("billDate:"+billDate+",billDate:"+o.getBILL_DATE());
+					}
+					sql.append("\n ");
+					logger.debug("sql:"+sql);
+					
+					ps = conn.prepareStatement(sql.toString());
+					rs = ps.executeQuery();
+					
+					while(rs.next()) {
+					   m = new SaveInvoiceBean();
+					   m.setCustCode(Utils.isNull(rs.getString("CUST_CODE"))); 
+					   m.setCustDesc(Utils.isNull(rs.getString("CUST_DESC"))); 
+					   
+					   m.setORACLE_INVOICE_NO(Utils.isNull(rs.getString("ORACLE_INVOICE_NO")));     
+					   m.setACTIVITY_CODE(Utils.isNull(rs.getString("ACTIVITY_CODE")));      
+					   m.setBILL_10(Utils.isNull(rs.getString("BILL_10")));      
+					   m.setCUST_ID(Utils.isNull(rs.getString("CUST_ID")));      
+					   m.setSHIP_NO(Utils.isNull(rs.getString("SHIP_NO")));      
+					   m.setBUS_CODE(Utils.isNull(rs.getString("BUS_CODE")));      
+					   m.setDEPT_CODE(Utils.isNull(rs.getString("DEPT_CODE")));      
+					   m.setPRODUCT_CODE(Utils.isNull(rs.getString("PRODUCT_CODE")));      
+					   m.setSPD_CODE(Utils.isNull(rs.getString("SPD_CODE")));      
+					   m.setPRODUCT_TNAME(Utils.isNull(rs.getString("PRODUCT_TNAME")));      
+					   m.setBILL_DATE(Utils.isNull(rs.getString("BILL_DATE")));      
+					   m.setSHIP_TO_ADDRESS(Utils.isNull(rs.getString("SHIP_TO_ADDRESS")));      
+					   m.setSHIP_NAME(Utils.isNull(rs.getString("SHIP_NAME")));      
+					   m.setTSC_ID(Utils.isNull(rs.getString("TSC_ID")));      
+					   m.setTSC_NAME(Utils.isNull(rs.getString("TSC_NAME")));      
+					   m.setSITE_ID(Utils.isNull(rs.getString("SITE_ID")));      
+					   m.setNET_AMOUNT(Utils.isNull(rs.getString("NET_AMOUNT")));      
+					   m.setTDH_GEN_NO(Utils.isNull(rs.getString("TDH_GEN_NO")));      
+					   m.setPRODUCT_BARCODE(Utils.isNull(rs.getString("PRODUCT_BARCODE")));      
+					   m.setBKK_UPC_FLAG(Utils.isNull(rs.getString("BKK_UPC_FLAG")));      
+					   m.setBILL_NO(Utils.isNull(rs.getString("BILL_NO")));      
+					   m.setVIA_TO_ADDRESS(Utils.isNull(rs.getString("VIA_TO_ADDRESS")));      
+					   m.setVIA_NAME(Utils.isNull(rs.getString("VIA_NAME")));      
+					   m.setCORNER_ID(Utils.isNull(rs.getString("CORNER_ID")));      
+					   m.setCORNER_NAME(Utils.isNull(rs.getString("CORNER_NAME")));      
+					   m.setDIS_SALE_PASS(Utils.isNull(rs.getString("DIS_SALE_PASS")));      
+					   m.setDISC1_PERCENT(Utils.isNull(rs.getString("DISC1_PERCENT")));      
+					   m.setDISC2_PERCENT(Utils.isNull(rs.getString("DISC2_PERCENT")));      
+					   m.setDISC_BAHT(Utils.isNull(rs.getString("DISC_BAHT")));      
+					   m.setZIPCODE(Utils.isNull(rs.getString("ZIPCODE")));      
+					   m.setSHIP_PHONE(Utils.isNull(rs.getString("SHIP_PHONE")));      
+					   m.setVIA_PHONE(Utils.isNull(rs.getString("VIA_PHONE")));      
+					   m.setCASH_FLAG(Utils.isNull(rs.getString("CASH_FLAG")));      
+					   m.setDELIVERY_DATE(Utils.isNull(rs.getString("DELIVERY_DATE")));      
+					   m.setPO_NO(Utils.isNull(rs.getString("PO_NO")));      
+					   m.setFROM_SYSTEM(Utils.isNull(rs.getString("FROM_SYSTEM")));      
+					   m.setGROUP_NO_BILL_REPLACE(Utils.isNull(rs.getString("GROUP_NO_BILL_REPLACE")));      
+					   m.setSORTER_ROUND(Utils.isNull(rs.getString("SORTER_ROUND")));      
+					   m.setSORTER_BATCH(Utils.isNull(rs.getString("SORTER_BATCH")));      
+					   m.setSORTER_CHUTE(Utils.isNull(rs.getString("SORTER_CHUTE")));      
+
+					   items.add(m);
+					   r++;
+					}//while
+					
+					//set Result 
+				
+				} catch (Exception e) {
+					throw e;
+				} finally {
+					try {
+						rs.close();
+						ps.close();
+					} catch (Exception e) {}
+				}
+			return items;
+		}
+		
+		public static void updateORACLE_INVOICE_NO_ON_ICCHead(Connection conn,User user,String ORACLE_INVOICE_NO,String BILL_10,String BILL_DATE) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("updateORACLE_INVOICE_NO_ON_ICCHead");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE PENSBME_ICC_HEAD SET  \n");
+				sql.append(" ORACLE_INVOICE_NO =?  ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				
+				sql.append(" WHERE BILL_10 =? and BILL_DATE = ?  \n" );
+
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, ORACLE_INVOICE_NO);
+				ps.setString(c++, user.getUserName());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, BILL_10);
+				ps.setString(c++, BILL_DATE);
+				
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+	
+}

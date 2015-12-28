@@ -65,25 +65,31 @@ public class AdminConsoleAction extends I_Action {
 				String username = env.getProperty("db.username");
 				String password = env.getProperty("db.password");
 		
-				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  Database Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
-				configInfo +="DB Password : "+password+"\n";
-				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				configInfo +="DB Password : "+password.toCharArray()+"\n";
+				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
-				configInfo += " ----------------------  FTP Server Config ---------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  FTP Server(PENS) Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
-				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
-				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				configInfo +="FTP Password: "+env.getProperty("ftp.password").toCharArray()+"\n";
+				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
+				configInfo += " ----------------------  FTP Server(ICC) Config ---------------------------------------------------------------------- \n";
+				configInfo +="FTP ICC IP : "+env.getProperty("ftp.icc.ip.server")+"\n";
+				configInfo +="FTP ICC User : "+env.getProperty("ftp.icc.username")+"\n";
+				configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password").toCharArray()+"\n";
+				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
 				configInfo += " ----------------------  Host PayInReport Server @Pens ---------------------------------------------------------------------- \n";
-				configInfo +="Host PayInReport : "+env.getProperty("host.payinreport")+"\n";
-				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				configInfo +="IP PayInReport : "+env.getProperty("host.payinreport")+"\n";
+				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
 			    configInfoTest = " ";
 			   if("tab_config_info".equalsIgnoreCase(action)){
-					configInfoTest += "\n ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
+					configInfoTest += " ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
 						 try {   
 							 configInfoTest += " \n "+ test.TestALL.testDBCon();
 						  } catch(Exception e) {
@@ -91,9 +97,16 @@ public class AdminConsoleAction extends I_Action {
 						  }
 						 
 						 
-					configInfoTest += "\n ----------------------  Result Test FTP Connection ------------------------------------------------------------- \n";
+					configInfoTest += " ----------------------  Result Test FTP(PENS) Connection ------------------------------------------------------------- \n";
 						try {   
-							 configInfoTest += " \n "+ test.TestALL.testFTPCon();
+							 configInfoTest += " \n "+ test.TestALL.testFTPPensCon();
+						  } catch(Exception e) {
+							 configInfoTest += " \n error :>> "+e.getMessage();
+						  }
+						
+				   configInfoTest += "----------------------  Result Test FTP(ICC) Connection ------------------------------------------------------------- \n";
+						try {   
+							 configInfoTest += " \n "+ test.TestALL.testFTPICCCon();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }

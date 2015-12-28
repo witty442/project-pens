@@ -29,12 +29,14 @@ public class Constants {
 	public static final String STORE_TYPE_PENS = "020999";
 	public static final String STORE_TYPE_GRAND_SALE = "000023";
 	public static final String STORE_TYPE_WIENNA = "020064";
+	
+	public static final String STORE_TYPE_OSHOPPING_CODE ="020066";
 
 	
 	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
 	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";
 	public static String STORE_TYPE_FRIDAY_ITEM = "FridayItem";
-	
+	public static String STORE_TYPE_OSHOPPING_ITEM = "OshoppingItem";
 	
 	
 	public static String getStoreGroupName(String storeGroup){

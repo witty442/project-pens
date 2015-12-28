@@ -30,7 +30,6 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfPickStockDAO;
-import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -160,7 +159,8 @@ public class ConfPickStockAction extends I_Action {
 				
 				p.setModeConfirm(mode.equalsIgnoreCase("confirm")?true:false);
 				p.setModeEdit(mode.equalsIgnoreCase("edit")?true:false);
-				
+				p.setCanEditDeliveryDate(mode.equalsIgnoreCase("view")?true:false);
+				 
 				//Get Item and set data to session dataGroupCodeMapAll
 				p = searchBypage(conn, p, request);
 				aForm.setBean(p);
@@ -324,6 +324,8 @@ public class ConfPickStockAction extends I_Action {
 			
 			if(p.isModeConfirm()){
 			  p.setCanEdit(false); 
+			  p.setCanEditDeliveryDate(true);
+			  
 			  if( Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_BEF)){
 				 p.setCanConfirm(true);
 			  }else{
@@ -331,6 +333,10 @@ public class ConfPickStockAction extends I_Action {
 			  }
 			}
 			
+			/** Exported = 'Y' No edit delivery date**/
+			if("Y".equalsIgnoreCase(p.getExported())){
+			    p.setCanEditDeliveryDate(false);
+			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -547,7 +553,7 @@ public class ConfPickStockAction extends I_Action {
 			h.setUpdateUser(user.getUserName());
 		
 			//update status stock_issue
-			ConfPickStockDAO.updateStausStockIssue(conn, h);
+			ConfPickStockDAO.confirmStausStockIssue(conn, h);
 			
 			 //Set Data from screen to List
 			Map<String, ReqPickStock> dataSaveMapAll = setDataSaveMap(request,aForm);
@@ -591,6 +597,46 @@ public class ConfPickStockAction extends I_Action {
 			}else{
 				//error 
 			}
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("clear");
+	}
+	
+	public ActionForward saveDeliveryDateAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveDeliveryDateAction");
+		ConfPickStockForm aForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			ReqPickStock h = aForm.getBean();
+			h.setUpdateUser(user.getUserName());
+		
+			//update delivery date ,total_ctn
+			ConfPickStockDAO.confirmDeliveryStockIssue(conn, h);
+			
+			conn.commit();
+			
+			//new search
+			h.setNewReq(true);
+			h.setNewSearch(true);
+	        h = searchBypage(conn, h, request);
+	        
+			request.getSession().setAttribute("results", h.getItems());
+			
+			aForm.setBean(h);
+				
+			request.setAttribute("Message", "บันทึกรายการ เรียบร้อยแล้ว");
+			
 		} catch (Exception e) {
 			conn.rollback();
 			logger.error(e.getMessage(),e);

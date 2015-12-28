@@ -598,9 +598,12 @@ public class CustomerAction extends I_Action {
 			String printTax = Utils.isNull(customer.getPrintTax());
 			String printHeadBranchDesc = Utils.isNull(customer.getPrintHeadBranchDesc());
 			
+			String airpayFlag = Utils.isNull(customer.getAirpayFlag());
+			
 			logger.debug("printType["+printType+"]");
 			logger.debug("printTax["+printTax+"]");
 			logger.debug("printHeadBranchDesc["+printHeadBranchDesc+"]");
+			logger.debug("airpayFlag["+airpayFlag+"]");
 			
 			if(printType.equals("H")){
 				customer.setPrintBranchDesc("");
@@ -610,6 +613,9 @@ public class CustomerAction extends I_Action {
 			}
 			if(printHeadBranchDesc.equals("")){
 				customer.setPrintHeadBranchDesc("N");
+			}
+			if(airpayFlag.equals("")){
+				customer.setAirpayFlag("N");
 			}
 			
 			conn = new DBCPConnectionProvider().getConnection(conn);

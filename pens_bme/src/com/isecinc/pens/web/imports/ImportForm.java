@@ -56,6 +56,9 @@ public class ImportForm extends I_Form {
 	private int summaryReturnWacoalListErrorSize;
 	private int summaryReturnWacoalListSuccessSize;
 	
+	private int shoppingListErrorSize;
+	private int shoppingListSuccessSize;
+	
 	private String countDate;
 	private String custCode;
 	
@@ -68,6 +71,22 @@ public class ImportForm extends I_Form {
 	
 	
 	
+	public int getShoppingListErrorSize() {
+		return shoppingListErrorSize;
+	}
+
+	public void setShoppingListErrorSize(int shoppingListErrorSize) {
+		this.shoppingListErrorSize = shoppingListErrorSize;
+	}
+
+	public int getShoppingListSuccessSize() {
+		return shoppingListSuccessSize;
+	}
+
+	public void setShoppingListSuccessSize(int shoppingListSuccessSize) {
+		this.shoppingListSuccessSize = shoppingListSuccessSize;
+	}
+
 	public String getStoreName() {
 		return storeName;
 	}

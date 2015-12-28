@@ -56,9 +56,44 @@ public class MCDAO {
 			}
 		}
 	 
-	 public static int updateMCStaffModel(Connection conn,MCBean o) throws Exception{
+	 public static int updateMCStaffModelByOrgEmpRefId(Connection conn,MCBean o) throws Exception{
 			PreparedStatement ps = null;
 			int  c = 1;
+			logger.debug("updateMCStaffModelByOrgEmpRefId o.getOrgEmpRefId()["+o.getOrgEmpRefId()+"]");
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE MC_STAFF_ROUTE SET   \n");
+				sql.append(" EMP_REF_ID =? ,EMPLOYEE_ID =?, \n");
+				sql.append(" IS_ACTIVE =? ,MC_ROUTE = ?,   \n");
+				sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE EMP_REF_ID = ?  \n" );
+
+				ps = conn.prepareStatement(sql.toString());
+				
+				ps.setInt(c++, Utils.convertStrToInt(o.getEmpRefId()));
+				ps.setInt(c++, Utils.convertStrToInt(o.getEmpId()));
+				ps.setString(c++, Utils.isNull(o.getActive()));
+				ps.setString(c++, o.getMcRoute());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setInt(c++, Utils.convertStrToInt(o.getOrgEmpRefId()));
+				
+				return ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+	}
+	 
+	 public static int updateMCStaffModelByEmpRefId(Connection conn,MCBean o) throws Exception{
+			PreparedStatement ps = null;
+			int  c = 1;
+			logger.debug("updateMCStaffModelByEmpRefId o.getEmpRefId()["+o.getEmpRefId()+"]");
+			logger.debug("mcRoute:"+o.getMcRoute());
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" UPDATE MC_STAFF_ROUTE SET   \n");
@@ -68,7 +103,7 @@ public class MCDAO {
 				sql.append(" WHERE EMP_REF_ID = ?  \n" );
 
 				ps = conn.prepareStatement(sql.toString());
-	
+				
 				ps.setInt(c++, Utils.convertStrToInt(o.getEmpId()));
 				ps.setString(c++, Utils.isNull(o.getActive()));
 				ps.setString(c++, o.getMcRoute());
@@ -296,9 +331,10 @@ public class MCDAO {
 				   sql.append("\n ,E.region ,S.mc_route,E.mobile1,E.mobile2" );
 				   sql.append("\n from MC_STAFF_ROUTE S ,MC_EMPLOYEE E WHERE 1=1");
 				   sql.append("\n AND S.EMP_REF_ID = E.EMP_REF_ID "); 
-				   sql.append("\n and S.employee_id not in(  "); 
+				   sql.append("\n AND S.employee_id not in(  "); 
 				   sql.append("\n   select employee_id from MC_TRANS WHERE  month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
 				   sql.append("\n )");
+				   sql.append("\n AND S.IS_ACTIVE ='Y' "); 
 				   
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
 						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
@@ -320,7 +356,12 @@ public class MCDAO {
 				   sql.append("\n ,E.region,S.mc_route,E.mobile1,E.mobile2" );
 				   sql.append("\n from MC_TRANS S ,MC_EMPLOYEE E WHERE 1=1");
 				   sql.append("\n AND S.EMP_REF_ID = E.EMP_REF_ID "); 
-				   
+				   sql.append("\n AND S.EMP_REF_ID IN( ");
+				   sql.append("\n   SELECT EMP_REF_ID FROM MC_STAFF_ROUTE R WHERE R.IS_ACTIVE ='Y' "); 
+				      if( !Utils.isNull(o.getMcRoute()).equals("")){
+						  sql.append("\n and R.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+					   }
+				   sql.append("\n ) "); 
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
 						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
 						sql.append("\n and E.employee_id in( "+sqlIn+")");
@@ -667,7 +708,9 @@ public class MCDAO {
 				while(rst.next()) {
 				   h = new MCBean();
 				   h.setNo(r);
+				   h.setOrgEmpRefId(Utils.isNull(rst.getString("emp_ref_id")));
 				   h.setEmpRefId(Utils.isNull(rst.getString("emp_ref_id")));
+				   
 				   if( !Utils.isNull(rst.getString("employee_id")).equals("0")){
 				      h.setEmpId(Utils.isNull(rst.getString("employee_id")));
 				   }else{
@@ -676,7 +719,8 @@ public class MCDAO {
 				   h.setOrgEmpId(Utils.isNull(rst.getString("employee_id")));
 				   h.setEmpType(Utils.isNull(rst.getString("emp_type")));
 				   h.setEmpTypeDesc(Utils.isNull(rst.getString("emp_type_desc")));
-				   h.setName(rst.getString("name")+" "+rst.getString("surname"));
+				   h.setName(rst.getString("name"));
+				   h.setFullName(rst.getString("name")+" "+rst.getString("surname"));
 				   h.setSurName(rst.getString("surname"));
 				   h.setMcArea(rst.getString("mc_area"));
 				   h.setMcAreaDesc(rst.getString("mc_area_desc"));
@@ -841,7 +885,7 @@ public class MCDAO {
 				sql.append("\n and H.month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
 			}
 			sql.append("\n order by H.employee_id asc ");
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
@@ -871,7 +915,7 @@ public class MCDAO {
 			try {
 				logger.debug("operation:"+operation+",descSearch:"+c.getDescSearch());
 				
-				sql.append("\n SELECT E.emp_ref_id,E.employee_id,E.name,E.surname,E.mobile1,E.mobile2,E.title,E.emp_type");
+				sql.append("\n SELECT E.emp_ref_id,E.employee_id,E.name,E.surname,E.mobile1,E.mobile2,E.title,E.emp_type,E.region");
 				sql.append("\n ,(select A.pens_desc from mc_mst_reference A where A.pens_value = E.emp_type and reference_code = 'StaffType')as emp_type_desc \n");
 				sql.append("\n from MC_EMPLOYEE E ");
 				sql.append("\n LEFT OUTER JOIN MC_STAFF_ROUTE M ");
@@ -937,6 +981,7 @@ public class MCDAO {
 					 empBean.setSurName(Utils.isNull(rst.getString("surname")));
 					 empBean.setMobile1(Utils.isNull(rst.getString("mobile1")));
 					 empBean.setMobile2(Utils.isNull(rst.getString("mobile2")));
+					 empBean.setRegion(Utils.isNull(rst.getString("region")));
 					 
 					 item.setMcEmpBean(empBean);
 					 
@@ -1105,7 +1150,7 @@ public class MCDAO {
 				sql.append("\n AND pens_value ='"+monthTrip+"' \n");
 				sql.append("\n \n");
 				
-				logger.debug("sql:"+sql);
+				//logger.debug("sql:"+sql);
 
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

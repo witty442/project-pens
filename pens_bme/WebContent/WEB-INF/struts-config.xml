@@ -33,6 +33,7 @@
 		
 		<form-bean name="orderForm" type="com.isecinc.pens.web.order.OrderForm" />
 		<form-bean name="orderFridayForm" type="com.isecinc.pens.web.order.OrderForm" />
+		<form-bean name="orderAllForm" type="com.isecinc.pens.web.order.OrderForm" />
 		
 		<form-bean name="reportForm" type="com.isecinc.pens.web.report.ReportForm" />
 		
@@ -82,7 +83,7 @@
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 		<!-- Interfaces -->
 		<form-bean name="interfacesForm" type="com.isecinc.pens.web.interfaces.InterfacesForm" />
-		
+		<form-bean name="saveInvoiceForm" type="com.isecinc.pens.web.interfaces.SaveInvoiceForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -175,7 +176,9 @@
 		<action name="orderFridayForm" path="/jsp/orderFridayAction" parameter="do" scope="session" type="com.isecinc.pens.web.order.OrderFridayAction" >
 			<forward name="search" path="/jsp/order/orderFriday.jsp"/>
 		</action>
-		
+		<action name="orderAllForm" path="/jsp/orderAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.order.OrderAllAction" >
+			<forward name="search" path="/jsp/order/orderAll.jsp"/>
+		</action>
 		<action name="memberImportForm" path="/jsp/memberimport" forward="/jsp/dataimports/memberImport.jsp" />
 		<action name="memberImportForm" path="/jsp/memberImportAction"
 			parameter="do" scope="request"
@@ -510,6 +513,11 @@
 			<forward name="prepare" path="/jsp/main/sumByGroupCode.jsp" />
 			<forward name="clear" path="/jsp/main/sumByGroupCode.jsp" />
 			<forward name="export" path="/jsp/main/sumByGroupCode.jsp" />
+		</action>
+		
+		<action name="saveInvoiceForm" path="/jsp/saveInvoiceAction" parameter="do" scope="session" type="com.isecinc.pens.web.interfaces.SaveInvoiceAction" >
+			<forward name="search" path="/jsp/interfaces/saveInvoice.jsp"/>
+			<forward name="clear" path="/jsp/interfaces/saveInvoice.jsp" />
 		</action>
 		
 		<!-- AdminConsole -->

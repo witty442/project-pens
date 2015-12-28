@@ -100,8 +100,6 @@ span.pagelinks {
 	color: #000000;
 	text-align: center;
 }
-
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -197,7 +195,7 @@ function validateTime(index,obj){
 			obj.value = "";
 		}
 	}
-	
+	var totalTime = document.getElementsByName("totalTime")[index];
 	var startTime = document.getElementsByName("startTime")[index];
 	var endTime = document.getElementsByName("endTime")[index];
 	//alert("startTime:"+startTime.value+",endTime:"+endTime.value);
@@ -214,11 +212,42 @@ function validateTime(index,obj){
 			endTime.focus();
 			endTime.value ="";
 			endTime.style.backgroundColor = '#fba';
+			totalTime.value = "";
+			
+			sumTotalTime();
 		}
 	}	
 }
 
 function calcTotalTime(index,startTime,endTime){
+	var totalTime = document.getElementsByName("totalTime")[index];
+  
+     //lets calculate the difference. But values consist of four digits.
+     var startHH = parseInt(startTime.substr(0,2));
+     var startMM = parseInt(startTime.substr(3,2));
+     var endHH = parseInt(endTime.substr(0,2));
+     var endMM = parseInt(endTime.substr(3,2));
+     
+     var diffHH = endHH - startHH;
+     
+     var diffMM = 0;
+     if(endMM < startMM){
+    	 diffMM = (endMM+60) - startMM;
+    	 diffHH = diffHH-1;
+     }else{
+        diffMM = endMM - startMM;
+     }
+     
+     diffHH = Math.abs(diffHH);
+     diffMM = Math.abs(diffMM);
+     
+     diffHH = diffHH < 10 ? "0" + diffHH : diffHH;
+     diffMM = diffMM < 10 ? "0" + diffMM : diffMM;
+
+     totalTime.value = diffHH + ":" + diffMM; 
+}
+
+function calcTotalTime_V1(index,startTime,endTime){
 	var totalTime = document.getElementsByName("totalTime")[index];
   
      //lets calculate the difference. But values consist of four digits.
@@ -231,12 +260,16 @@ function calcTotalTime(index,startTime,endTime){
      }
 
      var difference = time1Seconds - time2Seconds;
+     //alert("time2Seconds:"+time2Seconds+"<>time1Seconds:"+time1Seconds);
      if (difference < 0) {
          difference = Math.abs(difference);
      }
-     var hours = parseInt(difference/3600) 
+     var hours = parseInt(difference/3600); 
      hours = hours < 10 ? "0" + hours : hours;
-     var minutes =  parseInt((difference/3600) % 1 *60)
+     
+     var minutes =  parseInt((difference/3600) % 1 *60);
+     alert("diff["+difference+"]mod["+parseInt((difference/3600) % 1 *60)+"]");
+     
      minutes = minutes < 10 ? "0" + minutes : minutes;
 
      totalTime.value = hours + ":" + minutes; 
@@ -268,8 +301,7 @@ function toSeconds(hours, minutes){
     if ( (hours >= 0 && hours < 24) && (minutes >= 0 && minutes < 60)){
         seconds += (parseInt(hours)*3600) + (parseInt(minutes)*60);
         return seconds
-    }
-    else{
+    }else{
         return false;
     }
 }
@@ -332,25 +364,28 @@ function sumTotalTime(){
 	var totalTimeAll = document.getElementsByName("totalTimeAll")[0];
 	var totalTime = document.getElementsByName("totalTime");
 	//alert(totalTime.length);
-	
-	var totalSeconds  = 0;
+	var totalHH  = 0;
+	var totalMM  = 0;
 	for(var i=0;i<totalTime.length;i++){
 		if( totalTime[i].value != ''){
 			var HH = totalTime[i].value.substr(0,2);
 			var MM = totalTime[i].value.substr(3,2);
+			
 			//alert("HH["+HH+"]MM["+MM+"]");
 			
-			totalSeconds += hoursToSeconds(HH);//HH ->seconds
-			totalSeconds += minuteToSeconds(MM);//MM ->seconds
-		}
-	}
+			totalHH += parseInt(HH);//HH ->seconds
+			totalMM += parseInt(MM);//MM ->seconds
+		}//if
+	}//for
+	
     //convert to hh:mm
-    //alert("totalSeconds"+totalSeconds);
-		
-     var hours = parseInt(totalSeconds/3600); 
-     hours = hours < 10 ? "0" + hours : hours;
-     var minutes =  parseInt((totalSeconds/3600) % 1 *60);
+     //alert("totalMM["+totalMM+"]:%["+parseInt(totalMM % 60)+"]");
+	 var minutes =  parseInt(totalMM % 60);
      minutes = minutes < 10 ? "0" + minutes : minutes;
+     
+     var hours = totalHH +parseInt(totalMM/60);  
+     hours = hours < 10 ? "0" + hours : hours;
+    
 
     // alert(hours+":"+minutes);
      
@@ -461,7 +496,12 @@ function validateTimeModel(inputField) {
 									<td>		
 										<input type="text" name="disp"  size="10" value="${mcTimeForm.bean.staffYear}/${mcTimeForm.bean.staffMonth}" readonly class="disableText"/>
 									</td>
-								  
+								    <td align="right">ประเภท<font color="red"></font></td>
+									<td>		
+										 <html:text property="bean.empTypeDesc" styleId="empTypeDesc" size="10" styleClass="disableText" readonly="true"/>
+										 ภาค
+										  <html:text property="bean.regionDesc" styleId="regionDesc" size="40" styleClass="disableText" readonly="true"/>
+									</td>
 								</tr>
 						   </table>
 						

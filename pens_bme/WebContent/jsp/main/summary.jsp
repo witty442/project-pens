@@ -588,7 +588,8 @@ function getCustName(custCode,fieldName,storeType){
 										 <html:select property="onhandSummary.location" styleId="location">
 										     <html:option value=""></html:option>
 											<html:option value="StockStore">Stock ห้าง</html:option>
-											 <html:option value="StockFriday">Stock Friday</html:option>
+											<html:option value="StockFriday">Stock Friday</html:option>
+											<html:option value="StockOShopping">Stock O-Shopping</html:option>
 									     </html:select>
 									</td>
 									<td align="left" width="40%">       

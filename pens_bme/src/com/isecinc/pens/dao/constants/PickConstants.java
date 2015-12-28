@@ -3,11 +3,13 @@ package com.isecinc.pens.dao.constants;
 import java.util.ArrayList;
 import java.util.List;
 
+import util.Constants;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.inf.helper.Utils;
 
-public class PickConstants {
+public class PickConstants extends Constants{
 
 	public static String STATUS_OPEN ="O";
 	public static String STATUS_CLOSE ="C";
@@ -50,6 +52,7 @@ public class PickConstants {
 	
 	@Deprecated
 	public static String SUB_PICK_TYPE_PART_BOX ="PBOX";
+	
 	
 	public static String getStatusDesc(String status){
 		String d = "";

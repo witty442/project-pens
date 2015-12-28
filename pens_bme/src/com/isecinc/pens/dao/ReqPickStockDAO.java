@@ -895,7 +895,7 @@ public class ReqPickStockDAO extends PickConstants{
 					  onhandQty +=qty;
 				   }
 			   }
-			 //  h.setOnhandQty(Utils.decimalFormat(onhandQty,Utils.format_current_no_disgit));
+			 //  h.setOnhandQty(Utils.decimalFormat(onhandQty,Utils.format__no_disgit));
 			   
 			   if(rst.getInt("qty") != 0){
 			     h.setQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
@@ -1241,7 +1241,7 @@ public class ReqPickStockDAO extends PickConstants{
 		logger.debug("***getItemInStockListByGroupCode***");
 		try {
 			if( !pickStock.isNewReq()){
-				//Case Edit
+				//Case Edit 
 				sql.append("\n SELECT  M2.* FROM(");//M2
 				sql.append("\n   SELECT  M.*  FROM("); //M
 				sql.append("\n     SELECT A.*, rownum r__ FROM ( ");//A

@@ -193,7 +193,8 @@ function copyDataFromLastMonth(path){
 									  <html:hidden property="bean.surName" styleId="surName" />
 									   ‡∫Õ√Ï‚∑√»—æ∑Ï  #1:<html:text property="bean.mobile1" styleId="mobile1" size="15" readonly="true" styleClass="disableText"/>
 									   ‡∫Õ√Ï‚∑√»—æ∑Ï  #2:<html:text property="bean.mobile2" styleId="mobile2" size="15" readonly="true" styleClass="disableText"/>
-									ª√–‡¿∑ <html:text property="bean.empType" styleId="empType" size="8"  readonly="true" styleClass="disableText"/>
+									ª√–‡¿∑ <html:text property="bean.empTypeDesc" styleId="empTypeDes" size="8"  readonly="true" styleClass="disableText"/>
+									 <html:hidden property="bean.empType" styleId="empType" />
 									</td>
 								</tr>
 								<tr>

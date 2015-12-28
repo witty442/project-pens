@@ -1,7 +1,11 @@
 package com.isecinc.pens.web.interfaces;
 
+import java.util.List;
+
 import com.isecinc.core.web.I_Form;
+import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 
 /**
@@ -23,8 +27,29 @@ public class InterfacesForm extends I_Form {
 	private MonitorItemDetailBean[] resultsItemDetail = null;
     
 	private String[] chkIndex;
+	private InterfaceBean bean = new InterfaceBean();
+	private InterfaceBean beanCriteria = new InterfaceBean();
+
+	private MonitorItemBean monitorItemBeanResult = null;
+	private List<MonitorItemBean> monitorItemList;
     
 	
+	public List<MonitorItemBean> getMonitorItemList() {
+		return monitorItemList;
+	}
+
+	public void setMonitorItemList(List<MonitorItemBean> monitorItemList) {
+		this.monitorItemList = monitorItemList;
+	}
+
+	public MonitorItemBean getMonitorItemBeanResult() {
+		return monitorItemBeanResult;
+	}
+
+	public void setMonitorItemBeanResult(MonitorItemBean monitorItemBeanResult) {
+		this.monitorItemBeanResult = monitorItemBeanResult;
+	}
+
 	public MonitorItemDetailBean[] getResultsItemDetail() {
 		return resultsItemDetail;
 	}
@@ -65,6 +90,22 @@ public class InterfacesForm extends I_Form {
 		this.results = results;
 	}
 
+	public InterfaceBean getBean() {
+		return bean;
+	}
+
+	public void setBean(InterfaceBean bean) {
+		this.bean = bean;
+	}
+
+	public InterfaceBean getBeanCriteria() {
+		return beanCriteria;
+	}
+
+	public void setBeanCriteria(InterfaceBean beanCriteria) {
+		this.beanCriteria = beanCriteria;
+	}
+    
 	
 	
 

@@ -82,7 +82,7 @@ public class OrderAction extends I_Action {
 				 request.getSession().removeAttribute("totalPage"); 
 				 
 				 //init store type
-				 new OrderDAO().initStoreTypeMap();
+				 STORE_TYPE_MAP = new OrderDAO().initStoreTypeMap();
 				 
 				 Order order = new Order();
 				 //Old OrderDate set to next billDate
@@ -95,7 +95,8 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,Constants.STORE_TYPE_FRIDAY_CODE);
+				 String notInCustCode = Constants.STORE_TYPE_FRIDAY_CODE+"," +Constants.STORE_TYPE_OSHOPPING_CODE;
+				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,notInCustCode);
 			     request.getSession().setAttribute("storeTypeList",storeTypeList);
 			     
 				 List<References> regionList = importDAO.getRegionList(conn);

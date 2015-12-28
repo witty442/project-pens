@@ -89,6 +89,34 @@ public class ImportDAO {
 		return lastFileName;
 	} 
 	
+	public String getLastFileNameImportOShopping(Connection conn) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String lastFileName ="";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select max(file_name)as last_file_name  from PENSBME_ONHAND_BME_OSHOPPING \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				lastFileName = rs.getString("last_file_name");
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return lastFileName;
+	} 
+	
 	public Boolean importLotusFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -596,13 +624,13 @@ public class ImportDAO {
 		return m;
 	} 
 	
-	public String getItemByBarcode(Connection conn ,String barcode) throws Exception{
+	/*public String getItemByBarcode(Connection conn ,String barcode) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		String item = "";
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select pens_value  from PENSBME_MST_REFERENCE WHERE interface_desc ='"+barcode+"' \n");
+			sql.append(" select pens_value  from PENSBME_MST_REFERENCE WHERE  interface_desc ='"+barcode+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
@@ -623,7 +651,7 @@ public class ImportDAO {
 			
 		}
 		return item;
-	} 
+	} */
 	
 	public String getItemByBarcode(Connection conn ,String storeType,String barcode) throws Exception{
 		PreparedStatement ps =null;
@@ -787,7 +815,7 @@ public class ImportDAO {
 		return item;
 	} 
 	
-	public MasterBean getMasterBeanByBarcode(Connection conn ,String barcode) throws Exception{
+	/*public MasterBean getMasterBeanByBarcode(Connection conn ,String barcode) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		MasterBean item = null;
@@ -817,7 +845,7 @@ public class ImportDAO {
 			}
 		}
 		return item;
-	} 
+	} */
 	
 	public MasterBean getMasterBeanByBarcode(Connection conn ,String storeType,String barcode) throws Exception{
 		PreparedStatement ps =null;
@@ -1030,7 +1058,7 @@ public class ImportDAO {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return getStoreTypeListModel(conn,"");
+			return getStoreTypeListModel(conn,"","");
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -1043,7 +1071,7 @@ public class ImportDAO {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return getStoreTypeListModel(conn,notInCustCode);
+			return getStoreTypeListModel(conn,notInCustCode,"");
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -1055,15 +1083,23 @@ public class ImportDAO {
 	
 	public List<References> getStoreTypeList(Connection conn,String notInCustCode) throws Exception{
 		try{
-			return getStoreTypeListModel(conn,notInCustCode);
+			return getStoreTypeListModel(conn,notInCustCode,"");
 		}catch(Exception e){
 			throw e;
 		}finally{
 			
 		}
 	}
-	
-	public List<References> getStoreTypeListModel(Connection conn,String notInCustCode) throws Exception{
+	public List<References> getStoreTypeList(Connection conn,String notInCustCode,String custCode) throws Exception{
+		try{
+			return getStoreTypeListModel(conn,notInCustCode,custCode);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+	}
+	public List<References> getStoreTypeListModel(Connection conn,String notInCustCode,String custCode) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		List<References> storeList = new ArrayList<References>();
@@ -1072,7 +1108,14 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select pens_value ,pens_desc  from PENSBME_MST_REFERENCE WHERE Reference_code ='Customer' \n");
 			if( !Utils.isNull(notInCustCode).equals("")){
-			  sql.append(" and pens_value <> '"+notInCustCode+"' \n");
+				if(Utils.isNull(notInCustCode).indexOf(",") != -1){
+					sql.append(" and pens_value not in("+Utils.converToTextSqlIn(notInCustCode)+") \n");
+				}else{
+			       sql.append(" and pens_value <> '"+notInCustCode+"' \n");
+				}
+			}
+			if( !Utils.isNull(custCode).equals("")){
+				sql.append(" and pens_value ='"+custCode+"' \n");
 			}
 		    logger.debug("SQL:"+sql.toString());
 		    

@@ -251,13 +251,14 @@ function validateQty(obj,row){
 	var table = document.getElementById('tblProduct');
 	var rows = table.getElementsByTagName("tr"); 
 	
+	obj.value = currencyToNum(obj.value);
 	var r = isNum(obj);
 	var onhandQtyObj = document.getElementsByName("onhandQty");
 	//alert(onhandQtyObj[row].value);
 	if(r){
 		//validate Onhand Qty
-		var onhandQty = parseInt(onhandQtyObj[row].value);
-		var currQty = parseInt(obj.value);
+		var onhandQty = currencyToNum(onhandQtyObj[row].value);
+		var currQty = currencyToNum(obj.value);
 		if(currQty > onhandQty){
 			alert("จำนวนรวม QTY("+currQty+") มีมากว่า  Onhand QTY("+onhandQty+")");
 			//rows[row+1].className ="lineError";
@@ -280,7 +281,7 @@ function sumQty(){
 	var sumCurPageQty = 0;
 	for(var i=0;i<qtyObj.length;i++){
 		if(qtyObj[i].value != '')
-			sumCurPageQty = sumCurPageQty + parseInt(qtyObj[i].value);
+			sumCurPageQty = sumCurPageQty + currencyToNum(qtyObj[i].value);
 	}
 	
 	//alert("sumCurPageQty:"+sumCurPageQty);
@@ -289,7 +290,7 @@ function sumQty(){
 		totalQty.value = sumCurPageQty;
 	}else{
 		//alert("Case2 :totalQtyAll["+totalQtyAll.value+"]totalQtyNotInCurPage["+totalQtyNotInCurPage.value+"]sumCurPageQty:"+sumCurPageQty);
-		totalQty.value = parseInt(totalQtyNotInCurPage.value) + sumCurPageQty;
+		totalQty.value = currencyToNum(totalQtyNotInCurPage.value) + sumCurPageQty;
 	}
 }
 
@@ -302,11 +303,11 @@ function sumQtyOnfirst(){
 	var sumCurPageQty = 0;
 	for(var i=0;i<qtyObj.length;i++){
 		if(qtyObj[i].value != '')
-			sumCurPageQty = sumCurPageQty + parseInt(qtyObj[i].value);
+			sumCurPageQty = sumCurPageQty + currencyToNum(qtyObj[i].value);
 	}
 	
 	//alert("sumCurPageQty:"+sumCurPageQty);
-	totalQtyNotInCurPage.value = parseInt(totalQtyAll.value) -sumCurPageQty;
+	totalQtyNotInCurPage.value = currencyToNum(totalQtyAll.value) -sumCurPageQty;
 }
 
 function addItemPickStock(path,index,groupCode,pensItem){
@@ -481,6 +482,14 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
+
+function currencyToNum(str){
+	str = str+"";
+	var temp =  str.replace(/\,/g,''); //alert(r);
+	return parseInt(temp);
+}
+
+
 </script>
 
 </head>		
