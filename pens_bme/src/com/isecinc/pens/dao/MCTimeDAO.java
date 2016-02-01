@@ -168,11 +168,21 @@ public class MCTimeDAO {
 				   sql.append("\n      and EXTRACT(month FROM T.staff_date) = '"+Utils.isNull(o.getStaffMonth())+"'");
 				   sql.append("\n      group by T.emp_ref_id),0) as time_count " );
 				   sql.append(" \n from MC_EMPLOYEE S " );
-				
-				   sql.append(" \n WHERE 1=1  ");
 				   
+				    sql.append("\n INNER JOIN ( ");
+					sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ,MT.employee_id ");
+					sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
+					sql.append("\n    from MC_STAFF_ROUTE MT,MC_ROUTE R ");
+					sql.append("\n    WHERE  MT.mc_route = R.route_id");
+					sql.append("\n  )M  ON  M.region = S.region AND M.emp_ref_id = S.emp_ref_id ");
+					
+				   sql.append(" \n WHERE 1=1  ");
+				   sql.append("\n and s.status = 'A' ");
 				   if( !Utils.isNull(o.getMcArea()).equals("")){
 					    sql.append("\n and s.region = '"+Utils.isNull(o.getMcArea())+"'");
+					}
+				   if( !Utils.isNull(o.getEmpRouteName()).equals("")){
+					    sql.append("\n and M.route_name = '"+Utils.isNull(o.getEmpRouteName())+"'");
 					}
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
 						sql.append("\n and S.employee_id = "+Utils.isNull(o.getEmpId())+"");

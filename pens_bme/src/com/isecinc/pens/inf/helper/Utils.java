@@ -60,7 +60,7 @@ public class Utils {
 	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
 	private static String NUMBER_FORMAT ="#,##0";
 	
-	public static void main(String[] args){
+	public static void main1(String[] args){
 	    try{	
 	    	String str = "0001";
 			
@@ -70,7 +70,6 @@ public class Utils {
 	        e.printStackTrace();
 	    }
 	}
-	
 	
 	public static boolean userInRole(User user,String[] roles){
 		boolean r = false;
@@ -552,15 +551,25 @@ public class Utils {
 		return new Date(System.currentTimeMillis());
 	}
 	
+	public static java.sql.Date getSqlCurrentDate() {
+		return new java.sql.Date(System.currentTimeMillis());
+	}
+	
+	public static String getCurrentMonth() {
+		String mm = "";
+		Calendar c = Calendar.getInstance(local_th);
+		mm = (c.get(Calendar.MONTH)+1)+"";
+		mm = mm.length()==1?"0"+mm:mm;
+		return mm;
+	}
+	
 	public static String format(Date date, String pattern) {
 		if (date == null) {
 			return "";
 		}
 		return new SimpleDateFormat(pattern, Locale.US).format(date);
 	}
-	
-	
-	
+
 	public static String isNull(String str) {
 		if (str ==null){
 			return "";

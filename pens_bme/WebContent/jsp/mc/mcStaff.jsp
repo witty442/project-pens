@@ -103,8 +103,8 @@ function loadMe(){
 	document.getElementsByName('bean.mcArea')[0].value = '${mcForm.bean.mcArea}';
 	
 	loadRoute();
-	<%if( !"".equals(mcForm.getBean().getMcRoute())){ %>
-	  document.getElementsByName('bean.mcRoute')[0].value = <%=mcForm.getBean().getMcRoute()%>;
+	<%if( !"".equals(mcForm.getBean().getMcRouteDesc())){ %>
+	  document.getElementsByName('bean.mcRouteDesc')[0].value = '<%=mcForm.getBean().getMcRouteDesc()%>';
 	<% } %>
 }
 function clearForm(path){
@@ -157,7 +157,7 @@ function save(path){
 }
 
 function loadRoute(){
-	var cboDistrict = document.getElementsByName('bean.mcRoute')[0];
+	var cboDistrict = document.getElementsByName('bean.mcRouteDesc')[0];
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/RouteAjax.jsp",
@@ -364,7 +364,7 @@ function getStaffName(custCode){
 								<tr>
                                     <td  align="right"> Route เส้นทาง <font color="red">*</font></td>
 									<td colspan="3">		
-										 <html:select property="bean.mcRoute" styleId="mcRoute"> </html:select>
+										 <html:select property="bean.mcRouteDesc" styleId="mcRouteDesc"> </html:select>
 									</td>
 								</tr>
 								<tr>

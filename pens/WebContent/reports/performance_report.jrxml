@@ -7,6 +7,7 @@
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="total_discount" class="java.lang.Double"/>
 	<parameter name="total_amount" class="java.lang.Double"/>
+	<parameter name="total_ap_amount" class="java.lang.Double"/>
 	<parameter name="total_vat" class="java.lang.Double"/>
 	<parameter name="total_net" class="java.lang.Double"/>
 	<parameter name="target_amount" class="java.lang.Double"/>
@@ -1121,6 +1122,19 @@ ____/____/____]]></text>
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_airpay}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="277" y="44" width="49" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_ap_amount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

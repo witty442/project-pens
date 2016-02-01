@@ -69,6 +69,14 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandSummaryMTTResults(null);
 				 summaryForm.setOnhandSummaryMTTDetailResults(null);
+				 
+				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
+				 
+				 if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					 oh = new OnhandSummary();
+					 oh.setDispHaveQty("true");
+					 summaryForm.setOnhandSummary(oh);
+				 }
 			 }
 			
 		} catch (Exception e) {
@@ -112,6 +120,8 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandSummaryMTTResults(null);
 				 summaryForm.setOnhandSummaryMTTDetailResults(null);
+				 
+				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -360,6 +370,41 @@ public class SummaryAction extends I_Action {
 					summaryForm.setLotusSummaryResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
+			}else if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				//Validate Initial Date
+				Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date initDate = new SummaryDAO().searchInitDateBigC(summaryForm.getOnhandSummary().getPensCustCodeFrom());
+				
+				
+				logger.debug("initDate:"+initDate);
+				logger.debug("asOfDate:"+asOfDate);
+				
+				boolean pass = true;
+				if(initDate !=null){
+					if(asOfDate.before(initDate)){
+						summaryForm.setOnhandSummaryMTTResults(null);
+						request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
+						pass = false;
+					}
+				}
+				if(pass){
+					List<OnhandSummary> results = null;
+					results = new SummaryDAO().searchSizeColorBigCDetail(summaryForm.getOnhandSummary(),initDate,user);
+					
+					if (results != null  && results.size() >0) {
+						summaryForm.setOnhandSummarySizeColorBigCResults(results);
+						summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+						
+					} else {
+						summaryForm.setOnhandSummarySizeColorBigCResults(null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}
+				}
 			}
 			
 		} catch (Exception e) {
@@ -480,6 +525,13 @@ public class SummaryAction extends I_Action {
 			}else if("diff_stock".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				if(summaryForm.getDiffStockSummaryLists() != null && summaryForm.getDiffStockSummaryLists().size() > 0){
 					htmlTable = genDiffStockHTML(request,summaryForm,user);	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				if(summaryForm.getOnhandSummarySizeColorBigCResults() != null && summaryForm.getOnhandSummarySizeColorBigCResults().size() > 0){
+					htmlTable = genBigCSizeColorHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -728,6 +780,7 @@ public class SummaryAction extends I_Action {
 	private StringBuffer genOnhandMTTDetailHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
+		String colSpan ="12";
 		try{
 			h.append("<style> \n");
 			h.append(" .num { \n");
@@ -742,32 +795,32 @@ public class SummaryAction extends I_Action {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='12'>รายงาน Stock B'me Stock onhand - MTT ( ระดับสี/ไซร์ ) </td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงาน Stock B'me Stock onhand - MTT ( ระดับสี/ไซร์ ) </td> \n");
 			
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='12' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='12' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='12' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
-			h.append("</tr> \n");
-			
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='12' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
 
 			if(form.getOnhandSummaryMTTDetailResults() != null){
 			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummaryMTTDetailResults();
-			 	    
-				h.append("<table border='1'> \n");
+			    h.append("<table border='1'> \n");
 				h.append("<tr> \n");
 				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
 				  h.append("<td>CustNo(Oracle)</td> \n");
@@ -801,6 +854,97 @@ public class SummaryAction extends I_Action {
 					h.append("</tr>");
 				}
 				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	private StringBuffer genBigCSizeColorHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String a= "@";
+		String colSpan= "13";
+		try{
+			h.append("<style> \n");
+			h.append(" .num { \n");
+			h.append("  mso-number-format:General; \n");
+			h.append(" } \n");
+			h.append(" .text{ \n");
+			h.append("   mso-number-format:'"+a+"'; \n");
+			h.append(" } \n");
+			h.append("</style> \n");
+			
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รายงาน Stock B'me Stock onhand At BigC ( ระดับสี/ไซร์ ) </td> \n");
+			
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'  >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'  >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >วันที่ล่าสุดที่มีการตรวจนับสต็อก:"+form.getOnhandSummary().getInitDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'  >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+			
+			if(form.getOnhandSummarySizeColorBigCResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummarySizeColorBigCResults();
+			    
+			    h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td>Sub Inv</td> \n");
+				  h.append("<td>ชื่อร้านค้า</td> \n");
+				  h.append("<td>Group</td> \n");
+				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Materila Master</td> \n");
+				  h.append("<td>Barcode</td> \n");
+				  h.append("<td>Initial Stock</td> \n");
+				  h.append("<td>Trans In Qty</td> \n");
+				  h.append("<td>Sale Out Qty</td> \n");
+				  h.append("<td>Return Qty </td> \n");
+				  h.append("<td>Adjust Qty </td> \n");
+				  h.append("<td>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getSubInv()+"</td> \n");
+					  h.append("<td>"+s.getStoreName()+"</td> \n");
+					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getBarcode())+"</td> \n");
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getTransInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getAdjustSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+				
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

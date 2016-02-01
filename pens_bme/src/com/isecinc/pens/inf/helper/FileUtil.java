@@ -24,6 +24,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 
@@ -36,6 +38,24 @@ public class FileUtil {
 
 	public static void main(String[] s){
 		
+	}
+	public static void writeExcel(String path,HSSFWorkbook xssfWorkbook) throws Exception{
+		FileOutputStream outPutStream = null;
+        try {
+            outPutStream = new FileOutputStream(path);
+            xssfWorkbook.write(outPutStream);
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+        } finally {
+            if (outPutStream != null) {
+                try {
+                    outPutStream.flush();
+                    outPutStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 	}
 	
 	public static BufferedReader getBufferReaderFromClassLoader(String filename) throws Exception {

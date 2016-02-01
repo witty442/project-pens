@@ -48,6 +48,50 @@ public class InterfaceUtils {
 		return fileName;
 	}
 	
+	public static String getHisHerItemMasterTextFileName(String transDate){
+		String fileName ="";
+		Connection conn = null;
+		try{
+			   conn = DBConnection.getInstance().getConnection();
+			   //dd/mm/yyyy
+			   String curDD = transDate.substring(0,2);
+			   String curMonth = transDate.substring(3,5);
+			  
+			   fileName = ""+getConfigInterface(conn,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,"PENSTOCK","SITE_ID");
+			   
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			  conn.close();
+			}catch(Exception e){}
+		}
+		return fileName;
+	}
+	
+	//HISHER_ORDER_yymmdd.xls
+	public static String getHisHerExcelFileName(String transDate){
+		String fileName ="";
+		Connection conn = null;
+		try{
+			   conn = DBConnection.getInstance().getConnection();
+			   // dd/mm/yyyy
+			   String curDD = transDate.substring(0,2);
+			   String curMonth = transDate.substring(3,5);
+			   String curYear = transDate.substring(8,10);
+			   
+			   fileName = "HISHER_ORDER_"+curYear+curMonth+curDD+".xls";
+			   
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			  conn.close();
+			}catch(Exception e){}
+		}
+		return fileName;
+	}
+	
 	public static String genExportNameICC(String tableName,Map<String, String> batchParamMap){
 		String fileName ="";
 		Connection conn = null;
@@ -63,9 +107,9 @@ public class InterfaceUtils {
 		   String siteId = getConfigInterface(conn,"PENSTOCK","SITE_ID");
 		   
 		  if("PENSBME_ICC_HEAD".equalsIgnoreCase(tableName)){
-		     fileName = "tax"+curMonth+curDD+"."+siteId;
+		     fileName = "tax_"+curMonth+curDD+"."+siteId;
 		  }else  if("PENSBME_ICC_DLYR".equalsIgnoreCase(tableName)){
-			 fileName = "itm"+curMonth+curDD+"."+siteId;
+			 fileName = "itm_"+curMonth+curDD+"."+siteId;
 		  }
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

@@ -696,7 +696,36 @@ public class GeneralDAO {
 			}
 			return storeName;
 		}
-	 
+	 public static String getSubInvModel(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String storeName ="";
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select interface_desc  FROM ");
+				sql.append("\n PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'SubInv' ");
+				sql.append("\n AND pens_value ='"+storeCode+"' \n");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					storeName = Utils.isNull(rst.getString("interface_desc"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return storeName;
+		}
 	 public static StoreBean getStoreBeanModel(Connection conn,String storeCode) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

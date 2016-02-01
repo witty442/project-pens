@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.net.ssl.KeyManager;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -28,7 +29,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -53,7 +57,7 @@ public class FTPManager {
 	public String server;
 	public String userFtp;
 	public String passwordFtp;
-	EnvProperties env = EnvProperties.getInstance();
+	public static EnvProperties env = EnvProperties.getInstance();
 	
 	public FTPManager(String server,String userFtp,String passwordFtp){
 		this.server = server;
@@ -65,6 +69,36 @@ public class FTPManager {
 		//Case 2  server 2 no active -> server 1 (default)
 		
 		//chooseFtpServer();
+	}
+	public static void main(String[] s){
+		try{
+		   FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+		   ftpManager.testConnectionSFTP();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public  boolean testConnectionSFTP() {
+	   boolean re = true;
+	   FTPSClient sftp = null;
+    	try{
+    		logger.debug("server:"+"192.168.38.186");
+    		sftp = new FTPSClient("SSL");
+    		String[] protocolVersions = {"SSLv3"};
+			
+    		//sftp.setConnectTimeout(120000);
+			sftp.setEnabledProtocols(protocolVersions);
+			sftp.connect("192.168.38.186",990);
+			
+			int replyDesc = sftp.getReplyCode();
+			logger.debug("["+server+"]:["+replyDesc+"]");
+		
+		}catch(Exception e){
+			e.printStackTrace();
+			re = false;
+		}
+	    return re;
 	}
 	
 	public void chooseFtpServer() {
@@ -117,34 +151,7 @@ public class FTPManager {
 		}
 		return can;
 	}
-	
-	public boolean testConnectionURL() {
-	   boolean re = true;
-	   FTPClient ftp = null;
-    	try{
-			ftp = new FTPClient();
-			//ftp.connect(server);
-			ftp.isConnected();
-		}catch(Exception e){
-			re = false;
-		} finally {
-			try{
-				if(ftp != null && ftp.isConnected()) {
-					// Logout from the FTP Server and disconnect
-					ftp.logout();
-					ftp.disconnect();
-					logger.info("ftp disconnect : "+ftp.getReplyString());
-					ftp = null;
-				}
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
-			}
-		}
-	    return re;
-	}
-	
-	
-	
+
 	/**
 	 * canConnectFTPServer
 	 * @return true if can connection
@@ -682,6 +689,46 @@ public class FTPManager {
 		}
 	}
 	
+	public void deleteFileFTP(String path,String fileName) throws Exception{
+		FTPClient ftp = null;
+		try {	
+			logger.debug("Delete File From Path:"+path);
+			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			
+			//Step1 set Dir Active
+			ftp.changeWorkingDirectory(path);
+			logger.debug("Step1 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+			
+			//step 2 
+			ftp.sendCommand("delete "+fileName);
+			logger.debug("delete:"+fileName);
+			logger.debug("step2 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+			
+
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
 	/**
 	 * writeFileToFTP
 	 * @param path
@@ -789,14 +836,14 @@ public class FTPManager {
 				if(!ftp.login(userFtp, passwordFtp)){
 					throw new FTPException("FTP Username or password invalid! ");
 				}
-				 
+	
 				if(data != null && data.toString().length() >0){		
 						logger.info("Path:"+path);
-						logger.info("Write To pathFull:"+pathFull);
 						
-						ftp.changeWorkingDirectory(path);
-						logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
-
+						//ftp.changeWorkingDirectory(path);
+						//logger.info("changeWorkingDirectory FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+						
+						logger.info("Write To pathFull:"+pathFull);
 						out = ftp.storeFileStream(pathFull);
 					    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
 					    
@@ -851,6 +898,7 @@ public class FTPManager {
 			} catch (IOException e) {
 				throw new FTPException(e.getLocalizedMessage());
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new FTPException(e.getMessage());
 			} finally {
 				if(w != null){
@@ -859,6 +907,258 @@ public class FTPManager {
 				if(out != null){
 				  // out.close();
 				}
+				if(ftp != null && ftp.isConnected()) {
+					try{
+						ftp.logout();
+						ftp.disconnect();
+						//logger.info("ftp disconnect : "+ftp.getReplyString());
+						ftp = null;
+					}catch(Exception e){
+						logger.error(e.getMessage(),e);
+					}
+				}
+			}	
+		}
+		
+		public void uploadExcelByFTP(String localTempPath,String path,String pathFtpFull,HSSFWorkbook xssfWorkbook) throws Exception{
+			FTPClient ftp = null;
+			String reply = "";
+			logger.info("uploadExcelByFTP");
+			try {		
+				ftp = new FTPClient();
+				ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+				ftp.connect(server);
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				ftp.enterLocalPassiveMode();
+				 
+				//ftp.setConnectTimeout(connectTimeout);
+
+				//logger.info("connection timeout:"+ftp.getConnectTimeout());
+				
+				if(!ftp.login(userFtp, passwordFtp)){
+					throw new FTPException("FTP Username or password invalid! ");
+				}
+				 
+				if(xssfWorkbook != null ){		
+					logger.info("Path:"+path);
+					logger.info("Write To pathFtpFull:"+pathFtpFull);
+					
+					ftp.changeWorkingDirectory(path);
+					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+					  // APPROACH #2: uploads second file using an OutputStream
+		            File localFile = new File(localTempPath);
+		            InputStream inputStream = new FileInputStream(localFile);
+		 
+		            System.out.println("Start uploading second file");
+		            OutputStream outputStream = ftp.storeFileStream(pathFtpFull);
+		            byte[] bytesIn = new byte[4096];
+		            int read = 0;
+		 
+		            while ((read = inputStream.read(bytesIn)) != -1) {
+		                outputStream.write(bytesIn, 0, read);
+		            }
+		            inputStream.close();
+		            outputStream.close();
+		            
+		            logger.info("StoreFile To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+		            
+		            /** Close Command FTP **/
+				    try{
+					    logger.info(" Start completePendingCommand ");
+						boolean completed = ftp.completePendingCommand();
+						String ftpResponse = ftp.getReplyString();
+						logger.info("ftpResponse["+ftpResponse+"]");
+					    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    }catch(Exception e){
+				        logger.error(e.getMessage(),e);
+				    }
+		           
+				}else{
+					// Data not Found
+					logger.info("Data not found");
+				}
+		
+			} catch (SocketException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (UnknownHostException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (IOException e) {
+				throw new FTPException(e.getLocalizedMessage());
+			} catch (Exception e) {
+				throw new FTPException(e.getMessage());
+			} finally {
+				if(ftp != null && ftp.isConnected()) {
+					try{
+						ftp.logout();
+						ftp.disconnect();
+						//logger.info("ftp disconnect : "+ftp.getReplyString());
+						ftp = null;
+					}catch(Exception e){
+						logger.error(e.getMessage(),e);
+					}
+				}
+			}	
+		}
+		
+		public void uploadExcelByFTP_Method2(String localTempPath,String path,String pathFull,XSSFWorkbook xssfWorkbook) throws Exception{
+			FTPClient ftp = null;
+			String reply = "";
+			OutputStream out = null;
+			logger.info("uploadExcelByFTP");
+			try {		
+				ftp = new FTPClient();
+				ftp.setControlEncoding(Constants.FTP_ENCODING_UTF_8);
+				ftp.connect(server);
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				
+				//ftp.setConnectTimeout(connectTimeout);
+
+				//logger.info("connection timeout:"+ftp.getConnectTimeout());
+				
+				if(!ftp.login(userFtp, passwordFtp)){
+					throw new FTPException("FTP Username or password invalid! ");
+				}
+				 
+				if(xssfWorkbook != null ){		
+					logger.info("Path:"+path);
+					logger.info("Write To pathFull:"+pathFull);
+					
+					ftp.changeWorkingDirectory(path);
+					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+					InputStream input;
+		            input = new FileInputStream(localTempPath);
+		            //store the file in the remote server
+		            ftp.storeFile(pathFull, input);
+		            //close the stream
+		            input.close();
+
+				    /** Close Command FTP **/
+				    try{
+					    //logger.info(" Start completePendingCommand ");
+						//boolean completed = ftp.completePendingCommand();
+						//String ftpResponse = ftp.getReplyString();
+						//logger.info("ftpResponse["+ftpResponse+"]");
+					   // logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    }catch(Exception e){
+				        logger.error(e.getMessage(),e);
+				    }
+				    
+				    //SITE CHMOD 777 201011101437-SALESREP.txt
+				    /** Set Permission File ***/
+				    try{
+					    logger.info(" Start CHMOD 777 ");
+					   // ftp.sendSiteCommand("CHMOD 777 "+pathFull);
+					    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    }catch(Exception e){
+				    	logger.error(e.getMessage(),e);	
+				    }
+				}else{
+					// Data not Found
+					logger.info("Data not found");
+				}
+		
+			} catch (SocketException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (UnknownHostException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (IOException e) {
+				throw new FTPException(e.getLocalizedMessage());
+			} catch (Exception e) {
+				throw new FTPException(e.getMessage());
+			} finally {
+				if(ftp != null && ftp.isConnected()) {
+					try{
+						ftp.logout();
+						ftp.disconnect();
+						//logger.info("ftp disconnect : "+ftp.getReplyString());
+						ftp = null;
+					}catch(Exception e){
+						logger.error(e.getMessage(),e);
+					}
+				}
+			}	
+		}
+		public void uploadExcelByFTP_Method1(String path,String pathFull,HSSFWorkbook xssfWorkbook) throws Exception{
+			FTPClient ftp = null;
+			String reply = "";
+			OutputStream out = null;
+			logger.info("uploadExcelByFTP");
+			try {		
+				ftp = new FTPClient();
+				//ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+				ftp.connect(server);
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				
+				//ftp.setConnectTimeout(connectTimeout);
+
+				//logger.info("connection timeout:"+ftp.getConnectTimeout());
+				
+				if(!ftp.login(userFtp, passwordFtp)){
+					throw new FTPException("FTP Username or password invalid! ");
+				}
+				 
+				if(xssfWorkbook != null ){		
+						logger.info("Path:"+path);
+						logger.info("Write To pathFull:"+pathFull);
+						
+						ftp.changeWorkingDirectory(path);
+						logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+						/*InputStream input;
+			            input = new FileInputStream(localPathFull);
+			            //store the file in the remote server
+			            ftp.storeFile(pathFull, input);
+			            //close the stream
+			            input.close();*/
+						
+						 /** new Code ******************************************************/
+					    logger.info("Start Write OutputStreamWriter data:");
+					    
+					    out = ftp.storeFileStream(pathFull);
+					   
+					    xssfWorkbook.write(out);
+					    
+					    logger.info("End Write OutputStreamWriter data:");
+					    
+					    out.flush();
+					    out.close();
+
+					    /** Close Command FTP **/
+					    try{
+						    logger.info(" Start completePendingCommand ");
+							boolean completed = ftp.completePendingCommand();
+							String ftpResponse = ftp.getReplyString();
+							logger.info("ftpResponse["+ftpResponse+"]");
+						    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					        logger.error(e.getMessage(),e);
+					    }
+					    
+					    //SITE CHMOD 777 201011101437-SALESREP.txt
+					    /** Set Permission File ***/
+					    try{
+						    logger.info(" Start CHMOD 777 ");
+						    ftp.sendSiteCommand("CHMOD 777 "+pathFull);
+						    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					    	logger.error(e.getMessage(),e);	
+					    }
+					}else{
+						// Data not Found
+						logger.info("Data not found");
+					}
+		
+			} catch (SocketException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (UnknownHostException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (IOException e) {
+				throw new FTPException(e.getLocalizedMessage());
+			} catch (Exception e) {
+				throw new FTPException(e.getMessage());
+			} finally {
 				if(ftp != null && ftp.isConnected()) {
 					try{
 						ftp.logout();

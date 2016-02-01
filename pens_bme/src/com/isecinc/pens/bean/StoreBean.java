@@ -27,8 +27,24 @@ public class StoreBean implements Serializable{
 	private String custGroup;
 	private String storeNo;
 	private String storeStyle;
+	private String materialMaster;
+	
+	//For GenHisher
+	private String storeCorner;
 	
 	
+	public String getMaterialMaster() {
+		return materialMaster;
+	}
+	public void setMaterialMaster(String materialMaster) {
+		this.materialMaster = materialMaster;
+	}
+	public String getStoreCorner() {
+		return storeCorner;
+	}
+	public void setStoreCorner(String storeCorner) {
+		this.storeCorner = storeCorner;
+	}
 	public String getStoreStyle() {
 		return storeStyle;
 	}

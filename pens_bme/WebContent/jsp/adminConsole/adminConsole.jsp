@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -13,7 +14,9 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="adminConsoleForm" class="com.isecinc.pens.web.adminconsole.AdminConsoleForm" scope="request" />
- 
+ <%
+ EnvProperties env = EnvProperties.getInstance();
+ %>
 <html>
 <head>
 <title>Admin Console</title>
@@ -193,7 +196,7 @@ function clearCach1(){
 	  <div id="div_config_info"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <input type="button" name="clearCach"  value=" Clear Cach "  onclick="clearCach1()"/>
 	      
-		  <BR><span class="h1_style">Configuration Tab </span><br> 
+		  <BR><span class="h1_style">Configuration Tab (Config Type:<%= env.getProperty("product.type")%>) </span><br> 
 		       <html:textarea property="configInfo" style=" width :100%;" rows="16"/>
 		     <br><br>
 		   <INPUT TYPE="button" class="button2_style" name ="B_TEST_INFO" VALUE="Submit Test Connection" onclick="submitBT('<%=request.getContextPath()%>');"><br><br>
@@ -204,7 +207,7 @@ function clearCach1(){
 	  
 	   <div id="div_query"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <BR>
-		   <span class="h1_style"> Query Tab </span> :
+		   <span class="h1_style"> Query Tab (Config Type:<%= env.getProperty("product.type")%>)  </span> :
 	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
 	        <BR><br>
 		    Please enter your text SQL 1:<BR>
@@ -225,7 +228,7 @@ function clearCach1(){
 	  
 	   <div id="div_execute" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <BR>
-		     <span class="h1_style">Execute Tab </span> :
+		     <span class="h1_style">Execute Tab (Config Type:<%= env.getProperty("product.type")%>) </span> :
 	         <INPUT TYPE="button" class="button2_style" name ="B_EXECUTE"  VALUE="Submit Execute DB" onclick="submitBT('<%=request.getContextPath()%>');">
 		  <BR>
 		    Please enter your text SQL To Execute:

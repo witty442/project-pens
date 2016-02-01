@@ -43,6 +43,7 @@ public class PerformanceReportAction extends I_ReportAction<PerformanceReport> {
 				parameterMap.put("order_date", DateToolsUtil.dateNumToWord(reportForm.getPerformanceReport().getOrderDate()));
 				parameterMap.put("total_discount", p.getAllDiscount());
 				parameterMap.put("total_amount", p.getAllCashAmount());
+				parameterMap.put("total_ap_amount", p.getAllAirpayAmount());
 				parameterMap.put("total_receipt", p.getAllReceiptAmount());
 				parameterMap.put("total_vat", p.getAllVatAmount());
 				parameterMap.put("total_net", p.getAllNetAmount());

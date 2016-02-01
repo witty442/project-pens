@@ -1,5 +1,7 @@
 package com.isecinc.pens.web.interfaces;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
@@ -9,9 +11,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+
+import util.BeanParameter;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -30,6 +35,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.inf.manager.ProcessManager;
 import com.isecinc.pens.inf.manager.process.GenerateHISHER;
+import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 
@@ -71,6 +77,7 @@ public class InterfacesAction extends I_Action {
 		String returnText = "prepare";
 		InterfaceDAO dao = new InterfaceDAO();
 		try {
+			 
 			logger.debug("pageName:"+Utils.isNull(request.getParameter("pageName")) +",pageAction:"+Utils.isNull(request.getParameter("pageAction")));
 			
 			if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_HISHER)
@@ -81,7 +88,7 @@ public class InterfacesAction extends I_Action {
 				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
 				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    bean.setTextFileName("");
-				bean.setOutputPath("d://BME/");//Gen
+				bean.setOutputPath("");//Gen
 				
 				interfacesForm.setBean(bean);
 				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
@@ -121,8 +128,48 @@ public class InterfacesAction extends I_Action {
 				interfacesForm.setMonitorItemList(null);
 				
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT_BILL_ICC);
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ORDER_EXCEL)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				
+				//default value
+				InterfaceBean bean =new InterfaceBean();
+				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
+				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
+				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    bean.setTextFileName("");
+				bean.setOutputPath("");//Gen
+				
+				interfacesForm.setBean(bean);
+				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
+				
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ORDER_EXCEL);
+				
+			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				//default value
+				InterfaceBean bean =new InterfaceBean();
+				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
+				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
+				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    bean.setTextFileName("");
+				bean.setOutputPath("");//Gen
+				
+				interfacesForm.setBean(bean);
+				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
+				
+				
+				interfacesForm.setMonitorBean(new MonitorBean());
+				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+				interfacesForm.setMonitorItemList(null);
+				
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ITEM_MASTER_HISHER);
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -247,6 +294,59 @@ public class InterfacesAction extends I_Action {
 				} else {
 					request.setAttribute("Message", "Data not found");
 				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ORDER_EXCEL)){
+					type = Constants.TYPE_GEN_ORDER_EXCEL;
+					
+					InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+					if(request.getAttribute("searchKey") != null){
+						criteria.setSearchKey((String)request.getAttribute("searchKey"));
+					}
+					interfacesForm.setCriteria(criteria);
+					/** Set Condition Search **/
+					MonitorBean[] results = dao.findMonitorListNew(user,type);
+					
+					if (results != null && results.length > 0) {
+						interfacesForm.getCriteria().setSearchResult(results.length);
+						interfacesForm.setResults(results);
+						criteria.setMonitorBean(new MonitorBean());
+						interfacesForm.setCriteria(criteria);
+						
+						//Search interfaceResult (monitorItem)
+						MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+						interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+						
+					
+					} else {
+						request.setAttribute("Message", "Data not found");
+					}
+					
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
+				type = Constants.TYPE_GEN_ITEM_MASTER_HISHER;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+				
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
+				
 			}
 			
 			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
@@ -422,7 +522,7 @@ public class InterfacesAction extends I_Action {
 					request.setAttribute("id", m.getTransactionId());
 					
 					interfacesForm.getBean().setTextFileName(textFileName);
-					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export"));
+					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export.txt"));
 					
 				}else{
 					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
@@ -507,6 +607,105 @@ public class InterfacesAction extends I_Action {
 				}else{
 					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
 				}
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ORDER_EXCEL)){
+				String status = dao.findControlMonitor(Constants.TYPE_GEN_ORDER_EXCEL);
+				String realPathTemps = BeanParameter.getTempPath();
+				logger.debug("realPathTemps"+realPathTemps);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Generate Order Excel His&Her");
+					monitorModel.setType(Constants.TYPE_GEN_ORDER_EXCEL);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Gen FileName **/
+					textFileName = InterfaceUtils.getHisHerExcelFileName(interfacesForm.getBean().getTransactionDate());//Gen
+				
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					logger.debug("Output path:"+interfacesForm.getBean().getOutputPath());
+					
+					batchParamMap.put(GenerateOrderExcel.PARAM_OUTPUT_PATH,"");
+					batchParamMap.put(GenerateOrderExcel.PARAM_FILE_NAME,textFileName);
+					batchParamMap.put(GenerateOrderExcel.PARAM_CUST_GROUP,interfacesForm.getBean().getCustGroup());
+					batchParamMap.put(GenerateOrderExcel.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
+					batchParamMap.put(GenerateOrderExcel.PARAM_REAL_PATH_TEMP,realPathTemps);
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+					
+					interfacesForm.getBean().setTextFileName(textFileName);
+					interfacesForm.getBean().setOutputPath(env.getProperty("path.icc.hisher.export.orderexcel"));
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
+				String status = dao.findControlMonitor(Constants.TYPE_GEN_ITEM_MASTER_HISHER);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Generate Item Master His &Her to ICC");
+					monitorModel.setType(Constants.TYPE_GEN_ITEM_MASTER_HISHER);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Gen FileName **/
+					textFileName = InterfaceUtils.getHisHerItemMasterTextFileName(interfacesForm.getBean().getTransactionDate());//Gen
+				
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					logger.debug("Output path:"+interfacesForm.getBean().getOutputPath());
+					
+					batchParamMap.put(GenerateHISHER.PARAM_OUTPUT_PATH,"");
+					batchParamMap.put(GenerateHISHER.PARAM_FILE_NAME,textFileName);
+					batchParamMap.put(GenerateHISHER.PARAM_CUST_GROUP,interfacesForm.getBean().getCustGroup());
+					batchParamMap.put(GenerateHISHER.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+					
+					interfacesForm.getBean().setTextFileName(textFileName);
+					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export.master.txt"));
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
 			}
 			
 		} catch (Exception e) {
@@ -514,6 +713,46 @@ public class InterfacesAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("success");
+	}
+	
+	
+	/**
+	 * Search
+	 */
+	public ActionForward downloadFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("downloadFile");
+		InterfacesForm interfacesForm = (InterfacesForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		InterfaceDAO dao = new InterfaceDAO();
+		EnvProperties env = EnvProperties.getInstance();
+		try {
+			String realPathTemps = env.getProperty("path.backup.icc.hisher.export.orderexcel");//BeanParameter.getTempPath();
+			logger.debug("realPathTemps"+realPathTemps);
+			
+			logger.debug("monitorItemId:"+request.getParameter("monitorItemId"));
+			MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBeanByPK(user,request.getParameter("monitorItemId"));
+			
+			String pathFull = realPathTemps+"/"+monitorItemBeanResult.getFileName();
+			//Load Excel File
+			FileInputStream file = new FileInputStream(new File(pathFull));
+            //Create Workbook instance holding reference to .xlsx file
+            HSSFWorkbook workbook = new HSSFWorkbook(file);
+
+        	response.setHeader("Content-Disposition", "attachment; filename="+monitorItemBeanResult.getFileName());
+			response.setContentType("application/vnd.ms-excel; charset=windows-874");
+			java.io.OutputStream out = response.getOutputStream();
+
+			workbook.write(out);
+
+		    out.flush();
+		    out.close();
+		    file.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("showItemExport");
 	}
 	
 	/**

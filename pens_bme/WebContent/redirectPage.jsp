@@ -45,25 +45,25 @@ function redirectPage(){
       	<tr>
         	<td width="61">&nbsp;</td>
        	 	<td width="355" valign="top">
+       	 	 
        	 		<html:form action="/login" onsubmit="return false;">
-       	 		  <input type="text" id ="path" name="path" value="${pageContext.request.contextPath}" />
+       	 		  <input type="hidden" id ="path" name="path" value="${pageContext.request.contextPath}" readonly class="disableText"/>
 		        </html:form>
 			</td>
-        	<td width="523">&nbsp;</td>
+        	
       </tr>
       <tr>
-        <td>&nbsp;</td>
-        <td valign="top"><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="250" /></td>
-        <td>&nbsp;</td>
+        <td></td>
+        <td> <Font size="4">Processing Redirect to Page..................</Font></td>
       </tr>
       <tr>
+        <td></td>
+        <td>&nbsp;&nbsp;</td>
+      </tr>
+       <tr>
         <td>&nbsp;</td>
-        <td valign="top"><table width="355" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td width="197"><img src="${pageContext.request.contextPath}/images2/footer.jpg" width="454" height="38" /></td>
-          </tr>
-        </table></td>
-        <td>&nbsp;</td>
+        <td ><img src="${pageContext.request.contextPath}/images2/waiting.gif" width="350" height="350" /></td>
+    
       </tr>
     </table></td>
   </tr>

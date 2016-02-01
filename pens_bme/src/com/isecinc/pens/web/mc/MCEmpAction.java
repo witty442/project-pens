@@ -332,6 +332,7 @@ public class MCEmpAction extends I_Action {
 			
 			//Validate StaffId duplicate
 			if("add".equalsIgnoreCase((aForm.getMode()))){
+				logger.debug("insert:");
 				if(!Utils.isNull(h.getEmpId()).equals("")){
 					if( MCDAO.isDuplicateEmployeeId(conn, h.getEmpId(),h.getEmpRefId())){
 						request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
@@ -342,6 +343,7 @@ public class MCEmpAction extends I_Action {
 				}
 			    h = MCEmpDAO.insertMCEmpModel(conn, h);
 			}else{
+				logger.debug("update:");
 				if(!Utils.isNull(h.getEmpId()).equals("") ){
 					if( MCDAO.isDuplicateEmployeeId(conn, h.getEmpId(),h.getEmpRefId())){
 						request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้  ข้อมูล รหัสพนักงาน ซ้ำ");
@@ -353,13 +355,14 @@ public class MCEmpAction extends I_Action {
 				  MCEmpDAO.updateMCEmpModel(conn, h);
 				  
 			}
-			
+		
+			logger.debug("region:"+h.getRegion());
 			//Search Again
+			h.setEmpRouteName("");
 			MCEmpBean bean = MCEmpDAO.searchHead(conn,h,true).getItems().get(0);
-	
 		    aForm.setBean(bean);
-			
-			conn.commit();
+		    
+		    conn.commit();
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();

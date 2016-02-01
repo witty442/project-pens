@@ -68,14 +68,16 @@ function loadMe(){
         new Epoch('epoch_popup', 'th', document.getElementById('countDateTo'));
     <%} else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
         new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
-    <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+    <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%> 
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	<%}else if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
-     <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
+     <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+    		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
+    		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
@@ -436,6 +438,11 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMETransaction"/>
 				</jsp:include>
+			<%}else if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMESizeColorBigC"/>
+				</jsp:include>
+		
 			<%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -634,10 +641,11 @@ function getCustName(custCode,fieldName,storeType){
 								|| "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandMTT".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
+								|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 								) {
 								
 							    storeType ="lotus";
-								if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))){
+								if("onhandBigC".equalsIgnoreCase(request.getParameter("page")) || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){
 									storeType="bigc";
 								}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))){
 									storeType="MTT";
@@ -661,6 +669,16 @@ function getCustName(custCode,fieldName,storeType){
 									</td>
 									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
 								</tr>
+								
+								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){%>
+									 <tr>
+										<td align="right" >วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
+										 
+										   <html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
+										</td>	
+										<td align="left" width="30%"> </td>
+									</tr>
+								<%} %>
 								<tr>
 									<td align="right" width="30%">
 									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
@@ -679,8 +697,13 @@ function getCustName(custCode,fieldName,storeType){
 									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
 									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
 									     
+									   
 									  </td>
-									<td align="left" width="30%">&nbsp;</td>
+									<td align="left" width="30%">  
+								       <% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){%>
+									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
+									    <%} %>
+									 </td>
 							   </tr>
 							   
 						<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {
@@ -887,6 +910,29 @@ function getCustName(custCode,fieldName,storeType){
 							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
 							      
 							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
+							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
+							    				
+							</display:table>
+                    </c:if>
+                    
+                      <c:if test="${summaryForm.onhandSummarySizeColorBigCResults != null}">
+
+						<br/>
+							<display:table id="item" name="sessionScope.summaryForm.onhandSummarySizeColorBigCResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+							    
+							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>
+							    <display:column  title="SubInv" property="subInv"  sortable="false" />
+							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
+							    <display:column  title="Group" property="group"  sortable="false"/>	
+							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
+							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
+							    <display:column  title="Barcode" property="barcode"  sortable="false" />
+							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
+							    <display:column  title="Trans In Qty" property="transInQty"  sortable="false" />	
+							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
+							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
+							    <display:column  title="Adjust Qty" property="adjustSaleQty"  sortable="false" />
 							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
 							    				
 							</display:table>

@@ -171,6 +171,10 @@ function isNum(obj){
 }
 	
 function setTimeMask(index,obj){
+	var totalTime = document.getElementsByName("totalTime")[index];
+	var startTime = document.getElementsByName("startTime")[index];
+	var endTime = document.getElementsByName("endTime")[index];
+	
 	var t = obj.value;
 	 t = t.replace(new RegExp(':', 'g'), '');
 	// alert(t);
@@ -181,10 +185,22 @@ function setTimeMask(index,obj){
 			validateTime(index,obj);
 		}else {
 			alert("กรอก รูปแบบเวลาผิด  กรุณากรอกใหม่");
+			obj.focus();
 			obj.value = "";
 			obj.style.backgroundColor = '#fba';
+			
+			//Clear TotalTime
+			totalTime.value ='';
+			sumTotalTime();
 		}
-	}
+	}else{
+		//alert("startTime["+startTime.value+"]endTime["+endTime.value+"]");
+		if(startTime.value == '' || endTime.value  == ''){
+		  //Clear TotalTime
+		  totalTime.value ='';
+		  sumTotalTime();
+		}
+	}	
 }
 
 function validateTime(index,obj){
@@ -216,7 +232,7 @@ function validateTime(index,obj){
 			
 			sumTotalTime();
 		}
-	}	
+	}
 }
 
 function calcTotalTime(index,startTime,endTime){
@@ -385,7 +401,6 @@ function sumTotalTime(){
      
      var hours = totalHH +parseInt(totalMM/60);  
      hours = hours < 10 ? "0" + hours : hours;
-    
 
     // alert(hours+":"+minutes);
      
@@ -474,10 +489,8 @@ function validateTimeModel(inputField) {
 						<!-- BODY -->
 						<html:form action="/jsp/mcTimeAction">
 						<jsp:include page="../error.jsp"/>
-
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
-						     
 								<tr>
                                     <td align="right"> รหัสพนักงาน <font color="red"></font></td>
 									<td>		
@@ -490,17 +503,23 @@ function validateTimeModel(inputField) {
 									<td>		
 										 <html:text property="bean.fullName" styleId="fullName" size="40" styleClass="disableText" readonly="true"/>
 									</td>
+									 <td align="right">ประจำปี/เดือน<font color="red"></font></td>
+									 <td>		
+										<input type="text" name="disp"  size="40" value="${mcTimeForm.bean.staffYear}/${mcTimeForm.bean.staffMonth}" readonly class="disableText"/>
+									</td>
 								</tr>
 									<tr>
-                                    <td align="right">ประจำปี/เดือน<font color="red"></font></td>
-									<td>		
-										<input type="text" name="disp"  size="10" value="${mcTimeForm.bean.staffYear}/${mcTimeForm.bean.staffMonth}" readonly class="disableText"/>
-									</td>
-								    <td align="right">ประเภท<font color="red"></font></td>
+                                    <td align="right">ประเภท<font color="red"></font></td>
 									<td>		
 										 <html:text property="bean.empTypeDesc" styleId="empTypeDesc" size="10" styleClass="disableText" readonly="true"/>
-										 ภาค
+									</td>
+								    <td align="right"> ภาค<font color="red"></font></td>
+									<td>		
 										  <html:text property="bean.regionDesc" styleId="regionDesc" size="40" styleClass="disableText" readonly="true"/>
+									</td>
+									<td align="right">Route เส้นทาง/สายงาน<font color="red"></font></td>
+									 <td>		
+										<input type="text" name="disp"  size="40" value="${mcTimeForm.bean.empRouteName}" readonly class="disableText"/>
 									</td>
 								</tr>
 						   </table>

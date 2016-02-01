@@ -146,7 +146,7 @@ function loadMe(){
 	
 	loadRoute();
 	<%if( !"".equals(mcForm.getBean().getMcRoute())){ %>
-	  document.getElementsByName('bean.mcRoute')[0].value = <%=mcForm.getBean().getMcRoute()%>;
+	  document.getElementsByName('bean.mcRoute')[0].value = '<%=mcForm.getBean().getMcRoute()%>';
 	<% } %>
 }
 function clearForm(path){
@@ -282,7 +282,7 @@ function getStaffName(custCode){
 }
 
 function loadRoute(){
-	var cboDistrict = document.getElementsByName('bean.mcRoute')[0];
+	var cboDistrict = document.getElementsByName('bean.mcRouteDesc')[0];
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/RouteAjax.jsp",
@@ -360,7 +360,7 @@ function loadRoute(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> ประเภท<font color="red"></font></td>
+                                    <td> ประเภท <font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.empType" styleId="empType">
 											<html:options collection="staffTypeList" property="code" labelProperty="desc"/>
@@ -370,7 +370,7 @@ function loadRoute(){
 								<tr>
                                     <td> Route เส้นทาง <font color="red"></font></td>
 									<td>		
-										 <html:select property="bean.mcRoute" styleId="mcArea"> </html:select>
+										 <html:select property="bean.mcRouteDesc" styleId="mcRouteDesc"> </html:select>
 									</td>
 								</tr>
 								<tr>

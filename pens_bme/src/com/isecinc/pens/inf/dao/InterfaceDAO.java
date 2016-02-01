@@ -582,6 +582,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor.*  \n");
 			sql.append(" , (select count(*) from monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select max(id) from monitor_item where monitor_item.monitor_id = monitor.monitor_id)  as monitor_item_id  \n");
 			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
 			sql.append(" from monitor  \n");
 			sql.append(" inner join  \n");
@@ -604,6 +605,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			while(rs.next()){
 				MonitorBean m = new MonitorBean();
 				m.setTransactionId(rs.getBigDecimal("transaction_id"));
+				m.setMonitorItemId(rs.getBigDecimal("monitor_item_id"));
 				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
 				m.setMonitorId(rs.getBigDecimal("monitor_id"));
 				m.setName(rs.getString("name"));
@@ -856,6 +858,57 @@ public class InterfaceDAO extends InterfaceUtils{
 			sql.append(" select monitor_item.* \n");
 			sql.append(" from monitor_item where 1=1 \n");
 			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
+
+		    logger.debug("SQL:"+sql.toString());
+            conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){
+				item.setId(rs.getBigDecimal("id"));
+				item.setTableName(rs.getString("table_name"));
+				item.setFileName(rs.getString("file_name"));
+				item.setSource(rs.getString("source"));
+				item.setDestination(rs.getString("destination"));
+				item.setStatus(rs.getInt("status"));
+				item.setSuccessCount(rs.getInt("success_count"));
+				item.setFailCount(rs.getInt("fail_count"));
+				item.setErrorCode(rs.getString("error_code"));
+				item.setErrorMsg(rs.getString("error_msg"));
+				
+			    //SuccessList
+				item.setSuccessList(findMonitorItemResultList(conn,item.getId(),"SUCCESS"));
+				//FailList
+				item.setFailList(findMonitorItemResultList(conn,item.getId(),"FAIL"));
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+		return item;
+	} 
+	
+	public  MonitorItemBean findMonitorItemBeanByPK(User user, String id) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		MonitorItemBean item = new  MonitorItemBean();
+		Connection conn = null;
+	
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select monitor_item.* \n");
+			sql.append(" from monitor_item where 1=1 \n");
+			sql.append(" and id ="+id +"\n");
 
 		    logger.debug("SQL:"+sql.toString());
             conn = DBConnection.getInstance().getConnection();

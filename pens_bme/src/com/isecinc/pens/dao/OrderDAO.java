@@ -29,6 +29,7 @@ import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.exception.LogisticException;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -65,6 +66,10 @@ public class OrderDAO {
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n and group_item = '"+Utils.isNull(o.getGroupCode())+"'  ");
 			}
+			/** Case HISHER show only barcode in PENSBME_BARCODE_IN_ICC 26/01/2559 **/
+			if(PickConstants.STORE_TYPE_HISHER_CODE.equalsIgnoreCase(o.getStoreType())){
+				sql.append("\n and BARCODE IN(SELECT BARCODE FROM PENSBME_BARCODE_IN_ICC)");
+			}
 			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
@@ -84,8 +89,6 @@ public class OrderDAO {
 		}
 		return totalRow;
 	}
-	
-	
 	
 	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,String tableName) throws Exception {
 		Statement stmt = null;
@@ -204,7 +207,10 @@ public class OrderDAO {
 				if( !Utils.isNull(o.getGroupCode()).equals("")){
 					sql.append("\n and group_item = '"+Utils.isNull(o.getGroupCode())+"'  ");
 				}
-				
+				/** Case HISHER show only barcode in PENSBME_BARCODE_IN_ICC 26/01/2559 **/
+				if(PickConstants.STORE_TYPE_HISHER_CODE.equalsIgnoreCase(o.getStoreType())){
+					sql.append("\n and BARCODE IN(SELECT BARCODE FROM PENSBME_BARCODE_IN_ICC)");
+				}
 				sql.append("\n  ) s  ");
 				sql.append("\n order by s.group_item,s.item_style asc  ");
 				sql.append("\n ) a  ");

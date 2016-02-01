@@ -26,6 +26,13 @@
     <url-pattern>/jsp/*</url-pattern>
   </filter-mapping>
     <!-- Servlet -->
+       <!-- run First Time Only Running Script DB  -->
+	<!-- <servlet>
+		<display-name>Running Script DB</display-name>
+		<servlet-name>RunningScriptDB</servlet-name>
+		<servlet-class>com.isecinc.pens.web.RunScriptDBServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet> -->
 	<servlet>
 		<display-name>Web Initial</display-name>
 		<servlet-name>WebInitial</servlet-name>

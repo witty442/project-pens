@@ -64,7 +64,9 @@ public class AdminConsoleAction extends I_Action {
 				String url = env.getProperty("db.url");
 				String username = env.getProperty("db.username");
 				String password = env.getProperty("db.password");
+				
 		
+				
 				configInfo += " ----------------------  Database Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
@@ -75,13 +77,21 @@ public class AdminConsoleAction extends I_Action {
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
 				configInfo +="FTP Password: "+env.getProperty("ftp.password").toCharArray()+"\n";
-				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
-		
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
+				configInfo +="HOST DD: "+env.getProperty("host.dd.server")+"\n";
+				
 				configInfo += " ----------------------  FTP Server(ICC) Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP ICC IP : "+env.getProperty("ftp.icc.ip.server")+"\n";
 				configInfo +="FTP ICC User : "+env.getProperty("ftp.icc.username")+"\n";
 				configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password").toCharArray()+"\n";
-				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
+				configInfo +="path.icc.hisher.export.master.txt(twstock) : "+env.getProperty("path.icc.hisher.export.master.txt")+"\n";
+				configInfo +="path.icc.hisher.export.txt(twstock) : "+env.getProperty("path.icc.hisher.export.txt")+"\n";
+				configInfo +="path.icc.hisher.import.dlyr(dlyr) : "+env.getProperty("path.icc.hisher.import.dlyr")+"\n";
+				configInfo +="path.icc.hisher.export.iccbill(aosvat) : "+env.getProperty("path.icc.hisher.export.iccbill")+"\n";
+				
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
 				configInfo += " ----------------------  Host PayInReport Server @Pens ---------------------------------------------------------------------- \n";
 				configInfo +="IP PayInReport : "+env.getProperty("host.payinreport")+"\n";

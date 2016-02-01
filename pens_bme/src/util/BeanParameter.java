@@ -10,6 +10,7 @@ public class BeanParameter implements Serializable {
 	private static String contextname;
 	private static String database;
 	private static String reportPath;
+	private static String tempPath;
 	private static String logo;
 	private static String pensTaxNo;
 
@@ -43,9 +44,17 @@ public class BeanParameter implements Serializable {
 	private static String lineQualifierType;
 
 	// QUALIFIER -- end --
-
+    
 	public static String getDatabase() {
 		return database;
+	}
+
+	public static String getTempPath() {
+		return tempPath;
+	}
+
+	public static void setTempPath(String tempPath) {
+		BeanParameter.tempPath = tempPath;
 	}
 
 	public static void setDatabase(String database) {

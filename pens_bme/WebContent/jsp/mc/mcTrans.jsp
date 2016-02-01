@@ -203,7 +203,7 @@ function copyDataFromLastMonth(path){
 										 <html:hidden property="bean.mcArea" styleId="mcArea" />
 										  <html:text property="bean.mcAreaDesc" styleId="mcAreaDesc" size="20"  readonly="true" styleClass="disableText"/>
 									 Route 
-									 <html:hidden property="bean.mcRoute" styleId="mcRoute" /> 
+									 <html:hidden property="bean.mcRoute" styleId="mcRoute" /> -
 									 <html:text property="bean.mcRouteDesc" styleId="mcRouteDesc" size="100" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>

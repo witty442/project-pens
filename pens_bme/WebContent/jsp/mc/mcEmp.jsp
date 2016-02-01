@@ -163,7 +163,7 @@ function save(path){
 	return true;
 }
 
-function genDummyStaffID(){
+/* function genDummyStaffID(){
 	var returnString = "";
 	var form = document.mcEmpForm;
 	
@@ -179,7 +179,7 @@ function genDummyStaffID(){
 		}).responseText;
 
 	form.staffId.value = returnString;
-}
+} */
 
 function validateDate(DateFrom, DateTo){
 	if(DateFrom=='' || DateTo==''){return true;}

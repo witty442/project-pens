@@ -38,6 +38,7 @@ public class MCEmpBean implements Serializable{
 	
 	private String createUser;
 	private String updateUser;
+	private String empRouteName;
 	private List<MCEmpBean> items;
 
 	//optional
@@ -46,6 +47,13 @@ public class MCEmpBean implements Serializable{
 	private String mode;
 	
 	
+    
+	public String getEmpRouteName() {
+		return empRouteName;
+	}
+	public void setEmpRouteName(String empRouteName) {
+		this.empRouteName = empRouteName;
+	}
 	public String getReasonLeaveDesc() {
 		return reasonLeaveDesc;
 	}

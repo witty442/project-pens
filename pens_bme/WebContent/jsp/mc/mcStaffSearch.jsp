@@ -48,6 +48,14 @@ if(session.getAttribute("areaList") == null){
 	session.setAttribute("areaList",billTypeList);
 }
 
+if(session.getAttribute("empRouteList") == null){
+	List<PopupForm> billTypeList = new ArrayList();
+	PopupForm ref = new PopupForm("",""); 
+	billTypeList.add(ref);
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","Line-SA"));
+	
+	session.setAttribute("empRouteList",billTypeList);
+}
 %>
 
 <html>
@@ -104,7 +112,7 @@ function loadMe(){
 	
 	loadRoute();
 	<%if( !"".equals(mcForm.getBean().getMcRoute())){ %>
-	  document.getElementsByName('bean.mcRoute')[0].value = <%=mcForm.getBean().getMcRoute()%>;
+	  document.getElementsByName('bean.mcRoute')[0].value = '<%=mcForm.getBean().getMcRoute()%>';
 	<% } %>
 }
 function clearForm(path){
@@ -116,15 +124,15 @@ function clearForm(path){
 
 function search(path){
 	var form = document.mcForm;
-	if( $('#mcArea').val()==""){
-		alert("กรุณาระบุ เขตพื้นที่");
+	/*alert($('#mcArea').val());
+	alert($('#empType').val());
+	alert($('#mcRoute').val());
+	alert($('#empId').val());*/
+	if( $('#mcArea').val()=="" && $('#empType').val()=="" && $('#mcRouteDesc').val()==null && $('#empId').val()==""){
+		alert("กรุณาระบุ ข้อมูลอย่างน้อย 1 อย่าง");
+		$('#mcArea').focus();
 		return false;
 	}
-	/* if( $('#staffType').val()==""){
-		alert("กรุณาระบุ ประเภท");
-		return false;
-	} */
-	
 	
 	form.action = path + "/jsp/mcAction.do?do=searchMCStaff&action=newsearch";
 	form.submit();
@@ -236,7 +244,7 @@ function getStaffName(custCode){
 }
 
 function loadRoute(){
-	var cboDistrict = document.getElementsByName('bean.mcRoute')[0];
+	var cboDistrict = document.getElementsByName('bean.mcRouteDesc')[0];
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/RouteAjax.jsp",
@@ -294,7 +302,7 @@ function loadRoute(){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 								<tr>
-                                    <td> เขตพื้นที่ <font color="red">*</font></td>
+                                    <td> เขตพื้นที่ <font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.mcArea" styleId="mcArea" onchange="loadRoute();">
 											<html:options collection="areaList" property="code" labelProperty="desc"/>
@@ -310,9 +318,9 @@ function loadRoute(){
 									</td>
 								</tr>
 								<tr>
-                                    <td> Route เส้นทาง <font color="red"></font></td>
+                                    <td> Route เส้นทาง /สายงาน<font color="red"></font></td>
 									<td>		
-										 <html:select property="bean.mcRoute" styleId="mcArea"> </html:select>
+										 <html:select property="bean.mcRouteDesc" styleId="mcRouteDesc"> </html:select>
 									</td>
 								</tr>
 								<tr>

@@ -1,5 +1,6 @@
 package com.isecinc.pens.inf.helper;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +19,74 @@ public class ExportHelper extends InterfaceUtils{
 
 	protected static Logger logger = Logger.getLogger("PENS");
 	
+	
+	public static void main(String[] s){
+		try{
+			//DECIMAL4
+			 BigDecimal valueBig = new BigDecimal("3245.36878");
+			 valueBig = valueBig.setScale(4, BigDecimal.ROUND_HALF_UP);
+			 String valueAll = String.valueOf(valueBig);
+			 String BF1 ="";String BF2 ="";
+			 logger.debug("valueAll["+valueAll+"]valueAllLength["+valueAll.length()+"]");
+			 
+			 if(String.valueOf(valueAll).indexOf(".") != -1){
+			    BF1 = String.valueOf(valueAll).substring(0,String.valueOf(valueAll).indexOf("."));
+			    
+			    logger.debug(".LEN["+String.valueOf(valueAll).indexOf(".")+"]");
+			    
+			    if(valueAll.length() >= String.valueOf(valueAll).indexOf(".")+5){
+		           BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+5);
+			    }else   if(valueAll.length() < String.valueOf(valueAll).indexOf(".")+5){
+			       BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+4);
+			    }
+			 }else{
+				BF1 = String.valueOf(valueAll);
+				BF2 = "0000";
+			 }
+			 
+		     int pos1 = 11-4;
+		     int pos2 = 4;
+		     logger.debug("BF1["+BF1+"],BF2["+BF2+"]");
+			 String dataConvertStr= appendNumLeft(BF1,"0",pos1)+appendDecRightByLength(BF2,"0",pos2);//0002275
+			 logger.debug("result["+dataConvertStr+"]");
+			 
+		}catch(Exception e){
+			
+		}
+	}
+	public static void main1(String[] s){
+		try{
+			//DECIMAl
+			 BigDecimal valueBig = new BigDecimal("3245.368");
+			 valueBig = valueBig.setScale(2, BigDecimal.ROUND_HALF_UP);
+			 String valueAll = String.valueOf(valueBig);
+			 String BF1 ="";String BF2 ="";
+			 logger.debug("valueAll["+valueAll+"]length["+valueAll.length()+"]");
+			 
+			 if(String.valueOf(valueAll).indexOf(".") != -1){
+				logger.debug("case1");
+			    BF1 = String.valueOf(valueAll).substring(0,String.valueOf(valueAll).indexOf("."));
+			    
+			    if(valueAll.length() >= String.valueOf(valueAll).indexOf(".")+3){
+		           BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+3);
+			    }else   if(valueAll.length() < String.valueOf(valueAll).indexOf(".")+3){
+			       BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+2);
+			    }
+			 }else{
+				logger.debug("case2");
+				BF1 = String.valueOf(valueAll);
+				BF2 = "00";
+			 }
+		     int pos1 = 13 -2;
+		     int pos2 = 2;
+		     logger.debug("BF1["+BF1+"],BF2["+BF2+"]");
+			 String dataConvertStr= appendNumLeft(BF1,"0",pos1)+appendDecRightByLength(BF2,"0",pos2);//0002275
+			 logger.debug("result["+dataConvertStr+"]");
+			 
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	
 	
 	/**
@@ -98,13 +167,16 @@ public class ExportHelper extends InterfaceUtils{
 				dataConvertStr = appendRightByLength(Utils.isNull(rs.getString(colBean.getColumnName()))," ",colBean.getTextLength());
 				
 			}else if(colBean.getColumnType().equalsIgnoreCase("DECIMAL")){
-				 String valueAll = Utils.isNull(rs.getString(colBean.getColumnName()));
+				
+				 BigDecimal valueBig = new BigDecimal(rs.getString(colBean.getColumnName()));
+				 valueBig = valueBig.setScale(2, BigDecimal.ROUND_HALF_UP);
+				 String valueAll = String.valueOf(valueBig);
 				 String BF1 ="";String BF2 ="";
 				 logger.debug("valueAll["+valueAll+"]");
 				 
 				 if(String.valueOf(valueAll).indexOf(".") != -1){
 				    BF1 = String.valueOf(valueAll).substring(0,String.valueOf(valueAll).indexOf("."));
-				    if(valueAll.length() > String.valueOf(valueAll).indexOf(".")+3){
+				    if(valueAll.length() >= String.valueOf(valueAll).indexOf(".")+3){
 			           BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+3);
 				    }else   if(valueAll.length() < String.valueOf(valueAll).indexOf(".")+3){
 				       BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+2);
@@ -115,6 +187,34 @@ public class ExportHelper extends InterfaceUtils{
 				 }
 			     int pos1 = colBean.getTextLength() -2;
 			     int pos2 = 2;
+			     logger.debug("BF1["+BF1+"],BF2["+BF2+"]");
+				 dataConvertStr= appendNumLeft(BF1,"0",pos1)+appendDecRightByLength(BF2,"0",pos2);//0002275
+				 logger.debug("result["+dataConvertStr+"]");
+				 
+				 //247.25
+			}else if(colBean.getColumnType().equalsIgnoreCase("DECIMAL4")){
+				 BigDecimal valueBig = new BigDecimal(rs.getString(colBean.getColumnName()));
+				 valueBig = valueBig.setScale(4, BigDecimal.ROUND_HALF_UP);
+				 String valueAll = String.valueOf(valueBig);
+				 
+				 String BF1 ="";String BF2 ="";
+				 logger.debug("valueAll["+valueAll+"]");
+				 
+				 if(String.valueOf(valueAll).indexOf(".") != -1){
+				    BF1 = String.valueOf(valueAll).substring(0,String.valueOf(valueAll).indexOf("."));
+				    
+				    if(valueAll.length() >= String.valueOf(valueAll).indexOf(".")+5){
+			           BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+5);
+				    }else   if(valueAll.length() < String.valueOf(valueAll).indexOf(".")+5){
+				       BF2 = String.valueOf(valueAll).substring(String.valueOf(valueAll).indexOf(".")+1,String.valueOf(valueAll).indexOf(".")+4);
+				    }
+				 }else{
+					BF1 = String.valueOf(valueAll);
+					BF2 = "0000";
+				 }
+				 
+			     int pos1 = colBean.getTextLength() -4;
+			     int pos2 = 4;
 			     logger.debug("BF1["+BF1+"],BF2["+BF2+"]");
 				 dataConvertStr= appendNumLeft(BF1,"0",pos1)+appendDecRightByLength(BF2,"0",pos2);//0002275
 				 logger.debug("result["+dataConvertStr+"]");

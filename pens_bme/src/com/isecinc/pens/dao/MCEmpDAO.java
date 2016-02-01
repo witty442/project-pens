@@ -148,8 +148,20 @@ public class MCEmpDAO {
 			   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='EmpStatus' and M.pens_value=S.status ) as status_desc");
 			   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='LeaveReason' and M.pens_value=S.reason_leave ) as reason_leave_desc");
 			   sql.append("\n ,(SELECT M.pens_desc from MC_MST_REFERENCE M where 1=1 and reference_code ='StaffType' and M.pens_value =S.emp_type ) emp_type_desc");
-			   sql.append("\n  from MC_EMPLOYEE S WHERE 1=1");
-			   
+			   sql.append("\n ,( SELECT R.route_name FROM MC_STAFF_ROUTE MT,MC_ROUTE R ");
+			   sql.append("\n    WHERE  MT.mc_route = R.route_id ");
+			   sql.append("\n    AND MT.emp_ref_id  = s.emp_ref_id ");
+			   sql.append("\n    AND R.mc_area = s.region) emp_route_name");
+			   sql.append("\n  from MC_EMPLOYEE S ");
+			   /** Case Show SA Only Fix สายงาน  **/
+			   if( !Utils.isNull(o.getEmpRouteName()).equals("") ){
+				   sql.append("\n  INNER JOIN ( ");
+				   sql.append("\n   SELECT distinct R.mc_area as region,MT.emp_ref_id from MC_STAFF_ROUTE MT,MC_ROUTE R ");
+				   sql.append("\n   WHERE  MT.mc_route = R.route_id");
+				   sql.append("\n   and R.route_name = '"+Utils.isNull(o.getEmpRouteName())+"'");
+				   sql.append("\n ) MM  ON  MM.region = S.region AND MM.emp_ref_id=S.emp_ref_id ");
+			   }
+			   sql.append("\n  WHERE 1=1");
 			   if( !Utils.isNull(o.getEmpId()).equals("") ){
 					sql.append("\n and S.employee_id ="+Utils.isNull(o.getEmpId())+"");
 			   }
@@ -203,6 +215,7 @@ public class MCEmpDAO {
 				   h.setNote(Utils.isNull(rst.getString("note")));
 				   h.setRegion(Utils.isNull(rst.getString("region")));
 				   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
+				   h.setEmpRouteName(Utils.isNull(rst.getString("emp_route_name")));
 				   
 				   h.setStartDate(Utils.stringValue(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   if(rst.getDate("end_date") !=null){

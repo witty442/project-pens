@@ -29,6 +29,7 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
@@ -146,6 +147,16 @@ public class ImportBillICC extends InterfaceUtils{
 								}else{
 									fileTransImportSuccessList.add(ftpBean);//Add For Delete file and Move to In Processed
 									modelItem.setStatus(Constants.STATUS_SUCCESS);
+									
+									//Backup file to DD Server
+									String ddServerPath = env.getProperty("path.backup.icc.hisher.import.dlyr")+"/"+tableBean.getFileFtpNameFull();
+								    logger.debug("Backup Text File:"+ddServerPath);
+								    FileUtil.writeFile(ddServerPath, ftpBean.getDataLineText().toString(), "TIS-620");
+								    
+									/** Case Transaction and Cust,Address,Contact Import By sale code by FileName  and after import move File to  Sales-In-Processed */
+									logger.debug("Delete File After import:");
+								    ftpManager.deleteFileFTP(env.getProperty("path.icc.hisher.import.dlyr"), tableBean.getFileFtpNameFull());
+
 								}
 								
 								/** Update Monitor Item To Success **/
@@ -170,8 +181,6 @@ public class ImportBillICC extends InterfaceUtils{
 								monitorModel.setErrorCode("FileNotFoundException");
 								monitorModel.setErrorMsg("äÁè¾ºä¿Åì");
 							}
-	
-							
 							modelItem = dao.insertMonitorItem(connMonitor,modelItem);
 						    
 						}//for 2
@@ -185,8 +194,7 @@ public class ImportBillICC extends InterfaceUtils{
 				}//for 1
 				monitorTime.debugUsedTime();	
 			}//if
-				
-			
+
 			logger.debug("isExc:"+isExc+" ,rollBackFlag:"+rollBackFlag);
 			
 			/** Check Is Excute and No error **/
@@ -194,28 +202,6 @@ public class ImportBillICC extends InterfaceUtils{
 				logger.debug("Transaction commit");
 				conn.commit();
 				
-				//monitorTime = new MonitorTime("Move File FTP To In Process");
-				
-				/** Case Transaction and Cust,Address,Contact Import By sale code by FileName  and after import move File to  Sales-In-Processed */
-				logger.debug("File Transaction Success To Move:"+fileTransImportSuccessList.size());
-				if(fileTransImportSuccessList != null && fileTransImportSuccessList.size() > 0){
-					//ftpManager.moveFileFTP_NEW(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.processed"), fileTransImportSuccessList);
-				}
-				
-				/** Case Transaction Type Import File Error Move To Sales-In-Error */
-				if(fileTransImportErrorList != null && fileTransImportErrorList.size() >0){
-				  logger.info("Transaction Move File To Sales-In-Error");
-				  //ftpManager.moveFileFTP_NEW(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.error"), fileTransImportErrorList);
-				}
-				
-				/** Case User Admin do not Move file Cust,custAddr,contact */
-				if( !User.ADMIN.equals(user.getType())){
-					logger.debug("File Master (cust,address,contact,trip) Success To Move:"+fileMasterImportSuccessList.size());
-					if(fileMasterImportSuccessList != null && fileMasterImportSuccessList.size() > 0){
-						//ftpManager.moveFileFTP_NEW(env.getProperty("path.master.sales.in"), env.getProperty("path.master.sales.in.processed"), fileMasterImportSuccessList);
-					}
-			    }
-			
 				/** End process ***/
 				logger.debug("Update Monitor to Success:"+taskStatusInt);
 				monitorModel.setStatus(taskStatusInt);

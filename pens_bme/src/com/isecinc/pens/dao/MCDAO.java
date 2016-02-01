@@ -329,8 +329,16 @@ public class MCDAO {
 				
 				   sql.append("\n select S.emp_ref_id,S.employee_id,E.name,E.surname,E.title,E.emp_type " );
 				   sql.append("\n ,E.region ,S.mc_route,E.mobile1,E.mobile2" );
-				   sql.append("\n from MC_STAFF_ROUTE S ,MC_EMPLOYEE E WHERE 1=1");
-				   sql.append("\n AND S.EMP_REF_ID = E.EMP_REF_ID "); 
+				   sql.append("\n from MC_EMPLOYEE E " );
+				   
+				    sql.append("\n INNER JOIN ( ");
+					sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ,MT.employee_id ");
+					sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
+					sql.append("\n    from MC_STAFF_ROUTE MT,MC_ROUTE R ");
+					sql.append("\n    WHERE  MT.mc_route = R.route_id");
+					sql.append("\n  )S  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
+					
+				   sql.append("\n WHERE 1=1"); 
 				   sql.append("\n AND S.employee_id not in(  "); 
 				   sql.append("\n   select employee_id from MC_TRANS WHERE  month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
 				   sql.append("\n )");
@@ -343,8 +351,8 @@ public class MCDAO {
 					if( !Utils.isNull(o.getMcArea()).equals("")){
 						sql.append("\n and E.region = '"+Utils.isNull(o.getMcArea())+"'");
 					}
-					if( !Utils.isNull(o.getMcRoute()).equals("")){
-						sql.append("\n and S.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+					if( !Utils.isNull(o.getMcRouteDesc()).equals("")){
+						sql.append("\n and S.route_name = '"+Utils.isNull(o.getMcRouteDesc())+"'");
 					}
 					if( !Utils.isNull(o.getEmpType()).equals("")){
 						sql.append("\n and E.emp_type = '"+Utils.isNull(o.getEmpType())+"'");
@@ -354,12 +362,18 @@ public class MCDAO {
 				   
 				   sql.append("\n select  S.emp_ref_id,S.employee_id,E.name,E.surname,E.title,E.emp_type " );
 				   sql.append("\n ,E.region,S.mc_route,E.mobile1,E.mobile2" );
-				   sql.append("\n from MC_TRANS S ,MC_EMPLOYEE E WHERE 1=1");
-				   sql.append("\n AND S.EMP_REF_ID = E.EMP_REF_ID "); 
+				   sql.append("\n from MC_EMPLOYEE E ");
+				   sql.append("\n INNER JOIN ( ");
+					sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ,MT.employee_id ");
+					sql.append("\n    ,MT.month_trip ,MT.mc_route,R.route_name" );
+					sql.append("\n    from MC_TRANS MT, MC_ROUTE R ");
+					sql.append("\n    WHERE  MT.mc_route = R.route_id");
+					sql.append("\n  )S  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
+					
 				   sql.append("\n AND S.EMP_REF_ID IN( ");
-				   sql.append("\n   SELECT EMP_REF_ID FROM MC_STAFF_ROUTE R WHERE R.IS_ACTIVE ='Y' "); 
-				      if( !Utils.isNull(o.getMcRoute()).equals("")){
-						  sql.append("\n and R.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+				   sql.append("\n   SELECT EMP_REF_ID FROM MC_STAFF_ROUTE MT,MC_ROUTE R WHERE MT.mc_route = R.route_id and MT.IS_ACTIVE ='Y' "); 
+				      if( !Utils.isNull(o.getMcRouteDesc()).equals("")){
+						  sql.append("\n and R.route_name = '"+Utils.isNull(o.getMcRouteDesc())+"'");
 					   }
 				   sql.append("\n ) "); 
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
@@ -369,8 +383,8 @@ public class MCDAO {
 					if( !Utils.isNull(o.getMcArea()).equals("")){
 						sql.append("\n and E.region = '"+Utils.isNull(o.getMcArea())+"'");
 					}
-					if( !Utils.isNull(o.getMcRoute()).equals("")){
-						sql.append("\n and S.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+					if( !Utils.isNull(o.getMcRouteDesc()).equals("")){
+						sql.append("\n and S.route_name = '"+Utils.isNull(o.getMcRouteDesc())+"'");
 					}
 					if( !Utils.isNull(o.getEmpType()).equals("")){
 						sql.append("\n and E.emp_type = '"+Utils.isNull(o.getEmpType())+"'");
@@ -389,6 +403,7 @@ public class MCDAO {
 				
 				while(rst.next()) {
 				   h = new MCBean();
+				   logger.debug("Found");
 				   h.setNo(r);
 				   h.setEmpRefId(Utils.isNull(rst.getString("emp_ref_id")));
 				   h.setEmpId(Utils.isNull(rst.getString("employee_id")));
@@ -424,6 +439,8 @@ public class MCDAO {
 				//set Result 
 				o.setItems(items);
 				
+				logger.debug("Items Size:"+o.getItems().size());
+				
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -434,6 +451,8 @@ public class MCDAO {
 			}
 		return o;
 	}
+	
+	
 	 
 	 public static void copyFromLastMonthModel(Connection conn,String empRefId,String empId,String currentMonthTrip,String prevMonthTrip) throws Exception {
 			PreparedStatement ps = null;
@@ -673,13 +692,20 @@ public class MCDAO {
 			int r = 1;
 			try {
 				sql.append("\n select " );
-				sql.append("\n (select A.pens_desc from mc_mst_reference A where A.pens_value = E.region and reference_code = 'MCarea')as mc_area_desc \n");
-				sql.append("\n ,(select A.pens_desc from mc_mst_reference A where A.pens_value = E.emp_type and reference_code = 'StaffType')as emp_type_desc \n");
-				sql.append("\n ,(select A.route_name from mc_route A where A.route_id = S.mc_route and A.mc_area = E.region)as mc_route_desc \n");
-				sql.append("\n ,S.emp_ref_id,S.employee_id,E.name,E.surname,E.title,E.emp_type " );
+				sql.append("\n (select A.pens_desc from mc_mst_reference A where A.pens_value = E.region and reference_code = 'MCarea')as mc_area_desc ");
+				sql.append("\n ,(select A.pens_desc from mc_mst_reference A where A.pens_value = E.emp_type and reference_code = 'StaffType')as emp_type_desc ");
+				sql.append("\n ,(select A.route_name from mc_route A where A.route_id = S.mc_route and A.mc_area = E.region)as mc_route_desc ");
+				sql.append("\n ,E.emp_ref_id,E.employee_id,E.name,E.surname,E.title,E.emp_type " );
 			    sql.append("\n ,E.region as mc_area,S.mc_route,E.mobile1,E.mobile2,S.is_active" );
-				sql.append("\n from MC_STAFF_ROUTE S ,MC_EMPLOYEE E ");
-				sql.append("\n WHERE 1=1 AND S.EMP_REF_ID = E.EMP_REF_ID "); 
+				sql.append("\n from MC_EMPLOYEE E ");
+				sql.append("\n INNER JOIN ( ");
+				sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ");
+				sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
+				sql.append("\n    from MC_STAFF_ROUTE MT,MC_ROUTE R ");
+				sql.append("\n    WHERE  MT.mc_route = R.route_id");
+				sql.append("\n  )S  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
+						
+				sql.append("\n WHERE 1=1 "); 
 				
 				if( !Utils.isNull(o.getEmpId()).equals("0") && !Utils.isNull(o.getEmpId()).equals("") ){
 					sql.append("\n and E.employee_id  = "+Utils.isNull(o.getEmpId()));
@@ -690,8 +716,8 @@ public class MCDAO {
 				if( !Utils.isNull(o.getMcArea()).equals("")){
 					sql.append("\n and E.region = '"+Utils.isNull(o.getMcArea())+"'");
 				}
-				if( !Utils.isNull(o.getMcRoute()).equals("")){
-					sql.append("\n and S.mc_route = "+Utils.isNull(o.getMcRoute())+"");
+				if( !Utils.isNull(o.getMcRouteDesc()).equals("")){
+					sql.append("\n and S.route_name = '"+Utils.isNull(o.getMcRouteDesc())+"'");
 				}
 				if( !Utils.isNull(o.getEmpType()).equals("")){
 					sql.append("\n and E.emp_type = '"+Utils.isNull(o.getEmpType())+"'");
@@ -1032,8 +1058,63 @@ public class MCDAO {
 					no++;
 					PopupForm item = new PopupForm();
 					item.setNo(no);
-					item.setCode(Utils.isNull(rst.getString("pens_value")));
-					item.setDesc(Utils.isNull(rst.getString("pens_desc")));
+					if("Line-SA".equals(refCode)){
+					  item.setCode(Utils.isNull(rst.getString("pens_value")));
+					  item.setDesc(Utils.isNull(rst.getString("pens_value")));
+					}else{
+					  item.setCode(Utils.isNull(rst.getString("pens_value")));
+					  item.setDesc(Utils.isNull(rst.getString("pens_desc")));
+					}
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 
+	 public static List<PopupForm> searchRouteListList(String mcArea,String isActive,String empType) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT M.* from MC_ROUTE M");
+				sql.append("\n  where 1=1  ");
+
+				if( !Utils.isNull(mcArea).equals("")){
+					sql.append(" and mc_area ="+mcArea+" \n");
+				}
+				if( !Utils.isNull(isActive).equals("")){
+					sql.append(" and (is_active ='"+isActive+"' or is_active is null) \n");
+				}
+				if( Utils.isNull(empType).equals("SA")){
+					sql.append(" and route_name like 'สายงาน%' \n");
+				}
+				//sql.append("\n  ORDER BY pens_value asc \n");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("route_id")));
+					item.setDesc(Utils.isNull(rst.getString("route_name")));
 					pos.add(item);
 					
 				}//while
@@ -1169,32 +1250,21 @@ public class MCDAO {
 			return storeName;
 		}
 	 
-	 public static String genDummyStaffId() throws Exception {
-		    Connection conn = null;
+	 
+	 public static String getRouteIdByRouteName(Connection conn,String routeName,String region) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
-			String newStaffId ="";
+			String routeId ="";
 			try {
-				conn = DBConnection.getInstance().getConnection();
-				
-				sql.append("\n select max(staff_id) as max_staff_id ");
-				sql.append("\n FROM MC_STAFF WHERE 1=1   ");
-				sql.append("\n AND staff_id like '5%'");
-				
+				sql.delete(0, sql.length());
+				sql.append("\n select route_id FROM MC_ROUTE WHERE  route_name ='"+routeName+"' and mc_area ='"+region+"' \n");	
 				logger.debug("sql:"+sql);
 
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if (rst.next()) {
-					String maxStaffId = Utils.isNull(rst.getString("max_staff_id"));
-					if("".equals(maxStaffId)){
-						newStaffId = "5001";
-					}else{
-						maxStaffId = maxStaffId.substring(1,maxStaffId.length());
-						int nextId = Integer.parseInt(maxStaffId)+1;
-						newStaffId = "5"+new DecimalFormat("000").format(nextId);
-					}
+					routeId = Utils.isNull(rst.getString("route_id"));
 				}//while
 
 			} catch (Exception e) {
@@ -1203,9 +1273,10 @@ public class MCDAO {
 				try {
 					rst.close();
 					stmt.close();
-					conn.close();
 				} catch (Exception e) {}
 			}
-			return newStaffId;
+			return routeId;
 		}
+	 
+	 
 }

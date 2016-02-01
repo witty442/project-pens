@@ -35,6 +35,7 @@ public class MCBean implements Serializable{
 	private String mobile1;
 	private String mobile2;
 	private String active;
+	private String empRouteName;
 	
 	//trans head
 	private String monthTrip;
@@ -78,6 +79,13 @@ public class MCBean implements Serializable{
 	private int totalHH = 0;
 	private int totalMM = 0;
 	
+	
+	public String getEmpRouteName() {
+		return empRouteName;
+	}
+	public void setEmpRouteName(String empRouteName) {
+		this.empRouteName = empRouteName;
+	}
 	public String getOrgEmpRefId() {
 		return orgEmpRefId;
 	}

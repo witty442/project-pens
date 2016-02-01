@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,10 +14,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -32,16 +26,12 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.MCBean;
 import com.isecinc.pens.bean.MCEmpBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.MCEmpDAO;
 import com.isecinc.pens.dao.MCTimeDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.export.Excel;
 import com.isecinc.pens.web.export.ExcelResultBean;
-import com.isecinc.pens.web.export.ExcelStyle;
-import com.isecinc.pens.web.export.ExportReturnWacoal;
 import com.isecinc.pens.web.export.ExportTimeSheetGroup;
 
 
@@ -67,8 +57,11 @@ public class MCTimeAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				MCBean ad = new MCBean();
-			
+			    ad.setStaffMonth(Utils.getCurrentMonth());
+			    logger.debug("currentMonth:"+ad.getStaffMonth());
+			    
 				aForm.setBean(ad);
+				
 			}else if("back".equals(action)){
 				
 				aForm.setBean(MCTimeDAO.searchStaffTime(aForm.getBeanCriteria(),false));
@@ -107,7 +100,6 @@ public class MCTimeAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 			 
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -212,6 +204,7 @@ public class MCTimeAction extends I_Action {
 			bean.setEmpTypeDesc(empBean.getEmpTypeDesc());
 			bean.setStaffMonth(staffMonth);
 			bean.setStaffYear(staffYear);
+			bean.setEmpRouteName(empBean.getEmpRouteName());
 			
 			aForm.setBean(bean);
 			aForm.setResults(resultList);

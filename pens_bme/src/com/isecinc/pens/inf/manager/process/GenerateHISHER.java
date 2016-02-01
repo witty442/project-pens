@@ -16,6 +16,7 @@ import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
@@ -64,37 +65,36 @@ public class GenerateHISHER extends InterfaceUtils{
 			
 			//Get Config Map ALL
 			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK");
-			sql.append("\n SELECT A.barcode, A.group_code,A.pens_item, A.product_code ");
+			sql.append("\n SELECT A.barcode, A.group_code ,A.product_code ");
 			sql.append("\n , NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
 			sql.append("\n FROM( ");
-			sql.append("\n 		SELECT O.barcode, O.group_code,O.item as pens_item, M.interface_value as product_code, NVL(sum(O.qty),0) as qty ");
-			sql.append("\n 		,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		SELECT O.barcode, O.group_code " );
+			sql.append("\n      ,( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
+			sql.append("\n        WHERE  O.barcode = M.interface_desc     ");
+			sql.append("\n        AND M.reference_code = 'LotusItem' )  as product_code ");
+			sql.append("\n      , NVL(sum(O.qty),0) as qty ");
+			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n 		FROM PENSBME_ORDER O  ");
-			sql.append("\n 		LEFT OUTER JOIN PENSBME_MST_REFERENCE M	 ");
-			sql.append("\n   		ON  O.barcode = M.interface_desc     ");
-			sql.append("\n   		AND M.reference_code = 'LotusItem'    ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code ");
-			sql.append("\n   		AND P.pens_item = O.item ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
 			sql.append("\n 		and  ( O.exported <> 'Y' or O.exported is null)	 ");
-			sql.append("\n 		group by O.barcode, O.group_code,O.item, M.interface_value,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by O.barcode, O.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
 			
 			sql.append("\n 		UNION ALL ");
 			
 			/** Stock_ISSUE **/
-			sql.append("\n 		SELECT I.barcode, I.group_code,I.pens_item, M.interface_value as product_code, NVL(sum(I.issue_qty),0) as qty ");
-			sql.append("\n 		,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		SELECT I.barcode, I.group_code" );
+			sql.append("\n      ,( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
+			sql.append("\n        WHERE  I.barcode = M.interface_desc     ");
+			sql.append("\n        AND M.reference_code = 'LotusItem')  as product_code ");
+			sql.append("\n      , NVL(sum(I.issue_qty),0) as qty ");
+			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
-			sql.append("\n 		LEFT OUTER JOIN PENSBME_MST_REFERENCE M	 ");
-			sql.append("\n 		ON  I.barcode = M.interface_desc     ");
-			sql.append("\n 		and M.reference_code = 'LotusItem'    ");
-			
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		ON P.group_code = I.group_code ");
-			sql.append("\n   		AND P.pens_item = I.pens_item ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		WHERE 1=1 ");
 			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
@@ -102,9 +102,9 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and  ( H.exported <> 'Y' or H.exported is null)	 ");
-			sql.append("\n 		group by I.barcode, I.group_code,I.pens_item, M.interface_value,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by I.barcode, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
 			sql.append("\n )A ");
-			sql.append("\n group by A.barcode, A.group_code,A.pens_item, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
+			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
 			sql.append("\n order by A.group_code ,A.product_code ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -120,7 +120,7 @@ public class GenerateHISHER extends InterfaceUtils{
 				
 				barcode = Utils.isNull(rs.getString("barcode"));
 				groupCode = Utils.isNull(rs.getString("group_code"));
-				pensItem = Utils.isNull(rs.getString("pens_item"));
+				//pensItem = Utils.isNull(rs.getString("pens_item"));
 				productCode = Utils.isNull(rs.getString("product_code"));//Get From MST
 				qty = rs.getInt("qty");
 				wholePriceBF  = rs.getDouble("WHOLE_PRICE_BF");
@@ -162,13 +162,17 @@ public class GenerateHISHER extends InterfaceUtils{
 				 outputFile.append(outputLine);
 				 
 			     //write file
-			     String fileName = env.getProperty("path.icc.hisher.export")+batchParamMap.get(PARAM_FILE_NAME);
-			     //logger.debug("Write Text File:"+fileName);
-			    // FileUtil.writeFile(fileName, outputFile, "TIS-620");
+			     String fileName = env.getProperty("path.icc.hisher.export.txt")+"/"+batchParamMap.get(PARAM_FILE_NAME);
+			    
 			     
 			 	logger.debug("Step Upload ALL File To FTP Server");
-				ftpManager.uploadAllFileToFTP_OPT2_BY_FILE(env.getProperty("path.icc.hisher.export"),fileName, outputFile);
+				ftpManager.uploadAllFileToFTP_OPT2_BY_FILE(env.getProperty("path.icc.hisher.export.txt"),fileName, outputFile);
 			     
+				//Backup file to DD Server
+				String ddServerPath =env.getProperty("path.backup.icc.hisher.export.txt")+"/"+batchParamMap.get(PARAM_FILE_NAME);
+			    logger.debug("Backup Text File:"+ddServerPath);
+			    FileUtil.writeFile(ddServerPath, outputFile, "TIS-620");
+				
 			     //Update Exported ='Y' in BME_ORDER
 			     logger.debug("Update Exported ='Y' in BME_ORDER");
 			     int updateCount = updateOrderExportFlag(conn, user.getUserName(), date, batchParamMap.get(PARAM_CUST_GROUP));

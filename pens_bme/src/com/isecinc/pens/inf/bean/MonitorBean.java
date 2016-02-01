@@ -17,6 +17,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private boolean checked;
    private   BigDecimal transactionId;
    private   BigDecimal monitorId;
+   private   BigDecimal monitorItemId;
    private   String name ;
    private   String type ;
    private   String channel ;
@@ -58,6 +59,12 @@ private static final long serialVersionUID = -990650039740579753L;
 	private Map<String, String> batchParamMap;
 
 	
+public BigDecimal getMonitorItemId() {
+		return monitorItemId;
+	}
+	public void setMonitorItemId(BigDecimal monitorItemId) {
+		this.monitorItemId = monitorItemId;
+	}
 public String getStatusDesc() {
 		return statusDesc;
 	}

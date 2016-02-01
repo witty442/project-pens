@@ -77,6 +77,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
     	<%if(Constants.TYPE_GEN_HISHER.equalsIgnoreCase(pageName) 
     		|| Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
     		|| Constants.TYPE_EXPORT_BILL_ICC.equalsIgnoreCase(pageName)
+    		|| Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
     		) {%>
     	   new Epoch('epoch_popup','th',document.getElementById('transactionDate'));
     	<%}%>
@@ -282,6 +283,14 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ExportBillICC"/>
 				</jsp:include>
+			<%}else if(Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="GenOrderExcel"/>
+				</jsp:include>
+				<%}else if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="GenerateItemMasterHisHer"/>
+				</jsp:include>
 			<%} %>
 				
 	      	<!-- TABLE BODY -->
@@ -310,7 +319,48 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								</tr>
 							</table>
 
-					    <%}else if( Constants.TYPE_GEN_HISHER.equals(pageName)){  %>
+					    <%}else if( Constants.TYPE_GEN_HISHER.equals(pageName) || Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){  %>
+					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+					           <tr>
+							    <td align="right" width="40%">กลุ่มร้านค้า<font color="red"></font></td>
+							    <td valign="top" align="left">
+							      <html:text property="bean.custGroupDesc" styleId="custGroupDesc" styleClass="disableText" readonly="true" size="30" />
+							      <html:hidden property="bean.custGroup" styleId="custGroup"/>
+							    </td>
+						      </tr>
+						       <tr>
+							    <td align="right" width="40%">Text File Name<font color="red"></font></td>
+							    <td valign="top" align="left"><html:text property="bean.textFileName" styleId="textFileName" size="40" readonly="true" styleClass="disableText"/></td>
+						      </tr>
+							  <tr>
+							    <td align="right" width="40%">Output path of text file<font color="red"></font></td>
+							    <td valign="top" align="left"><html:text property="bean.outputPath" styleId="outputPath"  size="40"  readonly="true" styleClass="disableText" /></td>
+						      </tr>
+						       <tr>
+							    <td align="right" width="40%">Transaction Date<font color="red">*</font></td>
+							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="30"/></td>
+						      </tr>
+							</table>
+							
+						<!-- BUTTON -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+						   <tr>
+								<td align="right" width ="100%"> &nbsp;</td>
+							</tr>
+							<tr>
+								<td align="center" width ="100%">
+								   <input type="button" value="Generate File" class="newPosBtnLong" 
+								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
+								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
+								    &nbsp;&nbsp;&nbsp;
+								    <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" 
+								    title="ตรวจสอบ FTP Connection"><b>?</b></a>
+								
+								</td>
+							</tr>
+						</table>
+						
+					    <%}else if( Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 					           <tr>
 							    <td align="right" width="40%">กลุ่มร้านค้า<font color="red"></font></td>
@@ -423,13 +473,31 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 							</table>   
 							 <jsp:include page="monitor.jsp"></jsp:include>
 							<p></p>
-						 <% }else if( Constants.TYPE_GEN_HISHER.equals(pageName)){ %> 
+						 <% }else if( Constants.TYPE_GEN_HISHER.equals(pageName) || Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){ %> 
 						    <p></p>
 						    <jsp:include page="monitor_short.jsp"></jsp:include>
 							<p></p>
 							 <!-- BME Scan Result -->
 							<jsp:include page="interfacesResult.jsp"></jsp:include>
-							
+						<% }else if( Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){ %> 
+						 <!-- BUTTON -->
+							 <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+							   <tr>
+									<td align="right" width ="100%"> &nbsp;</td>
+								</tr>
+								<tr>
+									<td align="center" width ="100%">
+									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
+									    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+									    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
+									</td>
+								</tr>
+							</table>   
+						    <p></p>
+						    <jsp:include page="monitor_order_excel.jsp"></jsp:include>
+							<p></p>
+							 <!-- BME Scan Result -->
+							<jsp:include page="interfacesResult.jsp"></jsp:include>
 						  <%}else if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){  %>
 						      <!-- BUTTON -->
 							  <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">

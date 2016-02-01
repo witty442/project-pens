@@ -13,7 +13,7 @@
 
 String outputText = "";
 try{
-	outputText = MCDAO.genDummyStaffId();
+	//outputText = MCDAO.genDummyStaffId();
 }catch(Exception e){
 	e.printStackTrace();
 }

@@ -74,6 +74,15 @@ if(session.getAttribute("yearList") == null){
 		
 	session.setAttribute("yearList",yearList);
 }
+
+if(session.getAttribute("empRouteList") == null){
+	List<PopupForm> billTypeList = new ArrayList();
+	PopupForm ref = new PopupForm("",""); 
+	billTypeList.add(ref);
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","Line-SA"));
+	
+	session.setAttribute("empRouteList",billTypeList);
+}
 %>
 
 <html>
@@ -152,10 +161,10 @@ function exportExcelGroup(path){
 			return false;
 		}
 	}
-	if( $('#mcArea').val()==""){
+	/* if( $('#mcArea').val()==""){
 		alert("กรุณาระบุ เขตพื้นที่");
 		return false;
-	}
+	} */
 	form.action = path + "/jsp/mcTimeAction.do?do=exportExcelGroup"+param;
 	form.submit();
 	return true;
@@ -177,10 +186,10 @@ function search(path){
 			return false;
 		}
 	}
-	if( $('#mcArea').val()==""){
+/* 	if( $('#mcArea').val()==""){
 		alert("กรุณาระบุ เขตพื้นที่");
 		return false;
-	}
+	} */
 
 	form.action = path + "/jsp/mcTimeAction.do?do=search&action=newsearch";
 	form.submit();
@@ -338,21 +347,31 @@ function getStaffName(custCode){
 									    <html:select property="bean.staffMonth" styleId="staffMonth">
 											<html:options collection="monthList" property="code" labelProperty="desc"/>
 									    </html:select>	
-										
 									</td>
 								</tr>
 								<tr>
-                                    <td align="right"> ภาค <font color="red">*</font></td>
+                                    <td align="right"> ประเภท <font color="red"></font></td>
+									<td>		
+										  <html:select property="bean.empType" styleId="empType">
+											<html:options collection="empTypeList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
+								   <td align="right"> Route เส้นทาง/สายงาน <font color="red"></font></td>
+									<td>		
+									     <html:select property="bean.empRouteName" styleId="empRouteName">
+											<html:options collection="empRouteList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
+								</tr>
+								<tr>
+                                    <td align="right"> ภาค <font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.mcArea" styleId="mcArea" onchange="loadRoute();">
 											<html:options collection="areaList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
-								   <td align="right"> ประเภท<font color="red"></font></td>
-									<td>		
-										 <html:select property="bean.empType" styleId="empType">
-											<html:options collection="empTypeList" property="code" labelProperty="desc"/>
-									    </html:select>
+								   <td align="right"> <font color="red"></font></td>
+									<td>	
 									</td>
 								</tr>
 								<tr>

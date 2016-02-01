@@ -211,7 +211,9 @@ public class MCAction extends I_Action {
 			MCBean h = aForm.getBean();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
-			logger.debug("is_active:"+h.getActive());
+			//logger.debug("is_active:"+h.getActive());
+			//Get Route Id from RouteName
+			h.setMcRoute(MCDAO.getRouteIdByRouteName(conn, h.getMcRouteDesc(),h.getMcArea()));
 			
             if("add".equals(h.getMode())){
             	int update = 0;
@@ -231,14 +233,17 @@ public class MCAction extends I_Action {
             }
             
 			//Search Again
-			MCBean bean = MCDAO.searchStaff(conn,h).getItems().get(0);
+            MCBean cri = new MCBean();
+            cri.setEmpRefId(h.getEmpRefId());
+            cri.setMcRouteDesc(h.getMcRouteDesc());
+			MCBean bean = MCDAO.searchStaff(conn,cri).getItems().get(0);
 			bean.setMode("edit");
+			
 			//check can Edit
 			bean.setCanEdit(MCDAO.canEditStaff(conn, bean.getEmpRefId()));
 		    aForm.setBean(bean);
-			
+		    
 		    conn.commit();
-            
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
@@ -606,15 +611,16 @@ public class MCAction extends I_Action {
 				   MCDAO.insertMCTransDetail(conn, item);
 				}
 			}
-
+			
+			
 			//Search Again
 			MCBean bean = MCDAO.searchHead(conn,h,true).getItems().get(0);
 		    bean.setStartDayOfMonth(h.getStartDayOfMonth());
 		    bean.setMaxDay(h.getMaxDay());
 		    
 		    aForm.setBean(bean);
-			
-			conn.commit();
+		    
+		    conn.commit();
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
@@ -693,7 +699,14 @@ public class MCAction extends I_Action {
 			MCBean cri = aForm.getBean();
 			String currentMonth = cri.getMonthTrip();//012015
 			String prevMonth = ""+(Integer.parseInt(currentMonth.substring(0,2))-1);
-			String prevMonthTrip = (prevMonth.length()==1?"0"+prevMonth:prevMonth)+currentMonth.substring(2,6); 
+			String prevMonthTrip = "";
+			/** Case Month = 01 PrevMonth = 12(year-1)*/
+			if(Integer.parseInt(currentMonth.substring(0,2))==1){
+				prevMonthTrip = "12"+ (Integer.parseInt(currentMonth.substring(2,6))-1); 
+			}else{
+				prevMonthTrip = (prevMonth.length()==1?"0"+prevMonth:prevMonth)+currentMonth.substring(2,6); 
+			}
+			
 			
 			logger.debug("prevMonthTrip["+prevMonthTrip+"]");
 			

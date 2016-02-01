@@ -44,9 +44,17 @@ public class PerformanceReport implements Serializable {
 	private double allVatCashAmount;
 	private double allVatReceiptAmount;
 	private double totalCancelAmountToday;
+	private double allAirpayAmount;
+	
+	
+	public double getAllAirpayAmount() {
+		return allAirpayAmount;
+	}
 
-	
-	
+	public void setAllAirpayAmount(double allAirpayAmount) {
+		this.allAirpayAmount = allAirpayAmount;
+	}
+
 	public double getAirpayAmount() {
 		return airpayAmount;
 	}

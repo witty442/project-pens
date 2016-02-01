@@ -43,7 +43,10 @@ public class ExportTimeSheetGroup extends Excel{
 		   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='EmpStatus' and M.pens_value=S.status ) as status_desc");
 		   sql.append("\n ,(select pens_desc from MC_MST_REFERENCE M where M.reference_code='LeaveReason' and M.pens_value=S.reason_leave ) as reason_leave_desc");
 		   sql.append("\n ,(SELECT M.pens_desc from MC_MST_REFERENCE M where 1=1 and reference_code ='StaffType' and M.pens_value =S.emp_type ) emp_type_desc");
-		 
+		   sql.append("\n ,( SELECT R.route_name FROM MC_STAFF_ROUTE MT,MC_ROUTE R ");
+		   sql.append("\n    WHERE  MT.mc_route = R.route_id ");
+		   sql.append("\n    AND MT.emp_ref_id  = s.emp_ref_id ");
+		   sql.append("\n    AND R.mc_area = s.region) emp_route_name");
 		   sql.append(" \n from MC_EMPLOYEE S " );
 		   sql.append(" \n,(select distinct emp_ref_id from MC_STAFF_TIME T");
 		   sql.append("\n    where 1=1 " );
@@ -64,7 +67,6 @@ public class ExportTimeSheetGroup extends Excel{
 		   if( !Utils.isNull(o.getName()).equals("")){
 				sql.append("\n and S.name like '%"+Utils.isNull(o.getName())+"%'");
 		   }
-
 		   sql.append("\n order by S.EMP_REF_ID DESC ");
 			
 		   logger.debug("sql:"+sql.toString());
@@ -95,6 +97,7 @@ public class ExportTimeSheetGroup extends Excel{
 			   
 			   h.setStaffMonth(o.getStaffMonth());
 			   h.setStaffYear(o.getStaffYear());
+			   h.setEmpRouteName(Utils.isNull(rst.getString("emp_route_name")));
 			   
 			   logger.debug("Gen Excel EMP_REF_ID:"+rst.getString("EMP_REF_ID"));
 			   h = genExportToExcelModel(conn,user,xssfWorkbook,h);
@@ -116,7 +119,7 @@ public class ExportTimeSheetGroup extends Excel{
 			
 			  sheet++;
 			  found = true;
-			}
+			}//while
 			
 			 //adjust width of the column
 			  for(int s=0;s<sheet;s++){
@@ -251,7 +254,7 @@ public class ExportTimeSheetGroup extends Excel{
 
            sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
 	           
-		   /****  Create Header Row 0 ***/
+		   /****  Create Header Row 1 ***/
            row = row +1;
            headerRow = sheet.createRow(row);
            headerRow.setHeightInPoints((1*sheet.getDefaultRowHeightInPoints()));
@@ -262,7 +265,7 @@ public class ExportTimeSheetGroup extends Excel{
 
            sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
            
-           /*** Create Header Row 1 ***/
+           /*** Create Header Row 2 ***/
            row = row +1;
            headerRow = sheet.createRow(row);
            headerRow.setHeightInPoints((1*sheet.getDefaultRowHeightInPoints()));
@@ -273,7 +276,7 @@ public class ExportTimeSheetGroup extends Excel{
 
            sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
            
-           /** Create Header Row 2 ***/
+           /** Create Header Row 3 ***/
            row = row +1;
            headerRow = sheet.createRow(row);
            headerRow.setHeightInPoints((1*sheet.getDefaultRowHeightInPoints()));
@@ -283,8 +286,19 @@ public class ExportTimeSheetGroup extends Excel{
            headerCell1.setCellValue("ประเภท :"+b.getEmpTypeDesc() +"  ภาค:"+b.getRegionDesc());
 
            sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
+           
+           /** Create Header Row 4 ***/
+           row = row +1;
+           headerRow = sheet.createRow(row);
+           headerRow.setHeightInPoints((1*sheet.getDefaultRowHeightInPoints()));
+           //Header Row 0
+           headerCell1 = headerRow.createCell(0);
+           headerCell1.setCellStyle(style.headerStyleLeft2);
+           headerCell1.setCellValue("Route เส้นทาง/สายงาน:"+b.getEmpRouteName());
 
-           /** // Create Header Row 6  ***/
+           sheet.addMergedRegion(new CellRangeAddress(row,row,0,5));//Merge Cell 0-5
+
+           /** // Create Header Row 5  ***/
            row = row+2;
            headerRow = sheet.createRow(row);
            

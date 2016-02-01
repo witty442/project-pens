@@ -54,8 +54,30 @@ public class OnhandSummary implements Serializable{
     private String adjustQty;
     private String stockShortQty;
     private String initSaleQty;
+    private String adjustSaleQty;
     
-    
+	private String dispHaveQty;
+    private String initDate;
+	
+	
+	public String getDispHaveQty() {
+		return dispHaveQty;
+	}
+	public void setDispHaveQty(String dispHaveQty) {
+		this.dispHaveQty = dispHaveQty;
+	}
+	public String getInitDate() {
+		return initDate;
+	}
+	public void setInitDate(String initDate) {
+		this.initDate = initDate;
+	}
+	public String getAdjustSaleQty() {
+		return adjustSaleQty;
+	}
+	public void setAdjustSaleQty(String adjustSaleQty) {
+		this.adjustSaleQty = adjustSaleQty;
+	}
 	public String getInitSaleQty() {
 		return initSaleQty;
 	}

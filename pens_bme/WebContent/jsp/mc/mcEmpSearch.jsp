@@ -59,8 +59,15 @@ if(session.getAttribute("empStatusList") == null){
 	session.setAttribute("empStatusList",billTypeList);
 }
 
+if(session.getAttribute("empRouteList") == null){
+	List<PopupForm> billTypeList = new ArrayList();
+	PopupForm ref = new PopupForm("",""); 
+	billTypeList.add(ref);
+	billTypeList.addAll(MCDAO.searchMCRefList(new PopupForm(),"","Line-SA"));
+	
+	session.setAttribute("empRouteList",billTypeList);
+}
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -81,7 +88,6 @@ span.pagebanner {
 	border-bottom: none;
 	font-size: 15px;
 }
-
 span.pagelinks {
 	background-color: #eee;
 	border: 1px dotted #999;
@@ -92,7 +98,6 @@ span.pagelinks {
 	margin-bottom: -1px;
 	font-size: 15px;
 }
-
 .day {
   width: 14%;
 }
@@ -100,7 +105,6 @@ span.pagelinks {
   width: 14%;
   background-color: #F78181;
 }
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -108,9 +112,7 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
-	 
 }
 function clearForm(path){
 	var form = document.mcEmpForm;
@@ -297,9 +299,15 @@ function getStaffName(custCode){
 								</tr>
 								<tr>
 								    <td  align="right">Region<font color="red"></font></td>    
-									<td colspan="3">
+									<td colspan="2">
 									     <html:select property="bean.region" styleId="region">
 											<html:options collection="empRegionList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
+									<td>
+									Route เส้นทาง/สายงาน
+									     <html:select property="bean.empRouteName" styleId="empRouteName">
+											<html:options collection="empRouteList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
 						   </table>

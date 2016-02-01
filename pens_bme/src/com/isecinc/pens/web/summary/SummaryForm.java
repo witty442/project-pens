@@ -32,6 +32,7 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> onhandBigCResults;
 	private List<OnhandSummary> onhandSummaryLotusPeriodResults;
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
+	private List<OnhandSummary> onhandSummarySizeColorBigCResults;
 	
 	private List<TransactionSummary> lotusSummaryResults;
 	private List<TransactionSummary> bigcSummaryResults;
@@ -55,8 +56,14 @@ public class SummaryForm extends I_Form {
 	private int diffStockSummaryResultsSize;
 	private int summaryByGroupCodeResultsSize;
 
-	
-	
+
+	public List<OnhandSummary> getOnhandSummarySizeColorBigCResults() {
+		return onhandSummarySizeColorBigCResults;
+	}
+	public void setOnhandSummarySizeColorBigCResults(
+			List<OnhandSummary> onhandSummarySizeColorBigCResults) {
+		this.onhandSummarySizeColorBigCResults = onhandSummarySizeColorBigCResults;
+	}
 	public List<OnhandSummary> getOnhandSummaryMTTDetailResults() {
 		return onhandSummaryMTTDetailResults;
 	}
@@ -266,6 +273,7 @@ public class SummaryForm extends I_Form {
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		// reset properties
 		getOnhandSummary().setDispZeroStock("");
+		getOnhandSummary().setDispHaveQty("");
 		getDiffStockSummary().setHaveQty("");
 	}
     

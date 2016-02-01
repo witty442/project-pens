@@ -23,6 +23,7 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
@@ -112,9 +113,16 @@ public class ExportBillICC extends InterfaceUtils{
 					
 					//Export To FTP 
 					if( !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-					 	logger.debug("Step Upload ALL File To FTP Server");
-						ftpManager.uploadAllFileToFTP_OPT2_BY_FILE(env.getProperty("path.icc.hisher.export.iccbill"),tableBean.getFileFtpName(), tableBean.getDataStrExport());
+					 	logger.debug("Step Upload ALL File To FTP Server");        
+					 	String pathFull = env.getProperty("path.icc.hisher.export.iccbill")+"/"+tableBean.getFileFtpName();
+						ftpManager.uploadAllFileToFTP_OPT2_BY_FILE(env.getProperty("path.icc.hisher.export.iccbill"),pathFull, tableBean.getDataStrExport());
 					     
+						//Backup file to DD Server
+						String ddServerPath =env.getProperty("path.backup.icc.hisher.export.iccbill")+"/"+tableBean.getFileFtpName();
+					    logger.debug("Backup Text File:"+ddServerPath);
+					    FileUtil.writeFile(ddServerPath, tableBean.getDataStrExport(), "TIS-620");
+					    
+					
 					     //Update Exported ='Y' in BME_ORDER
 						if("PENSBME_ICC_HEAD".equalsIgnoreCase(tableName)){
 					       logger.debug("Update Exported ='Y' in PENSBME_ICC_HEAD");

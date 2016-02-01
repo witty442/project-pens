@@ -44,11 +44,15 @@ public class BatchProcessWorker extends BatchWorker {
             logger.debug(" **********Start Process["+this.monitorModel.getType()+"] ******************");
             
             if(this.monitorModel.getType().equals(Constants.TYPE_GEN_HISHER)){
-                monitorModel = (new ProcessManager()).processGenerateHisHer(this.monitorModel, user,request);
+                monitorModel = (new ProcessManager()).processGenerateHisHerTxt(this.monitorModel, user,request);
             }else if(this.monitorModel.getType().equals(Constants.TYPE_IMPORT_BILL_ICC)){
             	monitorModel = (new ProcessManager()).processImportBillICC(this.monitorModel, user,request);
             }else if(this.monitorModel.getType().equals(Constants.TYPE_EXPORT_BILL_ICC)){
             	monitorModel = (new ProcessManager()).processExportBillICC(this.monitorModel, user,request);
+            }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_ORDER_EXCEL)){
+            	monitorModel = (new ProcessManager()).processGenerateOrderExcel(this.monitorModel, user,request);
+            }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
+            	monitorModel = (new ProcessManager()).processGenerateItemMasterHisHerTxt(this.monitorModel, user,request);
             }
             
             logger.debug(" **********Result Process["+this.monitorModel.getType()+"] :"+monitorModel.getStatus()+" ******************");
