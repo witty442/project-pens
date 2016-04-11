@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.struts.upload.FormFile;
+
 /**
  * @author WITTY
  *
@@ -57,8 +59,15 @@ private static final long serialVersionUID = -990650039740579753L;
 
     /** Parameter for Run Batch **/
 	private Map<String, String> batchParamMap;
-
+    private FormFile dataFile;
 	
+    
+public FormFile getDataFile() {
+		return dataFile;
+	}
+	public void setDataFile(FormFile dataFile) {
+		this.dataFile = dataFile;
+	}
 public BigDecimal getMonitorItemId() {
 		return monitorItemId;
 	}

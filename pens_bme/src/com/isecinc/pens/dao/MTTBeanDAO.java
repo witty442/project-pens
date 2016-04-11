@@ -41,7 +41,7 @@ public class MTTBeanDAO{
 		int totalQty = 0;
 		try {
 			sql.append("\n  select doc_no,sale_date ,cust_group,cust_no,barcode," +
-					"\n MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF" +
+					"\n MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date" +
 		            "\n ,status,count(*) as qty"+
 					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
 					"     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
@@ -79,7 +79,21 @@ public class MTTBeanDAO{
 				sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
 			
-			sql.append("\n group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status");
+			if( !Utils.isNull(o.getCreateDateFrom()).equals("")){
+				Date fDate  = Utils.parse(o.getCreateDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append("\n and trunc(CREATE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			}
+			
+			if( !Utils.isNull(o.getCreateDateTo()).equals("")){
+				Date tDate  = Utils.parse(o.getCreateDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+
+				sql.append("\n and trunc(CREATE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			}
+			
+			sql.append("\n group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
 			sql.append("\n order by doc_no desc,GROUP_CODE desc ");
 			logger.debug("sql:"+sql);
 			
@@ -94,8 +108,10 @@ public class MTTBeanDAO{
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
 			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+			   h.setRemark(Utils.isNull(rst.getString("remark")));
 			   
                h.setBarcode(Utils.isNull(rst.getString("barcode")));
                h.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));
@@ -473,7 +489,7 @@ public class MTTBeanDAO{
 			//check documentNo
 			if(Utils.isNull(h.getDocNo()).equals("")){
 				//Gen JobId
-				h.setDocNo(genDocNo(conn,new Date()) );
+				h.setDocNo(genDocNo(new Date()) );
 				//save line
 				if(h.getItems() != null && h.getItems().size()>0){
 				   for(int i=0;i<h.getItems().size();i++){
@@ -483,6 +499,7 @@ public class MTTBeanDAO{
 					   l.setSaleDate(h.getSaleDate());
 					   l.setCustGroup(h.getCustGroup());
 					   l.setStoreCode(h.getStoreCode());
+					   l.setRemark(h.getRemark());
 					   
 				       saveModel(conn, l);
 				   }
@@ -500,6 +517,8 @@ public class MTTBeanDAO{
 					   l.setSaleDate(h.getSaleDate());
 					   l.setCustGroup(h.getCustGroup());
 					   l.setStoreCode(h.getStoreCode());
+					   l.setRemark(h.getRemark());
+					   
 					   int update = updateModel(conn, l);
 					   if(update==0){
 				         saveModel(conn, l);
@@ -522,10 +541,11 @@ public class MTTBeanDAO{
 	}
 	
 	// ( Running :  yymmxxxx  เช่น 57030001 )		 yyyymmxxxx  เช่น 2014120001	
-	 public static String genDocNo(Connection conn,Date date) throws Exception{
+	 public static String genDocNo(Date date) throws Exception{
        String docNo = "";
+       Connection conn = null;
 		   try{
-			   
+			   conn = DBConnection.getInstance().getConnection();
 			   String today = dfUs.format(date);
 			   String[] d1 = today.split("/");
 			   int curYear = Integer.parseInt(d1[0].substring(0,4));
@@ -537,6 +557,10 @@ public class MTTBeanDAO{
 			   docNo = new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("0000").format(seq);
 		   }catch(Exception e){
 			   throw e;
+		   }finally{
+			   if(conn != null){
+				   conn.close();conn=null;
+			   }
 		   }
 		  return docNo;
 	}
@@ -550,9 +574,9 @@ public class MTTBeanDAO{
 				sql.append(" INSERT INTO PENSBI.PENSBME_SALES_OUT \n");
 				sql.append(" (SALE_DATE,DOC_NO, LINE_ID,   \n");
 				sql.append("  CUST_GROUP, CUST_NO, BARCODE,MATERIAL_MASTER, ");
-				sql.append("  GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,STATUS,CREATE_DATE,CREATE_USER)  \n");
+				sql.append("  GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,STATUS,CREATE_DATE,CREATE_USER,REMARK)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? , ?, ?, ?,?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? , ?, ?, ?,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -572,6 +596,7 @@ public class MTTBeanDAO{
 				ps.setString(c++, o.getStatus());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
+				ps.setString(c++, Utils.isNull(o.getRemark()));
 				
 				ps.executeUpdate();
 				
@@ -583,8 +608,6 @@ public class MTTBeanDAO{
 				}
 			}
 		}
-	 
-	
 
 		public static int updateModel(Connection conn,MTTBean o) throws Exception{
 			PreparedStatement ps = null;
@@ -592,9 +615,8 @@ public class MTTBeanDAO{
 			int  c = 1;
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE PENSBI.PENSBME_SALES_OUT SET  \n");
-				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-				
+				sql.append(" UPDATE PENSBME_SALES_OUT SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =?   \n");
 				sql.append(" WHERE DOC_NO = ? and LINE_ID = ? \n" );
 
 				ps = conn.prepareStatement(sql.toString());
@@ -602,6 +624,7 @@ public class MTTBeanDAO{
 				ps.setString(c++, o.getStatus());
 				ps.setString(c++, o.getUpdateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, Utils.isNull(o.getRemark()));
 				
 				ps.setString(c++, Utils.isNull(o.getDocNo()));
 				ps.setInt(c++, o.getLineId());

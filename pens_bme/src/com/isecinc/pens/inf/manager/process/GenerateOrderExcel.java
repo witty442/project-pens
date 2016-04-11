@@ -660,7 +660,10 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		try{
 			Date orderDate = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
-			sql.append("\n 	SELECT O.store_code, M.interface_value,M.pens_desc");
+			sql.append("\n SELECT DISTINCT A.store_code ,A.store_no ,A.store_name FROM(");
+			
+			/** ORDER **/
+			sql.append("\n 	SELECT O.store_code, M.interface_value as store_no,M.pens_desc as store_name");
 			sql.append("\n 	FROM PENSBME_ORDER O  ");
 			sql.append("\n 	INNER JOIN PENSBME_MST_REFERENCE M	 ");
 			sql.append("\n  ON  O.store_code = M.pens_value   ");
@@ -668,19 +671,34 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 	where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 	and O.order_date = ?  ");
 			sql.append("\n 	and O.exported = 'Y'");
-			sql.append("\n 	group by O.store_code, M.interface_value,M.pens_desc ");
-		
+			
+			sql.append("\n 	UNION ALL ");
+			
+			/** Stock_ISSUE **/
+			sql.append("\n 	SELECT H.customer_no as store_code ,h.store_no ");
+			sql.append("\n 	,(select Max(M.pens_desc) from PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.customer_no) as store_name ");
+			sql.append("\n 	from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
+			sql.append("\n 	WHERE 1=1 ");
+			sql.append("\n 	and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
+			sql.append("\n 	and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n 	and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 	and H.delivery_date = ?  ");
+			sql.append("\n 	and H.exported = 'Y' ");
+			
+			sql.append("\n)A ");
+			
 			logger.debug("sql:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
+			ps.setDate(2, new java.sql.Date(orderDate.getTime()));
 			
 			rs = ps.executeQuery();
 			while(rs.next()){
 				StoreBean m = new StoreBean();
 				m.setStoreCode(Utils.isNull(rs.getString("store_code")));
-				m.setStoreName(Utils.isNull(rs.getString("pens_desc")));
-				m.setStoreNo(Utils.isNull(rs.getString("interface_value")));
+				m.setStoreName(Utils.isNull(rs.getString("store_name")));
+				m.setStoreNo(Utils.isNull(rs.getString("store_no")));
 				m.setStoreCorner(configMap.get("CONNER"));
 				storeList.add(m);
 			}
@@ -848,7 +866,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n      ,( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
 			sql.append("\n        WHERE  I.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
-			sql.append("\n      ,NVL(count(*),0) as qty  ");
+			sql.append("\n      ,NVL(sum(I.issue_qty),0) as qty  ");
 			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 		WHERE 1=1 ");
 			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");

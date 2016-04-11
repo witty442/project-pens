@@ -2,6 +2,8 @@ package com.isecinc.pens.web.interfaces;
 
 import java.util.List;
 
+import org.apache.struts.upload.FormFile;
+
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
@@ -18,7 +20,10 @@ import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 
 public class InterfacesForm extends I_Form {
 
-	private static final long serialVersionUID = 9066506758859129582L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4077513527723148160L;
 
 	private InterfacesCriteria criteria = new InterfacesCriteria();
 
@@ -32,7 +37,7 @@ public class InterfacesForm extends I_Form {
 
 	private MonitorItemBean monitorItemBeanResult = null;
 	private List<MonitorItemBean> monitorItemList;
-    
+	
 	
 	public List<MonitorItemBean> getMonitorItemList() {
 		return monitorItemList;
@@ -105,8 +110,5 @@ public class InterfacesForm extends I_Form {
 	public void setBeanCriteria(InterfaceBean beanCriteria) {
 		this.beanCriteria = beanCriteria;
 	}
-    
-	
-	
 
 }

@@ -34,6 +34,7 @@ public class GenCNBean implements Serializable{
 	
     private String createUser;
     private String updateUser;
+    private boolean foundError;
 
 	//optional
 	private boolean canEdit = false;
@@ -42,6 +43,14 @@ public class GenCNBean implements Serializable{
 	private List<GenCNBean> items;
 
 	
+	public boolean isFoundError() {
+		return foundError;
+	}
+
+	public void setFoundError(boolean foundError) {
+		this.foundError = foundError;
+	}
+
 	public String getInvoiceDate() {
 		return invoiceDate;
 	}

@@ -92,42 +92,65 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	//clear cach
 	$.ajaxSetup({cache: false});
 	
-	
+
 	function runBatch(path) {
-		var confirmText = "ยืนยัน Process ";
-		var pageName = document.getElementsByName("pageName")[0];
-		if("<%=Constants.TYPE_IMPORT_BILL_ICC%>" == pageName.value){
-			var transDate = document.getElementsByName("bean.transactionDate")[0];
-			if(transDate.value ==""){
-				alert("กรุณาระบุ Transaction Date");
-				transDate.focus();
-				return false;
+			var confirmText = "ยืนยัน Process ";
+			var pageName = document.getElementsByName("pageName")[0];
+			if("<%=Constants.TYPE_IMPORT_BILL_ICC%>" == pageName.value){
+				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				if(transDate.value ==""){
+					alert("กรุณาระบุ Transaction Date");
+					transDate.focus();
+					return false;
+				}
 			}
-		}
-		if("<%=Constants.TYPE_GEN_HISHER%>" == pageName.value){
-			var transDate = document.getElementsByName("bean.transactionDate")[0];
-			if(transDate.value ==""){
-				alert("กรุณาระบุ Transaction Date");
-				transDate.focus();
-				return false;
+			if("<%=Constants.TYPE_GEN_HISHER%>" == pageName.value){
+				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				if(transDate.value ==""){
+					alert("กรุณาระบุ Transaction Date");
+					transDate.focus();
+					return false;
+				}
 			}
-		}
-		if("<%=Constants.TYPE_EXPORT_BILL_ICC%>" == pageName.value){
-			var transDate = document.getElementsByName("bean.transactionDate")[0];
-			if(transDate.value ==""){
-				alert("กรุณาระบุ Transaction Date");
-				transDate.focus();
-				return false;
+			if("<%=Constants.TYPE_EXPORT_BILL_ICC%>" == pageName.value){
+				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				if(transDate.value ==""){
+					alert("กรุณาระบุ Transaction Date");
+					transDate.focus();
+					return false;
+				}
 			}
-		}
-		if(confirm(confirmText)){
-			document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=runBatch&action=submited";
-			document.interfacesForm.submit();
-			return true;
-		}
-		return false;
+			
+			if("<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>" == pageName.value){
+				var form = document.interfacesForm;
+				var fileNameObj = document.getElementsByName("bean.formDataFile")[0];
+				var extension = '';
+				var startFileName = '';
+				//alert(form.formDataFile.value);
+				if(fileNameObj.value.indexOf(".") > 0){
+					extension = fileNameObj.value.substring(fileNameObj.value.lastIndexOf(".") + 1).toLowerCase();
+					//alert(extension);
+				}
+				if(fileNameObj.value.indexOf("_") > 0){
+					var pathFileName = fileNameObj.value;
+					//alert(pathFileName +","+pathFileName.lastIndexOf("\\"));
+					startFileName = pathFileName.substring(pathFileName.lastIndexOf("\\")+1,pathFileName.indexOf("_")).toLowerCase();
+					//alert(startFileName);
+				}
+				 if(fileNameObj.value != '' && (extension == "xls" || extension == "xlsx") ){
+				 }else{
+					alert("กรุณาเลือกไฟล์นามสกุล  xls หรือ  xlsx ");
+					return;
+				}
+			}
+			
+			if(confirm(confirmText)){
+				document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=runBatch&action=submited";
+				document.interfacesForm.submit();
+				return true;
+			}
+			return false;
 	}
-	
 </Script>
 
 	<!-- ProgressBar -->
@@ -142,21 +165,21 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		   $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '20%', width: '60%' } }); 
 		});
 	   
-	   var stepMaxUp = 4;
-	   var stepMinUp = 2;
+	   var stepMaxUp = 3;
+	   var stepMinUp = 1;
 	   var stepHaftMinUp = 0.5;
+	   var stepDotOne = 0.1;
 	   var progressCount = 0;
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
 	   
 	   function update(status){
-		   
 	    	 if(status != '1' && status != "-1"){ //Running
-	    		 if(progressCount > 98){
-		    	   progressCount += 0; 
-	    		 }else if(progressCount > 95){
+	    		 if(progressCount > 95){
+		    	   progressCount += stepDotOne; 
+	    		 }else if(progressCount > 90){
 	    		   progressCount += stepHaftMinUp; 
-	    		 }else if(progressCount > 80){
+	    		 }else if(progressCount > 45){
 	    		   progressCount += stepMinUp; 
 	    		 }else{
 	    		   progressCount += stepMaxUp;
@@ -189,6 +212,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	   
 	   window.onload=function(){
     	   var status = document.getElementsByName("monitorBean.status")[0]; 
+    
     	   if (status.value != "1" && status.value != "-1"){
     		   window.setTimeout("checkStatusProcess();", 800);
     	   }
@@ -213,7 +237,6 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	    function checkStatus(){
 	    	  var status =  document.getElementsByName("monitorBean.status")[0].value;
 	    	   if(status == '1'){ //Finish Task
-	    		   
 	    		   //Calc Time thred use
 	    		   try{
 		    		   var endDate = new Date();
@@ -225,11 +248,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		    		   document.getElementsByName("monitorBean.timeInUse")[0].value = Seconds_from_T1_to_T2;//Seconds_Between_Dates; 
 		    		   
 		    		  // alert( document.getElementsByName("monitorBean.timeInUse")[0].value);
-		    		   
-	    		   }catch(e){
-	    			 
-	    		   }
-	    		   
+	    		   }catch(e){}
 	    		   /** Task Success ***/
 	    		   update(status);
 	    		   //search display
@@ -286,13 +305,17 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 			<%}else if(Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenOrderExcel"/>
-				</jsp:include>
-				<%}else if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)) {%>
+		   		</jsp:include>
+		     <%}else if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenerateItemMasterHisHer"/>
+		 		</jsp:include>
+		    <%}else if(Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMEFromLotus"/>
 				</jsp:include>
 			<%} %>
-				
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -304,7 +327,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
 		            <td bgcolor="#f8f8f8">
 						<!-- BODY -->
-						<html:form action="/jsp/interfacesAction">
+						<html:form action="/jsp/interfacesAction"  enctype="multipart/form-data">
 			
 						<jsp:include page="../error.jsp"/>
 						
@@ -351,11 +374,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								<td align="center" width ="100%">
 								   <input type="button" value="Generate File" class="newPosBtnLong" 
 								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
-								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;
-								    <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" 
-								    title="ตรวจสอบ FTP Connection"><b>?</b></a>
-								
+								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">  
 								</td>
 							</tr>
 						</table>
@@ -393,10 +412,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								   <input type="button" value="Generate File" class="newPosBtnLong" 
 								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
 								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;
-								    <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" 
-								    title="ตรวจสอบ FTP Connection"><b>?</b></a>
-								
+								 
 								</td>
 							</tr>
 						</table>
@@ -418,11 +434,8 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								<td align="center" width ="100%">
 								   <input type="button" value="Import File" class="newPosBtnLong" 
 								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
-								     &nbsp;&nbsp;&nbsp;<input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;
-								    <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" 
-								    title="ตรวจสอบ FTP Connection"><b>?</b></a>
-								
+								     <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
+								   
 								</td>
 							</tr>
 						</table>
@@ -445,10 +458,32 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								<td align="center" width ="100%">
 								   <input type="button" value="Export ข้อมูล" class="newPosBtnLong" 
 								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
-								     &nbsp;&nbsp;&nbsp;<input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;
-								    <a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" 
-								    title="ตรวจสอบ FTP Connection"><b>?</b></a>
+								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
+								
+								</td>
+							</tr>
+						</table>
+					       	
+					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName)){  %>
+					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+						      <tr>
+								<td align="right" width="40%">เลือกไฟล์&nbsp;&nbsp;</td>
+								<td valign="top" align="left">
+									<html:file property="bean.formDataFile" styleClass="" style="width:300px;height:21px"/>
+								</td>
+							</tr>
+							</table>
+							
+						<!-- BUTTON -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+						   <tr>
+								<td align="right" width ="100%"> &nbsp;</td>
+							</tr>
+							<tr>
+								<td align="center" width ="100%">
+								   <input type="button" value="Import ข้อมูล" class="newPosBtnLong" 
+								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
+								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
 								
 								</td>
 							</tr>
@@ -456,21 +491,22 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 					   
 					    <%} %>
 
-                        <!-- Monitor Batch Task -->
-                        <% if( Constants.TYPE_IMPORT_BMESCAN.equals(pageName)){ %> 
-                             <!-- BUTTON -->
+                          <!-- BUTTON -->
 							 <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 							   <tr>
-									<td align="right" width ="100%"> &nbsp;</td>
+									<td align="center" width ="100%"> &nbsp;</td>
 								</tr>
 								<tr>
 									<td align="center" width ="100%">
-									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-									    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-									    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
+									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')"> 
+									    <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 									</td>
 								</tr>
 							</table>   
+							
+                        <!-- Monitor Batch Task -->
+                        <% if( Constants.TYPE_IMPORT_BMESCAN.equals(pageName)){ %> 
+                            
 							 <jsp:include page="monitor.jsp"></jsp:include>
 							<p></p>
 						 <% }else if( Constants.TYPE_GEN_HISHER.equals(pageName) || Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){ %> 
@@ -481,38 +517,12 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 							<jsp:include page="interfacesResult.jsp"></jsp:include>
 						<% }else if( Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){ %> 
 						 <!-- BUTTON -->
-							 <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
-							   <tr>
-									<td align="right" width ="100%"> &nbsp;</td>
-								</tr>
-								<tr>
-									<td align="center" width ="100%">
-									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-									    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-									    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
-									</td>
-								</tr>
-							</table>   
 						    <p></p>
 						    <jsp:include page="monitor_order_excel.jsp"></jsp:include>
 							<p></p>
 							 <!-- BME Scan Result -->
 							<jsp:include page="interfacesResult.jsp"></jsp:include>
 						  <%}else if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){  %>
-						      <!-- BUTTON -->
-							  <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
-							   <tr>
-									<td align="right" width ="100%"> &nbsp;</td>
-								</tr>
-								<tr>
-									<td align="center" width ="100%">
-									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-									    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-									    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
-									</td>
-								</tr>
-							</table>   
-							
 						     <p></p>
 						    <jsp:include page="monitor_short.jsp"></jsp:include>
 							<p></p>
@@ -521,25 +531,18 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 							 
 					       <%}else if(Constants.TYPE_EXPORT_BILL_ICC.equals(pageName)){  %>
 						      <!-- BUTTON -->
-							  <table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
-							   <tr>
-									<td align="right" width ="100%"> &nbsp;</td>
-								</tr>
-								<tr>
-									<td align="center" width ="100%">
-									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-									    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-									    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
-									</td>
-								</tr>
-							</table>   
-							
 						     <p></p>
+						     <jsp:include page="monitor_short.jsp"></jsp:include>
+							 <p></p>
+							 <!-- BME Scan Result -->
+							 <jsp:include page="interfacesResultExportBillICC.jsp"></jsp:include>
+					      <% }else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName)){ %> 
+						    <p></p>
 						    <jsp:include page="monitor_short.jsp"></jsp:include>
 							<p></p>
 							 <!-- BME Scan Result -->
-							 <jsp:include page="interfacesResultExportBillICC.jsp"></jsp:include>
-					     <%} %>
+							<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
+						   <%} %>
 					     
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->
@@ -557,9 +560,8 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 									 </td>
 								</tr>
 							   </table>   
-						    <%} %>			    
+						    <%} %>			      
 						</div>
-					
 						<br><br>
 						
 						<div align="left">

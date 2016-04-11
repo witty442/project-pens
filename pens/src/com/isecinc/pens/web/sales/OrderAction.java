@@ -96,6 +96,10 @@ public class OrderAction extends I_Action {
 		logger.debug("prepare 0");
 		Connection conn = null;
 		try {
+			//Set Debug Mode
+			logger.debug("debug.isDebugEnable():"+debug.isDebugEnable());
+			request.getSession().setAttribute("debug_mode", debug.isDebugEnable());
+			
 			User user = (User) request.getSession(true).getAttribute("user");
 			Customer customer = null;
 			int orderId = orderForm.getOrder().getId();

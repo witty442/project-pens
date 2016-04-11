@@ -396,13 +396,14 @@ function copyDataFromLastMonth(path){
 					 <table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
-								   <%if( !User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      		  
+								    <%if ( !Utils.userInRole(user,new String[]{User.MT_SALE,User.MCQUERY}) ){%>         		  
 										<a href="javascript:copyDataFromLastMonth('${pageContext.request.contextPath}')">
 										  <input type="button" value="Copy Data From Last Month" class="newPosBtnLong"> 
 										</a>
 									<%} %>
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								    <%if( !User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      		  
+								    <%//if( !User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>  
+								    <%if ( !Utils.userInRole(user,new String[]{User.MT_SALE,User.MCQUERY}) ){%>       		  
 										<a href="javascript:save('${pageContext.request.contextPath}')">
 										  <input type="button" value="   บันทึก      " class="newPosBtnLong"> 
 										</a>

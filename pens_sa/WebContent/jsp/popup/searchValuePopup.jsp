@@ -3,7 +3,7 @@
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.DBConnection"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -29,13 +29,12 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <%
-
-boolean isMultiSelect = false;
+	boolean isMultiSelect = false;
  String load = Utils.isNull(request.getParameter("load"));
 
  String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
  String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
- String currCondNameText = Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
+ String currCondNameText = Utils.isNull((String)SAInitial.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
  String searchType = Utils.isNull(request.getParameter("searchType"));
 
 
@@ -48,7 +47,7 @@ System.out.println("searchType:"+searchType);
 System.out.println("currentPage:"+currentPage);
 
 
- if(SAProcess.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
+ if(SAInitial.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
 	 isMultiSelect = true;
  }
  
@@ -322,21 +321,21 @@ function loadNav(){
 	var currCondNo = document.getElementById("currCondNo");
 	//alert(<%=condType1%>);
 	if(currCondNo.value =='1'){
-	    nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+	    nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	}else if(currCondNo.value =='2'){
-		nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML = "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML = "#<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
 		
 	}else if(currCondNo.value =='3'){
-		nav1.innerHTML= "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML= "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
-		nav3.innerHTML= "3><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML= "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= "#<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= "#<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	
 	}else if(currCondNo.value =='4'){
-		nav1.innerHTML = "1><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML= "2><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
-		nav3.innerHTML= "3><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType3))%>["+document.getElementById("condValueDisp3").value+"]";
-		nav4.innerHTML= "4><%=Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= " #<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= " #<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType3))%>["+document.getElementById("condValueDisp3").value+"]";
+		nav4.innerHTML= " #<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	}
 }
 
@@ -394,10 +393,10 @@ function loadDataFromMain(){
 		<td class="h1" colspan="2"><b>ค้นหาข้อมูล :${searchValuePopupForm.curNavigation}</b></td>
 	</tr> --%>
 	 <tr height="21px">
-		<td class="h1" colspan="2"><b>ค้นหาข้อมูล :<%=currCondNameText %></b></td>
+		<td class="h1" colspan="2" align="center"><font size="3">ค้นหาข้อมูล :<%=currCondNameText %></font></td>
 	</tr>
 	<tr height="21px">
-		<td class="h1" colspan="2"><b><span id="nav1"></span><b><span id="nav2"></span><span id="nav3"></span><span id="nav4"></span></b></td>
+		<td class="h1" colspan="2"><font size="3"><b><span id="nav1"></span><span id="nav2"></span><span id="nav3"></span><span id="nav4"></span></b></font></td>
 	</tr>
 	<%-- <tr height="21px">
 		<td class="h1" colspan="2"><b>${searchValuePopupForm.navigation}</b></td>
@@ -424,7 +423,7 @@ function loadDataFromMain(){
 			<c:if test="${!isMultiSelect}" >
 				<input type="button" name="ok" value="OK" class="newPosBtn1"  onclick="selectOneRadio()" style="width:60px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:60px;"/>
+			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:65px;"/>
 		</td>
 	</tr>
 </table>

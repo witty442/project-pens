@@ -16,7 +16,8 @@ public class ImportSummary implements Serializable{
 	private String description;
 	private String qty;
 	private String message;
-	
+	private String materialMaster;
+	private String barcode;
 	private OnhandSummary onhandSummary;
 	private List<Message> errorMsgList;
 	
@@ -29,6 +30,18 @@ public class ImportSummary implements Serializable{
 	private String pensItem;
 	
 	
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+	public String getMaterialMaster() {
+		return materialMaster;
+	}
+	public void setMaterialMaster(String materialMaster) {
+		this.materialMaster = materialMaster;
+	}
 	public String getGroupCode() {
 		return groupCode;
 	}

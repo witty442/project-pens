@@ -90,22 +90,28 @@ public class GenCNAction extends I_Action {
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			GenCNBean p = GenCNDAO.searchHead(aForm.getBean());
+			boolean foundError = p.isFoundError();
 			
-			//Check is loaded
-			boolean isLoaded = GenCNDAO.isLoaded(p);
-			if(isLoaded){
-				msg  ="CN No นี้ ได้เคยนำมา Generate ไปแล้ว กรุณาตรวจสอบใหม่";
-			}else{
-			
-				p.setWarehouse(PickConstants.WAREHOUSE_W3);
-				if(p.getItems() != null && p.getItems().size() >0){
-					aForm.setResults(p.getItems());
+			if(foundError ==false){
+				//Check is loaded
+				boolean isLoaded = GenCNDAO.isLoaded(p);
+				if(isLoaded){
+					msg  ="CN No นี้ ได้เคยนำมา Generate ไปแล้ว กรุณาตรวจสอบใหม่";
 				}else{
-					msg  ="ไม่พบข้อมูล ";
-					aForm.setResults(null);
+				
+					p.setWarehouse(PickConstants.WAREHOUSE_W3);
+					if(p.getItems() != null && p.getItems().size() >0){
+						aForm.setResults(p.getItems());
+					}else{
+						msg  ="ไม่พบข้อมูล ";
+						aForm.setResults(null);
+					}
+					//set to form
+					aForm.setBean(p);
 				}
-				//set to form
-				aForm.setBean(p);
+			}else{
+				msg  ="ไม่พบข้อมูล Group Code ไม่สามารถ Generate ได้";
+				aForm.setResults(p.getItems());
 			}
 			//logger.debug("2totalQty:"+aForm.getBean().getTotalQty());
 			
@@ -176,31 +182,31 @@ public class GenCNAction extends I_Action {
 		
 			//Save Barcode Item
 			//String[] lineId = request.getParameterValues("lineId");
-			String[] barcode = request.getParameterValues("barcode");
-			String[] materialMaster = request.getParameterValues("materialMaster");
+			
 			String[] groupCode = request.getParameterValues("groupCode");
 			String[] pensItem = request.getParameterValues("pensItem");
-			String[] wholePriceBF = request.getParameterValues("wholePriceBF");
-			String[] retailPriceBF = request.getParameterValues("retailPriceBF");
 			String[] qty = request.getParameterValues("qty");
 			
-			logger.debug("barcode:"+barcode.length);
+			logger.debug("groupCode:"+groupCode.length);
 			
 			//add value to Results
-			if(barcode != null && barcode.length > 0){
-				for(int i=0;i<barcode.length;i++){
-					logger.debug("barcode:"+barcode[i]+",mat:"+materialMaster[i]);
-					if( !Utils.isNull(barcode[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("")){
+			if(groupCode != null && groupCode.length > 0){
+				for(int i=0;i<groupCode.length;i++){
+					logger.debug("barcode:"+groupCode[i]);
+					if( !Utils.isNull(groupCode[i]).equals("") && !Utils.isNull(pensItem[i]).equals("")){
 						
 						 Barcode l = new Barcode();
 						 l.setBoxNo(ad.getBoxNo());
-						 l.setJobId(ad.getJobId());						
-						 l.setBarcode(Utils.isNull(barcode[i]));
-						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
+						 l.setJobId(ad.getJobId());		
 						 l.setGroupCode(Utils.isNull(groupCode[i]));
 						 l.setPensItem(Utils.isNull(pensItem[i]));
-						 l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
-						 l.setRetailPriceBF(Utils.isNull(retailPriceBF[i]));
+						 
+						 Barcode b = GeneralDAO.searchProductByGroupCodeModelBMELocked(conn, l.getGroupCode());
+						 
+						 l.setBarcode(Utils.isNull(b.getBarcode()));
+						 l.setMaterialMaster(Utils.isNull(b.getMaterialMaster()));
+						 l.setWholePriceBF(Utils.isNull(b.getWholePriceBF()));
+						 l.setRetailPriceBF(Utils.isNull(b.getRetailPriceBF()));
 						
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());

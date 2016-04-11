@@ -89,6 +89,34 @@ public class ImportDAO {
 		return lastFileName;
 	} 
 	
+	public String getLastFileNameImport7Catalog(Connection conn) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String lastFileName ="";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select max(file_name)as last_file_name  from PENSBME_ONHAND_BME_7CATALOG \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				lastFileName = rs.getString("last_file_name");
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return lastFileName;
+	} 
+	
 	public String getLastFileNameImportOShopping(Connection conn) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -181,6 +209,33 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_SALES_FROM_KING WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
 			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				dup = true;
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return dup;
+	} 
+	
+	public Boolean importStockInitFileNameIsDuplicate(Connection conn ,String tableName,String countDate) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		boolean dup = false;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from "+tableName+" WHERE  count_stk_date = to_date('"+countDate+"','dd/mm/yyyy') \n");
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();

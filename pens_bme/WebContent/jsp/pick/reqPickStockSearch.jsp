@@ -50,8 +50,7 @@ if(session.getAttribute("pickTypeList") == null){
 	     billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
 	 }else{
 		 PopupForm cri = new PopupForm();
-		 cri.setCodeSearch(Constants.STORE_TYPE_HISHER_CODE);
-		 billTypeList.addAll(GeneralDAO.searchCustGroup(cri)); 
+		 billTypeList.addAll(GeneralDAO.searchCustGroupW4(cri)); 
 	 }
 	session.setAttribute("custGroupList",billTypeList);
 //}

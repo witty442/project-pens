@@ -48,6 +48,30 @@ public class InterfaceUtils {
 		return fileName;
 	}
 	
+	//Format File name =  FACT_ID || _MMDD. || SITE_ID     ตัวอย่างผลที่ได้ คือ PEN_1123.500 
+	//Edit new 04/02/2559  by Current Date
+	public static String getHisHerTextFileName(){
+		String fileName ="";
+		Connection conn = null;
+		try{
+			   String currentDate = Utils.stringValue(Utils.getCurrentDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   conn = DBConnection.getInstance().getConnection();
+			   //dd/mm/yyyy
+			   String curDD = currentDate.substring(0,2);
+			   String curMonth = currentDate.substring(3,5);
+			  
+			   fileName = ""+getConfigInterface(conn,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,"PENSTOCK","SITE_ID");
+			   
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			  conn.close();
+			}catch(Exception e){}
+		}
+		return fileName;
+	}
+	
 	public static String getHisHerItemMasterTextFileName(String transDate){
 		String fileName ="";
 		Connection conn = null;

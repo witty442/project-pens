@@ -18,6 +18,7 @@ import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.sun.org.apache.xpath.internal.FoundIndex;
 
 public class GenCNDAO extends PickConstants{
 	
@@ -34,6 +35,7 @@ public class GenCNDAO extends PickConstants{
 		List<GenCNBean> items = new ArrayList<GenCNBean>();
 		int no=1;
 		int totalQty = 0;
+		boolean foundError = false;
 		try {
 			sql.append("\n SELECT s.invoice_date, ");
 			sql.append("\n  (select g.customer_code from PENSBI.XXPENS_BI_MST_CUSTOMER g ");
@@ -66,13 +68,17 @@ public class GenCNDAO extends PickConstants{
 			   h.setQty(Utils.isNull(rst.getString("qty")));
  
 			   //Get Item 
-			   Barcode b = GeneralDAO.searchProductByPensItemModelBMELocked(conn, h.getPensItem());
+			   Barcode b = GeneralDAO.searchProductByPensItemModelByStep(conn, h.getPensItem());
 			   if(b !=null){
 				   h.setBarcode(b.getBarcode());
 				   h.setMaterialMaster(b.getMaterialMaster());
 				   h.setGroupCode(Utils.isNull(b.getGroupCode()));
 				   h.setWholePriceBF(b.getWholePriceBF());
 				   h.setRetailPriceBF(b.getRetailPriceBF());
+			   }
+			   //Validate GroupCode is null foundError = true
+			   if(Utils.isNull(h.getGroupCode()).equals("")){
+				   foundError = true;
 			   }
 			   items.add(h);
 			   
@@ -88,9 +94,12 @@ public class GenCNDAO extends PickConstants{
 			}
 			o.setTotalQty(Utils.convertToNumberStr(totalQty));
 			o.setItems(items);
+			o.setFoundError(foundError);
 			
 			if(items != null && items.size() >0){
-			  o.setCanEdit(true);
+				if(foundError==false){
+			      o.setCanEdit(true);
+				}
 			}
 			
 		} catch (Exception e) {

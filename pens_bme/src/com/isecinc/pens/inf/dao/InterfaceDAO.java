@@ -363,6 +363,32 @@ public class InterfaceDAO extends InterfaceUtils{
         }
     }
     
+    public static void clearTaskControlMonitorAll() {
+    	Connection conn = null;
+    	PreparedStatement ps = null;
+    	try {
+            conn = DBConnection.getInstance().getConnection();
+	       	String sql = "UPDATE c_monitor SET  transaction_id = 0";
+			ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+            
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }finally{
+        	try{
+	        	if(conn != null){
+	        		conn.close();conn=null;
+	        	}
+	        	if(ps != null){
+					ps.close();ps = null;
+				}
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        	
+        }
+    }
+    
     public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
 		PreparedStatement ps = null;
 		try {
@@ -617,7 +643,11 @@ public class InterfaceDAO extends InterfaceUtils{
 				m.setSubmitDate(rs.getTimestamp("submit_date"));
 	            m.setFileCount(rs.getInt("file_count"));
 	            m.setSuccessCount(rs.getInt("success_count"));
-	            m.setErrorMsg(rs.getString("error_disp"));
+	            if( !Utils.isNull(rs.getString("error_msg")).equals("")){
+	               m.setErrorMsg(rs.getString("error_msg"));
+	            }else{
+	               m.setErrorMsg(rs.getString("error_disp"));
+	            }
 	            
 	            if(Utils.isNull(m.getErrorMsg()).equals("")){
 	            	logger.debug("errorCode:"+rs.getString("error_code"));
@@ -852,7 +882,6 @@ public class InterfaceDAO extends InterfaceUtils{
 		ResultSet rs = null;
 		MonitorItemBean item = new  MonitorItemBean();
 		Connection conn = null;
-	
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor_item.* \n");
@@ -1016,7 +1045,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			sql.append(" select * from monitor_item_result where 1=1 \n");
 			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
 			sql.append(" and status ='"+statusDesc+"' \n");
-			
+			sql.append(" order by no asc ");
 		    logger.debug("SQL:"+sql.toString());
 
 			ps = conn.prepareStatement(sql.toString());
@@ -1169,15 +1198,13 @@ public class InterfaceDAO extends InterfaceUtils{
 	
 
 	public MonitorItemBean updateMonitorItem(Connection conn,MonitorItemBean model) throws Exception {
-		boolean result = false;
 		PreparedStatement ps = null;
-
 		try {
 			String sql = "UPDATE monitor_item SET " +
-			"  status = ? ,error_msg = ? "+
+			"  status = ? ,error_msg = ? ,success_count =? ,fail_count=?"+
 			" WHERE ID = ?";
 			
-			logger.debug("SQL:"+sql);
+			logger.debug("SQL:"+sql +"\nSuccessCount["+model.getSuccessCount()+"]");
 
 			logger.debug("id:"+model.getId());
 		
@@ -1185,10 +1212,13 @@ public class InterfaceDAO extends InterfaceUtils{
 			ps = conn.prepareStatement(sql);
 			ps.setInt(++index, model.getStatus());
 			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());
+		
+			ps.setInt(++index, model.getSuccessCount());
+			ps.setInt(++index, model.getFailCount());
 			ps.setBigDecimal(++index, model.getId());
 			
 			int ch = ps.executeUpdate();
-			result = ch>0?true:false;
+		
 		} catch (Exception ex) {
 			throw ex;
 		} finally {

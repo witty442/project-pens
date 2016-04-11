@@ -77,7 +77,8 @@ function loadMe(){
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
      <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
     		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
-    		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
+    		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+    		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
@@ -270,10 +271,11 @@ function openPopupCustomer(path,types,storeType){
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 }
 
-function openPopupCustomerAll(path,types,storeType){
+function openPopupCustomerAll(path,types,storeType,hideAll){
     var param = "&types="+types;
         param += "&storeType="+storeType;
-    
+        param += "&hideAll="+hideAll;
+        
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare&action=new"+param;
 	window.open(encodeURI(url),"",
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
@@ -353,10 +355,22 @@ function getCustName(custCode,fieldName,storeType){
 		}).responseText;
 	
 	if("pensCustNameFrom" == fieldName){
-		form.pensCustNameFrom.value = returnString;
+		if(returnString != ''){
+		   form.pensCustNameFrom.value = returnString;
+		}else{
+			custCode.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
 	}
 	if("pensCustNameTo" ==fieldName){
-		form.pensCustNameTo.value = returnString;
+		if(returnString != ''){
+		   form.pensCustNameTo.value = returnString;
+		}else{
+			custCode.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
 	}
 }
 
@@ -443,7 +457,13 @@ function getCustName(custCode,fieldName,storeType){
 					<jsp:param name="function" value="SummaryBMESizeColorBigC"/>
 				</jsp:include>
 		
+		    <%}else if("sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMESizeColorLotus"/>
+				</jsp:include>
+		
 			<%} %>
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -597,6 +617,7 @@ function getCustName(custCode,fieldName,storeType){
 											<html:option value="StockStore">Stock ห้าง</html:option>
 											<html:option value="StockFriday">Stock Friday</html:option>
 											<html:option value="StockOShopping">Stock O-Shopping</html:option>
+											<html:option value="Stock7Catalog">Stock 7-Catalog</html:option>
 									     </html:select>
 									</td>
 									<td align="left" width="40%">       
@@ -642,14 +663,19 @@ function getCustName(custCode,fieldName,storeType){
 								|| "onhandMTT".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+								|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
 								) {
-								
-							    storeType ="lotus";
+								String hideAll = "";
+								if(    "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
+									|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+									|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+									) {
+									hideAll = "true";
+								}
+							    storeType ="lotus";//defualt
 								if("onhandBigC".equalsIgnoreCase(request.getParameter("page")) || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){
 									storeType="bigc";
-								}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page"))){
-									storeType="MTT";
-								}else if("onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))){
+								}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))){
 									storeType="MTT";
 								}
 								%>
@@ -665,7 +691,7 @@ function getCustName(custCode,fieldName,storeType){
 									<td align="right">รหัสร้านค้า<font color="red">*</font>
 									  &nbsp;&nbsp;
 									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>')"/>
+									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
 									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
 								</tr>
@@ -700,7 +726,7 @@ function getCustName(custCode,fieldName,storeType){
 									   
 									  </td>
 									<td align="left" width="30%">  
-								       <% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){%>
+								       <% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ||  "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))){%>
 									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
 									    <%} %>
 									 </td>
@@ -919,6 +945,29 @@ function getCustName(custCode,fieldName,storeType){
 
 						<br/>
 							<display:table id="item" name="sessionScope.summaryForm.onhandSummarySizeColorBigCResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+							    
+							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>
+							    <display:column  title="SubInv" property="subInv"  sortable="false" />
+							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
+							    <display:column  title="Group" property="group"  sortable="false"/>	
+							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
+							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
+							    <display:column  title="Barcode" property="barcode"  sortable="false" />
+							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
+							    <display:column  title="Trans In Qty" property="transInQty"  sortable="false" />	
+							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
+							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
+							    <display:column  title="Adjust Qty" property="adjustSaleQty"  sortable="false" />
+							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
+							    				
+							</display:table>
+                    </c:if>
+                    
+                     <c:if test="${summaryForm.onhandSummarySizeColorLotusResults != null}">
+
+						<br/>
+							<display:table id="item" name="sessionScope.summaryForm.onhandSummarySizeColorLotusResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
 							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
 							    
 							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>

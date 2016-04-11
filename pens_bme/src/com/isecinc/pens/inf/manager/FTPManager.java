@@ -689,10 +689,10 @@ public class FTPManager {
 		}
 	}
 	
-	public void deleteFileFTP(String path,String fileName) throws Exception{
+	public void deleteFileFTPByFileName(String path,String fullFileName) throws Exception{
 		FTPClient ftp = null;
 		try {	
-			logger.debug("Delete File From Path:"+path);
+			logger.debug("Delete fullFileName:"+fullFileName);
 			
 			ftp = new FTPClient();
 			ftp.connect(server);
@@ -701,17 +701,15 @@ public class FTPManager {
 			if(!ftp.login(userFtp, passwordFtp)){
 				throw new FTPException("FTP Username or password invalid! ");
 			}
-			
 			//Step1 set Dir Active
 			ftp.changeWorkingDirectory(path);
 			logger.debug("Step1 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
 			
 			//step 2 
-			ftp.sendCommand("delete "+fileName);
-			logger.debug("delete:"+fileName);
+			ftp.deleteFile(fullFileName);
+			logger.debug("delete:"+fullFileName);
 			logger.debug("step2 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
 			
-
 		} catch (SocketException e) {
 			throw new FTPException("Could not connect to FTP server");
 		} catch (UnknownHostException e) {

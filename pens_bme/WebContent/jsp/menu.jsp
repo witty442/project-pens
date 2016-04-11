@@ -26,9 +26,16 @@
   String ipDD = env.getProperty("host.dd.server");
   String hostDD = "http://"+ipDD+":8081";
   
+  String currentIP =InetAddress.getLocalHost().getHostAddress();
+  System.out.println("Current IP:"+currentIP);
+
   //case Server Test contextPath = pens_bme_test
   if("192.168.38.186".equals(ipProd)){ //For Test
-	  contextPathProd ="/pens_bme_test";
+	  if("192.168.202.8".equals(currentIP)){ //On Witty
+	      contextPathProd ="/pens_bme";
+	  }else{
+		  contextPathProd ="/pens_bme_test"; //ON UAT SERVER
+	  }
   }
   //For test on Witty host
   if("192.168.202.8".equals(ipDD)){ 
@@ -48,6 +55,7 @@
 <script>
 
   function link(isProd,url){
+	  var newUrl ;
 	  <% 
 	    	// Link to Isec Server  DDServer To IsecServer
 	    	//input  : /jsp/mcAction.do?do=prepareMCStaff&action=new
@@ -65,9 +73,12 @@
 	  	     var pathRedirect = url.substring(url.indexOf("jsp")-1,url.length);
 	  	         pathRedirect = ReplaceAll (pathRedirect , '&', '$');
 	  	     //alert(pathRedirect);
-	  	     
-	  	     var newUrl = "<%=hostProd%><%=contextPathProd%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
-		     
+	  	    
+	  	     <% if("192.168.202.8".equals(currentIP)){ //On Witty%>
+	  	    	newUrl = url;
+	  	     <%}else{%>
+	  	        newUrl = "<%=hostProd%><%=contextPathProd%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
+		     <%}%>
 	  	     url = newUrl+"&userName=<%=userName%>&password=<%=password%>";
 	  	    // alert("isProd:"+isProd+":"+url);
 		     window.location = url;
@@ -108,15 +119,37 @@
 	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Stock Onhand B'me </span></a>
 		<ul>
 		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
+			    
 			    <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=master&action=new');">1.<span><bean:message bundle="sysprop" key="ImportBMEMaster"/></span></a>
 				</li>
-	           	<li>
-					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=onhand&action=new');">2.<span><bean:message bundle="sysprop" key="ImportBMEFromWacoal"/></span></a>
-				</li>
-			    <li>
+				
+				 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>2.Load Text file on-hand from Wacoal</span></a>
+			       <ul>
+				    	<li>
+						  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=onhand&action=new');">2.1 <span><bean:message bundle="sysprop" key="ImportBMEFromWacoal"/></span></a>
+					    </li>
+					    <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandFriday');">2.2 <span><bean:message bundle="sysprop" key="ImportBMEFridayFromWacoal"/></span></a>
+				       </li>
+				       <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandOShopping');">2.3 <span><bean:message bundle="sysprop" key="ImportBMEOShopping"/></span></a>
+				        </li>
+				        <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhand7Catalog');">2.4 <span><bean:message bundle="sysprop" key="ImportBME7Catalog"/></span></a>
+				        </li>
+			       </ul>
+			   </li>
+	           
+			     <%--   OLD
+			     <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=lotus&action=new');">3.<span><bean:message bundle="sysprop" key="ImportBMEFromLotus"/></span></a>
-				</li>
+				</li> --%>
+				<!--  NEW CODE --> 
+				<li>
+	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');"><span>1.<bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
+	            </li>
+	         
 				 <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=bigc&action=new');">4.<span><bean:message bundle="sysprop" key="ImportBMEFromBigC"/></span></a>
 				</li>
@@ -132,33 +165,41 @@
 					<li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=physical&action=new');">7.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
 					</li>
-					<li>
-						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=return_wacoal&action=new');">8.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
-					</li>
+					<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+						<li>
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=return_wacoal&action=new');">8.<span><bean:message bundle="sysprop" key="ImportReturnWacoal"/></span></a>
+						</li>
+					<%} %>
 				<%} %>
 				<li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/masterAction.do?do=prepare&action=new&page=master');">9.<span><bean:message bundle="sysprop" key="MaintainMaster"/></span></a>
 				</li>
-				<li>
-					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandFriday');">10.<span><bean:message bundle="sysprop" key="ImportBMEFridayFromWacoal"/></span></a>
-				</li>
+				
 				
 				<%-- <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
 				</li> --%>
 				
 				 <li>
-	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_BMESCAN%>');"><span>11.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
+	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_BMESCAN%>');"><span>10.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
 	          	</li>
           	<%} %>
           	<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
-          	 <li>
-          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare');"><span>12.<bean:message key="genCN" bundle="sysprop"/></span></a>
-          	</li>
+	          	 <li>
+	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare');"><span>11.<bean:message key="genCN" bundle="sysprop"/></span></a>
+	          	</li>
           	<%} %>
-          		<li>
-					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandOShopping');">13.<span><bean:message bundle="sysprop" key="ImportBMEOShopping"/></span></a>
-				</li>
+          		
+			   <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>12. Load ข้อมูลการตรวจนับสต๊อก</span></a>
+			       <ul>
+			           <li>
+					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitLotus');">12.1 <span><bean:message bundle="sysprop" key="LoadStockInitLotus"/></span></a>
+				       </li>
+				       <li>
+					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');">12.2 <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span></a>
+				     </li>
+			       </ul>
+			  </li>
 		</ul>
 	</li>
 <%} %>
@@ -169,36 +210,42 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhand');"><span>1.<bean:message bundle="sysprop" key="SummaryBMEFromWacoal"/></span></a>
 			</li>
-			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotus');"><span>2.<bean:message bundle="sysprop" key="SummaryBMEOnhandLotus"/></span></a>
-			</li>  
-			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=lotus');"><span>3.<bean:message bundle="sysprop" key="SummaryBMEFromLotus"/></span></a>
+			
+			<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>2.รายงาน Lotus</span></a>
+			    <ul>
+				    <li>
+					  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotus');"><span>2.1 <bean:message bundle="sysprop" key="SummaryBMEOnhandLotus"/></span></a>
+					</li>  
+					 <li>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=lotus');"><span>2.2 <bean:message bundle="sysprop" key="SummaryBMEFromLotus"/></span></a>
+					</li>
+					 <li>
+				      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorLotus');"><span>2.3 <bean:message bundle="sysprop" key="SummaryBMESizeColorLotus"/></span></a>
+			       </li>  
+					<li>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotusPeriod');"><span>2.4 <bean:message bundle="sysprop" key="SummaryBMEOnhandLotusPeriod"/></span></a>
+					</li> 
+			    </ul>
 			</li>
-			
-			
+			    
 	    	 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>4.รายงาน BigC</span></a>
 			    <ul>
 					<li>
-				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span>4.1<bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
+				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span>4.1 <bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
 			       </li>
 			       <li>
-				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigC');"><span>4.2<bean:message bundle="sysprop" key="SummaryBMEOnhandBigC"/></span></a>
+				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigC');"><span>4.2 <bean:message bundle="sysprop" key="SummaryBMEOnhandBigC"/></span></a>
 			        </li> 
 			          <li>
-				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');"><span>4.3<bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
+				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');"><span>4.3 <bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
 			        </li> 
 			  
 			   </ul>	    
 		    </li> 
-     
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=king');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromKing"/></span></a>
 			</li>
 
-			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotusPeriod');"><span>7.<bean:message bundle="sysprop" key="SummaryBMEOnhandLotusPeriod"/></span></a>
-			</li> 
 			<%-- <li>
 				<a href="#" onclick="window.location='<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=physical';"><span><bean:message bundle="sysprop" key="SummaryBMEFromPhysical"/></span></a>
 			</li>
@@ -207,30 +254,28 @@
 			</li> --%>
 		
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAction.do?do=prepare&action=new');"><span>8.<bean:message bundle="sysprop" key="Report"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAction.do?do=prepare&action=new');"><span>6.<bean:message bundle="sysprop" key="Report"/></span></a>
 			</li>
-			
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepareReport&action=new');"><span>9.<bean:message bundle="sysprop" key="mttReport"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepareReport&action=new');"><span>7.<bean:message bundle="sysprop" key="mttReport"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTT');"><span>10.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTT"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTT');"><span>8.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTT"/></span></a>
 			</li>  
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTTDetail');"><span>11.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTTDetail"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTTDetail');"><span>9.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTTDetail"/></span></a>
 			</li>
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/sumGroupCodeAction.do?do=prepare&action=new');"><span>12.<bean:message bundle="sysprop" key="SummaryBMEByGroupCode"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/sumGroupCodeAction.do?do=prepare&action=new');"><span>10.<bean:message bundle="sysprop" key="SummaryBMEByGroupCode"/></span></a>
 			</li>  
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>13.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepareScanReport&action=new');"><span>11.<bean:message bundle="sysprop" key="SummaryBMEScanReport"/></span></a>
 			</li>
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareReportOrder&action=new');"><span>14.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareReportOrder&action=new');"><span>12.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
 			</li>
-		
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=bmeTrans');"><span>15.<bean:message bundle="sysprop" key="SummaryBMETransaction"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=bmeTrans');"><span>13.<bean:message bundle="sysprop" key="SummaryBMETransaction"/></span></a>
 			</li>
 			
 		</ul>
@@ -250,6 +295,9 @@
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAllAction.do?do=prepare&action=new&pageName=OShopping');"><span><bean:message bundle="sysprop" key="OrderOShopping"/></span></a>
+			</li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAllAction.do?do=prepare&action=new&pageName=7Catalog');"><span><bean:message bundle="sysprop" key="Order7Catalog"/></span></a>
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareView&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiry"/></span></a>

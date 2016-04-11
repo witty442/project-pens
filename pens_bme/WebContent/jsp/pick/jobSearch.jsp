@@ -59,7 +59,7 @@ if(session.getAttribute("custGroupList") == null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_job.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -279,26 +279,20 @@ function resetStore(){
                                     <td> Sub Inventory</td>
 									<td >
 						               <html:text property="job.subInv" styleId="subInv" size="20" readonly="true" styleClass="disableText"/>
+						                Store No
+						                 <html:text property="job.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>	
-								<tr>
-                                    <td> Store No</td>
-									<td >
-						               <html:text property="job.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
-									</td>
-								</tr>	
+								
 								<tr>
                                     <td> Job Id</td>
 									<td >
-						               <html:text property="job.jobId" styleId="jobId" size="20" />
+						               <html:text property="job.jobId" styleId="jobId" size="10" />
+						                Job Name
+						                 <html:text property="job.name" styleId="name" size="40" />
 									</td>
 								</tr>	
-								<tr>
-                                    <td> Job Name</td>
-									<td >
-						               <html:text property="job.name" styleId="name" size="50" />
-									</td>
-								</tr>	
+									
 								<tr>
                                     <td> Job Status</td>
 									<td >
@@ -311,6 +305,12 @@ function resetStore(){
                                     <td> Close Date</td>
 									<td>						
 										  <html:text property="job.closeDate" styleId="closeDate" size="20" />
+									</td>
+								</tr>
+								<tr>
+                                    <td> เอกสารอ้างอิง</td>
+									<td>				
+										  <html:text property="job.refDoc" styleId="refDoc" size="40" />
 									</td>
 								</tr>
 						   </table>
@@ -336,7 +336,7 @@ function resetStore(){
 
             <c:if test="${jobForm.resultsSearch != null}">
                   	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableAjSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
 									<th >Open Date</th>
@@ -344,6 +344,7 @@ function resetStore(){
 									<th >กลุ่มลูกค้า</th>
 									<th >Job ID</th>
 									<th >Job Name</th>
+									<th> เอกสารอ้างอิง </th>
 									<th >Job Status</th>
 									<th >Job Close Date</th>
 									<th >แก้ไข</th>						
@@ -359,24 +360,27 @@ function resetStore(){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_openDate">
+										<td class="td_text_center" width="5%">${results.no}</td>
+										<td class="td_text_center" width="8%">
 										   ${results.openDate}
 										</td>
-										<td class="search_no">${results.wareHouse}</td>
-										<td class="search_custGroup">${results.custGroupDesc}</td>
-										<td class="search_jobId">${results.jobId}</td>
-										<td class="search_name">
+										<td class="td_text_center" width="5%">${results.wareHouse}</td>
+										<td class="td_text" width="10%">${results.custGroupDesc}</td>
+										<td class="td_text" width="5%">${results.jobId}</td>
+										<td class="td_text" width="10%">
 											${results.name}
 										</td>
-										<td class="search_status">
+										<td class="td_text" width="8%">
+											${results.refDoc}
+										</td>
+										<td class="td_text"  width="10%">
 										    ${results.statusDesc}
 										</td>
 										
-										<td class="search_closeDate">
+										<td class="td_text_center" width="8%">
 										  ${results.closeDate}
 										</td>
-										<td class="search_edit" align="center">
+										<td class="td_text_center" width="10%">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.jobId}','view')">
 											          ดู

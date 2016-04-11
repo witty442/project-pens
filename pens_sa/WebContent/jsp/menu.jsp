@@ -17,18 +17,18 @@ if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
            	<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/userAction.do?do=init&action=new';"><span><bean:message key="User" bundle="sysprop"/></span></a>
 			</li>
-			<%-- <li>
+			<%--  <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/groupRoleAction.do?do=prepare&action=new';"><span><bean:message key="Group" bundle="sysprop"/></span></a>
 			</li>
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/roleAction.do?do=prepare&action=new';"><span><bean:message key="Role" bundle="sysprop"/></span></a>
-			</li>  --%>
+			</li>  --%> 
 			
 		</ul>
 	</li>
 <%} %>
 	
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
+	<li><a href="#" class="parent" onclick="window.location=''${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
 		<ul>
 			<li>
 	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>

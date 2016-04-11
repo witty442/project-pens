@@ -48,12 +48,22 @@ public class ExportTimeSheetGroup extends Excel{
 		   sql.append("\n    AND MT.emp_ref_id  = s.emp_ref_id ");
 		   sql.append("\n    AND R.mc_area = s.region) emp_route_name");
 		   sql.append(" \n from MC_EMPLOYEE S " );
+		   sql.append("\n  INNER JOIN ( ");
+			sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ,MT.employee_id ");
+			sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
+			sql.append("\n    from MC_STAFF_ROUTE MT,MC_ROUTE R ");
+			sql.append("\n    WHERE  MT.mc_route = R.route_id");
+			sql.append("\n  )E  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
+			
 		   sql.append(" \n,(select distinct emp_ref_id from MC_STAFF_TIME T");
 		   sql.append("\n    where 1=1 " );
 		   sql.append("\n    and EXTRACT(year FROM staff_date) = '"+christYear+"'");
 		   sql.append("\n    and EXTRACT(month FROM staff_date) = '"+Utils.isNull(o.getStaffMonth())+"'");
 		   sql.append(" \n ) T  ");
 		   sql.append("\n  WHERE T.emp_ref_id =S.emp_ref_id " );
+		   
+		   sql.append("\n and S.status <> 'L' ");
+		   sql.append("\n and E.is_active = 'Y' ");
 		   
 		   if( !Utils.isNull(o.getMcArea()).equals("")){
 			    sql.append("\n and s.region = '"+Utils.isNull(o.getMcArea())+"'");
@@ -66,6 +76,9 @@ public class ExportTimeSheetGroup extends Excel{
 		   }
 		   if( !Utils.isNull(o.getName()).equals("")){
 				sql.append("\n and S.name like '%"+Utils.isNull(o.getName())+"%'");
+		   }
+		   if( !Utils.isNull(o.getEmpRouteName()).equals("")){
+				sql.append("\n and E.route_name = '"+Utils.isNull(o.getEmpRouteName())+"'");
 		   }
 		   sql.append("\n order by S.EMP_REF_ID DESC ");
 			

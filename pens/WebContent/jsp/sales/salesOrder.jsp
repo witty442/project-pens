@@ -77,8 +77,10 @@ if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
   canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
-System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 
+//System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
+boolean debugMode = session.getAttribute("debug_mode")!= null?((Boolean)session.getAttribute("debug_mode")):false;
+System.out.println("debugMode:"+debugMode);
 %>
 
 <%@page import="java.util.List"%>
@@ -686,8 +688,10 @@ function escapeParameter(param){
 										<td align="center">
 											
 												<c:if test="${lines1.promotion=='N'}">
-													<%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
-													<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a> --%>
+											         <%if(debugMode==true) {%>
+													   <%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
+													   <img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>  --%>
+													 <%} %>
 												</c:if>
 											
 										</td>

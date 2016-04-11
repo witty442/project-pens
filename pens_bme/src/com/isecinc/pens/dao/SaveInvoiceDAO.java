@@ -20,11 +20,11 @@ public class SaveInvoiceDAO {
 
 	 private static Logger logger = Logger.getLogger("PENS");
 
-	 public static List<SaveInvoiceBean> search(Connection conn,SaveInvoiceBean o,boolean getTrans ) throws Exception {
+	 public static SaveInvoiceBean search(Connection conn,SaveInvoiceBean o,boolean getTrans ) throws Exception {
 		  return searchModel(conn, o,getTrans);
 		}
 	   
-	   public static List<SaveInvoiceBean> search(SaveInvoiceBean o ,boolean getTrans) throws Exception {
+	   public static SaveInvoiceBean search(SaveInvoiceBean o ,boolean getTrans) throws Exception {
 		   Connection conn = null;
 		   try{
 			  conn = DBConnection.getInstance().getConnection();
@@ -36,24 +36,35 @@ public class SaveInvoiceDAO {
 		   }
 		}
 	   
-		public static List<SaveInvoiceBean> searchModel(Connection conn,SaveInvoiceBean o ,boolean getTrans) throws Exception {
+		public static SaveInvoiceBean searchModel(Connection conn,SaveInvoiceBean o ,boolean getTrans) throws Exception {
 				PreparedStatement ps = null;
 				ResultSet rs = null;
 				StringBuilder sql = new StringBuilder();
 				SaveInvoiceBean m = null;
 				List<SaveInvoiceBean> items = new ArrayList<SaveInvoiceBean>();
 				int r = 1;
+				String billDate ="";
+				double grandTotalQty = 0;
+				double grandNetBVat = 0;
 				try {
-				   sql.append("\n select h.* , m.pens_value as CUST_CODE, m.pens_desc2 as CUST_DESC" );
-				   sql.append("\n from pensbme_icc_head h ,PENSBME_MST_REFERENCE m" );
-				   sql.append("\n where 1=1 ");
-				   sql.append("\n and m.reference_code = 'Store' and m.interface_value = h.CUST_ID ");
-				   
 				   if( !Utils.isNull(o.getBILL_DATE()).equals("")){
-					   String billDate = o.getBILL_DATE().replaceAll("/", "");
-						sql.append("\n and h.bill_date = '"+billDate+"'");
-					    logger.debug("billDate:"+billDate+",billDate:"+o.getBILL_DATE());
-					}
+					   billDate = o.getBILL_DATE().replaceAll("/", "");
+				   }
+				   sql.append("\n select h.* , m.pens_value as CUST_CODE, m.pens_desc2 as CUST_DESC" );
+				   sql.append("\n ,d.total_qty,d.cost ,d.net_bvat ");
+				   sql.append("\n from pensbme_icc_head h ,PENSBME_MST_REFERENCE m" );
+				   sql.append("\n ,( select  d.bill_10,sum(d.total_qty) as total_qty ,sum(d.cost) as cost ");
+				   sql.append("\n    ,sum(d.total_qty *d.cost) net_bvat from pensbme_icc_dlyr d"); 
+				   sql.append("\n    where d.bill_10 in( ");
+				   sql.append("\n      select bill_10 from pensbme_icc_head where bill_date = '"+billDate+"'");
+				   sql.append("\n    )");
+				   sql.append("\n    group by d.bill_10" );
+				   sql.append("\n  )d ");
+				   sql.append("\n where 1=1 ");
+				   sql.append("\n and d.bill_10= h.bill_10 ");
+				   sql.append("\n and m.reference_code = 'Store' and m.interface_value = h.CUST_ID ");
+				   sql.append("\n and h.bill_date = '"+billDate+"'");
+					
 					sql.append("\n ");
 					logger.debug("sql:"+sql);
 					
@@ -105,13 +116,23 @@ public class SaveInvoiceDAO {
 					   m.setSORTER_ROUND(Utils.isNull(rs.getString("SORTER_ROUND")));      
 					   m.setSORTER_BATCH(Utils.isNull(rs.getString("SORTER_BATCH")));      
 					   m.setSORTER_CHUTE(Utils.isNull(rs.getString("SORTER_CHUTE")));      
-
+					   
+					   m.setTotalQty(Utils.decimalFormat(rs.getDouble("total_qty"), Utils.format_current_no_disgit));
+					   m.setCost(Utils.decimalFormat(rs.getDouble("cost"), Utils.format_current_2_disgit));
+					   m.setNetBVat(Utils.decimalFormat(rs.getDouble("net_bvat"), Utils.format_current_2_disgit));
+					   
+					   grandTotalQty +=rs.getDouble("total_qty");
+					   grandNetBVat += rs.getDouble("net_bvat");
+						
 					   items.add(m);
 					   r++;
 					}//while
 					
 					//set Result 
-				
+					o.setGrandTotalQty(Utils.decimalFormat(grandTotalQty, Utils.format_current_no_disgit));
+					o.setGrandNetBVat(Utils.decimalFormat(grandNetBVat, Utils.format_current_2_disgit));
+					o.setItemList(items);
+					 
 				} catch (Exception e) {
 					throw e;
 				} finally {
@@ -120,7 +141,7 @@ public class SaveInvoiceDAO {
 						ps.close();
 					} catch (Exception e) {}
 				}
-			return items;
+			return o;
 		}
 		
 		public static void updateORACLE_INVOICE_NO_ON_ICCHead(Connection conn,User user,String ORACLE_INVOICE_NO,String BILL_10,String BILL_DATE) throws Exception{

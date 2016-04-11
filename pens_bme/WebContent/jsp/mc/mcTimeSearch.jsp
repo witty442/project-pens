@@ -41,6 +41,7 @@ if(session.getAttribute("empTypeList") == null){
 	
 	session.setAttribute("empTypeList",billTypeList);
 }
+
 if(session.getAttribute("monthList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 

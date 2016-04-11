@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 
 public class SAUtils {
 
@@ -92,7 +92,7 @@ public class SAUtils {
 	
 	public  boolean isColumnOrder(String columnName) throws Exception{
 		boolean isColumnOrder = false;
-		if(SAProcess.getInstance().COLUMN_ORDER_MAP.get(columnName) != null){
+		if(SAInitial.getInstance().COLUMN_ORDER_MAP.get(columnName) != null){
 			isColumnOrder = true;
 		}
 		return isColumnOrder;
@@ -100,7 +100,7 @@ public class SAUtils {
 	
 	public  boolean isColumnInvoice(String columnName) throws Exception{
 		boolean isColumnInvoice = false;
-		if(SAProcess.getInstance().COLUMN_INVOICE_MAP.get(columnName) != null){
+		if(SAInitial.getInstance().COLUMN_INVOICE_MAP.get(columnName) != null){
 			isColumnInvoice = true;
 		}
 		return isColumnInvoice;

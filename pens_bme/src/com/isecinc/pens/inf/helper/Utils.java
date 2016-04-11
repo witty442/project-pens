@@ -60,11 +60,11 @@ public class Utils {
 	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
 	private static String NUMBER_FORMAT ="#,##0";
 	
-	public static void main1(String[] args){
+	public static void main(String[] args){
 	    try{	
-	    	String str = "0001";
-			
-	    	System.out.println(new BigDecimal(str));
+	    	String mat = "ME1260B3BL";
+            String groupCode  = mat.substring(0,6);
+	    	System.out.println(groupCode);
 	    
 	    }catch(Exception e){
 	        e.printStackTrace();

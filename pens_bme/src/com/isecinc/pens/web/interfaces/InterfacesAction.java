@@ -15,6 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
 
 import util.BeanParameter;
 
@@ -77,8 +78,12 @@ public class InterfacesAction extends I_Action {
 		String returnText = "prepare";
 		InterfaceDAO dao = new InterfaceDAO();
 		try {
-			 
 			logger.debug("pageName:"+Utils.isNull(request.getParameter("pageName")) +",pageAction:"+Utils.isNull(request.getParameter("pageAction")));
+			
+			//Clear Form
+			interfacesForm.setMonitorBean(new MonitorBean());
+			interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
+			interfacesForm.setMonitorItemList(null);
 			
 			if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_HISHER)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
@@ -93,39 +98,22 @@ public class InterfacesAction extends I_Action {
 				interfacesForm.setBean(bean);
 				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
 				
-				
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
-				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_HISHER);
 				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BILL_ICC)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
-				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_BILL_ICC);
 				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_BMESCAN)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
-				
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_BMESCAN);
 				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_EXPORT_BILL_ICC)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
-				
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
 				
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT_BILL_ICC);
 				
@@ -143,10 +131,6 @@ public class InterfacesAction extends I_Action {
 				interfacesForm.setBean(bean);
 				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
 				
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
-				
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ORDER_EXCEL);
 				
 			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)
@@ -162,14 +146,17 @@ public class InterfacesAction extends I_Action {
 				interfacesForm.setBean(bean);
 				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
 				
-				
-				interfacesForm.setMonitorBean(new MonitorBean());
-				interfacesForm.setMonitorItemBeanResult(new MonitorItemBean());
-				interfacesForm.setMonitorItemList(null);
-				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ITEM_MASTER_HISHER);
+				
+			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				//default value
+				
+				//clear Task running for next run
+				//dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -315,8 +302,6 @@ public class InterfacesAction extends I_Action {
 						//Search interfaceResult (monitorItem)
 						MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
 						interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
-						
-					
 					} else {
 						request.setAttribute("Message", "Data not found");
 					}
@@ -341,8 +326,33 @@ public class InterfacesAction extends I_Action {
 					//Search interfaceResult (monitorItem)
 					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
 					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
-					
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
 				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
+				type = Constants.TYPE_IMPORT_TRANSACTION_LOTUS;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					//logger.debug("")
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+					request.setAttribute("Message", results[0].getErrorMsg());
 				} else {
 					request.setAttribute("Message", "Data not found");
 				}
@@ -502,7 +512,7 @@ public class InterfacesAction extends I_Action {
 					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
 					
 					/** Gen FileName **/
-					textFileName = InterfaceUtils.getHisHerTextFileName(interfacesForm.getBean().getTransactionDate());//Gen
+					textFileName = InterfaceUtils.getHisHerTextFileName();//Gen
 				
 					/** Set Param Batch Map **/
 					Map<String, String> batchParamMap = new HashMap<String, String>();
@@ -692,6 +702,47 @@ public class InterfacesAction extends I_Action {
 					batchParamMap.put(GenerateHISHER.PARAM_TRANS_DATE, interfacesForm.getBean().getTransactionDate());
 					
 					monitorModel.setBatchParamMap(batchParamMap);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+					
+					interfacesForm.getBean().setTextFileName(textFileName);
+					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export.master.txt"));
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
+				String status = dao.findControlMonitor(Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Import transaction Lotus");
+					monitorModel.setType(Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					monitorModel.setBatchParamMap(batchParamMap);
+					/** Set FormFile **/
+					FormFile dataFile = interfacesForm.getBean().getFormDataFile();
+					monitorModel.setDataFile(dataFile);
 					
 					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
 				   

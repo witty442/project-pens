@@ -27,6 +27,7 @@ import com.isecinc.pens.inf.manager.process.GenerateHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateItemMasterHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportBillICC;
+import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.process.SequenceProcess;
 
 /**
@@ -477,6 +478,26 @@ public class ProcessManager {
 				connMonitor.close();
 				connMonitor=null;
 			}
+		}
+		return monitorModel;
+	}
+	
+	public  MonitorBean processImportTransactionLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+		MonitorTime monitorTime = null;
+		try{
+			logger.debug("import Type:"+monitorModel.getTransactionType());
+
+			monitorTime  = new MonitorTime("Import Transaction Lotus");   
+			
+			//Process Generate 
+			ImportTransactionLotusProcess.runProcess(user,monitorModel);
+			
+			monitorTime.debugUsedTime();
+	
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+		
 		}
 		return monitorModel;
 	}

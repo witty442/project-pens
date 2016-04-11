@@ -11,12 +11,10 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils" %>
-<%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
-
+<%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 <%
-
-if(request.getParameter("action") != null){
-    SAProcess.getInstance().initSession(request);
+	if(request.getParameter("action") != null){
+    SAInitial.getInstance().initSession(request);
  }
 
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
@@ -35,10 +33,15 @@ if(session.getAttribute("screenWidth") != null){
 %>
 <html>
 <head>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<meta http-equiv="cache-control" content="no-store" />
+<!-- <meta http-equiv="cache-control" content="no-cache" /> -->
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+
+
 <style type="text/css">
 <!--
 body {
@@ -51,6 +54,30 @@ select#summaryType{width:150px;}
 fieldset#condition-frame{height:186px}
 fieldset#display-frame{height:186px}
 
+fieldset {
+    font-family: sans-serif;
+    border: 1px solid #1F497D;
+  /*   background: #ddd; */
+    border-radius: 5px;
+    padding: 10px;
+}
+
+fieldset legend {
+    background: #3F5C93; /* #1F497D; */
+    color: #fff;
+    padding: 5px 10px ;
+    font-size: 14px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #ddd;
+    margin-left: 20px;
+}
+
+.txt_style {
+	font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	text-decoration: none;
+}
 
 #scroll {
 <%if(!"0".equals(screenWidth)){%>
@@ -491,7 +518,7 @@ function showSearchValuePopup(path,currCondNo){
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
 		window.open(encodeURI(url),"",
-				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+				   "menubar=no,resizable=no,titlebar=no,location=no,toolbar=no,scrollbars=yes,status=no,menubar=no,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 	}
 }
 
@@ -776,6 +803,32 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 
     return ( outText );
  }
+ 
+ function controlRoleTab(){
+	 var roleTabText =document.getElementsByName("roleTabText")[0];
+	 
+	 var span = document.getElementById('roleTabSpan');
+	 while( span.firstChild ) {
+	     span.removeChild( span.firstChild );
+	 }
+	 
+	 if("" ==roleTabText.value){
+		 //show 
+		 document.getElementById("roleTab").style.display = 'block';
+		// document.getElementById("roleTabText").innerHTML = "(Hide Role )";
+		 
+		 span.appendChild( document.createTextNode("(Hide Role Detail") );
+		 
+		 //alert(document.getElementById("roleTabText").innerHTML);
+		 roleTabText.value ="show";
+	 }else{
+		 //HIDE
+		 document.getElementById("roleTab").style.display = 'none';    
+		// document.getElementById("roleTabText").innerHTML = "(Show Role )";
+		 span.appendChild( document.createTextNode("(Show Role Detail)") );
+		 roleTabText.value ="";
+	 }
+ }
 
 </script>
 
@@ -819,14 +872,17 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 						<!-- BODY -->
 						<html:form action="/jsp/salesAnalystReportAction">
 						<html:hidden property="salesBean.returnString"/>
+						<input type="hidden" name="roleTabText" id="roleTabText"/>
 			            <jsp:include page="../error.jsp"/>	
 			             <fieldset>
+			               
 			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
 			                  <tr><td>
                                <%out.println(Utils.isNull(session.getAttribute("USER_ROLE_INFO"))); %>
                               </td></tr>
                              
                             </table>
+                            </div>
                            </fieldset>
                            
                            <fieldset>
@@ -838,7 +894,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 					                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
 					                  <tr>
 					                      <td width="15%" align="left">
-		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" >
+		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" styleClass="txt_style" >
 											         <html:options collection="profileList" property="key" labelProperty="name"/>
 									            </html:select>
 		                                  </td>
@@ -857,13 +913,13 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
                             <fieldset>
                            
                             <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
-									<tr><td colspan=8 align="left">ข้อมูล ณ วันที่ &nbsp;:&nbsp;<%=(String)session.getAttribute("maxOrderedDate")%>&nbsp;&nbsp;เวลา&nbsp;:<%=(String)session.getAttribute("maxOrderedTime")%></td>
+									<tr><td colspan=8 align="left"><b>ข้อมูล ณ วันที่ &nbsp;:&nbsp;<%=(String)session.getAttribute("maxOrderedDate")%>&nbsp;&nbsp;เวลา&nbsp;:<%=(String)session.getAttribute("maxOrderedTime")%></b></td>
 									</tr>
 									<tr>
 									  <td colspan="8" align="right">
 									    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
-										<tr>
-									  	<td width="13%" align="left">รอบเวลา &nbsp;&nbsp;<html:select property="salesBean.typeSearch" onchange="chkSearch()">
+										<tr class="txt_style" >
+									  	<td width="13%" align="left">รอบเวลา &nbsp;&nbsp;<html:select property="salesBean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
 									         <html:options collection="typeSearchList" property="key" labelProperty="name"/>
 								           </html:select>
 								           </td>
@@ -873,13 +929,13 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
                                         </td> 
 										<td width="2%" align="right">ปี</td>
 										<td width="6%" align="left">
-										  <html:select property="salesBean.year" styleId="yearList" onchange="chkYear()" >
+										  <html:select property="salesBean.year" styleId="yearList" onchange="chkYear()" styleClass="txt_style">
 									         <html:options collection="yearList" property="key" labelProperty="name"/>
 							              </html:select>
 										</td>
 									    <td width="8%" align="right">จัดกลุ่มตาม</td>
 									    <td width="20%" align="left">
-									        <html:select property="salesBean.groupBy">
+									        <html:select property="salesBean.groupBy" styleClass="txt_style">
 										         <html:options collection="groupByList" property="key" labelProperty="name"/>
 								            </html:select>
                                         </td>
@@ -897,7 +953,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									       <legend>เดือน</legend>
 										    <table width="100%" border="0">
 										    <c:forEach var="item" items="${yearList}" >
-	                                         <tr id="${item.key}">
+	                                         <tr id="${item.key}" class="txt_style" >
 	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}01</html:multibox>ม.ค.</td>
 	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}02</html:multibox>ก.พ.</td>
 	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}03</html:multibox>มี.ค.</td>
@@ -922,7 +978,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									       <legend>ไตรมาส</legend>
 										    <table width="100%" border="0">
 										     <c:forEach var="item" items="${yearList}" >
-		                                         <tr id="${item.key}_Q">
+		                                         <tr id="${item.key}_Q" class="txt_style" >
 		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}1</html:multibox>ไตรมาส 1</td>
 		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}2</html:multibox>ไตรมาส 2</td>
 		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}3</html:multibox>ไตรมาส 3</td>
@@ -938,7 +994,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									    <fieldset>
 									       <legend>ปี</legend>
 										    <table width="80%" border="0">
-	                                         <tr>
+	                                         <tr class="txt_style" >
 	                                         <%if(yearListASC != null){ 
 	                                              for(int i=0;i<yearListASC.size();i++){
 	                                            	  com.isecinc.core.bean.References ref=(com.isecinc.core.bean.References)yearListASC.get(i);
@@ -961,18 +1017,18 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	                            <fieldset id="condition-frame">
 	                            <legend>เงื่อนไขในการเลือกข้อมูล</legend>
 		                            <table width="100%"  border="0" cellpadding="1" cellspacing="1" >
-		                              <tr nowarp="nowarp" >
+		                              <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left" width="20%">ขอบเขตข้อมูล </td>
 		                                <td align="center" width="5%">=</td>
 		                                <td align="left" width="75%">ข้อมูลเงื่อนไข</td>
 		                              </tr>
-		                              <tr nowarp="nowarp">
+		                              <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName1" onchange="clearText(1);" styleId="condName1">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
 									        </html:select>
 								        </td>
-		                                <td align="center">
+		                                <td align="center" >
 		                                   =
 		                                </td>
 		                                <td align="left">
@@ -987,7 +1043,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									         <html:hidden property="salesBean.condValue1" styleId="condValue1"></html:hidden>
 								        </td>
 		                              </tr>
-		                             <tr nowarp="nowarp" >
+		                             <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName2" onchange="clearText(2);" styleId="condName2" >
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -1009,7 +1065,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									        
 								       </td>
 		                              </tr>
-		                             <tr nowarp="nowarp">
+		                             <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName3" onchange="clearText(3);" styleId="condName3">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -1031,7 +1087,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									       
 								       </td>
 		                              </tr>
-		                              <tr nowarp="nowarp">
+		                              <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName4" onchange="clearText(4);" styleId="condName4">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -1074,12 +1130,12 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									         	</html:select>
 			                              	</td>
 			                              </tr>
-			                              <tr>
+			                              <tr class="txt_style" >
 			                                <td align="left">ประเภทข้อมูล</td>
 			                                <td align="left">หน่วย</td>
 			                                <td align="left">เปรียบเทียบ</td>
 			                              </tr>
-			                              <tr>
+			                              <tr class="txt_style" >
 			                                <td align="left">
 			                                  <html:select property="salesBean.colNameDisp1">
 											        <html:options collection="dispColumnList" property="key" labelProperty="name"/>
@@ -1096,7 +1152,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									          </html:select>
 										    </td>
 			                              </tr>
-			                              <tr>
+			                              <tr class="txt_style" >
 			                                <td align="left">
 			                                  <html:select property="salesBean.colNameDisp2">
 											        <html:options collection="dispColumnList" property="key" labelProperty="name"/>
@@ -1111,7 +1167,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 			                                 
 										    </td>
 			                              </tr>
-			                            <tr>
+			                            <tr class="txt_style" >
 			                                <td align="left">
 			                                  <html:select property="salesBean.colNameDisp3">
 											        <html:options collection="dispColumnList" property="key" labelProperty="name"/>
@@ -1128,7 +1184,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									          </html:select>
 										    </td>
 			                              </tr>
-			                             <tr>
+			                             <tr class="txt_style" >
 			                                <td align="left">
 			                                  <html:select property="salesBean.colNameDisp4">
 											        <html:options collection="dispColumnList" property="key" labelProperty="name"/>
@@ -1156,15 +1212,17 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 							<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 								<tr>
 									<td align="right">
-									     <input type="button" value=" Search " class="newPosBtn" style="width: 120px;"
+									     <input type="button" value=" Search " class="newPosBtnLong" style="width: 120px;"
 										     onClick="javascript:search('${pageContext.request.contextPath}','admin')" />
-										 <input type="button" value=" Export " class="newPosBtn" style="width: 120px;" 
+										 <input type="button" value=" Export " class="newPosBtnLong" style="width: 120px;" 
 										     onClick="javascript:exportData('${pageContext.request.contextPath}','admin')" />
-										 <input type="button" value=" Clear " class="newPosBtn" style="width: 120px;" 
+										 <input type="button" value=" Clear " class="newPosBtnLong" style="width: 120px;" 
 										     onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')" />
-										 <input type="button" value=" GET SQL " class="newPosBtn" style="width: 120px;" 
-										     onClick="javascript:getSQL('${pageContext.request.contextPath}','admin')" />
 										     
+										  <a href="javascript:getSQL('${pageContext.request.contextPath}','admin')"  > ...?</a>
+										<%--  <input type="button" value=" GET SQL " class="newPosBtn" style="width: 120px;" 
+										     onClick="javascript:getSQL('${pageContext.request.contextPath}','admin')" />
+										  --%>    
 									
 									</td>
 								</tr>

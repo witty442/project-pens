@@ -53,7 +53,7 @@ public class SAGenerate {
 		String allCond = "";
 		List<StringBuffer> resultList = new ArrayList<StringBuffer>();
 		try{
-			if(SAProcess.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
+			if(SAInitial.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				/** Set Group Display  **/
 				if( !StringUtils.isEmpty(salesBean.getDay()) && !StringUtils.isEmpty(salesBean.getDayTo())){
 					Date startDate = DateToolsUtil.convertStringToDate(salesBean.getDay());
@@ -72,10 +72,10 @@ public class SAGenerate {
 					colGroupList.add(new ConfigBean(salesBean.getGroupBy(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay(),StringUtils.isEmpty(salesBean.getDay())?salesBean.getDayTo():salesBean.getDay()));
 				}
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 			   
 				
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    debug.debug("DateStr:"+salesBean.getDay());
@@ -87,13 +87,13 @@ public class SAGenerate {
 				    resultList.add(sql);
 				}
 				
-			}else if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkMonth:"+salesBean.getChkMonth().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkMonth().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkMonth()[i]+"]");
 					
-					colGroupList.add(new ConfigBean(salesBean.getChkMonth()[i],salesBean.getChkMonth()[i],Utils.isNull(SAProcess.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i]))));
+					colGroupList.add(new ConfigBean(salesBean.getChkMonth()[i],salesBean.getChkMonth()[i],Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i]))));
 					allCond +="'"+salesBean.getChkMonth()[i]+"',";
 				}
 				
@@ -103,9 +103,9 @@ public class SAGenerate {
 				
 				allCond +="'0'";
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
@@ -115,12 +115,12 @@ public class SAGenerate {
 				    resultList.add(sql);
 				}
 				
-			}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkQuarter:"+salesBean.getChkQuarter().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkQuarter().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkQuarter()[i]+"]");
-					colGroupList.add(new ConfigBean(salesBean.getChkQuarter()[i],salesBean.getChkQuarter()[i],Utils.isNull(SAProcess.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i]))));
+					colGroupList.add(new ConfigBean(salesBean.getChkQuarter()[i],salesBean.getChkQuarter()[i],Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i]))));
 					allCond +="'"+salesBean.getChkQuarter()[i]+"',";
 				}
 				
@@ -130,8 +130,8 @@ public class SAGenerate {
 				allCond +="'0'";
 				
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
@@ -141,7 +141,7 @@ public class SAGenerate {
 				    resultList.add(sql);
 				}
 				
-			}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkYear:"+salesBean.getChkYear().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkYear().length;i++){
@@ -153,8 +153,8 @@ public class SAGenerate {
 				allCond +="'0'";
 				
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
@@ -195,45 +195,45 @@ public class SAGenerate {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			
-			if(SAProcess.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
+			if(SAInitial.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				/** Set Group Display  **/
 				
 				colGroupList.add(new ConfigBean(salesBean.getGroupBy(),salesBean.getDay(),salesBean.getDay()));
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 			    
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
 				htmlCode = sql.toString();
-			}else if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkMonth:"+salesBean.getChkMonth().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkMonth().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkMonth()[i]+"]");
-					colGroupList.add(new ConfigBean(salesBean.getChkMonth()[i],salesBean.getChkMonth()[i],Utils.isNull(SAProcess.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i]))));
+					colGroupList.add(new ConfigBean(salesBean.getChkMonth()[i],salesBean.getChkMonth()[i],Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i]))));
 					allCond +="'"+salesBean.getChkMonth()[i]+"',";
 				}
 				allCond +="'0'";
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				htmlCode = sql.toString();
-			}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkQuarter:"+salesBean.getChkQuarter().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkQuarter().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkQuarter()[i]+"]");
-					colGroupList.add(new ConfigBean(salesBean.getChkQuarter()[i],salesBean.getChkQuarter()[i],Utils.isNull(SAProcess.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i]))));
+					colGroupList.add(new ConfigBean(salesBean.getChkQuarter()[i],salesBean.getChkQuarter()[i],Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i]))));
 					allCond +="'"+salesBean.getChkQuarter()[i]+"',";
 					
 				}
 				allCond +="'0'";
 				
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				htmlCode = sql.toString();
-			}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkYear:"+salesBean.getChkYear().length);
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkYear().length;i++){
@@ -245,8 +245,8 @@ public class SAGenerate {
 				allCond +="'0'";
 				
 				/** Display group by **/
-				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAProcess.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				htmlCode = sql.toString();
 			}
 		  return htmlCode;
@@ -267,7 +267,7 @@ public class SAGenerate {
 		
 		StringBuffer htmlStr = new StringBuffer("");
 		try{
-			htmlStr.append("<table border='1' width='100%' class='result' id='result'> \n");
+			htmlStr.append("<table border='1' width='100%' cellpadding='3' cellspacing='1' class='result'> \n");
 			htmlStr.append("<tr> \n");
 			htmlStr.append(" <td colspan='"+columnCount+"'><b>Sales Analysis Report</b></td>  \n");
 			htmlStr.append("</tr> \n");
@@ -275,7 +275,7 @@ public class SAGenerate {
 			htmlStr.append(" <td colspan='"+columnCount+"'> "+new String(condDisp5.getBytes("ISO8859_1"), "TIS-620")+"  </td>  \n") ;
 			htmlStr.append("</tr> \n");
 			
-			if(SAProcess.getInstance().TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
+			if(SAInitial.getInstance().TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				htmlStr.append("<tr> \n");
 				if(!StringUtils.isEmpty(salesBean.getDay()) && !StringUtils.isEmpty(salesBean.getDayTo()))
 					htmlStr.append(" <td colspan='"+columnCount+"'>รอบเวลา : วัน  : "+salesBean.getDay()+" - "+salesBean.getDayTo()+"</td>  \n");
@@ -284,17 +284,17 @@ public class SAGenerate {
 				
 				htmlStr.append("</tr> \n");
 				htmlStr.append("<tr> \n");
-				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
+				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
 				htmlStr.append("</tr> \n");
 				
-			}else if(SAProcess.getInstance().TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.getInstance().TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 				htmlStr.append("<tr> \n");
 				htmlStr.append(" <td colspan='"+columnCount+"'>รอบเวลา : เดือน  :  \n");
 					for(int i=0;i<salesBean.getChkMonth().length;i++){
 						if(i==salesBean.getChkMonth().length-1){
-					       htmlStr.append( Utils.isNull(SAProcess.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i])));
+					       htmlStr.append( Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i])));
 						}else{
-						   htmlStr.append( Utils.isNull(SAProcess.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i])) +", ");
+						   htmlStr.append( Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i])) +", ");
 						}
 					}
 				htmlStr.append("   พ.ศ. :"+Utils.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
@@ -302,17 +302,17 @@ public class SAGenerate {
 				htmlStr.append("</td> \n");
 				htmlStr.append("</tr> \n");
 				htmlStr.append("<tr> \n");
-				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
+				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
 				htmlStr.append("</tr> \n");
 				
-			}else if(SAProcess.getInstance().TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.getInstance().TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				htmlStr.append("<tr> \n");
 				htmlStr.append(" <td colspan='"+columnCount+"'>รอบเวลา : ไตรมาส  :  \n");
 					for(int i=0;i<salesBean.getChkQuarter().length;i++){
 						if(i==salesBean.getChkQuarter().length-1){
-					       htmlStr.append( Utils.isNull(SAProcess.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i])));
+					       htmlStr.append( Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i])));
 						}else{
-						   htmlStr.append( Utils.isNull(SAProcess.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i])) +", ");
+						   htmlStr.append( Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i])) +", ");
 						}
 					}
 				htmlStr.append("   พ.ศ. "+Utils.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
@@ -320,10 +320,10 @@ public class SAGenerate {
 				htmlStr.append("</td> \n");
 				htmlStr.append("</tr> \n");
 				htmlStr.append("<tr> \n");
-				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
+				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
 				htmlStr.append("</tr> \n");
 				
-			}else if(SAProcess.getInstance().TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+			}else if(SAInitial.getInstance().TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				htmlStr.append("<tr> \n");
 				htmlStr.append(" <td colspan='"+columnCount+"'>รอบเวลา : ปี  :  \n");
 					for(int i=0;i<salesBean.getChkYear().length;i++){
@@ -336,7 +336,7 @@ public class SAGenerate {
 				htmlStr.append("</td> \n");
 				htmlStr.append("</tr> \n");
 				htmlStr.append("<tr> \n");
-				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAProcess.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
+				htmlStr.append(" <td colspan='"+columnCount+"'>จัดกลุ่มตาม : "+Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy()))+"</th>  \n");
 				htmlStr.append("</tr> \n");
 				
 			}
@@ -391,14 +391,14 @@ public class SAGenerate {
 		String[] arrayfldNoDisplayCode=new String[]{"อำเภอ","จังหวัด","ตำบล","วันที่(Order)","วันที่ขาย(Invoice)","เลขที่สั่งซื้อ (Order No.)","เลขที่ขาย (Invoice No.)","ร้านค้า-ที่ส่งสินค้า","ร้านค้า-ที่ส่งบิล"};
 		
 		boolean isSummry = false;
-		if(SAProcess.SUMMARY_TYPE_SUM.equals(summaryType) 
-			|| SAProcess.SUMMARY_TYPE_AVG.equals(summaryType)
-			|| SAProcess.SUMMARY_TYPE_PERCENT.equals(summaryType)){
+		if(SAInitial.SUMMARY_TYPE_SUM.equals(summaryType) 
+			|| SAInitial.SUMMARY_TYPE_AVG.equals(summaryType)
+			|| SAInitial.SUMMARY_TYPE_PERCENT.equals(summaryType)){
 			isSummry = true;
 		}
 		
 		boolean isPercent = false;
-		if(SAProcess.SUMMARY_TYPE_PERCENT.equals(summaryType)){
+		if(SAInitial.SUMMARY_TYPE_PERCENT.equals(summaryType)){
 			isPercent = true;
 		}
 		
@@ -413,7 +413,8 @@ public class SAGenerate {
 			
 			Boolean isNoDisplayed = ArrayUtils.contains(arrayfldNoDisplayCode,groupBy); 
 			
-			htmlStr.append("<table border='1' width='100%' class='result2' id='sort-table'> <thead> \n");
+			//style='border:1px solid black; '
+			htmlStr.append("<table  width='100%' class='result2' id='sort-table' cellpadding='4' cellspacing='2'> <thead> \n");
 			
 			/***** Header Table ******************************/
 			htmlStr.append("<tr> \n");
@@ -435,9 +436,9 @@ public class SAGenerate {
 			
 			if(isSummry){
 				String label = "ผลรวม";
-				if(SAProcess.SUMMARY_TYPE_AVG.equals(summaryType)){
+				if(SAInitial.SUMMARY_TYPE_AVG.equals(summaryType)){
 					label = "ค่าเฉลี่ย";
-				}else if(SAProcess.SUMMARY_TYPE_PERCENT.equals(summaryType)){
+				}else if(SAInitial.SUMMARY_TYPE_PERCENT.equals(summaryType)){
 					ConfigBean colGroup1 = (ConfigBean)colGroupList.get(colGroupList.size()-2);
 					ConfigBean colGroup2 = (ConfigBean)colGroupList.get(colGroupList.size()-1);
 					
@@ -514,7 +515,7 @@ public class SAGenerate {
 
 				}else{
 					if(!isNoDisplayed)
-					rowHtml.append(" <td>"+rs.getString(groupByBean.getName()+"_CODE")+"</td> \n");
+					rowHtml.append(" <td align='left'>"+rs.getString(groupByBean.getName()+"_CODE")+"</td> \n");
 					rowHtml.append(" <td align='left'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
 				}
 				
@@ -537,10 +538,10 @@ public class SAGenerate {
 						debug.debug("resultKey:"+resultKey);
 						
 						/** Case Column CALL Summary CALL_NO DUP  and Type Summary **/
-						if(resultKey.startsWith("CALL") && !resultKey.startsWith("CALL_NEW") && isSummry && SAProcess.SUMMARY_TYPE_SUM.equals(summaryType)){
+						if(resultKey.startsWith("CALL") && !resultKey.startsWith("CALL_NEW") && isSummry && SAInitial.SUMMARY_TYPE_SUM.equals(summaryType)){
 							debug.debug("CALL:"+resultKey);
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
-							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAProcess.NO_DUP_PREFIX+resultKey));//ND_ Value
+							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_ Value
 							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}else{
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal Value
@@ -650,7 +651,7 @@ public class SAGenerate {
 						
 						//
 						
-						if(SAProcess.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
+						if(SAInitial.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
 							valueRowSum = valueRowSum.divide(BigDecimal.valueOf(colGroupList.size()), 2, BigDecimal.ROUND_HALF_UP);
 						}
 						//debug
@@ -878,7 +879,7 @@ public class SAGenerate {
 						
 					}
 					
-					if(SAProcess.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
+					if(SAInitial.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
 						valueRowSum = valueRowSum.divide(BigDecimal.valueOf(colGroupList.size()), 2, BigDecimal.ROUND_HALF_UP);
 					}
 					
@@ -920,9 +921,9 @@ public class SAGenerate {
 			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1())) ||
 			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1())) ){
 				
-			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+""));
+			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+""));
 			}else{
-			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit1()))+")"));
+			   colDispList.add(new ConfigBean(salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1",Utils.isNull(salesBean.getColNameDisp1()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp1()))+"("+Utils.isNull(SAInitial.getInstance().UNIT_MAP.get(salesBean.getColNameUnit1()))+")"));
 			}
 		}
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp2()))){
@@ -930,9 +931,9 @@ public class SAGenerate {
 			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2())) ||
 			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2()))){
 				
-				colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+""));
+				colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+""));
 			}else{
-			    colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit2()))+")"));
+			    colDispList.add(new ConfigBean(salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2",Utils.isNull(salesBean.getColNameDisp2()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp2()))+"("+Utils.isNull(SAInitial.getInstance().UNIT_MAP.get(salesBean.getColNameUnit2()))+")"));
 			}
 			if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
 				colDispList.add(new ConfigBean("PER1","%","%"));
@@ -943,18 +944,18 @@ public class SAGenerate {
 			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3())) || 
 			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3()))	){
 	
-			    colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+""));
+			    colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+""));
 			}else{
-				colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit3()))+")"));
+				colDispList.add(new ConfigBean(salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3",Utils.isNull(salesBean.getColNameDisp3()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp3()))+"("+Utils.isNull(SAInitial.getInstance().UNIT_MAP.get(salesBean.getColNameUnit3()))+")"));
 			}
 		}
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp4()))){
 			//Case Column Display =CALL  set unit = "" 
 			if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4())) || 
 			   "CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4()))	){
-			    colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+""));
+			    colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+""));
 			}else{
-				colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAProcess.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+"("+Utils.isNull(SAProcess.getInstance().UNIT_MAP.get(salesBean.getColNameUnit4()))+")"));
+				colDispList.add(new ConfigBean(salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4",Utils.isNull(salesBean.getColNameDisp4()),Utils.isNull(SAInitial.getInstance().DISP_COL_MAP.get(salesBean.getColNameDisp4()))+"("+Utils.isNull(SAInitial.getInstance().UNIT_MAP.get(salesBean.getColNameUnit4()))+")"));
 			}
 			if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
 				colDispList.add(new ConfigBean("PER2","%","%"));

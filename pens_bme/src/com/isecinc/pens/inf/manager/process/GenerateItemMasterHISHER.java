@@ -65,11 +65,13 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			
 			//Get Config Map ALL
 			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK");
-
-			sql.append("\n SELECT A.barcode, A.group_code,A.pens_item, A.product_code ");
-			sql.append("\n , NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
+			sql.append("\n SELECT A.barcode, A.group_code, A.product_code ");
+			sql.append("\n ,(select max(pens_value) from PENSBME_MST_REFERENCE  M ");
+			sql.append("\n  WHERE M.reference_code = 'LotusItem' ");
+			sql.append("\n  AND M.interface_desc = A.barcode ) as pens_item ");
+			sql.append("\n ,NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
 			sql.append("\n FROM( ");
-			sql.append("\n 		SELECT m.interface_desc as barcode, O.group_code,M.pens_value as pens_item, M.interface_value as product_code, 0 as qty ");
+			sql.append("\n 		SELECT m.interface_desc as barcode, O.group_code, M.interface_value as product_code, 0 as qty ");
 			sql.append("\n 		,NVL(O.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(O.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n 		FROM PENSBME_PRICELIST O  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_MST_REFERENCE M	 ");
@@ -77,11 +79,11 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			sql.append("\n   		AND M.reference_code = 'LotusItem'    ");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and  ( O.interface_icc = 'N' or O.interface_icc is null)	 ");
-			sql.append("\n 		group by M.interface_desc, O.group_code,M.pens_value , M.interface_value,O.WHOLE_PRICE_BF,O.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by M.interface_desc, O.group_code,M.interface_value,O.WHOLE_PRICE_BF,O.RETAIL_PRICE_BF ");
 			sql.append("\n  )A ");
 			sql.append("\n  WHERE A.barcode not in(select barcode from PENSBME_BARCODE_IN_ICC) ");
-			sql.append("\n group by A.barcode, A.group_code,A.pens_item, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
-			sql.append("\n order by A.group_code ,A.product_code ");
+			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
+			sql.append("\n order by A.group_code ,A.product_code ,A.barcode ");
 			
 			logger.debug("sql:"+sql.toString());
 			
@@ -124,7 +126,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 						insertMonitorItemResult(conn,monitorItemBean.getId(),"SUCCESS","PENS_ITEM["+pensItem+"] ,GROUP CODE["+groupCode+"] ,BARCODE["+barcode+"] ,InterfaceValue["+productCode+"] ,QTY["+qty+"] ");
 						 
 						// insert barcode
-						insertBARCODE_IN_ICC(conn,barcode,user.getUserName());
+						insertBARCODE_IN_ICC(conn,barcode,productCode,user.getUserName());
 					}
 					
 				}
@@ -234,14 +236,15 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 		}
 	}
 	
-	private static void insertBARCODE_IN_ICC(Connection conn,String barcode,String userName) throws Exception {
+	private static void insertBARCODE_IN_ICC(Connection conn,String barcode,String productCode,String userName) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO PENSBME_BARCODE_IN_ICC(BARCODE, CREATE_USER, CREATE_DATE)VALUES(?,?,?) ";
+			String sql = "INSERT INTO PENSBME_BARCODE_IN_ICC(BARCODE,MATERIAL_MASTER,CREATE_USER, CREATE_DATE)VALUES(?,?,?,?) ";
 			//logger.info("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			ps.setString(++index, barcode);
+			ps.setString(++index, productCode);
 			ps.setString(++index,userName);
 			ps.setDate(++index,Utils.getSqlCurrentDate());
 			

@@ -1,3 +1,4 @@
+
 function reGen(path, type) {
 	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=reGen&rf=N&action=submited";
 	document.interfacesForm.submit();

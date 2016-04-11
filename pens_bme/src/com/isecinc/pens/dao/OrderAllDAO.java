@@ -49,6 +49,8 @@ public class OrderAllDAO {
 		try {
 			if("OSHOPPING".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_OSHOPPING";
+			}else 	if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
+				tableName = "PENSBME_ONHAND_BME_7CATALOG";
 			}
 			sql.append("\n SELECT count(*) as total_row  from "+tableName+" ");
 			sql.append("\n where 1=1 AND onhand_qty <> 0 and status <> 'ERROR' ");
@@ -180,6 +182,11 @@ public class OrderAllDAO {
 				tableName = "PENSBME_ONHAND_BME_OSHOPPING";
 				storeType = Constants.STORE_TYPE_OSHOPPING_CODE;
 				storeTypeItemCode = Constants.STORE_TYPE_OSHOPPING_ITEM;
+				
+			}else if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
+				tableName = "PENSBME_ONHAND_BME_7CATALOG";
+				storeType = Constants.STORE_TYPE_7CATALOG_CODE;
+				storeTypeItemCode = Constants.STORE_TYPE_7CATALOG_ITEM;
 			}
 			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
@@ -1105,6 +1112,10 @@ public class OrderAllDAO {
 				tableName = "PENSBME_ONHAND_BME_OSHOPPING";
 				storeCodeType = Constants.STORE_TYPE_OSHOPPING_CODE;
 				storeTypeItemCode = Constants.STORE_TYPE_OSHOPPING_ITEM;
+			}else if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
+				tableName = "PENSBME_ONHAND_BME_7CATALOG";
+				storeCodeType = Constants.STORE_TYPE_7CATALOG_CODE;
+				storeTypeItemCode = Constants.STORE_TYPE_7CATALOG_ITEM;
 			}
 			
 			// Create Sheet.

@@ -175,6 +175,16 @@ function importExcel(path,noCheckError){
 				return false;
 			}
 		}
+		<%}else if("onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))) {%>
+		if(form.dataFile.value == '' || extension != "txt"){
+			alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			return true;
+		}else{
+			if( startFileName !='sevencat'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย  SEVENCAT เท่านั้น");
+				return false;
+			}
+		}
 	<%}else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 		var boxNo = form.boxNo;
 	 
@@ -359,6 +369,18 @@ function getCustName(custCode,fieldName){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEOShopping"/>
 				</jsp:include>
+			<%}else if("onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBME7Catalog"/>
+				</jsp:include>
+			<%}else if("LoadStockInitLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="LoadStockInitLotus"/>
+				</jsp:include>
+			<%}else if("LoadStockInitBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="LoadStockInitBigC"/>
+				</jsp:include>
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
@@ -439,7 +461,6 @@ function getCustName(custCode,fieldName){
 
 									</td>
 								</tr>
-		
 						<%} %>
 						
 						<%  if("ftp_file_scan_barcode".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -468,7 +489,9 @@ function getCustName(custCode,fieldName){
 									<input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm('${pageContext.request.contextPath}')">
 								    <% if("onhand".equalsIgnoreCase(request.getParameter("page")) 
 								    		|| "onhandFriday".equalsIgnoreCase(request.getParameter("page"))
-								    		|| "onhandOShopping".equalsIgnoreCase(request.getParameter("page"))) {%>
+								    		|| "onhandOShopping".equalsIgnoreCase(request.getParameter("page"))
+								    		|| "onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))
+								    		) {%>
 								       <input type="button" value="ยืนยัน Upload รวมข้อมูลที่ ERROR" class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','NO_CHECK_ERROR')">
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 								        <input type="button" value="Export to Excel" class="newPosBtnLong" onclick="javascript:exportReturnWacoal('${pageContext.request.contextPath}')">
@@ -1021,6 +1044,8 @@ function getCustName(custCode,fieldName){
 						</c:if>
 						
 						<!-- ************************* Return Wacoal From ******************************************* -->
+						<!-- Page Display Result -->
+						<jsp:include page="importStockInitLotusSub.jsp" /> 
 						
 						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr>

@@ -29,8 +29,8 @@ public class StockQuerySQL extends PickConstants{
 		
 		StringBuffer sql = new StringBuffer();
 		sql.append("\n select S.*, ");
-		sql.append("\n (select max(p.remark) from pensbme_pick_stock p,pensbme_pick_stock_i pi " +
-				   "\n       where p.issue_req_no = pi.issue_req_no and pi.job_id = S.job_id and pi.box_no = S.box_no )as remark ");
+		sql.append("\n (select max(p.issue_req_no)|| ' '|| max(p.remark) from pensbme_pick_stock p,pensbme_pick_stock_i pi " +
+				   "\n       where p.issue_req_no = pi.issue_req_no and pi.job_id = S.job_id and pi.box_no = S.box_no and pi.group_code  = S.group_code)as remark ");
 		sql.append("\n from( ");
 		sql.append(genFromStockPick(o,statusAll));
 		sql.append("\n )S ");

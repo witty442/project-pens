@@ -31,7 +31,7 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/mtt.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -598,6 +598,12 @@ function getProductModelByMat(matObj,lineId){
 									  <html:hidden property="bean.storeNo" styleId="storeNo"/>
 									</td>
 								</tr>
+								<tr>
+                                    <td> หมายเหตุ<font color="red"></font></td>
+									<td>		
+										  <html:text property="bean.remark" styleId="remark" size="40"/>
+									</td>
+								</tr>
 						   </table>
 						   
 				 <!-- Table Data -->
@@ -631,35 +637,35 @@ function getProductModelByMat(matObj,lineId){
 								
 									<tr class="<c:out value='${tabclass}'/>">
 										
-										<td class="data_chk" nowrap>
+										<td class="td_text_center" nowrap width="10%">
 										  <input type="checkbox" name="linechk" value="${results.lineId}"/>
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
 										</td>
-										<td class="data_barcode">
+										<td class="td_text_center" width="10%">
 										    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="30" 
 											    onkeypress="getProductKeypress(event,this,${results.lineId})"
 											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
 											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
 											    />
                                         </td>
-										<td class="data_materialMaster">
+										<td class="td_text_center" width="10%">
 											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" name="materialMaster" value ="${results.materialMaster}" size="25"/>
 										</td>
-										<td class="data_groupCode">
+										<td class="td_text_center" width="10%">
 										   <input type="text" name="groupCode" value ="${results.groupCode}" size="30" readonly class="disableText"/>
 										</td>
-										<td class="data_pensItem">
+										<td class="td_text_center" width="10%">
 										   <input type="text" name="pensItem" value ="${results.pensItem}" size="20" readonly class="disableText"/>
 										</td>
 										<%-- <td class="data_wholePriceBF">
 										   <input type="text" name="wholePriceBF" value ="${results.wholePriceBF}" size="20" readonly class="disableNumber"/>
 										</td> --%>
-										<td class="data_retailPriceBF">
+										<td class="td_text_center" width="10%">
 										  
 										   <input type="text" name="retailPriceBF" value ="${results.retailPriceBF}" size="20" readonly class="disableNumber"/>
 										   <input type="hidden" name="wholePriceBF" value ="${results.wholePriceBF}" size="20" readonly class="disableNumber"/>
 										</td>
-										<td class="data_status">
+										<td class="td_text_center" width="10%">
 										<input type="text" name="statusDesc" id="statusDesc" value ="${results.statusDesc}" size="20" readonly class="disableText"/>
 										<input type="hidden" name="status" id="status" value ="${results.status}" size="20" readonly class="disableText"/>
 										</td>

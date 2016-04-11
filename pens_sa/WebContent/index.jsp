@@ -12,6 +12,7 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css">
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <style type="text/css">
 <!--
 body {

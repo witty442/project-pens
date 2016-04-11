@@ -21,7 +21,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
-<%@page import="com.isecinc.pens.report.salesanalyst.SAProcess"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 <jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="request" />
 <%
  String condNo = request.getParameter("condNo");

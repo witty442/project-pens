@@ -2,6 +2,8 @@ package com.isecinc.pens.inf.bean;
 
 import java.io.Serializable;
 
+import org.apache.struts.upload.FormFile;
+
 public class InterfaceBean implements Serializable{
 
 	/**
@@ -14,7 +16,15 @@ public class InterfaceBean implements Serializable{
 	private String textFileName;
 	private String outputPath;
 	private String transactionDate;
+    private FormFile formDataFile;
 	
+	public FormFile getFormDataFile() {
+		return formDataFile;
+	}
+
+	public void setFormDataFile(FormFile formDataFile) {
+		this.formDataFile = formDataFile;
+	}
 	
 	public String getCustGroup() {
 		return custGroup;

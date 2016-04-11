@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,14 +14,13 @@ import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
-import com.isecinc.core.Database;
 import com.isecinc.core.model.I_Model;
-import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
 import com.isecinc.pens.process.order.OrderProcess;
@@ -131,6 +129,35 @@ public class MOrder extends I_Model<Order> {
 		return true;
 	}
 
+	public int saveOrderRemark(Connection conn,Order o,int userId) throws Exception{
+		PreparedStatement ps = null;
+		logger.debug("saveOrderRemark");
+		int  c = 1;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE t_order SET  \n");
+			sql.append(" REMARK = ? ,UPDATED_BY =? ,UPDATED = ?   \n");
+			sql.append(" WHERE ORDER_ID =?  \n" );
+			logger.debug("sql:"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+				
+			ps.setString(c++, Utils.isNull(o.getRemark()));
+			ps.setInt(c++, userId);
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setInt(c++, o.getId());
+			
+			c = ps.executeUpdate();
+			return c;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
 	/**
 	 * Save Import Order
 	 * 

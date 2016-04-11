@@ -144,7 +144,7 @@ public class GenerateHISHER extends InterfaceUtils{
 					   
 					}else{
 						 //Gen Line
-						outputLine.append(genLine(configMap,date,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF));
+						outputLine.append(genLine(configMap,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF));
 					     
 						successCount++;
 						//insert result msg
@@ -294,7 +294,7 @@ public class GenerateHISHER extends InterfaceUtils{
 		return "";//"[No["+no+"]["+s.length()+"] \n";
 	}
 	
-	private static String genLine(Map<String, String> configMap,Date date,String groupCode
+	private static String genLine(Map<String, String> configMap,String groupCode
 			,String barcode,String pensItem,String productCode,
 			int qty,double wholePriceBF,double retailPriceBF) throws Exception{
 		
@@ -309,6 +309,7 @@ public class GenerateHISHER extends InterfaceUtils{
 		String newPrice1  = "";
 		String newPrice2 ="";
 		int no =1;
+		Date date = new Date();
 		try{
 			
 			/**1 */line += appendRightByLength(Utils.isNull(configMap.get("FACT_ID"))," ",5);//FACT_ID	√À— ‚√ßß“π	CHAR(5)

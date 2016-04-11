@@ -33,14 +33,14 @@ public class ProfileProcess {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
-			if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())){
+			if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())){
 				logger.debug("chkMonth:"+b.getChkMonth().length);
 				/** Set Group Display  **/
 				for(int i=0;i<b.getChkMonth().length;i++){
 					logger.debug("name:["+i+"]value:["+b.getChkMonth()[i]+"]");
 					allCond +=""+b.getChkMonth()[i]+",";
 				}
-			}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())){
 				logger.debug("chkQuarter:"+b.getChkQuarter().length);
 				/** Set Group Display  **/
 				for(int i=0;i<b.getChkQuarter().length;i++){
@@ -48,7 +48,7 @@ public class ProfileProcess {
 					allCond +=""+b.getChkQuarter()[i]+",";
 				}
 				
-			}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())){
+			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())){
 				logger.debug("chkYear:"+b.getChkYear().length);
 				/** Set Group Display  **/
 				for(int i=0;i<b.getChkYear().length;i++){
@@ -188,9 +188,9 @@ public class ProfileProcess {
 			psIns.setString(++index, Utils.isNull(b.getDay()));//4 DATE_FROM
 			psIns.setString(++index, Utils.isNull(b.getDayTo()));//5 DATE_TO
 			
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//6 MONTH
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//7 QUARTER
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//8 YEAR
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//6 MONTH
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//7 QUARTER
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//8 YEAR
 			psIns.setString(++index, Utils.isNull(b.getCondName1()));//9 COND_NAME1
 			
 			psIns.setString(++index, Utils.isNull(b.getCondName2()));//10 COND_NAME2
@@ -267,9 +267,9 @@ public class ProfileProcess {
 			psIns.setString(++index, Utils.isNull(b.getDay()));//4 DATE_FROM
 			psIns.setString(++index, Utils.isNull(b.getDayTo()));//5 DATE_TO
 			
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//6 MONTH
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//7 QUARTER
-			psIns.setString(++index, SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//8 YEAR
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//6 MONTH
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//7 QUARTER
+			psIns.setString(++index, SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(b.getTypeSearch())?allCond:"");//8 YEAR
 			
 			psIns.setString(++index, Utils.isNull(b.getCondName1()));//9 COND_NAME1
 			psIns.setString(++index, Utils.isNull(b.getCondName2()));//10 COND_NAME2

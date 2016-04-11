@@ -26,6 +26,7 @@ public class Job implements Serializable{
 	private String storeNo;
 	private String wareHouse;
 	private String wareHouseDesc;
+	private String refDoc;
 	
 	private List<Job> items;
     
@@ -34,6 +35,12 @@ public class Job implements Serializable{
 	private boolean canCancel = false;
 	
 	
+	public String getRefDoc() {
+		return refDoc;
+	}
+	public void setRefDoc(String refDoc) {
+		this.refDoc = refDoc;
+	}
 	public String getWareHouseDesc() {
 		return wareHouseDesc;
 	}

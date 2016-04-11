@@ -50,7 +50,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
 			User user = null;
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnection_();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
             
 			if (user == null) {

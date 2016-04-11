@@ -31,11 +31,13 @@ public class ExceptionHandle {
     	ERROR_MAPPING.put("OracleInvoiceNoEmtpyException","\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16 Export file \u0E19\u0E35\u0E49\u0E44\u0E14\u0E49\u0E40\u0E19\u0E37\u0E48\u0E2D\u0E07\u0E08\u0E32\u0E01 \u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35\u0E01\u0E32\u0E23\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01 oracle invoice no");
     	ERROR_MAPPING.put("OrderFailInterfacetwstockException","Order \u0E15\u0E32\u0E21\u0E27\u0E31\u0E19\u0E17\u0E35\u0E48\u0E23\u0E30\u0E1A\u0E38 \u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E17\u0E33\u0E01\u0E32\u0E23 Interface Onhand to ICC -twstock");
     	ERROR_MAPPING.put("OrderDuplicationGenExcelException","\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E15\u0E32\u0E21\u0E27\u0E31\u0E19\u0E17\u0E35\u0E48 Order \u0E17\u0E35\u0E48\u0E23\u0E30\u0E1A\u0E38 \u0E44\u0E14\u0E49\u0E40\u0E04\u0E22 Generate excel file \u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27");
+    	ERROR_MAPPING.put("ImportErrorException","Upload \u0E44\u0E1F\u0E25\u0E4C  $ \u0E44\u0E21\u0E48\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08 \u0E01\u0E23\u0E38\u0E13\u0E32\u0E41\u0E01\u0E49\u0E44\u0E02\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E41\u0E25\u0E49\u0E27\u0E17\u0E33\u0E01\u0E32\u0E23 Import \u0E43\u0E2B\u0E21\u0E48");
+     	ERROR_MAPPING.put("SuccessException","\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23\u0E40\u0E23\u0E35\u0E22\u0E1A\u0E23\u0E49\u0E2D\u0E22\u0E41\u0E25\u0E49\u0E27");
     }
 	public static void main (String[] f){
 
-		System.out.println(Utils.toUnicodeChar("Order ตามวันที่ระบุ ยังไม่ได้ทำการ Interface Onhand to ICC -twstock"));
-		System.out.println(Utils.toUnicodeChar("ข้อมูลตามวันที่ Order ที่ระบุ ได้เคย Generate excel file ไปแล้ว"));
+		System.out.println(Utils.toUnicodeChar("บันทึกรายการเรียบร้อยแล้ว"));
+		//System.out.println(Utils.toUnicodeChar("ข้อมูลตามวันที่ Order ที่ระบุ ได้เคย Generate excel file ไปแล้ว"));
 	}
 	public static String getExceptionCode(Exception e){
 		String exceptionCode = "";

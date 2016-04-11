@@ -1,6 +1,7 @@
 package com.isecinc.pens.model;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,12 +15,16 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
+import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.Summary;
+import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.process.modifier.ModifierControl;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.invoicedetail.InvoiceDetailReport;
 import com.isecinc.pens.web.summary.SummaryForm;
@@ -27,14 +32,46 @@ import com.isecinc.pens.web.summary.SummaryForm;
 public class MSummary {
 
 	private Logger logger = Logger.getLogger("PENS");
+	public static String codeControl = "1";
+	
+	public static String getMethodCalcTargetControl(Connection conn){
+		String method = "2";//default new code
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try{
+			ps =conn.prepareStatement("select value from c_reference where ISACTIVE ='Y' and REFERENCE_ID=2403");
+			rs = ps.executeQuery();
+			if(rs.next()){
+				method = Utils.isNull(rs.getString("value")).equals("")?"2":Utils.isNull(rs.getString("value"));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps=null;
+				}
+				if(rs != null){
+				   rs.close();rs=null;
+				}
+			}catch(Exception ee){
+				ee.printStackTrace();
+			}
+		}
+		return method;
+	}
 	
 	  public List<Summary> search(Summary c,User user) throws Exception{
 	    	List<Summary> summaryList = new ArrayList<Summary>();
 	    	List<OrderLine> orderLines = new ArrayList<OrderLine>();
 	    	Connection conn = null;
+	    	
 	    	try{
 	    		conn = new DBCPConnectionProvider().getConnection(conn);
+	    		codeControl = getMethodCalcTargetControl(conn);
+	    		
 	    		if("DETAIL".equals(c.getType())){
+	    			
 	    		   summaryList = searchOrderLineDetail(c,conn,user);
 	    		}else{
 	    		   summaryList = searchOrderLineTotal(c,conn,user);
@@ -230,19 +267,28 @@ public class MSummary {
 				String uom2 = "";
 				String qty1 = "";
 				String qty2 = "";
+				int qty1Int = 0;
+				int qty2Int = 0;
 				Product product = new MProduct().find(productId);
 				
 				while(rst.next()){
 					if(product.getUom().getId().equals(rst.getString("UOM_ID"))){
 						uom1 = rst.getString("UOM_ID")+" ";
-						qty1 = NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit)+" ";
+						
+						qty1Int = rst.getInt("qty");
 					}else{
 						uom2 = " "+rst.getString("UOM_ID");
-						qty2 = " "+NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit);
+						
+						qty2Int = rst.getInt("qty");
 					}
 				}
-				
 				if(!"".equals(uom1) || !"".equals(uom2)){
+					//Calc CTN QTY and 
+					double[] newQty = calcCTNQty(productId,qty1Int,qty2Int,Utils.isNull(uom2));
+					
+					qty1 = NumberToolsUtil.decimalFormat(newQty[0],NumberToolsUtil.format_current_no_disgit)+" ";
+					qty2 = " "+NumberToolsUtil.decimalFormat(newQty[1],NumberToolsUtil.format_current_no_disgit);
+					
 	                r[0] = uom1 +"/"+uom2;
 	                r[1] = qty1 +"/"+qty2;
 				}
@@ -258,6 +304,7 @@ public class MSummary {
 			return r;
 		}
 	  
+	
 	  public String[] findProductPromotionDetail(Connection conn,Summary c,String orderDate,String productId,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -297,25 +344,31 @@ public class MSummary {
 				String uom2 = "";
 				String qty1 = "";
 				String qty2 = "";
+				int qty1Int = 0;
+				int qty2Int = 0;
 				
 				Product product = new MProduct().find(productId);
 				while(rst.next()){
 					if(product.getUom().getId().equals(rst.getString("UOM_ID"))){
 						uom1 = rst.getString("UOM_ID")+" ";
-						qty1 = NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit)+" ";
+						//qty1 = NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit)+" ";
+						qty1Int = rst.getInt("qty");
 					}else{
-						
 						uom2 = " "+rst.getString("UOM_ID");
-						qty2 = " "+NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit);
+						//qty2 = " "+NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit);
+						qty2Int = rst.getInt("qty");
 					}
 				}
 	
 				logger.debug(uom1+":"+uom2);
-				if("".equals(uom1)){
-					
-				}
 				
 				if(!"".equals(uom1) || !"".equals(uom2)){
+					//Calc CTN QTY and 
+					double[] newQty = calcCTNQty(productId,qty1Int,qty2Int,Utils.isNull(uom2));
+					
+					qty1 = NumberToolsUtil.decimalFormat(newQty[0],NumberToolsUtil.format_current_no_disgit)+" ";
+					qty2 = " "+NumberToolsUtil.decimalFormat(newQty[1],NumberToolsUtil.format_current_no_disgit);
+					
 	                r[0] = uom1 +"/"+uom2;
 	                r[1] = qty1 +"/"+qty2;
 				}
@@ -330,4 +383,45 @@ public class MSummary {
 			}
 			return r;
 		}
+	  
+	  private double[] calcCTNQty(String productId,int qty1,int qty2,String uom2Id) throws Exception{
+		    logger.debug("CalcCTN QTY productId["+productId+"]");
+		    String ctnUomId = "CTN";
+			double[] priQty = new double[2];
+			UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(Integer.parseInt(productId),ctnUomId);
+		    UOMConversion  uc2 = null;
+		    
+            if("1".equalsIgnoreCase(codeControl)){//default code
+            	  priQty[0] = qty1;
+            	  priQty[1] = qty2;
+            	  return priQty;
+		    }
+
+		    if( !Utils.isNull(uom2Id).equals("")){
+		        uc2 = new MUOMConversion().getCurrentConversion(Integer.parseInt(productId),uom2Id);
+		        logger.debug("qty2["+qty2+"]( rate1["+uc1.getConversionRate()+"]/rate2["+uc2.getConversionRate()+"])");
+		        
+		        if(uc2.getConversionRate() > 0){
+		        	double qty2Temp = qty2 / (uc1.getConversionRate()/uc2.getConversionRate()) ;
+		        	logger.debug("result divide["+qty2Temp+"]");
+		        
+					double pcsQty = new Double(qty2Temp).intValue();
+		        	priQty[0] = qty1  +pcsQty;
+		        	
+		        	//‡»…
+		        	double qty2Temp2 = qty2 % (uc1.getConversionRate()/uc2.getConversionRate()) ;
+		        	logger.debug("result mod["+qty2Temp2+"]");
+					priQty[1] = qty2Temp2;
+					
+		        }else{
+		        	priQty[0] = qty1;
+		        }
+		    }else{
+		    	//No Qty2 ,UOM2
+			    priQty[0] = qty1;
+		    }
+		   // logger.debug("result calc qty["+priQty+"]");
+		    return priQty;
+		}
+	
 }

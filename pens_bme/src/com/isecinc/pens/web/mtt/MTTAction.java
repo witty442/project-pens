@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.BundleUtil;
+import util.ExcelHeader;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
@@ -170,42 +171,40 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("report");
 	}
 	
-	
 	private StringBuffer genExportReport(HttpServletRequest request,MTTForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
+		String colSpan = "15";
 		try{
-			h.append("<style> \n");
-			h.append(" .num { \n");
-			h.append("  mso-number-format:General; \n");
-			h.append(" } \n");
-			h.append(" .text{ \n");
-			h.append("   mso-number-format:'"+a+"'; \n");
-			h.append(" } \n");
-			h.append("</style> \n");
+			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11'>รายงานข้อมูลขาย Sale-Out</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลขาย Sale-Out</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11' >จากวันที่ขาย:"+form.getBean().getSaleDateFrom()+"  ถึงวันที่ขาย:"+form.getBean().getSaleDateTo()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getBean().getSaleDateFrom()+"  ถึงวันที่ขาย:"+form.getBean().getSaleDateTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='11' >Group Code:"+form.getBean().getGroupCode()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >Group Code:"+form.getBean().getGroupCode()+"</td> \n");
 			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ Scan:"+form.getBean().getCreateDateFrom()+"  ถึงวันที่ Scan:"+form.getBean().getCreateDateTo()+"</td> \n");
+			h.append("</tr> \n");
+			
 			
 			h.append("</table> \n");
 
@@ -216,15 +215,19 @@ public class MTTAction extends I_Action {
 				h.append("<tr> \n");
 				  h.append("<td>No.</td> \n");
 				  h.append("<td>SaleDate</td> \n");
+				  h.append("<td>วันที่ Scan</td> \n");
 				  h.append("<td>DocNo</td> \n");
-				  h.append("<td>กลุ่มร้านค้า</td> \n");
+				  h.append("<td>กลุ่ม</td> \n");
+				  h.append("<td>รหัสกลุ่ม</td> \n");
 				  h.append("<td>รหัสร้านค้า</td> \n");
+				  h.append("<td>ชื่อร้านค้า</td> \n");
 				  h.append("<td>Barcode</td> \n");
 				  h.append("<td>GroupCode</td> \n");
 				  h.append("<td>Material Master </td> \n");
 				  h.append("<td>Pens Item </td> \n");
 				  h.append("<td>จำนวนชิ้นที่ขาย</td> \n");
 				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
+				  h.append("<td>Remark</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -232,15 +235,19 @@ public class MTTAction extends I_Action {
 					h.append("<tr> \n");
 					  h.append("<td>"+s.getNo()+"</td> \n");
 					  h.append("<td>"+s.getSaleDate()+"</td> \n");
+					  h.append("<td>"+s.getCreateDate()+"</td> \n");
 					  h.append("<td>"+s.getDocNo()+"</td> \n");
-					  h.append("<td>"+s.getCustGroup()+"&nbsp;"+s.getCustGroupName()+"</td> \n");
-					  h.append("<td>"+s.getStoreCode()+"&nbsp;"+s.getStoreName()+"</td> \n");
-					  h.append("<td class='num'>"+s.getBarcode()+"</td> \n");
+					  h.append("<td>"+s.getCustGroup()+"</td> \n");
+					  h.append("<td>"+s.getCustGroupName()+"</td> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
 					  h.append("<td>"+s.getGroupCode()+"</td> \n");
 					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
 					  h.append("<td class='num'>"+s.getQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getRetailPriceBF()+"</td> \n");
+					  h.append("<td>"+s.getRemark()+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");
@@ -371,8 +378,6 @@ public class MTTAction extends I_Action {
 		MTTForm aForm = (MTTForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-            //save for search back criteria
-			aForm.setBeanCriteria(aForm.getBean());
 			
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -446,8 +451,15 @@ public class MTTAction extends I_Action {
 			
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 			
-			//Set Criteria for search
-			//aForm.getBeanCriteria().setJobId(h.getJobId());
+			//save old criteria
+			MTTBean cri = new MTTBean();
+			cri.setSaleDateFrom(h.getSaleDate());
+			cri.setSaleDateTo(h.getSaleDate());
+			cri.setCustGroup(h.getCustGroup());
+			cri.setStoreCode(h.getStoreCode());
+		
+			aForm.setBeanCriteria(cri);
+			
 		} catch (Exception e) {
 			conn.rollback();
             e.printStackTrace();

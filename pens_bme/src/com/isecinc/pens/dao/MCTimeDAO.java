@@ -174,10 +174,12 @@ public class MCTimeDAO {
 					sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
 					sql.append("\n    from MC_STAFF_ROUTE MT,MC_ROUTE R ");
 					sql.append("\n    WHERE  MT.mc_route = R.route_id");
+				  
 					sql.append("\n  )M  ON  M.region = S.region AND M.emp_ref_id = S.emp_ref_id ");
 					
 				   sql.append(" \n WHERE 1=1  ");
-				   sql.append("\n and s.status = 'A' ");
+				   sql.append("\n and s.status <> 'L' ");
+				   sql.append("\n and M.is_active = 'Y' ");
 				   if( !Utils.isNull(o.getMcArea()).equals("")){
 					    sql.append("\n and s.region = '"+Utils.isNull(o.getMcArea())+"'");
 					}

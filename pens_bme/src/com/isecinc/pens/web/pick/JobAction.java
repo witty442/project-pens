@@ -243,6 +243,38 @@ public class JobAction extends I_Action {
 		return "search";
 	}
 	
+	public ActionForward saveRefDoc(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveRefDoc Action");
+		JobForm aForm = (JobForm) form;
+		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			Job h = aForm.getJob();
+			h.setCreateUser(user.getUserName());
+			h.setUpdateUser(user.getUserName());
+			
+			JobDAO.updateModel(conn,h);
+			
+			conn.commit();
+
+			//search
+			aForm.setJob(JobDAO.search(h));
+			
+			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("search");
+	}
 	
 	private AdjustStock createNewAdjustStock(AdjustStock lastAd){
 		AdjustStock aNew = new AdjustStock();

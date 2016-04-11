@@ -447,7 +447,8 @@ function loadRoute(){
 										<td class="td_text_center" width="5%"><%=mc.getNo() %></td>
 										<td class="td_text_center" width="5%">
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getMonthTrip()%>',<%=maxDay%>,'edit')">
-											  <%if(User.MT_SALE.equalsIgnoreCase(user.getRole().getKey())){  %>      
+											  <%//if(User.MT_SALE.equalsIgnoreCase(user.getRole().getKey()) || User.MCQUERY.equalsIgnoreCase(user.getRole().getKey())){  %> 
+											  <%if ( Utils.userInRole(user,new String[]{User.MT_SALE,User.MCQUERY}) ){%>     
 											        View 
 											   <%}else{ %>
 											                            ·°È‰¢

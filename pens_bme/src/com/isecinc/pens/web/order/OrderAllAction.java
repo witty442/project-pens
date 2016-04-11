@@ -72,39 +72,74 @@ public class OrderAllAction extends I_Action {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))
 					 && "OSHOPPING".equalsIgnoreCase(pageName) ){
 				 
-				 request.getSession().setAttribute("results"+pos_fix_session, null);
-				 request.getSession().setAttribute("storeList"+pos_fix_session,null);
-				 request.getSession().setAttribute("itemErrorMap"+pos_fix_session, null);
-				 
-				 request.getSession().removeAttribute("totalPage");
-				 request.getSession().removeAttribute("totalPage"); 
-				 
-				 //init store type
-				 STORE_TYPE_MAP = OrderAllDAO.initStoreTypeMap(Constants.STORE_TYPE_OSHOPPING_CODE);
-				 
-				 Order order = new Order();
-				 //Old OrderDate set to next billDate
-				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				 
-				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				 order.setStoreType(Constants.STORE_TYPE_OSHOPPING_CODE);
-				 summaryForm.setOrder(order);
-				 summaryForm.setPageName(pageName);
-				 
-				 ImportDAO importDAO = new ImportDAO();
-				 conn = DBConnection.getInstance().getConnection();
-				 
-				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"",Constants.STORE_TYPE_OSHOPPING_CODE);
-				 request.getSession().setAttribute("storeTypeList",storeTypeList);
-				
-				 List<References> regionList = importDAO.getRegionList(conn);
-				 request.getSession().setAttribute("regionList",regionList);
-				 
-				 List<References> billTypeList = importDAO.getBillTypeList();
-				 request.getSession().setAttribute("billTypeList",billTypeList);
+					 request.getSession().setAttribute("results"+pos_fix_session, null);
+					 request.getSession().setAttribute("storeList"+pos_fix_session,null);
+					 request.getSession().setAttribute("itemErrorMap"+pos_fix_session, null);
+					 
+					 request.getSession().removeAttribute("totalPage");
+					 request.getSession().removeAttribute("totalPage"); 
+					 
+					 //init store type
+					 STORE_TYPE_MAP = OrderAllDAO.initStoreTypeMap(Constants.STORE_TYPE_OSHOPPING_CODE);
+					 
+					 Order order = new Order();
+					 //Old OrderDate set to next billDate
+					 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 
+					 //new set to Current Date
+					 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 order.setStoreType(Constants.STORE_TYPE_OSHOPPING_CODE);
+					 summaryForm.setOrder(order);
+					 summaryForm.setPageName(pageName);
+					 
+					 ImportDAO importDAO = new ImportDAO();
+					 conn = DBConnection.getInstance().getConnection();
+					 
+					 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"",Constants.STORE_TYPE_OSHOPPING_CODE);
+					 request.getSession().setAttribute("storeTypeList",storeTypeList);
+					
+					 List<References> regionList = importDAO.getRegionList(conn);
+					 request.getSession().setAttribute("regionList",regionList);
+					 
+					 List<References> billTypeList = importDAO.getBillTypeList();
+					 request.getSession().setAttribute("billTypeList",billTypeList);
 
-			 }
+			 }else if("new".equalsIgnoreCase(request.getParameter("action"))
+						 && "7CATALOG".equalsIgnoreCase(pageName) ){
+					 
+					 request.getSession().setAttribute("results"+pos_fix_session, null);
+					 request.getSession().setAttribute("storeList"+pos_fix_session,null);
+					 request.getSession().setAttribute("itemErrorMap"+pos_fix_session, null);
+					 
+					 request.getSession().removeAttribute("totalPage");
+					 request.getSession().removeAttribute("totalPage"); 
+					 
+					 //init store type
+					 STORE_TYPE_MAP = OrderAllDAO.initStoreTypeMap(Constants.STORE_TYPE_7CATALOG_CODE);
+					 
+					 Order order = new Order();
+					 //Old OrderDate set to next billDate
+					 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 
+					 //new set to Current Date
+					 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 order.setStoreType(Constants.STORE_TYPE_7CATALOG_CODE);
+					 summaryForm.setOrder(order);
+					 summaryForm.setPageName(pageName);
+					 
+					 ImportDAO importDAO = new ImportDAO();
+					 conn = DBConnection.getInstance().getConnection();
+					 
+					 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"",Constants.STORE_TYPE_7CATALOG_CODE);
+					 request.getSession().setAttribute("storeTypeList",storeTypeList);
+					
+					 List<References> regionList = importDAO.getRegionList(conn);
+					 request.getSession().setAttribute("regionList",regionList);
+					 
+					 List<References> billTypeList = importDAO.getBillTypeList();
+					 request.getSession().setAttribute("billTypeList",billTypeList);
+
+				 }
 			
 		} catch (Exception e) {
 			

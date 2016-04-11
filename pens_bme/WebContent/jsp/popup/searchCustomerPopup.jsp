@@ -1,3 +1,4 @@
+<%@page import="util.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -28,6 +29,7 @@
 	String types = Utils.isNull(request.getParameter("types"));
     String storeType = Utils.isNull(request.getParameter("storeType"));
     String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+    String hideAll = Utils.isNull(request.getParameter("hideAll"));
     
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
@@ -226,8 +228,8 @@ window.onload = function(){
 
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px" class="txt1">
-		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูล ร้านค้า</b></td>
+		<td width="15%" >&nbsp;</td> 
+		<td width="90%" ><b>ค้นหาข้อมูล ร้านค้า ( <%=storeType%>)</b></td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b>รหัส</b>  </td>
@@ -246,7 +248,7 @@ window.onload = function(){
 		<td align="center">
 			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
 			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
-			<input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกร้านค้าทั้งหมด
+			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกร้านค้าทั้งหมด <%} %>
 		</td>
 	</tr>
 </table>

@@ -122,7 +122,6 @@ public class ExportBillICC extends InterfaceUtils{
 					    logger.debug("Backup Text File:"+ddServerPath);
 					    FileUtil.writeFile(ddServerPath, tableBean.getDataStrExport(), "TIS-620");
 					    
-					
 					     //Update Exported ='Y' in BME_ORDER
 						if("PENSBME_ICC_HEAD".equalsIgnoreCase(tableName)){
 					       logger.debug("Update Exported ='Y' in PENSBME_ICC_HEAD");

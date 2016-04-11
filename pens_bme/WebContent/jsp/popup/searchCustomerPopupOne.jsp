@@ -1,3 +1,4 @@
+<%@page import="util.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -63,7 +64,7 @@ function selectOneRadio(){
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px" class="txt1">
 		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูลร้านค้า</b></td>
+		<td width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=storeType%>)</b></td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b>รหัส</b>  </td>

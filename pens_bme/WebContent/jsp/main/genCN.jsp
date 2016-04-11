@@ -81,7 +81,11 @@ function back(path){
 	form.submit();
 	return true;
 }
-
+function searchKeypress(path,e){
+	if(e != null && e.keyCode == 13){
+		search(path);
+	}
+}
 function search(path){
 	var form = document.genCNForm;
 	var cnNo =$('#cnNo').val();
@@ -174,7 +178,7 @@ function isNum(obj){
 							   <c:if test="${genCNForm.results == null}">
 							    <tr>
                                     <td align="right"> อ้างอิงเลขที่ CN <font color="red">*</font>
-                                       	<html:text property="bean.cnNo" styleId="cnNo" size="20" />
+                                       	<html:text property="bean.cnNo" styleId="cnNo" size="20" onkeypress="searchKeypress('${pageContext.request.contextPath}',event)" />
                                      </td>
 									<td align="left">
 									     <a href="javascript:search('${pageContext.request.contextPath}')">
@@ -261,10 +265,7 @@ function isNum(obj){
 										</td>
 										<td class="td_text_center" width="5%">
 										   <input type="text" name="qty" value ="${results.qty}" size="20" readonly class="disableNumber"/>
-										    <input type="hidden" name="barcode" value ="${results.barcode}" />
-										    <input type="hidden" name="materialMaster" value ="${results.materialMaster}" />
-										    <input type="hidden" name="wholePriceBF" value ="${results.wholePriceBF}"  />
-										    <input type="hidden" name="retailPriceBF" value ="${results.retailPriceBF}" />
+										    
 										</td>
 										
 									</tr>

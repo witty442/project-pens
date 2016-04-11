@@ -145,18 +145,10 @@ public class ImportBillICC extends InterfaceUtils{
 									modelItem.setStatus(Constants.STATUS_FAIL);
 									fileTransImportErrorList.add(ftpBean);//Add For Delete file and Move to In Processed
 								}else{
+								
 									fileTransImportSuccessList.add(ftpBean);//Add For Delete file and Move to In Processed
 									modelItem.setStatus(Constants.STATUS_SUCCESS);
-									
-									//Backup file to DD Server
-									String ddServerPath = env.getProperty("path.backup.icc.hisher.import.dlyr")+"/"+tableBean.getFileFtpNameFull();
-								    logger.debug("Backup Text File:"+ddServerPath);
-								    FileUtil.writeFile(ddServerPath, ftpBean.getDataLineText().toString(), "TIS-620");
-								    
-									/** Case Transaction and Cust,Address,Contact Import By sale code by FileName  and after import move File to  Sales-In-Processed */
-									logger.debug("Delete File After import:");
-								    ftpManager.deleteFileFTP(env.getProperty("path.icc.hisher.import.dlyr"), tableBean.getFileFtpNameFull());
-
+								
 								}
 								
 								/** Update Monitor Item To Success **/
@@ -202,6 +194,23 @@ public class ImportBillICC extends InterfaceUtils{
 				logger.debug("Transaction commit");
 				conn.commit();
 				
+				if(fileTransImportSuccessList != null && fileTransImportSuccessList.size() >0){
+					for(int i=0;i<fileTransImportSuccessList.size();i++){
+						FTPFileBean ftpB = fileTransImportSuccessList.get(i);
+						logger.debug("Ftp File Name:"+ftpB.getFileName());
+						
+						//Backup file to DD Server
+						String ddServerPath = env.getProperty("path.backup.icc.hisher.import.dlyr")+"/"+ftpB.getFileName();
+					    logger.debug("Backup Text File:"+ddServerPath);
+					    FileUtil.writeFile(ddServerPath, ftpB.getDataLineText().toString(), "TIS-620");
+					    
+						/** Case Transaction and Cust,Address,Contact Import By sale code by FileName  and after import move File to  Sales-In-Processed */
+						logger.debug("Delete File After import:");
+						
+					    ftpManager.deleteFileFTPByFileName(env.getProperty("path.icc.hisher.import.dlyr"),ftpB.getFileName());
+					}
+				}
+			    
 				/** End process ***/
 				logger.debug("Update Monitor to Success:"+taskStatusInt);
 				monitorModel.setStatus(taskStatusInt);

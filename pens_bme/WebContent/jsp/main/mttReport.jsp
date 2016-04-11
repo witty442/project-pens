@@ -29,7 +29,7 @@ if(session.getAttribute("custGroupList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroupMTT( new PopupForm()));
+	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
@@ -41,7 +41,7 @@ if(session.getAttribute("custGroupList") == null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/mtt.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -77,6 +77,8 @@ span.pagelinks {
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateTo'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('createDateFrom'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('createDateTo'));
 }
 function clearForm(path){
 	var form = document.mttForm;
@@ -89,7 +91,7 @@ function search(path){
 	var form = document.mttForm;
 	if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
 		&& $('#custGroup').val()=="" && $('#storeCode').val()==""
-	    && $('#groupCode').val()==""){
+	    && $('#groupCode').val()=="" && $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
 		alert("กรุณากรอก ข้อมูลค้นหาอย่างน้อย 1 รายการ");
 		return false;
 	}
@@ -284,6 +286,14 @@ function resetStore(){
                                     <td> Group Code </td>
 									<td> <html:text property="bean.groupCode" styleId="groupCode"/></td>
 								</tr>
+								<tr>
+                                    <td> จากวันที่ Scan </td>
+									<td>		
+										 <html:text property="bean.createDateFrom" styleId="createDateFrom"/>
+										 ถึงวันที่ Scan
+										 <html:text property="bean.createDateTo" styleId="createDateTo"/>
+									</td>
+								</tr>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -308,18 +318,22 @@ function resetStore(){
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
+						       
 									<th >No</th>
 									<th >วันที่ขาย</th>
+									<th >วันที่ Scan</th>
 									<th >Doc No</th>
-									<th >กลุ่มร้านค้า</th>
+									<th >กลุ่ม</th>
+									<th >รหัสกลุ่ม</th>
 									<th >รหัสร้านค้า</th>
+									<th >ชื่อร้านค้า</th>
 									<th >Barcode</th>
 									<th >Group Code</th>
 									<th >Material Master</th>
 									<th >Pens Item</th>
 									<th >จำนวนชิ้นที่ขาย</th>		
-									<th >ราคาปลีกรวม Vat</th>	
-													
+									<th >ราคาปลีกก่อน Vat</th>	
+									<th >Remark</th>					
 							   </tr>
 							<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">
 								<c:choose>
@@ -331,18 +345,44 @@ function resetStore(){
 									</c:otherwise>
 								</c:choose>
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_saleDate">${results.saleDate}</td>
-										<td class="search_docNo">${results.docNo}</td>
-										<td class="search_custGroup">${results.custGroup}&nbsp;${results.custGroupName}</td>
-										<td class="search_storeCode">${results.storeCode}&nbsp;${results.storeName}</td>
-										<td class="search_barcode">${results.barcode}</td>
-										<td class="search_groupCode">${results.groupCode}</td>
-										<td class="search_materialMaster" >${results.materialMaster}</td>
-										<td class="search_pensItem">${results.pensItem}</td>
-										<td class="search_qty">${results.qty}</td>
-										<td class="search_retailPriceBF">${results.retailPriceBF}</td>
-										
+									
+										<td class="td_text_center" width="5%">${results.no}</td>
+										<td class="td_text_center" width="5%">${results.saleDate}
+										   <input type="hidden" name ="saleDate" id ="saleDate" value="${results.saleDate}" class="disableText" size="10">
+										</td>
+										<td class="td_text_center" width="5%">${results.createDate}</td>
+										<td class="td_text_center" width="7%">${results.docNo}
+										   <input type="hidden" name ="docNo" id ="docNo" value="${results.docNo}" class="disableText" size="15">
+										</td>
+										<td class="td_text_center" width="5%">${results.custGroup}
+										   <input type="hidden" name ="custGroup" id ="custGroup"  value="${results.custGroup}" class="disableText" size="20">
+										</td>
+										<td class="td_text_center" width="5%">${results.custGroupName}</td>
+										<td class="td_text_center" width="7%">${results.storeCode}
+										   <input type="hidden" name ="storeCode" id ="storeCode"  value="${results.storeCode}" class="disableText" size="15">
+										</td>
+										<td class="td_text" width="10%">${results.storeName}</td>
+										<td class="td_text_center" width="8%">${results.barcode}
+										   <input type="hidden" name ="barcode" id ="barcode"  value="${results.barcode}" class="disableText" size="15">
+										</td>
+										<td class="td_text_center" width="7%">${results.groupCode}
+										   <input type="hidden" name ="groupCode" id ="groupCode"  value="${results.groupCode}" class="disableText" size="10">
+										</td>
+										<td class="td_text"  width="8%">${results.materialMaster}
+										   <input type="hidden" name ="materialMaster" id ="materialMaster"  value="${results.materialMaster}" class="disableText" size="15">
+										</td>
+										<td class="td_text" width="8%">${results.pensItem}
+										   <input type="hidden" name ="pensItem" id ="pensItem"  value="${results.pensItem}" class="disableText" size="10">
+										</td>
+										<td class="td_text_right"  width="5%">
+										    ${results.qty}
+										</td>
+										<td class="td_number"  width="10%">
+										    ${results.retailPriceBF}
+										</td>
+										<td class="td_text"  width="5%">
+										    ${results.remark}
+										</td>
 									</tr>
 							  </c:forEach>
 							  
@@ -355,16 +395,21 @@ function resetStore(){
 							       <td class=""></td>
 							       <td class=""></td>
 							       <td class=""></td>
+							       <td class=""></td>
+							       <td class=""></td>
+							       <td class=""></td>
+							      
 								   <td class="hilight_text" align="right">
 									  <B> Total </B>
 									</td>
-									<td class="hilight_text" align="right">
+									<td class="hilight_text" align="center">
 									 <B>  ${mttForm.bean.totalQty}</B>
 									</td>
 									<td class=""></td>
-									<td class=""></td>
+									
 							</tr>
 					</table>
+					
 				</c:if>
 					<!-- ************************Result ***************************************************-->
 					

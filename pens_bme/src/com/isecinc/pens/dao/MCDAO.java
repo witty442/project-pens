@@ -706,6 +706,7 @@ public class MCDAO {
 				sql.append("\n  )S  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
 						
 				sql.append("\n WHERE 1=1 "); 
+				sql.append("\n AND E.status <> 'L'"); 
 				
 				if( !Utils.isNull(o.getEmpId()).equals("0") && !Utils.isNull(o.getEmpId()).equals("") ){
 					sql.append("\n and E.employee_id  = "+Utils.isNull(o.getEmpId()));

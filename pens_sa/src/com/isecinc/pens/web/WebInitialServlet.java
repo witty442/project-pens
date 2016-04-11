@@ -12,7 +12,7 @@ import util.DBCPConnectionProvider;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialParameter;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration

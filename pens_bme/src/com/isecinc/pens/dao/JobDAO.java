@@ -37,18 +37,22 @@ public class JobDAO extends PickConstants{
 
 			sql.append("\n select J.* " +
 			        " \n ,(select M.Interface_desc " +
-			        " \n   from PENSBI.PENSBME_MST_REFERENCE M WHERE 1=1 " +
+			        " \n   from PENSBME_MST_REFERENCE M WHERE 1=1 " +
 			        " \n  and M.pens_value =J.cust_group  and M.reference_code = 'Idwacoal') as cust_group_desc "+
 			       
 			        " \n  ,(SELECT m.pens_desc from PENSBME_MST_REFERENCE m "+
 					" \n    where 1=1  and j.store_code = m.pens_value and m.reference_code ='Store') as store_name "+
 			        
-					"\n from PENSBI.PENSBME_PICK_JOB J    ");
+					"\n from PENSBME_PICK_JOB J    ");
 			sql.append("\n where 1=1   ");
 			
 			if( !Utils.isNull(o.getJobId()).equals("")){
 				sql.append("\n and job_id = "+Utils.isNull(o.getJobId())+"");
 			}
+			if( !Utils.isNull(o.getRefDoc()).equals("")){
+				sql.append("\n and ref_doc = '"+Utils.isNull(o.getRefDoc())+"'");
+			}
+			
 			if( !Utils.isNull(o.getWareHouse()).equals("")){
 				sql.append("\n and warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 			}
@@ -97,9 +101,7 @@ public class JobDAO extends PickConstants{
 			}
 			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
-			  
 				   h = new Job();
 				   h.setNo(r);
 				   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
@@ -120,6 +122,7 @@ public class JobDAO extends PickConstants{
 				   h.setStoreName(Utils.isNull(rst.getString("store_name"))); 
 				   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
+				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
@@ -187,6 +190,9 @@ public class JobDAO extends PickConstants{
 			if( !Utils.isNull(o.getJobId()).equals("")){
 				sql.append("\n and job_id = "+Utils.isNull(o.getJobId())+"");
 			}
+			if( !Utils.isNull(o.getRefDoc()).equals("")){
+				sql.append("\n and ref_doc = '"+Utils.isNull(o.getRefDoc())+"'");
+			}
 			
 			if( !Utils.isNull(o.getName()).equals("")){
 				sql.append("\n and name like '%"+Utils.isNull(o.getName())+"%'  ");
@@ -231,6 +237,7 @@ public class JobDAO extends PickConstants{
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 				   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 				   h.setWareHouseDesc(Utils.isNull(rst.getString("warehouse_desc"))); 
+				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc"))); 
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
@@ -375,9 +382,9 @@ public class JobDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_JOB \n");
 				sql.append(" (JOB_ID, NAME, OPEN_DATE,   \n");
-				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE)  \n");
+				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE,REF_DOC)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -397,7 +404,7 @@ public class JobDAO extends PickConstants{
 				ps.setString(c++, o.getStoreNo());
 				ps.setString(c++, o.getSubInv());
 				ps.setString(c++, o.getWareHouse());
-				
+				ps.setString(c++, Utils.isNull(o.getRefDoc()));
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -478,6 +485,7 @@ public class JobDAO extends PickConstants{
 				sql.append(", WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"' \n" );
 				sql.append(", UPDATE_DATE = ? \n" );
 				sql.append(", UPDATE_USER = '"+Utils.isNull(o.getUpdateUser())+"' \n" );
+				sql.append(", REF_DOC = '"+Utils.isNull(o.getRefDoc())+"' \n" );
 				sql.append(" WHERE JOB_ID =? \n" );
                 
 				logger.debug("sql:"+sql.toString());

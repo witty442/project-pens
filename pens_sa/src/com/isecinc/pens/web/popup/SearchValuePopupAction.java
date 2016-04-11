@@ -15,7 +15,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.ConditionFilterBean;
 import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
@@ -58,7 +58,7 @@ public class SearchValuePopupAction extends I_Action {
 			 //DISPLAY Navigation
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
 			 String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
-			 String currCondNameText = Utils.isNull((String)SAProcess.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
+			 String currCondNameText = Utils.isNull((String)SAInitial.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
 			 String load = Utils.isNull(request.getParameter("load"));
 			 
 			 //set Filter Cond
@@ -88,11 +88,11 @@ public class SearchValuePopupAction extends I_Action {
 			 }
 			 
 			//Display Navigation
-			 String curNavigation =Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue));  
+			 String curNavigation =Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue));  
 			 String navigation ="";
 			 
 			 if(currCondNo.equals("1")){
-			 	 navigation += "1>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue));  
+			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue));  
 			 }else if(currCondNo.equals("2")){
 				 
 				 String cDisp1 = formBean.getFilterBean()!=null?formBean.getFilterBean().getCondValueDisp1():condValueDisp1;
@@ -100,26 +100,26 @@ public class SearchValuePopupAction extends I_Action {
 				 logger.debug("formBean.getFilterBean().getCondValueDisp1():"+formBean.getFilterBean().getCondValueDisp1());
 				 
 			 	 //Cond 1
-			 	 navigation += "1>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+cDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+cDisp1+"]" +"<br>";
 			 	 //CurrCond
-			 	 navigation += "2>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
 			 	
 			 }else if(currCondNo.equals("3")){
 			 	//Cond 1
-			 	 navigation += "1>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
 			 	//Cond 2
-			 	 navigation += "2>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
 			 	 //CurrCond
-			 	 navigation += "3>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
 			 }else if(currCondNo.equals("4")){
 			 	//Cond 1
-			 	 navigation += "1>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
 			 	//Cond 2
-			 	 navigation += "2>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
 			 	//Cond 3
-			 	 navigation += "3>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(condType3))+"["+condValueDisp3+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType3))+"["+condValueDisp3+"]" +"<br>";
 			 	 //curCond
-			 	 navigation += "4>"+Utils.isNull((String)SAProcess.GROUP_BY_MAP.get(currCondTypeValue))+"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))+"<br>"; 
 			 }
 			 
 	        //set Navigation
@@ -178,9 +178,9 @@ public class SearchValuePopupAction extends I_Action {
 				logger.debug("condType2:"+filterBean.getCondType2()+",condCode2:"+filterBean.getCondCode2());
 				logger.debug("condType3:"+filterBean.getCondType3()+",condCode3:"+filterBean.getCondCode3());
 				
-			    request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueListByParent(user,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc(),filterBean));
+			    request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueListByParent(user,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc(),filterBean));
 			}else{
-				request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueList(request,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
+				request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueList(request,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
 			}
 			
 		} catch (Exception e) {

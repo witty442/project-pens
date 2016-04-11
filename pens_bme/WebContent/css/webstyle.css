@@ -225,6 +225,53 @@ TABLE.result TD {
 	font-size: 13px;
 }
 
+/** Result 2 */
+.result_error {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 98%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.result_error TH {
+	background-color: #03b5c9;
+	text-align: center;
+	height: 25px;
+}
+
+TABLE.result_error TD {
+	color: #000000;
+	background-color: #F5B8B8;
+	height: 25px;
+	font-size: 13px;
+}
+
+/** Result Success */
+.result_success {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 98%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.result_success TH {
+	background-color: #03b5c9;
+	text-align: center;
+	height: 25px;
+}
+
+TABLE.result_success TD {
+	color: #000000;
+	background-color: #FFFFFF;
+	height: 25px;
+	font-size: 13px;
+}
 .footer {
 	text-align: left;
 	background-color: #bdd4f1;

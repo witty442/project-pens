@@ -26,10 +26,9 @@
 			  </font>
 			   
 			  <%
-			    
 				String url = EnvProperties.getInstance().getProperty("db.url");
 			  %>
-			  DB[<%=url%>]
+			  ,DB[<%=url%>] ,ProductType[<b><%= EnvProperties.getInstance().getProperty("product.type")%></b>]
 		</td>
         <td width="60px"><img src="${pageContext.request.contextPath}/images2/footer_right2.png" border="0"/></td>
         <td width="31px;"><img src="${pageContext.request.contextPath}/images2/footer_right.png" border="0"/></td>

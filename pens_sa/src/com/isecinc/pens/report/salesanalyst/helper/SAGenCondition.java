@@ -10,14 +10,21 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 
 public class SAGenCondition {
 	
 	protected static  Logger logger = Logger.getLogger("PENS");
 	SAUtils reportU = new SAUtils();
 	
-
+    public static String genGroupBySQL(String groupBy){
+    	String groupBySQl = groupBy;
+    	if("SUBBRAND".equalsIgnoreCase(groupBy)){
+    		groupBySQl +=",INVENTORY_ITEM_ID"; 
+    	}
+    	return groupBySQl;
+    }
+	
 	public  String genSqlWhereCondition(SABean salesBean) throws Exception{
 		return genSqlWhereCondition(salesBean,"");
 	}
@@ -34,7 +41,7 @@ public class SAGenCondition {
 				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("BrandXX")){
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
 					sql +="and ( ";
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName1())+" IN ("+ SAUtils.converToText(salesBean.getCondName1(), Utils.isNull(salesBean.getCondValue1()))+") \n ";
 					sql +="     or \n";
@@ -49,8 +56,11 @@ public class SAGenCondition {
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName1())+" = ( select brand_no from XXPENS_BI_MST_BRAND_GROUP where brand_group_no = '"+ SAUtils.converToText(salesBean.getCondName1(), Utils.isNull(salesBean.getCondValue1()))+"' ) \n ";
 					sql +=" ) \n";
 				}
+			}else if(Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("SUBBRAND")){
+			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue1())+"' ) \n ";
+				
 			}else{
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName1())+" IN ("+ SAUtils.converToText(salesBean.getCondName1(), Utils.isNull(salesBean.getCondValue1()))+") \n ";
 				}else if(SAUtils.isColumnNumberType(Utils.isNull(salesBean.getCondName1()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName1())+"="+Utils.isNull(salesBean.getCondValue1())+" \n ";
@@ -65,7 +75,7 @@ public class SAGenCondition {
 				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("BrandXX")){
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
 					sql +="and ( ";
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName2())+" IN ("+ SAUtils.converToText(salesBean.getCondName2(), Utils.isNull(salesBean.getCondValue2()))+") \n ";
 					sql +="     or \n";
@@ -80,8 +90,11 @@ public class SAGenCondition {
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName2())+" = ( select brand_no from XXPENS_BI_MST_BRAND_GROUP where brand_group_no = '"+ SAUtils.converToText(salesBean.getCondName2(), Utils.isNull(salesBean.getCondValue2()))+"' ) \n ";
 					sql +=" ) \n";
 				}
+			}else if(Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("SUBBRAND")){
+			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue2())+"' ) \n ";
+			
 			}else{
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName2())+" IN ("+SAUtils.converToText(salesBean.getCondName2(), Utils.isNull(salesBean.getCondValue2()))+") \n ";
 				}
 				else if(SAUtils.isColumnNumberType(Utils.isNull(salesBean.getCondName2()))){
@@ -97,7 +110,7 @@ public class SAGenCondition {
 				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("BrandXX")){
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
 					sql +="and ( ";
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName3())+" IN ("+ SAUtils.converToText(salesBean.getCondName3(), Utils.isNull(salesBean.getCondValue3()))+") \n ";
 					sql +="     or \n";
@@ -112,8 +125,11 @@ public class SAGenCondition {
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName3())+" = ( select brand_no from XXPENS_BI_MST_BRAND_GROUP where brand_group_no = '"+ SAUtils.converToText(salesBean.getCondName3(), Utils.isNull(salesBean.getCondValue3()))+"' ) \n ";
 					sql +=" ) \n";
 				}
+			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("SUBBRAND")){
+			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
+			
 			}else{
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName3())+" IN ("+SAUtils.converToText(salesBean.getCondName3(), Utils.isNull(salesBean.getCondValue3()))+") \n ";
 				}
 				else if(SAUtils.isColumnNumberType(Utils.isNull(salesBean.getCondName3()))){
@@ -129,7 +145,7 @@ public class SAGenCondition {
 				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName4()).equalsIgnoreCase("BrandXX")){
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
 					sql +="and ( ";
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName4())+" IN ("+ SAUtils.converToText(salesBean.getCondName4(), Utils.isNull(salesBean.getCondValue4()))+") \n ";
 					sql +="     or \n";
@@ -144,9 +160,11 @@ public class SAGenCondition {
 					sql +="    "+aliasSub+ Utils.isNull(salesBean.getCondName4())+" = ( select brand_no from XXPENS_BI_MST_BRAND_GROUP where brand_group_no = '"+ SAUtils.converToText(salesBean.getCondName4(), Utils.isNull(salesBean.getCondValue4()))+"' ) \n ";
 					sql +=" ) \n";
 				}
-				
+			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("SUBBRAND")){
+			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
+			
 			}else{
-				if(SAProcess.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
 					sql +="and "+ Utils.isNull(salesBean.getCondName4())+" IN ("+SAUtils.converToText(salesBean.getCondName4(), Utils.isNull(salesBean.getCondValue4()))+") \n ";
 				}
 				else if(SAUtils.isColumnNumberType(Utils.isNull(salesBean.getCondName4()))){
@@ -194,6 +212,9 @@ public class SAGenCondition {
 				
 			}else if("Brand_Group".equalsIgnoreCase(condType)){
 				sql = "(select max(M.brand_group_desc) as desc_ from XXPENS_BI_MST_BRAND_GROUP M WHERE M.brand_group_no = S.brand_group)";	
+				
+			}else if("SUBBRAND".equalsIgnoreCase(condType)){
+				sql = "(select max(M.subbrand_desc) as desc_ from XXPENS_BI_MST_SUBBRAND M WHERE M.INVENTORY_ITEM_ID = S.INVENTORY_ITEM_ID )";	
 				
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "(select M.Invoice_Date as desc_ from XXPENS_BI_MST_INVOICE_DATE M WHERE M.INVOICE_DATE = S.INVOICE_DATE)";
@@ -278,6 +299,9 @@ public class SAGenCondition {
 			}else if("Brand_Group".equalsIgnoreCase(condType)){
 				sql = "(select max(M.brand_group_no) as desc_ from XXPENS_BI_MST_BRAND_GROUP M WHERE M.brand_group_no = S.brand_group)";	
 				
+			}else if("SUBBRAND".equalsIgnoreCase(condType)){
+				sql = "(select max(M.subbrand_no) as desc_ from XXPENS_BI_MST_SUBBRAND M WHERE M.INVENTORY_ITEM_ID = S.INVENTORY_ITEM_ID)";	
+			
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "(select M.Invoice_Date as desc_ from XXPENS_BI_MST_INVOICE_DATE M WHERE M.INVOICE_DATE = S.INVOICE_DATE)";
 			
@@ -339,13 +363,13 @@ public class SAGenCondition {
 		StringBuffer sql = new StringBuffer("");
 
 		/** Where Condition By Group  **/
-		if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+		if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 		    sql.append(" AND (1=1 AND "+alias+"invoice_year||"+alias+"invoice_month = '"+colGroupName+"' ) \n");
 		    //sql.append(" AND invoice_year IN('"+salesBean.getYear()+"') \n");
-		}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+		}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 			sql.append(" AND (1=1 AND "+alias+"invoice_quarter = '"+colGroupName+"' \n");
 			sql.append(" AND "+alias+"invoice_year IN('"+salesBean.getYear()+"') ) \n");
-		}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+		}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 			sql.append(" AND (1=1 AND "+alias+"invoice_year = '"+colGroupName+"' ) \n");
 		}else{
 			 Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
@@ -360,49 +384,49 @@ public class SAGenCondition {
 		//sql.append("/*** genSubSQLByType **/ \n");
 		
 		if("ORDER".equalsIgnoreCase(type)){
-			sql.append(" SELECT \n");
-			sql.append( genSQLSelectColumn(salesBean,type,groupBy,colGroupName));
-			sql.append(" '1' AS A \n");
-			sql.append(" FROM "+SAProcess.TABLE_VIEW+" V \n");
-			sql.append(" WHERE 1=1 \n ");
-			sql.append(" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
+			sql.append("\t\t"+" SELECT \n");
+			sql.append("\t\t"+ genSQLSelectColumn(salesBean,type,groupBy,colGroupName)+"\n");
+			sql.append("\t\t"+" '1' AS A \n");
+			sql.append("\t\t"+" FROM "+SAInitial.TABLE_VIEW+" V \n");
+			sql.append("\t\t"+" WHERE 1=1 \n ");
+			sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
 			/** Condition Filter **/
 			sql.append(genSqlWhereCondition(salesBean));
 			
 			/** Where Condition By Group  **/
-			if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
-			    sql.append(" AND sales_order_year||sales_order_month = '"+colGroupName+"' \n");
-			}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(" AND sales_order_year||sales_order_quarter = '"+colGroupName+"' \n");
-			}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(" AND sales_order_year = '"+colGroupName+"' \n");
+			if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+			    sql.append(""+" AND sales_order_year||sales_order_month = '"+colGroupName+"' \n");
+			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+				sql.append(""+" AND sales_order_year||sales_order_quarter = '"+colGroupName+"' \n");
+			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+				sql.append(""+" AND sales_order_year = '"+colGroupName+"' \n");
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo() , Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append("AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
+				sql.append(""+"AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
 			}
 			
 			//Include Pos or not
 			//sql.append(ExternalCondition.genIncludePos(salesBean));
 		}else{
-			sql.append(" SELECT \n");
-			sql.append( genSQLSelectColumn(salesBean,type,groupBy,colGroupName));
-			sql.append(" '1' AS A \n");
-			sql.append(" FROM "+SAProcess.TABLE_VIEW+" V \n");
-			sql.append(" WHERE 1=1 \n ");
-			sql.append(" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
+			sql.append("\t\t"+ "SELECT \n");
+			sql.append("\t\t"+ genSQLSelectColumn(salesBean,type,groupBy,colGroupName));
+			sql.append("\t\t"+" '1' AS A \n");
+			sql.append("\t\t"+" FROM "+SAInitial.TABLE_VIEW+" V \n");
+			sql.append("\t\t"+" WHERE 1=1 \n ");
+			sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
 			/** Condition Filter **/
-			sql.append(  genSqlWhereCondition(salesBean));
+			sql.append("\t\t"+  genSqlWhereCondition(salesBean));
 			
 			/** Where Condition By Group  **/
-			if(SAProcess.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
-			    sql.append(" AND invoice_year||invoice_month = '"+colGroupName+"' \n");
-			}else if(SAProcess.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(" AND invoice_year||invoice_quarter = '"+colGroupName+"' \n");
-			}else if(SAProcess.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(" AND invoice_year = '"+colGroupName+"' \n");
+			if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
+			    sql.append(""+" AND invoice_year||invoice_month = '"+colGroupName+"' \n");
+			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
+				sql.append(""+" AND invoice_year||invoice_quarter = '"+colGroupName+"' \n");
+			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
+				sql.append(""+" AND invoice_year = '"+colGroupName+"' \n");
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append(" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+				sql.append(""+" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 			}
 			
 			//Include Pos or not
@@ -410,7 +434,7 @@ public class SAGenCondition {
 		}
 		
 		/** Filter Displsy Data By User **/
-		sql.append(SecurityHelper.genWhereSqlFilterByUser(conn,user, null,"V."));
+		sql.append("\t\t"+SecurityHelper.genWhereSqlFilterByUser(conn,user, null,"V."));
 	
 		return sql.toString();
 	}
@@ -429,7 +453,7 @@ public class SAGenCondition {
 		
 		ss.append("\n NVL( ");
 		ss.append("\n  ( SELECT COUNT(DISTINCT c.c_id) as c_id FROM( ");
-		ss.append("\n \t  SELECT DISTINCT c.customer_id as c_id ,c."+groupBy+" from "+SAProcess.TABLE_VIEW+" c " );
+		ss.append("\n \t  SELECT DISTINCT c.customer_id as c_id ,c."+groupBy+" from "+SAInitial.TABLE_VIEW+" c " );
 		ss.append("\n \t      WHERE 1=1 " );
 		ss.append("      \t "+genSqlWhereCondition(salesBean,"c."));
 		ss.append("      \t "+genSqlWhereCondByGroup(salesBean,"INVOICE","c.",colGroupName));
@@ -452,7 +476,7 @@ public class SAGenCondition {
 		
 		ss.append("\n NVL( ");
 		ss.append("\n  ( SELECT COUNT(DISTINCT c.c_id) as c_id FROM( ");
-		ss.append("\n \t  SELECT DISTINCT c.customer_id as c_id,c."+groupBy+" from "+SAProcess.TABLE_VIEW+" c " );
+		ss.append("\n \t  SELECT DISTINCT c.customer_id as c_id,c."+groupBy+" from "+SAInitial.TABLE_VIEW+" c " );
 		ss.append("\n \t      WHERE 1=1 " );
 		ss.append("      \t "+genSqlWhereCondition(salesBean,"c."));
 		ss.append("      \t "+genSqlWhereCondByGroup(salesBean,"INVOICE","c.",colGroupName));
@@ -478,7 +502,7 @@ public class SAGenCondition {
 		for(int i=0;i<sqlNotInCaseCallAllList.size();i++){
 			StringBuffer condNotInAll =(StringBuffer)sqlNotInCaseCallAllList.get(i);
 			ss.append("\n      UNION ALL ");
-			ss.append("\n      SELECT distinct c.customer_id as c_id ,c."+salesBean.getGroupBy()+" from "+SAProcess.TABLE_VIEW+" c " );
+			ss.append("\n      SELECT distinct c.customer_id as c_id ,c."+salesBean.getGroupBy()+" from "+SAInitial.TABLE_VIEW+" c " );
 			ss.append("\n      WHERE 1=1 " );
 			ss.append("\n      "+condNotInAll );
 			ss.append("\n      "+genSqlWhereCondition(salesBean,"c."));
@@ -530,8 +554,8 @@ public class SAGenCondition {
 		
 		colGroupName = reportU.getShortColName(colGroupName);
 			
-		columnTop.append( groupBy +", \n ");			
-		columnAll.append(groupBy +", \n ");;
+		columnTop.append(genGroupBySQL(groupBy) +", ");			
+		columnAll.append(groupBy +", ");;
 		
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp1()))){
 			
@@ -540,33 +564,33 @@ public class SAGenCondition {
 				columnName1 = salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName;	
 
 				/** Gen Column Top **/
-				columnTop.append( subSelect1+" as "+columnName1+", \n ");
+				columnTop.append( subSelect1+" as "+columnName1+",  ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName1+", \n ");		
+				columnAll.append( columnName1+", ");		
 	
 			}else if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1()))){
 				subSelect1 = genSqlCountCustomer(salesBean, groupBy, colGroupName).toString();
 				columnName1 = salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName;	
 				
 				String subSelectNoDup = genSqlCountCustomerNoDup(salesBean, groupBy, colGroupName,sqlNotIncaseCall).toString();
-				String columnNameNoDup = SAProcess.NO_DUP_PREFIX+salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName;
+				String columnNameNoDup = SAInitial.NO_DUP_PREFIX+salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName;
 				
 				/** Gen Column Top **/
-				columnTop.append( subSelect1+" as "+columnName1+", \n ");
-				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", \n ");
+				columnTop.append( subSelect1+" as "+columnName1+",  ");
+				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName1+", \n ");
-				columnAll.append( columnNameNoDup+", \n ");
+				columnAll.append( columnName1+",  ");
+				columnAll.append( columnNameNoDup+", ");
 				
 			}else{
 				subSelect1 = "NVL(sum("+salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName+"),0)" ;
 				columnName1 = salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName;
 				
 				/** Gen Column ALL **/
-				columnTop.append( subSelect1+" as "+columnName1+", \n ");
-				columnAll.append( columnName1+", \n ");
+				columnTop.append( subSelect1+" as "+columnName1+",  ");
+				columnAll.append( columnName1+",  ");
 			}
 		}
 		
@@ -577,18 +601,18 @@ public class SAGenCondition {
 				columnName2 = salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName;
 				
 				/** Gen Column Top **/
-				columnTop.append( subSelect2+" as "+columnName2+", \n ");
+				columnTop.append( subSelect2+" as "+columnName2+",  ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName2+", \n ");
+				columnAll.append( columnName2+",  ");
 							
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
 					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
-					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 ");
+					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",   ");
 				
-					columnAll.append(" PER1_"+colGroupName+", \n");;
+					columnAll.append(" PER1_"+colGroupName+", ");;
 				}
 				
 			}else if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp2()))){
@@ -596,23 +620,23 @@ public class SAGenCondition {
 				columnName2 = salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName;	
 				
 				String subSelectNoDup = genSqlCountCustomerNoDup(salesBean, groupBy, colGroupName,sqlNotIncaseCall).toString();
-				String columnNameNoDup = SAProcess.NO_DUP_PREFIX+salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName;
+				String columnNameNoDup = SAInitial.NO_DUP_PREFIX+salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName;
 					
 				/** Gen Column Top **/
-				columnTop.append( subSelect2+" as "+columnName2+", \n ");
-				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", \n ");
+				columnTop.append( subSelect2+" as "+columnName2+",  ");
+				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName2+", \n ");
-				columnAll.append( columnNameNoDup+", \n ");
+				columnAll.append( columnName2+",  ");
+				columnAll.append( columnNameNoDup+",  ");
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
 					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
-					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100  ");
+					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",   ");
 				
-					columnAll.append(" PER1_"+colGroupName+", \n");;
+					columnAll.append(" PER1_"+colGroupName+", ");;
 				}
 				
 			}else{
@@ -620,14 +644,14 @@ public class SAGenCondition {
 				columnName2 = salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName;
 				
 				/** Gen Column ALL **/
-				columnTop.append( subSelect2+" as "+columnName2+", \n ");
-				columnAll.append( columnName2+", \n ");
+				columnTop.append( subSelect2+" as "+columnName2+",  ");
+				columnAll.append( columnName2+",  ");
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp1()))){
 					columnTop.append("(CASE WHEN "+subSelect1+" <> 0");
-					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect2 +"/"+subSelect1 +")*100  ");
+					columnTop.append(" ELSE 0 END )  as PER1_"+colGroupName +",   ");
 					
 					columnAll.append(" PER1_"+colGroupName+", \n");;
 				}
@@ -641,33 +665,33 @@ public class SAGenCondition {
 				columnName3 = salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName;
 
 				/** Gen Column Top **/
-				columnTop.append( subSelect3+" as "+columnName3+", \n ");
+				columnTop.append( subSelect3+" as "+columnName3+",  ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName3+", \n ");
+				columnAll.append( columnName3+", ");
 				
 			}else if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp3()))){
 				subSelect3 = genSqlCountCustomer(salesBean, groupBy, colGroupName).toString();
 				columnName3 = salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName;
 				
 				String subSelectNoDup = genSqlCountCustomerNoDup(salesBean, groupBy, colGroupName,sqlNotIncaseCall).toString();
-			    String columnNameNoDup = SAProcess.NO_DUP_PREFIX+salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName;
+			    String columnNameNoDup = SAInitial.NO_DUP_PREFIX+salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName;
 					
 				/** Gen Column ALL **/
-				columnTop.append( subSelect3+" as "+columnName3+", \n ");
-				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", \n ");
+				columnTop.append( subSelect3+" as "+columnName3+",  ");
+				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+",  ");
 				
 				/** Gen Column ALL **/
-				columnAll.append( columnName3+", \n ");
-				columnAll.append( columnNameNoDup+", \n ");
+				columnAll.append( columnName3+",  ");
+				columnAll.append( columnNameNoDup+",  ");
 				
 			}else{
 				subSelect3 = "NVL(sum("+salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName+"),0)" ;
 				columnName3 = salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName;
 				
 				/** Gen Column ALL **/
-				columnTop.append( subSelect3+" as "+columnName3+", \n ");
-				columnAll.append( columnName3+", \n ");
+				columnTop.append( subSelect3+" as "+columnName3+",  ");
+				columnAll.append( columnName3+",  ");
 			}
 	   }
 		
@@ -678,18 +702,18 @@ public class SAGenCondition {
 				columnName4 = salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName;
 					
 				/** Gen Column Top **/
-				columnTop.append( subSelect4+" as "+columnName4+", \n ");
+				columnTop.append( subSelect4+" as "+columnName4+", ");
 
 				/** Gen Column ALL **/
-				columnAll.append( columnName4+", \n ");
+				columnAll.append( columnName4+",  ");
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
 					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
-					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100  ");
+					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",   ");
 				
-					columnAll.append(" PER2_"+colGroupName+", \n");;
+					columnAll.append(" PER2_"+colGroupName+", ");;
 				}
 				
 			}else if("CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp4()))){
@@ -697,40 +721,40 @@ public class SAGenCondition {
 				columnName4 = salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName;
 				
 				String subSelectNoDup = genSqlCountCustomer(salesBean, groupBy, colGroupName).toString();
-				String columnNameNoDup = SAProcess.NO_DUP_PREFIX+salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName;
+				String columnNameNoDup = SAInitial.NO_DUP_PREFIX+salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName;
 				
 				/** Gen Column ALL **/
-				columnTop.append( subSelect4+" as "+columnName4+", \n ");
-				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+", \n ");
+				columnTop.append( subSelect4+" as "+columnName4+",  ");
+				columnTop.append( subSelectNoDup+" as "+columnNameNoDup+",  ");
 				
 
 				/** Gen Column ALL **/
-				columnAll.append( columnName4+", \n ");
-				columnAll.append( columnNameNoDup+", \n ");
+				columnAll.append( columnName4+",  ");
+				columnAll.append( columnNameNoDup+",  ");
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
 					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
-					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100  ");
+					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  ");
 				
-					columnAll.append(" PER2_"+colGroupName+", \n");;
+					columnAll.append(" PER2_"+colGroupName+", ");;
 				}	
 			}else{
 				subSelect4 = "NVL(sum("+salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName+"),0)" ;
 				columnName4 = salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName;
 				
 				/** Gen Column ALL **/
-				columnTop.append( subSelect4+" as "+columnName4+", \n ");
-				columnAll.append( columnName4+", \n ");
+				columnTop.append( subSelect4+" as "+columnName4+",  ");
+				columnAll.append( columnName4+",  ");
 				
 				//PER
 				if( !"0".equals(Utils.isNull(salesBean.getCompareDisp2()))){
 					columnTop.append("(CASE WHEN "+subSelect3+" <> 0");
-					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100 \n ");
-					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",  \n ");
+					columnTop.append(" THEN ("+ subSelect4 +"/"+subSelect3 +")*100  ");
+					columnTop.append(" ELSE 0 END )  as PER2_"+colGroupName +",   ");
 				
-					columnAll.append(" PER2_"+colGroupName+", \n");;
+					columnAll.append(" PER2_"+colGroupName+", ");;
 				}
 			}
 	   }
@@ -761,28 +785,34 @@ public class SAGenCondition {
 		
 		if("ORDER".equalsIgnoreCase(type)){
 			if(colGroupName.equalsIgnoreCase("INVOICE_DATE")){
-				sql +="SALES_ORDER_DATE as "+groupBy+", \n ";
+				sql +="SALES_ORDER_DATE as "+groupBy+",  ";
 			}else{
-		        sql +=groupBy +" as "+groupBy+", \n ";
+		        sql += groupBy +" as "+groupBy+",  ";
+		        if("SUBBRAND".equalsIgnoreCase(groupBy)){
+		        	sql +="INVENTORY_ITEM_ID,"; 
+		    	}
 			}
 		}else{
-			sql +=groupBy +" as "+groupBy+", \n ";	
+			sql +=groupBy +" as "+groupBy+",  ";	
+			if("SUBBRAND".equalsIgnoreCase(groupBy)){
+	        	sql +="INVENTORY_ITEM_ID,"; 
+	    	}
 		}
 		
 		// IR_AMT = M.INVOICED_AMT-M.RETURNED_AMT
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp1()))){
 			if( !"CALL".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1())) && 
 				!"CALL_NEW".equalsIgnoreCase(Utils.isNull(salesBean.getColNameDisp1()))
-					){
-				colAlias1 = salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName ;
-				colName1 = reportU.genColumnName(salesBean.getColNameDisp1(),salesBean.getColNameUnit1());
-				if("ORDER".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp1()) != null){
-				   sql +=colName1 +" as "+colAlias1+", \n ";
-				}else if("INVOICE".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp1()) != null){
-				   sql +=colName1 +" as "+colAlias1+", \n ";
-				}else{
-				   sql +=" 0 as "+colAlias1+", \n ";
-				}
+			    ){
+				  colAlias1 = salesBean.getColNameDisp1()+"_"+salesBean.getColNameUnit1()+"_1_"+colGroupName ;
+				  colName1 = reportU.genColumnName(salesBean.getColNameDisp1(),salesBean.getColNameUnit1());
+				  if("ORDER".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp1()) != null){
+				     sql +=colName1 +" as "+colAlias1+",  ";
+				  }else if("INVOICE".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp1()) != null){
+				     sql +=colName1 +" as "+colAlias1+",  ";
+				  }else{
+				   sql +=" 0 as "+colAlias1+", ";
+				  }
 			}
 		}
 		
@@ -792,12 +822,12 @@ public class SAGenCondition {
 	        		){
 				colAlias2 = salesBean.getColNameDisp2()+"_"+salesBean.getColNameUnit2()+"_2_"+colGroupName  ;
 				colName2 = reportU.genColumnName(salesBean.getColNameDisp2(),salesBean.getColNameUnit2());
-				if("ORDER".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp2()) != null){
-				   sql +=colName2 +" as "+colAlias2+", \n ";
-				}else if("INVOICE".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp2()) != null){
-				   sql +=colName2 +" as "+colAlias2+", \n ";
+				if("ORDER".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp2()) != null){
+				   sql +=colName2 +" as "+colAlias2+",  ";
+				}else if("INVOICE".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp2()) != null){
+				   sql +=colName2 +" as "+colAlias2+",  ";
 				}else{
-				   sql +=" 0 as "+colAlias2+", \n ";
+				   sql +=" 0 as "+colAlias2+",  ";
 				}
 			}
 		}
@@ -809,12 +839,12 @@ public class SAGenCondition {
 			
 			    colAlias3 =  salesBean.getColNameDisp3()+"_"+salesBean.getColNameUnit3()+"_3_"+colGroupName  ;
 				colName3 = reportU.genColumnName(salesBean.getColNameDisp3(),salesBean.getColNameUnit3());
-				if("ORDER".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp3()) != null){
-				   sql +=colName3 +" as "+colAlias3+", \n ";
-				}else if("INVOICE".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp3()) != null){
-				   sql +=colName3 +" as "+colAlias3+", \n ";
+				if("ORDER".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp3()) != null){
+				   sql +=colName3 +" as "+colAlias3+",  ";
+				}else if("INVOICE".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp3()) != null){
+				   sql +=colName3 +" as "+colAlias3+",  ";
 				}else{
-				   sql +=" 0 as "+colAlias3+", \n ";
+				   sql +=" 0 as "+colAlias3+",  ";
 				}
 			}
 		}
@@ -825,12 +855,12 @@ public class SAGenCondition {
 	        		){
 				colAlias4 = salesBean.getColNameDisp4()+"_"+salesBean.getColNameUnit4()+"_4_"+colGroupName ;
 				colName4 = reportU.genColumnName(salesBean.getColNameDisp4(),salesBean.getColNameUnit4());
-				if("ORDER".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp4()) != null){
-				   sql +=colName4 +" as "+colAlias4+", \n ";
-				}else if("INVOICE".equalsIgnoreCase(type) && SAProcess.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp4()) != null){
-				   sql +=colName4 +" as "+colAlias4+", \n ";
+				if("ORDER".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_ORDER_MAP.get(salesBean.getColNameDisp4()) != null){
+				   sql +=colName4 +" as "+colAlias4+",  ";
+				}else if("INVOICE".equalsIgnoreCase(type) && SAInitial.getInstance().COLUMN_INVOICE_MAP.get(salesBean.getColNameDisp4()) != null){
+				   sql +=colName4 +" as "+colAlias4+",  ";
 				}else{
-				   sql +=" 0 as "+colAlias4+", \n ";
+				   sql +=" 0 as "+colAlias4+",  ";
 				}
 			}
 		}

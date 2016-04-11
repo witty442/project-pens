@@ -14,6 +14,9 @@ public class MTTBean implements Serializable{
 	private int no;
 	private String saleDateFrom;
 	private String saleDateTo;
+	private String createDateFrom;
+	private String createDateTo;
+	private String remark;
 	
 	private String saleDate;
 	private String docNo;
@@ -43,6 +46,7 @@ public class MTTBean implements Serializable{
 	private String updateUser;
 	private String status;
 	private String statusDesc;
+	private String createDate;
 	private List<MTTBean> items;
 	
 	private String docDate;
@@ -52,6 +56,30 @@ public class MTTBean implements Serializable{
 	private boolean canCancel = false;
 	
 	
+	public String getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+	public String getCreateDateFrom() {
+		return createDateFrom;
+	}
+	public void setCreateDateFrom(String createDateFrom) {
+		this.createDateFrom = createDateFrom;
+	}
+	public String getCreateDateTo() {
+		return createDateTo;
+	}
+	public void setCreateDateTo(String createDateTo) {
+		this.createDateTo = createDateTo;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public String getDocDate() {
 		return docDate;
 	}

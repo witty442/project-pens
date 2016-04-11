@@ -272,8 +272,10 @@ function isNum(obj){
 	      	<jsp:include page="../program.jsp">
 				<jsp:param name="function" value="OrderOShopping"/>
 			</jsp:include>
-		<%}else{ %>
-		
+		 <% }else if("7CATALOG".equalsIgnoreCase(pageName)){%>
+			<jsp:include page="../program.jsp">
+				<jsp:param name="function" value="Order7Catalog"/>
+			</jsp:include>
 		<%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">

@@ -59,6 +59,9 @@ public class ImportForm extends I_Form {
 	private int shoppingListErrorSize;
 	private int shoppingListSuccessSize;
 	
+	private int loadStockInitListErrorSize;
+	private int loadStockInitListSuccessSize;
+	
 	private String countDate;
 	private String custCode;
 	
@@ -68,9 +71,33 @@ public class ImportForm extends I_Form {
 	private String storeName;
 	private String importDate;
 	private String boxNo;
+	private String totalQty;
 	
 	
-	
+	public String getTotalQty() {
+		return totalQty;
+	}
+
+	public void setTotalQty(String totalQty) {
+		this.totalQty = totalQty;
+	}
+
+	public int getLoadStockInitListErrorSize() {
+		return loadStockInitListErrorSize;
+	}
+
+	public void setLoadStockInitListErrorSize(int loadStockInitListErrorSize) {
+		this.loadStockInitListErrorSize = loadStockInitListErrorSize;
+	}
+
+	public int getLoadStockInitListSuccessSize() {
+		return loadStockInitListSuccessSize;
+	}
+
+	public void setLoadStockInitListSuccessSize(int loadStockInitListSuccessSize) {
+		this.loadStockInitListSuccessSize = loadStockInitListSuccessSize;
+	}
+
 	public int getShoppingListErrorSize() {
 		return shoppingListErrorSize;
 	}

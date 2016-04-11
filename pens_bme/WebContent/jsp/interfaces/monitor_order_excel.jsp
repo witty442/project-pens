@@ -18,10 +18,11 @@ function downloadFile(){
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
     <tr>
       <th width="10%">Trans ID</th>
+      <th width="20%">Task Name</th>
       <th width="20%">Submit Date</th>
       <th width="10%">ʶҹ� </th>
       <th width="10%">Download File </th>
-      <th width="50%">Message </th>
+      <th width="40%">Message </th>
     
     </tr>
 	<c:forEach var="results" items="${interfacesForm.results}" varStatus="rows">
@@ -35,7 +36,7 @@ function downloadFile(){
 		    </c:choose>
 			<tr>
 			    <td><span class="<c:out value='${tabclass}'/>">${results.transactionId}</span></td>
-				<%-- <td><span class="<c:out value='${tabclass}'/>"> ${results.submitDate}</span></td> --%>
+				 <td><span class="<c:out value='${tabclass}'/>"> ${results.name}</span></td> 
 				
 				<td><span class="<c:out value='${tabclass}'/>"> <fmt:formatDate value="${results.submitDate}" pattern="dd-MM-yyyy HH:ss"></fmt:formatDate ></span></td>
 				<td><span class="<c:out value='${tabclass}'/>">${results.statusDesc}</span></td>

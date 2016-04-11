@@ -21,7 +21,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.ProfileProcess;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAGenerate;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
@@ -111,9 +111,9 @@ public class SAReportAction extends I_Action {
 		    }
 		    
 			//logger.debug("htmlCode: \n"+htmlCode);
-			SAProcess.getInstance().setMaxOrderedDateTime(conn);
-			String maxDate = SAProcess.getInstance().getMaxOrderedDate();
-			String maxTime = SAProcess.getInstance().getMaxOrderedTime();
+			SAInitial.getInstance().setMaxOrderedDateTime(conn);
+			String maxDate = SAInitial.getInstance().getMaxOrderedDate();
+			String maxTime = SAInitial.getInstance().getMaxOrderedTime();
 			
 			request.getSession().setAttribute("maxOrderedDate", maxDate);
 			request.getSession().setAttribute("maxOrderedTime", maxTime);
@@ -163,9 +163,20 @@ public class SAReportAction extends I_Action {
 		    	String headerHtml  = SAGenerate.genHeaderReportExportExcel( user,formBean.getSalesBean(),columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
                 //logger.debug("header html:\n "+headerHtml);
                 
+		    	StringBuffer EXCEL_HEADER = new StringBuffer("");
+	
+		    	EXCEL_HEADER.append("<style> \n");
+		    	EXCEL_HEADER.append(" table {\n");
+		    	EXCEL_HEADER.append(" border-collapse: collapse; \n");
+		    	EXCEL_HEADER.append(" }\n");
+				EXCEL_HEADER.append(" table, th, td{ \n");
+				EXCEL_HEADER.append("   border: 1px solid black; \n");
+				EXCEL_HEADER.append(" } \n");
+				EXCEL_HEADER.append("</style> \n");
+				
 		    	/** Replace Tag Html Img = img_XX **/
 		    	htmlCode = htmlCode.replaceAll("<img", "<img_xx");
-		    	headerHtml += htmlCode;
+		    	headerHtml += EXCEL_HEADER.toString()+ htmlCode;
 		    		
 		    	java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
@@ -191,6 +202,7 @@ public class SAReportAction extends I_Action {
 
 	public ActionForward getSQL(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		try {	
+			
 			logger.debug("getSQL");
 			String sql = "";
 			if( request.getSession().getAttribute("RESULT_SQL") != null	){

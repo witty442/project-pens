@@ -21,7 +21,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MRole;
 import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
 import com.isecinc.pens.web.report.salesanalyst.SAReportForm;
 import com.isecinc.pens.web.role.RoleForm;
@@ -78,7 +78,7 @@ public class SearchRolePopupAction extends I_Action {
 			String condNo = request.getParameter("condNo");
 			String searchType = request.getParameter("searchType");
 			
-			request.getSession().setAttribute("VALUE_LIST", SAProcess.getInstance().getConditionValueList4Role(condType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
+			request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueList4Role(condType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
 
 		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);

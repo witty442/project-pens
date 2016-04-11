@@ -14,7 +14,7 @@ import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Role;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.report.salesanalyst.SAConstants;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
@@ -183,7 +183,7 @@ public class MRole {
 					}else{
 						logger.debug("RoledatAccess:"+roleDataAccess);
 						if( !Utils.isNull(roleDataAccess).equalsIgnoreCase("")){
-							List<References> dataList  = SAProcess.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
+							List<References> dataList  = SAInitial.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
 							
 							if(dataList !=null && dataList.size()> 1){
 								role_data_access_desc  += ((References)dataList.get(1)).getName()+",";
@@ -268,7 +268,7 @@ public class MRole {
 					}else{
 						logger.debug("RoledatAccess:"+roleDataAccess);
 						if( !Utils.isNull(roleDataAccess).equalsIgnoreCase("")){
-							List<References> dataList  = SAProcess.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
+							List<References> dataList  = SAInitial.getInstance().getConditionValueList4Role(conn,role.getRoleColumnAccess(),roleDataAccess,null);	
 							
 							if(dataList !=null && dataList.size()> 1){
 								role_data_access_desc  += ((References)dataList.get(1)).getName()+",";

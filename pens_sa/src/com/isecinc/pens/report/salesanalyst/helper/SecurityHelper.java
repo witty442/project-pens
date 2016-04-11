@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.SAProcess;
+import com.isecinc.pens.report.salesanalyst.SAInitial;
 
 public class SecurityHelper {
 	/**
@@ -81,7 +81,8 @@ public class SecurityHelper {
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();	
 			html +="<fieldset>";
-			html +="<legend><b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"]</b></legend> ";
+			html +="<legend><b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] <a href='javascript:controlRoleTab()'>&nbsp;&nbsp;<span id='roleTabSpan' style='color:white'>(Show Role Detail)</span></a> </b></legend> ";
+			html +="<div id='roleTab' style='display: none;'>";
 			html +="<table border='0' align='center' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
@@ -100,6 +101,7 @@ public class SecurityHelper {
 			html += " <td>"+roles[3]+"</td>"+"<td>"+roles[4]+"</td>"+"<td>&nbsp;</td>";  
 			html +="<tr>\n";  
 			html +="</table>\n";
+			html +="</div>";
 			html +="</fieldset>";
 			return html;
 		}catch(Exception e){
@@ -217,7 +219,6 @@ public class SecurityHelper {
 	public static String genWhereSqlFilterByUser(Connection conn,User user,String columnAccess,String alias) throws Exception{
 		 return genWhereSqlFilterByUserModel(conn,null,user, columnAccess,alias);
 	}
-	
 	
 	public static String genWhereSqlFilterByUser(HttpServletRequest request,String columnAccess) throws Exception{
 		Connection conn = null;
@@ -437,7 +438,7 @@ public class SecurityHelper {
 			while(rs.next()){
 				condValue = rs.getString("role_data_access");
 				if( !Utils.isNull(condValue).equals("ALL")){
-				   List<References> dataList  = SAProcess.getInstance().getConditionValueList4Role(conn,condType,condValue,null);	
+				   List<References> dataList  = SAInitial.getInstance().getConditionValueList4Role(conn,condType,condValue,null);	
 				   if(dataList !=null && dataList.size()> 1){
 				     condDesc  += ((References)dataList.get(1)).getName()+",";
 				   }else{

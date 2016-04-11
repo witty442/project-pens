@@ -53,6 +53,8 @@ public class BatchProcessWorker extends BatchWorker {
             	monitorModel = (new ProcessManager()).processGenerateOrderExcel(this.monitorModel, user,request);
             }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
             	monitorModel = (new ProcessManager()).processGenerateItemMasterHisHerTxt(this.monitorModel, user,request);
+            }else if(this.monitorModel.getType().equals(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
+            	monitorModel = (new ProcessManager()).processImportTransactionLotus(this.monitorModel, user,request);
             }
             
             logger.debug(" **********Result Process["+this.monitorModel.getType()+"] :"+monitorModel.getStatus()+" ******************");

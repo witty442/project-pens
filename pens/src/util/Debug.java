@@ -7,6 +7,10 @@ public class Debug {
 	private Logger logger = Logger.getLogger("PENS");
 	private boolean isDebug = true;
 	
+	public boolean isDebugEnable(){
+		return logger.isDebugEnabled();
+	}
+	
 	public Debug(boolean isDebug){
 		this.isDebug = isDebug;
 	}

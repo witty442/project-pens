@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SaveInvoiceBean implements Serializable{
 
@@ -50,12 +51,56 @@ public class SaveInvoiceBean implements Serializable{
 	private String SORTER_CHUTE          ;        
 
 	private String ORACLE_INVOICE_NO;
+	private String totalQty;
+	private String cost;
+	private String netBVat;
 	private String createUser;
 	private String updateUser;
 	private String custCode;
 	private String custDesc;
 	
+	private List<SaveInvoiceBean> itemList;
+	private String grandTotalQty;
+	private String grandNetBVat;
 	
+	
+	public String getGrandTotalQty() {
+		return grandTotalQty;
+	}
+	public void setGrandTotalQty(String grandTotalQty) {
+		this.grandTotalQty = grandTotalQty;
+	}
+	
+	public String getGrandNetBVat() {
+		return grandNetBVat;
+	}
+	public void setGrandNetBVat(String grandNetBVat) {
+		this.grandNetBVat = grandNetBVat;
+	}
+	public List<SaveInvoiceBean> getItemList() {
+		return itemList;
+	}
+	public void setItemList(List<SaveInvoiceBean> itemList) {
+		this.itemList = itemList;
+	}
+	public String getTotalQty() {
+		return totalQty;
+	}
+	public void setTotalQty(String totalQty) {
+		this.totalQty = totalQty;
+	}
+	public String getCost() {
+		return cost;
+	}
+	public void setCost(String cost) {
+		this.cost = cost;
+	}
+	public String getNetBVat() {
+		return netBVat;
+	}
+	public void setNetBVat(String netBVat) {
+		this.netBVat = netBVat;
+	}
 	public String getCustCode() {
 		return custCode;
 	}

@@ -20,11 +20,9 @@
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="jobForm" class="com.isecinc.pens.web.pick.JobForm" scope="session" />
-
 <%
 
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -148,6 +146,16 @@ function save(path){
 	return false;
 }
 
+function saveRefDoc(path){
+	var form = document.jobForm;
+	if(confirm("ยันยันการบันทึกข้อมูล")){
+		form.action = path + "/jsp/jobAction.do?do=saveRefDoc";
+		form.submit();
+		return true;
+	}
+	return false;
+}
+
 function checkCloseDate(DateFrom, DateTo){
 	if(DateFrom=='' || DateTo==''){return true;}
 	DateFrom = DateFrom.split("/");
@@ -176,7 +184,6 @@ function openPopupCustomer(path,types,storeType){
 }
 
 function setStoreMainValue(code,desc,storeNo,subInv,types){
-
 	var form = document.jobForm;
 	//alert(form);
 	form.storeCode.value = code;
@@ -333,10 +340,20 @@ function resetStore(){
 								</tr>
 								<tr>
                                     <td> บันทึกเข้าคลัง <font color="red">*</font></td>
-									<td>						
-										 <html:select property="job.wareHouse" styleId="wareHouse" >
-											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
-									    </html:select>
+									<td>				
+									    <c:choose>
+									       <c:when test="${jobForm.job.canEdit == false}">
+										       <html:select property="job.wareHouse" styleId="wareHouse" disabled="true">
+												    <html:options collection="wareHouseList" property="key" labelProperty="name"/>
+										         </html:select>
+										    </c:when>
+									       <c:otherwise>
+									          <html:select property="job.wareHouse" styleId="wareHouse" >
+											    <html:options collection="wareHouseList" property="key" labelProperty="name"/>
+									         </html:select>
+									      </c:otherwise>
+									    </c:choose>		
+										
 									</td>
 								</tr>
 								<tr>
@@ -358,8 +375,13 @@ function resetStore(){
 									<td >รหัสร้านค้า<font color="red">*</font>
 									</td>
 									<td align="left"> 
-									 <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									 <c:if test="${jobForm.job.canEdit == true}">	
+									       <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									       <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  </c:if>
+									   <c:if test="${jobForm.job.canEdit == false}">	
+									   <html:text property="job.storeCode" styleId="storeCode" size="20" styleClass="disableText" disabled="true"/>-
+									   </c:if>
 									<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
 								</tr>
@@ -385,10 +407,10 @@ function resetStore(){
                                     <td> Job Name</td>
 									<td >
 									 <c:if test="${jobForm.job.canEdit == true}">
-						                 <html:text property="job.name" styleId="name" size="30" /><font color="red">*</font>
+						                 <html:text property="job.name" styleId="name" size="50" /><font color="red">*</font>
 						             </c:if>
 						            <c:if test="${jobForm.job.canEdit == false}">
-						                 <html:text property="job.name" styleId="name" size="30" readonly="true" styleClass="disableText" />
+						                 <html:text property="job.name" styleId="name" size="50" readonly="true" styleClass="disableText" />
 						             </c:if>
 									</td>
 								</tr>	
@@ -409,6 +431,12 @@ function resetStore(){
 									    </c:if>
 									</td>
 								</tr>
+								<tr>
+                                    <td> เอกสารอ้างอิง</td>
+									<td>				
+										  <html:text property="job.refDoc" styleId="refDoc" size="40" />
+									</td>
+								</tr>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -416,6 +444,12 @@ function resetStore(){
 									<td align="left">
 									    <c:if test="${jobForm.job.canEdit == true}">
 											<a href="javascript:save('${pageContext.request.contextPath}')">
+											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
+											</a>
+										</c:if>
+										
+										 <c:if test="${jobForm.job.canEdit == false}">
+											<a href="javascript:saveRefDoc('${pageContext.request.contextPath}')">
 											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
 											</a>
 										</c:if>

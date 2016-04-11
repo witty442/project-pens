@@ -48,7 +48,9 @@ public class SaveInvoiceAction extends I_Action {
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				SaveInvoiceBean cri  =aForm.getBeanCriteria();
-				aForm.setResultsSearch(SaveInvoiceDAO.search(cri,false));
+				SaveInvoiceBean b = SaveInvoiceDAO.search(cri,false);
+				aForm.setResultsSearch(b.getItemList());
+	            aForm.setBean(b);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,8 +67,10 @@ public class SaveInvoiceAction extends I_Action {
 		String msg = "";
 		try {
 			SaveInvoiceBean b = aForm.getBean();
-			aForm.setResultsSearch(SaveInvoiceDAO.search(aForm.getBean(),false));
-
+			b = SaveInvoiceDAO.search(aForm.getBean(),false);
+			aForm.setResultsSearch(b.getItemList());
+            aForm.setBean(b);
+            
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
 			   aForm.setResultsSearch(null);
@@ -189,9 +193,10 @@ public class SaveInvoiceAction extends I_Action {
 		    }
 			
 			//Search Again
-			List<SaveInvoiceBean> results = SaveInvoiceDAO.search(conn,h,true);
-		    aForm.setResultsSearch(results);
-			
+            SaveInvoiceBean b  = SaveInvoiceDAO.search(conn,h,true);
+		    aForm.setResultsSearch(b.getItemList());
+		    aForm.setBean(b);
+		    
 			conn.commit();
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {

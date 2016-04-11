@@ -7,8 +7,8 @@
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		
 		<!-- PRODUCTION BY IP-->  
-	   <!--   <property name="connection.url">jdbc:mysql://192.168.202.244:3306/penscenter?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</property>
-		 --> 
+	   <!--   <property name="connection.url">jdbc:mysql://192.168.202.7:3306/penscenter?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</property>
+		  -->
 	 	<property name="connection.url">jdbc:mysql://localhost:3306/penscenter?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</property>
 		 
 		<property name="connection.username">root</property>

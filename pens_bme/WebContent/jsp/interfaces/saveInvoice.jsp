@@ -61,8 +61,7 @@ span.pagelinks {
 .day {
   width: 14%;
 }
-.holiday {
-  width: 14%;
+.special {
   background-color: #F78181;
 }
 
@@ -176,7 +175,7 @@ function save(path){
 					  </div>
 
             <c:if test="${saveInvoiceForm.resultsSearch != null}">
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="1" cellspacing="1" class="tableSearch">
 						       <tr>
 						        <th>ORACLE INVOICE_NO</th>
 						        <th>รหัสร้านค้า</th>
@@ -185,6 +184,9 @@ function save(path){
 								<th>BILL </th>
 								<th>CUST ID</th>
 								<th>SHIP NO </th>
+								<th class="special" nowrap>TOTAL QTY</th>
+								<!-- <th class="special">COST</th> -->
+								<th class="special" nowrap>NET BVAT</th>
 								<th>BUS CODE</th>
 								<th>DEPT CODE</th>
 								<th>PRODUCT CODE</th>
@@ -199,27 +201,6 @@ function save(path){
 								<th>NET AMOUNT</th>
 								<th>TDH GEN_NO</th>
 								<th>PRODUCT BARCODE</th>
-								<!-- <th>BKK UPC_FLAG</th>
-								<th>BILL NO</th>
-								<th>VIA TO ADDRESS</th>
-								<th>VIA NAME</th>
-								<th>CORNER ID</th>
-								<th>CORNER NAME</th>
-								<th>DIS_SALE PASS</th>
-								<th>DISC1_% </th>
-								<th>DISC2_% </th>
-								<th>DISC BAHT</th>
-								<th>ZIPCODE</th>
-								<th>SHIP PHONE</th>
-								<th>VIA PHONE</th>
-								<th>CASH FLAG</th>
-								<th>DELIVERY DATE</th>
-								<th>PO NO</th>
-								<th>FROM SYSTEM</th>
-								<th>GROUP_NO BILL REPLACE</th>
-								<th>SORTER ROUND</th>
-								<th>SORTER BATCH</th>
-								<th>SORTER CHUTE</th> -->
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -237,16 +218,21 @@ function save(path){
 									      <input type ="hidden" name="bill_10" value="<%=mc.getBILL_10() %>"/>
 									      <input type ="hidden" name="bill_date" value="<%=mc.getBILL_DATE() %>"/>
 									</td>
-									    <td class="td_text" width="5%"><%=mc.getCustCode() %></td>
-									    <td class="td_text" width="5%"><%=mc.getCustDesc() %></td>
+									    <td class="td_text" width="7%" nowrap><%=mc.getCustCode() %></td>
+									    <td class="td_text" width="7%"><%=mc.getCustDesc() %></td>
 										<td class="td_text" width="5%"><%=mc.getACTIVITY_CODE() %></td>
 										<td class="td_text" width="5%"><%=mc.getBILL_10()%></td>
 										<td class="td_text" width="5%"><%=mc.getCUST_ID()%></td>
 									    <td class="td_text" width="5%"><%=mc.getSHIP_NO()%></td>
-									    <td class="td_text" width="5%"><%=mc.getBUS_CODE()%></td>
-										<td class="td_text" width="5%"><%=mc.getDEPT_CODE()%></td>
-										<td class="td_text" width="5%"><%=mc.getPRODUCT_CODE()%></td>
-										<td class="td_text" width="5%"><%=mc.getSPD_CODE()%></td>
+									    
+									    <td class="special" width="5%" ><%=mc.getTotalQty()%></td>
+									    <%-- <td class="special" width="5%"><%=mc.getCost()%></td> --%>
+									    <td class="special" width="5%"><%=mc.getNetBVat()%></td>
+									    
+									    <td class="td_text" width="2%"><%=mc.getBUS_CODE()%></td>
+										<td class="td_text" width="2%"><%=mc.getDEPT_CODE()%></td>
+										<td class="td_text" width="2%"><%=mc.getPRODUCT_CODE()%></td>
+										<td class="td_text" width="2%"><%=mc.getSPD_CODE()%></td>
 										<td class="td_text" width="5%"><%=mc.getPRODUCT_TNAME()%></td>
 									    <td class="td_text" width="5%"><%=mc.getBILL_DATE()%></td>
 									    <td class="td_text" width="5%"><%=mc.getSHIP_TO_ADDRESS()%></td>
@@ -257,29 +243,34 @@ function save(path){
 										<td class="td_text" width="5%"><%=mc.getNET_AMOUNT()%></td>
 										<td class="td_text" width="5%"><%=mc.getTDH_GEN_NO()%></td>
 										<td class="td_text" width="5%"><%=mc.getPRODUCT_BARCODE()%></td>
-										<%-- <td class="td_text" width="5%"><%=mc.getBKK_UPC_FLAG()%></td>
-										<td class="td_text" width="5%"><%=mc.getBILL_NO()%></td>
-										<td class="td_text" width="5%"><%=mc.getVIA_TO_ADDRESS()%></td>
-										<td class="td_text" width="5%"><%=mc.getVIA_NAME()%></td>
-										<td class="td_text" width="5%"><%=mc.getCORNER_ID()%></td>
-										<td class="td_text" width="5%"><%=mc.getCORNER_NAME()%></td>
-										<td class="td_text" width="5%"><%=mc.getDIS_SALE_PASS()%></td>
-										<td class="td_text" width="5%"><%=mc.getDISC1_PERCENT()%></td>
-										<td class="td_text" width="5%"><%=mc.getDISC2_PERCENT()%></td>
-										<td class="td_text" width="5%"><%=mc.getDISC_BAHT() %></td>
-										<td class="td_text" width="5%"><%=mc.getZIPCODE()%></td>
-										<td class="td_text" width="5%"><%=mc.getSHIP_PHONE()%></td>
-										<td class="td_text" width="5%"><%=mc.getVIA_PHONE()%></td>
-										<td class="td_text" width="5%"><%=mc.getCASH_FLAG()%></td>
-										<td class="td_text" width="5%"><%=mc.getDELIVERY_DATE() %></td>
-										<td class="td_text" width="5%"><%=mc.getPO_NO()%></td>
-										<td class="td_text" width="5%"><%=mc.getFROM_SYSTEM()%></td>
-										<td class="td_text" width="5%"><%=mc.getGROUP_NO_BILL_REPLACE()%></td>
-										<td class="td_text" width="5%"><%=mc.getSORTER_ROUND()%></td>
-										<td class="td_text" width="5%"><%=mc.getSORTER_BATCH()%></td>
-										<td class="td_text" width="5%"><%=mc.getSORTER_CHUTE()%></td> --%>
+										
 									</tr>
 							<%} %>
+							 <tr>
+						        <td></td>
+						        <td></td>
+						        <td></td>
+						        <td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td class="special">${saveInvoiceForm.bean.grandTotalQty}</td>
+								<td class="special">${saveInvoiceForm.bean.grandNetBVat}</td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							   </tr>
 					</table>
 					
 					 <table  border="0" cellpadding="3" cellspacing="0" >

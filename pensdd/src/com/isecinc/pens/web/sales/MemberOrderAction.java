@@ -942,7 +942,7 @@ public class MemberOrderAction extends OrderAction {
 
 			order.setRemark(orderForm.getOrder().getRemark());
 
-			new MOrder().save(order, user.getId(), conn);
+			new MOrder().saveOrderRemark(conn,order, user.getId());
 
 			conn.commit();
 
