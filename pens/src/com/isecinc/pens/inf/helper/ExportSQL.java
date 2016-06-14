@@ -9,9 +9,6 @@ public class ExportSQL {
 
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	
-	
-	
 	/**
 	 * Get SQL By Special Case Export
 	 * @param tableBean
@@ -21,148 +18,153 @@ public class ExportSQL {
 	public static String genSpecialSQL(TableBean tableBean,User userBean) throws Exception{
 		String str = "";
 		try{
+			
 			if(tableBean.getTableName().equalsIgnoreCase("M_CUSTOMER")){
 				str = " SELECT M.CUSTOMER_ID ,M.CODE AS CUSTOMER_NUMBER ,M.NAME AS CUSTOMER_NAME \n"+
-				" FROM m_customer M  \n"+
-				" INNER JOIN m_address A 	\n"+
-				" ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
-				" WHERE  M.user_id = "+userBean.getId() +"\n"+
-				" AND   (M.reference_id is null or M.reference_id =0) \n"+
-				" AND   A.PURPOSE IS NOT NULL \n"+
-				" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+
-				" GROUP BY M.CUSTOMER_ID ";
+					    " ,IMAGE_FILE_NAME \n"+
+						" FROM m_customer M  \n"+
+						" INNER JOIN m_address A 	\n"+
+						" ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
+						" WHERE  M.user_id = "+userBean.getId() +"\n"+
+						" AND   (M.reference_id is null or M.reference_id =0) \n"+
+						" AND   A.PURPOSE IS NOT NULL \n"+
+						//OLD CODE
+						" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+
+					    //New Version in 072559
+						//" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') OR (M.IS_CHANGE='Y') \n"+
+						" GROUP BY M.CUSTOMER_ID ";
 
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_order") ){
 				str ="	select 	order_id,			\n"+
-				"	'H'	AS	RECORD_TYPE	,	\n"+
-				"	t.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
-				"	t.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
-				"	t.ORDER_DATE	AS	ORDER_DATE	,	\n"+
-				"	t.ORDER_TIME	AS	ORDER_TIME	,	\n"+
-				"	t.CUSTOMER_ID	AS	CUSTOMER_ID	,	\n"+
-				"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
-				"	m.NAME	AS	CUSTOMER_NAME	,	\n"+
-				
-				/** OLD CODE **/
-				"	t.SHIP_ADDRESS_ID	AS	SHIP_TO_SITE_USE_ID ,\n"+
-				"	t.BILL_ADDRESS_ID	AS	BILL_TO_SITE_USE_ID	,\n"+
-				
-				/** NEW CODE **/
-				/*"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID),0) <> 0 \n"+
-				"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID)) \n"+ 
-				"	     ELSE CONCAT(CONCAT(m.code,'-') , t.SHIP_ADDRESS_ID) \n"+ 
-				"	END AS SHIP_TO_SITE_USE_ID, \n"+
-				
-				"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID),0) <> 0 \n"+
-				"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID)) \n"+ 
-				"	     ELSE CONCAT(CONCAT(m.code,'-') , t.BILL_ADDRESS_ID) \n"+ 
-				"	END AS BILL_TO_SITE_USE_ID, \n"+*/
-				
-				"	t.PAYMENT_TERM	AS	PAYMENT_TERM	,	\n"+
-				"	t.USER_ID	AS	SALESREP_ID	,	\n"+
-				"	t.PRICELIST_ID	AS	PRICELIST_ID	,	\n"+
-				"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
-				"	t.VAT_CODE	AS	VAT_CODE	,	\n"+
-				"	t.VAT_RATE	AS	VAT_RATE 	,	\n"+
-				"	t.PAYMENT_METHOD	AS	PAYMENT_METHOD	,	\n"+
-				"	t.SHIPPING_DAY	AS	SHIPPING_DAY	,	\n"+
-				"	t.SHIPPING_TIME	AS	SHIPPING_TIME	,	\n"+
-				"	t.TOTAL_AMOUNT	AS	TOTAL_AMOUNT	,	\n"+
-				"	t.VAT_AMOUNT	AS	VAT_AMOUNT	,	\n"+
-				"	t.NET_AMOUNT	AS	NET_AMOUNT	,	\n"+
-				"	t.PAYMENT	AS	PAYMENT	,	\n"+
-				"	t.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
-				"	t.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
-				"	t.DOC_STATUS	AS	DOC_STATUS	,	\n"+
-				"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
-				"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
-				"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
-				"   t.org as ORG ,t.created, t.print_datetime_pick \n"+
-				"	FROM t_order t ,m_customer m	\n"+
-				"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
-				"   and  m.user_id = "+userBean.getId()+" \n"+
-				"   and  t.DOC_STATUS = 'SV' \n"+
-				"   and ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
-				"   ORDER BY t.ORDER_NO \n";
+					"	'H'	AS	RECORD_TYPE	,	\n"+
+					"	t.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
+					"	t.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
+					"	t.ORDER_DATE	AS	ORDER_DATE	,	\n"+
+					"	t.ORDER_TIME	AS	ORDER_TIME	,	\n"+
+					"	t.CUSTOMER_ID	AS	CUSTOMER_ID	,	\n"+
+					"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
+					"	m.NAME	AS	CUSTOMER_NAME	,	\n"+
+					
+					/** OLD CODE **/
+					"	t.SHIP_ADDRESS_ID	AS	SHIP_TO_SITE_USE_ID ,\n"+
+					"	t.BILL_ADDRESS_ID	AS	BILL_TO_SITE_USE_ID	,\n"+
+					
+					/** NEW CODE **/
+					/*"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID),0) <> 0 \n"+
+					"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID)) \n"+ 
+					"	     ELSE CONCAT(CONCAT(m.code,'-') , t.SHIP_ADDRESS_ID) \n"+ 
+					"	END AS SHIP_TO_SITE_USE_ID, \n"+
+					
+					"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID),0) <> 0 \n"+
+					"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID)) \n"+ 
+					"	     ELSE CONCAT(CONCAT(m.code,'-') , t.BILL_ADDRESS_ID) \n"+ 
+					"	END AS BILL_TO_SITE_USE_ID, \n"+*/
+					
+					"	t.PAYMENT_TERM	AS	PAYMENT_TERM	,	\n"+
+					"	t.USER_ID	AS	SALESREP_ID	,	\n"+
+					"	t.PRICELIST_ID	AS	PRICELIST_ID	,	\n"+
+					"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
+					"	t.VAT_CODE	AS	VAT_CODE	,	\n"+
+					"	t.VAT_RATE	AS	VAT_RATE 	,	\n"+
+					"	t.PAYMENT_METHOD	AS	PAYMENT_METHOD	,	\n"+
+					"	t.SHIPPING_DAY	AS	SHIPPING_DAY	,	\n"+
+					"	t.SHIPPING_TIME	AS	SHIPPING_TIME	,	\n"+
+					"	t.TOTAL_AMOUNT	AS	TOTAL_AMOUNT	,	\n"+
+					"	t.VAT_AMOUNT	AS	VAT_AMOUNT	,	\n"+
+					"	t.NET_AMOUNT	AS	NET_AMOUNT	,	\n"+
+					"	t.PAYMENT	AS	PAYMENT	,	\n"+
+					"	t.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
+					"	t.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
+					"	t.DOC_STATUS	AS	DOC_STATUS	,	\n"+
+					"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
+					"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
+					"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
+					"   t.org as ORG ,t.created, t.print_datetime_pick \n"+
+					"	FROM t_order t ,m_customer m	\n"+
+					"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
+					"   and  m.user_id = "+userBean.getId()+" \n"+
+					"   and  t.DOC_STATUS = 'SV' \n"+
+					"   and ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
+					"   ORDER BY t.ORDER_NO \n";
 			}
 			else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec") ){
 				str ="	select 	order_id,			\n"+
-				"	'H'	AS	RECORD_TYPE	,	\n"+
-				"	t.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
-				"	t.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
-				"	t.ORDER_DATE	AS	ORDER_DATE	,	\n"+
-				"	t.ORDER_TIME	AS	ORDER_TIME	,	\n"+
-				"	t.CUSTOMER_ID	AS	CUSTOMER_ID	,	\n"+
-				"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
-				"	m.NAME	AS	CUSTOMER_NAME	,	\n"+
-				
-				/** OLD CODE **/
-				"	t.SHIP_ADDRESS_ID	AS	SHIP_TO_SITE_USE_ID ,\n"+
-				"	t.BILL_ADDRESS_ID	AS	BILL_TO_SITE_USE_ID	,\n"+
-				
-				/** NEW CODE **/
-				/*"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID),0) <> 0 \n"+
-				"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID)) \n"+ 
-				"	     ELSE CONCAT(CONCAT(m.code,'-') , t.SHIP_ADDRESS_ID) \n"+ 
-				"	END AS SHIP_TO_SITE_USE_ID, \n"+
-				
-				"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID),0) <> 0 \n"+
-				"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID)) \n"+ 
-				"	     ELSE CONCAT(CONCAT(m.code,'-') , t.BILL_ADDRESS_ID) \n"+ 
-				"	END AS BILL_TO_SITE_USE_ID, \n"+*/
-				
-				"	t.PAYMENT_TERM	AS	PAYMENT_TERM	,	\n"+
-				"	t.USER_ID	AS	SALESREP_ID	,	\n"+
-				"	t.PRICELIST_ID	AS	PRICELIST_ID	,	\n"+
-				"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
-				"	t.VAT_CODE	AS	VAT_CODE	,	\n"+
-				"	t.VAT_RATE	AS	VAT_RATE 	,	\n"+
-				"	t.PAYMENT_METHOD	AS	PAYMENT_METHOD	,	\n"+
-				"	t.SHIPPING_DAY	AS	SHIPPING_DAY	,	\n"+
-				"	t.SHIPPING_TIME	AS	SHIPPING_TIME	,	\n"+
-				"	t.TOTAL_AMOUNT	AS	TOTAL_AMOUNT	,	\n"+
-				"	t.VAT_AMOUNT	AS	VAT_AMOUNT	,	\n"+
-				"	t.NET_AMOUNT	AS	NET_AMOUNT	,	\n"+
-				"	t.PAYMENT	AS	PAYMENT	,	\n"+
-				"	t.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
-				"	t.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
-				"	t.DOC_STATUS	AS	DOC_STATUS	,	\n"+
-				"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
-				"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
-				"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
-                "   t.org as ORG \n"+
-				"	FROM t_order t ,m_customer m	\n"+
-				"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
-				"   and  m.user_id = "+userBean.getId()+" \n"+
-				"   and  t.DOC_STATUS = 'SV' \n"+
-				"   and ( t.TEMP2_EXPORTED  = 'N' OR t.TEMP2_EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
-				"   ORDER BY t.ORDER_NO \n";
+					"	'H'	AS	RECORD_TYPE	,	\n"+
+					"	t.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
+					"	t.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
+					"	t.ORDER_DATE	AS	ORDER_DATE	,	\n"+
+					"	t.ORDER_TIME	AS	ORDER_TIME	,	\n"+
+					"	t.CUSTOMER_ID	AS	CUSTOMER_ID	,	\n"+
+					"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
+					"	m.NAME	AS	CUSTOMER_NAME	,	\n"+
+					
+					/** OLD CODE **/
+					"	t.SHIP_ADDRESS_ID	AS	SHIP_TO_SITE_USE_ID ,\n"+
+					"	t.BILL_ADDRESS_ID	AS	BILL_TO_SITE_USE_ID	,\n"+
+					
+					/** NEW CODE **/
+					/*"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID),0) <> 0 \n"+
+					"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID)) \n"+ 
+					"	     ELSE CONCAT(CONCAT(m.code,'-') , t.SHIP_ADDRESS_ID) \n"+ 
+					"	END AS SHIP_TO_SITE_USE_ID, \n"+
+					
+					"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID),0) <> 0 \n"+
+					"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID)) \n"+ 
+					"	     ELSE CONCAT(CONCAT(m.code,'-') , t.BILL_ADDRESS_ID) \n"+ 
+					"	END AS BILL_TO_SITE_USE_ID, \n"+*/
+					
+					"	t.PAYMENT_TERM	AS	PAYMENT_TERM	,	\n"+
+					"	t.USER_ID	AS	SALESREP_ID	,	\n"+
+					"	t.PRICELIST_ID	AS	PRICELIST_ID	,	\n"+
+					"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
+					"	t.VAT_CODE	AS	VAT_CODE	,	\n"+
+					"	t.VAT_RATE	AS	VAT_RATE 	,	\n"+
+					"	t.PAYMENT_METHOD	AS	PAYMENT_METHOD	,	\n"+
+					"	t.SHIPPING_DAY	AS	SHIPPING_DAY	,	\n"+
+					"	t.SHIPPING_TIME	AS	SHIPPING_TIME	,	\n"+
+					"	t.TOTAL_AMOUNT	AS	TOTAL_AMOUNT	,	\n"+
+					"	t.VAT_AMOUNT	AS	VAT_AMOUNT	,	\n"+
+					"	t.NET_AMOUNT	AS	NET_AMOUNT	,	\n"+
+					"	t.PAYMENT	AS	PAYMENT	,	\n"+
+					"	t.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
+					"	t.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
+					"	t.DOC_STATUS	AS	DOC_STATUS	,	\n"+
+					"	t.ORA_BILL_ADDRESS_ID 	AS	ORA_BILL_ADDRESS_ID	,	\n"+
+					"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
+					"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
+	                "   t.org as ORG \n"+
+					"	FROM t_order t ,m_customer m	\n"+
+					"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
+					"   and  m.user_id = "+userBean.getId()+" \n"+
+					"   and  t.DOC_STATUS = 'SV' \n"+
+					"   and ( t.TEMP2_EXPORTED  = 'N' OR t.TEMP2_EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
+					"   ORDER BY t.ORDER_NO \n";
 			}
 			else if(tableBean.getTableName().equalsIgnoreCase("t_visit")){
 				str ="	select			\n"+
-				"	t_visit.visit_id	AS 	VISIT_ID,	\n"+
-				/** TEXT FORMAL **/
-				"	'H'	AS 	RECORD_TYPE,	\n"+
-				"	t_visit.CODE	AS 	VISIT_CODE,	\n"+
-				"	t_visit.CODE	AS 	CODE,	\n"+
-				"	t_visit.VISIT_DATE	AS 	VISIT_DATE,	\n"+
-				"	t_visit.VISIT_TIME	AS 	VISIT_TIME,	\n"+
-				"	m_customer.code	AS 	CUSTOMER_ID,	\n"+
-				"	t_visit.SALES_CLOSED	AS 	SALES_CLOSED,	\n"+
-				"	t_visit.UNCLOSED_REASON	AS 	UNCLOSED_REASON,	\n"+
-				"	t_visit.USER_ID	AS 	USER_ID,	\n"+
-				"	t_visit.ISACTIVE	AS 	ISACTIVE,	\n"+
-				"	t_visit.INTERFACES	AS 	INTERFACES,	\n"+
-				"	m_customer.code	AS 	CUSTOMER_NUMBER,	\n"+
-				"	m_customer.name	AS 	CUSTOMER_NAME ,	\n"+
-				"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
-				"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME	\n"+
-			
-				"   from t_visit ,m_customer "+
-				"   where t_visit.user_id ="+userBean.getId()+ " \n"+
-				"   and m_customer.customer_id = t_visit.customer_id \n"+
-				"   and t_visit.ISACTIVE ='Y'  \n"+
-				"   and ( t_visit.EXPORTED  = 'N' OR t_visit.EXPORTED  IS NULL OR TRIM(t_visit.EXPORTED) ='') \n";
+					"	t_visit.visit_id	AS 	VISIT_ID,	\n"+
+					/** TEXT FORMAL **/
+					"	'H'	AS 	RECORD_TYPE,	\n"+
+					"	t_visit.CODE	AS 	VISIT_CODE,	\n"+
+					"	t_visit.CODE	AS 	CODE,	\n"+
+					"	t_visit.VISIT_DATE	AS 	VISIT_DATE,	\n"+
+					"	t_visit.VISIT_TIME	AS 	VISIT_TIME,	\n"+
+					"	m_customer.code	AS 	CUSTOMER_ID,	\n"+
+					"	t_visit.SALES_CLOSED	AS 	SALES_CLOSED,	\n"+
+					"	t_visit.UNCLOSED_REASON	AS 	UNCLOSED_REASON,	\n"+
+					"	t_visit.USER_ID	AS 	USER_ID,	\n"+
+					"	t_visit.ISACTIVE	AS 	ISACTIVE,	\n"+
+					"	t_visit.INTERFACES	AS 	INTERFACES,	\n"+
+					"	m_customer.code	AS 	CUSTOMER_NUMBER,	\n"+
+					"	m_customer.name	AS 	CUSTOMER_NAME ,	\n"+
+					"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME	\n"+
+				
+					"   from t_visit ,m_customer "+
+					"   where t_visit.user_id ="+userBean.getId()+ " \n"+
+					"   and m_customer.customer_id = t_visit.customer_id \n"+
+					"   and t_visit.ISACTIVE ='Y'  \n"+
+					"   and ( t_visit.EXPORTED  = 'N' OR t_visit.EXPORTED  IS NULL OR TRIM(t_visit.EXPORTED) ='') \n";
 			}else if(tableBean.getTableName().equalsIgnoreCase("m_sales_inventory")){
 				str ="	select 	\n"+
 				"	(select name from m_sub_inventory s1 where s.sub_inventory_id = s1.sub_inventory_id)AS 	sub_inventory_id,	\n"+

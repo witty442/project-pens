@@ -86,6 +86,7 @@ public class SAInitial {
 		MULTI_SELECTION_LIST.add("Brand_Group");
 		MULTI_SELECTION_LIST.add("Organization_id");
 		MULTI_SELECTION_LIST.add("Order_type_id");
+		MULTI_SELECTION_LIST.add("SUBBRAND");
 		
 		/** Column Of ORDER **/
 		COLUMN_ORDER_MAP.put("ORDERED","ORDERED");
@@ -953,7 +954,7 @@ public class SAInitial {
 					}
 					
 					/** filter by user **/
-					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "Brand","");
+					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "subbrand","");
 					
 					sql += "order by subbrand_no \n";
 					

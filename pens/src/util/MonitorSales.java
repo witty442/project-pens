@@ -66,6 +66,12 @@ public class MonitorSales {
 			
 			String currentAppVersion = Utils.isNull(FileUtil.readFile(path+"current-app-version.txt", "UTF-8"));
 			String latestAppVersion  = Utils.isNull(FileUtil.readFile(path+"Lastest-app-version.txt", "UTF-8"));
+			if("".equals(currentAppVersion)){
+				FileUtil.writeFile(path+"current-app-version.txt", "");
+			}
+			if("".equals(latestAppVersion)){
+				FileUtil.writeFile(path+"Lastest-app-version.txt", "");
+			}
 			
 			String dateStr  = Utils.format(new Date(), "yyyyMM");
             String fileName = u.getCode()+".txt";

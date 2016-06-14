@@ -330,7 +330,6 @@ public class MCDAO {
 				   sql.append("\n select S.emp_ref_id,S.employee_id,E.name,E.surname,E.title,E.emp_type " );
 				   sql.append("\n ,E.region ,S.mc_route,E.mobile1,E.mobile2" );
 				   sql.append("\n from MC_EMPLOYEE E " );
-				   
 				    sql.append("\n INNER JOIN ( ");
 					sql.append("\n    SELECT distinct R.mc_area as region ,MT.emp_ref_id ,MT.employee_id ");
 					sql.append("\n    ,MT.is_active ,MT.mc_route,R.route_name" );
@@ -403,7 +402,7 @@ public class MCDAO {
 				
 				while(rst.next()) {
 				   h = new MCBean();
-				   logger.debug("Found");
+				  // logger.debug("Found");
 				   h.setNo(r);
 				   h.setEmpRefId(Utils.isNull(rst.getString("emp_ref_id")));
 				   h.setEmpId(Utils.isNull(rst.getString("employee_id")));

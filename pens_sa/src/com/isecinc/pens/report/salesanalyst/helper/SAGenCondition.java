@@ -57,8 +57,9 @@ public class SAGenCondition {
 					sql +=" ) \n";
 				}
 			}else if(Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("SUBBRAND")){
-			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue1())+"' ) \n ";
-				
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
+			       sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no in ("+ SAUtils.converToText(salesBean.getCondName1(), Utils.isNull(salesBean.getCondValue1()))+"))\n ";
+				}
 			}else{
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName1())+" IN ("+ SAUtils.converToText(salesBean.getCondName1(), Utils.isNull(salesBean.getCondValue1()))+") \n ";
@@ -91,8 +92,10 @@ public class SAGenCondition {
 					sql +=" ) \n";
 				}
 			}else if(Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("SUBBRAND")){
-			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue2())+"' ) \n ";
-			
+			     //sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue2())+"' ) \n ";
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
+				       sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no in ("+ SAUtils.converToText(salesBean.getCondName2(), Utils.isNull(salesBean.getCondValue2()))+")) \n ";
+				}
 			}else{
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName2())+" IN ("+SAUtils.converToText(salesBean.getCondName2(), Utils.isNull(salesBean.getCondValue2()))+") \n ";
@@ -126,8 +129,10 @@ public class SAGenCondition {
 					sql +=" ) \n";
 				}
 			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("SUBBRAND")){
-			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
-			
+			     //sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
+				      sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no in ("+ SAUtils.converToText(salesBean.getCondName3(), Utils.isNull(salesBean.getCondValue3()))+")) \n ";
+				}
 			}else{
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
 					sql +="and "+aliasSub+ Utils.isNull(salesBean.getCondName3())+" IN ("+SAUtils.converToText(salesBean.getCondName3(), Utils.isNull(salesBean.getCondValue3()))+") \n ";
@@ -161,8 +166,10 @@ public class SAGenCondition {
 					sql +=" ) \n";
 				}
 			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("SUBBRAND")){
-			     sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
-			
+			    // sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no = '"+ Utils.isNull(salesBean.getCondValue3())+"' ) \n ";
+				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
+				      sql +="AND  INVENTORY_ITEM_ID IN ( select INVENTORY_ITEM_ID from XXPENS_BI_MST_SUBBRAND where subbrand_no in ("+ SAUtils.converToText(salesBean.getCondName4(), Utils.isNull(salesBean.getCondValue4()))+")) \n ";
+				}
 			}else{
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
 					sql +="and "+ Utils.isNull(salesBean.getCondName4())+" IN ("+SAUtils.converToText(salesBean.getCondName4(), Utils.isNull(salesBean.getCondValue4()))+") \n ";

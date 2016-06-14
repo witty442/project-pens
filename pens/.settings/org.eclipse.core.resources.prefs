@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//WebContent/jsp/customer/dispImageLocal_BK2.jsp=UTF-8
 encoding//WebContent/jsp/header.jsp=UTF-8
+encoding//WebContent/jsp/location/showMapDetail.jsp=UTF-8
 encoding//src/com/isecinc/pens/process/modifier/ModifierProcess.java=cp874
 encoding/<project>=cp874

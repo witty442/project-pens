@@ -176,9 +176,9 @@ function search(path){
 	return true;
 }
 
-function exportExcel(path,staffId,monthTrip,maxDayInMonth){
+function exportExcel(path,empId,monthTrip,maxDayInMonth){
 	var form = document.mcForm;
-	var param ="&empId="+staffId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
+	var param ="&empId="+empId+"&monthTrip="+monthTrip+"&maxDayInMonth="+maxDayInMonth;
 	
 	form.action = path + "/jsp/mcAction.do?do=exportExcel"+param;
 	form.submit();

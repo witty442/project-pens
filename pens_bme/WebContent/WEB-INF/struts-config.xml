@@ -65,6 +65,7 @@
 		<form-bean name="addItemPickStockForm" type="com.isecinc.pens.web.pick.AddItemPickStockForm" />
 		<form-bean name="confPickStockForm" type="com.isecinc.pens.web.pick.ConfPickStockForm" />
 		<form-bean name="moveWarehouseForm" type="com.isecinc.pens.web.pick.MoveWarehouseForm" />
+		<form-bean name="moveStockWarehouseForm" type="com.isecinc.pens.web.pick.MoveStockWarehouseForm" />
 		<form-bean name="stockQueryForm" type="com.isecinc.pens.web.pick.StockQueryForm" />
 		<form-bean name="stockFinishGoodQueryForm" type="com.isecinc.pens.web.pick.StockFinishGoodQueryForm" />
 		
@@ -84,6 +85,9 @@
 		<!-- Interfaces -->
 		<form-bean name="interfacesForm" type="com.isecinc.pens.web.interfaces.InterfacesForm" />
 		<form-bean name="saveInvoiceForm" type="com.isecinc.pens.web.interfaces.SaveInvoiceForm" />
+		
+		<form-bean name="priceListMasterForm" type="com.isecinc.pens.web.pricelist.PriceListMasterForm" />
+		<form-bean name="scanCheckForm" type="com.isecinc.pens.web.pick.ScanCheckForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -233,10 +237,18 @@
 		</action>
 		
 		<!-- POPUP JOB -->
-		<action name="popupForm" path="/jsp/searchJobPopupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.SearchJobPopupAction" >
+		<action name="popupForm" path="/jsp/searchJobPopupAction" parameter="do" scope="request" type="com.isecinc.pens.web.popup.SearchJobPopupAction" >
 			<forward name="search" path="/jsp/popup/searchJobPopup.jsp" />
 			<forward name="prepare" path="/jsp/popup/searchJobPopup.jsp" />
 			<forward name="clear" path="/jsp/popup/searchJobPopup.jsp" />
+			
+			<forward name="search3" path="/jsp/popup/searchJobPopupWithStoreDetail.jsp" />
+		</action>
+		
+		<action name="popupForm" path="/jsp/searchStockIssuePopupAction" parameter="do" scope="request" type="com.isecinc.pens.web.popup.SearchStockIssuePopupAction" >
+			<forward name="search" path="/jsp/popup/searchStockIssuePopup.jsp" />
+			<forward name="prepare" path="/jsp/popup/searchStockIssuePopup.jsp" />
+			<forward name="clear" path="/jsp/popup/searchStockIssuePopup.jsp" />
 			
 			<forward name="search3" path="/jsp/popup/searchJobPopupWithStoreDetail.jsp" />
 		</action>
@@ -322,6 +334,17 @@
 			<forward name="prepare" path="/jsp/pick/barcode.jsp" />
 			<forward name="clear" path="/jsp/pick/barcode.jsp" />
 			<forward name="addRow" path="/jsp/pick/barcode.jsp" />
+		</action>
+		
+		<action name="scanCheckForm" path="/jsp/scanCheckAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ScanCheckAction">
+			<forward name="search2" path="/jsp/pick/scanCheckSearch.jsp" />
+			<forward name="prepare2" path="/jsp/pick/scanCheckSearch.jsp" />
+			<forward name="clear2" path="/jsp/pick/scanCheckSearch.jsp" />
+			
+			<forward name="search" path="/jsp/pick/scanCheck.jsp" />
+			<forward name="prepare" path="/jsp/pick/scanCheck.jsp" />
+			<forward name="clear" path="/jsp/pick/scanCheck.jsp" />
+			<forward name="addRow" path="/jsp/pick/scanCheck.jsp" />
 		</action>
 		
 		<action name="stockPickQueryForm" path="/jsp/stockPickQueryAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.StockPickQueryAction">
@@ -435,6 +458,11 @@
 			<forward name="prepare" path="/jsp/pick/moveWarehouse.jsp" />
 			<forward name="clear" path="/jsp/pick/moveWarehouse.jsp" />
 		</action>
+		<action name="moveStockWarehouseForm" path="/jsp/moveStockWarehouseAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.MoveStockWarehouseAction">
+			<forward name="search" path="/jsp/pick/moveStockWarehouse.jsp" />
+			<forward name="prepare" path="/jsp/pick/moveStockWarehouse.jsp" />
+			<forward name="clear" path="/jsp/pick/moveStockWarehouse.jsp" />
+		</action>
 		
 		<action name="genCNForm" path="/jsp/genCNAction" parameter="do" scope="session" type="com.isecinc.pens.web.cn.GenCNAction">
 			<forward name="search" path="/jsp/main/genCN.jsp" />
@@ -518,6 +546,11 @@
 		<action name="saveInvoiceForm" path="/jsp/saveInvoiceAction" parameter="do" scope="session" type="com.isecinc.pens.web.interfaces.SaveInvoiceAction" >
 			<forward name="search" path="/jsp/interfaces/saveInvoice.jsp"/>
 			<forward name="clear" path="/jsp/interfaces/saveInvoice.jsp" />
+		</action>
+		
+		<action name="priceListMasterForm" path="/jsp/priceListMasterAction" parameter="do" scope="session" type="com.isecinc.pens.web.pricelist.PriceListMasterAction" >
+			<forward name="search" path="/jsp/master/priceListMasterSearch.jsp"/>
+			<forward name="detail" path="/jsp/master/priceListMaster.jsp" />
 		</action>
 		
 		<!-- AdminConsole -->

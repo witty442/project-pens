@@ -28,6 +28,7 @@ public class InitialReferences extends I_Initial {
 	 */
 	public void init(Connection conn) {
 		try {
+
 			
 		} catch (Exception e) {
 			logger.error(e.toString());

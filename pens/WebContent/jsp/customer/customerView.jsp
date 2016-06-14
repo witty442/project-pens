@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -58,6 +59,46 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg" type="text/javascript"></script>
+
+<script type="text/javascript">
+/**********************************************MAP***************************************/
+ function gotoMap(path){
+	 var location= $("#location").val();
+		//alert(lat+","+lng);
+		if(location != "" ){
+			var locationArr = location.split(",");
+			var lat = locationArr[0];
+			var lng = locationArr[1];
+		    var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
+		   // window.open(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName);
+		    var width= window.innerWidth-100;
+			var height= window.innerHeight-100;
+			//alert(width+","+height);
+			PopupCenter(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName, "แสดงแผนที่",width,height);
+			//window.open("https://www.google.co.th/maps/place/"+location);
+	}else{
+		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
+	}
+}
+ /******************************** MAP**********************************************************/
+  function showImage(path,customerId){
+	 var location= $("#imageFileName").val();
+		//alert(lat+","+lng);
+	 if(location != "" ){
+		var width= window.innerWidth-100;
+		var height= window.innerHeight-100;
+	
+		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
+			
+	}else{
+		alert("ยังไม่ได้บันทึกข้อมูลรูปภาพ'");
+	}
+}
+
+</script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -120,7 +161,7 @@ body {
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.code" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.code" readonly="true" styleClass="disableText" styleId="customerCode"/>
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -134,7 +175,7 @@ body {
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Name" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.name" size="25" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.name" size="25" readonly="true" styleClass="disableText" styleId="customerName"/>
 								</td>
 								<%if(action.equals("view")){ %>
 								<td align="right"><bean:message key="Customer.SubName" bundle="sysele"/>&nbsp;&nbsp;</td>
@@ -357,7 +398,7 @@ body {
 									<html:hidden property="customer.totalInvoice"/>
 								</td>
 							</tr>
-							<%if(action.equalsIgnoreCase("view")){ %>
+						
 							<tr>
 								<%if(role.equalsIgnoreCase(User.VAN)){ %>
 								<td colspan="2"></td>
@@ -379,10 +420,49 @@ body {
 								</td>
 							</tr>
 							<%} %>
-							<%} %>
+							<tr>
+								<td></td>
+								<td colspan="4"><hr></td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2"></td>
+								<td align="left" colspan="3">
+								     <img id="blah" /> 
+									 <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									       <img src="${pageContext.request.contextPath }/photoServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
+									<%} %>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2">ไฟล์รูปร้านค้า</td>
+								<td align="left" colspan="3">
+								   <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									     <html:text property="customer.imageFileName" readonly="true" styleClass="disableText" size="100" styleId="imageFileName"></html:text>
+									<%}else{ %>
+									     <html:hidden property="customer.imageFileName" ></html:hidden>
+									 <%} %>
+									
+									<input type="button" value="แสดงรูปภาพเต็มจอ " class="newPosBtn" onclick="return showImage('${pageContext.request.contextPath}','${customerForm.customer.id }');">
+									 
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
+								<td align="left" colspan="3">
+									<html:text property="customer.location" size="100" readonly="true" styleId="location" styleClass="disableText" /> 
+								</td>
+							</tr>
+							<tr>
+							    <td align="right" colspan="2"></td>
+									<td align="left" colspan="3">
+										<input type="button" value="แสดงตำแหน่ง " class="newPosBtn" onclick="return gotoMap('${pageContext.request.contextPath}');">
+								</td>
+							</tr>
+						
 						</table>
 						<br />
 						<!-- BUTTON -->
+						CustomerView
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
 								<td align="center">
@@ -439,6 +519,8 @@ body {
 						<html:hidden property="customer.id"/>
 						<html:hidden property="customer.exported"/>
 						<input type="hidden" name="tf" value="<%=session.getAttribute("tf") %>">
+						<div id="addressList" style="text-align: left;display: none;"></div>
+						<div id="contactList" style="text-align: left;display: none;"></div>
 						</html:form>
 						<!-- BODY -->
 					</td>

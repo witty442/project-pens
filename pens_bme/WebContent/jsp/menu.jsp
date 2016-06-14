@@ -11,7 +11,7 @@
 <%
   EnvProperties env = EnvProperties.getInstance();
   User user = (User)session.getAttribute("user");
-  System.out.println("Role:"+user.getRole().getKey());
+ // System.out.println("Role:"+user.getRole().getKey());
   
   String userName =user.getUserName();
   String password=user.getPassword();
@@ -48,8 +48,8 @@
 	  hostDD = "http://"+ipDD+":8081";
   }
   
-  System.out.println("contextPathProd:"+contextPathProd);
-  System.out.println("contextPathDD:"+contextPathDD);
+ // System.out.println("contextPathProd:"+contextPathProd);
+ // System.out.println("contextPathDD:"+contextPathDD);
 
 %>
 <script>
@@ -197,7 +197,10 @@
 				       </li>
 				       <li>
 					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');">12.2 <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span></a>
-				     </li>
+				      </li>
+				      <li>
+					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitMTT');">12.3 <span><bean:message bundle="sysprop" key="LoadStockInitMTT"/></span></a>
+				      </li>
 			       </ul>
 			  </li>
 		</ul>
@@ -352,13 +355,20 @@
 		<ul>
 	     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/jobAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="job"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/jobAction.do?do=prepare2&action=new');"><span>1. <bean:message bundle="sysprop" key="job"/></span></a>
 			</li>
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/barcodeAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="scanBarcode"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/barcodeAction.do?do=prepare2&action=new');"><span>2. <bean:message bundle="sysprop" key="scanBarcode"/></span></a>
 			</li>
-			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveWarehouseAction.do?do=prepare&action=new');"><span>3.<bean:message bundle="sysprop" key="moveWarehouse"/></span></a>
+			 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>3.Transfer Stock </span></a>
+			       <ul>
+						<li>
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveWarehouseAction.do?do=prepare&action=new');"><span>3.1 <bean:message bundle="sysprop" key="moveWarehouse"/></span></a>
+						</li>
+						 <li>
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveStockWarehouseAction.do?do=prepare&action=new');"><span>3.2 <bean:message bundle="sysprop" key="moveStockWarehouse"/></span></a>
+						</li>  
+			      </ul>
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqFinishAction.do?do=prepare2&action=new');"><span>4.<bean:message bundle="sysprop" key="reqFinish"/></span></a>
@@ -372,39 +382,48 @@
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/stockFinishGoodQueryAction.do?do=prepare&action=new');"><span>7.<bean:message bundle="sysprop" key="stockFinishGoodQuery"/></span></a>
 			</li>
-			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W2');"><span>8.<bean:message bundle="sysprop" key="reqPickStockW2"/></span></a>
-			</li> 
-			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>9.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
-			</li> 
-			<!-- OLD -->
-			<%--  <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqReturnWacoalAction.do?do=prepare2&action=new');"><span>(OLD)10.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
-			</li>  
-			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confirmReturnWacoalAction.do?do=prepare2&action=new');"><span>(OLD)11.<bean:message bundle="sysprop" key="confirmReturnWacoal"/></span></a>
-			</li> --%>
 			
-			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqReturnAction.do?do=prepare2&action=new');"><span>10.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
+
+			 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>8.Request เบิกสินค้าจาก PD</span></a>
+			    <ul>
+			        <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W2');"><span>8.1 <bean:message bundle="sysprop" key="reqPickStockW2"/></span></a>
+			       </li>
+			        <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W3');"><span>8.2 <bean:message bundle="sysprop" key="reqPickStockW3"/></span></a>
+			       </li> 
+			        <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');"><span>8.3 <bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
+			        </li>
+			         <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W5');"><span>8.4 <bean:message bundle="sysprop" key="reqPickStockW5"/></span></a>
+			        </li>
+			    </ul>
+			 </li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/scanCheckAction.do?do=prepare2&action=new');"><span>9.<bean:message bundle="sysprop" key="scanCheck"/></span></a>
 			</li> 
 			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confirmReturnAction.do?do=prepare2&action=new');"><span>11.<bean:message bundle="sysprop" key="confirmReturnWacoal"/></span></a>
-			</li>
-			 
-			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span>12.<bean:message bundle="sysprop" key="pickStock"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>10.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
 			</li> 
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=req');"><span>13.<bean:message bundle="sysprop" key="pickStockGroup"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqReturnAction.do?do=prepare2&action=new');"><span>11.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
+			</li> 
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confirmReturnAction.do?do=prepare2&action=new');"><span>12.<bean:message bundle="sysprop" key="confirmReturnWacoal"/></span></a>
+			</li>
+			
+			 <!-- Deprecate -->
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span><u>_12.<bean:message bundle="sysprop" key="pickStock"/></u></span></a>
 			</li> 
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');"><span>14.<bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
-			</li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=req');"><span><u>13.<bean:message bundle="sysprop" key="pickStockGroup"/></u></span></a>
+			</li> 
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=complete');"><span>15.<bean:message bundle="sysprop" key="pickStockGroupComplete"/></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=complete');"><span><u>14.<bean:message bundle="sysprop" key="pickStockGroupComplete"/></u></span></a>
 			</li>
+			
 		</ul>
 	<%}else if ( Utils.userInRole(user,new String[]{User.SALE}) ){%>
 	        <li>
@@ -416,9 +435,12 @@
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W2');"><span>3.<bean:message bundle="sysprop" key="reqPickStockW2"/></span></a>
 			</li> 
-			 <li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W3');"><span>4.<bean:message bundle="sysprop" key="reqPickStockW3"/></span></a>
+			 </li> 
+			<%--  <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=req');"><span>4.<bean:message bundle="sysprop" key="pickStockGroup"/></span></a>
-			</li> 
+			</li>  --%>
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');"><span>5.<bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
 			</li>
@@ -497,6 +519,17 @@
 	</li> 
 <%} %>
 
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){%>
+  	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Master Data</span></a>
+		<ul>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){%>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/priceListMasterAction.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="PriceListMaster"/></span></a>
+			</li>   
+		<%} %>
+		</ul>
+	</li> 
+<%} %>
 
 </ul>
    

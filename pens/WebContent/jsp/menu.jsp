@@ -10,7 +10,7 @@ User user = (User)session.getAttribute("user");
 %>
 <%if(role.equalsIgnoreCase(User.NB)){ %>
 <ul id="nav">
-	<li><a href="#" class="parent"><span><bean:message key="Reports" bundle="sysprop"/></span></a>
+	<li><a href="" class="parent"><span><bean:message key="Reports" bundle="sysprop"/></span></a>
     	<ul>
 			<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/shipmentReport.do';"><span><bean:message key="HeartiBenecolShipment" bundle="sysprop"/></span></a>
@@ -29,7 +29,7 @@ User user = (User)session.getAttribute("user");
 </ul>
 <%}else {%>
 <ul id="nav">
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
+	<li><a href="" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
 		<ul>
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/profile.do?id=<%=((User)session.getAttribute("user")).getId() %>';"><span><bean:message key="Profile" bundle="sysprop"/></span></a>
@@ -103,7 +103,7 @@ User user = (User)session.getAttribute("user");
      <%} %>
             
     <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
-    <li><a href="#" class="parent"><span><bean:message key="MasterData" bundle="sysprop"/></span></a>
+    <li><a href="" class="parent"><span><bean:message key="MasterData" bundle="sysprop"/></span></a>
         <ul>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product.do';"><span><bean:message key="Product" bundle="sysprop"/></span></a>
@@ -129,7 +129,7 @@ User user = (User)session.getAttribute("user");
     <%} %>
     
     <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
-    <li><a href="#" class="parent"><span><bean:message key="Reports" bundle="sysprop"/></span></a>
+    <li><a href="" class="parent"><span><bean:message key="Reports" bundle="sysprop"/></span></a>
     	<ul>
     		<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/orderThreeMonthsReport.do';"><span><bean:message key="OrderHistoryReport" bundle="sysprop"/></span></a>
@@ -178,7 +178,7 @@ User user = (User)session.getAttribute("user");
     </li>
     <%} %>
    
-    <li class="parent"><a href="#"><span><bean:message key="Interfaces" bundle="sysprop"/></a>
+    <li class="parent"><a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';" class="parent"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
    		<ul>
            	<li>
            		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
@@ -192,7 +192,7 @@ User user = (User)session.getAttribute("user");
        </ul>
    </li>
    <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-    <li><a href="#" class="parent"><span><bean:message key="Interim" bundle="sysprop"/></span></a>
+    <li><a href="" class="parent"><span><bean:message key="Interim" bundle="sysprop"/></span></a>
     	<ul>
     		<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/autoCreateReceipt.do?do=prepare';"><span><bean:message key="Interim.AutoCreateReceipt" bundle="sysprop"/></span></a>
@@ -204,7 +204,7 @@ User user = (User)session.getAttribute("user");
       </li>
      <%} %>
      
-     <li><a href="#" onclick="" class="parent"><span>ค้นหาข้อมูล</span></a>
+     <li><a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';" class="parent"><span>ค้นหาข้อมูล</span></a>
 	     <ul>
 	    		<li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span>รายงานการขาย By Item</span></a>
@@ -212,7 +212,7 @@ User user = (User)session.getAttribute("user");
 	     </ul>
      </li>
 
-    <li><a href="#" class="parent"><span>รายการทั่วไป</span></a>
+    <li><a href="" class="parent"><span>รายการทั่วไป</span></a>
     	<ul>
     	   <%if(role.equalsIgnoreCase(User.TT)){ %>
     		<li>
@@ -226,7 +226,7 @@ User user = (User)session.getAttribute("user");
       </li>
     
 	 <%if(role.equalsIgnoreCase(User.VAN)){ %>
-	     <li><a href="#" onclick="" class="parent"><span>รายการ เบิก/คืน</span></a>
+	     <li><a href="" onclick="" class="parent"><span>รายการ เบิก/คืน</span></a>
 		     <ul>
 		    	<li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderAction.do?do=prepare&action=new&moveOrderType=MoveOrderRequisition';"><span>รายการใบเบิกสินค้า</span></a>

@@ -44,7 +44,7 @@ if(session.getAttribute("wareHouseList2") == null){
 	List<References> wareHouseList = new ArrayList();
 	References ref1 = new References("","");
 	wareHouseList.add(ref1);
-	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W4+"'"));
+	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W3+"','"+PickConstants.WAREHOUSE_W4+"'"));
 	
 	session.setAttribute("wareHouseList2",wareHouseList);
 }
@@ -54,6 +54,7 @@ if(session.getAttribute("wareHouseList2") == null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />

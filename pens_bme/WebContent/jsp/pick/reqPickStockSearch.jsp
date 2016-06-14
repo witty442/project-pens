@@ -47,10 +47,15 @@ if(session.getAttribute("pickTypeList") == null){
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
 	 if("W2".equalsIgnoreCase(wareHouse)){
-	     billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W2"));
+	 }else  if("W3".equalsIgnoreCase(wareHouse)){
+	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W3"));
+	 }else  if("W5".equalsIgnoreCase(wareHouse)){
+	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W5"));
 	 }else{
+		 //W4
 		 PopupForm cri = new PopupForm();
-		 billTypeList.addAll(GeneralDAO.searchCustGroupW4(cri)); 
+		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(cri,"W4")); 
 	 }
 	session.setAttribute("custGroupList",billTypeList);
 //}
@@ -60,6 +65,7 @@ if(session.getAttribute("pickTypeList") == null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
@@ -167,7 +173,11 @@ function openConfirm(path,documentNo,issueReqStatus){
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW2"/>
 				 </jsp:include>
-				<%}else{ %>
+			   <%}else if("W3".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW3"/>
+				 </jsp:include>
+				<%}else if("W4".equalsIgnoreCase(wareHouse)){ %>
 				  <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW4"/>
 				 </jsp:include>

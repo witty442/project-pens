@@ -51,7 +51,8 @@ public class StockFinishGoodQueryAction extends I_Action {
 				StockQuery bean = new StockQuery();
 				bean.setWareHouse("W2");
 				aForm.setBean(bean);
-			}else{
+				
+				//init Warehouse Desc
 				
 			}
 		

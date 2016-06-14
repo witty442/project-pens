@@ -64,6 +64,10 @@
 		</init-param>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
+	<servlet>
+	    <servlet-name>PhotoServlet</servlet-name>
+	    <servlet-class>util.PhotoServlet</servlet-class>
+	</servlet>
 
 	<!-- Member Import  -->
 	<servlet>
@@ -83,6 +87,10 @@
 		<url-pattern>/jsp/mior</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+	    <servlet-name>PhotoServlet</servlet-name>
+	    <url-pattern>/photoServlet</url-pattern>
+	</servlet-mapping>
 
 	<!-- Print Sticker  -->
 	<servlet-mapping>

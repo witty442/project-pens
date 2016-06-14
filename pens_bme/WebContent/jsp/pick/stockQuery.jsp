@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -29,6 +30,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stockPickQuery.css" type="text/css" />
@@ -70,10 +72,10 @@ function loadMe(){
 	if(   document.getElementsByName('bean.wareHouse')[0].checked==false 
 	   && document.getElementsByName('bean.wareHouse')[1].checked ==false 
 	   && document.getElementsByName('bean.wareHouse')[2].checked ==false
-	   && document.getElementsByName('bean.wareHouse')[3].checked ==false){
+	   && document.getElementsByName('bean.wareHouse')[3].checked ==false
+	   && document.getElementsByName('bean.wareHouse')[4].checked ==false){
 		
-		
-		document.getElementsByName('bean.wareHouse')[0].checked =true;//default W1
+		  document.getElementsByName('bean.wareHouse')[0].checked =true;//default W1
 	}
 	
 	swithWareHouse();
@@ -175,6 +177,9 @@ function swithWareHouse(){
 	}else if(document.getElementsByName('bean.wareHouse')[3].checked){//W4{
 		loadStatusList('W4');
 		loadSummaryTypeList('W4');
+	}else if(document.getElementsByName('bean.wareHouse')[4].checked){//W5{
+		loadStatusList('W5');
+		loadSummaryTypeList('W5');
 	}
 	
 	loadSummaryTypeListW2(document.getElementsByName('bean.status')[0]);
@@ -274,10 +279,11 @@ function loadSummaryTypeListW2(status){
 						        <tr>
                                     <td> Warehouse</td>
 									<td colspan="3">					
-										<html:radio property="bean.wareHouse" value="W1" onclick="swithWareHouse()">W1-คลังคืนโรงงานวาโก้</html:radio>
-										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-คลังสต็อก B'me สำหรับโอน</html:radio>
-										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-เบิกสินค้าจากคลังขายสด-เบิกทั้งกล่อง</html:radio>
-										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-คลังสินค้า HIS&HER</html:radio>
+										<html:radio property="bean.wareHouse" value="W1" onclick="swithWareHouse()">W1-<%=PickConstants.getWareHouseDesc("W1") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-<%=PickConstants.getWareHouseDesc("W2") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-<%=PickConstants.getWareHouseDesc("W3") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-<%=PickConstants.getWareHouseDesc("W4") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W5" onclick="swithWareHouse()">W5-<%=PickConstants.getWareHouseDesc("W5") %></html:radio>
 									</td>
 								</tr>
 						       <tr>

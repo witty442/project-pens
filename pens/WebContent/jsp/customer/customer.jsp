@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -28,8 +29,6 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
 List<References> shippingMethod = InitialReferences.getReferenes().get(InitialReferences.SHIPMENT);
 pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE);
-
-
 %>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -42,7 +41,7 @@ pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE)
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Pragma" content="no-cache" /> 
-<meta http-equiv="Expires" content="0" />
+<meta http-equiv="Expires" content="-1" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
@@ -61,10 +60,79 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" language="javascript">
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg" type="text/javascript"></script>
+<script type="text/javascript">
+//API KEY :AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg
+/********************************************** Google Map ***************************************/
+function getLocation(path){
+	var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
+	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName);
+	var width= window.innerWidth-50;
+	var height= window.innerHeight-50;
+	//alert(width+","+height);
+	PopupCenter(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print",width,height);
+	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
+}
+
+ function setLocationValue(location){
+	 $("#location").val(location);
+     //alert(lat+","+lng);
+ }
+
+ function gotoMap(path){
+	 var location= $("#location").val();
+		//alert(lat+","+lng);
+		if(location != "" ){
+			var locationArr = location.split(",");
+			var lat = locationArr[0];
+			var lng = locationArr[1];
+		    var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
+		    var width= window.innerWidth-100;
+			var height= window.innerHeight-100;
+			
+			PopupCenter(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName, "แสดงแผนที่",width,height);
+	        // window.open("https://www.google.co.th/maps/place/"+location);//version 1
+	}else{
+		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
+	}
+}
+ 
+ /********************************************** Google Map ***************************************/
+
+  function showImage(path){
+	 var location= $("#location").val();
+		//alert(lat+","+lng);
+	 if(location != "" ){
+		var width= window.innerWidth-100;
+		var height= window.innerHeight-100;
+	
+		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?", "แสดงรูปภาพ",width,height);
+			
+	}else{
+		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
+	}
+}
+  /** Display image after upload **/
+	function readURL(input) {
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+              $('#blah')
+                  .attr('src', e.target.result)
+                  .width(150)
+                  .height(200);
+          };
+          reader.readAsDataURL(input.files[0]);
+      }
+  }
+  /*****************************************/
+ 
 function editAddressRow(rowNo){
 	editAddress('${pageContext.request.contextPath}', rowNo);
 }
@@ -164,7 +232,7 @@ function switchPrintType(){
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
 		            <td bgcolor="#f8f8f8">
 						<!-- BODY -->
-						<html:form action="/jsp/customerAction">
+						<html:form action="/jsp/customerAction"  enctype="multipart/form-data">
 						<jsp:include page="../error.jsp"/>
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
@@ -191,7 +259,7 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.code" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.code" readonly="true" styleClass="disableText" styleId="customerCode"/>
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
@@ -204,7 +272,7 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Name" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
-									<html:text property="customer.name" size="25" />
+									<html:text property="customer.name" size="25" styleId="customerName"/>
 								</td>
 								<td align="right"><bean:message key="Customer.SubName" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -443,9 +511,56 @@ function switchPrintType(){
 									<html:checkbox property="customer.interfaces" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Interfaces" bundle="sysele"/>
 								</td>
 							</tr>
+							<tr>
+								<td></td>
+								<td colspan="4"><hr></td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2">เลือกไฟล์ รูปภาพร้านค้า&nbsp;&nbsp;</td>
+								<td align="left" colspan="3">
+									<html:file property="imageFile" styleClass="" style="width:300px;height:21px" styleId="imageFile" onchange="readURL(this)"/>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2"></td>
+								<td align="left" colspan="3">
+								   <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									               ไฟล์ที่บันทึกไว้:
+									     <html:text property="customer.imageFileName" readonly="true" styleClass="disableText" size="100" styleId="imageFileName"></html:text>
+									<%} %>
+									
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2"></td>
+								<td align="left" colspan="3">
+								     <img id="blah" /> 
+									 <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									       <img src="${pageContext.request.contextPath }/photoServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
+									<%} %>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
+								<td align="left" colspan="3">
+									<html:text property="customer.location" size="100" readonly="false" styleId="location" styleClass="" /> 
+								</td>
+							</tr>
+							<tr>
+							    <td align="right" colspan="2"></td>
+									<td align="left" colspan="3">
+								      <span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
+									 <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');">
+									
+									 <input type="button" value="แสดงตำแหน่ง " class="newPosBtn" onclick="return gotoMap('${pageContext.request.contextPath}');">
+									 
+								</td>
+							</tr>
 							<%} %>
 						</table>
 						<br />
+						
+						customer
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>

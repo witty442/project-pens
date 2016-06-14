@@ -45,118 +45,6 @@ public class ExportManager {
 
 	}
 	
-	public  MonitorBean exportMain(User userLogin,User userRequest ,String requestTable,String transType,HttpServletRequest request) throws Exception{
-		if(requestTable != null && !Utils.isNull(requestTable).equals("")){
-			return exportByRequestTable(userLogin,userRequest, requestTable, request,transType);
-		}
-		return export(userLogin, userLogin,requestTable, request,Constants.TRANSACTION_MASTER_TYPE);
-	}
-	/**
-	 * exportMain
-	 * @param userBean
-	 * @param requestTable
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	public  MonitorBean exportByRequestTable(User userLogin,User userRequest,String requestTable,HttpServletRequest request,String transType) throws Exception{
-		Connection connMonitor = null;
-		InterfaceDAO dao = new InterfaceDAO();
-		try{
-			connMonitor = DBConnection.getInstance().getConnection();
-			/** insert to monitor_interface **/
-			MonitorBean monitorModel = new MonitorBean();
-			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
-			monitorModel.setType(Constants.TYPE_EXPORT);
-			monitorModel.setStatus(Constants.STATUS_START);
-			monitorModel.setCreateUser(userLogin.getUserName());
-			monitorModel.setTransactionType(transType);
-			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
-			
-			new BatchExportWorker(monitorModel.getTransactionId(), monitorModel.getMonitorId(), monitorModel.getTransactionType(),userLogin, userRequest, requestTable, request).start();
-			
-			return monitorModel;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(connMonitor != null){
-				connMonitor.close();
-				connMonitor =null;
-			}
-		}
-	}
-	
-	/**
-	 * exportMain
-	 * @param userBean
-	 * @param requestTable
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	public  MonitorBean export(User userLogin,User userRequest,String requestTable,HttpServletRequest request,String transType) throws Exception{
-		Connection connMonitor = null;
-		InterfaceDAO dao = new InterfaceDAO();
-		try{
-			connMonitor = DBConnection.getInstance().getConnection();
-			/** Export Master**/
-			MonitorBean monitorModel = new MonitorBean();
-			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
-			monitorModel.setType(Constants.TYPE_EXPORT);
-			monitorModel.setStatus(Constants.STATUS_START);
-			monitorModel.setCreateUser(userLogin.getUserName());
-			monitorModel.setTransactionType(transType);
-			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
-			
-			new BatchExportWorker(monitorModel.getTransactionId(), monitorModel.getMonitorId(), monitorModel.getTransactionType(), userLogin,userRequest, requestTable, request).start();
-			
-			return monitorModel;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(connMonitor != null){
-				connMonitor.close();
-				connMonitor =null;
-			}
-		}
-	}
-	/**
-	 * exportTransaction
-	 * @param userBean
-	 * @param transType
-	 * @param requestTable
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	public  MonitorBean exportTransaction(BigDecimal transactionId ,User userLogin,User userRequest,String requestTable,HttpServletRequest request) throws Exception{
-		Connection connMonitor = null;
-		InterfaceDAO dao = new InterfaceDAO();
-		try{
-			connMonitor = DBConnection.getInstance().getConnection();
-			/** insert to monitor_interface **/
-			MonitorBean monitorModel = new MonitorBean();
-			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
-			monitorModel.setType(Constants.TYPE_EXPORT);
-			monitorModel.setStatus(Constants.STATUS_START);
-			monitorModel.setCreateUser(userLogin.getUserName());
-			monitorModel.setTransactionType(Constants.TRANSACTION_TRANS_TYPE);
-			monitorModel.setTransactionId(transactionId);
-			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
-			
-			monitorModel = exportToTxt(monitorModel.getTransactionId() ,monitorModel.getMonitorId(),monitorModel.getTransactionType(), userLogin,userRequest, requestTable, request);
-			
-			return monitorModel;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(connMonitor != null){
-				connMonitor.close();
-				connMonitor =null;
-			}
-		}
-	}
-	
 	/**
 	 * 
 	 * @param transactionId
@@ -211,8 +99,6 @@ public class ExportManager {
 				MonitorItemBean modelItem = new MonitorItemBean();
 				MonitorItemDetailBean[] modelDetailItem = null;
                 try{
-                	
-                	
 					if(tableBean.getTableName().equalsIgnoreCase("m_customer")){
 						logger.info("--Start Export m_customer --");
 					   /** Count Record and Prepare Monitor_item_detail(Data Export) */
@@ -484,14 +370,11 @@ public class ExportManager {
 				    int updateRecord = exProcess.updateExportFlag(conn, userRequest,tableBean);
 				    logger.debug("***** -Result Update Interfaces "+tableBean.getTableName()+"  Flag "+updateRecord+" *************");
 				}
-				
-				
-				
 				isExc = true;
 			}//for
 			
 			logger.info("Step Upload ALL File To FTP Server");
-			ftpManager.uploadAllFileToFTP_OPT2(initConfigMap, "");
+			ftpManager.uploadAllFileToFTP_OPT2(userLogin,initConfigMap, "");
 
 			logger.info("Step Success Transaction Commit");
 			conn.commit();
@@ -544,4 +427,118 @@ public class ExportManager {
 		}
 		return monitorModel;
 	}
+
+
+	public  MonitorBean exportMain(User userLogin,User userRequest ,String requestTable,String transType,HttpServletRequest request) throws Exception{
+		if(requestTable != null && !Utils.isNull(requestTable).equals("")){
+			return exportByRequestTable(userLogin,userRequest, requestTable, request,transType);
+		}
+		return export(userLogin, userLogin,requestTable, request,Constants.TRANSACTION_MASTER_TYPE);
+	}
+	/**
+	 * exportMain
+	 * @param userBean
+	 * @param requestTable
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public  MonitorBean exportByRequestTable(User userLogin,User userRequest,String requestTable,HttpServletRequest request,String transType) throws Exception{
+		Connection connMonitor = null;
+		InterfaceDAO dao = new InterfaceDAO();
+		try{
+			connMonitor = DBConnection.getInstance().getConnection();
+			/** insert to monitor_interface **/
+			MonitorBean monitorModel = new MonitorBean();
+			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
+			monitorModel.setType(Constants.TYPE_EXPORT);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
+			monitorModel.setTransactionType(transType);
+			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
+			
+			new BatchExportWorker(monitorModel.getTransactionId(), monitorModel.getMonitorId(), monitorModel.getTransactionType(),userLogin, userRequest, requestTable, request).start();
+			
+			return monitorModel;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(connMonitor != null){
+				connMonitor.close();
+				connMonitor =null;
+			}
+		}
+	}
+	
+	/**
+	 * exportMain
+	 * @param userBean
+	 * @param requestTable
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public  MonitorBean export(User userLogin,User userRequest,String requestTable,HttpServletRequest request,String transType) throws Exception{
+		Connection connMonitor = null;
+		InterfaceDAO dao = new InterfaceDAO();
+		try{
+			connMonitor = DBConnection.getInstance().getConnection();
+			/** Export Master**/
+			MonitorBean monitorModel = new MonitorBean();
+			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
+			monitorModel.setType(Constants.TYPE_EXPORT);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
+			monitorModel.setTransactionType(transType);
+			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
+			
+			new BatchExportWorker(monitorModel.getTransactionId(), monitorModel.getMonitorId(), monitorModel.getTransactionType(), userLogin,userRequest, requestTable, request).start();
+			
+			return monitorModel;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(connMonitor != null){
+				connMonitor.close();
+				connMonitor =null;
+			}
+		}
+	}
+	/**
+	 * exportTransaction
+	 * @param userBean
+	 * @param transType
+	 * @param requestTable
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public  MonitorBean exportTransaction(BigDecimal transactionId ,User userLogin,User userRequest,String requestTable,HttpServletRequest request) throws Exception{
+		Connection connMonitor = null;
+		InterfaceDAO dao = new InterfaceDAO();
+		try{
+			connMonitor = DBConnection.getInstance().getConnection();
+			/** insert to monitor_interface **/
+			MonitorBean monitorModel = new MonitorBean();
+			monitorModel.setName("EXP-"+request.getRemoteAddr()+"-"+request.getRemotePort());
+			monitorModel.setType(Constants.TYPE_EXPORT);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
+			monitorModel.setTransactionType(Constants.TRANSACTION_TRANS_TYPE);
+			monitorModel.setTransactionId(transactionId);
+			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
+			
+			monitorModel = exportToTxt(monitorModel.getTransactionId() ,monitorModel.getMonitorId(),monitorModel.getTransactionType(), userLogin,userRequest, requestTable, request);
+			
+			return monitorModel;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(connMonitor != null){
+				connMonitor.close();
+				connMonitor =null;
+			}
+		}
+	}
+	
 }

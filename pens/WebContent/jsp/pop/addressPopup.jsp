@@ -96,18 +96,15 @@ function putData(rowNo){
 
 	$("#district").val(districts.value);
 
-	if(statuses.value=='Y')
-	{
+	if(statuses.value=='Y'){
 		document.getElementById('status').checked = true;
-	}else
-	{
+	}else{
 		document.getElementById('status').checked = false;
 	}
 }
 
 function addRow(){
-	if(Trim($("#line1").val())=='')
-	{
+	if(Trim($("#line1").val())==''){
 		alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 		$("#line1").focus();
 		return false;
@@ -240,7 +237,10 @@ function changePV(pvid){
 			<a href="#" onclick="addRow();">
 <!--			<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
 			<input type="button" value="บันทึก" class="newPosBtn">
-			</a>
+			
+			<!-- <a href="#" onclick="deleteRow();">
+			<input type="button" value="ลบข้อมูลนี้" class="newPosBtn">
+			</a> -->
 			<a href="#" onclick="window.close();">
 <!--			<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
 			<input type="button" value="ยกเลิก" class="newNegBtn">

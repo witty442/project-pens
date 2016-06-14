@@ -1,8 +1,11 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
+
+import org.apache.struts.upload.FormFile;
 
 import util.ConvertNullUtil;
 import util.DateToolsUtil;
@@ -15,6 +18,7 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MUser;
+
 
 /**
  * Customer
@@ -102,6 +106,10 @@ public class Customer extends I_PO implements Serializable {
 		setPrintType(Utils.isNull(rst.getString("PRINT_TYPE")));//Y or N
 		
 		setAirpayFlag(Utils.isNull(rst.getString("AIRPAY_FLAG")));
+		setLocation(Utils.isNull(rst.getString("LOCATION")));
+		//setImageFileBlob(rst.getBlob("image_file"));
+		setImageFileName(Utils.isNull(rst.getString("image_file_name")));
+		
 	}
 
 	/**
@@ -250,8 +258,36 @@ public class Customer extends I_PO implements Serializable {
 	private String printHeadBranchDesc;
 	private String printTax;
 	private String airpayFlag;
-
+	private String location;
     
+   // private Blob imageFileBlob;
+    private String imageFileName;
+    
+    
+	public String getImageFileName() {
+		return imageFileName;
+	}
+
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
+	}
+
+	/*public Blob getImageFileBlob() {
+		return imageFileBlob;
+	}
+
+	public void setImageFileBlob(Blob imageFileBlob) {
+		this.imageFileBlob = imageFileBlob;
+	}*/
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
 	public String getAirpayFlag() {
 		return airpayFlag;
 	}

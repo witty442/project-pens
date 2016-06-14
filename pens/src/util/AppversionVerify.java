@@ -38,13 +38,6 @@ public class AppversionVerify {
 	private static String URL_DROPBOX_C4_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
 	private static String URL_DROPBOX_C4_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
 	
-	//New Dropbox itepens2013@gmail.com
-	//private static String URL_DROPBOX_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/";
-	//private static String URL_DROPBOX_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/";
-	
-	//private static String URL_DROPBOX_C4_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
-	//private static String URL_DROPBOX_C4_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
-	
 	/**
 	 * @param args
 	 */

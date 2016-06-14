@@ -182,8 +182,6 @@ function currencyToNum(str){
 	return parseInt(temp);
 }
 
-
-
 </script>
 </head>		
    <body onload="loadMe()">         

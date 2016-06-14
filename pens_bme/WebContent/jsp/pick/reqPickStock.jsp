@@ -23,11 +23,13 @@
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <%
 String wareHouse = reqPickStockForm.getBean().getWareHouse();
+//System.out.println("WareHouse:"+wareHouse);
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -513,15 +515,20 @@ function currencyToNum(str){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	    
-	       <%if("W2".equalsIgnoreCase(wareHouse)){ %>
+	        <%if("W2".equalsIgnoreCase(wareHouse)){ %>
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW2"/>
 				 </jsp:include>
-				<%}else{ %>
-				  <jsp:include page="../program.jsp">
+		    <%}else if("W3".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW3"/>
+				 </jsp:include>
+		    <%}else if("W4".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW4"/>
 				 </jsp:include>
-				<%} %>
+		     <%} %>
+				 
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -797,11 +804,11 @@ function currencyToNum(str){
 						</table>
 					
 					<div align="right">
-						<table  border="0" cellpadding="3" cellspacing="0" width="100%">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							<tr>
-								<td align="right" >	 <span class="pagelinks">รวมทั้งสิ้น :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td align="right" >	 <span class="pagelinks">รวมทั้งสิ้น :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								<html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
-								&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;	&nbsp;&nbsp;&nbsp;&nbsp;
 								
 								<!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
 								<!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>

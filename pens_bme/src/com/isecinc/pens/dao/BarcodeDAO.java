@@ -34,7 +34,9 @@ public class BarcodeDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		int totalQty = 0;
+		boolean foundCriteria = false;
 		try {
+			sql.append("\n select M.* , D.qty as qty_temp from( ");
 			sql.append("\n select i.* ,j.name ,j.status as job_status,j.store_code,j.store_no,j.sub_inv from PENSBI.PENSBME_PICK_BARCODE i INNER JOIN  \n");
 			sql.append("\n ( ");
 			sql.append("\n    select distinct job_id,name,status,store_code,store_no,sub_inv from PENSBME_PICK_JOB ");
@@ -43,22 +45,28 @@ public class BarcodeDAO extends PickConstants{
 			
 			if( !Utils.isNull(o.getJobId()).equals("")){
 				sql.append("\n and i.job_id = "+Utils.isNull(o.getJobId())+"");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getBoxNo()).equals("")){
 				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getRemark()).equals("")){
 				sql.append("\n and i.remark like '%"+Utils.isNull(o.getRemark())+"%'");
+				foundCriteria = true;
 			}
 
 			if( !Utils.isNull(o.getStoreCode()).equals("")){
 				sql.append("\n and j.store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getStoreNo()).equals("")){
 				sql.append("\n and j.store_no = '"+Utils.isNull(o.getStoreNo())+"'  ");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getSubInv()).equals("")){
 				sql.append("\n and j.sub_inv = '"+Utils.isNull(o.getSubInv())+"'  ");
+				foundCriteria = true;
 			}
 			
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
@@ -66,19 +74,35 @@ public class BarcodeDAO extends PickConstants{
 				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and i.TRANSACTION_DATE = to_date('"+dateStr+"','dd/mm/yyyy') ");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getStatus()).equals("")){
 				sql.append("\n and i.status = '"+Utils.isNull(o.getStatus())+"'");
+				foundCriteria = true;
 			}
 			if( !Utils.isNull(o.getCreateUser()).equals("")){
 				sql.append("\n and i.create_user LIKE '%"+Utils.isNull(o.getCreateUser())+"%'");
+				foundCriteria = true;
 			}
 			
 			if( Utils.isNull(o.getIncludeCancel()).equals("")){
 				sql.append("\n and i.status <> '"+PickConstants.STATUS_CANCEL+"'");
 			}
+			//Case no criteria default current date
+			if(foundCriteria ==false){
+				sql.append("\n and 1=2 ");
+               //String dateStr = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			  // sql.append("\n and i.TRANSACTION_DATE = to_date('"+dateStr+"','dd/mm/yyyy') ");
+			}
 			
-			sql.append("\n order by i.box_no desc ");
+			sql.append("\n ) M LEFT OUTER JOIN ");
+			sql.append("\n ( ");
+			sql.append("\n  select i.job_id,i.box_no,count(*) as qty from PENSBME_PICK_BARCODE_ITEM i  ");
+			sql.append("\n  where 1=1  ");
+			sql.append("\n  group by i.job_id,i.box_no ");
+			sql.append("\n ) D ON  M.job_id = D.job_id and M.box_no = D.box_no");
+			
+			sql.append("\n order by M.box_no desc ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -115,7 +139,10 @@ public class BarcodeDAO extends PickConstants{
 		       }
 			   
 			   //get Total Qty
-			   h.setQty(getTotalQtyByBoxNo(conn,h));
+			  // h.setQty(getTotalQtyByBoxNo(conn,h));
+			  // h.setQtyTemp(rst.getInt("qty_temp"));
+			   h.setQty(rst.getInt("qty_temp"));
+			   
 			   totalQty = totalQty+ h.getQty();
 			   
 			   items.add(h);

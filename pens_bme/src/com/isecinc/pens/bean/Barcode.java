@@ -40,6 +40,7 @@ public class Barcode implements Serializable{
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	private int qty;
+	private int qtyTemp;
 	private int totalQty;
 	
 	private String pensItemFrom;
@@ -58,6 +59,12 @@ public class Barcode implements Serializable{
 	private String includeCancel;
 	
 	
+	public int getQtyTemp() {
+		return qtyTemp;
+	}
+	public void setQtyTemp(int qtyTemp) {
+		this.qtyTemp = qtyTemp;
+	}
 	public String getIncludeCancel() {
 		return includeCancel;
 	}

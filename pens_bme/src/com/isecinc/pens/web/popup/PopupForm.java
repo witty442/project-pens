@@ -37,6 +37,71 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String wareHouse;
 	private String wareHouseDesc;
 	
+	//new 
+	private String custGroup;
+	private String issueReqDate;
+	private String requestor;
+	private String totalReqQty;
+	private String totalQty;
+	private String remark;
+	private String boxNo;
+	
+	
+	public String getBoxNo() {
+		return boxNo;
+	}
+
+	public void setBoxNo(String boxNo) {
+		this.boxNo = boxNo;
+	}
+
+	public String getTotalQty() {
+		return totalQty;
+	}
+
+	public void setTotalQty(String totalQty) {
+		this.totalQty = totalQty;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCustGroup() {
+		return custGroup;
+	}
+
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+
+	public String getIssueReqDate() {
+		return issueReqDate;
+	}
+
+	public void setIssueReqDate(String issueReqDate) {
+		this.issueReqDate = issueReqDate;
+	}
+
+	public String getRequestor() {
+		return requestor;
+	}
+
+	public void setRequestor(String requestor) {
+		this.requestor = requestor;
+	}
+
+	public String getTotalReqQty() {
+		return totalReqQty;
+	}
+
+	public void setTotalReqQty(String totalReqQty) {
+		this.totalReqQty = totalReqQty;
+	}
 	//MC EMPOLYEE
 	private MCEmpBean mcEmpBean;
 	

@@ -17,11 +17,19 @@ public class BarcodeForm extends I_Form {
 	private static final long serialVersionUID = 8932109820314224488L;
     private List<Barcode> results = new ArrayList<Barcode>();
     private List<Barcode> resultsSearch = new ArrayList<Barcode>();
-
+    private List<Barcode> resultsSearchPrev = new ArrayList<Barcode>();
+    
     private String mode;
     private Barcode Job ;
     private Barcode JobCriteria ;
     
+    
+	public List<Barcode> getResultsSearchPrev() {
+		return resultsSearchPrev;
+	}
+	public void setResultsSearchPrev(List<Barcode> resultsSearchPrev) {
+		this.resultsSearchPrev = resultsSearchPrev;
+	}
 	public List<Barcode> getResults() {
 		return results;
 	}

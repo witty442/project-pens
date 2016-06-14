@@ -18,6 +18,7 @@ import util.DateToolsUtil;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
@@ -43,7 +44,7 @@ public class MCustomer extends I_Model<Customer> {
 	private String[] columns = { COLUMN_ID, "CODE", "NAME", "NAME2", "CUSTOMER_TYPE", "TAX_NO", "TERRITORY", "WEBSITE",
 			"BUSINESS_TYPE", "BIRTHDAY", "CREDIT_CHECK", "PAYMENT_TERM", "VAT_CODE", "PAYMENT_METHOD",
 			"SHIPPING_METHOD", "USER_ID", "ISACTIVE", "CREATED_BY", "UPDATED_BY", "PARENT_CUSTOMER_ID", "PARTY_TYPE",
-			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC","AIRPAY_FLAG"};
+			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC","AIRPAY_FLAG","LOCATION","IMAGE_FILE_NAME"};
 
 	/**
 	 * Find
@@ -80,8 +81,11 @@ public class MCustomer extends I_Model<Customer> {
 		ResultSet rst = null;
 		int totalRow = 0;
 		try{
-			String sql = "select count(*) total_row from m_customer ,m_address  where 1=1 and m_customer.customer_id = m_address.customer_id " +
-					"\n and m_address.purpose ='B' "+whereCause;
+			String sql ="\n select count(*) total_row  from("+
+			            "\n   select distinct m_customer.* from m_customer ,m_address  where 1=1 and m_customer.customer_id = m_address.customer_id " +
+					    "\n   and m_address.purpose ='B' "+whereCause+
+					    "\n  )A";
+			
 			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
@@ -103,6 +107,74 @@ public class MCustomer extends I_Model<Customer> {
 		return totalRow;
 	}
 	
+	public Customer getImageFileName(String customerId) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		Customer c = null;
+		Connection conn = null;
+		try{
+			String sql ="\n select name,name2, image_file_name from m_customer where customer_id ="+customerId;
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				c = new Customer();
+				c.setName(Utils.isNull(rst.getString("name")));
+				c.setName2(Utils.isNull(rst.getString("name2")));
+				c.setImageFileName(Utils.isNull(rst.getString("image_file_name")));
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return c;
+	}
+	
+	public List<Customer> getCustomerLocation() throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Customer c = null;
+		Connection conn = null;
+		List<Customer> customerList = new ArrayList<Customer>();
+		try{
+			String sql ="\n select name,name2, location from m_customer where location is not null and location <> ''";
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				c = new Customer();
+				c.setName(Utils.isNull(rst.getString("name")));
+				c.setName2(Utils.isNull(rst.getString("name2")));
+				c.setLocation(Utils.isNull(rst.getString("location")));
+				customerList.add(c);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return customerList;
+	}
 	
 	public Customer[] searchOpt(Connection conn,String whereCause,User user,int start) throws Exception {
 		return searchOptModel(conn,whereCause,user,start);
@@ -253,6 +325,11 @@ public class MCustomer extends I_Model<Customer> {
 				
 				//Disp Column Edit Customer
 				m.setDisplayActionEditCust(displayActionEditCust);//disp
+				if( !Utils.isNull(Utils.isNull(rst.getString("image_file_name"))).equals("")){
+				    m.setImageFileName(Utils.isNull(rst.getString("image_file_name")));
+				}else{
+					m.setImageFileName("");
+				}
 				
 				//Can Edit Dust
 				if(role.equalsIgnoreCase(User.ADMIN)){
@@ -273,6 +350,8 @@ public class MCustomer extends I_Model<Customer> {
 						  m.setCanActionEditCust2(true);
 						}
 					}
+				}else if(role.equalsIgnoreCase(User.TT)){
+					   m.setCanActionEditCust2(true);
 				}
 				
 				//logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
@@ -527,22 +606,53 @@ public class MCustomer extends I_Model<Customer> {
 				activeUserID, activeUserID, customer.getParentID(),
 				ConvertNullUtil.convertToString(customer.getPartyType()).trim(),
 				customer.getPrintTax(),customer.getPrintType(),customer.getPrintBranchDesc(),customer.getPrintHeadBranchDesc(),
-				Utils.isNull(customer.getAirpayFlag())
+				Utils.isNull(customer.getAirpayFlag()),Utils.isNull(customer.getLocation()),
+				Utils.isNull(customer.getImageFileName())
 		      };
 		if (super.save(TABLE_NAME, columns, values, customer.getId(), conn)) {
 			customer.setId(id);
 		}
 		return true;
 	}
-
+	
 	public boolean update(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 		PreparedStatement ps = null;
 		try{
 		
+			
 			String sql = "update m_customer set tax_no ='"+customer.getTaxNo()+"' " +
 			        "\n ,print_type ='"+customer.getPrintType()+"',print_tax='"+customer.getPrintTax()+"'"+
 			        "\n ,PRINT_BRANCH_DESC ='"+customer.getPrintBranchDesc()+"',PRINT_HEAD_BRANCH_DESC='"+customer.getPrintHeadBranchDesc()+"'"+
-			        "\n ,airpay_flag ='"+customer.getAirpayFlag()+"' ,updated = sysdate() ,updated_by="+activeUserID+
+			        "\n ,airpay_flag ='"+customer.getAirpayFlag()+"' ,updated = sysdate() ,updated_by="+activeUserID+",location='"+customer.getLocation()+"'"+
+			        "\n ,image_file_name='"+Utils.isNull(customer.getImageFileName())+"'"+
+			        "\n ,NAME='"+ConvertNullUtil.convertToString(customer.getName()).trim()+"'"+
+			        "\n ,NAME2='"+ConvertNullUtil.convertToString(customer.getName2()).trim()+"'"+
+			        "\n ,WEBSITE='"+ConvertNullUtil.convertToString(customer.getWebsite()).trim()+"'"+
+			        "\n ,BUSINESS_TYPE='"+ConvertNullUtil.convertToString(customer.getBusinessType()).trim()+"'"+
+			        "\n ,BIRTHDAY=?"+
+			        "\n ,PARENT_CUSTOMER_ID="+customer.getParentID()+""+
+			        "\n ,PARTY_TYPE='"+ConvertNullUtil.convertToString(customer.getPartyType()).trim()+"',is_change='Y'"+
+					"\n  where customer_id ="+ customer.getId();
+			
+			 logger.debug("sql:"+sql);
+			 
+			 ps = conn.prepareStatement(sql);
+			 ps.setTimestamp(1, DateToolsUtil.convertToTimeStamp(customer.getBirthDay()));
+			 ps.executeUpdate();
+			 return true;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps=null;
+			}
+		}
+	}
+	
+	public boolean updateImageFile(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
+		PreparedStatement ps = null;
+		try{
+			String sql = "update m_customer set image_file_name='"+Utils.isNull(customer.getImageFileName())+"'"+
 					"\n  where customer_id ="+ customer.getId();
 			
 			 logger.debug("sql:"+sql);
@@ -559,6 +669,31 @@ public class MCustomer extends I_Model<Customer> {
 		}
 	}
 	
+
+	public boolean updateCredit(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
+		PreparedStatement ps = null;
+		try{
+		
+			String sql = "update m_customer set image_file_name='"+Utils.isNull(customer.getImageFileName())+"'"+
+					"\n ,location='"+customer.getLocation()+"' ,is_change='Y' "+
+					"\n  where customer_id ="+ customer.getId();
+			
+			 logger.debug("sql:"+sql);
+			 
+			 ps = conn.prepareStatement(sql);
+			 
+			 ps.executeUpdate();
+			 return true;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps=null;
+			}
+		}
+	}
+	
+
 	/**
 	 * Get Invoice Amount
 	 * 

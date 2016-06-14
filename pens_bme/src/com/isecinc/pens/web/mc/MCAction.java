@@ -343,17 +343,17 @@ public class MCAction extends I_Action {
 			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
 			response.setContentType("application/vnd.ms-excel");
 			
-			String staffId = Utils.isNull(request.getParameter("staffId"));
+			String empId = Utils.isNull(request.getParameter("empId"));
             String monthTrip = Utils.isNull(request.getParameter("monthTrip"));
             String maxDayInMonth = Utils.isNull(request.getParameter("maxDayInMonth"));
             
-            logger.debug("staffId:"+staffId);
+            logger.debug("empId:"+empId);
             logger.debug("monthTrip:"+monthTrip);
             logger.debug("maxDayInMonth:"+maxDayInMonth);
             
             MCBean c = new MCBean();
 			c.setMonthTrip(monthTrip);
-			c.setEmpId(staffId);
+			c.setEmpId(empId);
 			
 			MCBean mc = MCDAO.searchHead(c,true).getItems().get(0);
 			mc.setMaxDay(Integer.parseInt(maxDayInMonth));
@@ -417,7 +417,7 @@ public class MCAction extends I_Action {
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			    h.append("<td align='left' colspan='2'>หมายเหตุ:&nbsp;"+b.getRemark()+"</b></td> \n");
+			    h.append("<td align='left' colspan='2'>หมายเหตุ:&nbsp;"+Utils.isNull(b.getRemark())+"</b></td> \n");
 		    h.append("</tr> \n");	
 		
 			h.append("</table> \n");

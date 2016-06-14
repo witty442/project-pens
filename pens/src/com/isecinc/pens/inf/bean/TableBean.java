@@ -54,15 +54,30 @@ public class TableBean implements Serializable{
 	private int exportCountTransaction;
 	
 	private StringBuffer dataStrExport;
+	private StringBuffer dataCusLocationStrExport;
 	private List<TableBean> fileExportList;
 	//optional
 	private List<FTPFileBean> dataStrBuffList;
 	
 	//** For Update Case Export Flag*/
 	private List<String> sqlUpdateExportFlagList;
+	/** List File to Upload **/
+	private List<ImageFileBean> imageFileList;
     
 	
 	
+	public List<ImageFileBean> getImageFileList() {
+		return imageFileList;
+	}
+	public void setImageFileList(List<ImageFileBean> imageFileList) {
+		this.imageFileList = imageFileList;
+	}
+	public StringBuffer getDataCusLocationStrExport() {
+		return dataCusLocationStrExport;
+	}
+	public void setDataCusLocationStrExport(StringBuffer dataCusLocationStrExport) {
+		this.dataCusLocationStrExport = dataCusLocationStrExport;
+	}
 	public List<ColumnBean> getColumnKeyList() {
 		return columnKeyList;
 	}

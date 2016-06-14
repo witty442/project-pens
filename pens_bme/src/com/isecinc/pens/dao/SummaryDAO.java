@@ -873,7 +873,7 @@ public class SummaryDAO {
 						sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%' \n");
 					}
 				}
-				
+				sql.append("\n  and pens_desc4 ='N' \n");
 				sql.append("\n  ORDER BY pens_value asc \n");
 				
 				logger.debug("sql:"+sql);

@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import manual.cleardb.ClearDB;
+import manual.cleardb.ClearDupDB;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -68,7 +69,7 @@ public class AdminConsoleAction extends I_Action {
 				String url = hibernateConfig.getProperty("connection.url");
 				String username = hibernateConfig.getProperty("connection.username");
 				String password = hibernateConfig.getProperty("connection.password");
-		
+				configInfo += "*****Config Type:"+env.getProperty("config.type")+"************************\n";
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
@@ -77,7 +78,6 @@ public class AdminConsoleAction extends I_Action {
 		
 				configInfo += " ----------------------  FTP Server Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
-				configInfo +="FTP IP TEMP : "+env.getProperty("ftp.ip.server.temp")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
 				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
@@ -158,11 +158,23 @@ public class AdminConsoleAction extends I_Action {
 			}else if(currentTab.equals("tab_cleardb") && "tab_cleardb".equalsIgnoreCase(action)){
 				String resultBKDB = "";
 				  try {   
-				      
-				      
 					  StringBuffer resultClearDB = ClearDB.clearDB() ;
 					  
 					  adForm.setResultClearDB(resultClearDB.toString());
+					  
+				  } catch(Exception e) {
+				     e.printStackTrace();
+				  } 
+			
+			request.setAttribute("currentTab", currentTab);
+			
+			}else if(currentTab.equals("tab_clearcust_dup") && "tab_clearcust_dup".equalsIgnoreCase(action)){
+				String resultBKDB = "";
+				  try {   
+					  StringBuffer resultClearDB = ClearDupDB.clearDupCustDB() ;
+					  logger.debug("resultClearDB.toString():"+resultClearDB.toString());
+					  
+					  adForm.setResultClearCustDup(resultClearDB.toString());
 					  
 				  } catch(Exception e) {
 				     e.printStackTrace();

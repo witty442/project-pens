@@ -176,7 +176,6 @@ public class ImportAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		
         if("lotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
-        	
         	return importFromLotus(mapping, importForm, request, response);
         }else  if("tops".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
@@ -219,6 +218,10 @@ public class ImportAction extends I_Action {
         }else if("LoadStockInitBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
         	return ImportLoadStockInitProcess.importProcess(mapping, importForm, request, response,"BigC");
+        	
+        }else if("LoadStockInitMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	
+        	return ImportLoadStockInitProcess.importProcess(mapping, importForm, request, response,"MTT");
         	
         }else if("ftp_file_scan_barcode".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	

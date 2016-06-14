@@ -38,10 +38,9 @@ if(session.getAttribute("screenWidth") != null){
 <meta http-equiv="cache-control" content="no-store" />
 <!-- <meta http-equiv="cache-control" content="no-cache" /> -->
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-
-
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" /> 
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" />
 <style type="text/css">
 <!--
 body {

@@ -24,6 +24,8 @@ import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
@@ -85,7 +87,7 @@ public class CustomerAction extends I_Action {
 			} else {
 				request.getSession(true).removeAttribute("CMSearchKey");
 			}
-
+            
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -424,6 +426,7 @@ public class CustomerAction extends I_Action {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
 		int customerId = 0;
+		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
 
@@ -505,7 +508,7 @@ public class CustomerAction extends I_Action {
 				conn.rollback();
 				return "prepare";
 			}
-
+			
 			// Save customer to current user's trip.
 			if (customerId == 0) {
 				Trip trip = new Trip();
@@ -539,7 +542,7 @@ public class CustomerAction extends I_Action {
 				contact.setCustomerId(customer.getId());
 				new MContact().save(contact, userActive.getId(), conn);
 			}
-
+			
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_CUSTOMER);
@@ -549,12 +552,39 @@ public class CustomerAction extends I_Action {
 			trx.setUser(userActive);
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--
-
+			
+			//Write Image File To Local
+			if(customerForm.getImageFile() != null && !Utils.isNull(customerForm.getImageFile().getFileName()).equals("")){
+				//	Customer c = new MCustomer().find(String.valueOf(customerId));
+				
+				//rename file name to customerCode
+				String imageFileNametemp = Utils.isNull(customerForm.getImageFile().getFileName());
+				String fileName = customer.getCode() +imageFileNametemp.substring(imageFileNametemp.lastIndexOf("."),imageFileNametemp.length());
+				
+				logger.debug("imageFileNametemp:"+imageFileNametemp);
+				logger.debug("fileName:"+fileName);
+				
+				String imagePath = env.getProperty("path.image.local");//"D:/SalesApp/Images/";
+				//Delete file older
+				if( !Utils.isNull(customer.getImageFileName()).equals("") && !Utils.isNull(customer.getImageFileName()).equals(imagePath)){
+					FileUtil.deleteFile(Utils.isNull(customer.getImageFileName()));
+				}
+				
+			   FileUtil.createDir(imagePath);//Create HomePath
+			   String pathLocalImage = imagePath+fileName;
+			   FileUtil.writeImageFile(pathLocalImage, customerForm.getImageFile().getInputStream());
+			   
+			   customer.setImageFileName(pathLocalImage);
+			   
+			   // Save updateImageFile
+			   new MCustomer().updateImageFile(customer, userActive.getId(),userActive.getUserName(), conn);
+			}
+			
 			// Commit Transaction
 			conn.commit();
-			//
+            //Add message Success
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
-
+			
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -579,6 +609,7 @@ public class CustomerAction extends I_Action {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
 		int customerId = 0;
+		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
 
@@ -621,11 +652,41 @@ public class CustomerAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// Begin Transaction
 			conn.setAutoCommit(false);
-
+            
+			//Write Image File To Local
+			if(customerForm.getImageFile() != null && !Utils.isNull(customerForm.getImageFile().getFileName()).equals("")){
+				//rename file name to customerCode
+				String imageFileNametemp = Utils.isNull(customerForm.getImageFile().getFileName());
+				String fileName = customer.getCode() +imageFileNametemp.substring(imageFileNametemp.lastIndexOf("."),imageFileNametemp.length());
+				
+				String imagePath = env.getProperty("path.image.local");//"D:/SalesApp/Images/";
+				//Delete file older
+				if( !Utils.isNull(customer.getImageFileName()).equals("") && !Utils.isNull(customer.getImageFileName()).equals(imagePath)){
+					FileUtil.deleteFile(Utils.isNull(customer.getImageFileName()));
+				}
+				
+			   FileUtil.createDir(imagePath);//Create HomePath
+			   String pathLocalImage = imagePath+fileName;
+			   FileUtil.writeImageFile(pathLocalImage, customerForm.getImageFile().getInputStream());
+			   customer.setImageFileName(pathLocalImage);
+			}
 			
 			// Save Customer tax_no ,print only
 			new MCustomer().update(customer, userActive.getId(),userActive.getUserName(), conn);
-				
+			
+			// Save Address
+			logger.debug("AddressArr:"+customerForm.getAddresses().size());
+			for (Address address : customerForm.getAddresses()) {
+				address.setCustomerId(customer.getId());
+				new MAddress().save(address, userActive.getId(), conn);
+			}
+
+			// Save Contact
+			for (Contact contact : customerForm.getContacts()) {
+				contact.setCustomerId(customer.getId());
+				new MContact().save(contact, userActive.getId(), conn);
+			}
+						
 			// Commit Transaction
 			conn.commit();
 			
@@ -637,6 +698,82 @@ public class CustomerAction extends I_Action {
 			
 			//
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+			// Save Token
+			saveToken(request);
+		} catch (Exception e) {
+			customerForm.getCustomer().setId(customerId);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
+					+ e.getMessage());
+			try {
+				conn.rollback();
+			} catch (Exception e2) {}
+			e.printStackTrace();
+			return mapping.findForward("prepare"); 
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("view"); 
+	}
+	
+	public ActionForward saveEditCredit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		CustomerForm customerForm = (CustomerForm) form;
+		int customerId = 0;
+		EnvProperties env = EnvProperties.getInstance();
+		try {
+			customerId = customerForm.getCustomer().getId();
+
+			// check Token
+			if (!isTokenValid(request)) {
+				customerForm.setCustomer(new Customer());
+				customerForm.getAddresses().clear();
+				customerForm.getContacts().clear();
+				return mapping.findForward("prepare"); 
+			}
+			User userActive = (User) request.getSession(true).getAttribute("user");
+			Customer customer = customerForm.getCustomer();
+
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			// Begin Transaction
+			conn.setAutoCommit(false);
+            
+			//Write Image File To Local
+			if(customerForm.getImageFile() != null && !Utils.isNull(customerForm.getImageFile().getFileName()).equals("")){
+				//rename file name to customerCode
+				String imageFileNametemp = Utils.isNull(customerForm.getImageFile().getFileName());
+				String fileName = customer.getCode() +imageFileNametemp.substring(imageFileNametemp.lastIndexOf("."),imageFileNametemp.length());
+				
+				String imagePath = env.getProperty("path.image.local");//"D:/SalesApp/Images/";
+				//Delete file older
+				if( !Utils.isNull(customer.getImageFileName()).equals("") && !Utils.isNull(customer.getImageFileName()).equals(imagePath)){
+					FileUtil.deleteFile(Utils.isNull(customer.getImageFileName()));
+				}
+				
+			   FileUtil.createDir(imagePath);//Create HomePath
+			   String pathLocalImage = imagePath+fileName;
+			   /** Write File Image To Local **/
+			   FileUtil.writeImageFile(pathLocalImage, customerForm.getImageFile().getInputStream());
+			   customer.setImageFileName(pathLocalImage);
+			}
+			
+			// Save Customer tax_no ,print only
+			new MCustomer().updateCredit(customer, userActive.getId(),userActive.getUserName(), conn);
+						
+			// Commit Transaction
+			conn.commit();
+			
+			//searh refresh data
+			customer = new MCustomer().find(String.valueOf(customerId));
+			customerForm.setCustomer(customer);
+			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
+			customerForm.setContacts(new MContact().lookUp(customer.getId()));
+			
+			//
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+		 
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {

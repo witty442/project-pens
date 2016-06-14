@@ -25,6 +25,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -69,6 +70,12 @@ function loadMe(){
 function print(path){
 	var form = document.confPickStockForm;
 	form.action = path + "/jsp/confPickStockAction.do?do=print";
+	form.submit();
+	return true;
+}
+function printMini(path){
+	var form = document.confPickStockForm;
+	form.action = path + "/jsp/confPickStockAction.do?do=printMini";
 	form.submit();
 	return true;
 }
@@ -502,20 +509,20 @@ function sumQty(){
 
 									<td class="data_qty">
 										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
-										    class="disableNumber"
+										    class="disableNumber" readonly="true"
 										   />		 
 									</td>
 									<td class="data_issueQty">
 									  <c:choose>
 									     <c:when test="${confPickStockForm.bean.canEdit == true}">
 										      <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-											    class="enableNumber"
+											    class="disableNumber" readonly="true"
 											    onkeypress="chkQtyKeypress(this,event,<%=i%>)"
 							                    onchange="validateQty(this,<%=i%>)"/>	
 									     </c:when>
 									     <c:otherwise>
 										       <input tabindex="-1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-											    class="disableNumber"/>
+											    class="disableNumber" readonly="true"/>
 									     </c:otherwise>
 									  </c:choose>
 									</td>
@@ -529,15 +536,15 @@ function sumQty(){
 					<div align="right">
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
-								<td align="right"><span class="pagelinks">รวมทั้งสิ้น :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>	</td>
+								<td align="right"><span class="pagelinks">รวมทั้งสิ้น :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>	</td>
 								<td>
 								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" styleClass="disableNumber" readonly="true"/>
-								     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;
+								     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								</td>
 								
 								<td>
 								   <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber" readonly="true"/>
-								   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 								   <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value="${confPickStockForm.bean.totalQtyNotInCurPage}"/>
 								   <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>	
 								</td>
@@ -558,6 +565,10 @@ function sumQty(){
 								 </c:if> 
 								 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockForm.bean.canPrint == true}">
+								    <a href="javascript:printMini('${pageContext.request.contextPath}')">
+									  <input type="button" value=" พิมพ์ ใบเบิกสินค้าแบบย่อ " class="newPosBtnLong"> 
+									</a>
+									
 									<a href="javascript:print('${pageContext.request.contextPath}')">
 									  <input type="button" value=" พิมพ์ ใบเบิกสินค้า  " class="newPosBtnLong"> 
 									</a>

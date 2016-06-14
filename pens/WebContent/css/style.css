@@ -3,7 +3,7 @@
 
 #nav {
 	margin: 0;
-	padding: 7px 6px 0;
+	padding: 2px 2px 0;
 	background: #7d7d7d url(../images2/gradient.png) repeat-x 0 -110px;
 	line-height: 100%;
 
@@ -15,8 +15,8 @@
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0, .4);
 }
 #nav li {
-	margin: 0 5px;
-	padding: 0 0 8px;
+	margin: 0 2px;
+	padding: 0 0 2px;
 	float: left;
 	position: relative;
 	list-style: none;

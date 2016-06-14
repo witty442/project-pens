@@ -28,8 +28,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ReqPickStock;
+import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfPickStockDAO;
+import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -208,13 +210,12 @@ public class ConfPickStockAction extends I_Action {
 
 				totalRow = ConfPickStockDAO.getTotalRowInStockIssueItemCaseNoEdit(conn, p);
 				
-				if(  Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED) ||
-						 Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_BEF)){
+				if(  Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_ISSUED)){
 					
 					//totalReqQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);//Req qty	
 					totalQtyAll =  ConfPickStockDAO.getTotalIssueQtyInStockIssueItem(conn,p);//Real Qty	
 				}else{
-				    totalQtyAll =  ConfPickStockDAO.getTotalReqQtyInStockIssueItem(conn,p);	//Real qty = req qty (first time)
+				    totalQtyAll =  ConfPickStockDAO.getTotalReqQtyInScanCheckout(conn,p);	//Real qty = req qty (first time)
 				   // totalReqQtyAll = totalQtyAll;
 				}
 				
@@ -238,8 +239,9 @@ public class ConfPickStockAction extends I_Action {
 				 results = pAllItem.getItems();
 				    
 				 totalCurPageQty = pAllItem.getTotalQty();
+				 
 			}else if( Utils.isNull(p.getStatus()).equals(PickConstants.STATUS_BEF)){
-			     ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseNoEdit(conn, p,pageNumber,false);//
+			     ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseEdit(conn, p,pageNumber,false);//
 			     results = pAllItem.getItems();
 			    
 			     totalCurPageQty = pAllItem.getTotalQty();
@@ -407,9 +409,8 @@ public class ConfPickStockAction extends I_Action {
 		    Map<String, ReqPickStock> dataSaveMapAll = new HashMap<String, ReqPickStock>();
 		    if(request.getSession().getAttribute("dataSaveMapAll")!= null ){
 		       dataSaveMapAll = (Map<String,ReqPickStock>)request.getSession().getAttribute("dataSaveMapAll");
-		    }
-		    
-			logger.debug("dataSaveMapAll Size:"+(dataSaveMapAll!=null?dataSaveMapAll.size():0));
+		    } 
+			logger.debug("before dataSaveMapAll Size:"+(dataSaveMapAll!=null?dataSaveMapAll.size():0));
 			 
 			ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCaseEdit(conn, p,0,true);//
 		    List<ReqPickStock> results = pAllItem.getItems();
@@ -423,17 +424,20 @@ public class ConfPickStockAction extends I_Action {
 					
 					 //Key Map  
 					 String key = p.getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
+					 logger.debug("mat["+l.getMaterialMaster()+"]issueQty["+l.getIssueQty()+"]");
 					 dataSaveMapAll.put(key, l);
 					 
 				}//for
 			}//if
 	
 			request.getSession().setAttribute("dataSaveMapAll",dataSaveMapAll);
+			logger.debug("after dataSaveMapAll Size:"+(dataSaveMapAll!=null?dataSaveMapAll.size():0));
 	    }catch(Exception e){
 	    	logger.error(e.getMessage(),e);
 	    }
 	}
 	
+	/** Save Data prev page **/
 	private Map<String, ReqPickStock> setDataSaveMap(HttpServletRequest request,ConfPickStockForm aForm){
 	    User user = (User) request.getSession().getAttribute("user");
 	    //Data Disp Per Page
@@ -476,6 +480,7 @@ public class ConfPickStockAction extends I_Action {
 		return dataSaveMapAll;
 	}
 
+	/** Set Data case req_qty ==0 **/
 	private Map<String, ReqPickStock> setDispResults(HttpServletRequest request,ConfPickStockForm aForm){
 	    //Data Disp Per Page
 	    List<ReqPickStock> results = (List<ReqPickStock>)request.getSession(true).getAttribute("results"); //data per page
@@ -495,10 +500,12 @@ public class ConfPickStockAction extends I_Action {
 				ReqPickStock l = (ReqPickStock)results.get(i);
 				//Key Map  
 				 String key = aForm.getBean().getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
-				 if(dataSaveMapAll.get(key) != null){
-					 ReqPickStock pOld = (ReqPickStock) dataSaveMapAll.get(key); 
-					 logger.debug("pOld.getIssueQty():"+pOld.getIssueQty());
-				     l.setIssueQty(pOld.getIssueQty());
+				 
+			     if(dataSaveMapAll.get(key) != null){
+					 ReqPickStock r = (ReqPickStock) dataSaveMapAll.get(key); 
+					 logger.debug("issueQty:"+r.getIssueQty());
+					 
+					l.setIssueQty(r.getIssueQty());
 				 }
 				 //set data to list disp
 				 results.set(i, l);
@@ -579,6 +586,15 @@ public class ConfPickStockAction extends I_Action {
 			}
 
 			if(validate){
+				//Update status to issue scan_checkout
+				ScanCheckBean scan = new ScanCheckBean();
+				scan.setIssueReqNo(h.getIssueReqNo());
+				scan.setWareHouse(h.getWareHouse());
+				scan.setStatus(PickConstants.STATUS_ISSUED);
+				scan.setUpdateUser(user.getUserName());
+				
+				ScanCheckDAO.updateScanCheckOutStatusToIssue(conn, scan);
+				
 				//Balance Onhand
 				OnhandProcess.processUpdateBalanceOnhandByIssueReqNo(conn,h);
 				
@@ -693,9 +709,17 @@ public class ConfPickStockAction extends I_Action {
 			
 				conn.commit();
 				
+				//Clear session 
+				request.getSession().setAttribute("results", null);
+				request.getSession().setAttribute("custGroupList", null);
+				request.getSession().setAttribute("dataSaveMapAll", null);
+				request.getSession().setAttribute("totalAllQty",null);
+				request.getSession().setAttribute("curPageQtyMap",null);
+				
 				//new search
 				h.setNewReq(true);
 				h.setNewSearch(true);
+				
 		        h = searchBypage(conn, h, request);
 		        
 				request.getSession().setAttribute("results", h.getItems());
@@ -818,6 +842,65 @@ public class ConfPickStockAction extends I_Action {
 		return null;
 	}
 	
+	public ActionForward printMini(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		
+		logger.debug("Search for report : " + this.getClass());
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		try {
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+
+			ReqPickStock h = reportForm.getBean();
+			if(h != null){
+				logger.debug("ReqPickStock:"+h);
+				//Head
+				parameterMap.put("p_title", "ฟอร์มยืนยัน การเบิกสินค้า");
+				parameterMap.put("p_issueReqDate", h.getIssueReqDate());
+				parameterMap.put("p_issueReqNo", h.getIssueReqNo());
+				parameterMap.put("p_statusDesc", h.getStatusDesc());
+				parameterMap.put("p_requestor", h.getRequestor());
+				parameterMap.put("p_custGroupDesc", h.getCustGroup());
+				parameterMap.put("p_needDate", h.getNeedDate());
+				parameterMap.put("p_storeCode", h.getStoreCode()+"-"+h.getStoreName());
+				parameterMap.put("p_subInv", h.getSubInv());
+				parameterMap.put("p_storeNo", h.getStoreNo());
+				parameterMap.put("p_remark", h.getRemark());
+				parameterMap.put("p_wareHouse", h.getWareHouse());
+				
+				//Gen Report
+				String fileName = "conf_pick_mini_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCase4ReportMini(conn, h);//
+				List items = pAllItem.getItems();
+				
+				parameterMap.put("p_total_qty", pAllItem.getTotalQty()+"");
+				parameterMap.put("p_total_box", h.getTotalCtn()+"");
+				
+				logger.debug("items size:"+items.size());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
 	public ActionForward printByGroupCode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		

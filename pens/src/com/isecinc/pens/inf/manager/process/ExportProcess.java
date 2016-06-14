@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
+import com.isecinc.pens.inf.bean.ImageFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
@@ -226,6 +227,7 @@ public class ExportProcess {
 		ResultSet rs = null;
 		StringBuffer dataAppend = new StringBuffer("");
         List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+        List<ImageFileBean> imageFileList = new ArrayList<ImageFileBean>();
         int totalRows = 0;
         InterfaceDAO dao = new InterfaceDAO();
 		try{
@@ -244,19 +246,31 @@ public class ExportProcess {
 				//add customer contact
 				dataAppend.append(exportCustContactDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
 				
+				/** Add imageFileName to Upload **/
+				if( !Utils.isNull(rs.getString("image_file_name")).equals("")){
+					ImageFileBean im = new ImageFileBean();
+					im.setImageFileName(rs.getString("image_file_name"));
+					String fileName = im.getImageFileName().substring(im.getImageFileName().lastIndexOf("/")+1,im.getImageFileName().length());
+					im.setGenerateImageFileName(rs.getString("CUSTOMER_NUMBER")+"-"+fileName);
+					
+					imageFileList.add(im);
+				}
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update m_customer set exported = 'Y' WHERE customer_id="+rs.getString("customer_id"));
 				
 			}//while
 			
-			//set TotalRows
-			/*if( !Utils.isNull(dataAppend.toString()).equals("")){
-			   tableBean.setExportCount(dataAppend.toString().split("\n").length);
-			}*/
+			/** Export Customer Case Data Location **/
+			//New Version 062559
+			/*TableBean t = exportCustomerCaseLocation(conn,tableBean,userBean);
+			sqlUpdateExportFlagList.addAll(t.getSqlUpdateExportFlagList());
+			tableBean.setDataCusLocationStrExport(t.getDataCusLocationStrExport());
+			*/
 			
 			tableBean.setExportCount(totalRows);
 			tableBean.setDataStrExport(dataAppend);
 			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+			tableBean.setImageFileList(imageFileList);
 			
 			return tableBean;
 		}catch(Exception e){
@@ -271,6 +285,50 @@ public class ExportProcess {
 		}
 	}
 
+	public   TableBean exportCustomerCaseLocation(Connection conn,TableBean tableBean,User userBean) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+        int totalRows = 0;
+        InterfaceDAO dao = new InterfaceDAO();
+		try{
+            logger.debug("Select:"+tableBean.getPrepareSqlSelect());
+			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
+			
+			rs = ps.executeQuery();
+			while(rs.next()){ 
+				totalRows++;
+				String ADDRESS_ID_BILL_TO = dao.isSameAddress(conn, rs.getString("customer_id"));
+			
+				//Get Customer ,BILL_TO AND SHIP_TO
+				dataAppend.append(exportCustomerSplit2LineDataDB(conn, tableBean, userBean,rs.getString("customer_id"),ADDRESS_ID_BILL_TO));
+
+				//add customer contact
+				dataAppend.append(exportCustContactDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
+				
+				/** Set Data For Update InterfacesFlag **/
+				sqlUpdateExportFlagList.add("update m_customer set is_change = 'N' WHERE customer_id="+rs.getString("customer_id"));
+				
+			}//while
+			
+			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+			tableBean.setDataCusLocationStrExport(dataAppend);
+			
+			return tableBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+
+	
 	/**
 	 * 
 	 * @param conn
@@ -337,7 +395,8 @@ public class ExportProcess {
 			"	M.USER_ID AS SALESREP_ID,	\n"+
 			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
 			"   A.address_ID as ADDRESS_ID, \n"+
-			"   'O' AS PARTY_TYPE \n"+ /** Wait Future Use*/
+			"   'O' AS PARTY_TYPE, \n"+ /** Wait Future Use*/
+			"   M.location \n"+
 			"	 FROM m_customer M 	\n"+
 			"	 INNER JOIN m_address A 	\n"+
 			"	 ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+

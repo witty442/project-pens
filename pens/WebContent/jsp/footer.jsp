@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.AppversionVerify"%>
@@ -8,9 +9,7 @@
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg3 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }
-
 %>
-
 <script type="text/javascript">
 
 function openPopup(path){
@@ -39,14 +38,14 @@ function openDBBackupPopup(path){
 		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/footer_left.png" border="0"/></td>
 		<td width="44px;"><img src="${pageContext.request.contextPath}/images2/footer_left2.png" border="0"/></td>
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
-        	Application Version
+        	App Version
 			 <a href ="javascript:openPopup('${pageContext.request.contextPath}');">
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
-			 </a>&nbsp;&nbsp;
+			 </a>&nbsp;
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
 			  <font color="red"><%=msg3[0] %></font> </a>OR <%=msg3[1] %>
-			  &nbsp;&nbsp;
-			  <font color="black">| วันที่ปัจจุบัน 
+			  &nbsp;
+			  <font color="black">|วันที่ปัจจุบัน 
 			   <script>
 			  var currentdate = new Date(); 
 			  var datetime = "" + currentdate.getDate() + "/"
@@ -57,7 +56,7 @@ function openDBBackupPopup(path){
 			                  + currentdate.getSeconds();
 			            document.write(datetime);
 			  </script>
-			  
+			 |ConfigType:<%=EnvProperties.getInstance().getProperty("config.type") %>
 			  </font> |
 			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
 			      <font color="green"> กดเพื่อสำรองข้อมูลการขาย</font>

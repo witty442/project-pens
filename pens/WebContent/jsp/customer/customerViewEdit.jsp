@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -32,6 +33,18 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 List<References> shippingMethod = InitialReferences.getReferenes().get(InitialReferences.SHIPMENT);
 pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE);
 
+String readOnly = "false";
+String styleClass = "";
+if(role.equalsIgnoreCase(User.TT)){ 
+	readOnly = "true";
+	styleClass = "disableText";
+}else{
+	/** Van validate GPS is found no Edit Customer **/
+	
+}
+
+System.out.println("readOnly["+readOnly+"]styleClass["+styleClass+"]");
+/** Case TT Allow edit SAveImage and Location */
 %>
 
 <%@page import="java.util.List"%>
@@ -59,11 +72,102 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<!-- Calendar -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
-<script language="javascript">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg" type="text/javascript"></script>
+<script type="text/javascript">
+//API KEY :AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg
+/********************************************** Google Map ***************************************/
+function getLocation(path){
+	var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
+	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName);
+	var width= window.innerWidth-50;
+	var height= window.innerHeight-50;
+	//alert(width+","+height);
+	PopupCenter(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print",width,height);
+	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
+}
+
+ function setLocationValue(location){
+	 $("#location").val(location);
+     //alert(lat+","+lng);
+ }
+
+ function gotoMap(path){
+	 var location= $("#location").val();
+		//alert(lat+","+lng);
+		if(location != "" ){
+			var locationArr = location.split(",");
+			var lat = locationArr[0];
+			var lng = locationArr[1];
+		    var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
+		   // window.open(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName);
+		    var width= window.innerWidth-100;
+			var height= window.innerHeight-100;
+	
+			PopupCenter(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName, "แสดงแผนที่",width,height);
+			
+			//window.open("https://www.google.co.th/maps/place/"+location);
+	}else{
+		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
+	}
+}
+ 
+ /********************************************** Google Map ***************************************/
+ 
+ function showImage(path,customerId){
+	 var location= $("#imageFileName").val();
+		//alert(lat+","+lng);
+	 if(location != "" ){
+		var width= window.innerWidth-100;
+		var height= window.innerHeight-100;
+	
+		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
+			
+	}else{
+		alert("ยังไม่ได้บันทึกข้อมูลรูปภาพ'");
+	}
+}
+ 
+ /** Display image after upload **/
+	function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#blah')
+                    .attr('src', e.target.result)
+                    .width(150)
+                    .height(200);
+            };
+            reader.readAsDataURL(input.files[0]);
+            
+            //Hide old images
+             //$("imageDBDiv").hide();
+            setImageVisible("imageDB",false);
+        }
+    }
+	function setImageVisible(id, visible) {
+	    var img = document.getElementById(id);
+	    img.style.visibility = (visible ? 'visible' : 'hidden');
+	}
+/********************************************/
 
 window.onload =function(){
+	var rowAddr = document.getElementsByName('addr.id').length;
+	document.getElementsByName('addr_id')[0].value = rowAddr;
+	
+	/* if(document.getElementsByName('customer.parentCode')[0].value!=''){
+		document.getElementById('parentCode').value = (document.getElementsByName('customer.parentCode')[0].value);
+	} */
+
+	new Epoch('epoch_popup','th',document.getElementById('birthDay'));
 	switchPrintType();
+	initForm(<%=readOnly%>,'<%=styleClass%>')
 }
 
 function switchPrintType(){
@@ -76,6 +180,106 @@ function switchPrintType(){
 		$("input#printBranchDesc").attr("class", "normalText");
 	}
 }
+
+/*** Disable Text by Sale Type **/
+function initForm(readonly,styleClass){
+	$(document).ready(function(){
+	    $('#parentCode').attr('readonly', readonly);
+	    $('#parentCode').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#birthDay').attr('readonly', readonly);
+	    $('#birthDay').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#businessType').attr('readonly', readonly);
+	    $('#businessType').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#website').attr('readonly', readonly);
+	    $('#website').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#name2').attr('readonly', readonly);
+	    $('#name2').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#customerName').attr('readonly', readonly);
+	    $('#customerName').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#partyType').attr('readonly', readonly);
+	    $('#partyType').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#taxNo').attr('readonly', readonly);
+	    $('#taxNo').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#printTax').attr('disabled', readonly);
+	    $('#printTax').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#printTax').attr('disabled', readonly);
+	    $('#printTax').addClass(styleClass);
+	});
+
+	$(document).ready(function(){
+	    $('#printHeadBranchDesc').attr('disabled', readonly);
+	    $('#printHeadBranchDesc').addClass(styleClass);
+	});
+	$(document).ready(function(){
+	    $('#printType1').attr('disabled', readonly);
+	    $('#printType1').addClass(styleClass);
+	    $('#printType2').attr('disabled', readonly);
+	    $('#printType2').addClass(styleClass);
+	});
+	
+	$(document).ready(function(){
+	    $('#airpayFlag').attr('disabled', readonly);
+	    $('#airpayFlag').addClass(styleClass);
+	});
+}
+
+function editAddressRow(rowNo){
+	editAddress('${pageContext.request.contextPath}', rowNo);
+}
+
+//call ajax
+function loadMainCustomer(e){
+	//alert($('#parentCode').val());
+	if(e == null || (e != null && e.keyCode == 13)){
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/mainCustomerQuery.jsp",
+				data : "custcode=" + $('#parentCode').val() + "&main='Y'&id="+$('#customerId').val(),
+				async: false,
+				success: function(getData){
+					var returnString = jQuery.trim(getData);
+					if(returnString.length > 0){
+						document.getElementsByName('customer.parentID')[0].value=returnString.split('::')[0];
+						document.getElementsByName('customer.parentCode')[0].value=returnString.split('::')[1];
+						document.getElementsByName('customer.parentName')[0].value=returnString.split('::')[2];
+					}else{
+						document.getElementsByName('customer.parentID')[0].value='';
+						document.getElementsByName('customer.parentName')[0].value='';
+					}
+				}
+			}).responseText;
+		});
+	}
+}
+
+function showMainCustomer(path,id,custId){
+	window.open(path + "/jsp/pop/view/customerViewPopup.jsp?uId="+id+"&main='Y'&id="+custId, "Customer List", "width=500,height=350,location=No,resizable=No");
+}
+function setMainCustomer(code, name){
+	$('#parentCode').val(code);
+	$('#parentName').val(name);
+	loadMainCustomer(null);
+}
+
+
 </script>
 </head>
 <body  topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -112,7 +316,8 @@ function switchPrintType(){
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
 		            <td bgcolor="#f8f8f8">
 						<!-- BODY -->
-						<html:form action="/jsp/customerAction">
+						<html:form action="/jsp/customerAction" enctype="multipart/form-data">
+					
 						<jsp:include page="../error.jsp"/>
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
@@ -123,14 +328,14 @@ function switchPrintType(){
 							</tr>
 							<tr>
 								<td align="right" colspan="2">
-								  <html:radio property="customer.printType" styleId="printType" value="H" onclick="switchPrintType()"></html:radio>สำนักงานใหญ่ 
+								  <html:radio property="customer.printType" styleId="printType1" value="H" onclick="switchPrintType()"></html:radio>สำนักงานใหญ่ 
 								</td>
 								<td align="left">
-									 <html:radio property="customer.printType" styleId="printType" value="B" onclick="switchPrintType()"></html:radio>สาขาที่
+									 <html:radio property="customer.printType" styleId="printType2" value="B" onclick="switchPrintType()"></html:radio>สาขาที่
 								     <html:text property="customer.printBranchDesc"  size="10"  styleId="printBranchDesc" maxlength="5" readonly="true" onkeydown="return inputNum(event);" styleClass="disableText"/>
 								</td>
 								<td align="right">
-								 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
+								 <html:checkbox property="customer.printHeadBranchDesc" value="Y" styleId="printHeadBranchDesc">พิมพ์สนญ./สาขาที่</html:checkbox>
 								 </td>
 								<td align="left">
 									
@@ -139,11 +344,11 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.code" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.code" readonly="true" styleClass="disableText" styleId="customerCode"/>
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:select property="customer.partyType" disabled="true" styleClass="disableText">
+									<html:select property="customer.partyType" styleId="partyType" >
 										<html:option value=""></html:option>
 										<html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option>
@@ -153,12 +358,12 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Name" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.name" size="25" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.name" size="25"  styleId="customerName"/>
 								</td>
 								<%if(action.equals("edit2")){ %>
 								<td align="right"><bean:message key="Customer.SubName" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.name2" size="25" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.name2" size="25" styleId="name2"/>
 								</td>
 								<%} %>
 							</tr>
@@ -166,44 +371,48 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left" nowrap>
-									<html:text property="customer.taxNo" size="25" readonly="false" maxlength="20"/>
-									<html:checkbox property="customer.printTax" value="Y">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
+									<html:text property="customer.taxNo" size="25"  maxlength="20" styleId="taxNo"/>
+									<html:checkbox property="customer.printTax" value="Y" styleId="printTax">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.website" size="25" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.website" size="25" styleId="website"/>
 								</td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Territory" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:select property="customer.territory" disabled="true" styleClass="disableText">
-										<html:options collection="territories" property="key" labelProperty="name"/>
+									<html:select property="customer.territory" disabled="true" styleClass="disableText" >
+										<html:options collection="territories" property="key" labelProperty="name" />
 									</html:select>
 								</td>
 								<td align="right"><bean:message key="Customer.BusinessType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.businessType" size="25" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.businessType" size="25" styleId="businessType"/>
 								</td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.MainCode" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.parentCode" size="25" readonly="true" styleClass="disableText"/>
+									<input id="parentCode" name="parentCode" size="22" onkeypress="loadMainCustomer(event);"/>
+									<%if(readOnly.equals("false")){ %>
+									<a href="#" onclick="showMainCustomer('${pageContext.request.contextPath}','${user.id}','${customerForm.customer.id}');">
+									<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" align="absmiddle"/></a>
+									<%} %>
 								</td>
 								<td align="right"><bean:message key="Customer.Birthday" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.birthDay" maxlength="10" size="15" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.birthDay" maxlength="10" size="15" styleId="birthDay"/>
 								</td>
 							</tr>
 							<tr>
 								<td colspan="2">&nbsp;</td>
 								<td colspan="2">
-									<html:text property="customer.parentName" size="77" readonly="true" styleClass="disableText"/>
+									<html:text property="customer.parentName" size="77" styleId="parentName" readonly="true" styleClass="disableText"/>
 									<html:hidden property="customer.parentID"/>
 								</td>
 								<td align="left">
-									<html:checkbox property="customer.airpayFlag" value="Y" styleClass="normalText"/>
+									<html:checkbox property="customer.airpayFlag" value="Y" styleClass="normalText" styleId="airpayFlag"/>
 									ให้ชำระผ่านระบบแอร์เพย์ (Air Pay)
 								</td>
 							</tr>
@@ -212,10 +421,15 @@ function switchPrintType(){
 								<td></td>
 								<td colspan="4"><hr></td>
 							</tr>
+							<!--*********** Addresss *********************** -->
+							
 							<tr>
-								<td align="center" valign="top">&nbsp;</td>
 								<td align="right" valign="top">
-									<bean:message key="Address" bundle="sysele"/>&nbsp;&nbsp;
+									
+								</td>
+								<td align="right" valign="top">
+									<bean:message key="Address" bundle="sysele"/><font color="red">*</font>
+									<input type="hidden" name="addr_id" value="0"/>
 								</td>
 								<td colspan="3">
 									<table id="tblAddress" align="left" border="0" cellpadding="3" cellspacing="1" width="100%" class="result">
@@ -228,24 +442,50 @@ function switchPrintType(){
 												<c:set var="tabclass" value="lineE"/>
 											</c:otherwise>
 										</c:choose>
-										<tr class="<c:out value='${tabclass}'/>">
+										<tr style="cursor: pointer; cursor: hand;" class="<c:out value='${tabclass}'/>">
 											<td align="left">
 												${address1.lineString}
+												<input type="hidden" name='addr.id' value='${address1.id}'/>
+												<input type='hidden' name='addr.row' value='${rows1.index+1}'/>
+												<input type='hidden' name='addr.line1' value='${address1.line1}'/>
+												<input type='hidden' name='addr.line2' value='${address1.line2}'/>
+												<input type='hidden' name='addr.line3' value='${address1.line3}'/>
+												<input type='hidden' name='addr.district' value='${address1.district.id}'/>
+												<input type='hidden' name='addr.districtLabel' value='${address1.district.name}'/>
+												<input type='hidden' name='addr.province' value='${address1.province.id}'/>
+												<input type='hidden' name='addr.provinceLabel' value='${address1.province.name}'/>
+												<input type='hidden' name='addr.postcode' value='${address1.postalCode}'/>
+												<input type='hidden' name='addr.purpose' value='${address1.purpose}'/>
+												<input type='hidden' name='addr.purposeLabel' value='${address1.purposeLabel}'/>
+												<input type='hidden' name='addr.status' value='${address1.isActive}'/>
+												<input type='hidden' name='addr.statusLabel' value='${address1.activeLabel}'/>
 											</td>
 											<td align="center">${address1.purposeLabel}</td>
 											<td align="center" width="80px;">${address1.activeLabel}</td>
+											<td align="center" width="20px;">
+											<%if(readOnly.equals("false")){ %>
+												<a href="javascript:open_address('${pageContext.request.contextPath}',${rows1.index+1});">
+												<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
+											<%} %>
+											</td>
+										
 										</tr>
 										</c:forEach>
 									</table>
 								</td>
 							</tr>
+							<!-- ****************************Addresss************* -->
 							<tr>
 								<td></td>
 								<td colspan="4"><hr></td>
 							</tr>
 							<%if(action.equals("edit2")){ %>
 							<tr>
-								<td align="center" valign="top">&nbsp;</td>
+								<td align="right" valign="top">
+							    	<%if(readOnly.equals("false")){ %>
+									<input type="button" value="เพิ่มผู้ติดต่อ" onclick="open_contact('${pageContext.request.contextPath}', 0);"/>
+									<%} %>
+								</td>
 								<td align="right" valign="top">
 									<bean:message key="Contact" bundle="sysele"/>&nbsp;&nbsp;
 								</td>
@@ -260,10 +500,23 @@ function switchPrintType(){
 												<c:set var="tabclass" value="lineE"/>
 											</c:otherwise>
 										</c:choose>
-										<tr class="<c:out value='${tabclass}'/>">
+										<tr style="cursor: pointer; cursor: hand;" class="<c:out value='${tabclass}'/>">
 											<td align="left" valign="top">
 												${contact1.contactTo}<br>
 												${contact1.relation}
+												<input type="hidden" name='cont.id' value='${contact1.id}'/>
+												<input type='hidden' name='cont.row' value='${rows2.index+1}'/>
+												<input type='hidden' name='cont.contactTo' value='${contact1.contactTo}'/>
+												<input type='hidden' name='cont.relation' value='${contact1.relation}'/>
+												<input type='hidden' name='cont.phone' value='${contact1.phone}'/>
+												<input type='hidden' name='cont.fax' value='${contact1.fax}'/>
+												<input type='hidden' name='cont.status' value='${contact1.isActive}'/>
+												<input type='hidden' name='cont.statusLabel' value='${contact1.activeLabel}'/>
+												<input type='hidden' name='cont.phone2' value='${contact1.phone2}'/>
+												<input type='hidden' name='cont.mobile' value='${contact1.mobile}'/>
+												<input type='hidden' name='cont.mobile2' value='${contact1.mobile2}'/>
+												<input type='hidden' name='cont.phoneSub1' value='${contact1.phoneSub1}'/>
+												<input type='hidden' name='cont.phoneSub2' value='${contact1.phoneSub2}'/>
 											</td>
 											<td align="left">
 												<bean:message key="Contact.Phone" bundle="sysele"/> ${contact1.phone}
@@ -276,11 +529,18 @@ function switchPrintType(){
 												<bean:message key="Contact.Fax" bundle="sysele"/> ${contact1.fax}
 											</td>
 											<td align="center" width="80px;">${contact1.activeLabel}</td>
+											<td align="center" width="20px;">
+											<%if(readOnly.equals("false")){ %>
+												<a href="javascript:open_contact('${pageContext.request.contextPath}',${rows2.index+1});">
+												<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>
+											<%} %>
+											</td>
 										</tr>
 										</c:forEach>
 									</table>
 								</td>				
 							</tr>
+							<!-- *******************************Conntact****************************-->
 							<tr>
 								<td></td>
 								<td colspan="4"><hr></td>
@@ -387,26 +647,80 @@ function switchPrintType(){
 								<td align="left" colspan="3"><html:checkbox property="customer.isActive" value="Y" disabled="true"/>&nbsp;<bean:message key="Active" bundle="sysprop"/></td>
 								<%} %>
 							</tr>
-							<%if(role.equalsIgnoreCase(User.VAN)){ %>
 							<tr>
 								<td colspan="2"></td>
 								<td align="left">
 									<html:checkbox property="customer.interfaces" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Interfaces" bundle="sysele"/>
 								</td>
 							</tr>
-							<%} %>
+							<tr>
+								<td></td>
+								<td colspan="4"><hr></td>
+							</tr>
+		
+							<tr>
+								<td align="right" colspan="2">เลือกไฟล์ รูปภาพร้านค้า&nbsp;&nbsp;</td>
+								<td align="left" colspan="3">
+									<html:file property="imageFile"  style="width:300px;height:21px" styleId="imageFile" onchange="readURL(this)"/>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2"></td>
+								<td align="left" colspan="3">
+								     <img id="blah" /> 
+								  
+									   <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									       <img id="imageDB" src="${pageContext.request.contextPath }/photoServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
+									   <%} %>
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2"></td>
+								<td align="left" colspan="3">
+							    
+								   <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
+									               ไฟล์ที่บันทึกไว้:
+									     <html:text property="customer.imageFileName" readonly="true" styleClass="disableText" size="100" styleId="imageFileName"></html:text>
+																	
+										<a href="#" onclick="return showImage('${pageContext.request.contextPath}','${customerForm.customer.id}');">
+											<input type="button" value="แสดงรูปภาพเต็มจอ " class="newPosBtn">
+										 </a>
+									 <%} %>	
+								</td>
+							</tr>
+							<tr>
+								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
+								<td align="left" colspan="3">
+									<html:text property="customer.location" size="100" readonly="false" styleId="location" styleClass="" /> 
+								</td>
+							</tr>
+							<tr>
+							    <td align="right" colspan="2"></td>
+									<td align="left" colspan="3">
+								      <span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
+									 <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');">
+									<input type="button" value="แสดงตำแหน่ง " class="newPosBtn" onclick="return gotoMap('${pageContext.request.contextPath}');">
+								</td>
+							</tr>
 							<%} %>
 						</table>
 						<br />
 						<!-- BUTTON -->
-						<!-- BUTTON -->
+						CustomerViewEdit
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
-									<a href="#" onclick="return saveEdit('${pageContext.request.contextPath}');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="บันทึก" class="newPosBtn">
-									</a>
+								   <%if(role.equalsIgnoreCase(User.VAN)){ %>
+										<a href="#" onclick="return saveEdit('${pageContext.request.contextPath}');">
+										<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
+										<input type="button" value="บันทึก" class="newPosBtn">
+										</a>
+									<%}else{ %>
+										<a href="#" onclick="return saveEditCredit('${pageContext.request.contextPath}');">
+										<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
+										<input type="button" value="บันทึก" class="newPosBtn">
+										</a>
+									<%} %>
 									<a href="#" onclick="backsearch('${pageContext.request.contextPath}');">
 									<!--<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">-->
 									<input type="button" value="ยกเลิก" class="newNegBtn">
@@ -422,6 +736,8 @@ function switchPrintType(){
 						<html:hidden property="customer.id"/>
 						<html:hidden property="customer.exported"/>
 						<input type="hidden" name="tf" value="<%=session.getAttribute("tf") %>">
+						<div id="addressList" style="text-align: left;display: none;"></div>
+						<div id="contactList" style="text-align: left;display: none;"></div>
 						</html:form>
 						<!-- BODY -->
 					</td>

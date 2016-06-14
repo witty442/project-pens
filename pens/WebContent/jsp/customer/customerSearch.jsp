@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.bean.District"%>
 <%@page import="com.isecinc.pens.model.MDistrict"%>
@@ -71,6 +72,9 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg" type="text/javascript"></script>
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -146,7 +150,7 @@ $(function() {
 //change pv
  function changePV(pvid){
 	 var disId = parseInt(document.getElementsByName('customer.district')[0].value);
-	 alert("disId["+disId+"],pvid:"+pvid);
+	// alert("disId["+disId+"],pvid:"+pvid);
  	
 	 $("#district").html("");
  	<%for(District d : districts){%>
@@ -161,7 +165,28 @@ $(function() {
    <%}%>
  }
  
+ function showImage(path,customerId,imageFileName){
+	 
+		//alert(lat+","+lng);
+	 if(imageFileName != "" ){
+		var width= window.innerWidth-100;
+		var height= window.innerHeight-100;
+	
+		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
+			
+	}else{
+		alert("ยังไม่ได้ไฟล์ร๔ปภาพ'");
+	}
+}
+ 
+ function MarkLocationMap(path){
+	  var width= window.innerWidth-50;
+	  var height= window.innerHeight-20;
+	 PopupCenter(path+"/jsp/location/markLocationMap.jsp?", "Mark location map",width,height); 
+}
+ 
 </script>
+
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -258,6 +283,11 @@ $(function() {
 							<td align="center">
 								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
 								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
+								
+								<%--  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
+									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
+								</a> --%>
+								
 							</td>
 						</tr>
 					</table>				
@@ -293,17 +323,18 @@ $(function() {
 								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
 								  <th class="cust_actionReceipt">ทำจัดรายการ</th>
 								<%} %>
-								<% if( role.equalsIgnoreCase(User.VAN)){ %>
+								<% //if( role.equalsIgnoreCase(User.VAN)){ %>
 								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
-								<%} %>
+								<%//} %>
 								<th class="cust_actionView">แสดง</th>
 								<th class="cust_actionEdit">ทำรายการ</th>
+								<th>แสดงรูปร้านค้า</th>
 							</tr>	
 							<c:forEach var="item" items="${customerForm.results}" varStatus="rows">
 							<c:choose>
 								<c:when test="${item.no %2 == 0}">
 									<c:set var="tabclass" value="lineO"/>
-								</c:when>
+								</c:when> 
 								<c:otherwise>
 									<c:set var="tabclass" value="lineE"/>
 								</c:otherwise>
@@ -362,7 +393,16 @@ $(function() {
 											</c:if>
 									   </c:if>
 									</td>
-								<%} %>
+							<% }else if( role.equalsIgnoreCase(User.TT)){ %>
+								<td class="cust_actionEditCust">
+							        <c:if test="${item.canActionEditCust2=='true'}">
+									        <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
+											    <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
+									       </a>
+									</c:if>
+								</td>
+							<%} %>
+							
 								<td class="cust_actionView">
 								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
 									   <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
@@ -373,6 +413,14 @@ $(function() {
 									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
 								   </a>
 								</td>
+								<td class="cust_actionEdit">
+						
+								    <c:if test="${item.imageFileName != ''}">
+										<a href="#" onclick="return showImage('${pageContext.request.contextPath}','${item.id}','${item.imageFileName}');">
+											แสดงรูปภาพ 
+										 </a>
+									 </c:if>
+							    </td>
 							</tr>
 							</c:forEach>
 							</table>

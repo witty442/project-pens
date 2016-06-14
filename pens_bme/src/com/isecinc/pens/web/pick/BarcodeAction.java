@@ -66,8 +66,16 @@ public class BarcodeAction extends I_Action {
 				
 				aForm.setJob(ad);
 			}else if("back".equals(action)){
+				//OLD Code
 				aForm.setJob(BarcodeDAO.searchHead(aForm.getJobCriteria()));
-				aForm.setResultsSearch(aForm.getJob().getItems());
+				if( aForm.getJob().getItems() != null && aForm.getJob().getItems().size() >0){
+				   aForm.setResultsSearch(aForm.getJob().getItems());
+				}else{
+				   aForm.setResultsSearch(null);
+				}
+				//New Code
+				//aForm.setResultsSearch(aForm.getResultsSearchPrev());
+				
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -137,6 +145,8 @@ public class BarcodeAction extends I_Action {
 		try {
 			//save old criteria
 			aForm.setJobCriteria(aForm.getJob());
+			//New Code
+			//aForm.setResultsSearchPrev(aForm.getResultsSearch());
 			
             String jobId = Utils.isNull(request.getParameter("jobId"));
             String boxNo = Utils.isNull(request.getParameter("boxNo"));

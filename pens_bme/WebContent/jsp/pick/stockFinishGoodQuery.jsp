@@ -47,6 +47,7 @@ if(session.getAttribute("statusList") == null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stockPickQuery.css" type="text/css" />
@@ -148,8 +149,10 @@ function exportExcel(path){
 						       <tr>
                                     <td> Warehouse</td>
 									<td colspan="3">	
-										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-คลังสต็อก B'me สำหรับโอน</html:radio>
-										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-คลังสินค้า HIS&HER</html:radio>
+										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-<%=PickConstants.getWareHouseDesc("W2") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-<%=PickConstants.getWareHouseDesc("W3") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-<%=PickConstants.getWareHouseDesc("W4") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W5" onclick="swithWareHouse()">W5-<%=PickConstants.getWareHouseDesc("W5") %></html:radio>
 									</td>
 								</tr>
 						       <tr>

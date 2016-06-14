@@ -67,7 +67,7 @@ public class ConfFinishDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING i \n");
+			sql.append("\n select i.* from PENSBME_REQ_FINISHING i \n");
 			sql.append("\n where 1=1   \n");
 			
 			if( !Utils.isNull(o.getRequestDate()).equals("")){

@@ -128,7 +128,7 @@ public class DBBackUpManager {
 			tableList = (List<DBBean>)allList.get(0);
 			//tableUnAvaiableList = (List<DBBean>)allList.get(1);
 			
-			logger.debug("Generate Insert Statement ");
+			//logger.debug("Generate Insert Statement ");
 			
             if(tableList != null && tableList.size() >0){
             	// Get Header Mysqldump format 
@@ -607,7 +607,7 @@ public class DBBackUpManager {
 	}
 	*/
 	private  StringBuffer generateInsertScript(String schema,Connection conn,String tableName){
-		logger.debug("generateInsertScript:"+tableName);
+		//logger.debug("generateInsertScript:"+tableName);
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		PreparedStatement psSelect =null;

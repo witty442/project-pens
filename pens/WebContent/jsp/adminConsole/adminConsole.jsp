@@ -63,7 +63,7 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
-		
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
 		document.getElementById("id_config_info").className = "tab_selected_style";
 	}
 	if(currentTab =='tab_execute'){
@@ -73,7 +73,7 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'visible';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
-		
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
 		document.getElementById("id_execute").className = "tab_selected_style";
 		
 	}
@@ -84,7 +84,7 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
-		
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
 		document.getElementById("id_query").className = "tab_selected_style";
 	}
 	if(currentTab =='tab_backupdb'){
@@ -93,7 +93,7 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_query").style.visibility = 'hidden';
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
-		
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
 		document.getElementById("div_backupdb").style.visibility = 'visible';
 		
 		document.getElementById("id_backupdb").className = "tab_selected_style";
@@ -105,9 +105,21 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_query").style.visibility = 'hidden';
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
-		
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
 		document.getElementById("div_cleardb").style.visibility = "visible";
+		
 		document.getElementById("id_cleardb").className = "tab_selected_style";
+	}
+	if(currentTab =='tab_clearcust_dup'){
+		//alert(currentTab);
+		document.getElementById("div_config_info").style.visibility = 'hidden';
+		document.getElementById("div_query").style.visibility = 'hidden';
+		document.getElementById("div_execute").style.visibility = 'hidden';
+		document.getElementById("div_backupdb").style.visibility = 'hidden';
+		document.getElementById("div_cleardb").style.visibility = "hidden";
+		
+		document.getElementById("div_clearcust_dup").style.visibility = "visible";
+		document.getElementById("id_clearcust_dup").className = "tab_selected_style";
 	}
 }
 
@@ -145,6 +157,9 @@ function submitBT(path){
 	if(currentTab =='tab_cleardb'){
 		queryStr +="&action=tab_cleardb";
 	}
+	if(currentTab =='tab_clearcust_dup'){
+		queryStr +="&action=tab_clearcust_dup";
+	}
 	
 	//alert("quertStr:"+queryStr);
 	
@@ -170,6 +185,7 @@ function submitBT(path){
 	<INPUT TYPE="button" class="tab_style" id ="id_execute" name ="tab_execute"  VALUE="Execute DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_execute')">
 	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
+	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Duplicate Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
 	
     <div id="div_msg" style="display:none"> 
 		    <br/><br/>
@@ -238,6 +254,14 @@ function submitBT(path){
 		   <INPUT class="button2_style" TYPE="button" name ="B_ClearDB"  VALUE="Submit Clear DB" onclick="submitBT('<%=request.getContextPath()%>');">
 		  <BR>
 		   <html:textarea property="resultClearDB" style=" width :100%;" rows="40"/>
+		  <br>
+	  </div>
+	  <div id="div_clearcust_dup" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
+		  <BR>
+		  <span class="h1_style"> Clear Duplicate Address </span> :
+		   <INPUT class="button2_style" TYPE="button" name ="B_Clearcust_dup"  VALUE="Submit Clear Duplicate Address" onclick="submitBT('<%=request.getContextPath()%>');">
+		  <BR>
+		   <html:textarea property="resultClearCustDup" style=" width :100%;" rows="40"/>
 		  <br>
 	  </div>
   

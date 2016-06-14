@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.collections.Factory;
 import org.apache.commons.collections.list.LazyList;
+import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.bean.Address;
@@ -27,6 +28,7 @@ public class CustomerForm extends I_Form implements Serializable{
 	private CustomerCriteria criteria = new CustomerCriteria();
 
 	private Customer[] results = null;
+	private FormFile imageFile;
 
 	List<Address> addresses = null;
 
@@ -36,6 +38,14 @@ public class CustomerForm extends I_Form implements Serializable{
 	private int totalRow;
 	private int totalPage;
 	
+     
+	public FormFile getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(FormFile imageFile) {
+		this.imageFile = imageFile;
+	}
 
 	@SuppressWarnings("unchecked")
 	public CustomerForm() {

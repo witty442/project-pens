@@ -165,17 +165,24 @@ public class SAReportAction extends I_Action {
                 
 		    	StringBuffer EXCEL_HEADER = new StringBuffer("");
 	
-		    	EXCEL_HEADER.append("<style> \n");
+		    	/*EXCEL_HEADER.append("<style> \n");
 		    	EXCEL_HEADER.append(" table {\n");
 		    	EXCEL_HEADER.append(" border-collapse: collapse; \n");
 		    	EXCEL_HEADER.append(" }\n");
 				EXCEL_HEADER.append(" table, th, td{ \n");
 				EXCEL_HEADER.append("   border: 1px solid black; \n");
 				EXCEL_HEADER.append(" } \n");
+				EXCEL_HEADER.append("</style> \n");*/
+		    	
+		    	EXCEL_HEADER.append("<style> \n");
+		    	EXCEL_HEADER.append(" table, th, td{ \n");
+				EXCEL_HEADER.append("  height: 50px; \n");
+				EXCEL_HEADER.append(" } \n");
 				EXCEL_HEADER.append("</style> \n");
 				
 		    	/** Replace Tag Html Img = img_XX **/
 		    	htmlCode = htmlCode.replaceAll("<img", "<img_xx");
+		    	htmlCode = htmlCode.replaceAll("<table","<table border='1'");
 		    	headerHtml += EXCEL_HEADER.toString()+ htmlCode;
 		    		
 		    	java.io.OutputStream out = response.getOutputStream();

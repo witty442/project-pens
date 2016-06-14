@@ -6,6 +6,7 @@ User user = (User)session.getAttribute("user");
 
 <%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
 <title>PENS SALESYSTEM</title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />

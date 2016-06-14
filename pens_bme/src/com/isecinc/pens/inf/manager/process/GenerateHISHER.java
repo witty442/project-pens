@@ -80,7 +80,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
-			sql.append("\n 		and  ( O.exported <> 'Y' or O.exported is null)	 ");
+			sql.append("\n 		and  ( (O.exported <> 'Y' and O.exported <> 'G') or O.exported is null)	 ");
 			sql.append("\n 		group by O.barcode, O.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
 			
 			sql.append("\n 		UNION ALL ");
@@ -101,7 +101,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");
 			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and H.delivery_date = ?  ");
-			sql.append("\n 		and  ( H.exported <> 'Y' or H.exported is null)	 ");
+			sql.append("\n 		and  ( (H.exported <> 'Y' and H.exported <> 'G') or H.exported is null)	 ");
 			sql.append("\n 		group by I.barcode, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
 			sql.append("\n )A ");
 			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");

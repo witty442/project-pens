@@ -149,19 +149,21 @@ public class StockQueryDAO extends PickConstants{
 		}else if(o.getWareHouse().equals("W3")){
 			
 			if("ALL".equals(o.getStatus())){
-				 groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_RETURN+"'"; 
+				 groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_WORK_IN_PROCESS+"','"+STATUS_FINISH+"','"+STATUS_CANCEL+"'"; 
 				 groupFromStockPick = "'"+STATUS_ISSUED+"'";
-			}else if("SCANNING".equals(o.getStatus())){
-				 groupFromBarcode = "'"+STATUS_OPEN+"'";
 			}else if("ONHAND".equals(o.getStatus())){
 				groupFromBarcode = "'"+STATUS_CLOSE+"'";
-			}else if("ISSUED".equals(o.getStatus())){
-				groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}else if("SCANNING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_OPEN+"'";
+			}else if("FINISHING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_WORK_IN_PROCESS+"'";
+			}else if("FINISHGOODS".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_FINISH+"'";
 			}
         }else if(o.getWareHouse().equals("W4")){
 			
 			if("ALL".equals(o.getStatus())){
-				 groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_RETURN+"'"; 
+				groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_WORK_IN_PROCESS+"','"+STATUS_FINISH+"','"+STATUS_CANCEL+"'"; 
 				 groupFromStockPick = "'"+STATUS_ISSUED+"'";
 			}else if("SCANNING".equals(o.getStatus())){
 				 groupFromBarcode = "'"+STATUS_OPEN+"'";
@@ -169,6 +171,26 @@ public class StockQueryDAO extends PickConstants{
 				groupFromBarcode = "'"+STATUS_CLOSE+"'";
 			}else if("ISSUED".equals(o.getStatus())){
 				groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}else if("FINISHING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_WORK_IN_PROCESS+"'";
+			}else if("FINISHGOODS".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_FINISH+"'";
+			}
+         }else if(o.getWareHouse().equals("W5")){
+			
+			if("ALL".equals(o.getStatus())){
+				groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_WORK_IN_PROCESS+"','"+STATUS_FINISH+"','"+STATUS_CANCEL+"'"; 
+				 groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}else if("SCANNING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_OPEN+"'";
+			}else if("ONHAND".equals(o.getStatus())){
+				groupFromBarcode = "'"+STATUS_CLOSE+"'";
+			}else if("ISSUED".equals(o.getStatus())){
+				groupFromStockPick = "'"+STATUS_ISSUED+"'";
+			}else if("FINISHING".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_WORK_IN_PROCESS+"'";
+			}else if("FINISHGOODS".equals(o.getStatus())){
+				 groupFromBarcode = "'"+STATUS_FINISH+"'";
 			}
 		}
 		
@@ -198,7 +220,6 @@ public class StockQueryDAO extends PickConstants{
 		sql.append("\n )AA ");
 
 		return sql;
-		
 	}
 	
 	public static StockQuery searchSummaryFinishGoodByDetail(StockQuery o ) throws Exception {

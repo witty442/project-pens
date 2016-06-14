@@ -16,7 +16,6 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.ConditionFilterBean;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 
@@ -155,7 +154,6 @@ public class SearchValuePopupAction extends I_Action {
 		
 		return returnText;
 	}
-	
 	
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("SearchValuePopupAction Search Current Action");

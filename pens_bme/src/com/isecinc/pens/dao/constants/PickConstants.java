@@ -2,6 +2,7 @@ package com.isecinc.pens.dao.constants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import util.Constants;
 
@@ -41,6 +42,7 @@ public class PickConstants extends Constants{
 	public static String WAREHOUSE_W2 ="W2";//Move
 	public static String WAREHOUSE_W3 ="W3";//Move
 	public static String WAREHOUSE_W4 ="W4";//Move
+	public static String WAREHOUSE_W5 ="W5";//Move
 	
 	public static String WORK_STEP_POST_BYSALE = "Post by Sale";
 	public static String WORK_STEP_PICK_COMPLETE = "Pick Complete";
@@ -49,6 +51,8 @@ public class PickConstants extends Constants{
 	public static String PICK_TYPE_ITEM ="ITEM";
 	public static String PICK_TYPE_BOX ="BOX";
 	public static String PICK_TYPE_GROUP ="GROUP";
+	
+	public static Map<String, String> wareHouseMap;
 	
 	@Deprecated
 	public static String SUB_PICK_TYPE_PART_BOX ="PBOX";
@@ -101,17 +105,23 @@ public class PickConstants extends Constants{
 		return d;
 	}
 	
-	public static String getWareHouseDesc(String status){
+	
+	public static String getWareHouseDesc(String w){
+		//Check Init
+		wareHouseMap = wareHouseMap==null?GeneralDAO.initWarehouseDesc():wareHouseMap;
+				
 		String d = "";
-		status = Utils.isNull(status);
-		if(WAREHOUSE_W1.equals(status)){
-			d ="W1-คลังคืนโรงงานวาโก้";
-		}else if(WAREHOUSE_W2.equals(status)){
-			d = "W2-คลังสต็อก B'me สำหรับโอน ";
-		}else if(WAREHOUSE_W3.equals(status)){
-			d = "W3-เบิกสินค้าจากคลังขายสด-เบิกทั้งกล่อง";
-		}else if(WAREHOUSE_W4.equals(status)){
-			d = "W4-คลังสินค้า HIS&HER";
+		w = Utils.isNull(w);
+		if(WAREHOUSE_W1.equals(w)){
+			d = wareHouseMap.get("W1");
+		}else if(WAREHOUSE_W2.equals(w)){
+			d = wareHouseMap.get("W2");
+		}else if(WAREHOUSE_W3.equals(w)){
+			d = wareHouseMap.get("W3");
+		}else if(WAREHOUSE_W4.equals(w)){
+			d = wareHouseMap.get("W4");
+		}else if(WAREHOUSE_W5.equals(w)){
+			d = wareHouseMap.get("W5");
 		}
 		return d;
 	}
@@ -153,6 +163,13 @@ public class PickConstants extends Constants{
 		statusList.add(new References(STATUS_ISSUED, getStatusDesc(STATUS_ISSUED)));
 		statusList.add(new References(STATUS_WORK_IN_PROCESS, getStatusDesc(STATUS_WORK_IN_PROCESS)));
 		statusList.add(new References(STATUS_FINISH, getStatusDesc(STATUS_FINISH)));
+		return statusList;
+	}
+	
+	public static List<References> getScanCheckoutStatusList(){
+		List<References> statusList = new ArrayList<References>();
+		statusList.add(new References(STATUS_OPEN, getStatusDesc(STATUS_OPEN)));
+		statusList.add(new References(STATUS_ISSUED, getStatusDesc(STATUS_ISSUED)));
 		return statusList;
 	}
 	

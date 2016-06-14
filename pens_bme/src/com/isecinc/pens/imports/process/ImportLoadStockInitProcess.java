@@ -3,6 +3,8 @@ package com.isecinc.pens.imports.process;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +29,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
+import util.DBCPConnectionProvider;
 import util.UploadXLSUtil;
 
 import com.isecinc.pens.bean.Barcode;
@@ -37,6 +40,7 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.imports.ImportForm;
+import com.isecinc.pens.web.popup.PopupForm;
 
 public class ImportLoadStockInitProcess {
 	/** Logger */
@@ -99,8 +103,12 @@ public class ImportLoadStockInitProcess {
             	tableInitName = "PENSBME_BIGC_INIT_STK";
             	tableInitOnhandName = "PENSBME_BIGC_ONHAND_INIT_STK";
             	storeCodeValidate = "020049";
+            }else  if("MTT".equalsIgnoreCase(importType)){
+            	tableInitName = "PENSBME_MTT_INIT_STK";
+            	tableInitOnhandName = "PENSBME_MTT_ONHAND_INIT_STK";
+            	storeCodeValidate = "100001";
             }
-            
+           
 			FormFile dataFile = importForm.getDataFile();
 			if (dataFile != null) {
 				fileName = dataFile.getFileName();
@@ -150,6 +158,13 @@ public class ImportLoadStockInitProcess {
 					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  Upload ไปแล้ว");
 					return mapping.findForward("success");
 				}*/
+				 
+	            /** Validate Init by custNo,Count_str_date **/
+				if( isInitExist(tableInitName,storeNo,salesDateObj) ){
+					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลวันที่ :"+salesDate+" ร้านค้า:"+storeNo+"-"+storeName+" ถุกสร้างไปแล้ว");
+					return mapping.findForward("success");
+				}
+				
 				/** validate StoreNo **/
 				if( !storeNo.startsWith(storeCodeValidate)){
 					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
@@ -195,8 +210,8 @@ public class ImportLoadStockInitProcess {
 					mat = "";
 					qty = "";
 					
-					ps.setString(index++, storeNo);
-					ps.setDate(index++, new java.sql.Date(salesDateObj.getTime()));
+					ps.setString(index++, storeNo);//CUST_NO 1
+					ps.setDate(index++, new java.sql.Date(salesDateObj.getTime())); //COUNT_STK_DATE 2
 					
 					for (int colNo = 0; colNo < maxColumnNo; colNo++) {
 						cell = row.getCell((short) colNo);
@@ -212,12 +227,12 @@ public class ImportLoadStockInitProcess {
 							mat = Utils.isNull(cellValue);
                             groupCode  = mat.substring(0,6);
 							
-							ps.setString(index++, groupCode);
-						    ps.setString(index++, mat);
+							ps.setString(index++, groupCode);//GROUP_CODE 3
+						    ps.setString(index++, mat);//MAT 4
 						}else if(colNo==2){
 						  //qty
 						   qty = Utils.decimalFormat(Utils.isDoubleNull(cellValue),Utils.format_current_no_disgit);
-						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));
+						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));//QTY 5
 						   
 						   totalQty += Utils.isDoubleNull(cellValue);
 						}
@@ -229,8 +244,8 @@ public class ImportLoadStockInitProcess {
 						 pensItem = master.getPensItem();
 						 barcode = master.getBarcode();
 						 
-						 ps.setString(index++, barcode);
-						 ps.setString(index++, pensItem);
+						 ps.setString(index++, pensItem);//PENS_ITEM 6
+						 ps.setString(index++, barcode);//BARCODE 7
 					}else{
 						pensItem = "";
 						barcode = "";
@@ -384,4 +399,40 @@ public class ImportLoadStockInitProcess {
 
 		return mapping.findForward("success");
 	}
+	
+	  public static boolean isInitExist(String tableName,String custNo,java.util.Date countStkDate) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			boolean exist = false;
+			try {
+				sql.append(" select cust_no,count_stk_date FROM "+tableName +" WHERE 1=1 \n");
+				sql.append(" and cust_no = '"+custNo+"' \n");
+				sql.append(" and count_stk_date =? \n");
+				
+				logger.debug("sql:"+sql);
+	
+				conn = new DBCPConnectionProvider().getConnection(conn);
+				
+				ps = conn.prepareStatement(sql.toString());
+				
+				ps.setDate(1, new java.sql.Date(countStkDate.getTime())); //COUNT_STK_DATE 2
+				rst = ps.executeQuery();
+				
+				if (rst.next()) {
+					exist = true;
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return exist;
+		}
 }
