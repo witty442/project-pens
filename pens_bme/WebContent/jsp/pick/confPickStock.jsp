@@ -79,6 +79,12 @@ function printMini(path){
 	form.submit();
 	return true;
 }
+function printBillMini(path){
+	var form = document.confPickStockForm;
+	form.action = path + "/jsp/confPickStockAction.do?do=printBillMini";
+	form.submit();
+	return true;
+}
 function printByGroupCode(path){
 	var form = document.confPickStockForm;
 	form.action = path + "/jsp/confPickStockAction.do?do=printByGroupCode";
@@ -600,6 +606,10 @@ function sumQty(){
 								<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 								  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 								</a>						
+								&nbsp;
+								 <a href="javascript:printBillMini('${pageContext.request.contextPath}')">
+									  <input type="button" value=" พิมพ์ ใบเดินบิล" class="newPosBtnLong"> 
+									</a>
 								</td>
 							</tr>
 						</table>

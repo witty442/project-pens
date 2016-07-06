@@ -228,6 +228,9 @@
 					<li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotusPeriod');"><span>2.4 <bean:message bundle="sysprop" key="SummaryBMEOnhandLotusPeriod"/></span></a>
 					</li> 
+					<li>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=monthEndLotus');"><span>2.5 <bean:message bundle="sysprop" key="SummaryBMEMonthEndLotus"/></span></a>
+					</li>
 			    </ul>
 			</li>
 			    

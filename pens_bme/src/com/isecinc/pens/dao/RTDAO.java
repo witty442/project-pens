@@ -393,4 +393,66 @@ public class RTDAO {
 		   }
 		  return docNo;
 	}
+	 
+	 public static boolean validRefDoc(String refDoc) throws Exception{
+		    Connection conn = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try{
+				conn = DBConnection.getInstance().getConnection();
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" select count(*) as c from  PENSBME_RTN_CONTROL where ref_doc ='"+refDoc+"' and status <> 'AB' \n" );
+                logger.debug("sql:/n"+sql.toString());
+                
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					if(rs.getInt("c")>0){
+						return false;
+					}
+				}
+				
+				return true;
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}
+		}
+	 
+	 public static boolean validRtnNo(String rtnNo) throws Exception{
+		    Connection conn = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try{
+				conn = DBConnection.getInstance().getConnection();
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" select count(*) as c from  PENSBME_RTN_CONTROL where rtn_no ='"+rtnNo+"' and status <> 'AB' \n" );
+             logger.debug("sql:/n"+sql.toString());
+             
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					if(rs.getInt("c")>0){
+						return false;
+					}
+				}
+				
+				return true;
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}
+		}
 }

@@ -904,7 +904,345 @@ public class ConfPickStockDAO extends PickConstants{
 		}
 		return pickStock;
 	}
+	
+	public static ReqPickStock getStockIssueItemCase4ReportBillMini(Connection conn,ReqPickStock pickStock) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ReqPickStock> items = new ArrayList<ReqPickStock>();
 
+		int totalQty = 0;
+		logger.debug("***getStockIssueItemCase4ReportBillMini***");
+		try {
+			//Case Edit
+			sql.append("\n 	select group_code,count(*) as countGroup ,SUM(NVL(req_qty,0)) as req_qty  ");
+			sql.append("\n 	from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 	where 1=1  ");
+			sql.append("\n 	and h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 	and h.warehouse = '"+pickStock.getWareHouse()+"'");
+			if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
+			sql.append("\n 	and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
+			}
+			sql.append("\n 	group by group_code ");
+			sql.append("\n 	order by group_code ");
+
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			 
+				items.addAll(genMatDetail4BillReport(conn,pickStock,Utils.isNull(rst.getString("group_code")),rst.getInt("countGroup"),rst.getInt("req_qty")));
+				
+			   totalQty +=rst.getInt("req_qty");
+			}//while
+			
+			pickStock.setItems(items);
+			pickStock.setTotalQty(totalQty);
+			
+			//debug
+			if(items != null && items.size()>0){
+				for(int r=0;r<items.size();r++){
+					ReqPickStock p = items.get(r);
+					logger.debug("groupCode["+p.getGroupCode()+"]mat["+p.getMaterialMaster()+"]");
+				}
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return pickStock;
+	}
+	
+	public static ReqPickStock getStockIssueItemCase4ReportBillMiniAll(Connection conn,ReqPickStock pickStock,String issueReqNoAll) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ReqPickStock> items = new ArrayList<ReqPickStock>();
+
+		int totalQty = 0;
+		logger.debug("***getStockIssueItemCase4ReportBillMini***");
+		try {
+			//Case Edit
+			sql.append("\n 	select group_code,count(*) as countGroup ,SUM(NVL(req_qty,0)) as req_qty  ");
+			sql.append("\n 	from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 	where 1=1  ");
+			sql.append("\n 	and h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 	and h.issue_req_no in("+issueReqNoAll+")");
+			
+			sql.append("\n 	group by group_code ");
+			sql.append("\n 	order by group_code ");
+
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			 
+				items.addAll(genMatDetail4BillAllReport(conn,issueReqNoAll,Utils.isNull(rst.getString("group_code")),rst.getInt("countGroup"),rst.getInt("req_qty")));
+				
+			   totalQty +=rst.getInt("req_qty");
+			}//while
+			
+			pickStock.setItems(items);
+			pickStock.setTotalQty(totalQty);
+			
+			//debug
+			if(items != null && items.size()>0){
+				for(int r=0;r<items.size();r++){
+					ReqPickStock p = items.get(r);
+					//logger.debug("groupCode["+p.getGroupCode()+"]mat["+p.getMaterialMaster()+"]");
+				}
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return pickStock;
+	}
+	public static List<ReqPickStock> genMatDetail4BillAllReport(Connection conn,String issueReqnoAll,String groupCode,int countGroup,int issueQty) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ReqPickStock> matList = new ArrayList<ReqPickStock>();
+		int rowMax = 9;
+		int count = 0;
+		String mat = "";
+		String rowMat = "";
+		int r = 0;
+		int sumInt = 0;
+		logger.debug("***getMatDetail4Report*** RowMax["+rowMax+"]");
+		try {
+			//Case Edit
+			sql.append("\n 	select group_code,material_master,nvl(sum(req_qty),0) as issue_qty");
+			sql.append("\n 	from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 	where 1=1  ");
+			sql.append("\n 	and h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 	and group_code = '"+groupCode+"'");
+			sql.append("\n 	and h.issue_req_no in ("+issueReqnoAll+")");
+			
+			sql.append("\n 	group by group_code,material_master ");
+			sql.append("\n 	order by group_code,material_master ");
+
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+				count++;
+				if(issueQty >0 && countGroup >= rowMax){
+					logger.debug("Case 1 countGroup >= rowMax");
+					if(count < rowMax){
+						logger.debug("count["+count+"]["+rst.getString("material_master")+"] mat++");
+						mat = rst.getString("material_master");
+						if(mat.length()==10){
+						   mat = mat.substring(6,10);
+						}else if(mat.length()==10){
+						  mat = mat.substring(6,9);
+						}
+						if(rst.getInt("issue_qty") > 0)
+						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+					
+					}else{
+						logger.debug("count["+count+"] ["+rst.getString("material_master")+"] mat++");
+						mat = rst.getString("material_master");
+						if(mat.length()==10){
+						   mat = mat.substring(6,10);
+						}else if(mat.length()==10){
+						  mat = mat.substring(6,9);
+						}
+						if(rst.getInt("issue_qty") > 0)
+						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+						
+						r++;
+						logger.debug("count["+count+"] r["+r+"] add to list");
+						ReqPickStock p = new ReqPickStock();
+						if(r==1){
+							p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+						}else{
+							p.setGroupCode("");
+						}
+						p.setMaterialMaster(rowMat);
+						matList.add(p);
+						
+						//reset
+						rowMat = "";
+						count = 0;
+						
+					}
+				}else if(issueQty > 0 ){
+					logger.debug("Case 2 countGroup < rowMax ["+rst.getString("material_master")+"]");
+					mat = rst.getString("material_master");
+					if(mat.length()==10){
+					   mat = mat.substring(6,10);
+					}else if(mat.length()==10){
+					  mat = mat.substring(6,9);
+					}
+					
+					if(rst.getInt("issue_qty") >0)
+					  rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+					
+					if(count == countGroup){
+						ReqPickStock p = new ReqPickStock();
+						p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+						p.setMaterialMaster(rowMat);
+						matList.add(p);
+						
+						//reset
+						rowMat = "";
+						count = 0;
+					}
+				}
+				
+			}//while
+			
+			/** Case split remain from Case 1 **/
+			if( !rowMat.equals("")){
+				r++;
+				logger.debug("r["+r+"]rowMat["+rowMat+"] add remain to list");
+				ReqPickStock p = new ReqPickStock();
+				if(r==1){
+					p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+				}else{
+					p.setGroupCode("");
+				}
+				p.setMaterialMaster(rowMat);
+				matList.add(p);
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return matList;
+	}
+	
+	public static List<ReqPickStock> genMatDetail4BillReport(Connection conn,ReqPickStock pickStock,String groupCode,int countGroup,int issueQty) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ReqPickStock> matList = new ArrayList<ReqPickStock>();
+		int rowMax = 10;
+		int count = 0;
+		String mat = "";
+		String rowMat = "";
+		int r = 0;
+		int sumInt = 0;
+		logger.debug("***getMatDetail4Report*** RowMax["+rowMax+"]");
+		try {
+			//Case Edit
+			sql.append("\n 	select group_code,material_master,nvl(sum(req_qty),0) as issue_qty");
+			sql.append("\n 	from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 	where 1=1  ");
+			sql.append("\n 	and h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 	and h.warehouse = '"+pickStock.getWareHouse()+"'");
+			sql.append("\n 	and group_code = '"+groupCode+"'");
+			if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
+			sql.append("\n 	and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
+			}
+			sql.append("\n 	group by group_code,material_master ");
+			sql.append("\n 	order by group_code,material_master ");
+
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+				count++;
+				if(issueQty >0 && countGroup >= rowMax){
+					logger.debug("Case 1 countGroup >= rowMax");
+					if(count < rowMax){
+						logger.debug("count["+count+"]["+rst.getString("material_master")+"] mat++");
+						mat = rst.getString("material_master");
+						mat = mat.substring(6,10);
+						if(rst.getInt("issue_qty") > 0)
+						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+					
+					}else{
+						logger.debug("count["+count+"] ["+rst.getString("material_master")+"] mat++");
+						mat = rst.getString("material_master");
+						mat = mat.substring(6,10);
+						if(rst.getInt("issue_qty") > 0)
+						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+						
+						r++;
+						logger.debug("count["+count+"] r["+r+"] add to list");
+						ReqPickStock p = new ReqPickStock();
+						if(r==1){
+							p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+						}else{
+							p.setGroupCode("");
+						}
+						p.setMaterialMaster(rowMat);
+						matList.add(p);
+						
+						//reset
+						rowMat = "";
+						count = 0;
+						
+					}
+				}else if(issueQty > 0 ){
+					logger.debug("Case 2 countGroup < rowMax ["+rst.getString("material_master")+"]");
+					mat = rst.getString("material_master");
+					mat = mat.substring(6,10);
+					if(rst.getInt("issue_qty") >0)
+					  rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
+					
+					if(count == countGroup){
+						ReqPickStock p = new ReqPickStock();
+						p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+						p.setMaterialMaster(rowMat);
+						matList.add(p);
+						
+						//reset
+						rowMat = "";
+						count = 0;
+					}
+				}
+				
+			}//while
+			
+			/** Case split remain from Case 1 **/
+			if( !rowMat.equals("")){
+				r++;
+				logger.debug("r["+r+"]rowMat["+rowMat+"] add remain to list");
+				ReqPickStock p = new ReqPickStock();
+				if(r==1){
+					p.setGroupCode(groupCode+" [ "+issueQty+" ]");
+				}else{
+					p.setGroupCode("");
+				}
+				p.setMaterialMaster(rowMat);
+				matList.add(p);
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return matList;
+	}
+	
 	public static List<ReqPickStock> genMatDetail4Report(Connection conn,ReqPickStock pickStock,String groupCode,int countGroup,int issueQty) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;

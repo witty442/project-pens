@@ -72,6 +72,7 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
 				 summaryForm.setOnhandSummarySizeColorLotusResults(null);
+				 summaryForm.setOnhandSummaryMonthEndLotusResults(null);
 				 
 				 if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
 					|| "sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
@@ -125,6 +126,7 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
 				 summaryForm.setOnhandSummarySizeColorLotusResults(null);
+				 summaryForm.setOnhandSummaryMonthEndLotusResults(null);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -173,6 +175,23 @@ public class SummaryAction extends I_Action {
 					
 				} else {
 					summaryForm.setOnhandSummaryLotusResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
+			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				List<OnhandSummary> results = new SummaryDAO().searchOnhandMonthEndLotus(summaryForm.getOnhandSummary(),user);
+				if (results != null  && results.size() >0) {
+					summaryForm.setOnhandSummaryMonthEndLotusResults(results);
+					
+					OnhandSummary cc = (OnhandSummary)results.get(0);
+					
+					//logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
+					ImportDAO importDAO = new ImportDAO();
+					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+					if(m != null)
+					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+					
+				} else {
+					summaryForm.setOnhandSummaryMonthEndLotusResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
 			}else if("bmeTrans".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
@@ -378,7 +397,6 @@ public class SummaryAction extends I_Action {
 				Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				Date initDate = new SummaryDAO().searchInitDateBigC(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 				
-				
 				logger.debug("initDate:"+initDate);
 				logger.debug("asOfDate:"+asOfDate);
 				
@@ -413,7 +431,6 @@ public class SummaryAction extends I_Action {
 				//Validate Initial Date
 				Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				Date initDate = new SummaryDAO().searchInitDateLotus(summaryForm.getOnhandSummary().getPensCustCodeFrom());
-				
 				
 				logger.debug("initDate:"+initDate);
 				logger.debug("asOfDate:"+asOfDate);
@@ -486,6 +503,14 @@ public class SummaryAction extends I_Action {
 				 fileName ="Report Bme Stock on-hand at Lotus(As of).xls";
 			     if(summaryForm.getOnhandSummaryLotusResults() != null && summaryForm.getOnhandSummaryLotusResults().size() > 0){
 					htmlTable = genOnhandLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getOnhandSummaryLotusResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				 fileName ="Report Bme Stock close Lotus.xls";
+			     if(summaryForm.getOnhandSummaryMonthEndLotusResults() != null && summaryForm.getOnhandSummaryMonthEndLotusResults().size() > 0){
+					htmlTable = genOnhandMonthEndLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getOnhandSummaryMonthEndLotusResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -727,6 +752,75 @@ public class SummaryAction extends I_Action {
 					  h.append("<td>&nbsp;"+s.getStoreCode()+"</td> \n");
 					  h.append("<td>&nbsp;"+s.getPensItem()+"</td> \n");
 					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td>"+s.getAdjustQty()+"</td> \n");
+					  h.append("<td>"+s.getStockShortQty()+"</td> \n");
+					  h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					  
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	private StringBuffer genOnhandMonthEndLotusHTML(String page,HttpServletRequest request,SummaryForm form,User user,List<OnhandSummary> list){
+		StringBuffer h = new StringBuffer("");
+		int colspan = 10;
+		try{
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>รายงานปิดรอบ LOTUS</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(list != null){
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td>รหัสสาขา</td> \n");
+				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Group</td> \n");
+				  h.append("<td>Begining Qty</td> \n");
+				  h.append("<td>Sale In Qty</td> \n");
+				  h.append("<td>Sale Return Qty </td> \n");
+				  h.append("<td>Sales Out Qty </td> \n");
+				  h.append("<td>Adjust Qty</td> \n");
+				  h.append("<td>Stock short </td> \n");
+				  h.append("<td>Onhand Qty </td> \n");
+				 
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td>"+s.getBeginingQty()+"</td> \n");
 					  h.append("<td>"+s.getSaleInQty()+"</td> \n");
 					  h.append("<td>"+s.getSaleReturnQty()+"</td> \n");
 					  h.append("<td>"+s.getSaleOutQty()+"</td> \n");

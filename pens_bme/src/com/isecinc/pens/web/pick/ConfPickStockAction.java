@@ -62,6 +62,7 @@ public class ConfPickStockAction extends I_Action {
 				
 				aForm.setResultsSearch(null);
 				ReqPickStock ad = new ReqPickStock();
+				ad.setStatus(PickConstants.STATUS_POST);
 				aForm.setBean(ad);
 				
 			}else if("back".equals(action)){
@@ -115,6 +116,7 @@ public class ConfPickStockAction extends I_Action {
 			aForm.setResultsSearch(null);
 			
 			ReqPickStock ad = new ReqPickStock();
+			ad.setStatus(PickConstants.STATUS_POST);
 			//ad.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setBean(ad);
 			
@@ -901,6 +903,130 @@ public class ConfPickStockAction extends I_Action {
 		}
 		return null;
 	}
+	
+	public ActionForward printBillMini(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		
+		logger.debug("Search for report : " + this.getClass());
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		try {
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+
+			ReqPickStock h = reportForm.getBean();
+			if(h != null){
+				logger.debug("ReqPickStock:"+h);
+				//Head
+				parameterMap.put("p_title", "øÕ√Ï¡ „∫‡¥‘π∫‘≈");
+				parameterMap.put("p_issueReqDate", h.getIssueReqDate());
+				parameterMap.put("p_issueReqNo", h.getIssueReqNo());
+				parameterMap.put("p_statusDesc", h.getStatusDesc());
+				parameterMap.put("p_requestor", h.getRequestor());
+				parameterMap.put("p_custGroupDesc", h.getCustGroup());
+				parameterMap.put("p_needDate", h.getNeedDate());
+				parameterMap.put("p_storeCode", h.getStoreCode()+"-"+h.getStoreName());
+				parameterMap.put("p_subInv", h.getSubInv());
+				parameterMap.put("p_storeNo", h.getStoreNo());
+				parameterMap.put("p_remark", h.getRemark());
+				parameterMap.put("p_wareHouse", h.getWareHouse());
+				
+				//Gen Report
+				String fileName = "conf_pick_bill_mini_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCase4ReportBillMini(conn, h);//
+				List items = pAllItem.getItems();
+				
+				parameterMap.put("p_total_qty", pAllItem.getTotalQty()+"");
+				parameterMap.put("p_total_box", h.getTotalCtn()+"");
+				
+				logger.debug("items size:"+items.size());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				
+				request.setAttribute("Message", "‰¡Ëæ∫¢ÈÕ¡Ÿ≈  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
+	
+public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		
+		logger.debug("printBillMiniAll");
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		String issueReqNoAll = "";
+		String issueReqNoAllDisp = "";
+		try {
+			String fileType = SystemElements.PDF;
+			logger.debug("fileType:"+fileType);
+            //Get lineChk
+		    String[] issueReqNoArr= request.getParameterValues("linechk");
+		    logger.debug("issueReqNoArr length:"+issueReqNoArr.length);
+            for(int i=0;i<issueReqNoArr.length;i++){
+		    	
+		    	if(i==issueReqNoArr.length-1){
+		    		issueReqNoAll += "'"+issueReqNoArr[i]+"'";
+		    		issueReqNoAllDisp += issueReqNoArr[i]+"  ";
+		    	}else{
+		    		issueReqNoAll +="'"+issueReqNoArr[i]+"',";
+			    	issueReqNoAllDisp +=issueReqNoArr[i]+" / ";
+		    	}
+		    }
+		    
+			ReqPickStock h = reportForm.getBean();
+			if(h != null){
+				logger.debug("ReqPickStock:"+h);
+				//Head
+				parameterMap.put("p_title", "øÕ√Ï¡ „∫‡¥‘π∫‘≈(√«¡)");
+				parameterMap.put("p_issueReqNo", issueReqNoAllDisp);
+				
+				//Gen Report
+				String fileName = "conf_pick_bill_mini_all_report";
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock  pAllItem = ConfPickStockDAO.getStockIssueItemCase4ReportBillMiniAll(conn, h,issueReqNoAll);//
+				List items = pAllItem.getItems();
+				parameterMap.put("p_total_qty", pAllItem.getTotalQty()+"");
+				
+				logger.debug("items size:"+items.size());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, items);
+				
+			}else{
+				
+				request.setAttribute("Message", "‰¡Ëæ∫¢ÈÕ¡Ÿ≈  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
+
 	public ActionForward printByGroupCode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		

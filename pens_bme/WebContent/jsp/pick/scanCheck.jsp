@@ -93,8 +93,6 @@ function loadMe(){
 	 calcTotalRow();
 	 /** Sum All doc **/
 	 sumTotal();
-	 
-	
 }
 function clearForm(path){
 	var form = document.scanCheckForm;
@@ -257,9 +255,9 @@ function getIssueModel(code,warehouse,boxNo){
 		form.remark.value = retArr[6];
 		form.totalReqQty.value = retArr[7];
 		
-		  /** Backup totalQty for add qty in screen **/
-	     document.getElementsByName("totalQtyTemp")[0].value = retArr[8];
-	     document.getElementsByName("bean.totalQty")[0].value = retArr[8];
+	     /** Backup totalQty for add qty in screen **/
+	    document.getElementsByName("totalQtyTemp")[0].value = retArr[8];
+	    document.getElementsByName("bean.totalQty")[0].value = retArr[8];
 	}else{
 		alert("ไม่พบข้อมูล");
 		form.issueReqNo.value = '';
@@ -271,13 +269,14 @@ function getIssueModel(code,warehouse,boxNo){
 		form.custGroup.value = '';
 		form.remark.value = '';
 		form.totalReqQty.value ='0';
-		 document.getElementsByName("totalQtyTemp")[0].value = '0';
-	     document.getElementsByName("bean.totalQty")[0].value = '0';
+		
+		document.getElementsByName("totalQtyTemp")[0].value = '0';
+	    document.getElementsByName("bean.totalQty")[0].value = '0';
 	}
 	
 }
 
-function addRow(){
+function addRow(path){
 	var form = document.scanCheckForm;
 	// $('#myTable tr').length;
 	var rows = $('#tblProduct tr').length-1;
@@ -290,15 +289,16 @@ function addRow(){
 	
 	//alert("lineId["+lineId+"]");
 	
-	var rowData ="<tr class='"+className+"'>"+
+	var rowData ="<tr class='"+className+"'  onmouseover='getRowIndex(this)'> "+
 	    "<td class='td_text_center' width='10%'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
 	    "<td class='td_text_center' width='20%'> <input type='text' name='barcode' size='30'  "+
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
 	
 	    " />  </td>"+
-	    "<td class='td_text_right' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25' readonly='true' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='td_text_right' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25'  onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
-	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' /></td>"+ 
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' />"+ 
+	    "  <input type='hidden' tabindex ='-1' id='status' name='status' value='' /></td>"+
 	  /*   "<td class='data_pensItem'> </td>"+  */
 	    "</tr>";
 
@@ -323,7 +323,7 @@ function sumTotal(){
     totalQty[0].value =  parseInt(totalQtyStart[0].value) + parseInt(totalRow[0].value);
 }
 
-function calcTotalRow(){
+/* function calcTotalRow(){
 	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
 	var barcodeLastRow = document.getElementsByName("barcode")[rows-1]; //alert(barcodeLastRow.value);
 	if(barcodeLastRow.value ==''){
@@ -332,6 +332,24 @@ function calcTotalRow(){
 	//Calc Row
     var totalRow = document.getElementsByName("totalRow");
     totalRow[0].value = rows;
+} */
+
+function calcTotalRow(){
+	var count= 0;
+	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
+	for(var r=0;r<rows;r++){
+	   var barcodeObj = document.getElementsByName("barcode")[r]; 
+	   var statusObj = document.getElementsByName("status")[r]; 
+	   //alert(barcodeObj.value+":"+statusObj.value);
+	   
+       if(barcodeObj.value != '' && statusObj.value != 'AB'){
+    	   count++;
+       }
+	}
+	//set total in page
+	var totalRow = document.getElementsByName("totalRow");
+    totalRow[0].value = count;
+	return count;
 }
 
 function calcTotalRowByBarcode(barcode){
@@ -339,16 +357,22 @@ function calcTotalRowByBarcode(barcode){
 	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
 	for(var r=0;r<rows;r++){
 	   var barcodeObj = document.getElementsByName("barcode")[r]; 
-	   //alert(barcodeObj.value);
+	   var statusObj = document.getElementsByName("status")[r]; 
+	   //alert(barcodeObj.value+":"+statusObj.value);
 	   
-       if(barcodeObj.value != '' && barcodeObj.value ==barcode){
+       if(barcodeObj.value != '' && barcodeObj.value ==barcode && statusObj.value != 'AB'){
     	   count++;
        }
 	}
 	return count;
 }
 
-function removeRow(){
+function getRowIndex(rowTableObj){
+   //alert(rowTableObj.rowIndex);
+   document.getElementById('currentRowIndex').value = rowTableObj.rowIndex;
+}
+
+function removeRow(path){
 	//todo play with type
 	var tbl = document.getElementById('tblProduct');
 	var chk = document.getElementsByName("linechk");
@@ -356,15 +380,30 @@ function removeRow(){
 	var bcheck=false;
 	for(var i=chk.length-1;i>=0;i--){
 		if(chk[i].checked){
-			// alert(i);
 			drow = tbl.rows[i+1];
-			$(drow).remove();
+			//$(drow).remove();
 			bcheck=true;
+			
+			removeRowByIndex(path,drow,i);
 		}
 	}
 	if(!bcheck){alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;}
 	
+	 /** Calc in Page **/
+	 calcTotalRow();
+	 /** Sum All doc **/
+	 sumTotal();
 }
+
+function removeRowByIndex(path,drow,index){
+     //alert(drow);
+	//todo play with type	
+	drow.style.display ='none';
+	//set  staus = AB 
+	//alert(index);
+	document.getElementsByName("status")[index].value ='AB';
+}
+	
 function checkAll(chkObj){
 	var chk = document.getElementsByName("linechk");
 	for(var i=0;i<chk.length;i++){
@@ -380,6 +419,9 @@ function getProductKeypress(e,barcodeObj,lineId){
 	var materialMaster = document.getElementsByName("materialMaster");
 	var groupCode = document.getElementsByName("groupCode");
 	var pensItem = document.getElementsByName("pensItem");
+	
+	//Get rowIndex
+	//lineId = document.getElementById('currentRowIndex').value;
 	
 	if(e != null && e.keyCode == 13){
 	
@@ -413,7 +455,7 @@ function getProductModel(barcodeObj,lineId){
 	var form = document.scanCheckForm;
 	var warehouse =document.getElementsByName("bean.wareHouse")[0].value;
 	var boxNo = document.getElementsByName("bean.boxNo")[0].value;
-	//alert("["+boxNo+"]");
+	
 	if(boxNo ==''){
 	   boxNo ='0';
 	}
@@ -475,6 +517,112 @@ function getProductModel(barcodeObj,lineId){
 			   barcodeObj.className = 'disableText';
 			   materialMaster[lineId-1].className = 'disableText';
 			}
+		}
+	return found;
+}
+
+function getProductKeypressByMat(e,matObj,lineId){
+	//materialMaster groupCode pensItem wholePriceBF retailPriceBF
+	//alert(barcode.value);
+
+	var barcode = document.getElementsByName("barcode");
+	var materialMaster = document.getElementsByName("materialMaster");
+	var groupCode = document.getElementsByName("groupCode");
+	var pensItem = document.getElementsByName("pensItem");
+
+	if(e != null && e.keyCode == 13){
+		if(matObj.value ==''){
+			barcode[lineId-1].value = '';
+			groupCode[lineId-1].value = '';
+			pensItem[lineId-1].value = '';
+		}else{
+			var found = getProductModelByMat(matObj,lineId);
+			if(found){
+			    //Calc In Screen
+				calcTotalRow();
+				
+				//count all issue
+				sumTotal();
+				
+				//Add New Row Auto
+				addRow();
+				
+				barcode[lineId].focus();
+				
+				//Set Prev row readonly  
+				barcode[lineId-1].className= "disableText";
+				barcode[lineId-1].readOnly = true;
+				
+				materialMaster[lineId-1].className ="disableText";
+				materialMaster[lineId-1].readOnly = true;
+			}
+		}
+	}
+}
+
+function getProductModelByMat(matObj,lineId){
+	var found = false;
+	var barcode = document.getElementsByName("barcode");
+	var materialMaster = document.getElementsByName("materialMaster");
+	var groupCode = document.getElementsByName("groupCode");
+	var pensItem = document.getElementsByName("pensItem");
+	
+	var warehouse =document.getElementsByName("bean.wareHouse")[0].value;
+	var boxNo = document.getElementsByName("bean.boxNo")[0].value;
+	
+	var returnString = "";
+    var form = document.scanCheckForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcodeFromStockIssue.jsp",
+			data : "matCode=" + matObj.value+"&issueReqNo="+form.issueReqNo.value+"&warehouse="+warehouse+"&boxNo="+boxNo,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+
+	   // alert("x:"+returnString);
+	    
+		if(returnString==''){
+			alert("ไม่พบข้อมูลสินค้า  "+matObj.value);
+			matObj.focus();
+			
+			barcode[lineId-1].value = '';
+			materialMaster[lineId-1].value = '';
+			groupCode[lineId-1].value = '';
+			pensItem[lineId-1].value = '';
+
+		}else{
+			var s = returnString.split("|");
+			
+			barcode[lineId-1].value = s[0];
+			materialMaster[lineId-1].value = s[1];
+			groupCode[lineId-1].value = s[2];
+			pensItem[lineId-1].value = s[3];
+	
+			found = true;
+			//validate remain qty in stock issue
+			var countQtyScreen = calcTotalRowByBarcode(barcode[lineId-1].value);
+			var remainQtyNotinCurrentBoxNo = s[4];
+			
+			//alert("remainQtyNotinCurrentBoxNo["+remainQtyNotinCurrentBoxNo+"]countQtyScreen["+countQtyScreen+"]");
+			
+			if(countQtyScreen > remainQtyNotinCurrentBoxNo){
+				found = false;
+				alert("ยอดเกินจำนวนที่ได้มีการขอเบิก");
+				matObj.focus();
+				
+				barcode[lineId-1].value = '';
+				materialMaster[lineId-1].value = '';
+				groupCode[lineId-1].value = '';
+				pensItem[lineId-1].value = '';
+				
+			}else{
+			   matObj.className = 'disableText';
+			   barcode[lineId-1].className = 'disableText';
+			}
+			
 		}
 	return found;
 }
@@ -571,9 +719,7 @@ function getProductModel(barcodeObj,lineId){
 										   จำนวนรวมชิ้นที่เบิก
 										    <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" readonly="true" styleClass="disableText"/>
 									</td>
-									
 								</tr>	
-								
 								<tr>
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
@@ -585,16 +731,15 @@ function getProductModel(barcodeObj,lineId){
 										  <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" readonly="true" styleClass="disableText"/>
 										      เลขที่กล่อง Checkout
 										  <html:text property="bean.boxNo" styleId="boxNo" size="20" readonly="true" styleClass="disableText"/>
-									</td>
-									
+									</td>	
 								</tr>	
 				   </table>
                  <!-- Table Data -->
 				<c:if test="${scanCheckForm.results != null}">
                   	    <c:if test="${scanCheckForm.bean.canEdit == true}">
 	                        <div align="left">
-								<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow();"/>	
-								<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow();"/>	
+								<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>	
+								<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
 							</div>
 				        </c:if> 
 										    		
@@ -618,7 +763,7 @@ function getProductModel(barcodeObj,lineId){
 									</c:otherwise>
 								</c:choose>
 								
-									<tr class="<c:out value='${tabclass}'/>">
+									<tr class="<c:out value='${tabclass}'/>" onmouseover="getRowIndex(this)">
 										<%-- <td class="data_no">
 										   <input type="text" name="lineId" value ="${results.lineId}" size="5" readonly class="disableText"/>
 										</td> --%>
@@ -630,7 +775,7 @@ function getProductModel(barcodeObj,lineId){
 											    onkeypress="getProductKeypress(event,this,${results.lineId})"
 											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
 											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
-											    />
+											/>
                                         </td>
 										<td class="td_text_center" width="20%">
 											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" name="materialMaster"
@@ -641,6 +786,7 @@ function getProductModel(barcodeObj,lineId){
 										</td>
 										<td class="td_text_center" width="10%">
 										   <input type="text" name="pensItem" value ="${results.pensItem}" size="15" readonly class="disableText"/>
+										   <input type="hidden" name="status" id="status"/>
 										</td>
 										
 										<%-- <td class="td_text_center" width="20%">${results.statusDesc}</td> --%>
@@ -662,11 +808,11 @@ function getProductModel(barcodeObj,lineId){
 								<tr>
 									<td align="left">
 									
-										 <c:if test="${scanCheckForm.bean.canEdit == true}">
+										<%--  <c:if test="${scanCheckForm.bean.canPrint == true}"> --%>
 											<a href="javascript:printReport('${pageContext.request.contextPath}')">
 											  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
 											</a> 
-										</c:if>
+									<%-- 	</c:if> --%>
 										
 									     <c:if test="${scanCheckForm.bean.canEdit == true}">
 											<a href="javascript:newBox('${pageContext.request.contextPath}')">
@@ -702,7 +848,7 @@ function getProductModel(barcodeObj,lineId){
 							</table>
 					  </div>
 					<!-- ************************Result ***************************************************-->
-					
+					<input type="text" name="currentRowIndex" id="currentRowIndex" />
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					<script>
 					 //disable list field strut bug no get value from disable field

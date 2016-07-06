@@ -351,7 +351,7 @@ public class ScanCheckDAO extends PickConstants{
 			sql.append("\n  h.issue_req_no,h.Checkout_date,h.cust_group,h.Customer_no, ");
 			sql.append("\n  h.warehouse,h.Total_Req_Qty,h.status ,i.box_no ");
 			
-			sql.append("\n order by h.issue_req_no desc ");
+			sql.append("\n order by h.issue_req_no desc ,i.box_no desc ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -526,8 +526,10 @@ public class ScanCheckDAO extends PickConstants{
 			   
 			   if(Utils.isNull(rst.getString("status")).equals(PickConstants.STATUS_ISSUED)){
 				   h.setCanEdit(false);  
+				   h.setCanPrint(true);
 			   }else{
-					h.setCanEdit(true); 
+				   h.setCanEdit(true); 
+				   h.setCanPrint(false);
 		       }
  
 			   items.add(h);
@@ -711,6 +713,121 @@ public class ScanCheckDAO extends PickConstants{
 			} catch (Exception e) {}
 		}
 		return r;
+	}
+	
+	public static List<ScanCheckBean> getBoxNoList(Connection conn,ScanCheckBean o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ScanCheckBean h = null;
+		List<ScanCheckBean> items = new ArrayList<ScanCheckBean>();
+		try {
+			sql.append("\n select M.* ,L.total_box FROM(");
+				sql.append("\n select h.issue_req_no ,i.box_no,h.customer_no");
+				sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
+				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.customer_no) as customer_NAME ");
+				sql.append("\n from PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i ");
+				sql.append("\n where 1=1   ");
+				sql.append("\n and h.issue_req_no = i.issue_req_no  ");
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+		        sql.append("\n and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
+		        if(!Utils.isNull(o.getBoxNo()).equals("")){
+		        	sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
+		        }
+				sql.append("\n  group by h.issue_req_no ,i.box_no,h.customer_no ");
+			
+			sql.append("\n )M LEFT OUTER JOIN  ");
+			    sql.append("\n(");
+			    sql.append("\n select issue_req_no ,count(*) as total_box FROM(");
+				sql.append("\n  select  distinct i.issue_req_no, i.box_no ");
+				sql.append("\n  from PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i ");
+				sql.append("\n  where 1=1   ");
+				sql.append("\n  and h.issue_req_no = i.issue_req_no  ");
+				sql.append("\n  and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+				sql.append("\n  and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
+				if(!Utils.isNull(o.getBoxNo()).equals("")){
+		        	sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
+		        }
+				sql.append("\n ) group by issue_req_no ");
+			sql.append("\n) L ON  M.issue_req_no = L.issue_req_no");
+				
+			sql.append("\n  order by M.box_no asc  ");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new ScanCheckBean();
+			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
+			   h.setBoxNo(Utils.isNull(rst.getString("box_no")));
+			   h.setStoreCode(Utils.isNull(rst.getString("customer_no")));
+			   h.setStoreName(Utils.isNull(rst.getString("customer_name")));
+			   h.setWareHouse(o.getWareHouse());
+			   h.setTotalBox(rst.getInt("total_box"));
+			   
+			   items.add(h);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
+	public static ScanCheckBean getGroupCodeListByBoxNo(Connection conn,ScanCheckBean o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ScanCheckBean h = null;
+		List<ScanCheckBean> items = new ArrayList<ScanCheckBean>();
+		int totalQty = 0;
+		try {
+			sql.append("\n select M.* FROM(");
+				sql.append("\n select i.group_code ,count(*) as qty");
+				sql.append("\n from PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i ");
+				sql.append("\n where 1=1   ");
+				sql.append("\n and h.issue_req_no = i.issue_req_no  ");
+			    sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+				sql.append("\n and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
+				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
+				
+				sql.append("\n  group by i.group_code ");
+			
+			sql.append("\n )M  ");
+		
+			sql.append("\n  order by M.group_code asc  ");
+			
+			//logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new ScanCheckBean();
+			   h.setGroupCode(Utils.isNull(rst.getString("group_code")));
+			   h.setTotalQty(rst.getInt("qty"));
+			   totalQty += h.getTotalQty();
+			   
+			   items.add(h);
+			}//while
+           
+			o.setItems(items);
+			o.setTotalQty(totalQty);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return o;
 	}
 	
 }

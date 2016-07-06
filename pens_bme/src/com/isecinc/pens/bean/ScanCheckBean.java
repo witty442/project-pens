@@ -38,13 +38,27 @@ public class ScanCheckBean implements Serializable{
 	private boolean barcodeReadonly;
 	private String barcodeStyle;
 	private String requestor;
+	private int totalBox;
 	
 
 	//optional
 	private boolean canEdit = false;
 	private boolean canCancel = false;
+	private boolean canPrint = false;
 	
 	
+	public boolean isCanPrint() {
+		return canPrint;
+	}
+	public void setCanPrint(boolean canPrint) {
+		this.canPrint = canPrint;
+	}
+	public int getTotalBox() {
+		return totalBox;
+	}
+	public void setTotalBox(int totalBox) {
+		this.totalBox = totalBox;
+	}
 	public int getTotalQty() {
 		return totalQty;
 	}

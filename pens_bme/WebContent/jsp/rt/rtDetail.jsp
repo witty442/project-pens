@@ -195,6 +195,44 @@ function getCustName(custCode,fieldName){
 		}
 }
 
+function validRefDoc(e,obj){
+	var returnString = "";
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validRTRefDocAjax.jsp",
+			data : "refDoc=" + obj.value,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	
+		if(returnString =='false'){
+			alert("เล่ม/เลขที่ เคยมีการบันทึกการใช้งานไปแล้ว");
+			obj.value ='';
+			obj.focus();
+		}	
+}
+function validRtnNo(e,obj){
+	var returnString = "";
+	var form = document.rtForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validRTRtnNoAjax.jsp",
+			data : "rtnNo=" + obj.value,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	
+		if(returnString =='false'){
+			alert("RTN NO ของห้าง เคยมีการบันทึกการใช้งานไปแล้ว");
+		    obj.value ='';
+			obj.focus();
+		}	
+}
+
 function resetStore(){
 	var form = document.rtForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
@@ -283,7 +321,7 @@ function resetStore(){
 								<tr>
                                     <td> เล่ม/เลขที่<font color="red"></font></td>
 									<td>		
-										<html:text property="bean.refDoc" styleId="refDoc" styleClass="normalText" size="30"></html:text>
+										<html:text property="bean.refDoc" styleId="refDoc" styleClass="normalText" size="30" onblur="validRefDoc(event,this)"></html:text>
 									</td>
 								</tr>
 								<tr>
@@ -301,7 +339,7 @@ function resetStore(){
 								<tr>
                                     <td> RTN No ของห้าง<font color="red"></font></td>
 									<td>		
-										<html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30" maxlength="20"></html:text>
+										<html:text property="bean.rtnNo" styleId="rtnNo" styleClass="normalText" size="30" maxlength="20"  onblur="validRtnNo(event,this)"></html:text>
 									</td>
 								</tr>
 								<tr>

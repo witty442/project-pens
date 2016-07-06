@@ -62,9 +62,10 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	String mat = "ME1260B3BL";
-            String groupCode  = mat.substring(0,6);
-	    	System.out.println(groupCode);
+	    	String mat = "01/12/2016";
+            String mm  = mat.substring(3,5);
+            String yyyy  = mat.substring(6,10);
+	    	System.out.println("MM:"+mm+",yyyy:"+yyyy);
 	    
 	    }catch(Exception e){
 	        e.printStackTrace();

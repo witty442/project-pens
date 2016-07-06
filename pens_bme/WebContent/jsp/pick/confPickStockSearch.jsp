@@ -245,6 +245,37 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
+
+function printBillMiniAll(path){
+	var form = document.confPickStockForm;
+	if(!isSelectOne()){
+		alert("กรุณาเลือกอย่างน้อย 1 รายการ");
+		return false;
+	}
+	form.action = path + "/jsp/confPickStockAction.do?do=printBillMiniAll";
+	form.submit();
+	return true;
+}
+
+function checkAll(chkObj){
+	var chk = document.getElementsByName("linechk");
+	for(var i=0;i<chk.length;i++){
+		chk[i].checked = chkObj.checked;
+	}
+}
+
+function isSelectOne(){
+	var selected = false;
+	var chk = document.getElementsByName("linechk");
+	for(var i=0;i<chk.length;i++){
+		if(chk[i].checked){
+			selected = true;
+			break;
+		}
+	}
+	return selected;
+}
+
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -347,15 +378,18 @@ function resetStore(){
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>
+										 <a href="javascript:printBillMiniAll('${pageContext.request.contextPath}')">
+									       <input type="button" value="พิมพ์ใบเดินบิล (รวม)" class="newPosBtnLong"> 
+									    </a>
 									</td>
 									</tr>
 							</table>
 					  </div>
-
             <c:if test="${confPickStockForm.resultsSearch != null}">
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
+						            <th> <input type="checkbox" name="chkAll" onclick="checkAll(this)"/> </th>
 									<th >Issue Req Date</th>
 									<th >W/H</th>
 									<th >Issue Req No</th>
@@ -382,6 +416,9 @@ function resetStore(){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
+									     <td class="td_text_center" width="2%">
+										  <input type="checkbox" name="linechk" value="${results.issueReqNo}"/>
+										</td>
 										<td class="td_text_center" width="8%">
 										   ${results.issueReqDate}
 										</td>

@@ -343,11 +343,11 @@ public class AppversionVerify {
         String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
         String dest2Path = localSalesAppPath+"SalesAppUpdater";
 		try{
-			boolean isLatestVersion = isLatestVersion("SalesAppUpdater");
-			logger.info("isLatestVersion:"+isLatestVersion);
-			
 			boolean canDownload = false;
 			if(checkVersion == true){
+				boolean isLatestVersion = isLatestVersion("SalesAppUpdater");
+				logger.info("isLatestVersion:"+isLatestVersion);
+				
 				if(!isLatestVersion){
 					canDownload = true;
 				}else{

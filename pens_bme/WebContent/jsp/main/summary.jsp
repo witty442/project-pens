@@ -8,7 +8,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%-- <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%> --%>
+<%-- <%@taglib uri="/WEB-INF/displaytag-12.tld" prefix="display"%> --%>
 
 <%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
 
@@ -30,6 +30,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <%
 String storeType ="";
@@ -70,6 +71,8 @@ function loadMe(){
     <%} else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
         new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
     <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%> 
+	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
+	<%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%> 
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	<%}else if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
@@ -177,7 +180,18 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   } 
-	  
+   <%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		   var asOfDateFrom = form.salesDate.value;
+		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+		   
+		   if(asOfDateFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ As Of");
+			   return false;
+		   }
+		    if(pensCustCodeFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+			   return false;
+		   } 
    <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	   var asOfDateFrom = form.asOfDateFrom.value;
 	   var asOfDateTo = form.asOfDateTo.value;
@@ -374,8 +388,6 @@ function getCustName(custCode,fieldName,storeType){
 		}
 	}
 }
-
-
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -404,6 +416,10 @@ function getCustName(custCode,fieldName,storeType){
 			<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandLotus"/>
+				</jsp:include>
+			<%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEMonthEndLotus"/>
 				</jsp:include>
 		    <%}else if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
@@ -665,7 +681,9 @@ function getCustName(custCode,fieldName,storeType){
 								|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+								|| "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
 								) {
+							
 								String hideAll = "";
 								if(    "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 									|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
@@ -690,20 +708,22 @@ function getCustName(custCode,fieldName,storeType){
 								</tr>
 						       <tr>
 									<td align="right">รหัสร้านค้า<font color="red">*</font>
-									  &nbsp;&nbsp;
+									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
 									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
 								</tr>
 								
-								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) ){%>
+								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
+										|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page")) ){%>
 									 <tr>
-										<td align="right" >วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
-										 
-										   <html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
+										<td align="right">วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
+										<html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
 										</td>	
-										<td align="left" width="30%"> </td>
+										<td align="left" width="30%"> 
+										 
+										</td>
 									</tr>
 								<%} %>
 								<tr>
@@ -863,7 +883,7 @@ function getCustName(custCode,fieldName,storeType){
                     <c:if test="${summaryForm.onhandSummaryLotusResults != null}">
 
 						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryLotusResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryLotusResults" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
 							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
 							    
 							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
@@ -1220,7 +1240,24 @@ function getCustName(custCode,fieldName,storeType){
 					            <display:column  title="Diff" property="diff"  sortable="false" class="d_diff"/>	
 							</display:table>
                     </c:if>
-                    
+                    <c:if test="${summaryForm.onhandSummaryMonthEndLotusResults != null}">
+						<br/>
+							 <display:table id="item" name="sessionScope.summaryForm.onhandSummaryMonthEndLotusResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
+							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+							    
+							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/>
+							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"/>	 
+							    <display:column  title="Group" property="group"  sortable="false" class="td_text"/>	
+							    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_text"/>	
+							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_text"/>	
+							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_text"/>
+							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="td_text"/>	
+							    <display:column  title="Adjust QTY " property="adjustQty"  sortable="false" class="td_text"/>	
+							    <display:column  title="Stock Short QTY " property="stockShortQty"  sortable="false" class="td_text"/>	
+							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="td_text"/>	
+							    				
+							</display:table> 
+                    </c:if>
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					
 					<!-- hidden field -->

@@ -24,7 +24,7 @@
 
 
 /* main level link */
-#nav a {
+#nav div {
 	font-weight: bold;
 	color: #e7e5e5;
 	text-decoration: none;
@@ -37,14 +37,24 @@
 	
 	text-shadow: 0 1px 1px rgba(0,0,0, .3);
 }
-#nav a:hover {
+#nav div:hover {
 	background: #000;
 	color: #fff;
 }
 
+#nav span {
+	text-decoration: none;
+	display: block;
+	padding:  8px 20px;
+	margin: 0;
+
+	-webkit-border-radius: 1.6em;
+	-moz-border-radius: 1.6em;
+}
+
 /* main level link hover */
-#nav .current a, #nav li:hover > a {
-	background: #666 url(../images2/gradient.png) repeat-x 0 -40px;
+#nav .current div, #nav li:hover > div {
+	 background: #666 url(../images2/gradient.png) repeat-x 0 -40px;
 	color: #444;
 	border-top: solid 1px #f8f8f8;
 
@@ -57,14 +67,14 @@
 
 /* sub levels link hover */
 #nav ul li:hover a, #nav li:hover li a {
-	background: none;
+	 background: #666 url(../images2/gradient.png) repeat-x 0 -40px;
 	border: none;
 	color: #666;
 
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 }
-#nav ul a:hover {
+#nav ul span:hover {
 	background: #0078ff url(../images2/gradient.png) repeat-x 0 -100px !important;
 	color: #fff !important;
 
@@ -72,6 +82,7 @@
 	-moz-border-radius: 0;
 
 	text-shadow: 0 1px 1px rgba(0,0,0, .1);
+	
 }
 
 /* dropdown */
@@ -87,7 +98,7 @@
 	padding: 0;
 	width: 250px;
 	position: absolute;
-	top: 35px;
+	top: 30px;
 	left: 0;
 	background: #ddd url(../images2/gradient.png) repeat-x 0 0;
 	border: solid 1px #b4b4b4;

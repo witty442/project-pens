@@ -56,7 +56,7 @@ function openDBBackupPopup(path){
 			                  + currentdate.getSeconds();
 			            document.write(datetime);
 			  </script>
-			 |ConfigType:<%=EnvProperties.getInstance().getProperty("config.type") %>
+			 |<b>ConfigType:<%=EnvProperties.getInstance().getProperty("config.type") %></b>
 			  </font> |
 			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
 			      <font color="green"> กดเพื่อสำรองข้อมูลการขาย</font>

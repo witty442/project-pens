@@ -261,7 +261,10 @@ public class GeneralDAO {
 				sql.append("\n and i.issue_req_no = h.issue_req_no ");
 				sql.append("\n and i.issue_req_no = '"+issueReqNo+"' ");
 				sql.append("\n and h.warehouse = '"+warehouse+"' ");
-				sql.append("\n and i.box_no <> '"+boxNo+"' ");
+				logger.debug("boxNo:"+boxNo);
+				if( !Utils.isNull(boxNo).equals("")){
+				   sql.append("\n and i.box_no <> '"+boxNo+"' ");
+				}
 				
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append("\n and i.barcode = '"+c.getCodeSearch()+"' ");

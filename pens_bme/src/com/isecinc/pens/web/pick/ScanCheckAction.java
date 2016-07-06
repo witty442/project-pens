@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.pick;
 
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -25,6 +27,7 @@ import util.BeanParameter;
 import util.BundleUtil;
 import util.ExcelHeader;
 import util.ReportUtilServlet;
+import util.pdf.StampBoxNoReportPdf;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -274,13 +277,15 @@ public class ScanCheckAction extends I_Action {
 			String[] materialMaster = request.getParameterValues("materialMaster");
 			String[] groupCode = request.getParameterValues("groupCode");
 			String[] pensItem = request.getParameterValues("pensItem");
+			String[] status = request.getParameterValues("status");
 			
 			logger.debug("barcode:"+barcode.length);
 			
 			//add value to Results
 			if(barcode != null && barcode.length > 0){
 				for(int i=0;i<barcode.length;i++){
-					if( !Utils.isNull(barcode[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("")){
+					if( !Utils.isNull(barcode[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("") 
+						&& !Utils.isNull(status[i]).equals("AB") ){
 						 ScanCheckBean l = new ScanCheckBean();
 						 l.setLineId(i+1);
 						 l.setBarcode(Utils.isNull(barcode[i]));
@@ -404,42 +409,52 @@ public class ScanCheckAction extends I_Action {
 	@SuppressWarnings("unchecked")
 	public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		
-		logger.debug("Search for report : " + this.getClass());
 		ScanCheckForm reportForm = (ScanCheckForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		ReportUtilServlet reportServlet = new ReportUtilServlet();
-		HashMap parameterMap = new HashMap();
-		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
-		Connection conn = null;
 		try {
-	
-			String fileType = SystemElements.PDF;//request.getParameter("fileType");
-			logger.debug("fileType:"+fileType);
+			reportForm.getBean().setBoxNo("");
+			InputStream in= StampBoxNoReportPdf.generate(request,reportForm.getBean());// 
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename=data.pdf");
+			response.setContentType("application/vnd.ms-excel");
 			
-			ScanCheckBean h = null;//ScanCheckDAO.searchReport(reportForm.getBean());
-			if(h != null){
-				//Head
-				parameterMap.put("p_boxno", h.getBoxNo());
-				//parameterMap.put("p_jobname", h.getJobId()+"-"+h.getName());
-				parameterMap.put("p_remark", Utils.isNull(h.getRemark()));
-	
-				//Gen Report
-				String fileName = "boxno_pdf_report";
-				String fileJasper = BeanParameter.getReportPath() + fileName;
-				
-				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, h.getItems());
-				
-			}else{
-				
-				request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
-				return  mapping.findForward("prepare");
-			}
+			IOUtils.copy(in,out);
+
+		    out.flush();
+		    out.close();
+		    
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("Message", e.getMessage());
 		} finally {
 			try {
-				// conn.close();
+			
+			} catch (Exception e2) {}
+		}
+		// return null;
+		return null;
+	}
+	
+	public ActionForward printReport1Box(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		ScanCheckForm reportForm = (ScanCheckForm) form;
+		try {
+			
+			InputStream in= StampBoxNoReportPdf.generate(request,reportForm.getBean());// 
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename=data.pdf");
+			response.setContentType("application/vnd.ms-excel");
+			
+			IOUtils.copy(in,out);
+
+		    out.flush();
+		    out.close();
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+			
 			} catch (Exception e2) {}
 		}
 		// return null;

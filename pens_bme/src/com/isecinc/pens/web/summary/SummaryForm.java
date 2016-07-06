@@ -34,6 +34,7 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
 	private List<OnhandSummary> onhandSummarySizeColorBigCResults;
 	private List<OnhandSummary> onhandSummarySizeColorLotusResults;
+	private List<OnhandSummary> onhandSummaryMonthEndLotusResults;
 	
 	private List<TransactionSummary> lotusSummaryResults;
 	private List<TransactionSummary> bigcSummaryResults;
@@ -59,6 +60,13 @@ public class SummaryForm extends I_Form {
 
 
 	
+	public List<OnhandSummary> getOnhandSummaryMonthEndLotusResults() {
+		return onhandSummaryMonthEndLotusResults;
+	}
+	public void setOnhandSummaryMonthEndLotusResults(
+			List<OnhandSummary> onhandSummaryMonthEndLotusResults) {
+		this.onhandSummaryMonthEndLotusResults = onhandSummaryMonthEndLotusResults;
+	}
 	public List<OnhandSummary> getOnhandSummarySizeColorLotusResults() {
 		return onhandSummarySizeColorLotusResults;
 	}
