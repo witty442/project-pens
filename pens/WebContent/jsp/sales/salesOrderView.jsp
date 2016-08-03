@@ -340,6 +340,7 @@ function saveAutoReceiptVan(path){
 	
 	var orderDateObj = thaiDateToChristDate(document.getElementsByName('orderDate')[0].value);
 
+	//alert(document.getElementsByName('autoReceipt.paymentType')[3].value);
 	//enable 
 	$("#autoReceipt.internalBank").removeAttr("disabled"); 
 	if(!document.getElementsByName('autoReceipt.paymentType')[3].checked) {
@@ -493,6 +494,8 @@ function saveAutoReceiptVan(path){
 		auto = 'Y';
 		document.getElementsByName('order.isCash')[0].value='N';
 		document.getElementsByName('autoReceiptFlag')[0].value='Y';
+		
+		//alert(document.getElementsByName('order.isCash')[0].value);
 	}
 
 	 

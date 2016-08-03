@@ -296,10 +296,10 @@ public class Utils {
 		String dateStr = "";		
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
 		try {
-			logger.debug("dateBigdecimal:"+dateBigdecimal);
+			//logger.debug("dateBigdecimal:"+dateBigdecimal);
 			if(dateBigdecimal != 0.0){
 			   Timestamp ti = new Timestamp(dateBigdecimal);
-			   logger.debug("date timestamp>>"+ti);
+			   //logger.debug("date timestamp>>"+ti);
 			   dateStr = ft.format(ti);
 			}
 		} catch (Exception e) {

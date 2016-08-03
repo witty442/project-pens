@@ -942,7 +942,7 @@ public class OrderDAO {
 			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='FridayItem' and m.interface_desc = o.barcode) as material_master_friday, \n");
 			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+Constants.STORE_TYPE_OSHOPPING_ITEM+"' and m.interface_desc = o.barcode) as material_master_oshopping, \n");
 			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"' and m.interface_desc = o.barcode) as material_master_7catalog, \n");
-			
+			sql.append("  ( SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m  where m.reference_code ='"+Constants.STORE_TYPE_TVD_ITEM+"' and m.interface_desc = o.barcode) as material_master_tvdirect, \n");
 			sql.append("  o.whole_price_bf,o.retail_price_bf,o.create_date \n ");
 			sql.append("  from PENSBME_ORDER o \n ");
 			sql.append("  WHERE 1=1  \n ");
@@ -971,6 +971,8 @@ public class OrderDAO {
 				   materialMaster = Utils.isNull(rst.getString("material_master_oshopping"));
 				}else if(store_code.startsWith(Constants.STORE_TYPE_7CATALOG_CODE)){
 				  materialMaster = Utils.isNull(rst.getString("material_master_7catalog"));
+				}else if(store_code.startsWith(Constants.STORE_TYPE_TVD_CODE)){
+				  materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
 				}
 				
 				String barcode = Utils.isNull(rst.getString("barcode"));
@@ -1003,12 +1005,29 @@ public class OrderDAO {
 				}
 				
 				String whole_price_bf = Utils.isNull(rst.getString("whole_price_bf"));
-				String whole_price_bf_1 = whole_price_bf.substring(0,whole_price_bf.indexOf("."));
-		    	String whole_price_bf_2 = whole_price_bf.substring(whole_price_bf.indexOf(".")+1,whole_price_bf.length());
-		    	
+				logger.debug("whole_price_bf:"+whole_price_bf);
+				String whole_price_bf_1 = "";
+				String whole_price_bf_2 = "";
+				
+				if(whole_price_bf.indexOf(".") != -1){
+				   whole_price_bf_1 = whole_price_bf.substring(0,whole_price_bf.indexOf("."));
+		    	   whole_price_bf_2 = whole_price_bf.substring(whole_price_bf.indexOf(".")+1,whole_price_bf.length());
+				}else{
+					whole_price_bf_1  = whole_price_bf;
+					whole_price_bf_2 = "00";
+				}
+				
 				String retail_price_bf = Utils.isNull(rst.getString("retail_price_bf"));
-				String retail_price_bf_1 = retail_price_bf.substring(0,retail_price_bf.indexOf("."));
-		    	String retail_price_bf_2 = retail_price_bf.substring(retail_price_bf.indexOf(".")+1,retail_price_bf.length());
+				String retail_price_bf_1 = "";
+		    	String retail_price_bf_2 = "";
+		    	
+				if(retail_price_bf.indexOf(".") != -1){
+					retail_price_bf_1 = retail_price_bf.substring(0,retail_price_bf.indexOf("."));
+			    	retail_price_bf_2 = retail_price_bf.substring(retail_price_bf.indexOf(".")+1,retail_price_bf.length());
+				}else{
+					retail_price_bf_1 = retail_price_bf;
+					retail_price_bf_2 = "00";
+				}
 		    	
 		    	String storeGroup = "";
 		    	//020047-19

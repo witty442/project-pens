@@ -32,12 +32,14 @@ public class Constants {
 	
 	public static final String STORE_TYPE_OSHOPPING_CODE ="020066";
 	public static final String STORE_TYPE_7CATALOG_CODE ="020070";
+	public static final String STORE_TYPE_TVD_CODE ="020074";
 	
 	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
 	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";
 	public static String STORE_TYPE_FRIDAY_ITEM = "FridayItem";
 	public static String STORE_TYPE_OSHOPPING_ITEM = "OshoppingItem";
 	public static String STORE_TYPE_7CATALOG_ITEM = "7CItem";
+	public static String STORE_TYPE_TVD_ITEM = "TVDItem";
 	
 	
 	public static String getStoreGroupName(String storeGroup){
@@ -49,6 +51,8 @@ public class Constants {
 			return "TOPS";		
 		}else 	if(storeGroup.equals(STORE_TYPE_FRIDAY_CODE)){
 			return "FRIDAY";
+		}else 	if(storeGroup.equals(STORE_TYPE_TVD_CODE)){
+			return "TV-DIRECT";
 		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_1)){
 			return "MTT";
 		}else 	if(storeGroup.equals(STORE_TYPE_KING_POWER)){

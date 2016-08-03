@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
@@ -7,34 +10,54 @@
 <%@page import="java.util.List"%>
 <%@page import="java.math.BigDecimal"%>
 <%
-User user = ((User)session.getAttribute("user"));
-String pageId_param = request.getParameter("pageId");
-
-String custId = request.getParameter("custId");
-Basket basket = (Basket)session.getAttribute(custId);
-if(basket == null ){
-	basket = new Basket();	
+Connection conn = null;
+List<References> productCatL = null;
+int pageId  = 0;
+int no_of_column = 0;
+int no_of_rows =  0;
+int no_of_total_display = 0;
+int totalRecord =0;
+int totalPage = 0;
+Basket basket = null;
+try{
+	    conn = DBConnection.getInstance().getConnection();
+		User user = ((User)session.getAttribute("user"));
+		String pageId_param = request.getParameter("pageId");
+		
+		String custId = request.getParameter("custId");
+		boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
+		System.out.println("isCustHaveProductSpecial:"+isCustHaveProductSpecial);
+		
+		basket = (Basket)session.getAttribute(custId);
+		if(basket == null ){
+			basket = new Basket();	
+		}
+		
+		if(StringUtils.isEmpty(pageId_param))
+			pageId_param = "0";
+		
+		pageId = Integer.valueOf(pageId_param);
+		
+		MProductCategory mProductCat = new MProductCategory();
+		 productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
+		
+		 no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
+		 no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
+		 no_of_total_display = no_of_column * no_of_rows;
+		
+		 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
+		
+		 totalPage = totalRecord/(no_of_column * no_of_rows);
+		 BigDecimal r = new BigDecimal(totalPage);
+		 r = r.setScale(0,BigDecimal.ROUND_UP);
+		 totalPage = r.intValue();
+}catch(Exception e){
+	e.printStackTrace();
+}finally{ 
+	if(conn != null){
+		conn.close();
+	}
 }
-
-if(StringUtils.isEmpty(pageId_param))
-	pageId_param = "0";
-
-int pageId = Integer.valueOf(pageId_param);
-
-MProductCategory mProductCat = new MProductCategory();
-List<References> productCatL = mProductCat.lookUpBrandList(pageId,user);
-
-int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
-int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
-int no_of_total_display = no_of_column * no_of_rows;
-
-int totalRecord = mProductCat.lookUpBrandList(user).size();
-
-int totalPage = totalRecord/(no_of_column * no_of_rows);
-BigDecimal r = new BigDecimal(totalPage);
-r = r.setScale(0,BigDecimal.ROUND_UP);
-totalPage = r.intValue();
-
 
 /// Find Total Page
 //System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");

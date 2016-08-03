@@ -1,3 +1,4 @@
+<%@page import="util.Constants"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -28,10 +29,10 @@
 
 <%
 ImportDAO importDAO = new ImportDAO();
-if(session.getAttribute("storeTypeList") == null){
-   List<References> storeTypeList = importDAO.getStoreTypeList();
+//if(session.getAttribute("storeTypeList") == null){
+   List<References> storeTypeList = importDAO.getStoreTypeList(Constants.STORE_TYPE_7CATALOG_CODE+","+Constants.STORE_TYPE_TVD_CODE);
    session.setAttribute("storeTypeList",storeTypeList);
-}
+//}
 
 if(session.getAttribute("billTypeList") == null){
   List<References> billTypeList = importDAO.getBillTypeList();

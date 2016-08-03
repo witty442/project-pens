@@ -160,6 +160,36 @@ function loadProductModel(e,productCodeObj,index){
 	//calPrice();
 }
 
+function openPopupInvoice(path,index){
+	var form = document.requestPromotionForm;
+	
+    var param = "&index="+index;
+	url = path + "/jsp/popupAction.do?do=prepare&page=INVOICE&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+function setInvoiceValue(code,desc,index){
+	var form = document.requestPromotionForm;
+	//alert(form);
+	document.getElementsByName("invoiceNo")[index].value = code;
+}
+
+function openPopupBrand(path){
+	var form = document.requestPromotionForm;
+	
+    var param = "";
+	url = path + "/jsp/popupAction.do?do=prepare&page=BRAND&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+function setBrandValue(code,desc){
+	var form = document.requestPromotionForm;
+	//alert(form);
+	
+	$("#productCatagory").val(code);
+	$("#productCatagoryDesc").val(desc);
+}
+
 
 function openPopupCustomer(path){
 	var form = document.requestPromotionForm;
@@ -322,12 +352,13 @@ function calPrice(fieldName){
 										<td align="left" >
 										    ภาคการขาย  <html:text property="requestPromotion.territory" size="15" readonly="true" styleClass="disableText"/> 
 										 </td>
-										
 									</tr>
 									<tr>
-										<td align="right" >กลุ่มสินค้า</td>
-										<td align="left"  >
-										  <html:text property="requestPromotion.productCatagory" size="15"  styleClass=""/>
+										<td align="right" >แบรนด์</td>
+										<td align="left"  nowrap>
+										  <html:text property="requestPromotion.productCatagory" styleId= "productCatagory" size="4"/>-
+										  <html:text property="requestPromotion.productCatagoryDesc" styleId= "productCatagoryDesc" size="15"  styleClass="" />
+										  <input type="button" name="bt2" value="..." onclick="openPopupBrand('${pageContext.request.contextPath}')"/>
 										</td>
 										 <td align="left" >
 										    <html:radio property="requestPromotion.productType" styleId="productType" value="P">โปรโมชั่น</html:radio>     
@@ -429,29 +460,34 @@ function calPrice(fieldName){
 						<br/>
 						
 						<!-- Detail -->
-						 <table align="center" width="100%" border="0" cellpadding="1" cellspacing="1" class="resultByManual">
-							 <tr>
-								  <th colspan="5"></th>
-								  
-								  <th nowrap colspan="5" >  ของแถมหน้าร้านที่ใช้จัดรายการ </th>
-							 </tr>
-							 <tr >
-								  <th nowrap rowspan="2" >รหัสสินค้า</th>
-								  <th nowrap colspan="2" rowspan="2" >สินค้าที่จัดรายการ</th>
-								  <th  nowrap colspan="2" >สั่งใหม่</th>
-								  <th nowrap colspan="2"> สต๊อกของแถม</th>
-								  <th  nowrap colspan="3">ยืมของแถม</th>
-							 </tr>
-							 <tr>
-								  <th nowrap > หีบ</th>
-								  <th nowrap> บาท </th>
-								  <th nowrap>หีบ</th>
-								  <th  nowrap >ชิ้น</th>
-								  <th nowrap>หีบ</th>
-								  <th nowrap >ชิ้น </th>
-								  <th  nowrap >บาท</th>
-							 </tr>
-							 <% tabIndex =20;  
+								<table align="center" width="100%" border="0" cellpadding="1"
+									cellspacing="1" class="resultByManual">
+									<tr>
+										<th colspan="5"></th>
+										<th nowrap colspan="5">ของแถมหน้าร้านที่ใช้จัดรายการ</th>
+										<th></th>
+									</tr>
+									<tr>
+										<th nowrap rowspan="2">รหัสสินค้า</th>
+										<th nowrap colspan="2" rowspan="2">สินค้าที่จัดรายการ</th>
+										<th nowrap colspan="2">สั่งใหม่</th>
+										
+										<th nowrap colspan="2">สต๊อกของแถม</th>
+										<th nowrap colspan="3">ยืมของแถม</th>
+										<th></th>
+									</tr>
+									<tr>
+										<th nowrap>หีบ</th>
+										<th nowrap>บาท</th>
+										
+										<th nowrap>หีบ</th>
+										<th nowrap>ชิ้น</th>
+										<th nowrap>หีบ</th>
+										<th nowrap>ชิ้น</th>
+										<th nowrap>บาท</th>
+										<th>อ้างอิงเลขที่ Invoice</th>
+									</tr>
+									<% tabIndex =20;  
 							 for(int i=0;i<7;i++){
 								 String lineNo = "";
 								 String productCode =  "";
@@ -468,6 +504,7 @@ function calPrice(fieldName){
 								 String borrowCtn = "";
 								 String borrowQty = "";
 								 String borrowAmount = "";
+								 String invoiceNo = "";
 								 
 								 Map<String, RequestPromotionLine> lineMap = new HashMap<String, RequestPromotionLine>();
 							     if(session.getAttribute("lineTableMap") != null){
@@ -493,7 +530,7 @@ function calPrice(fieldName){
 										borrowQty = NumberToolsUtil.decimalFormat(c.getBorrowQty(), NumberToolsUtil.format_current_no_disgit); 
 									
 										borrowAmount =  NumberToolsUtil.decimalFormat(c.getBorrowAmount(), NumberToolsUtil.format_current_2_disgit);
-										
+										invoiceNo = Utils.isNull(c.getInvoiceNo()); 
 							    	}else{
 							    		lineNo = (i+1)+"";
 							    	}
@@ -502,45 +539,91 @@ function calPrice(fieldName){
 							     }
 							   
 							%>
-							 <tr class="lineE"> 
-								  <td nowrap>
-								     <input type="hidden" name="lineNo" value="<%=lineNo%>"/>
-								     <input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>" name="productCode" value="<%=productCode%>" size="10" onkeypress="loadProductOnKeyPress(event,this,<%=i %>);" onblur="loadProductOnblur(null,this,<%=i%>);"/>
-								     <input type="hidden" name="productId" id="productId" value="<%=productId%>">
-								     <input type="hidden" name="uom1" id="uom1" value="<%=uom1%>">
-								     <input type="hidden" name="uom2" id="uom2" value="<%=uom2%>">
-								     <input type="hidden" name="price1" id="price1" value="<%=price1%>">
-								     <input type="hidden" name="price2" id="price2" value="<%=price2%>">
-								  </td>
-								  <td nowrap colspan="2">
-								      <input type="text" id="productName" name="productName" size="60" readOnly class="disableText"  value="<%=productName%>"/> 
-								  </td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=newCtn%>" name="newCtn" size="10" onkeydown="return inputNum(event);" onblur="calPrice('newCtn');" class="numberText"/></td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=newAmount%>"  name="newAmount" size="10" onkeydown="return isNum0to9andpoint(this,event);" onblur="calPrice('newAmount');" class="numberText"/></td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=stockCtn%>"  name="stockCtn" size="10" onkeydown="return inputNum(event);" onblur="calPrice('stockCtn');" class="numberText"/></td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=stockQty%>"  name="stockQty" size="10" onkeydown="return inputNum(event);" onblur="calPrice('stockQty');" class="numberText"/> </td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=borrowCtn%>"  name="borrowCtn" size="10" onkeydown="return inputNum(event);" onblur="calPrice('borrowCtn');" class="numberText"/></td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=borrowQty%>"  name="borrowQty" size="10" onkeydown="return inputNum(event);" onblur="calPrice('borrowQty');" class="numberText"/></td>
-								  <td nowrap><input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"  value="<%=borrowAmount%>"  name="borrowAmount" size="10" onkeydown="return isNum0to9andpoint(this,event);" onblur="calPrice('borrowAmount');" class="numberText"/></td>  
-							 </tr>
-							<%} %>
-							  <tr class="lineE"> 
-								
-								  <td nowrap colspan="3">
-								       รวม
-								  </td>
-								  <td nowrap><input type="text" name="totalNewCtn" size="10" class="disableNumberText"/></td>
-								  <td nowrap><input type="text" name="totalNewAmount" size="10" class="disableNumberText"/></td>
-								  <td nowrap><input type="text" name="totalStockCtn" size="10"  class="disableNumberText"/></td>
-								  <td nowrap><input type="text" name="totalStockQty" size="10"  class="disableNumberText"/> </td>
-								  <td nowrap><input type="text" name="totalBorrowCtn" size="10" class="disableNumberText"/></td>
-								  <td nowrap><input type="text" name="totalBorrowQty" size="10"  class="disableNumberText"/></td>
-								  <td nowrap><input type="text" name="totalBorrowAmount" size="10"  class="disableNumberText"/></td>  
+									<tr class="lineE">
+										<td nowrap><input type="hidden" name="lineNo"
+											value="<%=lineNo%>" /> <input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											name="productCode" value="<%=productCode%>" size="8"
+											onkeypress="loadProductOnKeyPress(event,this,<%=i %>);"
+											onblur="loadProductOnblur(null,this,<%=i%>);" /> <input
+											type="hidden" name="productId" id="productId"
+											value="<%=productId%>"> <input type="hidden"
+											name="uom1" id="uom1" value="<%=uom1%>"> <input
+											type="hidden" name="uom2" id="uom2" value="<%=uom2%>">
+											<input type="hidden" name="price1" id="price1"
+											value="<%=price1%>"> <input type="hidden"
+											name="price2" id="price2" value="<%=price2%>"></td>
+										<td nowrap colspan="2"><input type="text"
+											id="productName" name="productName" size="45" readOnly
+											class="disableText" value="<%=productName%>" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=newCtn%>" name="newCtn" size="10"
+											onkeydown="return inputNum(event);"
+											onblur="calPrice('newCtn');" class="numberText" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=newAmount%>" name="newAmount" size="10"
+											onkeydown="return isNum0to9andpoint(this,event);"
+											onblur="calPrice('newAmount');" class="numberText" /></td>
+										
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=stockCtn%>" name="stockCtn" size="8"
+											onkeydown="return inputNum(event);"
+											onblur="calPrice('stockCtn');" class="numberText" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=stockQty%>" name="stockQty" size="8"
+											onkeydown="return inputNum(event);"
+											onblur="calPrice('stockQty');" class="numberText" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=borrowCtn%>" name="borrowCtn" size="8"
+											onkeydown="return inputNum(event);"
+											onblur="calPrice('borrowCtn');" class="numberText" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=borrowQty%>" name="borrowQty" size="8"
+											onkeydown="return inputNum(event);"
+											onblur="calPrice('borrowQty');" class="numberText" /></td>
+										<td nowrap><input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=borrowAmount%>" name="borrowAmount" size="8"
+											onkeydown="return isNum0to9andpoint(this,event);"
+											onblur="calPrice('borrowAmount');" class="numberText" />
+										</td>
+										<td>
+										  <input type="text"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=invoiceNo%>" name="invoiceNo" size="20"/>
+											 <input type="button" name="bt3" value="..." onclick="openPopupInvoice('${pageContext.request.contextPath}',<%=i%>)"/>
+										</td>
+									</tr>
+									<%} %>
+									<tr class="lineE">
 
-							 </tr>
-						</table>
-						
-						<br>
+										<td nowrap colspan="3">รวม</td>
+										<td nowrap><input type="text" name="totalNewCtn"
+											size="10" class="disableNumberText" /></td>
+										<td nowrap><input type="text" name="totalNewAmount"
+											size="10" class="disableNumberText" /></td>
+										
+										<td nowrap><input type="text" name="totalStockCtn"
+											size="10" class="disableNumberText" /></td>
+										<td nowrap><input type="text" name="totalStockQty"
+											size="10" class="disableNumberText" /></td>
+										<td nowrap><input type="text" name="totalBorrowCtn"
+											size="10" class="disableNumberText" /></td>
+										<td nowrap><input type="text" name="totalBorrowQty"
+											size="10" class="disableNumberText" /></td>
+										<td nowrap><input type="text" name="totalBorrowAmount"
+											size="10" class="disableNumberText" /></td>
+                                       <td></td>
+									</tr>
+								</table>
+
+								<br>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>

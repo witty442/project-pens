@@ -73,7 +73,38 @@ public class MCustomer extends I_Model<Customer> {
 		array = pos.toArray(array);
 		return array;
 	}
-
+	
+	public boolean isCustHaveProductSpecial(Connection conn,String customerId) throws Exception {
+        boolean isCustHaveProductSpecial = false;
+		Statement stmt = null;
+		ResultSet rst = null;
+		try{
+			String sql ="\n select count(*) as c from m_customer "+
+			            "\n where customer_id = "+customerId+ " and code in(select code from m_customer_center)" ;
+			
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				if( rst.getInt("c") >0){
+					isCustHaveProductSpecial = true;
+				}
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return isCustHaveProductSpecial;
+	}
+	
 	
 	public int getTotalRowCustomer(Connection conn,String whereCause,User user) throws Exception {
 
@@ -220,6 +251,7 @@ public class MCustomer extends I_Model<Customer> {
 			
 			String sql = "select distinct m_customer.*  \n";
 			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
+			       
 				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
 				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
 			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
@@ -229,9 +261,15 @@ public class MCustomer extends I_Model<Customer> {
                   // sql+= " ( select sum(o.net_amount) net_amount from t_order o \n where o.doc_status = 'SV'  and o.CUSTOMER_ID = m_customer.CUSTOMER_ID ) as total_order_amt,\n";
                
                   // sql+= " ( select sum(r.receipt_amount) receipt_amount from t_receipt r \n where r.doc_status = 'SV' and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) as total_receipt_amt \n";
-                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX ";
-                   sql+= " from m_customer ,m_address ,ad_user where m_customer.user_id = ad_user.user_id \n";
-                   sql+= " and m_customer.customer_id = m_address.customer_id  and m_address.purpose ='B'\n";
+                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX \n";
+                   
+                   sql+= " from m_customer  ,ad_user , \n" ;
+                   sql +="( \n";
+                   sql+="   select distinct customer_id,district_id,line1,line2,line3,line4 ,province_name,postal_code \n";;
+                   sql +="  from m_address where purpose ='B'\n";
+                   sql +=")m_address \n";
+                   sql+= " where m_customer.user_id = ad_user.user_id \n";
+                   sql+= " and m_customer.customer_id = m_address.customer_id \n";
 			       sql+= whereCause;
 			       
 			logger.debug("sql:"+sql);

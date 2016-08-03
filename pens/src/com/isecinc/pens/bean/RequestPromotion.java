@@ -20,6 +20,7 @@ public class RequestPromotion implements Serializable{
 	private String requestDate ;
 	private String printDate ;
 	private String productCatagory ;
+	private String productCatagoryDesc ;
 	private String productType;
 	private String promotionStartDate ;
 	private String promotionEndDate ;
@@ -50,6 +51,12 @@ public class RequestPromotion implements Serializable{
 
     
 	
+	public String getProductCatagoryDesc() {
+		return productCatagoryDesc;
+	}
+	public void setProductCatagoryDesc(String productCatagoryDesc) {
+		this.productCatagoryDesc = productCatagoryDesc;
+	}
 	public String getTerritory() {
 		return territory;
 	}

@@ -61,6 +61,7 @@ public class GenerateAutoReceiptVan {
 						
 					if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
 						 /** orderForm.setCanReceiptMoreCash("Y"); **/
+						
 					}else{
 						 /** orderForm.setCanReceiptMoreCash("N"); **/
 						//Case Customer No Cheque ,No Credit Gen AutoReceipt

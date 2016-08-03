@@ -27,7 +27,7 @@
   String hostDD = "http://"+ipDD+":8081";
   
   String currentIP =InetAddress.getLocalHost().getHostAddress();
-  System.out.println("Current IP:"+currentIP);
+  //System.out.println("Current IP:"+currentIP);
 
   //case Server Test contextPath = pens_bme_test
   if("192.168.38.186".equals(ipProd)){ //For Test
@@ -138,6 +138,9 @@
 				        <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhand7Catalog');">2.4 <span><bean:message bundle="sysprop" key="ImportBME7Catalog"/></span></a>
 				        </li>
+				        <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandTVDirect');">2.5 <span><bean:message bundle="sysprop" key="ImportBMETVDirect"/></span></a>
+				        </li>
 			       </ul>
 			   </li>
 	           
@@ -147,7 +150,7 @@
 				</li> --%>
 				<!--  NEW CODE --> 
 				<li>
-	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');"><span>1.<bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
+	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');"><span>3.<bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
 	            </li>
 	         
 				 <li>
@@ -242,10 +245,12 @@
 			       <li>
 				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigC');"><span>4.2 <bean:message bundle="sysprop" key="SummaryBMEOnhandBigC"/></span></a>
 			        </li> 
-			          <li>
-				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');"><span>4.3 <bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
+			         <li>
+				      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');"><span>4.3 <bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
 			        </li> 
-			  
+			        <li>
+				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigCSP');"><span>4.4 <bean:message bundle="sysprop" key="SummaryBMEOnhandBigCSP"/></span></a>
+			        </li> 
 			   </ul>	    
 		    </li> 
 			<li>
@@ -304,6 +309,9 @@
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAllAction.do?do=prepare&action=new&pageName=7Catalog');"><span><bean:message bundle="sysprop" key="Order7Catalog"/></span></a>
+			</li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAllAction.do?do=prepare&action=new&pageName=TVDIRECT');"><span><bean:message bundle="sysprop" key="OrderTVDirect"/></span></a>
 			</li>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareView&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiry"/></span></a>

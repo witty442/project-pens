@@ -191,7 +191,7 @@ function currencyToNum(str){
 			
                <html:hidden property="bean.rowIndex" styleId="rowIndex"/>
                <html:hidden property="bean.issueReqNo" styleId="issueReqNo"/>
-               <html:hidden property="bean.actionDB" styleId="actionDB"/>
+               <html:text property="bean.actionDB" styleId="actionDB"/>
           
                <input type="hidden" id="path" value="${pageContext.request.contextPath}"/>
                  

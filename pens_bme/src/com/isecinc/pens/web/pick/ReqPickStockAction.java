@@ -205,6 +205,7 @@ public class ReqPickStockAction extends I_Action {
 					p.setStatus(issueReqStatus);
 					p.setCanExport(true);
 					p.setWareHouse(aForm.getBean().getWareHouse());
+					p.setDisableCustGroup(true);
 					
 					if("confirm".equalsIgnoreCase(process)){
 						p.setModeConfirm(true);
@@ -263,6 +264,48 @@ public class ReqPickStockAction extends I_Action {
 			}
 		}
 		return forward;
+	}
+	
+	public ActionForward searchByCustGroup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ReqPickStockForm aForm = (ReqPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		Connection conn = null;
+		logger.debug("** searchByCustGroup **");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+		    //clear session
+			request.getSession().setAttribute("results", null);
+			request.getSession().setAttribute("resultsView", null);
+			request.getSession().setAttribute("groupCodeMap", null);
+			request.getSession().setAttribute("itemsBarcodeErrorMap", null);
+			request.getSession().setAttribute("groupCodeErrorMap", null);
+			
+			ReqPickStock p = aForm.getBean();
+			/*p.setWareHouse(aForm.getBean().getWareHouse());
+			p.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+
+			p.setCanEdit(true);
+			p.setNewReq(true);
+			p.setModeConfirm(false);
+			p.setModeEdit(true);
+			p.setNewSearch(true);//new search
+*/
+			//search by page 
+            p = searchBypage(conn, p, request);
+			aForm.setBean(p);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+			   conn.close();conn = null;
+			}
+		}
+		return mapping.findForward("prepare");
 	}
 	
 	private ReqPickStock searchBypage(Connection conn,ReqPickStock p, HttpServletRequest request) {
@@ -563,6 +606,9 @@ public class ReqPickStockAction extends I_Action {
             aForm.getBean().setNewReq(false);
 			
 			search(aForm, request, response);
+			
+			//set disable custGroup ,storeCode
+			aForm.getBean().setDisableCustGroup(true);
 			
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {

@@ -166,6 +166,16 @@ function importExcel(path,noCheckError){
 				return false;
 			}
 		}
+	<%}else if("onhandTVDirect".equalsIgnoreCase(request.getParameter("page"))) {%>
+		if(form.dataFile.value == '' || extension != "txt"){
+			alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			return true;
+		}else{
+			if( startFileName !='tvdirect'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย TVDIRECT เท่านั้น");
+				return false;
+			}
+		}
 	<%}else if("onhandOShopping".equalsIgnoreCase(request.getParameter("page"))) {%>
 		if(form.dataFile.value == '' || extension != "txt"){
 			alert("กรุณาเลือกไฟล์นามสกุล .txt");
@@ -382,6 +392,10 @@ function getCustName(custCode,fieldName){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="LoadStockInitBigC"/>
 				</jsp:include>
+			<%}else if("onhandTVDirect".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMETVDirect"/>
+				</jsp:include>
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
@@ -492,6 +506,7 @@ function getCustName(custCode,fieldName){
 								    		|| "onhandFriday".equalsIgnoreCase(request.getParameter("page"))
 								    		|| "onhandOShopping".equalsIgnoreCase(request.getParameter("page"))
 								    		|| "onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))
+								    		|| "onhandTVDirect".equalsIgnoreCase(request.getParameter("page"))
 								    		) {%>
 								       <input type="button" value="ยืนยัน Upload รวมข้อมูลที่ ERROR" class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','NO_CHECK_ERROR')">
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -1046,8 +1061,8 @@ function getCustName(custCode,fieldName){
 						
 						<!-- ************************* Return Wacoal From ******************************************* -->
 						<!-- Page Display Result -->
-						<jsp:include page="importStockInitLotusSub.jsp" /> 
-						
+						<jsp:include page="subimports/importStockInitLotusSub.jsp" /> 
+						<jsp:include page="subimports/importOnhandTVDirectSub.jsp" /> 
 						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr>
 								<td align="left" class="footer">&nbsp;</td>

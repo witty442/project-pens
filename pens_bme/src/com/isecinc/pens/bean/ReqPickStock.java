@@ -57,6 +57,7 @@ public class ReqPickStock implements Serializable{
 	private boolean newReq;
 	private boolean newSearch;
 	private boolean noSearch;
+	private boolean disableCustGroup;
 	
 	private String barcodeItemStatus;
 	private String lineItemStyle ;
@@ -76,6 +77,13 @@ public class ReqPickStock implements Serializable{
 	private int totalIssueQty;
 	
 	
+	
+	public boolean isDisableCustGroup() {
+		return disableCustGroup;
+	}
+	public void setDisableCustGroup(boolean disableCustGroup) {
+		this.disableCustGroup = disableCustGroup;
+	}
 	public boolean isCanEditDeliveryDate() {
 		return canEditDeliveryDate;
 	}

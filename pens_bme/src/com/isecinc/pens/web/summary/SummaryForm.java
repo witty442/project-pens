@@ -24,7 +24,7 @@ public class SummaryForm extends I_Form {
 	private static final long serialVersionUID = 8932109820314224488L;
 
 	private SummaryCriteria criteria = new SummaryCriteria();
-
+	private List<OnhandSummary> results;
 	private List<OnhandSummary> onhandSummaryResults;
 	private List<OnhandSummary> onhandSummaryLotusResults;
 	private List<OnhandSummary> onhandSummaryMTTResults;
@@ -33,7 +33,6 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> onhandSummaryLotusPeriodResults;
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
 	private List<OnhandSummary> onhandSummarySizeColorBigCResults;
-	private List<OnhandSummary> onhandSummarySizeColorLotusResults;
 	private List<OnhandSummary> onhandSummaryMonthEndLotusResults;
 	
 	private List<TransactionSummary> lotusSummaryResults;
@@ -58,21 +57,34 @@ public class SummaryForm extends I_Form {
 	private int diffStockSummaryResultsSize;
 	private int summaryByGroupCodeResultsSize;
 
-
+    private String page;
+    private String summaryType;
 	
+    
+	public String getSummaryType() {
+		return summaryType;
+	}
+	public void setSummaryType(String summaryType) {
+		this.summaryType = summaryType;
+	}
+	public String getPage() {
+		return page;
+	}
+	public void setPage(String page) {
+		this.page = page;
+	}
+	public List<OnhandSummary> getResults() {
+		return results;
+	}
+	public void setResults(List<OnhandSummary> results) {
+		this.results = results;
+	}
 	public List<OnhandSummary> getOnhandSummaryMonthEndLotusResults() {
 		return onhandSummaryMonthEndLotusResults;
 	}
 	public void setOnhandSummaryMonthEndLotusResults(
 			List<OnhandSummary> onhandSummaryMonthEndLotusResults) {
 		this.onhandSummaryMonthEndLotusResults = onhandSummaryMonthEndLotusResults;
-	}
-	public List<OnhandSummary> getOnhandSummarySizeColorLotusResults() {
-		return onhandSummarySizeColorLotusResults;
-	}
-	public void setOnhandSummarySizeColorLotusResults(
-			List<OnhandSummary> onhandSummarySizeColorLotusResults) {
-		this.onhandSummarySizeColorLotusResults = onhandSummarySizeColorLotusResults;
 	}
 	public List<OnhandSummary> getOnhandSummarySizeColorBigCResults() {
 		return onhandSummarySizeColorBigCResults;

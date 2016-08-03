@@ -1,3 +1,6 @@
+<%@page import="java.sql.Connection"%>
+<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.sales.bean.ProductCatalog"%>
@@ -8,11 +11,15 @@
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%
+Connection conn = null;
+try{
+conn = DBConnection.getInstance().getConnection();
 User user = ((User)session.getAttribute("user"));
 String custId = request.getParameter("custId");
 Basket basket = (Basket)session.getAttribute(custId);
 //System.out.println("basket session:"+basket);
-
+boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
+	
 if(basket == null ){
 	basket = new Basket();	
 }
@@ -37,7 +44,7 @@ List<ProductCatalog> catalogs = null;
 
 try{	
 	if(categoryCode != null && categoryCode.length()>0){
-		catalogs = new MProduct().getProductCatalogByBrand(categoryCode,orderDate,priceListId,user);
+		catalogs = new MProduct().getProductCatalogByBrand(categoryCode,orderDate,priceListId,user,isCustHaveProductSpecial);
 	}
 }catch(Exception e){
 	e.printStackTrace();
@@ -144,3 +151,12 @@ function linePrice(rowNo,price1,price2){
 	totalAmtText.innerHTML = addCommas(amt.toFixed(2));
 }
 </script>
+<%}catch(Exception e){
+	e.printStackTrace();
+}finally{
+	if(conn != null){
+		conn.close();
+	}
+}
+
+%>

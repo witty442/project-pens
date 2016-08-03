@@ -62,6 +62,9 @@ public class ImportForm extends I_Form {
 	private int loadStockInitListErrorSize;
 	private int loadStockInitListSuccessSize;
 	
+	private int loadOnhandTVDirectListErrorSize;
+	private int loadOnhandTVDirectListSuccessSize;
+	
 	private String countDate;
 	private String custCode;
 	
@@ -74,6 +77,24 @@ public class ImportForm extends I_Form {
 	private String totalQty;
 	
 	
+	public int getLoadOnhandTVDirectListErrorSize() {
+		return loadOnhandTVDirectListErrorSize;
+	}
+
+	public void setLoadOnhandTVDirectListErrorSize(
+			int loadOnhandTVDirectListErrorSize) {
+		this.loadOnhandTVDirectListErrorSize = loadOnhandTVDirectListErrorSize;
+	}
+
+	public int getLoadOnhandTVDirectListSuccessSize() {
+		return loadOnhandTVDirectListSuccessSize;
+	}
+
+	public void setLoadOnhandTVDirectListSuccessSize(
+			int loadOnhandTVDirectListSuccessSize) {
+		this.loadOnhandTVDirectListSuccessSize = loadOnhandTVDirectListSuccessSize;
+	}
+
 	public String getTotalQty() {
 		return totalQty;
 	}

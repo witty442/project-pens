@@ -181,7 +181,11 @@ function openConfirm(path,documentNo,issueReqStatus){
 				  <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW4"/>
 				 </jsp:include>
-				<%} %>
+			  <%}else if("W5".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW5"/>
+				 </jsp:include>
+		     <%} %>
 			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">

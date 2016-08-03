@@ -184,6 +184,106 @@ public class RTDAO {
 			return o;
 		}
 	
+		public static RTBean searchRTDetail(Connection conn,RTBean o) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			RTBean h = null;
+			int r = 1;
+			Date docDate=null;
+			try {
+			    sql.append("\n select h.* " +
+			    		"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						"\n     and M.reference_code = 'Store' and M.pens_value = h.cust_no) as store_name  "+
+						"\n ,(select interface_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
+						"\n     and M.reference_code = 'Idwacoal' and M.pens_value = h.cust_group) as cust_group_name  "+
+			    		"\n from PENSBME_RTN_CONTROL h where 1=1 ");
+
+					sql.append("\n and h.Authorize_no = '"+Utils.isNull(o.getDocNo())+"'");
+					
+					docDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					sql.append("\n and h.tran_date = to_date('"+dateStr+"','dd/mm/yyyy')");
+					
+					sql.append("\n and h.cust_no ='"+o.getStoreCode()+"'");
+					sql.append("\n and h.cust_group ='"+o.getCustGroup()+"'");
+				
+				logger.debug("sql:"+sql);
+				
+				ps = conn.prepareStatement(sql.toString());
+				
+				rst = ps.executeQuery();
+				while(rst.next()) {
+				   h = new RTBean();
+				   h.setDocNo(Utils.isNull(rst.getString("Authorize_no")));
+				   h.setDocDate(Utils.stringValue(rst.getDate("tran_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+
+				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
+				   h.setCustGroup(Utils.isNull(rst.getString("Cust_group")));
+				   h.setCustGroupName(Utils.isNull(rst.getString("Cust_group_name")));
+				   h.setStoreCode(Utils.isNull(rst.getString("Cust_no")));
+				   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+				   h.setStoreFullName(h.getStoreCode()+":"+h.getStoreName());
+				   
+				   h.setRtnNo(Utils.isNull(rst.getString("RTN_no")));
+				   h.setRtnQtyCTN(Utils.isNull(rst.getString("RTN_Qty_CTN")));
+				   h.setRtnQtyEA(Utils.isNull(rst.getString("RTN_Qty_EA")));
+				   
+				   if(rst.getDate("PIC_RCV_DATE") != null){
+				      h.setPicRcvDate(Utils.stringValue(rst.getDate("PIC_RCV_DATE"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   }else{
+					  h.setPicRcvDate("");
+				   }
+				   h.setPicRcvQtyCTN(Utils.isNull(rst.getString("PIC_rcv_Qty_CTN")));
+				   h.setPicRcvQtyEA(Utils.isNull(rst.getString("PIC_rcv_Qty_EA")));
+				   h.setStatus(Utils.isNull(rst.getString("Status")));
+				   h.setStatusDesc(RTConstant.getDesc(h.getStatus()));
+				   h.setRemark(Utils.isNull(rst.getString("remark")));
+				    
+				   h.setDeliveryBy(Utils.isNull(rst.getString("delivery_by")));
+				   if(rst.getDate("delivery_date") != null){
+				     h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   }else{
+					 h.setDeliveryDate("");
+				   }
+				   h.setDeliveryQty(Utils.isNull(rst.getString("delivery_qty")));
+				   h.setAttach1(Utils.isNull(rst.getString("attach1")));
+				   h.setAttach2(Utils.isNull(rst.getString("attach2")));
+				   h.setAttach3(Utils.isNull(rst.getString("attach3")));
+				   h.setAttach4(Utils.isNull(rst.getString("attach4")));
+				   h.setRemarkTeamPic(Utils.isNull(rst.getString("Remark_team_Pic")));
+				   
+				  //
+				  if(RTConstant.STATUS_OPEN.equals(h.getStatus())){
+					  h.setCanSave(true);
+					  h.setCanComplete(true);
+					  h.setCanCancel(true);
+				  }else  if(RTConstant.STATUS_COOMFIRM.equals(h.getStatus())){
+					  h.setCanSave(false);
+					  h.setCanComplete(false);
+					  h.setCanCancel(false);
+				  }else  if(RTConstant.STATUS_CANCEL.equals(h.getStatus())){
+					  h.setCanSave(false);
+					  h.setCanComplete(false);
+					  h.setCanCancel(false);
+				  }else  if(RTConstant.STATUS_RECEIVED.equals(h.getStatus())){
+					  h.setCanSave(false);
+					  h.setCanComplete(false);
+					  h.setCanCancel(false);
+				  } 
+				   r++;
+				}//while
+				
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+		return h;
+	}
 		
 	public static void insertRTNControlBySale(Connection conn,RTBean o) throws Exception{
 		PreparedStatement ps = null;
@@ -341,6 +441,8 @@ public class RTDAO {
 			ps.setString(c++, Utils.isNull(o.getStatus()));
 			if( !Utils.isNull(o.getPicRcvDate()).equals("") ){
 				ps.setTimestamp(c++, new java.sql.Timestamp(picRcvDate.getTime()));
+			 }else{
+				 ps.setTimestamp(c++, null);
 			 }
 			ps.setString(c++, Utils.isNull(o.getPicRcvQtyCTN()));
 			ps.setString(c++, Utils.isNull(o.getPicRcvQtyEA()));

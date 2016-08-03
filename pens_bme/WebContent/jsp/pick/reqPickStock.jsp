@@ -473,9 +473,10 @@ function getCustName(custCode,fieldName){
 	}
 }
 
-function resetStore(){
+function resetStore(path){
 	var form = document.reqPickStockForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
+	var storeGroupValue = $("#custGroup option:selected").val();
 	
 	if(storeGrouptext != ''){
 		form.storeCode.value = "";
@@ -483,6 +484,20 @@ function resetStore(){
 		form.storeNo.value = "";
 		form.subInv.value = "";
 	}
+	
+	//alert(storeGroupValue);
+	if(storeGroupValue !=''){
+	  //change data pick by custGroup
+		getNewData(path,form.issueReqNo.value,form.status.value);
+	}
+	
+}
+
+function getNewData(path,documentNo,issueReqStatus){
+	var form = document.reqPickStockForm;
+	form.action = path + "/jsp/reqPickStockAction.do?do=searchByCustGroup";
+	form.submit();
+	return true;
 }
 
 function currencyToNum(str){
@@ -527,6 +542,10 @@ function currencyToNum(str){
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW4"/>
 				 </jsp:include>
+		     <%}else if("W5".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW5"/>
+				 </jsp:include>
 		     <%} %>
 				 
 	      	<!-- TABLE BODY -->
@@ -565,13 +584,43 @@ function currencyToNum(str){
 								</tr>
 								<tr>
 								    <td nowrap> กลุ่มร้านค้า  <font color="red">*</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
-											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
-									    </html:select>
+								    <c:choose>
+									     <c:when test="${reqPickStockForm.mode == 'save'}">
+										        <c:if test="${reqPickStockForm.bean.disableCustGroup == false}">
+													 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore('${pageContext.request.contextPath}')">
+														<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+												    </html:select>
+											    </c:if>
+										
+											    <c:if test="${reqPickStockForm.bean.disableCustGroup == true}">
+													 <html:select property="bean.custGroup" styleId="custGroup" disabled="true">
+														<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+												    </html:select>
+											    </c:if>
+									     </c:when>
+									    <c:otherwise>
+										     <html:select property="bean.custGroup" styleId="custGroup" disabled="true">
+													<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+											    </html:select>
+									    </c:otherwise>
+								    </c:choose>
 						           </td>
 									<td nowrap>รหัสร้านค้า<font color="red">*</font>
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
-									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+										 <c:choose>
+										 <c:when test="${reqPickStockForm.mode == 'save'}">
+											    <c:if test="${reqPickStockForm.bean.disableCustGroup == false}">
+										           <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+										           <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+										        </c:if>
+										        <c:if test="${reqPickStockForm.bean.disableCustGroup == true}">
+										          <html:text property="bean.storeCode" styleId="storeCode" size="20" readonly="true" styleClass="disableText"></html:text>
+										        </c:if>
+										     </c:when>
+										    <c:otherwise>
+											     <html:text property="bean.storeCode" styleId="storeCode" size="20" readonly="true" styleClass="disableText"></html:text>
+										    </c:otherwise>
+									      </c:choose>     
+									
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
 									<td nowrap> Sub Inventory

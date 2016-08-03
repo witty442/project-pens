@@ -64,7 +64,7 @@ public class MProduct extends I_Model<Product>{
 		return array;
 	}
 	
-	public List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId ,User u) throws Exception {
+	public List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId ,User u,boolean isCustHaveProductSpecial) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -96,6 +96,16 @@ public class MProduct extends I_Model<Product>{
 		
         sql.append("\n  AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') ");
         sql.append("\n )A");
+        //Case product Special
+        if(isCustHaveProductSpecial){
+	        sql.append("\n WHERE A.product_id in(");
+	        sql.append("\n select M.product_id from M_product_center C ,M_product M where M.code = C.code");
+	        sql.append("\n ) ");
+        }else{
+        	sql.append("\n WHERE A.product_id not in(");
+ 	        sql.append("\n select M.product_id from M_product_center C ,M_product M where M.code = C.code");
+ 	        sql.append("\n ) ");
+        }
         sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
 		
         logger.debug("sql:"+sql);

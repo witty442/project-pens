@@ -139,7 +139,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		ResultSet rst = null;
 		double creditAmt = NumberToolsUtil.round(order.getNetAmount(), 2, BigDecimal.ROUND_HALF_UP);
 		double paidAmt = 0;
-		logger.debug("Start creditAmt :"+creditAmt);
+		//logger.debug("Start creditAmt :"+creditAmt);
 		try {
 			
 			String sql = "select SUM(rl.PAID_AMOUNT) as PAID_AMOUNT ";

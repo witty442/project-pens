@@ -193,6 +193,11 @@
 			
 		</action>
 		
+		<action name="popupForm" path="/jsp/popupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.PopupAction" >
+			<forward name="searchBrand" path="/jsp/pop/searchBrandPopup.jsp" />
+			<forward name="searchInvoice" path="/jsp/pop/searchInvoicePopup.jsp" />
+		</action>
+		
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request"
 			type="com.isecinc.pens.web.login.LoginAction">

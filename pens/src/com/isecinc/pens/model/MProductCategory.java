@@ -13,6 +13,7 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 
 /**
  * MProductCategory Class
@@ -118,10 +119,21 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		return pos;
 	}
 	
-	
 	public List<References> lookUpBrandList(User u) throws Exception {
-		List<References> pos = new ArrayList<References>();
 		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+		    return lookUpBrandList(conn,u,false);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+	}
+	public List<References> lookUpBrandList(Connection conn,User u,boolean isCustHaveProductSpecial) throws Exception {
+		List<References> pos = new ArrayList<References>();
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
@@ -132,11 +144,18 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			   sql.append("\n  FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ");
 			   sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
 			   sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
+			// product Special
+			   if(isCustHaveProductSpecial){
+				   sql.append("\n AND PRODUCT_CATEGORY_ID in(");
+				   sql.append("\n   select product_category_id from m_product where code in(");
+				   sql.append("\n     select code from m_product_center ");
+				   sql.append("\n    )  ");
+				   sql.append("\n ) ");
+			   }
 			}
 			
 			logger.info("sql:\n"+sql.toString());
 			
-			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
@@ -153,9 +172,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			try {
 				stmt.close();
 			} catch (Exception e2) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
+			
 		}
 		return pos;
 	}
@@ -164,9 +181,8 @@ public class MProductCategory extends I_Model<ProductCategory> {
 	public static int NO_OF_DISPLAY_ROWS = 3;
 	public static int NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE = NO_OF_DISPLAY_COLUMNS * NO_OF_DISPLAY_ROWS ;
 	
-	public List<References> lookUpBrandList(int pageId,User u) throws Exception {
+	public List<References> lookUpBrandList(Connection conn ,int pageId,User u,boolean isCustHaveProductSpecial) throws Exception {
 		List<References> pos = new ArrayList<References>();
-		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		
@@ -174,25 +190,31 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			
 			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
-					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
-					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
-					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
-					   .append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ")
-					   .append("\n AND pdc.seg_value1 <> '000' ") //Except DefaultValue
-					   .append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") //Except DefaultValue
+					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ");
+					   sql.append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ");
+					   sql.append("\n WHERE pdc.ISACTIVE = 'Y' ");
+					   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
+					   sql.append("\n AND pdc.seg_value1 <> '000' ") ;//Except DefaultValue
+					   sql.append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") ;//Except DefaultValue
 					   
-					   .append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ")
-					   .append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ")
-					   .append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ")
-					   .append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'")
-					   .append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ")
-					
-					   .append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ")
-					   .append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
+					   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ");
+					   sql.append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ");
+					   sql.append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ");
+					   sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
+					   sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
+					   // product Special
+					   /*if(isCustHaveProductSpecial){
+						   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID in(");
+						   sql.append("\n   select product_category_id from m_product where code in(");
+						   sql.append("\n     select code from m_product_center ");
+						   sql.append("\n    )  ");
+						   sql.append("\n ) ");
+					   }*/
+					   sql.append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ");
+					   sql.append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
 					
 			logger.debug("sql:\n"+sql.toString());
-			
-			conn = new DBCPConnectionProvider().getConnection(conn);
+
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
@@ -208,9 +230,6 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			} catch (Exception e2) {}
 			try {
 				stmt.close();
-			} catch (Exception e2) {}
-			try {
-				conn.close();
 			} catch (Exception e2) {}
 		}
 		return pos;

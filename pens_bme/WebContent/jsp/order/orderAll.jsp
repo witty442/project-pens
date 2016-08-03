@@ -247,9 +247,7 @@ function isNum(obj){
 }
 
 </script>
-</head>
-
-				
+</head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
@@ -276,6 +274,10 @@ function isNum(obj){
 		 <% }else if("7CATALOG".equalsIgnoreCase(pageName)){%>
 			<jsp:include page="../program.jsp">
 				<jsp:param name="function" value="Order7Catalog"/>
+			</jsp:include>
+		<% }else if("TVDIRECT".equalsIgnoreCase(pageName)){%>
+			<jsp:include page="../program.jsp">
+				<jsp:param name="function" value="OrderTVDirect"/>
 			</jsp:include>
 		<%} %>
 	      	<!-- TABLE BODY -->
@@ -353,7 +355,6 @@ function isNum(obj){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
 									<td >
-									
 									     ห้าง &nbsp;&nbsp; 
 									    <html:select property="order.storeType">
 											<html:options collection="storeTypeList" property="key" labelProperty="name"/>

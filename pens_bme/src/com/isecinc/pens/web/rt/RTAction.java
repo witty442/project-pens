@@ -228,24 +228,18 @@ public class RTAction extends I_Action {
 				RTDAO.insertRTNControlBySale(conn, h);
 			}
 			
-			//Search Again
-			
-			RTBean result = RTDAO.searchHead(conn,h,true);
-			logger.debug("Size:"+result.getItems().size());
-			
-			RTBean bean = result.getItems().get(0);
-		
-		    aForm.setBean(bean);
-			
 			conn.commit();
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			
+			//Search Again
+			RTBean bean = RTDAO.searchRTDetail(conn,h);
+			//logger.debug("Size:"+result.getItems().size());
+		    aForm.setBean(bean);
+			
 		} catch (Exception e) {
 			conn.rollback();
             e.printStackTrace();
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
-			try {
-				
-			} catch (Exception e2) {}
 			return "detail";
 		} finally {
 			try {

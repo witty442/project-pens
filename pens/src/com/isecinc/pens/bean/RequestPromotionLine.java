@@ -25,7 +25,8 @@ public class RequestPromotionLine implements Serializable{
 	private BigDecimal borrowCtn;
 	private BigDecimal borrowQty;
 	private BigDecimal borrowAmount;
-
+    private String invoiceNo;
+    
 	private String created; 
 	private String createdBy; 
 	private String updated; 
@@ -37,6 +38,14 @@ public class RequestPromotionLine implements Serializable{
 	private String price1;
 	private String price2;
 	private String productId;
+	
+	
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public String getRequestNo() {
 		return requestNo;
 	}
