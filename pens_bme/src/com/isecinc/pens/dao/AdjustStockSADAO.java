@@ -29,7 +29,7 @@ public class AdjustStockSADAO {
 	private static String BANK_NO = "01-0000-911530-000-821-000-001";
 	public static String STATUS_OPEN ="O";
 	public static String STATUS_CANCEL ="AB";
-
+	static int count = 0;
 	
 	public AdjustStockSADAO() {
 		// TODO Auto-generated constructor stub
@@ -45,7 +45,7 @@ public class AdjustStockSADAO {
 			//check documentNo
 			if(Utils.isNull(h.getDocumentNo()).equals("")){
 				//Gen DocNo
-				h.setDocumentNo(genDocumentNo(conn,tDate,h.getStoreCode()));
+				h.setDocumentNo(genDocumentNo(tDate));
 				h.setStatus(STATUS_OPEN);
 				
 				logger.debug("documentNo:"+h.getDocumentNo());
@@ -125,7 +125,7 @@ public class AdjustStockSADAO {
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and TRANSACTION_DATE = ? ");
 			}
-			sql.append("\n order by document_no asc ");
+			sql.append("\n order by document_no desc ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -172,7 +172,7 @@ public class AdjustStockSADAO {
 		return items;
 	}
 	
-	public static AdjustStockSA search(AdjustStockSA o ) throws Exception {
+	public static AdjustStockSA searchDetail(AdjustStockSA o ,String orderBy) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -183,8 +183,8 @@ public class AdjustStockSADAO {
 		int r = 1;
 		boolean found = false;
 		try {
-			sql.append("\n SELECT *  from PENSBME_ADJUST_SALES    \n");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n SELECT *  from PENSBME_ADJUST_SALES ");
+			sql.append("\n where 1=1 ");
 			
 			if( !Utils.isNull(o.getDocumentNo()).equals("")){
 				sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
@@ -196,6 +196,7 @@ public class AdjustStockSADAO {
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and TRANSACTION_DATE = ? ");
 			}
+			sql.append("\n "+orderBy);
 			
 			logger.debug("sql:"+sql);
 			
@@ -252,7 +253,7 @@ public class AdjustStockSADAO {
 			   }
 		      
 			   l.setItemAdjust(Utils.isNull(rst.getString("item_adjust")));
-			   l.setItemAdjustDesc(Utils.isNull(rst.getString("item_adjust_desc")));
+			   l.setGroupCode(Utils.isNull(rst.getString("item_adjust_desc")));
 			   l.setItemAdjustUom(Utils.isNull(rst.getString("item_adjust_uom")));
 			   l.setItemAdjustQty(rst.getString("item_adjust_qty"));
 			  
@@ -328,12 +329,64 @@ public class AdjustStockSADAO {
 		return storeName;
 	}
 	
+	public static boolean isDuplicateDocNo(String docNo) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		boolean dup = false;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			sql.delete(0, sql.length());
+			sql.append("\n  SELECT count(*) as c from PENSBME_ADJUST_SALES ");
+			sql.append("\n  where document_no ='"+docNo+"' \n");
+
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+		
+			if (rst.next()) {
+				if(rst.getInt("c") >0){
+					dup = true;
+				}
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return dup;
+	}
 	
-	
+	 private static String genDocumentNo(Date tDate) {
+		 String docNo = "";
+		 count++;
+		 try{
+			 docNo = genDocumentNoModel(tDate);
+			 boolean isDup =isDuplicateDocNo(docNo);
+			 logger.debug("count["+count+"]:docNo["+docNo+"] isDup["+isDup+"]");
+			 if(isDup){
+				 docNo = genDocumentNo(tDate);
+			 }
+		 }catch(Exception e){
+			 logger.error(e.getMessage(),e);
+		 }finally{
+			
+		 }
+		 return docNo;
+	 }
+	 
 	// ( Running :  yyyymm+running  เช่น 201403001 )			
-	 private static String genDocumentNo(Connection conn,Date tDate,String storeCode) throws Exception{
-		   String orderNo = "";
+	 private static String genDocumentNoModel(Date tDate) {
+		   String docNo = "";
+		   Connection conn = null;
 		   try{
+			   conn = DBConnection.getInstance().getConnection();
 			   String today = df.format(tDate);
 			   String[] d1 = today.split("/");
 			   int curYear = Integer.parseInt(d1[0].substring(0,4));
@@ -342,11 +395,17 @@ public class AdjustStockSADAO {
 			   //get Seq
 			   int seq = SequenceProcess.getNextValue(conn,"ADJUST_SA", "DOCUMENT_NO",tDate);
 			   
-			   orderNo = new DecimalFormat("0000").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("000").format(seq);
+			   docNo = new DecimalFormat("0000").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("000").format(seq);
 		   }catch(Exception e){
-			   throw e;
+			  logger.error(e.getMessage(),e);
+		   }finally{
+			   try{
+				   if(conn != null){
+					   conn.close();conn=null;
+				   }
+			   }catch(Exception e){}
 		   }
-		  return orderNo;
+		  return docNo;
 	}
 	 
 	
@@ -358,7 +417,7 @@ public class AdjustStockSADAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_ADJUST_SALES \n");
 			sql.append(" (DOCUMENT_NO, SEQ_NO, TRANSACTION_DATE, STORE_CODE,  \n");
-			sql.append(" STORE_NAME,STATUS, ITEM_ADJUST, ITEM_ADJUST_DESC,   \n");
+			sql.append(" STORE_NAME,STATUS, ITEM_ADJUST, item_adjust_desc,   \n");
 			sql.append(" ITEM_ADJUST_UOM, ITEM_ADJUST_QTY,  \n");
 			sql.append(" CREATE_DATE, CREATE_USER) \n");
 		    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?) \n");
@@ -378,10 +437,14 @@ public class AdjustStockSADAO {
 			ps.setString(c++, o.getStatus());
 			
 			ps.setString(c++, o.getItemAdjust());
-			ps.setString(c++, o.getItemAdjustDesc());
+			ps.setString(c++, o.getGroupCode());
 			ps.setString(c++, o.getItemAdjustUom());
-			ps.setDouble(c++, Integer.parseInt(o.getItemAdjustQty()));
+			if( !Utils.isNull(o.getItemAdjustQty()).equals("")){
+			   ps.setDouble(c++, Integer.parseInt(o.getItemAdjustQty()));
+			}else{
+			   ps.setDouble(c++,0);
 
+			}
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getCreateUser());
 			
@@ -401,7 +464,7 @@ public class AdjustStockSADAO {
 		logger.debug("Update");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" DELETE PENSBI.PENSBME_ADJUST_SALES \n");
+			sql.append(" DELETE PENSBME_ADJUST_SALES \n");
 			sql.append(" WHERE DOCUMENT_NO =? \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -424,7 +487,7 @@ public class AdjustStockSADAO {
 		logger.debug("Update");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBI.PENSBME_ADJUST_SALES SET STATUS = ? \n");
+			sql.append(" UPDATE PENSBME_ADJUST_SALES SET STATUS = ? \n");
 			sql.append(" WHERE DOCUMENT_NO =? \n" );
 
 			ps = conn.prepareStatement(sql.toString());

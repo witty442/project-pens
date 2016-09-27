@@ -65,7 +65,11 @@ public class ReqPickStockDAO extends PickConstants{
 			}else{
 				//Edit
 				logger.debug("Update IssueReqNo:"+h.getIssueReqNo());
-			
+				logger.debug("Update remark:"+h.getRemark());
+				
+				//update requestor ,remark ,need_date
+			    //updateStockIssue(conn, h);
+			    
 				//delete pickStockItem by reqno,groupCode
 				//deleteStockIssueItemByIssueReqNoAndGroup(conn,h);
 				
@@ -507,6 +511,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n SELECT count(*) as total_row FROM(");
 				sql.append("\n    SELECT M2.group_code,M2.pens_item FROM( ");
 				sql.append("\n       SELECT group_code,pens_item, sum(onhand_qty) as onhand_qty FROM( ");
+				
 				sql.append("\n         SELECT group_code,pens_item ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
 				sql.append("\n  	   from PENSBME_STOCK_FINISHED WHERE 1=1 ");
 				
@@ -515,7 +520,9 @@ public class ReqPickStockDAO extends PickConstants{
 				}
 				sql.append("\n 	       AND warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n  	   GROUP BY group_code,pens_item ");
+				
 				sql.append("\n         UNION ALL ");
+				
 				sql.append("\n 		   SELECT group_code ,pens_item,( (-1) * sum(req_qty) )as onhand_qty");
 				sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 		   WHERE 1=1  ");
@@ -533,6 +540,7 @@ public class ReqPickStockDAO extends PickConstants{
 				
 				sql.append("\n  	   GROUP BY group_code,pens_item ");
 				sql.append("\n       ) GROUP BY group_code ,pens_item ");
+				
 				sql.append("\n    )M2 WHERE onhand_qty > 0 ");
 				
 				sql.append("\n    UNION  ");
@@ -543,6 +551,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n 	  AND h.warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n 	  AND h.issue_req_no = i.issue_req_no ");
 				sql.append("\n 	  AND h.issue_req_no ='"+p.getIssueReqNo()+"'");
+				sql.append("\n 	  AND i.status IN('"+STATUS_OPEN+"')");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		   AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
@@ -575,7 +584,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n 		 WHERE 1=1  ");
 				sql.append("\n 	     AND h.warehouse ='"+p.getWareHouse()+"'");
 				sql.append("\n 		 AND h.issue_req_no = i.issue_req_no ");
-				sql.append("\n 		 AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+				sql.append("\n 	     AND i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 				if( !Utils.isNull(p.getGroupCode()).equals("")){
 					sql.append("\n 		AND i.group_code LIKE '%"+p.getGroupCode()+"%'");
 				}
@@ -1004,7 +1013,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 				WHERE 1=1   ");
 						sql.append("\n 	            AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 				AND h.issue_req_no = i.issue_req_no  ");
-						sql.append("\n 				AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+						sql.append("\n 	            AND i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
 						    sql.append("\n 		    AND h.issue_req_no <>'"+pickStock.getIssueReqNo()+"'");
 						}
@@ -1059,7 +1068,7 @@ public class ReqPickStockDAO extends PickConstants{
 						sql.append("\n 		  WHERE 1=1  ");
 						sql.append("\n 	      AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 						sql.append("\n 		  AND h.issue_req_no = i.issue_req_no ");
-						sql.append("\n 		  AND h.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+						sql.append("\n 	      AND i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 						if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
 							sql.append("\n 	  AND i.group_code LIKE '%"+pickStock.getGroupCode()+"%'");
 						}
@@ -1091,6 +1100,7 @@ public class ReqPickStockDAO extends PickConstants{
 				sql.append("\n   SELECT a.*, rownum r__ FROM (");
 				sql.append("\n   SELECT M2.* FROM (");
 			    	sql.append("\n   SELECT M.group_code,M.pens_item,NVL(SUM(onhand_qty),0) as onhand_qty,0 as qty FROM ( ");
+			    	
 					sql.append("\n  	select group_code,pens_item,(nvl(onhand_qty,0)-(nvl(issue_qty,0))) as onhand_qty  ");
 					sql.append("\n  	from PENSBME_STOCK_FINISHED ");
 					sql.append("\n  	where 1=1   ");
@@ -1109,7 +1119,7 @@ public class ReqPickStockDAO extends PickConstants{
 					sql.append("\n 		WHERE 1=1  ");
 					sql.append("\n 	    AND h.warehouse ='"+pickStock.getWareHouse()+"'");
 					sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
-					sql.append("\n 		AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+					sql.append("\n 	    AND i.status IN('"+STATUS_OPEN+"','"+STATUS_POST+"','"+STATUS_BEF+"')");
 					if( !Utils.isNull(pickStock.getGroupCode()).equals("")){
 						sql.append("\n 	and i.group_code LIKE '%"+pickStock.getGroupCode()+"%'");
 					}
@@ -1991,13 +2001,15 @@ public class ReqPickStockDAO extends PickConstants{
 		}
 	}
 	
-	private static void updateStockIssueModel(Connection conn,ReqPickStock o) throws Exception{
+	public static void updateStockIssue(Connection conn,ReqPickStock o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");
 		try{
+			Date needDate = Utils.parse( o.getNeedDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBI.PENSBME_STOCK_ISSUE \n");
-			sql.append(" SET  REQUESTOR = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? \n");
+			sql.append(" UPDATE PENSBME_STOCK_ISSUE \n");
+			sql.append(" SET  REQUESTOR = ?,REMARK =? ,need_date=?,UPDATE_DATE =?,UPDATE_USER =? \n");
 		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -2006,6 +2018,7 @@ public class ReqPickStockDAO extends PickConstants{
 			
 			ps.setString(c++, o.getRequestor());
 			ps.setString(c++, o.getRemark());
+			ps.setTimestamp(c++, new java.sql.Timestamp(needDate.getTime()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
 			ps.setString(c++, o.getIssueReqNo());

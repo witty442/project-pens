@@ -26,6 +26,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -100,6 +101,7 @@ function save(path){
 }
 
 function isNum(obj){
+	//alert(obj.value);
   if(obj.value != ""){
 	var newNum = parseInt(obj.value);
 	if(isNaN(newNum)){
@@ -122,15 +124,16 @@ function chkQtyKeypress(obj,e,row){
 function validateQty(obj,row){
 	var table = document.getElementById('tblProduct');
 	var rows = table.getElementsByTagName("tr"); 
-	
-	obj.value = currencyToNum(obj.value);
 	var r = isNum(obj);
+	
+	//obj.value = currencyToNum(obj.value);
+	
 	var onhandQtyObj = document.getElementsByName("onhandQty");
 	//alert(onhandQtyObj[row].value);
 	if(r){
 		//validate Onhand Qty
 		var onhandQty = currencyToNum(onhandQtyObj[row].value);
-		var currQty = currencyToNum(obj.value);
+		var currQty = obj.value != ""?currencyToNum(obj.value):0;
 		if(currQty > onhandQty){
 			alert("จำนวนรวม QTY("+currQty+") มีมากว่า  Onhand QTY("+onhandQty+")");
 			//rows[row+1].className ="lineError";
@@ -139,6 +142,8 @@ function validateQty(obj,row){
 			return false;
 		}
 		sumQty();
+	}else{
+		sumQty();	
 	}
 	return true;
 }
@@ -164,8 +169,11 @@ function sumQty(){
 	//alert(totalQtyNotCurPage);
 	var sumCurPageQty = 0;
 	for(var i=0;i<qtyObj.length;i++){
-		if(qtyObj[i].value != '')
+		if(qtyObj[i].value != ''){
 			sumCurPageQty = sumCurPageQty + currencyToNum(qtyObj[i].value);
+		}else{
+			sumCurPageQty = sumCurPageQty + 0;
+		}
 	}
 	//cur Page
 	document.getElementsByName("curPageQty")[0].value = currencyToNum(sumCurPageQty);
@@ -191,7 +199,7 @@ function currencyToNum(str){
 			
                <html:hidden property="bean.rowIndex" styleId="rowIndex"/>
                <html:hidden property="bean.issueReqNo" styleId="issueReqNo"/>
-               <html:text property="bean.actionDB" styleId="actionDB"/>
+               <html:hidden property="bean.actionDB" styleId="actionDB"/>
           
                <input type="hidden" id="path" value="${pageContext.request.contextPath}"/>
                  
@@ -243,7 +251,7 @@ function currencyToNum(str){
 								<td class="data_qty">
 									  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  class="enableNumber"
 									   onkeypress="chkQtyKeypress(this,event,<%=i%>)"
-					                   onchange="validateQty(this,<%=i%>)"
+					                   onblur="validateQty(this,<%=i%>)"
 									  />
 								</td>
 						</tr>

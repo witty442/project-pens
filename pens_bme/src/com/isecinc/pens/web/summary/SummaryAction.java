@@ -3,7 +3,6 @@ package com.isecinc.pens.web.summary;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,20 +15,19 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.DiffStockSummary;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.PhysicalSummary;
 import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BMECControlDAO;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.GenerateMonthEndLotus;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.summary.process.GenerateEndDateLotus;
+import com.isecinc.pens.summary.process.GenerateMonthEndLotus;
 
 /**
  * Summary Action
@@ -72,14 +70,15 @@ public class SummaryAction extends I_Action {
 				 
 				 summaryForm.setOnhandBigCResults(null);
 				 
-				 summaryForm.setOnhandSummaryMTTResults(null);
 				 summaryForm.setOnhandSummaryMTTDetailResults(null);
 				 
 				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
-				 summaryForm.setOnhandSummaryMonthEndLotusResults(null);
 				 
+				 //Default display have qty
 				 if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
-					|| "sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					|| "sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
+					|| "onhandBigCSP".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+					 
 					 oh = new OnhandSummary();
 					 oh.setDispHaveQty("true");
 					 summaryForm.setOnhandSummary(oh);
@@ -102,36 +101,6 @@ public class SummaryAction extends I_Action {
 		SummaryForm summaryForm = (SummaryForm) form;
 		try {
 			logger.debug("prepare 2");
-			if("new".equalsIgnoreCase(request.getParameter("action"))){
-				 request.getSession().setAttribute("results", null);
-				 summaryForm.setResults(null);
-				 summaryForm.setOnhandSummaryResults(null);
-				 OnhandSummary oh = new OnhandSummary();
-				 summaryForm.setOnhandSummary(oh);
-				 summaryForm.setOnhandSummaryResults(null);
-				 summaryForm.setOnhandSummaryLotusResults(null);
-				 
-				 summaryForm.setLotusSummaryResults(null);
-				 summaryForm.setBigcSummaryResults(null);
-				 summaryForm.setTopsSummaryResults(null);
-				 summaryForm.setKingSummaryResults(null);
-				 summaryForm.setTransactionSummary(new TransactionSummary());
-				 
-				 summaryForm.setPhysicalSummaryResults(null);
-				 summaryForm.setPhysicalSummary(new PhysicalSummary());
-				 
-				 summaryForm.setDiffStockSummaryLists(null);
-				 summaryForm.setDiffStockSummary(new DiffStockSummary());
-				 
-				 summaryForm.setOnhandSummaryLotusPeriodResults(null);
-				 summaryForm.setOnhandBigCResults(null);
-				 
-				 summaryForm.setOnhandSummaryMTTResults(null);
-				 summaryForm.setOnhandSummaryMTTDetailResults(null);
-				 
-				 summaryForm.setOnhandSummarySizeColorBigCResults(null);
-				 summaryForm.setOnhandSummaryMonthEndLotusResults(null);
-			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -191,10 +160,29 @@ public class SummaryAction extends I_Action {
 					summaryForm.setResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
-			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-				List<OnhandSummary> results = new SummaryDAO().searchOnhandMonthEndLotus(summaryForm.getOnhandSummary(),user);
+			}else if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				//set for display by page
+				summaryForm.setPage("reportEndDateLotus");
+				List<OnhandSummary> results = new SummaryDAO().searchReportEndDateLotus(summaryForm,summaryForm.getOnhandSummary(),user);
 				if (results != null  && results.size() >0) {
-					summaryForm.setOnhandSummaryMonthEndLotusResults(results);
+					summaryForm.setResults(results);
+					
+					//logger.debug("results:"+summaryForm.getResults());
+					ImportDAO importDAO = new ImportDAO();
+					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+					if(m != null)
+					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+					
+				} else {
+					summaryForm.setResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
+			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				List<OnhandSummary> results = new SummaryDAO().searchOnhandMonthEndLotus(summaryForm,summaryForm.getOnhandSummary(),user);
+				summaryForm.setPage("monthEndLotus");
+				
+				if (results != null  && results.size() >0) {
+					summaryForm.setResults(results);
 					
 					OnhandSummary cc = (OnhandSummary)results.get(0);
 					
@@ -205,7 +193,7 @@ public class SummaryAction extends I_Action {
 					  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
 					
 				} else {
-					summaryForm.setOnhandSummaryMonthEndLotusResults(null);
+					summaryForm.setResults(null);
 					request.setAttribute("Message", "ไม่พบข่อมูล");
 				}
 			}else if("bmeTrans".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
@@ -231,11 +219,11 @@ public class SummaryAction extends I_Action {
 				
 				logger.debug("initDate:"+initDate);
 				logger.debug("asOfDate:"+asOfDate);
-				
+				summaryForm.setPage("onhandMTT");
 				boolean pass = true;
 				if(initDate !=null){
 					if(asOfDate.before(initDate)){
-						summaryForm.setOnhandSummaryMTTResults(null);
+						summaryForm.setResults(null);
 						request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
 						pass = false;
 					}
@@ -245,7 +233,7 @@ public class SummaryAction extends I_Action {
 					results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user);
 					
 					if (results != null  && results.size() >0) {
-						summaryForm.setOnhandSummaryMTTResults(results);
+						summaryForm.setResults(results);
 						
 						ImportDAO importDAO = new ImportDAO();
 						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -253,7 +241,7 @@ public class SummaryAction extends I_Action {
 						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
 						
 					} else {
-						summaryForm.setOnhandSummaryMTTResults(null);
+						summaryForm.setResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
 				}
@@ -268,7 +256,7 @@ public class SummaryAction extends I_Action {
 				boolean pass = true;
 				if(initDate !=null){
 					if(asOfDate.before(initDate)){
-						summaryForm.setOnhandSummaryMTTResults(null);
+						summaryForm.setOnhandSummaryMTTDetailResults(null);
 						request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
 						pass = false;
 					}
@@ -446,6 +434,7 @@ public class SummaryAction extends I_Action {
 				
 				logger.debug("initDate:"+initDate);
 				logger.debug("asOfDate:"+asOfDate);
+				logger.debug("haveDispQty:"+summaryForm.getOnhandSummary().getDispHaveQty());
 				//set for display by page
 				summaryForm.setPage("onhandBigCSP");
 				
@@ -546,6 +535,32 @@ public class SummaryAction extends I_Action {
 		return mapping.findForward("export");
 	}
 	
+	public ActionForward genEndDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("genMonthEnd");
+		SummaryForm summaryForm = (SummaryForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String storeType = "";
+		String yearMonth = "";
+		String[] results = new String[3];
+		try{
+			storeType = Utils.isNull(request.getParameter("storeType"));
+			if("lotus".equalsIgnoreCase(storeType)){
+				
+				results = GenerateEndDateLotus.generateEndDateLotus(summaryForm.getOnhandSummary(), user);
+				if("".equals(results[2])){
+				  request.setAttribute("Message", "Generate End Date เรียบร้อยแล้ว");
+				}else{
+				  request.setAttribute("Message", "ไม่สามารถ Generate End Date ได้ \n "+results[2]);
+				}
+			}
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("export");
+	}
+	
 	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("export");
 		SummaryForm summaryForm = (SummaryForm) form;
@@ -584,8 +599,8 @@ public class SummaryAction extends I_Action {
 				}
 			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				 fileName ="Report Bme Stock close Lotus.xls";
-			     if(summaryForm.getOnhandSummaryMonthEndLotusResults() != null && summaryForm.getOnhandSummaryMonthEndLotusResults().size() > 0){
-					htmlTable = export.genOnhandMonthEndLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getOnhandSummaryMonthEndLotusResults());	
+			     if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
+					htmlTable = export.genOnhandMonthEndLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -600,7 +615,7 @@ public class SummaryAction extends I_Action {
 				}
 			}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				 fileName ="Report Bme Stock on-hand MTT.xls";
-			     if(summaryForm.getOnhandSummaryMTTResults() != null && summaryForm.getOnhandSummaryMTTResults().size() > 0){
+			     if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
 					htmlTable = export.genOnhandMTTHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -684,7 +699,7 @@ public class SummaryAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if("sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-				fileName="Report Stock on-hand at LOTUS Size-Color(Init New Stock)_"+summaryForm.getSummaryType()+".xls";
+				fileName="Report Stock on-hand at LOTUS Size-Color(Init New Stock)_"+Utils.isNull(summaryForm.getSummaryType())+".xls";
 				if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
 					htmlTable = export.genLotusSizeColorHTML(request,summaryForm,user);	
 				}else{
@@ -693,10 +708,10 @@ public class SummaryAction extends I_Action {
 				}
 			}
 			
-	        logger.debug("fileName:"+fileName);
+	        //logger.debug("fileName:"+fileName);
 	        //fileName = Utils.toUnicodeChar(fileName);
-	        logger.debug("fileName:"+fileName);
-	        		//"data.xls";
+	        //logger.debug("fileName:"+fileName);
+	        //"data.xls";
 			java.io.OutputStream out = response.getOutputStream();
 			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
 			response.setContentType("application/vnd.ms-excel");

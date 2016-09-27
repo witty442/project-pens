@@ -601,10 +601,13 @@ public class ReqPickStockAction extends I_Action {
 		Connection conn = null;
 		ReqPickStockForm aForm = (ReqPickStockForm) form;
 		try {
-
+			conn = DBConnection.getInstance().getConnection();
             aForm.getBean().setNewSearch(false);
             aForm.getBean().setNewReq(false);
 			
+            //update 2 requestor ,remark ,need_date
+            ReqPickStockDAO.updateStockIssue(conn, aForm.getBean());
+            
 			search(aForm, request, response);
 			
 			//set disable custGroup ,storeCode

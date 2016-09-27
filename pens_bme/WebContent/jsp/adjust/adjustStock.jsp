@@ -70,6 +70,9 @@ span.pagelinks {
 
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	 sumTotalIssueQty();
+	 sumTotalReceiptQty();
+	 sumTotalDiffCost();
 }
 function clearForm(path){
 	var form = document.adjustStockForm;
@@ -83,6 +86,40 @@ function back(path){
 	form.submit();
 	return true;
 }
+
+function sumTotalIssueQty(){
+	var itemIssueQty = document.getElementsByName("itemIssueQty");
+	var totalIssueQty = 0;
+	for(var i= 0;i<itemIssueQty.length;i++){
+		if(itemIssueQty[i].value != ''){
+			totalIssueQty += parseInt(itemIssueQty[i].value);
+		}
+	}
+	document.getElementsByName("totalIssueQty")[0].value = totalIssueQty;
+}
+function sumTotalReceiptQty(){
+	var itemIssueQty = document.getElementsByName("itemReceiptQty");
+	var totalIssueQty = 0;
+	for(var i= 0;i<itemIssueQty.length;i++){
+		if(itemIssueQty[i].value != ''){
+			totalIssueQty += parseInt(itemIssueQty[i].value);
+		}
+	}
+	document.getElementsByName("totalReceiptQty")[0].value = totalIssueQty;
+}
+
+function sumTotalDiffCost(){
+	var itemIssueQty = document.getElementsByName("diffCost");
+	var totalIssueQty = 0;
+	for(var i= 0;i<itemIssueQty.length;i++){
+		if(itemIssueQty[i].value != ''){
+			totalIssueQty += parseFloat(itemIssueQty[i].value);
+		}
+	}
+	var num = Number(totalIssueQty);
+	document.getElementsByName("totalDiffCost")[0].value = num.toFixed(2);
+}
+
 function validateItems(){
 	var pass = true;
 	var table = document.getElementById('tblProduct');
@@ -153,7 +190,7 @@ function save(path){
 		return false;
 	}
 	
-	var pass = validateItems();
+	var pass = true;//validateItems();
 	if(pass){
 	   form.action = path + "/jsp/adjustStockAction.do?do=save";
 	   form.submit();
@@ -165,10 +202,12 @@ function save(path){
 }
 
 function exported(path){
-   var form = document.adjustStockForm;
-   form.action = path + "/jsp/adjustStockAction.do?do=exported";
-   form.submit();
-   return true;
+	if(confirm("ยืนยันการ POST ")){
+	   var form = document.adjustStockForm;
+	   form.action = path + "/jsp/adjustStockAction.do?do=exported";
+	   form.submit();
+	   return true;
+	}
 }
 
 function search(path){
@@ -208,10 +247,119 @@ function verifyData(path){
 }
 
 function openPopupProduct(path,seqNo,types){
-	var param = "&types="+types+"&seqNo="+seqNo;
-	url = path + "/jsp/searchProductPopupAction.do?do=prepare2&action=new"+param;
+	var param = "&page=searchPensItemByGroupPopup";
+	    param += "&types="+types+"&seqNo="+seqNo;
+	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
 	window.open(encodeURI(url),"",
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
+function setProductMainValue(seqNo,types,groupCode,pensItem,price){
+	//alert("seqNo:"+seqNo);
+	
+	if("itemIssue" == types){
+		
+		document.getElementsByName("itemIssueDesc")[seqNo-1].value = groupCode;
+		document.getElementsByName("itemIssue")[seqNo-1].value = pensItem;
+		document.getElementsByName("itemIssueUom")[seqNo-1].value = 'EA';
+		document.getElementsByName("itemIssueRetailNonVat")[seqNo-1].value = price;
+	}else{
+		document.getElementsByName("itemReceiptDesc")[seqNo-1].value = groupCode;
+		document.getElementsByName("itemReceipt")[seqNo-1].value = pensItem;
+		document.getElementsByName("itemReceiptUom")[seqNo-1].value = 'EA';
+		document.getElementsByName("itemReceiptRetailNonVat")[seqNo-1].value = price;
+	}
+} 
+
+function getProductKeypress(e,type,groupCode,seqNo){
+	
+	var form = document.adjustStockForm;
+	
+	var itemIssue = document.getElementsByName("itemIssue");
+	var itemReceipt = document.getElementsByName("itemReceipt");
+	var itemIssueRetailNonVat = document.getElementsByName("itemIssueRetailNonVat");
+	var itemReceiptRetailNonVat = document.getElementsByName("itemReceiptRetailNonVat");
+	var itemIssueUom = document.getElementsByName("itemIssueUom");
+	var itemReceiptUom = document.getElementsByName("itemReceiptUom");
+	
+	if(e != null && e.keyCode == 13){
+		if('issue' == type){
+			if(groupCode.value ==''){
+				itemIssue[seqNo-1].value = '';
+				itemIssueRetailNonVat[seqNo-1].value ='';
+				itemIssueUom[seqNo-1].value ='';
+			}else{
+				getProductModel(type,groupCode,seqNo);
+			}
+		}else{
+			if(groupCode.value ==''){
+				itemReceipt[seqNo-1].value = '';
+				itemReceiptRetailNonVat[seqNo-1].value ='';
+				itemReceiptUom[seqNo-1].value ='';
+			}else{
+				getProductModel(type,groupCode,seqNo);
+			}
+		}
+	}
+}
+
+function getProductModel(type,groupCode,seqNo){
+	var itemIssue = document.getElementsByName("itemIssue");
+	var itemIssueDesc = document.getElementsByName("itemIssueDesc");
+	var itemIssueUom = document.getElementsByName("itemIssueUom");
+	var itemIssueRetailNonVat = document.getElementsByName("itemIssueRetailNonVat");
+	
+	var itemReceipt = document.getElementsByName("itemReceipt");
+	var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
+	var itemReceiptRetailNonVat = document.getElementsByName("itemReceiptRetailNonVat");
+	var itemReceiptUom = document.getElementsByName("itemReceiptUom");
+	
+	var returnString = "";
+	var form = document.adjustStockForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoProductByGroup.jsp",
+			data : "groupCode=" + groupCode.value,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+
+	
+	if('issue' == type){
+		if(returnString==''){
+			alert("ไม่พบข้อมูล item "+groupCode.value);
+			itemCode.focus();
+			
+			itemIssue[seqNo-1].value = '';
+		    itemIssue[seqNo-1].value = '';
+		    itemIssueRetailNonVat[seqNo-1].value ='';
+		    itemIssueUom[seqNo-1].value ='';
+		}else{
+			var s = returnString.split("|");
+			itemIssue[seqNo-1].value = s[0];
+			itemIssueRetailNonVat[seqNo-1].value = s[1];
+			itemIssueUom[seqNo-1].value ='EA';
+		}
+	}else{
+		if(returnString==''){
+           alert("ไม่พบข้อมูล item "+groupCode.value);
+		   itemCode.focus();
+			   
+		   itemReceipt[seqNo-1].value = '';
+		   itemReceipt[seqNo-1].value = '';
+		   itemReceiptRetailNonVat[seqNo-1].value ='';
+		   itemReceiptUom[seqNo-1].value ='';
+		  
+		}else{
+		   var s = returnString.split("|");
+		   itemReceipt[seqNo-1].value = s[0];
+		   itemReceiptRetailNonVat[seqNo-1].value =s[1];
+		   itemReceiptUom[seqNo-1].value ='EA';
+		}
+	}
+	
+	calcDiffCost(seqNo);
 }
 
 function addRow(path){
@@ -293,97 +441,6 @@ function getStoreNameModel(storeCode){
 	form.storeName.value = returnString;	
 }
 
-function getProductKeypress(e,type,itemCode,seqNo){
-	var form = document.adjustStockForm;
-	var itemIssueDesc = document.getElementsByName("itemIssueDesc");
-	var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
-	var itemIssueRetailNonVat = document.getElementsByName("itemIssueRetailNonVat");
-	var itemReceiptRetailNonVat = document.getElementsByName("itemReceiptRetailNonVat");
-	var itemIssueUom = document.getElementsByName("itemIssueUom");
-	var itemReceiptUom = document.getElementsByName("itemReceiptUom");
-	
-	if(e != null && e.keyCode == 13){
-		if('issue' == type){
-			if(itemCode.value ==''){
-				itemIssueDesc[seqNo-1].value = '';
-				itemIssueRetailNonVat[seqNo-1].value ='';
-				itemIssueUom[seqNo-1].value ='';
-			}else{
-				getProductModel(type,itemCode,seqNo);
-			}
-		}else{
-			if(itemCode.value ==''){
-				itemReceiptDesc[seqNo-1].value = '';
-				itemReceiptRetailNonVat[seqNo-1].value ='';
-				itemReceiptUom[seqNo-1].value ='';
-			}else{
-				getProductModel(type,itemCode,seqNo);
-			}
-		}
-	}
-}
-
-function getProductModel(type,itemCode,seqNo){
-	var itemIssue = document.getElementsByName("itemIssue");
-	var itemIssueDesc = document.getElementsByName("itemIssueDesc");
-	var itemIssueUom = document.getElementsByName("itemIssueUom");
-	var itemIssueRetailNonVat = document.getElementsByName("itemIssueRetailNonVat");
-	
-	var itemReceipt = document.getElementsByName("itemReceipt");
-	var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
-	var itemReceiptRetailNonVat = document.getElementsByName("itemReceiptRetailNonVat");
-	var itemReceiptUom = document.getElementsByName("itemReceiptUom");
-	
-	var returnString = "";
-	var form = document.adjustStockForm;
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoProduct.jsp",
-			data : "itemCode=" + itemCode.value,
-			async: false,
-			cache: false,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-
-	
-	if('issue' == type){
-		if(returnString==''){
-			alert("ไม่พบข้อมูล item "+itemCode.value);
-			itemCode.focus();
-			
-			itemIssue[seqNo-1].value = '';
-		    itemIssueDesc[seqNo-1].value = '';
-		    itemIssueRetailNonVat[seqNo-1].value ='';
-		    itemIssueUom[seqNo-1].value ='';
-		}else{
-			var s = returnString.split("|");
-			itemIssueDesc[seqNo-1].value = s[0];
-			itemIssueRetailNonVat[seqNo-1].value = s[1];
-			itemIssueUom[seqNo-1].value ='EA';
-		}
-	}else{
-		if(returnString==''){
-           alert("ไม่พบข้อมูล item "+itemCode.value);
-		   itemCode.focus();
-			   
-		   itemReceipt[seqNo-1].value = '';
-		   itemReceiptDesc[seqNo-1].value = '';
-		   itemReceiptRetailNonVat[seqNo-1].value ='';
-		   itemReceiptUom[seqNo-1].value ='';
-		  
-		}else{
-		   var s = returnString.split("|");
-		   itemReceiptDesc[seqNo-1].value = s[0];
-		   itemReceiptRetailNonVat[seqNo-1].value =s[1];
-		   itemReceiptUom[seqNo-1].value ='EA';
-		}
-	}
-	
-	calcDiffCost(seqNo);
-}
-
-
 function isNum(obj){
   if(obj.value != ""){
 	var newNum = parseInt(obj.value);
@@ -421,24 +478,6 @@ function checkSelect(chk1,chk2){
 	}
 	return;
 }
-
-function setProductMainValue(seqNo,types,code,desc,price){
-	//alert("seqNo:"+seqNo);
-	
-	if("itemIssue" == types){
-		
-		document.getElementsByName("itemIssue")[seqNo-1].value = code;
-		document.getElementsByName("itemIssueDesc")[seqNo-1].value = desc;
-		document.getElementsByName("itemIssueUom")[seqNo-1].value = 'EA';
-		document.getElementsByName("itemIssueRetailNonVat")[seqNo-1].value = price;
-	}else{
-		document.getElementsByName("itemReceipt")[seqNo-1].value = code;
-		document.getElementsByName("itemReceiptDesc")[seqNo-1].value = desc;
-		document.getElementsByName("itemReceiptUom")[seqNo-1].value = 'EA';
-		document.getElementsByName("itemReceiptRetailNonVat")[seqNo-1].value = price;
-	}
-} 
-
 </script>
 
 </head>		
@@ -592,12 +631,12 @@ function setProductMainValue(seqNo,types,code,desc,price){
 									<th ><input type="checkbox" name="chkAll"
 										onclick="checkSelect(this,document.getElementsByName('linechk'));" /></th>
 									
-									<th >Item Issue</th>
+									<th >Group Issue</th>
 									<th >Issue Description</th>
 									<th >UOM</th>
 									<th >ราคาขายส่งก่อน VAT</th>
 									<th >Issue Qty</th>
-									<th >Item Receipt</th>
+									<th >Group Receipt</th>
 									<th >Receipt Description</th>
 									<th >UOM</th>							
 									<th >ราคาขายส่งก่อน VAT</th>
@@ -618,9 +657,9 @@ function setProductMainValue(seqNo,types,code,desc,price){
 									<tr class="<c:out value='${tabclass}'/>">
 										<td class="seqNo">${results.seqNo}</td>
 										<td class="checkBoxAdjustStock"><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>
-										<td class="itemIssue" nowrap>
+										<td class="itemIssueDesc" nowrap>
 										   <c:if test="${results.canEdit == true}">
-											    <input type="text" name="itemIssue" id="itemIssue" value ="${results.itemIssue}" size="10" 
+											    <input type="text" name="itemIssueDesc" id="itemIssueDesc" value ="${results.itemIssueDesc}" size="10" 
 											    onkeypress="getProductKeypress(event,'issue',this,${results.seqNo})"
 											    onchange="getProductModel('issue',this,${results.seqNo})"
 											    />
@@ -628,27 +667,28 @@ function setProductMainValue(seqNo,types,code,desc,price){
 											     class="enableNumber"/>
 										   </c:if>
 										   <c:if test="${results.canEdit == false}">
-											    <input type="text" name="itemIssue" id="itemIssue" value ="${results.itemIssue}" size="10" 
+											    <input type="text" name="itemIssueDesc" id="itemIssueDesc" value ="${results.itemIssueDesc}" size="10" 
 											     readonly class="disableNumber"/>
 										   </c:if>
 
 										</td>
-										<td class="itemIssueSec"><input tabindex="-1" type="text" name="itemIssueDesc" value ="${results.itemIssueDesc}" size="20" readonly class="disableText"/></td>
+										<td class="itemIssue"><input tabindex="-1" type="text" name="itemIssue" value ="${results.itemIssue}" size="20" readonly class="disableText"/></td>
+										
 										<td class="itemIssueUom"><input tabindex="-1" type="text" name="itemIssueUom" value ="${results.itemIssueUom}" size="3" readonly class="disableText"/></td>
 										<td class="itemIssueRetailNonVat"><input tabindex="-1" type="text" name="itemIssueRetailNonVat" value ="${results.itemIssueRetailNonVat}" size="10" readonly class="disableNumber"/></td>
 										<td class="itemIssueQty">
 											<c:if test="${results.canEdit == true}">
-											    <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="5" onkeypress="isNum(this)" 
-											    onchange="calcDiffCost(${results.seqNo})" class="enableNumber"/>
+											    <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="10" onkeypress="isNum(this)" 
+											     class="enableNumber" onblur="sumTotalIssueQty();calcDiffCost(${results.seqNo})"/>
 											</c:if>
 											<c:if test="${results.canEdit == false}">
-											   <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="5" readonly class="disableNumber"/>
+											   <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="10" readonly class="disableNumber"/>
 											</c:if>
 										</td>
 										
-										<td class="itemReceipt"  nowrap>
+										<td class="itemReceiptDesc"  nowrap>
 										  <c:if test="${results.canEdit == true}">
-											    <input type="text" name="itemReceipt" id="itemReceipt" value ="${results.itemReceipt}" size="10"
+											    <input type="text" name="itemReceiptDesc" id="itemReceiptDesc" value ="${results.itemReceiptDesc}" size="10"
 											     onkeypress="getProductKeypress(event,'receipt',this,${results.seqNo})"
 											     onchange="getProductModel('receipt',this,${results.seqNo})"
 											     />
@@ -656,20 +696,21 @@ function setProductMainValue(seqNo,types,code,desc,price){
 								
 										 </c:if>
 										 <c:if test="${results.canEdit == false}">
-										      <input type="text" name="itemReceipt" id="itemReceipt" value ="${results.itemReceipt}" size="10"
+										      <input type="text" name="itemReceiptDesc" id="itemReceiptDesc" value ="${results.itemReceiptDesc}" size="10"
 											     readonly class="disableNumber" />
 										 </c:if>
 										</td>
-										<td class="itemReceiptDesc"><input  tabindex="-1" type="text" name="itemReceiptDesc" value ="${results.itemReceiptDesc}" size="20" readonly class="disableText"/></td>
+										<td class="itemReceipt"><input  tabindex="-1" type="text" name="itemReceipt" value ="${results.itemReceipt}" size="20" readonly class="disableText"/></td>
+										
 										<td class="itemReceiptUom"><input  tabindex="-1" type="text" name="itemReceiptUom" value ="${results.itemReceiptUom}" size="3" readonly class="disableText"/></td>
 										<td class="itemReceiptRetailNonVat"><input  tabindex="-1" type="text" name="itemReceiptRetailNonVat" value ="${results.itemReceiptRetailNonVat}" size="10" readonly class="disableNumber"/></td>
 										<td class="itemReceiptQty">
 										  <c:if test="${results.canEdit == true}">
-										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="5" onkeypress="isNum(this)" 
-										     onchange="calcDiffCost(${results.seqNo})" class="enableNumber"/>
+										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="10" onkeypress="isNum(this)" 
+										      class="enableNumber" onblur="sumTotalReceiptQty();calcDiffCost(${results.seqNo});sumTotalDiffCost()"/>
 										  </c:if>
 										  <c:if test="${results.canEdit == false}">
-										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="5" readonly class="disableNumber"/>
+										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="10" readonly class="disableNumber"/>
 										  </c:if>
 									    </td>
 										  
@@ -678,6 +719,21 @@ function setProductMainValue(seqNo,types,code,desc,price){
 									</tr>
 							
 							  </c:forEach>
+							  <tr>
+									<td ></td>
+									<td ></td>
+									<td ></td>
+									<td ></td>
+									<td ></td>
+									<td ></td>
+									<td ><input type="text" name="totalIssueQty" class="disableNumber" size="10"/></td>
+									<td ></td>
+									<td ></td>
+									<td ></td>							
+									<td ></td>
+									<td ><input type="text" name="totalReceiptQty" class="disableNumber" size="10"/></td>
+									<td ><input type="text" name="totalDiffCost" class="disableNumber" size="10"/></td>
+							</tr>
 					</table>
 								
 								
@@ -694,7 +750,7 @@ function setProductMainValue(seqNo,types,code,desc,price){
 										
 									      <c:if test="${adjustStockForm.adjustStock.canExport ==true}">							 
 												<a href="javascript:exported('${pageContext.request.contextPath}')">
-												  <input type="button" value="   ส่งข้อมูล     " class="newPosBtnLong"> 
+												  <input type="button" value="   POST    " class="newPosBtnLong"> 
 												</a>
 											</c:if>
 									   

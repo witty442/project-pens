@@ -54,9 +54,14 @@ TABLE.tableSearchNoWidth TD {
 	align:center;
 	
 }
-.td_text_right{
-	align:right;
+table.tableSearchNoWidth td.td_text_right {
+  text-align: right;
 }
+
+table.tableSearch td.td_text_right {
+  text-align: right;
+}
+
 .td_number{
 	text-align:center;
 }

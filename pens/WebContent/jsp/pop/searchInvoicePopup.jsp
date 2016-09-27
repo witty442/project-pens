@@ -12,6 +12,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
 String index = request.getParameter("index");
+String productCode = request.getParameter("productCode");
+String userId = request.getParameter("userId");
+String customerCode = request.getParameter("customerCode");
 %>
 
 <html>
@@ -63,21 +66,24 @@ function selectOneRadio(){
 <html:form action="/jsp/popupAction">
 <html:hidden property="page" value="INVOICE"></html:hidden>
 <input type="hidden" name="index" value="<%=index %>" />
+<input type="hidden" name="productCode" value="<%=productCode %>" />
+<input type="hidden" name="userId" value="<%=userId %>" />
+<input type="hidden" name="customerCode" value="<%=customerCode %>" />
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
     <tr height="21px" class="txt1">
 		<td width="15%" >&nbsp;</td>
 		<td width="90%" ><b>ค้นหาข้อมูล อ้างอิง Invoice</b></td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td width="15%" ><b>รหัส</b>  </td>
+		<td width="15%" ><b>Invoice No</b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
 		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
-	<tr height="21px" class="txt1">
+	<%-- <tr height="21px" class="txt1">
 		<td ><b>รายละเอียด</b></td>
 		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
-	</tr>
+	</tr> --%>
 </table>
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
@@ -100,7 +106,8 @@ function selectOneRadio(){
 	 </display:column>
     											    
     <display:column  title="Invoice No" property="code"   sortable="false" class="code"/>
-    <display:column  title="รายละเอียด" property="desc"  sortable="false" class="desc"/>								
+    <display:column  title="Order Date" property="stringDate"   sortable="false" class="code"/>
+    <display:column  title="Qty" property="desc"  sortable="false" class="desc"/>								
 </display:table>	
 <!-- RESULT -->
 

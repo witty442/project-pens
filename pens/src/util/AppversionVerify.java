@@ -55,8 +55,11 @@ public class AppversionVerify {
 			
 			String appVersionLatest = Utils.isNull(getLatestSalesVersion("Lastest-app-version.txt"));
 			String msgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/message-to-sales.txt");
+			String appVerionmsgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/appversion-message-to-sales.txt");
+			
 			logger.info("appVersionLatest :"+appVersionLatest);
 			logger.info("msgToSales :"+msgToSales);
+			logger.info("appVerionmsgToSales :"+appVerionmsgToSales);
 			
 			String localSalesAppPath = getLocalPathSalesApp();
 			
@@ -68,6 +71,9 @@ public class AppversionVerify {
 			
 			//Write Message To Sales
 			FileUtil.writeFile(localSalesAppPath+"message-to-sales.txt", msgToSales, "UTF-8");
+			
+			//Write App Version Message To Sales
+			FileUtil.writeFile(localSalesAppPath+"appversion-message-to-sales.txt", appVerionmsgToSales, "UTF-8");
 			
 			//** Download Sofware for netbook sales **/
 			new DownloadWorker().start();
@@ -93,8 +99,9 @@ public class AppversionVerify {
 				logger.debug("CurrentAppVersion :"+appVersion);
 				
 				if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
+					logger.debug("AppVersion Not match");
 					//appVersion not match
-					msg[0] =  SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
+					msg[0] =  getAppVersionMessageToSales(request);//SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
 					       
 					msg[1] = "<a href='https://dl.dropboxusercontent.com/u/24337336/pens/SalesApp/pensclient.war'>Download</a>";
 				}else{
@@ -131,6 +138,25 @@ public class AppversionVerify {
 		}catch(Exception e){
 			e.printStackTrace();
 			request.getSession().setAttribute("massageToSales","e");
+		}
+		return msg;
+	}
+	
+	public static String getAppVersionMessageToSales(HttpServletRequest request){
+		String msg = "";
+		try{
+			if(request.getSession().getAttribute("appVersionMassageToSales") == null){
+				logger.debug("Session :"+request.getSession().getAttribute("appVersionMassageToSales"));
+				String localSalesAppPath = getLocalPathSalesApp();
+				msg = Utils.isNull(FileUtil.readFile(localSalesAppPath+"appversion-message-to-sales.txt", "UTF-8"));
+				request.getSession().setAttribute("appVersionMassageToSales",msg);
+			}else{
+				msg = Utils.isNull(request.getSession().getAttribute("appVersionMassageToSales"));
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			request.getSession().setAttribute("appVersionMassageToSales","e");
 		}
 		return msg;
 	}

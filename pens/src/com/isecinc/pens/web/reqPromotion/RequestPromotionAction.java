@@ -173,6 +173,8 @@ public class RequestPromotionAction extends I_Action {
 			 // Save Old Criteria
 			 request.getSession().setAttribute("criteria_",f.getRequestPromotion());
 						
+			 logger.info("priceListId:"+(new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId()));
+			 
 			 //init Parametor By RequestPromotionType
 			 f.getRequestPromotion().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
 			 f.getRequestPromotion().setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -334,7 +336,7 @@ public class RequestPromotionAction extends I_Action {
 				List<References> ref = InitialReferences.getReferenes(InitialReferences.TERRITORY,user.getTerritory());
 				String territoryStr = ref != null && ref.size() >0?(ref.get(0).getName()):"";
 				
-				parameterMap.put("productCatagory",p.getProductCatagory());
+				parameterMap.put("productCatagory",p.getProductCatagory()+"-"+p.getProductCatagoryDesc());
 				parameterMap.put("productType",p.getProductType());
 				parameterMap.put("salesCode",user.getCode());
 				parameterMap.put("salesName",user.getName());
@@ -357,16 +359,17 @@ public class RequestPromotionAction extends I_Action {
 						 
 						 costTableMap.put(c.getLineNo()+"", c);
 					 }
-	
-					parameterMap.put("costDetail1",costTableMap.get("1").getCostDetail());
+	                 logger.debug("CostDetail1:"+costTableMap.get("1").getCostDetail());
+					 
+					parameterMap.put("costDetail1",Utils.isNull(costTableMap.get("1").getCostDetail()));
 					parameterMap.put("costAmount1",costTableMap.get("1").getCostAmount());
-					parameterMap.put("costDetail2",costTableMap.get("2").getCostDetail());
+					parameterMap.put("costDetail2",Utils.isNull(costTableMap.get("2").getCostDetail()));
 					parameterMap.put("costAmount2",costTableMap.get("2").getCostAmount());
-					parameterMap.put("costDetail3",costTableMap.get("3").getCostDetail());
+					parameterMap.put("costDetail3",Utils.isNull(costTableMap.get("3").getCostDetail()));
 					parameterMap.put("costAmount3",costTableMap.get("3").getCostAmount());
-					parameterMap.put("costDetail4",costTableMap.get("4").getCostDetail());
+					parameterMap.put("costDetail4",Utils.isNull(costTableMap.get("4").getCostDetail()));
 					parameterMap.put("costAmount4",costTableMap.get("4").getCostAmount());
-					parameterMap.put("costDetail5",costTableMap.get("5").getCostDetail());
+					parameterMap.put("costDetail5",Utils.isNull(costTableMap.get("5").getCostDetail()));
 					parameterMap.put("costAmount5",costTableMap.get("5").getCostAmount());
 						
 				 }
@@ -460,6 +463,8 @@ public class RequestPromotionAction extends I_Action {
 			String[] borrowQty= request.getParameterValues("borrowQty");
 			String[] borrowAmount= request.getParameterValues("borrowAmount");
 			
+			String[] invoiceNo= request.getParameterValues("invoiceNo");
+			
 			for(int i=0;i<7;i++){
 				logger.debug("i["+i+"]productCode["+productCode[i]+"]lineNo["+lineNo[i]+"]");
 				RequestPromotionLine line = new RequestPromotionLine();
@@ -480,6 +485,7 @@ public class RequestPromotionAction extends I_Action {
 				line.setUom2(Utils.isNull(uom2[i]));
 				line.setPrice1(Utils.isNull(price1[i]));
 				line.setPrice2(Utils.isNull(price2[i]));
+				line.setInvoiceNo(invoiceNo[i]);
 				
 				lineList.add(line);
 				lineMap.put(line.getLineNo()+"", line);

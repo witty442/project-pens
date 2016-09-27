@@ -477,9 +477,6 @@ public class ReportOnhandBigC_SPSQL {
 			sql.append("\n  AND M.STORE_CODE = SALE_ADJUST.STORE_CODE ");	
 	
 			sql.append("\n ) A ");
-			if("GroupCode".equalsIgnoreCase(summaryType)){
-				sql.append("\n GROUP BY A.store_code,A.store_name ,A.sub_inv ,A.group_type ");
-			}
 			if( !Utils.isNull(c.getDispHaveQty()).equals("")){
 				sql.append("\n WHERE ( A.INIT_SALE_QTY <> 0");
 				sql.append("\n OR A.TRANS_IN_QTY <> 0");
@@ -487,9 +484,11 @@ public class ReportOnhandBigC_SPSQL {
 				sql.append("\n OR A.SALE_RETURN_QTY <> 0");
 				sql.append("\n OR A.SALE_ADJUST_QTY <> 0 )");
 			}
-			sql.append("\n ORDER BY A.STORE_CODE,A.group_type asc ");
 			
-			//logger.debug("sql:"+sql);
+			if("GroupCode".equalsIgnoreCase(summaryType)){
+				sql.append("\n GROUP BY A.store_code,A.store_name ,A.sub_inv ,A.group_type ");
+			}
+			sql.append("\n ORDER BY A.STORE_CODE,A.group_type asc ");
 			
 			//debug write sql to file
 			if(logger.isDebugEnabled()){

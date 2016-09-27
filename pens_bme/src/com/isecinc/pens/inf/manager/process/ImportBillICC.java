@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -202,7 +203,9 @@ public class ImportBillICC extends InterfaceUtils{
 						//Backup file to DD Server
 						String ddServerPath = env.getProperty("path.backup.icc.hisher.import.dlyr")+"/"+ftpB.getFileName();
 					    logger.debug("Backup Text File:"+ddServerPath);
-					    FileUtil.writeFile(ddServerPath, ftpB.getDataLineText().toString(), "TIS-620");
+					    
+					    //FileUtil.writeFile(ddServerPath, ftpB.getDataLineText().toString(), "TIS-620");
+					    FileUtil.writeFile(ddServerPath, Arrays.toString(ftpB.getDataLineText()), "TIS-620");
 					    
 						/** Case Transaction and Cust,Address,Contact Import By sale code by FileName  and after import move File to  Sales-In-Processed */
 						logger.debug("Delete File After import:");

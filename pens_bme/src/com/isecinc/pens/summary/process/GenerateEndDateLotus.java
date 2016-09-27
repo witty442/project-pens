@@ -1,4 +1,4 @@
-package com.isecinc.pens.dao;
+package com.isecinc.pens.summary.process;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,15 +14,16 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.BMECControlDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 
-public class GenerateMonthEndLotus {
+public class GenerateEndDateLotus {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static String[] generateMonthLotus(OnhandSummary c,User user) throws Exception{
+	public static String[] generateEndDateLotus(OnhandSummary c,User user) throws Exception{
 		Connection conn = null;
 		PreparedStatement ps = null;
 		PreparedStatement psIns = null;
@@ -35,36 +36,25 @@ public class GenerateMonthEndLotus {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
+			Date asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			
 			//validate 
-			results = BMECControlDAO.canGenMonthEndLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+			results = BMECControlDAO.canGenEndDateLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
 			
 			if(results[0].equals("false")){
 				return results;
 			}
 			yearMonth = results[1];
 			
-			//Validate last day of month
-			Calendar ca = Calendar.getInstance();
-			ca.setTime(Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			int lastDayofMonth = ca.getActualMaximum(Calendar.DAY_OF_MONTH);
-			int dayAsOfDate = ca.get(Calendar.DATE);
-			logger.debug("lastDayofMonth:"+lastDayofMonth+"dayAsOfDate:"+dayAsOfDate);
-			/*if(true){
-				throw new Exception("Test");
-			}*/
-			if(lastDayofMonth != dayAsOfDate){
-				results[2] ="กรุณาระบุเป็นวันที่สุดท้ายของเดือน";
-				return results;
-			}
 			//delete old month by yearMonth
-			psDel = conn.prepareStatement("delete from PENSBME_ENDING_STOCK where year_month ='"+yearMonth+"'");
-			psDel.execute();
+			//psDel = conn.prepareStatement("delete from PENSBME_ENDDATE_STOCK where year_month ='"+yearMonth+"' and store_code ='"+c.getPensCustCodeFrom()+"'");
+			//psDel.execute();
 			
 			//gen sql
-			sql = genSQLOnhandMonthEndLotus(conn,c,user);
+			sql = genSQLOnhandEndDateLotus(conn,c,user);
 			//sql insert 
-			String sqlIns = "INSERT INTO PENSBME_ENDING_STOCK" +
-					"( STORE_CODE, YEAR_MONTH, GROUP_CODE, PENS_ITEM" +
+			String sqlIns = "INSERT INTO PENSBME_ENDDATE_STOCK" +
+					"( STORE_CODE, ENDING_DATE, GROUP_CODE, PENS_ITEM" +
 					", SALE_IN_QTY, SALE_OUT_QTY, SALE_RETURN_QTY" +
 					", ADJUST_QTY, SHORT_QTY, ENDING_QTY, CREATE_USER, CREATE_DATE) "+
 					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -75,7 +65,7 @@ public class GenerateMonthEndLotus {
 			while(rst.next()){
 	
 				psIns.setString(1, rst.getString("customer_code"));
-				psIns.setString(2, yearMonth);
+				psIns.setDate(2,new java.sql.Date(asofDate.getTime()));
 				psIns.setString(3, rst.getString("group_type"));
 				psIns.setString(4, rst.getString("pens_item"));
 				psIns.setDouble(5, rst.getDouble("sale_in_qty"));
@@ -106,7 +96,7 @@ public class GenerateMonthEndLotus {
 	}
 	
 	// Gen MonthEnd From Report onhandLotus
-	 public static StringBuilder genSQLOnhandMonthEndLotus(Connection conn,OnhandSummary c,User user) throws Exception{
+	 public static StringBuilder genSQLOnhandEndDateLotus(Connection conn,OnhandSummary c,User user) throws Exception{
 			StringBuilder sql = new StringBuilder();
 			String onhandDateAsOfConfigStr = "";
 			Date onhandDateAsOfConfig = null;
@@ -171,7 +161,7 @@ public class GenerateMonthEndLotus {
 						if( !Utils.isNull(c.getGroup()).equals("")){
 							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 						}
-						sql.append("UNION ");
+						sql.append("\n UNION ");
 						
 						sql.append("\n SELECT distinct ");
 						sql.append("\n J.store_code as customer_code,I.pens_item,  ");
@@ -204,29 +194,96 @@ public class GenerateMonthEndLotus {
 							sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
-                      sql.append("UNION ");
+                      sql.append("\n UNION ");
 						
                       sql.append("\n SELECT distinct ");
-      				sql.append("\n  L.PENS_CUST_CODE as customer_code");
-      				sql.append("\n ,L.PENS_ITEM ");
-      				sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
-      				sql.append("\n   M.pens_value = L.PENS_CUST_CODE AND M.reference_code ='Store') as customer_desc ");
-						sql.append("\n ,L.PENS_GROUP_TYPE as group_type ");
-						sql.append("\n  FROM PENSBME_SALES_FROM_LOTUS L ");
+      				  sql.append("\n  L.PENS_CUST_CODE as customer_code,L.PENS_ITEM ");
+      				  sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+  				      sql.append("\n   M.pens_value = L.PENS_CUST_CODE AND M.reference_code ='Store') as customer_desc ");
+					  sql.append("\n ,L.PENS_GROUP_TYPE as group_type ");
+					  sql.append("\n  FROM PENSBME_SALES_FROM_LOTUS L ");
+					  sql.append("\n WHERE 1=1 ");
+					  if( !Utils.isNull(c.getSalesDate()).equals("")){
+                        sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					  }
+					  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					  }
+					  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					  }
+					  if( !Utils.isNull(c.getGroup()).equals("")){
+						sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					  }
+					  
+					  sql.append("\n UNION");
 						
-						sql.append("\n WHERE 1=1 ");
+						/** Adjust issue **/
+						sql.append("\n SELECT DISTINCT L.store_code as customer_code,L.item_issue as pens_item ");
+						sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+	    				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
+						sql.append("\n ,L.item_issue_desc as group_type");
+						sql.append("\n FROM PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
+						// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 						if( !Utils.isNull(c.getSalesDate()).equals("")){
-	                        sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+							sql.append("\n AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.item_issue <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND L.item_issue_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						
+						sql.append("\n UNION");
+						
+						/** Adjust receipt **/
+						sql.append("\n SELECT DISTINCT L.store_code as customer_code,L.item_receipt as pens_item ");
+						sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+	    				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
+						sql.append("\n ,L.item_receipt_desc as group_type");
+						sql.append("\n FROM PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
+						// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
+						if( !Utils.isNull(c.getSalesDate()).equals("")){
+			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.item_receipt <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND L.item_receipt_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						}
+						
+						sql.append("\n UNION");
+						
+						/** Adjust **/
+						sql.append("\n SELECT DISTINCT ");
+						sql.append("\n  L.STORE_CODE as customer_code,L.item_adjust as pens_item ");
+						sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+	    				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
+						sql.append("\n ,L.item_adjust_desc as group_type ");
+						sql.append("\n FROM PENSBME_ADJUST_SALES L  WHERE 1=1 ");	 
+						if( !Utils.isNull(c.getSalesDate()).equals("")){
+			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						}
+						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						}
+						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+							sql.append("\n AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+							sql.append("\n AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						}
+						if( !Utils.isNull(c.getGroup()).equals("")){
+							sql.append("\n AND L.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
               sql.append("\n )M ");
@@ -304,7 +361,7 @@ public class GenerateMonthEndLotus {
 					sql.append("\n NVL(SUM(A.SALE_RETURN_QTY),0)  as SALE_RETURN_QTY ");
 					sql.append("\n FROM( ");
 					
-				        if(asofDate.before(onhandDateAsOfConfig)){// asofDate < onhandDate
+				        if(asofDate != null && asofDate.before(onhandDateAsOfConfig)){// asofDate < onhandDate
 				        	
 							sql.append("\n SELECT  ");
 							sql.append("\n C.customer_code,P.inventory_item_code as pens_item,  ");
@@ -501,9 +558,14 @@ public class GenerateMonthEndLotus {
 				sql.append("\n AND M.group_type = STOCK_SHORT.group_type ");
 				
 				sql.append("\n ) A ");
+				sql.append("\n WHERE A.group_type IS NOT NULL ");
 				sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
 				
-				logger.debug("sql:"+sql);
+				//debug write sql to file
+				if(logger.isDebugEnabled()){
+				   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+				}
+				//logger.debug("sql:"+sql);
 
 			} catch (Exception e) {
 				throw e;

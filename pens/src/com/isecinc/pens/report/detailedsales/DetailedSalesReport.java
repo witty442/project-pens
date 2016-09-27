@@ -16,6 +16,7 @@ public class DetailedSalesReport implements Serializable{
 
 	private static final long serialVersionUID = 9117495907654379254L;
 
+	private String no;
 	private String orderDate;
 	private String orderNo;
 	private String name;
@@ -37,6 +38,13 @@ public class DetailedSalesReport implements Serializable{
 	
 	private int sortType = 1;
 	
+	
+	public String getNo() {
+		return no;
+	}
+	public void setNo(String no) {
+		this.no = no;
+	}
 	public String getOrderDate() {
 		return orderDate;
 	}

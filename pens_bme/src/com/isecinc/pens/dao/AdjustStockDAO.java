@@ -206,6 +206,7 @@ public class AdjustStockDAO {
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and TRANSACTION_DATE = ? ");
 			}
+			sql.append("\n order by seq_no ");
 			
 			logger.debug("sql:"+sql);
 			

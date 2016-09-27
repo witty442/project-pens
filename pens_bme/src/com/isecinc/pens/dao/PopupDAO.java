@@ -1,0 +1,116 @@
+package com.isecinc.pens.dao;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.web.popup.PopupForm;
+
+public class PopupDAO {
+	private static Logger logger = Logger.getLogger("PENS");
+	
+	 public static List<PopupForm> searchPensItemByGroupCode(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT distinct pens_desc2 ");
+				sql.append("\n ,NVL(( select max(whole_price_bf) from PENSBME_ONHAND_BME_LOCKED B where B.group_item =M.pens_desc2),0) as price ");
+				sql.append("\n ,(SELECT MIN(pens_value) FROM PENSBME_MST_REFERENCE W WHERE W.pens_desc2 =M.pens_desc2 AND W.reference_code ='LotusItem' ) as pens_value ");
+				sql.append("\n from PENSBME_MST_REFERENCE M ");
+				sql.append("\n where 1=1 and reference_code ='LotusItem' ");
+			
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and pens_desc2 LIKE '%"+c.getCodeSearch()+"%' ");
+				}
+				
+				sql.append("\n  ORDER BY pens_desc2 asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("pens_desc2"));
+					item.setDesc(rst.getString("pens_value"));
+					item.setPrice(rst.getString("price"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchSAEmp(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT emp_id,name ,surname ,branch, group_store");
+				sql.append("\n from SA_EMPLOYEE M ");
+				sql.append("\n where 1=1  ");
+			
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and M.emp_id = '"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append(" and M.name LIKE '%"+c.getCodeSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY emp_id asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("emp_id"));
+					item.setName(rst.getString("name"));
+					item.setSurname(rst.getString("surname"));
+					item.setBranch(rst.getString("branch"));
+					item.setGroupStore(Utils.isNull(rst.getString("group_store")));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	  
+}

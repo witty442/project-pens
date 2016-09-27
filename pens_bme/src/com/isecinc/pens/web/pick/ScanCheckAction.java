@@ -61,6 +61,8 @@ public class ScanCheckAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
+			request.getSession().setAttribute("ITEM_MAP",null);
+			
 			logger.debug("action:"+action);
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
@@ -139,6 +141,9 @@ public class ScanCheckAction extends I_Action {
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+			//clear session
+			request.getSession().setAttribute("ITEM_MAP",null);
+			
 			//save old criteria
 			aForm.setBeanCriteria(aForm.getBean());
 			//logger.debug("resultSearch size:"+aForm.getResultsSearch().size());
@@ -155,6 +160,11 @@ public class ScanCheckAction extends I_Action {
 				c.setIssueReqNo(issueReqNo);
 				c.setBoxNo(boxNo);
 				c.setWareHouse(warehouse);
+				
+				//INIT SESSION ITEM_MAP;
+				conn = DBConnection.getInstance().getConnection();
+				Map<String, String> ITEM_MAP  = ScanCheckDAO.initItemMap(conn,c);
+				request.getSession().setAttribute("ITEM_MAP",ITEM_MAP);
 				
 				ScanCheckBean aS = ScanCheckDAO.searchDetail(c);
 				
@@ -331,6 +341,9 @@ public class ScanCheckAction extends I_Action {
 		logger.debug("newBox");
 		ScanCheckForm aForm = (ScanCheckForm) form;
 		try {
+			//clear session ITEM_MAP for check remain qty
+			request.getSession().setAttribute("ITEM_MAP",null);
+			
 			//save prev boxNo
 			String boxNo = saveDB(form, request);
 			

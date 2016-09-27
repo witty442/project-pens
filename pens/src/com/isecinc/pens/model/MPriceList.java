@@ -64,6 +64,8 @@ public class MPriceList extends I_Model<PriceList> {
 		// whereCause += "  and date_format(effective_date,'%Y%m%d') <= date_format(current_timestamp,'%Y%m%d') ";
 		// whereCause += "  and date_format(effectiveto_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d') ";
 		//whereCause += "  and isactive = 'Y' ";
+		
+		logger.info("xx:"+whereCause);
 		PriceList[] pls = search(whereCause);
 		if (pls != null) {
 			if (pls.length > 0) {

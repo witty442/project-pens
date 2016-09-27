@@ -1986,7 +1986,7 @@ public class ImportAction extends I_Action {
 				Row row = null;
 				Cell cell = null;
 				String salesDate = importForm.getImportDate();
-				String storeGroup = "020056";
+				String storeGroup = importForm.getStoreCode().substring(0,importForm.getStoreCode().indexOf("-"));//"020056";
 				String storeNo = importForm.getStoreCode();//"020056-1";
 				//String storeName = "020056-1";
 				String qty = "";

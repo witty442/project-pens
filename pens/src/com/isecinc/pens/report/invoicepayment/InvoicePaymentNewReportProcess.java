@@ -486,6 +486,62 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		
 		return value;
 	}
+	public double[] sumChequeDayBeforeCaseCredit(InvoicePaymentReport t, User user, Connection conn)throws Exception{
+		double cashDayBefore = 0;
+		double chequeDayBefore = 0;
+		double value[] = new double[2];
+		StringBuilder sql = new StringBuilder();
+		Statement stmt = null;
+		ResultSet rs = null;
+		logger.debug("sumChequeDayBeforeCaseCredit");
+		try {
+			sql.delete(0, sql.length());
+			sql.append("\n  SELECT A.* FROM ( ");
+			sql.append("\n  SELECT IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) as PAYMENTMETHOD" );
+			sql.append("\n  ,SUM(rcby.RECEIPT_AMOUNT) AS RECEIPT_AMOUNT ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  WHERE IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rcby.PAYMENT_METHOD,rc.PD_PAYMENTMETHOD) = 'CH' ");
+			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
+			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.RECEIPT_DATE,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.RECEIPT_DATE,rc.PDPAID_DATE) < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			
+			// Wit Edit 18/05/2011
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n    SELECT ORDER_ID FROM t_order ");
+			sql.append("\n    WHERE t_order.DOC_STATUS = 'SV' ");
+			sql.append("\n    AND t_order.ISCASH = 'N' ");
+			sql.append("\n  ) )A");
+			sql.append("\n  GROUP BY A.PAYMENTMETHOD ");
+			logger.debug("sql:"+sql.toString());
+			
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql.toString());
+			if(rs.next()){
+				if("CS".equals(rs.getString("PAYMENTMETHOD"))){
+				   cashDayBefore = rs.getDouble("RECEIPT_AMOUNT");
+				}else{
+				   chequeDayBefore = rs.getDouble("RECEIPT_AMOUNT");
+				}
+			}
+			value[0] = cashDayBefore;
+			value[1] = chequeDayBefore;
+		} catch (Exception e) {
+			throw e;
+		}finally{
+			try {
+				rs.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return value;
+	}
+	
 	public double[] sumChequeDayBefore(InvoicePaymentReport t, User user, Connection conn)throws Exception{
 		double cashDayBefore = 0;
 		double receiptCnt = 0;
@@ -583,27 +639,54 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 	{ 
 		try{
 		StringBuffer reportSql = new StringBuffer(); 
-		reportSql.append("\n SELECT A. *FROM ( ");
-		reportSql.append("\n SELECT inv.name as inv_name , inv.description , rcb.BANK , rcb.CHEQUE_NO, rcb.CHEQUE_DATE , us.CODE, us.NAME ");
-	  	reportSql.append("\n ,cus.NAME AS CUSTOMER_NAME, cus.CODE AS CUSTOMER_CODE, rch.receipt_no  , od.ORDER_NO, rch.receipt_date ");
-	  	reportSql.append("\n ,od.ORDER_DATE, rcb.receipt_amount, IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rcb.payment_method" );
-	  	reportSql.append("\n ,rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD " );
-	    reportSql.append("\n ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ");
-	    reportSql.append("\n ,(CASE WHEN rcb.payment_method ='CS' THEN '1'" );
+		reportSql.append("\n SELECT M. * FROM( " );
+		reportSql.append("\n   SELECT A. * " );
+		reportSql.append("\n  ,(CASE WHEN A.payment_term ='CASH' THEN '1' ");
+		reportSql.append("\n        WHEN A.payment_term ='CASH' THEN '2' ");
+		reportSql.append("\n       ELSE '3' END ) order_b ");
+		reportSql.append("\n  FROM ( ");
+		reportSql.append("\n    SELECT inv.name as inv_name ");
+		reportSql.append("\n    , inv.description " );
+		reportSql.append("\n    , rcb.BANK ");
+		reportSql.append("\n    , rcb.CHEQUE_NO");
+		reportSql.append("\n    , rcb.CHEQUE_DATE ");
+		reportSql.append("\n    , us.CODE, us.NAME ");
+	  	reportSql.append("\n    , cus.NAME AS CUSTOMER_NAME");
+		reportSql.append("\n    , cus.CODE AS CUSTOMER_CODE");
+		reportSql.append("\n    , rch.receipt_no  ");
+		reportSql.append("\n    , od.ORDER_NO");
+		reportSql.append("\n    , rch.receipt_date ");
+	  	reportSql.append("\n    , od.ORDER_DATE");
+		reportSql.append("\n    , rcb.receipt_amount");
+		reportSql.append("\n    , IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID =''");
+		reportSql.append("\n    , rcb.payment_method" );
+	  	reportSql.append("\n    , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD " );
+
+	  	//reportSql.append("\n ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ");
+	    //reportSql.append("\n ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='','CREDIT','CASH' ) as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ");
+	  	
+		reportSql.append("\n   , IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ISCASH ='N' ,'CREDIT','CASH' ),'CREDIT') as payment_term ");
+		
+	  	reportSql.append("\n   , rch.ISPDPAID ");
+	  	
+	  	reportSql.append("\n   , rch.PD_PAYMENTMETHOD ");
+	    reportSql.append("\n   , (CASE WHEN rcb.payment_method ='CS' THEN '1'" );
 	    reportSql.append("\n        WHEN rcb.payment_method ='AP' THEN '3'" );
 	    reportSql.append("\n        ELSE '2' END) as order_p ");
-	    reportSql.append("\n FROM t_receipt rch ");
-	  	reportSql.append("\n INNER JOIN t_receipt_line rcl ON rch.receipt_id = rcl.receipt_id ");
-	  	reportSql.append("\n INNER JOIN t_receipt_by rcb ON rch.receipt_id = rcb.receipt_id ");
-	  	reportSql.append("\n INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-	  	reportSql.append("\n INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
-	  	reportSql.append("\n INNER JOIN ad_user us ON rch.USER_ID = us.USER_ID ");
-	  	reportSql.append("\n LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
-	  	reportSql.append("\n WHERE rch.DOC_STATUS = 'SV' ");
-	  	reportSql.append("\n AND rcb.write_off = 'N' ");
-	  	reportSql.append("\n AND rch.user_id = ? ");
-	  	reportSql.append("\n AND IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ");
-	  	reportSql.append("\n )A ORDER BY A.order_p asc ");
+	            
+	    reportSql.append("\n   FROM t_receipt rch ");
+	  	reportSql.append("\n   INNER JOIN t_receipt_line rcl ON rch.receipt_id = rcl.receipt_id ");
+	  	reportSql.append("\n   INNER JOIN t_receipt_by rcb ON rch.receipt_id = rcb.receipt_id ");
+	  	reportSql.append("\n   INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
+	  	reportSql.append("\n   INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
+	  	reportSql.append("\n   INNER JOIN ad_user us ON rch.USER_ID = us.USER_ID ");
+	  	reportSql.append("\n   LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+	  	reportSql.append("\n   WHERE rch.DOC_STATUS = 'SV' ");
+	  	reportSql.append("\n   AND rcb.write_off = 'N' ");
+	  	reportSql.append("\n   AND rch.user_id = ? ");
+	  	reportSql.append("\n   AND IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',rch.receipt_date,rch.PDPAID_DATE) = DATE(?) ");
+		reportSql.append("\n  )A ");
+	  	reportSql.append("\n )M ORDER BY M.order_b,M.order_p asc ");
 		
 		logger.debug("sql SearchReport:"+reportSql.toString());
 		
@@ -617,7 +700,6 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		rset = ppstmt.executeQuery();
 		
 		int i =0;
-		
 		boolean iscash = false;
 		boolean iscredit = false;
 		boolean isairpay = false;
@@ -723,9 +805,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-
 		double creditSalesAmt = 0d;
-		
 		try {
 			sql.delete(0, sql.length());
 			sql.append("\n  SELECT SUM(rcby.RECEIPT_AMOUNT) AS CASH_AMOUNT ");

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 
 import util.Constants;
@@ -179,32 +181,183 @@ public class GeneralDAO {
 		 return searchProductByBarcodeModelBMELocked(c);
 	 }
     
-    public static Barcode searchProductByBarcodeFromStockIssue(PopupForm c,String issueReqNo,String warehouse,String boxNo) throws Exception {
-		
-		 return searchProductByBarcodeModelStockIssue(c,issueReqNo,warehouse,boxNo);
+
+    // Qty =1 can scan ,Qty =0->connot scan
+    public static Barcode searchProductByBarcodeFromStockIssue(Connection conn ,HttpServletRequest request,String barcode,String matCode,String issueReqNo,String warehouse,String boxNo,String pensItem) throws Exception {
+    	Barcode b = new Barcode();
+    	try{
+	    	//set default value
+			b.setBarcode(barcode);
+			b.setMaterialMaster(matCode);
+			b.setPensItem(pensItem);
+			
+	    	//Compare TotalQty to Session ITEM_MAP
+	    	int totalQtyByBarcodeAndPensItem = getTotalQtyProductByBarcodeAndPensItemModelStockIssue(conn,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);
+	    	int totalQtyByBarcodeAndPensItemSession = 0;
+
+    		String keyMap = barcode+pensItem;
+    		Map<String, String> ITEM_MAP = (Map)request.getSession().getAttribute("ITEM_MAP");
+    		totalQtyByBarcodeAndPensItemSession = Utils.convertStrToInt(ITEM_MAP.get(keyMap));
+    		
+    	   	logger.debug("totalQtyByBarcodeAndPensItem:"+totalQtyByBarcodeAndPensItem);
+        	logger.debug("totalQtyByBarcodeAndPensItemSession:"+totalQtyByBarcodeAndPensItemSession);
+        	
+    		if(totalQtyByBarcodeAndPensItem >= totalQtyByBarcodeAndPensItemSession){
+    			//Normal case 
+    			return searchProductByBarcodeModelStockIssue(conn,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);
+    		}else{
+    			b.setQty(0);
+    		    return b;
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	b.setQty(0);
+    	return b;
 	 }
     
-    public static Barcode searchProductByBarcodeModelStockIssue(PopupForm c,String issueReqNo,String warehouse,String boxNo) throws Exception {
+    public static Barcode getPensItemByBarcodeModelStockIssueIsQtyNotZero(Connection conn,String barcode,String matCode,String issueReqNo,String warehouse,String boxNo,Map<String, String> ITEM_MAP) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
-		Barcode b = null;
+		int remainQty = 0;
+		Barcode bResult = null;
+		String pensItem = "";
+		String barcodeStr = "";
+		String keyMap = "";
 		try {
 			sql.append("\n select i.* FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i WHERE 1=1 ");
 			sql.append(" and i.issue_req_no = h.issue_req_no \n");
 			sql.append(" and i.issue_req_no = '"+issueReqNo+"' \n");
 			sql.append(" and h.warehouse = '"+warehouse+"' \n");
 			
-			if( !Utils.isNull(c.getCodeSearch()).equals("")){
-				sql.append(" and i.barcode = '"+c.getCodeSearch()+"' \n");
+			if( !Utils.isNull(barcode).equals("")){
+				sql.append(" and i.barcode = '"+barcode+"' \n");
 			}
-			if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
-				   sql.append("\n and i.material_master ='"+c.getMatCodeSearch()+"'");
+			if( !Utils.isNull(matCode).equals("")){
+				sql.append("\n and i.material_master ='"+matCode+"'\n ");
 			}
-		
+			sql.append("order by i.pens_item asc \n");
+			
 			logger.debug("sql:"+sql);
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			
+			while (rst.next()) {
+				pensItem = rst.getString("pens_item");
+				barcodeStr = rst.getString("barcode");
+				
+				remainQty = getTotalQtyProductByBarcodeAndPensItemModelStockIssue(conn, barcode, matCode, issueReqNo, warehouse, boxNo, pensItem);
+				
+				keyMap = barcodeStr+pensItem;
+				
+				if(ITEM_MAP != null && ITEM_MAP.get(keyMap) != null){
+					int qtyInSessionByBarcodePensItem = Utils.convertStrToInt(ITEM_MAP.get(keyMap));
+					remainQty = remainQty - qtyInSessionByBarcodePensItem;
+					
+					logger.debug("before ["+pensItem+"]remainQtyDB["+remainQty+"]remainQtySession["+qtyInSessionByBarcodePensItem+"]");
+				}
+				logger.debug("result pens_item["+pensItem+"] remain qty:"+remainQty);
+				if(remainQty != 0){
+					bResult = new Barcode();
+					bResult.setPensItem(pensItem);
+					bResult.setQty(remainQty);//Total remain qty(barcode+pensItem)
+					break;
+				}
+			
+			}//while
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		} finally {
+			if(rst != null) rst.close();
+			if(stmt != null) stmt.close();	
+		}
+		return bResult;
+	}
+    
+    public static int getTotalQtyProductByBarcodeAndPensItemModelStockIssue(Connection conn,String barcode,String matCode,String issueReqNo,String warehouse,String boxNo,String pensItem) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalQty = 0;
+		try {
+			sql.append("\n select sum(req_qty)as req_qty from( ");
+				sql.append("\n select sum(req_qty) as req_qty " +
+						   "\n FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i WHERE 1=1 ");
+				sql.append("\n and i.issue_req_no = h.issue_req_no ");
+				sql.append("\n and i.issue_req_no = '"+issueReqNo+"' ");
+				sql.append("\n and h.warehouse = '"+warehouse+"' ");
+				sql.append("\n and i.pens_item = '"+pensItem+"' ");
+				
+				if( !Utils.isNull(barcode).equals("")){
+					sql.append("\n and barcode = '"+barcode+"'");
+				}
+				if( !Utils.isNull(matCode).equals("")){
+					 sql.append("\n and material_master ='"+matCode+"'");
+				}
+				sql.append("\n UNION ALL");
+				
+				sql.append("\n select -1*count(*) as req_qty " +
+						   "\n FROM PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i WHERE 1=1 ");
+				sql.append("\n and i.issue_req_no = h.issue_req_no ");
+				sql.append("\n and i.issue_req_no = '"+issueReqNo+"' ");
+				sql.append("\n and h.warehouse = '"+warehouse+"' ");
+				sql.append("\n and i.pens_item = '"+pensItem+"' ");
+				
+				//logger.debug("boxNo:"+boxNo);
+				if( !Utils.isNull(boxNo).equals("")){
+				   sql.append("\n and i.box_no <> '"+boxNo+"' ");
+				}
+				if( !Utils.isNull(barcode).equals("")){
+					sql.append("\n and i.barcode = '"+barcode+"' ");
+				}
+				if( !Utils.isNull(matCode).equals("")){
+					sql.append("\n and i.material_master ='"+matCode+"'");
+				}
+			sql.append("\n ) ");
+			
+			//logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			
+			if (rst.next()) {
+				totalQty = rst.getInt("req_qty");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if(rst != null) rst.close();
+			if(stmt != null) stmt.close();		
+		}
+		return totalQty;
+	}
+    
+    public static Barcode searchProductByBarcodeModelStockIssue(Connection conn,String barcode,String matCode,String issueReqNo,String warehouse,String boxNo,String pensItem) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Barcode b = null;
+		try {
+			sql.append("\n select i.* FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i WHERE 1=1 ");
+			sql.append(" and i.issue_req_no = h.issue_req_no \n");
+			sql.append(" and i.issue_req_no = '"+issueReqNo+"' \n");
+			sql.append(" and h.warehouse = '"+warehouse+"' \n");
+			if( !Utils.isNull(pensItem).equals("")){
+			   sql.append(" and i.pens_item = '"+pensItem+"' \n");
+			}
+			if( !Utils.isNull(barcode).equals("")){
+				sql.append(" and i.barcode = '"+barcode+"' \n");
+			}
+			if( !Utils.isNull(matCode).equals("")){
+				   sql.append("\n and i.material_master ='"+matCode+"'");
+			}
+			sql.append("order by i.pens_item asc \n");
+			
+			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
@@ -216,85 +369,20 @@ public class GeneralDAO {
 				b.setGroupCode(rst.getString("group_code"));
 				b.setPensItem(Utils.isNull(rst.getString("pens_item")));
 				
-				//Get qty no in current box
-				b.setQty(getRemainQtyStockIssueByMatNotInBoxNo(c,issueReqNo,warehouse,boxNo));
+				//int remainQtyNotInBoxNo  = getRemainQtyStockIssueByMatNotInBoxNo(conn,barcode,matCode,pensItem,issueReqNo,warehouse,boxNo); 
+				b.setQty(1);
 			
 			}//while
 
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try {
-				rst.close();
-				stmt.close();
-				conn.close();
-			} catch (Exception e) {}
+			if(rst != null) rst.close();
+			if(stmt != null) stmt.close();	
 		}
 		return b;
 	}
     
-    public static int  getRemainQtyStockIssueByMatNotInBoxNo(PopupForm c,String issueReqNo,String warehouse,String boxNo) throws Exception {
-		Statement stmt = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
-	    int qty = 0;
-		try {
-			sql.append("\n select sum(req_qty)as req_qty from( ");
-				sql.append("\n select sum(req_qty) as req_qty " +
-						   "\n FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i WHERE 1=1 ");
-				sql.append("\n and i.issue_req_no = h.issue_req_no ");
-				sql.append("\n and i.issue_req_no = '"+issueReqNo+"' ");
-				sql.append("\n and h.warehouse = '"+warehouse+"' ");
-				
-				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and barcode = '"+c.getCodeSearch()+"'");
-				}
-				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
-					 sql.append("\n and material_master ='"+c.getMatCodeSearch()+"'");
-				}
-				
-				sql.append("\n UNION ALL");
-				
-				sql.append("\n select -1*count(*) as req_qty " +
-						   "\n FROM PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i WHERE 1=1 ");
-				sql.append("\n and i.issue_req_no = h.issue_req_no ");
-				sql.append("\n and i.issue_req_no = '"+issueReqNo+"' ");
-				sql.append("\n and h.warehouse = '"+warehouse+"' ");
-				logger.debug("boxNo:"+boxNo);
-				if( !Utils.isNull(boxNo).equals("")){
-				   sql.append("\n and i.box_no <> '"+boxNo+"' ");
-				}
-				
-				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and i.barcode = '"+c.getCodeSearch()+"' ");
-				}
-				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
-					sql.append("\n and i.material_master ='"+c.getMatCodeSearch()+"'");
-				}
-			sql.append("\n ) ");
-		
-			logger.debug("sql:"+sql);
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			
-			if (rst.next()) {
-				qty = rst.getInt("req_qty");
-			}//while
-
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			try {
-				rst.close();
-				stmt.close();
-				conn.close();
-			} catch (Exception e) {}
-		}
-		return qty;
-	}
     
     public static Barcode searchProductByBarcodeModelFriday(PopupForm c) throws Exception {
 		Statement stmt = null;

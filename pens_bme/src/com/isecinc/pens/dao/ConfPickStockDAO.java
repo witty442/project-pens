@@ -1472,6 +1472,106 @@ public class ConfPickStockDAO extends PickConstants{
 		return pickStock;
 	}
 	
+	public static ReqPickStock getStockIssueItemCaseEditPageAll(Connection conn,ReqPickStock pickStock,int pageNumber,boolean allRec) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ReqPickStock> items = new ArrayList<ReqPickStock>();
+		int r = 1;
+		int totalQty = 0;
+		logger.debug("***getGroupCodeInStockListCaseNoEdit***");
+		try {
+				//Case Edit
+				sql.append("\n SELECT  M2.* FROM(");//M2
+				sql.append("\n   SELECT  M.*  FROM("); //M
+				sql.append("\n     SELECT A.*, rownum r__ FROM ( ");//A
+				sql.append("\n        SELECT  U.*  FROM( ");//U
+				
+		                sql.append("\n 	SELECT M.* ,NVL(P.req_qty,0) as issue_qty,NVL(P.req_qty,0) as req_qty  FROM ( ");
+						sql.append("\n 		select group_code,pens_item,material_master,barcode  ");
+						sql.append("\n 		from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+						sql.append("\n 		where 1=1  ");
+						sql.append("\n 		and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		and h.warehouse = '"+pickStock.getWareHouse()+"'");
+						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
+						sql.append("\n 		and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
+						}
+						sql.append("\n 		group by i.BARCODE, MATERIAL_MASTER,group_code,pens_item ");
+
+						sql.append("\n   ) M LEFT OUTER JOIN  ");
+						
+						sql.append("\n 	 ( select group_code,pens_item,material_master,barcode ,NVL(SUM(i.issue_qty),0) as issue_qty ,NVL(SUM(i.req_qty),0) as req_qty ");
+						sql.append("\n 		 from PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+						sql.append("\n 		 where 1=1  ");
+						sql.append("\n		 and h.issue_req_no = i.issue_req_no ");
+						sql.append("\n 		 and h.warehouse = '"+pickStock.getWareHouse()+"'");
+						if( !Utils.isNull(pickStock.getIssueReqNo()).equals("")){
+						sql.append("\n 		 and h.issue_req_no ='"+pickStock.getIssueReqNo()+"'");
+						}
+						sql.append("\n 		 group by group_code,pens_item,material_master,barcode  ");
+						sql.append("\n 	 )P ");
+						sql.append("\n 	 ON  M.pens_item = P.pens_item and M.group_code =P.group_code "  +
+								"       AND M.material_master = P.material_master AND M.barcode =P.barcode   ");
+				
+				sql.append("\n   	  )U ");
+			    sql.append("\n 		  order by U.group_code,U.pens_item ,U.material_master asc");
+				  
+				sql.append("\n      )A  ");
+				if( !allRec){
+				  sql.append("\n     WHERE rownum < (("+pageNumber+" * "+PickConstants.CONF_PICK_PAGE_SIZE+") + 1 )  ");
+			    }
+				sql.append("\n   )M  ");
+				if( !allRec){
+				   sql.append("\n  WHERE r__ >= ((("+pageNumber+"-1) * "+PickConstants.CONF_PICK_PAGE_SIZE+") + 1)  ");
+				}
+				sql.append("\n )M2  ");
+				
+	
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   ReqPickStock h = new ReqPickStock();
+			   h.setIssueReqNo(pickStock.getIssueReqNo());
+			   h.setGroupCode(rst.getString("group_code"));
+			   h.setPensItem(rst.getString("pens_item"));
+			   h.setMaterialMaster(rst.getString("material_master"));
+			   h.setBarcode(rst.getString("barcode"));
+			   int reqQty =  rst.getInt("req_qty");
+			   int issueQty =  rst.getInt("issue_qty");
+			   
+			   if(issueQty==0){
+				   issueQty = reqQty;
+			   }
+			 
+			   //new code get from scan checkout
+			   h.setQty(Utils.decimalFormat(reqQty,Utils.format_current_no_disgit));
+			   if(issueQty != 0)
+			      h.setIssueQty(Utils.decimalFormat(issueQty,Utils.format_current_no_disgit));
+			   
+			   totalQty +=issueQty;
+			   
+			   items.add(h);
+			   r++;
+			   
+			}//while
+			
+			pickStock.setItems(items);
+			pickStock.setTotalQty(totalQty);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return pickStock;
+	}
+	
 	public static int getTotalQtyInReqPickStock(Connection conn,ReqPickStock pickStock ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;

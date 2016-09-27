@@ -64,6 +64,7 @@
 		<form-bean name="reqPickStockForm" type="com.isecinc.pens.web.pick.ReqPickStockForm" />
 		<form-bean name="addItemPickStockForm" type="com.isecinc.pens.web.pick.AddItemPickStockForm" />
 		<form-bean name="confPickStockForm" type="com.isecinc.pens.web.pick.ConfPickStockForm" />
+		<form-bean name="confPickStockAllForm" type="com.isecinc.pens.web.pick.ConfPickStockForm" />
 		<form-bean name="moveWarehouseForm" type="com.isecinc.pens.web.pick.MoveWarehouseForm" />
 		<form-bean name="moveStockWarehouseForm" type="com.isecinc.pens.web.pick.MoveStockWarehouseForm" />
 		<form-bean name="stockQueryForm" type="com.isecinc.pens.web.pick.StockQueryForm" />
@@ -88,6 +89,10 @@
 		
 		<form-bean name="priceListMasterForm" type="com.isecinc.pens.web.pricelist.PriceListMasterForm" />
 		<form-bean name="scanCheckForm" type="com.isecinc.pens.web.pick.ScanCheckForm" />
+		<form-bean name="saEmpForm" type="com.isecinc.pens.web.sa.SAEmpForm" />
+		<form-bean name="saDamageForm" type="com.isecinc.pens.web.sa.SADamageForm" />
+		<form-bean name="saTranForm" type="com.isecinc.pens.web.sa.SATranForm" />
+		<form-bean name="saReportForm" type="com.isecinc.pens.web.sa.SAReportForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -150,6 +155,11 @@
 			<forward name="prepare" path="/jsp/main/summary.jsp" />
 			<forward name="clear" path="/jsp/main/summary.jsp" />
 			<forward name="export" path="/jsp/main/summary.jsp" />
+		</action>
+		
+		<action name="popupForm" path="/jsp/popupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.PopupAction" >
+			<forward name="searchPensItemByGroupPopup" path="/jsp/popup/searchPensItemByGroupPopup.jsp" />
+			<forward name="searchEmpPopup" path="/jsp/popup/searchEmpPopup.jsp" />
 		</action>
 		
 		<!-- Report -->
@@ -453,6 +463,17 @@
 			<forward name="addRow" path="/jsp/pick/confPickStock.jsp" />
 		</action>
 		
+		<action name="confPickStockAllForm" path="/jsp/confPickStockAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ConfPickStockAllAction">
+			<forward name="search2" path="/jsp/pick/confPickStockSearchAll.jsp" />
+			<forward name="prepare2" path="/jsp/pick/confPickStockSearchAll.jsp" />
+			<forward name="clear2" path="/jsp/pick/confPickStockSearchAll.jsp" />
+			
+			<forward name="search" path="/jsp/pick/confPickStockAll.jsp" />
+			<forward name="prepare" path="/jsp/pick/confPickStockAll.jsp" />
+			<forward name="clear" path="/jsp/pick/confPickStockAll.jsp" />
+			<forward name="addRow" path="/jsp/pick/confPickStockAll.jsp" />
+		</action>
+		
 		<action name="moveWarehouseForm" path="/jsp/moveWarehouseAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.MoveWarehouseAction">
 			<forward name="search" path="/jsp/pick/moveWarehouse.jsp" />
 			<forward name="prepare" path="/jsp/pick/moveWarehouse.jsp" />
@@ -508,6 +529,23 @@
 			<forward name="search" path="/jsp/mc/mcEmpSearch.jsp" />
 			<forward name="detail" path="/jsp/mc/mcEmp.jsp" />
 		</action>
+		<action name="saEmpForm" path="/jsp/saEmpAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SAEmpAction">
+			<forward name="search" path="/jsp/sa/saEmpSearch.jsp" />
+			<forward name="detail" path="/jsp/sa/saEmp.jsp" />
+		</action>
+		<action name="saDamageForm" path="/jsp/saDamageAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SADamageAction">
+			<forward name="search" path="/jsp/sa/saDamageSearch.jsp" />
+			<forward name="detail" path="/jsp/sa/saDamage.jsp" />
+		</action>
+		<action name="saTranForm" path="/jsp/saTranAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SATranAction">
+			<forward name="search" path="/jsp/sa/saTranSearch.jsp" />
+			<forward name="detail" path="/jsp/sa/saTran.jsp" />
+		</action>
+		
+		<action name="saReportForm" path="/jsp/saReportAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SAReportAction">
+		<forward name="search" path="/jsp/sa/saReport.jsp" />
+		</action>
+		
 		<action name="mcTimeForm" path="/jsp/mcTimeAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCTimeAction">
 			<forward name="search" path="/jsp/mc/mcTimeSearch.jsp" />
 			<forward name="detail" path="/jsp/mc/mcTime.jsp" />

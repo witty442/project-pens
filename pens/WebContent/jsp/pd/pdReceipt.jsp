@@ -94,10 +94,15 @@ body {
 							<td width="100%"><jsp:include page="../menu.jsp" /></td>
 						</tr>
 					</table>
-				</div> <!-- PROGRAM HEADER --> <jsp:include page="../program.jsp">
-					<jsp:param name="function" value="Receipt" />
+				</div> 
+				
+				<!-- PROGRAM HEADER --> 
+				<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="PD" />
 					<jsp:param name="code" value="" />
-				</jsp:include> <!-- TABLE BODY -->
+				</jsp:include> 
+				
+				<!-- TABLE BODY -->
 				<table width="100%" border="0" align="center" cellpadding="0"
 					cellspacing="0" class="txt1">
 					<tr style="height: 9px;">

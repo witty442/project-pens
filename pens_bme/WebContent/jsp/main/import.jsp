@@ -259,11 +259,11 @@ function clearForm(path){
 
 function openPopupCustomer(path,types,storeType){
 	var form = document.importForm;
-	var storeGroup = "020056";
+	//var storeGroup = "020056";
 	
     var param = "&types="+types;
         param += "&storeType="+storeType;
-        param += "&storeGroup="+storeGroup;
+      //  param += "&storeGroup="+storeGroup;
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
 	window.open(encodeURI(url),"",
@@ -471,7 +471,7 @@ function getCustName(custCode,fieldName){
 								<td align="right" width="40%">รหัสร้านค้า<font color="red">*</font></td>
 									<td align="left"> 
 									  <html:text property="storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
-									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','king')"/>
 									  <html:text property="storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 
 									</td>

@@ -45,7 +45,9 @@ public class Utils {
 	
 	//Thai date
 	public static final String MMMM_YYYY = "MMMM-yyyy";
+	public static final String MMMMYYYY = "MMMMyyyy";
 	public static final String MMM_YYYY = "MMM-yyyy";
+	public static final String MMM_YY = "MMM-yy";
 	
 	public static final Locale local_th= new Locale("th","TH");
 
@@ -62,11 +64,17 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	String mat = "01/12/2016";
-            String mm  = mat.substring(3,5);
-            String yyyy  = mat.substring(6,10);
-	    	System.out.println("MM:"+mm+",yyyy:"+yyyy);
-	    
+	    	Calendar c = Calendar.getInstance();
+	    	int count =0;
+			for(int i=11;i>=0;i--){
+				count++;
+			    c.set(Calendar.MONTH, i);
+			    String mmmyy = Utils.stringValue(c.getTime(), Utils.MMM_YY);
+			    System.out.println("c["+count+"]:"+c.getTime());
+			    System.out.println("mm["+count+"]:"+mmmyy);
+			    
+			}
+	    	
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }

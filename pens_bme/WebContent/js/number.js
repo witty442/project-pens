@@ -1,7 +1,7 @@
 function isNum(obj){
   if(obj.value != ""){
 	var newNum = parseFloat(obj.value);
-	if(isNaN(newNum)){
+	if(isNaN(obj.value)){
 		alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
 		obj.value = "";
 		obj.focus();

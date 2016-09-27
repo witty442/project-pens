@@ -775,9 +775,13 @@ public class OrderAction extends I_Action {
 			BigDecimal tt = new BigDecimal(order.getTotalAmount());
 			BigDecimal vt = new BigDecimal(order.getVatAmount());
 			BigDecimal nt = new BigDecimal(order.getNetAmount());
+			logger.debug("order.getNetAmount["+order.getNetAmount()+"]");
+			
 			tt = tt.setScale(2,BigDecimal.ROUND_HALF_UP);
 			vt = vt.setScale(2,BigDecimal.ROUND_HALF_UP);
 			nt = nt.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			logger.debug("nt["+nt+"]");
 			
 			order.setTotalAmount(tt.doubleValue());
 			order.setVatAmount(vt.doubleValue());
@@ -1533,7 +1537,14 @@ public class OrderAction extends I_Action {
 				lstData.add(taxInvoice);
 				no++;
 			}
-
+			logger.debug("order.getTotalAmount():"+order.getTotalAmount());
+			logger.debug("order.getVatAmount():"+order.getVatAmount());
+			logger.debug("order.getNetAmount():"+order.getNetAmount());
+			
+			parameterMap.put("p_sum_total_amount", order.getTotalAmount());
+			parameterMap.put("p_sum_total_vat", order.getVatAmount());
+			parameterMap.put("p_sum_total_net", order.getNetAmount());
+			
 			String fileName = "tax_invoice_summary_report";
 			/*if("copy".equalsIgnoreCase(reportType)){
 				if("2".equalsIgnoreCase(caseReport)){
@@ -1643,7 +1654,14 @@ public class OrderAction extends I_Action {
 			String fileJasper = BeanParameter.getReportPath() + fileName;
 			
 			//Set Report Parameter Map
-			parameterMap.put("p_totalAmount", orderForm.getOrder().getTotalAmount());
+			logger.debug("order.getTotalAmount():"+orderForm.getOrder().getTotalAmount());
+			logger.debug("order.getVatAmount():"+orderForm.getOrder().getVatAmount());
+			logger.debug("order.getNetAmount():"+orderForm.getOrder().getNetAmount());
+			
+			parameterMap.put("p_sum_total_amount", orderForm.getOrder().getTotalAmount());
+			parameterMap.put("p_sum_total_vat", orderForm.getOrder().getVatAmount());
+			parameterMap.put("p_sum_total_net", orderForm.getOrder().getNetAmount());
+			
 			parameterMap.put("p_vatcode", orderForm.getOrder().getVatCode());
 			parameterMap.put("totalLine", lstData.size()+"");
 			parameterMap.put("userName", user.getName());

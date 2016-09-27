@@ -70,13 +70,13 @@ public class AdminConsoleAction extends I_Action {
 				configInfo += " ----------------------  Database Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
-				configInfo +="DB Password : "+password.toCharArray()+"\n";
+				configInfo +="DB Password : "+password+"\n";
 				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
 				configInfo += " ----------------------  FTP Server(PENS) Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
-				configInfo +="FTP Password: "+env.getProperty("ftp.password").toCharArray()+"\n";
+				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
 				configInfo +="HOST DD: "+env.getProperty("host.dd.server")+"\n";
@@ -84,7 +84,7 @@ public class AdminConsoleAction extends I_Action {
 				configInfo += " ----------------------  FTP Server(ICC) Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP ICC IP : "+env.getProperty("ftp.icc.ip.server")+"\n";
 				configInfo +="FTP ICC User : "+env.getProperty("ftp.icc.username")+"\n";
-				configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password").toCharArray()+"\n";
+				configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password")+"\n";
 				
 				configInfo +="path.icc.hisher.export.master.txt(twstock) : "+env.getProperty("path.icc.hisher.export.master.txt")+"\n";
 				configInfo +="path.icc.hisher.export.txt(twstock) : "+env.getProperty("path.icc.hisher.export.txt")+"\n";

@@ -46,7 +46,55 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String remark;
 	private String boxNo;
 	
+	private String name;
+	private String surname;
+	private String branch;
+	private String groupStore;
 	
+	//
+	private String page;
+	
+	
+	public String getGroupStore() {
+		return groupStore;
+	}
+
+	public void setGroupStore(String groupStore) {
+		this.groupStore = groupStore;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSurname() {
+		return surname;
+	}
+
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	public String getPage() {
+		return page;
+	}
+
+	public void setPage(String page) {
+		this.page = page;
+	}
+
 	public String getBoxNo() {
 		return boxNo;
 	}

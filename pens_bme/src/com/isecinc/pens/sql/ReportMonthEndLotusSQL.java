@@ -16,12 +16,24 @@ import com.isecinc.pens.inf.helper.Utils;
 public class ReportMonthEndLotusSQL {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user) throws Exception{
+	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,String summaryType) throws Exception{
 			StringBuilder sql = new StringBuilder();
 			try {
 				BMEControlBean control = BMECControlDAO.calcMonthEndOnhandDateLotusAsOf(conn,c.getPensCustCodeFrom(),c.getSalesDate());
-			
-				sql.append("\n SELECT A.* FROM(");
+				
+				if("GroupCode".equalsIgnoreCase(summaryType)){
+					sql.append("\n SELECT A.customer_code,A.customer_desc ,A.group_type ");
+					sql.append("\n ,SUM(A.BEGINING_QTY) as BEGINING_QTY");
+					sql.append("\n ,SUM(A.SALE_IN_QTY) AS SALE_IN_QTY");
+					sql.append("\n ,SUM(A.SALE_OUT_QTY) AS SALE_OUT_QTY");
+					sql.append("\n ,SUM(A.SALE_RETURN_QTY) AS SALE_RETURN_QTY");
+					sql.append("\n ,SUM(A.ADJUST_QTY) AS ADJUST_QTY");
+					sql.append("\n ,SUM(A.STOCK_SHORT_QTY) AS STOCK_SHORT_QTY");
+					sql.append("\n ,SUM(A.ONHAND_QTY) AS ONHAND_QTY");
+					sql.append("\n FROM(");
+				}else{
+				    sql.append("\n SELECT A.* FROM(");
+				}
 				sql.append("\n SELECT M.*");
 				sql.append("\n , NVL(ENDING.BEGINING_QTY,0) as BEGINING_QTY ");
 				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");
@@ -343,6 +355,9 @@ public class ReportMonthEndLotusSQL {
 				sql.append("\n AND M.group_type = STOCK_SHORT.group_type ");
 				
 				sql.append("\n ) A ");
+				if("GroupCode".equalsIgnoreCase(summaryType)){
+					sql.append("\n GROUP BY A.customer_code,A.customer_desc ,A.group_type");
+				}
 				sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
 				
 				//debug write sql to file

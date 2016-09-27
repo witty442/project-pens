@@ -85,13 +85,13 @@ public class MRequestPromotion {
 						c.setRequestNo(head.getRequestNo());
 						c.setCreatedBy(head.getCreatedBy());
 						
-						if( !Utils.isNull(c.getCostDetail()).equals("")){
+						//if( !Utils.isNull(c.getCostDetail()).equals("")){
 							//update
 							boolean r = updateReqPromotionCost(conn, head, c);
 							if(r==false){
 							   insertPromotionCost(conn, c);
 							}
-						}
+						//}
 					}
 				}
 				
@@ -394,8 +394,8 @@ public class MRequestPromotion {
 			sql.append(" request_no, line_no, product_code, \n"); 
 			sql.append(" NEW_CTN, NEW_AMOUNT, STOCK_CTN, \n"); 
 			sql.append(" STOCK_QTY, BORROW_CTN,  \n");
-			sql.append(" BORROW_QTY, BORROW_AMOUNT, CREATED,CREATED_BY ) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" BORROW_QTY, BORROW_AMOUNT, CREATED,CREATED_BY,INVOICE_NO ) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 
 			//logger.debug("SQL:"+sql);
 			logger.debug("Insert DB request_no["+line.getRequestNo()+"]line_no["+line.getLineNo()+"]productCode["+line.getProductCode()+"]");
@@ -416,6 +416,7 @@ public class MRequestPromotion {
 			ps.setBigDecimal(++index, line.getBorrowAmount());//
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(++index, line.getCreatedBy());
+			ps.setString(++index, Utils.isNull(line.getInvoiceNo()));
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -476,7 +477,7 @@ public class MRequestPromotion {
 			sql.append(" product_code =? ,NEW_CTN = ? , \n"); 
 			sql.append(" NEW_AMOUNT =? , STOCK_CTN = ? , STOCK_QTY =?, \n"); 
 			sql.append(" BORROW_CTN =? ,BORROW_QTY =? , BORROW_AMOUNT = ? ,  \n");
-			sql.append(" UPDATED =?, UPDATED_BY =?  \n");
+			sql.append(" UPDATED =?, UPDATED_BY =?  ,INVOICE_NO = ? \n");
 			sql.append(" WHERE request_no=? and line_no = ? \n");
 			
 			logger.debug("Update DBL request_no["+line.getRequestNo()+"]line_no["+line.getLineNo()+"]productCode["+line.getProductCode()+"]");
@@ -496,6 +497,7 @@ public class MRequestPromotion {
 			ps.setBigDecimal(++index, line.getBorrowAmount());//
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(++index, line.getCreatedBy());
+			ps.setString(++index, Utils.isNull(line.getInvoiceNo()));
 			
 			ps.setString(++index, head.getRequestNo());//request_number
 			ps.setInt(++index, line.getLineNo());//line_number
@@ -585,6 +587,7 @@ public class MRequestPromotion {
 				sql.append("\n h.CREATED,h.CREATED_BY,h.UPDATED,h.UPDATED_BY,promotion_start_date,promotion_end_date, ");
 				sql.append("\n (select p.name from ad_user p where p.user_id = h.user_id) as sales_desc ");
 				sql.append("\n ,(select p.name from m_customer p where p.code = h.customer_code) as customer_name ");
+				sql.append("\n ,(select p.brand_desc from m_brand p where p.brand_no = h.product_catagory) as product_catagory_name ");
 				sql.append("\n  from t_req_promotion h ");
 				sql.append("\n  where 1=1 ");
 				if(!Utils.isNull(mCriteria.getRequestNo()).equals("")){
@@ -619,6 +622,8 @@ public class MRequestPromotion {
 				  m.setStatusDesc(getStatusDesc(m.getStatus()));
 				  
 				  m.setProductCatagory(Utils.isNull(rst.getString("product_catagory")));
+				  m.setProductCatagoryDesc(Utils.isNull(rst.getString("product_catagory_name")));
+				  
 				  m.setProductType(Utils.isNull(rst.getString("product_type")));
 				  m.setName(Utils.isNull(rst.getString("name")));
 				  m.setPhone(Utils.isNull(rst.getString("phone")));
@@ -656,6 +661,18 @@ public class MRequestPromotion {
 						  
 						  int diffRow = 5 - m.getCostLineList().size();
 						  int lastLineNo = lastCostLine.getLineNo();
+						  for(int r=0;r<diffRow;r++){
+							  lastLineNo++;
+							  RequestPromotionCost newCostLine = new RequestPromotionCost();
+							  newCostLine.setLineNo(lastLineNo);
+							  newCostLine.setCostDetail("");
+							  newCostLine.setCostAmount(null);
+							  
+							  m.getCostLineList().add(newCostLine);
+						  }
+					  }else if(m.getCostLineList().size() ==0){
+						  int diffRow = 5;
+						  int lastLineNo = 0;
 						  for(int r=0;r<diffRow;r++){
 							  lastLineNo++;
 							  RequestPromotionCost newCostLine = new RequestPromotionCost();
@@ -746,6 +763,7 @@ public class MRequestPromotion {
 					
 					line.setProductName(productName);
 					line.setProductId(Utils.isNull(rst.getString("product_id")));
+					line.setInvoiceNo(Utils.isNull(rst.getString("invoice_no")));
 					
 					//line.setUom1(Utils.isNull(uom1[i]));
 					//line.setUom2(Utils.isNull(uom2[i]));

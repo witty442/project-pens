@@ -62,8 +62,7 @@ public class ReportSizeColorLotus_SQL {
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
-				    sql.append("\n SELECT DISTINCT ");
-				    sql.append("\n L.store_code");
+				    sql.append("\n SELECT DISTINCT L.store_code");
 					sql.append("\n ,L.group_code as group_type" );
 					sql.append("\n ,(select max(X.interface_value) from PENSBME_MST_REFERENCE X WHERE X.interface_desc=L.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as material_master ");
 					sql.append("\n ,L.barcode ");
@@ -80,10 +79,9 @@ public class ReportSizeColorLotus_SQL {
 					if( !Utils.isNull(c.getGroup()).equals("")){
 						sql.append("\n AND L.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
-				    sql.append("\n UNION ALL");
+				    sql.append("\n UNION");
 
-					sql.append("\n SELECT DISTINCT");
-					sql.append("\n L.cust_no as store_code");
+					sql.append("\n SELECT DISTINCT L.cust_no as store_code");
 				    sql.append("\n ,L.GROUP_CODE as group_type, L.material_master,L.barcode ");
 					sql.append("\n FROM PENSBME_LOTUS_INIT_STK H,PENSBME_LOTUS_ONHAND_INIT_STK L");
 					sql.append("\n WHERE 1=1 ");
@@ -99,10 +97,9 @@ public class ReportSizeColorLotus_SQL {
 					if( !Utils.isNull(c.getGroup()).equals("")){
 						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION");
 					
-					sql.append("\n SELECT DISTINCT ");
-					sql.append("\n M.CUSTOMER_CODE as store_code");
+					sql.append("\n SELECT DISTINCT M.CUSTOMER_CODE as store_code");
 					sql.append("\n ,substr(P.inventory_item_desc,0,6) as group_type ");
 					sql.append("\n ,MI.material_master,MI.barcode ");
 					sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
@@ -116,7 +113,7 @@ public class ReportSizeColorLotus_SQL {
 					sql.append("\n  )MI ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+storeCode+"%' )" );
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
@@ -149,10 +146,9 @@ public class ReportSizeColorLotus_SQL {
 						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
 						
-					sql.append("\n UNION ALL  ");
+					sql.append("\n UNION");
 				
-					sql.append("\n SELECT DISTINCT ");
-					sql.append("\n M.store_code");
+					sql.append("\n SELECT DISTINCT M.store_code");
 					sql.append("\n ,I.group_code as group_type,I.material_master");
 					sql.append("\n ,(select max(X.interface_desc) from PENSBME_MST_REFERENCE X WHERE X.interface_value=I.material_master and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as barcode ");
 					sql.append("\n FROM PENSBME_PICK_STOCK M ,PENSBME_PICK_STOCK_I I ");
@@ -178,12 +174,11 @@ public class ReportSizeColorLotus_SQL {
 						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
-					sql.append("\n UNION ALL  ");
+					sql.append("\n UNION ");
 					/** STOCK _ISSUE **/
-					sql.append("\n SELECT  DISTINCT");
-					sql.append("\n M.CUSTOMER_NO as store_code");
+					sql.append("\n SELECT  DISTINCT M.CUSTOMER_NO as store_code");
 					sql.append("\n ,I.group_code as group_type,I.material_master,I.barcode ");
-					sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
+					sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBME_STOCK_ISSUE_ITEM I ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
 					sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -206,7 +201,7 @@ public class ReportSizeColorLotus_SQL {
 						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
-					sql.append("\n UNION ALL  ");
+					sql.append("\n UNION ");
 					/** RETURN **/
 					sql.append("\n SELECT DISTINCT J.STORE_CODE ");
 					sql.append("\n ,I.group_code as group_type,I.material_master,I.barcode ");
@@ -235,6 +230,45 @@ public class ReportSizeColorLotus_SQL {
 					if( !Utils.isNull(c.getGroup()).equals("")){
 						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
 					}
+					
+					sql.append("\n UNION ");
+					/** Sales Adjust **/
+				    sql.append("\n SELECT J.STORE_CODE,J.item_adjust_desc as group_type ");
+					sql.append("\n ,( ");
+					sql.append("\n   select max(interface_value) as material_master ");
+					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
+					sql.append("\n   and M.pens_value = J.item_adjust");
+					sql.append("\n  ) as material_master");
+					sql.append("\n ,( ");
+					sql.append("\n   select max(interface_desc) as barcode ");
+					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
+					sql.append("\n   and M.pens_value = J.item_adjust");
+					sql.append("\n  ) as barcode");
+					sql.append("\n FROM PENSBME_ADJUST_SALES J ");
+					
+					sql.append("\n WHERE 1=1   ");
+					sql.append("\n AND J.STATUS <> '"+PickConstants.STATUS_CANCEL+"' ");
+					
+					if(initDate != null){
+						 sql.append("\n AND J.transaction_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND J.transaction_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}else{
+						 sql.append("\n AND J.transaction_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}
+					sql.append("\n AND J.STORE_CODE LIKE '"+storeCode+"%'");
+					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+					    sql.append("\n AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND J.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND J.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					if( !Utils.isNull(c.getGroup()).equals("")){
+						sql.append("\n AND J.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					}
+					
 					sql.append("\n )AA");
 					
         sql.append("\n )M ");
@@ -270,8 +304,7 @@ public class ReportSizeColorLotus_SQL {
 				
 		   sql.append("\n LEFT OUTER JOIN(	 ");
 		       sql.append("\n /******* SALE_OUT *******/ ");
-				sql.append("\n SELECT ");
-				sql.append("\n L.CUST_NO AS STORE_CODE,");
+				sql.append("\n SELECT L.CUST_NO AS STORE_CODE,");
 			    sql.append("\n L.GROUP_CODE as group_type, L.material_master,L.barcode , ");
 				sql.append("\n NVL(COUNT(*),0) AS SALE_OUT_QTY ");
 				sql.append("\n FROM PENSBME_SALES_OUT L");
@@ -367,7 +400,7 @@ public class ReportSizeColorLotus_SQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n M.CUSTOMER_NO AS STORE_CODE, I.group_code as group_type,I.material_master,I.barcode, ");
 						sql.append("\n NVL(SUM(I.ISSUE_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
+						sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBME_STOCK_ISSUE_ITEM I ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
 						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -404,8 +437,7 @@ public class ReportSizeColorLotus_SQL {
 					sql.append("\n SELECT J.STORE_CODE, ");
 					sql.append("\n I.group_code as group_type,I.material_master,I.barcode ,");
 					sql.append("\n NVL(COUNT(*),0) as SALE_RETURN_QTY ");
-					sql.append("\n  FROM PENSBME_PICK_JOB J   ");
-					sql.append("\n ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+					sql.append("\n FROM PENSBME_PICK_JOB J ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.job_id = B.job_id  ");
 					sql.append("\n AND B.job_id = I.job_id ");
@@ -483,15 +515,15 @@ public class ReportSizeColorLotus_SQL {
 			sql.append("\n  AND M.material_master = SALE_ADJUST.material_master AND M.barcode = SALE_ADJUST.barcode ");
 	
 			sql.append("\n ) A ");
-			if("GroupCode".equalsIgnoreCase(summaryType)){
-				sql.append("\n GROUP BY A.customer_code,A.store_name ,A.group_type,A.sub_inv ");
-			}
 			if( !Utils.isNull(c.getDispHaveQty()).equals("")){
 				sql.append("\n WHERE ( A.INIT_SALE_QTY <> 0");
 				sql.append("\n OR A.TRANS_IN_QTY <> 0");
 				sql.append("\n OR A.SALE_OUT_QTY <> 0");
 				sql.append("\n OR A.SALE_RETURN_QTY <> 0");
 				sql.append("\n OR A.SALE_ADJUST_QTY <> 0 )");
+			}
+			if("GroupCode".equalsIgnoreCase(summaryType)){
+				sql.append("\n GROUP BY A.customer_code,A.store_name ,A.group_type,A.sub_inv ");
 			}
 			if("GroupCode".equalsIgnoreCase(summaryType)){
 			  sql.append("\n ORDER BY A.STORE_CODE,A.group_type asc ");

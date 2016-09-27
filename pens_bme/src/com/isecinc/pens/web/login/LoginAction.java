@@ -85,6 +85,10 @@ public class LoginAction extends DispatchAction {
 			if(screenWidth.equals("")){
 				screenWidth ="0";
 			}
+			String screenHeight = Utils.isNull(request.getParameter("screenHeight"));
+			if(screenHeight.equals("")){
+				screenHeight ="0";
+			}
 			logger.debug("Before ScreenWidth["+screenWidth+"]");
 			if(Integer.parseInt(screenWidth) < 600){
 				screenWidth = "0";
@@ -93,6 +97,7 @@ public class LoginAction extends DispatchAction {
 			
 			request.getSession().setAttribute("User", user.getUserName()+"_"+role);
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
+			request.getSession(true).setAttribute("screenHeight", screenHeight);
 			
 			if(role.equalsIgnoreCase(User.NISSINTEAM)){
 				forwordStr = "passRoleNissin";

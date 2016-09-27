@@ -125,7 +125,7 @@ public class AdjustStockSAAction extends I_Action {
 				logger.debug("prepare edit documentNo:"+documentNo);
 				AdjustStockSA c = new AdjustStockSA();
 				c.setDocumentNo(documentNo);
-				AdjustStockSA aS = AdjustStockSADAO.search(c);
+				AdjustStockSA aS = AdjustStockSADAO.searchDetail(c,"order by seq_no asc");
 				
 				aForm.setResults(aS.getItems());
 				aForm.setAdjustStockSA(aS);
@@ -190,7 +190,7 @@ public class AdjustStockSAAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			AdjustStockSA aS = AdjustStockSADAO.search(orderForm.getAdjustStockSA());
+			/*AdjustStockSA aS = AdjustStockSADAO.searchDetail(orderForm.getAdjustStockSA(),"order by seq_no asc");
 			orderForm.setResults(aS.getItems());
 			
 			if(Utils.isNull(aS.getStoreName()).equals("")){
@@ -201,7 +201,7 @@ public class AdjustStockSAAction extends I_Action {
 			}
 			orderForm.setAdjustStockSA(aS);
 			
-			request.setAttribute("Message", msg);
+			request.setAttribute("Message", msg);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -238,7 +238,7 @@ public class AdjustStockSAAction extends I_Action {
 			conn.commit();
 			
 			//Search 
-			AdjustStockSA aS = AdjustStockSADAO.search(aForm.getAdjustStockSA());
+			AdjustStockSA aS = AdjustStockSADAO.searchDetail(aForm.getAdjustStockSA(),"order by seq_no asc");
 			aForm.setAdjustStockSA(aS);
 			aForm.setResults(aS.getItems());
 			
@@ -275,7 +275,7 @@ public class AdjustStockSAAction extends I_Action {
 			AdjustStockSADAO.updateStatus(conn,h);
 			
 			//Search 
-			AdjustStockSA aS = AdjustStockSADAO.search(h);
+			AdjustStockSA aS = AdjustStockSADAO.searchDetail(h,"order by seq_no asc");
 			aForm.setAdjustStockSA(aS);
 			aForm.setResults(aS.getItems());
 			
@@ -373,7 +373,7 @@ public class AdjustStockSAAction extends I_Action {
 		logger.debug("Result Size:"+(results!=null?results.size():0));
 		//String[] linechk = request.getParameterValues("linechk");
 		String[] itemAdjust = request.getParameterValues("itemAdjust");
-		String[] itemAdjustDesc = request.getParameterValues("itemAdjustDesc");
+		String[] groupCode = request.getParameterValues("groupCode");
 		String[] itemAdjustUom = request.getParameterValues("itemAdjustUom");
 		String[] itemAdjustQty = request.getParameterValues("itemAdjustQty");
 		
@@ -386,7 +386,7 @@ public class AdjustStockSAAction extends I_Action {
 				 AdjustStockSA l = (AdjustStockSA)results.get(i);
 				 
 				 l.setItemAdjust(Utils.isNull(itemAdjust[i]));
-				 l.setItemAdjustDesc(Utils.isNull(itemAdjustDesc[i]));
+				 l.setGroupCode(Utils.isNull(groupCode[i]));
 				 l.setItemAdjustUom(Utils.isNull(itemAdjustUom[i]));
 				 l.setItemAdjustQty(itemAdjustQty[i]); 
 				

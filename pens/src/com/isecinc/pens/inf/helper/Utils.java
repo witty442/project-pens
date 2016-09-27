@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,7 +40,12 @@ public class Utils {
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	
 	public static final Locale local_th= new Locale("th","TH");
-
+	
+	public static final String format_current_no_disgit = "#,##0";
+	public static final String format_current_2_disgit = "#,##0.00";
+    public static final String format_current_5_digit = "#,##0.00000";
+	public static final String format_current_6_digit = "#,##0.000000";
+	
 	//20081223   09 42 34.572
 	//2008-12-23 09:42:34.572000
 	
@@ -52,6 +59,16 @@ public class Utils {
 	        e.printStackTrace();
 	    }
 	}
+	public static String decimalFormat(double num){
+		NumberFormat formatter = new DecimalFormat(format_current_2_disgit);
+		return formatter.format(num);
+	}
+	
+	public static String decimalFormat(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
+	
 	public static <T extends Appendable> T escapeNonLatin(CharSequence sequence,
 	      T out) throws java.io.IOException {
 	    for (int i = 0; i < sequence.length(); i++) {

@@ -131,7 +131,7 @@ public abstract class I_Model<T> implements Serializable {
 	 */
 	protected boolean save(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
 			throws Exception {
-		logger.debug("Save " + this.getClass());
+		//logger.debug("Save " + this.getClass());
 		if (valueID == 0) return saveNew(tableName, columns, values, valueID, conn);
 		else return saveUpdate(tableName, columns, values, valueID, conn);
 	}
@@ -152,7 +152,7 @@ public abstract class I_Model<T> implements Serializable {
 			throws Exception {
 		PreparedStatement pstmt = null;
 		try {
-			logger.debug("Save New " + this.getClass());
+			//logger.debug("Save New " + this.getClass());
 			String col = "";
 			String val = "";
 			for (String s : columns) {
@@ -167,7 +167,7 @@ public abstract class I_Model<T> implements Serializable {
 			sql.append("INSERT INTO " + tableName);
 			sql.append("(" + col + ") ");
 			sql.append("VALUES(" + val + ") ");
-			logger.debug(sql.toString());
+			//logger.debug(sql.toString());
 			pstmt = conn.prepareStatement(sql.toString());
 			int i = 1;
 			for (Object b : values) {
@@ -198,7 +198,7 @@ public abstract class I_Model<T> implements Serializable {
 	 */
 	private boolean saveUpdate(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
 			throws Exception {
-		logger.debug("Save Update " + this.getClass());
+		//logger.debug("Save Update " + this.getClass());
 		PreparedStatement pstmt = null;
 		try {
 			StringBuilder sql = new StringBuilder();
@@ -217,7 +217,7 @@ public abstract class I_Model<T> implements Serializable {
 			sql.append(" SET " + col);
 			sql.append(",UPDATED = CURRENT_TIMESTAMP ");
 			sql.append(" WHERE " + columns[0] + " = ?");
-			logger.debug(sql.toString());
+			//logger.debug(sql.toString());
 			pstmt = conn.prepareStatement(sql.toString());
 			int j = 1;
 			for (int i = 1; i < values.length; i++) {
@@ -250,7 +250,7 @@ public abstract class I_Model<T> implements Serializable {
 	 */
 	protected boolean changeActive(String tableName, String columnID, String active, String[] ids, int activeUserID,
 			Connection conn) throws Exception {
-		logger.debug("Change Active " + this.getClass());
+		//logger.debug("Change Active " + this.getClass());
 		PreparedStatement pstmt = null;
 		String id = "";
 		try {
@@ -263,7 +263,7 @@ public abstract class I_Model<T> implements Serializable {
 			sql.append(", UPDATED = CURRENT_TIMESTAMP ");
 			sql.append(", UPDATED_BY = " + activeUserID);
 			sql.append(" WHERE " + columnID + " IN (" + id + ") ");
-			logger.debug(sql.toString());
+			//logger.debug(sql.toString());
 			pstmt = conn.prepareStatement(sql.toString());
 			pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -313,7 +313,7 @@ public abstract class I_Model<T> implements Serializable {
 	 */
 	public boolean checkDocumentDuplicate(String tableName, String columnId, String columnDoc, String documentNo,
 			int id, Connection conn) throws Exception {
-		logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
+		//logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
@@ -322,7 +322,7 @@ public abstract class I_Model<T> implements Serializable {
 			String sql = "SELECT COUNT(*) as TOT FROM " + tableName;
 			sql += " WHERE " + columnDoc + "='" + documentNo + "' ";
 			if (id != 0) sql += "  AND " + columnId + "<> '" + id + "' ";
-			logger.debug(sql);
+			//logger.debug(sql);
 			rst = stmt.executeQuery(sql);
 			if (rst.next()) {
 				tot = rst.getInt("TOT");

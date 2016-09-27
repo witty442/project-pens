@@ -31,9 +31,21 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String storeNo;
 	private String subInv;
 	
-	private String customerId;
-	private String productId;
+	private String customerCode;
+	private String productCode;
 	private String page;
+	private String userId;
+	private String stringDate;
+	
+	
+	public String getStringDate() {
+		return stringDate;
+	}
+
+	public void setStringDate(String stringDate) {
+		this.stringDate = stringDate;
+	}
+
 	public PopupForm(){
 	}
 	
@@ -42,20 +54,29 @@ public class PopupForm extends ActionForm implements Serializable{
 		this.desc = desc;
 	}
 	
-	public String getCustomerId() {
-		return customerId;
+	public String getCustomerCode() {
+		return customerCode;
 	}
 
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+   
+    
+	public String getProductCode() {
+		return productCode;
 	}
 
-	public String getProductId() {
-		return productId;
+	public void setProductCode(String productCode) {
+		this.productCode = productCode;
 	}
 
-	public void setProductId(String productId) {
-		this.productId = productId;
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getPage() {

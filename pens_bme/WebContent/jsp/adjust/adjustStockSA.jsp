@@ -29,7 +29,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adjust_stock_sa.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/table_style.css" />
 
 <style type="text/css">
 span.pagebanner {
@@ -63,6 +63,7 @@ span.pagelinks {
 
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	 sumTotalQty();
 }
 function clearForm(path){
 	var form = document.adjustStockSAForm;
@@ -87,7 +88,22 @@ function back(path){
 	form.submit();
 	return true;
 }
-function validateItems(){
+function sumTotalQty(){
+	var itemAdjustQty = document.getElementsByName("itemAdjustQty");
+	var totalQty = 0;
+	//alert("rows:"+itemAdjustQty.length);
+	
+	for(var i= 0;i<itemAdjustQty.length;i++){
+		//alert(itemAdjustQty[i].value);
+		if(itemAdjustQty[i].value != ''){
+		   totalQty += parseInt(itemAdjustQty[i].value);
+		}
+	}
+	//alert(totalQty);
+	document.getElementById("totalQty").value = totalQty;
+}
+
+/* function validateItems(){
 	var pass = true;
 	var table = document.getElementById('tblProduct');
 	var rows = table.getElementsByTagName("tr"); 
@@ -146,7 +162,7 @@ function validateItems(){
 	}// for
 	return pass ;
 }
-
+ */
 function save(path){
 	var form = document.adjustStockSAForm;
 	var table = document.getElementById('tblProduct');
@@ -169,7 +185,7 @@ function save(path){
 		return false;
 	}
 	
-	var pass = validateItems();
+	var pass = true;//validateItems();
 	if(pass){
 	   form.action = path + "/jsp/adjustStockSAAction.do?do=save";
 	   form.submit();
@@ -309,33 +325,32 @@ function getStoreNameModel(storeCode){
 	form.storeName.value = returnString;	
 }
 
-function getProductKeypress(e,type,itemCode,seqNo){
+function getProductKeypress(e,type,groupCode,seqNo){
 	var form = document.adjustStockSAForm;
-	var itemAdjustDesc = document.getElementsByName("itemAdjustDesc");
+	var itemAdjust = document.getElementsByName("itemAdjust");
 	var itemAdjustUom = document.getElementsByName("itemAdjustUom");
 	
-	
 	if(e != null && e.keyCode == 13){
-		if(itemCode.value ==''){
-			itemAdjustDesc[seqNo-1].value = '';
+		if(groupCode.value ==''){
+			itemAdjust[seqNo-1].value = '';
 			itemAdjustUom[seqNo-1].value ='';
 		}else{
-			getProductModel(type,itemCode,seqNo);
+			getProductModel(type,groupCode,seqNo);
 		}
 		
 	}
 }
 
-function getProductModel(type,itemCode,seqNo){
+function getProductModel(type,groupCode,seqNo){
+	var groupCodeObj = document.getElementsByName("groupCode");
 	var itemAdjust = document.getElementsByName("itemAdjust");
-	var itemAdjustDesc = document.getElementsByName("itemAdjustDesc");
 	var itemAdjustUom = document.getElementsByName("itemAdjustUom");
 	
 	var returnString = "";
 	var form = document.adjustStockForm;
 	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoProduct.jsp",
-			data : "itemCode=" + itemCode.value,
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoProductByGroup.jsp",
+			data : "groupCode=" + groupCode.value,
 			async: false,
 			cache: false,
 			success: function(getData){
@@ -343,23 +358,21 @@ function getProductModel(type,itemCode,seqNo){
 			}
 		}).responseText;
 
-	
 		if(returnString==''){
-			alert("ไม่พบข้อมูล item "+itemCode.value);
-			itemCode.focus();
+			alert("ไม่พบข้อมูล Group Code "+groupCode.value);
+			groupCode.focus();
 			
+			groupCodeObj[seqNo-1].value = '';
 			itemAdjust[seqNo-1].value = '';
-			itemAdjustDesc[seqNo-1].value = '';
 		    itemAdjustUom[seqNo-1].value ='';
 		    
 		}else{
 			var s = returnString.split("|");
-			itemAdjustDesc[seqNo-1].value = s[0];
+			itemAdjust[seqNo-1].value = s[0];
 			itemAdjustUom[seqNo-1].value ='EA';
 		}
 	
 }
-
 
 function isNum(obj){
   if(obj.value != ""){
@@ -373,7 +386,6 @@ function isNum(obj){
    }
   return true;
 }
-
 
 function setProductMainValue(seqNo,types,code,desc,price){
 	//alert("seqNo:"+seqNo);
@@ -478,24 +490,22 @@ function setProductMainValue(seqNo,types,code,desc,price){
 
             <c:if test="${adjustStockSAForm.verify==true}">
                   <c:if test="${adjustStockSAForm.adjustStockSA.canEdit == true}">
-                        <div align="left">
-                        &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div align="left" style="padding-left: 155px;">
+                        
 							<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>	
 							<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
 						</div>
 				  </c:if>  			
 				  <c:if test="${adjustStockSAForm.resultsSize > 0}">
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableAj">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="80%">
 						       <tr>
 									<th >Seq no</th>
 									<th ><input type="checkbox" name="chkAll"
 										onclick="checkSelect(this,document.getElementsByName('linechk'));" /></th>
-									
-									<th >Item Adjust</th>
-									<th >Issue Description</th>
+									<th >Group Code to Adjust</th>
+									<th >Pens Item</th>
 									<th >UOM</th>
 									<th >Adjust Qty</th>
-									
 							</tr>
 						
 							<c:forEach var="results" items="${adjustStockSAForm.results}" varStatus="rows">
@@ -507,33 +517,30 @@ function setProductMainValue(seqNo,types,code,desc,price){
 										<c:set var="tabclass" value="lineE"/>
 									</c:otherwise>
 								</c:choose>
-								
-							
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="data_seqNo" align="center">${results.seqNo}</td>
-										<td class="data_chkbox" align="center"><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>
-										<td class="data_itemAdjust" nowrap>
+										<td class="td_text_center" width="10%">${results.seqNo}</td>
+										<td class="td_text_center" width="10%" ><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>
+										<td class="td_text_center" width="20%" nowrap>
 										   <c:if test="${results.canEdit == true}">
-											    <input type="text" name="itemAdjust" id="itemAdjust" value ="${results.itemAdjust}" size="20" 
+											    <input type="text" name="groupCode" id="groupCode" value ="${results.groupCode}" size="15" 
 											    onkeypress="getProductKeypress(event,'issue',this,${results.seqNo})"
 											    onchange="getProductModel('issue',this,${results.seqNo})"
 											    />
-											     <input  tabindex="-1" type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}',${results.seqNo},'itemAdjust')"
-											     class="enableNumber"/>
+											     <%-- <input  tabindex="-1" type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}',${results.seqNo},'groupCode')"
+											     class="enableNumber"/> --%>
 										   </c:if>
 										   <c:if test="${results.canEdit == false}">
-											    <input type="text" name="itemAdjust" id="itemAdjust" value ="${results.itemAdjust}" size="20" 
-											     readonly class="disableNumber"/>
+											    <input type="text" name="groupCode" id="groupCode" value ="${results.groupCode}" size="15" readonly class="disableText"/>
 										   </c:if>
-
 										</td>
-										<td class="data_itemAdjustDesc"><input tabindex="-1" type="text" name="itemAdjustDesc" value ="${results.itemAdjustDesc}" size="30" readonly class="disableText"/></td>
-										<td class="data_itemAdjustUom"><input tabindex="-1" type="text" name="itemAdjustUom" value ="${results.itemAdjustUom}" size="10" readonly class="disableText"/></td>
+										<td class="td_text_center"  width="20%"><input tabindex="-1" type="text" name="itemAdjust" value ="${results.itemAdjust}" size="15" readonly class="disableText"/></td>
 										
-										<td class="data_itemAdjustQty" align="center">
+										<td class="td_text_center"  width="20%"><input tabindex="-1" type="text" name="itemAdjustUom" value ="${results.itemAdjustUom}" size="10" readonly class="disableText"/></td>
+										
+										<td class="td_text_center"  width="10%">
 											<c:if test="${results.canEdit == true}">
-											    <input type="text" name="itemAdjustQty" id="itemAdjustQty" value ="${results.itemAdjustQty}" size="8" onblur="isNum(this)" 
-											    class="enableNumber"/>
+											    <input type="text" name="itemAdjustQty" id="itemAdjustQty" value ="${results.itemAdjustQty}" size="8" onblur="isNum(this);sumTotalQty()" 
+											    class="enableNumber" />
 											</c:if>
 											<c:if test="${results.canEdit == false}">
 											   <input type="text" name="itemAdjustQty" id="itemAdjustQty" value ="${results.itemAdjustQty}" size="8" readonly class="disableNumber"/>
@@ -541,9 +548,17 @@ function setProductMainValue(seqNo,types,code,desc,price){
 										</td>
 									</tr>
 							  </c:forEach>
+							  <tr>
+							    <td></td>
+							    <td></td>
+							    <td></td>
+							    <td></td>
+							    <td></td>
+							    <td><input type="text" name="totalQty" id="totalQty" readonly size="8" class="disableNumber" /></td>
+							  </tr>
+							  
 						</c:if>
 					</table>
-								
 								
 					<!-- BUTTON ACTION-->
 					<div align="center">

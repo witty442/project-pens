@@ -72,7 +72,12 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		*/
 		
 		List<InvoicePaymentReport> lstReport = process.searchReport(reportForm.getInvoicePaymentReport(), user, conn);
-	
+		
+		//Credit
+		//double[] valueCredit = process.sumChequeDayBeforeCaseCredit(reportForm.getInvoicePaymentReport(), user, conn);
+		//parameterMap.put("sumCreditCaseCashAmt", valueCredit[0]);
+		//parameterMap.put("sumCreditCaseChequeAmt", valueCredit[1]);
+		
 		// Sum Amt cash day before.
 		double[] value2 = process.sumCashDayBefore(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("cashDayBefore", value2[0]);

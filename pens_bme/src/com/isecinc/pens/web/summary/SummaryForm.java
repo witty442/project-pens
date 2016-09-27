@@ -27,13 +27,12 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> results;
 	private List<OnhandSummary> onhandSummaryResults;
 	private List<OnhandSummary> onhandSummaryLotusResults;
-	private List<OnhandSummary> onhandSummaryMTTResults;
+	
 	private List<OnhandSummary> onhandSummaryMTTDetailResults;
 	private List<OnhandSummary> onhandBigCResults;
 	private List<OnhandSummary> onhandSummaryLotusPeriodResults;
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
 	private List<OnhandSummary> onhandSummarySizeColorBigCResults;
-	private List<OnhandSummary> onhandSummaryMonthEndLotusResults;
 	
 	private List<TransactionSummary> lotusSummaryResults;
 	private List<TransactionSummary> bigcSummaryResults;
@@ -79,13 +78,7 @@ public class SummaryForm extends I_Form {
 	public void setResults(List<OnhandSummary> results) {
 		this.results = results;
 	}
-	public List<OnhandSummary> getOnhandSummaryMonthEndLotusResults() {
-		return onhandSummaryMonthEndLotusResults;
-	}
-	public void setOnhandSummaryMonthEndLotusResults(
-			List<OnhandSummary> onhandSummaryMonthEndLotusResults) {
-		this.onhandSummaryMonthEndLotusResults = onhandSummaryMonthEndLotusResults;
-	}
+
 	public List<OnhandSummary> getOnhandSummarySizeColorBigCResults() {
 		return onhandSummarySizeColorBigCResults;
 	}
@@ -125,16 +118,6 @@ public class SummaryForm extends I_Form {
 		return summaryByGroupCodeResults !=null?summaryByGroupCodeResults.size():0;
 	}
 
-	public List<OnhandSummary> getOnhandSummaryMTTResults() {
-		return onhandSummaryMTTResults;
-	}
-	public void setOnhandSummaryMTTResults(
-			List<OnhandSummary> onhandSummaryMTTResults) {
-		this.onhandSummaryMTTResults = onhandSummaryMTTResults;
-	}
-	public int getOnhandSummaryMTTResultsSize() {
-		return getOnhandSummaryMTTResults().size();
-	}
 	public void setOnhandSummaryMTTResultsSize(int onhandSummaryMTTResultsSize) {
 		this.onhandSummaryMTTResultsSize = onhandSummaryMTTResultsSize;
 	}

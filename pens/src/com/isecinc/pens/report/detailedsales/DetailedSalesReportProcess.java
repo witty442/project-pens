@@ -34,61 +34,62 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 		StringBuilder sql = new StringBuilder();
 		Statement stmt = null;
 		ResultSet rs = null;
-		
+		int no = 0;
 		try {
 			sql.delete(0, sql.length());
 			
 			// Aneak.t 21/01/2011
-			sql.append("SELECT t.* FROM ( ");
-			sql.append(" SELECT o.ORDER_DATE, o.ORDER_NO, c.NAME, c.NAME2, o.IsCash , ");
-			sql.append(" SUM(l.TOTAL_AMOUNT) AS TOTAL_AMOUNT, ");
-			sql.append(" o.PAYMENT, o.INTERFACES, o.EXPORTED, o.DOC_STATUS, ");
-			sql.append(" IF(o.ISCASH ='Y',null,(SELECT distinct rh.ISPDPAID FROM T_RECEIPT rh , T_RECEIPT_LINE rl WHERE rh.RECEIPT_ID = rl.RECEIPT_ID AND rl.ORDER_ID = o.ORDER_ID )) as ISPDPAID ");
-			sql.append(" FROM t_order o ");
-			sql.append(" INNER JOIN t_order_line l ON l.ORDER_ID = o.ORDER_ID ");
-			sql.append(" LEFT JOIN m_customer c ON o.CUSTOMER_ID = c.CUSTOMER_ID ");
-			sql.append(" WHERE c.CUSTOMER_TYPE = 'CV' ");
-			sql.append(" AND l.ISCANCEL <> 'Y' ");
+			sql.append("\n SELECT t.* FROM ( ");
+			sql.append("\n SELECT o.ORDER_DATE, o.ORDER_NO, c.NAME, c.NAME2, o.IsCash , ");
+			sql.append("\n SUM(o.NET_AMOUNT) AS NET_AMOUNT, ");
+			sql.append("\n o.PAYMENT, o.INTERFACES, o.EXPORTED, o.DOC_STATUS, ");
+			sql.append("\n IF(o.ISCASH ='Y',null,(SELECT distinct rh.ISPDPAID FROM T_RECEIPT rh , T_RECEIPT_LINE rl WHERE rh.RECEIPT_ID = rl.RECEIPT_ID AND rl.ORDER_ID = o.ORDER_ID )) as ISPDPAID ");
+			sql.append("\n FROM t_order o ");
+			sql.append("\n LEFT JOIN m_customer c ON o.CUSTOMER_ID = c.CUSTOMER_ID ");
+			sql.append("\n WHERE c.CUSTOMER_TYPE = 'CV' ");
 			
-			sql.append(" AND o.USER_ID = " + user.getId());	
-			sql.append(" AND o.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
-			sql.append(" AND o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "' ");
+			sql.append("\n AND o.USER_ID = " + user.getId());	
+			sql.append("\n AND o.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
+			sql.append("\n AND o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "' ");
 			
 			if(!StringUtils.isEmpty(t.getOrderType()))
-				sql.append(" AND o.IsCash = '"+t.getOrderType()+"' ");
+				sql.append("\n AND o.IsCash = '"+t.getOrderType()+"' ");
 			
 			//Aneak.t 21/01/2011
-			sql.append(" GROUP BY o.ORDER_NO ");
+			sql.append("\n GROUP BY o.ORDER_NO ");
 			
 			switch (t.getSortType()) {
 			case 1:
-				sql.append(" ORDER BY o.IsCASH, o.ORDER_DATE, o.ORDER_NO, c.CODE ");
+				sql.append("\n ORDER BY o.IsCASH, o.ORDER_DATE, o.ORDER_NO, c.CODE ");
 				break;
 			case 2:
-				sql.append(" ORDER BY o.IsCASH,o.ORDER_NO, o.ORDER_DATE ");
+				sql.append("\n ORDER BY o.IsCASH,o.ORDER_NO, o.ORDER_DATE ");
 				break;
 			case 3:
-				sql.append(" ORDER BY o.IsCASH,c.CODE, o.ORDER_DATE, o.ORDER_NO ");
+				sql.append("\n ORDER BY o.IsCASH,c.CODE, o.ORDER_DATE, o.ORDER_NO ");
 				break;
 			default:
-				sql.append(" ORDER BY o.IsCASH ");
+				sql.append("\n ORDER BY o.IsCASH ");
 				break;
 			}
 			
 			sql.append(") t ");
 			if(!StringUtils.isEmpty(t.getPdPaid()))
-				sql.append("WHERE t.ISPDPAID = '"+t.getPdPaid()+"' ");
+				sql.append("\n WHERE t.ISPDPAID = '"+t.getPdPaid()+"' ");
 			
+			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql.toString());
 			
 			while(rs.next()){
+				no++;
 				detailedSales = new DetailedSalesReport();
+				detailedSales.setNo(no+"");
 				detailedSales.setOrderDate(DateToolsUtil.convertToString(rs.getTimestamp("ORDER_DATE")));
 				detailedSales.setOrderNo(rs.getString("ORDER_NO"));
 				detailedSales.setName(rs.getString("NAME"));
 				detailedSales.setName2(rs.getString("NAME2"));
-				detailedSales.setTotalAmount(rs.getDouble("TOTAL_AMOUNT"));
+				detailedSales.setTotalAmount(rs.getDouble("NET_AMOUNT"));
 				detailedSales.setPayment(rs.getString("PAYMENT"));
 				detailedSales.setInterfaces(rs.getString("INTERFACES"));
 				detailedSales.setExported(rs.getString("EXPORTED"));

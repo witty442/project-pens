@@ -23,6 +23,12 @@
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <%
 String wareHouse = reqPickStockForm.getBean().getWareHouse();
+String screentHeight =(String)session.getAttribute("screenHeight");
+if("".equals(screentHeight)){
+	screentHeight ="540px";
+}else{
+	screentHeight +="px";
+}
 //System.out.println("WareHouse:"+wareHouse);
 %>
 <html>
@@ -227,7 +233,7 @@ function openPopupProduct(path,seqNo,types){
 	var param = "&types="+types+"&seqNo="+seqNo;
 	url = path + "/jsp/searchProductPopupAction.do?do=prepare2&action=new"+param;
 	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
 }
 function isNum(obj){
   if(obj.value != ""){
@@ -348,7 +354,7 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	        
 		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
 		window.open(encodeURI(url),"",
-				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
 	}
 	return false;
 }
@@ -381,7 +387,7 @@ function openPopupCustomer(path,types,storeType){
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
 	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
 }
 
 function setStoreMainValue(code,desc,storeNo,subInv,types){
@@ -749,24 +755,22 @@ function currencyToNum(str){
 							<% 
 							index++;
 							} %>
+							
+							<tr id="" class="">
+							         
+							            <td class="data_groupCode"></td>
+							            <td class="data_pensItem"> </td>
+										<td class="data_barcode">รวมทั้งสิ้น  </td>
+										<td class="data_qty">
+										 <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
+										 
+										 <!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
+								         <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
+								         <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>
+										</td>
+							  </tr>
 						</table>
 					
-					
-					<div align="right">
-						<table  border="0" cellpadding="3" cellspacing="0" >
-							<tr>
-								<td align="right">	 <span class="pagelinks">รวมทั้งสิ้น :
-								<html:text property="bean.totalQty" styleId="totalQty" size="30" styleClass="disableNumber"/>
-								
-								<br/>
-								<!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
-								<!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
-								<!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>
-								</span>			
-								</td>
-							</tr>
-						</table>
-					</div>	
 				<%} %>		
 					
 					
@@ -850,23 +854,22 @@ function currencyToNum(str){
 							<% 
 							index++;
 							} %>
+							
+							    <tr id="" class="">
+							         
+							            <td class="data_groupCode"></td>
+							            <td class="data_pensItem"> </td>
+										<td class="data_materialMaster"> </td>
+										<td class="data_barcode">รวมทั้งสิ้น  </td>
+										<td class="data_qty">
+										 <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
+										 
+										 <!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
+								         <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
+								         <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>
+										</td>
+							  </tr>
 						</table>
-					
-					<div align="right">
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
-							<tr>
-								<td align="right" >	 <span class="pagelinks">รวมทั้งสิ้น :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								<html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
-								&nbsp;&nbsp;&nbsp;	&nbsp;&nbsp;&nbsp;&nbsp;
-								
-								<!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
-								<!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value=""/>
-								<!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>
-								</span>			
-								</td>
-							</tr>
-						</table>
-					</div>	
 				<%} %>		
 				
 					<!-- BUTTON ACTION-->

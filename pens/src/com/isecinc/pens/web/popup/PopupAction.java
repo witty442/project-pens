@@ -36,8 +36,8 @@ public class PopupAction extends I_Action {
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action")) && "BRAND".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("BRAND_LIST", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -45,8 +45,8 @@ public class PopupAction extends I_Action {
 				 forward = "searchBrand";
 			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("INVOICE_LIST", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -98,6 +98,14 @@ public class PopupAction extends I_Action {
 				 }
 				 forward = "searchBrand";
 			}else if("INVOICE".equalsIgnoreCase(request.getParameter("page"))){
+				String productCode = Utils.isNull(request.getParameter("productCode"));
+				String userId = Utils.isNull(request.getParameter("userId"));
+				String customerCode = Utils.isNull(request.getParameter("customerCode"));
+				
+				popupForm.setCustomerCode(customerCode);
+				popupForm.setUserId(userId);
+				popupForm.setProductCode(productCode);
+				
 				 List<PopupForm> results = PopupDAO.searchInvoice(popupForm,"");
 				 
 				 if(results != null && results.size() >0){

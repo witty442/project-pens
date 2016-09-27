@@ -37,7 +37,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/adjust_stock_sa.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/table_style.css" />
 
 <style type="text/css">
 span.pagebanner {
@@ -236,7 +236,7 @@ function getStoreNameModel(storeCode){
 
             <c:if test="${adjustStockSAForm.resultsSearchSize != 0}">
                   	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableAj">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="80%">
 						       <tr>
 									<th >No</th>
 									<th >Document No</th>
@@ -257,21 +257,21 @@ function getStoreNameModel(storeCode){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_documentNo">
+										<td class="td_text_center">${results.no}</td>
+										<td class="td_text_center">
 										   ${results.documentNo}
 										</td>
-										<td class="search_transactionDate">${results.transactionDate}</td>
-										<td class="search_storeCode">
+										<td class="td_text_center">${results.transactionDate}</td>
+										<td class="td_text_center">
 											${results.storeCode}
 										</td>
-										<td class="search_storeName">
+										<td class="td_text_center">
 										    ${results.storeName}
 										</td>
-										<td class="search_status">
+										<td class="td_text_center">
 										     ${results.statusDesc}
 										</td>
-										<td class="search_edit">
+										<td class="td_text_center">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','view')">
 											          ´Ù

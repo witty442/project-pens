@@ -68,6 +68,7 @@ public class LoginAction extends DispatchAction {
 			//clear check version
 			request.getSession().setAttribute("appVersionCheckMsg",null);
 			request.getSession().setAttribute("massageToSales",null);
+			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
 			AppversionVerify.checkAppVersion(request);
 		} catch (Exception e) {

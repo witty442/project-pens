@@ -21,7 +21,7 @@ public class TestALL {
 			
 			output +="DB IP  : "+url+"\n";
 			output +="DB User : "+username+"\n";
-			output +="DB Password : "+password.toCharArray()+"\n";
+			output +="DB Password : "+password+"\n";
 			
 			Class.forName(driver);
 			//DriverManager.setLoginTimeout(600);

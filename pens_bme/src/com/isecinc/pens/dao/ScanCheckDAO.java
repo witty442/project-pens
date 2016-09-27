@@ -7,7 +7,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -488,9 +490,7 @@ public class ScanCheckDAO extends PickConstants{
 		int r = 1;
 		int totalQty = 0;
 		try {
-			sql.append("\n select  \n");
-			sql.append("\n  h.* ");
-			sql.append("\n  from PENSBME_SCAN_CHECKOUT h  ");
+			sql.append("\n select  h.* from PENSBME_SCAN_CHECKOUT h  ");
 			sql.append("\n where 1=1   ");
 			
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
@@ -620,6 +620,49 @@ public class ScanCheckDAO extends PickConstants{
 			} catch (Exception e) {}
 		}
 		return maxBoxNo;
+	}
+	
+	public static Map<String,String> initItemMap(Connection conn,ScanCheckBean o ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Map<String,String> ITEM_MAP = new HashMap<String, String>();
+		int r = 1;
+		String keyMap = "";
+		try {
+			sql.append("\n select barcode,pens_item ,count(*) as c from PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i ");
+			sql.append("\n where 1=1   ");
+			sql.append("\n and h.issue_req_no = i.issue_req_no  ");
+			if( !Utils.isNull(o.getWareHouse()).equals("")){
+				sql.append("\n and h.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+			}
+			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
+				sql.append("\n and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
+			}
+			if( !Utils.isNull(o.getBoxNo()).equals("")){
+				sql.append("\n and i.box_no = '"+Utils.isNull(o.getBoxNo())+"'");
+			}
+
+			sql.append("\n  group by barcode,pens_item  ");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+				keyMap = rst.getString("barcode")+rst.getString("pens_item");
+				ITEM_MAP.put(keyMap, rst.getString("c"));
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return ITEM_MAP;
 	}
 	
 	public static List<ScanCheckBean> searchDetailItems(Connection conn,ScanCheckBean o ) throws Exception {

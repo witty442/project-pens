@@ -180,25 +180,41 @@ public class MOrder extends I_Model<Order> {
 		return true;
 	}
 
-	/**
-	 * Re-Calculate
-	 * 
-	 * @param order
-	 * @param lines
-	 * @throws Exception
-	 */
-	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) throws Exception {
-		DecimalFormat df = new DecimalFormat("###0.00");
-		double totalAmount = 0;
-		for (OrderLine l : lines) {
-			totalAmount += l.getLineAmount()-l.getDiscount();
-		}
-		double vat = order.getVatRate() * totalAmount / 100;
-		double netAmount = totalAmount + vat;
-		order.setTotalAmount(new Double(df.format(totalAmount)));
-		order.setVatAmount(new Double(df.format(vat)));
-		order.setNetAmount(new Double(df.format(netAmount)));
+	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) {
+		BigDecimal totalAmountDec = new BigDecimal("0");
+		BigDecimal lineAmount = new BigDecimal("0");
+		BigDecimal lineDiscount = new BigDecimal("0");
 		
+		BigDecimal VatCodeDec = new BigDecimal("7");
+		BigDecimal VatDec = new BigDecimal(0);
+		BigDecimal NetDec = new BigDecimal(0);
+		DecimalFormat df = new DecimalFormat("###0.00");
+		try{
+			//get OrderLine 
+			for (OrderLine l : lines) {
+				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
+				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+			}
+
+			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			VatDec = (VatCodeDec.multiply(totalAmountDec)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
+			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			//recalc vatAmount
+			VatDec = NetDec.subtract(totalAmountDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
+			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
+			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
+			
+		}catch(Exception e){
+		   logger.debug(e.getMessage(),e);
+		}finally{
+			
+		}
 		return order;
 	}
 	
@@ -252,22 +268,39 @@ public class MOrder extends I_Model<Order> {
 		}
 		return productGroup;
 	}
-	
+
+	//Recalc Net Amount From DB After save DB
 	public Order reCalculateHeadAmountDB(Connection conn, Order order) {
+		BigDecimal totalAmountDec = new BigDecimal("0");
+		BigDecimal lineAmount = new BigDecimal("0");
+		BigDecimal lineDiscount = new BigDecimal("0");
+		
+		BigDecimal VatCodeDec = new BigDecimal("7");
+		BigDecimal VatDec = new BigDecimal(0);
+		BigDecimal NetDec = new BigDecimal(0);
 		try{
 			//get OrderLine 
 			List<OrderLine> newlines = new MOrderLine().lookUp(conn,order.getId());
-			
 			DecimalFormat df = new DecimalFormat("###0.00");
-			double totalAmount = 0;
+			
 			for (OrderLine l : newlines) {
-				totalAmount += l.getLineAmount()-l.getDiscount();
+				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
+				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
 			}
-			double vat = order.getVatRate() * totalAmount / 100;
-			double netAmount = totalAmount + vat;
-			order.setTotalAmount(new Double(df.format(totalAmount)));
-			order.setVatAmount(new Double(df.format(vat)));
-			order.setNetAmount(new Double(df.format(netAmount)));
+
+			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			VatDec = (VatCodeDec.multiply(totalAmountDec)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
+			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			//recalc vatAmount
+			VatDec = NetDec.subtract(totalAmountDec);
+			
+			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
+			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
+			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
 			
 		}catch(Exception e){
 		   logger.debug(e.getMessage(),e);

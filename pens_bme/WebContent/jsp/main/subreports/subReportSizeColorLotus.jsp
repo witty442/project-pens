@@ -57,7 +57,7 @@ body {
 </head>
      <c:if test="${summaryForm.page == 'sizeColorLotus'}">
 		<c:if test="${summaryForm.results != null}">
-		<c:if test="${summaryForm.summaryType == 'PensItem'}">
+		<c:if test="${summaryForm.summaryType == 'PensItem' || summaryForm.summaryType ==null}">
 		<br/>
 			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
 			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	

@@ -17,7 +17,8 @@ public class AdjustStockSA implements Serializable{
 	
 	private int seqNo;
 	private String itemAdjust;
-	private String itemAdjustDesc;
+	private String groupCode;
+	
 	private String itemAdjustUom;
 	private String itemAdjustQty;
 	
@@ -89,11 +90,12 @@ public class AdjustStockSA implements Serializable{
 	public void setItemAdjust(String itemAdjust) {
 		this.itemAdjust = itemAdjust;
 	}
-	public String getItemAdjustDesc() {
-		return itemAdjustDesc;
+    
+	public String getGroupCode() {
+		return groupCode;
 	}
-	public void setItemAdjustDesc(String itemAdjustDesc) {
-		this.itemAdjustDesc = itemAdjustDesc;
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
 	}
 	public String getItemAdjustUom() {
 		return itemAdjustUom;

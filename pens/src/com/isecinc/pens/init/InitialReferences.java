@@ -48,6 +48,7 @@ public class InitialReferences extends I_Initial {
 	public static final String ORGID_LIST = "OrgID"; 
 	public static final String MOVEORDER = "MoveOrder"; 
 	public static final String BILLPLAN = "BillPlan"; 
+	public static final String BACKDATE_INVOICE = "backdateinvoice"; 
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
@@ -98,11 +99,11 @@ public class InitialReferences extends I_Initial {
 		List<References> filter = new ArrayList<References>();
 		try{
 			List<References> refs =  referenes.get(key);
-			System.out.println("refs size:"+refs.size());
+			//System.out.println("refs size:"+refs.size());
 			if(refs != null && refs.size() > 0){
 				for(int i=0;i<refs.size();i++){
 					References r = (References)refs.get(i);
-					System.out.println("value["+value+"]key["+r.getKey()+"]code["+r.getCode()+"]");
+					//System.out.println("value["+value+"]key["+r.getKey()+"]code["+r.getCode()+"]");
 					if(value.equals(r.getKey())){
 						filter.add(r);
 					}

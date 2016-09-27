@@ -101,6 +101,9 @@
 		<form-bean name="detailedSalesReportForm"
 			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportForm" />
 			
+		<form-bean name="creditControlReportForm"
+			type="com.isecinc.pens.web.report.creditcontrol.CreditControlReportForm" />
+			
 		<!-- Interfaces -->
 		<form-bean name="interfacesForm"
 			type="com.isecinc.pens.web.interfaces.InterfacesForm" />
@@ -394,6 +397,16 @@
 			type="com.isecinc.pens.web.report.detailedsales.DetailedSalesReportAction">
 			<forward name="report" path="/jsp/reports/detailedSalesReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/detailedSalesReport.jsp" />
+		</action>
+		
+		<!-- Credit Control REPORT -->
+		<action name="creditControlReportForm" path="/jsp/creditControlReport"
+			forward="/jsp/reports/creditControlReport.jsp" />
+		<action name="creditControlReportForm" path="/jsp/creditControlReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.creditcontrol.CreditControlReportAction">
+			<forward name="report" path="/jsp/reports/creditControlReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/creditControlReport.jsp" />
 		</action>
 
 		<!-- PERFORMANCE REPORT -->

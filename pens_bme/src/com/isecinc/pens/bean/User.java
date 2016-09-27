@@ -26,6 +26,7 @@ public class User extends I_PO implements Serializable {
 	public static final String PICK = "PICK";
 	public static final String MC = "MC";
 	public static final String HR = "HR";
+	public static final String HRM = "HRM";
 	public static final String SALE = "SALE";
 	public static final String MT_SALE = "MTSALE";
 	public static final String REDDOC = "REDDOC";

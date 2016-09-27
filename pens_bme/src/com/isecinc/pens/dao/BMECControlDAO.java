@@ -268,6 +268,59 @@ public class BMECControlDAO {
 			return bean;
 		}
 	 
+	 public static String[] canGenEndDateLotus(Connection conn,String storeCode,String asOfdate) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String[] results = new String[3];
+			//int diffMonth = 0;
+			try {
+				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
+				sql.append("\n and store_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					if(rst.getDate("max_ending_date") != null){
+						 Date endingDate = rst.getDate("max_ending_date");
+					     if(asofDateTemp.after(endingDate)){
+					    	 results[0] = "true";
+					    	 results[1] = "";
+					    	 results[2] ="";
+					     }else{
+					    	 results[0] = "false";
+					    	 results[1] = "";
+					    	 results[2] ="กรุณาตรวจสอบวันที่จะ End date ต้องมากกว่าการ End date ครั้งก่อนหน้านี้ ";
+					     }
+					}else{
+						results[0] = "true";
+				    	results[1] = "";
+				    	results[2] ="";
+					}
+				}else{
+					results[0] = "true";
+			    	results[1] = "";
+			    	results[2] ="";
+				}
+				
+				return results;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			
+		}
+	 
 	 public static String[] canGenMonthEndLotus(Connection conn,String storeCode,String asOfdate) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

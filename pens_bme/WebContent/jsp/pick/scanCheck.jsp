@@ -323,17 +323,6 @@ function sumTotal(){
     totalQty[0].value =  parseInt(totalQtyStart[0].value) + parseInt(totalRow[0].value);
 }
 
-/* function calcTotalRow(){
-	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
-	var barcodeLastRow = document.getElementsByName("barcode")[rows-1]; //alert(barcodeLastRow.value);
-	if(barcodeLastRow.value ==''){
-		rows = rows-1;// blank row
-	}
-	//Calc Row
-    var totalRow = document.getElementsByName("totalRow");
-    totalRow[0].value = rows;
-} */
-
 function calcTotalRow(){
 	var count= 0;
 	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
@@ -352,15 +341,18 @@ function calcTotalRow(){
 	return count;
 }
 
-function calcTotalRowByBarcode(barcode){
+function calcTotalRowByBarcodeAndPensItem(barcode,pensItem){
 	var count= 0;
 	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
 	for(var r=0;r<rows;r++){
 	   var barcodeObj = document.getElementsByName("barcode")[r]; 
+	   var pensItemObj = document.getElementsByName("pensItem")[r]; 
 	   var statusObj = document.getElementsByName("status")[r]; 
 	   //alert(barcodeObj.value+":"+statusObj.value);
 	   
-       if(barcodeObj.value != '' && barcodeObj.value ==barcode && statusObj.value != 'AB'){
+       if( barcodeObj.value != '' && barcodeObj.value == barcode
+        && pensItemObj.value != '' && pensItemObj.value == pensItem
+        && statusObj.value != 'AB'){
     	   count++;
        }
 	}
@@ -376,6 +368,12 @@ function removeRow(path){
 	//todo play with type
 	var tbl = document.getElementById('tblProduct');
 	var chk = document.getElementsByName("linechk");
+	var barcode = document.getElementsByName("barcode");
+	var pensItem =document.getElementsByName("pensItem");
+	
+	var barcodeArr = "";
+	var pensItemArr = "";
+	
 	var drow;
 	var bcheck=false;
 	for(var i=chk.length-1;i>=0;i--){
@@ -385,9 +383,25 @@ function removeRow(path){
 			bcheck=true;
 			
 			removeRowByIndex(path,drow,i);
+			
+			//set for remove session
+			barcodeArr +=barcode[i].value+",";
+			pensItemArr +=pensItem[i].value+",";
+			
 		}
 	}
 	if(!bcheck){alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;}
+	
+	/** Set discount session ITEM_MAP **/
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/autoRemoveSessionBarcodeFromStockIssue.jsp",
+			data : "barcodeArr=" + barcodeArr+"&pensItemArr="+pensItemArr,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
 	
 	 /** Calc in Page **/
 	 calcTotalRow();
@@ -468,7 +482,7 @@ function getProductModel(barcodeObj,lineId){
 	var returnString = "";
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcodeFromStockIssue.jsp",
-			data : "itemCode=" + barcodeObj.value+"&issueReqNo="+form.issueReqNo.value+"&warehouse="+warehouse+"&boxNo="+boxNo,
+			data : "barcode=" + barcodeObj.value+"&issueReqNo="+form.issueReqNo.value+"&warehouse="+warehouse+"&boxNo="+boxNo,
 			async: false,
 			cache: false,
 			success: function(getData){
@@ -497,12 +511,12 @@ function getProductModel(barcodeObj,lineId){
 			
 			found = true;
 			
+			/******** OLD CODE **********************************/
 			//validate remain qty in stock issue
-			var countQtyScreen = calcTotalRowByBarcode(barcodeObj.value);
-			var remainQtyNotinCurrentBoxNo = s[4];
-			
+			//var countQtyScreen = calcTotalRowByBarcodeAndPensItem(barcodeObj.value,pensItem[lineId-1].value);//+PensItem
+			//var remainQtyNotinCurrentBoxNo = s[4];
 			//alert("remainQtyNotinCurrentBoxNo["+remainQtyNotinCurrentBoxNo+"]countQtyScreen["+countQtyScreen+"]");
-			
+			/* 
 			if(countQtyScreen > remainQtyNotinCurrentBoxNo){
 				found = false;
 				alert("ยอดเกินจำนวนที่ได้มีการขอเบิก");
@@ -516,7 +530,26 @@ function getProductModel(barcodeObj,lineId){
 			}else{
 			   barcodeObj.className = 'disableText';
 			   materialMaster[lineId-1].className = 'disableText';
+			} */
+			/****************************************************/
+			//New code
+			var remainQtyByBarcodePensItem = s[4];
+			if(remainQtyByBarcodePensItem == 0){
+				found = false;
+				alert("ยอดเกินจำนวนที่ได้มีการขอเบิก");
+				barcodeObj.focus();
+				
+				barcode[lineId-1].value = '';
+				materialMaster[lineId-1].value = '';
+				groupCode[lineId-1].value = '';
+				pensItem[lineId-1].value = '';
+				
+			}else{
+			   barcodeObj.className = 'disableText';
+			   materialMaster[lineId-1].className = 'disableText';
 			}
+			
+			/****************************************************/
 		}
 	return found;
 }
@@ -602,13 +635,30 @@ function getProductModelByMat(matObj,lineId){
 			pensItem[lineId-1].value = s[3];
 	
 			found = true;
-			//validate remain qty in stock issue
-			var countQtyScreen = calcTotalRowByBarcode(barcode[lineId-1].value);
-			var remainQtyNotinCurrentBoxNo = s[4];
 			
+			/** OlD CODE validate remain qty in stock issue **/
+			//var countQtyScreen = calcTotalRowByBarcode(barcode[lineId-1].value);
+			//var remainQtyNotinCurrentBoxNo = s[4];
 			//alert("remainQtyNotinCurrentBoxNo["+remainQtyNotinCurrentBoxNo+"]countQtyScreen["+countQtyScreen+"]");
 			
-			if(countQtyScreen > remainQtyNotinCurrentBoxNo){
+			/* if(countQtyScreen > remainQtyNotinCurrentBoxNo){
+				found = false;
+				alert("ยอดเกินจำนวนที่ได้มีการขอเบิก");
+				matObj.focus();
+				
+				barcode[lineId-1].value = '';
+				materialMaster[lineId-1].value = '';
+				groupCode[lineId-1].value = '';
+				pensItem[lineId-1].value = '';
+				
+			}else{
+			   matObj.className = 'disableText';
+			   barcode[lineId-1].className = 'disableText';
+			} */
+			
+			//New code
+			var remainQtyByBarcodePensItem = s[4];
+			if(remainQtyByBarcodePensItem == 0){
 				found = false;
 				alert("ยอดเกินจำนวนที่ได้มีการขอเบิก");
 				matObj.focus();
@@ -622,6 +672,7 @@ function getProductModelByMat(matObj,lineId){
 			   matObj.className = 'disableText';
 			   barcode[lineId-1].className = 'disableText';
 			}
+			/****************************************************/
 			
 		}
 	return found;
@@ -848,7 +899,7 @@ function getProductModelByMat(matObj,lineId){
 							</table>
 					  </div>
 					<!-- ************************Result ***************************************************-->
-					<input type="text" name="currentRowIndex" id="currentRowIndex" />
+					<input type="hidden" name="currentRowIndex" id="currentRowIndex" />
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					<script>
 					 //disable list field strut bug no get value from disable field

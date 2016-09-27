@@ -164,6 +164,10 @@ public class SummaryExport {
 		StringBuffer h = new StringBuffer("");
 		int colspan = 10;
 		try{
+			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				colspan = 9;
+			}
+			
 			//Header
 			h.append("<table border='1'> \n");
 			
@@ -193,7 +197,9 @@ public class SummaryExport {
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
 				  h.append("<td>รหัสสาขา</td> \n");
-				  h.append("<td>PensItem</td> \n");
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+				     h.append("<td>PensItem</td> \n");
+				  }
 				  h.append("<td>Group</td> \n");
 				  h.append("<td>Begining Qty</td> \n");
 				  h.append("<td>Sale In Qty</td> \n");
@@ -209,7 +215,9 @@ public class SummaryExport {
 					OnhandSummary s = (OnhandSummary)list.get(i);
 					h.append("<tr> \n");
 					  h.append("<td>"+s.getStoreCode()+"</td> \n");
-					  h.append("<td>"+s.getPensItem()+"</td> \n");
+					  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					     h.append("<td>"+s.getPensItem()+"</td> \n");
+					  }
 					  h.append("<td>"+s.getGroup()+"</td> \n");
 					  h.append("<td>"+s.getBeginingQty()+"</td> \n");
 					  h.append("<td>"+s.getSaleInQty()+"</td> \n");
@@ -268,8 +276,8 @@ public class SummaryExport {
 			
 			h.append("</table> \n");
 
-			if(form.getOnhandSummaryMTTResults() != null){
-			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummaryMTTResults();
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
 			 	    
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
@@ -633,7 +641,7 @@ public class SummaryExport {
 				  h.append("<td>Sub Inv</td> \n");
 				  h.append("<td>ชื่อร้านค้า</td> \n");
 				  h.append("<td>Group</td> \n");
-				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType()) || "".equalsIgnoreCase(Utils.isNull(form.getSummaryType()))){
 				    h.append("<td>PensItem</td> \n");
 				    h.append("<td>Materila Master</td> \n");
 				    h.append("<td>Barcode</td> \n");
@@ -653,7 +661,7 @@ public class SummaryExport {
 					  h.append("<td>"+s.getSubInv()+"</td> \n");
 					  h.append("<td>"+s.getStoreName()+"</td> \n");
 					  h.append("<td>"+s.getGroup()+"</td> \n");
-					  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					  if("PensItem".equalsIgnoreCase(form.getSummaryType()) || "".equalsIgnoreCase(Utils.isNull(form.getSummaryType()))){
 					  h.append("<td>"+s.getPensItem()+"</td> \n");
 					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 					  h.append("<td class='text'>"+Utils.isNull(s.getBarcode())+"</td> \n");

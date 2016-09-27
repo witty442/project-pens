@@ -293,6 +293,27 @@ function genMonthEnd(path,storeType){
 		return true;
    }
 }
+function genEndDate(path,storeType){
+	   var form = document.summaryForm;
+	   var asOfDateFrom = form.salesDate.value;
+	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
+	   if(confirm("กรุณายืนยันการ Stock End Date")){
+		   if(asOfDateFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ As Of");
+			   asOfDateFrom.focus();
+			   return false;
+		   }
+		    if(pensCustCodeFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+			   pensCustCodeFrom.focus();
+			   return false;
+		   } 
+			form.action = path + "/jsp/summaryAction.do?do=genEndDate&page=<%=request.getParameter("page")%>&storeType="+storeType;
+			form.submit();
+			return true;
+	   }
+	}
 
 function clearForm(path){
 	var form = document.summaryForm;
@@ -787,9 +808,11 @@ function getCustName(custCode,fieldName,storeType){
 									    <%} %>
 									 </td>
 							   </tr>
-							    <% if("sizeColorLotus".equalsIgnoreCase(request.getParameter("page")) 
-								    		 ||  "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
-								    		 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) ){%>
+							    <% if("sizeColorLotus_XX".equalsIgnoreCase(request.getParameter("page")) 
+								    	 || "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
+								    	 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
+								    	 || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))  
+							    		){%>
 									   <tr>
 											<td align="right" width="30%" >แสดงตาม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											       <html:select property="summaryType">
@@ -893,9 +916,14 @@ function getCustName(custCode,fieldName,storeType){
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
-									<a href="javascript:genMonthEnd('${pageContext.request.contextPath}','Lotus')">
-									  <input type="button" value="GenMonthEnd" class="newPosBtn">
+									<a href="javascript:genEndDate('${pageContext.request.contextPath}','Lotus')">
+									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
 									</a>
+								<%} %>
+								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
+									<%-- <a href="javascript:genMonthEnd('${pageContext.request.contextPath}','Lotus')">
+									  <input type="button" value="Gen MonthEnd" class="newPosBtn">
+									</a> --%>
 								<%} %>
 							</td>
 						</tr>
@@ -970,28 +998,7 @@ function getCustName(custCode,fieldName,storeType){
 							    				
 							</display:table>
                     </c:if>
-                    
-                    <c:if test="${summaryForm.onhandSummaryMTTResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryMTTResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
-							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-							      
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-                    
+   
                       <c:if test="${summaryForm.onhandSummaryMTTDetailResults != null}">
 
 						<br/>
@@ -1270,29 +1277,14 @@ function getCustName(custCode,fieldName,storeType){
 					            <display:column  title="Diff" property="diff"  sortable="false" class="d_diff"/>	
 							</display:table>
                     </c:if>
-                    <c:if test="${summaryForm.onhandSummaryMonthEndLotusResults != null}">
-						<br/>
-							 <display:table id="item" name="sessionScope.summaryForm.onhandSummaryMonthEndLotusResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/>
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"/>	 
-							    <display:column  title="Group" property="group"  sortable="false" class="td_text"/>	
-							    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_text"/>	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_text"/>	
-							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_text"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="td_text"/>	
-							    <display:column  title="Adjust QTY " property="adjustQty"  sortable="false" class="td_text"/>	
-							    <display:column  title="Stock Short QTY " property="stockShortQty"  sortable="false" class="td_text"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="td_text"/>	
-							    				
-							</display:table> 
-                    </c:if>
+                   
                     
                     <jsp:include page="subreports/subReportOnhandBigCSP.jsp" /> 
                     <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
-                     <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
-                       
+                    <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
+                    <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
+                    <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
+                           
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					
 					<!-- hidden field -->

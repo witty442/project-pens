@@ -417,6 +417,11 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>10.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
 			</li> 
+			 <%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+				 <li>
+					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAllAction.do?do=prepare2&action=new');"><span>10.1 <bean:message bundle="sysprop" key="confPickStockAll"/></span></a>
+				</li> 
+			<%} %>
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqReturnAction.do?do=prepare2&action=new');"><span>11.<bean:message bundle="sysprop" key="reqReturnWacoal"/></span></a>
 			</li> 
@@ -426,13 +431,13 @@
 			
 			 <!-- Deprecate -->
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span><u>_12.<bean:message bundle="sysprop" key="pickStock"/></u></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockAction.do?do=prepare2&action=new');"><span><u>TEMP_12.<bean:message bundle="sysprop" key="pickStock"/></u></span></a>
 			</li> 
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=req');"><span><u>13.<bean:message bundle="sysprop" key="pickStockGroup"/></u></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=req');"><span><u>TEMP_13.<bean:message bundle="sysprop" key="pickStockGroup"/></u></span></a>
 			</li> 
 			 <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=complete');"><span><u>14.<bean:message bundle="sysprop" key="pickStockGroupComplete"/></u></span></a>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickStockGroupAction.do?do=prepare2&action=new&page=complete');"><span><u>TEMP_14.<bean:message bundle="sysprop" key="pickStockGroupComplete"/></u></span></a>
 			</li>
 			
 		</ul>
@@ -488,6 +493,34 @@
 				</li>   
 			<%} %>
 			
+		</ul>
+	</li> 
+<%} %>
+
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){%>
+  	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>งาน SA</span></a>
+		<ul>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){%>
+			    <li>
+					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saEmpAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="saEmp"/></span></a>
+				</li>
+				 <li>
+					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saDamageAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="saDamage"/></span></a>
+				</li> 
+				 <li>
+					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saTranAction.do?do=prepare2&action=new');"><span>3.<bean:message bundle="sysprop" key="saTran"/></span></a>
+				</li>  
+				<li><a href="#" class="parent" onclick=";"><span>4.รายงานที่เกี่ยวข้อง</span></a>
+			       <ul>
+				    	<li>
+						  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saStatementReport&action=new');">4.1 <span><bean:message bundle="sysprop" key="saStatementReport"/></span></a>
+					    </li>
+					     <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saOrisoftReport&action=new');">4.2 <span><bean:message bundle="sysprop" key="saOrisoftReport"/></span></a>
+				       </li>
+			      </ul>
+			     </li>
+			<%} %> 
 		</ul>
 	</li> 
 <%} %>

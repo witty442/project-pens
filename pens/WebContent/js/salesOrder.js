@@ -158,8 +158,6 @@ function gotoReport(path, role){
 	window.open(path + "/jsp/pop/nextVisitPopup.jsp?rand="+rand+"&role="+role, "Print Receipt/Tax Invoice", "width="+w+",height="+h+", top="+top+", left="+left+",location=0,resizable=0");
 }
 
-
-
 function presave(path) {
 	if(document.getElementsByName('order.shipAddressId')[0].value==''){
 		alert('ไม่มีที่อยู่แบบ Ship to ไม่สามารถบันทึกข้อมูลได้');
@@ -659,6 +657,8 @@ function calculatePrice(){
 			totals[i].value = Number(toFixed(s,5)).toFixed(2);
 		}
 		
+		//alert("bf amount1["+amounts1[i].value+"]af amounts1["+Number(toFixed(amounts1[i].value,5)).toFixed(5)+"] ::: bf amount2["+amounts2[i].value+"]af amounts2["+Number(toFixed(amounts2[i].value,5)).toFixed(5)+"]");
+		
 		amounts1[i].value = Number(toFixed(amounts1[i].value,5)).toFixed(5);
 		amounts2[i].value = Number(toFixed(amounts2[i].value,5)).toFixed(5);
 		
@@ -695,16 +695,24 @@ function calculatePrice(){
 	//WIT Edit :08/06/2011  Cale Vat by total_amount of Header 
 	
 	//total_amount- total_discount  excluded vat
-	document.getElementsByName("order.totalAmount")[0].value = Number(toFixed(sumT,5));
-	document.getElementById("tempTotalAmount").value = addCommas(Number(toFixed(sumT,5)).toFixed(2));
+	//alert("sumT["+sumT+"]");
+	
+	var totalAmount = toFixed(Number(sumT),2);
+	document.getElementsByName("order.totalAmount")[0].value = totalAmount;
+	document.getElementById("tempTotalAmount").value = addCommas(Number(totalAmount).toFixed(2));
 	
 	//total_vat_amount
-	var sumVatAmount = (Number(v)*Number(sumT))/100; 
-	document.getElementsByName("order.vatAmount")[0].value = Number(toFixed(sumVatAmount,5));
-	document.getElementById("tempVatAmount").value = addCommas(Number(toFixed(sumVatAmount,5)).toFixed(2));
+	var sumVatAmount = toFixed((Number(v)*Number(sumT))/100,2); 
 	
-	document.getElementsByName("order.netAmount")[0].value = toFixed(Number(sumT)+Number(sumVatAmount),5);
-	document.getElementById("tempNetAmount").value = addCommas(Number(toFixed(Number(sumT)+Number(sumVatAmount),5)).toFixed(2));
+	//alert("sumVatAmount["+sumVatAmount+"]sumVatAmount5["+Number(toFixed(sumVatAmount,5))+"]");
+	var totalNetAmount = toFixed(Number(sumT)+Number(sumVatAmount),2);
+	document.getElementsByName("order.netAmount")[0].value = totalNetAmount;
+	document.getElementById("tempNetAmount").value = addCommas(Number(totalNetAmount).toFixed(2));
+	
+	//recalc TotalVatAmount
+	var sumVatAmount = Number(totalNetAmount).toFixed(2) - Number(totalAmount).toFixed(2);
+	document.getElementsByName("order.vatAmount")[0].value = sumVatAmount;
+	document.getElementById("tempVatAmount").value = addCommas(Number(sumVatAmount).toFixed(2));
 }
 
 function toFixed(num, pre){
