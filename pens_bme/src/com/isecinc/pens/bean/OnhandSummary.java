@@ -17,7 +17,7 @@ public class OnhandSummary implements Serializable{
 	private String pensItemFrom;
 	private String pensItemTo;
 	private String dispZeroStock;
-	
+	private String endDate;
 	
 	private String salesDate;
 	private String pensCustCodeFrom;
@@ -43,6 +43,7 @@ public class OnhandSummary implements Serializable{
     private String message;
     private String pensItem;
     
+    
     private String storeCode;
     private String storeName;
     private String custNo;//oracle
@@ -60,6 +61,12 @@ public class OnhandSummary implements Serializable{
     private String initDate;
 	
 	
+	public String getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
 	public String getBeginingQty() {
 		return beginingQty;
 	}

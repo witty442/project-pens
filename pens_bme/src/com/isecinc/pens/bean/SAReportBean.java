@@ -31,6 +31,7 @@ public class SAReportBean implements Serializable{
 	private String payType;
 	private String payDate;
 	private String payAmt;
+	private String delayPayAmt;
     private String totalDamage;
     
     private String asOfMonth;
@@ -40,8 +41,28 @@ public class SAReportBean implements Serializable{
     private String netSuretyBondAmt;
     
     private List<SAReportBean> items;
+    private String totalPayment;
+    private String totalDelayPayment;
     
     
+	public String getTotalPayment() {
+		return totalPayment;
+	}
+	public void setTotalPayment(String totalPayment) {
+		this.totalPayment = totalPayment;
+	}
+	public String getTotalDelayPayment() {
+		return totalDelayPayment;
+	}
+	public void setTotalDelayPayment(String totalDelayPayment) {
+		this.totalDelayPayment = totalDelayPayment;
+	}
+	public String getDelayPayAmt() {
+		return delayPayAmt;
+	}
+	public void setDelayPayAmt(String delayPayAmt) {
+		this.delayPayAmt = delayPayAmt;
+	}
 	public String getAsOfMonth() {
 		return asOfMonth;
 	}

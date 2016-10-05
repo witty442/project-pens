@@ -23,6 +23,7 @@ import com.isecinc.pens.inf.helper.Utils;
 public class User extends I_PO implements Serializable {
 
 	public static final String ADMIN = "ADMIN";
+	public static final String PICKADMIN = "PICKADMIN";
 	public static final String PICK = "PICK";
 	public static final String MC = "MC";
 	public static final String HR = "HR";

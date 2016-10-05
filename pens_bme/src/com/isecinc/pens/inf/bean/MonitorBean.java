@@ -59,9 +59,16 @@ private static final long serialVersionUID = -990650039740579753L;
 
     /** Parameter for Run Batch **/
 	private Map<String, String> batchParamMap;
+	private Map<String, Object> batchParamMapObj;
     private FormFile dataFile;
 	
     
+public Map<String, Object> getBatchParamMapObj() {
+		return batchParamMapObj;
+	}
+	public void setBatchParamMapObj(Map<String, Object> batchParamMapObj) {
+		this.batchParamMapObj = batchParamMapObj;
+	}
 public FormFile getDataFile() {
 		return dataFile;
 	}

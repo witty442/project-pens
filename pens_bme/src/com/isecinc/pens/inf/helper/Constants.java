@@ -34,6 +34,7 @@ public class Constants {
 	public static final String TYPE_EXPORT_BILL_ICC = "EXPORT_BILL_ICC";
 	public static final String TYPE_GEN_ORDER_EXCEL = "GEN_ORDER_EXCEL";
 	public static final String TYPE_IMPORT_TRANSACTION_LOTUS = "IMPORT_TRANS_LOTUS";
+	public static final String TYPE_GEN_STOCK_ENDDATE_LOTUS = "GEN_STOCK_ENDDDATE_LOTUS";
 	
 	public static final String TYPE_SALES = "SALES";
 	public static final String TYPE_CENTER = "CENTER";

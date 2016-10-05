@@ -42,6 +42,7 @@ public class Utils {
 	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	public static final String DD_MMM_YY = "dd-MMM-yy";
+	public static final String YYYYMM = "yyyyMM";
 	
 	//Thai date
 	public static final String MMMM_YYYY = "MMMM-yyyy";

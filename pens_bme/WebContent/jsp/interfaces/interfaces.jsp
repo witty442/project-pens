@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
 <%@page import="com.isecinc.pens.inf.helper.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -92,7 +93,6 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	//clear cach
 	$.ajaxSetup({cache: false});
 	
-
 	function runBatch(path) {
 			var confirmText = "ยืนยัน Process ";
 			var pageName = document.getElementsByName("pageName")[0];
@@ -236,6 +236,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
         /** Check Status Recursive **/
 	    function checkStatus(){
 	    	  var status =  document.getElementsByName("monitorBean.status")[0].value;
+	    	 // alert(status);
 	    	   if(status == '1'){ //Finish Task
 	    		   //Calc Time thred use
 	    		   try{
@@ -251,9 +252,16 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	    		   }catch(e){}
 	    		   /** Task Success ***/
 	    		   update(status);
-	    		   //search display
-	    		   search('<%=request.getContextPath()%>', 'admin');
-
+	    		   
+	    		   <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  %>
+	    		     //  if(status != '-1')
+	    		        //window.close();
+	    		      //search display
+	    		       search('<%=request.getContextPath()%>', 'admin');
+	    		   <%}else{ %>
+	    		       //search display
+	    		       search('<%=request.getContextPath()%>', 'admin');
+                   <%} %>
 	    	   }else { //Task Running
 	    		   /** Task Not Success  and Re Check Status**/
 		    	   update(status);
@@ -261,8 +269,33 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	           }
 	    }
 	    </script>
-	<% } %>
-<!-- PROGRESS BAR -->
+	    <!-- PROGRESS BAR -->
+	<% }else{ 
+		//Show Message In Parent window
+	    if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  
+	    	MonitorBean resultsBean = interfacesForm.getResults()[0];
+	    	String message = "Gen ข้อมูลเรียบร้อย";
+	    	
+	    	if(Utils.isNull(resultsBean.getErrorMsg()).equals("")){
+	  %>
+		    <script>
+		       window.opener.div_message.innerHTML = "<%=message %>";
+		       window.opener.div_error_message.innerHTML ="";
+		       window.close();
+		     </script>
+	    <% }else{ 
+	         message = Utils.isNull(resultsBean.getErrorMsg());
+	    %>
+	         <script>
+		       window.opener.div_error_message.innerHTML = "<%=message %>";
+		       window.opener.div_message.innerHTML  ="";
+		       window.close();
+		     </script>
+	 
+	 <%   }
+	    }
+	} %>
+
 </head>
 
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;"  style="height: 100%;" onload="loadme()">
@@ -313,6 +346,10 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		    <%}else if(Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equalsIgnoreCase(pageName)) {%>
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
+				</jsp:include>
+			 <%}else if(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="GenStockEndDateLotus"/>
 				</jsp:include>
 			<%} %>
 			
@@ -499,7 +536,11 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 								<tr>
 									<td align="center" width ="100%">
 									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')"> 
-									    <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+									    <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  %>
+									      <input type="button" value="ปิดหน้าต่างนี้" class="newPosBtnLong" style="width: 100px;" onClick="javascript:window.close()">
+									    <%}else{ %>
+									       <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+									    <%} %>
 									</td>
 								</tr>
 							</table>   
@@ -542,7 +583,11 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 							<p></p>
 							 <!-- BME Scan Result -->
 							<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
-						   <%} %>
+						   <% }else if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){ %> 
+							    <p></p>
+							    <jsp:include page="monitor_short.jsp"></jsp:include>
+								<p></p>
+							<%} %>
 					     
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->

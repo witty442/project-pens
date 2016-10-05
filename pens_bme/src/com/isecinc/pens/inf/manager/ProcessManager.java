@@ -12,7 +12,9 @@ import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.BMECControlDAO;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
@@ -29,6 +31,7 @@ import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportBillICC;
 import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.process.SequenceProcess;
+import com.isecinc.pens.summary.process.GenerateEndDateLotus;
 
 /**
  * @author WITTY
@@ -500,6 +503,15 @@ public class ProcessManager {
 		
 		}
 		return monitorModel;
+	}
+	
+
+	public  MonitorBean processGenStockEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+		try{
+			return GenerateEndDateLotus.processGenStockEndDateLotus(monitorModel, user, request);
+		}catch(Exception e){
+			throw e;
+		}
 	}
 	
 }

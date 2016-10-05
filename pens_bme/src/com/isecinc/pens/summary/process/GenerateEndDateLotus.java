@@ -1,50 +1,160 @@
 package com.isecinc.pens.summary.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BMECControlDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
+import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.inf.bean.MonitorItemBean;
+import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.isecinc.pens.inf.exception.ExceptionHandle;
+import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.process.SequenceProcess;
 
 public class GenerateEndDateLotus {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static String[] generateEndDateLotus(OnhandSummary c,User user) throws Exception{
+	public static MonitorBean processGenStockEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		Connection conn = null;
+		Connection connMonitor = null;
+		InterfaceDAO dao = new InterfaceDAO();
+		Map<String, Object> batchParamMap = new HashMap<String, Object>();
+		MonitorTime monitorTime = null;
+		int taskStatusInt = Constants.STATUS_START;
+		try{
+			
+			/** prepare Paramenter **/
+			batchParamMap = monitorModel.getBatchParamMapObj();
+			OnhandSummary summary = (OnhandSummary)batchParamMap.get("ONHAND_SUMMARY");
+			logger.debug("customerCode:"+summary.getPensCustCodeFrom());
+			logger.debug("salesdate:"+summary.getSalesDate());
+			
+			/** Connection Monitor */
+			connMonitor = DBConnection.getInstance().getConnection();
+				
+			/** Set Trasaction no Auto Commit **/
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+		
+			/** insert to monitor_item **/
+			logger.debug("Insert Monitor Item  TableName:Genreate Stock End Date Lotus");
+			MonitorItemBean modelItem = new MonitorItemBean();
+			modelItem.setMonitorId(monitorModel.getMonitorId());
+			modelItem.setSource("");
+			modelItem.setDestination("");
+			modelItem.setTableName("Genreate Stock End Date Lotus");
+			modelItem.setFileName("");
+			modelItem.setStatus(Constants.STATUS_START);
+			modelItem.setDataCount(0);
+			modelItem.setFileSize("");
+			modelItem.setSubmitDate(new Date());
+			modelItem.setId(new BigDecimal(SequenceProcess.getNextValue("monitor_item")));
+			
+			monitorTime  = new MonitorTime("Generate Stock End Date Lotus");   
+			
+			//Validate BME_ORDER EXPORTED 
+			String re[] = BMECControlDAO.canGenEndDateLotus(conn,summary.getPensCustCodeFrom(),summary.getSalesDate());
+			if("false".equals(re[0])){
+				taskStatusInt = Constants.STATUS_FAIL;
+			    modelItem.setErrorMsg("กรุณาตรวจสอบวันที่จะ End date ต้องมากกว่าการ End date ครั้งก่อนหน้านี้");
+				modelItem.setErrorCode("SalesDateException");
+			}
+			
+			if(taskStatusInt == Constants.STATUS_START){
+				//Process Generate 
+				modelItem = GenerateEndDateLotus.generateEndDateLotus(conn,modelItem,summary, user);
+				
+				monitorTime.debugUsedTime();
+			
+				//Insert Monitor Item
+				modelItem = dao.insertMonitorItem(connMonitor,modelItem);
+				
+				logger.debug("Transaction commit");
+				taskStatusInt = Constants.STATUS_SUCCESS;
+				conn.commit();
+				
+				/** Update Head Monitor **/
+				monitorModel.setStatus(taskStatusInt);
+				monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
+			}else{
+				/** Update Head Monitor **/
+				monitorModel.setStatus(taskStatusInt);
+				monitorModel.setErrorCode(modelItem.getErrorCode());
+				monitorModel.setErrorMsg(modelItem.getErrorMsg());
+				monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
+			}
+	
+			/** Update Monitor **/
+			dao.updateMonitor(connMonitor,monitorModel);
+
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			
+			/** End process ***/
+			logger.debug("Update Monitor to Fail ");
+			monitorModel.setStatus(Constants.STATUS_FAIL);
+			monitorModel.setBatchTaskStatus(Constants.STATUS_SUCCESS);//Thread batchTask end process
+			monitorModel.setTransactionType(monitorModel.getTransactionType());
+			monitorModel.setErrorCode(ExceptionHandle.getExceptionCode(e));
+			
+			dao.updateMonitorCaseError(connMonitor,monitorModel);
+
+			//clear Task running for next run
+			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
+			
+			if(conn != null){
+			  logger.debug("Transaction Rolback");
+			  conn.rollback();
+			}
+		
+		}finally{
+		
+			if(conn != null){
+				conn.setAutoCommit(true);
+				conn.close();
+				conn =null;
+			}
+			if(connMonitor != null){
+				connMonitor.close();
+				connMonitor=null;
+			}
+		}
+		return monitorModel;
+	}
+	
+	public static MonitorItemBean generateEndDateLotus(Connection conn,MonitorItemBean monitorItemBean,OnhandSummary c,User user) throws Exception{
 		PreparedStatement ps = null;
 		PreparedStatement psIns = null;
 		PreparedStatement psDel = null;
 	    ResultSet rst = null;
 	    StringBuilder sql = new StringBuilder();
-	    String[] results = new String[3];
-	    String yearMonth = "";
+	    //String[] results = new String[3];
+	    //String yearMonth = "";
+	    int result =0;
 		try{
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
 			Date asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			//validate 
-			results = BMECControlDAO.canGenEndDateLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
-			
-			if(results[0].equals("false")){
-				return results;
-			}
-			yearMonth = results[1];
+			//results = BMECControlDAO.canGenEndDateLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+			//yearMonth = results[1];
 			
 			//delete old month by yearMonth
 			//psDel = conn.prepareStatement("delete from PENSBME_ENDDATE_STOCK where year_month ='"+yearMonth+"' and store_code ='"+c.getPensCustCodeFrom()+"'");
@@ -81,18 +191,18 @@ public class GenerateEndDateLotus {
 				psIns.execute();
 			}
 			
-			conn.commit();
+			result = Constants.STATUS_SUCCESS;
+		
+			monitorItemBean.setStatus(result);
+			
 		}catch(Exception e){
-			results[2] = ""+e.getMessage();
-			conn.rollback();
 			throw e;
 		}finally{
 			if(rst != null)rst.close();
 			if(ps != null) ps.close();
 			if(psIns != null)psIns.close();
-			if(conn != null)conn.close();
 		}
-		return results;
+		return monitorItemBean;	
 	}
 	
 	// Gen MonthEnd From Report onhandLotus
@@ -101,7 +211,6 @@ public class GenerateEndDateLotus {
 			String onhandDateAsOfConfigStr = "";
 			Date onhandDateAsOfConfig = null;
 			Date asofDate = null;
-			boolean unionAllFlag = false;
 			try {
 				onhandDateAsOfConfigStr = BMECControlDAO.getOnhandDateLotusAsOf(conn);
 				onhandDateAsOfConfig = Utils.parse(onhandDateAsOfConfigStr,Utils.DD_MM_YYYY_WITHOUT_SLASH);
@@ -112,6 +221,9 @@ public class GenerateEndDateLotus {
 					asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				}
+				logger.debug("asofDate:"+asofDate);
+				logger.debug("onhandDateAsOfConfig:"+onhandDateAsOfConfig);
+				
 				sql.append("\n SELECT A.* FROM(");
 				sql.append("\n SELECT M.*");
 				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");
@@ -577,5 +689,39 @@ public class GenerateEndDateLotus {
 			return sql;
 	    }
 	
+	 public static String getEndDateStock(String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String r = "";
+			try {
+				//Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
+				sql.append("\n and store_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				}
+				
+				return r;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			
+		}
 
 }

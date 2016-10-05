@@ -60,12 +60,19 @@ public class SADamageAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				SADamageBean ad = new SADamageBean();
-				
+				//can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					ad.setCanEdit(true);
+				}
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				SADamageBean oldCri = aForm.getBeanCriteria();
-				
-				aForm.setBean(SADamageDAO.searchHead(oldCri,"",false));
+				SADamageBean bean = SADamageDAO.searchHead(oldCri,"",false);
+				//can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					bean.setCanEdit(true);
+				}
+				aForm.setBean(bean);
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
@@ -132,7 +139,10 @@ public class SADamageAction extends I_Action {
 				bean = SADamageDAO.searchHead(c,"edit",true).getItems().get(0);
 				bean.setCanEdit(true);
 			}
-			
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 			aForm.setBean(bean);
 			aForm.setMode(action);//Mode Edit ,Add
 			
@@ -194,10 +204,16 @@ public class SADamageAction extends I_Action {
 	
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
+		User user = (User) request.getSession().getAttribute("user");
 		SADamageForm aForm = (SADamageForm) form;
 		try {
 			aForm.setResultsSearch(null);
-			aForm.setBean(new SADamageBean());
+			SADamageBean bean = new SADamageBean();
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -380,7 +396,10 @@ public class SADamageAction extends I_Action {
 			criPK.setInvRefwal(h.getInvRefwal());
 			
 			SADamageBean bean = SADamageDAO.searchHead(conn,mode,criPK,true).getItems().get(0);
-			bean.setCanEdit(true);
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 		    aForm.setBean(bean);
 		    aForm.setMode(mode);
 		    
@@ -407,13 +426,17 @@ public class SADamageAction extends I_Action {
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			aForm.setResults(new ArrayList<SADamageBean>());
 			
 			SADamageBean bean = new SADamageBean();
 			bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			bean.setType("BME");
-			bean.setCanEdit(true);
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 			aForm.setBean(bean);
 			
 			aForm.setMode("add");

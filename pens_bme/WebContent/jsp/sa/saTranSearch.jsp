@@ -276,7 +276,12 @@ function openEdit(path,empId){
 								%>
 									<tr class="<%=tabclass%>"> 
 									   <td class="td_text_center" width="10%">
+									       <c:if test="${saTranForm.bean.canEdit == true}">
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')">Action</a><!-- 0 -->
+											</c:if>
+											<c:if test="${saTranForm.bean.canEdit == false}">
+											   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> VIEW </a><!-- 0 -->
+											</c:if>
 										</td>
 										<td class="td_text" width="6%"><%=mc.getEmpId()%></td><!-- 1 -->
 										<td class="td_text" width="10%"><%=mc.getName()%></td><!-- 3 -->

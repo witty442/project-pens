@@ -2,6 +2,7 @@ package util;
 
 public class ExcelHeader {
 	static String a= "@";
+	static String a2= "#";
 	public static StringBuffer EXCEL_HEADER = new StringBuffer("");
 	static{
 		EXCEL_HEADER.append("<style> \n");
@@ -14,7 +15,10 @@ public class ExcelHeader {
 		EXCEL_HEADER.append(" .colum_head{ \n");
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
+		EXCEL_HEADER.append(" .currency{ \n");
+		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
+		EXCEL_HEADER.append(" } \n");
 		EXCEL_HEADER.append("</style> \n");
-	
+		
 	}
 }

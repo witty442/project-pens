@@ -46,12 +46,16 @@ public class SAEmpBean implements Serializable{
 	private String suretyBond	;
 	private String startSuretyBondDate;
 	
+	private String totalDamage;
+	private String totalPayment;
+	private String totalDelayPayment;
 
 	
 	private String createUser;
 	private String updateUser;
 	private List<SAEmpBean> items;
 	private String disableTextClass;
+	private String dispDamage;
 
 	//optional
 	private boolean canEdit = false;
@@ -60,6 +64,30 @@ public class SAEmpBean implements Serializable{
 	
 	
     
+	public String getTotalDamage() {
+		return totalDamage;
+	}
+	public void setTotalDamage(String totalDamage) {
+		this.totalDamage = totalDamage;
+	}
+	public String getTotalPayment() {
+		return totalPayment;
+	}
+	public void setTotalPayment(String totalPayment) {
+		this.totalPayment = totalPayment;
+	}
+	public String getTotalDelayPayment() {
+		return totalDelayPayment;
+	}
+	public void setTotalDelayPayment(String totalDelayPayment) {
+		this.totalDelayPayment = totalDelayPayment;
+	}
+	public String getDispDamage() {
+		return dispDamage;
+	}
+	public void setDispDamage(String dispDamage) {
+		this.dispDamage = dispDamage;
+	}
 	public String getDisableTextClass() {
 		return disableTextClass;
 	}

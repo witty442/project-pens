@@ -334,8 +334,22 @@ public class SAEmpDAO {
 			try {
 			   sql.append(" \n select S.*" );
 			   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =S.region)as region_desc" );
+			   if( !Utils.isNull(o.getDispDamage()).equals("")){
+				   sql.append(" \n,(SELECT NVL(SUM(M.total_damage),0) FROM sa_damage_head M where M.emp_id = S.emp_id group by M.emp_id) as total_damage" );
+				   
+				   sql.append(" \n,(SELECT NVL(SUM(t.pay_amt),0) FROM sa_damage_tran t" );
+				   sql.append(" \n  where t.emp_id = S.emp_id " );
+				   sql.append(" \n  and t.paydate <= sysdate "); 
+				   sql.append(" \n  group by t.emp_id ");
+				   sql.append(" \n )as total_payment" );
+				   
+				   sql.append(" \n,(SELECT NVL(SUM(t.pay_amt),0) FROM sa_damage_tran t" );
+				   sql.append(" \n  where t.emp_id = S.emp_id  " );
+				   sql.append(" \n  and t.paydate > sysdate "); 
+				   sql.append(" \n  group by t.emp_id ");
+				   sql.append(" \n )as total_delay_payment" );
+				}
 			   sql.append("\n  from SA_EMPLOYEE S ");
-			   
 			   sql.append("\n  WHERE 1=1");
 			   if( !Utils.isNull(o.getEmpId()).equals("") ){
 					sql.append("\n and S.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
@@ -364,6 +378,10 @@ public class SAEmpDAO {
 				if( !Utils.isNull(o.getBranch()).equals("")){
 					sql.append("\n and S.branch = '"+Utils.isNull(o.getBranch())+"'");
 				}
+				if( !Utils.isNull(o.getDispDamage()).equals("")){
+					
+				}
+				
 				sql.append("\n order by S.name asc ");
 				
 				logger.debug("sql:"+sql);
@@ -432,6 +450,13 @@ public class SAEmpDAO {
 				   if("edit".equalsIgnoreCase(mode)){
 					   h.setDisableTextClass("disableText");
 				   }
+				   
+				   if( !Utils.isNull(o.getDispDamage()).equals("")){
+						h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
+						h.setTotalPayment(Utils.decimalFormat(rst.getDouble("total_payment"),Utils.format_current_2_disgit));
+						h.setTotalDelayPayment(Utils.decimalFormat(rst.getDouble("total_delay_payment"),Utils.format_current_2_disgit));
+					}
+				   
 				   items.add(h);
 				   r++;
 				   

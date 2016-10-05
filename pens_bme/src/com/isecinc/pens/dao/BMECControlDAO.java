@@ -268,6 +268,19 @@ public class BMECControlDAO {
 			return bean;
 		}
 	 
+	 public static String[] canGenEndDateLotus(String storeCode,String asOfdate) throws Exception {
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnection();
+			 return canGenEndDateLotus(conn, storeCode, asOfdate);
+		 }catch(Exception e){
+			 throw e;
+		 }finally{
+			 if(conn != null){
+				 conn.close();
+			 }
+		 }
+	 }
 	 public static String[] canGenEndDateLotus(Connection conn,String storeCode,String asOfdate) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

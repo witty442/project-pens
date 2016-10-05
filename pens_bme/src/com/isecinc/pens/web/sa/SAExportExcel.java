@@ -95,7 +95,7 @@ public class SAExportExcel {
 	
 	public static StringBuffer genSAStatementReport(SAReportBean bean,User user){
 		StringBuffer h = new StringBuffer("");
-		String colSpan= "8";
+		String colSpan= "9";
 		try{
 			Date date = Utils.parse(bean.getMonth(), Utils.DD_MM_YYYY_WITHOUT_SLASH);
 			
@@ -108,7 +108,7 @@ public class SAExportExcel {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='center' colspan='"+colSpan+"' ><b>Statemet ค่าความเสียหาย </b></td> \n");
+			h.append("<td align='center' colspan='"+colSpan+"' ><b>Statement ค่าความเสียหาย </b></td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
@@ -129,7 +129,7 @@ public class SAExportExcel {
 			
 			h.append("</table> \n");
 		
-		    List<SAReportBean> list = SAReportDAO.searchReport( bean);
+		    List<SAReportBean> list = SAReportDAO.searchStatementReport( bean);
 		    
 		    if(list != null && list.size() >0){
 			    h.append("<table border='1'> \n");
@@ -141,7 +141,8 @@ public class SAExportExcel {
 				  h.append("<td>Line No</td> \n");
 				  h.append("<td>ประเภทชำระ</td> \n");
 				  h.append("<td>วันที่ชำระ</td> \n");
-				  h.append("<td>ยอดชำระ </td> \n");
+				  h.append("<td>ยอดชำระแล้ว </td> \n");
+				  h.append("<td>ยอดค้างชำระ </td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -150,11 +151,18 @@ public class SAExportExcel {
 					  h.append("<td class='text'>"+s.getType()+"</td> \n");
 					  h.append("<td class='text'>"+s.getInvRefwal()+"</td> \n");
 					  h.append("<td class='text'>"+s.getTranDate()+"</td> \n");
-					  h.append("<td class='num'>"+s.getTotalDamage()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalDamage()+"</td> \n");
 					  h.append("<td class='text'>"+s.getLineId()+"</td> \n");
 					  h.append("<td class='text'>"+s.getPayType()+"</td> \n");
-					  h.append("<td class='text'>"+s.getPayDate()+"</td> \n");
-					  h.append("<td class='num'>"+s.getPayAmt()+"</td> \n");
+					  if(Utils.isNull(s.getPayType()).equals("")){
+						h.append("<td class='text'><b>"+s.getPayDate()+"</b></td> \n");
+						h.append("<td class='currency'><b>"+s.getPayAmt()+"</b></td> \n");
+						h.append("<td class='currency'><b>"+s.getDelayPayAmt()+"</b></td> \n");
+					  }else{
+					    h.append("<td class='text'>"+s.getPayDate()+"</td> \n");
+					    h.append("<td class='currency'>"+s.getPayAmt()+"</td> \n");
+					    h.append("<td class='currency'>"+s.getDelayPayAmt()+"</td> \n");
+					  }
 					h.append("</tr>");
 				}
 				h.append("</table> \n");
@@ -182,7 +190,7 @@ public class SAExportExcel {
 			//Header
 			h.append("<table border='1'> \n");
 			h.append("<tr> \n");
-			h.append("<td align='center' colspan='"+colSpan+"' ><b>Statemet ค่าความเสียหาย </b></td> \n");
+			h.append("<td align='center' colspan='"+colSpan+"' ><b>Statement ค่าความเสียหาย </b></td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			h.append("<td align='center' colspan='"+colSpan+"'  ><b> ณ เดือน&nbsp;&nbsp;:&nbsp;&nbsp;"+MMMMYYYY+"</b></td> \n");
@@ -193,7 +201,7 @@ public class SAExportExcel {
 			
 			h.append("</table> \n");
 
-		    List<SAReportBean> list = SAReportDAO.searchReportAll( bean);
+		    List<SAReportBean> list = SAReportDAO.searchStatementReportAll( bean);
 		    if(list != null && list.size() >0){
 			    h.append("<table border='1'> \n");
 				h.append("<tr class='colum_head'> \n");
@@ -208,7 +216,7 @@ public class SAExportExcel {
 				  h.append("<td>Line No</td> \n");
 				  h.append("<td>ประเภทชำระ</td> \n");
 				  h.append("<td>วันที่ชำระ</td> \n");
-				  h.append("<td>ยอดชำระ </td> \n");
+				  h.append("<td>ยอดค้างชำระ </td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -222,11 +230,11 @@ public class SAExportExcel {
 					  h.append("<td class='text'>"+s.getType()+"</td> \n");
 					  h.append("<td class='text'>"+s.getInvRefwal()+"</td> \n");
 					  h.append("<td class='text'>"+s.getTranDate()+"</td> \n");
-					  h.append("<td class='num'>"+s.getTotalDamage()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalDamage()+"</td> \n");
 					  h.append("<td class='text'>"+s.getLineId()+"</td> \n");
 					  h.append("<td class='text'>"+s.getPayType()+"</td> \n");
 					  h.append("<td class='text'>"+s.getPayDate()+"</td> \n");
-					  h.append("<td class='num'>"+s.getPayAmt()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getPayAmt()+"</td> \n");
 					h.append("</tr>");
 				}
 				 h.append("<tr> \n");
@@ -240,8 +248,8 @@ public class SAExportExcel {
 				  h.append("<td></td> \n");
 				  h.append("<td ></td> \n");
 				  h.append("<td ></td> \n");
-				  h.append("<td >รวมยอดค้างชำระ</td> \n");
-				  h.append("<td class='num'>"+Utils.decimalFormat(totalAmt,Utils.format_current_2_disgit)+"</td> \n");
+				  h.append("<td ><b>รวมยอดค้างชำระ</b></td> \n");
+				  h.append("<td class='currency'><b>"+Utils.decimalFormat(totalAmt,Utils.format_current_2_disgit)+"</b></td> \n");
 				h.append("</tr>");
 				h.append("</table> \n");
 		    }else{

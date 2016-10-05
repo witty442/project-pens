@@ -325,12 +325,14 @@ function setCanSave(chk,index){
 							<tr>
 								<td align="left">
 						           <%if(saTranForm.getBean().getItems() != null){ %>
-										<a href="javascript:save('${pageContext.request.contextPath}')">
-										  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
-										</a>
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>
+						              <c:if test="${saTranForm.bean.canEdit == true}">
+											<a href="javascript:save('${pageContext.request.contextPath}')">
+											  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
+											</a>
+											<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+											  <input type="button" value="   Clear   " class="newPosBtnLong">
+											</a>
+										</c:if>
 									  <%} %>
 									<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 									  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">

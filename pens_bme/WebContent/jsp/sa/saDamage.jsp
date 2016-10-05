@@ -744,13 +744,14 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-							
-										<a href="javascript:save('${pageContext.request.contextPath}')">
-										  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
-										</a>
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>
+							           <c:if test="${saDamageForm.bean.canEdit == true}">
+											<a href="javascript:save('${pageContext.request.contextPath}')">
+											  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
+											</a>
+											<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+											  <input type="button" value="   Clear   " class="newPosBtnLong">
+											</a>
+										</c:if>
 										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 										</a>							

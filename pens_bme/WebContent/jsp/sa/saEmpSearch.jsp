@@ -94,14 +94,36 @@ span.pagelinks {
   background-color: #F78181;
 }
 </style>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
+	sumTotal();
 }
+
+function sumTotal(){
+	var totalDamageTemp = document.getElementsByName("totalDamageTemp");
+	var totalPaymentTemp = document.getElementsByName("totalPaymentTemp");
+	var totalDelayPaymentTemp = document.getElementsByName("totalDelayPaymentTemp");
+	
+	var totalDamage = 0;
+	var totalPayment = 0;
+	var totalDelayPayment = 0;
+	for(var i=0;i<totalDamageTemp.length;i++){
+		totalDamage += parseFloat(totalDamageTemp[i].value.replace(/\,/g,''));
+		totalPayment += parseFloat(totalPaymentTemp[i].value.replace(/\,/g,''));
+		totalDelayPayment += parseFloat(totalDelayPaymentTemp[i].value.replace(/\,/g,''));
+	}
+	document.getElementById("totalDamage").innerHTML =addCommas(Number(toFixed(totalDamage,2)).toFixed(2));
+	document.getElementById("totalPayment").innerHTML =addCommas(Number(toFixed(totalPayment,2)).toFixed(2));
+	document.getElementById("totalDelayPayment").innerHTML =addCommas(Number(toFixed(totalDelayPayment,2)).toFixed(2));
+}
+
 function clearForm(path){
 	var form = document.saEmpForm;
 	form.action = path + "/jsp/saEmpAction.do?do=clear2";
@@ -293,6 +315,13 @@ function getStaffName(custCode){
 									    
 									    Branch <html:text property="bean.branch" styleId="branch" size="20"/>
 									</td>
+								</tr>
+								<tr>
+									<td colspan="4" align="center">
+									 <html:checkbox property="bean.dispDamage"></html:checkbox>  แสดงยอดค่าเสียหาย และ ยอดค้างชำระ 
+									</td>
+									
+								</tr>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -304,9 +333,11 @@ function getStaffName(custCode){
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
-										<a href="javascript:newEmp('${pageContext.request.contextPath}')">
-										  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
-										</a>
+										  <c:if test="${saEmpForm.bean.canEdit == true}">
+											<a href="javascript:newEmp('${pageContext.request.contextPath}')">
+											  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
+											</a>
+										</c:if>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -319,16 +350,26 @@ function getStaffName(custCode){
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						       <tr>
-						            <th >แก้ไข</th><!-- 0 -->
+						            <c:if test="${saEmpForm.bean.canEdit == true}">
+						               <th >แก้ไข</th><!-- 0 -->
+						            </c:if>
+						            <c:if test="${saEmpForm.bean.canEdit == false}">
+						               <th > View  </th><!-- 0 -->
+						            </c:if>
 						            <th >Employee ID</th><!-- 1 -->
 									<!-- <th >Title</th> --><!-- 2 -->
 									<th >Name</th><!-- 3 -->
 									<th >Surname</th><!-- 4 -->
-									<th >รหัสใน Oracle</th><!-- 5 -->
+									<th nowrap>รหัสในOracle</th><!-- 5 -->
 									<th >Type</th><!-- 6 -->
 									<th >Region</th><!-- 7 -->
 									<th >Group Store</th><!-- 8 -->
 									<th >Branch</th><!-- 9 -->
+									<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
+										<th >ค่าความเสียหาย </th><!-- 10 -->
+										<th >ยอดชำระแล้ว </th><!-- 10 -->
+										<th >ยอดค้างชำระ </th><!-- 10 -->
+									<%} %>
 									<th >Mobile No </th><!-- 10 -->
 									<th >Email</th><!-- 11 -->
 									<th >Bank Account</th><!-- 12 -->
@@ -355,17 +396,36 @@ function getStaffName(custCode){
 								%>
 									<tr class="<%=tabclass%>"> 
 									   <td class="td_text_center" width="8%">
+									      <c:if test="${saEmpForm.bean.canEdit == true}">
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpRefId()%>')">แก้ไข</a><!-- 0 -->
+										</c:if>
+										<c:if test="${saEmpForm.bean.canEdit == false}">
+										   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpRefId()%>')"> VIEW </a><!-- 0 -->
+										</c:if>
 										</td>
 										<td class="td_text" width="6%"><%=mc.getEmpId()%></td><!-- 1 -->
 										<%-- <td class="td_text" width="5%"><%=mc.getTitle()%></td> --%><!-- 2 -->
-										<td class="td_text" width="12%"><%=mc.getName()%></td><!-- 3 -->
-									    <td class="td_text" width="12%"><%=mc.getSurName()%></td><!-- 4 -->
-									    <td class="td_text" width="12%"><%=mc.getOracleRefId() %></td><!-- 5 -->
+										<td class="td_text" width="12%" nowrap><%=mc.getName()%></td><!-- 3 -->
+									    <td class="td_text" width="12%" nowrap><%=mc.getSurName()%></td><!-- 4 -->
+									    <td class="td_text" width="12%" nowrap><%=mc.getOracleRefId() %></td><!-- 5 -->
 										<td class="td_text" width="8%"><%=mc.getEmpType()%></td><!-- 6 -->
 										<td class="td_text" width="8%"><%=mc.getRegionDesc()%></td><!-- 7 -->
 										<td class="td_text" width="4%"><%=mc.getGroupStore()%></td><!-- 8 -->
 										<td class="td_text" width="7%"><%=mc.getBranch()%></td><!-- 9 -->
+										<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
+											<td class="td_text_right" width="8%">
+											<%=mc.getTotalDamage()%>
+											<input type="hidden" id="totalDamageTemp" name="totalDamageTemp" value="<%=mc.getTotalDamage()%>" />
+											</td><!-- 10 -->
+											<td class="td_text_right" width="8%">
+											   <%=mc.getTotalPayment()%>
+											   <input type="hidden" id="totalPaymentTemp" name="totalPaymentTemp" value="<%=mc.getTotalPayment()%>" />
+											</td><!-- 10 -->
+											<td class="td_text_right" width="8%">
+											  <%=mc.getTotalDelayPayment()%>
+											   <input type="hidden" id="totalDelayPaymentTemp" name="totalDelayPaymentTemp" value="<%=mc.getTotalDelayPayment()%>" />
+											</td><!-- 10 -->
+										<%} %>
 										<td class="td_text" width="8%"><%=mc.getMobile()%></td><!-- 10 -->
 										<td class="td_text" width="8%"><%=mc.getEmail()%></td><!-- 11 -->
 										<td class="td_text" width="8%"><%=mc.getBankAccount()%></td><!-- 12 -->
@@ -374,12 +434,26 @@ function getStaffName(custCode){
 										<td class="td_text" width="8%"><%=mc.getLeaveDate()%></td><!-- 15 -->
 										<td class="td_text" width="8%"><%=mc.getLeaveReason()%></td><!-- 16 -->
 										<td class="td_text" width="8%"><%=mc.getRewardBme()%></td><!-- 17 -->
-										<td class="td_text" width="8%"><%=mc.getStartRewardBmeDate()%></td><!-- 18 -->
-										<td class="td_text" width="8%"><%=mc.getRewardWacoal()%></td><!-- 19 -->
-										<td class="td_text" width="8%"><%=mc.getStartRewardWacoalDate()%></td><!-- 20 -->
-										<td class="td_text" width="8%"><%=mc.getSuretyBond()%></td><!-- 21 -->
-										<td class="td_text" width="8%"><%=mc.getStartSuretyBondDate()%></td><!-- 22 -->
+										<td class="td_text" width="6%"><%=mc.getStartRewardBmeDate()%></td><!-- 18 -->
+										<td class="td_text" width="6%"><%=mc.getRewardWacoal()%></td><!-- 19 -->
+										<td class="td_text" width="6%"><%=mc.getStartRewardWacoalDate()%></td><!-- 20 -->
+										<td class="td_text" width="6%"><%=mc.getSuretyBond()%></td><!-- 21 -->
+										<td class="td_text" width="6%"><%=mc.getStartSuretyBondDate()%></td><!-- 22 -->
 									</tr>
+							<%} %>
+							
+							<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
+								<tr class="<%=tabclass%>"> 
+								  <td colspan="9">
+								        <b> รวม</b>
+								  </td>
+								  <td nowrap>  <b><span id="totalDamage"></span></b></td>
+								  <td nowrap>  <b><span id="totalPayment"></span></b></td>
+								  <td nowrap>  <b><span id="totalDelayPayment"></span></b></td>
+								   <td colspan="13">
+								       
+								  </td>
+								</tr>
 							<%} %>
 							 
 					</table>

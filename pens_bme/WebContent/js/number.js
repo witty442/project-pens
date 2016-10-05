@@ -27,6 +27,11 @@ function isNum2Digit(obj){
   return true;
  }
 
+function currenyToNum(object){
+	var temp =  object.value.replace(/\,/g,''); //alert(r);
+	return temp;
+}
+	
 function toCurreny(object){
 	var temp =  object.value.replace(/\,/g,''); //alert(r);
 	object.value = addCommas(Number(toFixed(temp,2)).toFixed(2));

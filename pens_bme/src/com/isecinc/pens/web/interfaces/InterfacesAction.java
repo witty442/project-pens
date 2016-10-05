@@ -22,6 +22,7 @@ import util.BeanParameter;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.bean.InterfaceBean;
@@ -148,6 +149,21 @@ public class InterfacesAction extends I_Action {
 				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ITEM_MASTER_HISHER);
+				
+			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				//default value
+				InterfaceBean bean =new InterfaceBean();
+				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    bean.setTextFileName("");
+				bean.setOutputPath("");//Gen
+				
+				interfacesForm.setBean(bean);
+				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
+				
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
+				
 				
 			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
@@ -332,6 +348,33 @@ public class InterfacesAction extends I_Action {
 				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
 				type = Constants.TYPE_IMPORT_TRANSACTION_LOTUS;
+				
+				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
+				if(request.getAttribute("searchKey") != null){
+					criteria.setSearchKey((String)request.getAttribute("searchKey"));
+				}
+				interfacesForm.setCriteria(criteria);
+				/** Set Condition Search **/
+				MonitorBean[] results = dao.findMonitorListNew(user,type);
+				
+				if (results != null && results.length > 0) {
+					interfacesForm.getCriteria().setSearchResult(results.length);
+					interfacesForm.setResults(results);
+					criteria.setMonitorBean(new MonitorBean());
+					interfacesForm.setCriteria(criteria);
+					
+					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					//logger.debug("")
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+					request.setAttribute("Message", results[0].getErrorMsg());
+				} else {
+					request.setAttribute("Message", "Data not found");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
+				type = Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS;
 				
 				InterfacesCriteria criteria = getSearchCriteria(request, interfacesForm.getCriteria(), this.getClass().toString());
 				if(request.getAttribute("searchKey") != null){
@@ -752,6 +795,52 @@ public class InterfacesAction extends I_Action {
 					
 					interfacesForm.getBean().setTextFileName(textFileName);
 					interfacesForm.getBean().setOutputPath(	env.getProperty("path.icc.hisher.export.master.txt"));
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
+				String status = dao.findControlMonitor(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
+				
+				logger.info("status["+status+"]");
+				
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName("Generate Stock End Date Lotus");
+					monitorModel.setType(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					monitorModel.setBatchParamMap(batchParamMap);
+					
+					/** Set Param Batch Map Object**/
+					Map<String, Object> batchParamMapObj = new HashMap<String, Object>();
+					OnhandSummary onhandSummary = new OnhandSummary();
+					onhandSummary.setPensCustCodeFrom( Utils.isNull(request.getParameter("customerCode")));
+					onhandSummary.setSalesDate(Utils.isNull(request.getParameter("salesDate")));
+					
+					batchParamMapObj.put("ONHAND_SUMMARY", onhandSummary);
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					monitorModel.setBatchParamMapObj(batchParamMapObj);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
 					
 				}else{
 					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");

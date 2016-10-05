@@ -39,9 +39,22 @@ public class SATranBean implements Serializable{
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	private String mode;
+	private String startBmeYearMonth;
+	private String startWacoalYearMonth;
 	
-	
-	
+   
+	public String getStartBmeYearMonth() {
+		return startBmeYearMonth;
+	}
+	public void setStartBmeYearMonth(String startBmeYearMonth) {
+		this.startBmeYearMonth = startBmeYearMonth;
+	}
+	public String getStartWacoalYearMonth() {
+		return startWacoalYearMonth;
+	}
+	public void setStartWacoalYearMonth(String startWacoalYearMonth) {
+		this.startWacoalYearMonth = startWacoalYearMonth;
+	}
 	public boolean isExistDB() {
 		return isExistDB;
 	}

@@ -70,7 +70,6 @@ public class SAReportAction extends I_Action {
 					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
 					request.getSession().setAttribute("groupStoreList",billTypeList3);
 				
-					
 					SAReportBean ad = new SAReportBean();
 					//init MM
 					List<PopupForm> monthList = new ArrayList<PopupForm>();

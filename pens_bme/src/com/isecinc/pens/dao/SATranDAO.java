@@ -3,7 +3,6 @@ package com.isecinc.pens.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,15 +15,12 @@ import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.SATranBean;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.web.popup.PopupForm;
 
 public class SATranDAO {
 
 	 private static Logger logger = Logger.getLogger("PENS");
 	 
-	 
 	 public static List<SATranBean> initYearMonth(String empId,String payDate) throws Exception {
-		
 			Connection conn = null;
 			List<SATranBean> itemsList = new ArrayList<SATranBean>();
 			Map<String,SATranBean> YEARMMDB_MAP = new HashMap<String, SATranBean>();
@@ -36,8 +32,10 @@ public class SATranDAO {
 		        String yyyymmPayDate = yyyy+mm;
 		        
                 conn = DBConnection.getInstance().getConnection();
-                //Check 
+                
+                //GET DATA DB
                 YEARMMDB_MAP = getDataInDB_To_MAP(conn, empId);
+                
                 //Get Master Bean
                 SAEmpBean masterEmpBean = SAEmpDAO.getEmp(conn,empId);
                 
@@ -54,7 +52,6 @@ public class SATranDAO {
                 if( !"".equals(Utils.isNull(startYearMonth))){
 	                //case payDate < startYearMonth -> startYearMonth = yearMonthPayDate
 	                if(Long.parseLong(yyyymmPayDate) < Long.parseLong(startYearMonth)){
-	                	
 	                	 logger.debug("startYearMonthNew:"+startYearMonth);
 	                	 
 	                	 diffMonth = calcDiffMonth(yyyymmPayDate, startYearMonth);
@@ -76,13 +73,13 @@ public class SATranDAO {
 	                logger.debug("startYearMonth:"+startYearMonth);
 	                logger.debug("payDate:"+payDate);
 	                logger.debug("diffMonth:"+diffMonth);
+	                
                 }else{
                 	//case no date in sa_employee and no date in tran
                 	logger.debug("Case No Date init");
                 	startYearMonth = yyyymmPayDate;
                 	return null;
                 }
-                
                 
 				String yearMonthCount = startYearMonth;
 				int mm_Count  = Integer.parseInt(yearMonthCount.substring(4,6));
@@ -102,8 +99,6 @@ public class SATranDAO {
 						dataDB =  YEARMMDB_MAP.get(item.getYearMonth());
 						
 						item.setExistDB(true);
-						item.setBmeAmt(masterEmpBean.getRewardBme());
-						item.setWacoalAmt(masterEmpBean.getRewardWacoal());
 						
 						//Check canChange Chkbox payDateDB >= payDateScreen 
 						payDateScreen = Utils.parse(payDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -113,20 +108,34 @@ public class SATranDAO {
 						logger.debug("payDateDB    :"+payDateDB);
 						logger.debug("before:"+payDateDB.before(payDateScreen));
 						
+						//Can Change
 						if(payDateScreen.equals(payDateDB)){// payDateScreen < payDateDB
 							item.setCanChange(true);
 						}else{
 							item.setCanChange(false);
 						}
-						
+						item.setBmeAmt(dataDB.getBmeAmt());
+						item.setWacoalAmt(dataDB.getWacoalAmt());
 						//case isSave set payDate
 						item.setPayDate(dataDB.getPayDate());
 						
 					}else{
 						//Not found in SA_TRAN
 						item.setExistDB(false);
-						item.setBmeAmt(masterEmpBean.getRewardBme());
-						item.setWacoalAmt(masterEmpBean.getRewardWacoal());
+						//logger.debug(yearMonthCount+":"+Utils.convertStrToInt(startYearMonthBean.getStartBmeYearMonth()));
+						logger.debug(yearMonthCount+":"+Utils.convertStrToInt(startYearMonthBean.getStartWacoalYearMonth()));
+						
+						if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartBmeYearMonth()) ){
+						   item.setBmeAmt(masterEmpBean.getRewardBme());
+						}else{
+						   item.setBmeAmt("0");
+						}
+						if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartWacoalYearMonth()) ){
+							item.setWacoalAmt(masterEmpBean.getRewardWacoal());
+						}else{
+							item.setWacoalAmt("0");
+						}
+						
 						item.setCanChange(true);
 						item.setPayDate("");
 					}
@@ -148,12 +157,13 @@ public class SATranDAO {
 				throw e;
 			} finally {
 				try {
-					
-					conn.close();
+                    if(conn != null){
+					  conn.close();conn =null;
+                    }
 				} catch (Exception e) {}
 			}
 			return itemsList;
-		}
+	}
 	 
 	 private static int calcDiffMonth(String yearMonth,String yearMonthPayDate){
 		 int diffMonth = -1;
@@ -173,7 +183,6 @@ public class SATranDAO {
 		     }
 		 }
 	     return diffMonth;
-	        
 	 }
 	 
 	 public static String getYearMonthFromTran(Connection conn ,String empId,String method) throws Exception {
@@ -212,10 +221,10 @@ public class SATranDAO {
 			StringBuilder sql = new StringBuilder();
 			SATranBean item= null;
 			try {
-				sql.append("\n SELECT ");
-				sql.append("\n (CASE WHEN start_reward_bme_date > start_reward_wacoal_date " );
+				sql.append("\n SELECT start_reward_bme_date,start_reward_wacoal_date");
+				sql.append("\n ,(CASE WHEN start_reward_bme_date < start_reward_wacoal_date " );
 				sql.append("\n     THEN  TO_CHAR(TO_NUMBER(TO_CHAR(start_reward_bme_date,'YYYY') ))+543|| TO_CHAR(start_reward_bme_date,'MM')  ");
-				sql.append("\n     ELSE TO_CHAR(TO_NUMBER(TO_CHAR(start_reward_wacoal_date,'YYYY') ))+543|| TO_CHAR(start_reward_bme_date,'MM')  END) year_month ");
+				sql.append("\n     ELSE TO_CHAR(TO_NUMBER(TO_CHAR(start_reward_wacoal_date,'YYYY') ))+543|| TO_CHAR(start_reward_wacoal_date,'MM')  END) year_month ");
 				sql.append("\n ,null as paydate ,reward_bme as bme_amt,reward_wacoal as wacoal_amt ");
 				sql.append("\n  FROM  SA_EMPLOYEE");
 				sql.append("\n  WHERE emp_id = '"+empId+"' ");
@@ -227,6 +236,9 @@ public class SATranDAO {
 				if(rst.next()) {
 					item = new SATranBean();
 					item.setYearMonth(Utils.isNull(rst.getString("year_month")));
+					item.setStartBmeYearMonth(Utils.stringValue(rst.getDate("start_reward_bme_date"), Utils.YYYYMM,Utils.local_th));
+					item.setStartWacoalYearMonth(Utils.stringValue(rst.getDate("start_reward_wacoal_date"), Utils.YYYYMM,Utils.local_th));
+					
 					item.setBmeAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
 					item.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
 				}//while
@@ -241,7 +253,7 @@ public class SATranDAO {
 				} catch (Exception e) {}
 			}
 			return item;
-		}
+	}
 	 
 	 public static Map<String,SATranBean> getDataInDB_To_MAP(Connection conn ,String empId) throws Exception {
 			PreparedStatement ps = null;
@@ -282,7 +294,7 @@ public class SATranDAO {
 				} catch (Exception e) {}
 			}
 			return YEARMMDB_MAP;
-		}
+	}
 	 
 	 public static SATranBean insertModel(Connection conn,SATranBean o) throws Exception{
 			PreparedStatement ps = null;

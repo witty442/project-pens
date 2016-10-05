@@ -97,18 +97,30 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('tranDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('checkStockDate'));
+	 
+	 sumTotal();
 }
 function clearForm(path){
 	var form = document.saDamageForm;
 	form.action = path + "/jsp/saDamageAction.do?do=clear2";
 	form.submit();
 	return true;
+}
+
+function sumTotal(){
+	var totalDamageTemp = document.getElementsByName("totalDamageTemp");
+	var totalDamage = 0;
+	for(var i=0;i<totalDamageTemp.length;i++){
+		totalDamage += parseFloat(totalDamageTemp[i].value.replace(/\,/g,''));
+	}
+	document.getElementById("totalDamage").innerHTML =addCommas(Number(toFixed(totalDamage,2)).toFixed(2));
 }
 
 function search(path){
@@ -307,9 +319,11 @@ function getStaffName(custCode){
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
-										<a href="javascript:newEmp('${pageContext.request.contextPath}')">
-										  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
-										</a>
+										<c:if test="${saDamageForm.bean.canEdit == true}">
+											<a href="javascript:newEmp('${pageContext.request.contextPath}')">
+											  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
+											</a>
+										</c:if>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -322,7 +336,12 @@ function getStaffName(custCode){
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						       <tr>
-						            <th >แก้ไข</th><!-- 0 -->
+						           <c:if test="${saDamageForm.bean.canEdit == true}">
+						               <th >แก้ไข</th><!-- 0 -->
+						            </c:if>
+						            <c:if test="${saDamageForm.bean.canEdit == false}">
+						               <th > View  </th><!-- 0 -->
+						            </c:if>
 						            <th >วันที่บันทึก</th><!-- 1 -->
 						            <th >Employee ID</th><!-- 2 -->
 						            <th >Type</th><!-- 3 -->
@@ -347,7 +366,13 @@ function getStaffName(custCode){
 								%>
 									<tr class="<%=tabclass%>"> 
 									   <td class="td_text_center" width="10%">
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')">แก้ไข</a><!-- 0 -->
+										  <c:if test="${saDamageForm.bean.canEdit == true}">
+							                <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')">แก้ไข</a><!-- 0 -->
+							              </c:if>
+							              <c:if test="${saDamageForm.bean.canEdit == false}">
+							               <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')"> VIEW </a><!-- 0 -->
+							              </c:if>
+											
 										</td>
 										<td class="td_text_center" width="6%"><%=mc.getTranDate()%></td><!-- 1 -->
 										<td class="td_text_center" width="6%"><%=mc.getEmpId()%></td><!-- 1 -->
@@ -361,9 +386,17 @@ function getStaffName(custCode){
 										
 										<td class="td_text_center" width="7%"><%=mc.getBranch()%></td><!-- 9 -->
 										<td class="td_text_center" width="6%"><%=mc.getCheckStockDate()%></td><!-- 1 -->
-										<td class="td_text_center" width="6%"><%=mc.getTotalDamage()%></td><!-- 1 -->
+										<td class="td_text_right" width="6%"><%=mc.getTotalDamage()%>
+										<input type="hidden" name="totalDamageTemp" id="totalDamageTemp" value="<%=mc.getTotalDamage()%>"/>
+										</td><!-- 1 -->
 									</tr>
 							<%} %>	 
+							<tr class="<%=tabclass%>"> 
+								<td colspan="11" class="td_text_right" width="6%"><b> ยอดรวมค่าเสียหาย : </b></td><!-- 1 -->
+								<td class="td_text_right" width="6%">
+								    <b><span id="totalDamage"></span></b>
+								</td><!-- 1 -->
+							</tr>
 					</table>
 				</c:if>
 				

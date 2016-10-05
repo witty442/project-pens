@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -35,6 +36,8 @@
 <%
 String storeType ="";
 User user = (User)session.getAttribute("user");
+String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
+String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
 %>
 
 <style type="text/css">
@@ -84,7 +87,9 @@ function loadMe(){
      <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
     		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
     		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
-    		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+    		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
+    		 ) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
@@ -234,31 +239,41 @@ function search(path){
 		   }    
 	   
 	 <%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
-	   var asOfDateFrom = form.asOfDateFrom.value;
-	   var asOfDateTo = form.asOfDateTo.value;
-	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-	   
-	   if(asOfDateFrom ==""){ 
-		   alert("กรุณากรอกข้อมูลวันที่ขาย From");
-		   return false;
-	   }
-	   if(asOfDateTo ==""){ 
-		   alert("กรุณากรอกข้อมูลวันที่ขาย To");
-		   return false;
-	   }
-	    if(pensCustCodeFrom ==""){ 
-		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-		   return false;
-	   } 
-	   
+		   var asOfDateFrom = form.asOfDateFrom.value;
+		   var asOfDateTo = form.asOfDateTo.value;
+		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+		   
+		   if(asOfDateFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ขาย From");
+			   return false;
+		   }
+		   if(asOfDateTo ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ขาย To");
+			   return false;
+		   }
+		    if(pensCustCodeFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+			   return false;
+		   } 
 	 <%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
-	       var location = document.getElementById("location").value ;//form.location.value;
+	      var location = document.getElementById("location").value ;//form.location.value;
 	   
 	      if(location ==""){ 
 		    alert("กรุณาเลือกข้อมูล Location");
 		    return false;
 	      } 
-	 
+	<%}else if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		   var asOfDateFrom = form.salesDate.value;
+		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+		   
+		   if(asOfDateFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ As Of");
+			   return false;
+		   }
+		    if(pensCustCodeFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+			   return false;
+		   } 
 	 <% }%>
 	
 	form.action = path + "/jsp/summaryAction.do?do=search&page=<%=request.getParameter("page")%>";
@@ -293,27 +308,49 @@ function genMonthEnd(path,storeType){
 		return true;
    }
 }
-function genEndDate(path,storeType){
-	   var form = document.summaryForm;
-	   var asOfDateFrom = form.salesDate.value;
-	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-	   
-	   if(confirm("กรุณายืนยันการ Stock End Date")){
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   asOfDateFrom.focus();
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-			   pensCustCodeFrom.focus();
-			   return false;
-		   } 
-			form.action = path + "/jsp/summaryAction.do?do=genEndDate&page=<%=request.getParameter("page")%>&storeType="+storeType;
-			form.submit();
-			return true;
+
+function genEndDate_1(path,storeType){
+   var form = document.summaryForm;
+   var asOfDateFrom = form.salesDate.value;
+   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+   
+   if(confirm("กรุณายืนยันการ Stock End Date")){
+	   if(asOfDateFrom ==""){ 
+		   alert("กรุณากรอกข้อมูลวันที่ As Of");
+		   asOfDateFrom.focus();
+		   return false;
 	   }
-	}
+	    if(pensCustCodeFrom ==""){ 
+		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+		   pensCustCodeFrom.focus();
+		   return false;
+	   } 
+		form.action = path + "/jsp/summaryAction.do?do=genEndDate&page=<%=request.getParameter("page")%>&storeType="+storeType;
+		form.submit();
+		return true;
+   }
+}
+	
+function genEndDate(path){
+	var form = document.summaryForm;
+    var param = "&customerCode="+form.pensCustCodeFrom.value;
+        param += "&salesDate="+form.salesDate.value;
+        param += "&pageName=GEN_STOCK_ENDDDATE_LOTUS";
+        param += "&pageStaus=child";
+        
+        if(confirm("กรุณายืนยันการ Stock End Date")){
+			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
+			//window.open(encodeURI(url),"",
+					   //"menubar=no,resizable=no,toolbar=no,scrollbars=no,width=<%=screenWidth%>px,height=<%=screenHeight%>px,status=no,left=0,top= 0");
+			var params = [
+			              'height='+screen.height,
+			              'width='+screen.width,
+			              'fullscreen=yes' // only works in IE, but here for completeness
+			          ].join(',');
+			var popup = window.open(encodeURI(url), 'popup_window', params); 
+			popup.moveTo(0,0);
+        }
+}
 
 function clearForm(path){
 	var form = document.summaryForm;
@@ -528,6 +565,11 @@ function getCustName(custCode,fieldName,storeType){
 					<jsp:param name="function" value="SummaryBMESizeColorLotus"/>
 				</jsp:include>
 		
+			 <%}else if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="reportEndDateLotus"/>
+				</jsp:include>
+		
 			<%} %>
 			
 	      	<!-- TABLE BODY -->
@@ -544,6 +586,9 @@ function getCustName(custCode,fieldName,storeType){
 						<!-- BODY -->
 						<html:form action="/jsp/summaryAction">
 						<jsp:include page="../error.jsp"/>
+						
+						<div id="div_message" style="color:green" align="center"></div> 
+						<div id="div_error_message" style="color:red" align="center"></div> 
 						
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						
@@ -734,6 +779,7 @@ function getCustName(custCode,fieldName,storeType){
 								|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
+								|| "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
 								) {
 							
 								String hideAll = "";
@@ -759,7 +805,13 @@ function getCustName(custCode,fieldName,storeType){
 									&nbsp;&nbsp;
 									<html:text property="onhandSummary.salesDate" styleId="salesDate" readonly="true"/>
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-									<td align="left" width="30%">&nbsp;</td>
+									<td align="left" width="30%">
+									   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){ %>
+									      ปิดรอบสต็อกล่าสุดวันที่:
+									   	  <html:text property="onhandSummary.endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
+									   <%} %>
+									
+									</td>
 								</tr>
 						       <tr>
 									<td align="right">รหัสร้านค้า<font color="red">*</font>
@@ -801,9 +853,10 @@ function getCustName(custCode,fieldName,storeType){
 									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
 									  </td>
 									<td align="left" width="30%">  
-								       <% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
-								    		 ||  "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
-								    		 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) ){%>
+								       <% if(   "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
+								    		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+								    		 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
+								    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) ){%>
 									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
 									    <%} %>
 									 </td>
@@ -812,6 +865,7 @@ function getCustName(custCode,fieldName,storeType){
 								    	 || "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 								    	 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
 								    	 || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))  
+								    	 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
 							    		){%>
 									   <tr>
 											<td align="right" width="30%" >แสดงตาม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -915,11 +969,12 @@ function getCustName(custCode,fieldName,storeType){
 								<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
-								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
-									<a href="javascript:genEndDate('${pageContext.request.contextPath}','Lotus')">
+								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))){%>
+								   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+									<a href="javascript:genEndDate('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
 									</a>
-								<%} %>
+								<%}} %>
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
 									<%-- <a href="javascript:genMonthEnd('${pageContext.request.contextPath}','Lotus')">
 									  <input type="button" value="Gen MonthEnd" class="newPosBtn">
@@ -1284,6 +1339,10 @@ function getCustName(custCode,fieldName,storeType){
                     <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
                     <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
                     <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
+                    
+                     <%if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+                        <jsp:include page="subreports/subReportEndDateLotus.jsp" /> 
+                     <%} %>
                            
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					

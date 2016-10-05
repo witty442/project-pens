@@ -1,6 +1,8 @@
 package com.isecinc.pens.sql;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -13,14 +15,22 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 
-public class ReportMonthEndLotusSQL {
+public class ReportEndDateLotusSQL {
 	private static Logger logger = Logger.getLogger("PENS");
 	
 	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,String summaryType) throws Exception{
 			StringBuilder sql = new StringBuilder();
+			Date asofDate = null;
 			try {
-				BMEControlBean control = BMECControlDAO.calcMonthEndOnhandDateLotusAsOf(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				String christSalesDateStr ="";
+				if( !Utils.isNull(c.getSalesDate()).equals("")){
+					asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				}
 				
+				BMEControlBean control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				
+			sql.append("\n SELECT A.* FROM( ");
 				if("GroupCode".equalsIgnoreCase(summaryType)){
 					sql.append("\n SELECT A.customer_code,A.customer_desc ,A.group_type ");
 					sql.append("\n ,SUM(A.BEGINING_QTY) as BEGINING_QTY");
@@ -139,15 +149,10 @@ public class ReportMonthEndLotusSQL {
  				   sql.append("\n\t ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
  				   sql.append("\n\t   M.pens_value = L.STORE_CODE AND M.reference_code ='Store') as customer_desc ");
 					   sql.append("\n\t ,L.GROUP_CODE as group_type ");
-					   sql.append("\n\t  FROM PENSBME_ENDING_STOCK L ");
+					   sql.append("\n\t  FROM PENSBME_ENDDATE_STOCK L ");
 						
 					   sql.append("\n\t WHERE 1=1 ");
-					   if( !Utils.isNull(control.getYearMonth()).equals("")){
-	                      // sql.append("\n\t AND L.YEAR_MONTH ='"+control.getYearMonth()+"'");
-						}else{
-							//not found data no show
-						}
-						
+					   
 					   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						 sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					   }
@@ -166,15 +171,10 @@ public class ReportMonthEndLotusSQL {
 				    sql.append("\n\t L.STORE_CODE as customer_code,L.PENS_ITEM, ");
 					sql.append("\n\t L.GROUP_CODE as group_type, ");
 					sql.append("\n\t NVL(SUM(Ending_qty),0) AS BEGINING_QTY ");
-					sql.append("\n\t FROM PENSBME_ENDING_STOCK L ");
+					sql.append("\n\t FROM PENSBME_ENDDATE_STOCK L ");
 					sql.append("\n\t WHERE 1=1 ");
-						 
-					if( !Utils.isNull(control.getYearMonth()).equals("")){
-                        sql.append("\n\t AND L.YEAR_MONTH ='"+control.getYearMonth()+"'");
-					}else{
-						//not found data no show
-					}
-					 
+					sql.append("\n\t AND L.ENDING_DATE  = to_date('"+control.getStartDate()+"','dd/mm/yyyy')  ");
+					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -199,7 +199,7 @@ public class ReportMonthEndLotusSQL {
 						sql.append("\n\t FROM ");
 						sql.append("\n\t PENSBI.PENSBME_SALES_FROM_LOTUS L ");
 						sql.append("\n\t WHERE 1=1 ");
-						sql.append(genWhereCondDateMonthEnd(control,"L.sales_date"));
+						sql.append(genWhereCondDate(control,"L.sales_date"));
 						  
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 							sql.append("\n\t AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
@@ -234,7 +234,7 @@ public class ReportMonthEndLotusSQL {
 						
 						//Lotus Only 020047
 						sql.append("\n\t AND C.customer_code LIKE '020047%'");
-						sql.append(genWhereCondDateMonthEnd(control,"V.invoice_date"));
+						sql.append(genWhereCondDate(control,"V.invoice_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						    sql.append("\n\t AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
@@ -266,7 +266,8 @@ public class ReportMonthEndLotusSQL {
 					
 					//Lotus Only 020047
 					sql.append("\n\t AND J.cust_group = '020047'");
-					sql.append(genWhereCondDateMonthEnd(control,"J.close_date"));
+					sql.append(genWhereCondDate(control,"J.close_date"));
+					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 					    sql.append("\n\t AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -289,7 +290,7 @@ public class ReportMonthEndLotusSQL {
 				 	sql.append("\n\t (NVL(SUM(ITEM_ISSUE_QTY),0)*-1) AS ISSUE_QTY ");
 				 	sql.append("\n\t FROM PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
 				 	// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
-				 	sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
+				 	sql.append(genWhereCondDate(control,"L.transaction_date"));
 				 	if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 				 		sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				 	}
@@ -313,7 +314,7 @@ public class ReportMonthEndLotusSQL {
 				  sql.append("\n\t NVL(SUM(ITEM_RECEIPT_QTY),0) AS RECEIPT_QTY ");
 				  sql.append("\n\t FROM PENSBME_ADJUST_INVENTORY L  WHERE 1=1 ");
 				  //L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
-				  sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
+				  sql.append(genWhereCondDate(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 					sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
@@ -337,7 +338,7 @@ public class ReportMonthEndLotusSQL {
 				  sql.append("\n\t L.STORE_CODE as customer_code,L.item_adjust as pens_item,L.item_adjust_desc as group_type, ");
 				  sql.append("\n\t NVL(SUM(ITEM_ADJUST_QTY),0) AS STOCK_SHORT_QTY ");
 				  sql.append("\n\t FROM PENSBME_ADJUST_SALES L  WHERE 1=1 ");	 
-				  sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
+				  sql.append(genWhereCondDate(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 					  sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
@@ -355,11 +356,21 @@ public class ReportMonthEndLotusSQL {
 				sql.append("\n AND M.group_type = STOCK_SHORT.group_type ");
 				
 				sql.append("\n ) A ");
+				
 				if("GroupCode".equalsIgnoreCase(summaryType)){
 					sql.append("\n GROUP BY A.customer_code,A.customer_desc ,A.group_type");
 				}
 				sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
-				
+				sql.append("\n ) A ");
+				if( !"".equalsIgnoreCase(c.getDispHaveQty())){
+					sql.append("\n WHERE (A.BEGINING_QTY <> 0 ");
+					sql.append("\n OR A.SALE_IN_QTY <> 0 ");
+					sql.append("\n OR A.SALE_OUT_QTY <> 0 ");
+					sql.append("\n OR A.SALE_RETURN_QTY <> 0 ");
+					sql.append("\n OR A.ADJUST_QTY <> 0 ");
+					sql.append("\n OR A.STOCK_SHORT_QTY <> 0 ");
+					sql.append("\n OR A.ONHAND_QTY <> 0 )");
+				}
 				//debug write sql to file
 				if(logger.isDebugEnabled()){
 				   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
@@ -374,20 +385,73 @@ public class ReportMonthEndLotusSQL {
 			return sql;
 	    }
 	 
+	 public static BMEControlBean calcDueDate(Connection conn,String storeCode,String asOfdate) throws Exception {
+			BMEControlBean bean = new BMEControlBean();
+            String maxEndDate = "";
+			try {
+				
+				//Budish to ChristDate
+				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				//Get Max End Date By StoreCode and asOfdate
+				maxEndDate =  getMaxEndDateByStoreCode(conn,storeCode);
+				logger.debug("maxEndDate:"+maxEndDate);
+				
+				if ( !"".equals(maxEndDate)) {
+					bean.setStartDate(maxEndDate);
+					bean.setEndDate(christAsOfDateStr);
+				}else{
+					bean.setYearMonth("");
+					bean.setStartDate(christAsOfDateStr);
+				}
 
-	  public static String genWhereCondDateMonthEnd(BMEControlBean bean ,String symnoname){
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+				
+				} catch (Exception e) {}
+			}
+			return bean;
+		}
+	 
+
+	 
+	 public static String getMaxEndDateByStoreCode(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String yearMonth = "";
+			try {
+				sql.append("\n select distinct max(ending_date) as ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 and store_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					yearMonth = Utils.stringValue(rst.getDate("ending_date"),Utils.DD_MM_YYYY_WITH_SLASH);
+				}
+				
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return yearMonth;
+		}
+	 
+	  public static String genWhereCondDate(BMEControlBean bean ,String symnoname){
 		  String whereSQL = "";
-		  if("1".equals(bean.getCaseType())){
-			  whereSQL  ="\n\t AND "+ symnoname +">= to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
-			  whereSQL +="\n\t AND "+ symnoname +"<= to_date('"+bean.getEndDate()+"','dd/mm/yyyy')";
-		  }else   if("2".equals(bean.getCaseType())){
-			  whereSQL  ="\n\t AND "+ symnoname +">= to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
-			  whereSQL +="\n\t AND "+ symnoname +"<= to_date('"+bean.getEndDate()+"','dd/mm/yyyy')"; 
-		  }else   if("3".equals(bean.getCaseType())){
-			  whereSQL ="\n\t AND "+ symnoname +"<= to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
-		  }else   if("4".equals(bean.getCaseType())){
-			  whereSQL ="\n\t AND "+ symnoname +"<= to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
-		  }
+	      if( !"".equals(Utils.isNull(bean.getStartDate())) && !"".equals(Utils.isNull(bean.getEndDate()))){
+	    	  whereSQL ="\n\t AND "+ symnoname +" > to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
+	    	  whereSQL +="\n\t AND "+ symnoname +"<= to_date('"+bean.getEndDate()+"','dd/mm/yyyy')";
+	      }else{
+		      whereSQL ="\n\t AND "+ symnoname +"<= to_date('"+bean.getStartDate()+"','dd/mm/yyyy')";
+	      }
 		  return whereSQL;
 	  }
 }

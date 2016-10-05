@@ -58,14 +58,20 @@ public class SAEmpAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				SAEmpBean ad = new SAEmpBean();
-				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
+				//Can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					ad.setCanEdit(true);
+				}
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				SAEmpBean oldCri = aForm.getBeanCriteria();
 				oldCri.setEmpRefId("");
-				
-				aForm.setBean(SAEmpDAO.searchHead(oldCri,""));
+				SAEmpBean bean = SAEmpDAO.searchHead(oldCri,"");
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					bean.setCanEdit(true);
+				}
+				aForm.setBean(bean);
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
@@ -125,8 +131,12 @@ public class SAEmpAction extends I_Action {
 				SAEmpBean c = new SAEmpBean();
 				c.setEmpRefId(empRefId);
 				bean = SAEmpDAO.searchHead(c,"edit").getItems().get(0);
+				
 			}
-			
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 			aForm.setBean(bean);
 			aForm.setMode(action);//Mode Edit ,Add
 			
@@ -192,8 +202,16 @@ public class SAEmpAction extends I_Action {
 		Connection conn = null;
 		StringBuffer h = new StringBuffer("");
 		int colSpan = 21;
+		double totalDamage = 0;
+		double totalPayment = 0;
+		double totalDelayPayment = 0;
 		try {
 			SAEmpBean bean = aForm.getBean();
+			
+			 if( !Utils.isNull(bean.getDispDamage()).equals("")){
+				 colSpan =24;
+			 }
+			
 			if(bean != null){
 				h.append(ExcelHeader.EXCEL_HEADER);
 				
@@ -222,6 +240,11 @@ public class SAEmpAction extends I_Action {
 						h.append("<td>Region</th><!-- 7 --> \n");
 						h.append("<td>Group Store</th><!-- 8 --> \n");
 						h.append("<td>Branch</th><!-- 9 --> \n");
+						if( !Utils.isNull(bean.getDispDamage()).equals("")){
+						 h.append("<td>ค่าความเสียหาย </th><!-- 9 --> \n");
+						 h.append("<td>ยอดชำระแล้ว </th><!-- 9 --> \n");
+					     h.append("<td>ยอดค้างชำระ </th><!-- 9 --> \n");
+						}
 						h.append("<td>Mobile No </th><!-- 10 --> \n");
 						h.append("<td>Email</th><!-- 11 --> \n");
 						h.append("<td>Bank Account</th><!-- 12 --> \n");
@@ -247,6 +270,16 @@ public class SAEmpAction extends I_Action {
 							h.append("<td>"+item.getRegionDesc()+"</th><!-- 7 --> \n");
 							h.append("<td>"+item.getGroupStore()+"</th><!-- 8 --> \n");
 							h.append("<td>"+item.getBranch()+"</th><!-- 9 --> \n");
+							
+							if( !Utils.isNull(bean.getDispDamage()).equals("")){
+								totalDamage += Utils.convertStrToDouble(item.getTotalDamage());
+								totalPayment += Utils.convertStrToDouble(item.getTotalPayment());
+								totalDelayPayment += Utils.convertStrToDouble(item.getTotalDelayPayment());
+								
+								h.append("<td class='num'>"+item.getTotalDamage()+" </th><!-- 9 --> \n");
+							    h.append("<td class='num'>"+item.getTotalPayment()+"</th><!-- 9 --> \n");
+							    h.append("<td class='num'>"+item.getTotalDelayPayment()+" </th><!-- 9 --> \n");
+							}
 							h.append("<td class='text'>"+item.getMobile()+"</th><!-- 10 --> \n");
 							h.append("<td>"+item.getEmail()+"</th><!-- 11 --> \n");
 							h.append("<td class='text'>"+item.getBankAccount()+"</th><!-- 12 --> \n");
@@ -263,6 +296,37 @@ public class SAEmpAction extends I_Action {
 					    h.append("</tr>");
 					}
 					
+					/** Summary **/
+					h.append("<tr> \n");
+					h.append("<td class='text'></th><!-- 1 --> \n");
+					h.append("<td></th><!-- 3 --> \n");
+					h.append("<td></th><!-- 4 --> \n");
+					h.append("<td class='text'></th><!-- 5 --> \n");
+					h.append("<td></th><!-- 6 --> \n");
+					h.append("<td></th><!-- 7 --> \n");
+					h.append("<td></th><!-- 8 --> \n");
+					h.append("<td></th><!-- 9 --> \n");
+					
+					if( !Utils.isNull(bean.getDispDamage()).equals("")){
+						h.append("<td class='num'>"+totalDamage+" </th><!-- 9 --> \n");
+					    h.append("<td class='num'>"+totalPayment+"</th><!-- 9 --> \n");
+					    h.append("<td class='num'>"+totalDelayPayment+" </th><!-- 9 --> \n");
+					}
+					h.append("<td class='text'></th><!-- 10 --> \n");
+					h.append("<td></th><!-- 11 --> \n");
+					h.append("<td class='text'></th><!-- 12 --> \n");
+					h.append("<td class='text'></th><!-- 13 --> \n");
+					h.append("<td></th><!-- 14 --> \n");
+					h.append("<td></th><!-- 15 --> \n");
+					h.append("<td></th><!-- 16 --> \n");
+					h.append("<td class='text'></th><!-- 17 --> \n");
+					h.append("<td></th><!-- 18 --> \n");
+					h.append("<td class='text'></th><!-- 1 9--> \n");
+					h.append("<td></th><!-- 20 --> \n");
+					h.append("<td class='text'></th><!-- 21 --> \n");
+					h.append("<td></th><!-- 22 --> \n");
+			        h.append("</tr>");
+					
 					java.io.OutputStream out = response.getOutputStream();
 					response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 					response.setContentType("application/vnd.ms-excel");
@@ -274,11 +338,10 @@ public class SAEmpAction extends I_Action {
 	
 				    out.flush();
 				    out.close();
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล  ");
+					return  mapping.findForward("search");
 				}
-				
-			}else{
-				request.setAttribute("Message", "ไม่พบข้อมูล  ");
-				return  mapping.findForward("search");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -294,9 +357,14 @@ public class SAEmpAction extends I_Action {
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
 		SAEmpForm aForm = (SAEmpForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			aForm.setResultsSearch(null);
-			aForm.setBean(new SAEmpBean());
+			SAEmpBean bean = new SAEmpBean();
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -397,6 +465,10 @@ public class SAEmpAction extends I_Action {
 			}
 			//Search Again
 			SAEmpBean bean = SAEmpDAO.searchHead(conn,h).getItems().get(0);
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 		    aForm.setBean(bean);
 		    aForm.setMode("edit");
 		    
@@ -423,6 +495,7 @@ public class SAEmpAction extends I_Action {
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		SAEmpForm aForm = (SAEmpForm) form;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			aForm.setResults(new ArrayList<SAEmpBean>());
 			
@@ -432,7 +505,9 @@ public class SAEmpAction extends I_Action {
 			bean.setRewardWacoal(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","RewardWACOAL").get(0).getCode());
 			bean.setSuretyBond(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SuretyBond").get(0).getCode());
 			
-			bean.setCanEdit(true);
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 			aForm.setMode("add");
 			aForm.setBean(bean);
 			

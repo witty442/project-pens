@@ -5,12 +5,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,15 +16,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.SAEmpBean;
-import com.isecinc.pens.bean.SAReportBean;
 import com.isecinc.pens.bean.SATranBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SAEmpDAO;
@@ -57,7 +48,10 @@ public class SATranAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				SATranBean ad = new SATranBean();
-				
+				//Can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					ad.setCanEdit(true);
+				}
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				SATranBean oldCri = aForm.getBeanCriteria();
@@ -79,7 +73,11 @@ public class SATranAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			aForm.setBean(SATranDAO.searchHead(aForm.getBean(),""));
+			SATranBean bean = SATranDAO.searchHead(aForm.getBean(),"");
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
 			aForm.setResultsSearch(aForm.getBean().getItems());
 			
 			if(aForm.getResultsSearch().size() <=0){
@@ -127,16 +125,23 @@ public class SATranAction extends I_Action {
 	        List<SATranBean> items = SATranDAO.initYearMonth(bean.getEmpId(),bean.getPayDate());
 	        if(items != null){
 			    bean.setItems(items);
-			    bean.setCanEdit(true);
+			  //Can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					bean.setCanEdit(true);
+				}
 				
 				aForm.setBean(bean);
 				aForm.setMode(action);//Mode Edit ,Add
 	        }else{
 	        	bean.setItems(null);
-	        	bean.setCanEdit(true);
+	        	//Can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+					bean.setCanEdit(true);
+				}
 				
 				aForm.setBean(bean);
 				aForm.setMode(action);//Mode Edit ,Add
+				
 	        	request.setAttribute("Message","ไม่มีการระบุข้อมูล วันที่เริ่มให้ ค่าเฝ้าตู้");
 	        	return "detail";
 	        }
@@ -198,10 +203,16 @@ public class SATranAction extends I_Action {
 	
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
+		User user = (User) request.getSession().getAttribute("user");
 		SATranForm aForm = (SATranForm) form;
 		try {
 			aForm.setResultsSearch(null);
-			aForm.setBean(new SATranBean());
+			SATranBean bean = new SATranBean();
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -321,7 +332,10 @@ public class SATranAction extends I_Action {
 		    
 			//Search Again
 			h.setItems(SATranDAO.initYearMonth(h.getEmpId(),h.getPayDate()));
-			h.setCanEdit(true);
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				h.setCanEdit(true);
+			}
 		    aForm.setBean(h);
 		    aForm.setMode("edit");
 		    
@@ -345,13 +359,17 @@ public class SATranAction extends I_Action {
 	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
+		User user = (User) request.getSession().getAttribute("user");
 		SATranForm aForm = (SATranForm) form;
 		try {
 			aForm.setResults(new ArrayList<SATranBean>());
 			
 			SATranBean bean = new SATranBean();
 			bean.setType("BME");
-			bean.setCanEdit(true);
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				bean.setCanEdit(true);
+			}
 			aForm.setBean(bean);
 			
 			aForm.setMode("add");

@@ -24,6 +24,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.sql.ReportEndDateLotusSQL;
 import com.isecinc.pens.sql.ReportMonthEndLotusSQL;
 import com.isecinc.pens.sql.ReportOnhandBigCSQL;
 import com.isecinc.pens.sql.ReportOnhandBigC_SPSQL;
@@ -1449,64 +1450,66 @@ public class SummaryDAO {
 			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
-			Date asofDate = null;
+			double BEGINING_QTY = 0;
+			double sale_in_qty = 0;
+			double sale_return_qty = 0;
+			double sale_out_qty = 0;
+			double ADJUST_QTY = 0;
+			double STOCK_SHORT_QTY = 0;
+			double onhand_qty = 0;
 			try {
-				String christSalesDateStr ="";
-				if( !Utils.isNull(c.getSalesDate()).equals("")){
-					asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				}
-
 				conn = DBConnection.getInstance().getConnection();
-				sql.append("\n SELECT  ");
-				sql.append("\n  STORE_CODE,ENDING_DATE,GROUP_CODE,PENS_ITEM   ");
-				sql.append("\n ,SALE_IN_QT,SALE_OUT_QTY,SALE_RETURN_QTY ");
-				sql.append("\n ,ADJUST_QTY,SHORT_QTY,ENDING_QTY ");
-				sql.append("\n FROM PENSBME_ENDDATE_STOCK V   ");
-				sql.append("\n WHERE 1=1   ");
-				
-				//Lotus Only 020047
-				sql.append("\n AND V.STORE_CODE LIKE '020047%'");
-				
-				if( !Utils.isNull(c.getSalesDate()).equals("")){
-                    sql.append("\n AND V.ending_date == to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-				}
-				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				    sql.append("\n AND V.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
-				}
-				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-					sql.append("\n AND V.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-					sql.append("\n AND V.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
-				}
-				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND V.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
-				}
-				
+				sql = ReportEndDateLotusSQL.genSQL(conn, c, user, f.getSummaryType());
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				
 				while (rst.next()) {
 					OnhandSummary item = new OnhandSummary();
 					
-					item.setStoreCode(rst.getString("STORE_CODE"));
+					item.setStoreCode(rst.getString("CUSTOMER_CODE"));
 					//item.setStoreName(rst.getString("customer_desc"));
-					//if("PensItem".equalsIgnoreCase(f.getSummaryType())){
+					if("PensItem".equalsIgnoreCase(f.getSummaryType())){
 					   item.setPensItem(rst.getString("pens_item"));
-					//}
-					//item.setItemDesc(rst.getString("inventory_item_desc"));
-					item.setGroup(rst.getString("group_code"));
+					}
+				
+					item.setGroup(rst.getString("group_type"));
+					item.setBeginingQty(Utils.decimalFormat(rst.getDouble("BEGINING_QTY"),Utils.format_current_no_disgit));
 					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
 					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
 					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("ADJUST_QTY"),Utils.format_current_no_disgit));
 					item.setStockShortQty(Utils.decimalFormat(rst.getDouble("STOCK_SHORT_QTY"),Utils.format_current_no_disgit));
-					
-					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("ending_qty"),Utils.format_current_no_disgit));
+					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+					 
+					BEGINING_QTY += rst.getDouble("BEGINING_QTY");
+					sale_in_qty += rst.getDouble("sale_in_qty");
+					sale_return_qty += rst.getDouble("sale_return_qty");
+					sale_out_qty += rst.getDouble("sale_out_qty");
+					ADJUST_QTY += rst.getDouble("ADJUST_QTY");
+					STOCK_SHORT_QTY += rst.getDouble("STOCK_SHORT_QTY");
+					onhand_qty += rst.getDouble("onhand_qty");
 					
 					pos.add(item);
 					
 				}//while
-
+				
+				//add Summary Row
+				OnhandSummary item = new OnhandSummary();
+				item.setStoreCode("");
+				if("PensItem".equalsIgnoreCase(f.getSummaryType())){
+				   item.setPensItem("");
+				}
+				item.setGroup("");
+				item.setBeginingQty(Utils.decimalFormat(BEGINING_QTY,Utils.format_current_no_disgit));
+				item.setSaleInQty(Utils.decimalFormat(sale_in_qty,Utils.format_current_no_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(sale_return_qty,Utils.format_current_no_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(sale_out_qty,Utils.format_current_no_disgit));
+				item.setAdjustQty(Utils.decimalFormat(ADJUST_QTY,Utils.format_current_no_disgit));
+				item.setStockShortQty(Utils.decimalFormat(STOCK_SHORT_QTY,Utils.format_current_no_disgit));
+				item.setOnhandQty(Utils.decimalFormat(onhand_qty,Utils.format_current_no_disgit));
+				
+				pos.add(item);
+				
 			} catch (Exception e) {
 				throw e;
 			} finally {
