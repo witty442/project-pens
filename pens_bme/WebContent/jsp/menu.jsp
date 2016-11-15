@@ -127,7 +127,7 @@
 				 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>2.Load Text file on-hand from Wacoal</span></a>
 			       <ul>
 				    	<li>
-						  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=onhand&action=new');">2.1 <span><bean:message bundle="sysprop" key="ImportBMEFromWacoal"/></span></a>
+						  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=onhandLotus&action=new');">2.1 <span><bean:message bundle="sysprop" key="ImportBMEFromWacoal"/></span></a>
 					    </li>
 					    <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandFriday');">2.2 <span><bean:message bundle="sysprop" key="ImportBMEFridayFromWacoal"/></span></a>
@@ -357,7 +357,7 @@
 		</ul>
 	</li>
 <%} %>
- <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.PICKADMIN}) ){%>
 	 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Transaction</span></a>
 		<ul>
 			<li>
@@ -366,6 +366,11 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/adjustStockSAAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="adjustStockSA"/></span></a>
 			</li>
+			 <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+				<li>
+				   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=reconcile');">3 <span><bean:message bundle="sysprop" key="reconcile"/></span></a>
+			   </li>
+		   <%} %>
 		</ul>
 	</li>
 <%} %>
@@ -426,7 +431,7 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAction.do?do=prepare2&action=new');"><span>10.<bean:message bundle="sysprop" key="confPickStock"/></span></a>
 			</li> 
-			 <%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+			 <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 				 <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/confPickStockAllAction.do?do=prepare2&action=new');"><span>10.1 <bean:message bundle="sysprop" key="confPickStockAll"/></span></a>
 				</li> 
@@ -526,6 +531,9 @@
 					    </li>
 					     <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saOrisoftReport&action=new');">4.2 <span><bean:message bundle="sysprop" key="saOrisoftReport"/></span></a>
+				       </li>
+				       <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saDeptReport&action=new');">4.3 <span><bean:message bundle="sysprop" key="saDeptReport"/></span></a>
 				       </li>
 			      </ul>
 			     </li>

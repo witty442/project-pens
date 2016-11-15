@@ -110,6 +110,16 @@ public class ExportManager {
 					   }
 					   logger.info("--End Export m_customer --");
 					   
+					}else if(tableBean.getTableName().equalsIgnoreCase("m_customer_location")){
+						logger.info("--Start Export m_customer_location --");
+						   /** Count Record and Prepare Monitor_item_detail(Data Export) */
+						   modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+						   
+						   /** Check Data Found Before Export **/
+						   if(modelDetailItem != null && modelDetailItem.length > 0){
+						      tableBean = exProcess.exportCustomerLocation(conn,tableBean,userRequest);
+						   }
+						logger.info("--End Export m_customer_location --");
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_order")){
 						logger.info("--Start Export t_order --");
 						/** Count Record and Prepare Monitor_item_detail(Data Export)  */

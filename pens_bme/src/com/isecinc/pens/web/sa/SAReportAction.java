@@ -25,8 +25,6 @@ import com.isecinc.pens.dao.SAReportDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
-import com.isecinc.pens.web.summary.SummaryExport;
-import com.isecinc.pens.web.summary.SummaryForm;
 
 /**
  * Summary Action
@@ -125,8 +123,26 @@ public class SAReportAction extends I_Action {
 					
 					aForm.setBean(ad);
 				}	
+			}else if(page.equals("saDeptReport")){
+				if("new".equals(action) ){
+					//Clear list session
+					request.getSession().setAttribute("SA_DEPT_REPORT_LIST", null);
+					
+					List<PopupForm> billTypeList1 = new ArrayList();
+					PopupForm ref1 = new PopupForm("",""); 
+					billTypeList1.add(ref1);
+					billTypeList1.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
+					request.getSession().setAttribute("empTypeList",billTypeList1);
+					
+					List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
+					PopupForm ref3 = new PopupForm("",""); 
+					billTypeList3.add(ref3);
+					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+					request.getSession().setAttribute("groupStoreList",billTypeList3);
+					
+					aForm.setBean(new SAReportBean());
+				}	
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", "err:"+ e.getMessage());
@@ -188,6 +204,17 @@ public class SAReportAction extends I_Action {
 						request.setAttribute("Message", "ไม่พบข้อมูล");
 					}
 				}
+			}else if(page.equals("saDeptReport")){
+				SAReportBean result = SAReportDAO.searchEmployeeDeptList(aForm.getBean());
+				if(result != null){
+					List<SAReportBean> items = result.getItems();
+					request.getSession().setAttribute("SA_DEPT_REPORT_LIST", items);
+					if(items != null && items.size()>0){
+						
+					}else{
+						request.setAttribute("Message", "ไม่พบข้อมูล");
+					}
+				}
 			}
 
 		} catch (Exception e) {
@@ -226,10 +253,10 @@ public class SAReportAction extends I_Action {
 					cri.setFullName(cri.getName()+" "+cri.getSurname());
 				}
 				
-					htmlTable = SAExportExcel.genSAStatementReport(cri,user);
-					if( !"".equals(htmlTable.toString())){
-						found = true;
-					}
+				htmlTable = SAExportExcel.genSAStatementReport(cri,user);
+				if( !"".equals(htmlTable.toString())){
+					found = true;
+				}
 			}
 			
 			if(found){
@@ -279,6 +306,12 @@ public class SAReportAction extends I_Action {
 				if( !"".equals(htmlTable.toString())){
 					found = true;
 				}
+			}else if(Utils.isNull(request.getParameter("page")).equals("saDeptReport")){
+				 if(request.getSession().getAttribute("SA_DEPT_REPORT_LIST") != null){
+					 found = true;
+					 List<SAReportBean> dataList =(List)request.getSession().getAttribute("SA_DEPT_REPORT_LIST");
+					 htmlTable =SAExportExcel.genSADeptReport(aForm.getBean(),dataList,user);
+				 }
 			}
 			if(found){
 				java.io.OutputStream out = response.getOutputStream();

@@ -11,6 +11,7 @@ public class InterfaceBean implements Serializable{
 	 */
 	private static final long serialVersionUID = -492604978741933733L;
 	
+	private String productType;
 	private String custGroup;
 	private String custGroupDesc;
 	private String textFileName;
@@ -18,6 +19,15 @@ public class InterfaceBean implements Serializable{
 	private String transactionDate;
     private FormFile formDataFile;
 	
+    
+	public String getProductType() {
+		return productType;
+	}
+
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
+
 	public FormFile getFormDataFile() {
 		return formDataFile;
 	}

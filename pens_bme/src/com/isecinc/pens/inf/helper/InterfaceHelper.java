@@ -18,6 +18,7 @@ import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
 
 public class InterfaceHelper extends InterfaceUtils{
 	
@@ -165,6 +166,8 @@ public class InterfaceHelper extends InterfaceUtils{
 		EnvProperties env = EnvProperties.getInstance();
 		MonitorTime monitorTime = null;
 		try {
+			String productType  = batchParamMap.get(ExportOrderToICC.PARAM_PRODUCT_TYPE);
+			
 			String lineStr = null;
 			while ((lineStr = br.readLine()) != null) {
 				if (!Utils.isBlank(lineStr)) { // exclude blank line
@@ -189,7 +192,7 @@ public class InterfaceHelper extends InterfaceUtils{
 							/** Gen SQL Insert And Update **/
 							tableBean = ExportHelper.genPrepareSQL(tableBean,userBean ,batchParamMap);
 							/** Get File name Export **/
-							tableBean.setFileFtpName(genExportNameICC(tableBean.getTableName(), batchParamMap));
+							tableBean.setFileFtpName(genExportNameICC(productType,tableBean.getTableName(), batchParamMap));
 							/** Store Data Map **/
 						    tableMap.put(tableBean.getTableName(),tableBean);
 						

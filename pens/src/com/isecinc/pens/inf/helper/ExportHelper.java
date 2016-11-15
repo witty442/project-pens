@@ -95,7 +95,7 @@ public class ExportHelper {
 							
 							boolean canAccess = isCanAccess(userBean, tableBean);
 							
-//							logger.debug("tableName:"+tableBean.getTableName()+",userRole:"+userBean.getType()+",canAccess:"+canAccess+",transType:"+transactionType+"");
+							logger.debug("tableName:"+tableBean.getTableName()+",userRole:"+userBean.getType()+",canAccess:"+canAccess+",transType:"+transactionType+"");
 //                          logger.debug("requestTable:"+requestTable+",transactionType:"+tableBean.getTransactionType());
                             
 							if(    ( Utils.isNull(requestTable).equals(tableBean.getTableName()) || Utils.isNull(requestTable).equals(""))
@@ -264,6 +264,7 @@ public class ExportHelper {
 	    String selectSql = "";
 		try{
 			if(tableBean.getTableName().equalsIgnoreCase("m_customer") ||
+				tableBean.getTableName().equalsIgnoreCase("m_customer_location") ||
 				tableBean.getTableName().equalsIgnoreCase("m_cust_profile") ||
 			    tableBean.getTableName().equalsIgnoreCase("m_cust_contact") ||
 			    tableBean.getTableName().equalsIgnoreCase("t_order") ||

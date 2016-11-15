@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.inf.manager.external.process.ControlInterfaceICC"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
 <%@page import="com.isecinc.pens.inf.helper.Constants"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -18,7 +21,32 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="interfacesForm" class="com.isecinc.pens.web.interfaces.InterfacesForm" scope="request" />
+<%
+User user = (User) session.getAttribute("user");
+String role = ((User)session.getAttribute("user")).getType();
+String pageName = Utils.isNull(request.getParameter("pageName"));
+String productType = "";
+%>
 
+<%
+if(session.getAttribute("productTypeList") == null){
+	List<References> productTypeList = new ArrayList<References>();
+	productTypeList.add(new References("",""));
+	productTypeList.addAll(GeneralDAO.getProductTypeListInterfaceICC());
+	session.setAttribute("productTypeList",productTypeList); 
+}
+
+//Update Transtion Type by product;
+if(  Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
+	|| Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
+ 	|| Constants.TYPE_EXPORT_BILL_ICC.equalsIgnoreCase(pageName)
+ 	|| Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)
+ 		|| Constants.TYPE_GEN_HISHER.equalsIgnoreCase(pageName)
+ 	) {
+	productType= ControlInterfaceICC.getCurrentTransInterfaceICC();
+}
+
+%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -68,21 +96,29 @@ body {
 
 </style>
 
-<%
-User user = (User) session.getAttribute("user");
-String role = ((User)session.getAttribute("user")).getType();
-String pageName = Utils.isNull(request.getParameter("pageName"));
-%>
+
 <Script>
     function loadme(){
-    	<%if(Constants.TYPE_GEN_HISHER.equalsIgnoreCase(pageName) 
-    		|| Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
+    	<%if( Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
     		|| Constants.TYPE_EXPORT_BILL_ICC.equalsIgnoreCase(pageName)
     		|| Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
     		) {%>
     	   new Epoch('epoch_popup','th',document.getElementById('transactionDate'));
+    	   /** Set For product type **/
+    	   var productType = document.getElementsByName("bean.productType")[0];
+    	   productType.value ='<%=productType%>';
     	<%}%>
+    	
+    	<%if( Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
+        	|| Constants.TYPE_EXPORT_BILL_ICC.equalsIgnoreCase(pageName)
+        	|| Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
+        	) {%>
+        	
+        	 // var productType = document.getElementsByName("bean.productType")[0];
+       	     // productType.disabled =true;
+        	<%}%>
     }
+    
     
 	function disableF5(e) {
 		if (e.which == 116) e.preventDefault(); 
@@ -96,8 +132,14 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	function runBatch(path) {
 			var confirmText = "ยืนยัน Process ";
 			var pageName = document.getElementsByName("pageName")[0];
-			if("<%=Constants.TYPE_IMPORT_BILL_ICC%>" == pageName.value){
+			if("<%=Constants.TYPE_GEN_ITEM_MASTER_HISHER%>" == pageName.value){
 				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				var productType = document.getElementsByName("bean.productType")[0];
+				if(productType.value ==""){
+					alert("กรุณาระบุ กลุ่มสินค้า");
+					productType.focus();
+					return false;
+				}
 				if(transDate.value ==""){
 					alert("กรุณาระบุ Transaction Date");
 					transDate.focus();
@@ -106,12 +148,43 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 			}
 			if("<%=Constants.TYPE_GEN_HISHER%>" == pageName.value){
 				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				var productType = document.getElementsByName("bean.productType")[0];
+				if(productType.value ==""){
+					alert("กรุณาระบุ กลุ่มสินค้า");
+					productType.focus();
+					return false;
+				}
 				if(transDate.value ==""){
 					alert("กรุณาระบุ Transaction Date");
 					transDate.focus();
 					return false;
 				}
 			}
+			if("<%=Constants.TYPE_GEN_ORDER_EXCEL%>" == pageName.value){
+				//var transDate = document.getElementsByName("bean.transactionDate")[0];
+				var productType = document.getElementsByName("bean.productType")[0];
+				if(productType.value ==""){
+					alert("กรุณาระบุ กลุ่มสินค้า");
+					productType.focus();
+					return false;
+				}
+				/* if(transDate.value ==""){
+					alert("กรุณาระบุ Transaction Date");
+					transDate.focus();
+					return false;
+				} */
+			}
+			
+			if("<%=Constants.TYPE_IMPORT_BILL_ICC%>" == pageName.value){
+				var transDate = document.getElementsByName("bean.transactionDate")[0];
+				if(transDate.value ==""){
+					alert("กรุณาระบุ Transaction Date");
+					transDate.focus();
+					return false;
+				}
+			}
+			
+			
 			if("<%=Constants.TYPE_EXPORT_BILL_ICC%>" == pageName.value){
 				var transDate = document.getElementsByName("bean.transactionDate")[0];
 				if(transDate.value ==""){
@@ -253,7 +326,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	    		   /** Task Success ***/
 	    		   update(status);
 	    		   
-	    		   <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  %>
+	    		   <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName) ){  %>
 	    		     //  if(status != '-1')
 	    		        //window.close();
 	    		      //search display
@@ -272,7 +345,9 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	    <!-- PROGRESS BAR -->
 	<% }else{ 
 		//Show Message In Parent window
-	    if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  
+	    if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName) 
+	    	|| Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS.equals(pageName) ){  
+	    	
 	    	MonitorBean resultsBean = interfacesForm.getResults()[0];
 	    	String message = "Gen ข้อมูลเรียบร้อย";
 	    	
@@ -351,6 +426,10 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenStockEndDateLotus"/>
 				</jsp:include>
+			<%}else if(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="GenStockReportEndDateLotus"/>
+				</jsp:include>
 			<%} %>
 			
 	      	<!-- TABLE BODY -->
@@ -380,7 +459,15 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 							</table>
 
 					    <%}else if( Constants.TYPE_GEN_HISHER.equals(pageName) || Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){  %>
-					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+					       <table align="center" border="0" cellpadding="2" cellspacing="3" width="100%">
+					          <tr>
+								    <td align="right" width="40%">กลุ่มสินค้า<font color="red">*</font></td>
+								    <td valign="top" align="left">
+								       <html:select property="bean.productType" styleId="productType">
+											<html:options collection="productTypeList" property="key" labelProperty="name"/>
+									    </html:select>
+								    </td>
+						        </tr>
 					           <tr>
 							    <td align="right" width="40%">กลุ่มร้านค้า<font color="red"></font></td>
 							    <td valign="top" align="left">
@@ -418,6 +505,13 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 						
 					    <%}else if( Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+					            <tr>
+								    <td align="right" width="40%">กลุ่มสินค้า<font color="red"></font></td>
+								    <td valign="top" align="left">
+								       <html:text property="bean.productType" styleId="productType" styleClass="disableText" readonly="true"/>
+								    </td>
+						        </tr>
+	
 					           <tr>
 							    <td align="right" width="40%">กลุ่มร้านค้า<font color="red"></font></td>
 							    <td valign="top" align="left">
@@ -456,6 +550,12 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 						
 					  <%}else if( Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+					           <tr>
+								    <td align="right" width="40%">กลุ่มสินค้า<font color="red"></font></td>
+								    <td valign="top" align="left">
+								      <html:text property="bean.productType" styleId="productType" styleClass="disableText" readonly="true"/>
+								    </td>
+						        </tr>
 						       <tr>
 							    <td align="right" width="40%">Transaction Date<font color="red">*</font></td>
 							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20"/></td>
@@ -480,6 +580,12 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 					   	
 					  <%}else if( Constants.TYPE_EXPORT_BILL_ICC.equals(pageName)){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
+					           <tr>
+								    <td align="right" width="40%">กลุ่มสินค้า<font color="red"></font></td>
+								    <td valign="top" align="left">
+								      <html:text property="bean.productType" styleId="productType" styleClass="disableText" readonly="true"/>
+								    </td>
+						        </tr>
 						       <tr>
 							    <td align="right" width="40%">ระบุวันที่ icc สรุปบิล (Bill Date)<font color="red">*</font></td>
 							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20"/></td>

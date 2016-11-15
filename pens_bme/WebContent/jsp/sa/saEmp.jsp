@@ -79,11 +79,12 @@ span.pagelinks {
 
 function loadMe(){
 	<%if("add".equals(mode)){%>
-	    new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+	    //new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
 	<%}else{%>
 	    setStyletextField();
 	 <%}%>
-	    new Epoch('epoch_popup', 'th', document.getElementById('leaveDate'));
+	   new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+	   new Epoch('epoch_popup', 'th', document.getElementById('leaveDate'));
 	   new Epoch('epoch_popup', 'th', document.getElementById('startRewardBmeDate'));
 	   new Epoch('epoch_popup', 'th', document.getElementById('startRewardWacoalDate'));
 	   new Epoch('epoch_popup', 'th', document.getElementById('startSuretyBondDate'));
@@ -91,7 +92,7 @@ function loadMe(){
 function setStyletextField(){
 	document.getElementById('empId').className= "disableText";
 	document.getElementById('empId').readOnly= true;
-	document.getElementById('startDate').className= "disableText";
+	//document.getElementById('startDate').className= "disableText";
 }
 function clearForm(path){
 	var form = document.saEmpForm;

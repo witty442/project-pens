@@ -199,8 +199,8 @@ function actionMaster(path,action,interfaceValue,interfaceDesc,pensValue,pensDes
 			        <c:if test="${masterForm.masterResults != null}">
 				       
 						<br/>
-							<display:table id="item" name="requestScope.masterForm.masterResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/masterAction.do?do=search" sort="list" pagesize="30">	
+							<display:table style="width:100%;" id="item" name="requestScope.masterForm.masterResults" defaultsort="0" defaultorder="descending" class="resultDisp"
+							    requestURI="#" sort="list" pagesize="30">	
 							    
 							    <display:column  title="InterfaceValue" property="interfaceValue"  sortable="false" class="interfaceValue"/>
 							    <display:column  title="InterfaceDesc" property="interfaceDesc"  sortable="false" class="interfaceDesc"/>	

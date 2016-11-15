@@ -186,7 +186,7 @@ public class GenerateEndDateLotus {
 				psIns.setDouble(10, rst.getDouble("onhand_qty"));
 				
 				psIns.setString(11, user.getUserName());
-				psIns.setDate(12, new java.sql.Date(new Date().getTime()));
+				psIns.setTimestamp(12, new java.sql.Timestamp(new Date().getTime()));
 				
 				psIns.execute();
 			}
@@ -708,6 +708,79 @@ public class GenerateEndDateLotus {
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
 					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				}
+				
+				return r;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			
+		}
+	 
+	 public static String getEndDateStockTemp(String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String r = "";
+			try {
+				//Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK_TEMP WHERE 1=1 ");
+				sql.append("\n and store_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				}
+				
+				return r;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			
+		}
+	 
+	 public static String getEndSaleDateLotus(String storeCode,String asOfDate) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String r = "";
+			try {
+				Date asofDateTemp = Utils.parse(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
+				sql.append("\n select distinct max(sales_date) as max_ending_date FROM PENSBME_SALES_FROM_LOTUS WHERE 1=1 ");
+				sql.append("\n and pens_cust_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					if(rst.getDate("max_ending_date").before(asofDateTemp)){
+					   r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					}else{
+					   r = asOfDate;
+					}
 				}
 				
 				return r;

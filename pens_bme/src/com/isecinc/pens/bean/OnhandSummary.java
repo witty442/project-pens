@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.util.List;
 public class OnhandSummary implements Serializable{
 
 	/**
@@ -42,7 +43,7 @@ public class OnhandSummary implements Serializable{
     private String status;
     private String message;
     private String pensItem;
-    
+    private String onhandAmt;
     
     private String storeCode;
     private String storeName;
@@ -59,8 +60,44 @@ public class OnhandSummary implements Serializable{
     private String beginingQty;
 	private String dispHaveQty;
     private String initDate;
-	
-	
+
+    private String scanQty;
+    private String diffAmt;
+    
+    private List<OnhandSummary> itemsList;
+    private OnhandSummary summary;
+    
+    
+	public String getOnhandAmt() {
+		return onhandAmt;
+	}
+	public void setOnhandAmt(String onhandAmt) {
+		this.onhandAmt = onhandAmt;
+	}
+	public String getDiffAmt() {
+		return diffAmt;
+	}
+	public void setDiffAmt(String diffAmt) {
+		this.diffAmt = diffAmt;
+	}
+	public String getScanQty() {
+		return scanQty;
+	}
+	public void setScanQty(String scanQty) {
+		this.scanQty = scanQty;
+	}
+	public OnhandSummary getSummary() {
+		return summary;
+	}
+	public void setSummary(OnhandSummary summary) {
+		this.summary = summary;
+	}
+	public List<OnhandSummary> getItemsList() {
+		return itemsList;
+	}
+	public void setItemsList(List<OnhandSummary> itemsList) {
+		this.itemsList = itemsList;
+	}
 	public String getEndDate() {
 		return endDate;
 	}

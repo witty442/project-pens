@@ -63,5 +63,9 @@ table.tableSearch td.td_text_right {
 }
 
 .td_number{
-	text-align:center;
+	text-align:right;
+}
+.td_number_bold{
+	text-align:right;
+	font-weight: bold;
 }

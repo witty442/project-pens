@@ -32,6 +32,10 @@ public class ReportOnhandLotus_SQL {
 				asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
 			}
+			sql.append("\n SELECT A.*");
+			sql.append("\n,(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T WHERE A.group_type = T.group_item) as retail_price_bf \n");
+			sql.append("\n,(A.ONHAND_QTY *(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T WHERE A.group_type = T.group_item)) as onhand_amt \n");
+			sql.append("\n FROM ( ");
 			if("GroupCode".equalsIgnoreCase(summaryType)){
 				sql.append("\n SELECT A.customer_code ,A.group_type ");
 				
@@ -485,8 +489,8 @@ public class ReportOnhandLotus_SQL {
 			if("GroupCode".equalsIgnoreCase(summaryType)){
 				sql.append("\n GROUP BY A.customer_code,A.group_type ");
 			}
-			sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
-			
+			sql.append("\n  ORDER BY A.customer_code,A.group_type asc ");
+			sql.append("\n )A ");
 			//debug write sql to file
 			if(logger.isDebugEnabled()){
 			   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());

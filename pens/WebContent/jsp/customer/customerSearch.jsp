@@ -284,9 +284,9 @@ $(function() {
 								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
 								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
 								
-								<%--  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
+								  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
 									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
-								</a> --%>
+								</a> 
 								
 							</td>
 						</tr>

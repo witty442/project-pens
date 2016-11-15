@@ -65,17 +65,10 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	Calendar c = Calendar.getInstance();
-	    	int count =0;
-			for(int i=11;i>=0;i--){
-				count++;
-			    c.set(Calendar.MONTH, i);
-			    String mmmyy = Utils.stringValue(c.getTime(), Utils.MMM_YY);
-			    System.out.println("c["+count+"]:"+c.getTime());
-			    System.out.println("mm["+count+"]:"+mmmyy);
-			    
-			}
+	    	Calendar c = Calendar.getInstance(Utils.local_th);
+			String yyyymmPayDate = Utils.stringValue(c.getTime(), Utils.YYYYMM);
 	    	
+			System.out.println("yyyymmPayDate:"+yyyymmPayDate);
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -143,6 +136,7 @@ public class Utils {
 		
 		return totalPage.intValue();
 	}
+	
 	
 	public static String genFileName(String prefix){
 		String fileName = "";

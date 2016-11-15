@@ -27,7 +27,7 @@ public class InterfaceUtils {
 	}
 	
 	//Format File name =  FACT_ID || _MMDD. || SITE_ID     ตัวอย่างผลที่ได้ คือ PEN_1123.500 
-	public static String getHisHerTextFileName(String transDate){
+	public static String getHisHerTextFileName(String productType,String transDate){
 		String fileName ="";
 		Connection conn = null;
 		try{
@@ -36,7 +36,7 @@ public class InterfaceUtils {
 			   String curDD = transDate.substring(0,2);
 			   String curMonth = transDate.substring(3,5);
 			  
-			   fileName = ""+getConfigInterface(conn,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,"PENSTOCK","SITE_ID");
+			   fileName = ""+getConfigInterface(conn,productType,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,productType,"PENSTOCK","SITE_ID");
 			   
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -50,7 +50,7 @@ public class InterfaceUtils {
 	
 	//Format File name =  FACT_ID || _MMDD. || SITE_ID     ตัวอย่างผลที่ได้ คือ PEN_1123.500 
 	//Edit new 04/02/2559  by Current Date
-	public static String getHisHerTextFileName(){
+	public static String getHisHerTextFileName(String productType){
 		String fileName ="";
 		Connection conn = null;
 		try{
@@ -60,7 +60,7 @@ public class InterfaceUtils {
 			   String curDD = currentDate.substring(0,2);
 			   String curMonth = currentDate.substring(3,5);
 			  
-			   fileName = ""+getConfigInterface(conn,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,"PENSTOCK","SITE_ID");
+			   fileName = ""+getConfigInterface(conn,productType,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,productType,"PENSTOCK","SITE_ID");
 			   
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -72,7 +72,7 @@ public class InterfaceUtils {
 		return fileName;
 	}
 	
-	public static String getHisHerItemMasterTextFileName(String transDate){
+	public static String getHisHerItemMasterTextFileName(String productType,String transDate){
 		String fileName ="";
 		Connection conn = null;
 		try{
@@ -81,7 +81,7 @@ public class InterfaceUtils {
 			   String curDD = transDate.substring(0,2);
 			   String curMonth = transDate.substring(3,5);
 			  
-			   fileName = ""+getConfigInterface(conn,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,"PENSTOCK","SITE_ID");
+			   fileName = ""+getConfigInterface(conn,productType,"PENSTOCK","FILENAME_PREFIX")+"_"+curMonth+curDD+"."+getConfigInterface(conn,productType,"PENSTOCK","SITE_ID");
 			   
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -116,25 +116,26 @@ public class InterfaceUtils {
 		return fileName;
 	}
 	
-	public static String genExportNameICC(String tableName,Map<String, String> batchParamMap){
+	public static String genExportNameICC(String productType,String tableName,Map<String, String> batchParamMap){
 		String fileName ="";
 		Connection conn = null;
 		String transDate = "";
+		productType ="BME";
 		try{
 			 conn = DBConnection.getInstance().getConnection();
 			//logger.debug("transDate:"+transDate);
 			 transDate = batchParamMap.get("TRANS_DATE");
 			 
-		   //dd/mm/yyyy
-		   String curDD = transDate.substring(0,2);
-		   String curMonth = transDate.substring(3,5);
-		   String siteId = getConfigInterface(conn,"PENSTOCK","SITE_ID");
+		    //dd/mm/yyyy
+		    String curDD = transDate.substring(0,2);
+		    String curMonth = transDate.substring(3,5);
+		    String siteId = getConfigInterface(conn,productType,"PENSTOCK","SITE_ID");
 		   
-		  if("PENSBME_ICC_HEAD".equalsIgnoreCase(tableName)){
-		     fileName = "tax_"+curMonth+curDD+"."+siteId;
-		  }else  if("PENSBME_ICC_DLYR".equalsIgnoreCase(tableName)){
-			 fileName = "itm_"+curMonth+curDD+"."+siteId;
-		  }
+		   if("PENSBME_ICC_HEAD".equalsIgnoreCase(tableName)){
+		      fileName = "tax_"+curMonth+curDD+"."+siteId;
+		   }else  if("PENSBME_ICC_DLYR".equalsIgnoreCase(tableName)){
+			  fileName = "itm_"+curMonth+curDD+"."+siteId;
+		   }
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -163,14 +164,15 @@ public class InterfaceUtils {
 		return fileName;
 	}
 	
-	 public static String getConfigInterface(Connection conn,String subject,String fieldName) throws Exception {
+	 public static String getConfigInterface(Connection conn,String productType,String subject,String fieldName) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
 			String fieldValue ="";
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n select field_Value FROM PENSBI.PENSBME_CONFIG_INTERFACE WHERE 1=1 ");
+				sql.append("\n select field_Value FROM PENSBME_CONFIG_INTERFACE WHERE 1=1 ");
+				sql.append("\n AND product ='"+productType+"' \n");
 				sql.append("\n AND subject ='"+subject+"' \n");
 				sql.append("\n AND field_name ='"+fieldName+"' \n");
 				
@@ -193,15 +195,16 @@ public class InterfaceUtils {
 			return fieldValue;
 		}
 	 
-	 public static Map<String,String> getConfigInterfaceAllBySubject(Connection conn,String subject) throws Exception {
+	 public static Map<String,String> getConfigInterfaceAllBySubject(Connection conn,String subject,String productType) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
 			Map<String,String> m = new HashedMap();
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n select field_name,field_Value FROM PENSBI.PENSBME_CONFIG_INTERFACE WHERE 1=1 ");
-				sql.append("\n AND subject ='"+subject+"' \n");
+				sql.append("\n select field_name,field_Value FROM PENSBME_CONFIG_INTERFACE WHERE 1=1 ");
+				sql.append("\n AND subject ='"+subject+"' ");
+				sql.append("\n AND product ='"+productType+"' ");
 				
 				logger.debug("sql:"+sql);
 

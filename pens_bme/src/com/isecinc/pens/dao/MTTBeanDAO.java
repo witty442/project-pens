@@ -12,14 +12,11 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MTTBean;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
-
 public class MTTBeanDAO{
 
 	protected static Logger logger = Logger.getLogger("PENS");

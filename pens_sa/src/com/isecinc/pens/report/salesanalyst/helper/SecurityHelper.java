@@ -81,8 +81,8 @@ public class SecurityHelper {
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();	
 			html +="<fieldset>";
-			html +="<legend><b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] <a href='javascript:controlRoleTab()'>&nbsp;&nbsp;<span id='roleTabSpan' style='color:white'>(Show Role Detail)</span></a> </b></legend> ";
-			html +="<div id='roleTab' style='display: none;'>";
+			html +="<legend><b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"]</b></legend> ";
+			html +="<div id='roleTab' style='display: block;'>";
 			html +="<table border='0' align='center' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
@@ -95,10 +95,7 @@ public class SecurityHelper {
 			     i++;
 			}
 			html +="<tr>\n";
-			html += " <td>"+roles[0]+"</td>"+"<td>"+roles[1]+"</td>"+"<td>"+roles[2]+"</td>";  
-			html +="<tr>\n";  
-			html +="<tr>\n";
-			html += " <td>"+roles[3]+"</td>"+"<td>"+roles[4]+"</td>"+"<td>&nbsp;</td>";  
+			html += " <td>"+roles[0]+" : "+roles[1]+" : "+roles[2]+" : "+roles[3]+" : "+roles[4]+"</td>";  
 			html +="<tr>\n";  
 			html +="</table>\n";
 			html +="</div>";

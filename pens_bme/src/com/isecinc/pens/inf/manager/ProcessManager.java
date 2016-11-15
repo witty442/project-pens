@@ -12,9 +12,7 @@ import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BMECControlDAO;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
@@ -24,7 +22,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchProcessWorker;
-import com.isecinc.pens.inf.manager.process.ExportBillICC;
+import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
 import com.isecinc.pens.inf.manager.process.GenerateHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateItemMasterHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
@@ -32,6 +30,7 @@ import com.isecinc.pens.inf.manager.process.ImportBillICC;
 import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.summary.process.GenerateEndDateLotus;
+import com.isecinc.pens.summary.process.GenerateReportEndDateLotus;
 
 /**
  * @author WITTY
@@ -42,6 +41,50 @@ public class ProcessManager {
 	public static Logger logger = Logger.getLogger("PENS");
 	public static Object IMPORT_Q = new Object();
 
+	
+	public MonitorBean mainProcess(MonitorBean monitorModel,User user,HttpServletRequest request ) {
+		logger.info("Start Thread:" + Thread.currentThread().getName());
+		try {
+           
+			/** Process Interface ICC *******************************************************************************/
+           if(monitorModel.getType().equals(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
+        	   monitorModel = (new ProcessManager()).processGenerateItemMasterHisHerTxt(monitorModel, user,request);
+        	   
+           }else if(monitorModel.getType().equals(Constants.TYPE_GEN_HISHER)){
+                monitorModel = (new ProcessManager()).processGenerateHisHerTxt(monitorModel, user,request); 
+                
+           }else if(monitorModel.getType().equals(Constants.TYPE_GEN_ORDER_EXCEL)){
+        	   
+              	monitorModel = (new ProcessManager()).processGenerateOrderExcel(monitorModel, user,request);
+           	
+            }else if(monitorModel.getType().equals(Constants.TYPE_IMPORT_BILL_ICC)){
+            	monitorModel = (new ProcessManager()).processImportBillICC(monitorModel, user,request);
+            	
+            }else if(monitorModel.getType().equals(Constants.TYPE_EXPORT_BILL_ICC)){
+            	monitorModel = (new ProcessManager()).processExportOrderToICC(monitorModel, user,request);
+            	
+            /** Process Interface ICC*******************************************************************************/
+           	
+            	
+            /** Process Transaction BME ****************************************************************************/
+            }else if(monitorModel.getType().equals(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
+            	monitorModel = (new ProcessManager()).processImportTransactionLotus(monitorModel, user,request);
+            	
+            }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
+            	monitorModel = (new ProcessManager()).processGenStockEndDateLotus(monitorModel, user,request);
+            	
+            }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS)){
+            	monitorModel = (new ProcessManager()).processGenStockReportEndDateLotus(monitorModel, user,request);
+            	
+            }
+           /** Process Transaction BME ****************************************************************************/
+           
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}
+		return monitorModel;
+	}
+	
 	/**
 	 * 
 	 * @param transType
@@ -337,15 +380,15 @@ public class ProcessManager {
 		return monitorModel;
 	}
 	
-	public  MonitorBean processExportBillICC(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+	public  MonitorBean processExportOrderToICC(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		MonitorTime monitorTime = null;
 		try{
 			logger.debug("Export Type:"+monitorModel.getTransactionType());
 
-			monitorTime  = new MonitorTime("Export Bill ICC");   
+			monitorTime  = new MonitorTime("processExportOrderToICC");   
 			
 			//Process Generate 
-			ExportBillICC.runProcess(user,monitorModel);
+			ExportOrderToICC.runProcess(user,monitorModel);
 			
 			monitorTime.debugUsedTime();
 	
@@ -509,6 +552,13 @@ public class ProcessManager {
 	public  MonitorBean processGenStockEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		try{
 			return GenerateEndDateLotus.processGenStockEndDateLotus(monitorModel, user, request);
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	public  MonitorBean processGenStockReportEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+		try{
+			return GenerateReportEndDateLotus.process(monitorModel, user, request);
 		}catch(Exception e){
 			throw e;
 		}

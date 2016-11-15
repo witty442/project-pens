@@ -34,7 +34,6 @@ public class BatchProcessWorker extends BatchWorker {
 	@Override
 	public void run() {
 		System.out.println("Start Thread:" + Thread.currentThread().getName());
-		 MonitorBean monitorModel = null;
 		try {
 			/** Process run Script Before Import **/
 			new ExternalProcess().processImportBefore(request, user);
@@ -43,24 +42,36 @@ public class BatchProcessWorker extends BatchWorker {
             
             logger.debug(" **********Start Process["+this.monitorModel.getType()+"] ******************");
             
-            if(this.monitorModel.getType().equals(Constants.TYPE_GEN_HISHER)){
+            this.monitorModel = new ProcessManager().mainProcess(this.monitorModel,user,request);
+            
+           /* if(this.monitorModel.getType().equals(Constants.TYPE_GEN_HISHER)){
                 monitorModel = (new ProcessManager()).processGenerateHisHerTxt(this.monitorModel, user,request);
+                
             }else if(this.monitorModel.getType().equals(Constants.TYPE_IMPORT_BILL_ICC)){
             	monitorModel = (new ProcessManager()).processImportBillICC(this.monitorModel, user,request);
+            	
             }else if(this.monitorModel.getType().equals(Constants.TYPE_EXPORT_BILL_ICC)){
             	monitorModel = (new ProcessManager()).processExportBillICC(this.monitorModel, user,request);
+            	
             }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_ORDER_EXCEL)){
             	monitorModel = (new ProcessManager()).processGenerateOrderExcel(this.monitorModel, user,request);
+            	
             }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_ITEM_MASTER_HISHER)){
             	monitorModel = (new ProcessManager()).processGenerateItemMasterHisHerTxt(this.monitorModel, user,request);
+            	
             }else if(this.monitorModel.getType().equals(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
             	monitorModel = (new ProcessManager()).processImportTransactionLotus(this.monitorModel, user,request);
+            	
             }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
             	monitorModel = (new ProcessManager()).processGenStockEndDateLotus(this.monitorModel, user,request);
-            }
+            	
+            }else if(this.monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS)){
+            	monitorModel = (new ProcessManager()).processGenStockReportEndDateLotus(this.monitorModel, user,request);
+            	
+            }*/
             
-            logger.debug(" **********Result Process["+this.monitorModel.getType()+"] :"+monitorModel.getStatus()+" ******************");
-			logger.debug(" **********Result Process["+this.monitorModel.getType()+"] ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
+            logger.debug(" **********Result Process["+this.monitorModel.getType()+"] :"+this.monitorModel.getStatus()+" ******************");
+			logger.debug(" **********Result Process["+this.monitorModel.getType()+"] ErrorCode:"+Utils.isNull(this.monitorModel.getErrorCode()));
             
 			/** Process Run Script After Import **/
 			new ExternalProcess().processImportAfter(request,user);

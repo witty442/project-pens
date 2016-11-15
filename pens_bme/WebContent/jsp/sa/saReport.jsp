@@ -61,6 +61,7 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -73,7 +74,6 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function search(path){
 	var form = document.saReportForm;
 	form.action = path + "/jsp/saReportAction.do?do=search";
@@ -92,9 +92,7 @@ function exportToExcelAll(path){
 	form.submit();
 	return true;
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -118,6 +116,10 @@ function exportToExcelAll(path){
 	       <%if(pageN.equals("saStatementReport")){ %>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="saStatementReport"/>
+				</jsp:include>
+		    <%}else if(pageN.equals("saDeptReport")){ %>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="saDeptReport"/>
 				</jsp:include>
 			<% }else{%>
 				<jsp:include page="../program.jsp">
@@ -187,6 +189,56 @@ function exportToExcelAll(path){
 									</td>
 								</tr>
 						      </table>
+						    <%}else if(pageN.equals("saDeptReport")){ %>
+                       
+						      <table align="center" border="0" cellpadding="3" cellspacing="0" >
+						      <tr>
+								    <td  align="right">Group Store<font color="red"></font></td>    
+									<td colspan="2">
+									     <html:select property="bean.groupStore" styleId="groupStore">
+											<html:options collection="groupStoreList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
+									<td>
+									ประเภท 
+									    <html:select property="bean.empType" styleId="empType">
+											<html:options collection="empTypeList" property="code" labelProperty="desc"/>
+									    </html:select>
+									</td>
+								</tr>
+								<tr>
+			                        <td> Employee ID <font color="red"></font></td>
+									<td>		
+										 <html:text property="bean.empId" styleId="empId" size="20"/>
+									</td>
+								   <td>รหัสลูกหนี้ใน Oracle</td>
+									<td>		
+				                       <html:text property="bean.oracleRefId" styleId="oracleRefId" size="20"/>
+									</td>
+								</tr>
+								<tr>
+			                        <td> Name <font color="red"></font></td>
+									<td>		
+										 <html:text property="bean.name" styleId="name" size="20"/>
+									</td>
+								   <td>  Surname<font color="red"></font></td>
+									<td>	
+									     <html:text property="bean.surname" styleId="surname" size="20"/>
+									</td>
+								</tr>
+								<tr>
+			                        <td> แสดงตาม <font color="red"></font></td>
+									<td>		
+										 <html:select property="bean.summaryType" styleId="summaryType">
+											<html:option value="Detail">Detail</html:option>
+											<html:option value="Summary">Summary</html:option>
+									    </html:select>
+									</td>
+								   <td></td>
+								   <td></td>
+								</tr>
+						      </table>
+						      
 						     <%}else if(pageN.equals("saOrisoftReport")){ %>
 						      
 						      <table align="center" border="0" cellpadding="3" cellspacing="0" >
@@ -227,9 +279,11 @@ function exportToExcelAll(path){
 					  
 					   <%if(pageN.equals("saStatementReport")){ %>
 						    <jsp:include page="saStatementReport_sub.jsp" />  
-						<%}else if(pageN.equals("saOrisoftReport")){ %>
+					   <%}else if(pageN.equals("saOrisoftReport")){ %>
 						    <jsp:include page="saOrisoftReport_sub.jsp" />  
-		                <%} %>
+		               <%}else if(pageN.equals("saDeptReport")){ %>
+						    <jsp:include page="saDeptReport_sub.jsp" />  
+		               <%} %>
 					
 					
 					<!-- hidden field -->

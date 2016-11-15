@@ -23,11 +23,11 @@ public class SAReportDAO {
 	 private static Logger logger = Logger.getLogger("PENS");
 	 
 	 
-   public static SAReportBean searchEmployeeList(SAReportBean o ) throws Exception {
+   public static SAReportBean searchEmployeeDeptList(SAReportBean o ) throws Exception {
 	   Connection conn = null;
 	   try{
 		  conn = DBConnection.getInstance().getConnection();
-		  return searchEmployeeListModel(conn, o);
+		  return searchEmployeeDeptListModel(conn, o);
 	   }catch(Exception e){
 		   throw e;
 	   }finally{
@@ -35,28 +35,46 @@ public class SAReportDAO {
 	   }
 	}
    
-	public static SAReportBean searchEmployeeListModel(Connection conn,SAReportBean o) throws Exception {
+	public static SAReportBean searchEmployeeDeptListModel(Connection conn,SAReportBean o) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
-			
 			SAReportBean h = null;
 			List<SAReportBean> items = new ArrayList<SAReportBean>();
-			int r = 1;
+			Map<String,String> damageMap = new HashMap<String,String>();
 			try {
 			   sql.append(" \n select distinct E.* " );
-			   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =E.region)as region_desc" );
-			   sql.append(" \n ,D.total_damage ");
+			   sql.append(" \n ,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =E.region)as region_desc" );
+			   sql.append(" \n ,D.total_damage,INV.total_invoice_amt");
+			   sql.append(" \n,(SELECT NVL(SUM(M.bme_amt),0) FROM sa_reward_tran M where M.emp_id = E.emp_id group by M.emp_id) as total_reward_bme" );
+			   sql.append(" \n,(SELECT NVL(SUM(M.wacoal_amt),0) FROM sa_reward_tran M where M.emp_id = E.emp_id group by M.emp_id) as total_reward_wacoal" );
+			   if(Utils.isNull(o.getSummaryType()).equals("Detail")){
+			      sql.append("\n ,INV.TRX_NUMBER ");
+			   }
 			   sql.append("\n  from SA_EMPLOYEE E ");
-			   sql.append("\n  ,(select H.emp_id ,nvl(sum(pay_amt),0) as total_damage");
+			   sql.append("\n  LEFT OUTER JOIN " );
+			   if(Utils.isNull(o.getSummaryType()).equals("Detail")){
+				   sql.append("\n  ( select H.ACCOUNT_NUMBER,H.TRX_NUMBER ,nvl(sum(AMOUNT_DUE_ORIGINAL),0) as total_invoice_amt");
+				   sql.append("\n    FROM SA_AR_DAMAGE H");
+				   sql.append("\n    GROUP BY H.ACCOUNT_NUMBER,H.TRX_NUMBER ");
+				   sql.append("\n  )INV");
+			   }else{
+				   sql.append("\n  ( select H.ACCOUNT_NUMBER ,nvl(sum(AMOUNT_DUE_ORIGINAL),0) as total_invoice_amt");
+				   sql.append("\n    FROM SA_AR_DAMAGE H");
+				   sql.append("\n    GROUP BY H.ACCOUNT_NUMBER ");
+				   sql.append("\n  )INV"); 
+			   }
+			   sql.append("\n  ON E.oracle_ref_id = INV.ACCOUNT_NUMBER");
+			   
+			   sql.append("\n  LEFT OUTER JOIN " );
+			   sql.append("\n  (select H.emp_id ,nvl(sum(pay_amt),0) as total_damage");
 			   sql.append("\n   FROM SA_DAMAGE_HEAD H,SA_DAMAGE_TRAN T");
 			   sql.append("\n   WHERE H.emp_id = T.emp_id AND H.type = T.type AND H.inv_refwal=T.inv_refwal ");
-			   sql.append("\n   and T.paydate >= to_date('"+o.getMonth()+"','ddmmyyyy')");
 			   sql.append("\n   GROUP BY H.emp_id ");
-			   sql.append("\n  )D");
+			   sql.append("\n  )D ON E.emp_id = D.emp_id");
+			   
 			   sql.append("\n  WHERE 1=1");
-			   sql.append("\n  AND E.emp_id = D.emp_id");
-
+			   
 			    if( !Utils.isNull(o.getEmpId()).equals("") ){
 					sql.append("\n and E.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
 			    }
@@ -75,11 +93,8 @@ public class SAReportDAO {
 				if( !Utils.isNull(o.getGroupStore()).equals("")){
 					sql.append("\n and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
 				}
-				if( !Utils.isNull(o.getBranch()).equals("")){
-					sql.append("\n and E.branch LIKE '%"+Utils.isNull(o.getBranch())+"%'");
-				}
-				
-				sql.append("\n order by E.emp_id asc ");
+			
+				sql.append("\n order by E.emp_id,E.oracle_ref_id,E.name asc ");
 				
 				logger.debug("sql:"+sql);
 				
@@ -87,7 +102,7 @@ public class SAReportDAO {
 				rst = ps.executeQuery();
 				
 				while(rst.next()) {
-				  h = new SAReportBean();
+				   h = new SAReportBean();
 				  
 				   h.setEmpId(Utils.isNull(rst.getString("emp_id")));
 				   h.setType(Utils.isNull(rst.getString("type")));
@@ -100,13 +115,25 @@ public class SAReportDAO {
 				   
 				   h.setGroupStore(Utils.isNull(rst.getString("group_store")));
 				   h.setBranch(Utils.isNull(rst.getString("branch")));
-				   h.setRegion(Utils.isNull(rst.getString("region")));
-				   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
-    
-				   h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
-				   items.add(h);
-				   r++;
+
+				   if(Utils.isNull(o.getSummaryType()).equals("Detail")){
+				      h.setInvoiceNo(Utils.isNull(rst.getString("TRX_NUMBER")));
+				   }else{
+					   h.setTotalRewardBme(Utils.decimalFormat(rst.getDouble("total_reward_bme"),Utils.format_current_2_disgit));
+					   h.setTotalRewardWacoal(Utils.decimalFormat(rst.getDouble("total_reward_wacoal"),Utils.format_current_2_disgit));
+				   }
+				   h.setTotalInvoiceAmt(Utils.decimalFormat(rst.getDouble("total_invoice_amt"),Utils.format_current_2_disgit));
 				   
+				   //Case display totalDamage per oracle_ref_id in first row
+				   if(damageMap.get(h.getOracleRefId()) == null){
+				      h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
+				      damageMap.put(h.getOracleRefId(), h.getOracleRefId());//set for check duplicate row by oracle_ref_id
+				   }else{
+					   h.setTotalDamage("0.00"); 
+				   }
+				   
+				   items.add(h);
+
 				}//while
 				
 				//set Result 
@@ -123,6 +150,105 @@ public class SAReportDAO {
 		return o;
 	}
 	
+	 public static SAReportBean searchEmployeeList(SAReportBean o ) throws Exception {
+		   Connection conn = null;
+		   try{
+			  conn = DBConnection.getInstance().getConnection();
+			  return searchEmployeeListModel(conn, o);
+		   }catch(Exception e){
+			   throw e;
+		   }finally{
+			   conn.close();
+		   }
+		}
+	   
+		public static SAReportBean searchEmployeeListModel(Connection conn,SAReportBean o) throws Exception {
+				PreparedStatement ps = null;
+				ResultSet rst = null;
+				StringBuilder sql = new StringBuilder();
+				
+				SAReportBean h = null;
+				List<SAReportBean> items = new ArrayList<SAReportBean>();
+				int r = 1;
+				try {
+				   sql.append(" \n select distinct E.* " );
+				   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =E.region)as region_desc" );
+				   sql.append(" \n ,D.total_damage ");
+				   sql.append("\n  from SA_EMPLOYEE E ");
+				   sql.append("\n  ,(select H.emp_id ,nvl(sum(pay_amt),0) as total_damage");
+				   sql.append("\n   FROM SA_DAMAGE_HEAD H,SA_DAMAGE_TRAN T");
+				   sql.append("\n   WHERE H.emp_id = T.emp_id AND H.type = T.type AND H.inv_refwal=T.inv_refwal ");
+				   sql.append("\n   and T.paydate >= to_date('"+o.getMonth()+"','ddmmyyyy')");
+				   sql.append("\n   GROUP BY H.emp_id ");
+				   sql.append("\n  )D");
+				   sql.append("\n  WHERE 1=1");
+				   sql.append("\n  AND E.emp_id = D.emp_id");
+
+				    if( !Utils.isNull(o.getEmpId()).equals("") ){
+						sql.append("\n and E.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+				    }
+				    if( !Utils.isNull(o.getOracleRefId()).equals("")){
+						sql.append("\n and E.oracle_ref_id ='"+o.getOracleRefId()+"'");
+					}
+					if( !Utils.isNull(o.getType()).equals("")){
+						sql.append("\n and E.type = '"+Utils.isNull(o.getType())+"'");
+					}
+					if( !Utils.isNull(o.getName()).equals("")){
+						sql.append("\n and E.name LIKE '%"+Utils.isNull(o.getName())+"%'");
+					}
+					if( !Utils.isNull(o.getSurname()).equals("")){
+						sql.append("\n and E.surname LIKE '%"+Utils.isNull(o.getSurname())+"%'");
+					}
+					if( !Utils.isNull(o.getGroupStore()).equals("")){
+						sql.append("\n and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
+					}
+					if( !Utils.isNull(o.getBranch()).equals("")){
+						sql.append("\n and E.branch LIKE '%"+Utils.isNull(o.getBranch())+"%'");
+					}
+					
+					sql.append("\n order by E.emp_id asc ");
+					
+					logger.debug("sql:"+sql);
+					
+					ps = conn.prepareStatement(sql.toString());
+					rst = ps.executeQuery();
+					
+					while(rst.next()) {
+					  h = new SAReportBean();
+					  
+					   h.setEmpId(Utils.isNull(rst.getString("emp_id")));
+					   h.setType(Utils.isNull(rst.getString("type")));
+					   
+					   h.setOracleRefId(Utils.isNull(rst.getString("oracle_ref_id")));
+					   h.setBranch(Utils.isNull(rst.getString("branch")));
+					   h.setName(Utils.isNull(rst.getString("name")));
+					   h.setSurname(Utils.isNull(rst.getString("surname")));
+					   h.setFullName(h.getName()+" "+h.getSurname());
+					   
+					   h.setGroupStore(Utils.isNull(rst.getString("group_store")));
+					   h.setBranch(Utils.isNull(rst.getString("branch")));
+					   h.setRegion(Utils.isNull(rst.getString("region")));
+					   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
+	    
+					   h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
+					   items.add(h);
+					   r++;
+					   
+					}//while
+					
+					//set Result 
+					o.setItems(items);
+					
+				} catch (Exception e) {
+					throw e;
+				} finally {
+					try {
+						rst.close();
+						ps.close();
+					} catch (Exception e) {}
+				}
+			return o;
+		}
 	 public static List<SAReportBean> searchStatementReport(SAReportBean o ) throws Exception {
 		   Connection conn = null;
 		   try{

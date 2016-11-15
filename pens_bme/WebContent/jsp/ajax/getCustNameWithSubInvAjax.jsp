@@ -12,6 +12,7 @@
 
 String custCode = Utils.isNull(request.getParameter("custCode"));
 String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
+String storeType = Utils.isNull(request.getParameter("storeType"));
 String outputText = "";
 try{
 
@@ -22,7 +23,7 @@ try{
 		PopupForm cri = new PopupForm();
 		cri.setCodeSearch(custCode);
 		
-		List<PopupForm> ret = SummaryDAO.searchCustomerMaster(cri,"",storeGroup,"equals");
+		List<PopupForm> ret = SummaryDAO.searchCustomerMaster(cri,storeType,storeGroup,"equals");
 		if(ret != null &&  ret.size() >0){
 			PopupForm p = ret.get(0);
 			outputText = p.getDesc()+"|"+p.getStoreNo()+"|"+p.getSubInv();

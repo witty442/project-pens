@@ -107,18 +107,26 @@ function loadMe(){
 }
 
 function sumTotal(){
+	var totalRewardBmeTemp = document.getElementsByName("totalRewardBmeTemp");
+	var totalRewardWacoalTemp = document.getElementsByName("totalRewardWacoalTemp");
 	var totalDamageTemp = document.getElementsByName("totalDamageTemp");
 	var totalPaymentTemp = document.getElementsByName("totalPaymentTemp");
 	var totalDelayPaymentTemp = document.getElementsByName("totalDelayPaymentTemp");
 	
+	var totalRewardBme = 0;
+	var totalRewardWacoal = 0;
 	var totalDamage = 0;
 	var totalPayment = 0;
 	var totalDelayPayment = 0;
 	for(var i=0;i<totalDamageTemp.length;i++){
+		totalRewardBme += parseFloat(totalRewardBmeTemp[i].value.replace(/\,/g,''));
+		totalRewardWacoal += parseFloat(totalRewardWacoalTemp[i].value.replace(/\,/g,''));
 		totalDamage += parseFloat(totalDamageTemp[i].value.replace(/\,/g,''));
 		totalPayment += parseFloat(totalPaymentTemp[i].value.replace(/\,/g,''));
 		totalDelayPayment += parseFloat(totalDelayPaymentTemp[i].value.replace(/\,/g,''));
 	}
+	document.getElementById("totalRewardBme").innerHTML =addCommas(Number(toFixed(totalRewardBme,2)).toFixed(2));
+	document.getElementById("totalRewardWacoal").innerHTML =addCommas(Number(toFixed(totalRewardWacoal,2)).toFixed(2));
 	document.getElementById("totalDamage").innerHTML =addCommas(Number(toFixed(totalDamage,2)).toFixed(2));
 	document.getElementById("totalPayment").innerHTML =addCommas(Number(toFixed(totalPayment,2)).toFixed(2));
 	document.getElementById("totalDelayPayment").innerHTML =addCommas(Number(toFixed(totalDelayPayment,2)).toFixed(2));
@@ -365,6 +373,8 @@ function getStaffName(custCode){
 									<th >Region</th><!-- 7 -->
 									<th >Group Store</th><!-- 8 -->
 									<th >Branch</th><!-- 9 -->
+									<th >ยอดสะสม ค่าเฝ้าตู้ Bme</th><!-- 9 -->
+									<th >ยอดสะสม ค่าเฝ้าตู้ Wacoal</th><!-- 9 -->
 									<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
 										<th >ค่าความเสียหาย </th><!-- 10 -->
 										<th >ยอดชำระแล้ว </th><!-- 10 -->
@@ -412,6 +422,13 @@ function getStaffName(custCode){
 										<td class="td_text" width="8%"><%=mc.getRegionDesc()%></td><!-- 7 -->
 										<td class="td_text" width="4%"><%=mc.getGroupStore()%></td><!-- 8 -->
 										<td class="td_text" width="7%"><%=mc.getBranch()%></td><!-- 9 -->
+										<td class="td_text" width="7%"><%=mc.getTotalRewardBme()%>
+											<input type="hidden" id="totalRewardBmeTemp" name="totalRewardBmeTemp" value="<%=mc.getTotalRewardBme()%>" />
+										</td><!-- 9 -->
+										<td class="td_text" width="7%"><%=mc.getTotalRewardWacoal()%>
+											<input type="hidden" id="totalRewardWacoalTemp" name="totalRewardWacoalTemp" value="<%=mc.getTotalRewardWacoal()%>" />
+										</td><!-- 9 -->
+										
 										<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
 											<td class="td_text_right" width="8%">
 											<%=mc.getTotalDamage()%>
@@ -444,9 +461,11 @@ function getStaffName(custCode){
 							
 							<%if( !"".equals(Utils.isNull(saEmpForm.getBean().getDispDamage()))){ %>
 								<tr class="<%=tabclass%>"> 
-								  <td colspan="9">
+								  <td colspan="9"> 
 								        <b> รวม</b>
 								  </td>
+								  <td nowrap>  <b><span id="totalRewardBme"></span></b></td>
+								  <td nowrap>  <b><span id="totalRewardWacoal"></span></b></td>
 								  <td nowrap>  <b><span id="totalDamage"></span></b></td>
 								  <td nowrap>  <b><span id="totalPayment"></span></b></td>
 								  <td nowrap>  <b><span id="totalDelayPayment"></span></b></td>

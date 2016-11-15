@@ -855,40 +855,43 @@ public class FTPManager {
 			Set s = controlTableMap.keySet();
 			Iterator it = s.iterator();
 			while(it.hasNext()) {
-				String tableName = (String) it.next();
-				TableBean tableBean = (TableBean) controlTableMap.get(tableName);
-				logger.info("tableName:"+tableName); 
+				String fileControlName = (String) it.next();
+				TableBean tableBean = (TableBean) controlTableMap.get(fileControlName);
+				logger.debug("export image fileControlName:"+fileControlName); 
 				
-				if(tableBean.getFileExportList() != null && tableBean.getFileExportList().size() > 0){
-					
-	                for(int f=0;f<tableBean.getFileExportList().size();f++){
-	                	TableBean fileExportBean =(TableBean)tableBean.getFileExportList().get(f);
-	                	//Upload by step by one file
-	                	
-	                	uploadAllFileToFTP_OPT2_BY_FILE(path,fileExportBean);
-	                }//for
-	                
-	            }else if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-	            	//Upload by step by one file
-	      
-	            	if("CUST".equalsIgnoreCase(tableName)){
-	            		/** Case Export Customer Export Location **/
-                	     uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);
-                	     
-                	     /** Upload image file to Ftp Server **/
-                	    // uploadImageAllToFTP(userBean ,tableBean);
-                	     
-                	     //Data Customer location :deparecate
-                	     if( tableBean.getDataCusLocationStrExport() != null && !Utils.isNull(tableBean.getDataCusLocationStrExport().toString()).equals("")){
-                	        ///uploadCustomerLocationAllFileToFTP_OPT2_BY_FILE(userBean,tableBean,tableBean.getDataCusLocationStrExport());
-                	     }
-	            	}else{
-	            		 uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);	
-	            	}
+				if("CUSTLOC".equalsIgnoreCase(fileControlName)){
+					/** Case Export Customer Export Location **/
+				
+					if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
+            	        uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);
+					}
+            	     
+            	     /** Upload image file to Ftp Server **/
+					if(tableBean.getImageFileList() != null && tableBean.getImageFileList().size() >0){
+						try{
+            	          uploadImageAllToFTP(userBean ,tableBean);
+						}catch(Exception e){
+							logger.info("No throw Exception Error uploaf image:"+e.getMessage());
+						}
+					}
 				}else{
-					// Data not Found
-					logger.info(tableName+":Data not found");
-				}
+					//More 1 file
+					if(tableBean.getFileExportList() != null && tableBean.getFileExportList().size() > 0){
+		                for(int f=0;f<tableBean.getFileExportList().size();f++){
+		                	TableBean fileExportBean =(TableBean)tableBean.getFileExportList().get(f);
+		                	//Upload by step by one file
+		                	
+		                	uploadAllFileToFTP_OPT2_BY_FILE(path,fileExportBean);
+		                }//for
+		                
+		            }else if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
+		            	//Upload by step by one file
+		            	uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);	
+					}else{
+						// Data not Found
+						logger.info(fileControlName+":Data not found");
+					}
+				}//if
 			}//for		
 		} catch (Exception e) {
 			throw new FTPException(e.getMessage());

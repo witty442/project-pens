@@ -138,6 +138,15 @@ function openEdit(path,empId){
 	form.submit();
 	return true; 
 }
+
+function openView(path,empId){
+	var form = document.saTranForm;
+	var param ="&empId="+empId+"&payDate=";
+	form.action = path + "/jsp/saTranAction.do?do=prepare&action=view"+param;
+	form.submit();
+	return true; 
+}
+
 </script>
 
 </head>		
@@ -277,10 +286,16 @@ function openEdit(path,empId){
 									<tr class="<%=tabclass%>"> 
 									   <td class="td_text_center" width="10%">
 									       <c:if test="${saTranForm.bean.canEdit == true}">
+									         <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> 
+									            <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
+									          </a>
+									         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')">Action</a><!-- 0 -->
 											</c:if>
 											<c:if test="${saTranForm.bean.canEdit == false}">
-											   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> VIEW </a><!-- 0 -->
+											   <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> 
+									             <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
+									           </a>
 											</c:if>
 										</td>
 										<td class="td_text" width="6%"><%=mc.getEmpId()%></td><!-- 1 -->

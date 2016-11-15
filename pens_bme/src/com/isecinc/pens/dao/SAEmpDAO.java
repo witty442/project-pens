@@ -245,7 +245,7 @@ public class SAEmpDAO {
 				sql.append(", MOBILE_NO=?, EMAIL=?, BANK_ACCOUNT=?, IDCARD=? \n");//5-8
 				sql.append(", REGION=?, GROUP_STORE=? , BRANCH=?, LEAVE_DATE=?  \n");//9 -12
 				sql.append(", LEAVE_REASON=?, REWARD_BME=?, START_REWARD_BME_DATE=? , REWARD_WACOAL=? \n");//13-16
-				sql.append(", START_REWARD_WACOAL_DATE=?, SURETY_BOND=?, START_SURETY_BOND_DATE=?, UPDATE_DATE=?, UPDATE_USER=? \n");//17-21
+				sql.append(", START_REWARD_WACOAL_DATE=?, SURETY_BOND=?, START_SURETY_BOND_DATE=?, UPDATE_DATE=?, UPDATE_USER=? ,START_WORKING_DATE = ? \n");//17-21
 				
 				sql.append(" WHERE EMP_ID = ?  \n" );//22
 
@@ -293,6 +293,12 @@ public class SAEmpDAO {
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//20
 				ps.setString(c++, o.getCreateUser());//21
 				
+				if( !Utils.isNull(o.getStartDate()).equals("")){//21
+					ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				}else{
+					ps.setTimestamp(c++,null);
+				}
+				
 				//key
 				ps.setString(c++,o.getEmpId());//22
 				return ps.executeUpdate();
@@ -334,6 +340,8 @@ public class SAEmpDAO {
 			try {
 			   sql.append(" \n select S.*" );
 			   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =S.region)as region_desc" );
+			   sql.append(" \n,(SELECT NVL(SUM(M.bme_amt),0) FROM sa_reward_tran M where M.emp_id = S.emp_id group by M.emp_id) as total_reward_bme" );
+			   sql.append(" \n,(SELECT NVL(SUM(M.wacoal_amt),0) FROM sa_reward_tran M where M.emp_id = S.emp_id group by M.emp_id) as total_reward_wacoal" );
 			   if( !Utils.isNull(o.getDispDamage()).equals("")){
 				   sql.append(" \n,(SELECT NVL(SUM(M.total_damage),0) FROM sa_damage_head M where M.emp_id = S.emp_id group by M.emp_id) as total_damage" );
 				   
@@ -457,6 +465,8 @@ public class SAEmpDAO {
 						h.setTotalDelayPayment(Utils.decimalFormat(rst.getDouble("total_delay_payment"),Utils.format_current_2_disgit));
 					}
 				   
+				   h.setTotalRewardBme(Utils.decimalFormat(rst.getDouble("total_reward_bme"),Utils.format_current_2_disgit));
+				   h.setTotalRewardWacoal(Utils.decimalFormat(rst.getDouble("total_reward_wacoal"),Utils.format_current_2_disgit));
 				   items.add(h);
 				   r++;
 				   

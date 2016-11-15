@@ -53,6 +53,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 	public final static String PARAM_CUST_GROUP = "CUST_GROUP";
 	public final static String PARAM_TRANS_DATE = "TRANS_DATE";//Budish Date
 	public final static String PARAM_REAL_PATH_TEMP = "REAL_PATH_TEMP";
+	public final static String PARAM_PRODUCT_TYPE = "PRODUCT_TYPE";
     private static int row = 0;
 	
 	public static MonitorItemBean runProcess(User user,MonitorItemBean monitorItemBean,Map<String, String> batchParamMap) throws Exception{
@@ -75,6 +76,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		List<Order> orderList = new ArrayList<Order>();
 		row = 0;
 		try{
+			
 			//Create Connection
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -86,10 +88,13 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			
 			//Prepare parameter
 			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String productType = Utils.isNull(batchParamMap.get(PARAM_PRODUCT_TYPE));
 			String realPathTemp  = batchParamMap.get(PARAM_REAL_PATH_TEMP);
 			
+			logger.debug("productType:"+productType);
+			
 			//Get Config Map ALL
-			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "GEN-ORDER");
+			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "GEN-ORDER",productType);
 			
 		    /** Init Excel Object **/
 	        HSSFSheet sheet = workbook.createSheet("orders");
@@ -743,6 +748,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
 			sql.append("\n 		and O.exported = 'Y'");
@@ -758,6 +764,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		    ON P.group_code = I.group_code ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
 			sql.append("\n 		WHERE 1=1 ");
 			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
 			sql.append("\n 		and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");

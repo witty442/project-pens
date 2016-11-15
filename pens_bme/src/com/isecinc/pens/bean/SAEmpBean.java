@@ -40,8 +40,10 @@ public class SAEmpBean implements Serializable{
 	private String leaveDate;
 	private String leaveReason;
 	private String rewardBme;
+	private String totalRewardBme;
 	private String startRewardBmeDate;
 	private String rewardWacoal;
+	private String totalRewardWacoal;
 	private String startRewardWacoalDate;
 	private String suretyBond	;
 	private String startSuretyBondDate;
@@ -64,6 +66,18 @@ public class SAEmpBean implements Serializable{
 	
 	
     
+	public String getTotalRewardBme() {
+		return totalRewardBme;
+	}
+	public void setTotalRewardBme(String totalRewardBme) {
+		this.totalRewardBme = totalRewardBme;
+	}
+	public String getTotalRewardWacoal() {
+		return totalRewardWacoal;
+	}
+	public void setTotalRewardWacoal(String totalRewardWacoal) {
+		this.totalRewardWacoal = totalRewardWacoal;
+	}
 	public String getTotalDamage() {
 		return totalDamage;
 	}

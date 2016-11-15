@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +27,26 @@ public class SATranDAO {
 			Map<String,SATranBean> YEARMMDB_MAP = new HashMap<String, SATranBean>();
 			String startYearMonth = "";
 			int diffMonth = 0;
+			String yyyymmPayDate = "";
 			try {
-				String mm  = payDate.substring(3,5);
-		        String yyyy  = payDate.substring(6,10);
-		        String yyyymmPayDate = yyyy+mm;
+				 conn = DBConnection.getInstance().getConnection();
+				 
+				if( !Utils.isNull(payDate).equals("")){
+				   String mm  = payDate.substring(3,5);
+		           String yyyy  = payDate.substring(6,10);
+		           yyyymmPayDate = yyyy+mm;
+				}else{
+					//Case View
+					yyyymmPayDate = getYearMonthFromTran(conn, empId,"max");
+					if( !Utils.isNull(yyyymmPayDate).equals("")){
+						payDate = "01"+"/"+yyyymmPayDate.substring(4,6)+"/"+yyyymmPayDate.substring(0,2);
+					}else{
+						//default now date
+						yyyymmPayDate = Utils.stringValue(new Date(), Utils.YYYYMM,Utils.local_th);
+						payDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					}
+				}
 		        
-                conn = DBConnection.getInstance().getConnection();
-                
                 //GET DATA DB
                 YEARMMDB_MAP = getDataInDB_To_MAP(conn, empId);
                 

@@ -18,9 +18,10 @@ import com.isecinc.pens.inf.helper.Utils;
 public class ReportEndDateLotusSQL {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,String summaryType) throws Exception{
+	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,String summaryType,String typeGen) throws Exception{
 			StringBuilder sql = new StringBuilder();
 			Date asofDate = null;
+			BMEControlBean control = null;
 			try {
 				String christSalesDateStr ="";
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
@@ -28,9 +29,16 @@ public class ReportEndDateLotusSQL {
 					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				}
 				
-				BMEControlBean control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
-				
-			sql.append("\n SELECT A.* FROM( ");
+				if("GenReportEndDate".equalsIgnoreCase(typeGen)){
+				    //control = calcDueDateTemp(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				    control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				}else{
+					control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				}
+			sql.append("\n SELECT A.* " );
+			sql.append("\n,(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T WHERE A.group_type = T.group_item) as retail_price_bf \n");
+			sql.append("\n,(A.ONHAND_QTY *(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T WHERE A.group_type = T.group_item)) as onhand_amt \n");
+			sql.append("\n FROM( ");
 				if("GroupCode".equalsIgnoreCase(summaryType)){
 					sql.append("\n SELECT A.customer_code,A.customer_desc ,A.group_type ");
 					sql.append("\n ,SUM(A.BEGINING_QTY) as BEGINING_QTY");
@@ -42,7 +50,8 @@ public class ReportEndDateLotusSQL {
 					sql.append("\n ,SUM(A.ONHAND_QTY) AS ONHAND_QTY");
 					sql.append("\n FROM(");
 				}else{
-				    sql.append("\n SELECT A.* FROM(");
+				    sql.append("\n SELECT A.* ");
+					sql.append("\n FROM(");
 				}
 				sql.append("\n SELECT M.*");
 				sql.append("\n , NVL(ENDING.BEGINING_QTY,0) as BEGINING_QTY ");
@@ -398,7 +407,38 @@ public class ReportEndDateLotusSQL {
 				maxEndDate =  getMaxEndDateByStoreCode(conn,storeCode);
 				logger.debug("maxEndDate:"+maxEndDate);
 				
-				if ( !"".equals(maxEndDate)) {
+				if ( !"".equals(Utils.isNull(maxEndDate))) {
+					bean.setStartDate(maxEndDate);
+					bean.setEndDate(christAsOfDateStr);
+				}else{
+					bean.setYearMonth("");
+					bean.setStartDate(christAsOfDateStr);
+				}
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+				
+				} catch (Exception e) {}
+			}
+			return bean;
+		}
+	 
+	 public static BMEControlBean calcDueDateTemp(Connection conn,String storeCode,String asOfdate) throws Exception {
+			BMEControlBean bean = new BMEControlBean();
+         String maxEndDate = "";
+			try {
+				
+				//Budish to ChristDate
+				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				
+				//Get Max End Date By StoreCode and asOfdate
+				maxEndDate =  getMaxEndDateByStoreCodeTemp(conn,storeCode);
+				logger.debug("maxEndDate:"+maxEndDate);
+				
+				if ( !"".equals(Utils.isNull(maxEndDate))) {
 					bean.setStartDate(maxEndDate);
 					bean.setEndDate(christAsOfDateStr);
 				}else{
@@ -425,6 +465,32 @@ public class ReportEndDateLotusSQL {
 			String yearMonth = "";
 			try {
 				sql.append("\n select distinct max(ending_date) as ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 and store_code ='"+storeCode+"'");
+			
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					yearMonth = Utils.stringValue(rst.getDate("ending_date"),Utils.DD_MM_YYYY_WITH_SLASH);
+				}
+				
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return yearMonth;
+		}
+	 
+	 public static String getMaxEndDateByStoreCodeTemp(Connection conn,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String yearMonth = "";
+			try {
+				sql.append("\n select distinct max(ending_date) as ending_date FROM PENSBME_ENDDATE_STOCK_TEMP WHERE 1=1 and store_code ='"+storeCode+"'");
 			
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();

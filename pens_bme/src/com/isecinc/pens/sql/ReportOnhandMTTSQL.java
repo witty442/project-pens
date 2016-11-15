@@ -16,7 +16,7 @@ import com.isecinc.pens.inf.helper.Utils;
 public class ReportOnhandMTTSQL {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,Date initDate) throws Exception{
+	public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,Date initDate,String summaryType) throws Exception{
 		StringBuilder sql = new StringBuilder();
 		try {
 			//prepare parameter
@@ -29,8 +29,17 @@ public class ReportOnhandMTTSQL {
 			if( initDate != null){
 				initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
 			}
-			
-			sql.append("\n SELECT A.* FROM(");
+			if("GroupCode".equalsIgnoreCase(summaryType)){
+				sql.append("\n SELECT A.customer_code,A.customer_desc , A.cust_no ,A.group_type ");
+				sql.append("\n ,SUM(A.INIT_SALE_QTY) as INIT_SALE_QTY");
+				sql.append("\n ,SUM(A.SALE_IN_QTY) AS SALE_IN_QTY");
+				sql.append("\n ,SUM(A.SALE_OUT_QTY) AS SALE_OUT_QTY");
+				sql.append("\n ,SUM(A.SALE_RETURN_QTY) AS SALE_RETURN_QTY");
+				sql.append("\n ,SUM(A.ONHAND_QTY) AS ONHAND_QTY");
+				sql.append("\n FROM(");
+			}else{
+			  sql.append("\n SELECT A.* FROM(");
+			}
 			sql.append("\n SELECT M.*");
 			
 			sql.append("\n , NVL(INIT_MTT.INIT_SALE_QTY,0) AS INIT_SALE_QTY");
@@ -52,7 +61,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -89,9 +99,10 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
 					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
-					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
+					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' ");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1 ");
@@ -166,7 +177,8 @@ public class ReportOnhandMTTSQL {
 				sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 				sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
 				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
-				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%')");
+				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
+				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%')");
 				sql.append("\n   AND M.reference_code ='Store' ");
 		        sql.append("\n  ) M ");
 				sql.append("\n WHERE 1=1 ");
@@ -189,7 +201,8 @@ public class ReportOnhandMTTSQL {
 			
    		   sql.append("\n LEFT OUTER JOIN(	 ");
    				sql.append("\n SELECT ");
-					if( Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER)){
+					if( Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER)
+						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_2)){
 						sql.append("\n L.CUST_NO as customer_code,L.PENS_ITEM, ");
 				        sql.append("\n L.GROUP_CODE as group_type, ");
 						sql.append("\n NVL(SUM(L.QTY),0)AS SALE_OUT_QTY ");
@@ -239,7 +252,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -285,7 +299,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -318,6 +333,11 @@ public class ReportOnhandMTTSQL {
 			sql.append("\n  ON  M.customer_code = SALE_RETURN.customer_code and M.pens_item = SALE_RETURN.pens_item ");
 			sql.append("\n  AND M.group_type   = SALE_RETURN.group_type");
 			sql.append("\n ) A ");
+			
+			if("GroupCode".equalsIgnoreCase(summaryType)){
+				sql.append("\n GROUP BY A.customer_code,A.customer_desc , A.cust_no ,A.group_type ");
+			}
+			
 			sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
 			
 			//logger.debug("sql:"+sql);

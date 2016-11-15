@@ -25,6 +25,9 @@ public class SummaryForm extends I_Form {
 
 	private SummaryCriteria criteria = new SummaryCriteria();
 	private List<OnhandSummary> results;
+	private List<TransactionSummary> resultsTrans;
+	private OnhandSummary summary;
+	private TransactionSummary summaryTran;
 	private List<OnhandSummary> onhandSummaryResults;
 	private List<OnhandSummary> onhandSummaryLotusResults;
 	
@@ -34,10 +37,6 @@ public class SummaryForm extends I_Form {
 	private List<OnhandSummary> onhandSummaryBmeTransResults;
 	private List<OnhandSummary> onhandSummarySizeColorBigCResults;
 	
-	private List<TransactionSummary> lotusSummaryResults;
-	private List<TransactionSummary> bigcSummaryResults;
-	private List<TransactionSummary> topsSummaryResults;
-	private List<TransactionSummary> kingSummaryResults;
 	private List<PhysicalSummary> physicalSummaryResults;
 	private List<DiffStockSummary> diffStockSummaryLists;
 	private List<TransactionSummary> summaryByGroupCodeResults;
@@ -58,8 +57,41 @@ public class SummaryForm extends I_Form {
 
     private String page;
     private String summaryType;
+    private String endDate;
+    private String endSaleDate;
 	
     
+    
+	public List<TransactionSummary> getResultsTrans() {
+		return resultsTrans;
+	}
+	public void setResultsTrans(List<TransactionSummary> resultsTrans) {
+		this.resultsTrans = resultsTrans;
+	}
+	public TransactionSummary getSummaryTran() {
+		return summaryTran;
+	}
+	public void setSummaryTran(TransactionSummary summaryTran) {
+		this.summaryTran = summaryTran;
+	}
+	public String getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+	public String getEndSaleDate() {
+		return endSaleDate;
+	}
+	public void setEndSaleDate(String endSaleDate) {
+		this.endSaleDate = endSaleDate;
+	}
+	public OnhandSummary getSummary() {
+		return summary;
+	}
+	public void setSummary(OnhandSummary summary) {
+		this.summary = summary;
+	}
 	public String getSummaryType() {
 		return summaryType;
 	}
@@ -93,12 +125,7 @@ public class SummaryForm extends I_Form {
 			List<OnhandSummary> onhandSummaryMTTDetailResults) {
 		this.onhandSummaryMTTDetailResults = onhandSummaryMTTDetailResults;
 	}
-	public List<TransactionSummary> getKingSummaryResults() {
-		return kingSummaryResults;
-	}
-	public void setKingSummaryResults(List<TransactionSummary> kingSummaryResults) {
-		this.kingSummaryResults = kingSummaryResults;
-	}
+	
 	public List<OnhandSummary> getOnhandSummaryBmeTransResults() {
 		return onhandSummaryBmeTransResults;
 	}
@@ -121,18 +148,7 @@ public class SummaryForm extends I_Form {
 	public void setOnhandSummaryMTTResultsSize(int onhandSummaryMTTResultsSize) {
 		this.onhandSummaryMTTResultsSize = onhandSummaryMTTResultsSize;
 	}
-	public int getTopsSummaryResultsSize() {
-		return topsSummaryResults != null?topsSummaryResults.size():0;
-	}
-	public void setTopsSummaryResultsSize(int topsSummaryResultsSize) {
-		this.topsSummaryResultsSize = topsSummaryResultsSize;
-	}
-	public List<TransactionSummary> getTopsSummaryResults() {
-		return topsSummaryResults;
-	}
-	public void setTopsSummaryResults(List<TransactionSummary> topsSummaryResults) {
-		this.topsSummaryResults = topsSummaryResults;
-	}
+	
 	public List<OnhandSummary> getOnhandBigCResults() {
 		return onhandBigCResults;
 	}
@@ -166,12 +182,7 @@ public class SummaryForm extends I_Form {
 	public void setOnhandSummaryLotusResultsSize(int onhandSummaryLotusResultsSize) {
 		this.onhandSummaryLotusResultsSize = onhandSummaryLotusResultsSize;
 	}
-	public List<TransactionSummary> getBigcSummaryResults() {
-		return bigcSummaryResults;
-	}
-	public void setBigcSummaryResults(List<TransactionSummary> bigcSummaryResults) {
-		this.bigcSummaryResults = bigcSummaryResults;
-	}
+	
 	public int getBigcSummaryResultsSize() {
 		return bigcSummaryResultsSize;
 	}
@@ -236,13 +247,6 @@ public class SummaryForm extends I_Form {
 		this.onhandSummaryResults = onhandSummaryResults;
 	}
     
-
-	public List<TransactionSummary> getLotusSummaryResults() {
-		return lotusSummaryResults;
-	}
-	public void setLotusSummaryResults(List<TransactionSummary> lotusSummaryResults) {
-		this.lotusSummaryResults = lotusSummaryResults;
-	}
 	public int getLotusSummaryResultsSize() {
 		return lotusSummaryResultsSize;
 	}

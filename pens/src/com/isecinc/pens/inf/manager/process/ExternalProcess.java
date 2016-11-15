@@ -62,8 +62,8 @@ public class ExternalProcess {
 		RunScriptDBAction.runManualScriptProcess("export_after",userLogin);
 		
 		//Run SalesAppVersion to Ftp Server
-		logger.info("--- 2.Run uploadSalesAppVersion ---");
-		MonitorSales.uploadSalesAppVersion(userLogin);
+		//logger.info("--- 2.Run uploadSalesAppVersion ---");
+		//MonitorSales.uploadSalesAppVersion(userLogin);
 	}
 	
 }

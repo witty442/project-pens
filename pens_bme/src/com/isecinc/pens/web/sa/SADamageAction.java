@@ -1,8 +1,5 @@
 package com.isecinc.pens.web.sa;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,23 +18,17 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
-import util.ExcelHeader;
 import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.SADamageBean;
-import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SADamageDAO;
-import com.isecinc.pens.dao.SAEmpDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.adjuststock.AdjustStockForm;
-import com.isecinc.pens.web.popup.PopupForm;
 
 /**
  * Summary Action
@@ -130,19 +121,22 @@ public class SADamageAction extends I_Action {
 				//init default value
 				bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setType("BME");
-				bean.setCanEdit(true);
 			}else{
 				SADamageBean c = new SADamageBean();
 				c.setEmpId(empId);
 				c.setType(type);
 				c.setInvRefwal(invRefwal);
 				bean = SADamageDAO.searchHead(c,"edit",true).getItems().get(0);
-				bean.setCanEdit(true);
+			
 			}
+			
 			//can Edit
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 				bean.setCanEdit(true);
 			}
+			
+			logger.debug("canEdit:"+bean.isCanEdit());
+			
 			aForm.setBean(bean);
 			aForm.setMode(action);//Mode Edit ,Add
 			

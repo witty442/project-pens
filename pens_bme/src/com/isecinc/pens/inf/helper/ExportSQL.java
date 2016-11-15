@@ -6,11 +6,11 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.TableBean;
+import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
 
 public class ExportSQL {
 
 	protected static Logger logger = Logger.getLogger("PENS");
-	
 	
 	
 	
@@ -23,6 +23,8 @@ public class ExportSQL {
 	public static String genSpecialSQL(TableBean tableBean,User userBean,Map<String, String> batchParamMap) throws Exception{
 		String str = "";
 		try{
+			String productType = Utils.isNull(batchParamMap.get(ExportOrderToICC.PARAM_PRODUCT_TYPE));
+			
 			if(tableBean.getTableName().equalsIgnoreCase("PENSBME_ICC_HEAD")){
 				//Budish Date
 				String billDateStr  = batchParamMap.get("TRANS_DATE").replaceAll("/", "");
@@ -118,7 +120,7 @@ public class ExportSQL {
 				" ,NVL(SUM((to_number(d.cost)*to_number(d.total_qty) )),0) as cost_icc_amt  \n" +
 				" ,'' as spi_id \n" +
 				" ,'' as sup_id \n" +
-				" , (SELECT field_value FROM  PENSBME_CONFIG_INTERFACE where subject = 'itm_MMDD' and field_name = 'CREDIT_TERM') as Credit_Term \n" +
+				" , (SELECT field_value FROM  PENSBME_CONFIG_INTERFACE where product='"+productType+"' and subject = 'itm_MMDD' and field_name = 'CREDIT_TERM') as Credit_Term \n" +
 				" ,m.Site_id \n" +
 				" ,'ICC' as Cust_Fact \n" +
 				" ,'ICC' as Sell_Cust \n" +

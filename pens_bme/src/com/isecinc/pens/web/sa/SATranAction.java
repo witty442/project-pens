@@ -129,7 +129,9 @@ public class SATranAction extends I_Action {
 				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 					bean.setCanEdit(true);
 				}
-				
+				if("view".equalsIgnoreCase(action)){
+					bean.setCanEdit(false);
+				}
 				aForm.setBean(bean);
 				aForm.setMode(action);//Mode Edit ,Add
 	        }else{
@@ -137,6 +139,9 @@ public class SATranAction extends I_Action {
 	        	//Can Edit
 				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 					bean.setCanEdit(true);
+				}
+				if("view".equalsIgnoreCase(action)){
+					bean.setCanEdit(false);
 				}
 				
 				aForm.setBean(bean);

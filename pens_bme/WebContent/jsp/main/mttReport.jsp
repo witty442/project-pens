@@ -42,11 +42,11 @@ if(session.getAttribute("custGroupList") == null){
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
+<link href="${pageContext.request.contextPath}/css/extremecomponents.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
-span.pagebanner {
+span.pagebanner{ 
 	background-color: #eee;
 	border: 1px dotted #999;
 	padding: 4px 6px 4px 6px;
@@ -57,7 +57,7 @@ span.pagebanner {
 	font-size: 15px;
 }
 
-span.pagelinks {
+span.pagelinks{
 	background-color: #eee;
 	border: 1px dotted #999;
 	padding: 4px 6px 4px 6px;
@@ -314,8 +314,9 @@ function resetStore(){
 								</tr>
 							</table>
 					  </div>
-
-            <c:if test="${mttForm.resultsSearch != null}">
+               <jsp:include page="subreports/subMttReport.jsp" />
+   
+<%--             <c:if test="${mttForm.resultsSearch != null}">
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
@@ -409,9 +410,9 @@ function resetStore(){
 									<td class=""></td>
 									
 							</tr>
-					</table>
+					</table> --%>
 					
-				</c:if>
+				<%-- </c:if> --%>
 					<!-- ************************Result ***************************************************-->
 					
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>

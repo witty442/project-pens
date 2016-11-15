@@ -97,10 +97,10 @@ function selectOneRadio(){
 </table>
 
 <!-- RESULT -->
-<display:table  id="item" name="requestScope.GROUP_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/popupAction.do?do=search" sort="list" pagesize="20" class="resultDisp">	
+<display:table style="width:100%;" id="item" name="requestScope.GROUP_LIST" 
+    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     	
-    <display:column  title="เลือกข้อมูล"   sortable="false" class="chk">
+    <display:column  style="text-align:center;" title="เลือกข้อมูล"   sortable="false" class="chk">
 
 		<input type ="radio" name="chRadio" />
 		<input type ="hidden" name="code" id="code" value="<bean:write name="item" property="code"/>" />

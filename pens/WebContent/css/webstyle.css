@@ -236,7 +236,9 @@ TABLE.result TD {
 .lineError {
 	background-color: red;
 }
-
+.lineError2 {
+	background-color: #EDBB99;
+}
 .pop_lineE {
 	background-color: #F8F2E8;
 }

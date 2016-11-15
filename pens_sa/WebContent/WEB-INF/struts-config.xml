@@ -84,7 +84,7 @@
 		
 		<!-- SALES ANALYST -->
 		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction" forward="/jsp/salesAnalyst/sales_analyst.jsp" />
-		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction" parameter="do" scope="request"
+		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction" parameter="do" scope="session"
 			type="com.isecinc.pens.web.report.salesanalyst.SAReportAction">
 			<forward name="search" path="/jsp/salesAnalyst/sales_analyst.jsp" />
 			<forward name="prepare" path="/jsp/salesAnalyst/sales_analyst.jsp" />

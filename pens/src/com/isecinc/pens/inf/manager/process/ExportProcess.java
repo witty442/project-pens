@@ -246,26 +246,12 @@ public class ExportProcess {
 				//add customer contact
 				dataAppend.append(exportCustContactDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
 				
-				/** Add imageFileName to Upload **/
-				if( !Utils.isNull(rs.getString("image_file_name")).equals("")){
-					ImageFileBean im = new ImageFileBean();
-					im.setImageFileName(rs.getString("image_file_name"));
-					String fileName = im.getImageFileName().substring(im.getImageFileName().lastIndexOf("/")+1,im.getImageFileName().length());
-					im.setGenerateImageFileName(rs.getString("CUSTOMER_NUMBER")+"-"+fileName);
-					
-					imageFileList.add(im);
-				}
+				
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update m_customer set exported = 'Y' WHERE customer_id="+rs.getString("customer_id"));
-				
+		
 			}//while
 			
-			/** Export Customer Case Data Location **/
-			//New Version 062559
-			/*TableBean t = exportCustomerCaseLocation(conn,tableBean,userBean);
-			sqlUpdateExportFlagList.addAll(t.getSqlUpdateExportFlagList());
-			tableBean.setDataCusLocationStrExport(t.getDataCusLocationStrExport());
-			*/
 			
 			tableBean.setExportCount(totalRows);
 			tableBean.setDataStrExport(dataAppend);
@@ -285,37 +271,50 @@ public class ExportProcess {
 		}
 	}
 
-	public   TableBean exportCustomerCaseLocation(Connection conn,TableBean tableBean,User userBean) throws Exception{
+	public  TableBean exportCustomerLocation(Connection conn,TableBean tableBean,User userBean) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		StringBuffer dataAppend = new StringBuffer("");
         List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+        List<ImageFileBean> imageFileList = new ArrayList<ImageFileBean>();
         int totalRows = 0;
         InterfaceDAO dao = new InterfaceDAO();
+        int c = 0;
 		try{
             logger.debug("Select:"+tableBean.getPrepareSqlSelect());
 			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
 			
 			rs = ps.executeQuery();
 			while(rs.next()){ 
-				totalRows++;
-				String ADDRESS_ID_BILL_TO = dao.isSameAddress(conn, rs.getString("customer_id"));
-			
-				//Get Customer ,BILL_TO AND SHIP_TO
-				dataAppend.append(exportCustomerSplit2LineDataDB(conn, tableBean, userBean,rs.getString("customer_id"),ADDRESS_ID_BILL_TO));
-
-				//add customer contact
-				dataAppend.append(exportCustContactDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
 				
+				/** Case isChange=Y check location is not null */
+				if( !Utils.isNull(rs.getString("location")).equals("")){
+				   dataAppend.append(exportCustomerLocationLineDataDB(conn, tableBean, userBean,rs.getString("customer_id")));
+				   c =1;
+				}
+				/** Add imageFileName to Upload **/
+				if( !Utils.isNull(rs.getString("image_file_name")).equals("")){
+					ImageFileBean im = new ImageFileBean();
+					im.setImageFileName(rs.getString("image_file_name"));
+					String fileName = im.getImageFileName().substring(im.getImageFileName().lastIndexOf("/")+1,im.getImageFileName().length());
+					im.setGenerateImageFileName(fileName);
+					
+					imageFileList.add(im);
+					c =1;
+				}
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update m_customer set is_change = 'N' WHERE customer_id="+rs.getString("customer_id"));
-				
+		
+				totalRows += c;
 			}//while
 			
+			tableBean.setExportCount(totalRows);
+			tableBean.setDataStrExport(dataAppend);
 			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
-			tableBean.setDataCusLocationStrExport(dataAppend);
+			tableBean.setImageFileList(imageFileList);
 			
 			return tableBean;
+			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -328,7 +327,6 @@ public class ExportProcess {
 		}
 	}
 
-	
 	/**
 	 * 
 	 * @param conn
@@ -396,7 +394,10 @@ public class ExportProcess {
 			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
 			"   A.address_ID as ADDRESS_ID, \n"+
 			"   'O' AS PARTY_TYPE, \n"+ /** Wait Future Use*/
-			"   M.location \n"+
+			"   M.location, \n"+
+			"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
+			"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longtitude \n"+
+			
 			"	 FROM m_customer M 	\n"+
 			"	 INNER JOIN m_address A 	\n"+
 			"	 ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
@@ -451,6 +452,65 @@ public class ExportProcess {
 				dataAppend.append(dataAppendLine2);
 			}*/
 			
+			
+			return dataAppend.toString();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
+	private  String exportCustomerLocationLineDataDB(Connection conn,TableBean tableBean,User userBean,String customerId) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+		try{
+			logger.debug("*** exportCustomerLocationLineDataDB ****");	
+			String subSql = "";
+			
+			subSql = "SELECT M.CUSTOMER_ID , \n"+
+			"	'H'  AS RECORD_TYPE,	\n"+
+			"	M.CODE AS CUSTOMER_NUMBER ,  \n"+
+			"	M.NAME  AS CUSTOMER_NAME,	\n"+
+			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
+			"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
+			"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longitude \n"+
+			"	FROM m_customer M 	\n"+
+			"   WHERE M.user_id = "+userBean.getId()+
+			"   AND M.CUSTOMER_ID ="+customerId +
+			"   ORDER BY M.CUSTOMER_ID \n";
+			
+            logger.debug("Select:"+subSql);
+			ps= conn.prepareStatement(subSql);
+			
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				for(i=0;i<tableBean.getColumnBeanList().size();i++){
+					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+					logger.debug("colName:"+colBean.getColumnName());
+					if(i==tableBean.getColumnBeanList().size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+					   dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}
+				}//for
+				dataAppend.append(Constants.newLine);//new line
+			}//while
 			
 			return dataAppend.toString();
 		}catch(Exception e){

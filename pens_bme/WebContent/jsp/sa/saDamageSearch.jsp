@@ -340,7 +340,7 @@ function getStaffName(custCode){
 						               <th >แก้ไข</th><!-- 0 -->
 						            </c:if>
 						            <c:if test="${saDamageForm.bean.canEdit == false}">
-						               <th > View  </th><!-- 0 -->
+						               <th > Action  </th><!-- 0 -->
 						            </c:if>
 						            <th >วันที่บันทึก</th><!-- 1 -->
 						            <th >Employee ID</th><!-- 2 -->

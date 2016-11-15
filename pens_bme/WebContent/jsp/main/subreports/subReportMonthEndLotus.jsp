@@ -78,8 +78,8 @@ body {
 		<c:if test="${summaryForm.results != null}">
 		<c:if test="${summaryForm.summaryType == 'PensItem'}">
 		<br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
 			    
 			     <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/>
 			    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"/>	 
@@ -97,8 +97,8 @@ body {
 			
 			<c:if test="${summaryForm.summaryType == 'GroupCode'}">
 		    <br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
 			    
 			   <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/> 
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text"/>	

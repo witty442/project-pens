@@ -59,10 +59,10 @@ body {
 		<c:if test="${summaryForm.results != null}">
 		<c:if test="${summaryForm.summaryType == 'PensItem' || summaryForm.summaryType ==null}">
 		<br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
 			    
-			   <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>
+			   <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" />
 			    <display:column  title="SubInv" property="subInv"  sortable="false" />
 			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
 			    <display:column  title="Group" property="group"  sortable="false"/>	
@@ -81,10 +81,10 @@ body {
 			
 			<c:if test="${summaryForm.summaryType == 'GroupCode'}">
 		    <br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
 			    
-			   <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>
+			   <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" />
 			    <display:column  title="SubInv" property="subInv"  sortable="false" />
 			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
 			    <display:column  title="Group" property="group"  sortable="false"/>	

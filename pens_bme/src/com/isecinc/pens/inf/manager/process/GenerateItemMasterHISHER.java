@@ -27,6 +27,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 	public final static String PARAM_OUTPUT_PATH = "OUTPUT_PATH";
 	public final static String PARAM_CUST_GROUP = "CUST_GROUP";
 	public final static String PARAM_TRANS_DATE = "TRANS_DATE";//Budish Date
+	public final static String PARAM_PRODUCT_TYPE = "PRODUCT_TYPE";
 	
 	public static MonitorItemBean runProcess(User user,MonitorItemBean monitorItemBean,Map<String, String> batchParamMap) throws Exception{
 		EnvProperties env = EnvProperties.getInstance();
@@ -58,13 +59,15 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			
 			//Prepare parameter
 			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String productType = Utils.isNull(batchParamMap.get(PARAM_PRODUCT_TYPE));
 			
 			//Create Connection
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			//Get Config Map ALL
-			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK");
+			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK",productType);
+			
 			sql.append("\n SELECT A.barcode, A.group_code, A.product_code ");
 			sql.append("\n ,(select max(pens_value) from PENSBME_MST_REFERENCE  M ");
 			sql.append("\n  WHERE M.reference_code = 'LotusItem' ");
@@ -78,6 +81,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			sql.append("\n   		ON  O.group_code = M.pens_desc2     ");
 			sql.append("\n   		AND M.reference_code = 'LotusItem'    ");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 		and   O.product = '"+productType+"'");
 			sql.append("\n 		and  ( O.interface_icc = 'N' or O.interface_icc is null)	 ");
 			sql.append("\n 		group by M.interface_desc, O.group_code,M.interface_value,O.WHOLE_PRICE_BF,O.RETAIL_PRICE_BF ");
 			sql.append("\n  )A ");
@@ -128,7 +132,6 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 						// insert barcode
 						insertBARCODE_IN_ICC(conn,barcode,productCode,user.getUserName());
 					}
-					
 				}
 	
 			}//while
@@ -260,7 +263,10 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 	}
 	
 	private static String debug(int no,String s){
-		return "";//"[No["+no+"]["+s.length()+"] \n";
+		return""; //"[No["+no+"]["+s.length()+"] \n";
+	}
+	private static String debug(int no,String s,String prefix){
+		return""; //"[No["+no+"]["+prefix+"]["+s+"] \n";
 	}
 	
 	private static String genLine(Map<String, String> configMap,Date date,String groupCode
@@ -290,10 +296,10 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("BUS_CODE"))," ",1));no++;
 			       
 			/**4 */line += appendRightByLength(Utils.isNull(configMap.get("DEPT_CODE"))," ",1);//DEPT_CODE	รหัสฝ่าย	CHAR(1)
-			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("DEPT_CODE"))," ",1));no++;
+			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("DEPT_CODE"))," ",1),"DEPT_CODE");no++;
 			       
 			/**5 */line += appendRightByLength(Utils.isNull(configMap.get("PRODUCT_CODE"))," ",1);//PRODUCT_CODE	รหัสผลิตภัณฑ์	CHAR(1)
-			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("PRODUCT_CODE"))," ",1));no++;
+			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("PRODUCT_CODE"))," ",1),"PRODUCT_CODE");no++;
 			       
 			/**6 */line += appendRightByLength(Utils.isNull(configMap.get("SPD_CODE"))," ",1);//SPD_CODE	รหัสผลิตภัณฑ์ย่อย	CHAR(1)
 			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("SPD_CODE"))," ",1));no++;

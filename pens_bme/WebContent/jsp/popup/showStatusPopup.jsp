@@ -111,17 +111,17 @@ function selectMultiple(){
 			</table>
 			
 			<!-- RESULT -->
-			<display:table width="100%" id="item" name="requestScope.STATUS_LIST" 
-			    defaultsort="0" defaultorder="descending" requestURI=".." sort="list" pagesize="20" class="resultDisp">	
+			<display:table style="width:100%;" id="item" name="requestScope.STATUS_LIST" 
+			    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
 			    	
-			    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
+			    <display:column style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
 					<input type ="checkbox" name="chCheck" id="chCheck"   />
 					<input type ="hidden" name="code" value="<bean:write name="item" property="key"/>" />
 	            	<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" /> 
 				 </display:column>
 			    											    
-			    <display:column align="left" title="รหัส" property="key"  nowrap="false" sortable="false" class="code"/>
-			    <display:column align="left" title="รายละเอียด" property="name" nowrap="false" sortable="false" class="desc"/>								
+			    <display:column title="รหัส" property="key"  sortable="false" class="code"/>
+			    <display:column title="รายละเอียด" property="name"  sortable="false" class="desc"/>								
 			</display:table>	
 			<!-- RESULT -->
 		</td>

@@ -44,15 +44,15 @@ public class SAExportExcel {
 		        
 			    h.append("<table border='1'> \n");
 				h.append("<tr  class='colum_head'> \n");
-				  h.append("<td>Emp ID</td> \n");
-				  h.append("<td>Name</td> \n");
-				  h.append("<td>Surname</td> \n");
-				  h.append("<td>Group Store</td> \n");
-				  h.append("<td>Branch</td> \n");
-				  h.append("<td>Year Month</td> \n");
-				  h.append("<td>Pay Date</td> \n");
-				  h.append("<td>Bme Amt</td> \n");
-				  h.append("<td>Wacoal Amt</td> \n");
+				  h.append("<th>Emp ID</th> \n");
+				  h.append("<th>Name</th> \n");
+				  h.append("<th>Surname</th> \n");
+				  h.append("<th>Group Store</th> \n");
+				  h.append("<th>Branch</th> \n");
+				  h.append("<th>Year Month</th> \n");
+				  h.append("<th>Pay Date</th> \n");
+				  h.append("<th>Bme Amt</th> \n");
+				  h.append("<th>Wacoal Amt</th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -61,7 +61,7 @@ public class SAExportExcel {
 					totalWacoalAmt += Utils.convertStrToDouble(s.getWacoalAmt());
 					
 					h.append("<tr> \n");
-					  h.append("<td class='text'>"+s.getEmpId()+"</td> \n");
+					  h.append("<th class='text'>"+s.getEmpId()+"</td> \n");
 					  h.append("<td class='text'>"+s.getName()+"</td> \n");
 					  h.append("<td class='text'>"+s.getSurname()+"</td> \n");
 					  h.append("<td class='num'>"+s.getGroupStore()+"</td> \n");
@@ -84,6 +84,105 @@ public class SAExportExcel {
 				  h.append("<td class='num'>"+Utils.decimalFormat(totalWacoalAmt,Utils.format_current_2_disgit)+"</td> \n");
 				h.append("</tr>");
 				h.append("</table> \n");
+		    }else{
+		    	return new StringBuffer("");
+		    }
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	public static StringBuffer genSADeptReport(SAReportBean bean ,List<SAReportBean> list,User user){
+		StringBuffer h = new StringBuffer("");
+		String colSpan= "9";
+		double totalInvoiceAmt = 0;
+		double totalDamage = 0;
+		double totalRewardBme = 0;
+		double totalRewardWacoal = 0;
+		try{
+			if("Summary".equalsIgnoreCase(bean.getSummaryType())){
+				colSpan= "10";
+			}
+			//include style header
+			h.append(ExcelHeader.EXCEL_HEADER);
+		
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='center' colspan='"+colSpan+"' ><b>รายงานลูกหนี้พนักงาน SA </b></td> \n");
+			h.append("</tr> \n");
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' ></td> \n");
+			h.append("</tr> \n");
+			h.append("</table> \n");
+		
+		    if(list != null && list.size() >0){
+			    h.append("<table border='1'> \n");
+				h.append("<tr  class='colum_head'> \n");
+				  h.append("<th>รหัสพนักงาน</th> \n");
+				  h.append("<th>รหัสลูกหนี้ Oracle</th> \n");
+				  h.append("<th>Name</th> \n");
+				  h.append("<th>Surname</th> \n");
+				  h.append("<th>Group Store</th> \n");
+				  h.append("<th>Branch</th> \n");
+				  if(!"Summary".equalsIgnoreCase(bean.getSummaryType())){
+				    h.append("<th>Invoice No</th> \n");
+				  }else{
+					  h.append("<th>ยอดสะสม ค่าเฝ้าตู้ Bme</th> \n");
+					  h.append("<th>ยอดสะสม ค่าเฝ้าตู้ Wacoal</th> \n");
+				  }
+				  h.append("<th>Invoice Amt </th> \n");
+				  h.append("<th>บันทึกค่าความเสียหาย </th> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					SAReportBean s = (SAReportBean)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getEmpId()+"</td> \n");
+					  h.append("<td class='text'>"+s.getOracleRefId()+"</td> \n");
+					  h.append("<td class='text'>"+s.getName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getSurname()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroupStore()+"</td> \n");
+					  h.append("<td class='text'>"+s.getBranch()+"</td> \n");
+					  if(!"Summary".equalsIgnoreCase(bean.getSummaryType())){
+					     h.append("<td class='text'>"+s.getInvoiceNo()+"</td> \n");
+					  }else{
+						  h.append("<td class='currency'>"+s.getTotalRewardBme()+"</td> \n");
+						  h.append("<td class='currency'>"+s.getTotalRewardWacoal()+"</td> \n");
+					  }
+					  
+					  h.append("<td class='currency'>"+s.getTotalInvoiceAmt()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalDamage()+"</td> \n");
+					  
+					h.append("</tr>");
+					
+					 totalInvoiceAmt += Utils.convertStrToDouble(s.getTotalInvoiceAmt());
+					 totalDamage += Utils.convertStrToDouble(s.getTotalDamage());
+					 totalRewardBme += Utils.convertStrToDouble(s.getTotalRewardBme());
+					 totalRewardWacoal += Utils.convertStrToDouble(s.getTotalRewardWacoal());
+				}
+				h.append("<tr> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  if(!"Summary".equalsIgnoreCase(bean.getSummaryType())){
+					 h.append("<td class='text'></td> \n");
+				     h.append("<td class='colum_head'>ยอดรวม</td> \n");
+				  }else{
+					 h.append("<td class='colum_head'>ยอดรวม</td> \n");
+					  h.append("<td class='currency_bold'>"+Utils.decimalFormat(totalRewardBme,Utils.format_current_2_disgit)+"</td> \n");
+					  h.append("<td class='currency_bold'>"+Utils.decimalFormat(totalRewardWacoal,Utils.format_current_2_disgit)+"</td> \n");
+				  }
+				  h.append("<td class='currency_bold'>"+Utils.decimalFormat(totalInvoiceAmt,Utils.format_current_2_disgit)+"</td> \n");
+				  h.append("<td class='currency_bold'>"+Utils.decimalFormat(totalDamage,Utils.format_current_2_disgit)+"</td> \n");
+				  
+				h.append("</tr>");
+				h.append("</table> \n");
+				
 		    }else{
 		    	return new StringBuffer("");
 		    }
@@ -134,15 +233,15 @@ public class SAExportExcel {
 		    if(list != null && list.size() >0){
 			    h.append("<table border='1'> \n");
 				h.append("<tr  class='colum_head'> \n");
-				  h.append("<td>Type</td> \n");
-				  h.append("<td>Invoice no / Ref Wacoal</td> \n");
-				  h.append("<td>วันที่บันทึก</td> \n");
-				  h.append("<td>ค่าความเสียหาย</td> \n");
-				  h.append("<td>Line No</td> \n");
-				  h.append("<td>ประเภทชำระ</td> \n");
-				  h.append("<td>วันที่ชำระ</td> \n");
-				  h.append("<td>ยอดชำระแล้ว </td> \n");
-				  h.append("<td>ยอดค้างชำระ </td> \n");
+				  h.append("<th>Type</th> \n");
+				  h.append("<th>Invoice no / Ref Wacoal</th> \n");
+				  h.append("<th>วันที่บันทึก</th> \n");
+				  h.append("<th>ค่าความเสียหาย</th> \n");
+				  h.append("<th>Line No</th> \n");
+				  h.append("<th>ประเภทชำระ</th> \n");
+				  h.append("<th>วันที่ชำระ</th> \n");
+				  h.append("<th>ยอดชำระแล้ว </th> \n");
+				  h.append("<th>ยอดค้างชำระ </th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -205,18 +304,18 @@ public class SAExportExcel {
 		    if(list != null && list.size() >0){
 			    h.append("<table border='1'> \n");
 				h.append("<tr class='colum_head'> \n");
-				  h.append("<td>Emp ID</td> \n");
-				  h.append("<td>Name-Surname</td> \n");
-				  h.append("<td>Group Store</td> \n");
-				  h.append("<td>Branch</td> \n");
-				  h.append("<td>Type</td> \n");
-				  h.append("<td>Invoice no / Ref Wacoal</td> \n");
-				  h.append("<td>วันที่บันทึก</td> \n");
-				  h.append("<td>ค่าความเสียหาย</td> \n");
-				  h.append("<td>Line No</td> \n");
-				  h.append("<td>ประเภทชำระ</td> \n");
-				  h.append("<td>วันที่ชำระ</td> \n");
-				  h.append("<td>ยอดค้างชำระ </td> \n");
+				  h.append("<th>Emp ID</th> \n");
+				  h.append("<th>Name-Surname</th> \n");
+				  h.append("<th>Group Store</th> \n");
+				  h.append("<th>Branch</th> \n");
+				  h.append("<th>Type</th> \n");
+				  h.append("<th>Invoice no / Ref Wacoal</th> \n");
+				  h.append("<th>วันที่บันทึก</th> \n");
+				  h.append("<th>ค่าความเสียหาย</th> \n");
+				  h.append("<th>Line No</th> \n");
+				  h.append("<th>ประเภทชำระ</th> \n");
+				  h.append("<th>วันที่ชำระ</th> \n");
+				  h.append("<th>ยอดค้างชำระ </th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -267,7 +366,6 @@ public class SAExportExcel {
 		double totalAmt = 0;
 		try{
 			Date date = Utils.parse("01"+bean.getMonth(), Utils.DD_MM_YYYY_WITHOUT_SLASH);
-			
 			String MMMMYYYY= Utils.stringValue(date, "MMMM yyyy",Utils.local_th);
 		
 			//include style header
@@ -284,7 +382,6 @@ public class SAExportExcel {
 			h.append("<tr> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' ></td> \n");
 			h.append("</tr> \n");
-			
 			h.append("</table> \n");
 			
             SAReportBean dataBean =  SAReportDAO.searchData4OrisoftReport( bean);
@@ -293,16 +390,16 @@ public class SAExportExcel {
 		    if(list != null && list.size() >0){
 			    h.append("<table border='1'> \n");
 				h.append("<tr class='colum_head'> \n");
-				  h.append("<td>Emp ID</td> \n");
-				  h.append("<td>Name</td> \n");
-				  h.append("<td>Surname</td> \n");
-				  h.append("<td>Group Store</td> \n");
-				  h.append("<td>Branch</td> \n");
-				  h.append("<td>as Of Month</td> \n");
-				  h.append("<td>Surety Bond จากเงินเดือน</td> \n");
-				  h.append("<td>ค่าเฝ้าตู้</td> \n");
-				  h.append("<td>ค่าเสียหายหักจากเงินเดือน</td> \n");
-				  h.append("<td>หัก Surety Bond ของบริษัท</td> \n");
+				  h.append("<th>Emp ID</th> \n");
+				  h.append("<th>Name</th> \n");
+				  h.append("<th>Surname</th> \n");
+				  h.append("<th>Group Store</th> \n");
+				  h.append("<th>Branch</th> \n");
+				  h.append("<th>as Of Month</th> \n");
+				  h.append("<th>Surety Bond จากเงินเดือน</th> \n");
+				  h.append("<th>ค่าเฝ้าตู้</th> \n");
+				  h.append("<th>ค่าเสียหายหักจากเงินเดือน</th> \n");
+				  h.append("<th>หัก Surety Bond ของบริษัท</th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -321,6 +418,7 @@ public class SAExportExcel {
 					  h.append("<td class='num'>"+s.getNetSuretyBondAmt()+"</td> \n");
 					 h.append("</tr>");
 				}
+				
 				 /* h.append("<tr> \n");
 				  h.append("<td></td> \n");
 				  h.append("<td></td> \n");
@@ -333,6 +431,7 @@ public class SAExportExcel {
 				  h.append("<td >รวมยอดค้างชำระ</td> \n");
 				  h.append("<td class='num'>"+Utils.decimalFormat(totalAmt,Utils.format_current_2_disgit)+"</td> \n");
 				h.append("</tr>");*/
+				
 				h.append("</table> \n");
 		    }else{
 		    	return new StringBuffer("");

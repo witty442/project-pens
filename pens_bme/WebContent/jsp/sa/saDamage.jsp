@@ -22,7 +22,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <jsp:useBean id="saDamageForm" class="com.isecinc.pens.web.sa.SADamageForm" scope="session" />
 
 <%
@@ -111,15 +111,16 @@ function loadMe(){
 	   }
 		   
 	  /** Disable empId **/ 
-	   if(document.getElementsByName('bean.type')[0].checked){ //BME
+	   if(document.getElementsByName('bean.type')[0].checked ||
+	      document.getElementsByName('bean.type')[1].checked){ //BME ,WACOAl
 			document.getElementById('empId').className= "disableText";
 			document.getElementById('empId').readOnly= true;
 			document.getElementById('getempId').style.display='none';
 	   }else{
 		   //WACOAL
-		   document.getElementById('empId').className= "normalText";
+		   /* document.getElementById('empId').className= "normalText";
 		   document.getElementById('empId').readOnly= false;
-		   document.getElementById('getempId').style.display='block';
+		   document.getElementById('getempId').style.display='block'; */
 	
 	   }
 }
@@ -347,17 +348,17 @@ function resetInvRefWal(){
 	form.totalDamage.value = '';
 	
 	if(document.getElementsByName('bean.type')[1].checked){//WCOAL
-		form.totalDamage.className = 'normalText';
+		/* form.totalDamage.className = 'normalText';
 		form.totalDamage.readOnly = false;
 		
 	    document.getElementById('empId').className= "normalText";
 		document.getElementById('empId').readOnly= false;
-		document.getElementById('getempId').style.display='block';
+		document.getElementById('getempId').style.display='block'; */
 	}else{
 		//BME
-		document.getElementById('empId').className= "disableText";
+		/* document.getElementById('empId').className= "disableText";
 		document.getElementById('empId').readOnly= true;
-		document.getElementById('getempId').style.display='none';
+		document.getElementById('getempId').style.display='none'; */
 
 	}
 }
@@ -374,7 +375,9 @@ function getInvRefWal(invRefWalObj){
 	}
 	
 	//BME
-	if(document.getElementsByName('bean.type')[0].checked){
+	if(document.getElementsByName('bean.type')[0].checked || 
+	   document.getElementsByName('bean.type')[1].checked
+	 ){
 		var getData = $.ajax({
 				url: "${pageContext.request.contextPath}/jsp/sa/saGetInvoiceAjax.jsp",
 				data : "invRefWal=" + invRefWalObj.value,
@@ -684,8 +687,8 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 							String tabclass ="lineE";
 							
 							List<SADamageBean> items = saDamageForm.getBean() !=null?saDamageForm.getBean().getItems():null;
-							if(items != null)
-							   System.out.println("Screen items size:"+items.size());
+							//if(items != null)
+							  // System.out.println("Screen items size:"+items.size());
 							int tabindex = 1;
 							int no = 0;
 							if(items != null && items.size() >0){

@@ -41,10 +41,52 @@ public class SAReportBean implements Serializable{
     private String netSuretyBondAmt;
     
     private List<SAReportBean> items;
+    private String summaryType;
+    private String empType;
+    private String invoiceNo;
     private String totalPayment;
+    private String totalInvoiceAmt;
     private String totalDelayPayment;
+	private String totalRewardBme;
+	private String totalRewardWacoal;
     
     
+	public String getTotalRewardBme() {
+		return totalRewardBme;
+	}
+	public void setTotalRewardBme(String totalRewardBme) {
+		this.totalRewardBme = totalRewardBme;
+	}
+	public String getTotalRewardWacoal() {
+		return totalRewardWacoal;
+	}
+	public void setTotalRewardWacoal(String totalRewardWacoal) {
+		this.totalRewardWacoal = totalRewardWacoal;
+	}
+	public String getTotalInvoiceAmt() {
+		return totalInvoiceAmt;
+	}
+	public void setTotalInvoiceAmt(String totalInvoiceAmt) {
+		this.totalInvoiceAmt = totalInvoiceAmt;
+	}
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
+	public String getEmpType() {
+		return empType;
+	}
+	public void setEmpType(String empType) {
+		this.empType = empType;
+	}
+	public String getSummaryType() {
+		return summaryType;
+	}
+	public void setSummaryType(String summaryType) {
+		this.summaryType = summaryType;
+	}
 	public String getTotalPayment() {
 		return totalPayment;
 	}

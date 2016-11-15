@@ -233,6 +233,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("forwordStr:"+forwordStr);
 			
 			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			String screenHeight = Utils.isNull(request.getParameter("screenHeight"));
 			if(screenWidth.equals("")){
 				screenWidth ="0";
 			}
@@ -243,7 +244,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("After Calc ScreenWidth:"+screenWidth);
 			
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
-			
+			request.getSession(true).setAttribute("screenHeight", screenHeight);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

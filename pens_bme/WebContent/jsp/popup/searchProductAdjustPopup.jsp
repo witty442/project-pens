@@ -87,10 +87,10 @@ function selectOneRadio(){
 </table>
 
 <!-- RESULT -->
-<display:table width="100%" id="item" name="requestScope.PRODUCT_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchProductPopupAction.do?do=search2" sort="list" pagesize="20" class="resultDisp">	
+<display:table style="width:100%;" id="item" name="requestScope.PRODUCT_LIST" 
+    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     	
-    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
+    <display:column style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
 
 		<input type ="radio" name="chRadio" />
 		<input type ="hidden" name="code" id="code" value="<bean:write name="item" property="code"/>" />
@@ -98,9 +98,9 @@ function selectOneRadio(){
 		<input type ="hidden" name="price" id="price" value="<bean:write name="item" property="price"/>" />
 	 </display:column>
     											    
-    <display:column align="left" title="item" property="code"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="ItemDesc" property="desc" nowrap="false" sortable="false" class="desc"/>		
-     <display:column align="left" title="ราคา" property="price" nowrap="false" sortable="false" class="desc"/>								
+    <display:column title="item" property="code"   sortable="false" class="code"/>
+    <display:column title="ItemDesc" property="desc"  sortable="false" class="desc"/>		
+     <display:column title="ราคา" property="price"  sortable="false" class="desc"/>								
 </display:table>
 	
 <!-- RESULT -->

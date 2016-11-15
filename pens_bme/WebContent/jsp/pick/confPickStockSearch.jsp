@@ -31,7 +31,6 @@ if(session.getAttribute("statusIssueReqList2") == null){
 	billTypeList.addAll(PickConstants.getRequestStatusW2ListInPageConfPickStock());
 	session.setAttribute("statusIssueReqList2",billTypeList);
 }
-
 if(session.getAttribute("custGroupList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
@@ -44,12 +43,11 @@ if(session.getAttribute("wareHouseList2") == null){
 	List<References> wareHouseList = new ArrayList();
 	References ref1 = new References("","");
 	wareHouseList.add(ref1);
-	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W3+"','"+PickConstants.WAREHOUSE_W4+"'"));
+	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W3+"','"+PickConstants.WAREHOUSE_W4+"','"+PickConstants.WAREHOUSE_W5+"'"));
 	
 	session.setAttribute("wareHouseList2",wareHouseList);
 }
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">

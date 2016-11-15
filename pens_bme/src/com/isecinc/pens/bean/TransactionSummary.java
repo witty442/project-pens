@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class TransactionSummary implements Serializable{
    /**
@@ -89,7 +90,22 @@ public class TransactionSummary implements Serializable{
 	private String kingAmount;		
 	private String kingCostAmt;
 	
+	private List<TransactionSummary> itemsList;
+	private TransactionSummary summary;
 	
+	
+	public List<TransactionSummary> getItemsList() {
+		return itemsList;
+	}
+	public void setItemsList(List<TransactionSummary> itemsList) {
+		this.itemsList = itemsList;
+	}
+	public TransactionSummary getSummary() {
+		return summary;
+	}
+	public void setSummary(TransactionSummary summary) {
+		this.summary = summary;
+	}
 	public String getCustGroup() {
 		return custGroup;
 	}

@@ -338,10 +338,11 @@ public class MCDAO {
 					sql.append("\n  )S  ON  S.region = E.region AND S.emp_ref_id = E.emp_ref_id ");
 					
 				   sql.append("\n WHERE 1=1"); 
-				   sql.append("\n AND S.employee_id not in(  "); 
-				   sql.append("\n   select employee_id from MC_TRANS WHERE  month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
+				   sql.append("\n AND S.emp_ref_id not in(  "); 
+				   sql.append("\n   select emp_ref_id from MC_TRANS WHERE  month_trip = '"+Utils.isNull(o.getMonthTrip())+"'");
 				   sql.append("\n )");
 				   sql.append("\n AND S.IS_ACTIVE ='Y' "); 
+				   sql.append("\n AND E.status ='A'");
 				   
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
 						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
@@ -375,6 +376,8 @@ public class MCDAO {
 						  sql.append("\n and R.route_name = '"+Utils.isNull(o.getMcRouteDesc())+"'");
 					   }
 				   sql.append("\n ) "); 
+				   
+				   sql.append("\n AND E.status ='A'");
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
 						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
 						sql.append("\n and E.employee_id in( "+sqlIn+")");

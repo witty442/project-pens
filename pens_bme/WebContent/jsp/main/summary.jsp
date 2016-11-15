@@ -1,7 +1,14 @@
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -9,18 +16,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%-- <%@taglib uri="/WEB-INF/displaytag-12.tld" prefix="display"%> --%>
-
-<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
-
+<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
 
 <html>
@@ -31,17 +29,16 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
-
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+
 <%
-String storeType ="";
-User user = (User)session.getAttribute("user");
-String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
-String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
+	String storeType ="";
+	User user = (User)session.getAttribute("user");
+	String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
+	String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
 %>
 
 <style type="text/css">
-<!--
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	/**background-repeat: repeat;**/
@@ -287,6 +284,7 @@ function exportExcel(path){
 	form.submit();
 	return true;
 }
+
 function genMonthEnd(path,storeType){
    var form = document.summaryForm;
    var asOfDateFrom = form.salesDate.value;
@@ -309,36 +307,86 @@ function genMonthEnd(path,storeType){
    }
 }
 
-function genEndDate_1(path,storeType){
-   var form = document.summaryForm;
-   var asOfDateFrom = form.salesDate.value;
-   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-   
-   if(confirm("กรุณายืนยันการ Stock End Date")){
-	   if(asOfDateFrom ==""){ 
-		   alert("กรุณากรอกข้อมูลวันที่ As Of");
-		   asOfDateFrom.focus();
-		   return false;
-	   }
-	    if(pensCustCodeFrom ==""){ 
-		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-		   pensCustCodeFrom.focus();
-		   return false;
-	   } 
-		form.action = path + "/jsp/summaryAction.do?do=genEndDate&page=<%=request.getParameter("page")%>&storeType="+storeType;
-		form.submit();
-		return true;
-   }
-}
-	
+
 function genEndDate(path){
 	var form = document.summaryForm;
+	var asOfDateFrom = form.salesDate.value;
+	var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
     var param = "&customerCode="+form.pensCustCodeFrom.value;
         param += "&salesDate="+form.salesDate.value;
         param += "&pageName=GEN_STOCK_ENDDDATE_LOTUS";
         param += "&pageStaus=child";
         
+        if(asOfDateFrom ==""){ 
+ 		   alert("กรุณากรอกข้อมูลวันที่ As Of");
+ 		   asOfDateFrom.focus();
+ 		   return false;
+ 	   }
+ 	    if(pensCustCodeFrom ==""){ 
+ 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+ 		   pensCustCodeFrom.focus();
+ 		   return false;
+ 	   } 
+ 	    
         if(confirm("กรุณายืนยันการ Stock End Date")){
+			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
+			//window.open(encodeURI(url),"",
+					   //"menubar=no,resizable=no,toolbar=no,scrollbars=no,width=<%=screenWidth%>px,height=<%=screenHeight%>px,status=no,left=0,top= 0");
+			var params = [
+			              'height='+screen.height,
+			              'width='+screen.width,
+			              'fullscreen=yes' // only works in IE, but here for completeness
+			          ].join(',');
+			var popup = window.open(encodeURI(url), 'popup_window', params); 
+			popup.moveTo(0,0);
+        }
+}
+
+function genReportEndDate(path){
+	var form = document.summaryForm;
+	var asOfDateFrom = form.salesDate.value;
+	var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
+    var param = "&customerCode="+form.pensCustCodeFrom.value;
+        param += "&salesDate="+form.salesDate.value;
+        param += "&pageName=GEN_STOCK_REPORT_ENDDDATE_LOTUS";
+        param += "&pageStaus=child";
+        
+        if(asOfDateFrom ==""){ 
+  		   alert("กรุณากรอกข้อมูลวันที่ As Of");
+  		   asOfDateFrom.focus();
+  		   return false;
+  	   }
+  	    if(pensCustCodeFrom ==""){ 
+  		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+  		   pensCustCodeFrom.focus();
+  		   return false;
+  	   } 
+  	    
+  	    //Validate Endate Stock
+  	    var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validEndDateStockLotusAjax.jsp",
+			data : "storeCode=" + pensCustCodeFrom+"&asOfDate="+asOfDateFrom,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+  	    
+  	   // alert(returnString);
+  	    if(returnString != ''){
+  	    	if(returnString =='END_STOCK_LOTUS_NOT_FOUND'){
+  	    		alert("ต้องทำการ End Date Stock จริงอย่างน้อย 1 ครั้ง ");
+  	    	}else if(returnString =='END_STOCK_LOTUS_DATE_MUST_MORE_THAN_ENDING_DATE'){
+  	    		alert("ต้องระบ วันที่ขาย(as of) ให้มากกว่า วันที่ปิดสต๊อกล่าสุด ");
+  	    	}
+  	    	return false;
+  	    }
+  	    
+  	    
+        if(confirm("กรุณายืนยันการ  Data เปรียบเทียบนับสต็อก")){
 			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
 			//window.open(encodeURI(url),"",
 					   //"menubar=no,resizable=no,toolbar=no,scrollbars=no,width=<%=screenWidth%>px,height=<%=screenHeight%>px,status=no,left=0,top= 0");
@@ -587,31 +635,38 @@ function getCustName(custCode,fieldName,storeType){
 						<html:form action="/jsp/summaryAction">
 						<jsp:include page="../error.jsp"/>
 						
-						<div id="div_message" style="color:green" align="center"></div> 
-						<div id="div_error_message" style="color:red" align="center"></div> 
+						<div id="div_message" style="font-size:15px;color:green" align="center"></div> 
+						<div id="div_error_message" style="font-size:15px;color:red" align="center"></div> 
 						
-						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-						
+					<div id="div_m" align="center">	
+					
 						<%if("lotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+						    <table  border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 								 <tr>
-									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
+					                <td width="30%"></td>
+									<td align="left">
+									จาก วันที่ขาย&nbsp;&nbsp;&nbsp; 
+									<html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
+									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/>
+									</td>
 								</tr>
 								<tr>
+								    <td width="30%"></td>
 									<td align="left">รหัสร้านค้า
 									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','lotus')"/>
 									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
 									</td>
-									<td align="left">
-									</td>
 								</tr>
 								<tr>
+								    <td width="30%"></td>
 									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
-									
+									    <html:text property="transactionSummary.fileName" styleId="fileName"/>
+									 </td>
 								</tr>
+							</table>
 						<%}else if("sumByGroupCode".equalsIgnoreCase(request.getParameter("page"))) {%>
+						     <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								 <tr>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
@@ -629,12 +684,16 @@ function getCustName(custCode,fieldName,storeType){
 									<td align="left">
 									 </td>	
 								</tr>
+							</table>
 						<%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))) {%>
+						    <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								 <tr>
+								  <td width="30%"></td>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
 								</tr>
 								<tr>
+								 <td width="30%"></td>
 									<td align="left">รหัสร้านค้า
 									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','bigc')"/>
@@ -642,11 +701,14 @@ function getCustName(custCode,fieldName,storeType){
 									</td>
 								</tr>
 								<tr>
+								 <td width="30%"></td>
 									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
 									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
+							</table>
 						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) ) {%>
+						      <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								 <tr>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
@@ -663,12 +725,16 @@ function getCustName(custCode,fieldName,storeType){
 									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
+							 </table>
 							<%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+							  <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								 <tr>
+								    <td width="30%"></td>
 									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
 								</tr>
 								<tr>
+								    <td width="30%"></td>
 									<td align="left">รหัสร้านค้า
 									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','king')"/>
@@ -676,11 +742,14 @@ function getCustName(custCode,fieldName,storeType){
 									</td>
 								</tr>
 								<tr>
+								    <td width="30%"></td>
 									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
 									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
+							 </table>
 						<%}else if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
+						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								 <tr>
 									<td align="left">จาก วันที่นับสต็อก&nbsp; <html:text property="physicalSummary.countDateFrom" styleId="countDateFrom" readonly="true"/></td>
 									<td align="left">ถึง วันที่นับสต็อก&nbsp; <html:text property="physicalSummary.countDateTo" styleId="countDateTo"/></td>
@@ -702,8 +771,9 @@ function getCustName(custCode,fieldName,storeType){
 									 <html:text property="physicalSummary.fileName" styleId="fileName"/></td>
 									<td align="left"></td>
 								</tr>
+							</table>
 						<%}else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
-								 
+						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 								<tr>
 									<td align="right" width="25%">รหัสร้านค้า</td>
 									<td align="left" width="40%">
@@ -720,7 +790,9 @@ function getCustName(custCode,fieldName,storeType){
 									<td align="right" width="25%">Only have qty</td>
 									<td align="left" width="40%"><html:checkbox property="diffStockSummary.haveQty" /></td>
 								</tr>
+							</table>
 						<%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
+						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						          <tr>
 									<td align="left" width="30%">Location <font color="red">*</font>
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -770,7 +842,7 @@ function getCustName(custCode,fieldName,storeType){
 								     Display Zero Stock <html:checkbox property="onhandSummary.dispZeroStock" />
 									</td>
 								</tr>
-								
+							</table>
 						<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
@@ -799,34 +871,38 @@ function getCustName(custCode,fieldName,storeType){
 									storeType="MTT";
 								}
 								%>
-						
+					    	<table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						        <tr>
-									<td align="right">จาก วันที่ขาย (As Of)<font color="red">*</font> 
+									<td align="right"  nowrap>จาก วันที่ขาย (As Of)<font color="red">*</font> 
 									&nbsp;&nbsp;
 									<html:text property="onhandSummary.salesDate" styleId="salesDate" readonly="true"/>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-									<td align="left" width="30%">
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									</td>
+									<td align="left" width="50%" nowrap>
 									   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){ %>
 									      ปิดรอบสต็อกล่าสุดวันที่:
-									   	  <html:text property="onhandSummary.endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
+									   	  <html:text property="endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
+									   	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   	       ข้อมูลขายถึงวันที่:
+									   	  <html:text property="endSaleDate" styleId="endSaleDate" size="20" styleClass="disableText" readonly="true"/> 
 									   <%} %>
 									
 									</td>
 								</tr>
 						       <tr>
-									<td align="right">รหัสร้านค้า<font color="red">*</font>
+									<td align="right"  nowrap>รหัสร้านค้า<font color="red">*</font>
 									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
-									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
+									<td align="left" width="30%"  nowrap> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
 								</tr>
 								
 								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
 										|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
 										|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) ){%>
 									 <tr>
-										<td align="right">วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
+										<td align="right"  nowrap>วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
 										<html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
 										</td>	
 										<td align="left" width="30%"> 
@@ -835,18 +911,18 @@ function getCustName(custCode,fieldName,storeType){
 									</tr>
 								<%} %>
 								<tr>
-									<td align="right" width="30%">
+									<td align="right" width="30%"  nowrap>
 									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
 									     &nbsp;
 									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
 									</td>
-									<td align="left" width="30%">
+									<td align="left" width="30%"  nowrap>
 									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
 									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
 									</td>
 								</tr>
 								<tr>
-									<td align="right" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<td align="right" width="30%"  nowrap>Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									    <html:text property="onhandSummary.group" styleId="group" />
 									    &nbsp;
 									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
@@ -866,21 +942,23 @@ function getCustName(custCode,fieldName,storeType){
 								    	 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
 								    	 || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))  
 								    	 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
+								    	 || "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
 							    		){%>
 									   <tr>
-											<td align="right" width="30%" >แสดงตาม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											<td align="right" width="30%"  nowrap>แสดงตาม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											       <html:select property="summaryType">
 													 <html:option value="GroupCode">Group Code</html:option>
 													 <html:option value="PensItem">Pens Item</html:option>
 											      </html:select>
 											 </td>
-											
 											<td align="left" width="30%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>    
 									   </tr>
 							   <%} %>
+							  </table>
 						<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {
 							    storeType ="";
 								%>
+							<table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						        <tr>
 									<td align="right">จาก วันที่ <font color="red">*</font>&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
 									</td>
@@ -915,8 +993,9 @@ function getCustName(custCode,fieldName,storeType){
 									  </td>
 									<td align="left" width="30%">&nbsp;</td>
 							   </tr>
+							 </table>
 						<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
-						
+						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						        <tr>
 									<td align="right">จาก วันที่ขาย <font color="red">*</font> &nbsp;
 									<html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
@@ -952,14 +1031,15 @@ function getCustName(custCode,fieldName,storeType){
 									  </td>
 									<td align="left" width="30%">&nbsp;</td>
 							   </tr>
+							 </table>
 						<%} %>
-					   </table>
+					
 					   
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
-							<td align="center">
+							<td align="center" width="80%">
 								<a href="javascript:search('${pageContext.request.contextPath}')">
 								  <input type="button" value="ค้นหา" class="newPosBtn"> 
 								</a>
@@ -969,10 +1049,20 @@ function getCustName(custCode,fieldName,storeType){
 								<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
+							</td>
+							 <td align="right" width="20%">
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))){%>
 								   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+								 
 									<a href="javascript:genEndDate('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
+									</a>
+								<%}} %>
+								<%if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){%>
+								   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+								 
+									<a href="javascript:genReportEndDate('${pageContext.request.contextPath}')">
+									  <input type="button" value="Gen Data เปรียบเทียบนับสต็อก" class="newPosBtn">
 									</a>
 								<%}} %>
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
@@ -983,367 +1073,45 @@ function getCustName(custCode,fieldName,storeType){
 							</td>
 						</tr>
 					</table>
-					<!-- RESULT -->
-				    
-			        <c:if test="${summaryForm.onhandSummaryResults != null}">
-				        <table align="Left" border="0" cellpadding="3" cellspacing="0" class="body">
-							<tr>
-								<td align="left">
-									<b>Data As Of Date :  ${summaryForm.onhandSummary.asOfDate} </b>
-								</td>
-							</tr>
-							<tr>
-								<td align="left">
-									<b>File Name :${summaryForm.onhandSummary.fileName}</b>
-								</td>
-							</tr>
-						</table>
-						<br/>
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="Group" property="group"  sortable="false" class="group"/>
-							    <display:column  title="Item" property="item"  sortable="false" class="item"/>
-							    <display:column  title="Description" property="itemDesc"  sortable="false" class="itemDesc"/>	
-							    <display:column  title="On-Hand" property="onhandQty"  sortable="false" class="onhandQty"/>	
-							    <display:column  title="ราคาขายส่งก่อน VAT" property="wholePriceBF"  sortable="false" class="wholePriceBF"/>	
-							    <display:column  title="ราคาขายปลีกก่อน VAT " property="retailPriceBF"  sortable="false" class="retailPriceBF"/>			
-							    <display:column  title="Barcode" property="barcode"  sortable="false" class="barcode"/>	
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="pensItem"/>
-							    <display:column  title=" Material Master" property="materialMaster"  sortable="false" class="materialMaster"/>	
-							    <display:column  title=" Status" property="status"  sortable="false" class="status"/>	
-							    <display:column  title=" Message" property="message"  sortable="false" class="message"/>			
-							</display:table>
-                    </c:if>       
-                     <c:if test="${summaryForm.onhandSummaryLotusResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryLotusResults" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-							    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="lotus_adjustQty"/>	
-							    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="lotus_stockShortQty"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-                    
-                     <c:if test="${summaryForm.onhandSummaryBmeTransResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryBmeTransResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-							    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="lotus_adjustQty"/>	
-							    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="lotus_stockShortQty"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-   
-                      <c:if test="${summaryForm.onhandSummaryMTTDetailResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryMTTDetailResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false"  width="10"/>
-							    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" />
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
-							    <display:column  title="Group" property="group"  sortable="false"/>	
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
-							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
-							    <display:column  title="Barcode" property="barcode"  sortable="false" />
-							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" />	
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
-							      
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
-							    				
-							</display:table>
-                    </c:if>
-                    
-                      <c:if test="${summaryForm.onhandSummarySizeColorBigCResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummarySizeColorBigCResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" nowrap="false"/>
-							    <display:column  title="SubInv" property="subInv"  sortable="false" />
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
-							    <display:column  title="Group" property="group"  sortable="false"/>	
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
-							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
-							    <display:column  title="Barcode" property="barcode"  sortable="false" />
-							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
-							    <display:column  title="Trans In Qty" property="transInQty"  sortable="false" />	
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
-							    <display:column  title="Adjust Qty" property="adjustSaleQty"  sortable="false" />
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
-							    				
-							</display:table>
-                    </c:if>
-
-                     <c:if test="${summaryForm.onhandBigCResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandBigCResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="bigc_storeCode"/>
-							    <display:column  title="Sub Inv" property="subInv"  sortable="false" class="bigc_subInv"/>
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="bigc_storeName"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="bigc_group"/>	
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="bigc_pensItem"/>	
-							    <display:column  title="Transfer In Qty" property="transInQty"  sortable="false" class="bigc_transInQty"/>	
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="bigc_saleReturnQty"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="bigc_saleOutQty"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="bigc_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-                    
-                    <c:if test="${summaryForm.onhandSummaryLotusPeriodResults != null}">
-
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.onhandSummaryLotusPeriodResults" defaultsort="0" defaultorder="descending" width="100%" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="lotus_storeName"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-							    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-                    
-                     <c:if test="${summaryForm.lotusSummaryResults != null}">
-						
-							<display:table id="item" name="sessionScope.summaryForm.lotusSummaryResults" defaultsort="0" defaultorder="descending"  class="resultTrans"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
-							    
-							    <display:column  title="Sales Date" property="salesDate"  sortable="false" class="salesDate"/>
-							    <display:column  title="Pens Cust Code" property="pensCustCode"  sortable="false" class="pensCustCode"/>	
-							    <display:column  title="Pens Cust Desc" property="pensCustDesc"  sortable="false" class="pensCustDesc"/>	
-							    <display:column  title="Store No" property="storeNo"  sortable="false" class="storeNo"/>	
-							    <display:column  title="Store Name " property="storeName"  sortable="false" class="storeName"/>			
-							    <display:column  title="STYLE NO" property="styleNo"  sortable="false" class="styleNo"/>	
-							    <display:column  title="DESCRIPTION" property="description"  sortable="false" class="description"/>	
-							    
-							    <display:column  title="QTY" property="qty"  sortable="false" class="qty"/>
-							    <display:column  title="Pens Group" property="pensGroup"  sortable="false" class="pensGroup"/>	
-							    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false" class="pensGroupType"/>	
-							    <display:column  title="Sales Year" property="salesYear"  sortable="false" class="salesYear"/>	
-							    <display:column  title="Sales Month" property="salesMonth"  sortable="false" class="salesMonth"/>			
-							    <display:column  title="file Name" property="fileName"  sortable="false" class="fileName"/>	
-							    <display:column  title="Vendor" property="vendor"  sortable="false" class="vendor"/>
-							    <display:column  title="Name" property="name" nowrap="true" sortable="false" class="name"/>	
-							    <display:column  title="AP Type" property="apType"  sortable="false" class="apType"/>	
-							    <display:column  title="LEASE VENDOR TYPE" property="leaseVendorType"  sortable="false" class="leaseVendorType"/>			
-							    <display:column  title="COL" property="col"  sortable="false" class="col"/>	
-							    <display:column  title="Size Type" property="sizeType"  sortable="false" class="sizeType"/>	
-							    			
-							    <display:column  title="SIZE" property="sizes"  sortable="false" class="sizes"/>	
-							    <display:column  title="GROSS SALES" property="grossSales"  sortable="false" class="grossSales"/>	
-							    <display:column  title="RETURN AMT" property="returnAmt"  sortable="false" class="returnAmt"/>			
-							    <display:column  title="NET SALES INCL VAT" property="netSalesInclVat"  sortable="false" class="netSalesInclVat"/>	
-							    <display:column  title="VAT AMT" property="vatAmt"  sortable="false" class="vatAmt"/>		
-			
-							    <display:column  title="NET SALES EXC VAT" property="netSalesExcVat"  sortable="false" class="netSalesExcVat"/>	
-							    <display:column  title="GP AMOUNT" property="gpAmount"  sortable="false" class="gpAmount"/>			
-							    <display:column  title="VAT ON GP AMOUNT" property="vatOnGpAmount"  sortable="false" class="vatOnGpAmount"/>	
-							    <display:column  title="GP AMOUNT INCL VAT" property="gpAmountInclVat"  sortable="false" class="gpAmountInclVat"/>		
-			
-							    <display:column  title="AP AMOUNT" property="apAmount"  sortable="false" class="apAmount"/>	
-							    <display:column  title="TOTAL VAT AMT" property="totalVatAmt"  sortable="false" class="totalVatAmt"/>	
-							    <display:column  title="AP AMOUNT INCL VAT" property="apAmountInclVat"  sortable="false" class="apAmountInclVat"/>			
-							    <display:column  title="Create date" property="createDate"  sortable="false" class="createDate"/>	
-							    <display:column  title="Create by" property="createUser"  sortable="false" class="createUser"/>	
-							    	
-							</display:table>
-                    </c:if>
-                    <c:if test="${summaryForm.topsSummaryResults != null}">
-						        
-						
-							<display:table id="item" name="sessionScope.summaryForm.topsSummaryResults" defaultsort="0" defaultorder="descending"  class="resultTrans"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
-							    
-							    <display:column  title="Sales Date" property="salesDate" width="10%" sortable="false" class="tops_salesDate"/>
-							    <display:column  title="Pens Cust Code" nowrap="false" property="pensCustCode" width="10%" sortable="false" class="tops_pensCustCode"/>	
-							    <display:column  title="Pens Cust Desc" property="pensCustDesc" width="20%" sortable="false" class="tops_pensCustDesc"/>	
-							    <display:column  title="Pens Group" property="pensGroup" width="10" sortable="false" class="tops_pensGroup"/>	
-							    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false" class="tops_pensGroupType"/>	
-                                <display:column  title="Pens Item" property="pensItem"  sortable="false" class="tops_pensItem"/>	
-							    <display:column  title="QTY" property="qty"  sortable="false" class="tops_qty"/>
-							    <display:column  title="Item" property="item"  sortable="false" class="tops_item"/>	
-							    <display:column  title="Item Desc" property="itemDesc"  sortable="false" class="tops_itemDesc"/>	
-							    <display:column  title="Branch Name" property="branchName"  sortable="false" class="tops_branchName"/>	
-							    <display:column  title="Group No" property="groupNo"  sortable="false" class="tops_groupNo"/>
-							    <display:column  title="Group Name" property="groupName"  sortable="false" class="tops_groupName"/>
-							    <display:column  title="DEPT" property="dept"  sortable="false" class="tops_dept"/>
-							    <display:column  title="Dept Name" property="deptName"  sortable="false" class="tops_deptName"/>
-							    <display:column  title="Unit Cost" property="unitCost"  sortable="false" class="tops_unitCost"/>
-							    <display:column  title="Retail Price" property="retailPrice"  sortable="false" class="tops_retailPrice"/>
-							    <display:column  title="GP PERCENT" property="gpPercent"  sortable="false" class="tops_gpPercent"/>		
-							    <display:column  title="NET SALES INCL VAT" property="netSalesInclVat"  sortable="false" class="tops_netSalesInclVat"/>
-							    <display:column  title="NET SALES EXC VAT" property="netSalesExcVat"  sortable="false" class="tops_netSalesExcVat"/>
-							    <display:column  title="GP AMOUNT" property="gpAmount"  sortable="false" class="tops_gpAmount"/>		
-							    <display:column  title="GROSS SALES" property="grossSales"  sortable="false" class="tops_grossSales"/>	
-							   	<display:column  title="Discount" property="discount"  sortable="false" class="tops_discount"/>
-							   	<display:column  title="CUS RETURN" property="cusReturn"  sortable="false" class="tops_cusReturn"/>
-							   	<display:column  title="DISCOUNT CUS RETURN" property="discountCusReturn"  sortable="false" class="tops_discountCusReturn"/>
-							   	<display:column  title="NET CUS RETURN" property="netCusReturn"  sortable="false" class="tops_netCusReturn"/>
-							   	<display:column  title="COGS" property="cogs"  sortable="false" class="tops_cogs"/>
-		
-							    <display:column  title="Sales Year" property="salesYear"  sortable="false" class="tops_salesYear"/>	
-							    <display:column  title="Sales Month" property="salesMonth"  sortable="false" class="tops_salesMonth"/>			
-							    <display:column  title="file Name" property="fileName"  sortable="false" class="tops_fileName"/>				
-							    <display:column  title="Create date" property="createDate"  sortable="false" class="tops_createDate"/>	
-							    <display:column  title="Create by" property="createUser"  sortable="false" class="tops_createUser"/>	
-							    	
-							</display:table>
-                    </c:if>
-                     <c:if test="${summaryForm.kingSummaryResults != null}">
-						        
-						
-							<display:table id="item" name="sessionScope.summaryForm.kingSummaryResults" defaultsort="0" defaultorder="descending"  class="resultTrans"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
-							    
-							    <display:column  title="Sales Date" property="salesDate" width="20%" sortable="false" class="king_salesDate"/>
-							    <display:column  title="Cust Group" property="custGroup" width="10%" sortable="false" class="king_custGroup"/>
-							    <display:column  title="Cust No" nowrap="false" property="storeNo"  sortable="false" class="king_storeNo"/>	
-							    <display:column  title="Cust Name" nowrap="false" property="storeName"  sortable="false" class="king_storeName"/>	
-							    <display:column  title="Code" property="kingCode" width="20%" sortable="false" class="king_kingCode"/>	
-							    <display:column  title="Description" property="kingDescription" width="10" sortable="false" class="kingDescription"/>	
-							    <display:column  title="Reference" property="kingReference"  sortable="false" class="kingReference"/>	
-                                <display:column  title="Unit Price" property="kingUnitPrice"  sortable="false" class="kingUnitPrice"/>	
-                                <display:column  title="Unit Cost" property="kingUnitCost"  sortable="false" class="kingUnitCost"/>	
-                                <display:column  title="QTY" property="qty"  sortable="false" class="king_qty"/>
-                                <display:column  title="Amount" property="kingAmount"  sortable="false" class="kingAmount"/>	
-                                <display:column  title="Cost Amount" property="kingCostAmt"  sortable="false" class="kingCostAmt"/>	
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="king_pensItem"/>	
-							    <display:column  title="Group Code" property="groupCode"  sortable="false" class="king_groupCode"/>	
-							    <display:column  title="file Name" property="fileName"  sortable="false" class="king_fileName"/>				
-							    <display:column  title="Create date" property="createDate"  sortable="false" class="king_createDate"/>	
-							    <display:column  title="Create by" property="createUser"  sortable="false" class="king_createUser"/>	
-							    	
-							</display:table>
-                    </c:if>
-                    
-                     <c:if test="${summaryForm.bigcSummaryResults != null}">
-						
-							<display:table id="item" name="sessionScope.summaryForm.bigcSummaryResults" defaultsort="0" defaultorder="descending" class="resultTrans"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
-							    
-							    <display:column  title="Sales Date" property="salesDate"  sortable="false" class="salesDate"/>
-							    <display:column  title="Pens Cust Code" property="pensCustCode"  sortable="false" class="pensCustCode"/>	
-							    <display:column  title="Pens Cust Desc" property="pensCustDesc"  sortable="false" class="pensCustDesc"/>	
-							    <display:column  title="Store No" property="storeNo"  sortable="false" class="storeNo"/>	
-							    <display:column  title="Store Name " property="storeName"  sortable="false" class="storeName"/>			
-							    <display:column  title="STYLE NO" property="styleNo"  sortable="false" class="styleNo"/>	
-							    <display:column  title="DESCRIPTION" property="description"  sortable="false" class="description"/>	
-							    
-							    <display:column  title="QTY" property="qty"  sortable="false" class="qty"/>
-							    <display:column  title="Whole Price BF" property="wholePriceBF"  sortable="false" class="totalWholePriceBF"/>	
-							    <display:column  title="Retail Price BF" property="retailPriceBF"  sortable="false" class="totalWholePriceBF"/>	
-							    <display:column  title="TOTAL Whole Price BF" property="totalWholePriceBF"  sortable="false" class="totalWholePriceBF"/>	
-							    <display:column  title="Pens Group" property="pensGroup"  sortable="false" class="pensGroup"/>	
-							    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false" class="pensGroupType"/>	
-							    <display:column  title="Sales Year" property="salesYear"  sortable="false" class="salesYear"/>	
-							    <display:column  title="Sales Month" property="salesMonth"  sortable="false" class="salesMonth"/>			
-							    <display:column  title="file Name" property="fileName"  sortable="false" class="fileName"/>	
-							    <display:column  title="Vendor" property="vendor"  sortable="false" class="vendor"/>
-							    <display:column  title="Name" property="name" nowrap="true" sortable="false" class="name"/>	
-
-							    <display:column  title="GP Percent" property="gpPercent"  sortable="false" class="gpPercent"/>	
-							   
-							    <display:column  title="Create date" property="createDate"  sortable="false" class="createDate"/>	
-							    <display:column  title="Create by" property="createUser"  sortable="false" class="createUser"/>	
-							    	
-							</display:table>
-                    </c:if>
-                    
-                     <c:if test="${summaryForm.physicalSummaryResults != null}">
-						<br/>
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.physicalSummaryResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="30">	
-							    
-							    <display:column  title="Item" property="item"  sortable="false" class="phy_item"/>
-							    <display:column  title="Barcode" property="barcode"  sortable="false" class="phy_barcode"/>	
-							    <display:column  title="Cust Code" property="pensCustCode"  sortable="false" class="phy_custCode"/>
-							    <display:column  title="Cust Name" property="pensCustName"  sortable="false" class="phy_custName"/>		
-							    <display:column  title="Count Date" property="countDate"  sortable="false" class="phy_countDate"/>	
-							    <display:column  title="File Name " property="fileName"  sortable="false" class="phy_fileName"/>			
-							    <display:column  title="Create Date" property="createDate"  sortable="false" class="phy_createDate"/>	
+			</div>
 					
-							</display:table>
-                    </c:if>
-                    
-                      <c:if test="${summaryForm.diffStockSummaryLists != null}">
-						<br/>
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.diffStockSummaryLists" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="custCode"  sortable="false" class="d_custCode"/>
-							    <display:column  title="Item" property="item"  sortable="false" class="d_item"/>
-							    <display:column  title="Description" property="description"  sortable="false" class="d_description"/>
-							    <display:column  title="Order Consign" property="orderConsign"  sortable="false" class="d_orderConsign"/>		
-							    <display:column  title="Order From Lotus" property="orderFromLotus"  sortable="false" class="d_orderFromLotus"/>	
-							    <display:column  title="Data From Physical " property="dataFromPhysical"  sortable="false" class="d_dataFromPhysical"/>			
-							    <display:column  title="Adjust" property="adjust"  sortable="false" class="d_adjust"/>	
-					            <display:column  title="Diff" property="diff"  sortable="false" class="d_diff"/>	
-							</display:table>
-                    </c:if>
-                    
-                     <c:if test="${summaryForm.summaryByGroupCodeResults != null}">
-						<br/>
-						<br/>
-							<display:table id="item" name="sessionScope.summaryForm.summaryByGroupCodeResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="custCode"  sortable="false" class="d_custCode"/>
-							    <display:column  title="Item" property="item"  sortable="false" class="d_item"/>
-							    <display:column  title="Description" property="description"  sortable="false" class="d_description"/>
-							    <display:column  title="Order Consign" property="orderConsign"  sortable="false" class="d_orderConsign"/>		
-							    <display:column  title="Order From Lotus" property="orderFromLotus"  sortable="false" class="d_orderFromLotus"/>	
-							    <display:column  title="Data From Physical " property="dataFromPhysical"  sortable="false" class="d_dataFromPhysical"/>			
-							    <display:column  title="Adjust" property="adjust"  sortable="false" class="d_adjust"/>	
-					            <display:column  title="Diff" property="diff"  sortable="false" class="d_diff"/>	
-							</display:table>
-                    </c:if>
+					<!-- ****** RESULT ***************************************************************** -->
+				     <!-- ALL SUB Report By old code -->
+			         <jsp:include page="subreports/subReportAll.jsp" /> 
                    
-                    
-                    <jsp:include page="subreports/subReportOnhandBigCSP.jsp" /> 
-                    <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
-                    <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
-                    <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
-                    <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
-                    
-                     <%if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+                    <!-- New code -->
+                    <c:if test="${summaryForm.page == 'onhandBigCSP'}">
+                        <jsp:include page="subreports/subReportOnhandBigCSP.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'onhandLotus'}">
+                        <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'sizeColorLotus'}">
+                        <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'monthEndLotus'}">
+                        <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'onhandMTT'}">
+                       <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'reportEndDateLotus'}">
                         <jsp:include page="subreports/subReportEndDateLotus.jsp" /> 
-                     <%} %>
-                           
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'lotus'}">
+                        <jsp:include page="subreports/subReportSalesLotus.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'BigC'}">
+                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
+                    </c:if>
+                    <c:if test="${summaryForm.page == 'Tops'}">
+                        <jsp:include page="subreports/subReportSalesTops.jsp" /> 
+                    </c:if>
+                     <c:if test="${summaryForm.page == 'king'}">
+                        <jsp:include page="subreports/subReportSalesKing.jsp" /> 
+                    </c:if>
+                    <!-- ****** RESULT ***************************************************************** -->
+                    
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					
 					<!-- hidden field -->

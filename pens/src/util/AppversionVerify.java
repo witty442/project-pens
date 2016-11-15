@@ -584,7 +584,7 @@ public class AppversionVerify {
             e.printStackTrace();
         }
         return appVersion;
-	 }
+	}
 	
 	private  static String getLocalPathSalesApp(){
 		String path = "D:/SalesApp/";

@@ -40,7 +40,7 @@ public class DBCPConnectionProvider {
 
 			try {
 				ds = BasicDataSourceFactory.createDataSource(dbcpProperties);
-				logger.debug("DBCPConnectionProvider:"+ds);
+				//logger.debug("DBCPConnectionProvider:"+ds);
 				init = true;
 			} catch (Exception err) {
 				throw err;

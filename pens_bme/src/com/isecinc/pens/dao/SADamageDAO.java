@@ -129,10 +129,54 @@ public class SADamageDAO {
 			Connection conn = null;
 			SADamageBean bean = null;
 			try {
+				sql.append("\n SELECT  ACCOUNT_NUMBER ,TRX_NUMBER ,PARTY_NAME, AMOUNT_DUE_ORIGINAL ");
+				sql.append("\n   FROM  SA_AR_DAMAGE b  ");
+				sql.append("\n   WHERE b.TRX_NUMBER = '"+invRefwal+"' ");
+									
+				logger.debug("sql:"+sql);
+                conn = DBConnection.getInstance().getConnection();
+				ps = conn.prepareStatement(sql.toString());
+				rst = ps.executeQuery();
+				
+				if(rst.next()) {
+					bean = new SADamageBean();
+					bean.setInvRefwal(invRefwal);
+					bean.setOracleRefId(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
+					bean.setOracleRefName(Utils.isNull(rst.getString("PARTY_NAME")));
+					bean.setTotalDamage(Utils.decimalFormat(rst.getDouble("AMOUNT_DUE_ORIGINAL"),Utils.format_current_2_disgit));
+					
+					//Get EMP
+					SAEmpBean em = getEmpByOracleRefId(conn,bean.getOracleRefId());
+					if(em != null){
+						bean.setEmpId(em.getEmpId());
+						bean.setName(em.getName());
+						bean.setSurname(em.getSurName());
+						bean.setBranch(em.getBranch());
+						bean.setGroupStore(em.getGroupStore());
+					}
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+		return bean;
+	}
+	 
+	 public static SADamageBean getInvRefwalFromSaleAnalysis_OLD(String invRefwal) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			SADamageBean bean = null;
+			try {
 				sql.append("\nSELECT  a.customer_code  , a.customer_desc ");
 				sql.append("\n, (( sum(invoiced_amt) - sum(discount_amt) ) * 1.07 ) as total_damage ");
 				sql.append("\n   FROM  XXPENS_BI_MST_CUSTOMER a,XXPENS_BI_SALES_ANALYSIS b ");
-			
 				sql.append("\n   WHERE b.invoice_no = '"+invRefwal+"' ");
 				sql.append("\n   AND   b.customer_id = a.customer_id ");
 				sql.append("\n   group by a.customer_code  , a.customer_desc ");
@@ -158,8 +202,8 @@ public class SADamageDAO {
 						bean.setBranch(em.getBranch());
 						bean.setGroupStore(em.getGroupStore());
 					}
-				}//while
-
+				}else{
+				}
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -169,8 +213,8 @@ public class SADamageDAO {
 					conn.close();
 				} catch (Exception e) {}
 			}
-			return bean;
-		}
+		return bean;
+	}
 	 
 	 public static SAEmpBean getEmpByOracleRefId(Connection conn,String oracleRefId) throws Exception {
 			PreparedStatement ps = null;
@@ -181,9 +225,8 @@ public class SADamageDAO {
 				sql.append("\nSELECT  emp_id,name,surname,branch,group_store ");
 				sql.append("\n FROM  SA_EMPLOYEE ");
 				sql.append("\n WHERE oracle_ref_id = '"+oracleRefId+"' ");
-				
 				logger.debug("sql:"+sql);
-         
+				
 				ps = conn.prepareStatement(sql.toString());
 				rst = ps.executeQuery();
 				
@@ -206,8 +249,7 @@ public class SADamageDAO {
 				} catch (Exception e) {}
 			}
 			return bean;
-		}
-	 
+	 }
 	 
 	 public static String getInvRefwalInDamageHead(String invRefwal) throws Exception {
 			PreparedStatement ps = null;

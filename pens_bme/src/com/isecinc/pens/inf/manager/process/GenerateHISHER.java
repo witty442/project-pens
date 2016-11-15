@@ -20,6 +20,7 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.isecinc.pens.inf.manager.external.process.ControlInterfaceICC;
 
 public class GenerateHISHER extends InterfaceUtils{
 	private static Logger logger = Logger.getLogger("PENS");
@@ -27,6 +28,7 @@ public class GenerateHISHER extends InterfaceUtils{
 	public final static String PARAM_OUTPUT_PATH = "OUTPUT_PATH";
 	public final static String PARAM_CUST_GROUP = "CUST_GROUP";
 	public final static String PARAM_TRANS_DATE = "TRANS_DATE";//Budish Date
+	public final static String PARAM_PRODUCT_TYPE = "PRODUCT_TYPE";
 	
 	public static MonitorItemBean runProcess(User user,MonitorItemBean monitorItemBean,Map<String, String> batchParamMap) throws Exception{
 		EnvProperties env = EnvProperties.getInstance();
@@ -51,20 +53,25 @@ public class GenerateHISHER extends InterfaceUtils{
 		StringBuffer outputLine = new StringBuffer("");
 		StringBuffer outputFile = new StringBuffer("");
 		try{
+			//Prepare parameter
+			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String productType = Utils.isNull(batchParamMap.get(PARAM_PRODUCT_TYPE));
+			
+			//Update Transtion Type by product;
+			ControlInterfaceICC.updateTransInterfaceICC(productType);
+			
 			//Prepare FTP Manager **/
 			/** Check Status FTP Server Alive  if Cant Connection Throw Exception*/
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.icc.ip.server"), env.getProperty("ftp.icc.username"), env.getProperty("ftp.icc.password"));
 			ftpManager.canConnectFTPServer();
 			
-			//Prepare parameter
-			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			
+		
 			//Create Connection
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
 			//Get Config Map ALL
-			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK");
+			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK",productType);
 			sql.append("\n SELECT A.barcode, A.group_code ,A.product_code ");
 			sql.append("\n , NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
 			sql.append("\n FROM( ");
@@ -78,6 +85,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+productType+"'");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
 			sql.append("\n 		and  ( (O.exported <> 'Y' and O.exported <> 'G') or O.exported is null)	 ");
@@ -96,6 +104,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		ON P.group_code = I.group_code ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+productType+"'");
 			sql.append("\n 		WHERE 1=1 ");
 			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
 			sql.append("\n 		and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");

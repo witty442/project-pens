@@ -21,8 +21,9 @@ body {
 }
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+
 <script type="text/javascript">
 <!--
 function MM_swapImgRestore() { //v3.0
@@ -59,6 +60,23 @@ function popupChangePassword(path){
 	window.open(url,"",
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=260px,status=no,left="+ 50 + ",top=" + 0);
 }
+
+function login(path){
+	document.getElementsByName('screenWidth')[0].value = screen.width;
+	
+    if(Trim(document.getElementsByName('userName')[0].value)==''){
+        document.getElementsByName('userName')[0].focus();
+        return false;
+    }
+    if(Trim(document.getElementsByName('password')[0].value)==''){
+    	document.getElementsByName('password')[0].focus();
+        return false;
+    }
+    document.loginForm.action=path+"/login.do?do=login";
+    document.loginForm.submit();
+    return true;
+}
+
 </script>
 </head>
 <body onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_login2.png','${pageContext.request.contextPath}/images2/button_forgotpwd2.png')" topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0">
@@ -125,6 +143,7 @@ function popupChangePassword(path){
 		            </tr>
 		        </table>
 		        <input type="hidden" id = "screenWidth" name="screenWidth" />
+		        <input type="hidden" id = "screenHeight" name="screenHeight" />
 		        </html:form>
 			</td>
         	<td width="523">&nbsp;</td>
@@ -146,5 +165,6 @@ function popupChangePassword(path){
     </table></td>
   </tr>
 </table>
+
 </body>
 </html>

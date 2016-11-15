@@ -201,7 +201,9 @@ public class SAEmpAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		Connection conn = null;
 		StringBuffer h = new StringBuffer("");
-		int colSpan = 21;
+		int colSpan = 23;
+		double totalRewardBme = 0;
+		double totalRewardWacoal = 0;
 		double totalDamage = 0;
 		double totalPayment = 0;
 		double totalDelayPayment = 0;
@@ -209,7 +211,7 @@ public class SAEmpAction extends I_Action {
 			SAEmpBean bean = aForm.getBean();
 			
 			 if( !Utils.isNull(bean.getDispDamage()).equals("")){
-				 colSpan =24;
+				 colSpan =26;
 			 }
 			
 			if(bean != null){
@@ -240,6 +242,8 @@ public class SAEmpAction extends I_Action {
 						h.append("<td>Region</th><!-- 7 --> \n");
 						h.append("<td>Group Store</th><!-- 8 --> \n");
 						h.append("<td>Branch</th><!-- 9 --> \n");
+						h.append("<td>ยอดสะสม ค่าเฝ้าตู้ Bme</td><!-- 9 --> \n");
+						h.append("<td>ยอดสะสม ค่าเฝ้าตู้ Wacoal</td><!-- 9 --> \n");
 						if( !Utils.isNull(bean.getDispDamage()).equals("")){
 						 h.append("<td>ค่าความเสียหาย </th><!-- 9 --> \n");
 						 h.append("<td>ยอดชำระแล้ว </th><!-- 9 --> \n");
@@ -270,15 +274,18 @@ public class SAEmpAction extends I_Action {
 							h.append("<td>"+item.getRegionDesc()+"</th><!-- 7 --> \n");
 							h.append("<td>"+item.getGroupStore()+"</th><!-- 8 --> \n");
 							h.append("<td>"+item.getBranch()+"</th><!-- 9 --> \n");
-							
+							h.append("<td class='currency'>"+item.getTotalRewardBme()+" </th><!-- 9 --> \n");
+							h.append("<td class='currency'>"+item.getTotalRewardWacoal()+" </th><!-- 9 --> \n");
 							if( !Utils.isNull(bean.getDispDamage()).equals("")){
+								totalRewardBme += Utils.convertStrToDouble(item.getTotalRewardBme());
+								totalRewardWacoal += Utils.convertStrToDouble(item.getTotalRewardWacoal());
 								totalDamage += Utils.convertStrToDouble(item.getTotalDamage());
 								totalPayment += Utils.convertStrToDouble(item.getTotalPayment());
 								totalDelayPayment += Utils.convertStrToDouble(item.getTotalDelayPayment());
 								
-								h.append("<td class='num'>"+item.getTotalDamage()+" </th><!-- 9 --> \n");
-							    h.append("<td class='num'>"+item.getTotalPayment()+"</th><!-- 9 --> \n");
-							    h.append("<td class='num'>"+item.getTotalDelayPayment()+" </th><!-- 9 --> \n");
+								h.append("<td class='currency'>"+item.getTotalDamage()+" </th><!-- 9 --> \n");
+							    h.append("<td class='currency'>"+item.getTotalPayment()+"</th><!-- 9 --> \n");
+							    h.append("<td class='currency'>"+item.getTotalDelayPayment()+" </th><!-- 9 --> \n");
 							}
 							h.append("<td class='text'>"+item.getMobile()+"</th><!-- 10 --> \n");
 							h.append("<td>"+item.getEmail()+"</th><!-- 11 --> \n");
@@ -305,12 +312,13 @@ public class SAEmpAction extends I_Action {
 					h.append("<td></th><!-- 6 --> \n");
 					h.append("<td></th><!-- 7 --> \n");
 					h.append("<td></th><!-- 8 --> \n");
-					h.append("<td></th><!-- 9 --> \n");
-					
+					h.append("<td><b>รวม</b></th><!-- 9 --> \n");
 					if( !Utils.isNull(bean.getDispDamage()).equals("")){
-						h.append("<td class='num'>"+totalDamage+" </th><!-- 9 --> \n");
-					    h.append("<td class='num'>"+totalPayment+"</th><!-- 9 --> \n");
-					    h.append("<td class='num'>"+totalDelayPayment+" </th><!-- 9 --> \n");
+						h.append("<td class='currency_bold'>"+totalRewardBme+" </th><!-- 9 --> \n");
+						h.append("<td class='currency_bold'>"+totalRewardWacoal+" </th><!-- 9 --> \n");
+						h.append("<td class='currency_bold'>"+totalDamage+" </th><!-- 9 --> \n");
+					    h.append("<td class='currency_bold'>"+totalPayment+"</th><!-- 9 --> \n");
+					    h.append("<td class='currency_bold'>"+totalDelayPayment+" </th><!-- 9 --> \n");
 					}
 					h.append("<td class='text'></th><!-- 10 --> \n");
 					h.append("<td></th><!-- 11 --> \n");

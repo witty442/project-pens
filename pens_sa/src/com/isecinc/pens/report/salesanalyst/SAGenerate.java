@@ -771,7 +771,7 @@ public class SAGenerate {
 							
 						columnCount++;
 						String debug = isDebug?"CSum:":"";
-						summaryRowHtml2.append("<td class='summary' align='right'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),summaryValue)+"</td> \n");    
+						summaryRowHtml2.append("<td class='summary' align='right'><b>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),summaryValue)+"</b></td> \n");    
 						   
 					}//for2
 				}//for1
@@ -817,14 +817,14 @@ public class SAGenerate {
 			
 			// Summary All case SumRow == Show not Show
 			if(hideRowEnable == false ){
-				 summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'>ยอดรวม  "+totalRecord+" รายการ</td>  \n");
+				 summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'><b>ยอดรวม  "+totalRecord+" รายการ</b></td>  \n");
 				 summaryRowHtml.append(summaryRowHtml2); 
 			}else{
 				if(summaryAll.compareTo(bigZero)!=0 ){
-				    summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'>ยอดรวม  "+totalRecord+" รายการ</td>  \n");
+				    summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'><b>ยอดรวม  "+totalRecord+" รายการ</b></td>  \n");
 				    summaryRowHtml.append(summaryRowHtml2);
 				}else{
-					summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'>ยอดรวม  0  รายการ</td>  \n");
+					summaryRowHtml.append(" <td class='summary' colspan='"+cSpan+"' align='right'><b>ยอดรวม  0  รายการ</b></td>  \n");
 					summaryRowHtml.append(summaryRowHtml2);
 				}
 			}
@@ -885,7 +885,7 @@ public class SAGenerate {
 					
 					columnCount++;
 					String debug = isDebug?"TSum:":"";
-					htmlStr.append("<td class='summary' align='right'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</td> \n");
+					htmlStr.append("<td class='summary' align='right'><b>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</b></td> \n");
 				}//for
 			}
 			htmlStr.append("</tr> </tfoot> \n");

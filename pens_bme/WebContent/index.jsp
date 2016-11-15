@@ -4,7 +4,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <html>
 <head>
@@ -14,12 +13,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css">
 <style type="text/css">
-<!--
-body {
-	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
-	background-repeat: repeat;
-}
--->
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/login_temp.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>

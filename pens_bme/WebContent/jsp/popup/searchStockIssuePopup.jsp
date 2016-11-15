@@ -100,11 +100,11 @@ function selectOneRadio(){
 	</tr>
 </table>
 <!-- RESULT -->
-<display:table width="100%" id="item" name="requestScope.JOB_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchStockIssuePopupAction.do?do=search" sort="list" pagesize="20" class="resultDisp">	
+<display:table style="width:100%;" id="item" name="requestScope.JOB_LIST" 
+    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     	
     	
-    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
+    <display:column style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
 
 		<input type ="radio" name="chRadio" />
 		<input type ="hidden" name="code" id="code" value="<bean:write name="item" property="code"/>" />
@@ -119,11 +119,11 @@ function selectOneRadio(){
 		<input type ="hidden" name="totalQty" id="totalQty" value="<bean:write name="item" property="totalQty"/>" />
 	 </display:column>
 	 
-    <display:column align="left" title="คลัง" property="wareHouse"  nowrap="false" sortable="false" class="code"/>						    
-    <display:column align="left" title="IssueReqNo" property="code"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="custGroup" property="custGroup" nowrap="false" sortable="false" class="desc"/>
-    <display:column align="left" title="Store Code" property="storeCode"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="Store Name" property="storeName" nowrap="false" sortable="false" class="desc"/>
+    <display:column title="คลัง" property="wareHouse" sortable="false" class="code"/>						    
+    <display:column title="IssueReqNo" property="code"   sortable="false" class="code"/>
+    <display:column title="custGroup" property="custGroup"  sortable="false" class="desc"/>
+    <display:column title="Store Code" property="storeCode" sortable="false" class="code"/>
+    <display:column title="Store Name" property="storeName"  sortable="false" class="desc"/>
 							
 </display:table>	
 <!-- RESULT -->

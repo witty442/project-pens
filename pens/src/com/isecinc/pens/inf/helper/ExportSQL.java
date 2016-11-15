@@ -28,12 +28,16 @@ public class ExportSQL {
 						" WHERE  M.user_id = "+userBean.getId() +"\n"+
 						" AND   (M.reference_id is null or M.reference_id =0) \n"+
 						" AND   A.PURPOSE IS NOT NULL \n"+
-						//OLD CODE
-						" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+
 					    //New Version in 072559
-						//" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') OR (M.IS_CHANGE='Y') \n"+
+						" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+
 						" GROUP BY M.CUSTOMER_ID ";
-
+							
+			}else if(tableBean.getTableName().equalsIgnoreCase("M_CUSTOMER_LOCATION")){
+				str = " SELECT M.CUSTOMER_ID ,M.CODE AS CUSTOMER_NUMBER ,M.NAME AS CUSTOMER_NAME ,IMAGE_FILE_NAME,LOCATION \n"+
+						"FROM m_customer M  \n"+
+						"WHERE  M.user_id = "+userBean.getId() +"\n"+
+						"AND M.IS_CHANGE='Y' \n";
+						
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_order") ){
 				str ="	select 	order_id,			\n"+
 					"	'H'	AS	RECORD_TYPE	,	\n"+

@@ -425,8 +425,8 @@ public class DBBackUpManager {
 	private  String getFtpPath(HttpServletRequest request){
 		String path = "/DB_Backup/"; //PROD Default
 		try{
-			logger.debug("contextPath:"+request.getLocalAddr());
-	        if("/penstest".equalsIgnoreCase(request.getContextPath())){
+			//logger.debug("contextPath:"+request.getLocalAddr());
+	        /*if("/penstest".equalsIgnoreCase(request.getContextPath())){
 	        	//UAT
 				path = "/DB_Backup/";
 	        }else if("127.0.0.1".equalsIgnoreCase(request.getLocalAddr())){
@@ -435,7 +435,7 @@ public class DBBackUpManager {
 			}else{
 				//PROD
 				path = "/DB_Backup/";
-			}
+			}*/
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

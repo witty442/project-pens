@@ -93,14 +93,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["ชื่อหน่วย "+$P{p_fromDesc}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="25" width="149" height="20"/>
+				<reportElement x="0" y="25" width="136" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["วันที่ " + $P{p_requestDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="312" y="45" width="242" height="20"/>
+				<reportElement x="334" y="45" width="220" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14" isBold="true"/>
 				</textElement>
@@ -121,7 +121,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["หน่วยปลายทาง"+" " + $P{p_toCode}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="176" y="25" width="136" height="40"/>
+				<reportElement x="136" y="25" width="198" height="40"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="26" isBold="true"/>
 				</textElement>

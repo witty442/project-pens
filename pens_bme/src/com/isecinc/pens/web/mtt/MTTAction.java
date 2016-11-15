@@ -104,7 +104,7 @@ public class MTTAction extends I_Action {
 				aForm.setResultsSearch(null);
 				MTTBean ad = new MTTBean();
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
-				
+				request.getSession().setAttribute("summary",null);
 				aForm.setBean(ad);
 			}
 		} catch (Exception e) {
@@ -121,9 +121,13 @@ public class MTTAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			MTTBean b = aForm.getBean();
 			aForm.setBean(MTTBeanDAO.searchHead(aForm.getBean()));
 			aForm.setResultsSearch(aForm.getBean().getItems());
+			
+			//set summary
+			MTTBean summary = new MTTBean();
+			summary.setTotalQty(aForm.getBean().getTotalQty());
+			request.getSession().setAttribute("summary", summary);
 			
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -210,7 +214,6 @@ public class MTTAction extends I_Action {
 
 			if(form.getResultsSearch() != null){
 			    List<MTTBean> list = (List<MTTBean>)form.getResultsSearch();
-			    
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
 				  h.append("<td>No.</td> \n");
@@ -229,7 +232,6 @@ public class MTTAction extends I_Action {
 				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
 				  h.append("<td>Remark</td> \n");
 				h.append("</tr> \n");
-				
 				for(int i=0;i<list.size();i++){
 					MTTBean s = (MTTBean)list.get(i);
 					h.append("<tr> \n");
@@ -293,7 +295,7 @@ public class MTTAction extends I_Action {
             String docNo = Utils.isNull(request.getParameter("docNo"));
             String mode = Utils.isNull(request.getParameter("mode"));
             
-			if( !"".equals(docNo) && !"".equals(docNo)){
+			if( !"".equals(docNo)){
 				logger.debug("prepare edit docNo:"+docNo);
 				MTTBean c = new MTTBean();
 				c.setDocNo(docNo);

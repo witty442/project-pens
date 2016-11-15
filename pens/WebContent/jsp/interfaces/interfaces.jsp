@@ -34,7 +34,7 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Pragma" content="no-cache" /> 
-<meta http-equiv="Expires" content="0" />
+
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -48,7 +48,7 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 
 <!-- Calendar -->
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle2.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -72,6 +72,16 @@ body {
  height: 40px;
  background-color: green;
  width: 10%;
+}
+.msgError {
+	font-size: 30px;
+	font-weight: bold;
+	color: #EDBB99;
+}
+.msgSuccess {
+	font-size: 30px;
+	font-weight: bold;
+	color: #27AE60;
 }
 </style>
 
@@ -363,8 +373,10 @@ body {
 								</td>
 							</tr>
 						</table>
-
-						 
+                        <br/>
+						<div id="dispMsg" style="" align="center">
+						  ..
+						</div> 
 					   <!-- RESULT -->
 					   <c:if test="${interfacesForm.results != null}">
 							<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>
@@ -395,12 +407,19 @@ body {
 								</tr>
 								<c:forEach var="results" items="${interfacesForm.results}" varStatus="rows">
 								
-								<c:choose>
+							 	<c:choose>
 									<c:when test="${rows.index %2 == 0}">
 										<c:set var="tabclass" value="lineO"/>
 									</c:when>
 									<c:otherwise>
 										<c:set var="tabclass" value="lineE"/>
+									</c:otherwise>
+								</c:choose> 
+								
+								<c:choose>
+									<c:when test="${results.status == 1}"></c:when>
+									<c:otherwise>
+										<c:set var="tabclass" value="lineError2"/>
 									</c:otherwise>
 								</c:choose>
 								
@@ -408,9 +427,14 @@ body {
 								       
 						                <td> <c:out value='${rows.index+1}'/></td>
 						                <td> ${results.transactionId}</td>
-										<td> ${results.type}</td>
+										<td> 
+										 ${results.type}
+										 <input type="hidden" name="transTypeText" value="${results.type}"/>
+										</td>
 										<td>
-										<c:choose>
+										  <input type="hidden" name="transactionTypeText" value="${results.transactionType}"/>
+										   <c:choose>
+										 
 											<c:when test="${results.transactionType == 'MASTER'}">
 												ข้อมูลพื้นฐาน
 											</c:when>
@@ -428,7 +452,8 @@ body {
 										<td> ${results.createUser}</td>
 										
 										<td> 
-										  <c:choose>
+										   <input type="hidden" name="statusText" value="${results.status}"/>
+										   <c:choose>
 											<c:when test="${results.status == 1}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:when>
@@ -478,6 +503,42 @@ body {
 						    <%} %>			    
 						</div>
 					
+					 <c:if test="${interfacesForm.results != null}">
+					<script>
+					dispMsg();
+					 function dispMsg(){
+						 if(document.getElementsByName("transTypeText")[0].value == "EXPORT"){
+							 if(document.getElementsByName("statusText")[0].value == "-1"
+							   || document.getElementsByName("statusText")[1].value == "-1"){
+								 
+								 document.getElementById("dispMsg").innerHTML = "ไม่สามารถ Export ข้อมูลบางส่วน ได้";
+								 document.getElementById("dispMsg").className = "msgError";
+							 }else{
+								 document.getElementById("dispMsg").innerHTML = "Export เรียบร้อยแล้ว"; 
+								 document.getElementById("dispMsg").className = "msgSuccess";
+							 }
+						 }else{
+							 if(document.getElementsByName("statusText")[0].value == "-1"
+							 || document.getElementsByName("statusText")[1].value == "-1"
+							 || document.getElementsByName("statusText")[2].value == "-1"){ 
+								 
+							    if(document.getElementsByName("statusText")[1].value == "-1"){
+							       document.getElementById("dispMsg").innerHTML = "ไม่สามารถ Import ข้อมูล Masterได้  ";
+								   document.getElementById("dispMsg").className = "msgError";
+							    }else{
+								   document.getElementById("dispMsg").innerHTML = "ไม่สามารถ Import ข้อมูลบางส่วน ได้";
+								   document.getElementById("dispMsg").className = "msgError";
+							    }
+							 }else{
+								 document.getElementById("dispMsg").innerHTML = "Import เรียบร้อยแล้ว"; 
+								 document.getElementById("dispMsg").className = "msgSuccess";
+							 }
+						 }
+						 
+					 }
+					
+					</script>
+					</c:if>
 						<br><br>
 						<!-- BODY -->
 						<div align="center">

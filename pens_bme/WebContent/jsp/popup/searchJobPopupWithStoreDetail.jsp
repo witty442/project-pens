@@ -90,10 +90,10 @@ function selectOneRadio(){
 	</tr>
 </table>
 <!-- RESULT -->
-<display:table width="100%" id="item" name="requestScope.JOB_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchJobPopupAction.do?do=search3" sort="list" pagesize="20" class="resultDisp">	
+<display:table style="width:100%;" id="item" name="requestScope.JOB_LIST" 
+    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     	
-    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
+    <display:column style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
 
 		<input type ="radio" name="chRadio" />
 		<input type ="hidden" name="code" id="code" value="<bean:write name="item" property="code"/>" />
@@ -106,12 +106,12 @@ function selectOneRadio(){
 		<input type ="hidden" name="wareHouseDesc" id="wareHouseDesc" value="<bean:write name="item" property="wareHouseDesc"/>" />
 	 </display:column>
     											    
-    <display:column align="left" title="รหัส" property="code"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="รายละเอียด" property="desc" nowrap="false" sortable="false" class="desc"/>
-    <display:column align="left" title="Store Code" property="storeCode"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="Store No" property="storeNo" nowrap="false" sortable="false" class="desc"/>
-    <display:column align="left" title="Sub Inv" property="subInv"  nowrap="false" sortable="false" class="code"/>
-	<display:column align="left" title="คลัง" property="wareHouse"  nowrap="false" sortable="false" class="code"/>
+    <display:column title="รหัส" property="code"   sortable="false" class="code"/>
+    <display:column title="รายละเอียด" property="desc" sortable="false" class="desc"/>
+    <display:column title="Store Code" property="storeCode"  sortable="false" class="code"/>
+    <display:column title="Store No" property="storeNo" sortable="false" class="desc"/>
+    <display:column title="Sub Inv" property="subInv"   sortable="false" class="code"/>
+	<display:column title="คลัง" property="wareHouse"  sortable="false" class="code"/>
 				
 </display:table>	
 <!-- RESULT -->

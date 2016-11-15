@@ -13,7 +13,7 @@
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils" %>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 <%
-	if(request.getParameter("action") != null){
+if(request.getParameter("action") != null){
     SAInitial.getInstance().initSession(request);
  }
 
@@ -30,6 +30,7 @@ String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 
 	screenWidth = (String)session.getAttribute("screenWidth");
 }
+System.out.println("screenWidth:"+screenWidth);
 %>
 <html>
 <head>
@@ -39,16 +40,15 @@ if(session.getAttribute("screenWidth") != null){
 <!-- <meta http-equiv="cache-control" content="no-cache" /> -->
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" /> 
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" /> --%>
 <style type="text/css">
-<!--
+
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	/**background-repeat: repeat;**/
 }
 .style1 {color: #004a80}
--->
 select#summaryType{width:150px;}
 fieldset#condition-frame{height:186px}
 fieldset#display-frame{height:186px}
@@ -78,7 +78,7 @@ fieldset legend {
 	text-decoration: none;
 }
 
-#scroll {
+ #scroll {
 <%if(!"0".equals(screenWidth)){%>
     width:<%=screenWidth%>px;
     background:#A3CBE0;
@@ -89,9 +89,7 @@ fieldset legend {
 <%}else{%>
  
 <%}%>
-
-}
-
+ 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -105,6 +103,7 @@ fieldset legend {
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
 
 <script type="text/javascript" language="javascript">
 
@@ -829,6 +828,92 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	 }
  }
 
+ 
+ 
+	//String headerHtml  = SAGenerate.genHeaderReportExportExcel( user,formBean.getSalesBean(),columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
+ function genHeadTable(){
+	 var columnCount = document.getElementsByName("columnCount")[0].value;
+	 
+	 var cond1 = document.getElementsByName("salesBean.condName1")[0];
+     var cond2 = document.getElementsByName("salesBean.condName2")[0];
+     var cond3 = document.getElementsByName("salesBean.condName3")[0];
+     var cond4 = document.getElementsByName("salesBean.condName4")[0];
+
+     var condDisp1 = cond1.options[cond1.selectedIndex].text;
+     var condDisp2 = cond1.options[cond2.selectedIndex].text;
+     var condDisp3 = cond1.options[cond3.selectedIndex].text;
+     var condDisp4 = cond1.options[cond4.selectedIndex].text;
+	    
+     var maxOrderedDate = document.getElementById('maxOrderedDate').value;
+     var maxOrderedTime = document.getElementById('maxOrderedTime').value;
+   
+     //alert("xx"+maxOrderedDate);
+ 	 var condDisp5 = "ข้อมูล ณ วันที่  "+maxOrderedDate+" เวลา "+maxOrderedTime;
+ 	
+     var headerTable = "";
+	 var param   = "columnCount="+columnCount;
+	     param  += "&condDisp1="+condDisp1;
+	     param  += "&condDisp2="+condDisp2;
+	     param  += "&condDisp3="+condDisp3;
+	     param  += "&condDisp4="+condDisp4;
+	     param  += "&condDisp5="+condDisp5
+	     
+	 $(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/genHeaderExcelAjax.jsp",
+				data : param ,
+				async: false,
+				cache: true,
+				success: function(getData){
+					headerTable = jQuery.trim(getData);
+				}
+			}).responseText;
+		});
+	 
+	// alert(headerTable);
+	 return headerTable;
+ }
+ 
+ function fnExcelReport(){
+	 var style ="<style>"
+	         +".summary{"
+		     +"   font-weight: bold;"
+		     +" } ";
+		     +"</style> ";
+	 var headerTable = genHeadTable();
+	// alert(headerTable);
+	 
+     var tab_text= headerTable+"\n <table border='2px'><tr bgcolor=''>";
+     var textRange; var j=0;
+     tab = document.getElementById('sort-table'); // id of table
+
+     for(j = 0 ; j < tab.rows.length ; j++){     
+         tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+         //tab_text=tab_text+"</tr>";
+     }
+
+     tab_text=tab_text+"</table>";
+     tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+     tab_text= tab_text.replace(/<img[^>]*>/gi,""); // remove if u want images in your table
+     tab_text= tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+     var ua = window.navigator.userAgent;
+     var msie = ua.indexOf("MSIE "); 
+
+     if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+     {
+         txtArea1.document.open("txt/html","replace");
+         txtArea1.document.write(tab_text);
+         txtArea1.document.close();
+         txtArea1.focus(); 
+         sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
+     }  
+     else                 //other browser not tested on IE 11
+         sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
+
+     return (sa);
+ }
+ 
 </script>
 
 
@@ -858,6 +943,9 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 				<jsp:param name="function" value="SalesAnalysis"/>
 				<jsp:param name="code" value=""/>
 			</jsp:include>
+			<!-- For Export To Excel display -->
+			<iframe id="txtArea1" style="display:none"></iframe>
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -873,15 +961,12 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 						<html:hidden property="salesBean.returnString"/>
 						<input type="hidden" name="roleTabText" id="roleTabText"/>
 			            <jsp:include page="../error.jsp"/>	
-			             <fieldset>
-			               
+			               <fieldset>
 			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
 			                  <tr><td>
                                <%out.println(Utils.isNull(session.getAttribute("USER_ROLE_INFO"))); %>
                               </td></tr>
-                             
                             </table>
-                            </div>
                            </fieldset>
                            
                            <fieldset>
@@ -940,7 +1025,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
                                         </td>
                                        
                                        <input type="hidden" name="maxOrderedDate" value=<%=(String)session.getAttribute("maxOrderedDate")%> id="maxOrderedDate"/>
-                                         <input type="hidden" name="maxOrderedTime" value=<%=(String)session.getAttribute("maxOrderedTime")%> id="maxOrderedTime"/>
+                                       <input type="hidden" name="maxOrderedTime" value=<%=(String)session.getAttribute("maxOrderedTime")%> id="maxOrderedTime"/>
 									</tr>
 										</table>
 									  </td>
@@ -1213,11 +1298,14 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									<td align="right">
 									     <input type="button" value=" Search " class="newPosBtnLong" style="width: 120px;"
 										     onClick="javascript:search('${pageContext.request.contextPath}','admin')" />
-										 <input type="button" value=" Export " class="newPosBtnLong" style="width: 120px;" 
-										     onClick="javascript:exportData('${pageContext.request.contextPath}','admin')" />
+										<%--  <input type="button" value=" Export " class="newPosBtnLong" style="width: 120px;" 
+										     onClick="javascript:exportData('${pageContext.request.contextPath}','admin')" /> --%>
+										 <button type="button" id="btnExport" onclick="fnExcelReport();" class="newPosBtnLong" style="width:120px;" > Export</button>  
 										 <input type="button" value=" Clear " class="newPosBtnLong" style="width: 120px;" 
 										     onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')" />
 										     
+										 
+										  
 										  <a href="javascript:getSQL('${pageContext.request.contextPath}','admin')"  > ...?</a>
 										<%--  <input type="button" value=" GET SQL " class="newPosBtn" style="width: 120px;" 
 										     onClick="javascript:getSQL('${pageContext.request.contextPath}','admin')" />
@@ -1227,7 +1315,6 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 								</tr>
 							</table>
 							<!-- BUTTON -->
-							</br>
 							
 							<!-- RESULT -->
 							<script>

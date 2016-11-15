@@ -1144,6 +1144,8 @@ public class ConfPickStockDAO extends PickConstants{
 		String rowMat = "";
 		int r = 0;
 		int sumInt = 0;
+		int sub_start = 6;
+		int sub_end = 10;
 		logger.debug("***getMatDetail4Report*** RowMax["+rowMax+"]");
 		try {
 			//Case Edit
@@ -1167,17 +1169,19 @@ public class ConfPickStockDAO extends PickConstants{
 				count++;
 				if(issueQty >0 && countGroup >= rowMax){
 					logger.debug("Case 1 countGroup >= rowMax");
+					sub_end = Utils.isNull(rst.getString("material_master")).length();
+					
 					if(count < rowMax){
 						logger.debug("count["+count+"]["+rst.getString("material_master")+"] mat++");
 						mat = rst.getString("material_master");
-						mat = mat.substring(6,10);
+						mat = mat.substring(sub_start,sub_end);
 						if(rst.getInt("issue_qty") > 0)
 						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 					
 					}else{
 						logger.debug("count["+count+"] ["+rst.getString("material_master")+"] mat++");
 						mat = rst.getString("material_master");
-						mat = mat.substring(6,10);
+						mat = mat.substring(sub_start,sub_end);
 						if(rst.getInt("issue_qty") > 0)
 						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 						
@@ -1200,7 +1204,7 @@ public class ConfPickStockDAO extends PickConstants{
 				}else if(issueQty > 0 ){
 					logger.debug("Case 2 countGroup < rowMax ["+rst.getString("material_master")+"]");
 					mat = rst.getString("material_master");
-					mat = mat.substring(6,10);
+					mat = mat.substring(sub_start,sub_end);
 					if(rst.getInt("issue_qty") >0)
 					  rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 					
@@ -1254,6 +1258,8 @@ public class ConfPickStockDAO extends PickConstants{
 		String rowMat = "";
 		int r = 0;
 		int sumInt = 0;
+		int start_sub = 6;
+		int end_sub = 10;
 		logger.debug("***getMatDetail4Report*** RowMax["+rowMax+"]");
 		try {
 			//Case Edit
@@ -1275,19 +1281,20 @@ public class ConfPickStockDAO extends PickConstants{
 			rst = ps.executeQuery();
 			while(rst.next()) {
 				count++;
+				end_sub = Utils.isNull(rst.getString("material_master")).length();
 				if(issueQty >0 && countGroup >= rowMax){
 					logger.debug("Case 1 countGroup >= rowMax");
 					if(count < rowMax){
 						logger.debug("count["+count+"]["+rst.getString("material_master")+"] mat++");
 						mat = rst.getString("material_master");
-						mat = mat.substring(6,10);
+						mat = mat.substring(start_sub,end_sub);
 						if(rst.getInt("issue_qty") > 0)
 						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 					
 					}else{
 						logger.debug("count["+count+"] ["+rst.getString("material_master")+"] mat++");
 						mat = rst.getString("material_master");
-						mat = mat.substring(6,10);
+						mat = mat.substring(start_sub,end_sub);
 						if(rst.getInt("issue_qty") > 0)
 						   rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 						
@@ -1310,7 +1317,7 @@ public class ConfPickStockDAO extends PickConstants{
 				}else if(issueQty > 0 ){
 					logger.debug("Case 2 countGroup < rowMax ["+rst.getString("material_master")+"]");
 					mat = rst.getString("material_master");
-					mat = mat.substring(6,10);
+					mat = mat.substring(start_sub,end_sub);
 					if(rst.getInt("issue_qty") >0)
 					  rowMat += mat+" "+rst.getInt("issue_qty")+" / ";
 					

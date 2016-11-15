@@ -585,7 +585,9 @@ public class ImportDAO {
 				}else if(storeType.equalsIgnoreCase("MTT")){
 					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
-					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%' ) \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%' ) \n");
+					 
 				}
 			}
 			

@@ -1,6 +1,18 @@
+
+function convetTxtObjToFloat(obj){
+		 // alert(obj.value);
+	 try{
+	  if(obj.value==''){
+		  return 0;
+	  }
+	  return parseFloat(obj.value.replace(/\,/g,''));
+	 }catch(err) {
+		 alert(err.message);
+	 }
+  }
+
 function isNum(obj){
   if(obj.value != ""){
-	var newNum = parseFloat(obj.value);
 	if(isNaN(obj.value)){
 		alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
 		obj.value = "";

@@ -1,3 +1,4 @@
+
 package com.isecinc.pens.dao;
 
 import java.sql.Connection;
@@ -5,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -528,16 +530,6 @@ public class GeneralDAO {
 			try {
 
 				sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
-				sql.append("\n  from PENSBME_ONHAND_BME M   ");
-				sql.append("\n  where 1=1 ");
-				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					   sql.append("\n and M.BARCODE ='"+c.getCodeSearch()+"'");
-				}
-				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
-					   sql.append("\n and M.MATERIAL_MASTER ='"+c.getMatCodeSearch()+"'");
-				}
-				sql.append("\n  UNION ALL ");
-				sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
 				sql.append("\n  from PENSBME_ONHAND_BME_LOCKED M   ");
 				sql.append("\n  where 1=1 ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
@@ -556,12 +548,41 @@ public class GeneralDAO {
 				
 				if (rst.next()) {
 					b = new Barcode();
-					b.setBarcode(rst.getString("barcode"));
-					b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
-					b.setGroupCode(rst.getString("group_item"));
-					b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
-					b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
-					b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+					
+					if( !Utils.isNull(rst.getString("group_item")).equals("") 
+						&& !Utils.isNull(rst.getString("PENS_ITEM")).equals("") 
+						&& !Utils.isNull(rst.getString("MATERIAL_MASTER")).equals("") ){
+						
+						b.setBarcode(rst.getString("barcode"));
+						b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+						b.setGroupCode(rst.getString("group_item"));
+						b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+						b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+						b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+					}else{
+						sql = new StringBuilder();
+						sql.append("\n  select BARCODE ,MATERIAL_MASTER,GROUP_ITEM ,PENS_ITEM,WHOLE_PRICE_BF,RETAIL_PRICE_BF ");
+						sql.append("\n  from PENSBME_ONHAND_BME M   ");
+						sql.append("\n  where 1=1 ");
+						if( !Utils.isNull(c.getCodeSearch()).equals("")){
+							   sql.append("\n and M.BARCODE ='"+c.getCodeSearch()+"'");
+						}
+						if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
+							   sql.append("\n and M.MATERIAL_MASTER ='"+c.getMatCodeSearch()+"'");
+						}
+						logger.debug("sql:"+sql);
+						
+						stmt = conn.createStatement();
+						rst = stmt.executeQuery(sql.toString());
+						if(rst.next()){
+							b.setBarcode(rst.getString("barcode"));
+							b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+							b.setGroupCode(rst.getString("group_item"));
+							b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+							b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+							b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+						}
+					}
 				}//while
 
 			} catch (Exception e) {
@@ -1349,5 +1370,86 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return pensItem;
+		}
+	 
+	 public static List<References> getProductTypeListInterfaceICC() throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<References> statusList= new ArrayList<References>();
+			Connection conn = null;
+			try {
+				sql.append("\n select distinct product FROM ");
+				sql.append("\n PENSBME_CONFIG_INTERFACE ");
+				sql.append("\n order by product ");
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					statusList.add(new References(rst.getString("product"), rst.getString("product")));
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				    conn.close();
+				} catch (Exception e) {}
+			}
+			return statusList;
+		}
+	 
+	 public static String validAsOfDate_EndDateStockLotus(String asOfDateStr,String storeCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String message = "";
+			Date asOfDate = null;
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				asOfDate = Utils.parse(asOfDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
+				sql.append("\n select MAX(ENDING_DATE) as ENDING_DATE FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
+				sql.append("\n and STORE_CODE = '"+storeCode+"' \n");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					Date endingDate = rst.getDate("ENDING_DATE");
+					logger.debug("asOfDate:"+asOfDate);
+					logger.debug("endingDate:"+endingDate);
+					if(rst.getDate("ENDING_DATE") != null){
+						if(asOfDate.after(endingDate)){
+							logger.debug("asOfDate.after(endingDate):"+asOfDate.after(endingDate));
+						}else{
+							message ="END_STOCK_LOTUS_DATE_MUST_MORE_THAN_ENDING_DATE";
+						}
+					}else{
+						message ="END_STOCK_LOTUS_NOT_FOUND";
+					}
+				}else{
+					message ="END_STOCK_LOTUS_NOT_FOUND";
+				}
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				    conn.close();
+				} catch (Exception e) {}
+			}
+			return message;
 		}
 }

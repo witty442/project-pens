@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -15,16 +16,29 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 
-<jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
+ <jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" /> 
 <%
+  //get d-xxx-d parameter d-49489-p=16
+  String queryStr= request.getQueryString();
+if(queryStr.indexOf("d-") != -1){
+	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+	System.out.println("queryStr:"+queryStr);
+}
 
+  String currentPage = Utils.isNull(request.getParameter(queryStr));
+  String totalPage = "";
+  System.out.println("currentPage:"+currentPage);
+  List<OnhandSummary> dataList = summaryForm.getResults();
+  if(dataList != null && dataList.size() >0){
+    totalPage = String.valueOf((dataList.size()/ 50)+1);
+  } 
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" /> --%>
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
 <style type="text/css">
 <!--
 body {
@@ -42,52 +56,74 @@ body {
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-
 <script>
-	function gotoPage(path,pageNumber){
-		var form = document.reqPickStockForm;
-	   // form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber+"&prevPageNumber="+form.pageNumber.value+"&totalQtyCurPage="+document.getElementsByName("totalQtyCurPage")[0].value;
-		form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber;
-		
-	    form.submit();
-	    return true;
-	}
 </script>
- 
 </head>
      <c:if test="${summaryForm.page == 'onhandLotus'}">
 		<c:if test="${summaryForm.results != null}">
 		<c:if test="${summaryForm.summaryType == 'PensItem'}">
 		<br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
 			    
-			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
-			    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-			    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="lotus_adjustQty"/>	
-			    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="lotus_stockShortQty"/>	
-			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-			    				
-			</display:table>
+			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text_center" style="width:10%"/>
+			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="td_text_center" style="width:10%"/>
+			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center" style="width:8%"/>	
+			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Price List " property="retailPriceBF"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Amount " property="onhandAmt"  sortable="false" class="td_number" style="width:8%"/>	   
+			   <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+				<display:footer>
+			      <tr class="text_blod">
+			          <td colspan="3" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="adjustQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="stockShortQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			          <td class="td_number"></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandAmt"/></td>
+			      </tr>
+			    </display:footer>
+		       <%} %>
+		    </display:table>
 			</c:if>
 			
 			<c:if test="${summaryForm.summaryType == 'GroupCode'}">
 		    <br/>
-			<display:table id="item" name="sessionScope.summaryForm.results" defaultsort="0"  width="100%" defaultorder="descending" class="resultDisp"
-			    requestURI="../jsp/summaryAction.do?do=search" sort="list" pagesize="50">	
-			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="lotus_storeCode"/>
-			    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
-			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
-			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-			    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="lotus_adjustQty"/>	
-			    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="lotus_stockShortQty"/>	
-			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-			    				
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
+			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text_center" style="width:10%"/>
+			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center" style="width:10%"/>	
+			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Adjust" property="adjustQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Stock short" property="stockShortQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Price List " property="retailPriceBF"  sortable="false" class="td_number" style="width:8%"/>	
+			    <display:column  title="Amount " property="onhandAmt"  sortable="false" class="td_number" style="width:8%"/>
+			     <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+			    <display:footer>
+			      <tr class="text_blod">
+			          <td colspan="2" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="adjustQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="stockShortQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			          <td class="td_number"></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandAmt"/></td>
+			      </tr>
+			    </display:footer>	
+			    <%} %>
 			</display:table>
 			</c:if>
 	   </c:if>

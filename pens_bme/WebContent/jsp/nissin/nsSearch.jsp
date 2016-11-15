@@ -30,6 +30,9 @@
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
 
 <%
+String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
+String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
+
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRole().getKey();
 
@@ -38,12 +41,9 @@ if(session.getAttribute("channelList") == null){
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
 	billTypeList.addAll(NSDAO.searchChannelList(new PopupForm(),""));
-	
 	session.setAttribute("channelList",billTypeList);
 }
-
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -77,8 +77,8 @@ span.pagelinks {
 	font-size: 15px;
 }
 #scroll {
-    width:1200px;
-    height:550px;
+    width:<%=screenWidth%>px;
+    height:<%=screenHeight%>px;
     background:#A3CBE0;
 	border:1px solid #000;
 	overflow:auto;
@@ -97,6 +97,7 @@ function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('orderDateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('orderDateTo'));
 }
+
 function clearForm(path){
 	var form = document.nsForm;
 	form.action = path + "/jsp/nsAction.do?do=clear2";

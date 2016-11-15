@@ -295,6 +295,12 @@ public class InterfaceDAO {
 					   item.setCode("");
 					   item.setType(type);
 					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("m_customer_location")){
+					   item.setCustomerCode(rs.getString("CUSTOMER_NUMBER"));
+					   item.setCustomerName(rs.getString("CUSTOMER_NAME"));
+					   item.setCode("");
+					   item.setType(type);
+					   item.setAmount(0); 
 				   }else if(type.equalsIgnoreCase("t_move_order")){
 					   item.setCustomerCode("");
 					   item.setCustomerName("");
@@ -639,7 +645,7 @@ public class InterfaceDAO {
 			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
 			sql.append("  ) s  \n");
 			sql.append("  on  monitor.transaction_id = s.transaction_id \n");
-			sql.append("  order by monitor.submit_date \n");
+			sql.append("  order by monitor.monitor_id ,monitor.submit_date \n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();

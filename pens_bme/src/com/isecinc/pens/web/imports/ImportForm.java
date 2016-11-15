@@ -32,7 +32,7 @@ public class ImportForm extends I_Form {
 	
 	private OnhandSummary summary;
 	
-	private String pageTypeImport;
+	private String page;
 	
 	private List<ImportSummary> summarySuccessList;
 	private List<ImportSummary> summaryErrorList;
@@ -77,6 +77,17 @@ public class ImportForm extends I_Form {
 	private String totalQty;
 	
 	
+	private List<OnhandSummary> reconcileList;
+	
+
+	public List<OnhandSummary> getReconcileList() {
+		return reconcileList;
+	}
+
+	public void setReconcileList(List<OnhandSummary> reconcileList) {
+		this.reconcileList = reconcileList;
+	}
+
 	public int getLoadOnhandTVDirectListErrorSize() {
 		return loadOnhandTVDirectListErrorSize;
 	}
@@ -329,14 +340,14 @@ public class ImportForm extends I_Form {
 	public void setCustCode(String custCode) {
 		this.custCode = custCode;
 	}
+    
 
-
-	public String getPageTypeImport() {
-		return pageTypeImport;
+	public String getPage() {
+		return page;
 	}
 
-	public void setPageTypeImport(String pageTypeImport) {
-		this.pageTypeImport = pageTypeImport;
+	public void setPage(String page) {
+		this.page = page;
 	}
 
 	public List<OnhandSummary> getResults() {
