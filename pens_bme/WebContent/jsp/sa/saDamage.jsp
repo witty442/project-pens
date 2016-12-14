@@ -326,17 +326,72 @@ function save(path){
 	return false;
 }
 
+function validateTypeInvoice(invRefWalObj){
+   var form = document.saDamageForm;
+   //validate TypeInvoice
+    var start = document.getElementById("invRefwal").value.substr(0,1);
+    //alert(start);
+    
+      //BME
+      if(document.getElementsByName('bean.type')[0].checked==true){
+         if(start != "1"){
+           alert("Invoice No / Ref Wacoal ต้องขึ้นด้วย 1 เท่านั้น");
+           invRefWalObj.value = "";
+           invRefWalObj.focus();
+           
+           form.oracleRefId.value = '';
+		   form.oracleRefName.value = '';
+		   form.totalDamage.value = '';
+		    
+		   form.empId.value = '';
+		   form.name.value = '';
+		   form.surname.value = '';
+		   form.branch.value = '';
+		   form.groupStore.value = '';
+		   form.fullName.value = '';
+           return false;
+         }
+      }else{
+        //WACOAL
+         if(start != "M"){
+           alert("Invoice No / Ref Wacoal ต้องขึ้นด้วย M เท่านั้น");
+           invRefWalObj.value = "";
+           invRefWalObj.focus();
+           
+           form.oracleRefId.value = '';
+		   form.oracleRefName.value = '';
+		   form.totalDamage.value = '';
+		    
+		   form.empId.value = '';
+		   form.name.value = '';
+		   form.surname.value = '';
+		   form.branch.value = '';
+		   form.groupStore.value = '';
+		   form.fullName.value = '';
+           return false;
+         }
+      }
+      return true;
+ }
+ 
 function getInvRefWalKeypress(e,invRefWalObj){
 	var form = document.saDamageForm;
 	if(e != null && e.keyCode == 13){
-		getInvRefWal(invRefWalObj);
+	   if(document.getElementById("invRefwal").value != ""){
+	      if(validateTypeInvoice(invRefWalObj)){
+		     getInvRefWal(invRefWalObj);
+		  }
+		}
 	}
 }
+
 //Case Wacoal Only
 function getInvRefWalOnblur(e,invRefWalObj){
 	var form = document.saDamageForm;
-	if(document.getElementsByName('bean.type')[1].checked){
-		  getInvRefWal(invRefWalObj);
+	if(document.getElementById("invRefwal").value != ""){
+	    if(validateTypeInvoice(invRefWalObj)){
+		     getInvRefWal(invRefWalObj);
+		  }
 	 }
 }
 
@@ -366,6 +421,7 @@ function resetInvRefWal(){
 function getInvRefWal(invRefWalObj){
 	var returnString = "";
 	var form = document.saDamageForm;
+	var typeInvoice = "";
 	
 	//validate check bme or wacoal
 	if(document.getElementsByName('bean.type')[0].checked==false
@@ -373,14 +429,20 @@ function getInvRefWal(invRefWalObj){
 		alert("กรุณาเลือกประเภท B'ME หรือ  WACOAL");
 		return false;
 	}
+	if(document.getElementsByName('bean.type')[0].checked==true){
+	    typeInvoice = "BME"; 
+	}else if(document.getElementsByName('bean.type')[1].checked ==true){
+	   typeInvoice = "WACOAL"; 
+	}
+	//alert(typeInvoice);
 	
-	//BME
+	//ALL
 	if(document.getElementsByName('bean.type')[0].checked || 
 	   document.getElementsByName('bean.type')[1].checked
 	 ){
 		var getData = $.ajax({
 				url: "${pageContext.request.contextPath}/jsp/sa/saGetInvoiceAjax.jsp",
-				data : "invRefWal=" + invRefWalObj.value,
+				data : "invRefWal=" + invRefWalObj.value+"&typeInvoice="+typeInvoice,
 				async: false,
 				cache: false,
 				success: function(getData){
@@ -447,25 +509,6 @@ function getInvRefWal(invRefWalObj){
 		    form.branch.value = '';
 		    form.groupStore.value = '';
 		    form.fullName.value = '';
-		}
-	}else{
-		//WACOAL
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/sa/saGetInvDamageAjax.jsp",
-			data : "invRefWal=" + invRefWalObj.value,
-			async: false,
-			cache: false,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-		//alert(returnString);
-		
-		if(returnString !=''){
-			alert("Ref Wacoal นี้ ได้เคยมีการบันทึกไปแล้ว กรุณาตรวจสอบใหม่");
-			invRefWalObj.focus();
-			invRefWalObj.value ="";
-
 		}
 	}
 }
@@ -611,8 +654,8 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
                                     <td  align="right">Invoice No / Ref Wacoal<font color="red">*</font></td>
 									<td colspan="3">		
 									<%if("add".equals(saDamageForm.getMode())){ %>
-										  <html:text property="bean.invRefwal" styleId="invRefwal" size="30" onkeypress="getInvRefWalKeypress(event,this)"
-										   onblur="getInvRefWalOnblur(event,this)"> </html:text>
+										  <html:text property="bean.invRefwal" styleId="invRefwal" size="30" 
+										   onblur="getInvRefWalOnblur(event,this)" onkeypress="getInvRefWalKeypress(event,this)"> </html:text>
 										<%}else{ %>
 										  <html:text property="bean.invRefwal" styleId="invRefwal" size="30" styleClass="disableText" readonly="true"> </html:text>
 										<%} %>

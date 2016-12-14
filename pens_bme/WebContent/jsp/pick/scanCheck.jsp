@@ -438,7 +438,6 @@ function getProductKeypress(e,barcodeObj,lineId){
 	//lineId = document.getElementById('currentRowIndex').value;
 	
 	if(e != null && e.keyCode == 13){
-	
 		if(barcodeObj.value ==''){
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
@@ -464,6 +463,10 @@ function getProductKeypress(e,barcodeObj,lineId){
 	}
 }
 
+function playWrongAudio(){
+  var audio = new Audio('${pageContext.request.contextPath}/audio/Wrong-effect.mp3');
+   audio.play();
+}
 function getProductModel(barcodeObj,lineId){
 	var found = false;
 	var form = document.scanCheckForm;
@@ -501,6 +504,7 @@ function getProductModel(barcodeObj,lineId){
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
 			
+			playWrongAudio();
 		}else{
 			var s = returnString.split("|");
 			
@@ -544,6 +548,7 @@ function getProductModel(barcodeObj,lineId){
 				groupCode[lineId-1].value = '';
 				pensItem[lineId-1].value = '';
 				
+				playWrongAudio();
 			}else{
 			   barcodeObj.className = 'disableText';
 			   materialMaster[lineId-1].className = 'disableText';
@@ -625,7 +630,8 @@ function getProductModelByMat(matObj,lineId){
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
-
+			
+            playWrongAudio();
 		}else{
 			var s = returnString.split("|");
 			
@@ -668,6 +674,7 @@ function getProductModelByMat(matObj,lineId){
 				groupCode[lineId-1].value = '';
 				pensItem[lineId-1].value = '';
 				
+				playWrongAudio();
 			}else{
 			   matObj.className = 'disableText';
 			   barcode[lineId-1].className = 'disableText';

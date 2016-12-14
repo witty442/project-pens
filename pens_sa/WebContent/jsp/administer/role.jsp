@@ -128,20 +128,20 @@ body {
 				        <!-- RESULT -->
 				        <c:if test="${ROLE_LIST != null}">
 				        
-				        <display:table width="70%" id="item" name="sessionScope.ROLE_LIST"  
+				        <display:table style="width:70%;"  id="item" name="sessionScope.ROLE_LIST"  
 						    defaultsort="0" defaultorder="descending" requestURI="../jsp/roleAction.do?do=search" sort="list" pagesize="60"
 						    class ="resultDisp" border="0" cellpadding="1" cellspacing="1"
 						    align ="center">	
 						    
-							<display:column align="left" title="No." property ="indexDisp" width="10" nowrap="false" sortable="true" valign="top"/>	    
-						    <display:column align="left" title="Role" property="roleIdDisp" width="60" nowrap="false" sortable="true" valign="top" />
-						    <display:column align="left" title="ประเภทข้อมูล"  width="100" nowrap="false" sortable="true" valign="top">
+							<display:column align="left" title="No." property ="indexDisp" style="width:10;align:left;white-space:nowrap"" sortable="true" />	    
+						    <display:column align="left" title="Role" property="roleIdDisp" style="width:60;align:left;white-space:nowrap" sortable="true" />
+						    <display:column align="left" title="ประเภทข้อมูล"  style="width:100;align:left;white-space:nowrap" sortable="true" >
 						      <bean:write name="item" property="roleColumnAccessDesc"/>
 						    </display:column>
-						    <display:column align="left" title="ประเภทข้อมูลย่อย" width="120" nowrap="false" sortable="true" valign="top">
+						    <display:column align="left" title="ประเภทข้อมูลย่อย" style="width:120;align:left;white-space:nowrap" sortable="true">
 						         ${item.roleDataAccessDesc}
 						    </display:column>
-						    <display:column align="center" title="แก้ไข" width="30" nowrap="false" sortable="false" valign="top"  >	
+						    <display:column align="center" title="แก้ไข" style="width:30;align:left;white-space:nowrap" sortable="false">	
 							     <c:choose>
 									<c:when test="${item.roleIdDisp !=''}">
 										<a href="#" onclick="javascript:editRole('${pageContext.request.contextPath}',' <c:out value="${item.roleId}"/>' ,'<c:out value="${item.roleName}"/>');">

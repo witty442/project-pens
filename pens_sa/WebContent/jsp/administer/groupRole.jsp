@@ -165,20 +165,20 @@ body {
 				         <c:if test="${GROUP_ROLE_LIST != null}">
 				         
 				        <!-- RESULT -->
-				        <display:table width="70%" id="item" name="sessionScope.GROUP_ROLE_LIST"  
+				        <display:table style="width:70%;"  id="item" name="sessionScope.GROUP_ROLE_LIST"  
 						    defaultsort="0" defaultorder="descending" requestURI="../jsp/groupRoleAction.do?do=search" sort="list" pagesize="50"
 						    class ="resultDisp" border="0" cellpadding="3" cellspacing="1" align="center" >	
 						    
-						    <display:column align="center" title="No." property ="index" width="20" nowrap="false" sortable="true"/>
-						     <display:column align="center" title="เลือก"  width="30" nowrap="false" sortable="true">	
+						    <display:column align="center" title="No." property ="index" style="eidth:20;align:left;white-space:nowrap" sortable="true"/>
+						     <display:column align="center" title="เลือก"  width="30" style="align:left;white-space:nowrap" sortable="true">	
 							   <input type="checkbox" name="ids" value="${item.index}" <c:out value='${item.disabled}'/>/>
 							 </display:column>	
 						     
-							 <display:column align="left" title="รหัสกลุ่มผู้ใช้"  width="100" nowrap="false" sortable="true">
+							 <display:column align="left" title="รหัสกลุ่มผู้ใช้"  style="width:100;align:left;white-space:nowrap" sortable="true">
 							      <input type="hidden" name="userGroupId"  value ="${item.userGroupId}" />
 							      <input type="text" name="userGroupName"  value ="${item.userGroupName}" size="50" />
 							 </display:column>   
-						     <display:column align="left" title="Role"  width="100" nowrap="false" sortable="true">
+						     <display:column align="left" title="Role" style="width:100;align:left;white-space:nowrap" sortable="true">
 						        <select name="roleId">
 							          <c:forEach items='${sessionScope.roleList}' var='p'>
 		                                   <c:choose>

@@ -1,3 +1,6 @@
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.InterfaceUtils"%>
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="com.isecinc.pens.inf.manager.external.process.ControlInterfaceICC"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
@@ -26,9 +29,7 @@ User user = (User) session.getAttribute("user");
 String role = ((User)session.getAttribute("user")).getType();
 String pageName = Utils.isNull(request.getParameter("pageName"));
 String productType = "";
-%>
 
-<%
 if(session.getAttribute("productTypeList") == null){
 	List<References> productTypeList = new ArrayList<References>();
 	productTypeList.add(new References("",""));
@@ -79,12 +80,10 @@ body {
  position: relative;
  padding: 3px;
 }
-
 #percent {
  position: absolute;   
  left: 50%;
 }
-
 #bar {
  height: 40px;
  background-color: green;
@@ -93,9 +92,7 @@ body {
 .errorLine {
    color: red;
 }
-
 </style>
-
 
 <Script>
     function loadme(){
@@ -717,7 +714,23 @@ body {
 						
 						<div align="left">
 							<!-- Status:  --><html:hidden property="monitorBean.status"  styleClass="disableText"/>
-							Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"  styleClass="disableText"/>Seconds
+							<table class="test">
+							<tr>
+							    <td align="left" width="50%">
+								  <b> Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"  styleClass="disableText"/> Seconds</b>
+								</td>
+								<td align="right"  width="50%">
+								   <b>
+									   <%if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
+										   String path = EnvProperties.getInstance().getProperty("path.icc.hisher.import.dlyr")+"/";
+										   out.print("    Example file :");
+										   out.print(path+InterfaceUtils.getImportNameICC("PENSBME_ICC_HEAD",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+										   out.print("      &nbsp;&nbsp;,"+path+InterfaceUtils.getImportNameICC("PENSBME_ICC_DLYR",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+									   } %>
+								   </b>
+								 </td>
+							 </tr>
+							</table>
 						</div>
 						<input type="hidden" name="pageName" value="<%=pageName%>"/>
 						

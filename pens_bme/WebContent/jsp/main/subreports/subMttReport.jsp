@@ -59,6 +59,7 @@ System.out.println("currentPage:"+currentPage);
 			<display:table style="width:100%;" id="item" name="sessionScope.mttForm.resultsSearch"
 			 defaultsort="0" defaultorder="descending" class="resultDisp"
 			 requestURI="#" sort="list" pagesize="50">	
+			 
 			    <display:setProperty name="export.pdf" value="true" />
                 <display:setProperty name="export.excel.filename" value="ActorDetails.xls" />
 		        <display:setProperty name="export.pdf.filename" value="ActorDetails.pdf" />

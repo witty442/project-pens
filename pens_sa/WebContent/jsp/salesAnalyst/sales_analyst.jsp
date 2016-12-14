@@ -43,7 +43,6 @@ System.out.println("screenWidth:"+screenWidth);
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" /> --%>
 <style type="text/css">
-
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	/**background-repeat: repeat;**/
@@ -60,7 +59,6 @@ fieldset {
     border-radius: 5px;
     padding: 10px;
 }
-
 fieldset legend {
     background: #3F5C93; /* #1F497D; */
     color: #fff;
@@ -70,7 +68,6 @@ fieldset legend {
     box-shadow: 0 0 0 1px #ddd;
     margin-left: 20px;
 }
-
 .txt_style {
 	font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 	font-size: 14px;
@@ -89,7 +86,6 @@ fieldset legend {
 <%}else{%>
  
 <%}%>
- 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -99,7 +95,7 @@ fieldset legend {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.tablednd_0_5.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/date.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.tablesorter.min.js"></script>
-
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -515,8 +511,9 @@ function showSearchValuePopup(path,currCondNo){
 		//alert(param);
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
-		window.open(encodeURI(url),"",
-				   "menubar=no,resizable=no,titlebar=no,location=no,toolbar=no,scrollbars=yes,status=no,menubar=no,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//	window.open(encodeURI(url),"",
+				   //"menubar=no,resizable=no,titlebar=no,location=no,toolbar=no,scrollbars=yes,status=no,menubar=no,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	      PopupCenter(encodeURI(url),"","700", "600");
 	}
 }
 
@@ -1118,10 +1115,11 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                <td align="left">
 											 <html:text property="salesBean.condCode1" styleId="condCode1" style="width:100px;" onkeyup="loadValue(event, 1,true);" onchange="set_display_value1(event, 1);"/>&nbsp;   
 											 <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','1');">
-									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" />
+									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" width="20px" height="20px"/>
 									        </a>
+									        &nbsp;
 									         <a href="javascript:clearText('1');">
-									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"/>
+									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png" width="20px" height="20px"/>
 									        </a>                                        
 									         <html:text property="salesBean.condValueDisp1" readonly ="true" styleId="condValueDisp1" style="width:200px"></html:text>
 									         <html:hidden property="salesBean.condValue1" styleId="condValue1"></html:hidden>
@@ -1139,10 +1137,11 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                <td align="left">
 											 <html:text property="salesBean.condCode2" styleId="condCode2" style="width:100px;" onkeyup="loadValue(event, 2,true);" onchange="set_display_value2(event, 2);"/>&nbsp;
 											 <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','2');">
-									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" />
+									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
+									        &nbsp;
 									         <a href="javascript:clearText('2');">
-									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"/>
+									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"  width="20px" height="20px"/>
 									        </a>
                                              <html:text property="salesBean.condValueDisp2" readonly="true" styleId="condValueDisp2" style="width:200px"></html:text>
 									         <html:hidden property="salesBean.condValue2"  styleId="condValue2"></html:hidden>
@@ -1161,10 +1160,11 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                <td align="left">
 											 <html:text property="salesBean.condCode3" styleId="condCode3" style="width:100px;" onkeyup="loadValue(event, 3,true);" onchange="set_display_value3(event, 3);"/>&nbsp;
 											  <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','3');">
-									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" />
+									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
+									        &nbsp;
 									         <a href="javascript:clearText('3');">
-									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"/>
+									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"  width="20px" height="20px"/>
 									        </a>
                   							 <html:text property="salesBean.condValueDisp3" styleId="condValueDisp3" readonly="true" style="width:200px"></html:text>
 									         <html:hidden property="salesBean.condValue3"  styleId="condValue3"></html:hidden>
@@ -1183,10 +1183,11 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                <td align="left" >
                                              <html:text property="salesBean.condCode4" styleId="condCode4" style="width:100px;" onkeyup="loadValue(event, 4,true);" onchange="set_display_value4(event, 4);"/>&nbsp;
 											  <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','4');">
-									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" />
+									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
+									        &nbsp;
 									         <a href="javascript:clearText('4');">
-									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png"/>
+									          <img border=0 src="${pageContext.request.contextPath}/icons/clean.png" width="20px" height="20px"/>
 									        </a>
                   							 <html:text property="salesBean.condValueDisp4" styleId="condValueDisp4" readonly="true" style="width:200px"></html:text>
 									         <html:hidden property="salesBean.condValue4"  styleId="condValue4"></html:hidden>							 

@@ -9,6 +9,7 @@ input,textarea {
 	font-size: 12px;
 	/**font-size: 1em;**/
 }
+
 <!-- ************** for DisplayTag Table *********************************-->
 TABLE{
 	width: 100%;
@@ -56,20 +57,16 @@ TD.desc {
 	width:10%;
 	text-align:left;
 }
-
-
 th.sorted {
     background-color: orange;
     color: orange;
 }
-
 th.sortable.sorted a {
 	background-position: right;
 	display: block;
 	width: 100%;
 	color: orange;
 }
-
 th.sortable a {
 	background-position: right;
 	display: block;
@@ -77,7 +74,6 @@ th.sortable a {
 	color: #FFFFFF;
 
 }
-
 th.order1 a {
 
 }

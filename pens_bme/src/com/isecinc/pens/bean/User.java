@@ -36,6 +36,7 @@ public class User extends I_PO implements Serializable {
 	public static final String PENSTEAM ="PENSTEAM";
 	public static final String MCQUERY ="MCQUERY";
 	public static final String HISHER ="HISHER";
+	public static final String IT = "IT";
 	
 	private static final long serialVersionUID = 2247823086169174428L;
 

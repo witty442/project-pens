@@ -30,6 +30,7 @@
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 		
 		<form-bean name="mttForm" type="com.isecinc.pens.web.mtt.MTTForm" />
+		<form-bean name="posForm" type="com.isecinc.pens.web.pos.PosForm" />
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 	</form-beans>
 
@@ -52,6 +53,7 @@
 			type="com.isecinc.pens.web.login.LoginAction">
 			
 			<forward name="pass" path="jsp/mttAction.do?do=prepare2&amp;action=new" redirect="true" />
+			<forward name="passPos" path="jsp/posReportAction.do?do=prepare2&amp;action=new" redirect="true" />
 			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
 			<forward name="fail" path="/index.jsp" />
 			 <forward name="logoff" path="/index.jsp" />
@@ -103,6 +105,9 @@
 			
 			<forward name="report" path="/jsp/main/mttReport.jsp" />
 			<forward name="scanReport" path="/jsp/main/scanReport.jsp" />
+		</action>
+		<action name="posForm" path="/jsp/posAction" parameter="do" scope="session" type="com.isecinc.pens.web.pos.PosAction">
+			<forward name="search" path="/jsp/pos/posSearch.jsp" />	
 		</action>
 		
 			<!-- POPUP -->

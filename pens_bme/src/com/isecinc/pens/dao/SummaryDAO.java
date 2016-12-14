@@ -901,7 +901,9 @@ public class SummaryDAO {
 						
 					}else if(storeType.equalsIgnoreCase("king")){
 						sql.append(" and (pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%' \n");
-						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%' ) \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%' ) \n");
 					}
 				}
 				sql.append("\n  and pens_desc4 ='N' \n");

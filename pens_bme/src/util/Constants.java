@@ -23,6 +23,8 @@ public class Constants {
 	public static final String STORE_TYPE_MTT_CODE_1 ="100001";
 	public static final String STORE_TYPE_KING_POWER ="020056";//King Power
 	public static final String STORE_TYPE_KING_POWER_2 ="020072";//King Power
+	public static final String STORE_TYPE_KING_POWER_3 ="020068";//King Power
+	public static final String STORE_TYPE_KING_POWER_4 ="020083";//King Power
 	
 	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
 	public static final String STORE_TYPE_HISHER_CODE = "020051";

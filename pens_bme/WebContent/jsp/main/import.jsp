@@ -428,6 +428,10 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="reconcile"/>
 				</jsp:include>
+			<%}else if("filePosBME".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="filePosBME"/>
+				</jsp:include>
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>
@@ -525,6 +529,14 @@ function getCustName(custCode,fieldName,storeType){
 									<html:file property="dataFile" styleClass="" style="width:300px;height:21px"/>
 								</td>
 							</tr>
+					   <%}else if("FilePosBME".equalsIgnoreCase(request.getParameter("page"))) {%>
+							<tr>
+								<td align="right" width="40%">เลือกไฟล์&nbsp;&nbsp;</td>
+								<td valign="top" align="left">
+									<html:file property="dataFile" styleClass="" style="width:300px;height:21px"/>
+								</td>
+							</tr>
+							
 						<%}else{ %>
 							<tr>
 								<td align="right" width="40%">เลือกไฟล์&nbsp;&nbsp;</td>
@@ -562,6 +574,9 @@ function getCustName(custCode,fieldName,storeType){
 								    <% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
 								        <input type="button" value="Export to Excel" class="newPosBtnLong" onclick="javascript:exportReturnWacoal('${pageContext.request.contextPath}')">
 								    <%} %>
+								  <%} %>
+								  <%if("FilePosBME".equalsIgnoreCase(request.getParameter("page"))) {%>
+								     <input type="button" value="  GenerateExcel   " class="newPosBtnLong" onclick="javascript:exportToExcel('${pageContext.request.contextPath}','')">
 								  <%} %>
 								</td>
 							</tr>

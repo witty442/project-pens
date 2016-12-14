@@ -283,15 +283,15 @@ body {
 				         
 				        <!-- RESULT -->
 				       <c:if test="${ROLE_DETAIL_LIST != null}">
-				        <display:table width="70%" id="item" name="sessionScope.ROLE_DETAIL_LIST"  
+				        <display:table style="width:70%;"  id="item" name="sessionScope.ROLE_DETAIL_LIST"  
 						    defaultsort="0" defaultorder="descending" requestURI="../jsp/roleAddAction.do?do=search" sort="list" pagesize="10"
 						    class ="resultDisp" border="0" cellpadding="1" cellspacing="1" align="center" >	
 						    
 				
 						    	
-						     <display:column align="left" title="No." property ="index" width="20" nowrap="false" sortable="false" valign="top"/>
+						     <display:column align="left" title="No." property ="index" style="width=20;align:left;white-space:nowrap" sortable="false" />
 						    
-							 <display:column align="left" title="ประเภทข้อมูล"  width="100" nowrap="false" sortable="false" valign="top">
+							 <display:column align="left" title="ประเภทข้อมูล"   nowrap="false" style="width=100;align:left;white-space:nowrap"" >
 						        <select name="roleColumnAccess" onchange="clearText('${item.index}')">
 							          <c:forEach items='${sessionScope.roleColumnAccessList}' var='p'>
 								             <c:choose>
@@ -305,7 +305,7 @@ body {
 									  </c:forEach>
 								  </select>
 						    </display:column>
-						    <display:column align="left" title="ประเภทข้อมูลย่อย" width="100" nowrap="false" sortable="false" valign="top">
+						    <display:column align="left" title="ประเภทข้อมูลย่อย" style="width=100;align:left;white-space:nowrap" sortable="false" >
 								    <input type="text" name="roleDataAccess" value="${item.roleDataAccess}"/>
 								    <textarea  name="roleDataAccessDesc" rows="2" cols="60">${item.roleDataAccessDesc} </textarea >
 								   &nbsp;   

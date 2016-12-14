@@ -9,8 +9,9 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
+<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="session" />
 <html>
 <head>
@@ -29,7 +30,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <%
-	boolean isMultiSelect = false;
+ boolean isMultiSelect = false;
  String load = Utils.isNull(request.getParameter("load"));
 
  String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
@@ -38,18 +39,27 @@
  String searchType = Utils.isNull(request.getParameter("searchType"));
 
 
-String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+//String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+String queryStr= request.getQueryString();
+if(queryStr.indexOf("d-") != -1){
+	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+	System.out.println("queryStr:"+queryStr);
+}
+String currentPage = request.getParameter(queryStr);
 
-System.out.println("currCondNo:"+currCondNo);
+ System.out.println("currCondNo:"+currCondNo);
 System.out.println("currCondTypeValue:"+currCondTypeValue);
 System.out.println("currCondNameText:"+currCondNameText);
 System.out.println("searchType:"+searchType);
-System.out.println("currentPage:"+currentPage);
+System.out.println("currentPage:"+Utils.isNull(currentPage)); 
+System.out.println("desc1:"+request.getParameter("salesBean.desc"));
 
+String code = session.getAttribute("code_session")!=null?(String)session.getAttribute("code_session"):"";
+String desc = session.getAttribute("desc_session")!=null?(String)session.getAttribute("desc_session"):"";
 
  if(SAInitial.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
 	 isMultiSelect = true;
- }
+ } 
  
  pageContext.setAttribute("isMultiSelect", isMultiSelect, PageContext.PAGE_SCOPE);
  
@@ -58,15 +68,15 @@ System.out.println("currentPage:"+currentPage);
  String keys = Utils.isNull(session.getAttribute("keys"));
  String descs = Utils.isNull(session.getAttribute("descs"));
  
- System.out.println("codes:"+codes);
+ //System.out.println("codes:"+codes);
  
  String condType1 = Utils.isNull(request.getParameter("condType1"));
  String condType2 = Utils.isNull(request.getParameter("condType2"));
  String condType3 = Utils.isNull(request.getParameter("condType3"));
  String condType4 = Utils.isNull(request.getParameter("condType4"));
 
- System.out.println("condType1:"+condType1);
- System.out.println("condType1:"+Utils.isNull(request.getParameter("condType1")));
+ //System.out.println("condType1:"+condType1);
+ //System.out.println("condType1:"+Utils.isNull(request.getParameter("condType1")));
 %>
 <script type="text/javascript">
 
@@ -310,8 +320,17 @@ window.onload = function(){
 	setChkInPage();
 	//loadDataFromMain();
 	loadNav();
+	//load Critiria thai
+	loadCritiria();
 }
-
+function loadCritiria(){
+	<%if( !Utils.isNull(code).equals("")){ %>
+	   document.getElementsByName("salesBean.code")[0].value ="<%=Utils.isNull(code)%>";
+	<%}%>
+	<%if( !Utils.isNull(desc).equals("")){ %>
+	   document.getElementsByName("salesBean.desc")[0].value ="<%=Utils.isNull(desc)%>";
+	<%}%>
+}
 function loadNav(){
 	var nav1 = document.getElementById("nav1");
 	var nav2 = document.getElementById("nav2");
@@ -342,7 +361,6 @@ function loadNav(){
 function loadDataFromMain(){
     //alert(window.opener.$("#condName1").val());
 	//alert(window.opener.$("#condCode1").val());
-	
 	//alert(document.getElementById("condValueDisp1").value);
 	
 	<% if("1".equals(load)){ %>
@@ -359,7 +377,6 @@ function loadDataFromMain(){
 		document.getElementById("condValueDisp3").value = window.opener.$("#condValue3").val(); 
    <%}%>
 }
-
 </script>
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -388,50 +405,51 @@ function loadDataFromMain(){
 
 <input type="hidden" name="currentPage" size="50" value ="<%=currentPage%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
+<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%"  bgcolor="#FAFAFA">
     <%-- <tr height="21px">
 		<td class="h1" colspan="2"><b>ค้นหาข้อมูล :${searchValuePopupForm.curNavigation}</b></td>
 	</tr> --%>
-	 <tr height="21px">
-		<td class="h1" colspan="2" align="center"><font size="3">ค้นหาข้อมูล :<%=currCondNameText %></font></td>
+	 <tr height="21px" bgcolor="#FAFAFA">
+		<td class="h1" colspan="2" align="center" bgcolor="#FAFAFA"><font size="3">ค้นหาข้อมูล :<%=currCondNameText %></font></td>
 	</tr>
-	<tr height="21px">
-		<td class="h1" colspan="2"><font size="3"><b><span id="nav1"></span><span id="nav2"></span><span id="nav3"></span><span id="nav4"></span></b></font></td>
+	<tr height="21px" bgcolor="#F1F1F1">
+		<td class="h1" colspan="2" align="left"><font size="3"><b><span id="nav1"></span><span id="nav2"></span><span id="nav3"></span><span id="nav4"></span></b></font></td>
 	</tr>
 	<%-- <tr height="21px">
 		<td class="h1" colspan="2"><b>${searchValuePopupForm.navigation}</b></td>
 	</tr> --%>
 	<tr height="21px">
-		<td width="15%" ><b>รหัส</b>  </td>
-		<td width="90%" ><html:text property="salesBean.code"  size="30" style="height:20px"/>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<input type="button" name="search" class="newPosBtn1"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		<td width="15%" align="right"><b>รหัส</b>  </td>
+		<td width="90%" align="left"><html:text property="salesBean.code"  size="30" style="height:20px"/>
 		</td>
 	</tr>
 	<tr height="21px">
-		<td ><b>รายละเอียด</b></td>
-		<td ><html:text property="salesBean.desc"  size="60" style="height:20px"/></td>
+		<td width="15%"  align="right"><b>รายละเอียด</b></td>
+		<td width="90%" align="left"><html:text property="salesBean.desc"  size="60" style="height:20px"/> 
+		<input type="button" name="search" class="newPosBtn1"  value="ค้นหาข้อมูล" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		</td>
 	</tr>
 </table>
 
-<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
+<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" bgcolor="#F1F1F1">
 	<tr>
-		<td align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<td align="left">
 			<c:if test="${isMultiSelect}" >
-				<input type="button" name="ok" value="OK" class="newPosBtn1"  onclick="selectMultiple()" style="width:60px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectMultiple()" style="width:80px;"/>
 			</c:if>
 			<c:if test="${!isMultiSelect}" >
-				<input type="button" name="ok" value="OK" class="newPosBtn1"  onclick="selectOneRadio()" style="width:60px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectOneRadio()" style="width:80px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:65px;"/>
+			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:80px;"/>
 		</td>
 	</tr>
 </table>
 <!-- RESULT -->
-<display:table width="100%" id="item" name="sessionScope.VALUE_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="../jsp/searchValuePopupAction.do?do=search" sort="list" pagesize="20" class="resultDisp">	
-    	
-    <display:column align="left" title="เลือกข้อมูล"  nowrap="true" sortable="false" class="chk">
+<%-- <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST"  defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
+ --%>    
+ <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST" defaultsort="0"  defaultorder="descending" class="resultDisp" requestURI="#" sort="list" pagesize="20">
+ 	
+    <display:column style="align:left;white-space:nowrap"  title="เลือกข้อมูล" class="chk">
 		<c:if test="${isMultiSelect}" >
 			<input type ="checkbox" name="chCheck" onclick="saveSelectedInPage(${item.no})"  />
 		</c:if>
@@ -443,14 +461,14 @@ function loadDataFromMain(){
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" />
 	 </display:column>
     											    
-    <display:column align="left" title="รหัส" property="key"  nowrap="false" sortable="false" class="code"/>
-    <display:column align="left" title="รายละเอียด" property="name" nowrap="false" sortable="false" class="desc"/>								
-</display:table>	
+    <display:column style="align:left;white-space:nowrap" title="รหัส" property="key"  sortable="false" class="code"/>
+    <display:column style="align:left;white-space:nowrap" title="รายละเอียด" property="name"  sortable="false" class="desc"/>				
+</display:table>
 <!-- RESULT -->
 
-		<Script>
-		loadDataFromMain();
-		</Script>
+	<Script>
+	loadDataFromMain();
+	</Script>
 		
 </html:form>
 </body>

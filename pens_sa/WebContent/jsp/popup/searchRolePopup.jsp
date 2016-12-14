@@ -102,18 +102,18 @@ function selectChkRole(){
 	</tr>
 </table>
 <!-- RESULT -->
-<display:table width="100%" id="item" name="sessionScope.VALUE_LIST" 
+<display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST" 
     defaultsort="0" defaultorder="descending" requestURI="../jsp/searchValuePopupAction.do?do=search" sort="list" pagesize="20">	
     	
-    <display:column align="left" title="เลือกข้อมูล"  width="20" nowrap="true" sortable="true">
+    <display:column title="เลือกข้อมูล" style="width:20;align:left;white-space:nowrap" sortable="true">
 		<input type ="checkbox" name="chk" /> 
 		<input type ="hidden" name="code" value="<bean:write name="item" property="code"/>" />
 		<input type ="hidden" name="key" value="<bean:write name="item" property="key"/>" />
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" />
 	 </display:column>
     											    
-    <display:column align="left" title="รหัส" property="key" width="80" nowrap="false" sortable="true"/>
-    <display:column align="left" title="รายละเอียด" property="name" width="100" nowrap="false" sortable="true"/>								
+    <display:column  title="รหัส" property="key" style="width:80;align:left;white-space:nowrap" sortable="true"/>
+    <display:column  title="รายละเอียด" property="name" style="width:100;align:left;white-space:nowrap" sortable="true"/>								
 </display:table>	
 <!-- RESULT -->
 

@@ -25,6 +25,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
+import com.sun.corba.se.spi.extension.ZeroPortPolicy;
 
 
 
@@ -405,7 +406,7 @@ public class SAGenerate {
         //Set Function enable or disable
 		boolean isDebug = false;
 		boolean hideRowEnable = true;
-		
+		boolean isFoundDataInRow = false;
 		try{
 			debug.debug("colGroupList Size:"+colGroupList.size(),1);
 			
@@ -499,6 +500,7 @@ public class SAGenerate {
 			StringBuffer rowHtml = new StringBuffer("");
 			while(rs.next()){
 				found = true;
+				isFoundDataInRow = false;
 				StringBuffer rowNoHtml = new StringBuffer("");
 
 				if("Invoice_Date".equalsIgnoreCase(groupByBean.getName())){
@@ -530,6 +532,7 @@ public class SAGenerate {
 					BigDecimal value = null;
 					BigDecimal valueRowSummary = null;
 					BigDecimal valueColSummary = null;
+				
 					
 					for(int d=0;d<colDispList.size();d++){
 						ConfigBean configBean = (ConfigBean)colDispList.get(d);
@@ -547,6 +550,10 @@ public class SAGenerate {
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal Value
 							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//for summary
 							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
+						}
+						/** Validate all row found data to show or not **/
+						if(valueRowSummary.compareTo(bigZero) != 0){
+							isFoundDataInRow = true;
 						}
 						
 						/** Summary By Column **/						
@@ -674,9 +681,14 @@ public class SAGenerate {
 					ConfigBean configBean = (ConfigBean)colDispList.get(d);
 					String resultRowSumBean = configBean.getName();
 					BigDecimal valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
+					debug.debug("before["+resultRowSumBean+"] valueRowSum["+valueRowSum.doubleValue()+"]");
+					
 					if(valueRowSum.doubleValue() <0){
 						valueRowSum = valueRowSum.multiply(new BigDecimal("-1"));
+						debug.debug("valueRowSum<0");
 					}
+					debug.debug("after["+resultRowSumBean+"] valueRowSum["+valueRowSum.doubleValue()+"]");
+					
 					rowSumAll = rowSumAll.add(valueRowSum);
 					
 				}
@@ -690,7 +702,7 @@ public class SAGenerate {
 					 htmlStr.append(rowHtml.toString());
 					 totalRecord++;
 				}else{
-					if(bigZero.compareTo(rowSumAll) !=0){
+					if(bigZero.compareTo(rowSumAll) !=0 || isFoundDataInRow ==true){
 					   no++;
 					   rowNoHtml.append("  <tr> \n");
 					   rowNoHtml.append(" <td>"+no+"</td>  \n");

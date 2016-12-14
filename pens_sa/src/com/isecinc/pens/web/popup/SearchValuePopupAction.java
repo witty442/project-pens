@@ -33,6 +33,8 @@ public class SearchValuePopupAction extends I_Action {
 		String returnText = "prepare";
 		Connection conn = null;
 		try {
+			request.getSession().setAttribute("code_session", "");
+			request.getSession().setAttribute("desc_session", "");
 			request.getSession().setAttribute("RESULT",null);
 			formBean.setSalesBean(new SABean());
 	
@@ -54,6 +56,9 @@ public class SearchValuePopupAction extends I_Action {
 		SearchValuePopupForm formBean = (SearchValuePopupForm) form;
 		String returnText = "prepare";
 		try {
+			request.getSession().setAttribute("code_session", "");
+			request.getSession().setAttribute("desc_session", "");
+			
 			 //DISPLAY Navigation
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
 			 String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
@@ -160,27 +165,44 @@ public class SearchValuePopupAction extends I_Action {
 		SearchValuePopupForm forms = (SearchValuePopupForm) form;
 		String returnText = "search";
 		User user = (User) request.getSession().getAttribute("user");
+		String desc = forms.getSalesBean().getDesc();
 		try {
 			 String currCondType = Utils.isNull(request.getParameter("currCondType"));
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));			 
 			
 			logger.debug("currCondNo:"+currCondNo+",currCondType:"+currCondType);
 			
-			if (currCondNo.equalsIgnoreCase("2") || currCondNo.equalsIgnoreCase("3") || currCondNo.equalsIgnoreCase("4")){
-			
-				ConditionFilterBean filterBean = forms.getFilterBean();
-				filterBean.setCurrCondNo(currCondNo);
-				filterBean.setCurrCondType(currCondType);
-				
-				logger.debug("condType1:"+filterBean.getCondType1()+",condCode1:"+filterBean.getCondCode1());
-				logger.debug("condType2:"+filterBean.getCondType2()+",condCode2:"+filterBean.getCondCode2());
-				logger.debug("condType3:"+filterBean.getCondType3()+",condCode3:"+filterBean.getCondCode3());
-				
-			    request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueListByParent(user,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc(),filterBean));
+			/** Check Next page no query **/
+			 String queryStr= request.getQueryString();
+			 if(queryStr.indexOf("d-") != -1){
+			 	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+			 	System.out.println("queryStr:"+queryStr);
+			 }
+			 
+			//Case link page in display no search again
+			logger.debug("currentPage:"+request.getParameter(queryStr));
+			if(request.getParameter(queryStr) != null){
+				logger.debug("No Query");
 			}else{
-				request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueList(request,currCondType,forms.getSalesBean().getCode(),forms.getSalesBean().getDesc()));	
+				//Set old criteria data to session
+				request.getSession().setAttribute("code_session", forms.getSalesBean().getCode());
+				request.getSession().setAttribute("desc_session", forms.getSalesBean().getDesc());
+				
+				if (currCondNo.equalsIgnoreCase("2") || currCondNo.equalsIgnoreCase("3") || currCondNo.equalsIgnoreCase("4")){
+				
+					ConditionFilterBean filterBean = forms.getFilterBean();
+					filterBean.setCurrCondNo(currCondNo);
+					filterBean.setCurrCondType(currCondType);
+					
+					logger.debug("condType1:"+filterBean.getCondType1()+",condCode1:"+filterBean.getCondCode1());
+					logger.debug("condType2:"+filterBean.getCondType2()+",condCode2:"+filterBean.getCondCode2());
+					logger.debug("condType3:"+filterBean.getCondType3()+",condCode3:"+filterBean.getCondCode3());
+					
+				    request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueListByParent(user,currCondType,forms.getSalesBean().getCode(),desc,filterBean));
+				}else{
+					request.getSession().setAttribute("VALUE_LIST", SAInitial.getInstance().getConditionValueList(request,currCondType,forms.getSalesBean().getCode(),desc));	
+				}
 			}
-			
 		} catch (Exception e) {
 			logger.debug(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());

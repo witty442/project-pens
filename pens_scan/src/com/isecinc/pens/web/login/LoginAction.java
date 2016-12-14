@@ -18,6 +18,7 @@ import util.DBCPConnectionProvider;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.web.managepath.ManagePath;
@@ -47,6 +48,7 @@ public class LoginAction extends DispatchAction {
 			HttpServletResponse response) {
 		Connection conn = null;
 		LoginForm loginForm = null;
+		String forward = "pass";
 		try {
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
@@ -65,6 +67,9 @@ public class LoginAction extends DispatchAction {
 			}
 			request.getSession(true).setAttribute("user", user);
 			
+			if ( Utils.userInRole(user,new String[]{User.POS}) ){
+				forward = "passPos";
+			}
 			//clear check version
 			request.getSession().setAttribute("appVersionCheckMsg",null);
 			request.getSession().setAttribute("massageToSales",null);
@@ -78,7 +83,7 @@ public class LoginAction extends DispatchAction {
 				conn.close();
 			} catch (Exception e2) {}
 		}
-		return mapping.findForward("pass");
+		return mapping.findForward(forward);
 	}
 	public ActionForward logoff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {

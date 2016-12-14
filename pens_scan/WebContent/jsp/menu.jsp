@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -9,6 +10,7 @@ String role = ((User)session.getAttribute("user")).getType();
 User user = (User)session.getAttribute("user");
 %>
 <ul id="nav">
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
   <li class="parent"><a href="#"><span>ScanBarcode</span></a>
   		<ul>
           	<li>
@@ -16,7 +18,8 @@ User user = (User)session.getAttribute("user");
           	</li>
       </ul>
   </li>
-  
+ <%} %>
+ <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
    <li class="parent"><a href="#"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
   		<ul>
           	<li>
@@ -28,7 +31,8 @@ User user = (User)session.getAttribute("user");
           	
       </ul>
   </li> 
-  
+  <%} %>
+  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
    <li class="parent"><a href="#"><span>รายงาน</span></a>
       <ul>
 	    <li>
@@ -36,7 +40,11 @@ User user = (User)session.getAttribute("user");
 		</li>
 	  </ul>
    </li>
-	
+  <%} %>
+   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.POS}) ){%>
+   <li class="parent"><a href="window.location='${pageContext.request.contextPath}/jsp/posAction.do?do=prepare2&action=new'"><span>ออกใบกำกับภาษี</span></a>
+   </li>
+  <%} %>
   </ul>
   
   

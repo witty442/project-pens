@@ -202,6 +202,10 @@ public class ImportAction extends I_Action {
         }else if("LoadStockInitMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
         	return ImportLoadStockInitProcess.importProcess(mapping, importForm, request, response,"MTT");
+        	
+         }else if("filePosBME".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	
+        	return FilePosBMEProcess.importFilePostBME(mapping, importForm, request, response);
         
          }else if("reconcile".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	 importForm.setImported(false);
@@ -241,6 +245,9 @@ public class ImportAction extends I_Action {
 			if("reconcile".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				fileName ="Reconcile.xls";
 				htmlTable = export.genReconcileHTML(request,importForm);
+			}else if("filePosBME".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				fileName ="Pos_BME.xls";
+				htmlTable = FilePosBMEProcess.genExcelHTML(request,importForm);
 			}
 			 //logger.debug("fileName:"+fileName);
 	        //fileName = Utils.toUnicodeChar(fileName);
