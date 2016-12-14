@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.model.MUser"%>
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -6,10 +9,16 @@
 <%@taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 
 <%@page import="com.isecinc.pens.SystemProperties"%>
+<%
+User userDefault = new MUser().getCurrentUserName();
+String userName = Utils.isNull(userDefault.getUserName());
+String password = Utils.isNull(userDefault.getPassword());
+%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css">
 <style type="text/css">
@@ -93,8 +102,8 @@ function gologin(e){
 		              <td><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="5" /></td>
 		            </tr>
 		            <tr>
-		              <td><html:text property="userName" size="10"/></td>
-		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="1234"/></td>
+		              <td><html:text property="userName" size="10" onkeypress="gologin(event);" value="<%=userName %>"/></td>
+		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="<%=password %>"/></td>
 		            </tr>
 		            <tr>
 		            	<td colspan="2">

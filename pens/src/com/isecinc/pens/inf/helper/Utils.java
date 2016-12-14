@@ -1,8 +1,16 @@
 
 package com.isecinc.pens.inf.helper;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.channels.Channel;
+import java.nio.channels.Channels;
+import java.nio.channels.SocketChannel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,14 +59,165 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	   
-	    	//BigDecimal value1 = new BigDecimal("39.24").setScale(0,BigDecimal.ROUND_UP);
-	    	//String value1 = 
-	    	//System.out.println(value1);
-	    	
+	    	System.out.println(isInternetConnect());
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
 	}
+	
+	public static void stopTomcat(){
+	      String line;
+	      OutputStream stdin = null;
+	      InputStream stderr = null;
+	      InputStream stdout = null;
+	      try{
+	          //Runtime.getRuntime().exec("taskkill /IM "+ );
+	          System.out.println("stopTomcat");
+	          String command = "taskkill /f /IM tomcat6.exe";
+	          Process process = Runtime.getRuntime().exec(command);
+
+	          String command2 = "taskkill /f /IM cmd.exe";
+	          process = Runtime.getRuntime().exec(command2);
+	          
+	            stdin = process.getOutputStream ();
+	            stderr = process.getErrorStream ();
+	            stdout = process.getInputStream ();
+
+	            // "write" the parms into stdin
+	            line = "param1" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	            line = "param2" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	            line = "param3" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	           // System.out.println("stdin:"+stdin.toString());
+	            stdin.close();
+
+	            // clean up if any output in stdout
+	            BufferedReader brCleanUp = new BufferedReader (new InputStreamReader (stdout));
+	            while ((line = brCleanUp.readLine ()) != null) {
+	              System.out.println ("[Stdout] " + line);
+	            }
+	            brCleanUp.close();
+
+	            // clean up if any output in stderr
+	            brCleanUp =new BufferedReader (new InputStreamReader (stderr));
+	            while ((line = brCleanUp.readLine ()) != null) {
+	              System.out.println ("[Stderr] " + line);
+	            }
+	            brCleanUp.close();
+	            
+	       }catch(Exception e){
+	          e.printStackTrace();
+	       }  
+	    }
+	   
+	    public static void startTomcat(){
+	        String line;
+	        OutputStream stdin = null;
+	        InputStream stderr = null;
+	        InputStream stdout = null;
+	        String command = "";
+	        String pathTomcat = "C:/Program Files/Apache Software Foundation/Tomcat 6.0/webapps/";
+	        String pathTomcatX64 = "C:/Program Files (x86)/Apache Software Foundation/Tomcat 6.0/webapps/";
+	        String windowType ="x86";
+	        try{
+	        	//Validate Path Tomcat Case Windwo 64 bit
+	            if( !FileUtil.isFolderExist(pathTomcat)){
+	               pathTomcat = pathTomcatX64; 
+	               windowType = "x64";
+	            }
+	            
+	            System.out.println("startTomcat");
+	            //Runtime.getRuntime().exec("cmd ");
+	            System.out.println("windowType:"+windowType);
+	            if("x64".equals(windowType)){
+	              command = "cmd /c start d:/salesApp/SalesAppUpdater/startTomcatX64.bat_sh.lnk";
+	              //command = "cmd /c start C:\\\\Program Files (x86)\\\\Apache Software Foundation\\\\Tomcat 6.0\\\\bin\\\\tomcat6.exe";
+	            }else{
+	              command = "cmd /c start d:/salesApp/SalesAppUpdater/startTomcat.bat_sh.lnk";
+	              // command = "start C:\\\\Program Files\\\\Apache Software Foundation\\\\Tomcat 6.0\\\\bin\\\\tomcat6.exe";
+	            }
+	            Process process = Runtime.getRuntime().exec(command);
+	            
+	           // System.out.println("startTomcat:"+child.exitValue());
+	            stdin = process.getOutputStream ();
+	            stderr = process.getErrorStream ();
+	            stdout = process.getInputStream ();
+
+	            // "write" the parms into stdin
+	            line = "param1" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	            line = "param2" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	            line = "param3" + "\n";
+	            stdin.write(line.getBytes() );
+	            stdin.flush();
+
+	           // System.out.println("stdin:"+stdin.toString());
+	            stdin.close();
+
+	            // clean up if any output in stdout
+	            BufferedReader brCleanUp = new BufferedReader (new InputStreamReader (stdout));
+	            while ((line = brCleanUp.readLine ()) != null) {
+	              System.out.println ("[Stdout] " + line);
+	            }
+	            brCleanUp.close();
+
+	            // clean up if any output in stderr
+	            brCleanUp =new BufferedReader (new InputStreamReader (stderr));
+	            while ((line = brCleanUp.readLine ()) != null) {
+	              System.out.println ("[Stderr] " + line);
+	            }
+	            brCleanUp.close();
+	        }catch(Exception e){
+	            e.printStackTrace();
+	        }
+	   }
+	public static boolean isInternetConnect(){
+		boolean r = true;
+		try{
+		   InetAddress addr = InetAddress.getByName("www.google.co.th");
+		   //System.out.println(addr.getHostName());
+		}catch(Exception e){
+			//e.printStackTrace();
+			r = false;
+		}
+		return r;
+	}
+	public static boolean isInternetConnect_bk(){
+		boolean r = true;
+		try{
+			 int timeout = 2000;
+			 InetAddress[] addresses = InetAddress.getAllByName("www.google.com");
+			 for (InetAddress address : addresses) {
+			    if (address.isReachable(timeout)){
+			      System.out.printf("%s is reachable%n", address);
+			      r = true;
+			      break;
+			    }else{
+			      System.out.printf("%s could not be contacted%n", address);
+			      r = false;
+			      break;
+			    }
+			 }
+		}catch(Exception e){
+			//e.printStackTrace();
+			r = false;
+		}
+		return r;
+	}
+	
 	public static String decimalFormat(double num){
 		NumberFormat formatter = new DecimalFormat(format_current_2_disgit);
 		return formatter.format(num);
@@ -339,7 +498,26 @@ public class Utils {
 		return new SimpleDateFormat(pattern, Locale.US).format(date);
 	}
 	
-	
+	public static boolean isLocationValid(String str) {
+		boolean r= true;
+		if (str ==null || Utils.isNull(str).equals("")){
+			return false;
+		}
+		//logger.debug("before 1str:"+str);
+		str = str.replaceAll("\\,", "");
+		//logger.debug("before 2str:"+str);
+		str = str.replaceAll("\\.", "");
+		//logger.debug("before 3str:"+str);
+		str = str.replaceAll(" ", "");
+		//logger.debug("after str:"+str.trim());
+		try{
+			BigDecimal c = new BigDecimal(str);
+		}catch(Exception e){
+			//e.printStackTrace();
+			r= false;
+		}
+		return r;
+	}
 	
 	public static String isNull(String str) {
 		if (str ==null){

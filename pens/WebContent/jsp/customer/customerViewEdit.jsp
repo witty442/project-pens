@@ -54,6 +54,7 @@ System.out.println("readOnly["+readOnly+"]styleClass["+styleClass+"]");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <style type="text/css">
@@ -85,11 +86,11 @@ body {
 function getLocation(path){
 	var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
 	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName);
-	var width= window.innerWidth-50;
-	var height= window.innerHeight-50;
+	var width= window.innerWidth;
+	var height= window.innerHeight;
 	//alert(width+","+height);
-	PopupCenter(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print",width,height);
-	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
+	//PopupCenter(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print",width,height);
+	window.open(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
 }
 
  function setLocationValue(location){
@@ -691,7 +692,7 @@ function setMainCustomer(code, name){
 							<tr>
 								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
 								<td align="left" colspan="3">
-									<html:text property="customer.location" size="100" readonly="false" styleId="location" styleClass="" /> 
+									<html:text property="customer.location" size="100" readonly="true" styleId="location" styleClass="disableText" /> 
 								</td>
 							</tr>
 							<tr>

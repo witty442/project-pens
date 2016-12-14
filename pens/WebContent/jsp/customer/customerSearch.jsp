@@ -51,6 +51,7 @@ if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
@@ -132,7 +133,7 @@ $(function() {
 	window.location = path+"/jsp/interfaces/interfaces.jsp";
  }
  
- setTimeout(function(){ $("#dialog").dialog('close');},4000);
+ setTimeout(function(){ $("#dialog").dialog('close');},9000);
  
  <%}else{%>
  
@@ -169,8 +170,8 @@ $(function() {
 	 
 		//alert(lat+","+lng);
 	 if(imageFileName != "" ){
-		var width= window.innerWidth-100;
-		var height= window.innerHeight-100;
+		var width= screen.innerWidth-50;
+		var height= screen.innerHeight-50;
 	
 		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
 			
@@ -473,8 +474,8 @@ $(function() {
 
 <div id="dialog" title="คำแนะนำ" style="display:none">
     <p align="center"><b>
-     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=msg4[0]%></a> 
-     OR <%=msg4[1] %></font></b>
+     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=msg4[0]%></font></a> 
+     &nbsp;|&nbsp; <%=msg4[1] %></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
 	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>

@@ -355,6 +355,7 @@ public class MOrder extends I_Model<Order> {
 		whereCause += "  and doc_status <> 'VO' ";
 		if (selected.length() > 0) whereCause += "  and order_id " + operator + " (" + selected + ") ";
 
+		logger.debug("WhereSql:"+whereCause);
 		pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Order.class);
 		return pos;
 	}

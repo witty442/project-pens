@@ -39,6 +39,19 @@ public class FileUtil {
 	public static void main(String[] s){
 		
 	}
+	 public static boolean isFolderExist(String path) {
+        boolean r = false;
+        try{
+            File file = new File(path);
+            if(file.exists()) {
+              r = true;
+            }
+          
+        }catch(Exception e){
+          e.printStackTrace();
+        }
+       return r;
+    }
 	public static String writeImageFile(String path,InputStream in){
 		try{
 			OutputStream out = new FileOutputStream(path);

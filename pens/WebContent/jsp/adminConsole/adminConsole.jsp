@@ -1,3 +1,4 @@
+<%@page import="test.gps.SerialTest"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -13,7 +14,9 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="adminConsoleForm" class="com.isecinc.pens.web.adminconsole.AdminConsoleForm" scope="request" />
+<%
 
+%>
 <html>
 <head>
 <title>Admin Console</title>
@@ -197,6 +200,7 @@ function submitBT(path){
 		       <html:textarea property="configInfo" style=" width :100%;" rows="14"/>
 		     <br><br>
 		   <INPUT TYPE="button" class="button2_style" name ="B_TEST_INFO" VALUE="Submit Test Connection" onclick="submitBT('<%=request.getContextPath()%>');"><br><br>
+		   
 		   <span class="text_style">Result Test Connection </span><br>
 		   <html:textarea property="configInfoTest" style=" width :100%;" rows="16"/>
 	  </div>

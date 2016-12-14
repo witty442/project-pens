@@ -314,7 +314,6 @@ public class ExportProcess {
 			tableBean.setImageFileList(imageFileList);
 			
 			return tableBean;
-			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -482,6 +481,7 @@ public class ExportProcess {
 			"	M.CODE AS CUSTOMER_NUMBER ,  \n"+
 			"	M.NAME  AS CUSTOMER_NAME,	\n"+
 			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
+			"   M.location, \n"+
 			"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
 			"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longitude \n"+
 			"	FROM m_customer M 	\n"+
@@ -494,22 +494,25 @@ public class ExportProcess {
 			
 			rs = ps.executeQuery();
 			while(rs.next()){
-				totalRows++;
-				for(i=0;i<tableBean.getColumnBeanList().size();i++){
-					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
-					logger.debug("colName:"+colBean.getColumnName());
-					if(i==tableBean.getColumnBeanList().size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-					   dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}
-				}//for
-				dataAppend.append(Constants.newLine);//new line
+				//validate location format
+				if(Utils.isLocationValid(rs.getString("location"))){
+					totalRows++;
+					for(i=0;i<tableBean.getColumnBeanList().size();i++){
+						ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+						logger.debug("colName:"+colBean.getColumnName());
+						if(i==tableBean.getColumnBeanList().size()-1){
+							lastAppen = "";
+						}else{
+							lastAppen = Constants.delimeterPipeStr;
+						}
+						if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+							dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+						}else{
+						   dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+						}
+					}//for
+					dataAppend.append(Constants.newLine);//new line
+				}
 			}//while
 			
 			return dataAppend.toString();

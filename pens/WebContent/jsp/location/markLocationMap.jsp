@@ -13,11 +13,15 @@ String zoom = "1";
 if(customerList != null && customerList.size() >0){ 
       for(int r=0;r<customerList.size();r++){
 	   	   Customer c = customerList.get(r);
-	   	   if(r==customerList.size()-1){
-	   	      locations +="['"+c.getName()+"', "+c.getLocation()+", "+r+"] \n";
-	   	   }else{
-	   		  locations +="['"+c.getName()+"', "+c.getLocation()+", "+r+"],\n";  
-	   	   }
+	   	   //System.out.println("Location:"+c.getLocation());
+	   	   
+	   	   if(Utils.isLocationValid(c.getLocation())){
+		   	   if(r==customerList.size()-1){
+		   	      locations +="['"+c.getName()+"', "+c.getLocation()+", "+r+"] \n";
+		   	   }else{
+		   		  locations +="['"+c.getName()+"', "+c.getLocation()+", "+r+"],\n";  
+		   	   }
+	   	   }//if
      }
  }
 %>

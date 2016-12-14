@@ -859,7 +859,7 @@ public class FTPManager {
 				TableBean tableBean = (TableBean) controlTableMap.get(fileControlName);
 				logger.debug("export image fileControlName:"+fileControlName); 
 				
-				if("CUSTLOC".equalsIgnoreCase(fileControlName)){
+				if("LOCATION".equalsIgnoreCase(fileControlName)){
 					/** Case Export Customer Export Location **/
 				
 					if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
@@ -869,7 +869,7 @@ public class FTPManager {
             	     /** Upload image file to Ftp Server **/
 					if(tableBean.getImageFileList() != null && tableBean.getImageFileList().size() >0){
 						try{
-            	          uploadImageAllToFTP(userBean ,tableBean);
+            	            uploadImageAllToFTP(userBean ,tableBean);
 						}catch(Exception e){
 							logger.info("No throw Exception Error uploaf image:"+e.getMessage());
 						}
@@ -913,7 +913,7 @@ public class FTPManager {
 			ftp.connect(server);
 			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
 			
-			//ftp.setConnectTimeout(connectTimeout);
+			//ftp.setConnectTimeout(10000);
 
 			logger.info("connection timeout:"+ftp.getConnectTimeout());
 			
@@ -930,7 +930,7 @@ public class FTPManager {
 					ftp.changeWorkingDirectory(path);
 					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
 
-					logger.info("Write fileName:"+tableBean.getTableName());
+					logger.info("Write fileName:"+tableBean.getTableName()+":"+tableBean.getFileFtpNameFull());
 					out = ftp.storeFileStream(tableBean.getFileFtpNameFull());
 				    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
 				    

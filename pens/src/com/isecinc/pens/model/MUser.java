@@ -1,12 +1,16 @@
 package com.isecinc.pens.model;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 import util.ConvertNullUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 
 /**
  * I_Model Class
@@ -53,6 +57,34 @@ public class MUser extends I_Model<User> {
 		return array;
 	}
 
+	public User  getCurrentUserName() throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		User userDefault = new User();
+		try{
+			String sql ="\n select user_name,password from ad_user where user_name <> 'admin' " ;
+			      sql +="\n and 1=1 and user_id = (select user_id from t_order where created = (select max(created) from t_order))";
+			      
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				userDefault.setUserName(Utils.isNull(rst.getString("user_name")));
+				userDefault.setPassword(Utils.isNull(rst.getString("password")));
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return userDefault;
+	}
 	/**
 	 * Save
 	 * 

@@ -74,6 +74,8 @@ public class RunScriptDBAction {
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
 
+			//Update location is unvalid format
+			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -243,6 +245,7 @@ public class RunScriptDBAction {
 		}
 		return success;
   }
+	
 	
 	//Delete Data m_sales_target_new back 2 month
 	private static boolean purgDataSalesTarget(Connection conn){

@@ -36,33 +36,37 @@ function openDBBackupPopup(path){
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/footer_left.png" border="0"/></td>
-		<td width="44px;"><img src="${pageContext.request.contextPath}/images2/footer_left2.png" border="0"/></td>
+		<td width="44px;"><img src="${pageContext.request.contextPath}/images2/footer_left2.png" border="0"/>
+		
+		</td>
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
+           <b>
         	App Version
 			 <a href ="javascript:openPopup('${pageContext.request.contextPath}');">
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			 </a>&nbsp;
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
-			  <font color="red"><%=msg3[0] %></font> </a>OR <%=msg3[1] %>
+			  <font color="red"><%=msg3[0] %></font> </a>|&nbsp;&nbsp;<%=msg3[1] %>
 			  &nbsp;
-			  <font color="black">|วันที่ปัจจุบัน 
+			  <font color="black">|วันที่&nbsp; 
 			   <script>
 			  var currentdate = new Date(); 
 			  var datetime = "" + currentdate.getDate() + "/"
 			                  + (currentdate.getMonth()+1)  + "/" 
-			                  + (currentdate.getFullYear()+543) + " เวลา  "  
+			                  + (currentdate.getFullYear()+543) + "|"  
 			                  + currentdate.getHours() + ":"  
 			                  + currentdate.getMinutes() + ":" 
 			                  + currentdate.getSeconds();
 			            document.write(datetime);
 			  </script>
-			 |<b>ConfigType:<%=EnvProperties.getInstance().getProperty("config.type") %></b>
+			 |Type:<%=EnvProperties.getInstance().getProperty("config.type") %>
 			  </font> |
 			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
-			      <font color="green"> กดเพื่อสำรองข้อมูลการขาย</font>
+			      <font color="green">สำรองข้อมูล</font>
 			       <img src="${pageContext.request.contextPath}/icons/process.gif"></img>
 			   </a>
-			   
+			   &nbsp;|&nbsp;เบอร์โทรไอที : 087-8016837, 083-3061296
+			  </b>
 		</td>
         <td width="60px"><img src="${pageContext.request.contextPath}/images2/footer_right2.png" border="0"/></td>
         <td width="31px;"><img src="${pageContext.request.contextPath}/images2/footer_right.png" border="0"/></td>

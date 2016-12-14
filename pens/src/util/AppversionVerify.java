@@ -103,7 +103,7 @@ public class AppversionVerify {
 					//appVersion not match
 					msg[0] =  getAppVersionMessageToSales(request);//SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
 					       
-					msg[1] = "<a href='https://dl.dropboxusercontent.com/u/24337336/pens/SalesApp/pensclient.war'>Download</a>";
+					msg[1] = "";
 				}else{
 					msg[0] = "";
 					msg[1] = "";
