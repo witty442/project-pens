@@ -186,8 +186,18 @@ public class OrderLine extends I_PO implements Serializable {
 	private Date orderDate;
 	private String status;
 	
+	private String cancelDate;
 	
 	
+	
+	public String getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(String cancelDate) {
+		this.cancelDate = cancelDate;
+	}
+
 	public String getOrg() {
 		return org;
 	}

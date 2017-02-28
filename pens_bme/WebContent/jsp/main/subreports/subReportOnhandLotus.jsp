@@ -66,8 +66,9 @@ body {
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    
-			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text_center" style="width:10%"/>
-			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="td_text_center" style="width:10%"/>
+			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text_center" style="width:8%"/>
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="td_text" style="width:8%"/>
+			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="td_text_center" style="width:5%"/>
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center" style="width:8%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
 			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>
@@ -80,7 +81,7 @@ body {
 			   <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
 				<display:footer>
 			      <tr class="text_blod">
-			          <td colspan="3" align="right"><b>รวม</b></td>
+			          <td colspan="4" align="right"><b>รวม</b></td>
 			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
@@ -100,6 +101,7 @@ body {
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text_center" style="width:10%"/>
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="td_text" style="width:10%"/>
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center" style="width:10%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
 			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>
@@ -112,7 +114,7 @@ body {
 			     <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
 			    <display:footer>
 			      <tr class="text_blod">
-			          <td colspan="2" align="right"><b>รวม</b></td>
+			          <td colspan="3" align="right"><b>รวม</b></td>
 			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>

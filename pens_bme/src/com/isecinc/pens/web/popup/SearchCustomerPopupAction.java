@@ -325,6 +325,29 @@ public class SearchCustomerPopupAction extends I_Action {
 		}
 		return mapping.findForward("searchMC");
 	}
+	
+	public ActionForward searchMultiCustomer(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchMultiCustomer");
+		PopupForm popupForm = (PopupForm) form;
+		try {
+			
+			 String storeType = Utils.isNull(request.getParameter("storeType"));
+			 String storeGroup = Utils.isNull(request.getParameter("storeGroup"));
+			 logger.debug("StoreType["+storeType+"]storeGroup["+storeGroup+"]");
+			
+			 List<PopupForm> results = SummaryDAO.searchCustomerMaster(popupForm,storeType,storeGroup,"");
+			 if(results != null && results.size() >0){
+				 request.setAttribute("CUSTOMER_LIST", results);
+			 }else{
+				 request.setAttribute("Message", "ไม่พบข่อมูล");
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("searchMultiCustomer");
+	}
+	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

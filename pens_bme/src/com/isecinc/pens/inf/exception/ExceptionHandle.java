@@ -148,6 +148,8 @@ public class ExceptionHandle {
 			 throw new java.sql.SQLIntegrityConstraintViolationException("ColName["+colName+"] Value["+value+"]: Duplicate Primary Key ");
 		}else if(classException.equals("FindUserException")){
 			 throw new FindUserException("ColName["+colName+"] Value["+value+"]: Cannot find User ID ");
+		}else if(classException.equals("FieldValueNotFoundException")){
+			 throw new FieldValueNotFoundException("ColName["+colName+"] Value["+value+"]: Cannot find "+colName+"  ");
 		}
 		
 	}

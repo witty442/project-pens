@@ -89,6 +89,10 @@ function search(path){
 		alert("กรุณาระบุ BILL DATE");
 		return false;
 	}
+	/* if( $('#productName').val()==""){
+		alert("กรุณาระบุ Product");
+		return false;
+	} */
 	form.action = path + "/jsp/saveInvoiceAction.do?do=search2&action=newsearch";
 	form.submit();
 	return true;
@@ -154,6 +158,11 @@ function save(path){
 										 <html:text property="bean.BILL_DATE" styleClass="" styleId="BILL_DATE"></html:text>
 										
 									</td>
+									<td> Product <font color="red"></font>
+									  <html:select property="bean.productName" styleId="productName">
+											<html:options collection="productNameList" property="key" labelProperty="name"/>
+									    </html:select>
+									</td>
 								</tr>
 								
 						   </table>
@@ -217,6 +226,9 @@ function save(path){
 									    <input type ="text" name="oracle_invoice_no" value="<%=mc.getORACLE_INVOICE_NO()%>"/>
 									      <input type ="hidden" name="bill_10" value="<%=mc.getBILL_10() %>"/>
 									      <input type ="hidden" name="bill_date" value="<%=mc.getBILL_DATE() %>"/>
+									      <input type ="hidden" name="busCode" value="<%=mc.getBUS_CODE() %>"/>
+									      <input type ="hidden" name="deptCode" value="<%=mc.getDEPT_CODE() %>"/>
+									      <input type ="hidden" name="productCode" value="<%=mc.getPRODUCT_CODE() %>"/>
 									</td>
 									    <td class="td_text" width="7%" nowrap><%=mc.getCustCode() %></td>
 									    <td class="td_text" width="7%"><%=mc.getCustDesc() %></td>

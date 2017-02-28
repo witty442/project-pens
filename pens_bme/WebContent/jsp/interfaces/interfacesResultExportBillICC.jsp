@@ -15,6 +15,7 @@
 		<th width="10%">FileName</th>
 		<th width="10%">Status</th>
 		<th width="10%">Total Line</th>
+		<th width="10%">Total Qty</th>
 		<th width="50%">Message</th>
 	</tr>
 	<c:forEach var="results" items="${interfacesForm.monitorItemList}" varStatus="rows">
@@ -39,6 +40,7 @@
 			<td><span class="<c:out value='${tabclass}'/>">${results.fileName}</span></td>
 			<td align="center"><span class="<c:out value='${tabclass}'/>">${results.statusDesc}</span></td>
 			<td><span class="<c:out value='${tabclass}'/>">${results.dataCount}</span></td>
+			<td><span class="<c:out value='${tabclass}'/>">${results.totalQty}</span></td>
 			<td align="left"><span class="<c:out value='${tabclass}'/>">${results.errorMsg}</span></td>
 			
 		</tr>

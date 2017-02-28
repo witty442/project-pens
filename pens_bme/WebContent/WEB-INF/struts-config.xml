@@ -93,6 +93,18 @@
 		<form-bean name="saDamageForm" type="com.isecinc.pens.web.sa.SADamageForm" />
 		<form-bean name="saTranForm" type="com.isecinc.pens.web.sa.SATranForm" />
 		<form-bean name="saReportForm" type="com.isecinc.pens.web.sa.SAReportForm" />
+		
+		<!-- Sales Analyst-->
+		<form-bean name="salesAnalystReportForm" type="com.isecinc.pens.web.salesanalyst.SAReportForm" />
+		
+		<form-bean name="SAsearchValuePopupForm" type="com.isecinc.pens.web.salesanalyst.SASearchValuePopupForm" />
+		<form-bean name="lockItemOrderForm" type="com.isecinc.pens.web.lockitem.LockItemOrderForm" />
+		
+		<!-- Schedule -->
+		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
+		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
+		
+		
 	</form-beans>
 	
 	<global-forwards>
@@ -100,6 +112,22 @@
 	</global-forwards>
 		
 	<action-mappings>
+	     <!-- SALES ANALYST -->
+		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction" forward="/jsp/salesAnalyst/sales_analyst.jsp" />
+		<action name="salesAnalystReportForm" path="/jsp/salesAnalystReportAction" parameter="do" scope="session"
+			type="com.isecinc.pens.web.salesanalyst.SAReportAction">
+			<forward name="search" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+			<forward name="prepare" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+			<forward name="clearform" path="/jsp/salesAnalyst/sales_analyst.jsp" />
+		</action>
+		<action name="SAsearchValuePopupForm" path="/jsp/SAsearchValuePopupAction" forward="/jsp/salesAnalyst/searchValuePopup.jsp" />
+		<action name="SAsearchValuePopupForm" path="/jsp/SAsearchValuePopupAction" parameter="do" scope="request"
+			type="com.isecinc.pens.web.salesanalyst.SearchValuePopupAction">
+			<forward name="search" path="/jsp/salesAnalyst/searchValuePopup.jsp" />
+			<forward name="prepare" path="/jsp/salesAnalyst/searchValuePopup.jsp" />
+			<forward name="clearform" path="/jsp/salesAnalyst/searchValuePopup.jsp" />
+		</action>
+		
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
 			 <forward name="pass_admin" path="/jsp/mainpage.jsp" redirect="true" />
@@ -226,6 +254,7 @@
 			
 			<forward name="search3" path="/jsp/popup/searchCustomerPopupOneWithSubInv.jsp" />
 			<forward name="searchMC" path="/jsp/popup/searchMCStaffPopup.jsp" />
+			<forward name="searchMultiCustomer" path="/jsp/popup/searchMultiCustomerPopup.jsp" />
 		</action>
 		
 		<!-- POPUP -->
@@ -595,6 +624,21 @@
 		<action name="adminConsoleForm" path="/jsp/adminConsole" parameter="do" scope="request" type="com.isecinc.pens.web.adminconsole.AdminConsoleAction" >
 			<forward name="process" path="/jsp/adminConsole/adminConsole.jsp" />
 		</action>
+		
+		<action name="lockItemOrderForm" path="/jsp/lockItemOrderAction" parameter="do" scope="session" type="com.isecinc.pens.web.lockitem.LockItemOrderAction">
+			<forward name="search" path="/jsp/lockItemOrder/lockItemOrderSearch.jsp" />
+			<forward name="detail" path="/jsp/lockItemOrder/lockItemOrder.jsp" />
+		</action>
+		
+		<action  name="scheduleForm" path="/schedule" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.ScheduleAction" >
+           <forward name="Success" path="/jsp/schedule/mainSchedule.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
+        </action>
+        
+        <action  name="searchTaskForm" path="/searchTask" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.SearchTaskAction" >
+           <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
+        </action>
 		
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

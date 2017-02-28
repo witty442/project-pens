@@ -475,10 +475,10 @@ public class FTPManager {
 				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
-			
 		}
 	}
 	
+
 	public static String convertStreamToString(InputStream is,String tableName,User userBean) throws IOException {
         /*
           * To convert the InputStream to String we use the

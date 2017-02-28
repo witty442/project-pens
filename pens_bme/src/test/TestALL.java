@@ -110,4 +110,18 @@ public class TestALL {
 	 }
 	 return output;
   }
+ 
+ public static String testDataSource(){
+	 try{
+	    javax.naming.Context initContext = new javax.naming.InitialContext();
+		javax.naming.Context envContext  = (javax.naming.Context)initContext.lookup("java:/comp/env");
+		javax.sql.DataSource ds = (javax.sql.DataSource)envContext.lookup("jdbc/pensbi");
+		Connection conn = ds.getConnection();
+		return "DB Result Test Connection DataSource: Success ["+conn+"]\n";
+    }catch(Exception e){
+    	e.printStackTrace();
+    }
+	 return"";
+ }
+ 
 }

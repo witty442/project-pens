@@ -851,7 +851,7 @@ public class ImportHelper {
 				       String posValue = Utils.isNull(lineArray[colBean.getTextPosition()]);
 				       
 				       // Case LineStr[pos]='' update by old data
-				       logger.debug("tableName["+tableBean.getTableName()+"]colName["+colBean.getColumnName()+"]posValue["+posValue+"]");
+				       //logger.debug("tableName["+tableBean.getTableName()+"]colName["+colBean.getColumnName()+"]posValue["+posValue+"]");
 				       
 				       if("".equals(posValue)){
 				    	   if(    !"t_order_orcl".equalsIgnoreCase(tableBean.getTableName())

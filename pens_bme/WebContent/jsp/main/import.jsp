@@ -63,7 +63,6 @@ function loadMe(){
 }
 
 function loadStoreList(){
-	
 	var storeCode = document.getElementsByName('storeCode')[0];
 	///alert("StoreType:"+document.getElementsByName('storeType')[0].value);
 	

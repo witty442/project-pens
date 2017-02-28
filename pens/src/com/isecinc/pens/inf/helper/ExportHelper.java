@@ -438,6 +438,12 @@ public class ExportHelper {
 				}else{
 					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
 				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("LONG_TIMESTAMP_LONG_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+				}else{
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+				}
 			}else{
 				 dataConvertStr = Utils.isNull(rs.getString(Utils.removeStringEnter(colBean.getColumnName())));
 			}
@@ -445,31 +451,24 @@ public class ExportHelper {
 		}
 	   return dataConvertStr;
 	}
-	
-	
 
 	
-	public static String covertToFormatExportByFunction(Connection conn,ColumnBean colBean ,String value) throws Exception{
+	public static String covertToFormatExportByFunction(ColumnBean colBean,ResultSet rs,User user) throws Exception{
 		String dataConvertStr = "";
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 		try{
-		   if("GET_REF_ADDRESS_ID".equalsIgnoreCase(colBean.getExternalFunction())){
-			   ps = conn.prepareStatement("select address_id,reference_id from m_address where address_id = "+value);
-			   rs= ps.executeQuery();
-			   if(rs.next()){
-				   
-			   }
-		   }
+		   if(Utils.isNull(colBean.getExternalFunction()).equals("CONVERT_LONG_TO_TIMESTAMP")){
+			   dataConvertStr = Utils.stringValueSpecial(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+			   
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_USER_ID")){	
+				logger.debug("User:"+user.getUserName()+":id:"+user.getId());
+				if(user != null)
+				  dataConvertStr = String.valueOf(user.getId());
+			}	
+				
        }catch(Exception e){
     	   logger.error(e.getMessage(),e);
        }finally{
-    	   if(ps != null){
-    		   ps.close();ps=null;
-    	   }
-    	   if(rs != null){
-    		   rs.close();rs=null;
-    	   }
+    	  
        }
 	   return dataConvertStr;
 	}

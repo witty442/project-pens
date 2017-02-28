@@ -3,11 +3,8 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.util.List;
 
-
-
 public class SAReportBean implements Serializable{
 
-	
 	/**
 	 * 
 	 */
@@ -35,10 +32,12 @@ public class SAReportBean implements Serializable{
     private String totalDamage;
     
     private String asOfMonth;
+    private String asOfDate;
     private String suretyBondAmt;
     private String rewardAmt;
     private String netDamageAmt;
     private String netSuretyBondAmt;
+    private String totalSuretyBondAmt;
     
     private List<SAReportBean> items;
     private String summaryType;
@@ -49,8 +48,100 @@ public class SAReportBean implements Serializable{
     private String totalDelayPayment;
 	private String totalRewardBme;
 	private String totalRewardWacoal;
-    
-    
+	private String countStockDate;
+	private String rewardMonth;
+	private String rewardMonthCount;
+	
+	//Criteria
+	private String countStockDateFrom;
+	private String countStockDateTo;
+	private String payDateFrom;
+	private String payDateTo;
+   
+	private String payType1Amt;
+	private String payType2Amt;
+	private String payType3Amt;
+	private String payType4Amt;
+	
+	
+	public String getPayType1Amt() {
+		return payType1Amt;
+	}
+	public void setPayType1Amt(String payType1Amt) {
+		this.payType1Amt = payType1Amt;
+	}
+	public String getPayType2Amt() {
+		return payType2Amt;
+	}
+	public void setPayType2Amt(String payType2Amt) {
+		this.payType2Amt = payType2Amt;
+	}
+	public String getPayType3Amt() {
+		return payType3Amt;
+	}
+	public void setPayType3Amt(String payType3Amt) {
+		this.payType3Amt = payType3Amt;
+	}
+	public String getPayType4Amt() {
+		return payType4Amt;
+	}
+	public void setPayType4Amt(String payType4Amt) {
+		this.payType4Amt = payType4Amt;
+	}
+	public String getRewardMonthCount() {
+		return rewardMonthCount;
+	}
+	public void setRewardMonthCount(String rewardMonthCount) {
+		this.rewardMonthCount = rewardMonthCount;
+	}
+	public String getCountStockDateFrom() {
+		return countStockDateFrom;
+	}
+	public void setCountStockDateFrom(String countStockDateFrom) {
+		this.countStockDateFrom = countStockDateFrom;
+	}
+	public String getCountStockDateTo() {
+		return countStockDateTo;
+	}
+	public void setCountStockDateTo(String countStockDateTo) {
+		this.countStockDateTo = countStockDateTo;
+	}
+	public String getPayDateFrom() {
+		return payDateFrom;
+	}
+	public void setPayDateFrom(String payDateFrom) {
+		this.payDateFrom = payDateFrom;
+	}
+	public String getPayDateTo() {
+		return payDateTo;
+	}
+	public void setPayDateTo(String payDateTo) {
+		this.payDateTo = payDateTo;
+	}
+	public String getTotalSuretyBondAmt() {
+		return totalSuretyBondAmt;
+	}
+	public void setTotalSuretyBondAmt(String totalSuretyBondAmt) {
+		this.totalSuretyBondAmt = totalSuretyBondAmt;
+	}
+	public String getRewardMonth() {
+		return rewardMonth;
+	}
+	public void setRewardMonth(String rewardMonth) {
+		this.rewardMonth = rewardMonth;
+	}
+	public String getCountStockDate() {
+		return countStockDate;
+	}
+	public void setCountStockDate(String countStockDate) {
+		this.countStockDate = countStockDate;
+	}
+	public String getAsOfDate() {
+		return asOfDate;
+	}
+	public void setAsOfDate(String asOfDate) {
+		this.asOfDate = asOfDate;
+	}
 	public String getTotalRewardBme() {
 		return totalRewardBme;
 	}

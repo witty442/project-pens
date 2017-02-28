@@ -137,6 +137,7 @@ public class ExportOrderToICC extends InterfaceUtils{
 						/** Update Monitor Item To Success **/
 						modelItem.setDataCount(tableBean.getExportCount());
 						modelItem.setSuccessCount(tableBean.getExportCount());
+						modelItem.setTotalQty(tableBean.getTotalQty());
 						modelItem.setErrorMsg("");
 						modelItem.setErrorCode("");
 						
@@ -227,6 +228,7 @@ public class ExportOrderToICC extends InterfaceUtils{
 		StringBuffer dataAppend = new StringBuffer("");
         int i = 0;
         int totalRows = 0;
+        int totalQty = 0;
         String lineStr = "";
 		try{
             logger.debug("Select:"+tableBean.getPrepareSqlSelect());
@@ -246,18 +248,23 @@ public class ExportOrderToICC extends InterfaceUtils{
 				logger.debug("Line length:"+lineStr.length());
 				lineStr += Constants.newLine;//new line
 				dataAppend.append(lineStr);
+				
+				//Sum Total qty
+				if("PENSBME_ICC_DLYR".equalsIgnoreCase(tableBean.getTableName())){
+					totalQty += rs.getInt("qty");
+				}
 			}//while
 			
 			logger.debug("totalRows:"+totalRows);
 			//Add Total record
 			if(totalRows >0){
-			  dataAll.append(InterfaceUtils.appendNumLeft(String.valueOf(totalRows),"0",10)+"\n");
+			   dataAll.append(InterfaceUtils.appendNumLeft(String.valueOf(totalRows),"0",10)+"\n");
 			   dataAll.append(dataAppend);
 			}
 			
 			tableBean.setExportCount(totalRows);
 			tableBean.setDataStrExport(dataAll);
-			
+			tableBean.setTotalQty(totalQty);
 			return tableBean;
 		}catch(Exception e){
 			throw e;

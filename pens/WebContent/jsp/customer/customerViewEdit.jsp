@@ -90,7 +90,7 @@ function getLocation(path){
 	var height= window.innerHeight;
 	//alert(width+","+height);
 	//PopupCenter(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print",width,height);
-	window.open(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
+	window.open(path+"/jsp/location/findLocation.jsp?run=new&customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
 }
 
  function setLocationValue(location){

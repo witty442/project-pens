@@ -158,7 +158,7 @@ TABLE.result TD {
      }
      
     function noLocation() {
-   		$("#location").val("not found");
+    	document.getElementById("location").value="not found";
    		//$('#spnWait').hide();
     }
     

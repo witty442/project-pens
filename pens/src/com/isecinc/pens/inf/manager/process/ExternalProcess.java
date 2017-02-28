@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import util.AppversionVerify;
-import util.MonitorSales;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
@@ -32,7 +31,7 @@ public class ExternalProcess {
 		  
 		  //Get AppVersion and MessageToSales
 		  logger.info("--- 2.Run processAfterImport ---");
-		  AppversionVerify.processAfterImport();
+		  AppversionVerify.processAfterImport(userLogin);
 	}
 
 	/******* export *********************************************/

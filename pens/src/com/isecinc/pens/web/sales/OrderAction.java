@@ -1381,7 +1381,7 @@ public class OrderAction extends I_Action {
 		Customer customer = null;
 		Address address = null;
 		List<Address> addresses = new ArrayList<Address>();
-		
+		String fileName = "tax_invoice_summary_report";
 		String caseReport ="2";//for 
 		
 		try {
@@ -1437,15 +1437,32 @@ public class OrderAction extends I_Action {
 			}
 			
 			//original or copy report
+			//Cash
 			if("original".equalsIgnoreCase(reportType)){
 				pReportTitle ="ใบส่งสินค้า/ใบกำกับภาษี/ใบเสร็จรับเงิน";
+				fileName = "tax_invoice_summary_new_report";
+				parameterMap.put("p_sign_name_1", "พนักงานขาย");
+				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า/ผู้ชำระเงิน");
+				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");
+				
 			}else if("copy".equalsIgnoreCase(reportType)){ 
 				pReportTitle = "ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว"; //default
-				
+				fileName = "tax_invoice_summary_new_report";
+				parameterMap.put("p_sign_name_1", "พนักงานขาย");
+				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า/ผู้ชำระเงิน");
+				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");
+			
+			//Credit
 			}else if("tax".equalsIgnoreCase(reportType)){ 
 				pReportTitle = "ใบส่งของ/ใบกำกับภาษี"; //พิมพ์ใบส่งของ/ใบกำกับภาษี
+				fileName = "tax_invoice_summary_new_report";
+				
+				parameterMap.put("p_sign_name_1", "พนักงานขาย");
+				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า");
+				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");
 			}else if("bill".equalsIgnoreCase(reportType)){ 
 				pReportTitle = "ใบเสร็จรับเงิน"; //พิมพ์ใบเสร็จรับเงิน
+				fileName = "tax_invoice_summary_report";
 			}
 			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
 
@@ -1545,7 +1562,7 @@ public class OrderAction extends I_Action {
 			parameterMap.put("p_sum_total_vat", order.getVatAmount());
 			parameterMap.put("p_sum_total_net", order.getNetAmount());
 			
-			String fileName = "tax_invoice_summary_report";
+			
 			/*if("copy".equalsIgnoreCase(reportType)){
 				if("2".equalsIgnoreCase(caseReport)){
 				  fileName = "tax_invoice_summary_2_report";

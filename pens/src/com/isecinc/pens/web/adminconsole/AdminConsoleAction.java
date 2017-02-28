@@ -11,8 +11,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.hibernate.cfg.Configuration;
 
-import test.gps.SerialTest2;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
@@ -103,7 +101,7 @@ public class AdminConsoleAction extends I_Action {
 						
 					configInfoTest += "\n ----------------------  Result Test GPS Connection ------------------------------------------------------------- \n";
 						try {   
-							  SerialTest2.test();
+							 // SerialTest2.test();
 							  configInfoTest += "\n Test GPS Start ";
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();

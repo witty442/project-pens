@@ -153,6 +153,12 @@ User user = (User)session.getAttribute("user");
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentNewReport.do';"><span><bean:message key="ReceiptReport" bundle="sysprop"/></span></a>
             </li>
+             <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/cancelDetailReport.do';"><span><bean:message key="CancelDetailReport" bundle="sysprop"/></span></a>
+            </li>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderReport.do';"><span><bean:message key="MoveOrderReport" bundle="sysprop"/></span></a>
+            </li>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';"><span><bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></span></a>
             </li>
@@ -165,7 +171,7 @@ User user = (User)session.getAttribute("user");
              <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentReport.do';"><span><bean:message key="ReceiptReport" bundle="sysprop"/>(เวอร์ชั่นเก่า)</span></a>
             </li>
-             
+            
         	<%} %>
         	<%if(role.equalsIgnoreCase(User.TT)){ %>
 	        	<li>

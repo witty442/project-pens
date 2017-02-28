@@ -1304,6 +1304,94 @@ public class GeneralDAO {
 			return custNo;
 		}
 	 
+	 
+	 public static List<Master> getCustGroupList(String custGroup) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<Master> dataList = new ArrayList<Master>();
+			Master m = null;
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				sql.delete(0, sql.length());
+				sql.append("\n select *   ");
+				sql.append("\n FROM PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Customer' ");
+				if( !Utils.isNull(custGroup).equals("")){
+				  sql.append("\n AND pens_value ='"+custGroup+"' \n");
+				}
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new Master();
+					m.setPensValue(rst.getString("pens_value"));
+					m.setPensDesc(rst.getString("pens_desc"));
+					
+					dataList.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return dataList;
+		}
+	 
+	 public static List<Master> getCustGroupListCaseAdd(String custGroup) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<Master> dataList = new ArrayList<Master>();
+			Master m = null;
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				sql.delete(0, sql.length());
+				sql.append("\n select *   ");
+				sql.append("\n FROM PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Customer' ");
+				if( !Utils.isNull(custGroup).equals("")){
+				  sql.append("\n AND pens_value ='"+custGroup+"' \n");
+				}
+				 sql.append("\n AND pens_value not in( \n");
+				 sql.append("\n   select group_store from PENSBME_LOCK_ITEM  \n");
+				 sql.append("\n   where (unlock_date is null or unlock_date > sysdate) ");
+				 sql.append("\n   and store_no ='allStore'");
+				 sql.append("\n  ) \n");
+				 
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new Master();
+					m.setPensValue(rst.getString("pens_value"));
+					m.setPensDesc(rst.getString("pens_desc"));
+					
+					dataList.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return dataList;
+		}
 	 public static Master getMasterIdwacoal(Connection conn ,String type ,String custGroup) throws Exception{
 			PreparedStatement ps =null;
 			ResultSet rs = null;
@@ -1451,5 +1539,45 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return message;
+		}
+	 
+	 public static List<Master> getStoreList(String groupStore) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Master m = null;
+			List<Master> items = new ArrayList<Master>();
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				
+				sql.append("\n select pens_value ,pens_desc FROM ");
+				sql.append("\n PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and reference_code ='Store' ");
+				sql.append("\n and pens_value like '"+groupStore+"%' \n");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+			    while (rst.next()) {
+					m = new Master();
+					m.setPensValue(Utils.isNull(rst.getString("pens_value")));
+					m.setPensDesc(Utils.isNull(rst.getString("pens_desc")));
+					
+					items.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				    conn.close();
+				} catch (Exception e) {}
+			}
+			return items;
 		}
 }

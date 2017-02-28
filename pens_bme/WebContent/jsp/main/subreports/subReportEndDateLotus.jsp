@@ -41,9 +41,10 @@ System.out.println("currentPage:"+currentPage);
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    
-			     <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text" style="width:10%"/>
-			    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"  style="width:8%"/>	 
-			    <display:column  title="Group" property="group"  sortable="false" class="td_text"  style="width:8%"/>	
+			    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text" style="width:5%"/>
+			    <display:column  title="ชื่อสาขา" property="storeName"  sortable="false" class="td_text" style="width:10%"/>
+			    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"  style="width:5%"/>	 
+			    <display:column  title="Group" property="group"  sortable="false" class="td_text"  style="width:6%"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_number"  style="width:8%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number"  style="width:8%"/>	
 			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number"  style="width:8%"/>
@@ -57,9 +58,10 @@ System.out.println("currentPage:"+currentPage);
 			 <%if(currentPage.equals(totalPage)){ %>
 				<table width="100%" class="resultDisp">		
 				    <tr>
+				      <td width="5%">&nbsp;</td>
 				      <td width="10%">&nbsp;</td>
-				      <td width="8%">&nbsp;</td>
-				      <td width="8%">Total</td>
+				      <td width="5%">&nbsp;</td>
+				      <td width="6%"><b>Total</b></td>
 				      <td class="td_number_bold" width="8%"><bean:write name="summary" property="beginingQty"/> </td>
 				      <td class="td_number_bold" width="8%"><bean:write name="summary" property="saleInQty"/> </td>
 				      <td class="td_number_bold" width="8%"><bean:write name="summary" property="saleReturnQty"/> </td>
@@ -79,7 +81,8 @@ System.out.println("currentPage:"+currentPage);
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    
-			   <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"  style="width:20%"/> 
+			    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text"  style="width:8%"/> 
+			    <display:column  title="ชื่อสาขา" property="storeName"  sortable="false" class="td_text"  style="width:12%"/> 
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text" style="width:8%"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_number" style="width:8%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
@@ -94,7 +97,8 @@ System.out.println("currentPage:"+currentPage);
 			<%if(currentPage.equals(totalPage)){ %>
 				<table width="100%" class="resultDisp">		
 				    <tr>
-				      <td width="20%">&nbsp;</td>
+				      <td width="8%">&nbsp;</td>
+				      <td width="12%">&nbsp;</td>
 				      <td width="8%"><b>Total</b></td>
 				      <td class="td_number_bold" width="8%"><bean:write name="summary" property="beginingQty"/> </td>
 				      <td class="td_number_bold" width="8%"><bean:write name="summary" property="saleInQty"/> </td>

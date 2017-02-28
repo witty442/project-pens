@@ -26,6 +26,7 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SADamageDAO;
+import com.isecinc.pens.dao.SATranDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -52,7 +53,7 @@ public class SADamageAction extends I_Action {
 				aForm.setResultsSearch(null);
 				SADamageBean ad = new SADamageBean();
 				//can Edit
-				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 					ad.setCanEdit(true);
 				}
 				aForm.setBean(ad);
@@ -60,7 +61,7 @@ public class SADamageAction extends I_Action {
 				SADamageBean oldCri = aForm.getBeanCriteria();
 				SADamageBean bean = SADamageDAO.searchHead(oldCri,"",false);
 				//can Edit
-				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 					bean.setCanEdit(true);
 				}
 				aForm.setBean(bean);
@@ -131,7 +132,7 @@ public class SADamageAction extends I_Action {
 			}
 			
 			//can Edit
-			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 				bean.setCanEdit(true);
 			}
 			
@@ -204,7 +205,7 @@ public class SADamageAction extends I_Action {
 			aForm.setResultsSearch(null);
 			SADamageBean bean = new SADamageBean();
 			//can Edit
-			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 				bean.setCanEdit(true);
 			}
 			aForm.setBean(bean);
@@ -264,6 +265,7 @@ public class SADamageAction extends I_Action {
 		int r=  0;
 		String idDelete = "";
 		int lineIdNew = 0;
+		boolean isFoundReward = false;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -343,6 +345,11 @@ public class SADamageAction extends I_Action {
 					    id++;
 					    item.setId(id+"");
 						r +=SADamageDAO.insertItemModel(conn, item);
+						//check is found reward
+						if(item.getPayType().equalsIgnoreCase("2. หักค่าเฝ้าตู้")){
+							isFoundReward = true;
+						}
+						
 					}
 				    logger.debug("total insert record :"+r);
 			    }
@@ -377,11 +384,21 @@ public class SADamageAction extends I_Action {
 							item.setId(maxId+"");
 							r +=SADamageDAO.insertItemModel(conn, item);
 						}
+						//check is found reward
+						if(item.getPayType().equalsIgnoreCase("2. หักค่าเฝ้าตู้")){
+							isFoundReward = true;
+						}
 					}
 				    logger.debug("total insert record :"+r);
 			    } 
 			}
-	
+	        //update sa_reward_tran used row
+			if(isFoundReward){
+				SATranDAO.updateFlagUsed(conn,h,"Y");
+			}else{
+				SATranDAO.updateFlagUsed(conn,h,"N");
+			}
+			
 			//Search Again
 			String mode ="edit";
 			SADamageBean criPK = new SADamageBean();
@@ -391,7 +408,7 @@ public class SADamageAction extends I_Action {
 			
 			SADamageBean bean = SADamageDAO.searchHead(conn,mode,criPK,true).getItems().get(0);
 			//Can Edit
-			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 				bean.setCanEdit(true);
 			}
 		    aForm.setBean(bean);
@@ -428,7 +445,7 @@ public class SADamageAction extends I_Action {
 			bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			bean.setType("BME");
 			//can Edit
-			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 				bean.setCanEdit(true);
 			}
 			aForm.setBean(bean);

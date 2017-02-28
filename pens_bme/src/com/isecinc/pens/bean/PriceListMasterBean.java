@@ -7,6 +7,7 @@ public class PriceListMasterBean implements Serializable{
 
 	private static final long serialVersionUID = 9211619557079034456L;
 	
+	private String productType;
 	private String custGroup;
 	private String custGroupDesc;
 	
@@ -23,6 +24,12 @@ public class PriceListMasterBean implements Serializable{
 	private boolean canCancel;
 	
 	
+	public String getProductType() {
+		return productType;
+	}
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
 	public String getCustGroupDesc() {
 		return custGroupDesc;
 	}

@@ -114,6 +114,9 @@ body {
         	 // var productType = document.getElementsByName("bean.productType")[0];
        	     // productType.disabled =true;
         	<%}%>
+        	<% if( "submited".equals(request.getAttribute("action"))){ %>
+        	   startBatch();
+        	<%}%>
     }
     
     
@@ -181,7 +184,6 @@ body {
 				}
 			}
 			
-			
 			if("<%=Constants.TYPE_EXPORT_BILL_ICC%>" == pageName.value){
 				var transDate = document.getElementsByName("bean.transactionDate")[0];
 				if(transDate.value ==""){
@@ -227,13 +229,13 @@ body {
 	<% if( "submited".equals(request.getAttribute("action"))){ %>
 	   <script type="text/javascript" language="javascript">
 	   
-	   //To disable f5
-	   $(document).bind("keydown", disableF5);
+	    //To disable f5
+	    $(document).bind("keydown", disableF5);
 	 
-	   $(function() {
+	    $(function() {
 			///$("#dialog").dialog({ height: 200,width:650,modal:true });
 		   $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '20%', width: '60%' } }); 
-		});
+		}); 
 	   
 	   var stepMaxUp = 3;
 	   var stepMinUp = 1;
@@ -243,7 +245,20 @@ body {
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
 	   
-	   function update(status){
+
+	   /** Onload Window    */
+	   var startDate = new Date();
+	   function startBatch(){
+    	   var status = document.getElementsByName("monitorBean.status")[0]; 
+            
+    	 // alert(status.value);
+    	   if (status.value != "1" && status.value != "-1"){
+    		   window.setTimeout("checkStatusProcess();", 800);
+    	   }
+    	   updateProgress(status.value);
+	    } 
+	   
+	   function updateProgress(status){
 	    	 if(status != '1' && status != "-1"){ //Running
 	    		 if(progressCount > 95){
 		    	   progressCount += stepDotOne; 
@@ -266,6 +281,7 @@ body {
 	    		// $("#progress").hide();
 	    		 
 	    		 setTimeout(function(){ $("#progress").hide();}, 3000);
+	    		 document.getElementsByName("monitorBean.status")[0].value = "0";//reset status
 	    	 }  
 	    	  
 	    	 //var progress = $("#progressbar") .progressbar("option","value");
@@ -277,17 +293,6 @@ body {
 		   	 }
 	    }
 	
-	   /** Onload Window    */
-	   var startDate = new Date();
-	   
-	   window.onload=function(){
-    	   var status = document.getElementsByName("monitorBean.status")[0]; 
-    
-    	   if (status.value != "1" && status.value != "-1"){
-    		   window.setTimeout("checkStatusProcess();", 800);
-    	   }
-    	   update(status.value);
-	    } 
 
 	    /** Check Status From monitor_id BY AJax */
 	    function checkStatusProcess(){
@@ -303,6 +308,7 @@ body {
 	    	});
 	    	setTimeout("checkStatus()",3000);
 	    }
+	    
         /** Check Status Recursive **/
 	    function checkStatus(){
 	    	  var status =  document.getElementsByName("monitorBean.status")[0].value;
@@ -320,21 +326,16 @@ body {
 		    		   
 		    		  // alert( document.getElementsByName("monitorBean.timeInUse")[0].value);
 	    		   }catch(e){}
-	    		   /** Task Success ***/
-	    		   update(status);
 	    		   
-	    		   <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName) ){  %>
-	    		     //  if(status != '-1')
-	    		        //window.close();
-	    		      //search display
-	    		       search('<%=request.getContextPath()%>', 'admin');
-	    		   <%}else{ %>
-	    		       //search display
-	    		       search('<%=request.getContextPath()%>', 'admin');
-                   <%} %>
+	    		   /** Task Success ***/
+	    		   updateProgress(status);
+	    		   
+	    		   //search display
+	    		   search('<%=request.getContextPath()%>', 'admin');
+                 
 	    	   }else { //Task Running
 	    		   /** Task Not Success  and Re Check Status**/
-		    	   update(status);
+		    	   updateProgress(status);
 	               window.setTimeout("checkStatusProcess();", 1200);
 	           }
 	    }
@@ -349,24 +350,25 @@ body {
 	    	String message = "Gen ข้อมูลเรียบร้อย";
 	    	
 	    	if(Utils.isNull(resultsBean.getErrorMsg()).equals("")){
+	 %>
+		       <script>
+		          window.opener.div_message.innerHTML = "<%=message %>";
+		          window.opener.div_error_message.innerHTML ="";
+		           window.close();
+		        </script>
+	  <%    }else{ 
+	            message = Utils.isNull(resultsBean.getErrorMsg());
 	  %>
-		    <script>
-		       window.opener.div_message.innerHTML = "<%=message %>";
-		       window.opener.div_error_message.innerHTML ="";
-		       window.close();
-		     </script>
-	    <% }else{ 
-	         message = Utils.isNull(resultsBean.getErrorMsg());
-	    %>
-	         <script>
-		       window.opener.div_error_message.innerHTML = "<%=message %>";
-		       window.opener.div_message.innerHTML  ="";
-		       window.close();
-		     </script>
+		        <script>
+			       window.opener.div_error_message.innerHTML = "<%=message %>";
+			       window.opener.div_message.innerHTML  ="";
+			       window.close();
+			    </script>
 	 
-	 <%   }
+	 <%    }
 	    }
-	} %>
+	}
+    %>
 
 </head>
 
@@ -427,8 +429,20 @@ body {
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenStockReportEndDateLotus"/>
 				</jsp:include>
+			<%}else if(Constants.TYPE_IMPORT_WACOAL_STOCK.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportWacoalStock"/>
+				</jsp:include>
+			<%}else if(Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportWacoalSaleInReturn"/>
+				</jsp:include>
+			<%}else if(Constants.TYPE_IMPORT_SALEOUT_WACOAL.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportSaleOutWacoal"/>
+				</jsp:include>
 			<%} %>
-			
+
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -604,7 +618,7 @@ body {
 							</tr>
 						</table>
 					       	
-					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName)){  %>
+					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName) || Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 						      <tr>
 								<td align="right" width="40%">เลือกไฟล์&nbsp;&nbsp;</td>
@@ -625,6 +639,22 @@ body {
 								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
 								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
 								
+								</td>
+							</tr>
+						</table>
+					   
+					   <%}else if( Constants.TYPE_IMPORT_WACOAL_STOCK.equals(pageName) || Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN.equals(pageName)){  %>
+					      
+						<!-- BUTTON -->
+						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
+						   <tr>
+								<td align="right" width ="100%"> &nbsp;</td>
+							</tr>
+							<tr>
+								<td align="center" width ="100%">
+								   <input type="button" value="Import ข้อมูล" class="newPosBtnLong" 
+								    style="width: 200px;" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
+								    <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong" style="width: 100px;" onClick="javascript:backToMainpage('${pageContext.request.contextPath}','admin')">
 								</td>
 							</tr>
 						</table>
@@ -650,47 +680,63 @@ body {
 							
                         <!-- Monitor Batch Task -->
                         <% if( Constants.TYPE_IMPORT_BMESCAN.equals(pageName)){ %> 
-                            
-							 <jsp:include page="monitor.jsp"></jsp:include>
-							<p></p>
+							  <jsp:include page="monitor.jsp"></jsp:include>
+							  <p></p>
 						 <% }else if( Constants.TYPE_GEN_HISHER.equals(pageName) || Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){ %> 
-						    <p></p>
-						    <jsp:include page="monitor_short.jsp"></jsp:include>
-							<p></p>
-							 <!-- BME Scan Result -->
-							<jsp:include page="interfacesResult.jsp"></jsp:include>
+							    <p></p>
+							    <jsp:include page="monitor_short.jsp"></jsp:include>
+								<p></p>
+								 <!-- BME Scan Result -->
+								<jsp:include page="interfacesResult.jsp"></jsp:include>
 						<% }else if( Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){ %> 
-						 <!-- BUTTON -->
-						    <p></p>
-						    <jsp:include page="monitor_order_excel.jsp"></jsp:include>
-							<p></p>
-							 <!-- BME Scan Result -->
-							<jsp:include page="interfacesResult.jsp"></jsp:include>
+							 <!-- BUTTON -->
+							    <p></p>
+							    <jsp:include page="monitor_order_excel.jsp"></jsp:include>
+								<p></p>
+								 <!-- BME Scan Result -->
+								<jsp:include page="interfacesResult.jsp"></jsp:include>
 						  <%}else if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){  %>
-						     <p></p>
-						    <jsp:include page="monitor_short.jsp"></jsp:include>
-							<p></p>
-							 <!-- BME Scan Result -->
-							 <jsp:include page="interfacesResultImportBillICC.jsp"></jsp:include>
+							     <p></p>
+							    <jsp:include page="monitor_short.jsp"></jsp:include>
+								<p></p>
+								 <!-- BME Scan Result -->
+								 <jsp:include page="interfacesResultImportBillICC.jsp"></jsp:include>
 							 
 					       <%}else if(Constants.TYPE_EXPORT_BILL_ICC.equals(pageName)){  %>
-						      <!-- BUTTON -->
-						     <p></p>
-						     <jsp:include page="monitor_short.jsp"></jsp:include>
-							 <p></p>
-							 <!-- BME Scan Result -->
-							 <jsp:include page="interfacesResultExportBillICC.jsp"></jsp:include>
+							      <!-- BUTTON -->
+							     <p></p>
+							     <jsp:include page="monitor_short.jsp"></jsp:include>
+								 <p></p>
+								 <!-- BME Scan Result -->
+								 <jsp:include page="interfacesResultExportBillICC.jsp"></jsp:include>
 					      <% }else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName)){ %> 
-						    <p></p>
-						    <jsp:include page="monitor_short.jsp"></jsp:include>
-							<p></p>
-							 <!-- BME Scan Result -->
-							<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
+							    <p></p>
+							    <jsp:include page="monitor_short.jsp"></jsp:include>
+								<p></p>
+								 <!-- BME Scan Result -->
+								<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
+						 <% }else if( Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)){ %> 
+							    <p></p>
+							    <jsp:include page="monitor_short.jsp"></jsp:include>
+								<p></p>
+								 <!-- BME Scan Result -->
+								<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
 						   <% }else if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){ %> 
 							    <p></p>
 							    <jsp:include page="monitor_short.jsp"></jsp:include>
 								<p></p>
-							<%} %>
+								
+						  <% }else if( Constants.TYPE_IMPORT_WACOAL_STOCK.equals(pageName)){ %> 
+							    <p></p>
+							    <jsp:include page="interfacesResultImportWacoalStock.jsp"></jsp:include>
+								<p></p>
+							
+						  <% }else if( Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN.equals(pageName)){ %> 
+							    <p></p>
+							    <jsp:include page="interfacesResultImportWacoalSaleInReturn.jsp"></jsp:include>
+								<p></p>
+				
+						   <%} %>
 					     
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->
@@ -734,7 +780,7 @@ body {
 						</div>
 						<input type="hidden" name="pageName" value="<%=pageName%>"/>
 						
-						<jsp:include page="../searchCriteria.jsp"></jsp:include>
+					 	<jsp:include page="../searchCriteria.jsp"></jsp:include> 
 					</html:form>
 					<!-- BODY -->  
 					</td>

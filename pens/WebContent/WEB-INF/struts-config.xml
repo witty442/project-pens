@@ -142,7 +142,13 @@
 		<!-- INVOICE DETAIL REPORT -->
 		<form-bean name="invoiceDetailReportForm"
 			type="com.isecinc.pens.web.report.invoicedetail.InvoiceDetailReportForm" />
+			
+		<form-bean name="cancelDetailReportForm"
+			type="com.isecinc.pens.web.report.canceldetail.CancelDetailReportForm" />
 
+        <form-bean name="moveOrderReportForm"
+			type="com.isecinc.pens.web.report.moveorder.MoveOrderReportForm" />
+			
 		<!-- Sales Target Summary REPORT -->
 		<form-bean name="salesTargetSummaryForm"
 			type="com.isecinc.pens.web.report.salestargetsummary.SalesTargetSummaryForm" />
@@ -602,6 +608,24 @@
 			<forward name="report" path="/jsp/reports/invoiceDetailReport.jsp" />
 		</action>
 
+       <!-- CANCEL DETAIL REPORT -->
+		<action name="cancelDetailReportForm" path="/jsp/cancelDetailReport"
+			forward="/jsp/reports/cancelDetailReport.jsp" />
+		<action name="cancelDetailReportForm" path="/jsp/cancelDetailReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.canceldetail.CancelDetailReportAction">
+			<forward name="report" path="/jsp/reports/cancelDetailReport.jsp" />
+		</action>
+		
+		 <!-- Move Order REPORT -->
+		<action name="moveOrderReportForm" path="/jsp/moveOrderReport"
+			forward="/jsp/reports/moveOrderReport.jsp" />
+		<action name="moveOrderReportForm" path="/jsp/moveOrderReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.moveorder.MoveOrderReportAction">
+			<forward name="report" path="/jsp/reports/moveOrderReport.jsp" />
+		</action>
+		
 		<action name="salesTargetSummaryForm" path="/jsp/salesTargetSummary"
 			forward="/jsp/reports/salesTargetSummary.jsp"  >
 			<forward name="report" path="/jsp/reports/salesTargetSummary.jsp" />

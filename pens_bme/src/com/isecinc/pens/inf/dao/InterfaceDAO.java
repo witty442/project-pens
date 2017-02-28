@@ -121,13 +121,14 @@ public class InterfaceDAO extends InterfaceUtils{
 			" group_name," +
 			" file_size ," +
 			" success_count," +
-			" fail_count)"+
-			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+			" fail_count," +
+			" total_qty)"+
+			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 			  
 			logger.debug("SQL:"+sql);
 			logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				   model.setId(new BigDecimal(SequenceProcess.getNextValue("monitor_item")));
+				model.setId(new BigDecimal(SequenceProcess.getNextValue("monitor_item")));
 			}
 			
 			int index = 0;
@@ -147,6 +148,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			ps.setString(++index, model.getFileSize());
 			ps.setInt(++index, model.getSuccessCount());
 			ps.setInt(++index, model.getFailCount());
+			ps.setInt(++index, model.getTotalQty());
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -321,7 +323,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			sql.append(" select channel as batch_task_status from monitor \n");
 			sql.append("where MONITOR_ID = (select min(monitor_id) from monitor where transaction_id ="+id+") \n");
 			
-		    //logger.info("SQL:"+sql.toString());
+		    logger.info("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -884,8 +886,9 @@ public class InterfaceDAO extends InterfaceUtils{
 		Connection conn = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select monitor_item.* \n");
-			sql.append(" from monitor_item where 1=1 \n");
+			sql.append(" select *   \n");
+			sql.append(" from monitor_item  \n");
+			sql.append(" where 1=1 \n");
 			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
 
 		    logger.debug("SQL:"+sql.toString());
@@ -926,6 +929,7 @@ public class InterfaceDAO extends InterfaceUtils{
 		}
 		return item;
 	} 
+	
 	
 	public  MonitorItemBean findMonitorItemBeanByPK(User user, String id) throws Exception{
 		PreparedStatement ps =null;
@@ -979,6 +983,10 @@ public class InterfaceDAO extends InterfaceUtils{
 	} 
 	
 	public  List<MonitorItemBean> findMonitorItemList(User user, MonitorBean mc) throws Exception{
+		return findMonitorItemList(user,mc,"");
+	}
+	
+	public  List<MonitorItemBean> findMonitorItemList(User user, MonitorBean mc,String typeImport) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		MonitorItemBean item = null;
@@ -988,6 +996,7 @@ public class InterfaceDAO extends InterfaceUtils{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor_item.* \n");
+			sql.append(",(select max(transaction_id) from monitor where monitor.monitor_id =monitor_item.monitor_id)as transaction_id \n");
 			sql.append(" from monitor_item where 1=1 \n");
 			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
 
@@ -1003,7 +1012,9 @@ public class InterfaceDAO extends InterfaceUtils{
 				}
 				item = new  MonitorItemBean();
 				item.setRow(row);
+				item.setTransactionId(rs.getBigDecimal("transaction_id"));
 				item.setId(rs.getBigDecimal("id"));
+				item.setMonitorId(rs.getBigDecimal("monitor_id"));
 				item.setTableName(rs.getString("table_name"));
 				item.setFileName(rs.getString("file_name"));
 				item.setSource(rs.getString("source"));
@@ -1014,8 +1025,18 @@ public class InterfaceDAO extends InterfaceUtils{
 				item.setSuccessCount(rs.getInt("success_count"));
 				item.setFailCount(rs.getInt("fail_count"));
 				item.setErrorCode(rs.getString("error_code"));
-				item.setErrorMsg(rs.getString("error_msg"));
+				item.setErrorMsg(ExceptionHandle.ERROR_MAPPING.get(item.getErrorCode()));
+				if(Utils.isNull(item.getErrorMsg()).equals("")){
+				   item.setErrorMsg(rs.getString("error_msg"));
+				}
+				item.setTotalQty(rs.getInt("total_qty"));
 				
+				if(typeImport.equalsIgnoreCase(Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN)){
+				   //SalesInList
+				   item.setSalesInList(findMonitorItemResultListByTypeMessage(conn,item.getId(),"salein"));
+				   //ReturnList
+				   item.setReturnList(findMonitorItemResultListByTypeMessage(conn,item.getId(),"GR"));
+				}
 				monitorItemList.add(item);
 			}
 			
@@ -1045,6 +1066,46 @@ public class InterfaceDAO extends InterfaceUtils{
 			sql.append(" select * from monitor_item_result where 1=1 \n");
 			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
 			sql.append(" and status ='"+statusDesc+"' \n");
+			sql.append(" order by no asc ");
+		    logger.debug("SQL:"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				MonitorItemResultBean item = new  MonitorItemResultBean();
+				row++;
+				item.setRow(row);
+				item.setMonitorItemId(rs.getBigDecimal("monitor_item_id"));
+				item.setStatus(rs.getString("status"));
+				item.setMsg(rs.getString("message"));
+				resultItemList.add(item);
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return resultItemList;
+	} 
+	
+	public  List<MonitorItemResultBean> findMonitorItemResultListByTypeMessage(Connection conn,BigDecimal monitorIItemId,String typeMessage) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		List<MonitorItemResultBean> resultItemList = new ArrayList<MonitorItemResultBean> ();
+		int row = 0;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from monitor_item_result where 1=1 \n");
+			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
+			sql.append(" and monitor_item_id in(select id from monitor_item where id ="+monitorIItemId+" )");
+			sql.append(" and message like'"+typeMessage+"%' \n");
 			sql.append(" order by no asc ");
 		    logger.debug("SQL:"+sql.toString());
 
@@ -1358,474 +1419,6 @@ public class InterfaceDAO extends InterfaceUtils{
 	}
 	return configMap;
 } 
- 
- /**
-  * 
-  * @param configMap
-  * @return
-  * @throws Exception
-  */
- public  TableBean getSunInvNameMap(Connection conn,TableBean tableBean ,User userBean) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-
-        Map subInvMap = new HashMap();
-        Map userCodeMap = new HashMap();
-		try{
-			
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select '1' as t ,s.name as sub_inv from m_sub_inventory s where 1=1 and s.sub_inventory_id in (select sub_inventory_id from m_sales_inventory where user_id ="+userBean.getId()+") \n");
-			sql.append(" union all \n");
-			sql.append(" select '1' as t ,s.name as sub_inv from m_sub_inventory s where 1=1 and s.name ='"+userBean.getCode()+"' \n");
-			sql.append(" union all \n");
-			sql.append(" select '2' as t, s.code as sub_inv from ad_user s where s.user_id ="+userBean.getId() +"\n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			
-			while(rs.next()){
-				if(rs.getString("t").equals("1")){
-				   subInvMap.put(rs.getString("sub_inv"),rs.getString("sub_inv"));
-				}else{
-				   userCodeMap.put(rs.getString("sub_inv"),rs.getString("sub_inv"));
-				}
-				
-			}
-			
-			tableBean.setSubInvMap(subInvMap);
-			tableBean.setUserCodeMap(userCodeMap);
-			
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return tableBean;
-	} 
- 
- 
-
-
- /**
-  * 
-  * @param conn
-  * @param user
-  * @return
-  * @throws Exception
-  */
- public  List<String> getOrderIdListByOrderNo(Connection conn,String orderNoInStr) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    List<String> orderList = new ArrayList<String>();
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select order_id from t_order where 1=1 and order_no in("+orderNoInStr+") \n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			while(rs.next()){
-				orderList.add(rs.getString("order_id"));
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return orderList;
-}
- 
- /**
-  * 
-  * @param conn
-  * @param orderId
-  * @return
-  * @throws Exception
-  */
- public  boolean isOrderLineCancelOne(Connection conn,String orderId) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    boolean caseCancelOneFlag = false; 
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select count(payment) as c from t_order_line where order_id ="+orderId+" and iscancel ='Y' \n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("c") > 0){
-					caseCancelOneFlag = true;
-				}
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return caseCancelOneFlag;
-} 
- 
- /**
-  * isOrderLineCancelAll
-  * @param conn
-  * @param orderId
-  * @return
-  * @throws Exception
-  */
- public  boolean isOrderLineCancelAll(Connection conn,String orderId) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    boolean isCancelAll = true; 
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select count(payment) as c from t_order_line where order_id ="+orderId+" and iscancel ='N' \n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("c") > 0){
-					isCancelAll = false;
-				}
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return isCancelAll;
-} 
- /**
-  * Update Order Payment Case Cancel Order
-  * @param conn
-  * @param orderId
-  * @param paymentFlag
-  * @return
-  * @throws Exception
-   * "Update Payment Flag ��
-     (1) ��ҷ�� header payment  = 'Y' ����дѺ line ����ҡѺ   "Y" ����
-     (2) ��ҷ�� header payment  = 'N' ����дѺ line ����ҡѺ   "N" ����
-  */
- public  int updatePaymentInOrderLine(Connection conn,String orderId) throws Exception{
-     PreparedStatement ps =null;
-     int updateInt = 0;
-	 try{
-		StringBuffer sql = new StringBuffer("");
-		sql.append(" update t_order_line set payment = (select payment from t_order where order_id ="+orderId+") where order_id ="+orderId+" \n");
-	    logger.debug("SQL:"+sql.toString());
-	    
-		ps = conn.prepareStatement(sql.toString());
-		updateInt = ps.executeUpdate();	
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-	}
-		return updateInt;
-} 
- 
-/**
- * updateRecalcAmountInInOrder
- * @param conn
- * @param orderId
- * @return
- * @throws Exception
- * Desc: 
- * Recalc Amount in Order Header
- */
- public  int updateRecalcAmountInOrder(Connection conn,String orderId) throws Exception{
-     PreparedStatement ps =null;
-     int updateInt = 0;
-	 try{
-		StringBuffer sql = new StringBuffer("");
-		sql.append("  update t_order set \n");
-		sql.append("  t_order.total_amount = (select sum(t_order_line.line_amount)-sum(t_order_line.discount) from t_order_line where t_order_line.order_id ="+orderId+" and t_order_line.iscancel='N') \n");
-		sql.append(" ,t_order.vat_amount   = (select sum(t_order_line.vat_amount) from t_order_line where t_order_line.order_id ="+orderId+"  and t_order_line.iscancel='N') \n");
-		sql.append(" ,t_order.net_amount   = (select sum(t_order_line.total_amount) from t_order_line where t_order_line.order_id ="+orderId+"  and t_order_line.iscancel='N') \n");
-		sql.append("  where t_order.order_id = "+orderId+"  \n");
-		
-	    logger.debug("SQL:"+sql.toString());
-	    
-		ps = conn.prepareStatement(sql.toString());
-		updateInt = ps.executeUpdate();	
-		
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-	}
-		return updateInt;
-} 
- 
- /**
-  * updatePaymentFlagHeader
-  * @param conn
-  * @param orderId
-  * @param paymentFlag
-  * @return
-  * @throws Exception
-  */
- public  int updatePaymentInOrder(Connection conn,String orderId,String paymentFlag ) throws Exception{
-     PreparedStatement ps =null;
-     int updateInt = 0;
-	 try{
-		StringBuffer sql = new StringBuffer("");
-		sql.append(" update t_order set payment = '"+paymentFlag+"'  where order_id = "+orderId+" \n");
-	    logger.debug("SQL:"+sql.toString());
-	    
-		ps = conn.prepareStatement(sql.toString());
-		updateInt = ps.executeUpdate();	
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-	}
-		return updateInt;
-} 
- 
- public  int updateDocStatusInOrder(Connection conn,String orderId,String docStatus) throws Exception{
-     PreparedStatement ps =null;
-     int updateInt = 0;
-	 try{
-		StringBuffer sql = new StringBuffer("");
-		sql.append(" update t_order set doc_status ='"+docStatus+"' where order_id = "+orderId+" \n");
-	    logger.debug("SQL:"+sql.toString());
-	    
-		ps = conn.prepareStatement(sql.toString());
-		updateInt = ps.executeUpdate();	
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-	}
-		return updateInt;
-}
- 
- /**
-  * isOrderLinePaymentAll
-  * @param conn
-  * @param orderId
-  * @return
-  * @throws Exception
-  */
- public  boolean isOrderLinePaymentAll(Connection conn,String orderId) throws Exception{
-	PreparedStatement ps =null;
-	ResultSet rs = null;
-    boolean paymentAll = false; 
-	try{
-		StringBuffer sql = new StringBuffer("");
-		sql.append(" select count(payment) as c from t_order_line where order_id = "+orderId+" and (payment = 'N' or payment is null) \n");
-	    logger.debug("SQL:"+sql.toString());
-	    
-		ps = conn.prepareStatement(sql.toString());
-		rs = ps.executeQuery();
-		if(rs.next()){
-			if(rs.getInt("c") == 0){
-				paymentAll = true;
-			}
-		}
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-		if(rs != null){
-		   rs.close();rs = null;
-		}
-	}
-	return paymentAll;
-} 
 
  
- /**
-  * 
-  * @param conn
-  * @param customerId
-  * @return
-  * @throws Exception
-  */
- public  String isSameAddress(Connection conn,String customerId) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    PreparedStatement ps2 =null;
-		ResultSet rs2 = null;
-		String sameAddress = "NO"; 
-		String sqlS = "";
-		String ADDRESS_ID_BILL_TO = "";
-		StringBuffer sql = new StringBuffer("");
-		try{
-			sql.append(" select count(*) as c from (select count(*) from m_address sa  where sa.customer_id = "+customerId+" group by sa.line1)a \n"); 
-		    logger.debug("SQL Check SameAddress:"+sql.toString());
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("c") == 1){
-					sameAddress = "SAME_ADDRESS";
-				}
-			}
-			sqlS +=	"  SELECT 	\n";
-			sqlS +=	"  concat(concat(M.CODE , '-'),A.address_id )  as ORIG_SYSTEM_ADDRESS_REF_BILL_TO,	\n";
-			sqlS +=	"  A.address_id  as ADDRESS_ID_BILL_TO,	\n";
-			sqlS += "  A.PURPOSE  \n";
-			sqlS +=	"  FROM m_customer M ,m_address A	\n";
-			sqlS +=	"  WHERE  M.customer_id = A.customer_id	\n";
-			sqlS +=	"  AND  M.customer_id = "+customerId+"	\n";
-			sqlS += "  AND A.PURPOSE ='B' \n";
-			
-			logger.debug("SQL get Address BillTO:"+sqlS.toString());
-			ps2 = conn.prepareStatement(sqlS.toString());
-			rs2 = ps2.executeQuery();
-			if(rs2.next()){
-				if(sameAddress.equalsIgnoreCase("SAME_ADDRESS")){
-					ADDRESS_ID_BILL_TO = rs2.getString("ADDRESS_ID_BILL_TO");
-				}else{
-					ADDRESS_ID_BILL_TO = null;
-				}
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-			if(ps2 != null){
-			   ps2.close();ps2 = null;
-			}
-			if(rs2 != null){
-			   rs2.close();rs2 = null;
-			}
-		}
-		return ADDRESS_ID_BILL_TO;
-	} 
- 
- public  String getOrgID(Connection conn,String customerId) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-		StringBuffer sql = new StringBuffer("");
-		String orgId ="83";//default
-		try{
-			sql.append(" select value from c_reference where code ='OrgID' \n"); 
-		    logger.debug("SQL Check SameAddress:"+sql.toString());
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			if(rs.next()){
-				orgId = rs.getString("value");
-			}
-			
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-			
-		}
-		return orgId;
-	} 
- /**
-  * isSameAddressId
-  * @param conn
-  * @param customerId
-  * @return
-  * @throws Exception
-  * RETURN STR "SAME_ADDRESS"  Case Equals
-  */
- public  String getORIG_SYSTEM_ADDRESS_REF_FUNC(Connection conn,String customerId,String addressId) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-		PreparedStatement ps2 =null;
-		ResultSet rs2 = null;
-	    String sameAddress = "NO"; 
-	    String sqlS = "";
-	    String ORIG_SYSTEM_ADDRESS_REF = "";
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select count(*) as c from (select count(*) from m_address sa  where sa.customer_id = "+customerId+" group by sa.line1)a \n"); 
-		    logger.debug("SQL:"+sql.toString());
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("c") == 1){
-					sameAddress = "SAME_ADDRESS";
-				}
-			}
-			
-			sqlS +=	"  SELECT "+addressId+" as ADDRESS_ID_ORG,	\n";
-			sqlS +=	"  concat(concat(M.CODE , '-'), "+addressId+")  as ORIG_SYSTEM_ADDRESS_REF_NORMAL,	\n";
-			sqlS += "  A.PURPOSE,  \n";
-			sqlS +=	"  CASE WHEN  'SAME_ADDRESS' ='"+sameAddress+"' 	\n";
-			sqlS +=	"       THEN concat(concat(M.CODE , '-'), A.ADDRESS_ID)  	\n";
-			sqlS +=	"   END AS ORIG_SYSTEM_ADDRESS_REF_SAME_ADDRESS 	\n";
-			sqlS +=	"   FROM m_customer M ,m_address A	\n";
-			sqlS +=	"   WHERE  M.customer_id = A.customer_id	\n";
-			sqlS +=	"   AND  M.customer_id = "+customerId+"	\n";
-			
-			ps2 = conn.prepareStatement(sqlS.toString());
-			rs2 = ps2.executeQuery();
-			while(rs2.next()){
-				if(sameAddress.equalsIgnoreCase("SAME_ADDRESS")){
-					if( Utils.isNull(rs2.getString("PURPOSE")).equals("B")){
-						ORIG_SYSTEM_ADDRESS_REF = rs2.getString("ORIG_SYSTEM_ADDRESS_REF_SAME_ADDRESS");
-					}
-				}else{
-				   ORIG_SYSTEM_ADDRESS_REF = rs2.getString("ORIG_SYSTEM_ADDRESS_REF_NORMAL");
-				}
-			}
-			
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-			if(ps2 != null){
-			  ps2.close();ps = null;
-			}
-			if(rs2 != null){
-			  rs2.close();rs = null;
-			}
-		}
-		return ORIG_SYSTEM_ADDRESS_REF;
-	} 
 }

@@ -1827,6 +1827,7 @@ public class OrderDAO {
 		return xssfWorkbook;
 	}
 	
+	
 	private StoreBean getOrderByStoreNo(Connection conn,String storeType,Date orderDate,String storeCode,String item) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -2234,6 +2235,7 @@ public class OrderDAO {
 				m.setBillType(Utils.isNull(rs.getString("pens_desc4")));
 				m.setValidFrom(Utils.isNull(rs.getString("pens_desc5")));
 				m.setValidTo(Utils.isNull(rs.getString("pens_desc6")));
+				m.setCustGroup(m.getStoreCode().substring(0,m.getStoreCode().indexOf("-")));
 				
 				if( !Utils.isNull(m.getStoreName()).equals("")){
 					//m.setStoreDisp(m.getStoreName().substring(0,8)+" "+m.getStoreName().substring(9,m.getStoreName().length()));

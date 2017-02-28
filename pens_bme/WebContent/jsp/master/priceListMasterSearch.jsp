@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
@@ -27,6 +28,12 @@ if(request.getAttribute("custGroupList") == null){
 	billTypeList.addAll(GeneralDAO.searchCustGroup(ref));
 	
 	request.setAttribute("custGroupList",billTypeList);
+}
+if(session.getAttribute("productTypeList") == null){
+	List<References> productTypeList = new ArrayList<References>();
+	productTypeList.add(new References("",""));
+	productTypeList.addAll(GeneralDAO.getProductTypeListInterfaceICC());
+	session.setAttribute("productTypeList",productTypeList); 
 }
 %>
 <html>
@@ -90,11 +97,12 @@ function back(path){
 	form.submit();
 	return true;
 }
-function openEdit(path,custGroup,groupCode,pensItem){
+function openEdit(path,custGroup,groupCode,pensItem,productType){
 	var form = document.priceListMasterForm;
 	var param  ="&custGroup="+custGroup;
 	    param +="&groupCode="+groupCode;
 	    param +="&pensItem="+pensItem;
+	    param +="&productType="+productType;
 	    param +="&mode=edit";
 	form.action = path + "/jsp/priceListMasterAction.do?do=searchDetail"+param;
 	form.submit();
@@ -199,6 +207,7 @@ function openAdd(path){
                   	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch" width="50%">
 					        <tr>
+					            <th >กลุ่มสินค้า </th>
 					            <th >กลุ่มร้านค้า </th>
 								<th >Group Code</th>
 								<th >Pens Item</th>
@@ -217,6 +226,7 @@ function openAdd(path){
 								}
 								%>
 									<tr class="<%=tabclass%>">
+									   <td class="td_text_center" width="8%"><%=mc.getProductType()%></td>
 										<td class="td_text_center" width="8%"><%=mc.getCustGroup()%></td>
 										<td class="td_text_center" width="8%"><%=mc.getGroupCode()%></td>
 										<td class="td_text_center" width="8%"><%=mc.getPensItem()%></td>
@@ -225,7 +235,7 @@ function openAdd(path){
 				
 										<td class="td_text_center" width="10%">
 										<%if(mc.isCanEdit()){ %>
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getCustGroup()%>','<%=mc.getGroupCode()%>','<%=mc.getPensItem()%>')">
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getCustGroup()%>','<%=mc.getGroupCode()%>','<%=mc.getPensItem()%>','<%=mc.getProductType()%>')">
 											             แก้ไข
 											 </a>
 										<%} %>

@@ -129,7 +129,12 @@ function gotoPage(path,pageNumber){
 	//return false;
 }
 
-
+function exportSummaryAllToExcel(path){
+	var form = document.orderForm;
+	form.action = path + "/jsp/orderAction.do?do=exportSummaryAllToExcel";
+	form.submit();
+	return true;
+}
 function exportToTextAll(path){
 	var form = document.orderForm;
 	form.action = path + "/jsp/orderAction.do?do=exportToTextAllView";
@@ -337,6 +342,9 @@ function clearForm(path){
 								</a>
 								<a href="javascript:exportDetailToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export Detail To Excel" class="newPosBtnLong">
+								</a>
+									<a href="javascript:exportSummaryAllToExcel('${pageContext.request.contextPath}')">
+								  <input type="button" value="Export สรุปยอดรวมทุกห้าง" class="newPosBtnLong">
 								</a>
 								<%-- <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export To Excel" class="newPosBtnLong">

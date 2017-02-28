@@ -81,7 +81,8 @@ body {
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    
-			     <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/>
+			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/>
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="td_text"/>
 			    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"/>	 
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_text"/>	
@@ -100,7 +101,8 @@ body {
 			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 			    requestURI="#" sort="list" pagesize="50">	
 			    
-			   <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/> 
+			    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="td_text"/> 
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="td_text"/>
 			    <display:column  title="Group" property="group"  sortable="false" class="td_text"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_text"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_text"/>	

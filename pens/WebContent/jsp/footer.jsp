@@ -48,18 +48,8 @@ function openDBBackupPopup(path){
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
 			  <font color="red"><%=msg3[0] %></font> </a>|&nbsp;&nbsp;<%=msg3[1] %>
 			  &nbsp;
-			  <font color="black">|วันที่&nbsp; 
-			   <script>
-			  var currentdate = new Date(); 
-			  var datetime = "" + currentdate.getDate() + "/"
-			                  + (currentdate.getMonth()+1)  + "/" 
-			                  + (currentdate.getFullYear()+543) + "|"  
-			                  + currentdate.getHours() + ":"  
-			                  + currentdate.getMinutes() + ":" 
-			                  + currentdate.getSeconds();
-			            document.write(datetime);
-			  </script>
-			 |Type:<%=EnvProperties.getInstance().getProperty("config.type") %>
+			  <font color="black">
+			  Type:<%=EnvProperties.getInstance().getProperty("config.type") %>
 			  </font> |
 			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
 			      <font color="green">สำรองข้อมูล</font>

@@ -95,6 +95,7 @@ public class ExternalFunctionHelper {
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_TIMESTAMP")){	
 				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
+				//logger.debug("GET_CURRENT_TIMESTAMP:"+id);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_FILE_NAME_IMPORT")){	
 				
@@ -133,7 +134,7 @@ public class ExternalFunctionHelper {
 			}
 			
 			msg += "resultValue["+id+"]";
-			logger.debug(msg);
+			//logger.debug(msg);
 			
 		}catch(Exception e){
 	      throw e;

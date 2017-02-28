@@ -57,29 +57,35 @@ public class MUser extends I_Model<User> {
 		return array;
 	}
 
-	public User  getCurrentUserName() throws Exception {
+	public User  getCurrentUserName() {
 		Statement stmt = null;
 		ResultSet rst = null;
 		Connection conn = null;
 		User userDefault = new User();
+		int count = 0;
 		try{
-			String sql ="\n select user_name,password from ad_user where user_name <> 'admin' " ;
-			      sql +="\n and 1=1 and user_id = (select user_id from t_order where created = (select max(created) from t_order))";
+			String sql ="\n select user_name,password from ad_user where user_name <> 'admin'" ;
+			     // sql +="\n and 1=1 and user_id in(select user_id from t_order where created in(select max(created) from t_order))";
 			      
 			logger.debug("sql:"+sql);
 			conn = DBConnection.getInstance().getConnection();
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
-			if(rst.next()){
+			while(rst.next()){ 
 				userDefault.setUserName(Utils.isNull(rst.getString("user_name")));
 				userDefault.setPassword(Utils.isNull(rst.getString("password")));
+				count++;
+			}
+			if(count >1){
+				userDefault.setUserName("");
+				userDefault.setPassword("1234");
 			}
 		} catch (Exception e) {
-			throw e;
+			logger.error(e);
 		} finally {
 			try {
 				rst.close();
-				stmt.close();
+				stmt.close(); 
 				conn.close();
 			} catch (Exception e2) {}
 		}

@@ -51,7 +51,7 @@ public class SADamageDAO {
 			}
 			return dup;
 		}
-	 
+	
 	 public static boolean isDuplicateDamageHeadPK(Connection conn,String empId,String type,String invRefwal) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;

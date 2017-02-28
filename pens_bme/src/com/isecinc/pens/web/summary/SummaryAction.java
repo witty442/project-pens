@@ -228,7 +228,7 @@ public class SummaryAction extends I_Action {
 					if (results != null  && results.size() >0) {
 						summaryForm.setResults(results);
 						
-						OnhandSummary cc = (OnhandSummary)results.get(0);
+						//OnhandSummary cc = (OnhandSummary)results.get(0);
 						
 						//logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
 						ImportDAO importDAO = new ImportDAO();
@@ -667,9 +667,9 @@ public class SummaryAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-				 fileName ="Report Bme Stock close Lotus.xls";
+				 fileName ="Report Bme Stock Month End Lotus.xls";
 			     if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
-					htmlTable = export.genOnhandMonthEndLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getResults());	
+					htmlTable = export.genMonthEndLotusHTML(Utils.isNull(request.getParameter("page")),request,summaryForm,user,summaryForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");

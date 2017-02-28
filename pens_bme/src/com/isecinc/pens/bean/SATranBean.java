@@ -26,10 +26,11 @@ public class SATranBean implements Serializable{
 
 	//Line
 	private String payDate;
-	private String bmeAmt;
-	private String wacoalAmt;
+	private String countStockDate;
+	private String amt;
 	private boolean canChange;
 	private boolean isExistDB;
+	private boolean used;
 	
 	//optional
 	private String createUser;
@@ -41,8 +42,63 @@ public class SATranBean implements Serializable{
 	private String mode;
 	private String startBmeYearMonth;
 	private String startWacoalYearMonth;
+	/** 4Report **/
+	private String bmeAmt;
+	private String wacoalAmt;
+	private String bmePayDate;
+	private String wacoalPayDate;
+	private String bmeCountStockDate;
+	private String wacoalCountStockDate;
 	
-   
+	
+	public String getBmeCountStockDate() {
+		return bmeCountStockDate;
+	}
+	public void setBmeCountStockDate(String bmeCountStockDate) {
+		this.bmeCountStockDate = bmeCountStockDate;
+	}
+	public String getWacoalCountStockDate() {
+		return wacoalCountStockDate;
+	}
+	public void setWacoalCountStockDate(String wacoalCountStockDate) {
+		this.wacoalCountStockDate = wacoalCountStockDate;
+	}
+	public String getBmePayDate() {
+		return bmePayDate;
+	}
+	public void setBmePayDate(String bmePayDate) {
+		this.bmePayDate = bmePayDate;
+	}
+	public String getWacoalPayDate() {
+		return wacoalPayDate;
+	}
+	public void setWacoalPayDate(String wacoalPayDate) {
+		this.wacoalPayDate = wacoalPayDate;
+	}
+	public String getBmeAmt() {
+		return bmeAmt;
+	}
+	public void setBmeAmt(String bmeAmt) {
+		this.bmeAmt = bmeAmt;
+	}
+	public String getWacoalAmt() {
+		return wacoalAmt;
+	}
+	public void setWacoalAmt(String wacoalAmt) {
+		this.wacoalAmt = wacoalAmt;
+	}
+	public boolean isUsed() {
+		return used;
+	}
+	public void setUsed(boolean used) {
+		this.used = used;
+	}
+	public String getCountStockDate() {
+		return countStockDate;
+	}
+	public void setCountStockDate(String countStockDate) {
+		this.countStockDate = countStockDate;
+	}
 	public String getStartBmeYearMonth() {
 		return startBmeYearMonth;
 	}
@@ -153,17 +209,12 @@ public class SATranBean implements Serializable{
 	public void setYearMonth(String yearMonth) {
 		this.yearMonth = yearMonth;
 	}
-	public String getBmeAmt() {
-		return bmeAmt;
+	
+	public String getAmt() {
+		return amt;
 	}
-	public void setBmeAmt(String bmeAmt) {
-		this.bmeAmt = bmeAmt;
-	}
-	public String getWacoalAmt() {
-		return wacoalAmt;
-	}
-	public void setWacoalAmt(String wacoalAmt) {
-		this.wacoalAmt = wacoalAmt;
+	public void setAmt(String amt) {
+		this.amt = amt;
 	}
 	public String getCreateUser() {
 		return createUser;

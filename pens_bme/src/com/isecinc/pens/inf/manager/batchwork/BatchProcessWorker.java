@@ -11,7 +11,7 @@ import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ImportManager;
-import com.isecinc.pens.inf.manager.ProcessManager;
+import com.isecinc.pens.inf.manager.BatchProcessManager;
 import com.isecinc.pens.inf.manager.process.ExternalProcess;
 
 /**
@@ -42,7 +42,7 @@ public class BatchProcessWorker extends BatchWorker {
             
             logger.debug(" **********Start Process["+this.monitorModel.getType()+"] ******************");
             
-            this.monitorModel = new ProcessManager().mainProcess(this.monitorModel,user,request);
+            this.monitorModel = new BatchProcessManager().mainProcess(this.monitorModel,user,request);
             
            /* if(this.monitorModel.getType().equals(Constants.TYPE_GEN_HISHER)){
                 monitorModel = (new ProcessManager()).processGenerateHisHerTxt(this.monitorModel, user,request);

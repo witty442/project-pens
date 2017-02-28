@@ -1,5 +1,39 @@
 @charset "utf-8";
 
+.result2 {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.result2 TH {
+	background-color: #03A4B6;
+	text-align: center;
+	height: 30px;
+	border: 1px solid black;
+}
+
+TABLE.result2 TD {
+	color: #000000;
+	background-color: #FFFFFF;
+	height: 25px;
+	font-size: 13px;
+	 border: 1px solid black; 
+}
+
+TABLE.result2 TD.summary {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+	font-weight: bold;
+	background-color: #AFDDE0;
+	border: 1px solid black; 
+}
+
 .cssstyle {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -175,6 +209,13 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 	text-align: right;
+}
+.enableNumberBold {
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
 }
 .disableNumber {
 	background-color: #DCDCDC;

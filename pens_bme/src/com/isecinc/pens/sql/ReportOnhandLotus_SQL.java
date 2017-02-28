@@ -37,7 +37,7 @@ public class ReportOnhandLotus_SQL {
 			sql.append("\n,(A.ONHAND_QTY *(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T WHERE A.group_type = T.group_item)) as onhand_amt \n");
 			sql.append("\n FROM ( ");
 			if("GroupCode".equalsIgnoreCase(summaryType)){
-				sql.append("\n SELECT A.customer_code ,A.group_type ");
+				sql.append("\n SELECT A.customer_code,A.customer_desc ,A.group_type ");
 				
 				sql.append("\n ,SUM(A.SALE_IN_QTY) as SALE_IN_QTY");
 				sql.append("\n ,SUM(A.SALE_OUT_QTY) AS SALE_OUT_QTY");
@@ -487,7 +487,7 @@ public class ReportOnhandLotus_SQL {
 			sql.append("\n ) A ");
 			sql.append("\n WHERE A.GROUP_TYPE IS NOT NULL ");
 			if("GroupCode".equalsIgnoreCase(summaryType)){
-				sql.append("\n GROUP BY A.customer_code,A.group_type ");
+				sql.append("\n GROUP BY A.customer_code,A.customer_desc,A.group_type ");
 			}
 			sql.append("\n  ORDER BY A.customer_code,A.group_type asc ");
 			sql.append("\n )A ");

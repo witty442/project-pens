@@ -96,6 +96,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					item.setCustomerName(orderLine.getCustomerName());
 					item.setCustomerCode(orderLine.getCustomerCode());
 					item.setOrderDate(orderLine.getOrderDate());
+					item.setOrderDateStr(Utils.stringValue(orderLine.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					//item.setLineAmount1(orderLine.getLineAmount());
 					item.setTotalAmount1(orderLine.getLineAmount()-orderLine.getDiscount());

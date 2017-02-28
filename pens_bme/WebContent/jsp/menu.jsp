@@ -115,7 +115,8 @@
 </script>
 
 <ul id="nav">
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE,User.PICK}) ){%>
+<!-- ---------------------------------------------------------------------------------------------------------------------------------------- -->
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE,User.PICK}) ){ %>
 	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Stock Onhand B'me </span></a>
 		<ul>
 		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
@@ -144,11 +145,6 @@
 			       </ul>
 			   </li>
 	           
-			     <%--   OLD
-			     <li>
-					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=lotus&action=new');">3.<span><bean:message bundle="sysprop" key="ImportBMEFromLotus"/></span></a>
-				</li> --%>
-				<!--  NEW CODE --> 
 				<li>
 	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');"><span>3.<bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
 	            </li>
@@ -156,14 +152,16 @@
 				 <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=bigc&action=new');">4.<span><bean:message bundle="sysprop" key="ImportBMEFromBigC"/></span></a>
 				</li>
-				<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+				<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
 					 <li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=king&action=new');">5.<span><bean:message bundle="sysprop" key="ImportBMEFromKing"/></span></a>
 					</li>
 				<%} %>
+				
 				 <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepare2&action=new');">6.<span><bean:message bundle="sysprop" key="mtt"/></span></a>
 				</li>
+				
 				<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
 					<li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=physical&action=new');">7.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
@@ -177,8 +175,6 @@
 				<li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/masterAction.do?do=prepare&action=new&page=master');">9.<span><bean:message bundle="sysprop" key="MaintainMaster"/></span></a>
 				</li>
-				
-				
 				<%-- <li>
 					<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=ftp_file_scan_barcode');">11.<span><bean:message bundle="sysprop" key="ImportScanBarcode"/></span></a>
 				</li> --%>
@@ -186,30 +182,62 @@
 				 <li>
 	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_BMESCAN%>');"><span>10.<bean:message key="ImportBarcodeScan" bundle="sysprop"/></span></a>
 	          	</li>
-          	<%} %>
-          	<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
+         <%} %>
+         
+         <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 	          	 <li>
 	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare');"><span>11.<bean:message key="genCN" bundle="sysprop"/></span></a>
 	          	</li>
-          	<%} %>
+         <%} %>
           		
-			   <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>12. Load ข้อมูลการตรวจนับสต๊อก</span></a>
-			       <ul>
-			           <li>
-					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitLotus');">12.1 <span><bean:message bundle="sysprop" key="LoadStockInitLotus"/></span></a>
-				       </li>
-				       <li>
-					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');">12.2 <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span></a>
-				      </li>
-				      <li>
-					       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitMTT');">12.3 <span><bean:message bundle="sysprop" key="LoadStockInitMTT"/></span></a>
-				      </li>
-			       </ul>
-			  </li>
+		   <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>12. Load ข้อมูลการตรวจนับสต๊อก</span></a>
+		       <ul>
+		           <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitLotus');">12.1 <span><bean:message bundle="sysprop" key="LoadStockInitLotus"/></span></a>
+			       </li>
+			       <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');">12.2 <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span></a>
+			      </li>
+			      <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitMTT');">12.3 <span><bean:message bundle="sysprop" key="LoadStockInitMTT"/></span></a>
+			      </li>
+		       </ul>
+		  </li>
+		  
 		</ul>
 	</li>
 <%} %>
 
+<%if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){%>
+	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Stock Onhand B'me </span></a>
+		<ul>
+		     <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepare2&action=new');">1.<span><bean:message bundle="sysprop" key="mtt"/></span></a>
+			</li>
+		</ul>
+	</li>
+<%} %>
+<!-- -------------------------------------------------------------STock Role Wacoal----------------------------------------------------------------------------------------------------------------- -->
+
+<!-- WACOAL Menu-->
+<%if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN}) ){%>
+	<li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Wacoal </span></a>
+		<ul> 
+		  <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_STOCK%>');"><span>1.<bean:message key="ImportWacoalStock" bundle="sysprop"/></span></a>
+	         </li>
+			<li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN%>');"><span>2.<bean:message key="ImportWacoalSaleInReturn" bundle="sysprop"/></span></a>
+	         </li>
+	          <li>
+	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_SALEOUT_WACOAL%>');"><span>3.<bean:message key="ImportSaleOutWacoal" bundle="sysprop"/></span></a>
+	         </li> 
+	         
+		</ul>
+	</li>
+<%} %>
+
+<!-- -------------------------------------------------------------------Report ------------------------------------------------------------------------------------------------------- -->
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.SALE}) ){%>
     <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Report</span></a>
 		<ul>
@@ -301,8 +329,30 @@
 		</ul>
 	</li>
 <%} %>
+<%if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){%>
+    <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Report</span></a>
+		<ul>
+		    <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhand');"><span>1.<bean:message bundle="sysprop" key="SummaryBMEFromWacoal"/></span></a>
+			</li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/mttAction.do?do=prepareReport&action=new');"><span>2.<bean:message bundle="sysprop" key="mttReport"/></span></a>
+			</li>
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=lotus');"><span>3 <bean:message bundle="sysprop" key="SummaryBMEFromLotus"/></span></a>
+			 </li>
+			 <li>
+				   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span>4 <bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
+			 </li>
+			 <li>
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=king');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromKing"/></span></a>
+			</li>
+		</ul>
+	</li>
+<%} %>
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
-
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
  
 	 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Order</span></a>
@@ -332,6 +382,7 @@
 		</ul>
 	</li>
 <%} %>
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){%>
 	 <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Interfaces</span></a>
 		<ul>
@@ -535,6 +586,9 @@
 				       <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saDeptReport&action=new');">4.3 <span><bean:message bundle="sysprop" key="saDeptReport"/></span></a>
 				       </li>
+				         <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/saReportAction.do?do=prepare&page=saDamageReport&action=new');">4.4 <span><bean:message bundle="sysprop" key="saDamageReport"/></span></a>
+				       </li>
 			      </ul>
 			     </li>
 			<%} %> 
@@ -550,6 +604,11 @@
 			  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/payAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
 			  
 			</li> 
+			<%if ( Utils.userInRole(user,new String[]{User.IT}) ){%>
+			<li>
+			  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=filePosBME');"><span>2.<bean:message bundle="sysprop" key="filePosBME"/></span></a>
+			</li> 
+			<%} %>
 		</ul>
 	</li> 
 <%} %>
@@ -588,8 +647,28 @@
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/priceListMasterAction.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="PriceListMaster"/></span></a>
 			</li>   
 		<%} %>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+			  <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/lockItemOrderAction.do?do=prepare2&action=new');"><span>2.<bean:message bundle="sysprop" key="lockItemOrder"/></span></a>
+			</li>  
+		<%} %>
 		</ul>
 	</li> 
+<%} %>
+
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+  	<%-- <li><a href="#" class="parent" onclick="window.location='<%=contextPathProd%>/jsp/mainpage.jsp';"><span>Scheduler</span></a>
+		<ul>
+		<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+			   <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/schedule.do?do=prepare&action=new');"><span>1.<bean:message bundle="sysprop" key="scheduler"/></span></a>
+			</li>  
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/searchTask.do?do=prepare&action=new');"><span>2.<bean:message bundle="sysprop" key="searchTask"/></span></a>
+			</li>
+		<%} %>
+		</ul>
+	</li>  --%>
 <%} %>
 
 </ul>

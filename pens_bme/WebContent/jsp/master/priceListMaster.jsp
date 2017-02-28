@@ -90,7 +90,12 @@ function save(path){
 	var pensItem =$('#pensItem').val();
 	var wholePriceBF =$('#wholePriceBF').val();
 	var retailPriceBF =$('#retailPriceBF').val();
-
+	var productType =$('#productType').val();
+	
+	if(productType ==""){
+		alert("กรุณากรอก  กลุ่มสินค้า");
+		return false;
+	}
 	if(groupCode ==""){
 		alert("กรุณากรอก   group Code");
 		return false;
@@ -172,7 +177,14 @@ function save(path){
 	                                   <td colspan="1" align="center"> <b>แก้ไขรายการ </b> </td>	
 	                             <%} %>
 								</tr>
-					
+					            <tr>
+								    <td>กลุ่มสินค้า<font color="red">*</font></td>
+								    <td>
+								       <html:select property="bean.productType" styleId="productType">
+											<html:options collection="productTypeList" property="key" labelProperty="name"/>
+									    </html:select>
+								    </td>
+						        </tr>
 								<tr>
                                     <td> กลุ่มร้านค้า <font color="red">*</font></td>
 									<td>			

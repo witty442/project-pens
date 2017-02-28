@@ -138,6 +138,7 @@ public class ExportManager {
 						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
 					    /** Check Data Found Before Export **/
 						if(modelDetailItem != null && modelDetailItem.length > 0){
+						   userRequest = userRequest!=null?userRequest:userLogin;
 						   tableBean = exProcess.exportMoveOrder(conn,tableBean,userRequest);	
 						}
 						

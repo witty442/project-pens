@@ -106,8 +106,20 @@ function loadMe(){
 	      <%}%> 
 	   }
 	   //init paydate on  table row
+	    var payTypes = document.getElementsByName('payType');
 	   for(var i=0;i<rows;i++){
-		   new Epoch('epoch_popup', 'th', document.getElementsByName('payDate')[i]);
+	      if(payTypes[i].value=="2. หักค่าเฝ้าตู้"){
+		       document.getElementsByName('payAmt')[i].className = "disableNumberBold";
+		       document.getElementsByName('payDate')[i].className = "disableText";
+		       
+		       document.getElementsByName('payAmt')[i].readOnly = true;
+		       document.getElementsByName('payDate')[i].readOnly = true;
+		   }else{
+		      new Epoch('epoch_popup', 'th', document.getElementsByName('payDate')[i]);
+		      
+		      document.getElementsByName('payAmt')[i].className = "enableNumberBold";
+		      document.getElementsByName('payDate')[i].className = "normalText";
+		   }
 	   }
 		   
 	  /** Disable empId **/ 
@@ -141,7 +153,7 @@ function addRow(){
 	    "<input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
 	    "<td class='td_text_center' width='15%'> <input type='text' name='lineId' readonly id='lineId' size='3' value='"+lineId+"' class='disableText tabindex='' readonly> </td>"+
 	    "<td class='td_text_center' width='15%'> "+
-	    "<select name='payType' id='payType' tabindex=''>"+
+	    "<select name='payType' id='payType' tabindex=''  onchange='getRewardTransData(this,"+lineId+")'>"+
 		    <%if(payTypeList != null && payTypeList.size() >0){ 
 		  	  String selected = "";
 		      for(int i=0;i<payTypeList.size();i++){
@@ -152,7 +164,7 @@ function addRow(){
 	    "</select>"+
 	    "</td>"+
 	    "<td class='td_text_center' width='15%'> <input type='text' readonly name='payDate' id='payDate' size='30' tabindex=''> </td>"+
-	    "<td class='td_text_center' width='15%'> <input type='text' name='payAmt' id='payAmt' size='30' tabindex='' onblur='isNum2Digit(this);sumTotal();' class='enableNumber'></td>"+
+	    "<td class='td_text_center' width='15%'> <input type='text' name='payAmt' id='payAmt' size='22' tabindex='' onblur='isNum2Digit(this);sumTotal();' class='enableNumberBold'></td>"+
 
 	    "</tr>";
 
@@ -227,13 +239,17 @@ function removeRowByIndex(path,drow,index){
 	//set  staus = AB 
 	//alert(index);
 	document.getElementsByName("status")[index].value ='AB';
+	
+	sumTotal();
 }
 
 function sumTotal(){
 	var amount = document.getElementsByName("payAmt");
+	var payType = document.getElementsByName("payType");
+	var status = document.getElementsByName("status");
 	var totalQtyTemp = 0;
 	for(var i=0;i<amount.length;i++){
-		if(amount[i].value != ""){
+		if(amount[i].value != "" && payType[i].value != "" && status[i].value != "AB"){
 		   var amountTemp = amount[i].value;
 		   amountTemp = amountTemp.replace(/\,/g,''); //alert(r);
 		   totalQtyTemp += parseFloat(amountTemp);	
@@ -241,7 +257,13 @@ function sumTotal(){
 	}
 	var t = addCommas(Number(toFixed(totalQtyTemp,2)).toFixed(2));
 	$('#totalQty').val(t);
-	 
+	
+	/* Calc Diff to Show **/
+	var totalQty = 	Number($('#totalQty').val().replace(/[^0-9\.]+/g,""));
+	var totalDamage = 	Number($('#totalDamage').val().replace(/[^0-9\.]+/g,""));
+	var diff = Math.abs(totalDamage-totalQty);
+	
+	 $('#totalDiffQty').val(addCommas(Number(toFixed(diff,2)).toFixed(2)));
 }
 
 function setStyletextField(){
@@ -313,9 +335,11 @@ function save(path){
 	var totalDamage = 	Number($('#totalDamage').val().replace(/[^0-9\.]+/g,""));
 	var diff = Math.abs(totalDamage-totalQty);
 	//alert("totalQty["+totalQty+"]totalDamage["+totalDamage+"]diff["+diff+"]");
-	if(diff > 0.5){
-	   alert("ยอดรวมต่างกันได้ ไม่เกิน 0.50 ");
-	   return false;
+	if(totalDamage != diff){
+		if(diff > 0.5){
+		   alert("ยอดรวมต่างกันได้ ไม่เกิน 0.50 ");
+		   return false;
+		}
 	}
 	
 	if(confirm("ยืนยันการบันทึกข้อมูล")){
@@ -555,16 +579,16 @@ function getEmp(empIdObj){
 }
 function isNum(obj){
 	//alert("isNum");
-	  if(obj.value != ""){
-		if(isNaN(obj.value)){
+   if(obj.value != ""){
+	 if(isNaN(obj.value)){
 			alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
 			obj.value = "";
 			obj.focus();
 			return false;
-		}else{return true;}
-	   }
-	  return true;
-	}
+	 }else{return true;}
+   }
+  return true;
+}
 
 function openPopupEmp(path,seqNo,types){
 	var param = "&page=searchEmpPopup";
@@ -582,8 +606,93 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
     form.fullName.value = name +" "+surname;
 	
 } 
-</script>
 
+function getRewardTransData(selectedObj,index){ 
+  var form = document.saDamageForm;
+  index = index - 1;//position table html start:0
+  
+  //validate payType 2. หักค่าเฝ้าตู้   -> 1 row only
+  var payTypes = document.getElementsByName('payType');
+  var countDup = 0;
+  var indexDup = 0;
+  for(var r=0;r<payTypes.length;r++){
+     if(payTypes[r].value =="2. หักค่าเฝ้าตู้"){
+       countDup++;
+       indexDup = r;
+      // alert(r);
+     }//if
+  }//for
+  
+  if(countDup >1){
+     alert("ไม่สามารถหักค่าเฝ้าตู้ ได้  2 รายการ");
+     document.getElementsByName('payType')[indexDup].value = "";
+	 document.getElementsByName('payAmt')[indexDup].value = "";
+	 document.getElementsByName('payDate')[indexDup].value = "";
+	 
+     return true;
+  }
+   
+   //alert(selectedObj.value);
+  if(form.empId.value != "" && form.invRefwal.value != "" && selectedObj.value=="2. หักค่าเฝ้าตู้"){
+     //  alert("data");
+     
+     var typeInvoice = "";
+     if(document.getElementsByName('bean.type')[0].checked==true){
+	     typeInvoice = "BME"; 
+	 }else if(document.getElementsByName('bean.type')[1].checked ==true){
+	     typeInvoice = "WACOAL"; 
+	 }
+	 document.getElementsByName('payAmt')[index].readonly = true;
+	 document.getElementsByName('payDate')[index].readonly = true;
+	 
+	 document.getElementsByName('payAmt')[index].className = "disableNumberBold";
+	 document.getElementsByName('payDate')[index].className = "disableText";
+	 
+	 if(form.checkStockDate.value ==""){
+	   alert("กรุณากรอกข้อมูล วันที่เข้าตรวจนับ");
+	   form.checkStockDate.focus();
+	   selectedObj.value = ""; //Reset Selected
+	   return false;
+	 }
+	 //Get amt From RewardTrans
+	 var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/sa/saGetRewardByEmpAjax.jsp",
+			data : "empId=" + form.empId.value+"&checkStockDate="+form.checkStockDate.value+"&typeInvoice="+typeInvoice,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			  //alert(returnString);
+			  if(returnString != ""){
+			      returnString = returnString.split("|");
+			      document.getElementsByName('payAmt')[index].value = returnString[0];
+			      document.getElementsByName('payDate')[index].value = returnString[1];
+			     
+			      //alert(currenyToNum(document.getElementsByName('payAmt')[index]) +":"+currenyToNum(form.totalDamage));
+			      if(parseFloat(currenyToNum(document.getElementsByName('payAmt')[index])) > parseFloat(currenyToNum(form.totalDamage))){
+			           
+			           document.getElementsByName('payAmt')[index].value = form.totalDamage.value; 
+			      }
+			  }else{
+			      alert("วันที่เข้าตรวจนับ ไม่ตรงกับวันทีบันทึกค่าเผ้าตู้");
+			      document.getElementsByName('payAmt')[index].value = "";
+			      document.getElementsByName('payDate')[index].value = ""; 
+			  }
+			}
+		}).responseText;
+  }else{
+     new Epoch('epoch_popup', 'th', document.getElementsByName('payDate')[index]);
+     document.getElementsByName('payAmt')[index].readonly = false;
+	 document.getElementsByName('payDate')[index].readonly = false;
+	 
+	 document.getElementsByName('payAmt')[index].className = "enableNumberBold";
+	 document.getElementsByName('payDate')[index].className = "normalText";
+  }
+  /** Sum Tota; All new **/
+  sumTotal();
+	
+}
+</script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -689,9 +798,8 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 									</td>
 									<td align="left">
 										   <html:text property="bean.fullName" styleId="fullName" size="40" styleClass="disableText" > </html:text>
-										    <html:hidden property="bean.name" styleId="name"  />
+										     <html:hidden property="bean.name" styleId="name"  />
 										   <html:hidden property="bean.surname" styleId="surname"  />
-									   
 									 </td>
 								</tr>
 								<tr>
@@ -702,7 +810,6 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 										  <html:text property="bean.totalDamage" styleId="totalDamage" size="30" readonly="true" styleClass="disableText" onblur="isNum2Digit(this);"> </html:text>
 									</td>
 								</tr>
-								
 								<tr>
                                     <td  align="right">Remark<font color="red"></font></td>
 									<td colspan="3">		
@@ -710,7 +817,6 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 									</td>
 								</tr>
 						   </table>
-						   
 						    <!-- Items -->
 						  <c:if test="${saDamageForm.bean.canEdit == true}">
 	                        <div align="left" style="padding-left: 200px;">
@@ -751,12 +857,13 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 										    <input type="text" name="lineId" readonly id="lineId" value="<%=item.getLineId() %>" size="3" class="disableText" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
 										<td class="td_text_center" width="15%" >
-											<select name="payType" id="payType" tabindex="<%out.print(tabindex);tabindex++;%>">
+											<select name="payType" id="payType" tabindex="<%out.print(tabindex);tabindex++;%>" onchange="getRewardTransData(this,'<%=item.getId() %>');">
 						                      <%if(payTypeList != null && payTypeList.size() >0){ 
 						                    	  String selected = "";
 						                        for(int i=0;i<payTypeList.size();i++){
 						                        	PopupForm p = payTypeList.get(i);
 						                        	selected = item.getPayType().equals(p.getCode())?"selected":"";
+						                        	
 						                      %>
 											  <option value="<%=p.getCode()%>" <%=selected%>><%=p.getDesc()%></option>
 											  <%}} %>
@@ -765,22 +872,31 @@ function setEmpMainValue(empId,name,surname,branch,groupStore){
 										<td class="td_text_center" width="15%">
 										   <input type="text" name="payDate" readonly id="payDate" size="30"  value="<%=item.getPayDate() %>" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
-										<td class="td_text_center" width="15%"> 
-										   <input type="text" name="payAmt" id="payAmt" size="30" value="<%=item.getPayAmt() %>" tabindex="<%out.print(tabindex);tabindex++;%>"
-										    onblur="isNum2Digit(this);sumTotal();"  class="enableNumber">
+										<td class="td_text_center" width="15%" >
+										   <input type="text" name="payAmt" id="payAmt" size="22" value="<%=item.getPayAmt() %>" tabindex="<%out.print(tabindex);tabindex++;%>"
+										    onblur="isNum2Digit(this);sumTotal();"  class="enableNumberBold">
 										</td>
 									</tr>
 							<%} }//for  %>
 							
 					</table>
 					<table align="center" width="75%" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth">
-					        <tr>
-					            <td class="td_text_center" width="10%"></td>
-							    <td class="td_text_center" width="15%"></td>
-                             	<td class="td_text_center" width="15%"></td>
+					        <tr class=>
+					            <td class="td_text_center" width="10%">&nbsp;</td>
+							    <td class="td_text_center" width="15%">&nbsp;</td>
+                             	<td class="td_text_center" width="15%">&nbsp;</td>
 								<td class="td_text_right" width="15%"> <b>ยอดรวม</b></td>
-								<td class="td_text_center" width="15%"> &nbsp;&nbsp;
+								<td class="td_text_center" width="15%"> &nbsp;&nbsp;&nbsp;&nbsp;
 								   <input type="text" name="totalQty" id="totalQty" size="22" class="disableNumberBold" readonly>
+								</td>
+							</tr>
+							 <tr>
+					            <td class="td_text_center" width="10%">&nbsp;</td>
+							    <td class="td_text_center" width="15%">&nbsp;</td>
+                             	<td class="td_text_center" width="15%">&nbsp;</td>
+								<td class="td_text_right" width="15%"> <b>ค่าความเสียหายคงเหลือ</b></td>
+								<td class="td_text_center" width="15%"> &nbsp;&nbsp;&nbsp;&nbsp;
+								   <input type="text" name="totalDiffQty" id="totalDiffQty" size="22" class="disableNumberBold" readonly>
 								</td>
 							</tr>
 					</table>

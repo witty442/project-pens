@@ -103,6 +103,8 @@ public class OrderAllAction extends I_Action {
 					 
 					 List<References> billTypeList = importDAO.getBillTypeList();
 					 request.getSession().setAttribute("billTypeList",billTypeList);
+					 
+					 request.getSession().setAttribute("canOrderMap", null);
 
 			 }else if("new".equalsIgnoreCase(request.getParameter("action"))
 						 && "7CATALOG".equalsIgnoreCase(pageName) ){
@@ -138,6 +140,8 @@ public class OrderAllAction extends I_Action {
 					 
 					 List<References> billTypeList = importDAO.getBillTypeList();
 					 request.getSession().setAttribute("billTypeList",billTypeList);
+					 
+					 request.getSession().setAttribute("canOrderMap", null);
 
 			 }else if("new".equalsIgnoreCase(request.getParameter("action"))
 					 && "TVDIRECT".equalsIgnoreCase(pageName) ){
@@ -173,7 +177,8 @@ public class OrderAllAction extends I_Action {
 				 
 				 List<References> billTypeList = importDAO.getBillTypeList();
 				 request.getSession().setAttribute("billTypeList",billTypeList);
-
+				 
+				 request.getSession().setAttribute("canOrderMap", null);
 			 }
 			
 		} catch (Exception e) {

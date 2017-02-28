@@ -401,7 +401,6 @@ body {
 									  </c:otherwise>
 								   </c:choose>
 								</th>
-				<!--				<th> Remark</th>-->
 								<th> Message</th>
 								<th> รายละเอียด</th>
 								</tr>
@@ -415,7 +414,7 @@ body {
 										<c:set var="tabclass" value="lineE"/>
 									</c:otherwise>
 								</c:choose> 
-								
+	
 								<c:choose>
 									<c:when test="${results.status == 1}"></c:when>
 									<c:otherwise>
@@ -423,58 +422,57 @@ body {
 									</c:otherwise>
 								</c:choose>
 								
-								<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}">
-								       
-						                <td> <c:out value='${rows.index+1}'/></td>
-						                <td> ${results.transactionId}</td>
-										<td> 
+								<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}"> 
+						                <td width="5%"> <c:out value='${rows.index+1}'/></td>
+						                <td width="5%"> ${results.transactionId}</td>
+										<td width="10%"> 
 										 ${results.type}
 										 <input type="hidden" name="transTypeText" value="${results.type}"/>
 										</td>
-										<td>
+										<td width="10%">
 										  <input type="hidden" name="transactionTypeText" value="${results.transactionType}"/>
 										   <c:choose>
-										 
-											<c:when test="${results.transactionType == 'MASTER'}">
-												ข้อมูลพื้นฐาน
-											</c:when>
-											<c:when test="${results.transactionType == 'TRANSACTION'}">
-												ข้อมูล Transaction
-											</c:when>
-											<c:when test="${results.transactionType == 'WEB-MEMBER'}">
-												ข้อมูล WEB MEMBER
-											</c:when>
-											<c:otherwise>
-												Update Transaction Sales
-											</c:otherwise>
-										</c:choose>
-										</td>
-										<td> ${results.createUser}</td>
-										
-										<td> 
-										   <input type="hidden" name="statusText" value="${results.status}"/>
-										   <c:choose>
-											<c:when test="${results.status == 1}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:when>
-											<c:otherwise>
-												<img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif">
-											</c:otherwise>
-										   </c:choose>
-										</td>
-										<td> ${results.submitDate}</td>
-										<td>
-										<c:choose>
-												<c:when test="${results.type == 'IMPORT'}">
-													${results.successCount}/ ${results.fileCount}
+												<c:when test="${results.transactionType == 'MASTER'}">
+													ข้อมูลพื้นฐาน
+												</c:when>
+												<c:when test="${results.transactionType == 'TRANSACTION'}">
+													ข้อมูล Transaction
+												</c:when>
+												<c:when test="${results.transactionType == 'WEB-MEMBER'}">
+													ข้อมูล WEB MEMBER
 												</c:when>
 												<c:otherwise>
-													${results.fileCount}
+													Update Transaction Sales
 												</c:otherwise>
-											</c:choose>
+										   </c:choose>
 										</td>
-										<td align="left"> ${results.errorMsg}</td>
-										<td> 
+										<td width="10%"> ${results.createUser}</td>
+										<td width="10%"> 
+										    <input type="hidden" name="statusText" value="${results.status}"/>
+										    <c:choose>
+												<c:when test="${results.status == 1}">
+													<img border=0 src="${pageContext.request.contextPath}/icons/check.gif" width="30px" height="30px" >
+												</c:when>
+												<c:otherwise>
+													<img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif" width="30px" height="30px" >
+												</c:otherwise>
+										    </c:choose>
+										</td>
+										<td width="10%"> ${results.submitDate}</td>
+										<td width="10%">
+										  <b>
+											   <c:choose>
+													<c:when test="${results.type == 'IMPORT'}">
+														${results.successCount}/ ${results.fileCount}
+													</c:when>
+													<c:otherwise>
+														${results.fileCount}
+													</c:otherwise>
+												</c:choose>
+											</b>
+										</td>
+										<td align="left" width="15%"> ${results.errorMsg}</td>
+										<td width="10%"> 
 										     <a href="#" onclick="javascript:searchDetail('${pageContext.request.contextPath}','admin','${results.monitorId}');">
 									          <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
 										</td>
@@ -482,8 +480,7 @@ body {
 								</c:forEach>
 							</table>
 						</c:if>
-					
-					
+
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->
 							  <% if( "submited".equals(request.getAttribute("action"))){ %>  

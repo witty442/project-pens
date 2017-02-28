@@ -8,7 +8,6 @@
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.bean.StoreBean"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -28,22 +27,6 @@
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
 <%
-ImportDAO importDAO = new ImportDAO();
-//if(session.getAttribute("storeTypeList") == null){
-   List<References> storeTypeList = importDAO.getStoreTypeList(Constants.STORE_TYPE_7CATALOG_CODE+","+Constants.STORE_TYPE_TVD_CODE);
-   session.setAttribute("storeTypeList",storeTypeList);
-//}
-
-if(session.getAttribute("billTypeList") == null){
-  List<References> billTypeList = importDAO.getBillTypeList();
-  session.setAttribute("billTypeList",billTypeList);
-}
-
-if(session.getAttribute("regionList") == null){
-   List<References> regionList = importDAO.getRegionList();
-   session.setAttribute("regionList",regionList);
-}
-
 List<StoreBean> storeList = null;
 if(session.getAttribute("storeList") != null){
 	storeList = (List<StoreBean>)session.getAttribute("storeList");
@@ -191,7 +174,12 @@ function exportSummaryToExcel(path){
 	form.submit();
 	return true;
 }
-
+function exportSummaryAllToExcel(path){
+	var form = document.orderForm;
+	form.action = path + "/jsp/orderAction.do?do=exportSummaryAllToExcel";
+	form.submit();
+	return true;
+}
 function exportDetailToExcel(path){
 	var form = document.orderForm;
 	form.action = path + "/jsp/orderAction.do?do=exportDetailToExcel";
@@ -303,7 +291,6 @@ function isNum(obj){
 </script>
 </head>
 
-				
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
@@ -391,8 +378,8 @@ function isNum(obj){
 									</td>
 								</tr>
 						  </table>
-							
 					     </div>
+					     
 					     <br/>
 					     <br/>
 					     <br/> 
@@ -471,6 +458,9 @@ function isNum(obj){
 								</a>
 								<a href="javascript:exportDetailToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export Detail To Excel" class="newPosBtnLong">
+								</a>
+								<a href="javascript:exportSummaryAllToExcel('${pageContext.request.contextPath}')">
+								  <input type="button" value="Export สรุปยอดรวมทุกห้าง" class="newPosBtnLong">
 								</a>
 								<%-- <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export To Excel" class="newPosBtnLong">
@@ -558,6 +548,14 @@ function isNum(obj){
 							itemErrorMap = (Map)session.getAttribute("itemErrorMap");
 						}
 						
+						/** Get session StoreNo can order group Code **/
+						Map<String,String> canOrderMap = new HashMap<String,String>();
+						if(session.getAttribute("canOrderMap") != null){
+							canOrderMap = (Map)session.getAttribute("canOrderMap");
+						}
+						
+						String key = "";
+						String value ="";
 						int tabindex = 0;
 						int no= start;
 						String titleDisp ="";
@@ -566,7 +564,7 @@ function isNum(obj){
 						   titleDisp = o.getItemDesc()+" Onhand("+o.getOnhandQty()+")";
 						  
 						   String classStyle = (i%2==0)?"lineO":"lineE";
-						   
+						
 						   if(i%15==0 && i > 0){
 						%>
 						     <tr>
@@ -606,6 +604,8 @@ function isNum(obj){
 						       </td>
 						       <!--  For By Store -->
 						        <%if(o.getStoreItemList() != null && o.getStoreItemList().size()>0){ 
+						        	String readOnly = "";
+						        	String className = "";
 						        	for(int c=0;c<o.getStoreItemList().size();c++){
 						              StoreBean storeItem = (StoreBean)o.getStoreItemList().get(c);
 						              
@@ -617,6 +617,23 @@ function isNum(obj){
 						              //disp
 						              //StoreBean storeDisp = (StoreBean)storeList.get(c);
 						              
+						                 
+						               /**** Key for check canOrder ****************************/
+						               key = o.getGroupCode()+"_"+storeItem.getCustGroup();
+						               value = Utils.isNull(canOrderMap.get(key));
+						               readOnly = "";
+							           className = ""; 
+						               if( !Utils.isNull(value).equals("")){
+							               if(value.indexOf("ALL") != -1){
+							            	   readOnly = "readonly";
+							            	   className = "disableText";
+							               }else if( Utils.stringInStringArr(storeItem.getStoreCode(), value.split("\\,"))){
+							            	   readOnly = "readonly";
+								               className = "disableText"; 
+							               }
+						               }
+
+						             /*********************************************************/
 						         %>
 						              <td  class="<%=storeColumnClass%>">  
 						                 <input type="text" name="qty_<%=c%>_<%=i%>" id="qty_<%=c%>_<%=i%>" 
@@ -624,6 +641,7 @@ function isNum(obj){
 						                        onkeypress="chkQtyKeypress(this,event,'<%=c%>','<%=i%>')"
 						                        onchange="validateQty(this,'<%=c%>','<%=i%>')"
 						                        title="<%=titleDisp %>"
+						                        <%=readOnly%> class="<%=className%>"
 						                        />
 						                        
 						                 <%if( "storeError".equalsIgnoreCase(storeColumnClass)){ %>
@@ -659,7 +677,6 @@ function isNum(obj){
 					<!-- hidden field -->
 					<input type="hidden" name="maxColumns" id="maxColumns" value="<%=storeList!=null?storeList.size():0%>"/>
 				    <input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
-					
 					
 					</html:form>
 					<!-- BODY -->

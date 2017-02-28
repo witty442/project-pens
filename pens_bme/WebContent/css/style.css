@@ -28,7 +28,7 @@
 	color: #e7e5e5;
 	text-decoration: none;
 	display: block;
-	padding:  8px 20px;
+	padding:  8px 15px;
 	margin: 0;
 
 	-webkit-border-radius: 1.6em;
@@ -84,7 +84,7 @@
 
 	margin: 0;
 	padding: 0;
-	width: 380px;
+	width: 250px;
 	position: absolute;
 	top: 35px;
 	left: 0;
@@ -112,7 +112,7 @@
 
 /* level 3+ list */
 #nav ul ul {
-	left: 380px;
+	left: 250px;
 	top: -3px;
 }
 

@@ -665,7 +665,7 @@ public class MMoveOrder {
 					  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 					  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
-				sql.append("\n  ORDER BY h.request_date desc \n");
+				sql.append("\n  ORDER BY h.request_date desc ,h.request_number desc \n");
 				
 				logger.debug("sql:"+sql);
 				

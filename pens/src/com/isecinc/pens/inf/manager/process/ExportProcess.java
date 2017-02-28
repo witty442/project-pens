@@ -19,6 +19,7 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ExportHelper;
+import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ExportManager;
 
@@ -1764,6 +1765,8 @@ public class ExportProcess {
 					//logger.debug("colName["+colBean.getColumnName()+"]");
 					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
 						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+/*					}else if( !colBean.getExternalFunction().equalsIgnoreCase("N")){
+						dataAppend.append(ExportHelper.covertToFormatExportByFunction(colBean,rs,userBean)).append(lastAppen);*/
 					}else{
 						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
 					}	

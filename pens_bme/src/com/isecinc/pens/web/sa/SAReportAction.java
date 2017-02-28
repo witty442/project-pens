@@ -142,6 +142,25 @@ public class SAReportAction extends I_Action {
 					
 					aForm.setBean(new SAReportBean());
 				}	
+			}else if(page.equals("saDamageReport")){
+				if("new".equals(action) ){
+					//Clear list session
+					request.getSession().setAttribute("SA_DAMAGE_REPORT_LIST", null);
+					
+					List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
+					PopupForm ref3 = new PopupForm("",""); 
+					billTypeList3.add(ref3);
+					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+					request.getSession().setAttribute("groupStoreList",billTypeList3);
+					
+					List<PopupForm> billTypeList1 = new ArrayList();
+					billTypeList1.add(new PopupForm("",""));
+					billTypeList1.add(new PopupForm("BME","BME"));
+					billTypeList1.add(new PopupForm("WACOAL","WACOAL"));
+					request.getSession().setAttribute("typeList",billTypeList1);
+					
+					aForm.setBean(new SAReportBean());
+				}	
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -215,6 +234,17 @@ public class SAReportAction extends I_Action {
 						request.setAttribute("Message", "ไม่พบข้อมูล");
 					}
 				}
+			}else if(page.equals("saDamageReport")){
+				SAReportBean result = SAReportDAO.searchDamagetList(aForm.getBean());
+				if(result != null){
+					List<SAReportBean> items = result.getItems();
+					request.getSession().setAttribute("SA_DAMAGE_REPORT_LIST", items);
+					if(items != null && items.size()>0){
+						
+					}else{
+						request.setAttribute("Message", "ไม่พบข้อมูล");
+					}
+				}
 			}
 
 		} catch (Exception e) {
@@ -236,12 +266,11 @@ public class SAReportAction extends I_Action {
 		String fileName ="data.xls";
 		boolean found = false;
 		try {
-			
 			logger.debug("PageAction:"+request.getParameter("page"));
 			/** Onhand **/
 			if("saStatementReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				SAReportBean cri = new SAReportBean();
-				cri.setMonth(aForm.getBean().getMonth());
+				cri.setAsOfDate(aForm.getBean().getAsOfDate());
 				cri.setEmpId(Utils.isNull(request.getParameter("empId")));
 				
 				SAEmpBean empBean = SAEmpDAO.getEmp(cri.getEmpId());
@@ -293,6 +322,7 @@ public class SAReportAction extends I_Action {
 			logger.debug("PageAction:"+request.getParameter("page"));
 			SAReportBean cri = new SAReportBean();
 			cri.setMonth(aForm.getBean().getMonth());
+			cri.setAsOfDate(aForm.getBean().getAsOfDate());
 			
 			/** Onhand **/
 			if("saStatementReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){

@@ -39,7 +39,7 @@ public class TableBean implements Serializable{
 	private String prepareSqlDelete;
 	private String prepareSqlUpdCS;
 	
-	
+	private int startRowData;
 	private String exportPath;
 	private String source;
 	private String destination;
@@ -51,7 +51,7 @@ public class TableBean implements Serializable{
 	private int importDestCount;
 	private int exportCount;
 	private int exportCountTransaction;
-	
+	private int totalQty;
 	private StringBuffer dataStrExport;
 	private List<TableBean> fileExportList;
 	//optional
@@ -62,6 +62,18 @@ public class TableBean implements Serializable{
     
 	
 	
+	public int getStartRowData() {
+		return startRowData;
+	}
+	public void setStartRowData(int startRowData) {
+		this.startRowData = startRowData;
+	}
+	public int getTotalQty() {
+		return totalQty;
+	}
+	public void setTotalQty(int totalQty) {
+		this.totalQty = totalQty;
+	}
 	public String getCheckDupFile() {
 		return checkDupFile;
 	}

@@ -14,9 +14,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SaveInvoiceBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.SaveInvoiceDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -44,6 +46,11 @@ public class SaveInvoiceAction extends I_Action {
 				aForm.setResultsSearch(null);
 				SaveInvoiceBean ad = new SaveInvoiceBean();
 				ad.setCreateUser(user.getUserName());
+				
+			    List<References> productTypeList = new ArrayList<References>();
+			    productTypeList.add(new References("",""));
+			    productTypeList.addAll(SaveInvoiceDAO.getProductNameList());
+			    request.getSession().setAttribute("productNameList",productTypeList); 
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
@@ -186,9 +193,12 @@ public class SaveInvoiceAction extends I_Action {
 			String[] oracle_invoice_no =request.getParameterValues("oracle_invoice_no");
 			String[] bill_10 =request.getParameterValues("bill_10");
 			String[] bill_date =request.getParameterValues("bill_date");
+			String[] busCode =request.getParameterValues("busCode");
+			String[] deptCode =request.getParameterValues("deptCode");
+			String[] productCode =request.getParameterValues("productCode");
 		    if(oracle_invoice_no.length >0){
 		    	for(int i=0;i<oracle_invoice_no.length;i++){
-		    		SaveInvoiceDAO.updateORACLE_INVOICE_NO_ON_ICCHead(conn, user, oracle_invoice_no[i], bill_10[i], bill_date[i]);
+		    		SaveInvoiceDAO.updateORACLE_INVOICE_NO_ON_ICCHead(conn, user, oracle_invoice_no[i], bill_10[i], bill_date[i],busCode[i],deptCode[i],productCode[i]);
 		    	}
 		    }
 			

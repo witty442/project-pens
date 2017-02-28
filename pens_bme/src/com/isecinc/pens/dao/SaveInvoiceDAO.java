@@ -3,12 +3,14 @@ package com.isecinc.pens.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.bean.SaveInvoiceBean;
@@ -24,6 +26,37 @@ public class SaveInvoiceDAO {
 		  return searchModel(conn, o,getTrans);
 		}
 	   
+	 public static List<References> getProductNameList() throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<References> statusList= new ArrayList<References>();
+			Connection conn = null;
+			try {
+				sql.append("\n select distinct product_tname FROM pensbme_icc_head order by product_tname ");
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					statusList.add(new References(rst.getString("product_tname"), rst.getString("product_tname")));
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				    conn.close();
+				} catch (Exception e) {}
+			}
+			return statusList;
+		}
+	 
 	   public static SaveInvoiceBean search(SaveInvoiceBean o ,boolean getTrans) throws Exception {
 		   Connection conn = null;
 		   try{
@@ -53,19 +86,21 @@ public class SaveInvoiceDAO {
 				   sql.append("\n select h.* , m.pens_value as CUST_CODE, m.pens_desc2 as CUST_DESC" );
 				   sql.append("\n ,d.total_qty,d.cost ,d.net_bvat ");
 				   sql.append("\n from pensbme_icc_head h ,PENSBME_MST_REFERENCE m" );
-				   sql.append("\n ,( select  d.bill_10,sum(d.total_qty) as total_qty ,sum(d.cost) as cost ");
+				   sql.append("\n ,( select  d.bill_10 ,d.bus_code,d.dept_code,d.product_code,sum(d.total_qty) as total_qty ,sum(d.cost) as cost ");
 				   sql.append("\n    ,sum(d.total_qty *d.cost) net_bvat from pensbme_icc_dlyr d"); 
-				   sql.append("\n    where d.bill_10 in( ");
-				   sql.append("\n      select bill_10 from pensbme_icc_head where bill_date = '"+billDate+"'");
-				   sql.append("\n    )");
-				   sql.append("\n    group by d.bill_10" );
+				   sql.append("\n    group by d.bill_10 ,d.bus_code,d.dept_code,d.product_code" );
 				   sql.append("\n  )d ");
 				   sql.append("\n where 1=1 ");
 				   sql.append("\n and d.bill_10= h.bill_10 ");
+				   sql.append("\n and d.bus_code = h.bus_code" );
+				   sql.append("\n and d.dept_code = h.dept_code" );
+				   sql.append("\n and d.product_code = h.product_code ");
+					  
 				   sql.append("\n and m.reference_code = 'Store' and m.interface_value = h.CUST_ID ");
 				   sql.append("\n and h.bill_date = '"+billDate+"'");
-					
-					sql.append("\n ");
+				   if( !Utils.isNull(o.getProductName()).equals(""))
+				      sql.append("\n and h.product_tname ='"+o.getProductName()+"'");
+				   sql.append("\n ");
 					logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql.toString());
@@ -144,7 +179,7 @@ public class SaveInvoiceDAO {
 			return o;
 		}
 		
-		public static void updateORACLE_INVOICE_NO_ON_ICCHead(Connection conn,User user,String ORACLE_INVOICE_NO,String BILL_10,String BILL_DATE) throws Exception{
+		public static void updateORACLE_INVOICE_NO_ON_ICCHead(Connection conn,User user,String ORACLE_INVOICE_NO,String BILL_10,String BILL_DATE,String busCode ,String deptCode,String productCode) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("updateORACLE_INVOICE_NO_ON_ICCHead");
 			int  c = 1;
@@ -153,7 +188,7 @@ public class SaveInvoiceDAO {
 				sql.append(" UPDATE PENSBME_ICC_HEAD SET  \n");
 				sql.append(" ORACLE_INVOICE_NO =?  ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
 				
-				sql.append(" WHERE BILL_10 =? and BILL_DATE = ?  \n" );
+				sql.append(" WHERE BILL_10 =? and BILL_DATE = ? and BUS_CODE =? and DEPT_CODE =? and PRODUCT_CODE = ? \n" );
 
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -162,7 +197,9 @@ public class SaveInvoiceDAO {
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, BILL_10);
 				ps.setString(c++, BILL_DATE);
-				
+				ps.setString(c++, busCode);
+				ps.setString(c++, deptCode);
+				ps.setString(c++, productCode);
 				ps.executeUpdate();
 				
 			}catch(Exception e){

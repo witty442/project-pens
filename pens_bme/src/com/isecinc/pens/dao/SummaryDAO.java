@@ -1437,6 +1437,7 @@ public class SummaryDAO {
 					OnhandSummary item = new OnhandSummary();
 					
 					item.setStoreCode(rst.getString("customer_code"));
+					item.setStoreName(rst.getString("customer_desc"));
 					if("PensItem".equalsIgnoreCase(f.getSummaryType())){
 					   item.setPensItem(rst.getString("pens_item"));
 					}
@@ -1517,7 +1518,7 @@ public class SummaryDAO {
 					OnhandSummary item = new OnhandSummary();
 					
 					item.setStoreCode(rst.getString("CUSTOMER_CODE"));
-					//item.setStoreName(rst.getString("customer_desc"));
+					item.setStoreName(rst.getString("customer_desc"));
 					if("PensItem".equalsIgnoreCase(f.getSummaryType())){
 					   item.setPensItem(rst.getString("pens_item"));
 					}
@@ -2849,6 +2850,7 @@ public class SummaryDAO {
 					OnhandSummary item = new OnhandSummary();
 					
 					item.setStoreCode(rst.getString("customer_code"));
+					item.setStoreName(rst.getString("customer_desc"));
 					if("PensItem".equalsIgnoreCase(form.getSummaryType())){
 					  item.setPensItem(rst.getString("pens_item"));
 					}

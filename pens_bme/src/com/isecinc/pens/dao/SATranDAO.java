@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.SATranBean;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -21,8 +22,9 @@ public class SATranDAO {
 
 	 private static Logger logger = Logger.getLogger("PENS");
 	 
-	 public static List<SATranBean> initYearMonth(String empId,String payDate) throws Exception {
+	 public static SATranBean initYearMonth(String empId,String payDate,String type) throws Exception {
 			Connection conn = null;
+			SATranBean saTranBean = new SATranBean();
 			List<SATranBean> itemsList = new ArrayList<SATranBean>();
 			Map<String,SATranBean> YEARMMDB_MAP = new HashMap<String, SATranBean>();
 			String startYearMonth = "";
@@ -37,7 +39,7 @@ public class SATranDAO {
 		           yyyymmPayDate = yyyy+mm;
 				}else{
 					//Case View
-					yyyymmPayDate = getYearMonthFromTran(conn, empId,"max");
+					yyyymmPayDate = getYearMonthFromTran(conn, empId,"max",type);
 					if( !Utils.isNull(yyyymmPayDate).equals("")){
 						payDate = "01"+"/"+yyyymmPayDate.substring(4,6)+"/"+yyyymmPayDate.substring(0,2);
 					}else{
@@ -48,16 +50,16 @@ public class SATranDAO {
 				}
 		        
                 //GET DATA DB
-                YEARMMDB_MAP = getDataInDB_To_MAP(conn, empId);
+                YEARMMDB_MAP = getDataInDB_To_MAP(conn, empId,type);
                 
                 //Get Master Bean
                 SAEmpBean masterEmpBean = SAEmpDAO.getEmp(conn,empId);
                 
                 // get Start Year From SA_TRAN_REWARD
-                startYearMonth = getYearMonthFromTran(conn, empId,"min");
+                startYearMonth = getYearMonthFromTran(conn, empId,"min",type);
                
                 //get Start YearMonth From Employee
-                SATranBean startYearMonthBean = getStartYearMonthFromEmployee(conn, empId);
+                SATranBean startYearMonthBean = getStartYearMonthFromEmployee(conn, empId,type);
                 
                 if("".equals(Utils.isNull(startYearMonth))){
                 	startYearMonth = startYearMonthBean.getYearMonth();
@@ -76,7 +78,7 @@ public class SATranDAO {
 	                
 	                //case diffMonth ==0 calc from max-min (payDateMonth==min YearMonth)
 	                if(diffMonth ==0){
-	                	String maxYearMonth = getYearMonthFromTran(conn, empId,"max");
+	                	String maxYearMonth = getYearMonthFromTran(conn, empId,"max",type);
 	                	String minYearMonthNew = startYearMonth;
 	                	
 	                	logger.debug("maxYearMonth:"+maxYearMonth);
@@ -101,7 +103,7 @@ public class SATranDAO {
 			    SATranBean dataDB = null;
 			    Date payDateScreen = null;
 			    Date payDateDB = null;
-			    
+			    String countStockDate = "";
 				for(int i=0;i<=diffMonth;i++){
 		
 					SATranBean item= new SATranBean();
@@ -122,34 +124,41 @@ public class SATranDAO {
 						logger.debug("payDateDB    :"+payDateDB);
 						logger.debug("before:"+payDateDB.before(payDateScreen));
 						
-						//Can Change
-						if(payDateScreen.equals(payDateDB)){// payDateScreen < payDateDB
-							item.setCanChange(true);
-						}else{
+						//Can Change 
+						if(dataDB.isUsed()){//Used cannot change
 							item.setCanChange(false);
+						}else{
+							if(payDateScreen.equals(payDateDB)){// payDateScreen < payDateDB
+								item.setCanChange(true);
+								countStockDate = dataDB.getCountStockDate();
+							}else{
+								item.setCanChange(false);
+							}
 						}
-						item.setBmeAmt(dataDB.getBmeAmt());
-						item.setWacoalAmt(dataDB.getWacoalAmt());
+						item.setAmt(dataDB.getAmt());
 						//case isSave set payDate
 						item.setPayDate(dataDB.getPayDate());
-						
+						item.setUsed(dataDB.isUsed());
+						item.setCountStockDate(dataDB.getCountStockDate());
 					}else{
 						//Not found in SA_TRAN
 						item.setExistDB(false);
 						//logger.debug(yearMonthCount+":"+Utils.convertStrToInt(startYearMonthBean.getStartBmeYearMonth()));
 						logger.debug(yearMonthCount+":"+Utils.convertStrToInt(startYearMonthBean.getStartWacoalYearMonth()));
 						
-						if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartBmeYearMonth()) ){
-						   item.setBmeAmt(masterEmpBean.getRewardBme());
+						if("BME".equalsIgnoreCase(type)){
+							if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartBmeYearMonth()) ){
+							   item.setAmt(masterEmpBean.getRewardBme());
+							}else{
+							   item.setAmt("0");
+							}
 						}else{
-						   item.setBmeAmt("0");
+							if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartWacoalYearMonth()) ){
+								item.setAmt(masterEmpBean.getRewardWacoal());
+							}else{
+								item.setAmt("0");
+							}
 						}
-						if( Utils.convertStrToInt(yearMonthCount) >= Utils.convertStrToInt(startYearMonthBean.getStartWacoalYearMonth()) ){
-							item.setWacoalAmt(masterEmpBean.getRewardWacoal());
-						}else{
-							item.setWacoalAmt("0");
-						}
-						
 						item.setCanChange(true);
 						item.setPayDate("");
 					}
@@ -167,6 +176,8 @@ public class SATranDAO {
 				  
 				}//for
 				
+				saTranBean.setItems(itemsList);
+				saTranBean.setCountStockDate(countStockDate);
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -176,7 +187,7 @@ public class SATranDAO {
                     }
 				} catch (Exception e) {}
 			}
-			return itemsList;
+			return saTranBean;
 	}
 	 
 	 private static int calcDiffMonth(String yearMonth,String yearMonthPayDate){
@@ -199,7 +210,7 @@ public class SATranDAO {
 	     return diffMonth;
 	 }
 	 
-	 public static String getYearMonthFromTran(Connection conn ,String empId,String method) throws Exception {
+	 public static String getYearMonthFromTran(Connection conn ,String empId,String method,String type) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -208,8 +219,9 @@ public class SATranDAO {
 				sql.append("\n SELECT "+method+"(year_month) as year_month ");
 				sql.append("\n FROM  SA_REWARD_TRAN");
 				sql.append("\n WHERE emp_id = '"+empId+"' ");
-				
+				sql.append("\n and type = '"+type+"' ");
 				logger.debug("sql:"+sql);
+				
 				ps = conn.prepareStatement(sql.toString());
 				rst = ps.executeQuery();
 				
@@ -229,7 +241,7 @@ public class SATranDAO {
 			return yearMonth;
 		}
 	
-	 public static SATranBean getStartYearMonthFromEmployee(Connection conn ,String empId) throws Exception {
+	 public static SATranBean getStartYearMonthFromEmployee(Connection conn ,String empId ,String type) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -253,8 +265,11 @@ public class SATranDAO {
 					item.setStartBmeYearMonth(Utils.stringValue(rst.getDate("start_reward_bme_date"), Utils.YYYYMM,Utils.local_th));
 					item.setStartWacoalYearMonth(Utils.stringValue(rst.getDate("start_reward_wacoal_date"), Utils.YYYYMM,Utils.local_th));
 					
-					item.setBmeAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
-					item.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
+					if("BME".equalsIgnoreCase(type)){
+					   item.setAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
+					}else{
+					   item.setAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
+					}
 				}//while
 
 			} catch (Exception e) {
@@ -269,15 +284,15 @@ public class SATranDAO {
 			return item;
 	}
 	 
-	 public static Map<String,SATranBean> getDataInDB_To_MAP(Connection conn ,String empId) throws Exception {
+	 public static Map<String,SATranBean> getDataInDB_To_MAP(Connection conn ,String empId,String type) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
 			Map<String,SATranBean> YEARMMDB_MAP = new HashMap<String, SATranBean>();
 			SATranBean item = null;
 			try {
-				sql.append("\n SELECT year_month,bme_amt,wacoal_amt ,paydate FROM  SA_REWARD_TRAN");
-				sql.append("\n  WHERE emp_id = '"+empId+"'");
+				sql.append("\n SELECT year_month,amt,paydate,count_stock_date,DAMAGE_USE_FLAG FROM  SA_REWARD_TRAN");
+				sql.append("\n  WHERE emp_id = '"+empId+"' and type='"+type+"'");
 				
 				logger.debug("sql:"+sql);
 				ps = conn.prepareStatement(sql.toString());
@@ -286,14 +301,19 @@ public class SATranDAO {
 				while(rst.next()) {
 					item = new SATranBean();
 					item.setYearMonth(Utils.isNull(rst.getString("year_month")));
-					item.setBmeAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
-					item.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
+					item.setAmt(Utils.decimalFormat(rst.getDouble("amt"), Utils.format_current_2_disgit));
 					
 					if(rst.getDate("paydate") != null){
 						item.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					}else{
 						item.setPayDate("");
 					}
+					if(rst.getDate("count_stock_date") != null){
+						item.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					}else{
+						item.setCountStockDate("");
+					}
+					item.setUsed(Utils.isNull(rst.getString("DAMAGE_USE_FLAG")).equals("")?false:true);
 					
 					YEARMMDB_MAP.put(Utils.isNull(rst.getString("year_month")), item);
 				}//while
@@ -304,7 +324,7 @@ public class SATranDAO {
 				try {
 					rst.close();
 					ps.close();
-				
+			
 				} catch (Exception e) {}
 			}
 			return YEARMMDB_MAP;
@@ -317,13 +337,14 @@ public class SATranDAO {
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append("INSERT INTO SA_REWARD_TRAN \n");
-				sql.append("(EMP_ID, year_month, paydate, Bme_amt, Wacoal_amt,CREATE_DATE, CREATE_USER) \n");
-				sql.append("VALUES (?, ?, ?, ?, ?, ?, ?) \n");//7
+				sql.append("(TYPE,EMP_ID, year_month, paydate,count_stock_date, amt,CREATE_DATE, CREATE_USER) \n");
+				sql.append("VALUES (?,?, ?, ?, ?, ?, ?, ? ) \n");//7
 				
 				logger.debug("sql:"+sql.toString());
 				
 				ps = conn.prepareStatement(sql.toString());
 				
+				ps.setString(c++, Utils.isNull(o.getType()));//1
 				ps.setString(c++, Utils.isNull(o.getEmpId()));//1
 				ps.setString(c++, Utils.isNull(o.getYearMonth())); //2
 			
@@ -332,9 +353,13 @@ public class SATranDAO {
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
-				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getBmeAmt()));//12
-				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getWacoalAmt()));//12
-				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//14
+				if( !Utils.isNull(o.getCountStockDate()).equals("")){//4
+					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCountStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				}else{
+					 ps.setTimestamp(c++,null);
+				}
+				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getAmt()));//12
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//13
 				ps.setString(c++, o.getCreateUser());//15
 				
 				ps.executeUpdate();
@@ -357,27 +382,33 @@ public class SATranDAO {
 		
 				StringBuffer sql = new StringBuffer("");
 				sql.append("UPDATE SA_REWARD_TRAN \n");
-				sql.append("SET paydate =?, Bme_amt =?, Wacoal_amt=?,UPDATE_DATE=?, UPDATE_USER=? \n");
-				sql.append("WHERE EMP_ID=? AND year_month=? \n");//7
+				sql.append("SET paydate =?,count_stock_date=?, amt =?,UPDATE_DATE=?, UPDATE_USER=? \n");
+				sql.append("WHERE EMP_ID=? AND year_month=? AND type=? \n");//7
 				
 				logger.debug("sql:"+sql.toString());
 				
 				ps = conn.prepareStatement(sql.toString());
 				
+			
 				if( !Utils.isNull(o.getPayDate()).equals("")){//4
 					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
+				if( !Utils.isNull(o.getCountStockDate()).equals("")){//4
+					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCountStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				}else{
+					 ps.setTimestamp(c++,null);
+				}
 				
-				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getBmeAmt()));//12
-				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getWacoalAmt()));//12
+				ps.setDouble(c++, Utils.convertStrToDouble2Digit(o.getAmt()));//12
 				
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//14
 				ps.setString(c++, o.getCreateUser());//15
 				
 				ps.setString(c++, Utils.isNull(o.getEmpId()));//1
 				ps.setString(c++, Utils.isNull(o.getYearMonth())); //2
+				ps.setString(c++, Utils.isNull(o.getType()));//3
 			
 				return  ps.executeUpdate();
 
@@ -397,14 +428,43 @@ public class SATranDAO {
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append("DELETE FROM SA_REWARD_TRAN \n");
-				sql.append("WHERE EMP_ID=? AND year_month=? \n");//7
+				sql.append("WHERE EMP_ID=? AND year_month=? AND TYPE =? \n");//7
 				
 				logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
 	
 				ps.setString(c++, Utils.isNull(o.getEmpId()));//1
 				ps.setString(c++, Utils.isNull(o.getYearMonth())); //2
-			
+				ps.setString(c++, Utils.isNull(o.getType()));//3
+				return  ps.executeUpdate();
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+	  }
+	 
+	 public static int updateFlagUsed(Connection conn,SADamageBean o,String flag) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("deleteModel");
+			int c =1;
+			try{
+				Date checkStockDateObj = Utils.parse(o.getCheckStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				
+				StringBuffer sql = new StringBuffer("");
+				sql.append("UPDATE SA_REWARD_TRAN set DAMAGE_USE_FLAG ='"+flag+"',UPDATE_DATE=?, UPDATE_USER=? \n");
+				sql.append("WHERE emp_id = '"+o.getEmpId()+"' \n");
+				sql.append("and  count_stock_date = ? \n");
+				
+				logger.debug("sql:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//14
+				ps.setString(c++, o.getCreateUser());//15
+				ps.setDate(c++, new java.sql.Date(checkStockDateObj.getTime()));
+				
 				return  ps.executeUpdate();
 			}catch(Exception e){
 				throw e;
@@ -529,6 +589,7 @@ public class SATranDAO {
 			   conn.close();
 		   }
 		}
+	 
 	public static SATranBean searchReportModel(Connection conn,SATranBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -538,37 +599,60 @@ public class SATranDAO {
 		List<SATranBean> items = new ArrayList<SATranBean>();
 		int r = 1;
 		try {
-		   sql.append(" \n select E.emp_id,E.name,E.surname,E.group_store,E.branch " );
-		   sql.append("\n  ,T.year_month,T.paydate,T.bme_amt,T.wacoal_amt");
-		   sql.append("\n  from SA_EMPLOYEE E ,SA_REWARD_TRAN T");
-		   sql.append("\n  WHERE 1=1 and E.emp_id = T.emp_id");
+			sql.append("\n select A.* FROM (");
+			sql.append("\n  SELECT M.* ,BME.paydate as bme_paydate,BME.bme_amt ,BME.count_stock_date as bme_count_stock_date," );
+			sql.append("\n    WACOAL.paydate as wacoal_paydate,WACOAL.wacoal_amt,WACOAL.count_stock_date as wacoal_count_stock_date " );
+			sql.append("\n    FROM( ");
+		    sql.append("\n    select E.emp_id,E.name,E.surname,E.group_store,E.branch,MONTH.year_month " );
+		    sql.append("\n    from SA_EMPLOYEE E ");
+		    sql.append("\n    LEFT OUTER JOIN ( ");
+		    sql.append("\n       SELECT distinct T.emp_id,T.year_month ");
+		    sql.append("\n       from SA_REWARD_TRAN T  ");
+		    sql.append("\n       WHERE amt <> 0  ");
+		    sql.append("\n    )MONTH ");
+		    sql.append("\n    ON E.emp_id = MONTH.emp_id  ");
+		    sql.append("\n    WHERE 1=1");
 		   
 		    if( !Utils.isNull(o.getEmpId()).equals("") ){
-				sql.append("\n and E.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+				sql.append("\n  and E.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
 		    }
 		    if( !Utils.isNull(o.getOracleRefId()).equals("")){
-				sql.append("\n and E.oracle_ref_id ='"+o.getOracleRefId()+"'");
+				sql.append("\n  and E.oracle_ref_id ='"+o.getOracleRefId()+"'");
 			}
 			if( !Utils.isNull(o.getType()).equals("")){
-				sql.append("\n and E.type = '"+Utils.isNull(o.getType())+"'");
+				sql.append("\n  and E.type = '"+Utils.isNull(o.getType())+"'");
 			}
 			if( !Utils.isNull(o.getName()).equals("")){
-				sql.append("\n and E.name LIKE '%"+Utils.isNull(o.getName())+"%'");
+				sql.append("\n  and E.name LIKE '%"+Utils.isNull(o.getName())+"%'");
 			}
 			if( !Utils.isNull(o.getSurname()).equals("")){
-				sql.append("\n and E.surname LIKE '%"+Utils.isNull(o.getSurname())+"%'");
+				sql.append("\n  and E.surname LIKE '%"+Utils.isNull(o.getSurname())+"%'");
 			}
 			if( !Utils.isNull(o.getGroupStore()).equals("")){
-				sql.append("\n and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
+				sql.append("\n  and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
 			}
 			if( !Utils.isNull(o.getBranch()).equals("")){
-				sql.append("\n and E.branch LIKE '%"+Utils.isNull(o.getBranch())+"%'");
+				sql.append("\n  and E.branch LIKE '%"+Utils.isNull(o.getBranch())+"%'");
 			}
-			
-			sql.append("\n order by E.emp_id ,T.year_month asc ");
+			sql.append("\n  ) M");
+			sql.append("\n  LEFT OUTER JOIN ");
+			sql.append("\n  (");
+			sql.append("\n    SELECT T.emp_id,T.year_month,T.paydate,T.count_stock_date,T.amt as bme_amt");
+			sql.append("\n    from SA_REWARD_TRAN T");
+			sql.append("\n    where type='BME' ");
+			sql.append("\n  )BME");
+			sql.append("\n  ON M.emp_id = BME.emp_id and M.year_month = BME.year_month");
+			sql.append("\n  LEFT OUTER JOIN ");
+			sql.append("\n  (");
+			sql.append("\n    SELECT T.emp_id,T.year_month,T.paydate,T.count_stock_date,T.amt as wacoal_amt");
+			sql.append("\n    from SA_REWARD_TRAN T");
+			sql.append("\n    where type='WACOAL' ");
+			sql.append("\n  )WACOAL");
+			sql.append("\n  ON M.emp_id = WACOAL.emp_id and M.year_month = WACOAL.year_month");
+			sql.append("\n )A");
+			sql.append("\n order by A.emp_id ,A.year_month asc ");
 			
 			logger.debug("sql:"+sql);
-			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			
@@ -595,13 +679,28 @@ public class SATranDAO {
 			   h.setYearMonth(Utils.isNull(rst.getString("year_month")));
 			   h.setBmeAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
 			   h.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
-				
-			   if(rst.getDate("paydate") != null){
-				 h.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  }else{
+			   
+			   if(rst.getDate("bme_count_stock_date") != null){
+				   h.setBmeCountStockDate(Utils.stringValue(rst.getDate("bme_count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				}else{
+				   h.setBmeCountStockDate("");
+				}
+			   if(rst.getDate("bme_paydate") != null){
+				 h.setBmePayDate(Utils.stringValue(rst.getDate("bme_paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   }else{
 				 h.setPayDate("");
 			   }
-				   
+			   
+			   if(rst.getDate("wacoal_count_stock_date") != null){
+				   h.setWacoalCountStockDate(Utils.stringValue(rst.getDate("wacoal_count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				}else{
+				   h.setWacoalCountStockDate("");
+				}
+			   if(rst.getDate("wacoal_paydate") != null){
+				  h.setWacoalPayDate(Utils.stringValue(rst.getDate("wacoal_paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   }else{
+				  h.setPayDate("");
+			   }
 			   items.add(h);
 			   r++;
 			   
@@ -621,6 +720,57 @@ public class SATranDAO {
 			} catch (Exception e) {}
 		}
 		return o;
+	}
+	
+	 public static SATranBean getRewardByEmp(String empId,String typeInvoice,String checkStockDate) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			SATranBean item = null;
+			Connection conn = null;
+			double amt = 0;
+			Date payDate  = null;
+			try {
+				Date checkStockDateObj = Utils.parse(checkStockDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				sql.append("\n SELECT nvl(sum(amt),0) as amt,paydate FROM SA_REWARD_TRAN");
+				sql.append("\n  WHERE emp_id = '"+empId+"'");
+				sql.append("\n  and type = '"+typeInvoice+"'");
+				sql.append("\n  and count_stock_date = ?");
+				sql.append("\n  group by paydate");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				ps = conn.prepareStatement(sql.toString());
+				ps.setDate(1, new java.sql.Date(checkStockDateObj.getTime()));
+				rst = ps.executeQuery();
+				
+				while(rst.next()) {
+					payDate = rst.getDate("paydate");
+					amt +=rst.getDouble("amt");
+					
+				}//while
+
+				logger.debug("amt:"+amt);
+				
+				item = new SATranBean();
+				item.setAmt(Utils.decimalFormat(amt, Utils.format_current_2_disgit));
+			    
+			    if(payDate != null){
+					item.setPayDate(Utils.stringValue(payDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				}else{
+			        item.setPayDate("");
+				}
+			    
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				
+				} catch (Exception e) {}
+			}
+			return item;
 	}
 	
 }

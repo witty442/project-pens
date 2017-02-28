@@ -340,8 +340,10 @@ public class SAEmpDAO {
 			try {
 			   sql.append(" \n select S.*" );
 			   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =S.region)as region_desc" );
-			   sql.append(" \n,(SELECT NVL(SUM(M.bme_amt),0) FROM sa_reward_tran M where M.emp_id = S.emp_id group by M.emp_id) as total_reward_bme" );
-			   sql.append(" \n,(SELECT NVL(SUM(M.wacoal_amt),0) FROM sa_reward_tran M where M.emp_id = S.emp_id group by M.emp_id) as total_reward_wacoal" );
+			   
+			   sql.append(" \n,(SELECT NVL(SUM(M.amt),0) FROM sa_reward_tran M where M.type='BME' AND M.emp_id = S.emp_id group by M.emp_id) as total_reward_bme" );
+			   sql.append(" \n,(SELECT NVL(SUM(M.amt),0) FROM sa_reward_tran M where M.type='WACOAL' AND M.emp_id = S.emp_id group by M.emp_id) as total_reward_wacoal" );
+			   
 			   if( !Utils.isNull(o.getDispDamage()).equals("")){
 				   sql.append(" \n,(SELECT NVL(SUM(M.total_damage),0) FROM sa_damage_head M where M.emp_id = S.emp_id group by M.emp_id) as total_damage" );
 				   

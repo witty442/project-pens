@@ -58,12 +58,20 @@ public class SaveInvoiceBean implements Serializable{
 	private String updateUser;
 	private String custCode;
 	private String custDesc;
+	private String productName;
 	
 	private List<SaveInvoiceBean> itemList;
 	private String grandTotalQty;
 	private String grandNetBVat;
 	
 	
+	
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 	public String getGrandTotalQty() {
 		return grandTotalQty;
 	}

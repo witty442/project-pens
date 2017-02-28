@@ -49,6 +49,7 @@ public class Utils {
 	public static final String MMMMYYYY = "MMMMyyyy";
 	public static final String MMM_YYYY = "MMM-yyyy";
 	public static final String MMM_YY = "MMM-yy";
+	public static final String DD_MMMM_YYYY = "dd MMMM yyyy";
 	
 	public static final Locale local_th= new Locale("th","TH");
 
@@ -65,10 +66,18 @@ public class Utils {
 	
 	public static void main(String[] args){
 	    try{	
-	    	Calendar c = Calendar.getInstance(Utils.local_th);
-			String yyyymmPayDate = Utils.stringValue(c.getTime(), Utils.YYYYMM);
+	    	String doubleStr = "100.15000";
+	    	System.out.println("length:"+doubleStr.length());
+	    	System.out.println("doubleStr.indexOf(.)+3:"+(doubleStr.indexOf(".")+3));
 	    	
-			System.out.println("yyyymmPayDate:"+yyyymmPayDate);
+	        String num2 = "00";
+	        if( (doubleStr.length()) > (doubleStr.indexOf(".")+3) ){
+	        	num2= doubleStr.substring(doubleStr.indexOf(".")+1,(doubleStr.indexOf(".")+3));
+	        }else{
+	        	num2= doubleStr.substring((doubleStr.indexOf(".")+1),(doubleStr.indexOf(".")+2));
+	        }
+	        System.out.println("num2:"+num2);
+	        
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -92,6 +101,21 @@ public class Utils {
 				}
 			}//for 2
 			
+		}//for 1
+		return r;
+	}
+	
+	public static boolean stringInStringArr(String str,String[] array){
+		boolean r = false;
+		for(int i=0;i<array.length;i++){
+			String arrCheck = array[i].toLowerCase().trim();
+			//logger.debug(str+":"+arrCheck);
+			if(str.equalsIgnoreCase(arrCheck)){
+				//logger.debug("equals");
+				r= true;
+				break;
+			}
+
 		}//for 1
 		return r;
 	}
@@ -645,6 +669,34 @@ public class Utils {
 		return doubleStr;
 	}
 	
+	/**
+	 * 
+	 * @param double1
+	 * @return
+	 * Case1 input 100.20 return 100.20
+	 * case2 input 100.00 return 100
+	 */
+	public static String convertToNumberSpecial(BigDecimal double1){
+
+		String doubleStr = double1.toString();
+		//logger.debug("doubleStr:"+doubleStr);
+		
+		if(doubleStr.indexOf(".") != -1){
+		   String num1 = doubleStr.substring(0,doubleStr.indexOf("."));
+		   String num2 ="0";
+		   if( (doubleStr.length()) > (doubleStr.indexOf(".")+3) ){
+	        	num2= doubleStr.substring(doubleStr.indexOf(".")+1,(doubleStr.indexOf(".")+3));
+	        }else{
+	        	num2= doubleStr.substring((doubleStr.indexOf(".")+1),(doubleStr.indexOf(".")+2));
+	        }
+		  
+		  // logger.debug("num1="+num1+",num2="+num2);
+		   return num1+"."+num2;
+		}
+		return doubleStr;
+	}
+	
+	
 	public static double convertStrToDouble(String str){
 		if(isNull(str).equals("")){
 			return 0;
@@ -676,12 +728,23 @@ public class Utils {
 		return ((Double)str);
 	}
 	
+	public static Double isDoubleNull2Digit(Object str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		String strTemp = str.toString();
+		int diff  = strTemp.length() - strTemp.indexOf(".");
+		strTemp = strTemp.substring(0,strTemp.indexOf(".")+diff);
+		//logger.debug("isDoubleNull:"+(new Double(strTemp)));
+		return new Double(strTemp);
+	}
+	
 	public static Double isDoubleNull(String str) {
 		if (str ==null){
 			return new Double(0);
 		}
 		str = str.replaceAll(",", "");
-		//logger.debug("str:"+str);
+		//logger.debug("isDoubleNull:"+(new Double(str)));
 		return (new Double(str));
 	}
 	
@@ -1037,4 +1100,34 @@ public class Utils {
  		}
  		return dateStr;
  	}
+ 	public static String[] isNullArray(Object obj){
+		if(obj == null)
+		  return null;
+		String[] str = (String[]) obj;
+		return str;
+	}
+	public static Date getDate(String strDateTime, String pattern) {
+		try {
+		if (strDateTime != null && strDateTime.length() > 0) {
+		SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.US);
+		Date dtDate = format.parse(strDateTime);
+
+		return dtDate;
+
+		} else {
+		return null;
+		}
+		} catch (Exception ex) {
+		ex.printStackTrace();
+		}
+		return null;
+		}
+	
+	
+	public static String isNullDefaultZero(Object obj){
+		if(obj == null)
+		  return "0";
+		String str = (String) obj;
+		return str.trim();
+	}
 }

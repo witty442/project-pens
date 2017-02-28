@@ -160,6 +160,52 @@ public class InterfaceHelper extends InterfaceUtils{
 			FileUtil.close(br);
 		}
 	}
+	public static void initImportConfigWacoal(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,User userBean) throws Exception {
+		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
+		EnvProperties env = EnvProperties.getInstance();
+		MonitorTime monitorTime = null;
+		try {
+			String lineStr = null;
+			while ((lineStr = br.readLine()) != null) {
+				if (!Utils.isBlank(lineStr)) { // exclude blank line
+					String[] cs = lineStr.split("\t");
+					if (!cs[0].startsWith("Seq") && !cs[0].startsWith("#")) { // exclude header, comment
+						TableBean tableBean = new TableBean();
+						try {
+							String[] p = ((String)cs[0]).split(",");
+							tableBean.setTableName(Utils.isNull(p[1].toLowerCase()));
+							tableBean.setFileFtpName(Utils.isNull(p[2]));
+							tableBean.setSource(Utils.isNull(p[3]));
+							tableBean.setDestination(Utils.isNull(p[4]));
+							tableBean.setTransactionType(Utils.isNull(p[5]));
+							tableBean.setAuthen(Utils.isNull(p[6]));
+							tableBean.setChildTable(Utils.isNull(p[7]));
+							tableBean.setActionDB(Utils.isNull(p[8]));
+							tableBean.setPreFunction(Utils.isNull(p[9]));
+							tableBean.setPostFunction(Utils.isNull(p[10]));
+							
+							/** init table properties  */
+							tableBean = initColumnICC(path,tableBean);
+							/** Gen SQL Insert And Update***/
+							tableBean = genPrepareSQL(tableBean,userBean);
+							
+							/** Store Data Map **/
+						    tableMap.put(tableBean.getTableName(),tableBean);
+						
+						} catch (Exception e) {
+							logger.info("TabelName Error:"+tableBean.getTableName());
+							throw e;
+						}
+					}//if 2
+				}//if 1
+			}//while
+			
+		}catch(Exception e){
+			throw e;
+		} finally {
+			FileUtil.close(br);
+		}
+	}
 	
 	public static void initExportConfigICC(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,User userBean,Map<String, String> batchParamMap) throws Exception {
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination

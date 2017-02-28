@@ -24,6 +24,7 @@ public class InvoiceDetailReport implements Serializable {
 	private String orderNo;
 	private String invoiceNo;
 	private Date orderDate;
+	private String orderDateStr;
 	private String productCode;
 	private String productName;
 	private String fullUom;
@@ -55,6 +56,12 @@ public class InvoiceDetailReport implements Serializable {
     private String productCodeTo;
 
     
+	public String getOrderDateStr() {
+		return orderDateStr;
+	}
+	public void setOrderDateStr(String orderDateStr) {
+		this.orderDateStr = orderDateStr;
+	}
 	public String getInvoiceNo() {
 		return invoiceNo;
 	}

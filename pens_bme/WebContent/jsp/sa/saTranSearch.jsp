@@ -125,7 +125,7 @@ function newEmp(path){
 	return true; 
 }
 
-function openEdit(path,empId){
+function openEdit(path,empId,type){
 	 var form = document.saTranForm;
 	 var payDate = document.getElementById("payDate");
 	 if(payDate.value ==""){
@@ -134,14 +134,16 @@ function openEdit(path,empId){
 		 return false;
 	 }
 	var param ="&empId="+empId+"&payDate="+payDate.value;
+	 param +="&type="+type;
 	form.action = path + "/jsp/saTranAction.do?do=prepare&action=edit"+param;
 	form.submit();
 	return true; 
 }
 
-function openView(path,empId){
+function openView(path,empId,type){
 	var form = document.saTranForm;
 	var param ="&empId="+empId+"&payDate=";
+	    param +="&type="+type;
 	form.action = path + "/jsp/saTranAction.do?do=prepare&action=view"+param;
 	form.submit();
 	return true; 
@@ -198,6 +200,7 @@ function openView(path,empId){
 								   <td> รหัสร้านค้าใน Oracle<font color="red"></font></td>
 									<td>		
 				                        <html:text property="bean.oracleRefId" styleId="oracleRefId" size="20"/>
+				                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									    ประเภท
 									     <html:select property="bean.type" styleId="type">
 											<html:options collection="empTypeList" property="code" labelProperty="desc"/>
@@ -205,28 +208,30 @@ function openView(path,empId){
 									</td>
 								</tr>
 								<tr>
-                                    <td> Name <font color="red"></font></td>
+                                    <td align="right"> Name <font color="red"></font></td>
 									<td>		
 										 <html:text property="bean.name" styleId="name" size="20"/>
 									</td>
-								   <td> Surname<font color="red"></font></td>
+								   <td align="right"> Surname<font color="red"></font></td>
 									<td>		
 										 <html:text property="bean.surname" styleId="surname" size="20"/>
 									</td>
 								</tr>
 								<tr>
 								    <td  align="right">Region<font color="red"></font></td>    
-									<td colspan="2">
+									<td >
 									     <html:select property="bean.region" styleId="region">
 											<html:options collection="empRegionList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
-									<td>
+									<td align="right">
 									Group Store
+									</td>
+									<td>
 									     <html:select property="bean.groupStore" styleId="groupStore">
 											<html:options collection="groupStoreList" property="code" labelProperty="desc"/>
 									    </html:select>
-									    
+									   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									    Branch <html:text property="bean.branch" styleId="branch" size="20"/>
 									</td>
 						   </table>
@@ -263,7 +268,8 @@ function openView(path,empId){
 						</table>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						       <tr>
-						            <th >บันทึกค่าเฝ้าตู้</th><!-- 0 -->
+						            <th >บันทึกค่าเฝ้าตู้ BME</th><!-- 0 -->
+						            <th >บันทึกค่าเฝ้าตู้  WACOAL</th><!-- 0 -->
 						            <th >Employee ID</th><!-- 1 -->
 									<th >Name</th><!-- 3 -->
 									<th >Surname</th><!-- 4 -->
@@ -284,16 +290,30 @@ function openView(path,empId){
 								}
 								%>
 									<tr class="<%=tabclass%>"> 
-									   <td class="td_text_center" width="10%">
+									   <td class="td_text_center" width="11%" nowrap>
 									       <c:if test="${saTranForm.bean.canEdit == true}">
-									         <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> 
+									         <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','BME')"> 
 									            <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
 									          </a>
-									         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')">Action</a><!-- 0 -->
+									         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','BME')">Action BME</a><!-- 0 -->
 											</c:if>
 											<c:if test="${saTranForm.bean.canEdit == false}">
-											   <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>')"> 
+											   <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','BME')"> 
+									             <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
+									           </a>
+											</c:if>
+										</td>
+										 <td class="td_text_center" width="11%" nowrap>
+									       <c:if test="${saTranForm.bean.canEdit == true}">
+									         <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','WACOAL')"> 
+									            <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
+									          </a>
+									         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','WACOAL')">Action WACOAL</a><!-- 0 -->
+											</c:if>
+											<c:if test="${saTranForm.bean.canEdit == false}">
+											   <a href="javascript:openView('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','WACOAL')"> 
 									             <img  src="${pageContext.request.contextPath}/icons/lookup.gif"/>
 									           </a>
 											</c:if>
@@ -302,7 +322,7 @@ function openView(path,empId){
 										<td class="td_text" width="10%"><%=mc.getName()%></td><!-- 3 -->
 									    <td class="td_text" width="10%"><%=mc.getSurname()%></td><!-- 4 -->
 									    <td class="td_text" width="8%"><%=mc.getOracleRefId() %></td><!-- 5 -->
-										<td class="td_text" width="8%"><%=mc.getType()%></td><!-- 6 -->
+										<td class="td_text" width="5%"><%=mc.getType()%></td><!-- 6 -->
 										<td class="td_text" width="8%"><%=mc.getRegionDesc()%></td><!-- 7 -->
 										<td class="td_text" width="4%"><%=mc.getGroupStore()%></td><!-- 8 -->
 										<td class="td_text" width="7%"><%=mc.getBranch()%></td><!-- 9 -->

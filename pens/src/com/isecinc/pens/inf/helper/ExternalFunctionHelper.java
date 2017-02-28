@@ -176,6 +176,9 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_DATE")){	
 				id = Utils.format(new Date(), Utils.DD_MM_YYYY_WITHOUT_SLASH);
 				exe = false;
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_UPDATED_BY_ORCL")){	
+				id = "9999";
+				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_USER")){	
 				id = String.valueOf(userBean.getId());
 				exe = false;
@@ -381,7 +384,9 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_TIMESTAMP")){	
 				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
 				exe = false;
-				
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_SHORT_TIMESTAMP")){	
+				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH);
+				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GEN_CUST_CODE")){
 				// String prefix = new DecimalFormat("00").format(Integer.parseInt(member.getTerritory()));
 				String prefix = "";
@@ -455,11 +460,12 @@ public class ExternalFunctionHelper {
 				if(Utils.isNull(value).equals("")){
 					exe = false;
 				}	
-				
+			
 			/** GET Order Type  **/
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ORDER_TYPE")){	
 				id =  userBean.getOrderType().getKey();
 				exe = false;
+				
 			}else{
 				exe = false;
 			}

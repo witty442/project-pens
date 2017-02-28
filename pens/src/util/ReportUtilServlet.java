@@ -742,8 +742,10 @@ public class ReportUtilServlet extends HttpServlet {
 		   
 			}else if("list_order_product_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_report".equalsIgnoreCase(fileName)
+					|| "tax_invoice_summary_new_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)){
 				try{
+					printerInvoiceName = "ZDesigner MZ 320";
 					PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
 					if (services == null || services.length < 1) {
 						  throw new  Exception("printer Exception");
@@ -753,9 +755,10 @@ public class ReportUtilServlet extends HttpServlet {
 					/* Scan found services to see if anyone suits our needs */
 					for(int i = 0; i < services.length;i++){
 					   if(services[i].getName().toUpperCase().contains("ZDesigner MZ 320".toUpperCase())){
-					      logger.debug("Sleected Printer Name["+services[i].getName().toUpperCase()+"]");
+					      logger.debug("Slected Printer Name["+services[i].getName().toUpperCase()+"]");
 						  /*If the service is named as what we are querying we select it */
 					      selectedService = i;
+					      break;
 					   }
 					}
 					
@@ -768,7 +771,8 @@ public class ReportUtilServlet extends HttpServlet {
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
-	
+					
+				     
 					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);

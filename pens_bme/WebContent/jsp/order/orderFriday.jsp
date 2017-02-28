@@ -495,6 +495,14 @@ function isNum(obj){
 							itemErrorMap = (Map)session.getAttribute("itemErrorMap");
 						}
 						
+						/** Get session StoreNo can order group Code **/
+						Map<String,String> canOrderMap = new HashMap<String,String>();
+						if(session.getAttribute("canOrderMap") != null){
+							canOrderMap = (Map)session.getAttribute("canOrderMap");
+						}
+
+						String key = "";
+						String value ="";
 						int tabindex = 0;
 						int no= start;
 						String titleDisp ="";
@@ -542,6 +550,8 @@ function isNum(obj){
 						       </td>
 						       <!--  For By Store -->
 						        <%if(o.getStoreItemList() != null && o.getStoreItemList().size()>0){ 
+						        	String readOnly = "";
+						        	String className = "";
 						        	for(int c=0;c<o.getStoreItemList().size();c++){
 						              StoreBean storeItem = (StoreBean)o.getStoreItemList().get(c);
 						             
@@ -549,6 +559,22 @@ function isNum(obj){
 						              //disp
 						              StoreBean storeDisp = (StoreBean)storeList.get(c);
 						              
+						               /**** Key for check canOrder ****************************/
+						               key = o.getGroupCode()+"_"+storeItem.getCustGroup();
+						               value = Utils.isNull(canOrderMap.get(key));
+						               readOnly = "";
+							           className = "";  
+						               if( !Utils.isNull(value).equals("")){
+							               if(value.indexOf("ALL") != -1){
+							            	   readOnly = "readonly";
+							            	   className = "disableText";
+							               }else if( Utils.stringInStringArr(storeItem.getStoreCode(), value.split("\\,"))){
+							            	   readOnly = "readonly";
+								               className = "disableText"; 
+							               }
+						               }
+
+						             /*********************************************************/
 						         %>
 						              <td>  
 						                 <input type="text" name="qty_<%=c%>_<%=i%>" id="qty_<%=c%>_<%=i%>" 
@@ -556,6 +582,7 @@ function isNum(obj){
 						                        onkeypress="chkQtyKeypress(this,event,'<%=c%>','<%=i%>')"
 						                        onchange="validateQty(this,'<%=c%>','<%=i%>')"
 						                        title="<%=titleDisp %>"
+						                         <%=readOnly%> class="<%=className%>"
 						                        />
 						                      <input type="hidden" name="orderNo_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getOrderNo())%>">
 						                      <input type="hidden" name="barOnBox_<%=c%>_<%=i%>"  value="<%=Utils.isNull(storeItem.getBarOnBox())%>">

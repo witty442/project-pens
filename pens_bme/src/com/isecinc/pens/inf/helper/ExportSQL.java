@@ -47,14 +47,14 @@ public class ExportSQL {
 					"  SELECT \n" +
 					"  m.Bill_date  \n"+
 					" ,m.oracle_invoice_no as Bill_no  \n"+
-					" ,(select max(d.fact_id) from PENSBME_ICC_DLYR d where d.bill_10 = m.bill_10 group by d.bill_10) Fact_id  \n"+
+					" ,(select max(d.fact_id) from PENSBME_ICC_DLYR d where d.bill_10 = m.bill_10 and d.bus_code = m.bus_code and d.dept_code = m.dept_code and d.product_code = m.product_code group by d.bill_10) Fact_id  \n"+
 					" ,m.bus_code    \n"+
 					" ,m.dept_code    \n"+
 					" ,m.product_code   \n"+ 
 					" ,m.spd_code   \n"+
 					" ,NVL(D.Total_Amt,0) as Total_Amt   \n"+
 					" ,NVL(D.Total_Amt*0.07,0)  as Vat_Amt  \n"+
-					" ,(select max(d.Wh_SyStem) from PENSBME_ICC_DLYR d where d.bill_10 = m.bill_10 group by d.bill_10) as Wh_SyStem   \n"+
+					" ,(select max(d.Wh_SyStem) from PENSBME_ICC_DLYR d where d.bill_10 = m.bill_10 and d.bus_code = m.bus_code and d.dept_code = m.dept_code and d.product_code = m.product_code group by d.bill_10) as Wh_SyStem   \n"+
 					" ,m.Site_id  \n"+
 					" ,'0000000000000' as Discount_Baht   \n"+
 					" FROM PENSBME_ICC_HEAD m \n"+
@@ -63,6 +63,9 @@ public class ExportSQL {
 					"   from PENSBME_ICC_HEAD h , PENSBME_ICC_DLYR d \n" +
 					"   WHERE 1=1 \n"+
 					"   and h.bill_10 = d.bill_10 \n"+
+					"   and d.bus_code = h.bus_code \n"+
+					"   and d.dept_code = h.dept_code \n"+
+					"   and d.product_code = h.product_code \n "+
 					"   and h.bill_date = '"+billDateStr+"' \n"+
 					"   and (h.interface_icc is null or h.interface_icc = 'N') \n"+
 					"   group by h.oracle_invoice_no \n" +
@@ -132,6 +135,9 @@ public class ExportSQL {
 				" ,PENSBME_ICC_DLYR d \n"+
 				" WHERE 1=1 \n"+
 				" and m.bill_10 = d.bill_10 \n"+
+				" and d.bus_code = m.bus_code \n"+
+				" and d.dept_code = m.dept_code \n"+
+				" and d.product_code = m.product_code \n "+
 				" and m.bill_date = '"+billDateStr+"'"+
 				" and (m.interface_icc is null or m.interface_icc = 'N')"+
 				

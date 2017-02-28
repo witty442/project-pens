@@ -9,6 +9,7 @@ import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
+import com.isecinc.pens.inf.bean.MonitorItemResultBean;
 
 /**
  * Trip Form
@@ -38,7 +39,26 @@ public class InterfacesForm extends I_Form {
 	private MonitorItemBean monitorItemBeanResult = null;
 	private List<MonitorItemBean> monitorItemList;
 	
+	private List<MonitorItemResultBean> salesInList;
+	private List<MonitorItemResultBean> returnList;
 	
+	
+	public List<MonitorItemResultBean> getSalesInList() {
+		return salesInList;
+	}
+
+	public void setSalesInList(List<MonitorItemResultBean> salesInList) {
+		this.salesInList = salesInList;
+	}
+
+	public List<MonitorItemResultBean> getReturnList() {
+		return returnList;
+	}
+
+	public void setReturnList(List<MonitorItemResultBean> returnList) {
+		this.returnList = returnList;
+	}
+
 	public List<MonitorItemBean> getMonitorItemList() {
 		return monitorItemList;
 	}

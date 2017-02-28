@@ -1113,28 +1113,24 @@ function stampPrint(){
 								   </c:if>
 									
 									<%if(role.equals(User.VAN)){ %>
-									<c:if test="${orderForm.order.docStatus=='SV'}">
-									
-									     <c:if test="${orderForm.order.isCash=='Y'}">
-										    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy');">
-				                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
-                                          </c:if>
-                                          
-                                          <c:if test="${orderForm.order.isCash=='N'}">
-										    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax');">
-				                            <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill');">
-                                          </c:if>
-                                          
-										  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
-										
-									</c:if>
+										<c:if test="${orderForm.order.docStatus=='SV'}">
+										     <c:if test="${orderForm.order.isCash=='Y'}">
+											    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy');">
+					                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+	                                          </c:if>
+	                                          
+	                                          <c:if test="${orderForm.order.isCash=='N'}">
+											    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax');">
+					                            <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill');">
+	                                          </c:if>
+											  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
+										</c:if>
 									<%} %>
 									
 								  <%if(role.equals(User.VAN)){ %>
 								     <c:if test="${orderForm.mode=='edit'}">
 										<c:if test="${orderForm.order.payment=='N'}">
 											<c:if test="${orderForm.order.docStatus=='SV'}">
-											
 											    <input type="button" value="บันทึกรับเงิน" class="newPosBtn" onclick="autoReceiptNew('${pageContext.request.contextPath}','<%=role %>','<%=canReceiptMoreCash%>');">
 											</c:if>
 										</c:if>
@@ -1142,9 +1138,7 @@ function stampPrint(){
 									<%} %>
 								</td>
 								<td align="right">
-									
 									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-									
 								</td>
 								<td width="10%">&nbsp;</td>
 							</tr>
@@ -1198,8 +1192,7 @@ function stampPrint(){
 							<jsp:param name="module" value="<%=TrxHistory.MOD_ORDER%>"/>
 							<jsp:param name="id" value="${orderForm.order.id}"/>
 						</jsp:include>
-						
-					</div>
+					  </div>
 
 						</html:form>
 						<!-- BODY -->

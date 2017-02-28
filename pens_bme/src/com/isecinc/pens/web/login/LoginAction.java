@@ -18,6 +18,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.login.LoginProcess;
+import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.web.managepath.ManagePath;
 
 /**
@@ -71,6 +72,8 @@ public class LoginAction extends DispatchAction {
 				return mapping.findForward("fail");
 			}
 			//"Login", "User", "userName", "UserName", "Utilisateur" };
+			user.setDateLogon(DateUtil.getCurrentDate());
+            user.setTimeLogon(DateUtil.getCurrentTime());
 			request.getSession(true).setAttribute("user", user);
 		
 			//request.getSession().setAttribute("UserName", user.getUserName());

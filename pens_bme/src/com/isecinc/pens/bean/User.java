@@ -37,7 +37,7 @@ public class User extends I_PO implements Serializable {
 	public static final String MCQUERY ="MCQUERY";
 	public static final String HISHER ="HISHER";
 	public static final String IT = "IT";
-	
+	public static final String WACOAL = "WACOAL";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -185,8 +185,26 @@ public class User extends I_PO implements Serializable {
 	
     private String newPassword;
     private String reNewPassword;
+	private String dateLogon;
+	private String timeLogon;
     
-    
+	
+	public String getDateLogon() {
+		return dateLogon;
+	}
+
+	public void setDateLogon(String dateLogon) {
+		this.dateLogon = dateLogon;
+	}
+
+	public String getTimeLogon() {
+		return timeLogon;
+	}
+
+	public void setTimeLogon(String timeLogon) {
+		this.timeLogon = timeLogon;
+	}
+
 	public String getType() {
 		return type;
 	}

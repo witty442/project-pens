@@ -18,6 +18,7 @@ public class MonitorItemBean implements Serializable{
 	 */
    private static final long serialVersionUID = -5543198782059403439L;
    private int row;
+   private   BigDecimal transactionId;
    private   BigDecimal id;
    private   BigDecimal monitorId;
    private   String tableName;
@@ -32,14 +33,41 @@ public class MonitorItemBean implements Serializable{
    private int dataCount ;
    private int successCount ;
    private int failCount ;
+   private int totalQty;
    private String fileSize;
    private String groupName;
    private StringBuffer outputFile;   
    private List<MonitorItemResultBean> successList;
    private List<MonitorItemResultBean> failList;
+   private List<MonitorItemResultBean> salesInList;
+   private List<MonitorItemResultBean> returnList;
    
    
    
+public List<MonitorItemResultBean> getSalesInList() {
+	return salesInList;
+}
+public void setSalesInList(List<MonitorItemResultBean> salesInList) {
+	this.salesInList = salesInList;
+}
+public List<MonitorItemResultBean> getReturnList() {
+	return returnList;
+}
+public void setReturnList(List<MonitorItemResultBean> returnList) {
+	this.returnList = returnList;
+}
+public BigDecimal getTransactionId() {
+	return transactionId;
+}
+public void setTransactionId(BigDecimal transactionId) {
+	this.transactionId = transactionId;
+}
+public int getTotalQty() {
+	return totalQty;
+}
+public void setTotalQty(int totalQty) {
+	this.totalQty = totalQty;
+}
 public String getStatusDesc() {
 	return statusDesc;
 }

@@ -125,6 +125,7 @@ public class PriceListMasterAction extends I_Action {
 			cri.setCustGroup(Utils.isNull(request.getParameter("custGroup")));
 			cri.setGroupCode(Utils.isNull(request.getParameter("groupCode")));
 			cri.setPensItem(Utils.isNull(request.getParameter("pensItem")));
+			cri.setProductType(Utils.isNull(request.getParameter("productType")));
 			String mode =Utils.isNull(request.getParameter("mode"));
 			
 			if("edit".equalsIgnoreCase(mode)){
@@ -135,6 +136,7 @@ public class PriceListMasterAction extends I_Action {
 			   key.setCustGroup(results.get(0).getCustGroup());
 			   key.setGroupCode(results.get(0).getGroupCode());
 			   key.setPensItem(results.get(0).getPensItem());
+			   key.setProductType(results.get(0).getProductType());
 			   aForm.setBeanOLD(key);//set for update
 
 			}else{

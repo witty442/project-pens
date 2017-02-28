@@ -110,9 +110,10 @@ public class SATranAction extends I_Action {
 			
             String empId = Utils.isNull(request.getParameter("empId"));
             String payDate = Utils.isNull(request.getParameter("payDate"));
+            String type = Utils.isNull(request.getParameter("type"));
             String action = Utils.isNull(request.getParameter("action"));
 		
-			logger.debug("prepare edit empId:"+empId+",action:"+action);
+			logger.debug("prepare edit empId:"+empId+",action:"+action+"type:"+type);
 			
 			//init default value
 			SAEmpBean b= SAEmpDAO.getEmp(empId);
@@ -120,9 +121,13 @@ public class SATranAction extends I_Action {
 			bean.setName(b.getName());
 			bean.setSurname(b.getSurName());
 	        bean.setPayDate(payDate);
+	        bean.setType(type);
 			
 			//init data yearMonth old and new
-	        List<SATranBean> items = SATranDAO.initYearMonth(bean.getEmpId(),bean.getPayDate());
+	        SATranBean re = SATranDAO.initYearMonth(bean.getEmpId(),bean.getPayDate(),bean.getType());
+			bean.setCountStockDate(re.getCountStockDate());
+	        List<SATranBean> items = re.getItems();
+	        
 	        if(items != null){
 			    bean.setItems(items);
 			  //Can Edit
@@ -285,8 +290,7 @@ public class SATranAction extends I_Action {
 			
 			//Get Data Table Item
 			String[] yearMonth = request.getParameterValues("yearMonth");
-			String[] bmeAmt = request.getParameterValues("bmeAmt");
-			String[] wacoalAmt = request.getParameterValues("wacoalAmt");
+			String[] amt = request.getParameterValues("amt");
 			String[] canSave = request.getParameterValues("canSave");
 			String[] status = request.getParameterValues("status");
 			
@@ -303,11 +307,12 @@ public class SATranAction extends I_Action {
 				
 					//set key
 					item.setEmpId(h.getEmpId());
+					item.setType(h.getType());
 					item.setPayDate(h.getPayDate());
+					item.setCountStockDate(h.getCountStockDate());
 					
 					item.setYearMonth(yearMonth[i]);
-					item.setBmeAmt(Utils.isNull(bmeAmt[i]));
-					item.setWacoalAmt(Utils.isNull(wacoalAmt[i]));
+					item.setAmt(Utils.isNull(amt[i]));
 					item.setCreateUser(h.getCreateUser());
 					item.setUpdateUser(h.getUpdateUser());
 					
@@ -336,7 +341,9 @@ public class SATranAction extends I_Action {
 		    request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		    
 			//Search Again
-			h.setItems(SATranDAO.initYearMonth(h.getEmpId(),h.getPayDate()));
+		    SATranBean re = SATranDAO.initYearMonth(h.getEmpId(),h.getPayDate(),h.getType());
+			h.setItems(re.getItems());
+			h.setCountStockDate(re.getCountStockDate());
 			//Can Edit
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 				h.setCanEdit(true);
@@ -394,9 +401,7 @@ public class SATranAction extends I_Action {
 		String fileName ="data.xls";
 		boolean found = false;
 		try {
-			
 			logger.debug("PageAction:"+request.getParameter("page"));
-			/** Onhand **/
 	
 			SATranBean cri = aForm.getBean();
 			

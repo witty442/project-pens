@@ -15,10 +15,11 @@
 		            <th >Group Store</th><!-- 8 -->
 		            <th >Branch</th><!-- 9 -->
 					<th >as Of Month</th><!-- 7 -->
-					<th >Surety Bond จากเงินเดือน</th><!-- 9 -->
+					<th >Surety Bond ของเดือนนี้</th><!-- 9 -->
 					<th >ค่าเฝ้าตู้</th><!-- 9 -->
 					<th >ค่าเสียหายหักจากเงินเดือน</th><!-- 9 -->
 					<th >หัก Surety Bond ของบริษัท</th><!-- 9 -->
+					<th >ยอด Surety Bond สะสม</th><!-- 9 -->
 			   </tr>
 			<% 
 			String tabclass ="lineE";
@@ -39,6 +40,7 @@
 						<td class="td_text_right" width="7%"><%=mc.getRewardAmt()%></td><!-- 9 -->
 						<td class="td_text_right" width="7%"><%=mc.getNetDamageAmt()%></td><!-- 9 --> 
 						<td class="td_text_right" width="7%"><%=mc.getNetSuretyBondAmt()%></td><!-- 9 -->
+						<td class="td_text_right" width="7%"><%=mc.getTotalSuretyBondAmt()%></td><!-- 10 -->
 					</tr>
 			<%} %>
 			 

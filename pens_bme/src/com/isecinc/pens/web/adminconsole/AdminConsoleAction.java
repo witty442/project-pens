@@ -97,11 +97,15 @@ public class AdminConsoleAction extends I_Action {
 				configInfo +="IP PayInReport : "+env.getProperty("host.payinreport")+"\n";
 				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
+				
+				
 			    configInfoTest = " ";
 			   if("tab_config_info".equalsIgnoreCase(action)){
 					configInfoTest += " ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
 						 try {   
 							 configInfoTest += " \n "+ test.TestALL.testDBCon();
+							 
+							
 						  } catch(Exception e) {
 							  configInfoTest += " \n error:>> "+e.getMessage();
 						  }
@@ -117,6 +121,13 @@ public class AdminConsoleAction extends I_Action {
 				   configInfoTest += "----------------------  Result Test FTP(ICC) Connection ------------------------------------------------------------- \n";
 						try {   
 							 configInfoTest += " \n "+ test.TestALL.testFTPICCCon();
+						  } catch(Exception e) {
+							 configInfoTest += " \n error :>> "+e.getMessage();
+						  }
+				   configInfoTest += "----------------------  Result Test DataSource Connection ------------------------------------------------------------- \n";
+					 
+						try {   
+							 configInfoTest += " \n "+  test.TestALL.testDataSource();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }

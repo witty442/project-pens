@@ -23,6 +23,7 @@
 	<field name="requestDate" class="java.lang.String"/>
 	<field name="promotion" class="java.lang.String"/>
 	<field name="orderDate" class="java.util.Date"/>
+	<field name="orderDateStr" class="java.lang.String"/>
 	<field name="status" class="java.lang.String"/>
 	<field name="customerCode" class="java.lang.String"/>
 	<field name="vatAmount" class="java.lang.Double"/>
@@ -54,12 +55,12 @@
 					</textElement>
 					<text><![CDATA[วันที่  ]]></text>
 				</staticText>
-				<textField pattern="dd/MM/yyyy">
+				<textField pattern="">
 					<reportElement x="195" y="10" width="55" height="20"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Angsana New" size="15" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.util.Date"><![CDATA[$F{orderDate}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{orderDateStr}]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement x="19" y="10" width="52" height="20"/>

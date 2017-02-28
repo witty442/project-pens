@@ -29,6 +29,8 @@ User user = (User) request.getSession().getAttribute("user");
 String mode = saTranForm.getMode();
 SATranBean bean = saTranForm.getBean(); 
 
+
+
 //PayTypeList
 List<PopupForm> payTypeList = new ArrayList();
 PopupForm ref2 = new PopupForm("",""); 
@@ -92,6 +94,8 @@ input[type=checkbox]
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -105,6 +109,7 @@ function loadMe(){
 	 <%}%>
 	 
    new Epoch('epoch_popup', 'th', document.getElementById('payDate'));
+   new Epoch('epoch_popup', 'th', document.getElementById('countStockDate'));
 }
 
 function setStyletextField(){
@@ -134,6 +139,23 @@ function save(path){
 		alert("กรุณาระบุ  วันที่ส่งเงิน(+)");
 		$('#payDate').focus();
 		return false;
+	}
+	
+	if( $('#countStockDate').val()==""){
+		alert("กรุณาระบุ  วันที่เข้าตรวจนับ");
+		$('#countStockDate').focus();
+		return false;
+	}else{
+		//countStockDate must < payDate
+		var payDate = thaiDateToChristDate($('#payDate').val());
+		
+		var countStockDate = thaiDateToChristDate($('#countStockDate').val());
+		
+		if(countStockDate >=  payDate){
+			alert("วันที่เข้าตรวจนับ ต้องน้อยกว่า วันที่ส่่งเงิน (+)");
+			$('#countStockDate').focus();
+			return false;
+		}
 	}
 	
 	if(confirm("กรุณายืนยันการบันทึก ค่าเฝ้าตู้")){
@@ -217,11 +239,11 @@ function setCanSave(chk,index){
 										 <%}else{ %>
 									                            แก้ไขข้อมูล
 										 <%} %>
+										  ค่าเฝ้าตู้ &nbsp;<bean:write name="saTranForm" property="bean.type"/>
 										 </b>
 										 </font>	
 									</td>
 								</tr>
-								
 								<tr>
                                     <td  align="right">Employee ID<font color="red"></font></td>
 									<td colspan="3">		
@@ -232,6 +254,7 @@ function setCanSave(chk,index){
                                     <td align="right">Name</td>
 									<td colspan="3">	
 									<html:text property="bean.name" styleId="name"  size="30"  readonly="true" styleClass="disableText"/>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									Surname
 									    <html:text property="bean.surname" styleId="surname" size="30"  readonly="true" styleClass="disableText"/>
 									 </td>
@@ -241,25 +264,24 @@ function setCanSave(chk,index){
 									<td>		
 										 <html:text property="bean.payDate" styleId="payDate" size="30" readonly="true"> </html:text>
 									</td>
-									 <td  align="right"></td>
-									<td>		
-									</td>
+									 <td  align="right"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่เข้าตรวจนับ <font color="red">*</font></td>
+									<td> <html:text property="bean.countStockDate" styleId="countStockDate" size="30" readonly="true"> </html:text></td>
 								</tr>
 						   </table>
 						   
-						    <!-- Table Items -->
-						    <%if(saTranForm.getBean().getItems() != null){ %>
+						   <!-- Table Items -->
+						   <%if(saTranForm.getBean().getItems() != null){ %>
 						   <table id="tblProduct" align="center" width="75%" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth">
 						       <tr> 
 						            <th>เคยจ่ายแล้ว</th>
 						            <th>ค่าเฝ้าตู้ของเดือน</th>
 									<th>วันที่ได้ชำระ</th>
-									<th>B'me</th>
-									<th>Wacoal</th>
+									<th>Amt</th>								
+									<th>วันที่เข้าตรวจนับ</th>
+									<th>บันทึกความเสียหายแล้ว</th>
 							   </tr>
 							<% 
 							String tabclass ="lineE";
-							
 							List<SATranBean> items = saTranForm.getBean() !=null?saTranForm.getBean().getItems():null;
 							if(items != null)
 							   System.out.println("Screen items size:"+items.size());
@@ -267,6 +289,7 @@ function setCanSave(chk,index){
 							int no = 0;
 							String isPayed ="";
 							String isPayedChk = "checked";
+						
 							if(items != null && items.size() >0){
 								for(int n=0;n<items.size();n++){
 									SATranBean item = item = items.get(n);
@@ -309,10 +332,15 @@ function setCanSave(chk,index){
 											 <input type="text" name="payDates" readonly id="payDates" size="20"  value="<%=item.getPayDate() %>" tabindex="-1" class="disableNumber">
 										</td>
 										<td class="td_text_center" width="15%">
-										   <input type="text" name="bmeAmt" readonly id="bmeAmt" size="20"  value="<%=item.getBmeAmt() %>" tabindex="-1" class="disableNumber">
+										   <input type="text" name="amt" readonly id="amt" size="20"  value="<%=item.getAmt() %>" tabindex="-1" class="disableNumber">
 										</td>
-										<td class="td_text_center" width="15%"> 
-										   <input type="text" name="wacoalAmt" readonly id="wacoalAmt" size="20"  value="<%=item.getWacoalAmt() %>" tabindex="-1"  class="disableNumber">
+										<td class="td_text_center" width="10%"> 
+										   <input type="text" name="countStockDate" readonly id="countStockDate" size="20"  value="<%=Utils.isNull(item.getCountStockDate()) %>" tabindex="-1"  class="disableNumber">
+										</td>
+										<td class="td_text_center" width="10%"> 
+										<%if(item.isUsed()){ %>
+										    <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+										  <%} %>
 										</td>
 									</tr>
 							<%} }//for  %>
@@ -345,6 +373,7 @@ function setCanSave(chk,index){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<html:hidden property="bean.type"></html:hidden>
 					</html:form>
 					<!-- BODY -->
 					</td>

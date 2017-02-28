@@ -25,7 +25,41 @@
     <filter-name>login</filter-name>
     <url-pattern>/jsp/*</url-pattern>
   </filter-mapping>
-	
+  
+  <!-- Quartz -->
+	<!--  <context-param>
+         <param-name>quartz:config-file</param-name>
+         <param-value>quartz.properties</param-value>
+     </context-param>
+     <context-param>
+         <param-name>quartz:shutdown-on-unload</param-name>
+         <param-value>true</param-value>
+     </context-param>
+     <context-param>
+         <param-name>quartz:wait-on-shutdown</param-name>
+         <param-value>false</param-value>
+     </context-param>
+     <context-param>
+         <param-name>quartz:start-scheduler-on-load</param-name>
+         <param-value>true</param-value>
+     </context-param>
+     
+     <listener>
+         <listener-class>
+             org.quartz.ee.servlet.QuartzInitializerListener
+         </listener-class>
+     </listener>
+     <servlet>
+		  <servlet-name>QuartzInitializer</servlet-name>
+		  <servlet-class>org.quartz.ee.servlet.QuartzInitializerServlet</servlet-class>
+		  <init-param>
+		    <param-name>shutdown-on-unload</param-name>
+		    <param-value>true</param-value>
+		  </init-param>
+		  <load-on-startup>2</load-on-startup>
+	 </servlet>  -->
+    <!-- Quartz -->
+     
     <!-- Servlet -->
        <!-- run First Time Only Running Script DB  -->
 	<!-- <servlet>
@@ -63,6 +97,7 @@
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
+  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>

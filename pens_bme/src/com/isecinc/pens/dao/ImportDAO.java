@@ -201,6 +201,34 @@ public class ImportDAO {
 		return dup;
 	} 
 	
+	public Boolean importSaleOutWacoalLotusFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		boolean dup = false;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from PENSBME_SALESWACOAL_FROM_LOTUS WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				dup = true;
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return dup;
+	} 
+	
 	public Boolean importTopsFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -1202,6 +1230,8 @@ public class ImportDAO {
 			if( !Utils.isNull(custCode).equals("")){
 				sql.append(" and pens_value ='"+custCode+"' \n");
 			}
+			sql.append(" order by  sequence asc \n");
+			
 		    logger.debug("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());

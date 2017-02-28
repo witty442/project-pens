@@ -96,6 +96,7 @@ public class OrderFridayAction extends I_Action {
 				 List<References> billTypeList = importDAO.getBillTypeList();
 				 request.getSession().setAttribute("billTypeList",billTypeList);
 
+				 request.getSession().setAttribute("canOrderMap", null);
 			 }
 			
 		} catch (Exception e) {

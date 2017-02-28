@@ -29,6 +29,7 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
+import com.isecinc.pens.dao.LockItemOrderDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.StockLimitDAO;
 import com.isecinc.pens.gendate.OrderDateUtils;
@@ -95,7 +96,7 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 String notInCustCode = Constants.STORE_TYPE_FRIDAY_CODE+"," +Constants.STORE_TYPE_OSHOPPING_CODE;
+				 String notInCustCode = Constants.STORE_TYPE_FRIDAY_CODE+"," +Constants.STORE_TYPE_OSHOPPING_CODE+"," +Constants.STORE_TYPE_7CATALOG_CODE+"," +Constants.STORE_TYPE_TVD_CODE;
 				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,notInCustCode);
 			     request.getSession().setAttribute("storeTypeList",storeTypeList);
 			     
@@ -104,6 +105,8 @@ public class OrderAction extends I_Action {
 				 
 				 List<References> billTypeList = importDAO.getBillTypeList();
 				 request.getSession().setAttribute("billTypeList",billTypeList);
+				 
+				 request.getSession().setAttribute("canOrderMap", null);
 
 			 }
 			
@@ -154,7 +157,9 @@ public class OrderAction extends I_Action {
 		Date orderDate = null;
 		String barcodeInPage = "";
 		String validateStore = "true";
+		Map<String,String> canOrderMap = new HashMap<String,String>();
 		try {
+			
 			Order orderCri = orderForm.getOrder();
 			if(orderCri.getStoreType().equals(Constants.STORE_TYPE_FRIDAY_CODE)){
 				tableName = "PENSBME_ONHAND_BME_FRIDAY";
@@ -164,7 +169,6 @@ public class OrderAction extends I_Action {
 			conn = DBConnection.getInstance().getConnection();
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("action:"+action);
-			
 		
 			if("save".equalsIgnoreCase(action)){
 				logger.debug("Search and Save");
@@ -354,6 +358,13 @@ public class OrderAction extends I_Action {
 				totalPage = (totalRow/ pageSize)+1;
 				request.getSession().setAttribute("totalPage", totalPage);
 				request.getSession().setAttribute("totalRow", totalRow);
+				
+				
+				//Load StoreCode can order Group Code
+				canOrderMap = LockItemOrderDAO.getStoreCodeCanOrderGroupCode(conn);
+				request.getSession().setAttribute("canOrderMap", canOrderMap);
+				logger.debug("1 canOrderMap:"+canOrderMap);
+			
 
 			}else{
 			    pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
@@ -775,6 +786,35 @@ public class OrderAction extends I_Action {
 				conn.close();conn=null;
 			}
 		}
+	}
+	
+	public ActionForward exportSummaryAllToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("export Summary All ToExcel");
+		OrderForm orderForm = (OrderForm) form;
+		try {
+			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			
+			String fileName = "SummaryAll_"+dateFileName+".xls";
+			StringBuffer htmlTable = OrderExport.exportSummaryAll(orderForm.getOrder().getOrderDate());
+		
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+			response.setContentType("application/vnd.ms-excel");
+			
+			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+			w.write(htmlTable.toString());
+		    w.flush();
+		    w.close();
+
+		    out.flush();
+		    out.close();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", e.toString());
+		}
+		return mapping.findForward("export");
 	}
 	
 	public ActionForward exportDetailToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {

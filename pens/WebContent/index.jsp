@@ -10,9 +10,12 @@
 
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%
-User userDefault = new MUser().getCurrentUserName();
+ User userDefault = new MUser().getCurrentUserName();
 String userName = Utils.isNull(userDefault.getUserName());
-String password = Utils.isNull(userDefault.getPassword());
+String password = Utils.isNull(userDefault.getPassword()); 
+
+/* String userName ="";
+String password =""; */
 %>
 <html>
 <head>
@@ -102,8 +105,13 @@ function gologin(e){
 		              <td><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="5" /></td>
 		            </tr>
 		            <tr>
-		              <td><html:text property="userName" size="10" onkeypress="gologin(event);" value="<%=userName %>"/></td>
-		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="<%=password %>"/></td>
+		            <%if( !Utils.isNull(userName).equals("")) {%>
+		                 <td><html:text property="userName" size="10" onkeypress="gologin(event);" value="<%=userName %>"/></td>
+		                 <td><html:password property="password" size="10" onkeypress="gologin(event);" value="<%=password %>"/></td>
+		              <%}else{ %>
+		                 <td><html:text property="userName" size="10" onkeypress="gologin(event);" /></td>
+		                 <td><html:password property="password" size="10" onkeypress="gologin(event);"/></td>
+		              <%} %>
 		            </tr>
 		            <tr>
 		            	<td colspan="2">

@@ -2,12 +2,14 @@
 package com.isecinc.pens.inf.helper;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
@@ -21,7 +23,9 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
@@ -43,6 +47,7 @@ public class Utils {
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
 	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyyHHmm";
+	public static final String DD_MM_YYYY_HHmmss_WITHOUT_SLASH = "ddMMyyyyHHmmss";
 	
 	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
@@ -57,6 +62,8 @@ public class Utils {
 	//20081223   09 42 34.572
 	//2008-12-23 09:42:34.572000
 	
+	
+	
 	public static void main(String[] args){
 	    try{	   
 	    	System.out.println(isInternetConnect());
@@ -65,6 +72,8 @@ public class Utils {
 	    }
 	}
 	
+	
+	 
 	public static void stopTomcat(){
 	      String line;
 	      OutputStream stdin = null;
@@ -460,7 +469,7 @@ public class Utils {
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
 		try {
 			Timestamp ti = new Timestamp(dateBigdecimal);
-			logger.debug("date timestamp>>"+ti);
+			//logger.debug("date timestamp>>"+ti);
 			dateStr = ft.format(ti);
 		} catch (Exception e) {
 		}

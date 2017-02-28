@@ -54,12 +54,15 @@ TABLE.tableSearchNoWidth TD {
 	align:center;
 	
 }
+
 table.tableSearchNoWidth td.td_text_right {
   text-align: right;
+  align:right;
 }
 
 table.tableSearch td.td_text_right {
   text-align: right;
+  align:right;
 }
 
 .td_number{

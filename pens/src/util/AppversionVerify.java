@@ -11,7 +11,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,21 +34,61 @@ import com.isecinc.pens.inf.manager.batchwork.DownloadWorker;
 public class AppversionVerify {
 
 	protected static Logger logger = Logger.getLogger("PENS");
-	private static String URL_DROPBOX_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/";
-	private static String URL_DROPBOX_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/";
+	//private static String URL_DROPBOX_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/";
+	//private static String URL_DROPBOX_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/";
 	
-	private static String URL_DROPBOX_C4_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
-	private static String URL_DROPBOX_C4_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
+	//private static String URL_DROPBOX_C4_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
+	//private static String URL_DROPBOX_C4_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
 	
+	public static Map<String,String> urlFileMap = new HashMap<String, String>();
+	static String initPathFileDropbox = "https://www.dropbox.com/s/0i7ibswl3qw2s4w/initPathFile.txt?dl=1";
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 	}
+	
+	static{
+		if(urlFileMap.isEmpty()){
+			urlFileMap = getInitPathFile();
+		}
+	}
 
+	 public static Map<String,String> getInitPathFile(){
+	        Map<String,String> pathFileMap = new HashMap<String, String>();
+	        System.out.println("***Start getInitPathFile***");
+	        try{                   
+	            URL url = new URL(initPathFileDropbox);
+	            url.openConnection();
+	            InputStream inStream = url.openStream();
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+	            String line = null;
+	            String[] lineArr = null;
+	            try {
+	                while ((line = reader.readLine()) != null) {
+	                    //System.out.println(line);
+	                   lineArr = line.split("\\,");
+	                   System.out.println(lineArr[0]+","+lineArr[1]);
+	                   pathFileMap.put(Utils.isNull(lineArr[0]), Utils.isNull(lineArr[1]));
+	                }
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            } finally {
+	                try {
+	                    inStream.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }catch(Exception e){
+	            e.printStackTrace();
+	        }
+	        return pathFileMap;
+	  }
+	 
 	//Process Run After Import:
-	public static void processAfterImport(){
+	public static void processAfterImport(User user){
 		EnvProperties env = EnvProperties.getInstance();
 		try{
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
@@ -76,7 +118,7 @@ public class AppversionVerify {
 			FileUtil.writeFile(localSalesAppPath+"appversion-message-to-sales.txt", appVerionmsgToSales, "UTF-8");
 			
 			//** Download Sofware for netbook sales **/
-			new DownloadWorker().start();
+			new DownloadWorker(user).start();
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -213,20 +255,22 @@ public class AppversionVerify {
    }
 	
     /** Download Software After Import  separate Thread **/
-    public static void downloadSoftware(){
+    public static void downloadSoftware(User user){
     	logger.info("downloadSoftware");
     	getSalesAppUpdater(true);
     	getSoftware4SalesApp();
     	
-    	getC4SalesApp();
+    	getC4SalesApp(user);
+    	
+    	getPlanSalesApp(user);
     }
     
     
     /** Software For Sales App **/
     public static void getSoftware4SalesApp(){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath = URL_DROPBOX_+"Software4SalesApp.zip";
-		String sourcePath2 = URL_DROPBOX_2+"Software4SalesApp.zip";
+		String sourcePath =  urlFileMap.get("Software4SalesApp.zip");
+		String sourcePath2 =  urlFileMap.get("Software4SalesApp.zip");
         String destPath  = localSalesAppPath+"Software4SalesApp.zip";
         String dest2Path = localSalesAppPath+"Software4SalesApp";
 		try{
@@ -275,19 +319,47 @@ public class AppversionVerify {
 		}
 	}
     
-    public static void getC4SalesApp(){
-    	String localSalesAppPath = getLocalPathSalesAppC4();
+    public static void getC4SalesApp(User user){
+    	String localSalesAppPath = getLocalPathPensDocument();
     	try{
     		 //Get Old Version 
 			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+"C4-version.txt", "UTF-8"));
 			
     		boolean isLatestVersion = isLatestVersionC4("C4");
-    		
-    		//Get VAN
-    		getC4SalesApp(localSalesAppPath,isLatestVersion,"VAN",localVersion);
-    		
-    		//Get Credit
-    		getC4SalesApp(localSalesAppPath,isLatestVersion,"CREDIT",localVersion);
+    		if(user.getType().equalsIgnoreCase(User.TT)){
+    			//Get Credit
+        		getC4SalesApp(localSalesAppPath,isLatestVersion,"CREDIT",localVersion);
+    			
+    		}else{
+    			//Get VAN
+        		getC4SalesApp(localSalesAppPath,isLatestVersion,"VAN",localVersion);
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    }
+    
+    public static void getPlanSalesApp(User user){
+    	String localSalesAppPath = getLocalPathPensDocument();
+    	String fileName = "";
+    	try{
+    		 //Get Old Version 
+			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+"plan-version.txt", "UTF-8"));
+			
+    		boolean isLatestVersion = false;
+    		if(user.getType().equalsIgnoreCase(User.TT)){
+    		   fileName ="เอกสารแผนงาน ของ Credit";
+    		   isLatestVersion = isLatestVersionPlan("plan");
+    		   
+    		   //Get Credit
+       		   getPlanSalesApp(localSalesAppPath,isLatestVersion,"CREDIT",localVersion,fileName);
+    		}else{
+    		   fileName ="เอกสารแผนงาน ของ Van";
+    		   isLatestVersion = isLatestVersionPlan("plan");
+    		   
+    			//Get VAN
+       		   getPlanSalesApp(localSalesAppPath,isLatestVersion,"VAN",localVersion,fileName);
+    		}
     		
     	}catch(Exception e){
     		e.printStackTrace();
@@ -296,8 +368,8 @@ public class AppversionVerify {
     
     public static void getC4SalesApp(String localSalesAppPath,boolean isLatestVersion,String userType,String localVersion){
 		
-		String sourcePath = URL_DROPBOX_C4_+"C4-"+userType+".pdf";
-		String sourcePath2 = URL_DROPBOX_C4_2+"C4-"+userType+".pdf";
+		String sourcePath =  urlFileMap.get("C4-"+userType+".pdf");
+		String sourcePath2 =  urlFileMap.get("C4-"+userType+".pdf");
         String destPath  = localSalesAppPath+"C4-"+userType+".pdf";
 		try{ 
 			logger.info("Start Process Download C4 "+userType);
@@ -359,13 +431,77 @@ public class AppversionVerify {
 		}
 	}
     
+public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVersion,String userType,String localVersion,String fileName){
+		
+		String sourcePath =  urlFileMap.get(fileName+".pdf");
+		String sourcePath2 =  urlFileMap.get(fileName+".pdf");
+        String destPath  = localSalesAppPath+fileName+".pdf";
+		try{ 
+			logger.info("Start Process Download plan "+userType);
+           
+			if( !isLatestVersion){
+				logger.info("*** Start download plan.pdf ***");
+				if( !Utils.isNull(localVersion).equals("")){
+					/*String backupPath  = localSalesAppPath+"C4-"+userType+"-"+localVersion+".pdf";
+					
+					logger.info(" Copy Old File to BK File Path:"+backupPath);
+					
+					InputStream reader1 = new FileInputStream(destPath);
+		            FileOutputStream writer1 = new FileOutputStream(backupPath);
+		            byte[] buffer1 = new byte[1024];
+		            //int totalBytesRead = 0;
+		            int bytesRead1 = 0;
+		            while ((bytesRead1 = reader1.read(buffer1)) > 0){  
+		              writer1.write(buffer1, 0, bytesRead1);
+		              //buffer = new byte[153600];
+		            }
+		            writer1.close();
+		            reader1.close();*/
+				}
+				/********************************************************/
+				logger.info("Download File From http...From("+sourcePath+") to ("+destPath+")");
+				URL url = null;
+	            InputStream reader = null;
+	            try{
+		            url = new URL(sourcePath);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }catch(Exception e){
+	            	logger.error("Error Source1 retry Source2");
+	            	url = new URL(sourcePath2);
+		            url.openConnection();
+		            reader = url.openStream();
+	            }
+	
+	            /******************************************************/
+	        	logger.info("Write File to Local ");  
+	            FileOutputStream writer = new FileOutputStream(destPath);
+	            byte[] buffer = new byte[1024];
+	            //int totalBytesRead = 0;
+	            int bytesRead = 0;
+	            while ((bytesRead = reader.read(buffer)) > 0){  
+	              writer.write(buffer, 0, bytesRead);
+	              //buffer = new byte[153600];
+	            }
+	            writer.close();
+	            reader.close();
+	            
+			}else{
+				logger.info("Plan is no update");
+			}
+			
+			logger.info("*** End Process download Plan.pdf ***");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
    
     
     /** Software SalesAppUpdater.jsr **/
 	public static void getSalesAppUpdater(boolean checkVersion){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath = URL_DROPBOX_+"SalesAppUpdater.zip";
-		String sourcePath2 = URL_DROPBOX_2+"SalesAppUpdater.zip";
+		String sourcePath =  urlFileMap.get("SalesAppUpdater.zip");
+		String sourcePath2 =  urlFileMap.get("SalesAppUpdater.zip");
         String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
         String dest2Path = localSalesAppPath+"SalesAppUpdater";
 		try{
@@ -453,9 +589,29 @@ public class AppversionVerify {
 	public static boolean isLatestVersionC4(String name){
 		boolean r = true;
 		try{
-			String localSalesAppPath = getLocalPathSalesAppC4();
+			String localSalesAppPath = getLocalPathPensDocument();
 			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+name+"-version.txt", "UTF-8"));
-			String latestVersionInServer = Utils.isNull(getLatestSalesVersionC4(name+"-version.txt"));
+			String latestVersionInServer = Utils.isNull(getLatestSalesVersion(name+"-version.txt"));
+			
+			logger.info("localVersion["+localVersion+"],latestVersionInServer["+latestVersionInServer+"]");
+			if( !localVersion.equalsIgnoreCase(latestVersionInServer)){ //no Latest Version
+				r = false;
+				logger.info("write file version:"+localSalesAppPath+name+"-version.txt");
+				FileUtil.writeFile(localSalesAppPath+name+"-version.txt", latestVersionInServer, "UTF-8");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			return true;
+		}
+		return r;
+	}
+	
+	public static boolean isLatestVersionPlan(String name){
+		boolean r = true;
+		try{
+			String localSalesAppPath = getLocalPathPensDocument();
+			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+name+"-version.txt", "UTF-8"));
+			String latestVersionInServer = Utils.isNull(getLatestSalesVersion(name+"-version.txt"));
 			
 			logger.info("localVersion["+localVersion+"],latestVersionInServer["+latestVersionInServer+"]");
 			if( !localVersion.equalsIgnoreCase(latestVersionInServer)){ //no Latest Version
@@ -527,7 +683,7 @@ public class AppversionVerify {
 	private static String getLatestSalesVersion(String name){
         String appVersion = "";
         try{
-        	String str = URL_DROPBOX_+name+"";
+        	String str = urlFileMap.get(name);
         	logger.info("url:"+str);
             URL url = new URL(str);
             url.openConnection();
@@ -555,36 +711,6 @@ public class AppversionVerify {
         return appVersion;
 	 }
 	
-	private static String getLatestSalesVersionC4(String name){
-        String appVersion = "";
-        try{
-        	String str = URL_DROPBOX_C4_+name+"";
-        	logger.info("url:"+str);
-            URL url = new URL(str);
-            url.openConnection();
-            InputStream inStream = url.openStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-            StringBuilder builder = new StringBuilder();
-            String line = null;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                appVersion = builder.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    inStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return appVersion;
-	}
 	
 	private  static String getLocalPathSalesApp(){
 		String path = "D:/SalesApp/";
@@ -608,8 +734,8 @@ public class AppversionVerify {
 		return path;
 	}
 	
-	private  static String getLocalPathSalesAppC4(){
-		String path = "D:/C4/";
+	private  static String getLocalPathPensDocument(){
+		String path = "D:/Pens Document/";
 		try{
 			File directory = new File(path);
 			if(!directory.exists()){
@@ -618,7 +744,7 @@ public class AppversionVerify {
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 			try{
-				path = "D:/C4/";
+				path = "D:/Pens Document/";
 				File directory = new File(path);
 				if(!directory.exists()){
 					FileUtils.forceMkdir(directory);
@@ -629,5 +755,6 @@ public class AppversionVerify {
 		}
 		return path;
 	}
+
 	
 }

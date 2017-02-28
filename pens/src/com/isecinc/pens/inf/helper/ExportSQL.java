@@ -189,8 +189,10 @@ public class ExportSQL {
 					"	(CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN PD_CODE ELSE SALES_CODE END) AS FROM_SUBINVENTORY_CODE, \n "+
 					"	(CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN SALES_CODE ELSE PD_CODE END) AS TO_SUBINVENTORY_CODE, \n"+
 					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,	\n"+
-					"	DESCRIPTION \n"+
-
+					"	DESCRIPTION ,\n"+
+					"	USER_ID ,\n"+
+					"	( CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN 'T' ELSE 'R' END) AS MOVE_TYPE ,\n"+
+					"	CREATED_LONG \n"+
 				"	from t_move_order \n"+
 				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
 				"   and request_date <= now() \n";

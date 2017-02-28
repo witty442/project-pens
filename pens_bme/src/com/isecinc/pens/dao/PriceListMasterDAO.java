@@ -52,6 +52,9 @@ public class PriceListMasterDAO extends PickConstants{
 			if( !Utils.isNull(o.getPensItem()).equals("")){
 				sql.append("\n and PENS_ITEM = '"+Utils.isNull(o.getPensItem())+"'");
 			}
+			if( !Utils.isNull(o.getProductType()).equals("")){
+				sql.append("\n and PRODUCT = '"+Utils.isNull(o.getProductType())+"'");
+			}
 			
 			sql.append("\n order by STORE_TYPE,GROUP_CODE asc ");
 			logger.debug("sql:"+sql);
@@ -62,6 +65,7 @@ public class PriceListMasterDAO extends PickConstants{
 			rst = ps.executeQuery();
 			while(rst.next()) {
 				   h = new PriceListMasterBean();
+				   h.setProductType(Utils.isNull(rst.getString("product")));
 				   h.setCustGroup(Utils.isNull(rst.getString("store_type")));
 				   h.setCustGroupDesc(Utils.isNull(rst.getString("cust_group_desc")));
 				   h.setGroupCode(Utils.isNull(rst.getString("group_code"))); 
@@ -119,6 +123,7 @@ public class PriceListMasterDAO extends PickConstants{
 			rst = ps.executeQuery();
 			if(rst.next()) {
 				h = new PriceListMasterBean();
+				h.setProductType(Utils.isNull(rst.getString("product")));
 				h.setCustGroup(Utils.isNull(rst.getString("store_type")));
 				h.setCustGroupDesc(Utils.isNull(rst.getString("cust_group_desc")));
 				h.setGroupCode(Utils.isNull(rst.getString("group_code"))); 
@@ -156,6 +161,9 @@ public class PriceListMasterDAO extends PickConstants{
 			
 			if( !Utils.isNull(o.getPensItem()).equals("")){
 				sql.append("\n and PENS_ITEM = '"+Utils.isNull(o.getPensItem())+"'");
+			}
+			if( !Utils.isNull(o.getProductType()).equals("")){
+				sql.append("\n and PRODUCT = '"+Utils.isNull(o.getProductType())+"'");
 			}
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
@@ -223,13 +231,13 @@ public class PriceListMasterDAO extends PickConstants{
 				
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBME_PRICELIST \n");
-				sql.append(" (STORE_TYPE, GROUP_CODE, PENS_ITEM, WHOLE_PRICE_BF, RETAIL_PRICE_BF, CREATE_DATE, CREATE_USER) \n");
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ) \n");
+				sql.append(" (PRODUCT,STORE_TYPE, GROUP_CODE, PENS_ITEM, WHOLE_PRICE_BF, RETAIL_PRICE_BF, CREATE_DATE, CREATE_USER) \n");
+			    sql.append(" VALUES (?,?, ?, ?, ?, ?, ?, ? ) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 				
 				int c =1;
-				
+				ps.setString(c++, Utils.isNull(o.getProductType()));
 				ps.setString(c++, o.getCustGroup());
 				ps.setString(c++, o.getGroupCode());
 				ps.setString(c++, o.getPensItem());
@@ -270,7 +278,8 @@ public class PriceListMasterDAO extends PickConstants{
 
 				sql.append(" WHERE STORE_TYPE= '"+Utils.isNull(key.getCustGroup())+"'" +
 						" AND GROUP_CODE ='"+Utils.isNull(key.getGroupCode())+"'" +
-						" AND PENS_ITEM = '"+ Utils.isNull(key.getPensItem())+"' \n" );
+						" AND PENS_ITEM = '"+ Utils.isNull(key.getPensItem())+"' \n" +
+				        " AND PRODUCT = '"+ Utils.isNull(key.getProductType())+"' \n" );
                 
 				logger.debug("sql:"+sql.toString());
 				
