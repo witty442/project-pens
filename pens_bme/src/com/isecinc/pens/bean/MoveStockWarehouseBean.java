@@ -17,6 +17,7 @@ public class MoveStockWarehouseBean implements Serializable{
 	private String barcode;
 	private String onhandQty;
 	private String transferQty;
+	private String pensItem;
 	
 	private int totalTransferQty;
 	private int totalOnhandQty;
@@ -31,6 +32,14 @@ public class MoveStockWarehouseBean implements Serializable{
 	private List<MoveStockWarehouseBean> items;
 
 	
+	public String getPensItem() {
+		return pensItem;
+	}
+
+	public void setPensItem(String pensItem) {
+		this.pensItem = pensItem;
+	}
+
 	public String getWarehouseFrom() {
 		return warehouseFrom;
 	}

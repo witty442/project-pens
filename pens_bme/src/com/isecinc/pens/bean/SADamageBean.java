@@ -12,6 +12,7 @@ public class SADamageBean implements Serializable{
 	private String empId;
 	private String type;
 	private String invRefwal;
+	private String invoiceDate;
 	
 	private String tranDate;
 	private String oracleRefId;
@@ -42,6 +43,12 @@ public class SADamageBean implements Serializable{
 	
 	
 	
+	public String getInvoiceDate() {
+		return invoiceDate;
+	}
+	public void setInvoiceDate(String invoiceDate) {
+		this.invoiceDate = invoiceDate;
+	}
 	public String getId() {
 		return id;
 	}

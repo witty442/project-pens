@@ -24,12 +24,19 @@ public class ImportSummary implements Serializable{
 	private String storeType;
 	private String boxNo;
 	private Date importDate;
+	private String lineArr;
 	
 	//option
 	private String groupCode;
 	private String pensItem;
 	
 	
+	public String getLineArr() {
+		return lineArr;
+	}
+	public void setLineArr(String lineArr) {
+		this.lineArr = lineArr;
+	}
 	public String getBarcode() {
 		return barcode;
 	}

@@ -37,17 +37,7 @@ if(queryStr.indexOf("d-") != -1){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" /> --%>
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
-<style type="text/css">
-<!--
-body {
-	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
-	/**background-repeat: repeat;**/
-}
-.style1 {color: #004a80}
--->
-</style>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>

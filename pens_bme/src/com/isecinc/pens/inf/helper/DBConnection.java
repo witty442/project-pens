@@ -19,7 +19,7 @@ public class DBConnection {
 	
 	public static DBConnection getInstance(){
 	  if(_instance ==null)
-	    return new DBConnection();
+		  _instance = new DBConnection();
 	  return _instance;
 	}
 	

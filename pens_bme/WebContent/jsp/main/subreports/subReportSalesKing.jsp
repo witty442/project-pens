@@ -84,17 +84,19 @@ System.out.println("currentPage:"+currentPage);
 							    
 					    <%if(currentPage.equals(totalPage)){ %>
 					    <display:footer>
-					      <!-- <tr>
+					       <tr>
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%">&nbsp;</td>
-						      <td width="5%">Total</td>
-						      <td class="td_number_bold" width="10%"><span id="totalQty"></span> </td>
 						      <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
+							  <td width="5%"><b>Total</b></td>
+							  <td class="td_number_bold" width="10%">
+							    <span id="totalQty"><%=Utils.decimalFormat(Utils.convertStrToDouble(totalQty),Utils.format_current_2_disgit)%></span>
+							  </td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
@@ -102,35 +104,16 @@ System.out.println("currentPage:"+currentPage);
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-						    </tr> -->
+							 
+						    </tr>
 					    </display:footer>
                         <%} %>
 					</display:table>
 			
 			 </div>
 		</c:if>
-			
+			 
  </c:if>
-  <%if(currentPage.equals(totalPage)){ %>
-	<script>
-	 // document.getElementById("totalQty").innerHTML = '<%=totalQty%>';
-	</script>
-<%} %>
+ 
 </body>
 </html>

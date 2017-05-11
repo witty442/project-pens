@@ -25,7 +25,8 @@ try{
             // เลือก Wacoal  เช็ค invoice ต้องขึ้นต้นด้วย M
 			if(bean != null ){
 			    outputText  =  bean.getOracleRefId()+"|"+bean.getOracleRefName()+"|"+bean.getTotalDamage();
-			    outputText += "|"+Utils.isNull(bean.getEmpId())+"|"+Utils.isNull(bean.getName())+"|"+Utils.isNull(bean.getSurname())+"|"+Utils.isNull(bean.getBranch())+"|"+Utils.isNull(bean.getGroupStore());
+			    outputText += "|"+Utils.isNull(bean.getEmpId())+"|"+Utils.isNull(bean.getName())+"|"+Utils.isNull(bean.getSurname());
+			    outputText += "|"+Utils.isNull(bean.getBranch())+"|"+Utils.isNull(bean.getGroupStore())+"|"+Utils.isNull(bean.getInvoiceDate());
 			}else{
 			    outputText ="";
 			}

@@ -51,6 +51,8 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -412,8 +414,10 @@ function openPopupCustomer(path,types,storeType){
         param += "&storeType="+storeType;
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			//   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	
+	PopupCenterFullHeight(url,"",600);
 }
 
 function openPopupCustomerAll(path,types,storeType,hideAll){
@@ -422,22 +426,26 @@ function openPopupCustomerAll(path,types,storeType,hideAll){
         param += "&hideAll="+hideAll;
         
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	
+	PopupCenterFullHeight(url,"",600);
 }
 
 function openPopupGroup(path){
     var param = "";
 	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",600);
 }
 
 function openPopupProduct(path,types){
 	var param = "&types="+types;
 	url = path + "/jsp/searchProductPopupAction.do?do=prepare&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",600);
 }
 
 function setStoreMainValue(code,desc,types){
@@ -858,6 +866,8 @@ function getCustName(custCode,fieldName,storeType){
 								if(    "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 									|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 									|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+									|| "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
+									|| "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
 									) {
 									hideAll = "true";
 								}
@@ -907,6 +917,18 @@ function getCustName(custCode,fieldName,storeType){
 										</td>	
 										<td align="left" width="30%"> 
 										 
+										</td>
+									</tr>
+								<%} %>
+								<% if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) ){%>
+									 <tr>
+										<td align="right"  nowrap>วันที่ล่าสุดที่มีการ Load ข้อมูลนับสต็อก 
+										
+										  <html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
+										  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										</td>	
+										<td align="left" width="30%"> 
+										  รหัสร้านค้าใน Oracle คือ   <html:text property="onhandSummary.custNo" styleId="initDate" size="20" styleClass="disableText" readonly="true"/>  
 										</td>
 									</tr>
 								<%} %>

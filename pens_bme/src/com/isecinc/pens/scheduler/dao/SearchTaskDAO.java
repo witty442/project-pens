@@ -16,6 +16,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.scheduler.bean.BatchTaskDTO;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
+import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.scheduler.utils.EnvSchedulerProperties;
 
@@ -44,6 +45,40 @@ public class SearchTaskDAO {
 	              }
 	              
 	              return dataList;
+	        }catch(Exception e){
+	        	throw e;
+	        }finally{
+	        	if(rs != null){
+	                rs.close();
+	            }
+	            if(pstmt != null){
+	                pstmt.close();
+	            }
+	            if(con != null){
+	                con.close();
+	            }
+	        }
+	}
+	 public static ScheduleVO getJobInit(String programId)throws Exception{
+	        Connection con = null;
+	        PreparedStatement pstmt = null;
+	        ResultSet rs = null;
+	        ScheduleVO vo = new ScheduleVO();
+	        try{            
+	        	  con = DBConnection.getInstance().getConnection();
+	        	  String sql ="select program_id ,program_name,type,rerun,visible ,param from scheduler_job_initial \n";
+	        	         sql +=" where program_id = '"+programId+"' \n";
+	              logger.debug("sql:"+sql.toString());
+	              
+	              pstmt = con.prepareStatement(sql);
+	              rs = pstmt.executeQuery();
+	              while (rs.next()){
+	            	 vo.setProgramId(rs.getString("program_id"));
+	            	 vo.setProgramName(rs.getString("program_name"));
+	            	 vo.setParamRegen(rs.getString("param"));
+	              }
+	              
+	              return vo;
 	        }catch(Exception e){
 	        	throw e;
 	        }finally{
@@ -90,8 +125,9 @@ public class SearchTaskDAO {
 //            	logger.debug("limitPage : "+limitPage);
             }
             
-            sql.append("SELECT  /*+ FIRST_ROWS(").append(limitRow).append(") */ * \n");
-            sql.append("FROM SCHEDULE_LOG \n");
+            sql.append("SELECT ( SELECT PARAM from scheduler_job_initial J where j.program_id = M.program_id) as PARAM_REGEN \n");
+            sql.append(" ,M.* ");
+            sql.append("FROM MONITOR_SCHEDULE M \n");
             
             /* Make serach condition */
             if(dto.getNo() != null){
@@ -323,16 +359,23 @@ public class SearchTaskDAO {
         dto.setType(rs.getString("TYPE"));
         dto.setProgramId(rs.getString("PROGRAM_ID"));
         dto.setUpdateDate(rs.getDate("UPDATE_DATE"));
-        dto.setAsOfDate(DateUtil.stringValue(rs.getTimestamp("as_Of_Date"),"dd/MM/yyyy HH:mm:ss"));
-        dto.setBatchDateTime(DateUtil.stringValue(rs.getTimestamp("batch_date"),"dd/MM/yyyy HH:mm:ss"));
+
         dto.setNoOfRecord(rs.getString("NO_OF_RECORD"));
         dto.setSizeOfFile(rs.getString("SIZE_OF_FILE"));
-        dto.setFolderName(rs.getString("FOLDER_NAME"));
-        dto.setLastRunDate(DateUtil.stringValue(rs.getTimestamp("LAST_RUN_DATE"),"dd/MM/yyyy HH:mm:ss"));
-        dto.setNextRunDate(DateUtil.stringValue(rs.getTimestamp("NEXT_RUN_DATE"),"dd/MM/yyyy HH:mm:ss"));
+        dto.setFileName(rs.getString("FILE_NAME"));
+        dto.setSourcePath(rs.getString("SOURCE_PATH"));
+        dto.setDestPath(rs.getString("DEST_PATH"));
+        dto.setMessage(Utils.isNull(rs.getString("MESSAGE")));
+        
+        dto.setBatchDateTime(Utils.stringValue(rs.getTimestamp("batch_date"),"dd/MM/yyyy HH:mm:ss" ,Utils.local_th));
+        dto.setLastRunDate(Utils.stringValue(rs.getTimestamp("LAST_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
+        dto.setNextRunDate(Utils.stringValue(rs.getTimestamp("NEXT_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
+        
+        dto.setParamRegen(rs.getString("PARAM_REGEN"));
         
         System.out.println("NextDate:"+rs.getTimestamp("NEXT_RUN_DATE"));
         System.out.println("NextRunDate:"+dto.getNextRunDate());
         return dto;
+        
     }
 }

@@ -28,6 +28,7 @@ import com.isecinc.pens.inf.manager.process.GenerateHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateItemMasterHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportBillICC;
+import com.isecinc.pens.inf.manager.process.ImportPosProcess;
 import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalFromLotusProcess;
 import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
@@ -90,9 +91,12 @@ public class BatchProcessManager {
 
 		   }else if(monitorModel.getType().equals(Constants.TYPE_IMPORT_SALEOUT_WACOAL)){
          	    monitorModel = (new BatchProcessManager()).processImportSaleOutWacoal(monitorModel, user,request);
-		   }
+		   
            /** Process  Wacoal ****************************************************************************/
          
+		   }else if(monitorModel.getType().equals(Constants.TYPE_IMPORT_POS)){
+      	        monitorModel = (new BatchProcessManager()).processImportPos(monitorModel, user,request);
+		   }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 		}
@@ -625,6 +629,23 @@ public class BatchProcessManager {
 			monitorTime  = new MonitorTime("import processImportSaleOutWacoal");   
 
 			ImportSaleOutWacoalFromLotusProcess.runProcess(user,monitorModel);
+			
+			monitorTime.debugUsedTime();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+		
+		}
+		return monitorModel;
+	}
+	
+	public  MonitorBean processImportPos(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+		MonitorTime monitorTime = null;
+		try{
+			logger.debug("import Type:"+monitorModel.getType());
+			monitorTime  = new MonitorTime("import ImportPosProcess");   
+
+			ImportPosProcess.runProcess(user,monitorModel);
 			
 			monitorTime.debugUsedTime();
 		}catch(Exception e){

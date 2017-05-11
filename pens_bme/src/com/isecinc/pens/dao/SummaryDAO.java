@@ -249,8 +249,8 @@ public class SummaryDAO {
 		    	   summaryList = searchTops(c,conn,user);	
 		    	   re.setItemsList(summaryList);
 	    		}else if("king".equalsIgnoreCase(type)){
-			       summaryList = searchKing(c,conn,user);	
-			       re.setItemsList(summaryList);
+			       re = searchKing(c,conn,user);	
+			     
 			    }
 	    		
 	    	}catch(Exception e){
@@ -705,7 +705,7 @@ public class SummaryDAO {
 			return pos;
 		}
 	  
-	  public List<TransactionSummary> searchKing(TransactionSummary c,Connection conn,User user) throws Exception {
+	  public TransactionSummary searchKing(TransactionSummary c,Connection conn,User user) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			List<TransactionSummary> pos = new ArrayList<TransactionSummary>();
@@ -713,6 +713,8 @@ public class SummaryDAO {
 			boolean salesDateFlag = false;
 			Date salesDateFromParam = null;
 			Date salesDateToParam = null;
+			TransactionSummary re = new TransactionSummary();
+			int totalQty = 0;
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n  SELECT h.* " );
@@ -771,10 +773,18 @@ public class SummaryDAO {
 					item.setKingAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
 					item.setKingCostAmt(Utils.decimalFormat(rst.getDouble("cost_amt"),Utils.format_current_2_disgit));
 				
+					totalQty += Utils.convertStrToDouble(item.getQty());
+					
 					pos.add(item);
 					
 				}//while
 
+				TransactionSummary sum = new TransactionSummary();
+				sum.setQty(totalQty+"");
+				
+				re.setItemsList(pos);
+				re.setSummary(sum);
+				
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -783,7 +793,7 @@ public class SummaryDAO {
 					ps.close();
 				} catch (Exception e) {}
 			}
-			return pos;
+			return re;
 		}
 	  
 	  
@@ -897,7 +907,9 @@ public class SummaryDAO {
 						sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%' \n" );
-						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%')  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%')  \n");
 						
 					}else if(storeType.equalsIgnoreCase("king")){
 						sql.append(" and (pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%' \n");
@@ -994,7 +1006,7 @@ public class SummaryDAO {
 			Connection conn = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT distinct trunc(Count_stk_date) as Count_stk_date from PENSBME_MTT_INIT_STK \n");
+				sql.append("\n  SELECT distinct trunc(max(Count_stk_date)) as Count_stk_date from PENSBME_MTT_INIT_STK \n");
 				sql.append("\n  where 1=1 and Cust_no ='"+custNo+"' \n");
 				
 				logger.debug("sql:"+sql);
@@ -1919,12 +1931,19 @@ public class SummaryDAO {
 			return pos;
 	    }
 	  
-	  public List<OnhandSummary> searchOnhandMTT(OnhandSummary c,Date initDate,User user,String summaryType) throws Exception{
+	  public OnhandSummary searchOnhandMTT(OnhandSummary c,Date initDate,User user,String summaryType) throws Exception{
 		   Statement stmt = null;
 			ResultSet rst = null;
 			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
+			double initSaleQty = 0;
+		    double saleInQtyTemp = 0;
+		    double saleReturnQtyTemp = 0;
+		    double saleOutQtyTemp = 0;
+		    double adjustQtyTemp =0;
+		    double stockShortQtyTemp = 0;
+		    double onhandQtyTemp = 0;
 			try {
 				conn = DBConnection.getInstance().getConnection();
 		
@@ -1949,10 +1968,30 @@ public class SummaryDAO {
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
 					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
 					
-					pos.add(item);
+					initSaleQty += Utils.convertStrToDouble(item.getInitSaleQty());
+					saleInQtyTemp += Utils.convertStrToDouble(item.getSaleInQty());
+					saleReturnQtyTemp +=Utils.convertStrToDouble(item.getSaleReturnQty());
+					saleOutQtyTemp +=Utils.convertStrToDouble(item.getSaleOutQty());
+					onhandQtyTemp +=Utils.convertStrToDouble(item.getOnhandQty());
 					
+					pos.add(item);
 				}//while
-
+				
+				//Summary
+				OnhandSummary item = new OnhandSummary();
+				item.setStoreCode("");
+				if("PensItem".equalsIgnoreCase(summaryType)){
+				   item.setPensItem("");
+				}
+				item.setGroup("");
+				item.setInitSaleQty(Utils.decimalFormat(initSaleQty,Utils.format_current_no_disgit));
+				item.setSaleInQty(Utils.decimalFormat(saleInQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(saleReturnQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(saleOutQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
+				c.setSummary(item);
+				c.setItemsList(pos);
+				
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -1962,7 +2001,7 @@ public class SummaryDAO {
 					conn.close();
 				} catch (Exception e) {}
 			}
-			return pos;
+			return c;
 	    }
 	  
 	  public List<OnhandSummary> searchOnhandMTTDetail(OnhandSummary c,Date initDate,User user) throws Exception{

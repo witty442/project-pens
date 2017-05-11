@@ -124,6 +124,9 @@ public class JobDAO extends PickConstants{
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
 				   
+				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
+				   h.setRtnAmt(Utils.decimalFormat(rst.getDouble("rtn_amt"),Utils.format_current_2_disgit,""));
+				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
 					   h.setCanEdit(false);
@@ -238,6 +241,9 @@ public class JobDAO extends PickConstants{
 				   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
 				   h.setWareHouseDesc(Utils.isNull(rst.getString("warehouse_desc"))); 
 				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc"))); 
+				   
+				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
+				   h.setRtnAmt(Utils.decimalFormat(rst.getDouble("rtn_amt"),Utils.format_current_2_disgit,""));
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
@@ -382,9 +388,9 @@ public class JobDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_JOB \n");
 				sql.append(" (JOB_ID, NAME, OPEN_DATE,   \n");
-				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE,REF_DOC)  \n");
+				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE,REF_DOC,RTN_QTY,RTN_AMT)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,? ,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -405,6 +411,9 @@ public class JobDAO extends PickConstants{
 				ps.setString(c++, o.getSubInv());
 				ps.setString(c++, o.getWareHouse());
 				ps.setString(c++, Utils.isNull(o.getRefDoc()));
+				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnQty()));
+				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnAmt()));
+				
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -486,9 +495,15 @@ public class JobDAO extends PickConstants{
 				sql.append(", UPDATE_DATE = ? \n" );
 				sql.append(", UPDATE_USER = '"+Utils.isNull(o.getUpdateUser())+"' \n" );
 				sql.append(", REF_DOC = '"+Utils.isNull(o.getRefDoc())+"' \n" );
+				sql.append(", RTN_QTY = "+Utils.convertStrToDouble(o.getRtnQty())+" \n" );
+				sql.append(", RTN_AMT = "+Utils.convertStrToDouble(o.getRtnAmt())+" \n" );
+				
 				sql.append(" WHERE JOB_ID =? \n" );
                 
 				logger.debug("sql:"+sql.toString());
+				
+				//ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnQty()));
+				//ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnAmt()));
 				
 				ps = conn.prepareStatement(sql.toString());
 					

@@ -137,7 +137,7 @@ public class SummaryExport {
 					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
 					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
 					  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
-					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					     h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
 					  }
 					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
 					  h.append("<td class='num_currency'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
@@ -149,6 +149,8 @@ public class SummaryExport {
 					  h.append("<td class='num_currency'>"+bStart+s.getRetailPriceBF()+bEnd+"</td> \n");
 					  h.append("<td class='currency'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
 					h.append("</tr>");
+					
+					logger.debug("onhandQty:"+s.getOnhandQty());
 				}
 				/** Summary **/
 				bStart ="<b>";
@@ -475,24 +477,24 @@ public class SummaryExport {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand MTT</td> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand MTT</td> \n");
 			
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("<td class='colum_head'  align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -502,18 +504,18 @@ public class SummaryExport {
 			 	    
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
-				  h.append("<td>CustNo(Oracle)</td> \n");
-				  h.append("<td>ชื่อร้านค้า</td> \n");
-				  h.append("<td>Group</td> \n");
+				  h.append("<td class='colum_head'>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td class='colum_head'>CustNo(Oracle)</td> \n");
+				  h.append("<td class='colum_head'>ชื่อร้านค้า</td> \n");
+				  h.append("<td class='colum_head'>Group</td> \n");
 				  if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
-				    h.append("<td>PensItem</td> \n");
+				    h.append("<td class='colum_head'>PensItem</td> \n");
 				  }
-				  h.append("<td>Initial Stock</td> \n");
-				  h.append("<td>Sale In Qty</td> \n");
-				  h.append("<td>Sale Out Qty</td> \n");
-				  h.append("<td>Return Qty </td> \n");
-				  h.append("<td>Onhand Qty </td> \n");
+				  h.append("<td class='colum_head'>Initial Stock</td> \n");
+				  h.append("<td class='colum_head'>Sale In Qty</td> \n");
+				  h.append("<td class='colum_head'>Sale Out Qty</td> \n");
+				  h.append("<td class='colum_head'>Return Qty </td> \n");
+				  h.append("<td class='colum_head'>Onhand Qty </td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
@@ -533,6 +535,20 @@ public class SummaryExport {
 					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
 					h.append("</tr>");
 				}
+				OnhandSummary sum = (OnhandSummary)request.getSession().getAttribute("summary");
+				   h.append("<tr> \n");
+				      if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+					    h.append("<td class='colum_head' colspan='5' align='right'>รวม</td> \n");
+					  }else{
+						h.append("<td class='colum_head' colspan='4' align='right'>รวม</td> \n");  
+					  }
+					  h.append("<td class='num_currency_bold'>"+sum.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getOnhandQty()+"</td> \n");
+				   h.append("</tr>");
+				
 				h.append("</table> \n");
 			}
 		}catch(Exception e){
@@ -1171,7 +1187,6 @@ public class SummaryExport {
 				sum = (TransactionSummary) request.getSession().getAttribute("summaryTrans");
 			}
 			h.append(ExcelHeader.EXCEL_HEADER);
-			
 			//Header
 			h.append("<table border='1'> \n");
 			
@@ -1318,7 +1333,11 @@ public class SummaryExport {
 	
 	public StringBuffer genTopsHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
+		TransactionSummary sum = new TransactionSummary();
 		try{
+			if(request.getSession().getAttribute("summaryTrans") != null){
+				sum = (TransactionSummary) request.getSession().getAttribute("summaryTrans");
+			}
 			//Header
 			h.append("<table border='1'> \n");
 			
@@ -1430,8 +1449,14 @@ public class SummaryExport {
 	//wait
 	public StringBuffer genKingHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
+		TransactionSummary sum = new TransactionSummary();
 		try{
+			if(request.getSession().getAttribute("summaryTrans") != null){
+				sum = (TransactionSummary) request.getSession().getAttribute("summaryTrans");
+			}
 			//Header
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
@@ -1492,6 +1517,7 @@ public class SummaryExport {
 						h.append("<td>"+Utils.isNull(s.getKingUnitPrice())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getKingUnitCost())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getQty())+"</td> \n");
+						
 						h.append("<td>"+Utils.isNull(s.getKingAmount())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getKingCostAmt())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getPensItem())+"</td> \n");
@@ -1502,6 +1528,27 @@ public class SummaryExport {
 						
 					h.append("</tr>");
 				}
+				h.append("<tr> \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td> \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td><b>Total</b></td> \n");
+				h.append("<td class='num_bold'>"+sum.getQty()+"</td> \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				
+			h.append("</tr>");
+				h.append("</table> \n");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){

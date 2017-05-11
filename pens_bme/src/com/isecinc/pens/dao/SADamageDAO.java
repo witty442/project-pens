@@ -129,9 +129,9 @@ public class SADamageDAO {
 			Connection conn = null;
 			SADamageBean bean = null;
 			try {
-				sql.append("\n SELECT  ACCOUNT_NUMBER ,TRX_NUMBER ,PARTY_NAME, AMOUNT_DUE_ORIGINAL ");
-				sql.append("\n   FROM  SA_AR_DAMAGE b  ");
-				sql.append("\n   WHERE b.TRX_NUMBER = '"+invRefwal+"' ");
+				sql.append("\n SELECT  ACCOUNT_NUMBER ,TRX_NUMBER ,PARTY_NAME, AMOUNT_DUE_ORIGINAL,TRX_DATE ");
+				sql.append("\n  FROM  SA_AR_DAMAGE b  ");
+				sql.append("\n  WHERE b.TRX_NUMBER = '"+invRefwal+"' ");
 									
 				logger.debug("sql:"+sql);
                 conn = DBConnection.getInstance().getConnection();
@@ -144,6 +144,7 @@ public class SADamageDAO {
 					bean.setOracleRefId(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 					bean.setOracleRefName(Utils.isNull(rst.getString("PARTY_NAME")));
 					bean.setTotalDamage(Utils.decimalFormat(rst.getDouble("AMOUNT_DUE_ORIGINAL"),Utils.format_current_2_disgit));
+					bean.setInvoiceDate(Utils.stringValueNull(rst.getDate("TRX_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					
 					//Get EMP
 					SAEmpBean em = getEmpByOracleRefId(conn,bean.getOracleRefId());
@@ -153,6 +154,7 @@ public class SADamageDAO {
 						bean.setSurname(em.getSurName());
 						bean.setBranch(em.getBranch());
 						bean.setGroupStore(em.getGroupStore());
+						
 					}
 				}
 			} catch (Exception e) {
@@ -251,6 +253,11 @@ public class SADamageDAO {
 			return bean;
 	 }
 	 
+	 public static String genDummyInvRefWal(String empId,String transDate){
+		 
+		 return empId+"-"+transDate.replaceAll("/", "");
+	 }
+	 
 	 public static String getInvRefwalInDamageHead(String invRefwal) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
@@ -263,7 +270,7 @@ public class SADamageDAO {
 	
 									
 				logger.debug("sql:"+sql);
-             conn = DBConnection.getInstance().getConnection();
+                conn = DBConnection.getInstance().getConnection();
 				ps = conn.prepareStatement(sql.toString());
 				rst = ps.executeQuery();
 				
@@ -293,8 +300,8 @@ public class SADamageDAO {
 				sql.append("INSERT INTO SA_DAMAGE_HEAD \n");
 				sql.append("(EMP_ID, TYPE, INV_REFWAL, tran_date, oracle_ref_id" +
 						", oracle_ref_name, name,surname,group_store,branch" +
-						",check_stock_date,total_damage,remark, CREATE_DATE, CREATE_USER) \n");
-				sql.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,?,?) \n");//15
+						",check_stock_date,total_damage,remark, CREATE_DATE, CREATE_USER,INVOICE_DATE) \n");
+				sql.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,?,? ,?) \n");//15
 				
 				logger.debug("sql:"+sql.toString());
 				
@@ -326,7 +333,12 @@ public class SADamageDAO {
 				
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));//14
 				ps.setString(c++, o.getCreateUser());//15
-
+				
+				if( !Utils.isNull(o.getInvoiceDate()).equals("")){//16
+					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getInvoiceDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				}else{
+					 ps.setTimestamp(c++,null);
+				}
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -494,19 +506,18 @@ public class SADamageDAO {
 	}
 	 
 
-   public static SADamageBean searchHead(Connection conn,SADamageBean o,boolean getItems) throws Exception {
-	  return searchHeadModel(conn,o,"",getItems);
+   public static SADamageBean searchHead(Connection conn,SADamageBean o,boolean getItems,String typeSearch) throws Exception {
+	  return searchHeadModel(conn,o,"",getItems,typeSearch);
 	}
    
-
-   public static SADamageBean searchHead(Connection conn,String mode,SADamageBean o,boolean getItems) throws Exception {
-	  return searchHeadModel(conn,o,mode,getItems);
+   public static SADamageBean searchHead(Connection conn,String mode,SADamageBean o,boolean getItems,String typeSearch) throws Exception {
+	  return searchHeadModel(conn,o,mode,getItems,typeSearch);
 	}
-   public static SADamageBean searchHead(SADamageBean o ,String mode,boolean getItems) throws Exception {
+   public static SADamageBean searchHead(SADamageBean o ,String mode,boolean getItems,String typeSearch) throws Exception {
 	   Connection conn = null;
 	   try{
 		  conn = DBConnection.getInstance().getConnection();
-		  return searchHeadModel(conn, o,mode,getItems);
+		  return searchHeadModel(conn, o,mode,getItems,typeSearch);
 	   }catch(Exception e){
 		   throw e;
 	   }finally{
@@ -514,7 +525,7 @@ public class SADamageDAO {
 	   }
 	}
    
-	public static SADamageBean searchHeadModel(Connection conn,SADamageBean o ,String mode,boolean getItems) throws Exception {
+	public static SADamageBean searchHeadModel(Connection conn,SADamageBean o ,String mode,boolean getItems,String typeSearch) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -565,6 +576,12 @@ public class SADamageDAO {
 					sql.append(" and trunc(S.check_stock_date) = to_date('"+date+"','dd/mm/yyyy') \n");
 				}
 				
+				if(typeSearch.equalsIgnoreCase("NoDamage")){
+					sql.append("\n and S.oracle_ref_id is null ");
+				}else{
+					sql.append("\n and S.oracle_ref_id is not null ");
+				}
+				
 				sql.append("\n order by S.tran_date desc ");
 				
 				logger.debug("sql:"+sql);
@@ -600,7 +617,8 @@ public class SADamageDAO {
 				   }else{
 					 h.setCheckStockDate("");
 				   }
-					   
+				   h.setInvoiceDate(Utils.stringValueNull(rst.getDate("invoice_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   
 				   if("edit".equalsIgnoreCase(mode)){
 					   h.setDisableTextClass("disableText");
 				   }

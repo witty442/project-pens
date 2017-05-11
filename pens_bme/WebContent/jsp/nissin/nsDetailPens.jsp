@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.RTDAO"%>
 <%@page import="com.isecinc.pens.bean.RTBean"%>
 <%@page import="com.isecinc.pens.web.nissin.NSForm"%>
@@ -28,15 +29,16 @@
 
 <%
 User user = (User) request.getSession().getAttribute("user");
+String role = user.getRole().getKey();
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -218,12 +220,16 @@ function cancelAction(path){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0">
 						       <tr>
                                     <td  align="center" colspan="2">
-                                    <c:if test="${nsForm.bean.mode == 'add'}">
-                                        <b>เพิ่มรายการใหม่</b>
-                                     </c:if>
-                                     <c:if test="${nsForm.bean.mode == 'edit'}">
-                                         <b>แก้ไขรายการ  </b>
-                                     </c:if>
+                                     <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
+	                                    <c:if test="${nsForm.bean.mode == 'add'}">
+	                                        <b>Add new</b>
+	                                     </c:if>
+	                                     <c:if test="${nsForm.bean.mode == 'edit'}">
+	                                         <b>Edit  </b>
+	                                     </c:if>
+	                                  <%}else{ %>
+	                                      	
+	                                  <%} %>
 									</td>
 								</tr>
 							<tr>
@@ -235,49 +241,49 @@ function cancelAction(path){
 								</td>
 							</tr>
 						     <tr>
-                                    <td align="right"> วันที่บันทึก
+                                    <td align="right"> Date
                                     </td>
 									<td align="left"><html:text property="bean.orderDate" styleClass="disableText" styleId="orderDate"></html:text>
-									    ประเภท
+									    Type
 										 <html:select property="bean.customerType" styleId="customerType" disabled="true" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
 										    <html:option value="Mini">Mini</html:option>
 											<html:option value="Shop">Shop</html:option>
 										   </html:select>
-										      ภาค 
+										      Region 
 										  <html:select property="bean.channelId" styleId="channelId" disabled="true">
 											<html:options collection="channelList" property="code" labelProperty="desc"/>
 									    </html:select>
 									    
-									    จังหวัด  
+									    Province 
 									      <html:select property="bean.provinceId" styleId="provinceId" disabled="true">
 									    </html:select> 
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> ชื่อร้านค้า <font color="red">*</font>
+                                    <td  align="right"> Customer name <font color="red">*</font>
 									</td>
 									<td align="left">
 									    <html:text property="bean.customerName" styleClass="normalText" styleId="customerName"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td align="right"> ที่อยู่ Line1 
+                                    <td align="right"> Address Line1 
 									</td>
 									<td align="left">
 									  <html:text property="bean.addressLine1" styleClass="normalText" styleId="addressLine1"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> ที่อยู่ Line2  
+                                    <td  align="right"> Address Line2  
 									</td>
 									<td align="left">
 									  <html:text property="bean.addressLine2" styleClass="normalText" styleId="addressLine2"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> เบอร์โทรศัพท์
+                                    <td  align="right">Phone Number
 									</td>
 									<td align="left">
 									  <html:text property="bean.phone" styleClass="disableText" styleId="phone" size="20"></html:text>
@@ -310,9 +316,9 @@ function cancelAction(path){
 	                                          <fieldset>
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" >
 		                                         <tr><td>
-				                                                                                                                                    รหัสร้านค้า<font color="red">*</font>  
+				                                       Customer Code<font color="red">*</font>  
 													   <html:text property="bean.customerCode" styleClass="" styleId="customerCode" size="20" readonly="" ></html:text>
-													       รหัส Sale <font color="red">*</font> 
+													   Sale Code <font color="red">*</font> 
 													    <html:text property="bean.saleCode" styleClass="" styleId="saleCode" size="20" ></html:text>
 												 </td></tr>
 												 <tr><td>
@@ -327,16 +333,16 @@ function cancelAction(path){
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
 			                                    <tr>
 			                                      <th colspan="2">CUP 72</th>
-			                                      <th colspan="2">ซอง</th>
+			                                      <th colspan="2">BAG</th>
 			                                      <th colspan="2">POOH 72</th>
 			                                    </tr>
 			                                    <tr>
-			                                      <th>หีบ</th>
-			                                      <th>ถ้วย</th>
-			                                      <th>หีบ</th>
-			                                      <th>ซอง</th>
-			                                      <th>หีบ</th>
-			                                      <th>ถ้วย</th>
+			                                      <th>CTN</th>
+			                                      <th>CUP</th>
+			                                      <th>CTN</th>
+			                                      <th>BAG</th>
+			                                      <th>CTN</th>
+			                                      <th>CUP</th>
 			                                    </tr>
 			                                    <tr>
 			                                       <td><html:text property="bean.cupQty" styleClass="" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
@@ -354,14 +360,14 @@ function cancelAction(path){
 	                                       <fieldset >
 			                                    <table align="right" border="0" cellpadding="3" cellspacing="2" >
 				                                    <tr>
-				                                       <td>เปลี่ยนสถานะเป็น PENDING 
+				                                       <td>Change Status To PENDING 
 					                                       <html:select property="bean.status" styleId="status" >
 					                                          <html:option value=""></html:option>
 					                                       	   <html:option value="P">PENDING</html:option>
 														   </html:select></td>
 				                                    </tr>
 				                                    <tr>
-				                                       <td nowrap>เหตุผลที่ PENDING
+				                                       <td nowrap>Reason PENDING
 				                                        <html:text property="bean.pendingReason" styleClass="" styleId="pendingReason" size="60" maxlength="200"></html:text>
 				                                       </td>
 				                                      
@@ -380,14 +386,15 @@ function cancelAction(path){
 									<td align="left">
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<c:if test="${nsForm.bean.canSave == true}">
-											<a href="javascript:savePens('${pageContext.request.contextPath}')">
-											  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
-											</a>
-										</c:if>
-										
+										  <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
+											<c:if test="${nsForm.bean.canSave == true}">
+												<a href="javascript:savePens('${pageContext.request.contextPath}')">
+												  <input type="button" value="    Save   " class="newPosBtnLong"> 
+												</a>
+											</c:if>
+										<%} %>
 										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
-										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
+										  <input type="button" value="   Close   " class="newPosBtnLong">
 										</a>		
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

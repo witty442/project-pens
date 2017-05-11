@@ -25,7 +25,6 @@ public class BME001Task implements org.quartz.Job{
 		    param = (ScheduleVO)jobExecutionContext.getJobDetail().getJobDataMap().get(SchedulerConstant.JOB_DATAMAP_PARAM);
 		    conn = DBConnection.getInstance().getConnection();
 		    
-		    
 		    logger.debug("BME001Task"+":Process Task ...AT:"+new Date());
 		    
 		    /******** Action************/
@@ -52,14 +51,12 @@ public class BME001Task implements org.quartz.Job{
 			    if(conn != null){
 			    	conn.close();conn = null;
 			    }
-			  }catch(Exception e){
-				  
-			  }
+			  }catch(Exception e){}
 		  }
 	  }
 	 
 	 /** After Finish Action Task  Check ActionTask is Success or Fail 
-	     *  For update status in TCB_SCHEDULE_LOG
+	     *  For update status in MONITOR_SCHEDULE
 	  */
 	 private void postExecute(Connection conn,ScheduleVO vo) {
 		 try{

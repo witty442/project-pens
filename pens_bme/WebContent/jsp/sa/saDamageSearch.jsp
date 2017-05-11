@@ -153,6 +153,15 @@ function openEdit(path,empId,type,invRefwal){
 	form.submit();
 	return true; 
 }
+function openEditNoDamage(path,empId,type,invRefwal){
+	 var form = document.saDamageForm;
+	var param ="&empId="+empId;
+	    param +="&type="+type;
+	    param +="&invRefwal="+invRefwal;
+	form.action = path + "/jsp/saDamageAction.do?do=prepareNoDamage&action=edit"+param;
+	form.submit();
+	return true; 
+}
 
 function openPopupCustomer(path){
 	var form = document.saDamageForm;
@@ -346,6 +355,7 @@ function getStaffName(custCode){
 						            <th >Employee ID</th><!-- 2 -->
 						            <th >Type</th><!-- 3 -->
 						            <th >Invoice No / Ref Wacoal</th><!-- 4 -->
+						            <th >Invoice Date</th><!-- 5 -->
 									<th >Name</th><!-- 5 -->
 									<th >Surname</th><!-- 6 -->
 									<th >รหัสใน Oracle</th><!-- 7 -->
@@ -367,10 +377,12 @@ function getStaffName(custCode){
 									<tr class="<%=tabclass%>"> 
 									   <td class="td_text_center" width="10%">
 										  <c:if test="${saDamageForm.bean.canEdit == true}">
-							                <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')">แก้ไข</a><!-- 0 -->
+							                   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')">แก้ไข</a><!-- 0 -->  
 							              </c:if>
+
 							              <c:if test="${saDamageForm.bean.canEdit == false}">
-							               <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')"> VIEW </a><!-- 0 -->
+							                  <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getEmpId()%>','<%=mc.getType()%>','<%=mc.getInvRefwal()%>')"> VIEW </a><!-- 0 -->
+							               
 							              </c:if>
 											
 										</td>
@@ -378,7 +390,7 @@ function getStaffName(custCode){
 										<td class="td_text_center" width="6%"><%=mc.getEmpId()%></td><!-- 1 -->
 										<td class="td_text_center" width="6%"><%=mc.getType()%></td><!-- 6 -->
 										<td class="td_text_center" width="8%"><%=mc.getInvRefwal()%></td><!-- 1 -->
-									
+										<td class="td_text_center" width="5%"><%=mc.getInvoiceDate()%></td><!-- 1 -->
 										<td class="td_text_center" width="10%"><%=mc.getName()%></td><!-- 3 -->
 									    <td class="td_text_center" width="10%"><%=mc.getSurname()%></td><!-- 4 -->
 									    <td class="td_text_center" width="8%"><%=mc.getOracleRefId() %></td><!-- 5 -->
@@ -392,7 +404,7 @@ function getStaffName(custCode){
 									</tr>
 							<%} %>	 
 							<tr class="<%=tabclass%>"> 
-								<td colspan="11" class="td_text_right" width="6%"><b> ยอดรวมค่าเสียหาย : </b></td><!-- 1 -->
+								<td colspan="12" class="td_text_right" width="6%"><b> ยอดรวมค่าเสียหาย : </b></td><!-- 1 -->
 								<td class="td_text_right" width="6%">
 								    <b><span id="totalDamage"></span></b>
 								</td><!-- 1 -->

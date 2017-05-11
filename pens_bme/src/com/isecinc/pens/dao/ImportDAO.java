@@ -33,6 +33,34 @@ public class ImportDAO {
 
 	}
 	
+	public String getBranchID(Connection conn,String storeNo) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String branchId ="";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select branch_id from pensbme_wacoal_store_mapping where store_no ='"+storeNo+"'");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				branchId = rs.getString("branch_id");
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return branchId;
+	} 
+	
 	public String getLastFileNameImport(Connection conn) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -208,6 +236,34 @@ public class ImportDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_SALESWACOAL_FROM_LOTUS WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				dup = true;
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return dup;
+	} 
+	
+	public Boolean importPOSFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		boolean dup = false;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from pensbme_pos_order_temp WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
@@ -614,7 +670,9 @@ public class ImportDAO {
 					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%'  \n");
-					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%' ) \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%' ) \n");
 					 
 				}
 			}
@@ -657,6 +715,7 @@ public class ImportDAO {
 				m = new Master();
 				m.setPensValue(rs.getString("pens_value"));
 				m.setPensDesc(rs.getString("pens_desc"));
+				m.setInterfaceValue(rs.getString("interface_value"));
 			}
 		
 		}catch(Exception e){

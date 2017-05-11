@@ -32,12 +32,46 @@ public class BatchTaskDTO implements Serializable{
 	private String batchDateTime;
 	private String noOfRecord;
 	private String sizeOfFile;
-	private String folderName;
 	private String lastRunDate;
 	private String nextRunDate;
 	private String cencel;
+    private String sourcePath;
+    private String destPath;
+    private String fileName;
+    private String message;
+    private String paramRegen;
 	
-	
+    
+	public String getParamRegen() {
+		return paramRegen;
+	}
+	public void setParamRegen(String paramRegen) {
+		this.paramRegen = paramRegen;
+	}
+	public String getSourcePath() {
+		return sourcePath;
+	}
+	public void setSourcePath(String sourcePath) {
+		this.sourcePath = sourcePath;
+	}
+	public String getDestPath() {
+		return destPath;
+	}
+	public void setDestPath(String destPath) {
+		this.destPath = destPath;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 	public BigDecimal getId() {
 		return id;
 	}
@@ -75,12 +109,7 @@ public class BatchTaskDTO implements Serializable{
 	public void setSizeOfFile(String sizeOfFile) {
 		this.sizeOfFile = sizeOfFile;
 	}
-	public String getFolderName() {
-		return folderName;
-	}
-	public void setFolderName(String folderName) {
-		this.folderName = folderName;
-	}
+	
 	public BigDecimal getNo() {
 		return no;
 	}

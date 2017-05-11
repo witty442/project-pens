@@ -59,7 +59,7 @@ public class SADamageAction extends I_Action {
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				SADamageBean oldCri = aForm.getBeanCriteria();
-				SADamageBean bean = SADamageDAO.searchHead(oldCri,"",false);
+				SADamageBean bean = SADamageDAO.searchHead(oldCri,"",false,"");
 				//can Edit
 				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 					bean.setCanEdit(true);
@@ -81,7 +81,7 @@ public class SADamageAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			aForm.setBean(SADamageDAO.searchHead(aForm.getBean(),"",false));
+			aForm.setBean(SADamageDAO.searchHead(aForm.getBean(),"",false,""));
 			aForm.setResultsSearch(aForm.getBean().getItems());
 			
 			if(aForm.getResultsSearch().size() <=0){
@@ -98,6 +98,64 @@ public class SADamageAction extends I_Action {
 		}
 		return mapping.findForward("search");
 	}
+	
+	public ActionForward prepareNoDamageSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareNoDamageSearch");
+		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if("new".equals(action)){
+				aForm.setResultsSearch(null);
+				SADamageBean ad = new SADamageBean();
+				
+				//can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+					ad.setCanEdit(true);
+				}
+				aForm.setBean(ad);
+			}else if("back".equals(action)){
+				SADamageBean oldCri = aForm.getBeanCriteria();
+				SADamageBean bean = SADamageDAO.searchHead(oldCri,"",false,"noDamage");
+				//can Edit
+				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+					bean.setCanEdit(true);
+				}
+				aForm.setBean(bean);
+				aForm.setResultsSearch(aForm.getBean().getItems());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			
+		}
+		return mapping.findForward("noDamageSearch");
+	}
+	
+	public ActionForward searchNoDamage(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchNoDamage");
+		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		try {
+			aForm.setBean(SADamageDAO.searchHead(aForm.getBean(),"",false,"noDamage"));
+			aForm.setResultsSearch(aForm.getBean().getItems());
+			
+			if(aForm.getResultsSearch().size() <=0){
+			   request.setAttribute("Message", "ไม่พบข้อมูล");
+			   aForm.setResultsSearch(null);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			
+		}
+		return mapping.findForward("noDamageSearch");
+	}
+	
 	/**
 	 * Prepare without ID
 	 */
@@ -127,7 +185,7 @@ public class SADamageAction extends I_Action {
 				c.setEmpId(empId);
 				c.setType(type);
 				c.setInvRefwal(invRefwal);
-				bean = SADamageDAO.searchHead(c,"edit",true).getItems().get(0);
+				bean = SADamageDAO.searchHead(c,"edit",true,"").getItems().get(0);
 			
 			}
 			
@@ -149,6 +207,54 @@ public class SADamageAction extends I_Action {
 			
 		}
 		return forward;
+	}
+	
+	public ActionForward prepareNoDamage(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareNoDamage");
+		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		SADamageBean bean = new SADamageBean();
+		String mode = "";
+		try {
+			//save old criteria Case link from damageSearch 
+			aForm.setBeanCriteria(aForm.getBean());
+			
+            String empId = Utils.isNull(request.getParameter("empId"));
+            String type = Utils.isNull(request.getParameter("type"));
+            String invRefwal = Utils.isNull(request.getParameter("invRefwal"));
+            String action = Utils.isNull(request.getParameter("action"));
+            
+			if("add".equals(action)){
+				logger.debug("add");
+				//init default value
+				bean = new SADamageBean();
+				bean.setInvoiceDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setType("BME"); //default case new add
+				mode ="add";
+			}else{
+				SADamageBean c = new SADamageBean();
+				c.setEmpId(empId);
+				c.setType(type);
+				c.setInvRefwal(invRefwal);
+				bean = SADamageDAO.searchHead(c,"edit",true,"noDamage").getItems().get(0);
+			    mode ="edit";
+			}
+			
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+				bean.setCanEdit(true);
+			}
+			
+			aForm.setBean(bean);
+			aForm.setMode(mode);//Mode Edit ,Add
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			
+		}
+		return mapping.findForward("noDamage");
 	}
 	
 	public ActionForward prepareReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -215,6 +321,26 @@ public class SADamageAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("search");
+	}
+	
+	public ActionForward clearNoDamageSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clear2");
+		User user = (User) request.getSession().getAttribute("user");
+		SADamageForm aForm = (SADamageForm) form;
+		try {
+			aForm.setResultsSearch(null);
+			SADamageBean bean = new SADamageBean();
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("noDamageSearch");
 	}
 	
 	/**
@@ -406,7 +532,7 @@ public class SADamageAction extends I_Action {
 			criPK.setType(h.getType());
 			criPK.setInvRefwal(h.getInvRefwal());
 			
-			SADamageBean bean = SADamageDAO.searchHead(conn,mode,criPK,true).getItems().get(0);
+			SADamageBean bean = SADamageDAO.searchHead(conn,mode,criPK,true,"").getItems().get(0);
 			//Can Edit
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
 				bean.setCanEdit(true);
@@ -434,6 +560,181 @@ public class SADamageAction extends I_Action {
 		return "detail";
 	}
 	
+	/**
+	 * Save
+	 */
+	public ActionForward saveNoDamage(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		Connection conn = null;
+		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		int r=  0;
+		String idDelete = "";
+		int lineIdNew = 0;
+		boolean isFoundReward = false;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			SADamageBean h = aForm.getBean();
+			logger.debug("mode:"+aForm.getMode());
+			//head 
+			h.setCreateUser(user.getUserName());
+			h.setUpdateUser(user.getUserName());
+			
+			//Get Data Table Item
+			String[] payType = request.getParameterValues("payType");
+			String[] payDate = request.getParameterValues("payDate");
+			String[] payAmt = request.getParameterValues("payAmt");
+			String[] status = request.getParameterValues("status");
+			String[] lineId = request.getParameterValues("lineId");
+			String[] ids = request.getParameterValues("ids");
+			
+			//Add data  to List
+			List<SADamageBean> itemList = new ArrayList<SADamageBean>();
+			for(int i=0;i<payType.length;i++){
+				logger.debug("payType["+i+"]["+Utils.isNull(payType[i])+"]");
+				logger.debug("status["+i+"]["+Utils.isNull(status[i])+"]");
+				if( !Utils.isNull(payType[i]).equals("") && !Utils.isNull(status[i]).equalsIgnoreCase("AB")){
+					SADamageBean item = new SADamageBean();
+			
+					//set key
+					item.setCreateUser(h.getCreateUser());
+					item.setUpdateUser(h.getUpdateUser());
+					item.setEmpId(h.getEmpId());
+					item.setType(h.getType());
+					item.setInvRefwal(h.getInvRefwal());
+					
+					item.setLineId(Utils.isNull(lineId[i]));
+					item.setPayType(Utils.isNull(payType[i]));
+					item.setPayDate(Utils.isNull(payDate[i]));
+					item.setPayAmt("0");
+					
+					item.setId(Utils.isNull(ids[i]));
+					
+					itemList.add(item);
+				}else if( Utils.isNull(status[i]).equalsIgnoreCase("AB")){
+					//Delete lineIdDelete
+					idDelete += Utils.isNull(ids[i])+",";
+				}
+			}//for
+			
+			//set Date to Bean case Show Error
+			h.setItems(itemList);
+			aForm.setBean(h);
+			
+			//Validate StaffId duplicate
+			if("add".equalsIgnoreCase((aForm.getMode()))){
+				logger.debug("insert:");
+				//Gen Dummy InvRef
+	            h.setInvRefwal(SADamageDAO.genDummyInvRefWal(h.getEmpId(), h.getTranDate()));
+				
+				//Validate Duplicate PK
+				boolean dup = SADamageDAO.isDuplicateDamageHeadPK(conn, h.getEmpId(), h.getType(), h.getInvRefwal());
+				if(dup){
+					request.setAttribute("Message", "Primary key Duplicate");
+					return mapping.findForward("noDamage");
+				}
+				
+			    h = SADamageDAO.insertHeadModel(conn, h);
+			  
+			    //Insert Item Trans 
+			    int id= 0;
+			    if(itemList != null && itemList.size()>0){
+					for(int i=0;i<itemList.size();i++){
+						SADamageBean item = itemList.get(i);
+					    id++;
+					    item.setId(id+"");
+					    item.setInvRefwal(h.getInvRefwal());
+						r += SADamageDAO.insertItemModel(conn, item);
+						//check is found reward
+						if(item.getPayType().equalsIgnoreCase("2. หักค่าเฝ้าตู้")){
+							isFoundReward = true;
+						}
+						
+					}
+				    logger.debug("total insert record :"+r);
+			    }
+				
+			}else{
+				logger.debug("update:");
+				 SADamageDAO.updateHeadModel(conn, h);
+				 
+				  //delete item Trans status ='AB'
+				 if(idDelete != null && idDelete.length() >0){
+					 idDelete = idDelete.substring(0,idDelete.length()-1);
+				 
+				    r = SADamageDAO.deleteItemModelById(conn, h,idDelete);  
+				    logger.debug("result delete:"+r);
+				 }
+				 
+				 //Get MaxId from getMaxIdFromDanageTran
+				 int maxId = SADamageDAO.getMaxIdFromDanageTran(conn, h.getEmpId(), h.getType(), h.getInvRefwal());
+				 
+				 //Insert or update Item Trans
+			    if(itemList != null && itemList.size()>0){
+					for(int i=0;i<itemList.size();i++){
+						lineIdNew++;
+						SADamageBean item = itemList.get(i);
+						item.setLineId(lineIdNew+"");
+						
+						if( !"".equals(item.getId())){
+							int u = SADamageDAO.updateItemModelById(conn, item);
+							r +=u;
+						}else{
+							maxId++;
+							item.setId(maxId+"");
+							r +=SADamageDAO.insertItemModel(conn, item);
+						}
+						//check is found reward
+						if(item.getPayType().equalsIgnoreCase("2. หักค่าเฝ้าตู้")){
+							isFoundReward = true;
+						}
+					}
+				    logger.debug("total insert record :"+r);
+			    } 
+			}
+	        //update sa_reward_tran used row
+			if(isFoundReward){
+				SATranDAO.updateFlagUsed(conn,h,"Y");
+			}else{
+				SATranDAO.updateFlagUsed(conn,h,"N");
+			}
+			
+			//Search Again
+			String mode ="edit";
+			SADamageBean criPK = new SADamageBean();
+			criPK.setEmpId(h.getEmpId());
+			criPK.setType(h.getType());
+			criPK.setInvRefwal(h.getInvRefwal());
+			
+			SADamageBean bean = SADamageDAO.searchHead(conn,mode,criPK,true,"noDamage").getItems().get(0);
+			//Can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+				bean.setCanEdit(true);
+			}
+		    aForm.setBean(bean);
+		    aForm.setMode(mode);
+		    
+		    conn.commit();
+		    request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+		} catch (Exception e) {
+			conn.rollback();
+            e.printStackTrace();
+			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			try {
+				
+			} catch (Exception e2) {}
+			return mapping.findForward("noDamage");
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("noDamage");
+	}
+	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		SADamageForm aForm = (SADamageForm) form;
@@ -457,6 +758,31 @@ public class SADamageAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("detail");
+	}
+	
+	public ActionForward clearNoDamage(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clear");
+		SADamageForm aForm = (SADamageForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			aForm.setResults(new ArrayList<SADamageBean>());
+			
+			SADamageBean bean = new SADamageBean();
+			bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			bean.setType("BME");
+			//can Edit
+			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
+				bean.setCanEdit(true);
+			}
+			aForm.setBean(bean);
+			
+			aForm.setMode("add");
+		
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("noDamage");
 	}
 	
 	

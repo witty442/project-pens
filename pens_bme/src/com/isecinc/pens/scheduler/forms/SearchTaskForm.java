@@ -1,8 +1,9 @@
 package com.isecinc.pens.scheduler.forms;
 
-import org.apache.struts.action.ActionForm;
+import com.isecinc.core.web.I_Form;
 
-public class SearchTaskForm extends ActionForm{
+public class SearchTaskForm extends I_Form{
+
 	String programId;          
     String searchId;            
 	String searchTaskName;      
@@ -18,9 +19,7 @@ public class SearchTaskForm extends ActionForm{
 	String searchTimeToMinute; 
 	String searchReturnCode; 
 	String tranDateSchFrom;    
-	String tranDateSchTo;       
-	String entity;          
-	String product;         
+	String tranDateSchTo;               
 	String currentPage;
 	
 	
@@ -119,19 +118,6 @@ public class SearchTaskForm extends ActionForm{
 	}
 	public void setTranDateSchTo(String tranDateSchTo) {
 		this.tranDateSchTo = tranDateSchTo;
-	}
-	
-	public String getEntity() {
-		return entity;
-	}
-	public void setEntity(String entity) {
-		this.entity = entity;
-	}
-	public String getProduct() {
-		return product;
-	}
-	public void setProduct(String product) {
-		this.product = product;
 	}
 	public String getCurrentPage() {
 		return currentPage;

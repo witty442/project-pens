@@ -87,6 +87,7 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number_2.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -189,7 +190,7 @@ function chkQtyKeypress(obj,e,col,row){
 
 function validateQty(obj,col,row){
 	
-	var r = isNum(obj);
+	var r = isNumPositive(obj);
 	var onhandQty =$('#onhandQty_'+row).val();
 	if(r){
 		//validate Onhand Qty
@@ -231,19 +232,6 @@ function sumQtyInRow(row){
 	   }
      }         
     return sumQtyInRow;
-}
-
-function isNum(obj){
-  if(obj.value != ""){
-	var newNum = parseInt(obj.value);
-	if(isNaN(newNum)){
-		alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
-		obj.value = "";
-		obj.focus();
-		return false;
-	}else{return true;}
-   }
-  return true;
 }
 
 </script>

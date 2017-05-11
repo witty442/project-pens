@@ -1090,7 +1090,7 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 		User user = (User) request.getSession().getAttribute("user");
 		Connection conn = null;
 		StringBuffer h = new StringBuffer("");
-		int colSpan = 6;
+		int colSpan = 9;
 		try {
 	
 			String fileType = SystemElements.PDF;
@@ -1148,6 +1148,9 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 						h.append("<td>Barcode</td> \n");
 						h.append("<td>Qty ที่จะเบิก.</td> \n");
 						h.append("<td>Qty ที่เบิกได้จริง.</td> \n");
+						h.append("<td>Issue req</td> \n");
+						h.append("<td>ร้านค้า</td> \n");
+						h.append("<td>Sub Inv</td> \n");
 					h.append("</tr>");
 					for(int i=0 ;i<items.size();i++){
 						ReqPickStock item = items.get(i);
@@ -1158,6 +1161,9 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 							h.append("<td class='text'>"+item.getBarcode()+"</td> \n");
 							h.append("<td>"+item.getQty()+"</td> \n");
 							h.append("<td>"+Utils.isNull(item.getIssueQty())+"</td> \n");
+							h.append("<td class='text'>"+bean.getIssueReqNo()+"</td> \n");
+							h.append("<td class='text'>"+bean.getStoreCode()+"-"+bean.getStoreName()+"</td> \n");
+							h.append("<td class='text'>"+bean.getSubInv()+"</td> \n");
 					    h.append("</tr>");
 					}
 					

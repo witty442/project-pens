@@ -73,7 +73,7 @@ public class RecoveryScheduleAction {
 	    	List dataList = new ArrayList();
 	    	try{
 	    		StringBuffer sql =new StringBuffer("");
-	    		sql.append(" SELECT * FROM TCB_SCHEDULE_LOG \n");
+	    		sql.append(" SELECT * FROM MONITOR_SCHEDULE \n");
 	    	    sql.append(" WHERE  1=1  \n");
 	    	    sql.append(" AND TYPE IN('"+SchedulerConstant.SCHEDULE_TYPE_WEEKLY+"') \n");
 	    	   // sql.append(" AND UPDATE_DATE >= sysdate-1 \n");
@@ -81,7 +81,7 @@ public class RecoveryScheduleAction {
 	    	    
 	    	    ps = conn.prepareStatement(sql.toString());
 	    	    
-	    	    //sql = new StringBuffer("update TCB_SCHEDULE_LOG set STATUS ='"+SchedulerConstant.STATUS_CANCEL+"' where NO = ? ");
+	    	    //sql = new StringBuffer("update MONITOR_SCHEDULE set STATUS ='"+SchedulerConstant.STATUS_CANCEL+"' where NO = ? ");
 	    	    //psUpdate = conn.prepareStatement(sql.toString());
 	    	    
 	    	    rs = ps.executeQuery();

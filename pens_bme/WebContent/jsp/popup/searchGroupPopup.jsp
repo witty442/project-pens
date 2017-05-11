@@ -7,16 +7,33 @@
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-
 <html>
 <head>
 <title></title>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
 <style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -31,7 +48,7 @@
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
     String descs = Utils.isNull(session.getAttribute("descs"));
-    
+    String selectOne = Utils.isNull(request.getParameter("selectOne"));
     System.out.println("codes:"+codes);
 %>
 <script type="text/javascript">
@@ -42,6 +59,20 @@ function searchPopup(path, type) {
    return true;
 }
 
+function selectOneRadio(){
+	var chRadio = document.getElementsByName("chCheck");
+	var code = document.getElementsByName("code_temp");
+	var desc = document.getElementsByName("desc");
+
+	for(var i=0;i<chRadio.length;i++){
+        if(chRadio[i].checked){
+        	//alert(i+":"+code[i+1].value);
+            window.opener.setGroupMainValue(code[i].value, desc[i].value, desc[i].value  ,'');
+        	window.close();
+            break;
+        }
+	}
+}
 
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
@@ -215,29 +246,36 @@ window.onload = function(){
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
+<input type="hidden" name="selectOne" value="<%=selectOne %>"/>
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
-    <tr height="21px" class="txt1">
-		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูล กลุ่มสินค้า</b></td>
+<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
+    <tr height="21px">
+		<th width="15%" >&nbsp;</th>
+		<th width="90%" ><b>ค้นหาข้อมูล กลุ่มสินค้า</b></th>
 	</tr>
-	<tr height="21px" class="txt1">
+	<tr height="21px">
 		<td width="15%" ><b>รหัส</b>  </td>
-		<td width="90%" ><html:text property="code"  size="30" style="height:20px"/>
-		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
+			&nbsp;<input type="button" name="search"  class="newPosBtnLong" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td ><b>รายละเอียด</b></td>
-		<td ><html:text property="desc"  size="60" style="height:20px"/></td>
+		<td nowrap><b>รายละเอียด</b></td>
+		<td ><html:text property="descSearch"  size="30" style="height:20px"/>
+	
+		</td>
 	</tr>
 </table>
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
+		  <%if(selectOne.equals("selectOne")){ %>
+		    <input type="button" name="ok"  class="newPosBtnLong" value="OK" onclick="selectOneRadio()" style="width:80px;"/>
+		<%}else{ %>
+		   	<input type="button" name="ok"  class="newPosBtnLong" value="OK" onclick="selectMultiple()" style="width:80px;"/>
+		<%} %>
+			<input type="button" name="close"  class="newPosBtnLong" value="Close" onclick="javascript:window.close();" style="width:80px;"/>
 		</td>
 	</tr>
 </table>
@@ -246,13 +284,16 @@ window.onload = function(){
     defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     	
     <display:column  style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
-		<input type ="checkbox" name="chCheck" id="chCheck" onclick="saveSelectedInPage(${item.no})"  />
+        <%if(selectOne.equals("selectOne")){ %>
+           <input type ="radio" name="chCheck" id="chCheck"/>
+        <%}else{ %>
+		   <input type ="checkbox" name="chCheck" id="chCheck" onclick="saveSelectedInPage(${item.no})"  />
+		<%} %>
 		<input type ="hidden" name="code_temp" value="<bean:write name="item" property="code"/>" />
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="desc"/>" />
 	 </display:column>
     											    
-    <display:column title="รหัส" property="code"  sortable="false" class="code"/>
-    <display:column title="รายละเอียด" property="desc" sortable="false" class="desc"/>								
+    <display:column title="กลุ่มสินค้า" property="code"  sortable="false" class="code"/>							
 </display:table>	
 <!-- RESULT -->
 

@@ -123,10 +123,9 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n AND V.customer_id = C.customer_id ");
 					sql.append("\n AND M.cust_no = C.customer_code  ");
 					sql.append("\n AND P.inventory_item_code = MI.pens_item  ");
-					
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
 						 sql.append("\n AND V.invoice_date > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -157,6 +156,11 @@ public class ReportOnhandMTTDetailSQL {
 				sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n and H.cust_no = L.cust_no  ");
+				sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
+				
+				if( !Utils.isNull(initDateStr).equals("")){
+					 sql.append("\n AND H.COUNT_STK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 					sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
@@ -183,7 +187,7 @@ public class ReportOnhandMTTDetailSQL {
 				sql.append("\n AND L.status <> '"+PickConstants.STATUS_CANCEL+"'");
 					
 					if(initDate != null){
-						 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND L.sale_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -223,7 +227,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n  )MI ");
 						sql.append("\n WHERE MI.BARCODE = M.BARCODE  ");
 						if(initDate != null){
-							 sql.append("\n AND M.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.order_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -259,7 +263,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
 						
 						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -287,7 +291,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
 						
 						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -325,7 +329,7 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n AND I.STATUS IN( '"+PickConstants.STATUS_RETURN+"' )");
 					
 					if(initDate != null){
-						 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND J.close_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND J.close_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");

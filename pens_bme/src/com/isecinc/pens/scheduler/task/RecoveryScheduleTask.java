@@ -52,7 +52,7 @@ public class RecoveryScheduleTask implements org.quartz.Job{
 	  }
 	 
 	 /** After Finish Action Task  Check ActionTask is Success or Fail 
-	     *  For update status in TCB_SCHEDULE_LOG
+	     *  For update status in MONITOR_SCHEDULE
 	  */
 	 private void postExecute(Connection conn,ScheduleVO vo) {
 		 try{

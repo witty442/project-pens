@@ -53,6 +53,13 @@ public class NSDAO {
 				List<NSBean> items = new ArrayList<NSBean>();
 				int r = 1;
 				Date docDate=null;
+				int CUP_QTY =0;
+				int PAC_QTY  =0;
+				int POOH_QTY  =0;
+				   
+				int CUP_QTY_N  =0;
+				int PAC_QTY_N  =0;
+				int POOH_QTY_N  =0;
 				try {
 				    sql.append("\n select h.* " +
 				            "\n ,(select a.channel_name from pens_sales_channel a where a.channel_id = h.channel_id) as channel_name"+
@@ -132,6 +139,14 @@ public class NSDAO {
 					   h.setPacNQty(Utils.isNull(rst.getInt("PAC_QTY_N")));
 					   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
 						   
+					    CUP_QTY += rst.getInt("CUP_QTY");
+						PAC_QTY  += rst.getInt("PAC_QTY");
+						POOH_QTY  += rst.getInt("POOH_QTY");
+						   
+						CUP_QTY_N  += rst.getInt("CUP_QTY_N");
+						PAC_QTY_N  += rst.getInt("PAC_QTY_N");
+						POOH_QTY_N  += rst.getInt("POOH_QTY_N");
+						
 					   h.setStatus(Utils.isNull(rst.getString("Status")));
 					   h.setStatusDesc(NSConstant.getDesc(h.getStatus()));
 					   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -162,8 +177,18 @@ public class NSDAO {
 					   r++;
 					}//while
 					
+					NSBean summary = new NSBean();
+					summary.setCupQty(Utils.decimalFormat(CUP_QTY,Utils.format_current_no_disgit));
+					summary.setPacQty(Utils.decimalFormat(PAC_QTY,Utils.format_current_no_disgit));
+					summary.setPoohQty(Utils.decimalFormat(POOH_QTY,Utils.format_current_no_disgit));
+					   
+					summary.setCupNQty(Utils.decimalFormat(CUP_QTY_N,Utils.format_current_no_disgit));
+					summary.setPacNQty(Utils.decimalFormat(PAC_QTY_N,Utils.format_current_no_disgit));
+					summary.setPoohNQty(Utils.decimalFormat(POOH_QTY_N,Utils.format_current_no_disgit));
+					
 					//set Result 
 					o.setItems(items);
+					o.setSummary(summary);
 				} catch (Exception e) {
 					throw e;
 				} finally {

@@ -1170,4 +1170,45 @@ public class FTPManager {
 			}	
 		}
 		
+		public void uploadFileFromLocal(String ftpFilePath,String localFile) throws Exception{
+			
+			DataOutputStream dos = null;
+			sun.net.TelnetOutputStream tos = null;
+			FileInputStream fos = null;
+			sun.net.ftp.FtpClient ftp = null;
+			try{
+				ftp = new sun.net.ftp.FtpClient(server, 21);
+			    ftp.login(userFtp, passwordFtp);
+			    ftp.binary();
+			   // ftp.ascii();
+			    
+			    fos = new FileInputStream(localFile);
+			    tos = ftp.put(ftpFilePath);
+			    dos = new DataOutputStream(tos);
+			    
+			    byte[] buffer = new byte[2048 * 2048];
+			    for (int length; (length = fos.read(buffer)) > 0;) {
+			        dos.write(buffer, 0, length);
+			    }
+			    tos.flush();
+			    dos.flush();
+			    logger.info("upload success");
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}finally{
+				if(ftp != null){
+					ftp = null;
+				}
+				if(tos != null){
+					tos.close();
+				}
+				if(fos != null){
+					fos.close();
+				}
+				if(dos != null){
+					dos.close();
+				}
+			}
+	 }
+		
 }

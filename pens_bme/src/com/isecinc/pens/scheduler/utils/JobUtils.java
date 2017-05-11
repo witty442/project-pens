@@ -20,6 +20,15 @@ public class JobUtils {
 		}
 		return jobId;
 	}
+	public static String genRegenJobId(ScheduleVO param){
+		String jobId ="NO_JOB_ID";
+		try{
+			jobId = "REGENJOB_"+Utils.isNull(param.getProgramId())+"_"+Utils.isNull(param.getGroupId());
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return jobId;
+	}
 	
 	public static String genFileName(ScheduleVO param){
 		String fileName ="";

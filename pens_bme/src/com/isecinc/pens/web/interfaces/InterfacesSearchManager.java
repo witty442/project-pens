@@ -211,7 +211,7 @@ public class InterfacesSearchManager  {
 				} else {
 					request.setAttribute("Message", "Data not found");
 				}
-              }else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)){
+             }else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)){
 				
 				/** Set Condition Search **/
 				MonitorBean[] results = dao.findMonitorListNew(user,Constants.TYPE_IMPORT_SALEOUT_WACOAL);
@@ -228,7 +228,24 @@ public class InterfacesSearchManager  {
 				} else {
 					request.setAttribute("Message", "Data not found");
 				}
-             }
+				
+             }else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_POS)){
+ 				
+            	 /** Set Condition Search **/
+ 				MonitorBean[] results = dao.findMonitorListNew(user,Constants.TYPE_IMPORT_POS);
+ 				
+ 				if (results != null && results.length > 0) {
+ 					interfacesForm.setResults(results);
+ 					
+ 					//Search interfaceResult (monitorItem)
+					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
+					//logger.debug("")
+					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
+					
+ 				} else {
+ 					request.setAttribute("Message", "Data not found");
+ 				}
+              }
 			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

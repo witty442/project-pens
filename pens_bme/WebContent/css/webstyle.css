@@ -447,6 +447,10 @@ TABLE.result2 TD {
 	height: 90px;
 	margin-left:18px;
 }
+.hilight_text {
+	background-color: #909090;
+	height: 30px;
+}
 
 .footerNoAlign {
 	background-color: #bdd4f1;

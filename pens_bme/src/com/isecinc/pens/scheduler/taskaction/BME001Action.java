@@ -7,18 +7,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.html.HTMLHtmlElement;
 
 import util.ExcelHeader;
 
+import com.isecinc.pens.bean.ExportFileBean;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.dao.MTTBeanDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.FTPManagerWacoal;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
@@ -26,25 +28,77 @@ import com.isecinc.pens.scheduler.manager.SchedulerConstant;
 
 public class BME001Action {
 	protected static Logger logger = Logger.getLogger("PENS");
+	private static String PARAM_AS_OF_DATE ="AS_OF_DATE";
+	
+	private static String genFileName(Date asOfDate) {
+		try{
+			Calendar now = Calendar.getInstance();
+			now.setTime(asOfDate);
+			now.add(Calendar.DATE, -1);
+			
+		    return "saleout_"+Utils.stringValue(now.getTime(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".xls";
+		}catch(Exception e){}
+		return "";
+	}
+	
 	public  ScheduleVO  execute(Connection conn ,ScheduleVO param) {
 		EnvProperties env = EnvProperties.getInstance();
-		String ftpFilePath = env.getProperty("wacoal.path");//wait
-		String localFile = param.getLocalPath()+"/"+"temp.xls";
+		String fileName = "";
+		String ftpFilePath = env.getProperty("path.export.wacoal.saleout");//wait
+		String localTempFile = param.getLocalPath()+"/"+"temp.xls";
+		String fileSize = "";
+		Date asOfDate = null;
 		try{
-			//Get Data To Html Excel
-            StringBuffer htmlTable = genExportReport();
-            
-            logger.debug("localFile:"+localFile);
-			//write file to local
-            FileUtil.writeFile(localFile, htmlTable.toString());
-           // FTPManagerWacoal ftpManager = new FTPManagerWacoal(env.getProperty("ftp.wacoal.ip.server"), env.getProperty("ftp.wacoal.username"), env.getProperty("ftp.wacoal.password"));
-            
-          //  ftpManager.uploadFileFromLocal(ftpFilePath, localFile);
-            
-			/** Set NoOfRecord and SizeOfFile */
-			param.setNoOfRecord("0");
-			param.setSizeOfFile("0");
+			//Get Param 
+			Map<String, String> paramMap = param.getParamMap();
+			if(paramMap != null && paramMap.get(PARAM_AS_OF_DATE) != null){
+			    asOfDate = Utils.parse(paramMap.get(PARAM_AS_OF_DATE),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    
+			    logger.debug("Param asOfDate:"+asOfDate);
+			}else{
+				asOfDate = new Date();//CurrentDate;
+			}
 			
+			fileName = genFileName(asOfDate);
+			
+			//Get Data To Html Excel
+			ExportFileBean exportFileBean = genDataExport(asOfDate);
+            StringBuffer dataExport = exportFileBean.getDataExport();
+            
+            logger.debug("localTempFile:"+localTempFile);
+            param.setNoOfRecord("0");
+			param.setSizeOfFile("0");
+			param.setSourcePath("PENS");
+			param.setDestPath(ftpFilePath);
+			param.setFileName(fileName);//
+			
+            if(dataExport != null && exportFileBean.getTotalRecord() >0){
+				//write file to local
+	            FileUtil.writeFile(localTempFile, dataExport,"UTF-8");
+	            
+	            FTPManagerWacoal ftpManagerWacoal = new FTPManagerWacoal(env.getProperty("ftp.wacoal.ip.server"), env.getProperty("ftp.wacoal.username"), env.getProperty("ftp.wacoal.password"));
+	            //upload file from local by subftp to Wacoal Ftp Server
+	            logger.debug("Upload file to Wacoal Ftp Server");
+	            logger.debug("local file:"+localTempFile);
+	            logger.debug("Wacoal ftp file:"+ftpFilePath+fileName);
+	            ftpManagerWacoal.uploadFileFromLocal(ftpFilePath+fileName, localTempFile);
+	           
+	            //Upload backup from local to Pens Ftp server
+	            FTPManager ftpManagerPens = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+	        	String ftpFilePathPens = env.getProperty("path.export.wacoal.pens.saleout_backup");//wait
+	        	logger.debug("Upload file to Pens Ftp Server");
+	        	logger.debug("local file:"+localTempFile);
+		        logger.debug("Pens ftp file:"+ftpFilePathPens+fileName);
+	            ftpManagerPens.uploadFileFromLocal(ftpFilePathPens+fileName, localTempFile);
+	            
+	            /** Set NoOfRecord and SizeOfFile */
+				param.setNoOfRecord(exportFileBean.getTotalRecord()+"");
+				fileSize = FileUtil.getFileSize(dataExport.toString());
+				logger.debug("fileSize:"+fileSize);
+				
+				param.setSizeOfFile(fileSize);
+            }
+        
 			//set status Complete
 			param.setStatus(SchedulerConstant.STATUS_COMPLETE);
 		}catch(Exception e){
@@ -53,83 +107,92 @@ public class BME001Action {
 		}
 		return param;
 	}
+	
 	public String appendCsv(String str){
 		return Utils.isNull(str).replaceAll("\n","")+",";
 	}
 	
-	private StringBuffer genExportReport(){
+	private ExportFileBean genDataExport(Date asOfDate){
 		StringBuffer h = new StringBuffer("");
-		String a= "@";
 		String colSpan = "15";
 		MTTBean bean = new MTTBean();
+		ExportFileBean exportFileBean = new ExportFileBean();
+		String date = "";
+		int totalRecord = 0;
 		try{
-			//Now -1
+			//asOfDate -1
 			Calendar now = Calendar.getInstance();
+			now.setTime(asOfDate);
 			now.add(Calendar.DATE, -1);
 			
-			h.append(ExcelHeader.EXCEL_HEADER);
+			date = Utils.stringValue(now.getTime(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
-			//Header
-			h.append("<table border='1'> \n");
-			
-			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลขาย Sale-Out</td> \n");
-			h.append("</tr> \n");
-			
-		/*	h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getBean().getSaleDateFrom()+"  ถึงวันที่ขาย:"+form.getBean().getSaleDateTo()+"</td> \n");
-			h.append("</tr> \n");*/
-
-			h.append("</table> \n");
-        	
 			bean = getDataList(bean,now.getTime(),now.getTime());
 			
 			if(bean.getItems() != null){
-			    List<MTTBean> list = (List<MTTBean>)bean.getItems();
+				h.append(ExcelHeader.EXCEL_HEADER);
+				
+				//Header
 				h.append("<table border='1'> \n");
+				
 				h.append("<tr> \n");
-				  h.append("<td>No.</td> \n");
-				  h.append("<td>SaleDate</td> \n");
-				  h.append("<td>วันที่ Scan</td> \n");
-				  h.append("<td>DocNo</td> \n");
-				  h.append("<td>กลุ่ม</td> \n");
-				  h.append("<td>รหัสกลุ่ม</td> \n");
-				  h.append("<td>รหัสร้านค้า</td> \n");
-				  h.append("<td>ชื่อร้านค้า</td> \n");
-				  h.append("<td>Barcode</td> \n");
-				  h.append("<td>GroupCode</td> \n");
-				  h.append("<td>Material Master </td> \n");
-				  h.append("<td>Pens Item </td> \n");
-				  h.append("<td>จำนวนชิ้นที่ขาย</td> \n");
-				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
-				  h.append("<td>Remark</td> \n");
+				h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลขาย Sale-Out</td> \n");
 				h.append("</tr> \n");
-				for(int i=0;i<list.size();i++){
-					MTTBean s = (MTTBean)list.get(i);
-					h.append("<tr> \n");
-					  h.append("<td>"+s.getNo()+"</td> \n");
-					  h.append("<td>"+s.getSaleDate()+"</td> \n");
-					  h.append("<td>"+s.getCreateDate()+"</td> \n");
-					  h.append("<td>"+s.getDocNo()+"</td> \n");
-					  h.append("<td>"+s.getCustGroup()+"</td> \n");
-					  h.append("<td>"+s.getCustGroupName()+"</td> \n");
-					  h.append("<td>"+s.getStoreCode()+"</td> \n");
-					  h.append("<td>"+s.getStoreName()+"</td> \n");
-					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
-					  h.append("<td>"+s.getGroupCode()+"</td> \n");
-					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
-					  h.append("<td>"+s.getPensItem()+"</td> \n");
-					  h.append("<td class='num'>"+s.getQty()+"</td> \n");
-					  h.append("<td class='num'>"+s.getRetailPriceBF()+"</td> \n");
-					  h.append("<td>"+s.getRemark()+"</td> \n");
-					h.append("</tr>");
-				}
+				
+				h.append("<tr> \n");
+				h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+date+"  ถึงวันที่ขาย:"+date+"</td> \n");
+				h.append("</tr> \n");
+	
 				h.append("</table> \n");
+				    List<MTTBean> list = (List<MTTBean>)bean.getItems();
+					h.append("<table border='1'> \n");
+					h.append("<tr> \n");
+					  h.append("<td>No.</td> \n");
+					  h.append("<td>SaleDate</td> \n");
+					  h.append("<td>วันที่ Scan</td> \n");
+					  h.append("<td>DocNo</td> \n");
+					  h.append("<td>กลุ่ม</td> \n");
+					  h.append("<td>รหัสกลุ่ม</td> \n");
+					  h.append("<td>รหัสร้านค้า</td> \n");
+					  h.append("<td>ชื่อร้านค้า</td> \n");
+					  h.append("<td>Barcode</td> \n");
+					  h.append("<td>GroupCode</td> \n");
+					  h.append("<td>Material Master </td> \n");
+					  h.append("<td>Pens Item </td> \n");
+					  h.append("<td>จำนวนชิ้นที่ขาย</td> \n");
+					  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
+					  h.append("<td>Remark</td> \n");
+					h.append("</tr> \n");
+					for(int i=0;i<list.size();i++){
+						MTTBean s = (MTTBean)list.get(i);
+						h.append("<tr> \n");
+						  h.append("<td>"+s.getNo()+"</td> \n");
+						  h.append("<td>"+s.getSaleDate()+"</td> \n");
+						  h.append("<td>"+s.getCreateDate()+"</td> \n");
+						  h.append("<td>"+s.getDocNo()+"</td> \n");
+						  h.append("<td>"+s.getCustGroup()+"</td> \n");
+						  h.append("<td>"+s.getCustGroupName()+"</td> \n");
+						  h.append("<td>"+s.getStoreCode()+"</td> \n");
+						  h.append("<td>"+s.getStoreName()+"</td> \n");
+						  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+						  h.append("<td>"+s.getGroupCode()+"</td> \n");
+						  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+						  h.append("<td>"+s.getPensItem()+"</td> \n");
+						  h.append("<td class='num'>"+s.getQty()+"</td> \n");
+						  h.append("<td class='num'>"+s.getRetailPriceBF()+"</td> \n");
+						  h.append("<td>"+s.getRemark()+"</td> \n");
+						h.append("</tr>");
+						
+						totalRecord++;
+					}
+					h.append("</table> \n");
 			}
+			exportFileBean.setDataExport(h);
+			exportFileBean.setTotalRecord(totalRecord);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
-		return h;
+		return exportFileBean;
 	}
 	
 	public static MTTBean getDataList(MTTBean o,Date createDateFrom ,Date createDateTo ) throws Exception {

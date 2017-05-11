@@ -1,7 +1,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.scheduler.utils.CronExpressionUtil"%>
 <%@page import="com.isecinc.pens.scheduler.manager.SchedulerConstant"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -12,7 +11,6 @@
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%-- <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" /> --%>
 <%
 
 %>
@@ -23,7 +21,7 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -48,11 +46,11 @@ function loadMe(){
 }	
 
 function searchForm(path){
-   document.searchTaskForm.action = path + "/searchTask.do?do=search";
+   document.searchTaskForm.action = path + "/jsp/searchTask.do?do=search";
    document.searchTaskForm.submit();
 }
 function clearForm(path){
-   document.searchTaskForm.action = path + "/searchTask.do?do=prepare&action=new";
+   document.searchTaskForm.action = path + "/jsp/searchTask.do?do=prepare&action=new";
    document.searchTaskForm.submit();
 }
 </script>
@@ -71,7 +69,7 @@ function clearForm(path){
 	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 				<tr>
 			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
+			        	<jsp:include page="../menu_q.jsp"/>
 			       	</td>
 				</tr>
 	    	</table>
@@ -93,7 +91,7 @@ function clearForm(path){
 		            <td bgcolor="#f8f8f8">
 		            
 						<!-- BODY -->
-						<html:form action="/searchTask">
+						<html:form action="/jsp/searchTask">
 						<jsp:include page="../error.jsp"/>
 						
                          <!-- hidden field -->
@@ -104,7 +102,7 @@ function clearForm(path){
           
 								<table width="100%" border="0" cellspacing="1" cellpadding="2">
 									<tr>
-										<td  colspan="2" align="center"><b>Schedule Detail</b></td>
+										<td  colspan="2" align="center"><b>Search Task Schedule</b></td>
 									</tr>
 									<tr align="center">
 										<td align="right" width="45%">Select Job&nbsp;&nbsp; </td>
@@ -115,7 +113,7 @@ function clearForm(path){
 										</td>
 									</tr>
 									<tr align="center">
-										<td align="right" width="45%">Search Id </td>
+										<td align="right" width="45%">No </td>
 										<td align="left" width="55%"> 
 										  <html:text property="searchId"></html:text>
 										  Task Name
@@ -155,7 +153,7 @@ function clearForm(path){
 								</table>
 	                    <hr>
 				    <!-- Pageing -->
-					   <jsp:include page="subScheduleResults.jsp" />
+					   <jsp:include page="subScheduleDetail.jsp" />
 				 	<!-- Pageing -->   
 					
 					</html:form>

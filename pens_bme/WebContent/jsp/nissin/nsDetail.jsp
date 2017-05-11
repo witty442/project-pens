@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.NSBean"%>
 <%@page import="com.isecinc.pens.dao.NSDAO"%>
 <%@page import="com.isecinc.pens.dao.RTDAO"%>
@@ -30,6 +31,7 @@
 
 <%
 User user = (User) request.getSession().getAttribute("user");
+String role = user.getRole().getKey();
 
 NSBean bean = ((NSForm)session.getAttribute("nsForm")).getBean();
 System.out.println("Bean:"+bean.getChannelId());
@@ -40,9 +42,9 @@ System.out.println("Bean:"+bean.getChannelId());
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -217,12 +219,16 @@ function loadProvince(){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0">
 						       <tr>
                                     <td  align="center" colspan="2">
-                                    <c:if test="${nsForm.bean.mode == 'add'}">
-                                        <b>เพิ่มรายการใหม่</b>
-                                     </c:if>
-                                     <c:if test="${nsForm.bean.mode == 'edit'}">
-                                         <b>แก้ไขรายการ  </b>
-                                     </c:if>
+                                       <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
+		                                    <c:if test="${nsForm.bean.mode == 'add'}">
+		                                        <b>Add New</b>
+		                                     </c:if>
+		                                     <c:if test="${nsForm.bean.mode == 'edit'}">
+		                                         <b>Edit </b>
+		                                     </c:if>
+		                               <%}else{ %>
+		                                                                                                                            
+		                               <%} %>
 									</td>
 								</tr>
 							<tr>
@@ -234,51 +240,51 @@ function loadProvince(){
 									</td>
 								</tr>
 						     <tr>
-                                    <td align="right"> วันที่บันทึก
+                                    <td align="right"> Date
                                       
                                     </td>
 									<td align="left"><html:text property="bean.orderDate" styleClass="disableText" readonly="true" styleId="orderDate"/>
 									
-									    ประเภท <font color="red">*</font>
+									    Type <font color="red">*</font>
 										 <html:select property="bean.customerType" styleId="customerType" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
 										    <html:option value="Mini">Mini</html:option>
 											<html:option value="Shop">Shop</html:option>
 										   </html:select>
-								    ภาค <font color="red">*</font>
+								    Region <font color="red">*</font>
 										  <html:select property="bean.channelId" styleId="channelId" onchange="loadProvince();">
 											<html:options collection="channelList" property="code" labelProperty="desc"/>
 									    </html:select>
 									    
-									    จังหวัด  <font color="red">*</font>
+									    Province <font color="red">*</font>
 									      <html:select property="bean.provinceId" styleId="provinceId" >
 									    </html:select> 
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> ชื่อร้านค้า <font color="red">*</font>
+                                    <td  align="right"> Customer Name<font color="red">*</font>
 									</td>
 									<td align="left">
 									    <html:text property="bean.customerName" styleClass="" styleId="customerName"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td align="right"> ที่อยู่ Line1 
+                                    <td align="right"> Address Line1 
 									</td>
 									<td align="left">
 									  <html:text property="bean.addressLine1" styleClass="" styleId="addressLine1"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> ที่อยู่ Line2  
+                                    <td  align="right"> Address Line2  
 									</td>
 									<td align="left">
 									  <html:text property="bean.addressLine2" styleClass="" styleId="addressLine2"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
-                                    <td  align="right"> เบอร์โทรศัพท์ <font color="red">*</font>
+                                    <td  align="right"> Phone Number<font color="red">*</font>
 									</td>
 									<td align="left">
 									  <html:text property="bean.phone" styleClass="" styleId="phone" size="20"></html:text>
@@ -298,16 +304,18 @@ function loadProvince(){
 									<td align="left">
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<c:if test="${nsForm.bean.canSave == true}">
-											<a href="javascript:save('${pageContext.request.contextPath}')">
-											  <input type="button" value="    บันทึก   " class="newPosBtnLong"> 
-											</a>
-										</c:if>
+									    <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
+											<c:if test="${nsForm.bean.canSave == true}">
+												<a href="javascript:save('${pageContext.request.contextPath}')">
+												  <input type="button" value="    Save   " class="newPosBtnLong"> 
+												</a>
+											</c:if>
+										<%} %>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>
 										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
-										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
+										  <input type="button" value="   Close   " class="newPosBtnLong">
 										</a>		
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

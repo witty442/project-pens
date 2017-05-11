@@ -54,6 +54,7 @@ public class SummaryAction extends I_Action {
 				 request.getSession().setAttribute("summary",null);
 				 request.getSession().setAttribute("resultsTrans", null);
 				 request.getSession().setAttribute("summaryTrans",null);
+				 request.getSession().setAttribute("HeadSummary",null);
 				 
 				 summaryForm.setEndDate("");
 				 summaryForm.setEndSaleDate("");
@@ -132,17 +133,51 @@ public class SummaryAction extends I_Action {
 			logger.debug("currentPage:"+request.getParameter(queryStr));
 			if(request.getParameter(queryStr) != null){
 				
-				ImportDAO importDAO = new ImportDAO();
+				/*ImportDAO importDAO = new ImportDAO();
 				Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 				if(m != null){
 				  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-				}
+				}*/
 				
-				if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-				  // summaryForm.getOnhandSummary().setEndDate(GenerateEndDateLotus.getEndDateStock(summaryForm.getOnhandSummary().getPensCustCodeFrom()));
-				}
+				/*logger.debug("summaryForm.getOnhandSummary() :"+summaryForm.getOnhandSummary());
+				logger.debug("summaryForm.getTransactionSummary() :"+summaryForm.getTransactionSummary());
+				logger.debug("summaryForm.getDiffStockSummary() :"+summaryForm.getDiffStockSummary());
+				logger.debug("summaryForm.getPhysicalSummary() :"+summaryForm.getPhysicalSummary());*/
 				
+				Object HeadSummaryObj = (Object)request.getSession(true).getAttribute("HeadSummary");
+				
+				
+				// Store Value Case Click page 
+				if(HeadSummaryObj instanceof OnhandSummary){
+					OnhandSummary HeadSummary = (OnhandSummary)HeadSummaryObj;
+					
+					/*logger.debug("HeadSummary.getPensCustNameFrom():"+HeadSummary.getPensCustNameFrom());
+					logger.debug("HeadSummary.getInitDate():"+HeadSummary.getInitDate());
+					logger.debug("HeadSummary.getCustNo():"+HeadSummary.getCustNo());*/
+					
+					summaryForm.getOnhandSummary().setPensCustNameFrom(HeadSummary.getPensCustNameFrom());
+					summaryForm.getOnhandSummary().setInitDate(HeadSummary.getInitDate());
+					summaryForm.getOnhandSummary().setCustNo(HeadSummary.getCustNo());
+					
+				}else if(HeadSummaryObj instanceof TransactionSummary){
+				
+					TransactionSummary HeadSummary = (TransactionSummary)HeadSummaryObj;
+					logger.debug("getTransactionSummary.getPensCustNameFrom():"+HeadSummary.getPensCustNameFrom());
+					summaryForm.getTransactionSummary().setPensCustNameFrom(HeadSummary.getPensCustNameFrom());
+					
+				}else if(HeadSummaryObj instanceof DiffStockSummary){
+					DiffStockSummary HeadSummary = (DiffStockSummary)HeadSummaryObj;
+					logger.debug("getDiffStockSummary.getPensCustNameFrom():"+HeadSummary.getPensCustNameFrom());
+					summaryForm.getDiffStockSummary().setPensCustNameFrom(HeadSummary.getPensCustNameFrom());
+					
+				}else if(HeadSummaryObj instanceof PhysicalSummary){
+					
+					PhysicalSummary HeadSummary = (PhysicalSummary)HeadSummaryObj;
+					logger.debug("getPhysicalSummary.getPensCustNameFrom():"+HeadSummary.getPensCustNameFrom());
+					summaryForm.getPhysicalSummary().setPensCustNameFrom(HeadSummary.getPensCustNameFrom());
+				}
 			}else{
+				
 				if("onhand".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					List<OnhandSummary> results = new SummaryDAO().search(summaryForm.getOnhandSummary(),user);
 					if (results != null  && results.size() >0) {
@@ -227,15 +262,13 @@ public class SummaryAction extends I_Action {
 					
 					if (results != null  && results.size() >0) {
 						summaryForm.setResults(results);
-						
-						//OnhandSummary cc = (OnhandSummary)results.get(0);
-						
+
 						//logger.debug("results:"+summaryForm.getOnhandSummaryLotusResults());
 						ImportDAO importDAO = new ImportDAO();
 						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 						if(m != null)
 						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-						
+					
 					} else {
 						summaryForm.setResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
@@ -257,6 +290,7 @@ public class SummaryAction extends I_Action {
 					}
 					
 				}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					request.getSession().setAttribute("summary" ,null);
 					//Validate Initial Date
 					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					Date initDate = new SummaryDAO().searchInitDateMTT(summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -264,6 +298,7 @@ public class SummaryAction extends I_Action {
 					logger.debug("initDate:"+initDate);
 					logger.debug("asOfDate:"+asOfDate);
 					summaryForm.setPage("onhandMTT");
+				
 					boolean pass = true;
 					if(initDate !=null){
 						if(asOfDate.before(initDate)){
@@ -274,16 +309,20 @@ public class SummaryAction extends I_Action {
 					}
 					if(pass){
 						List<OnhandSummary> results = null;
-						results = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user,summaryForm.getSummaryType());
-						
+						OnhandSummary r = new SummaryDAO().searchOnhandMTT(summaryForm.getOnhandSummary(),initDate,user,summaryForm.getSummaryType());
+						results = r.getItemsList();
 						if (results != null  && results.size() >0) {
 							summaryForm.setResults(results);
+							request.getSession().setAttribute("summary" ,r.getSummary());
+							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							
 							ImportDAO importDAO = new ImportDAO();
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
-							if(m != null)
+							if(m != null){
 							  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-							
+							  summaryForm.getOnhandSummary().setCustNo(m.getInterfaceValue());
+							}
+                          
 						} else {
 							summaryForm.setResults(null);
 							request.setAttribute("Message", "ไม่พบข่อมูล");
@@ -311,6 +350,7 @@ public class SummaryAction extends I_Action {
 						
 						if (results != null  && results.size() >0) {
 							summaryForm.setOnhandSummaryMTTDetailResults(results);
+							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							
 							ImportDAO importDAO = new ImportDAO();
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -383,6 +423,10 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResultsTrans(results);
 						//logger.debug("results:"+summaryForm.getLotusSummaryResults());
 						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getTransactionSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getTransactionSummary().setPensCustNameFrom(m.getPensDesc());
 					} else {
 						summaryForm.setResultsTrans(null);
 						request.getSession().setAttribute("summaryTrans", null);
@@ -401,6 +445,10 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResultsTrans(results);
 						//logger.debug("results:"+summaryForm.getBigcSummaryResults());
 						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getTransactionSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getTransactionSummary().setPensCustNameFrom(m.getPensDesc());
 					} else {
 						summaryForm.setResultsTrans(null);
 						request.getSession().setAttribute("summaryTrans", null);
@@ -418,6 +466,10 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResultsTrans(results);
 						//logger.debug("results:"+summaryForm.getTopsSummaryResults());
 						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getTransactionSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getTransactionSummary().setPensCustNameFrom(m.getPensDesc());
 					} else {
 						summaryForm.setResultsTrans(null);
 						request.getSession().setAttribute("summaryTrans",null);
@@ -433,14 +485,18 @@ public class SummaryAction extends I_Action {
 					if (results != null  && results.size() >0) {
 						summaryForm.setResultsTrans(results);
 						request.getSession().setAttribute("summaryTrans", re.getSummary());
-						//logger.debug("results:"+summaryForm.getTopsSummaryResults());
 						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getTransactionSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getTransactionSummary().setPensCustNameFrom(m.getPensDesc());
+						
+						logger.debug("custname:"+summaryForm.getTransactionSummary().getPensCustNameFrom());
 					} else {
 						summaryForm.setResultsTrans(null);
 						request.getSession().setAttribute("summaryTrans",null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}	
-					summaryForm.getTransactionSummary().setPensCustNameFrom(GeneralDAO.getStoreName(summaryForm.getTransactionSummary().getPensCustCodeFrom()));
 					
 				}else if("diff_stock".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					List<DiffStockSummary> results = new SummaryDAO().searchDiffStock(summaryForm.getDiffStockSummary(),user);
@@ -529,7 +585,7 @@ public class SummaryAction extends I_Action {
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 							if(m != null)
 							  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-							
+						
 						} else {
 							summaryForm.setResults(null);
 							request.setAttribute("Message", "ไม่พบข่อมูล");
@@ -564,13 +620,42 @@ public class SummaryAction extends I_Action {
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
 							if(m != null)
 							  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-							
+														
 						} else {
 							summaryForm.setResults(null);
 							request.setAttribute("Message", "ไม่พบข่อมูล");
 						}
 					}
+				}//if
+				
+				// set param on screen
+				if( !Utils.isNull(summaryForm.getOnhandSummary().getPensCustNameFrom()).equals("") ){
+					logger.debug("set OnhandSummary");
+				    OnhandSummary HeadSummary = new OnhandSummary();
+	                HeadSummary.setInitDate(summaryForm.getOnhandSummary().getInitDate());
+	                HeadSummary.setCustNo(summaryForm.getOnhandSummary().getCustNo());
+	                HeadSummary.setPensCustNameFrom(summaryForm.getOnhandSummary().getPensCustNameFrom());
+				    request.getSession(true).setAttribute("HeadSummary",HeadSummary);
+				    
+				}else if( !Utils.isNull(summaryForm.getTransactionSummary().getPensCustNameFrom()).equals("") ){
+					logger.debug("set TransactionSummary");
+					 TransactionSummary HeadSummary = new TransactionSummary();
+		             HeadSummary.setPensCustNameFrom(summaryForm.getTransactionSummary().getPensCustNameFrom());
+					 request.getSession(true).setAttribute("HeadSummary",HeadSummary);
+					 
+				}else if( !Utils.isNull(summaryForm.getDiffStockSummary().getPensCustNameFrom()).equals("") ){
+					logger.debug("set DiffStockSummary");
+					 DiffStockSummary HeadSummary = new DiffStockSummary();
+		             HeadSummary.setPensCustNameFrom(summaryForm.getDiffStockSummary().getPensCustNameFrom());
+					 request.getSession(true).setAttribute("HeadSummary",HeadSummary);
+					 
+				}else if( !Utils.isNull(summaryForm.getPhysicalSummary().getPensCustNameFrom()).equals("") ){
+					logger.debug("set PhysicalSummary");
+					 PhysicalSummary HeadSummary = new PhysicalSummary();
+		             HeadSummary.setPensCustNameFrom(summaryForm.getPhysicalSummary().getPensCustNameFrom());
+					 request.getSession(true).setAttribute("HeadSummary",HeadSummary);
 				}
+				
 			}//Case Click Link	
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

@@ -11,6 +11,7 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.inf.helper.EnvQuartzProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 
@@ -60,77 +61,91 @@ public class AdminConsoleAction extends I_Action {
 				String configInfoTest ="";
 				
 				EnvProperties env = EnvProperties.getInstance();
+				EnvQuartzProperties envQ = EnvQuartzProperties.getInstance();
 
 				String url = env.getProperty("db.url");
 				String username = env.getProperty("db.username");
 				String password = env.getProperty("db.password");
 				
-		
+				configInfo += " ----------------------  Database PENS Config ----------------------------------------------------------------------- \n";
+				configInfo +="DB PENS IP : "+url+"\n";
+				//configInfo +="DB PENS User : "+username+"\n";
+				//configInfo +="DB PENS Password : "+password+"\n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
-				configInfo += " ----------------------  Database Config ----------------------------------------------------------------------- \n";
-				configInfo +="DB IP : "+url+"\n";
-				configInfo +="DB User : "+username+"\n";
-				configInfo +="DB Password : "+password+"\n";
-				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  Database Quartz Config --------------------------------------------------------------------- \n";
+				configInfo +="Quartz Product Type : "+envQ.getProperty("product.type")+"\n";
+				configInfo +="DB Quartz URL : "+envQ.getProperty("org.quartz.dataSource.myDS.URL")+"\n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
-				configInfo += " ----------------------  FTP Server(PENS) Config ---------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  FTP Server(PENS) Config -------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
-				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
-				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
+				//configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
+				//configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
 				configInfo +="HOST DD: "+env.getProperty("host.dd.server")+"\n";
 				
-				configInfo += " ----------------------  FTP Server(ICC) Config ---------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  FTP Server(ICC) Config --------------------------------------------------------------------- \n";
 				configInfo +="FTP ICC IP : "+env.getProperty("ftp.icc.ip.server")+"\n";
-				configInfo +="FTP ICC User : "+env.getProperty("ftp.icc.username")+"\n";
-				configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password")+"\n";
-				
+				//configInfo +="FTP ICC User : "+env.getProperty("ftp.icc.username")+"\n";
+				//configInfo +="FTP ICC Password: "+env.getProperty("ftp.icc.password")+"\n";
+				configInfo +=" \n";
 				configInfo +="path.icc.hisher.export.master.txt(twstock) : "+env.getProperty("path.icc.hisher.export.master.txt")+"\n";
 				configInfo +="path.icc.hisher.export.txt(twstock) : "+env.getProperty("path.icc.hisher.export.txt")+"\n";
 				configInfo +="path.icc.hisher.import.dlyr(dlyr) : "+env.getProperty("path.icc.hisher.import.dlyr")+"\n";
 				configInfo +="path.icc.hisher.export.iccbill(aosvat) : "+env.getProperty("path.icc.hisher.export.iccbill")+"\n";
-				
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
-				configInfo += " ----------------------  Host PayInReport Server @Pens ---------------------------------------------------------------------- \n";
+				configInfo += " ----------------------  FTP Server(Wacoal) Config ------------------------------------------------------------------- \n";
+				configInfo +="FTP WACOAL IP : "+env.getProperty("ftp.wacoal.ip.server")+"\n";
+				//configInfo +="FTP WACOAL User : "+env.getProperty("ftp.wacoal.username")+"\n";
+				//configInfo +="FTP WACOAL Password: "+env.getProperty("ftp.wacoal.password")+"\n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
+				configInfo += " ----------------------  Host PayInReport(Red Paper) Server @Pens --------------------------------------------------- \n";
 				configInfo +="IP PayInReport : "+env.getProperty("host.payinreport")+"\n";
-				//configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 				
-				
-				
+
 			    configInfoTest = " ";
 			   if("tab_config_info".equalsIgnoreCase(action)){
-					configInfoTest += " ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
+					configInfoTest += " ----------------------  Result Test DB PENS Connection ----------------------------------------------------- \n";
 						 try {   
 							 configInfoTest += " \n "+ test.TestALL.testDBCon();
 							 
-							
 						  } catch(Exception e) {
 							  configInfoTest += " \n error:>> "+e.getMessage();
 						  }
-						 
-						 
-					configInfoTest += " ----------------------  Result Test FTP(PENS) Connection ------------------------------------------------------------- \n";
+
+					configInfoTest += " ----------------------  Result Test FTP(PENS) Connection --------------------------------------------------- \n";
 						try {   
 							 configInfoTest += " \n "+ test.TestALL.testFTPPensCon();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }
 						
-				   configInfoTest += "----------------------  Result Test FTP(ICC) Connection ------------------------------------------------------------- \n";
+				    configInfoTest += "----------------------  Result Test FTP(ICC) Connection ------------------------------------------------------- \n";
 						try {   
 							 configInfoTest += " \n "+ test.TestALL.testFTPICCCon();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }
-				   configInfoTest += "----------------------  Result Test DataSource Connection ------------------------------------------------------------- \n";
+						
+				    configInfoTest += "----------------------  Result Test FTP(WACOAL) Connection ----------------------------------------------------- \n";
+					   try {   
+						   configInfoTest += " \n "+ test.TestALL.testFTPWacoalCon();
+					    } catch(Exception e) {
+						   configInfoTest += " \n error :>> "+e.getMessage();
+					   }
+					
+				  /* configInfoTest += "----------------------  Result Test DataSource Connection ------------------------------------------------------------- \n";
 					 
 						try {   
-							 configInfoTest += " \n "+  test.TestALL.testDataSource();
+							 //configInfoTest += " \n "+  test.TestALL.testDataSource();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
-						  }
+						  }*/
 			   }		
 			   
 			   logger.debug(configInfo);

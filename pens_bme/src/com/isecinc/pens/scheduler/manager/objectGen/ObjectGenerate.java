@@ -28,7 +28,7 @@ public class ObjectGenerate {
         try{
 	      
 	        con = DBConnection.getInstance().getConnection();
-	        ps = con.prepareStatement("select max(no) as max_id from tcb_schedule_log "); 
+	        ps = con.prepareStatement("select max(no) as max_id from MONITOR_SCHEDULE "); 
 	        rs = ps.executeQuery();
 			if(rs.next()){
 				BigDecimal bb = rs.getBigDecimal("max_id")==null?new BigDecimal("0"):rs.getBigDecimal("max_id");

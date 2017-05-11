@@ -55,8 +55,17 @@ public class NSBean implements Serializable{
 	private String orderType;
 	
 	private List<NSBean> items;
-
+    private NSBean summary;
 	
+    
+	public NSBean getSummary() {
+		return summary;
+	}
+
+	public void setSummary(NSBean summary) {
+		this.summary = summary;
+	}
+
 	public String getChannelName() {
 		return channelName;
 	}

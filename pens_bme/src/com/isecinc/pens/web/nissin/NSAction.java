@@ -43,7 +43,7 @@ import com.isecinc.pens.process.SequenceProcess;
  */
 public class NSAction extends I_Action {
 
-	public static int pageSize = 90;
+	public static int pageSize = 50;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	public static String STATUS_SAVE ="SV";
 	
@@ -81,16 +81,19 @@ public class NSAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			String page = Utils.isNull(request.getParameter("page"));
-			NSBean b = aForm.getBean();
-			aForm.setBean(NSDAO.searchHead(aForm.getBean(),false,page));
-			
-			aForm.setResultsSearch(aForm.getBean().getItems());
-
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
-			}
+		    String action = Utils.isNull(request.getParameter("action"));
+		    if( "newsearch".equalsIgnoreCase(action)){
+				String page = Utils.isNull(request.getParameter("page"));
+				
+				aForm.setBean(NSDAO.searchHead(aForm.getBean(),false,page));
+				
+				aForm.setResultsSearch(aForm.getBean().getItems());
+	
+				if(aForm.getResultsSearch().size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+		    }
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -511,25 +514,25 @@ public class NSAction extends I_Action {
 			  h.append("<tr> \n");
 				    h.append("<th>ID</th>\n");
 					h.append("<th>Status</th>\n");
-					h.append("<th>วันที่บันทึก</th>\n");
-					h.append("<th>ประเภท</th>\n");
-					h.append("<th>รหัสร้านค้า</th>\n");
-					h.append("<th>ชื่อร้านค้า</th>\n");
-					h.append("<th>ภาค</th>\n");
-					h.append("<th>จังหวัด</th>\n");
-					h.append("<th>ที่อยู่ Line1</th>\n");
-					h.append("<th>ที่อยู่ Line2</th>\n");
-					h.append("<th>เบอร์โทรศัพท์</th>\n");
+					h.append("<th>Date</th>\n");
+					h.append("<th>Type</th>\n");
+					h.append("<th>Customer Code</th>\n");
+					h.append("<th>Customer Name</th>\n");
+					h.append("<th>Region</th>\n");
+					h.append("<th>Province</th>\n");
+					h.append("<th>Address Line1</th>\n");
+					h.append("<th>Address Line2</th>\n");
+					h.append("<th>Phone Number</th>\n");
 					h.append("<th>Invoice No</th>\n");
 					h.append("<th>Invoice Date</th>\n");
-					h.append("<th>รหัส Sale</th>\n");
+					h.append("<th>Sale Code</th>\n");
 					
-					h.append("<th>Cup72 (หีบ)</th>\n");
-					h.append("<th>Cup72 (ถ้วย)</th>\n");
-					h.append("<th>ซอง (หีบ)</th>\n");
-					h.append("<th>ซอง  (ซอง)</th>\n");
-					h.append("<th>Pooh72 (หีบ)</th>\n");
-					h.append("<th>Pooh72 (ถ้วย)</th>\n");
+					h.append("<th>Cup72 (CTN)</th>\n");
+					h.append("<th>Cup72 (CUP)</th>\n");
+					h.append("<th>BAG (CTN)</th>\n");
+					h.append("<th>BAG (BAG)</th>\n");
+					h.append("<th>Pooh72 (CTN)</th>\n");
+					h.append("<th>Pooh72 (CUP)</th>\n");
 					
 					h.append("<th>Remark1</th>\n");
 					h.append("<th>Pending reason</th>\n");

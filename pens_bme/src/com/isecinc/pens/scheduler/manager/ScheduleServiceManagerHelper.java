@@ -38,7 +38,7 @@ public class ScheduleServiceManagerHelper {
 	    	try{
 	    		debug(param);
 	    		StringBuffer sql = new StringBuffer("");
-	    		sql.append(" INSERT INTO SCHEDULE_LOG (\n");
+	    		sql.append(" INSERT INTO MONITOR_SCHEDULE (\n");
 	    		sql.append(" NO, PROGRAM_ID, GROUP_ID, \n"); //1-3
 	    		sql.append(" STATUS,  TYPE, \n"); //4-5
 	    		sql.append(" PROGRAM_NAME, CREATE_DATE, CREAT_USER, \n");//6-8
@@ -85,7 +85,7 @@ public class ScheduleServiceManagerHelper {
 	    	try{
 	    		debug(param);
 	    		StringBuffer sql = new StringBuffer("");
-	    		sql.append(" DELETE FROM SCHEDULE_LOG WHERE NO =? \n");
+	    		sql.append(" DELETE FROM MONITOR_SCHEDULE WHERE NO =? \n");
 	    		ps = conn.prepareStatement(sql.toString());
 	    		ps.setBigDecimal(index++, param.getNo());
 
@@ -109,7 +109,7 @@ public class ScheduleServiceManagerHelper {
 	    	try{
 	    		debug(param);
 	    		StringBuffer sql =new StringBuffer("");
-	    		sql.append(" UPDATE SCHEDULE_LOG  \n");
+	    		sql.append(" UPDATE MONITOR_SCHEDULE  \n");
 	    		sql.append(" SET STATUS = ? , \n");
 	    		sql.append(" UPDATE_DATE = ?, UPDATE_USER = ? ,  \n");
 	    		sql.append(" TYPE = ?  \n");
@@ -164,19 +164,20 @@ public class ScheduleServiceManagerHelper {
 	    		}
 	    		
 	    		StringBuffer sql =new StringBuffer("");
-	    		sql.append(" UPDATE SCHEDULE_LOG  \n");
+	    		sql.append(" UPDATE MONITOR_SCHEDULE  \n");
 	    		sql.append(" SET STATUS = ? , \n");
 	    		sql.append(" UPDATE_DATE = ?, UPDATE_USER =?,   \n");
-	    		sql.append(" SIZE_OF_FILE = ? ,NO_OF_RECORD =? ,FOLDER_NAME =?, \n");
-	    		sql.append(" BATCH_DATE = ? ,LAST_RUN_DATE =? ,NEXT_RUN_DATE =?  \n");
+	    		sql.append(" SIZE_OF_FILE = ? ,NO_OF_RECORD =? ,FILE_NAME =?, \n");
+	    		sql.append(" BATCH_DATE = ? ,LAST_RUN_DATE =? ,NEXT_RUN_DATE =? ,  \n");
+	    		sql.append(" SOURCE_PATH = ? ,DEST_PATH =? ,Message = ?  \n");
 	    		sql.append(" WHERE NO =?  \n");
 	    		ps = conn.prepareStatement(sql.toString());
 	    		ps.setString(index++, param.getStatus());//status
 	    		ps.setTimestamp(index++, new Timestamp(System.currentTimeMillis()));//updateDate
 	    		ps.setString(index++, param.getUserId()); //userId
-	    		ps.setBigDecimal(index++, new BigDecimal(Utils.isNullDefaultZero(param.getSizeOfFile()))); //sizeOfFile
+	    		ps.setString(index++, param.getSizeOfFile()); //sizeOfFile
 	    		ps.setBigDecimal(index++, new BigDecimal(Utils.isNullDefaultZero(param.getNoOfRecord()))); //noOfRecord
-	    		ps.setString(index++, param.getFolderName()); //folderName
+	    		ps.setString(index++, param.getFileName()); //folderName
 	    		ps.setTimestamp(index++, new Timestamp(System.currentTimeMillis())); //batchDate as CurrentDate
 	    		if(param.getLastRunDate() != null){
 	    		   ps.setTimestamp(index++, new Timestamp(param.getLastRunDate().getTime()));//lastRunDate
@@ -188,6 +189,10 @@ public class ScheduleServiceManagerHelper {
 	    		}else{
 	    		  ps.setTimestamp(index++, null);//nextRunDate
 	    		}
+	    		ps.setString(index++, Utils.isNull(param.getSourcePath())); //folderName
+	    		ps.setString(index++, Utils.isNull(param.getDestPath())); //
+	    		ps.setString(index++, Utils.isNull(param.getMessage())); //
+	    		
 	    		ps.setBigDecimal(index++,param.getNo()); //no
 	    		ps.execute();
 	    		
@@ -207,7 +212,7 @@ public class ScheduleServiceManagerHelper {
 		 ScheduleVO vo = null;
 		 logger.debug("**Start findLastRunDateByProgramId**");
     	 try{
-            StringBuffer sql = new StringBuffer(" select no,update_date from schedule_log where program_id = ? \n");
+            StringBuffer sql = new StringBuffer(" select no,update_date from MONITOR_SCHEDULE where program_id = ? \n");
             sql.append("and type not in('"+SchedulerConstant.SCHEDULE_TYPE_NOW+"','"+SchedulerConstant.SCHEDULE_TYPE_ONCE+"')");
             
             ps = conn.prepareStatement(sql.toString()); 
@@ -236,7 +241,7 @@ public class ScheduleServiceManagerHelper {
 		 ScheduleVO vo = null;
 		 logger.debug("**Start findLastRunDateByProgramId**");
     	 try{
-            StringBuffer sql = new StringBuffer(" select no,type,job_id,program_id,group_id from schedule_log where no = ? \n");
+            StringBuffer sql = new StringBuffer(" select no,type,job_id,program_id,group_id from MONITOR_SCHEDULE where no = ? \n");
             ps = conn.prepareStatement(sql.toString()); 
             ps.setBigDecimal(1,param.getNo());
             rs2 = ps.executeQuery();

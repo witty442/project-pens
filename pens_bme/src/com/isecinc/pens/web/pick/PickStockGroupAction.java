@@ -18,6 +18,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.ExcelHeader;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PickStock;
@@ -727,6 +729,7 @@ public class PickStockGroupAction extends I_Action {
 		try{
 			//Header
 			String title = "ใบเบิกเลขที่ :"+p.getIssueReqNo();
+			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			h.append("<table border='1'> \n");
 				h.append("<tr> \n");
@@ -747,6 +750,9 @@ public class PickStockGroupAction extends I_Action {
 					 h.append("<td><b>Group Code</b></td> \n");
 					 h.append("<td><b>Pens Item </b></td> \n");
 					 h.append("<td><b>QTY ที่เบิก </b></td> \n");
+					 h.append("<td>Issue req</td> \n");
+					 h.append("<td>ร้านค้า</td> \n");
+					 h.append("<td>Sun Inv</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<dataList.size();i++){
@@ -759,6 +765,9 @@ public class PickStockGroupAction extends I_Action {
 				   h.append("<td>"+s.getGroupCode()+"&nbsp;</td> \n");
 				   h.append("<td>"+s.getPensItem()+"</td> \n");
 				   h.append("<td>"+s.getQty()+"</td> \n");
+				   h.append("<td class='text'>"+p.getIssueReqNo()+"</td> \n");
+				   h.append("<td class='text'>"+p.getStoreCode()+"-"+p.getStoreName()+"</td> \n");
+				   h.append("<td class='text'>"+p.getSubInv()+"</td> \n");
 				   h.append("</tr>");
 				}//for 
 				
@@ -826,7 +835,6 @@ public class PickStockGroupAction extends I_Action {
 		}
 		return h;
 	}
-	
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

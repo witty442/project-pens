@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.SAReportBean"%>
 <%@page import="com.isecinc.pens.dao.SAEmpDAO"%>
 <%@page import="java.util.Calendar"%>
@@ -31,9 +32,9 @@ String pageN = Utils.isNull(request.getParameter("page"));
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -60,9 +61,9 @@ span.pagelinks {
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
@@ -75,6 +76,8 @@ function loadMe(){
 		 new Epoch('epoch_popup', 'th', document.getElementById('payDateTo'));
 		 new Epoch('epoch_popup', 'th', document.getElementById('countStockDateFrom'));
 		 new Epoch('epoch_popup', 'th', document.getElementById('countStockDateTo'));
+		 new Epoch('epoch_popup', 'th', document.getElementById('invoiceDateFrom'));
+		 new Epoch('epoch_popup', 'th', document.getElementById('invoiceDateTo'));
 	 <%}%>
 }
 function clearForm(path){
@@ -129,9 +132,7 @@ function exportToExcelAll(path){
 	return true;
 }
 
-
 /********** Gen Head Excel**********************/
-	 
 function genHeadTable(){
 	  var colspan = 10;
 	  var form = document.saReportForm;
@@ -141,7 +142,11 @@ function genHeadTable(){
 	  var  headerTable ="";
 	  //headerTable ="\n <table border='2px'>";
 	  headerTable +="\n <tr>";
-	  headerTable +="\n   <td colspan="+colspan+"> <b>รายงานการจ่ายค่าเฝ้าตู้และการหักค่าความเสียหาย ( "+form.summaryType.value+" )</b></td>";
+	  if(form.summaryType.value =="Detail2"){
+	     headerTable +="\n   <td colspan="+colspan+"> <b>รายงานการจ่ายค่าเฝ้าตู้และการหักค่าความเสียหาย ( Detail-แสดงหักเงินเดือน )</b></td>";
+	  }else{
+		  headerTable +="\n   <td colspan="+colspan+"> <b>รายงานการจ่ายค่าเฝ้าตู้และการหักค่าความเสียหาย ( "+form.summaryType.value+" )</b></td>";  
+	  }
 	  headerTable +="\n </tr>";
 	  if(form.type.value != '' || form.groupStore.value != ''){
 		  headerTable +="\n <tr>";
@@ -160,10 +165,14 @@ function genHeadTable(){
 	  }
 	  if(form.countStockDateFrom.value != '' || form.countStockDateFrom.value != ''){
 		  headerTable +="\n <tr>";
-		  headerTable +="\n   <td colspan="+colspan+">"+(form.countStockDateFrom.value!=''?"จากวันที่ตรวจนับ : "+form.countStockDateFrom.value:"")+"  "+(form.countStockDateFrom.value!=''?" ถึงวันที่ตรวจนับ : "+form.countStockDateFrom.value:"")+"</td>";
+		  headerTable +="\n   <td colspan="+colspan+">"+(form.countStockDateFrom.value!=''?"จากวันที่ตรวจนับ : "+form.countStockDateFrom.value:"")+"  "+(form.countStockDateTo.value!=''?" ถึงวันที่ตรวจนับ : "+form.countStockDateTo.value:"")+"</td>";
 		  headerTable +="\n </tr>";
 	  }
-	 
+	  if(form.invoiceDateFrom.value != '' || form.invoiceDateFrom.value != ''){
+		  headerTable +="\n <tr>";
+		  headerTable +="\n   <td colspan="+colspan+">"+(form.invoiceDateFrom.value!=''?"จากวันที่ Invoice : "+form.invoiceDateFrom.value:"")+"  "+(form.invoiceDateTo.value!=''?" ถึงวันที่ Invoice : "+form.invoiceDateTo.value:"")+"</td>";
+		  headerTable +="\n </tr>";
+	  }
 	  var currentdate = new Date(); 
 	  var datetime = "" + currentdate.getDate() + "/"
 	                  + (currentdate.getMonth()+1)  + "/" 
@@ -429,10 +438,21 @@ function exportToExcelByJavascript(){
 										</td>
 									</tr>
 									<tr>
+				                        <td> จากวันที่ Invoice <font color="red"></font></td>
+										<td>		
+											 <html:text property="bean.invoiceDateFrom" styleId="invoiceDateFrom" readonly="true" size="20"/>
+										</td>
+									   <td> ถึงวันที่ Invoice</td>
+										<td>		
+					                       <html:text property="bean.invoiceDateTo" styleId="invoiceDateTo" readonly="true" size="20"/>
+										</td>
+									</tr>
+									<tr>
 				                        <td> เลือกแสดงแบบ <font color="red">*</font></td>
 										<td>		
 											 <html:select property="bean.summaryType" styleId="summaryType">
 												<html:option value="Detail">Detail</html:option>
+												<html:option value="Detail2">Detail-แสดงหักเงินเดือน</html:option>
 												<html:option value="Summary">Summary</html:option>
 										    </html:select>
 										</td>
@@ -498,7 +518,7 @@ function exportToExcelByJavascript(){
 					<!-- hidden field -->
 					<input type="hidden" name="page" value="<%=pageN %>"/>
 					<a id="dlink" style="display:none;"></a>
-                    <div id="name">filename</div>
+                   <!--  <div id="name">filename</div> -->
 
 					</html:form>
 					<!-- BODY -->

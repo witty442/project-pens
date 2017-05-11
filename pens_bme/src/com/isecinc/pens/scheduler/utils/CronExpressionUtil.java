@@ -163,13 +163,12 @@ public class CronExpressionUtil {
 	 * @return String - Cron Expression
 	 * @throws CronExpressionException
 	 */
-	public static String nthDayOfMonthToCronExpr(int nthDay, String[] months,
-			Date startDate) throws CronExpressionException {
+	public static String nthDayOfMonthToCronExpr(int nthDay,Date startDate) throws CronExpressionException {
 		try {
 			StringBuffer cronExpr = new StringBuffer();
 			StringBuffer cronMonth = new StringBuffer();
 			logger.debug("nthDay : " + nthDay);
-			logger.debug("months : " + months);
+			//logger.debug("months : " + months);
 			logger.debug("startDate : " + startDate);
 			logger.debug("startDate : "
 					+ DateUtil.stringValue(startDate, "dd/MM/yyyy HH:mm"));
@@ -179,17 +178,19 @@ public class CronExpressionUtil {
 						"Nth day out of range between 1 and 31");
 			}
 
-			if (cronMonth == null) {
+			/*if (cronMonth == null) {
 				throw new CronExpressionException("Month is empty");
-			}
+			}*/
 
-			for (int i = 0; i < months.length; i++) {
+			/*for (int i = 0; i < months.length; i++) {
 				logger.debug("months[" + i + "]: " + (String) months[i]);
 				cronMonth.append((String) months[i]);
 				if (i < months.length - 1) {
 					cronMonth.append(",");
 				}
-			}
+			}*/
+			
+			cronMonth.append("1/1");//run every 1 Month
 
 			int startHour = Integer.parseInt(DateUtil.stringValue(startDate,
 					"HH"));

@@ -39,6 +39,7 @@ public class Constants {
 	public static final String TYPE_IMPORT_WACOAL_STOCK = "IMPORT_WACOAL_STOCK";
 	public static final String TYPE_IMPORT_WACOAL_SALESIN_RETURN = "IMPORT_WACOAL_SALESIN_RETURN";
 	public static final String TYPE_IMPORT_SALEOUT_WACOAL = "IMPORT_SALEOUT_WACOAL";
+	public static final String TYPE_IMPORT_POS = "IMPORT_POS";
 	
 	public static final String TYPE_SALES = "SALES";
 	public static final String TYPE_CENTER = "CENTER";

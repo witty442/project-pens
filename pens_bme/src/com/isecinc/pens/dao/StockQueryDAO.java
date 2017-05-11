@@ -298,6 +298,7 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n group by l.material_master ,l.group_code,l.pens_item,l.barcode");
 				sql.append("\n )A ");
+				sql.append("\n WHERE A.qty > 0 ");
 				sql.append("\n group by A.material_master ,A.group_code,A.pens_item,A.barcode,A.status ");
 				sql.append("\n order by A.group_code,A.pens_item, A.material_master ,A.barcode asc ");
 					
@@ -533,6 +534,7 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n and l.warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
 				sql.append("\n group by l.group_code,l.pens_item");
 				sql.append("\n )A ");
+				sql.append("\n WHERE A.qty > 0 ");
 				sql.append("\n group by A.group_code,A.pens_item,A.status ");
 				sql.append("\n order by A.group_code,A.pens_item asc ");
 					

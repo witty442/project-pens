@@ -16,6 +16,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.SessionIdUtils;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.scheduler.utils.DateUtil;
@@ -60,6 +61,9 @@ public class LoginAction extends DispatchAction {
 		String forwordStr = "pass_user";
 		try {
 			logger.debug("Locale:"+Locale.getDefault());
+			
+			//remove session id
+			SessionIdUtils.clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
@@ -130,6 +134,9 @@ public class LoginAction extends DispatchAction {
 		try {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
 			
+			//remove session id
+			SessionIdUtils.clearInstance();
+			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
 			String pathRedirect = Utils.isNull(request.getParameter("pathRedirect"));
@@ -197,6 +204,8 @@ public class LoginAction extends DispatchAction {
 		String forwordStr = "pass_user";
 		try {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
+			//remove session id
+			SessionIdUtils.clearInstance();
 			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
@@ -267,9 +276,12 @@ public class LoginAction extends DispatchAction {
 			logger.debug("logoff");
 			//Manage Path
 			if(request.getSession().getAttribute("user") != null){
-			  User user = (User)request.getSession().getAttribute("user") ;
-			  ManagePath.savePath(user, "logoff");
+			 // User user = (User)request.getSession().getAttribute("user") ;
+			 // ManagePath.savePath(user, "logoff");
 			}
+			
+			//remove session id
+			SessionIdUtils.clearInstance();
 			
 			request.getSession().invalidate();
 		} catch (Exception e) {

@@ -36,7 +36,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward prepare(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Prepare " + this.getClass());
+		//logger.debug("Prepare " + this.getClass());
 		String forward = "prepare";
 		try {
 			if (request.getParameter("id") != null) {

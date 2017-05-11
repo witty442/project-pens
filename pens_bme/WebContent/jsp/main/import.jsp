@@ -583,9 +583,7 @@ function getCustName(custCode,fieldName,storeType){
 
 						<!-- RESULT -->
 						<br/>
-						<!--  ALL OLD IMPORT -->
-						 <jsp:include page="subimports/importAllSub.jsp" />
-						 
+						
 						<!-- Page Display Result -->
 						 <c:if test="${importForm.page == 'LoadStockInitLotus'}">
 						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
@@ -602,6 +600,20 @@ function getCustName(custCode,fieldName,storeType){
 						 <c:if test="${importForm.page == 'reconcile'}">
 						   <jsp:include page="subimports/reconcileSub.jsp" />  
 						 </c:if> 
+						 
+						
+						<c:choose>
+					    <c:when test="${importForm.page == 'king'}">
+					       <jsp:include page="subimports/importKingTranSub.jsp" /> 
+					    </c:when>
+					    <c:when test="${importForm.page == 'wait'}">
+					       
+					    </c:when>
+					    <c:otherwise>
+					        <!--  ALL OLD IMPORT -->
+					        <jsp:include page="subimports/importAllSub.jsp" />
+					    </c:otherwise>
+					</c:choose>
 						
 						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr>

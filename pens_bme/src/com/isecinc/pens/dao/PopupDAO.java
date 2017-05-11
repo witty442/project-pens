@@ -79,8 +79,9 @@ public class PopupDAO {
 					sql.append(" and M.emp_id = '"+c.getCodeSearch()+"' ");
 				}
 				if( !Utils.isNull(c.getDescSearch()).equals("")){
-					sql.append(" and M.name LIKE '%"+c.getCodeSearch()+"%' ");
+					sql.append(" and M.name LIKE '%"+c.getDescSearch()+"%' ");
 				}
+				
 				sql.append("\n  ORDER BY emp_id asc ");
 				
 				logger.debug("sql:"+sql);
@@ -97,6 +98,48 @@ public class PopupDAO {
 					item.setSurname(rst.getString("surname"));
 					item.setBranch(rst.getString("branch"));
 					item.setGroupStore(Utils.isNull(rst.getString("group_store")));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchSACheckStockDate(String empId,String type) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n  SELECT distinct count_stock_date from SA_REWARD_TRAN M");
+				sql.append("\n where 1=1  ");
+				sql.append("\n and M.emp_id = '"+empId+"' ");
+				sql.append("\n and M.type = '"+type+"' ");
+				sql.append("\n and (damage_use_flag is null or damage_use_flag ='')  ");
+				sql.append("\n and M.count_stock_date is not null");
+				sql.append("\n ORDER BY count_stock_date asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCheckStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					pos.add(item);
 					
 				}//while

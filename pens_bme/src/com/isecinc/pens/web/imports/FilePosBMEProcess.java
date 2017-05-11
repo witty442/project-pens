@@ -113,18 +113,23 @@ public class FilePosBMEProcess {
 						
 						/** Check Row is null **/
 						try{
-						Cell cellCheck = row.getCell((short) 0);
-						Object cellCheckValue = xslUtils.getCellValue(0, cellCheck);
-						logger.debug("cellCheckValue["+cellCheckValue+"]");
-						
-						String rowCheck =  cellCheckValue.toString();
-						logger.debug("rowCheck["+rowCheck+"]");
-						
-						
-						if(cellCheckValue == null || rowCheck.equals("")){
-							break;
-						}
+							//logger.debug("row["+i+"]object["+row+"]");
+							Cell cellCheck = row.getCell((short)9);
+							//logger.debug("cell:"+cell.getStringCellValue());
+							Object cellCheckValue = xslUtils.getCellValue((short)9, cellCheck);
+							logger.debug("col[8]cellCheckValue["+cellCheckValue+"]");
+							
+							String rowCheck =  "";
+							if(cellCheckValue != null)
+								rowCheck =cellCheckValue.toString();
+							
+							logger.debug("rowCheck["+rowCheck+"]");
+							
+							if(cellCheckValue == null || rowCheck.equals("")){
+								break;
+							}
 						}catch(Exception e){
+							logger.debug("Error :Row["+i+"] Break");
 							break;
 						}
 						//initial
@@ -263,7 +268,7 @@ public class FilePosBMEProcess {
 						 //logger.debug("specialpriceDB:"+specialpriceDB);
 						 retailPrice = Utils.decimalFormat(specialpriceDB,Utils.format_current_2_disgit);
 					 }else{
-						 ddText ="D"+Discount_Percent;
+						 ddText ="D"+Utils.decimalFormat(Discount_Percent,Utils.format_current_no_disgit); ;
 						 retailPriceDB = rst.getDouble("Retail_Price_BF");
 						 retailPrice = Utils.decimalFormat(retailPriceDB,Utils.format_current_2_disgit); 
 					 }
@@ -278,7 +283,7 @@ public class FilePosBMEProcess {
 				  h.append("<td class='text'>ชิ้น</td> \n");//7
 				  h.append("<td class='text'>V</td> \n");//8
 				  h.append("<td class='text'>7</td> \n");//9
-				  h.append("<td class='text'>"+Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+"</td> \n");//10
+				  h.append("<td class='text'>"+Utils.decimalFormat(rst.getDouble("Pens_Price_BF"),Utils.format_current_2_disgit)+"</td> \n");//10
 				  
 				  h.append("<td class='text'>"+retailPrice+"</td> \n");//11
 				  h.append("<td class='text'>"+ddText+"</td> \n");//12

@@ -288,9 +288,13 @@ public class SummaryForm extends I_Form {
 	@Override
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		// reset properties
-		getOnhandSummary().setDispZeroStock("");
-		getOnhandSummary().setDispHaveQty("");
-		getDiffStockSummary().setHaveQty("");
+		if(getOnhandSummary() != null){
+		   getOnhandSummary().setDispZeroStock("");
+		  getOnhandSummary().setDispHaveQty("");
+		}
+		if(getDiffStockSummary() != null){
+		  getDiffStockSummary().setHaveQty("");
+		}
 	}
     
 }

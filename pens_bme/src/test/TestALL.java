@@ -111,6 +111,41 @@ public class TestALL {
 	 return output;
   }
  
+ public static String testFTPWacoalCon() {
+	 String output = "";
+	 EnvProperties env =EnvProperties.getInstance();
+	 boolean can = true;
+	 String errorMsg = "";
+	 try{
+		 String ip = env.getProperty("ftp.wacoal.ip.server");
+		 String user = env.getProperty("ftp.wacoal.username");
+		 String pwd = env.getProperty("ftp.wacoal.password");
+		 
+		 FTPManager ftpManager = new FTPManager(ip,user, pwd );
+		 try{
+		   ftpManager.canConnectFTPServer();
+		 }catch(Exception ee){
+			 can = false;
+			 errorMsg = ee.getMessage();
+		 }
+		 output +="FTP(WACOAL) SERVER IP : "+ftpManager.server+"\n";
+		 output +="FTP(WACOAL) SERVER User : "+user+"\n";
+		 output +="FTP(WACOAL) SERVER Password : "+pwd.toCharArray()+"\n";
+		 
+		 if(can==false){
+		    output +="FTP(WACOAL) SERVER Result Connection:"+errorMsg+"\n"; 
+		 }else{
+		    output +="FTP(WACOAL) SERVER Result Connection: Success \n";
+		 }
+	 }catch(Exception e){
+		 e.printStackTrace();
+		 
+	 }finally{
+		
+	 }
+	 return output;
+  }
+ 
  public static String testDataSource(){
 	 try{
 	    javax.naming.Context initContext = new javax.naming.InitialContext();

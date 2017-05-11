@@ -12,10 +12,26 @@
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
 <style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
-</style>
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+</style>>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>

@@ -12,7 +12,7 @@ public class ExcelHeader {
 		EXCEL_HEADER.append(" } \n");
 		
 		EXCEL_HEADER.append(" .num_currency{ \n");
-		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\; \n");
+		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0; \n");
 		EXCEL_HEADER.append(" } \n");
 		
 		EXCEL_HEADER.append(" .num_bold { \n");
@@ -21,12 +21,7 @@ public class ExcelHeader {
 		EXCEL_HEADER.append(" } \n");
 		
 		EXCEL_HEADER.append(" .num_currency_bold{ \n");
-		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\; \n");
-		EXCEL_HEADER.append("   font-weight: bold; \n");
-		EXCEL_HEADER.append(" } \n");
-		
-		EXCEL_HEADER.append(" .currency_bold{ \n");
-		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\; \n");
+		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0; \n");
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
 		

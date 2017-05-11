@@ -313,7 +313,12 @@ public class SATranDAO {
 					}else{
 						item.setCountStockDate("");
 					}
-					item.setUsed(Utils.isNull(rst.getString("DAMAGE_USE_FLAG")).equals("")?false:true);
+					//item.setUsed(Utils.isNull(rst.getString("DAMAGE_USE_FLAG")).equals("")?false:true);
+					if(Utils.isNull(rst.getString("DAMAGE_USE_FLAG")).equals("") || Utils.isNull(rst.getString("DAMAGE_USE_FLAG")).equals("N")){
+						item.setUsed(false);
+					}else{
+						item.setUsed(true);
+					}
 					
 					YEARMMDB_MAP.put(Utils.isNull(rst.getString("year_month")), item);
 				}//while

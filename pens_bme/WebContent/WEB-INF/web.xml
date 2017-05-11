@@ -26,68 +26,57 @@
     <url-pattern>/jsp/*</url-pattern>
   </filter-mapping>
   
-  <!-- Quartz -->
-	<!--  <context-param>
-         <param-name>quartz:config-file</param-name>
-         <param-value>quartz.properties</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:shutdown-on-unload</param-name>
-         <param-value>true</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:wait-on-shutdown</param-name>
-         <param-value>false</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:start-scheduler-on-load</param-name>
-         <param-value>true</param-value>
-     </context-param>
-     
-     <listener>
-         <listener-class>
-             org.quartz.ee.servlet.QuartzInitializerListener
-         </listener-class>
-     </listener>
-     <servlet>
-		  <servlet-name>QuartzInitializer</servlet-name>
-		  <servlet-class>org.quartz.ee.servlet.QuartzInitializerServlet</servlet-class>
-		  <init-param>
-		    <param-name>shutdown-on-unload</param-name>
-		    <param-value>true</param-value>
-		  </init-param>
-		  <load-on-startup>2</load-on-startup>
-	 </servlet>  -->
-    <!-- Quartz -->
-     
-    <!-- Servlet -->
-       <!-- run First Time Only Running Script DB  -->
-	<!-- <servlet>
-		<display-name>Running Script DB</display-name>
-		<servlet-name>RunningScriptDB</servlet-name>
-		<servlet-class>com.isecinc.pens.web.RunScriptDBServlet</servlet-class>
-		<load-on-startup>0</load-on-startup>
-	</servlet> -->
-	<servlet>
-		<display-name>Web Initial</display-name>
-		<servlet-name>WebInitial</servlet-name>
-		<servlet-class>com.isecinc.pens.web.WebInitialServlet</servlet-class>
-		<init-param>
-			<param-name>parameterfile</param-name>
-			<param-value>/WEB-INF/parameter.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	
-	<servlet>
-      <servlet-name>PrintPayInReport</servlet-name>
-      <servlet-class>com.isecinc.pens.web.PrintPayInServlet</servlet-class>
-    </servlet>
-	<servlet-mapping>
-       <servlet-name>PrintPayInReport</servlet-name>
-       <url-pattern>/printPayInReport</url-pattern>
-    </servlet-mapping>
-
+  <!--  Quarzt -->
+  <!-- <context-param>
+    <param-name>quartz:config-file</param-name>
+    <param-value>quartz.properties</param-value>
+  </context-param>
+  <context-param>
+    <param-name>quartz:shutdown-on-unload</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>quartz:wait-on-shutdown</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  <context-param>
+    <param-name>quartz:start-scheduler-on-load</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <listener>
+    <listener-class>
+       org.quartz.ee.servlet.QuartzInitializerListener
+    </listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>QuartzInitializer</servlet-name>
+    <servlet-class>org.quartz.ee.servlet.QuartzInitializerServlet</servlet-class>
+    <init-param>
+      <param-name>shutdown-on-unload</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>  -->
+   <!--  Quarzt -->
+   
+  <servlet>
+    <display-name>Web Initial</display-name>
+    <servlet-name>WebInitial</servlet-name>
+    <servlet-class>com.isecinc.pens.web.WebInitialServlet</servlet-class>
+    <init-param>
+      <param-name>parameterfile</param-name>
+      <param-value>/WEB-INF/parameter.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>PrintPayInReport</servlet-name>
+    <servlet-class>com.isecinc.pens.web.PrintPayInServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PrintPayInReport</servlet-name>
+    <url-pattern>/printPayInReport</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
@@ -97,12 +86,10 @@
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
-  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
   </servlet-mapping>
-  
   <session-config>
     <session-timeout>30</session-timeout>
   </session-config>
@@ -110,10 +97,9 @@
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
   <jsp-config>
-     <taglib>
+    <taglib>
       <taglib-uri>http://displaytag.sourceforge.net/</taglib-uri>
       <taglib-location>/WEB-INF/displaytag-11.tld</taglib-location>
     </taglib>
-    
   </jsp-config>
 </web-app>

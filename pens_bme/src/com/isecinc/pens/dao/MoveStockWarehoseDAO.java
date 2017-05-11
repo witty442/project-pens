@@ -22,6 +22,7 @@ import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.web.popup.PopupForm;
 
 public class MoveStockWarehoseDAO extends PickConstants{
 	
@@ -111,7 +112,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY - ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
-			sql.append(" WHERE  material_Master = ?  and warehouse=? \n" );
+			sql.append(" WHERE  material_Master = ?  and warehouse=? and pens_item = ?\n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -120,6 +121,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			ps.setString(3, o.getUpdateUser());
 			ps.setString(4, o.getMaterialMaster());
 			ps.setString(5, o.getWarehouseFrom());
+			ps.setString(6, o.getPensItem());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -150,7 +152,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY + ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
-			sql.append(" WHERE  material_Master = ?  and warehouse=? \n" );
+			sql.append(" WHERE  material_Master = ?  and warehouse=? and pens_item  =?\n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -159,6 +161,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			ps.setString(3, o.getUpdateUser());
 			ps.setString(4, o.getMaterialMaster());
 			ps.setString(5, o.getWarehouseTo());
+			ps.setString(6, o.getPensItem());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -198,13 +201,14 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("  '"+o.getUpdateUser()+"' as CREATE_USER, \n");
 			sql.append("  '"+o.getWarehouseTo()+"' as WAREHOUSE \n");
 			sql.append("  FROM  PENSBME_STOCK_FINISHED \n");
-			sql.append("WHERE  material_Master = ?  and warehouse=? \n" );
+			sql.append("WHERE  material_Master = ?  and warehouse=? and pens_item = ? \n" );
 
 			logger.debug("sql:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 
 			ps.setString(index++, o.getMaterialMaster());
 			ps.setString(index++, o.getWarehouseFrom());
+			ps.setString(index++, o.getPensItem());
 			
 			r = ps.executeUpdate();
 			return r;
@@ -217,6 +221,59 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		}
 	}
 	
+	public static List<PopupForm>  getPensItemListStockFinish(String warehouse,String mat) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		Connection conn = null;
+		try {
+		    conn = DBConnection.getInstance().getConnection();
+		    
+			sql.append("\n    SELECT M.material_master,pens_item, sum(M.onhand_qty) as onhand_qty FROM( ");
+			sql.append("\n        SELECT material_master,pens_item ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
+			sql.append("\n  	  from PENSBME_STOCK_FINISHED WHERE 1=1 ");
+			sql.append("\n 		  AND material_master ='"+mat+"'");
+			sql.append("\n 	      AND warehouse ='"+warehouse+"'");
+			sql.append("\n  	  GROUP BY material_master ,pens_item ");
+			
+			/*sql.append("\n         UNION ALL ");
+			
+			sql.append("\n 		   SELECT material_master,( (-1) * sum(req_qty) )as onhand_qty");
+			sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 		   WHERE 1=1  ");
+			sql.append("\n 	       AND h.warehouse ='"+p.getWarehouseFrom()+"'");
+			sql.append("\n 		   AND h.issue_req_no = i.issue_req_no ");
+			sql.append("\n 		   AND h.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
+			sql.append("\n 		   AND i.material_master = '"+p.getMaterialMaster()+"'");
+			sql.append("\n  	   GROUP BY material_master ");*/
+			
+			sql.append("\n  )M ");
+			sql.append("\n  GROUP BY M.material_master ,M.pens_item");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+				PopupForm item = new PopupForm();
+			    item.setMat(Utils.isNull(rst.getString("material_master")));
+			    item.setPensItem(Utils.isNull(rst.getString("pens_item")));
+			    item.setQty(rst.getInt("onhand_qty")+"");
+				pos.add(item);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
 	
 	public static MoveStockWarehouseBean canMoveStockFinish(Connection conn,MoveStockWarehouseBean p) throws Exception {
 		PreparedStatement ps = null;
@@ -230,6 +287,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("\n  	   from PENSBME_STOCK_FINISHED WHERE 1=1 ");
 			sql.append("\n 		   AND material_master ='"+p.getMaterialMaster()+"'");
 			sql.append("\n 	       AND warehouse ='"+p.getWarehouseFrom()+"'");
+			sql.append("\n 	       AND pens_item ='"+p.getPensItem()+"'");
 			sql.append("\n  	   GROUP BY material_master ");
 			
 			/*sql.append("\n         UNION ALL ");
@@ -274,8 +332,8 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBME_MOVE_STOCK_FINISH_HIS \n");
-			sql.append(" (warehouse_from,warehouse_to,MATERIAL_MASTER,create_date,create_user,transfer_qty) \n");
-		    sql.append(" values(?,?,?,?,?,?) \n");
+			sql.append(" (warehouse_from,warehouse_to,MATERIAL_MASTER,create_date,create_user,transfer_qty,pens_item) \n");
+		    sql.append(" values(?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -285,7 +343,8 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
 			ps.setString(c++, o.getTransferQty());
-		
+			ps.setString(c++, o.getPensItem());
+			
 			ps.executeUpdate();
 			
 		}catch(Exception e){

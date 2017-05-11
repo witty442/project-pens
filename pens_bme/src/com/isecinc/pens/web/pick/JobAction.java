@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,16 +15,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.OnhandDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.popup.PopupForm;
 
 /**
  * Summary Action
@@ -51,9 +55,25 @@ public class JobAction extends I_Action {
 				
 				aForm.setJob(ad);
 				
-				request.getSession().setAttribute("wareHouseList", null);
-				request.getSession().setAttribute("jobStatusList", null);
-				request.getSession().setAttribute("custGroupList", null);
+				//Set Session List
+				List<References> wareHouseList = new ArrayList();
+				References ref = new References("","");
+				wareHouseList.add(ref);
+				wareHouseList.addAll(JobDAO.getWareHouseList());
+				request.getSession().setAttribute("wareHouseList",wareHouseList);
+
+				List<References> jobStatusList = new ArrayList();
+				ref = new References("","");
+				jobStatusList.add(ref);
+				jobStatusList.addAll(JobDAO.getJobStatusList());
+				request.getSession().setAttribute("jobStatusList",jobStatusList);
+		
+				List<PopupForm> custGroupList = new ArrayList();
+				PopupForm refP = new PopupForm("",""); 
+				custGroupList.add(refP);
+				custGroupList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+				request.getSession().setAttribute("custGroupList",custGroupList);
+				
 			}else if("back".equals(action)){
 				aForm.setJob(aForm.getJobCriteria());
 				aForm.setResultsSearch(JobDAO.searchHead(aForm.getJob()));

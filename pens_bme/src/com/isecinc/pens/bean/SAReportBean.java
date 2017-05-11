@@ -57,6 +57,8 @@ public class SAReportBean implements Serializable{
 	private String countStockDateTo;
 	private String payDateFrom;
 	private String payDateTo;
+	private String invoiceDateFrom;
+	private String invoiceDateTo;
    
 	private String payType1Amt;
 	private String payType2Amt;
@@ -64,6 +66,19 @@ public class SAReportBean implements Serializable{
 	private String payType4Amt;
 	
 	
+	
+	public String getInvoiceDateFrom() {
+		return invoiceDateFrom;
+	}
+	public void setInvoiceDateFrom(String invoiceDateFrom) {
+		this.invoiceDateFrom = invoiceDateFrom;
+	}
+	public String getInvoiceDateTo() {
+		return invoiceDateTo;
+	}
+	public void setInvoiceDateTo(String invoiceDateTo) {
+		this.invoiceDateTo = invoiceDateTo;
+	}
 	public String getPayType1Amt() {
 		return payType1Amt;
 	}

@@ -38,6 +38,8 @@ public class User extends I_PO implements Serializable {
 	public static final String HISHER ="HISHER";
 	public static final String IT = "IT";
 	public static final String WACOAL = "WACOAL";
+	public static final String NISSINVIEW ="NISSINVIEW";
+	
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**

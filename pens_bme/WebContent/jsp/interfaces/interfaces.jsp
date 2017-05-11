@@ -193,7 +193,9 @@ body {
 				}
 			}
 			
-			if("<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>" == pageName.value){
+			if(   "<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>" == pageName.value
+			   || "<%=Constants.TYPE_IMPORT_POS%>" == pageName.value	
+			  ){
 				var form = document.interfacesForm;
 				var fileNameObj = document.getElementsByName("bean.formDataFile")[0];
 				var extension = '';
@@ -215,7 +217,7 @@ body {
 					return;
 				}
 			}
-			
+	
 			if(confirm(confirmText)){
 				document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=runBatch&action=submited";
 				document.interfacesForm.submit();
@@ -441,6 +443,10 @@ body {
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportSaleOutWacoal"/>
 				</jsp:include>
+			<%}else if(Constants.TYPE_IMPORT_POS.equalsIgnoreCase(pageName)) {%>
+		     	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportPos"/>
+				</jsp:include>
 			<%} %>
 
 	      	<!-- TABLE BODY -->
@@ -616,9 +622,11 @@ body {
 								
 								</td>
 							</tr>
-						</table>
-					       	
-					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName) || Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)){  %>
+						</table>	     
+					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName) 
+							   || Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)
+							   || Constants.TYPE_IMPORT_POS.equals(pageName)
+							  ){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 						      <tr>
 								<td align="right" width="40%">àÅ×Í¡ä¿Åì&nbsp;&nbsp;</td>
@@ -734,6 +742,11 @@ body {
 						  <% }else if( Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN.equals(pageName)){ %> 
 							    <p></p>
 							    <jsp:include page="interfacesResultImportWacoalSaleInReturn.jsp"></jsp:include>
+								<p></p>
+				
+						  <% }else if( Constants.TYPE_IMPORT_POS.equals(pageName)){ %> 
+							    <p></p>
+							    <jsp:include page="importPosSub.jsp"></jsp:include>
 								<p></p>
 				
 						   <%} %>

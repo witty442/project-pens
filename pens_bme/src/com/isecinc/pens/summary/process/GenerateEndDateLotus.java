@@ -258,7 +258,7 @@ public class GenerateEndDateLotus {
 						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 						//Lotus Only 020047
-						sql.append("\n AND C.customer_code LIKE '020047%'");
+						sql.append("\n AND C.customer_code LIKE '020047-%'");
 						
 						if( !Utils.isNull(c.getSalesDate()).equals("")){
 		                    sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");

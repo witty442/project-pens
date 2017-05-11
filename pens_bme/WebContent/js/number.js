@@ -23,21 +23,56 @@ function isNum(obj){
   return true;
 }
 
-function isNum2Digit(obj){
+function isNumPositive(obj){
   if(obj.value != ""){
-	var newNum = parseFloat(obj.value);
-	if(isNaN(newNum)){
+	 var v = obj.value;
+	if(isNaN(v)){
 		alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
 		obj.value = "";
 		obj.focus();
 		return false;
 	}else{
-		toCurreny(obj);
+		if(v < 0){
+			alert('ใม่สามารถกรอก ตัวเลขติดลบได้');
+			obj.value = "";
+			obj.focus();
+			return false;
+		}
 		return true;
 	}
    }
   return true;
+}
+
+function isNum2Digit(obj){
+  try{
+	  if(obj.value != ""){
+		var newNum = parseFloat(obj.value);
+		if( !isNotNumeric(obj.value)){
+			alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
+			obj.value = "";
+			obj.focus();
+			return false;
+		}else{
+			toCurreny(obj);
+			return true;
+		}
+	   }
+	  return true;
+  }catch(Exception ){
+	  alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
+	  obj.value = "";
+	  obj.focus();
+	  return false;
+  }
  }
+
+function isNotNumeric(n) {
+	n = n.replace(/\,/g,'');
+	//alert(n);
+	return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 
 function currenyToNum(object){
 	var temp =  object.value.replace(/\,/g,''); //alert(r);

@@ -27,6 +27,8 @@ public class Job implements Serializable{
 	private String wareHouse;
 	private String wareHouseDesc;
 	private String refDoc;
+	private String rtnQty;
+	private String rtnAmt;
 	
 	private List<Job> items;
     
@@ -35,6 +37,18 @@ public class Job implements Serializable{
 	private boolean canCancel = false;
 	
 	
+	public String getRtnQty() {
+		return rtnQty;
+	}
+	public void setRtnQty(String rtnQty) {
+		this.rtnQty = rtnQty;
+	}
+	public String getRtnAmt() {
+		return rtnAmt;
+	}
+	public void setRtnAmt(String rtnAmt) {
+		this.rtnAmt = rtnAmt;
+	}
 	public String getRefDoc() {
 		return refDoc;
 	}

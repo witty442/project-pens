@@ -1,7 +1,9 @@
 package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +25,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.isecinc.pens.web.popup.PopupForm;
 
 /**
  * Summary Action
@@ -43,14 +46,16 @@ public class MoveStockWarehouseAction extends I_Action {
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			//save old criteria
-			MoveStockWarehouseBean w = new MoveStockWarehouseBean();
-			//w.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			//w.setCloseDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			
-			aForm.setBean(w);
-			aForm.setResults(null);
-			
+			String action = Utils.isNull(request.getParameter("action"));
+			if("new".equalsIgnoreCase(action)){
+				//save old criteria
+				MoveStockWarehouseBean w = new MoveStockWarehouseBean();
+				//w.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				//w.setCloseDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				
+				aForm.setBean(w);
+				aForm.setResults(null);
+			}
 		} catch (Exception e) {
 			request.setAttribute("Message", "error:"+ e.getMessage());
 			throw e;
@@ -119,6 +124,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
 		User user = (User) request.getSession().getAttribute("user");
         String msg  = "";
+        String pensItemOld = "";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -126,7 +132,9 @@ public class MoveStockWarehouseAction extends I_Action {
 			MoveStockWarehouseBean h = aForm.getBean();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
+			pensItemOld = h.getPensItem();
 			
+			h.setPensItem(pensItemOld.split("\\|")[0]);
 			//validate Stock
 			boolean canMoveStock  = false;
 			MoveStockWarehouseBean reCheck = MoveStockWarehoseDAO.canMoveStockFinish(conn, h);
@@ -155,10 +163,11 @@ public class MoveStockWarehouseAction extends I_Action {
 		    }
 		   // hide save button
 		    h.setCanEdit(false);
+		    h.setPensItem(pensItemOld);//value 90411|0
 		    
 			//set to form
 			aForm.setBean(h);
-		
+			
 			request.setAttribute("Message",msg);
 			
 			conn.commit();

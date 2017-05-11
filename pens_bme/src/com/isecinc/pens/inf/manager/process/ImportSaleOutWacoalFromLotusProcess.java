@@ -114,6 +114,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					modelItem = importToDB(conn,connMonitor,modelItem,user,dataFile,fileType , fileName);
 					logger.debug("Result FailCount:"+modelItem.getFailCount() );
 					logger.debug("Result SuccessCount:"+modelItem.getSuccessCount() );
+					
 					if(modelItem.getFailCount() > 0){
 						
 						rollBackFlag = true;
@@ -401,17 +402,32 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					 //CREATE_USER
 			         ps.setString(27, user.getUserName());
 			   
-		        	  //Add Success Msg No Check PensItem
-			         ImportSummary s = new ImportSummary();
-			         s.setRow(i+1);
-			         s.setSalesDate(salesDate);
-			         s.setStoreNo(storeNo);
-			         s.setStoreName(storeName);
-			         s.setDescription(description);
-			         s.setQty(qty);
-			         s.setMessage("Success :No Validate Pens Item");
-			         successMap.put(i+"", s); 
-			        
+			         //Validate Get Branch id By StoreNo
+					 String branchId = new ImportDAO().getBranchID(conn,storeNo);
+					 if(Utils.isNull(branchId).equals("")){
+						 //Add Error Msg
+				         importError = true;
+				         ImportSummary s = new ImportSummary();
+				         s.setRow(i+1);
+				         s.setSalesDate(salesDate);
+				         s.setStoreNo(storeNo);
+				         s.setStoreName(storeName);
+				         s.setDescription(description);
+				         s.setMessage("ไม่พบข้อมูล Mapping Store no กับ Branch id");
+				         errorMap.put(i+"", s);
+			         }else{
+					 
+			        	  //Add Success Msg No Check PensItem
+				         ImportSummary s = new ImportSummary();
+				         s.setRow(i+1);
+				         s.setSalesDate(salesDate);
+				         s.setStoreNo(storeNo);
+				         s.setStoreName(storeName);
+				         s.setDescription(description);
+				         s.setQty(qty);
+				         s.setMessage("Success :No Validate Pens Item");
+				         successMap.put(i+"", s); 
+			         }
 				     // PENS_CUST_CODE VARCHAR2(30),
 				     ps.setString(28, "");
 				     // PENS_CUST_DESC VARCHAR2(100),O
@@ -447,7 +463,6 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 				}//for Row
 				ps.executeBatch();
 			}
-			
 			
 			if(importError){
 			    importError = true;

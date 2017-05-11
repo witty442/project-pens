@@ -14,10 +14,27 @@
 <head>
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
 <style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -28,13 +45,20 @@
 <%
 	String types = Utils.isNull(request.getParameter("types"));
     String storeType = Utils.isNull(request.getParameter("storeType"));
-    String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
+    String currentPage = "1";
     String hideAll = Utils.isNull(request.getParameter("hideAll"));
     
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
     String descs = Utils.isNull(session.getAttribute("descs"));
     
+    String queryStr= request.getQueryString();
+	 if(queryStr.indexOf("d-") != -1){
+	 	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+	 	System.out.println("queryStr:"+queryStr);
+	    currentPage = request.getParameter(queryStr)==null?"1":request.getParameter(queryStr);
+	 }
+	 
     System.out.println("codes:"+codes);
 %>
 <script type="text/javascript">
@@ -104,9 +128,7 @@ function saveSelectedInPage(no){
 	if(no >= 21){
 	   no = no - ( (currentPage-1) *20);
 	}
-	//alert(currentPage+":"+no);
 	no = no -1;
-	
 	//alert("no["+no+"]checked:"+chk[no].checked);
     if(chk[no].checked){
     	//Add 
@@ -226,19 +248,19 @@ window.onload = function(){
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
+<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px" class="txt1">
-		<td width="15%" >&nbsp;</td> 
-		<td width="90%" ><b>ค้นหาข้อมูล ร้านค้า ( <%=storeType%>)</b></td>
+		<th width="15%" >&nbsp;</th> 
+		<th width="90%" ><b>ค้นหาข้อมูล ร้านค้า ( <%=storeType%>)..</b></th>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b>รหัส</b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
-		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		<input type="button" name="search"  class="newPosBtnLong"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td ><b>รายละเอียด</b></td>
+		<td nowrap><b>รายละเอียด</b></td>
 		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
 	</tr>
 </table>
@@ -246,8 +268,9 @@ window.onload = function(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:60px;"/>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
+			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
+			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:80px;"  class="newPosBtnLong" />
+			&nbsp;
 			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกร้านค้าทั้งหมด <%} %>
 		</td>
 	</tr>

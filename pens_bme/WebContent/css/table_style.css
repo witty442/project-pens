@@ -44,6 +44,7 @@ TABLE.tableSearchNoWidth TD {
 .hilight_text {
 	background-color: #909090;
 	height: 30px;
+	font-weight: bold;
 }
 
 .td_text{

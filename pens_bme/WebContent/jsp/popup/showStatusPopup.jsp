@@ -22,7 +22,27 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<style type="text/css">
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
 
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+</style>
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css" type="text/css">

@@ -794,7 +794,7 @@ public class PickStockAction extends I_Action {
 			
 			h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				h.append("<td align='left' colspan='7'><b>"+title+" </b></td> \n");
+				h.append("<td align='left' colspan='10'><b>"+title+" </b></td> \n");
 				h.append("</tr> \n");
 			h.append("</table> \n");
 
@@ -811,6 +811,9 @@ public class PickStockAction extends I_Action {
 					 h.append("<td><b>Group Code</b></td> \n");
 					 h.append("<td><b>Pens Item </b></td> \n");
 					 h.append("<td><b>QTY ที่เบิก </b></td> \n");
+					 h.append("<td>Issue req</td> \n");
+					 h.append("<td>ร้านค้า</td> \n");
+					 h.append("<td>Sub Inv</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<dataList.size();i++){
@@ -823,12 +826,16 @@ public class PickStockAction extends I_Action {
 				   h.append("<td>"+s.getGroupCode()+"&nbsp;</td> \n");
 				   h.append("<td>"+s.getPensItem()+"</td> \n");
 				   h.append("<td>"+s.getQty()+"</td> \n");
+				   h.append("<td class='text'>"+p.getIssueReqNo()+"</td> \n");
+				   h.append("<td class='text'>"+p.getStoreCode()+"-"+p.getStoreName()+"</td> \n");
+				   h.append("<td class='text'>"+p.getSubInv()+"</td> \n");
 				   h.append("</tr>");
 				}//for 
 				
 				h.append("<tr> \n");
 				h.append("<td colspan='6' align='right'><b>Total</b></td> \n");
 				h.append("<td><b>"+p.getTotalQty()+"</b></td> \n");
+				h.append("<td colspan='3' align='right'></td> \n");
 				h.append("</tr>");	
 			h.append("</table> \n");
 			}

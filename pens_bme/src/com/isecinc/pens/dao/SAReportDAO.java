@@ -165,6 +165,8 @@ public class SAReportDAO {
 			  conn = DBConnection.getInstance().getConnection();
 			  if(o.getSummaryType().equalsIgnoreCase("Detail")){
 				  return searchDamagetListModelDetail(conn, o);
+			  }else  if(o.getSummaryType().equalsIgnoreCase("Detail2")){
+				  return searchDamagetListModelDetail2(conn, o);
 			  }
 			  return searchDamagetListModelSummary(conn, o);
 		   }catch(Exception e){
@@ -349,6 +351,13 @@ public class SAReportDAO {
 					sql.append("\n\t\t and M.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and M.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
+			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and M.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and M.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
 			   if( !Utils.isNull(o.getType()).equals("")){
 					sql.append("\n\t\t and M.type = '"+Utils.isNull(o.getType())+"'");
 				}
@@ -453,6 +462,13 @@ public class SAReportDAO {
 					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
+			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
 			   if( !Utils.isNull(o.getType()).equals("")){
 					sql.append("\n\t AND H.type = '"+Utils.isNull(o.getType())+"'");
 			   }
@@ -496,6 +512,237 @@ public class SAReportDAO {
 				   h.setPayType2Amt(Utils.decimalFormat(rst.getDouble("payType2_amt"),Utils.format_current_2_disgit));
 				   h.setPayType3Amt(Utils.decimalFormat(rst.getDouble("payType3_amt"),Utils.format_current_2_disgit));
 				   h.setPayType4Amt(Utils.decimalFormat(rst.getDouble("payType4_amt"),Utils.format_current_2_disgit));
+				   
+				   items.add(h);
+				}//while
+				//set Result 
+				o.setItems(items);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+		return o;
+	}
+		
+		public static SAReportBean searchDamagetListModelDetail2(Connection conn,SAReportBean o) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			SAReportBean h = null;
+			List<SAReportBean> items = new ArrayList<SAReportBean>();
+			try {
+			   sql.append(" \n select A.* " );
+			   sql.append(" \n ,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =A.region)as region_desc" );
+			   sql.append("\n FROM( ");
+			   sql.append("\n   SELECT M.* ");
+			   sql.append("\n   ,D.total_damage ,D.payType1_amt ,D.payType2_amt,D.payType3_amt,D.payType4_amt");
+			   sql.append("\n   ,R.min_year_month ,R.max_year_month,R.reward_month ,R.reward_amt ,C.paydate ,C.pay_amt");
+			   sql.append("\n    FROM ( ");
+			   sql.append("\n      SELECT DISTINCT E.emp_id,E.name ,E.surname ,E.group_store,E.region,E.branch,M.type,M.check_stock_date as count_stock_date,M.inv_refwal " );
+			   sql.append("\n      FROM SA_EMPLOYEE E , SA_DAMAGE_HEAD M ,SA_DAMAGE_TRAN T");
+			   sql.append("\n      WHERE 1=1");
+			   sql.append("\n      AND E.emp_id = M.emp_id ");
+			   sql.append("\n      AND M.emp_id = T.emp_id ");
+			   sql.append("\n      AND M.inv_refwal = T.inv_refwal ");
+			   sql.append("\n      AND M.check_stock_date is not null");
+			   sql.append("\n      AND M.inv_refwal is not null");
+			    if( !Utils.isNull(o.getEmpId()).equals("") ){
+					sql.append("\n\t\t and E.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+			    }
+				if( !Utils.isNull(o.getName()).equals("")){
+					sql.append("\n\t\t and E.name LIKE '%"+Utils.isNull(o.getName())+"%'");
+				}
+				if( !Utils.isNull(o.getSurname()).equals("")){
+					sql.append("\n\t\t and E.surname LIKE '%"+Utils.isNull(o.getSurname())+"%'");
+				}
+				if( !Utils.isNull(o.getGroupStore()).equals("")){
+					sql.append("\n\t\t and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
+				}
+				if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and M.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and M.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and M.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and M.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getType()).equals("")){
+					sql.append("\n\t\t and M.type = '"+Utils.isNull(o.getType())+"'");
+				}
+			   
+			   sql.append("\n  ) M ");
+               sql.append("\n  LEFT OUTER JOIN  " );
+			   sql.append("\n  (  SELECT emp_id,count_stock_date,min(year_month) as min_year_month ,max(year_month) as max_year_month");
+			   sql.append("\n     ,(min(year_month)||'-' || max(year_month)) as reward_month ,NVL(SUM(M.amt),0) as reward_amt ");
+			   sql.append("\n     FROM sa_reward_tran M ");
+			   sql.append("\n     where 1=1 ");
+			   sql.append("\n     AND M.count_stock_date is not null");
+			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t AND M.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND M.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t AND M.count_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND M.count_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getType()).equals("")){
+					sql.append("\n\t AND M.type = '"+Utils.isNull(o.getType())+"'");
+				}
+			   if( !Utils.isNull(o.getEmpId()).equals("") ){
+					sql.append("\n\t AND M.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+			    }
+			   sql.append("\n    group by M.emp_id ,M.count_stock_date ");
+			   
+			   sql.append("\n )R ON M.emp_id = R.emp_id AND M.count_stock_date = R.count_stock_date ");
+			   
+			   sql.append("\n  LEFT OUTER JOIN  " );
+			   sql.append("\n  (SELECT emp_id,inv_refwal ,count_stock_date ,sum(total_damage) as total_damage");
+			   sql.append("\n   ,sum(payType1_amt) as payType1_amt" );
+			   sql.append("\n   ,sum(payType2_amt) as payType2_amt" );
+			   sql.append("\n   ,sum(payType3_amt) as payType3_amt" );
+			   sql.append("\n   ,sum(payType4_amt) as payType4_amt");
+			   sql.append("\n   FROM(");
+			   sql.append("\n   SELECT  " );
+			   sql.append("\n     H.emp_id,H.inv_refwal,H.check_stock_date as count_stock_date ,T.payType " );
+			   sql.append("\n    ,sum(T.pay_amt) as total_damage " );
+			   sql.append("\n    ,NVL(SUM(case when T.payType='1. หักเงินสด' then T.pay_amt else 0 end),0) as payType1_amt");
+			   sql.append("\n    ,NVL(SUM(case when T.payType='2. หักค่าเฝ้าตู้' then T.pay_amt else 0 end),0) as payType2_amt");
+			   sql.append("\n    ,NVL(SUM(case when T.payType='3. หักเงินเดือน' then T.pay_amt else 0 end),0) as payType3_amt");
+			   sql.append("\n    ,NVL(SUM(case when T.payType='4. หัก Surety bond' then T.pay_amt else 0 end),0) as payType4_amt");
+			   
+			   sql.append("\n     FROM SA_DAMAGE_HEAD H,SA_DAMAGE_TRAN T");
+			   sql.append("\n     WHERE H.emp_id = T.emp_id " );
+			   sql.append("\n     AND H.type = T.type " );
+			   sql.append("\n     AND H.inv_refwal=T.inv_refwal ");
+			   sql.append("\n     AND H.check_stock_date is not null");
+			   
+			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					sql.append("\n\t AND T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+			   }
+			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+			   }
+			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getType()).equals("")){
+					sql.append("\n\t AND H.type = '"+Utils.isNull(o.getType())+"'");
+			   }
+			   if( !Utils.isNull(o.getEmpId()).equals("") ){
+					sql.append("\n\t AND H.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+			   }
+			   sql.append("\n       GROUP BY H.emp_id,H.inv_refwal ,H.check_stock_date ,T.payType ");
+			   sql.append("\n     )GROUP BY emp_id ,inv_refwal,count_stock_date ");
+			   sql.append("\n   )D ON M.emp_id = D.emp_id AND M.inv_refwal = D.inv_refwal AND M.count_stock_date = D.count_stock_date ");
+			   
+			   /******** '3. หักเงินเดือน' ***************************************************************/
+			   sql.append("\n  LEFT OUTER JOIN  " );
+			   sql.append("\n  (  SELECT  " );
+			   sql.append("\n     H.emp_id,H.inv_refwal,H.check_stock_date as count_stock_date ,T.paydate ,nvl(sum(pay_amt),0) as pay_amt " );
+			   sql.append("\n     FROM SA_DAMAGE_HEAD H,SA_DAMAGE_TRAN T");
+			   sql.append("\n     WHERE H.emp_id = T.emp_id " );
+			   sql.append("\n     AND H.type = T.type " );
+			   sql.append("\n     AND H.inv_refwal=T.inv_refwal ");
+			   sql.append("\n     AND H.check_stock_date is not null");
+			   sql.append("\n     AND T.payType='3. หักเงินเดือน' ");
+			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					sql.append("\n\t AND T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+			   }
+			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+			   }
+			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
+				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    
+					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
+					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
+				}
+			   if( !Utils.isNull(o.getType()).equals("")){
+					sql.append("\n\t AND H.type = '"+Utils.isNull(o.getType())+"'");
+			   }
+			   if( !Utils.isNull(o.getEmpId()).equals("") ){
+					sql.append("\n\t AND H.emp_id ='"+Utils.isNull(o.getEmpId())+"'");
+			   }
+			   sql.append("\n     GROUP BY H.emp_id ,H.inv_refwal,H.check_stock_date ,T.paydate ");
+			   sql.append("\n   )C ON M.emp_id = C.emp_id AND M.inv_refwal = C.inv_refwal AND M.count_stock_date = C.count_stock_date ");
+			   
+			   sql.append("\n )A");
+			   sql.append("\n order by A.group_store,A.name,A.surname ,A.count_stock_date,A.inv_refwal asc ,A.paydate asc ");
+				
+				logger.debug("sql:"+sql);
+				
+				ps = conn.prepareStatement(sql.toString());
+				rst = ps.executeQuery();
+				
+				while(rst.next()) {
+				   h = new SAReportBean();
+				   h.setEmpId(Utils.isNull(rst.getString("emp_id")));
+				   h.setType(Utils.isNull(rst.getString("type")));
+				   h.setBranch(Utils.isNull(rst.getString("branch")));
+				   h.setName(Utils.isNull(rst.getString("name")));
+				   h.setSurname(Utils.isNull(rst.getString("surname")));
+				   h.setGroupStore(Utils.isNull(rst.getString("group_store")));
+				   h.setBranch(Utils.isNull(rst.getString("branch")));
+				   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
+				   h.setInvoiceNo(Utils.isNull(rst.getString("inv_refwal")));
+				   
+				   //TRAN
+				   h.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRewardMonth(Utils.isNull(rst.getString("reward_month")));
+				   h.setRewardMonthCount(calcDiffYearMonth(rst.getString("min_year_month"),rst.getString("max_year_month")));
+				   h.setRewardAmt(Utils.decimalFormat(rst.getDouble("reward_amt"),Utils.format_current_2_disgit));
+				 
+				   h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
+				   h.setNetDamageAmt(Utils.decimalFormat(rst.getDouble("total_damage")-rst.getDouble("reward_amt"),Utils.format_current_2_disgit));
+				   
+				   h.setPayType1Amt(Utils.decimalFormat(rst.getDouble("payType1_amt"),Utils.format_current_2_disgit));
+				   h.setPayType2Amt(Utils.decimalFormat(rst.getDouble("payType2_amt"),Utils.format_current_2_disgit));
+				   h.setPayType3Amt(Utils.decimalFormat(rst.getDouble("payType3_amt"),Utils.format_current_2_disgit));
+				   h.setPayType4Amt(Utils.decimalFormat(rst.getDouble("payType4_amt"),Utils.format_current_2_disgit));
+				   
+				   //หักเงินเดือน
+				   h.setPayDate(Utils.stringValueNull(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setPayAmt(Utils.decimalFormat(rst.getDouble("pay_amt"),Utils.format_current_2_disgit));
 				   
 				   items.add(h);
 				}//while

@@ -14,10 +14,27 @@
 <head>
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
 <style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -69,10 +86,10 @@ function selectOneRadio(){
 <input type="hidden" name="storeGroup" value="<%=storeGroup %>"/>
 <input type="hidden" name="methodName" value="<%=methodName %>"/>
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" >
+<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px" class="txt1">
-		<td width="15%" >&nbsp;</td>
-		<td width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=Constants.getStoreGroupName(storeGroup)%>)</b></td>
+		<th width="15%" >&nbsp;</th>
+		<th width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=Constants.getStoreGroupName(storeGroup)%>)</b></th>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="20%" ><b>รหัส</b>  </td>
@@ -89,8 +106,8 @@ function selectOneRadio(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:60px;"/>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:60px;"/>
+			<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
+			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:80px;"  class="newPosBtnLong" />
 		</td>
 	</tr>
 </table>

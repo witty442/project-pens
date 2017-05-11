@@ -198,7 +198,7 @@ function isNum(obj){
 }
 
 function openPopupGroupCode(path){
-    var param = "";
+    var param = "&selectOne=selectOne";
 	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
 	//window.open(encodeURI(url),"",
 		//	   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);

@@ -21,17 +21,20 @@ if(queryStr.indexOf("d-") != -1){
 	<display:table style="width:100%;" id="item" name="sessionScope.dataList" defaultsort="0"  defaultorder="descending" class="resultDisp"
 	    requestURI="#" sort="list" pagesize="50">	
 	    
-	    <display:column  title="No." property="id"  sortable="false" class="td_text_center" style="width:5%"/>
+	    <display:column  title="No" property="id"  sortable="false" class="td_text_center" style="width:5%"/>
+	    <display:column  title="Program ID" property="programId"  sortable="false" class="td_text" style="width:5%"/>
 	    <display:column  title="Task Name" property="name"  sortable="false" class="td_text" style="width:10%"/>
-	    <display:column  title="Status" property="status"  sortable="false" class="td_text_center" style="width:10%"/>
-	    <display:column  title="Type" property="type"  sortable="false" class="td_text_center" style="width:5%"/>	
-	    <display:column  title="Batch Date" property="batchDateTime"  sortable="false" class="td_text_center" style="width:10%"/>	
-	    <display:column  title="last Run Date" property="lastRunDate"  sortable="false" class="td_text_center" style="width:10%"/>
+	    <display:column  title="Status" property="status"  sortable="false" class="td_text_center" style="width:6%"/>
+	    <display:column  title="Type" property="type"  sortable="false" class="td_text_center" style="width:4%"/>	
+	    <display:column  title="Execute Batch Date" property="batchDateTime"  sortable="false" class="td_text_center" style="width:10%"/>	
+	    <display:column  title="Last Run Date" property="lastRunDate"  sortable="false" class="td_text_center" style="width:10%"/>
 	    <display:column  title="Next Run Date" property="nextRunDate"  sortable="false" class="td_text_center" style="width:10%"/>	
 	    <display:column  title="Delete" sortable="false" class="td_text_center" style="width:5%"> 
 	            <html:button property="button" value="Delete" onclick="submitDelete('${pageContext.request.contextPath}',${item.no});"/>
 	    </display:column>
-	
+	     <display:column  title="Regenerate" sortable="false" class="td_text_center" style="width:5%"> 
+	            <html:button property="button" value="ReGenerate" onclick="submitRegen('${pageContext.request.contextPath}','${item.programId}','${item.paramRegen}','${item.type}');"/>
+	    </display:column>
     </display:table>
 <%} %>
 

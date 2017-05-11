@@ -119,7 +119,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			 sql.append("from(\n");
 			 sql.append("  select O.barcode, nvl(sum(O.qty) ,0) as order_qty\n");
 			 sql.append("    ,( select sum(onhand_qty)  \n");
-			 sql.append("       FROM  PENSBME_ONHAND_BME  OH \n");
+			 sql.append("       FROM  PENSBME_ONHAND_BME_FRIDAY  OH \n");
 			 sql.append("       where OH.barcode = O.barcode \n");
 			 sql.append("       group by OH.barcode \n");
 			 sql.append("     ) as onhand_qty\n");
@@ -137,7 +137,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			 sql.append("from(\n");
 			 sql.append("  select O.barcode, nvl(sum(O.qty) ,0) as order_qty\n");
 			 sql.append("    ,( select sum(onhand_qty)  \n");
-			 sql.append("       FROM  PENSBME_ONHAND_BME  OH \n");
+			 sql.append("       FROM  PENSBME_ONHAND_BME_OSHOPPING  OH \n");
 			 sql.append("       where OH.barcode = O.barcode \n");
 			 sql.append("       group by OH.barcode \n");
 			 sql.append("     ) as onhand_qty\n");
@@ -155,7 +155,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			 sql.append("from(\n");
 			 sql.append("  select O.barcode, nvl(sum(O.qty) ,0) as order_qty\n");
 			 sql.append("    ,( select sum(onhand_qty)  \n");
-			 sql.append("       FROM  PENSBME_ONHAND_BME  OH \n");
+			 sql.append("       FROM  PENSBME_ONHAND_BME_7CATALOG  OH \n");
 			 sql.append("       where OH.barcode = O.barcode \n");
 			 sql.append("       group by OH.barcode \n");
 			 sql.append("     ) as onhand_qty\n");
@@ -173,7 +173,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			 sql.append("from(\n");
 			 sql.append("  select O.barcode, nvl(sum(O.qty) ,0) as order_qty\n");
 			 sql.append("    ,( select sum(onhand_qty)  \n");
-			 sql.append("       FROM  PENSBME_ONHAND_BME  OH \n");
+			 sql.append("       FROM  PENSBME_ONHAND_BME_TVDIRECT  OH \n");
 			 sql.append("       where OH.barcode = O.barcode \n");
 			 sql.append("       group by OH.barcode \n");
 			 sql.append("     ) as onhand_qty\n");
@@ -220,6 +220,69 @@ private static Logger logger = Logger.getLogger("PENS");
 				h.append("  <td class='text' align='center'>"+Utils.isNull(rs.getString("mat"))+"</td> \n");
 				h.append("  <td class='num_currency' align='center'>"+Utils.decimalFormat(rs.getDouble("order_qty"),Utils.format_current_no_disgit)+"</td> \n");
 				h.append("  <td class='num_currency' align='center'>"+Utils.decimalFormat(rs.getDouble("onhand_qty"),Utils.format_current_no_disgit)+"</td> \n");
+				h.append("</tr> \n");
+				
+				count ++;
+			}
+			h.append("</table> \n");
+			
+			//Order qty < 0
+			count = 0;
+			 sql = new StringBuffer();
+			 sql.append("  select O.store_code,O.qty\n");
+			 sql.append(",(select OH.material_master FROM PENSBME_ONHAND_BME OH WHERE OH.barcode =O.barcode ) mat \n");
+			 sql.append(",(select OH.material_master FROM PENSBME_ONHAND_BME_FRIDAY OH WHERE OH.barcode =O.barcode ) mat_friday \n");
+			 sql.append(",(select OH.material_master FROM PENSBME_ONHAND_BME_OSHOPPING OH WHERE OH.barcode =O.barcode ) mat_oshopping \n");
+			 sql.append(",(select OH.material_master FROM PENSBME_ONHAND_BME_TVDIRECT OH WHERE OH.barcode =O.barcode ) mat_tvdirect \n");
+			 sql.append(",(select OH.material_master FROM PENSBME_ONHAND_BME_7CATALOG OH WHERE OH.barcode =O.barcode ) mat_7catalog \n");
+			 sql.append("  from PENSBME_ORDER O\n");
+			 sql.append("  WHERE trunc(O.order_date) = ? \n");
+			 sql.append("  and O.qty < 0 \n");
+			 
+			 logger.debug("sql:"+sql.toString());
+			 
+			 ps = conn.prepareStatement(sql.toString());
+		     ps.setTimestamp(1, new java.sql.Timestamp(orderDateO.getTime()));
+		     rs = ps.executeQuery();
+			 
+			 h.append("<table border='0'> \n");
+		     h.append("<tr> \n");
+			 h.append("  <td colspan='3'></td> \n");
+			 h.append("</tr> \n");
+			 h.append("<tr> \n");
+			 h.append("  <td colspan='3'>แสดงรายการที่มีการคีย์ ยอดติดลบ</td> \n");
+			 h.append("</tr> \n");
+			 h.append("<tr> \n");
+			 h.append("  <td colspan='3'></td> \n");
+			 h.append("</tr> \n");
+			 h.append("</table> \n");
+			 
+		     h.append("<table border='1'> \n");
+		     String mat = "";
+			 while(rs.next()){
+				 if(count==0){
+					h.append("<tr> \n");
+					h.append("  <td class='colum_head' align='center'>รหัสร้านค้า</td> \n");
+					h.append("  <td class='colum_head' align='center'>Material Master</td> \n");
+					h.append("  <td class='colum_head' align='center'>Order Qty</td> \n");
+					h.append("</tr> \n");
+				 }
+				 if( !Utils.isNull(rs.getString("mat")).equals("")){
+					 mat = Utils.isNull(rs.getString("mat"));
+				 }else  if( !Utils.isNull(rs.getString("mat_friday")).equals("")){
+					 mat = Utils.isNull(rs.getString("mat_friday"));
+				 }else  if( !Utils.isNull(rs.getString("mat_oshopping")).equals("")){
+					 mat = Utils.isNull(rs.getString("mat_oshopping"));
+				 }else  if( !Utils.isNull(rs.getString("mat_tvdirect")).equals("")){
+					 mat = Utils.isNull(rs.getString("mat_tvdirect"));
+				 }else  if( !Utils.isNull(rs.getString("mat_7catalog")).equals("")){
+					 mat = Utils.isNull(rs.getString("mat_7catalog"));
+				 }
+				 
+				h.append("<tr> \n");
+				h.append("  <td class='text' align='center'>"+Utils.isNull(rs.getString("store_code"))+"</td> \n");
+				h.append("  <td class='num_currency' align='center'>"+mat+"</td> \n");
+				h.append("  <td class='num_currency' align='center'>"+Utils.decimalFormat(rs.getDouble("qty"),Utils.format_current_no_disgit)+"</td> \n");
 				h.append("</tr> \n");
 				
 				count ++;

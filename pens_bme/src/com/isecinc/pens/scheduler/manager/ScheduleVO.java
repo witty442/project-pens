@@ -3,6 +3,7 @@ package com.isecinc.pens.scheduler.manager;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 
 public class ScheduleVO implements Serializable{
@@ -26,10 +27,8 @@ public class ScheduleVO implements Serializable{
 	private String updateUser;
     private String entity;
     private String product;
-    private String folderName;
     private String sizeOfFile;
     private String noOfRecord;
-    private String asOfDate;
     private String batchDate;
 	private String userId;
 	private Date lastRunDate;
@@ -37,8 +36,40 @@ public class ScheduleVO implements Serializable{
 	private String crontriggerExp;
     private String everyDay;
     private String localPath;
-	
+    private String sourcePath;
+    private String destPath;
+    private String fileName;
+    private String message;
+    private String paramRegen;
+    private Map<String, String> paramMap;
     
+    
+    
+	public Map<String, String> getParamMap() {
+		return paramMap;
+	}
+	public void setParamMap(Map<String, String> paramMap) {
+		this.paramMap = paramMap;
+	}
+	public String getParamRegen() {
+		return paramRegen;
+	}
+	public void setParamRegen(String paramRegen) {
+		this.paramRegen = paramRegen;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 	public String getLocalPath() {
 		return localPath;
 	}
@@ -69,12 +100,7 @@ public class ScheduleVO implements Serializable{
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	public String getFolderName() {
-		return folderName;
-	}
-	public void setFolderName(String folderName) {
-		this.folderName = folderName;
-	}
+	
 	public String getSizeOfFile() {
 		return sizeOfFile;
 	}
@@ -87,11 +113,18 @@ public class ScheduleVO implements Serializable{
 	public void setNoOfRecord(String noOfRecord) {
 		this.noOfRecord = noOfRecord;
 	}
-	public String getAsOfDate() {
-		return asOfDate;
+	
+	public String getSourcePath() {
+		return sourcePath;
 	}
-	public void setAsOfDate(String asOfDate) {
-		this.asOfDate = asOfDate;
+	public void setSourcePath(String sourcePath) {
+		this.sourcePath = sourcePath;
+	}
+	public String getDestPath() {
+		return destPath;
+	}
+	public void setDestPath(String destPath) {
+		this.destPath = destPath;
 	}
 	public String getBatchDate() {
 		return batchDate;

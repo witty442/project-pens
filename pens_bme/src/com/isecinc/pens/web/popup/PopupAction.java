@@ -14,6 +14,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PopupDAO;
 import com.isecinc.pens.dao.SummaryDAO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 
 /**
@@ -57,6 +58,23 @@ public class PopupAction extends I_Action {
 					 request.getSession().setAttribute("codes", null);
 					 request.getSession().setAttribute("keys", null);
 					 request.getSession().setAttribute("descs", null);
+					 
+			 }else if("new".equalsIgnoreCase(request.getParameter("action")) 
+						&& "searchCheckStockDatePopup".equalsIgnoreCase(request.getParameter("page")) ){
+					 request.getSession().setAttribute("codes", null);
+					 request.getSession().setAttribute("keys", null);
+					 request.getSession().setAttribute("descs", null);
+					 
+					 String empId = Utils.isNull(request.getParameter("empId"));
+					 String type = Utils.isNull(request.getParameter("type"));
+					 
+					 forward = "searchCheckStockDatePopup";
+					 List<PopupForm> results = PopupDAO.searchSACheckStockDate(empId,type);
+					 if(results != null && results.size() >0){
+						 request.setAttribute("CHECK_STOCK_DATE_LIST", results);
+					 }else{
+						 request.setAttribute("Message", "ไม่พบข่อมูล");
+					 }
 				 }
 			
 		} catch (Exception e) {
@@ -108,7 +126,17 @@ public class PopupAction extends I_Action {
 					 }else{
 						 request.setAttribute("Message", "ไม่พบข่อมูล");
 					 }
-				}
+			}else if("searchCheckStockDatePopup".equalsIgnoreCase(request.getParameter("page")) ){
+				 forward = "searchCheckStockDatePopup";
+				 String empId = Utils.isNull(request.getParameter("empId"));
+				 String type = Utils.isNull(request.getParameter("type"));
+				 List<PopupForm> results = PopupDAO.searchSACheckStockDate(empId,type);
+				 if(results != null && results.size() >0){
+					 request.setAttribute("CHECK_STOCK_DATE_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();

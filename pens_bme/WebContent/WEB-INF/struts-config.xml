@@ -104,6 +104,7 @@
 		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
 		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
 		
+		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
 		
 	</form-beans>
 	
@@ -157,6 +158,10 @@
 			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
 		</action>
 		
+		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
+           <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
+        </action>
+        
         <!-- USER -->
 
 		<action name="userForm" path="/jsp/userAction" parameter="do" scope="request" type="com.isecinc.pens.web.user.UserAction">
@@ -188,6 +193,7 @@
 		<action name="popupForm" path="/jsp/popupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.PopupAction" >
 			<forward name="searchPensItemByGroupPopup" path="/jsp/popup/searchPensItemByGroupPopup.jsp" />
 			<forward name="searchEmpPopup" path="/jsp/popup/searchEmpPopup.jsp" />
+			<forward name="searchCheckStockDatePopup" path="/jsp/popup/searchCheckStockDatePopup.jsp" />
 		</action>
 		
 		<!-- Report -->
@@ -565,6 +571,8 @@
 		<action name="saDamageForm" path="/jsp/saDamageAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SADamageAction">
 			<forward name="search" path="/jsp/sa/saDamageSearch.jsp" />
 			<forward name="detail" path="/jsp/sa/saDamage.jsp" />
+			<forward name="noDamageSearch" path="/jsp/sa/saNoDamageSearch.jsp" />
+			<forward name="noDamage" path="/jsp/sa/saNoDamage.jsp" />
 		</action>
 		<action name="saTranForm" path="/jsp/saTranAction" parameter="do" scope="session" type="com.isecinc.pens.web.sa.SATranAction">
 			<forward name="search" path="/jsp/sa/saTranSearch.jsp" />
@@ -630,12 +638,13 @@
 			<forward name="detail" path="/jsp/lockItemOrder/lockItemOrder.jsp" />
 		</action>
 		
-		<action  name="scheduleForm" path="/schedule" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.ScheduleAction" >
+		<action  name="scheduleForm" path="/jsp/schedule" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.ScheduleAction" >
            <forward name="Success" path="/jsp/schedule/mainSchedule.jsp"></forward>
+           <forward name="Regen" path="/jsp/schedule/popupRegen.jsp"></forward>
 		   <forward name="Fail" path="/jsp/error.jsp"></forward>
         </action>
         
-        <action  name="searchTaskForm" path="/searchTask" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.SearchTaskAction" >
+        <action  name="searchTaskForm" path="/jsp/searchTask" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.SearchTaskAction" >
            <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
 		   <forward name="Fail" path="/jsp/error.jsp"></forward>
         </action>

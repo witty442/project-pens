@@ -29,6 +29,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -545,6 +546,7 @@ public void uploadFileFromLocal(String ftpFilePath,String localFile) throws Exce
 			ftp = new sun.net.ftp.FtpClient(server, 21);
 		    ftp.login(userFtp, passwordFtp);
 		    ftp.binary();
+		   // ftp.ascii();
 		    
 		    fos = new FileInputStream(localFile);
 		    tos = ftp.put(ftpFilePath);
@@ -574,7 +576,61 @@ public void uploadFileFromLocal(String ftpFilePath,String localFile) throws Exce
 			}
 		}
  }
-	
+
+public void uploadExcelFileFromLocal(String path,String ftpFilePath,String localFile) throws Exception{
+	FTPClient ftp = null;
+	String reply = "";
+	OutputStream out = null;
+	logger.info("uploadExcelFileFromLocal");
+	try {		
+		ftp = new FTPClient();
+		ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+		ftp.connect(server);
+		ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+		
+		//ftp.setConnectTimeout(connectTimeout);
+
+		//logger.info("connection timeout:"+ftp.getConnectTimeout());
+		
+		if(!ftp.login(userFtp, passwordFtp)){
+			throw new FTPException("FTP Username or password invalid! ");
+		}
+		 
+		logger.info("Path:"+path);
+		logger.info("Write To pathFull:"+ftpFilePath);
+		
+		ftp.changeWorkingDirectory(path);
+		logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+
+		InputStream input;
+        input = new FileInputStream(localFile);
+        //store the file in the remote server
+        ftp.storeFile(ftpFilePath, input);
+        //close the stream
+        input.close();
+
+	} catch (SocketException e) {
+		throw new FTPException("Could not connect to FTP server");
+	} catch (UnknownHostException e) {
+		throw new FTPException("Could not connect to FTP server");
+	} catch (IOException e) {
+		throw new FTPException(e.getLocalizedMessage());
+	} catch (Exception e) {
+		throw new FTPException(e.getMessage());
+	} finally {
+		if(ftp != null && ftp.isConnected()) {
+			try{
+				ftp.logout();
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+	}	
+}
+
 public void uploadBackUpDBZipFileToFTP_OPT3(User user,String ftpFilePath,String localFile) throws Exception{
 		
 		DataOutputStream dos = null;

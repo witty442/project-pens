@@ -16,6 +16,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.isecinc.pens.inf.helper.Utils;
@@ -55,6 +56,9 @@ public class ScheduleServiceManager {
 			 }else  if(SchedulerConstant.SCHEDULE_TYPE_WEEKLY.equals(scheduleVO.getType())){
 				 runTypeScheduleCron(conn,schedule,scheduleVO);
 				 
+			 }else  if(SchedulerConstant.SCHEDULE_TYPE_MONTHLY.equals(scheduleVO.getType())){
+				 runTypeScheduleCron(conn,schedule,scheduleVO);
+				 
 			 }
 				
 			 logger.debug("Type:"+scheduleVO.getType());
@@ -76,19 +80,33 @@ public class ScheduleServiceManager {
 		     
 	    	 ScheduleVO jobExitsInQuartz = isJobExistQuartz(schedule, scheduleBean);
 	    	 
-	    	 /** JOB IS Exist IN TCB_SCHEDULE_LOG(TAB) */
+	    	 /** JOB IS Exist IN TCB_MONITOR_SCHEDULE(TAB) */
 	         if(jobDBVO != null && jobExitsInQuartz != null){
 		    	/** delete Job in Quartz Ram */
 		    	deleteJobInRamPool(schedule, scheduleBean);
-		    	/** delete Job in TCB_SCHEDULE_LOG */
+		    	/** delete Job in TCB_MONITOR_SCHEDULE */
 		    	deleteBatchTask(conn, jobDBVO);
 	         }else if(jobDBVO != null && jobExitsInQuartz == null){
-	        	/** delete Job in TCB_SCHEDULE_LOG */
+	        	/** delete Job in TCB_MONITOR_SCHEDULE */
 		    	deleteBatchTask(conn, jobDBVO);
 	         }else if(jobDBVO == null && jobExitsInQuartz != null){
 	        	/** delete Job in Quartz Ram */
 		    	deleteJobInRamPool(schedule, scheduleBean);
 	         }
+				
+		 }catch(Exception e){
+			 throw e;
+		 }
+
+	 } 
+	 
+	 public void clearAllJob(ScheduleVO scheduleVO,Connection conn) throws Exception{
+		 Locale.setDefault(Locale.US);
+		 Scheduler schedule = getScheduler();
+		 ScheduleBean scheduleBean = new ScheduleBean();
+		 ScheduleServiceManagerHelper helper = new ScheduleServiceManagerHelper();
+		 try{
+			 
 				
 		 }catch(Exception e){
 			 throw e;
@@ -107,18 +125,18 @@ public class ScheduleServiceManager {
 			  Scheduler schedule = getScheduler();
 			  
 			 /** Case Schedule Once or Now after finish ,delete job in QuartzRAMPool*/
-			  if(vo.getType().equals(SchedulerConstant.SCHEDULE_TYPE_ONCE)){
+			  if(vo.getType().equals(SchedulerConstant.SCHEDULE_TYPE_ONCE) || vo.getType().equals(SchedulerConstant.SCHEDULE_TYPE_NOW)){
 				  
 		    	  ScheduleVO jobExitsInQuartz = isJobExistQuartz(schedule, scheduleBean);
 		    	 
-		    	 /** JOB IS Exist IN TCB_SCHEDULE_LOG(TAB) */
+		    	 /** JOB IS Exist IN TCB_MONITOR_SCHEDULE(TAB) */
 		         if(jobExitsInQuartz != null ){
 			    	/** delete Job in Quartz RamPool */
 			    	deleteJobInRamPool(schedule, scheduleBean);
 		         }
 			  }
 			  
-			  /** update status in TCB_SCHEDULE_LOG(TAB) */
+			  /** update status in TCB_MONITOR_SCHEDULE(TAB) */
 			  updateStatusBatchTask(conn, vo);
 			  
 			  /** debug Task in Running in RAMPool */
@@ -128,6 +146,23 @@ public class ScheduleServiceManager {
 			 logger.error(e.getMessage(),e);
 		 }
 	 }
+	 
+	 public boolean runTypeScheduleNowRegen(Connection conn,ScheduleVO scheduleVO) throws Exception{
+		 Scheduler schedule = getScheduler();
+		 /** create schedule Bean (JobDetail,Trigger)  */
+		 ScheduleBean scheduleBean = new ScheduleCreateJobManager().createScheduleBean(scheduleVO);
+	     
+		 logger.debug("schedule:"+schedule);
+	     logger.debug("JobDetail:"+scheduleBean.getJobDetail());
+	     logger.debug("Trigger:"+scheduleBean.getTrigger());
+	         
+		 scheduleVO.setNo(ObjectIdGenerator.getInstance().getNextSequenceId(conn));
+		 schedule.scheduleJob(scheduleBean.getJobDetail(),scheduleBean.getTrigger());
+		 //start create BatchTask 
+		 createBatchTask(conn, scheduleVO);
+		 return true;
+	 }
+	 
 	 /**
 	  * runTypeScheduleNow
 	  * @param conn
@@ -194,11 +229,11 @@ public class ScheduleServiceManager {
     		//Create JobDetail and Trigger
             ScheduleBean scheduleBean = new ScheduleCreateJobManager().createScheduleBean(scheduleVO);
             
-	    	/** check job isExist IN SCHEDULE_LOG */
+	    	/** check job isExist IN MONITOR_SCHEDULE */
 	    	ScheduleServiceManagerHelper helper = new ScheduleServiceManagerHelper();
 	    	ScheduleVO jobDBVO = helper.findLastRunDateByProgramId(conn, scheduleVO); 
 	    	
-	    	/** JOB IS Exist IN SCHEDULE_LOG(TAB) */
+	    	/** JOB IS Exist IN MONITOR_SCHEDULE(TAB) */
 	        if(jobDBVO != null){
 	        	ScheduleVO jobExitsInQuartz = isJobExistQuartz(schedule, scheduleBean);
 	        	if(jobExitsInQuartz != null){ /** Case Job Exist in Quartz Ram */
@@ -216,11 +251,11 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 			        
-			        /** Update TCB_SCHEDULE_LOG(TAB) */
+			        /** Update TCB_MONITOR_SCHEDULE(TAB) */
 			        updateBatchTaskSchedule(conn, scheduleVO);
 			        
 		    	}else{ /** Case Not found in Quartz  */ 
-		    		/** Get Data From SCHEDULE_LOG(TAB) */
+		    		/** Get Data From MONITOR_SCHEDULE(TAB) */
 			    	scheduleVO.setNo(jobDBVO.getNo());
 			    	scheduleVO.setLastRunDate(jobDBVO.getLastRunDate());
 			    	
@@ -231,14 +266,14 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 			        
-			        /** Update TCB_SCHEDULE_LOG(TAB) */
+			        /** Update TCB_MONITOR_SCHEDULE(TAB) */
 			        updateBatchTaskSchedule(conn, scheduleVO);
 		    	}
 	        	
-	        }else{ /** Not found In SCHEDULE_LOG(TAB) */
+	        }else{ /** Not found In MONITOR_SCHEDULE(TAB) */
 	        	
 	        	ScheduleVO jobExitsInQuartz = isJobExistQuartz(schedule, scheduleBean);
-	        	if(jobExitsInQuartz != null){ /** Case Job Exist in Quartz Ram And not found in TCB_SCHEDULE_LOG */
+	        	if(jobExitsInQuartz != null){ /** Case Job Exist in Quartz Ram And not found in TCB_MONITOR_SCHEDULE */
 		    		/** No data New */
 			    	scheduleVO.setNo(jobExitsInQuartz.getNo());
 			    	scheduleVO.setLastRunDate(jobExitsInQuartz.getLastRunDate());
@@ -253,10 +288,10 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 	
-			        /** Create New TCB_SCHEDULE_LOG(TAB) */
+			        /** Create New TCB_MONITOR_SCHEDULE(TAB) */
 			        createBatchTask(conn, scheduleVO);
 			        
-		    	}else{ /** Case Not found in Quartz And not found in TCB_SCHEDULE_LOG */ 
+		    	}else{ /** Case Not found in Quartz And not found in TCB_MONITOR_SCHEDULE */ 
 		    		
 		    		/** No data New initial */
 			    	scheduleVO.setNo(ObjectIdGenerator.getInstance().getNextSequenceId(conn));
@@ -269,7 +304,7 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 	
-			        /** Create New TCB_SCHEDULE_LOG(TAB) */
+			        /** Create New MONITOR_SCHEDULE(TAB) */
 			        createBatchTask(conn, scheduleVO);
 		    	}
 	        	
@@ -373,11 +408,14 @@ public class ScheduleServiceManager {
 	 */
 	private void deleteJobInRamPool(Scheduler schedule ,ScheduleBean sb) throws Exception {
 		if(sb != null){
-	      //logger.debug("delete JobId:"+sb.getJobDetail().getName()+":"+sb.getJobDetail().getGroup());
+	      logger.debug("delete JobId In RamPool:"+sb.getJobDetail().getKey().getName()+":"+sb.getJobDetail().getKey().getGroup());
+		  try{
+		     schedule.deleteJob(sb.getJobDetail().getKey());
 			
-		  schedule.deleteJob(sb.getJobDetail().getKey());
-			
-		  //schedule.deleteTrigger(param.getJobId(), param.getGroup());
+		     schedule.unscheduleJob(new TriggerKey(sb.getJobDetail().getKey().getName(),sb.getJobDetail().getKey().getGroup()));
+		  }catch(Exception e){
+			  logger.error("ERROR DEL JOB IN RAMPool \n"+e.getMessage());
+		  }
 		}
 	}
 	

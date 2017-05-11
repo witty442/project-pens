@@ -23,8 +23,7 @@ public class Master implements Serializable{
 	
 	/** option **/
 	private String orderBy;
-	
-	
+
 	public String getOrderBy() {
 		return orderBy;
 	}

@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 User user = (User)session.getAttribute("user");
@@ -6,12 +9,12 @@ User user = (User)session.getAttribute("user");
 
 <%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
 <title>PENS SALESYSTEM</title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script> 
 <style type="text/css">
 <!--
 body {
@@ -35,7 +38,11 @@ body {
 	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 				<tr>
 			        <td>
+			        <%if(request.getContextPath().startsWith("/batch_task")) {%>
+			           <jsp:include page="menu_q.jsp"/>
+			        <%}else{ %>
 			        	<jsp:include page="menu.jsp"/>
+			        <%} %>
 			       	</td>
 				</tr>
 	    	</table>

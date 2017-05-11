@@ -59,6 +59,7 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -303,7 +304,6 @@ function resetStore(){
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	    
 	      	<jsp:include page="../program.jsp">
 				<jsp:param name="function" value="job"/>
 			</jsp:include>
@@ -436,6 +436,18 @@ function resetStore(){
                                     <td> เอกสารอ้างอิง</td>
 									<td>				
 										  <html:text property="job.refDoc" styleId="refDoc" size="40" />
+									</td>
+								</tr>
+								<tr>
+                                    <td> จำนวนตัว (ตาม RTN)</td>
+									<td>				
+										  <html:text property="job.rtnQty" styleId="rtnQty" size="15" onblur="isNum(this)"/>
+									</td>
+								</tr>
+								<tr>
+                                    <td> ยอดเงิน (ตาม RTN) </td>
+									<td>				
+										  <html:text property="job.rtnAmt" styleId="rtnAmt" size="15"  onblur="isNum2Digit(this)"/>
 									</td>
 								</tr>
 						   </table>

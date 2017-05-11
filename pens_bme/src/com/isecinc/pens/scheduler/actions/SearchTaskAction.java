@@ -24,8 +24,6 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.dao.SearchTaskDAO;
 import com.isecinc.pens.scheduler.forms.SearchTaskForm;
-import com.isecinc.pens.scheduler.manager.ScheduleServiceManager;
-import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 
 public class SearchTaskAction extends  I_Action
@@ -164,13 +162,11 @@ public class SearchTaskAction extends  I_Action
 		// TODO Auto-generated method stub
 		return null;
 	}
-    
-   
 
     private TaskConditionDTO getSearchCondition(SearchTaskForm dynaForm)throws Exception{
         String dateFormat = "dd/MM/yyyy" ;//Constant.DATE_FORMAT_ddMMYYYY_WITH_SLASH;
         String dateFormatWithTime = "dd/MM/yyyy HH:mm";// Constant.DATE_FORMAT_ddMMYYYY_WITH_SLASH_WITH_TIME;
-        
+        String programId = Utils.isNull(dynaForm.getProgramId()).equals("")?"": dynaForm.getProgramId().split("\\,")[0];
         String no = dynaForm.getSearchId();//(String) dynaForm.get("searchId");
         String taskName = dynaForm.getSearchTaskName();// (String) dynaForm.get("searchTaskName");		
 		String createDateFromStr = dynaForm.getSearchCreateDateFrom();//(String) dynaForm.get("searchCreateDateFrom");
@@ -181,8 +177,6 @@ public class SearchTaskAction extends  I_Action
 		String createTimeFromMinStr = dynaForm.getSearchTimeFromMinute();//(String) dynaForm.get("searchTimeFromMinute");
 		String createTimeToHourStr = dynaForm.getSearchTimeToHour();//(String) dynaForm.get("searchTimeToHour");
 		String createTimeToMinStr = dynaForm.getSearchTimeToMinute();//(String) dynaForm.get("searchTimeToMinute");
-		String entity = dynaForm.getEntity();//(String) dynaForm.get("entitySch");
-		String product = dynaForm.getProduct();//(String) dynaForm.get("productSch");
 		
 		Timestamp createDateFrom = null;
 		boolean createDateFromWithTime = false;
@@ -216,6 +210,7 @@ public class SearchTaskAction extends  I_Action
 		
 		System.out.println("BatchFrom:"+tranDateSchFromStr);
 		System.out.println("BatchTO:"+tranDateSchToStr);
+		System.out.println("programId:"+programId);
 		
 		Date tranDateSchFrom = (tranDateSchFromStr != null && !"".equals(tranDateSchFromStr))
 			?DateUtil.parse(tranDateSchFromStr,dateFormat) :null;
@@ -233,9 +228,7 @@ public class SearchTaskAction extends  I_Action
 		dto.setCreateDateToWithTime(createDateToWithTime);
 		dto.setBatchDateFrom(tranDateSchFrom);
 		dto.setBatchDateTo(tranDateSchTo);
-		dto.setEntityId(entity);
-		dto.setProduct(product);
-		dto.setProgramId(null);
+		dto.setProgramId(programId);
 		return dto;
     }
     

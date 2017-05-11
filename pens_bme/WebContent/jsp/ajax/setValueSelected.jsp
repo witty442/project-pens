@@ -14,6 +14,8 @@ session.setAttribute("codes", codes);
 session.setAttribute("keys", keys);
 session.setAttribute("descs", descs);
 
+System.out.println("set Value Selected Session");
+
 System.out.println("SetAjax codes:"+codes);
 System.out.println("SetAjax descs:"+descs);
 System.out.println("Result SetAjax descs:"+(String)session.getAttribute("descs"));

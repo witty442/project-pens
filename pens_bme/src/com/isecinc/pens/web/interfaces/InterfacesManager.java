@@ -520,6 +520,44 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
 				}
 				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_POS)){
+				String status = dao.findControlMonitor(Constants.TYPE_IMPORT_POS);
+				String realPathTemps = BeanParameter.getTempPath();
+				logger.info("status["+status+"]");
+				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+				    canRunBatch = true;
+				}
+			
+				if(canRunBatch){
+					logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+					/** Import Data */
+
+					/** insert to monitor_interface **/
+					MonitorBean monitorModel = new MonitorBean();
+					monitorModel.setName(Constants.TYPE_IMPORT_POS);
+					monitorModel.setType(Constants.TYPE_IMPORT_POS);
+					monitorModel.setStatus(Constants.STATUS_START);
+					monitorModel.setCreateUser(userLogin.getUserName());
+					monitorModel.setTransactionType(Constants.TRANSACTION_BME_TYPE);
+					
+					/** Set Param Batch Map **/
+					Map<String, String> batchParamMap = new HashMap<String, String>();
+					batchParamMap.put(ImportExcelProcess.PARAM_REAL_PATH_TEMP,realPathTemps);
+					
+					monitorModel.setBatchParamMap(batchParamMap);
+					/** Set FormFile **/
+					FormFile dataFile = interfacesForm.getBean().getFormDataFile();
+					monitorModel.setDataFile(dataFile);
+					
+					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+				   
+					/** Set for Progress Bar Opoup **/
+					request.setAttribute("action", "submited");
+					request.setAttribute("id", m.getTransactionId());
+					
+				}else{
+					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+				}
 			}
 			
 		} catch (Exception e) {

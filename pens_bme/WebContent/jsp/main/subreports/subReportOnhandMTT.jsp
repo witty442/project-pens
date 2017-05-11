@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -17,7 +18,20 @@
 
 <jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
 <%
+  //get d-xxx-d parameter d-49489-p=16
+  String queryStr= request.getQueryString();
+if(queryStr.indexOf("d-") != -1){
+	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+	System.out.println("queryStr:"+queryStr);
+}
 
+  String currentPage = Utils.isNull(request.getParameter(queryStr));
+  String totalPage = "";
+  System.out.println("currentPage:"+currentPage);
+  List<OnhandSummary> dataList = summaryForm.getResults();
+  if(dataList != null && dataList.size() >0){
+    totalPage = String.valueOf((dataList.size()/ 50)+1);
+  } 
 %>
 <html>
 <head>
@@ -67,13 +81,25 @@ body {
 			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="lotus_storeCode"/>
 			    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
 			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
+			    
 			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-			      
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	   
 			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
 			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>			
-			    				
+			   
+			   <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+				<display:footer>
+			      <tr class="text_blod">
+			          <td colspan="5" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			      </tr>
+			    </display:footer>
+		       <%} %>	
 			</display:table>
 			</c:if>
 			
@@ -90,10 +116,21 @@ body {
 			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
-			      
 			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
 			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
-			    				
+			    
+			    <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+				<display:footer>
+			      <tr class="text_blod">
+			          <td colspan="4" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			      </tr>
+			    </display:footer>
+		       <%} %>	
 			</display:table>
 			</c:if>
 	   </c:if>

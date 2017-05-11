@@ -86,6 +86,7 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -438,7 +439,6 @@ function resetInvRefWal(){
 		/* document.getElementById('empId').className= "disableText";
 		document.getElementById('empId').readOnly= true;
 		document.getElementById('getempId').style.display='none'; */
-
 	}
 }
 
@@ -484,6 +484,7 @@ function getInvRefWal(invRefWalObj){
 				form.oracleRefId.value = '';
 				form.oracleRefName.value = '';
 			    form.totalDamage.value = '';
+			    form.invoiceDate.value = '';
 			}else{
 				var retArr = returnString.split("|");
 				form.oracleRefId.value = retArr[0];
@@ -498,7 +499,7 @@ function getInvRefWal(invRefWalObj){
 					form.surname.value = retArr[5];
 				    form.branch.value = retArr[6];
 				    form.groupStore.value = retArr[7];
-				    
+				    form.invoiceDate.value = retArr[8];
 				    form.fullName.value = form.name.value+" "+form.surname.value;
 			    }else{
 			    	alert("ไม่พบข้อมูลพนักงานที่ตรงกับรหัสร้านค้าใน Invoice กรุณาตรวจสอบข้อมูลพนักงาน SA");
@@ -515,6 +516,7 @@ function getInvRefWal(invRefWalObj){
 				    form.branch.value = '';
 				    form.groupStore.value = '';
 				    form.fullName.value = '';
+				    form.invoiceDate.value = '';
 			    }
 			}
 
@@ -533,6 +535,7 @@ function getInvRefWal(invRefWalObj){
 		    form.branch.value = '';
 		    form.groupStore.value = '';
 		    form.fullName.value = '';
+		    form.invoiceDate.value = '';
 		}
 	}
 }
@@ -692,6 +695,26 @@ function getRewardTransData(selectedObj,index){
   sumTotal();
 	
 }
+
+function openPopupCheckStockDate(path){
+    var form = document.saDamageForm;
+    if(form.empId.value != ""){
+		var param  = "&page=searchCheckStockDatePopup";
+		    param += "&empId="+form.empId.value;
+		    param += "&type="+form.type.value;
+		url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
+		//window.open(encodeURI(url),"",
+				  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+		PopupCenterFullHeight(url,"","600");
+	}else{
+	   alert("โปรดระบุ Emp ID ก่อน ");
+	   form.empId.focus();
+	}
+}
+function setCheckStockDateMainValue(checkStockDate){
+	var form = document.saDamageForm;
+	form.checkStockDate.value = checkStockDate;
+}
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -768,7 +791,8 @@ function getRewardTransData(selectedObj,index){
 										<%}else{ %>
 										  <html:text property="bean.invRefwal" styleId="invRefwal" size="30" styleClass="disableText" readonly="true"> </html:text>
 										<%} %>
-										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										&nbsp;&nbsp;&nbsp;Invoice Date &nbsp; <html:text property="bean.invoiceDate" styleId="invoiceDate" styleClass="disableText" readonly="true"> </html:text>
+
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									วันที่บันทึก <font color="red"></font>
 											
@@ -791,10 +815,10 @@ function getRewardTransData(selectedObj,index){
 								<tr>
                                     <td align="right">Employee ID<font color="red">*</font></td>
 									<td nowrap> 
-										   <html:text property="bean.empId" styleId="empId" size="20" maxlength="6"  onkeypress="getEmpKeypress(event,this)" readonly="true" styleClass="disableText"/>  
+										 <html:text property="bean.empId" styleId="empId" size="20" maxlength="6"  onkeypress="getEmpKeypress(event,this)" readonly="true" styleClass="disableText"/>  
 									</td>
 									<td>  
-										  <input  tabindex="-1" type="button" id="getempId" name="getempId" value="..." onclick="openPopupEmp('${pageContext.request.contextPath}')" />
+										 <input  tabindex="-1" type="button" id="getempId" name="getempId" value="..." onclick="openPopupEmp('${pageContext.request.contextPath}')" />
 									</td>
 									<td align="left">
 										   <html:text property="bean.fullName" styleId="fullName" size="40" styleClass="disableText" > </html:text>
@@ -806,6 +830,8 @@ function getRewardTransData(selectedObj,index){
                                     <td  align="right">วันที่เข้าตรวจนับ<font color="red"></font></td>
 									<td colspan="3">		
 										 <html:text property="bean.checkStockDate" styleId="checkStockDate" size="30" readonly="true"> </html:text>
+										   <input  tabindex="-1" type="button" id="getempId" name="getempId" value="..." onclick="openPopupCheckStockDate('${pageContext.request.contextPath}')" />
+										   &nbsp;
 									ค่าความเสียหาย<font color="red"></font>
 										  <html:text property="bean.totalDamage" styleId="totalDamage" size="30" readonly="true" styleClass="disableText" onblur="isNum2Digit(this);"> </html:text>
 									</td>
@@ -826,7 +852,7 @@ function getRewardTransData(selectedObj,index){
 				           </c:if> 
 						   <table id="tblProduct" align="center" width="75%" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth">
 						       <tr> 
-						            <th ><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
+						            <th><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
 						            <th>ลำดับที่</th>
 						            <th>ประเภทการหักเงิน</th>
 									<th>วันที่ส่งเงิน(-)</th>

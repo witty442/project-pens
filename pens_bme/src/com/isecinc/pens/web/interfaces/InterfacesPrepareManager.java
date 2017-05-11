@@ -96,7 +96,7 @@ public class InterfacesPrepareManager {
 				
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ORDER_EXCEL);
 				
-			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_ITEM_MASTER_HISHER)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value
 				InterfaceBean bean =new InterfaceBean();
@@ -112,7 +112,7 @@ public class InterfacesPrepareManager {
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ITEM_MASTER_HISHER);
 				
-			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value
 				InterfaceBean bean =new InterfaceBean();
@@ -127,19 +127,26 @@ public class InterfacesPrepareManager {
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
 				
 				
-			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value
 				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
 				
-			}else 	if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value
 				
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_SALEOUT_WACOAL);
+				
+			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_POS)
+					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
+				//default value
+				
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_POS);
 			}
 			
 		} catch (Exception e) {

@@ -1299,8 +1299,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									<td align="right">
 									     <input type="button" value=" Search " class="newPosBtnLong" style="width: 120px;"
 										     onClick="javascript:search('${pageContext.request.contextPath}','admin')" />
-										<%--  <input type="button" value=" Export " class="newPosBtnLong" style="width: 120px;" 
-										     onClick="javascript:exportData('${pageContext.request.contextPath}','admin')" /> --%>
+										
 										 <button type="button" id="btnExport" onclick="fnExcelReport();" class="newPosBtnLong" style="width:120px;" > Export</button>  
 										 <input type="button" value=" Clear " class="newPosBtnLong" style="width: 120px;" 
 										     onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')" />
@@ -1308,6 +1307,10 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 										 
 										  
 										  <a href="javascript:getSQL('${pageContext.request.contextPath}','admin')"  > ...?</a>
+										  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										    <input type="button" value=" Export(ข้อมูลจำนวนมาก) " class="newPosBtnLong" style="width: 220px;" 
+										     onClick="javascript:exportData('${pageContext.request.contextPath}','admin')" />
+										     
 										<%--  <input type="button" value=" GET SQL " class="newPosBtn" style="width: 120px;" 
 										     onClick="javascript:getSQL('${pageContext.request.contextPath}','admin')" />
 										  --%>    

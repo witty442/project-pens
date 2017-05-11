@@ -7,7 +7,9 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +31,7 @@ import com.isecinc.pens.scheduler.dao.SearchTaskDAO;
 import com.isecinc.pens.scheduler.forms.ScheduleForm;
 import com.isecinc.pens.scheduler.manager.ScheduleServiceManager;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
+import com.isecinc.pens.scheduler.manager.SchedulerConstant;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.scheduler.utils.JobUtils;
 import com.isecinc.pens.scheduler.utils.SecurityUtils;
@@ -106,9 +109,10 @@ public class ScheduleAction extends  I_Action
 		}
 		return returnText;
 	}
+	
 	/**
 	 * Search
-	 */
+	*/
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("Interfaces Search Current Action");
 		ScheduleForm f = (ScheduleForm) form;
@@ -163,12 +167,68 @@ public class ScheduleAction extends  I_Action
         return mapping.findForward("Success");
 	}
 	
+	public ActionForward regen(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ScheduleForm f = (ScheduleForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		ArrayList dataList = new ArrayList();
+	    Connection conn = null;
+	    logger.debug("Action Regen Batch");
+	    Map<String, String> paramMap = new HashMap<String, String>();
+		try{
+		     //Get Param From Job_Init
+			 String programId = Utils.isNull(request.getParameter("programId"));
+			 ScheduleVO param = SearchTaskDAO.getJobInit(programId);
+			 
+			 //Get Parameter Regen\
+			 String paramQtr = param.getParamRegen();
+			 if( !"".equals(paramQtr)){
+			    String[] paramArr = paramQtr.split("\\,");
+			    if(paramArr.length >0){ 
+					 for(int i=0;i<paramArr.length;i++){
+					   String[] paramTemp = paramArr[i].split("\\|");
+					   String paramName = paramTemp[0];
+					   String paramType = paramTemp[1];
+					   String paramValue = Utils.isNull(request.getParameter(paramName));
+					   logger.debug(paramName+":"+paramValue);
+					   
+					   paramMap.put(paramName, paramValue);
+					 }
+			    }
+			 }
+			 param.setProgramName(param.getProgramName()+"(regen)");
+			 param.setGroupId(Utils.isNull(SchedulerConstant.SCHEDULE_TYPE_NOW));// group by type schedule
+			 param.setType(Utils.isNull(SchedulerConstant.SCHEDULE_TYPE_NOW));
+			 //Gen JobName
+			 param.setJobId(JobUtils.genRegenJobId(param));
+			 //set localPath
+			 param.setLocalPath(request.getRealPath("temps"));
+			 param.setParamMap(paramMap);
+			 
+			 //get Connection 
+			 conn = DBConnection.getInstance().getConnection();
+			 
+			 //run job
+			 ScheduleServiceManager service = new  ScheduleServiceManager();
+			 service.runTypeScheduleNowRegen(conn,param);
+			 
+			 request.setAttribute("regenSuccess", "Success");
+			 
+		}catch(Exception e){
+			 e.printStackTrace();
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+        return mapping.findForward("Regen");
+	}
+	
 	public ActionForward deleteBatch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		ScheduleForm f = (ScheduleForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		ArrayList dataList = new ArrayList();
 	    Connection conn = null;
-	    logger.debug("Action Run Batch");
+	    logger.debug("Action Delete Batch");
 		try{
 			// Job & trigger information
 		     ScheduleVO param = new ScheduleVO();
@@ -264,6 +324,7 @@ public class ScheduleAction extends  I_Action
 		 param.setStartMinute(Utils.isNull(f.getStartMinute()));
 		 param.setUserId(SecurityUtils.getInstance().getUserId(request));
 		 param.setEveryDay(f.getEveryDay());
+		 param.setNDay(f.getNDay());
 		 
 		 //Gen JobName
 		 param.setJobId(JobUtils.genJobId(param));

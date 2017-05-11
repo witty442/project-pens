@@ -10,6 +10,7 @@ public class SchedulerConstant {
 	public final static String SCHEDULE_TYPE_NOW = "NOW";
 	public final static String SCHEDULE_TYPE_ONCE = "ONCE";
 	public final static String SCHEDULE_TYPE_WEEKLY = "WEEKLY";
+	public final static String SCHEDULE_TYPE_MONTHLY = "MONTHLY";
 	public final static String SCHEDULE_TYPE_DAILY = "DAILY";
 	
 	public final static String STATUS_FAIL ="FAIL";

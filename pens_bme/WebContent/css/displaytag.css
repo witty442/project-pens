@@ -8,8 +8,9 @@ TABLE.resultDisp {
 	margin-left:auto; 
     margin-right:auto;
     width:100%; 
-
+    text-align: center;
 }
+
 TABLE.resultDisp TH {
 	background-color: #03A4B6;
 	text-align: center;
@@ -21,7 +22,15 @@ TABLE.resultDisp TD {
 	height: 25px;
 	font-size: 13px;
 }
+table.resultDisp td.td_text_right {
+  text-align: right;
+  align:right;
+}
 
+table.resultDisp td.td_text_center {
+  text-align: center;
+  align:center;
+}
 
 th.sorted {
     background-color: orange;
@@ -71,14 +80,14 @@ tr.tableRowEven,tr.even {
 }
 .td_text_center{
 	align:center;
-	
+}
+
+.td_number{
+	text-align:right;
 }
 .td_number_bold{
 	text-align:right;
 	font-weight: bold;
-}
-.td_number{
-	text-align:right;
 }
 
 div.exportlinks {

@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.MoveStockWarehouseBean"%>
 <%@page import="com.isecinc.pens.bean.MoveWarehouse"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
@@ -41,36 +42,14 @@ if(session.getAttribute("wareHouseList") == null){
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>" ></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>" ></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -79,6 +58,20 @@ function loadMe(){
 	 <%if(resultList != null && resultList.size() >0) {%>
 	    sumQty();
 	    sumOnhandQty();
+	  <%}%>
+	  if(document.getElementsByName('bean.materialMaster')[0].value != ''){
+		  loadPensItemModel("<%=moveStockWarehouseForm.getBean().getPensItem()%>");
+		  setOnhandQtyByPensItemAfterSave("<%=moveStockWarehouseForm.getBean().getPensItem()%>");
+	  }
+	  <%
+	  if(request.getAttribute("Message") != null){
+	  %>
+	    alert("<%=(String)request.getAttribute("Message")%>");
+	    //clear old data
+		document.getElementsByName('bean.materialMaster')[0].value="";
+		loadPensItemModel("");
+		document.getElementsByName('bean.onhandQty')[0].value ="";
+		$('#transferQty').val('');
 	  <%}%>
 }
 
@@ -108,6 +101,54 @@ function search(path){
 	form.action = path + "/jsp/moveStockWarehouseAction.do?do=search&action=newsearch";
 	form.submit();
 	return true;
+}
+function loadPensItem(e){
+	if(e != null && e.keyCode == 13){
+		loadPensItemModel('');
+	}
+}
+
+function loadPensItemModel(pensItem){
+		var pensItemList = document.getElementById('pensItem');
+		var mat = document.getElementsByName('bean.materialMaster')[0];
+		var warehouseFrom = document.getElementsByName('bean.warehouseFrom')[0];
+		
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/getPensItemMoveStockWarehoseListAjax.jsp",
+				data : "warehouse=" + warehouseFrom.value+"&mat="+mat.value+"&pensItem="+pensItem,
+				async: false,
+				success: function(getData){
+					var returnString = jQuery.trim(getData);
+					pensItemList.innerHTML=returnString;
+					//alert(returnString);
+				}
+			}).responseText;
+		});
+	
+}
+
+function setOnhandQtyByPensItem(pensItem){
+	//alert(pensItem.value);
+	var pensItemTemp = pensItem.value;
+	var onhandQty = pensItemTemp.split("|")[1]; 
+	var pensItemStr = pensItemTemp.split("|")[0]; 
+	
+	if(onhandQty=='0'){
+		document.getElementsByName('bean.onhandQty')[0].value ="";
+		alert("ไม่สามารถ Transfer Stock PensItem["+pensItemStr+"]ได้  เนื่องจาก  ยอด onhand เป็น 0");
+		pensItem.value = "";
+	}else{
+	  document.getElementsByName('bean.onhandQty')[0].value = onhandQty;
+	}
+}
+
+/** display new onhand qty after save **/
+function setOnhandQtyByPensItemAfterSave(pensItem){
+	//alert(pensItem.value);
+	var pensItemTemp =  document.getElementById('pensItem').value;
+	var onhandQty = pensItemTemp.split("|")[1]; 
+    document.getElementsByName('bean.onhandQty')[0].value = onhandQty;
 }
 
 function save(path){
@@ -142,6 +183,17 @@ function save(path){
 		$('#materialMaster').focus();
 		return false;
 	}
+	if(pensItem ==""){
+		alert("กรุณากรอก เลือก Pens Item");
+		$('#pensItem').focus();
+		return false;
+	}
+	/* if(onhandQty =="" && onhandQty != '0'){
+		alert("ไม่่สามารถ ใช้ Pens Itemนี้ได้เนือ่งจากยอด Onhand เป็น 0");
+		$('#pensItem').focus();
+		return false;
+	} */
+	
 	if(transferQty =="" && transferQty != '0'){
 		alert("กรุณากรอก จำนวน");
 		$('#transferQty').focus();
@@ -292,23 +344,26 @@ function isNum(obj){
                                         <html:select property="bean.warehouseFrom" styleId="warehouseFrom" >
 											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
 									    </html:select>
-                                     </td>
-									<td align="left">Move To Warehouse </td>
-									<td align="left">
+									     &nbsp;&nbsp;Move To Warehouse <font color="red">*</font>
 									      <html:select property="bean.warehouseTo" styleId="warehouseTo" >
-											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
+											 <html:options collection="wareHouseList" property="key" labelProperty="name"/>
 									       </html:select>
-									</td>
+                                     </td>
+									
 								</tr>     			
 						        <tr>
                                     <td align="right"> รุ่นสินค้า(สีไซร์)<font color="red">*</font></td>
-                                      <td>
-                                        <html:text property="bean.materialMaster" styleId="materialMaster" />
+                                    <td>
+                                        <html:text property="bean.materialMaster" styleId="materialMaster" onkeypress='loadPensItem(event)'/>
+                                        &nbsp;&nbsp;PensItem :<font color="red">*</font>
+                                        <html:select property="bean.pensItem" styleId="pensItem" onchange="setOnhandQtyByPensItem(this)" >
+                                          
+                                        </html:select>
+                                         &nbsp;&nbsp;Onhand Qty :
+                                        <html:text property="bean.onhandQty" styleId="onhandQty" readonly="true" styleClass="disableText" size="5"/>
+                                        
+                                          &nbsp;&nbsp;   จำนวน <font color="red">*</font> <html:text property="bean.transferQty" styleId="transferQty" onchange="isNum(this)"/>
                                      </td>
-									<td align="left">จำนวน <font color="red">*</font></td>
-									<td align="left">
-									      <html:text property="bean.transferQty" styleId="transferQty" onchange="isNum(this)"/>
-									</td>
 								</tr>     
 								<%-- <tr>
                                     <td align="right">Group Code </td>
@@ -397,7 +452,7 @@ function isNum(obj){
 									 </a>
 									
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value=" Clear " class="newPosBtnLong"> 
+										  <input type="button" value="    Clear    " class="newPosBtnLong"> 
 								    </a>
 										
 								</td>
@@ -406,7 +461,6 @@ function isNum(obj){
 				   </div>
 		
 					<!-- ************************Result ***************************************************-->
-					
 					<!-- hidden field -->
 					</html:form>
 					<!-- BODY -->

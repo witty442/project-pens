@@ -59,24 +59,15 @@ public class Utils {
 	public static final String format_current_6_digit = "#,##0.000000";
 	
 	
-	private static String DECIMAL_FORMAT ="#.00000000000000000000";
+	//private static String DECIMAL_FORMAT ="#.00000000000000000000";
 	private static String CURRENCY_FORMAT ="#,##0.00";
 	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
 	private static String NUMBER_FORMAT ="#,##0";
 	
 	public static void main(String[] args){
 	    try{	
-	    	String doubleStr = "100.15000";
-	    	System.out.println("length:"+doubleStr.length());
-	    	System.out.println("doubleStr.indexOf(.)+3:"+(doubleStr.indexOf(".")+3));
-	    	
-	        String num2 = "00";
-	        if( (doubleStr.length()) > (doubleStr.indexOf(".")+3) ){
-	        	num2= doubleStr.substring(doubleStr.indexOf(".")+1,(doubleStr.indexOf(".")+3));
-	        }else{
-	        	num2= doubleStr.substring((doubleStr.indexOf(".")+1),(doubleStr.indexOf(".")+2));
-	        }
-	        System.out.println("num2:"+num2);
+	    	double num2 = 100.0;
+	  
 	        
 	    }catch(Exception e){
 	        e.printStackTrace();
@@ -354,6 +345,12 @@ public class Utils {
 		NumberFormat formatter = new DecimalFormat(format);
 		return formatter.format(num);
 	}
+	public static String decimalFormat(double num,String format,String defaultS){
+		if(num==0 || num == 0.00 || num ==0.0)
+			return defaultS;
+		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
 	
 	public static double strToDouble(String s){
 		if(s == null || "".equals(s)){
@@ -556,6 +553,19 @@ public class Utils {
 		return dateStr;
 	}
 	
+	public static String stringValueNull(Date date, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date != null){
+			   dateStr = ft.format(date);
+			}else{
+			   dateStr = "";
+			}
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
 	
 	public static String stringValueSpecial(long dateBigdecimal, String format ,Locale locale) throws Exception {
 		String dateStr = null;		
@@ -623,7 +633,18 @@ public class Utils {
 		}else{
 			return ((String)str).trim();
 		}
+	}
+	
+	//input 111.0 
+	//output 111
+	public static String convertDoubleToStrNoDigit(Object str) {
+		String strNoDigit = "";
+		strNoDigit = isNull(str);
+		if(strNoDigit.indexOf(".") != -1){
+			strNoDigit = strNoDigit.substring(0,strNoDigit.indexOf("."));
+		}
 		
+		return strNoDigit;
 	}
 	
 	//in :8.850009281274E12
@@ -721,6 +742,14 @@ public class Utils {
 	}
 	
 	public static Double isDoubleNull(Object str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		//logger.debug("str:"+str);
+		return ((Double)str);
+	}
+	
+	public static Double isDoubleNoDigitNull(Object str) {
 		if (str ==null || isNull(str).equals("")){
 			return new Double(0);
 		}

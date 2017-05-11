@@ -24,6 +24,18 @@ public class ScheduleForm extends I_Form{
 	String everyDay;
 	
 	
+	public String getnDay() {
+		return nDay;
+	}
+	public void setnDay(String nDay) {
+		this.nDay = nDay;
+	}
+	public String getnMonth() {
+		return nMonth;
+	}
+	public void setnMonth(String nMonth) {
+		this.nMonth = nMonth;
+	}
 	public String getEveryDay() {
 		return everyDay;
 	}

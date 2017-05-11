@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
 
+import com.isecinc.pens.bean.User;
+
 /**
  * @author WITTY
  *
@@ -61,8 +63,15 @@ private static final long serialVersionUID = -990650039740579753L;
 	private Map<String, String> batchParamMap;
 	private Map<String, Object> batchParamMapObj;
     private FormFile dataFile;
-	
+	private User user;
     
+	
+   public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
 public Map<String, Object> getBatchParamMapObj() {
 		return batchParamMapObj;
 	}

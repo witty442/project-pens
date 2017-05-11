@@ -42,6 +42,9 @@ public class ScheduleCreateJobManager {
 		}else if(SchedulerConstant.SCHEDULE_TYPE_WEEKLY.equals(param.getType())){
 			bean.setCronTrigger(createCrontrigger(param));
 			
+		}else if(SchedulerConstant.SCHEDULE_TYPE_MONTHLY.equals(param.getType())){
+			bean.setCronTrigger(createCrontrigger(param));
+			
 		}
 		bean.setJobDetail(jobDetail);
 		
@@ -140,10 +143,14 @@ public class ScheduleCreateJobManager {
 		    	  cronTriggerStr = CronExpressionUtil.dailyToCronExpr(param.getEveryDay(), startTime);
 		    	 
 		      }else if(SchedulerConstant.SCHEDULE_TYPE_WEEKLY.equals(param.getType())){
-				 //weekly
-				 cronTriggerStr = CronExpressionUtil.weeklyToCronExpr(param.getDays(), startTime);
+				  //weekly
+				  cronTriggerStr = CronExpressionUtil.weeklyToCronExpr(param.getDays(), startTime);
 				 //cronTriggerStr  =  "0 45 17 ? * TUE"; //run every tueday start at 10:15  //sample cronStr
-			 }
+				  
+		      }else if(SchedulerConstant.SCHEDULE_TYPE_MONTHLY.equals(param.getType())){
+				  //monthly
+				  cronTriggerStr = CronExpressionUtil.nthDayOfMonthToCronExpr(Integer.parseInt(param.getNDay()), startTime);
+			  }
 		  
 		}
 		logger.debug("cronTriggerStr :"+cronTriggerStr);

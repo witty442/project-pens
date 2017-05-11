@@ -23,36 +23,9 @@
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="jobForm" class="com.isecinc.pens.web.pick.JobForm" scope="session" />
-
 <%
-if(session.getAttribute("wareHouseList") == null){
-	List<References> wareHouseList = new ArrayList();
-	References ref1 = new References("","");
-	wareHouseList.add(ref1);
-	wareHouseList.addAll(JobDAO.getWareHouseList());
-	
-	session.setAttribute("wareHouseList",wareHouseList);
-}
 
-if(session.getAttribute("jobStatusList") == null){
-	List<References> billTypeList = new ArrayList();
-	References ref = new References("","");
-	billTypeList.add(ref);
-	billTypeList.addAll(JobDAO.getJobStatusList());
-	
-	session.setAttribute("jobStatusList",billTypeList);
-}
-
-if(session.getAttribute("custGroupList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
-	
-	session.setAttribute("custGroupList",billTypeList);
-}
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -346,6 +319,8 @@ function resetStore(){
 									<th >Job ID</th>
 									<th >Job Name</th>
 									<th> เอกสารอ้างอิง </th>
+									<th> จำนวนตัว (ตาม RTN)</th>
+									<th> ยอดเงิน (ตาม RTN)</th>
 									<th >Job Status</th>
 									<th >Job Close Date</th>
 									<th >แก้ไข</th>						
@@ -361,24 +336,30 @@ function resetStore(){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="td_text_center" width="5%">${results.no}</td>
+										<td class="td_text_center" width="3%">${results.no}</td>
 										<td class="td_text_center" width="8%">
 										   ${results.openDate}
 										</td>
 										<td class="td_text_center" width="5%">${results.wareHouse}</td>
-										<td class="td_text" width="10%">${results.custGroupDesc}</td>
-										<td class="td_text" width="5%">${results.jobId}</td>
-										<td class="td_text" width="10%">
+										<td class="td_text" width="7%">${results.custGroupDesc}</td>
+										<td class="td_text" width="3%">${results.jobId}</td>
+										<td class="td_text" width="17%">
 											${results.name}
 										</td>
 										<td class="td_text" width="8%">
 											${results.refDoc}
 										</td>
-										<td class="td_text"  width="10%">
+										<td class="td_text" width="4%">
+											${results.rtnQty}
+										</td>
+										<td class="td_text" width="4%">
+											${results.rtnAmt}
+										</td>
+										<td class="td_text"  width="5%">
 										    ${results.statusDesc}
 										</td>
 										
-										<td class="td_text_center" width="8%">
+										<td class="td_text_center" width="5%">
 										  ${results.closeDate}
 										</td>
 										<td class="td_text_center" width="10%">

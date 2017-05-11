@@ -53,8 +53,44 @@ public class PopupForm extends ActionForm implements Serializable{
 	
 	//
 	private String page;
+	private String checkStockDate;
+	private String mat;
+	private String pensItem;
+	private String qty;
 	
 	
+	public String getQty() {
+		return qty;
+	}
+
+	public void setQty(String qty) {
+		this.qty = qty;
+	}
+
+	public String getPensItem() {
+		return pensItem;
+	}
+
+	public void setPensItem(String pensItem) {
+		this.pensItem = pensItem;
+	}
+
+	public String getMat() {
+		return mat;
+	}
+
+	public void setMat(String mat) {
+		this.mat = mat;
+	}
+
+	public String getCheckStockDate() {
+		return checkStockDate;
+	}
+
+	public void setCheckStockDate(String checkStockDate) {
+		this.checkStockDate = checkStockDate;
+	}
+
 	public String getGroupStore() {
 		return groupStore;
 	}
