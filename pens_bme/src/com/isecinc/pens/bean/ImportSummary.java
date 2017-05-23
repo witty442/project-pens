@@ -29,8 +29,15 @@ public class ImportSummary implements Serializable{
 	//option
 	private String groupCode;
 	private String pensItem;
+	private String itemWacoal;
 	
 	
+	public String getItemWacoal() {
+		return itemWacoal;
+	}
+	public void setItemWacoal(String itemWacoal) {
+		this.itemWacoal = itemWacoal;
+	}
 	public String getLineArr() {
 		return lineArr;
 	}

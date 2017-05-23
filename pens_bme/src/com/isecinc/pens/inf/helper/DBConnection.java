@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.Properties;
 
 import oracle.jdbc.driver.OracleConnection;
@@ -14,16 +15,15 @@ import org.apache.log4j.Logger;
 public class DBConnection {
    
 	private static Logger logger = Logger.getLogger("PENS");
-	EnvProperties env = EnvProperties.getInstance();
-	private static DBConnection _instance;
+	private  static DBConnection _instance;
 	
-	public static DBConnection getInstance(){
+	public static  DBConnection getInstance(){
 	  if(_instance ==null)
 		  _instance = new DBConnection();
 	  return _instance;
 	}
 	
-	public  Connection getConnection(){		
+	public   Connection getConnection(){		
 		Connection _instanceInf =null;
 		try{
 		   _instanceInf = getConnection1();
@@ -71,8 +71,9 @@ public class DBConnection {
 		return _instanceInf;	
 	}*/
 	
-	public  Connection getConnection1(){		
+	public  static Connection getConnection1(){		
 		Connection _instanceInf =null;
+		EnvProperties env = EnvProperties.getInstance();
 		try {	
 
 			String driver = env.getProperty("db.driver_class");

@@ -14,6 +14,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import util.EncyptUtils;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.SessionIdUtils;
@@ -63,7 +65,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("Locale:"+Locale.getDefault());
 			
 			//remove session id
-			SessionIdUtils.clearInstance();
+			SessionIdUtils.getInstance().clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
@@ -135,7 +137,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
 			
 			//remove session id
-			SessionIdUtils.clearInstance();
+			SessionIdUtils.getInstance().clearInstance();
 			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
@@ -151,6 +153,8 @@ public class LoginAction extends DispatchAction {
 			
 			String userName = Utils.isNull(request.getParameter("userName"));
 			String password = Utils.isNull(request.getParameter("password"));
+			//decode
+			password = EncyptUtils.base64decode(password);
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
@@ -205,7 +209,7 @@ public class LoginAction extends DispatchAction {
 		try {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
 			//remove session id
-			SessionIdUtils.clearInstance();
+			SessionIdUtils.getInstance().clearInstance();
 			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
@@ -274,14 +278,9 @@ public class LoginAction extends DispatchAction {
 		String forwordStr = "logoff";
 		try {
 			logger.debug("logoff");
-			//Manage Path
-			if(request.getSession().getAttribute("user") != null){
-			 // User user = (User)request.getSession().getAttribute("user") ;
-			 // ManagePath.savePath(user, "logoff");
-			}
 			
 			//remove session id
-			SessionIdUtils.clearInstance();
+			SessionIdUtils.getInstance().clearInstance();
 			
 			request.getSession().invalidate();
 		} catch (Exception e) {

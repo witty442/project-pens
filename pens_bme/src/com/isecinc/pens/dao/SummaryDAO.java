@@ -33,6 +33,7 @@ import com.isecinc.pens.sql.ReportOnhandMTTDetailSQL;
 import com.isecinc.pens.sql.ReportOnhandMTTSQL;
 import com.isecinc.pens.sql.ReportSizeColorBigCSQL;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
+import com.isecinc.pens.sql.ReportStockWacoalLotus_SQL;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.summary.SummaryForm;
 
@@ -1492,6 +1493,81 @@ public class SummaryDAO {
 				item.setOnhandAmt(Utils.decimalFormat(onhand_amt,Utils.format_current_2_disgit));
 				c.setSummary(item);
 
+				c.setItemsList(pos);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return c;
+	    }
+	  public OnhandSummary searchReportStockWacoalLotus(SummaryForm f,OnhandSummary c,User user) throws Exception{
+		   Statement stmt = null;
+			ResultSet rst = null;
+			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+		    double saleInQtyTemp = 0;
+		    double saleReturnQtyTemp = 0;
+		    double saleOutQtyTemp = 0;
+		    double adjustQtyTemp =0;
+		    double stockShortQtyTemp = 0;
+		    double onhandQtyTemp = 0;
+		    double onhand_amt = 0;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+                sql = ReportStockWacoalLotus_SQL.genSQL(conn, c, f.getSummaryType());
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					OnhandSummary item = new OnhandSummary();
+					
+					item.setStoreCode(rst.getString("customer_code"));
+					item.setStoreName(rst.getString("customer_desc"));
+					
+					item.setGroup(rst.getString("group_type"));
+					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
+					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("ADJUST_QTY"),Utils.format_current_no_disgit));
+					item.setStockShortQty(Utils.decimalFormat(rst.getDouble("STOCK_SHORT_QTY"),Utils.format_current_no_disgit));
+					item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price_bf"),Utils.format_current_2_disgit));
+					item.setOnhandAmt(Utils.decimalFormat(rst.getDouble("onhand_amt"),Utils.format_current_2_disgit));
+					 
+					
+					saleInQtyTemp += Utils.convertStrToDouble(item.getSaleInQty());
+					saleReturnQtyTemp +=Utils.convertStrToDouble(item.getSaleReturnQty());
+					saleOutQtyTemp +=Utils.convertStrToDouble(item.getSaleOutQty());
+					adjustQtyTemp +=Utils.convertStrToDouble(item.getAdjustQty());
+					stockShortQtyTemp +=Utils.convertStrToDouble(item.getStockShortQty());
+					onhandQtyTemp +=Utils.convertStrToDouble(item.getOnhandQty());
+					onhand_amt += rst.getDouble("onhand_amt");
+							
+					pos.add(item);
+					
+				}//while
+				
+				//Summary
+				OnhandSummary item = new OnhandSummary();
+				item.setStoreCode("");
+				item.setGroup("");
+				item.setSaleInQty(Utils.decimalFormat(saleInQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(saleReturnQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(saleOutQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
+				item.setAdjustQty(Utils.decimalFormat(adjustQtyTemp,Utils.format_current_no_disgit));
+				item.setStockShortQty(Utils.decimalFormat(stockShortQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandAmt(Utils.decimalFormat(onhand_amt,Utils.format_current_2_disgit));
+				c.setSummary(item);
+                
+				//set data list
 				c.setItemsList(pos);
 			} catch (Exception e) {
 				throw e;

@@ -221,6 +221,32 @@ public class SummaryAction extends I_Action {
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
 					
+				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					//set for display by page
+					request.getSession().setAttribute("summary",null);
+					summaryForm.setPage("ReportStockWacoalLotus");
+					List<OnhandSummary> results = null;
+					OnhandSummary re = new SummaryDAO().searchReportStockWacoalLotus(summaryForm,summaryForm.getOnhandSummary(),user);
+					if(re != null){
+						results = re.getItemsList();
+						request.getSession().setAttribute("summary",re.getSummary());
+					}else{
+						request.getSession().setAttribute("summary",null);
+					}
+					
+					if (results != null  && results.size() >0) {
+						summaryForm.setResults(results);
+						
+						//logger.debug("results:"+summaryForm.getResults());
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
+						
+					} else {
+						summaryForm.setResults(null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}	
 				}else if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//set for display by page
 					request.getSession().setAttribute("summary" ,null);

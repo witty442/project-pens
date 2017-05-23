@@ -1460,6 +1460,38 @@ public class GeneralDAO {
 			return pensItem;
 		}
 	 
+	 public  String getBranchName(String branchId) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String branchName = null;
+			Connection conn = null;
+			try {
+				sql.append("\n select branch_id,branch_name FROM pensbme_wacoal_store_mapping WHERE 1=1 ");
+				sql.append("\n and branch_id = '"+branchId+"' \n");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					branchName = Utils.isNull(rst.getString("pens_value"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				    conn.close();
+				} catch (Exception e) {}
+			}
+			return branchName;
+		}
+	 
+	 
 	 public static List<References> getProductTypeListInterfaceICC() throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

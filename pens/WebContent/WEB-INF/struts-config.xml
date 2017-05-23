@@ -213,6 +213,7 @@
 			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
 			<forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" />
 			<forward name="fail" path="/index.jsp" />
+			<forward name="logoff" path="/index.jsp" /> 
 		</action>
 
 		<!-- USER -->

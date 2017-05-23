@@ -20,22 +20,22 @@
 	<field name="docStatus" class="java.lang.String"/>
 	<field name="interfaces" class="java.lang.String"/>
 	<variable name="v_sum_req" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")?$F{totalAmount}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{totalAmount}:0]]></variableExpression>
 	</variable>
 	<variable name="v_sum_req_ctn" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")?$F{qty1}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{qty1}:0]]></variableExpression>
 	</variable>
 	<variable name="v_sum_req_s" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")?$F{qty2}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E40\u0E1A\u0E34\u0E01")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{qty2}:0]]></variableExpression>
 	</variable>
 	<variable name="v_sum_return" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E04\u0E37\u0E19")?$F{totalAmount}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E04\u0E37\u0E19")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{totalAmount}:0]]></variableExpression>
 	</variable>
 	<variable name="v_sum_return_ctn" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E04\u0E37\u0E19")?$F{qty1}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E04\u0E37\u0E19")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{qty1}:0]]></variableExpression>
 	</variable>
 	<variable name="v_sum_return_s" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{moveOrderType}.equals("\u0E04\u0E37\u0E19")?$F{qty2}:0]]></variableExpression>
+		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E04\u0E37\u0E19")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{qty2}:0]]></variableExpression>
 	</variable>
 	<background>
 		<band splitType="Stretch"/>

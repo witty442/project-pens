@@ -103,6 +103,7 @@ public class DBBackUpManager {
 		String zipFileName = "";
 		String[] resultPath = new String[2];
 		String ftpFilePath = "";
+		String rootFtpPath = "";
 		try{
 			logger.info("Start processBackup ");
 			
@@ -194,6 +195,8 @@ public class DBBackUpManager {
 				
 				//Move DBbackupFile.zip to FtpServer
 				ftpFilePath = getFtpPath(request);
+				rootFtpPath = ftpFilePath;
+				
 				logger.debug("ftpFilePath:"+ftpFilePath);
 				logger.debug("localZipFile:"+pathZipFull);
 				logger.debug("zipFileName:"+zipFileName);
@@ -201,13 +204,15 @@ public class DBBackUpManager {
 				
 				if(Utils.isNull(user.getType()).equals(User.TT)){
 					ftpFilePath += "Credit/"+zipFileName;
+					rootFtpPath +="Credit/";
 				 }else if(Utils.isNull(user.getType()).equals(User.VAN)){
 					 ftpFilePath += "Van/"+zipFileName;
+					 rootFtpPath +="Van/";
 				 }
 				
 				logger.debug("Upload Zip File To FTP Server");
 				FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-				ftpManager.uploadBackUpDBZipFileToFTP_OPT3(user, ftpFilePath, pathZipFull);
+				ftpManager.uploadBackUpDBZipFileToFTP_OPT3(rootFtpPath, ftpFilePath, pathZipFull);
 			}
 
             /*if(tableUnAvaiableList != null && tableUnAvaiableList.size() > 0){

@@ -14,10 +14,8 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
 
@@ -36,6 +34,7 @@
 	User user = (User)session.getAttribute("user");
 	String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
 	String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
+	String pageName = Utils.isNull(request.getParameter("page"));
 %>
 
 <style type="text/css">
@@ -494,11 +493,62 @@ function getCustNameKeypress(e,custCode,fieldName){
 	}
 }
 
+function getBranchNameKeypress(e,custCode,fieldName){
+	var form = document.summaryForm;
+	var storeType = form.storeType.value;
+	
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			if("pensCustNameFrom" == fieldName){
+				form.pensCustNameFrom.value = '';
+			}
+			if("pensCustNameTo" ==fieldName){
+				form.pensCustNameTo.value = '';
+			}
+		}else{
+		   getBranchName(custCode,fieldName,storeType);
+		}
+	}
+}
+
 function getCustName(custCode,fieldName,storeType){
 	var returnString = "";
 	var form = document.summaryForm;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameAjax.jsp",
+			data : "custCode=" + custCode.value+"&storeType="+storeType,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	
+	if("pensCustNameFrom" == fieldName){
+		if(returnString != ''){
+		   form.pensCustNameFrom.value = returnString;
+		}else{
+			custCode.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
+	}
+	if("pensCustNameTo" ==fieldName){
+		if(returnString != ''){
+		   form.pensCustNameTo.value = returnString;
+		}else{
+			custCode.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
+	}
+}
+
+function getBranchName(custCode,fieldName,storeType){
+	var returnString = "";
+	var form = document.summaryForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/getBranchNameAjax.jsp",
 			data : "custCode=" + custCode.value+"&storeType="+storeType,
 			async: false,
 			cache: false,
@@ -626,8 +676,11 @@ function getCustName(custCode,fieldName,storeType){
 					<jsp:param name="function" value="reportEndDateLotus"/>
 				</jsp:include>
 		
+			<%}else{ %>
+				<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="<%=pageName %>"/>
+				</jsp:include>
 			<%} %>
-			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -649,208 +702,21 @@ function getCustName(custCode,fieldName,storeType){
 					<div id="div_m" align="center">	
 					
 						<%if("lotus".equalsIgnoreCase(request.getParameter("page"))) {%>
-						    <table  border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
-								 <tr>
-					                <td width="30%"></td>
-									<td align="left">
-									จาก วันที่ขาย&nbsp;&nbsp;&nbsp; 
-									<html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/>
-									</td>
-								</tr>
-								<tr>
-								    <td width="30%"></td>
-									<td align="left">รหัสร้านค้า
-									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','lotus')"/>
-									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
-									</td>
-								</tr>
-								<tr>
-								    <td width="30%"></td>
-									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-									    <html:text property="transactionSummary.fileName" styleId="fileName"/>
-									 </td>
-								</tr>
-							</table>
+						   <jsp:include page="criteria/LotusCriteria.jsp" /> 
 						<%}else if("sumByGroupCode".equalsIgnoreCase(request.getParameter("page"))) {%>
-						     <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								 <tr>
-									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
-								</tr>
-								<tr>
-									<td align="left">รหัสร้านค้า
-									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','lotus')"/>
-									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
-									</td>
-									<td align="left">
-									</td>
-								</tr>
-								<tr>
-									<td align="left">
-									 </td>	
-								</tr>
-							</table>
+						    <jsp:include page="criteria/SumByGroupCodeCriteria.jsp" /> 
 						<%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))) {%>
-						    <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								 <tr>
-								  <td width="30%"></td>
-									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
-								</tr>
-								<tr>
-								 <td width="30%"></td>
-									<td align="left">รหัสร้านค้า
-									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','bigc')"/>
-									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
-									</td>
-								</tr>
-								<tr>
-								 <td width="30%"></td>
-									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
-									<td align="left"></td>
-								</tr>
-							</table>
+						   <jsp:include page="criteria/BigCCriteria.jsp" /> 
 						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) ) {%>
-						      <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								 <tr>
-									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
-								</tr>
-								<tr>
-									<td align="left">รหัสร้านค้า
-									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','tops')"/>
-									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
-									</td>
-								</tr>
-								<tr>
-									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
-									<td align="left"></td>
-								</tr>
-							 </table>
-							<%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
-							  <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								 <tr>
-								    <td width="30%"></td>
-									<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-									ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
-								</tr>
-								<tr>
-								    <td width="30%"></td>
-									<td align="left">รหัสร้านค้า
-									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','king')"/>
-									    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
-									</td>
-								</tr>
-								<tr>
-								    <td width="30%"></td>
-									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-									    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
-									<td align="left"></td>
-								</tr>
-							 </table>
+						      <jsp:include page="criteria/TopsCriteria.jsp" /> 
+						<%}else if("king".equalsIgnoreCase(request.getParameter("page"))) {%>
+							  <jsp:include page="criteria/KingCriteria.jsp" /> 
 						<%}else if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
-						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								 <tr>
-									<td align="left">จาก วันที่นับสต็อก&nbsp; <html:text property="physicalSummary.countDateFrom" styleId="countDateFrom" readonly="true"/></td>
-									<td align="left">ถึง วันที่นับสต็อก&nbsp; <html:text property="physicalSummary.countDateTo" styleId="countDateTo"/></td>
-								</tr>
-								<tr>
-									<td align="left">จาก รหัสร้านค้า&nbsp;&nbsp; &nbsp; 
-									    <html:text property="physicalSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <html:text property="physicalSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText"/>
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
-									</td>
-									<td align="left">ถึง รหัสร้านค้า&nbsp;&nbsp;&nbsp;&nbsp; 
-									    <html:text property="physicalSummary.pensCustCodeTo" styleId="pensCustCodeTo" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameTo')"/>-
-									    <html:text property="physicalSummary.pensCustNameTo" styleId="pensCustNameTo" readonly="true" styleClass="disableText"/>
-									    <input type="button" name="x2" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','to','')"/>
-									</td>
-								</tr>
-								<tr>
-									<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;    
-									 <html:text property="physicalSummary.fileName" styleId="fileName"/></td>
-									<td align="left"></td>
-								</tr>
-							</table>
+						     <jsp:include page="criteria/PhysicalCriteria.jsp" /> 
 						<%}else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
-						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-								<tr>
-									<td align="right" width="25%">รหัสร้านค้า</td>
-									<td align="left" width="40%">
-									    <html:text property="diffStockSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <html:text property="diffStockSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText"/>
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
-									</td>
-								</tr>
-								<tr>
-									<td align="right" width="25%">As Of Date</td>
-									<td align="left" width="40%"><html:text property="diffStockSummary.asOfDate" styleId="asOfDate" readonly="true"/></td>
-								</tr>
-								<tr>
-									<td align="right" width="25%">Only have qty</td>
-									<td align="left" width="40%"><html:checkbox property="diffStockSummary.haveQty" /></td>
-								</tr>
-							</table>
+						     <jsp:include page="criteria/DiffStockCriteria.jsp" /> 
 						<%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
-						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-						          <tr>
-									<td align="left" width="30%">Location <font color="red">*</font>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										 <html:select property="onhandSummary.location" styleId="location">
-										     <html:option value=""></html:option>
-											<html:option value="StockStore">Stock ห้าง</html:option>
-											<html:option value="StockFriday">Stock Friday</html:option>
-											<html:option value="StockOShopping">Stock O-Shopping</html:option>
-											<html:option value="Stock7Catalog">Stock 7-Catalog</html:option>
-											<html:option value="StockTVDirect">Stock TV-Direct</html:option>
-									     </html:select>
-									</td>
-									<td align="left" width="40%">       
-									</td>
-								  </tr> 
-						       <tr>
-									<td align="left" width="30%">
-									     จาก รหัสสินค้า&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;<html:text property="onhandSummary.itemCodeFrom" styleId="itemCodeFrom"/>
-									</td>
-									<td align="left" width="40%">
-									          ถึง รหัสสินค้า&nbsp;&nbsp; <html:text property="onhandSummary.itemCodeTo" styleId="itemCodeTo"/>
-									</td>
-								</tr>
-								<tr>
-									<td align="left" width="30%">
-									     Pens Item From&nbsp;&nbsp; <html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
-									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
-									</td>
-									<td align="left" width="40%">
-									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
-									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>    
-									</td>
-								</tr>
-								<tr>
-									<td align="left" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									    <html:text property="onhandSummary.group" styleId="group" size="25"/>
-									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
-									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
-									  </td>
-									<td align="left" width="40%">สถานะ
-									   &nbsp;
-									   <html:select property="onhandSummary.status">
-										<html:option value="SUCCESS">SUCCESS</html:option>
-										<html:option value="ERROR">ERROR</html:option>
-								     </html:select>
-								     Display Zero Stock <html:checkbox property="onhandSummary.dispZeroStock" />
-									</td>
-								</tr>
-							</table>
+						     <jsp:include page="criteria/OnhandCriteria.jsp" /> 
 						<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
@@ -866,9 +732,8 @@ function getCustName(custCode,fieldName,storeType){
 								if(    "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 									|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 									|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
-									|| "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 									|| "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
-									) {
+								) {
 									hideAll = "true";
 								}
 							    storeType ="lotus";//defualt
@@ -905,7 +770,9 @@ function getCustName(custCode,fieldName,storeType){
 									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
-									<td align="left" width="30%"  nowrap> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
+									<td align="left" width="30%"  nowrap> 
+									    <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/>
+									</td>
 								</tr>
 								
 								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
@@ -980,83 +847,13 @@ function getCustName(custCode,fieldName,storeType){
 						<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {
 							    storeType ="";
 								%>
-							<table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-						        <tr>
-									<td align="right">จาก วันที่ <font color="red">*</font>&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
-									</td>
-									<td align="left" width="30%">ถึง วันที่&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateTo" styleId="asOfDateTo"/></td>
-								</tr>
-						       <tr>
-									<td align="right">รหัสร้านค้า<font color="red">*</font>
-									  &nbsp;&nbsp;
-									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>')"/>
-									</td>
-									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
-								</tr>
-								<tr>
-									<td align="right" width="30%">
-									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
-									     &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
-									</td>
-									<td align="left" width="30%">
-									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
-									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
-									</td>
-								</tr>
-								<tr>
-									<td align="right" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									    <html:text property="onhandSummary.group" styleId="group" />
-									    &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
-									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
-									     
-									  </td>
-									<td align="left" width="30%">&nbsp;</td>
-							   </tr>
-							 </table>
+							 <jsp:include page="criteria/BmeTransCriteria.jsp" /> 
 						<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
-						   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
-						        <tr>
-									<td align="right">จาก วันที่ขาย <font color="red">*</font> &nbsp;
-									<html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-									<td align="left" width="30%">ถึง วันที่ขาย <font color="red">*</font> 
-									<html:text property="onhandSummary.asOfDateTo" styleId="asOfDateTo" readonly="true"/>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-								</tr>
-						       <tr>
-									<td align="right">รหัสร้านค้า<font color="red">*</font>
-									    <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
-									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','lotus')"/>
-									</td>
-									<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="30"/></td>
-								</tr>
-								<tr>
-									<td align="right" width="30%">
-									     Pens Item From<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
-									     &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
-									</td>
-									<td align="left" width="30%">
-									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
-									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
-									</td>
-								</tr>
-								<tr>
-									<td align="right" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									    <html:text property="onhandSummary.group" styleId="group" />
-									    &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
-									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
-									  </td>
-									<td align="left" width="30%">&nbsp;</td>
-							   </tr>
-							 </table>
+						     <jsp:include page="criteria/OnhandLotusPeriodCriteria.jsp" /> 
+					   <%}else if("ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+					         <jsp:include page="criteria/ReportStockWacoalLotusCriteria.jsp" /> 
 						<%} %>
-					
-					   
+
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">

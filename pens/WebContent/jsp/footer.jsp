@@ -46,10 +46,9 @@ function openDBBackupPopup(path){
 			   <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			 </a>&nbsp;
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
-			  <font color="red"><%=msg3[0] %></font> </a>|&nbsp;&nbsp;<%=msg3[1] %>
-			  &nbsp;
-			  <font color="black">
-			  Type:<%=EnvProperties.getInstance().getProperty("config.type") %>
+			  <font color="red"><%=msg3[0] %></font> </a>|&nbsp;<%=msg3[1] %>
+			  &nbsp;<font color="black">
+			  Config:<%=EnvProperties.getInstance().getProperty("config.type") %>
 			  </font> |
 			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
 			      <font color="green">สำรองข้อมูล</font>

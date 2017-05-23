@@ -7,18 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
-import net.sf.jasperreports.components.barcode4j.BarcodeUtils;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
-import com.isecinc.pens.bean.MoveStockWarehouseBean;
-import com.isecinc.pens.bean.Onhand;
-import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -30,7 +22,130 @@ public class MoveStockWarehoseDAO extends PickConstants{
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 
 	
-	public static MoveStockWarehouseBean searchHead(MoveStockWarehouseBean o ) throws Exception {
+	public static int searchTotalRowMoveStockHis(MoveStockWarehouseBean bean) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalRow = 0;
+		Connection conn = null;
+		try {
+		    conn = DBConnection.getInstance().getConnection();
+		    
+			sql.append("\n SELECT count(*) as c FROM PENSBME_MOVE_STOCK_FINISH_HIS");
+			sql.append("\n WHERE 1=1");
+			if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
+			    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+			   
+			    Date dateTo = Utils.parse(bean.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+			   
+			    sql.append("\n and create_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')");
+			    sql.append("\n and create_date <= to_date('"+dateToStr+"','dd/mm/yyyy')");
+			}
+			if( !Utils.isNull(bean.getMaterialMaster()).equals("")){
+				 sql.append("\n and material_master ='"+Utils.isNull(bean.getMaterialMaster())+"'");
+			}
+			if( !Utils.isNull(bean.getGroupCodeSearch()).equals("")){
+				 sql.append("\n and substr(MATERIAL_MASTER,0,6) ='"+Utils.isNull(bean.getGroupCodeSearch())+"'");
+			}
+			if( !Utils.isNull(bean.getWarehouseFrom()).equals("")){
+				sql.append("\n and warehouse_from = '"+Utils.isNull(bean.getWarehouseFrom())+"'");
+			}
+			if( !Utils.isNull(bean.getWarehouseTo()).equals("")){
+				sql.append("\n and warehouse_to = '"+Utils.isNull(bean.getWarehouseTo())+"'");
+			}
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+				totalRow = rst.getInt("c");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return totalRow;
+	}
+	
+	public static List<MoveStockWarehouseBean> searchMoveStockHis(MoveStockWarehouseBean bean,int pageNumber,int pageSize) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<MoveStockWarehouseBean> pos = new ArrayList<MoveStockWarehouseBean>();
+		Connection conn = null;
+		try {
+		    conn = DBConnection.getInstance().getConnection();
+		    sql.append("\n SELECT * FROM( \n");
+			sql.append("\n SELECT a.*, rownum r__ \n");
+			sql.append("\n FROM ( \n");
+				sql.append("\n SELECT * FROM PENSBME_MOVE_STOCK_FINISH_HIS");
+				sql.append("\n WHERE 1=1");
+				if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
+				    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				    String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+				   
+				    Date dateTo = Utils.parse(bean.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				    String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+				   
+				    sql.append("\n and create_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')");
+				    sql.append("\n and create_date <= to_date('"+dateToStr+"','dd/mm/yyyy')");
+				}
+				if( !Utils.isNull(bean.getMaterialMaster()).equals("")){
+					 sql.append("\n and material_master ='"+Utils.isNull(bean.getMaterialMaster())+"'");
+				}
+				if( !Utils.isNull(bean.getGroupCodeSearch()).equals("")){
+					 sql.append("\n and substr(MATERIAL_MASTER,0,6) ='"+Utils.isNull(bean.getGroupCodeSearch())+"'");
+				}
+				if( !Utils.isNull(bean.getWarehouseFrom()).equals("")){
+					sql.append("\n and warehouse_from = '"+Utils.isNull(bean.getWarehouseFrom())+"'");
+				}
+				if( !Utils.isNull(bean.getWarehouseTo()).equals("")){
+					sql.append("\n and warehouse_to = '"+Utils.isNull(bean.getWarehouseTo())+"'");
+				}
+				sql.append("\n  ORDER BY CREATE_DATE DESC ");
+				sql.append("\n ) a  ");
+				sql.append("\n  WHERE rownum < (("+pageNumber+" * "+pageSize+") + 1 )  ");
+				sql.append("\n )  ");
+				sql.append("\n WHERE r__ >= ((("+pageNumber+"-1) * "+pageSize+") + 1)  ");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+				MoveStockWarehouseBean item = new MoveStockWarehouseBean();
+				item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setWarehouseFrom(rst.getString("WAREHOUSE_FROM"));
+				item.setWarehouseTo(rst.getString("WAREHOUSE_TO"));
+		
+				item.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));
+				item.setTransferQty(rst.getInt("TRANSFER_QTY")+"");
+				
+				pos.add(item);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
+	
+	public static MoveStockWarehouseBean searchMoveStock(MoveStockWarehouseBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();

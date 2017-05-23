@@ -1,3 +1,5 @@
+<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -11,7 +13,7 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <jsp:useBean id="customerForm" class="com.isecinc.pens.web.customer.CustomerForm" scope="request" />
 <%
-String tripFlag = request.getParameter("tf") != null ? (String)request.getParameter("tf") : "";
+	String tripFlag = request.getParameter("tf") != null ? (String)request.getParameter("tf") : "";
 session.setAttribute("tf", tripFlag);
 
 String action = (String)request.getParameter("action");
@@ -53,10 +55,10 @@ System.out.println("readOnly["+readOnly+"]styleClass["+styleClass+"]");
 <%@page import="com.isecinc.pens.bean.TrxHistory"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -79,7 +81,7 @@ body {
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg" type="text/javascript"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>" type="text/javascript"></script>
 <script type="text/javascript">
 //API KEY :AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg
 /********************************************** Google Map ***************************************/
@@ -343,9 +345,9 @@ function setMainCustomer(code, name){
 								</td>
 							</tr>
 							<tr>
-								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right" colspan="2"><b><bean:message key="Customer.Code" bundle="sysele"/></b>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.code" readonly="true" styleClass="disableText" styleId="customerCode"/>
+									<b><html:text property="customer.code" readonly="true" styleClass="disableTextBigSize" styleId="customerCode"/></b>
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">

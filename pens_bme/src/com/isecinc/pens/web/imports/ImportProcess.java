@@ -3779,9 +3779,12 @@ public class ImportProcess {
 			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(14,22),Utils.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImportOShopping(conn);
+			logger.debug("lastFileNameImport:"+lastFileNameImport);
 			
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(13,21),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				logger.debug(lastFileNameImport.substring(14,22));
+				
+				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(14,22),Utils.YYYY_MM_DD_WITHOUT_SLASH);
 				logger.debug("lastFileNameAsOfDate:"+lastFileNameAsOfDate);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport

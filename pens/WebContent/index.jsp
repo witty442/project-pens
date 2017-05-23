@@ -1,3 +1,4 @@
+<%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -22,8 +23,8 @@ String password =""; */
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
 <style type="text/css">
 <!--
 body {
@@ -32,8 +33,8 @@ body {
 }
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 <!--
 function MM_swapImgRestore() { //v3.0

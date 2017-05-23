@@ -1,8 +1,6 @@
 package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,18 +12,12 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
-import com.isecinc.pens.bean.MoveWarehouse;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.MoveStockWarehoseDAO;
-import com.isecinc.pens.dao.MoveWarehoseDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.pick.process.OnhandProcess;
-import com.isecinc.pens.web.popup.PopupForm;
 
 /**
  * Summary Action
@@ -35,17 +27,89 @@ import com.isecinc.pens.web.popup.PopupForm;
  */
 public class MoveStockWarehouseAction extends I_Action {
 
+	public static int pageSize = 50;
+	public ActionForward prepareSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clear");
+		MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if("new".equalsIgnoreCase(action)){
+				aForm.setBean(new MoveStockWarehouseBean());
+				aForm.setResultsSearch(null);
+			}else{
+				//back Search
+				aForm.setBean(aForm.getBeanCriteria());
+				searchHead(mapping, aForm, request, response);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("search");
+	}
+	
+	public ActionForward searchHead(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchHead");
+			MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			String msg = "";
+			Connection conn = null;
+			String action = Utils.isNull(request.getParameter("action"));
+			List<MoveStockWarehouseBean> data = null;
+			int totalRow = 0;
+			int totalPage = 0;
+			int pageNumber = 1;
+			try {
+				if("newsearch".equalsIgnoreCase(action)){
+					conn = DBConnection.getInstance().getConnection();
 
+					pageNumber = 1;
+					totalRow =  MoveStockWarehoseDAO.searchTotalRowMoveStockHis(aForm.getBean());
+					totalPage = Utils.calcTotalPage(totalRow, pageSize);
+					
+					aForm.setTotalPage(totalPage);
+					aForm.setTotalRow(totalRow);
+				}else{
+					pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+				}
+				logger.debug("totalRow:"+aForm.getTotalRow());
+				logger.debug("totalPage:"+aForm.getTotalPage());
+				
+				//search by start ,end rownum 
+				data = MoveStockWarehoseDAO.searchMoveStockHis(aForm.getBean(),pageNumber,pageSize);
+				
+				if(data != null && data.size() >0){
+					aForm.setResultsSearch(data);
+				}else{
+					msg  ="ไม่พบข้อมูล ";
+					aForm.setResultsSearch(null);
+				}
+				
+				request.setAttribute("Message", msg);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+			   conn.close();conn = null;
+			}
+		}
+		return mapping.findForward("search");
+	}
+	
 	/**
 	 * Prepare without ID
 	 */
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		String forward = "prepare";
+		String forward = "detail";
 		MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+			//save old critiria
+			aForm.setBeanCriteria(aForm.getBean());
+			
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equalsIgnoreCase(action)){
 				//save old criteria
@@ -55,6 +119,9 @@ public class MoveStockWarehouseAction extends I_Action {
 				
 				aForm.setBean(w);
 				aForm.setResults(null);
+			}else{
+				//view
+				
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", "error:"+ e.getMessage());
@@ -81,7 +148,7 @@ public class MoveStockWarehouseAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}
-		return "prepare";
+		return "detail";
 	}
 
 	/**
@@ -94,7 +161,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			MoveStockWarehouseBean p = MoveStockWarehoseDAO.searchHead(aForm.getBean());
+			MoveStockWarehouseBean p = MoveStockWarehoseDAO.searchMoveStock(aForm.getBean());
 			if(p.getItems() != null && p.getItems().size() >0){
 				aForm.setResults(p.getItems());
 				p.setCanEdit(true);
@@ -116,7 +183,7 @@ public class MoveStockWarehouseAction extends I_Action {
 			   conn.close();conn = null;
 			}
 		}
-		return "search";
+		return "detail";
 	}
 	
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -178,7 +245,7 @@ public class MoveStockWarehouseAction extends I_Action {
 			try {
 				
 			} catch (Exception e2) {}
-			return "prepare";
+			return "detail";
 		} finally {
 			try {
 				if(conn != null){
@@ -186,7 +253,7 @@ public class MoveStockWarehouseAction extends I_Action {
 				}
 			} catch (Exception e2) {}
 		}
-		return "search";
+		return "detail";
 	}
 	
 	/**
@@ -259,7 +326,7 @@ public class MoveStockWarehouseAction extends I_Action {
 			try {
 				
 			} catch (Exception e2) {}
-			return "prepare";
+			return "detail";
 		} finally {
 			try {
 				if(conn != null){
@@ -267,7 +334,7 @@ public class MoveStockWarehouseAction extends I_Action {
 				}
 			} catch (Exception e2) {}
 		}
-		return "search";
+		return "detail";
 	}
 
 	
@@ -286,7 +353,7 @@ public class MoveStockWarehouseAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear");
+		return mapping.findForward("detail");
 	}
 
 	@Override

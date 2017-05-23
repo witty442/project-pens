@@ -1,3 +1,4 @@
+<%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
@@ -107,7 +108,7 @@ if(customerList != null && customerList.size() >0){
 
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg&callback=initMap&region=TH&language=th">
+    src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>&callback=initMap&region=TH&language=th">
     </script>
   </body>
 </html>

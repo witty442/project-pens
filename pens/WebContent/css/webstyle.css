@@ -631,6 +631,19 @@ SELECT.moveOrder.pdCode{
 	border-color: #BEBEBE;
 	color: #000000;
 }
+
+.disableTextBigSize {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-weight: bold;
+	font-size: 16px;
+}
+.labelBigSize {
+	font-weight: bold;
+	font-size: 16px;
+}
 .normalText {
 	
 }

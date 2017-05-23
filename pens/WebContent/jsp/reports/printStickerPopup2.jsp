@@ -1,4 +1,5 @@
 
+<%@page import="util.SessionGen"%>
 <%@page import="net.sf.jasperreports.view.JRViewer"%>
 <%@page import="java.awt.BorderLayout"%>
 <%@page import="java.io.InputStream"%>
@@ -45,7 +46,7 @@ body{ background-color:#FFFFFF; background-image:none; color:#000000 }
 #contentarea{ width:100%;}
 }
 </style>
-<link rel="stylesheet" type="text/css" media="print" href="print.css">
+<link rel="stylesheet" type="text/css" media="print" href="print.css?v=<%=SessionGen.getInstance().getIdSession()%>">
 <body leftmargin="0" topmargin="0" bottommargin="0" rightmargin="0" onload="print();window.close();">
 <%
 String reqDate = ConvertNullUtil.convertToString(request.getParameter("reqDate"));

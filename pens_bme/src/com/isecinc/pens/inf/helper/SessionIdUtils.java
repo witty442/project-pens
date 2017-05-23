@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class SessionIdUtils {
     private static SessionIdUtils _instance;
-    private static String idSession = "";
+    private  String idSession = "";
 	
     public SessionIdUtils(){
     	try{
@@ -23,11 +23,11 @@ public class SessionIdUtils {
 	  return _instance;
 	}
 	
-	public static void clearInstance(){
+	public  void clearInstance(){
 		_instance =  new SessionIdUtils();
 	}
 	
-	public static String getIdSession(){
+	public  String getIdSession(){
 		return idSession;
 	}
 

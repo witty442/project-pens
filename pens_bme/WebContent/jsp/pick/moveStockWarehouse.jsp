@@ -291,7 +291,12 @@ function isNum(obj){
 		return parseInt(temp);
 	}
 
-
+	function back(path){
+		var form = document.moveStockWarehouseForm;
+		form.action = path + "/jsp/moveStockWarehouseAction.do?do=prepareSearch&action=back";
+		form.submit();
+		return true;
+	}
 </script>
 
 </head>		
@@ -454,7 +459,10 @@ function isNum(obj){
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="    Clear    " class="newPosBtnLong"> 
 								    </a>
-										
+								    
+									<a href="javascript:back('${pageContext.request.contextPath}')">
+										  <input type="button" value="    ปิดหน้าจอ    " class="newPosBtnLong"> 
+								    </a>
 								</td>
 							</tr>
 						</table>

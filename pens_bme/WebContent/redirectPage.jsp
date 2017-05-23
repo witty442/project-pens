@@ -50,11 +50,10 @@ function redirectPage(){
        	 		  <input type="hidden" id ="path" name="path" value="${pageContext.request.contextPath}" readonly class="disableText"/>
 		        </html:form>
 			</td>
-        	
       </tr>
-      <tr>
+  <%--     <tr>
         <td></td>
-        <td> <Font size="4">Processing Redirect to Page..................</Font></td>
+        <td> <Font size="4">Processing Redirect to <%=Utils.isNull(request.getAttribute("url"))%></Font></td>
       </tr>
       <tr>
         <td></td>
@@ -62,9 +61,9 @@ function redirectPage(){
       </tr>
        <tr>
         <td>&nbsp;</td>
-        <td ><img src="${pageContext.request.contextPath}/images2/waiting.gif" width="350" height="350" /></td>
-    
-      </tr>
+        <td ><img src="${pageContext.request.contextPath}/images2/waiting.gif" width="100%" height="100%" /></td>
+      </tr> --%>
+      
     </table></td>
   </tr>
 </table>

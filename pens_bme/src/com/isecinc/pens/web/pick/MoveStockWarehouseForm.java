@@ -16,7 +16,26 @@ public class MoveStockWarehouseForm extends I_Form {
     private String mode;
     private MoveStockWarehouseBean bean ;
     private MoveStockWarehouseBean beanCriteria ;
+    private int totalPage;
+    private int totalRow;
     
+    
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getTotalRow() {
+		return totalRow;
+	}
+
+	public void setTotalRow(int totalRow) {
+		this.totalRow = totalRow;
+	}
+
 	public List<MoveStockWarehouseBean> getResults() {
 		return results;
 	}

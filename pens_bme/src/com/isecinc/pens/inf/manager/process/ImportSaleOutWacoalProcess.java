@@ -40,7 +40,7 @@ import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 
-public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
+public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 
 	private static Logger logger = Logger.getLogger("PENS");
 
@@ -83,7 +83,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 				fileType = fileName.substring(fileName.indexOf(".")+1,fileName.length());
 				
 				/** cehck FileName duplicate **/
-				boolean dup = importDAO.importSaleOutWacoalLotusFileNameIsDuplicate(conn, fileName);
+				boolean dup = false;//importDAO.importSaleOutWacoalFileNameIsDuplicate(conn, fileName);
 				if(dup){
 					taskStatusInt = Constants.STATUS_FAIL;
 				}
@@ -102,7 +102,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					modelItem.setMonitorId(monitorModel.getMonitorId());
 					modelItem.setSource("");
 					modelItem.setDestination("");
-					modelItem.setTableName("Import SaleOut Wacoal Lotus");
+					modelItem.setTableName("Import SaleOut Wacoal");
 					modelItem.setFileName(fileName);
 					modelItem.setStatus(Constants.STATUS_START);
 					modelItem.setDataCount(0);
@@ -112,6 +112,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					dao.insertMonitorItem(connMonitor, modelItem);
 					
 					modelItem = importToDB(conn,connMonitor,modelItem,user,dataFile,fileType , fileName);
+					
 					logger.debug("Result FailCount:"+modelItem.getFailCount() );
 					logger.debug("Result SuccessCount:"+modelItem.getSuccessCount() );
 					
@@ -229,27 +230,18 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 		try {
 			if (dataFile != null) {
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" INSERT INTO PENSBME_SALESWACOAL_FROM_LOTUS( \n");
+				sql.append(" INSERT INTO PENSBME_WACOAL_SALEOUT \n");
+				sql.append(" (Store_no, Sales_date ,Item_wacoal ,Qty ,  \n");
+				sql.append(" Branch_id, Branch_name, CREATE_DATE,CREATE_USER )  \n");
+				sql.append(" VALUES( ?,?,?,? ,?,?,?,?) \n");
+                
+				logger.debug("sql:"+sql.toString());
 				
-				sql.append(" VENDOR, NAME, AP_TYPE, LEASE_VENDOR_TYPE,  \n");
-				sql.append(" STORE_NO, STORE_NAME, STYLE_NO,  \n");
-				sql.append(" DESCRIPTION, COL, SIZE_TYPE,  \n");
-				sql.append(" SIZES, SALES_DATE, QTY,  \n");
-				sql.append(" GROSS_SALES, RETURN_AMT, NET_SALES_INCL_VAT,  \n");
-				sql.append(" VAT_AMT, NET_SALES_EXC_VAT, GP_PERCENT,  \n");
-				sql.append(" GP_AMOUNT, VAT_ON_GP_AMOUNT, GP_AMOUNT_INCL_VAT,  \n");
-				sql.append(" AP_AMOUNT, TOTAL_VAT_AMT, AP_AMOUNT_INCL_VAT, \n");
-				
-				sql.append(" CREATE_DATE, CREATE_USER ,PENS_CUST_CODE, \n");
-				sql.append(" PENS_CUST_DESC ,PENS_GROUP ,PENS_GROUP_TYPE, \n");
-				sql.append(" SALES_YEAR ,SALES_MONTH ,File_name,PENS_ITEM ,RETAIL_PRICE_BF,TOTAL_WHOLE_PRICE_BF ) \n");
-				sql.append(" VALUES( ?,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,? ,?,?,?,? ,?,?)");
-
 				ps = conn.prepareStatement(sql.toString());
 				  
 				int sheetNo = 0; // xls sheet no. or name
-				int rowNo = 4; // row of begin data
-				int maxColumnNo = 26; // max column of data per row
+				int rowNo = 1; // row of begin data
+				int maxColumnNo = 4; // max column of data per row
 				
 				Workbook wb1 = null;
 				XSSFWorkbook wb2 = null;
@@ -265,20 +257,15 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 				   sheet = wb2.getSheetAt(sheetNo);
 				   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
 				}
-				
+
 				Row row = null;
 				Cell cell = null;
-				String salesDate = "";
+			
 				String storeNo = "";
-				String groupNo = "";
-				String storeName = "";
-				String description ="";
+				String salesDate = "";
+				String Item_wacoal = "";
 				String qty = "";
-				String styleNo = "";
-				String lotusItem = "";
-				double netSalesIncVat = 0;
-				double apAmount = 0;
-				
+
 	            int no = 0;
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
 	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
@@ -290,7 +277,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					Cell cellCheck = row.getCell((short) 0);
 					Object cellCheckValue = xslUtils.getCellValue(0, cellCheck);
 					String rowCheck = Utils.convertDoubleToStr(Utils.isDoubleNull(cellCheckValue));
-					//logger.debug("rowCheck["+rowCheck+"]");
+					logger.debug("rowCheck["+rowCheck+"]");
 					if("0".equals(rowCheck)){
 						break;
 					}
@@ -302,167 +289,73 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 						Object cellValue = xslUtils.getCellValue(colNo, cell);
 						
 						if(colNo==0){
-						   //VENDOR
-						   String vendor = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
-						   ps.setString(1,  vendor);
+						   storeNo =  Utils.convertToNumberStr((Double)cellValue);
+						   logger.debug("storeNo:"+storeNo);
+						   ps.setString(1,storeNo+"");
 						   
 						}else if(colNo==1){
-						   //NAME
-						   ps.setString(2, Utils.isNull(cellValue));
+							java.util.Date asOfDate =  (java.util.Date) cellValue;
+						// logger.debug("Date:"+asOfDate);
+							salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+							logger.debug("salesDate:"+salesDate);
+							ps.setDate(2, new java.sql.Date(asOfDate.getTime()));  
+							
 						}else if(colNo==2){
-						   //AP_TYPE
-						   ps.setString(3, Utils.isNull(cellValue));
+						    Item_wacoal = Utils.isNull(cellValue);
+						    logger.debug("itemWacoal:"+Item_wacoal);
+						    ps.setString(3,Item_wacoal);
+						    
 						}else if(colNo==3){
-						   //LEASE_VENDOR_TYPE
-						   ps.setString(4, Utils.isNull(cellValue));
-						}else if(colNo==4){
-						  //STORE_NO
-						   storeNo = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
-						   ps.setString(5, storeNo);
-						}else if(colNo==5){
-						  //STORE_NAME
-						  storeName = Utils.isNull(cellValue);
-						  ps.setString(6, storeName);
-						}else if(colNo==6){
-						  //STYLE_NO
-						   styleNo = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
-						   ps.setString(7, styleNo);
-						}else if(colNo==7){
-						   //DESCRIPTION
-						   description = Utils.isNull(cellValue);
-						   ps.setString(8, description);
-						   groupNo = description.substring(0,6);
-						   lotusItem = description.substring(0,10);
-						}else if(colNo==8){
-						  //COL
-						  String value = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
-						  ps.setString(9, value);
-						}else if(colNo==9){
-						  //SIZE_TYPE
-						  ps.setString(10, Utils.isNull(cellValue));
-						}else if(colNo==10){
-						  //SIZES
-						  String value = Utils.convertDoubleStrToStr(Utils.isNull(cellValue).toString());
-						  ps.setString(11,value);
-						}else if(colNo==11){
-						  //SALES_DATE
-						  java.util.Date asOfDate =  (java.util.Date) cellValue;
-						  //logger.debug("Date:"+asOfDate);
-						  salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
-						  //logger.debug("salesDate:"+salesDate);
-						  ps.setTimestamp(12, new java.sql.Timestamp(asOfDate.getTime()));  
-						}else if(colNo==12){
-						  //QTY
-						  qty = ""+Utils.isDoubleNull(cellValue);
-						  ps.setDouble(13, Utils.isDoubleNull(cellValue));
-						}else if(colNo==13){
-						  //GROSS_SALES
-						  ps.setDouble(14, Utils.isDoubleNull(cellValue));
-						}else if(colNo==14){
-						  //RETURN_AMT
-						  ps.setDouble(15, Utils.isDoubleNull(cellValue));
-						}else if(colNo==15){
-						  //NET_SALES_INCL_VAT
-						  netSalesIncVat = Utils.isDoubleNull(cellValue);
-						  ps.setDouble(16, Utils.isDoubleNull(cellValue));
-						}else if(colNo==16){
-						  //VAT_AMT
-						  ps.setDouble(17, Utils.isDoubleNull(cellValue));
-						}else if(colNo==17){
-						  //NET_SALES_EXC_VAT
-						  ps.setDouble(18,Utils.isDoubleNull(cellValue));
-						}else if(colNo==18){
-						  //GP_PERCENT
-						  ps.setDouble(19,Utils.isDoubleNull(cellValue));
-						}else if(colNo==19){
-						  //GP_AMOUNT
-						  ps.setDouble(20, Utils.isDoubleNull(cellValue));
-						}else if(colNo==20){
-						  //VAT_ON_GP_AMOUNT
-						  ps.setDouble(21, Utils.isDoubleNull(cellValue));
-						}else if(colNo==21){
-						  //GP_AMOUNT_INCL_VAT
-						  ps.setDouble(22, Utils.isDoubleNull(cellValue));
-						}else if(colNo==22){
-						  //AP_AMOUNT
-						  apAmount = Utils.isDoubleNull(cellValue);
-						  ps.setDouble(23,apAmount);
-						}else if(colNo==23){
-						  //TOTAL_VAT_AMT
-						  ps.setDouble(24, Utils.isDoubleNull(cellValue));
-						}else if(colNo==24){
-						  //AP_AMOUNT_INCL_VAT
-						  ps.setDouble(25,Utils.isDoubleNull(cellValue));
+							qty = Utils.convertToNumberStr((Double)cellValue);
+							logger.debug("qty:"+qty);
+						    ps.setInt(4, Utils.convertStrToInt(qty));
 						}
-						 
 					}//for column
 					
-					 //CREATE_DATE
-					 ps.setTimestamp(26, new java.sql.Timestamp(new java.util.Date().getTime()));
-					 //CREATE_USER
-			         ps.setString(27, user.getUserName());
-			   
 			         //Validate Get Branch id By StoreNo
-					 String branchId = new ImportDAO().getBranchID(conn,storeNo);
-					 if(Utils.isNull(branchId).equals("")){
+					 String[] branchId = new ImportDAO().getBranchID(conn,storeNo);
+					 if(branchId == null){
 						 //Add Error Msg
 				         importError = true;
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         s.setSalesDate(salesDate);
 				         s.setStoreNo(storeNo);
-				         s.setStoreName(storeName);
-				         s.setDescription(description);
+				         s.setQty(qty);
+				         s.setItemWacoal(Item_wacoal);
 				         s.setMessage("ไม่พบข้อมูล Mapping Store no กับ Branch id");
 				         errorMap.put(i+"", s);
+				         
+				         //set prepare
+				         ps.setString(5,"");//branch_id
+				         ps.setString(6,"");//branch Name
 			         }else{
-					 
-			        	  //Add Success Msg No Check PensItem
+				
+			        	  //Add Success Msg 
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         s.setSalesDate(salesDate);
 				         s.setStoreNo(storeNo);
-				         s.setStoreName(storeName);
-				         s.setDescription(description);
 				         s.setQty(qty);
-				         s.setMessage("Success :No Validate Pens Item");
+				         s.setItemWacoal(Item_wacoal);
+				         s.setQty(qty);
+				         s.setMessage("Success ");
 				         successMap.put(i+"", s); 
+				         
+				       //set prepare
+				         ps.setString(5,branchId[0]);//branch_id
+				         ps.setString(6,branchId[1]);//branch Name
 			         }
-				     // PENS_CUST_CODE VARCHAR2(30),
-				     ps.setString(28, "");
-				     // PENS_CUST_DESC VARCHAR2(100),O
-				     ps.setString(29, "");
-			  
-					 ps.setString(30, groupNo);//m.getPensDesc());
-				     ps.setString(31, groupNo);//m.getPensDesc());
-					     
-			         String year = "";
-			         String month ="";
-			         
-			         // dd/mm/yyyy
-			         year = salesDate.substring(6,10);
-			         month = salesDate.substring(3,5);
-			         
-			         // SALES_YEAR VARCHAR2(10),
-			         ps.setString(32, year);
-			         //SALES_MONTH VARCHAR2(10),
-			         ps.setString(33, month);
-			         // File_name VARCHAR2(100),
-			         ps.setString(34, fileName);
-			         //PENS_ITEM
-			         ps.setString(35, "");
-			         
-			         //Case LOTUS
-			         //RETAIL_PRICE_BF 	= NET SALES INC. VAT (P) ขายปลีกสุทธิ รวม vat
-			         //TOTAL_WHOLE_PRICE_BF 	= A/P AMOUNT (W) ขายส่ง
-			         
-			         ps.setDouble(36, netSalesIncVat);
-			         ps.setDouble(37, apAmount);
-			         
-					 ps.addBatch();
+					
+					 //CREATE_DATE
+					 ps.setTimestamp(7, new java.sql.Timestamp(new java.util.Date().getTime()));
+					 //CREATE_USER
+			         ps.setString(8, user.getUserName());
+			   
+			         ps.execute();
 				}//for Row
-				ps.executeBatch();
-			}
+
+			}//if data file not null
 			
 			if(importError){
 			    importError = true;
@@ -510,7 +403,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 					  if(errorList != null && errorList.size() >0){
 						  for(int r=0;r<errorList.size();r++){
 							  ImportSummary m = errorList.get(r);
-					          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"FAIL",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getDescription()+","+m.getQty()+","+m.getMessage());
+					          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"FAIL",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage());
 						  }
 					  }
 					 
@@ -519,6 +412,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 				    mi.setFailCount(errorList.size());
 					  
 			}else{
+
 				
 				importError = false;
 				 /** Success List **/
@@ -540,7 +434,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 				  if(successList != null && successList.size() >0){
 					  for(int r=0;r<successList.size();r++){
 						  ImportSummary m = successList.get(r);
-				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getDescription()+","+m.getQty()+","+m.getMessage());
+				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage());
 					  }
 				  }
 				/** Set Count Record **/
@@ -548,7 +442,7 @@ public class ImportSaleOutWacoalFromLotusProcess extends InterfaceUtils{
 			    mi.setFailCount(errorList.size());
 			}
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 			//request.setAttribute("Message","ข้อมูลไฟล์ไม่ถูกต้อง:"+e.toString());
 			importError = true;
 		} finally {

@@ -1,3 +1,4 @@
+<%@page import="util.EncyptUtils"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="java.net.InetAddress"%>
@@ -80,13 +81,13 @@
 	  	     <%}else{%>
 	  	        newUrl = "<%=hostProd%><%=contextPathProd%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
 		     <%}%>
-	  	     url = newUrl+"&userName=<%=userName%>&password=<%=password%>";
+	  	     url = newUrl+"&userName=<%=userName%>&password=<%=EncyptUtils.base64encode(password)%>";
 	  	    // alert("isProd:"+isProd+":"+url);
-		     window.location = url;
+		     window.location = encodeURI(url);
 		 
 		  }else{
 			  //alert(url);
-	         window.location = url;
+	         window.location = encodeURI(url);
 		  }
 		<%}else{ %>
 		    //Goto HostDD
@@ -103,12 +104,12 @@
 	  	         
 		  	     var newUrl = "<%=hostDD%><%=contextPathDD%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
 		  	     
-		  	     url = newUrl+"&userName=<%=userName%>&password=<%=password%>";
+		  	     url = newUrl+"&userName=<%=userName%>&password=<%=EncyptUtils.base64encode(password)%>";
 		  	     
 		  	    // alert("isProd:"+isProd+":"+url);
-			     window.location = url;
+			     window.location = encodeURI(url);
 		    }else{
-		    	 window.location = url;
+		    	 window.location = encodeURI(url);
 		    }
 		<%}%>
 		
@@ -234,7 +235,9 @@
 	          <li>
 	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_SALEOUT_WACOAL%>');"><span>3.<bean:message key="ImportSaleOutWacoal" bundle="sysprop"/></span></a>
 	         </li> 
-	         
+	         <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=ReportStockWacoalLotus');"><span>4.<bean:message bundle="sysprop" key="ReportStockWacoalLotus"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>
@@ -346,9 +349,9 @@
 			 <li>
 				   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span>4 <bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
 			 </li>
-			 <%-- <li>
-				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=king');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromKing"/></span></a>
-			</li> --%>
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=king');"><span>5.<bean:message bundle="sysprop" key="SummaryBMEFromKing"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>
@@ -466,7 +469,7 @@
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveWarehouseAction.do?do=prepare&action=new');"><span>3.1 <bean:message bundle="sysprop" key="moveWarehouse"/></span></a>
 						</li>
 						 <li>
-							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveStockWarehouseAction.do?do=prepare&action=new');"><span>3.2 <bean:message bundle="sysprop" key="moveStockWarehouse"/></span></a>
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/moveStockWarehouseAction.do?do=prepareSearch&action=new');"><span>3.2 <bean:message bundle="sysprop" key="moveStockWarehouse"/></span></a>
 						</li>  
 			      </ul>
 			</li>

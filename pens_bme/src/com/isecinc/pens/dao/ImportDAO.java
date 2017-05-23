@@ -33,19 +33,21 @@ public class ImportDAO {
 
 	}
 	
-	public String getBranchID(Connection conn,String storeNo) throws Exception{
+	public String[] getBranchID(Connection conn,String storeNo) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
-		String branchId ="";
+		String[] branchId =null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select branch_id from pensbme_wacoal_store_mapping where store_no ='"+storeNo+"'");
+			sql.append(" select branch_id ,branch_name from pensbme_wacoal_store_mapping where store_no ='"+storeNo+"'");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				branchId = rs.getString("branch_id");
+				branchId = new String[2];
+			    branchId[0] = rs.getString("branch_id");
+			    branchId[1] = rs.getString("branch_name");
 			}
 		
 		}catch(Exception e){
@@ -229,13 +231,13 @@ public class ImportDAO {
 		return dup;
 	} 
 	
-	public Boolean importSaleOutWacoalLotusFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
+	public Boolean importSaleOutWacoalFileNameIsDuplicate(Connection conn ,String fileName) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		boolean dup = false;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select *  from PENSBME_SALESWACOAL_FROM_LOTUS WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
+			sql.append(" select *  from PENSBME_WACOAL_SALEOUT WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());

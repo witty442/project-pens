@@ -29,7 +29,7 @@ import com.isecinc.pens.inf.manager.process.GenerateItemMasterHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportBillICC;
 import com.isecinc.pens.inf.manager.process.ImportPosProcess;
-import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalFromLotusProcess;
+import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalProcess;
 import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
 import com.isecinc.pens.process.SequenceProcess;
@@ -628,7 +628,7 @@ public class BatchProcessManager {
 			logger.debug("import Type:"+monitorModel.getType());
 			monitorTime  = new MonitorTime("import processImportSaleOutWacoal");   
 
-			ImportSaleOutWacoalFromLotusProcess.runProcess(user,monitorModel);
+			ImportSaleOutWacoalProcess.runProcess(user,monitorModel);
 			
 			monitorTime.debugUsedTime();
 		}catch(Exception e){

@@ -11,6 +11,7 @@ import meter.MonitorTime;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
@@ -31,7 +32,7 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 		logger.debug("transactionId:"+monitorModel.getTransactionId());
 	}*/
 	/**
-	 * Return :name|label|Type|default value|validate$Button Name
+	 * Return :Param Name|Param label|Param Type|default value|validate$Button Name
 	 */
 	public String getParam(){
 		return "AS_OF_DATE|วันที่เปิด Order Big-C จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
@@ -59,7 +60,6 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 			/** insert to monitor_item **/
 			logger.debug("Insert Monitor Item BigC PO ");
 			MonitorItemBean modelItem = prepareMonitorItemBean(monitorModel);
-			
 			
 			//Validate Duplication
 			if(isImportExist(conn,monitorModel)){
@@ -161,7 +161,7 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 			sql.append("\n WHERE O.ORDER_DATE  = TO_DATE('"+asOfDate+"','dd/mm/yyyy')");
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
 			sql.append("\n AND O.ORDER_LOT_NO IN(  ");
-			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_BIGC_ORDER_MST ");
+			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");
 			sql.append("\n  ) ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -207,22 +207,24 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 			sql.append("\n  O.STORE_CODE");
 			sql.append("\n ,O.ORDER_DATE");
 			sql.append("\n ,(SELECT INTERFACE_DESC FROM PENSBME_MST_REFERENCE M where reference_code = 'SubInv' and M.pens_value = O.store_code) as SUBINV");
+			sql.append("\n ,(SELECT PENS_DESC FROM PENSBME_MST_REFERENCE M where reference_code = 'Store' and M.pens_value = O.store_code) as STORE_NAME");
 			sql.append("\n ,O.ORDER_LOT_NO");
 			sql.append("\n FROM PENSBME_ORDER O");
 			sql.append("\n WHERE O.ORDER_DATE  = TO_DATE('"+asOfDate+"','dd/mm/yyyy')");
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
+			sql.append("\n AND O.STORE_TYPE ='"+PickConstants.STORE_TYPE_BIGC_CODE+"'");
 			sql.append("\n AND O.ORDER_LOT_NO NOT IN(  ");
-			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_BIGC_ORDER_MST ");
+			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");
 			sql.append("\n  ) ");
 			
 			logger.debug("sql:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			
-			String sqlIn = "insert into XXPENS_PO_BIGC_ORDER_MST \n";
+			String sqlIn = "insert into XXPENS_PO_ORDER_IMPORT_MST \n";
 			sqlIn +=" ( created_by, creation_date,last_updated_by, last_update_date,last_update_login, \n";
 			sqlIn +=" header_id ,account_number,ordered_date , \n ";
-			sqlIn +=" subinventory , int_flag,order_number ) \n";
-			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?) \n";
+			sqlIn +=" subinventory , int_flag,order_number,comments ) \n";
+			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?) \n";
 			
 			psIns = conn.prepareStatement(sqlIn);
 			
@@ -243,7 +245,8 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 				psIns.setString(++index, Utils.isNull(rs.getString("subinv")));
 				psIns.setString(++index,"N");
 				psIns.setString(++index, Utils.isNull(rs.getString("order_lot_no")));
-		
+				psIns.setString(++index, Utils.isNull(rs.getString("STORE_NAME")));
+				
 				psIns.executeUpdate();
 				
 				//insert Line
@@ -281,21 +284,22 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 		int index = 0;
 		int lineId = 0;	
 		try{
-			String sqlIn = " insert into XXPENS_PO_BIGC_ORDER_DT \n";
+			String sqlIn = " insert into XXPENS_PO_ORDER_IMPORT_DT \n";
 			sqlIn +=" ( created_by, creation_date,last_updated_by, last_update_date,last_update_login, \n";
-			sqlIn +="   header_id,line_id,item_no , qty )\n ";
-			sqlIn += " values(?,?,?,? ,?,?,?,? ,?)";
+			sqlIn +="   header_id,line_id,item_no , qty,group_code )\n ";
+			sqlIn += " values(?,?,?,? ,?,?,?,? ,?,?)";
 			psIns = conn.prepareStatement(sqlIn);
 			
-			
 			sql.append("\n SELECT  ");
-			sql.append("\n O.ORDER_LOT_NO,O.ITEM");
+			sql.append("\n O.ORDER_LOT_NO,O.ITEM ,O.GROUP_CODE");
 			sql.append("\n ,NVL(SUM(O.QTY),0) as QTY");
 			sql.append("\n FROM PENSBME_ORDER O");
 			sql.append("\n WHERE O.ORDER_LOT_NO ='"+orderLotNo+"'");
-			sql.append("\n GROUP BY O.ORDER_LOT_NO,O.ITEM");
+			sql.append("\n GROUP BY O.ORDER_LOT_NO,O.ITEM,O.GROUP_CODE ");
+			sql.append("\n ORDER BY O.GROUP_CODE ,O.ITEM");
 			
 			logger.debug("sql:"+sql.toString());
+			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			while(rs.next()){
@@ -312,7 +316,8 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 				psIns.setInt(++index, lineId);//lineId
 				psIns.setString(++index, Utils.isNull(rs.getString("item")));
 				psIns.setInt(++index, rs.getInt("qty"));
-			    
+				psIns.setString(++index, Utils.isNull(rs.getString("group_code")));
+				
 				psIns.executeUpdate();
 				successCount++;
 			}//while

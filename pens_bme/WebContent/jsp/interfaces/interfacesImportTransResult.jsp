@@ -25,7 +25,7 @@
 		<th width="5%">Row In Excel</th>
 		<th width="10%">Sales Date</th>
 		<th width="5%">Store No</th>
-		<th width="25%">Store Name</th>
+		<th width="25%">Item Wacoal</th>
 		<th width="30%">Description</th>
 		<th width="5%">QTY</th>
 		<th width="25%">Message </th>

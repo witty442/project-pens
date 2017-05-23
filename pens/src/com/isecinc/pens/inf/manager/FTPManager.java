@@ -2281,7 +2281,7 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 		}
 	}
 	
-public void uploadBackUpDBZipFileToFTP_OPT3(User user,String ftpFilePath,String localFile) throws Exception{
+public void uploadBackUpDBZipFileToFTP_OPT3(String rootFtpPath, String ftpFilePath,String localFile) throws Exception{
 		
 		DataOutputStream dos = null;
 		sun.net.TelnetOutputStream tos = null;
@@ -2303,6 +2303,10 @@ public void uploadBackUpDBZipFileToFTP_OPT3(User user,String ftpFilePath,String 
 		    tos.flush();
 		    dos.flush();
 		    logger.info("upload success");
+		    
+		    /** Change Mode file to 777 **/
+		    changeModeFile(rootFtpPath,ftpFilePath);
+		    
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -2321,4 +2325,45 @@ public void uploadBackUpDBZipFileToFTP_OPT3(User user,String ftpFilePath,String 
 		}
 	}
 	
+public void changeModeFile(String rootFtpPath,String ftpFilePath) throws Exception{
+	FTPClient ftp = null;
+	String reply = "";
+	try {		
+		
+		ftp = new FTPClient();
+		ftp.connect(server);
+		//ftp.enterLocalActiveMode();
+		ftp.enterLocalPassiveMode();
+		ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+
+		if(!ftp.login(userFtp, passwordFtp)){
+			throw new FTPException("FTP Username or password invalid! ");
+		}
+
+		logger.info("Write To Path:"+rootFtpPath);
+		ftp.changeWorkingDirectory(rootFtpPath);
+		logger.info("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+ 
+	    //SITE CHMOD 777 201011101437-SALESREP.txt
+	    /** Set Permission File ***/
+	    logger.info(" Start CHMOD 777 ");
+	    ftp.sendSiteCommand("CHMOD 777 "+ftpFilePath);
+	    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+
+	} catch (SocketException e) {
+		throw new FTPException("Could not connect to FTP server");
+	} catch (UnknownHostException e) {
+		throw new FTPException("Could not connect to FTP server");
+	} catch (IOException e) {
+		throw new FTPException(e.getLocalizedMessage());
+	} catch (Exception e) {
+		throw new FTPException(e.getMessage());
+	} finally {
+		if(ftp != null && ftp.isConnected()) {
+			ftp.disconnect();
+			//logger.info("ftp disconnect : "+ftp.getReplyString());
+			ftp = null;
+		}
+	}	
+}
 }

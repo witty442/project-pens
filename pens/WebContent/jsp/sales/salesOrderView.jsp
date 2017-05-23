@@ -1,3 +1,4 @@
+<%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -14,7 +15,7 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
 <%
-User user = ((User)session.getAttribute("user"));
+	User user = ((User)session.getAttribute("user"));
 String role = user.getType();
 String action = (String)request.getParameter("action");
 if(action == null){
@@ -75,9 +76,9 @@ System.out.println("canAirpay:"+canAirpay);
 <%@page import="com.isecinc.pens.bean.TrxHistory"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css">
 <!--
@@ -88,11 +89,11 @@ body {
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
@@ -853,7 +854,19 @@ function stampPrint(){
 								<td align="left"></td>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="order.orderNo" size="20" readonly="true" styleClass="disableText"/>
+									<html:hidden property="order.orderNo" />
+									<%
+									 String orderNo1 = "";
+									 String orderNo2 = "";
+									 if(orderForm.getOrder() != null){
+										 String orderNoTemp = orderForm.getOrder().getOrderNo();
+										 if(orderNoTemp.length()==12){
+											orderNo1 =  orderNoTemp.substring(0,8);
+											orderNo2 =  orderNoTemp.substring(8,12);
+										 }
+									 }
+									%>
+									<b><span><%=orderNo1%></span></b><span class="labelBigSize"><%=orderNo2%></span>
 								</td>
 							</tr>
 							<tr>
@@ -1143,7 +1156,7 @@ function stampPrint(){
 								<td width="10%">&nbsp;</td>
 							</tr>
 						</table>
-						
+					
 						<!--  -->
 						<html:hidden property="order.payment" styleId="payment"/>
 						<html:hidden property="deletedId"/>
@@ -1193,7 +1206,7 @@ function stampPrint(){
 							<jsp:param name="id" value="${orderForm.order.id}"/>
 						</jsp:include>
 					  </div>
-
+	                  SalesOrderView
 						</html:form>
 						<!-- BODY -->
 					</td>

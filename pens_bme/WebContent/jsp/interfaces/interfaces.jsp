@@ -728,7 +728,7 @@ body {
 							    <jsp:include page="monitor_short.jsp"></jsp:include>
 								<p></p>
 								 <!-- BME Scan Result -->
-								<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
+								<jsp:include page="subImportSaleOutWacoalResult.jsp"></jsp:include>
 						   <% }else if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){ %> 
 							    <p></p>
 							    <jsp:include page="monitor_short.jsp"></jsp:include>
@@ -780,12 +780,20 @@ body {
 								</td>
 								<td align="right"  width="50%">
 								   <b>
+								   <!-- Display Path FTP -->
 									   <%if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
 										   String path = EnvProperties.getInstance().getProperty("path.icc.hisher.import.dlyr")+"/";
 										   out.print("    Example file :");
 										   out.print(path+InterfaceUtils.getImportNameICC("PENSBME_ICC_HEAD",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
 										   out.print("      &nbsp;&nbsp;,"+path+InterfaceUtils.getImportNameICC("PENSBME_ICC_DLYR",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
-									   } %>
+										}else if( Constants.TYPE_IMPORT_WACOAL_STOCK.equals(pageName)){ 
+										    String path = EnvProperties.getInstance().getProperty("path.import.wacoal.stock")+"/";
+										    out.print("    Path :"+path);
+										}else if( Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN.equals(pageName)){
+										    String path = EnvProperties.getInstance().getProperty("path.import.wacoal.salesin")+"";
+										    out.print("    Path :"+path);
+										}
+										%>
 								   </b>
 								 </td>
 							 </tr>

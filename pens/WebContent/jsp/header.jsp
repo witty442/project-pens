@@ -26,7 +26,7 @@ if(request.getSession().getAttribute("appVersionCheckMsg") != null){
          </td>
         <td width="523px;" background="${pageContext.request.contextPath}/images2/header02.png" align="right" valign="top">
         
-        	<a href="${pageContext.request.contextPath}/?logoff=T" onmouseout="MM_swapImgRestore()" 
+        	<a href="${pageContext.request.contextPath}/login.do?do=logoff" onmouseout="MM_swapImgRestore()" 
         	  onmouseover="MM_swapImage('Image14','','${pageContext.request.contextPath}/images2/button_logout2.png',1)">
         	  <img src="${pageContext.request.contextPath}/images2/button_logout1.png" name="Image14" width="46" height="46" border="0" id="Image14" />
         	</a>

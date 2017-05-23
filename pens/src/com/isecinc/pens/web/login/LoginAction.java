@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import util.AppversionVerify;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
+import util.SessionGen;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
@@ -48,6 +49,9 @@ public class LoginAction extends DispatchAction {
 		Connection conn = null;
 		LoginForm loginForm = null;
 		try {
+			//remove session id
+			SessionGen.getInstance().clearInstance();
+			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
 			User user = null;
@@ -81,5 +85,30 @@ public class LoginAction extends DispatchAction {
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward("pass");
+	}
+	
+	public ActionForward logoff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		String forwordStr = "logoff";
+		try {
+			logger.debug("logoff");
+			//Manage Path
+			if(request.getSession().getAttribute("user") != null){
+			 // User user = (User)request.getSession().getAttribute("user") ;
+			 // ManagePath.savePath(user, "logoff");
+			}
+			
+			//remove session id
+			SessionGen.getInstance().clearInstance();
+			
+			request.getSession().invalidate();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			request.setAttribute("errormsg", e.getMessage());
+			return mapping.findForward("fail");
+		} finally {
+			
+		}
+		return mapping.findForward(forwordStr);
 	}
 }
