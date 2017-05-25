@@ -27,13 +27,13 @@ public class WebInitialServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger("PENS");
 
 	public void init() throws ServletException {
-		logger.debug("Initial PENS...");
+		//logger.debug("Initial PENS...");
 		Connection conn = null;
 		try {
 			logger.info("Initial System Parameter");
 			InitialParameter initParam = new InitialParameter();
 			initParam.init(getInitParameter("parameterfile"), getServletContext());
-            
+      
 			logger.info("Clear Task All");
 			InterfaceDAO.clearTaskControlMonitorAll();
 		} catch (Exception e) {

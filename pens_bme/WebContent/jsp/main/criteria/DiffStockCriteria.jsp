@@ -14,7 +14,7 @@ String hideAll = "";
 	<tr>
 		<td align="right" width="25%">รหัสร้านค้า</td>
 		<td align="left" width="40%">
-		    <html:text property="diffStockSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
+		    <html:text property="diffStockSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
 		    <html:text property="diffStockSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText"/>
 		    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 		</td>

@@ -261,6 +261,8 @@
 			<forward name="search3" path="/jsp/popup/searchCustomerPopupOneWithSubInv.jsp" />
 			<forward name="searchMC" path="/jsp/popup/searchMCStaffPopup.jsp" />
 			<forward name="searchMultiCustomer" path="/jsp/popup/searchMultiCustomerPopup.jsp" />
+			
+			<forward name="branch" path="/jsp/popup/searchBranchPopup.jsp" />
 		</action>
 		
 		<!-- POPUP -->

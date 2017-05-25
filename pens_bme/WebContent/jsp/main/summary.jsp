@@ -1,10 +1,11 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
+<%@page import="java.util.List"%> 
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -24,9 +25,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <%
@@ -45,13 +46,14 @@ body {
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/page/summary.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -87,6 +89,7 @@ function loadMe(){
     		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
     		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
     		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
+    		 || "ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))
     		 ) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -272,6 +275,18 @@ function search(path){
 			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 			   return false;
 		   } 
+	 <%}else if("ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+		   var asOfDateFrom = form.salesDate.value;
+		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+		   
+		   if(asOfDateFrom ==""){ 
+			   alert("กรุณากรอกข้อมูลวันที่ As Of");
+			   return false;
+		   }
+		    if(pensCustCodeFrom ==""){ 
+			   alert("กรุณากรอกข้อมูล Branch ID");
+			   return false;
+		   } 
 	 <% }%>
 	
 	form.action = path + "/jsp/summaryAction.do?do=search&page=<%=request.getParameter("page")%>";
@@ -307,7 +322,6 @@ function genMonthEnd(path,storeType){
 		return true;
    }
 }
-
 
 function genEndDate(path){
 	var form = document.summaryForm;
@@ -406,175 +420,6 @@ function clearForm(path){
 	form.action = path + "/jsp/summaryAction.do?do=prepare&action=new&page=<%=request.getParameter("page")%>";
 	form.submit();
 	return true;
-}
-
-function openPopupCustomer(path,types,storeType){
-    var param = "&types="+types;
-        param += "&storeType="+storeType;
-    
-	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
-	//window.open(encodeURI(url),"",
-			//   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	
-	PopupCenterFullHeight(url,"",600);
-}
-
-function openPopupCustomerAll(path,types,storeType,hideAll){
-    var param = "&types="+types;
-        param += "&storeType="+storeType;
-        param += "&hideAll="+hideAll;
-        
-	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare&action=new"+param;
-	//window.open(encodeURI(url),"",
-			   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	
-	PopupCenterFullHeight(url,"",600);
-}
-
-function openPopupGroup(path){
-    var param = "";
-	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
-	//window.open(encodeURI(url),"",
-			   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	PopupCenterFullHeight(url,"",600);
-}
-
-function openPopupProduct(path,types){
-	var param = "&types="+types;
-	url = path + "/jsp/searchProductPopupAction.do?do=prepare&action=new"+param;
-	//window.open(encodeURI(url),"",
-			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	PopupCenterFullHeight(url,"",600);
-}
-
-function setStoreMainValue(code,desc,types){
-	var form = document.summaryForm;
-	//alert(form);
-	if("from" == types){
-		form.pensCustCodeFrom.value = code;
-		form.pensCustNameFrom.value = desc;
-	}else{
-		form.pensCustCodeTo.value = code;
-		form.pensCustNameTo.value = desc;
-	}
-} 
-
-function setGroupMainValue(code,desc,types){
-	var form = document.summaryForm;
-	form.group.value = code;
-	form.groupDesc.value = desc;
-}
-
-function setProductMainValue(code,desc,types){
-	var form = document.summaryForm;
-	//alert(form);
-	if("from" == types){
-		form.pensItemFrom.value = code;
-	}else{
-		form.pensItemTo.value = code;
-	}
-} 
-
-function getCustNameKeypress(e,custCode,fieldName){
-	var form = document.summaryForm;
-	var storeType = form.storeType.value;
-	
-	if(e != null && e.keyCode == 13){
-		if(custCode.value ==''){
-			if("pensCustNameFrom" == fieldName){
-				form.pensCustNameFrom.value = '';
-			}
-			if("pensCustNameTo" ==fieldName){
-				form.pensCustNameTo.value = '';
-			}
-		}else{
-		   getCustName(custCode,fieldName,storeType);
-		}
-	}
-}
-
-function getBranchNameKeypress(e,custCode,fieldName){
-	var form = document.summaryForm;
-	var storeType = form.storeType.value;
-	
-	if(e != null && e.keyCode == 13){
-		if(custCode.value ==''){
-			if("pensCustNameFrom" == fieldName){
-				form.pensCustNameFrom.value = '';
-			}
-			if("pensCustNameTo" ==fieldName){
-				form.pensCustNameTo.value = '';
-			}
-		}else{
-		   getBranchName(custCode,fieldName,storeType);
-		}
-	}
-}
-
-function getCustName(custCode,fieldName,storeType){
-	var returnString = "";
-	var form = document.summaryForm;
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameAjax.jsp",
-			data : "custCode=" + custCode.value+"&storeType="+storeType,
-			async: false,
-			cache: false,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-	
-	if("pensCustNameFrom" == fieldName){
-		if(returnString != ''){
-		   form.pensCustNameFrom.value = returnString;
-		}else{
-			custCode.value ='';
-			custCode.focus();
-			alert("ไม่พบข้อมูล");
-		}
-	}
-	if("pensCustNameTo" ==fieldName){
-		if(returnString != ''){
-		   form.pensCustNameTo.value = returnString;
-		}else{
-			custCode.value ='';
-			custCode.focus();
-			alert("ไม่พบข้อมูล");
-		}
-	}
-}
-
-function getBranchName(custCode,fieldName,storeType){
-	var returnString = "";
-	var form = document.summaryForm;
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/getBranchNameAjax.jsp",
-			data : "custCode=" + custCode.value+"&storeType="+storeType,
-			async: false,
-			cache: false,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-	
-	if("pensCustNameFrom" == fieldName){
-		if(returnString != ''){
-		   form.pensCustNameFrom.value = returnString;
-		}else{
-			custCode.value ='';
-			custCode.focus();
-			alert("ไม่พบข้อมูล");
-		}
-	}
-	if("pensCustNameTo" ==fieldName){
-		if(returnString != ''){
-		   form.pensCustNameTo.value = returnString;
-		}else{
-			custCode.value ='';
-			custCode.focus();
-			alert("ไม่พบข้อมูล");
-		}
-	}
 }
 </script>
 </head>
@@ -767,7 +612,7 @@ function getBranchName(custCode,fieldName,storeType){
 						       <tr>
 									<td align="right"  nowrap>รหัสร้านค้า<font color="red">*</font>
 									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
+									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
 									<td align="left" width="30%"  nowrap> 
@@ -895,40 +740,47 @@ function getBranchName(custCode,fieldName,storeType){
 			</div>
 					
 					<!-- ****** RESULT ***************************************************************** -->
-				     <!-- ALL SUB Report By old code -->
-			         <jsp:include page="subreports/subReportAll.jsp" /> 
-                   
-                    <!-- New code -->
-                    <c:if test="${summaryForm.page == 'onhandBigCSP'}">
-                        <jsp:include page="subreports/subReportOnhandBigCSP.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'onhandLotus'}">
-                        <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'sizeColorLotus'}">
+				    
+                   <c:choose>
+                       <c:when test="${summaryForm.page == 'ReportStockWacoalLotus'}">
+                          <jsp:include page="subreports/subReportStockWacoalLotus.jsp" /> 
+				      </c:when> 
+                      <c:when test="${summaryForm.page == 'onhandBigCSP'}">
+                          <jsp:include page="subreports/subReportOnhandBigCSP.jsp" /> 
+				      </c:when>    
+				      <c:when test="${summaryForm.page == 'onhandLotus'}">
+                           <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
+                      </c:when>
+                      <c:when test="${summaryForm.page == 'sizeColorLotus'}">
                         <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'monthEndLotus'}">
+                      </c:when>
+                       <c:when test="${summaryForm.page == 'monthEndLotus'}">
                         <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'onhandMTT'}">
-                       <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'reportEndDateLotus'}">
-                        <jsp:include page="subreports/subReportEndDateLotus.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'lotus'}">
-                        <jsp:include page="subreports/subReportSalesLotus.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'BigC'}">
-                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
-                    </c:if>
-                    <c:if test="${summaryForm.page == 'Tops'}">
-                        <jsp:include page="subreports/subReportSalesTops.jsp" /> 
-                    </c:if>
-                     <c:if test="${summaryForm.page == 'king'}">
-                        <jsp:include page="subreports/subReportSalesKing.jsp" /> 
-                    </c:if>
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'onhandMTT'}">
+	                       <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'reportEndDateLotus'}">
+	                        <jsp:include page="subreports/subReportEndDateLotus.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'lotus'}">
+	                        <jsp:include page="subreports/subReportSalesLotus.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'BigC'}">
+	                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'Tops'}">
+	                        <jsp:include page="subreports/subReportSalesTops.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'king'}">
+	                        <jsp:include page="subreports/subReportSalesKing.jsp" /> 
+	                   </c:when>
+				      <c:otherwise>
+				         <!-- ALL SUB Report By old code -->
+				         <jsp:include page="subreports/subReportAll.jsp" /> 
+				      </c:otherwise>
+				   </c:choose>
+                    
                     <!-- ****** RESULT ***************************************************************** -->
                     
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>

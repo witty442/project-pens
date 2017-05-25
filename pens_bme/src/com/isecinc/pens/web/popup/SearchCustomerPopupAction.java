@@ -203,7 +203,6 @@ public class SearchCustomerPopupAction extends I_Action {
 		return mapping.findForward("clear2");
 	}
 	
-	
 	public ActionForward prepare3(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare3");
 		PopupForm popupForm = (PopupForm) form;
@@ -346,6 +345,48 @@ public class SearchCustomerPopupAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("searchMultiCustomer");
+	}
+	
+	public ActionForward prepareBranch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("branch");
+		PopupForm popupForm = (PopupForm) form;
+		try {
+			 if("new".equalsIgnoreCase(request.getParameter("action"))){
+				 request.setAttribute("BRANCH_LIST", null);
+				 popupForm.setCode("");
+				 popupForm.setDesc("");
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("branch");
+	}
+	
+	public ActionForward searchBranch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("branch");
+		PopupForm popupForm = (PopupForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			String storeType = Utils.isNull(request.getParameter("storeType"));
+			logger.debug("StoreType["+storeType+"]");
+			
+			 List<PopupForm> results = SummaryDAO.searchBranchMaster(popupForm,storeType,"");
+			 if(results != null && results.size() >0){
+				 request.setAttribute("BRANCH_LIST", results);
+			 }else{
+				 request.setAttribute("Message", "ไม่พบข่อมูล");
+			 }
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("branch");
 	}
 	
 	@Override

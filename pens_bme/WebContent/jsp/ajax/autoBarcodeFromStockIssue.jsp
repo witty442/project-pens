@@ -9,7 +9,7 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%
-String barcode = Utils.isNull((String) request.getParameter("barcode"));
+	String barcode = Utils.isNull((String) request.getParameter("barcode"));
 String issueReqNo = Utils.isNull((String) request.getParameter("issueReqNo"));
 String matCode = Utils.isNull((String) request.getParameter("matCode"));
 String warehouse = Utils.isNull((String) request.getParameter("warehouse"));
@@ -34,10 +34,10 @@ try{
 		}
 		
 		//Get pensItem by Barcode order by pens_item asc and have count qty <> 0
-		 Barcode bResult = GeneralDAO.getPensItemByBarcodeModelStockIssueIsQtyNotZero(conn, barcode, matCode, issueReqNo, warehouse, boxNo,itemMap);
+		 SalesTargetBean bResult = GeneralDAO.getPensItemByBarcodeModelStockIssueIsQtyNotZero(conn, barcode, matCode, issueReqNo, warehouse, boxNo,itemMap);
 		 if(bResult != null){
-			 pensItem = bResult.getPensItem();
-			 totalQtyByBarcodeAndPensItem = bResult.getQty();
+	 pensItem = bResult.getPensItem();
+	 totalQtyByBarcodeAndPensItem = bResult.getQty();
 		 } 
          System.out.println("*********No remian Qty <> 0 pensItem:"+pensItem+",remain Qty:"+totalQtyByBarcodeAndPensItem);
 		
@@ -47,20 +47,20 @@ try{
 		
 		//Set count Qty by Barcode+pensItem
 		if(session.getAttribute("ITEM_MAP") != null){
-			itemMap = (Map)session.getAttribute("ITEM_MAP");
-			if(itemMap.get(keyMap) != null){
-				int totalQtyByBarcodePensItem = Utils.convertStrToInt(itemMap.get(keyMap)) +1;//count totalQty
-				itemMap.put(keyMap, String.valueOf(totalQtyByBarcodePensItem));
-			}else{
-				itemMap.put(keyMap, "1");
-			}
-			session.setAttribute("ITEM_MAP",itemMap);
+	itemMap = (Map)session.getAttribute("ITEM_MAP");
+	if(itemMap.get(keyMap) != null){
+		int totalQtyByBarcodePensItem = Utils.convertStrToInt(itemMap.get(keyMap)) +1;//count totalQty
+		itemMap.put(keyMap, String.valueOf(totalQtyByBarcodePensItem));
+	}else{
+		itemMap.put(keyMap, "1");
+	}
+	session.setAttribute("ITEM_MAP",itemMap);
 		}else{
-			itemMap.put(keyMap, "1");
-			session.setAttribute("ITEM_MAP",itemMap);
+	itemMap.put(keyMap, "1");
+	session.setAttribute("ITEM_MAP",itemMap);
 		}
 		 
-		Barcode b = GeneralDAO.searchProductByBarcodeFromStockIssue(conn,request,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);  
+		SalesTargetBean b = GeneralDAO.searchProductByBarcodeFromStockIssue(conn,request,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);  
 		
 		if(b != null ){
 		    outputText = b.getBarcode()+"|"+b.getMaterialMaster()+"|"+b.getGroupCode()+"|"+b.getPensItem()+"|"+b.getQty();

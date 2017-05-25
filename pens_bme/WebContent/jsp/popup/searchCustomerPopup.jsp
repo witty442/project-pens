@@ -289,9 +289,6 @@ window.onload = function(){
     <display:column  title="รายละเอียด" property="desc" sortable="false" class="desc"/>								
 </display:table>	
 <!-- RESULT -->
-
-
-
 </html:form>
 </body>
 </html>

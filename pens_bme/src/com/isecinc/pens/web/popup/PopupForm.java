@@ -57,8 +57,26 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String mat;
 	private String pensItem;
 	private String qty;
+	private String branchId;
+	private String branchName;
 	
 	
+	public String getBranchId() {
+		return branchId;
+	}
+
+	public void setBranchId(String branchId) {
+		this.branchId = branchId;
+	}
+
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+
 	public String getQty() {
 		return qty;
 	}

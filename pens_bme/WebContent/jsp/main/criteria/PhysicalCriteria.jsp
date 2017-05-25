@@ -17,12 +17,12 @@ String hideAll = "";
 	</tr>
 	<tr>
 		<td align="left">จาก รหัสร้านค้า&nbsp;&nbsp; &nbsp; 
-		    <html:text property="physicalSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameFrom')"/>-
+		    <html:text property="physicalSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="10" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
 		    <html:text property="physicalSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText"/>
 		    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 		</td>
 		<td align="left">ถึง รหัสร้านค้า&nbsp;&nbsp;&nbsp;&nbsp; 
-		    <html:text property="physicalSummary.pensCustCodeTo" styleId="pensCustCodeTo" size="10" onkeypress="getCustNameKeypress(event,this,'pensCustNameTo')"/>-
+		    <html:text property="physicalSummary.pensCustCodeTo" styleId="pensCustCodeTo" size="10" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameTo')"/>-
 		    <html:text property="physicalSummary.pensCustNameTo" styleId="pensCustNameTo" readonly="true" styleClass="disableText"/>
 		    <input type="button" name="x2" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','to','')"/>
 		</td>

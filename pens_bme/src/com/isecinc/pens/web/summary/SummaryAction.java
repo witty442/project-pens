@@ -220,33 +220,43 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
-					
 				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-					//set for display by page
-					request.getSession().setAttribute("summary",null);
-					summaryForm.setPage("ReportStockWacoalLotus");
-					List<OnhandSummary> results = null;
-					OnhandSummary re = new SummaryDAO().searchReportStockWacoalLotus(summaryForm,summaryForm.getOnhandSummary(),user);
-					if(re != null){
-						results = re.getItemsList();
-						request.getSession().setAttribute("summary",re.getSummary());
-					}else{
-						request.getSession().setAttribute("summary",null);
-					}
+					//Validate Initial Date
+					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date initDate = new SummaryDAO().searchInitDateWacoalStock(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
-					if (results != null  && results.size() >0) {
-						summaryForm.setResults(results);
-						
-						//logger.debug("results:"+summaryForm.getResults());
-						ImportDAO importDAO = new ImportDAO();
-						Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
-						if(m != null)
-						  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-						
-					} else {
-						summaryForm.setResults(null);
-						request.setAttribute("Message", "ไม่พบข่อมูล");
-					}	
+					logger.debug("initDate:"+initDate);
+					logger.debug("asOfDate:"+asOfDate);
+					request.getSession().setAttribute("summary",null);
+					
+					boolean pass = true;
+					if(initDate !=null){
+						if(asOfDate.before(initDate)){
+							summaryForm.setResults(null);
+							request.setAttribute("Message", "วันที่ as of ต้องมากกว่าเท่ากับวันที่นับสต๊อกตั้งต้น");
+							pass = false;
+						}
+					}
+					if(pass){
+						List<OnhandSummary> results = null;
+						OnhandSummary re = new SummaryDAO().searchReportStockWacoalLotus(summaryForm,user,initDate,asOfDate);
+						if(re != null){
+							results = re.getItemsList();	
+							request.getSession().setAttribute("summary",re.getSummary());
+						}
+						if (results != null  && results.size() >0) {
+							summaryForm.setResults(results);
+							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							//get Branch Name
+							GeneralDAO DAO = new GeneralDAO();
+							summaryForm.getOnhandSummary().setPensCustNameFrom(DAO.getBranchName(summaryForm.getOnhandSummary().getPensCustCodeFrom()));
+							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						} else {
+							summaryForm.setResults(null);
+							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							request.setAttribute("Message", "ไม่พบข่อมูล");
+						}
+					}
 				}else if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//set for display by page
 					request.getSession().setAttribute("summary" ,null);
@@ -757,6 +767,14 @@ public class SummaryAction extends I_Action {
 				fileName ="ReportStockonhandBme.xls";
 				if(summaryForm.getOnhandSummaryResults() != null && summaryForm.getOnhandSummaryResults().size() > 0){
 					htmlTable = export.genOnhandHTML(request,summaryForm,user);	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				fileName ="ReportStockWacoalLotus.xls";
+				if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
+					htmlTable = export.genReportStockWacoalLotusHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
