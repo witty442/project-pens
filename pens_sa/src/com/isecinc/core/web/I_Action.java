@@ -36,7 +36,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward prepare(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Prepare " + this.getClass());
+		//logger.debug("Prepare " + this.getClass());
 		String forward = "prepare";
 		try {
 			if (request.getParameter("id") != null) {
@@ -61,7 +61,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward search(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Search " + this.getClass());
+		//logger.debug("Search " + this.getClass());
 		String forward = "search";
 		try {
 			forward = search(form, request, response);
@@ -82,7 +82,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Save " + this.getClass());
+		//logger.debug("Save " + this.getClass());
 		String forward = "prepare";
 		try {
 			forward = save(form, request, response);
@@ -103,7 +103,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward changeActive(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Change Active " + this.getClass());
+		//logger.debug("Change Active " + this.getClass());
 		String forward = "search";
 		try {
 			forward = changeActive(form, request, response);
@@ -124,7 +124,7 @@ public abstract class I_Action extends DispatchAction {
 	 */
 	public ActionForward clearForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		logger.debug("Clear Form " + this.getClass());
+		//logger.debug("Clear Form " + this.getClass());
 		String searchKey = (String) request.getSession(true).getAttribute(this.getClass().toString());
 		if (searchKey != null) {
 			request.getSession(true).removeAttribute(searchKey);

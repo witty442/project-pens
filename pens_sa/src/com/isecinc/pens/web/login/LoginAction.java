@@ -12,6 +12,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import util.SIdUtils;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
@@ -44,8 +46,11 @@ public class LoginAction extends DispatchAction {
 		Connection conn = null;
 		LoginForm loginForm = null;
 		String forwordStr = "pass_user";
+		//String forwordStr = "pass_salestarget";
 		try {
 			logger.debug("Locale:"+Locale.getDefault());
+			//remove session id
+			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;

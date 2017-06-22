@@ -11,19 +11,6 @@
 			<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole/adminConsole.jsp','','width=800px,height=600px')" title="Configuration">
 			  <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			</a>
-			<font color="black">Current Date
-			   <script>
-			  var currentdate = new Date(); 
-			  var datetime = "" + currentdate.getDate() + "/"
-			                  + (currentdate.getMonth()+1)  + "/" 
-			                  + (currentdate.getFullYear()+543) + " Time  "  
-			                  + currentdate.getHours() + ":"  
-			                  + currentdate.getMinutes() + ":" 
-			                  + currentdate.getSeconds();
-			            document.write(datetime);
-			  </script>
-			  </font>
-			   
 			  <%
 			    Configuration hibernateConfig = new Configuration();
 				hibernateConfig.configure();

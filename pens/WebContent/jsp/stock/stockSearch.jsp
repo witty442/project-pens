@@ -1,3 +1,4 @@
+
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -54,6 +55,10 @@ function loadMe(){
 }
 function backsearch(path) {
 	document.stockForm.action = path + "/jsp/stockAction.do?do=prepareCustomer"+"&action=back";//stockCustomerSearch
+	document.stockForm.submit();
+}
+function clearForm(path) {
+	document.stockForm.action = path + "/jsp/stockAction.do?do=prepareCustomer"+"&action=new";//clearForm
 	document.stockForm.submit();
 }
 

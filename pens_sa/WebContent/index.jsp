@@ -123,8 +123,17 @@ function login(path){
 		              <td><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="5" /></td>
 		            </tr>
 		            <tr>
-		              <td><html:text property="userName" size="10"/></td>
-		              <td><html:password property="password" size="10" onkeypress="gologin(event);"/></td>
+		              <td><html:text property="userName" size="10" /></td>
+		              <td><html:password property="password" size="10" onkeypress="gologin(event);"/></td> 
+		              
+		            <!-- MKT -->
+		             <%--  <td><html:text property="userName" size="10" value="pattarin"/></td>
+		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="matcy9019"/></td> --%>
+		             
+		             <!-- MT -->
+		             <%--  <td><html:text property="userName" size="10" value="rattana"/></td>
+		              <td><html:password property="password" size="10" onkeypress="gologin(event);" value="0810"/></td>  --%>
+		              
 		            </tr>
 		             <tr>
 <!--		              <td><a href="javascript:popupChangePassword('${pageContext.request.contextPath}')">เปลี่ยนรหัสผ่านใหม่</a></td>-->

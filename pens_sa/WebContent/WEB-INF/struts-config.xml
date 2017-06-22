@@ -24,13 +24,14 @@
 		<form-bean name="roleForm" type="com.isecinc.pens.web.role.RoleForm" />
 		<!-- Sales Analyst-->
 		<form-bean name="salesAnalystReportForm" type="com.isecinc.pens.web.report.salesanalyst.SAReportForm" />
-		
 		<form-bean name="searchValuePopupForm" type="com.isecinc.pens.web.popup.SearchValuePopupForm" />
 		<form-bean name="searchRolePopupForm" type="com.isecinc.pens.web.popup.SearchRolePopupForm" />
 			
 		<!-- Group ROLE -->
-		
 		<form-bean name="groupRoleForm" type="com.isecinc.pens.web.group.GroupRoleForm" />
+		<form-bean name="salesTargetForm" type="com.isecinc.pens.web.salestarget.SalesTargetForm" />
+		
+		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -38,17 +39,19 @@
 	</global-forwards>
 		
 	<action-mappings>
-
-
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
 			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
+             <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
-
+		
+        <action name="popupForm" path="/jsp/popupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.PopupAction" >
+			<forward name="popup" path="/jsp/popup/popup.jsp" />
+		</action>
+		
         <!-- USER -->
-
 		<action name="userForm" path="/jsp/userAction" parameter="do" scope="request" type="com.isecinc.pens.web.user.UserAction">
 			<forward name="init" path="/jsp/administer/userSearch.jsp" />
 			<forward name="search" path="/jsp/administer/userSearch.jsp" />
@@ -108,6 +111,11 @@
 			<forward name="clearform" path="/jsp/popup/searchRolePopup.jsp" />
 		</action>
 		
+		<action name="salesTargetForm" path="/jsp/salesTargetAction" parameter="do" scope="session" type="com.isecinc.pens.web.salestarget.SalesTargetAction">
+			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
+			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
+
+		</action>
 	</action-mappings>
  
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

@@ -684,6 +684,8 @@
 			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
 			<forward name="clear" path="/jsp/stock/stockSearch.jsp" />
 			
+			<forward name="stockReport" path="/jsp/stock/stockReport.jsp" />
+			
 			<forward name="new" path="/jsp/stock/stock.jsp"/>
 			<forward name="edit" path="/jsp/stock/stock.jsp"/>
 			<forward name="preview" path="/jsp/stock/stock.jsp" />

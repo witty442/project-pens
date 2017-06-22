@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -7,12 +9,11 @@
 <%@page import="com.isecinc.pens.report.salesanalyst.SAConstants"%>
 <%
 	User user = (User)session.getAttribute("user");
+    String role = user.getRoleSalesTarget(); 
 %>
 <ul id="nav">
-<%
-if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
-%>
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp';"><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
+<%if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){%>
+	<li><a href="javascript: void(0)" class="parent" ><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
 		<ul>
            	<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/userAction.do?do=init&action=new';"><span><bean:message key="User" bundle="sysprop"/></span></a>
@@ -27,17 +28,63 @@ if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){
 		</ul>
 	</li>
 <%} %>
-	
-	<li><a href="#" class="parent" onclick="window.location=''${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
 		<ul>
-			<li>
+			<%-- <li>
 	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
-	       </li>
+	       </li> --%>
 		</ul>
-	</li>
+	</li> 
 	
+<%if ( Utils.userInRole(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
+%>
+	<li><a href="javascript: void(0)" class="parent"><span>Sale Target</span></a>
+		<ul>
+	        <li><a class="parent"><span>1.เป้าหมายของ MT</span></a>
+			       <ul>
+			       <%if ( Utils.userInRole(user,new String[]{User.MKT}) ){ %>
+					     <li>
+		                    <a href="#" class="parent" 
+		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MKT%>&action=new';">
+		                      <span>1.1 <bean:message key="MKT_SalesTarget" bundle="sysprop"/></span>
+		                    </a>
+		                 </li>
+	                 <%}%>
+	                  <%if ( Utils.userInRole(user,new String[]{User.DD_SALES,User.MT_SALES}) ){ %>
+		                  <li>
+		                    <a href="#" class="parent" 
+		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_SALES%>&action=new';">
+		                    <span>1.2 <bean:message key="MT_SalesTarget" bundle="sysprop"/></span>
+		                    </a>
+		                 </li> 
+	                 <%}%>
+	                  <%if ( Utils.userInRole(user,new String[]{User.MTMGR}) ){ %>
+		                <li>
+		                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MTMGR%>&action=new';">
+		                      <span>1.3 <bean:message key="MTMGR_SalesTarget" bundle="sysprop"/></span>
+		                    </a>
+		                 </li>
+	                 <%} %>
+			       </ul>
+			   </li>
+			   
+			   <li>
+					  <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET%>&action=new';"> 
+		                  <span>2 <bean:message key="ReportSalesTarget" bundle="sysprop"/></span>
+		             </a> 
+	           </li> 
+	            <li>
+					 <%--  <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL%>&action=new';">
+		                  <span>3 <bean:message key="ReportSalesTargetAll" bundle="sysprop"/></span>
+		             </a>  --%>
+	           </li> 
+		 </ul>
+	</li>
+<%} %>
+
 	<li>
 	   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
 	</li>
+	
 </ul>
    

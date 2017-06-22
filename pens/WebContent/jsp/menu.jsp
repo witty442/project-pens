@@ -162,10 +162,16 @@ User user = (User)session.getAttribute("user");
         	<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetSummary.do';"><span><bean:message key="SalesTargetSummary" bundle="sysprop"/></span></a>
             </li>
+            <%if(role.equalsIgnoreCase(User.VAN)){ %>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/creditControlReport.do';"><span><bean:message key="CreditControlReport" bundle="sysprop"/></span></a>
             </li>
-           
+           <%} %>
+           <%if(role.equalsIgnoreCase(User.TT)){ %>
+                <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=stockReport&action=new';"><span><bean:message key="StockCreditReport" bundle="sysprop"/></span></a>
+	         	</li>
+           <%} %>
         </ul>
     </li>
     <%} %>

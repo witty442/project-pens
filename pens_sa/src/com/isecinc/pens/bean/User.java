@@ -29,7 +29,11 @@ public class User extends I_PO implements Serializable {
 	public static final String TT = "TT";
 	public static final String VAN = "VAN";
 	public static final String DD = "DD";
-
+	public static final String MKT = "MKT";
+	public static final String MT_SALES = "MTSALES";
+	public static final String DD_SALES = "DDSALES";
+	public static final String MTMGR = "MTMGR";
+	
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -73,9 +77,12 @@ public class User extends I_PO implements Serializable {
          
 		setUserGroupId(rst.getInt("USER_GROUP_ID"));
 		setUserGroupName(MGroupRole.getUserGroupName(getUserGroupId()));
+		//set Role Sales Target
+		setRoleSalesTarget(convertToString(rst.getString("ROLE_SALESTARGET")));
+		
 		// set display label
 		setDisplayLabel();
-
+  
 		// active role information
 		// customer type, sales group, order type
 		activeRoleInfo();
@@ -173,8 +180,17 @@ public class User extends I_PO implements Serializable {
 	
     private String newPassword;
     private String reNewPassword;
+    private String roleSalesTarget;
     
     
+	public String getRoleSalesTarget() {
+		return roleSalesTarget;
+	}
+
+	public void setRoleSalesTarget(String roleSalesTarget) {
+		this.roleSalesTarget = roleSalesTarget;
+	}
+
 	public String getNewPassword() {
 		return newPassword;
 	}

@@ -446,24 +446,26 @@ function loadDataFromMain(){
 </table>
 <!-- RESULT -->
 <%-- <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST"  defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
- --%>    
- <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST" defaultsort="0"  defaultorder="descending" class="resultDisp" requestURI="#" sort="list" pagesize="20">
- 	
-    <display:column style="align:left;white-space:nowrap"  title="เลือกข้อมูล" class="chk">
-		<c:if test="${isMultiSelect}" >
-			<input type ="checkbox" name="chCheck" onclick="saveSelectedInPage(${item.no})"  />
-		</c:if>
-		<c:if test="${!isMultiSelect}" >
-			<input type ="radio" name="chRadio" />
-		</c:if> 
-		<input type ="hidden" name="code" value="<bean:write name="item" property="code"/>" />
-		<input type ="hidden" name="key" value="<bean:write name="item" property="key"/>" />
-		<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" />
-	 </display:column>
-    											    
-    <display:column style="align:left;white-space:nowrap" title="รหัส" property="key"  sortable="false" class="code"/>
-    <display:column style="align:left;white-space:nowrap" title="รายละเอียด" property="name"  sortable="false" class="desc"/>				
-</display:table>
+ --%>   
+<%if(session.getAttribute("VALUE_LIST") != null){ %>
+	 <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST" defaultsort="0"  defaultorder="descending" class="resultDisp" requestURI="#" sort="list" pagesize="20">
+	 	
+	    <display:column style="align:left;white-space:nowrap"  title="เลือกข้อมูล" class="chk">
+			<c:if test="${isMultiSelect}" >
+				<input type ="checkbox" name="chCheck" onclick="saveSelectedInPage(${item.no})"  />
+			</c:if>
+			<c:if test="${!isMultiSelect}" >
+				<input type ="radio" name="chRadio" />
+			</c:if> 
+			<input type ="hidden" name="code" value="<bean:write name="item" property="code"/>" />
+			<input type ="hidden" name="key" value="<bean:write name="item" property="key"/>" />
+			<input type ="hidden" name="desc" value="<bean:write name="item" property="name"/>" />
+		 </display:column>
+	    											    
+	    <display:column style="align:left;white-space:nowrap" title="รหัส" property="key"  sortable="false" class="code"/>
+	    <display:column style="align:left;white-space:nowrap" title="รายละเอียด" property="name"  sortable="false" class="desc"/>				
+	</display:table>
+<%} %>
 <!-- RESULT -->
 
 	<Script>

@@ -45,7 +45,7 @@ public class SequenceProcess {
 	 * @throws Exception
 	 */
 	public static Integer getNextValueModel(Connection conn,String tableName,String columnId) throws Exception {
-		Integer nextValue = 0;
+		Integer nextValue = 1;
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {

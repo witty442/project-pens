@@ -35,7 +35,7 @@ function addProduct2(path,objValue){
         tds += '<td align="left"></td>';//2 product
         tds += '<td align="center"></td>';//3 uom
         tds += '<td align="center"></td>';//4 qty 
-        tds += '<td align="center"><input type="text" name="lined.createDate" id="createDate" onmouseover="popCalendar(this,this)" readonly/><font color="red">*</font></td>';//5
+        tds += '<td align="center"><input type="text" name="lined.createDate" id="createDate" onmouseover="popCalendar(this,this)" readonly/></td>';//5
         tds += '<td align="center"><input type="text" name="lines.expireDate" id="expireDate" onmouseover="popCalendar(this,this)" readonly/><font color="red">*</font></td>';//6
         
         tds += '</tr>';
@@ -151,7 +151,7 @@ function setValueToProduct(path, objValue){
 	iconLabel+='<a href="#" onclick="open_product(\''+path+'\','+objValue.row+');">';
 	iconLabel+="<img border=0 src='"+path+"/icons/doc_edit.gif'></a>";
 	
-	var createDateLabel='<input type="text" name="lines.createDate" id="createDate" onmouseover="popCalendar(this,this)"  readonly/><font color="red">*</font>';
+	var createDateLabel='<input type="text" name="lines.createDate" id="createDate" onmouseover="popCalendar(this,this)"  readonly/>';
 	var expireDateLabel='<input type="text" name="lines.expireDate" id="expireDate" onmouseover="popCalendar(this,this)"  readonly/><font color="red">*</font>';
 	
 	//Column
@@ -221,12 +221,12 @@ function createProductList(){
 	var error = false;
 	var errorDate = false;
 	for(var i=0;i<ids.length;i++){
-		if(createDate[i].value==""){
+		/*if(createDate[i].value==""){
 			createDate[i].className ="lineError";
 			error = true;
 		}else{
 			createDate[i].className ="";
-		}
+		}*/
 		
 		if(expireDate[i].value==""){
 			expireDate[i].className ="lineError";
@@ -234,16 +234,18 @@ function createProductList(){
 		}else{
 			expireDate[i].className ="";
 		}
-		
-		if(validateDate(createDate[i].value,expireDate[i].value)==false ){
-			errorDate = true;
-			createDate[i].className ="lineError";
-			expireDate[i].className ="lineError";
-			//alert("false");
-		}else{
-			//alert("true");
-			createDate[i].className ="";
-			expireDate[i].className ="";
+		//Check case CreateDate not null
+		if(createDate[i].value !=""){
+			if(validateDate(createDate[i].value,expireDate[i].value)==false ){
+				errorDate = true;
+				createDate[i].className ="lineError";
+				expireDate[i].className ="lineError";
+				//alert("false");
+			}else{
+				//alert("true");
+				createDate[i].className ="";
+				expireDate[i].className ="";
+			}
 		}
 	}
 	

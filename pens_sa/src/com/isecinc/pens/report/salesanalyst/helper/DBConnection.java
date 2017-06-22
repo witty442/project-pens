@@ -29,7 +29,7 @@ public class DBConnection {
 		try {	
 			DBCPConnectionProvider dbSource = new DBCPConnectionProvider();
 			_instanceInf = dbSource.getConnection(_instanceInf);
-			logger.debug("Connection:"+_instanceInf);
+			//logger.debug("Connection:"+_instanceInf);
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);			
 		}
@@ -49,12 +49,12 @@ public class DBConnection {
 			String username = hibernateConfig.getProperty("connection.username");
 			String password = hibernateConfig.getProperty("connection.password");
 			
-			logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			
 			 Class.forName(driver);
 			//DriverManager.setLoginTimeout(600);
 			_instanceInf = DriverManager.getConnection(url,username,password);	
-			logger.debug("Connection:"+_instanceInf);
+			//logger.debug("Connection:"+_instanceInf);
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);			
 		}

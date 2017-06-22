@@ -1,5 +1,8 @@
 package com.isecinc.pens.web.stock;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -105,6 +108,58 @@ public class StockAction extends I_Action {
 			throw e;
 		}
 		return mapping.findForward("prepareCustomer");
+	}
+	
+	public ActionForward stockReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		StockForm stockForm = (StockForm) form;
+		StringBuffer html = null;
+		boolean excel = false;
+		 User user = (User) request.getSession(true).getAttribute("user");
+		try {
+			 logger.debug("prepare :"+request.getParameter("action"));
+
+			 if("new".equalsIgnoreCase(request.getParameter("action"))){
+				 //Clear and init Parametor By moveOrderType  
+				 stockForm.setCustomer(new Customer());
+				 request.getSession().setAttribute("RESULTS",null);
+				 
+			 }else if("exportToExcel".equalsIgnoreCase(request.getParameter("action"))){
+				 excel = true;
+				 html = StockReport.genResultToHtml(request, stockForm,excel);
+				 request.getSession().setAttribute("RESULTS",html);
+				 
+			     if(html ==null){
+				    request.setAttribute("Message","ไม่พบข้อมูล");
+			     }else{
+			        //Export To Excel
+				    java.io.OutputStream out = response.getOutputStream();
+					response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+					response.setContentType("application/vnd.ms-excel");
+					
+					Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+					w.write(html.toString());
+				    w.flush();
+				    w.close();
+	
+				    out.flush();
+				    out.close();
+			     }
+			 }else {
+				//search Report 
+				 html = StockReport.genResultToHtml(request, stockForm,excel);
+				 request.getSession().setAttribute("RESULTS",html);
+				 if(html ==null){
+					 request.setAttribute("Message","ไม่พบข้อมูล");
+				 }
+			 }
+			// save token
+			saveToken(request);
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}
+		return mapping.findForward("stockReport");
 	}
 	
 	/**

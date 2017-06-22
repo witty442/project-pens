@@ -463,6 +463,18 @@ public class Utils {
 		return dateStr;
 	}
 	
+	public static String stringValueDefault(Date date, String format ,Locale locale,String defaultS) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date==null){
+				return defaultS;
+			}
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
 	
 	public static String stringValueSpecial(long dateBigdecimal, String format ,Locale locale) throws Exception {
 		String dateStr = null;		

@@ -49,7 +49,7 @@ public class Stock {
 	
 	private List<StockLine> lineList;
     private List<String> lineNoDeleteList;
-	
+
 	
 	public String getCurrentDate() {
 		try{

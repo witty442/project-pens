@@ -329,7 +329,11 @@ public class MStock {
 			ps.setString(++index, head.getUserId());//USER_ID
 			ps.setDate(++index, Utils.getCurrentSqlDate());
 			ps.setString(++index, line.getCreatedBy());//CREATED_BY
-			ps.setDate(++index, new java.sql.Date(Utils.parse(line.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			if( !Utils.isNull(line.getCreateDate()).equals("")){
+			   ps.setDate(++index, new java.sql.Date(Utils.parse(line.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			}else{
+			   ps.setNull(++index,java.sql.Types.DATE);
+			}
 			ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			
 			int ch = ps.executeUpdate();

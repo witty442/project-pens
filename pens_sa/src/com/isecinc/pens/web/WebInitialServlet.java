@@ -7,13 +7,6 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
-
-import com.isecinc.core.init.I_Initial;
-import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.init.InitialParameter;
-import com.isecinc.pens.report.salesanalyst.SAInitial;
-
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration
  * 
@@ -29,11 +22,9 @@ public class WebInitialServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger("PENS");
 
 	public void init() throws ServletException {
-		logger.debug("Initial PENS...");
+		logger.debug("Initial Pens App...");
 		Connection conn = null;
-		
 		try {
-          
             
 		} catch (Exception e) {
 			logger.error(e.getMessage());

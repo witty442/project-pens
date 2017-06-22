@@ -1,6 +1,4 @@
 @charset "utf-8";
-
-
 .cssstyle {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -127,11 +125,11 @@ HTML,BODY {
 	font-size: 14px;
 }
 
-body,td,th,table,div,span {
+ body,td,th,table,div,span {
 	font-family: tahoma;
 	font-size: 13px;
-	/**font-size: 0.9em;**/
-}
+	*font-size: 0.9em;*
+} 
 
 input,textarea {
 	font-family: tahoma;
@@ -149,13 +147,82 @@ UL {
 	width: 99%;
 }
 
+.normalText {
+	color: #000000;
+}
+.errorText {
+	color: red;
+}
+.errorDisableText {
+	background-color: #DCDCDC;
+	color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	text-align:center;
+}
+.errorDisableTextCenter {
+	background-color: #DCDCDC;
+	color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
 .disableText {
 	background-color: #DCDCDC;
 	border: 1px solid;
 	border-color: #BEBEBE;
 	color: #000000;
 }
-
+.disableTextCenter {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align:center;
+}
+.disableTextBigBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-weight: bold;
+	font-family: tahoma;
+	font-size: 18px;
+}
+.enableNumber {
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+}
+.errorNumber {
+	background-color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+}
+.enableNumberBold {
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
+}
+.disableNumber {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+}
+.disableNumberBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
+}
 .recordfound {
 	text-align: left;
 	height: 20px;
@@ -200,16 +267,19 @@ TABLE.result TD {
 .lineE {
 	background-color: #e7eefa;
 }
-
 .lineE:hover {
 	background-color: #FFBBFF;
 }
-
 .lineO {
 	background-color: #e7eefa;
 }
-
 .lineO:hover {
+	background-color: #FFBBFF;
+}
+.lineError {
+	background-color: #FF0000;
+}
+.lineError:hover {
 	background-color: #FFBBFF;
 }
 

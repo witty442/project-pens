@@ -1,3 +1,4 @@
+<%@page import="util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -39,8 +40,8 @@ System.out.println("screenWidth:"+screenWidth);
 <meta http-equiv="cache-control" content="no-store" />
 <!-- <meta http-equiv="cache-control" content="no-cache" /> -->
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" /> 
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" /> 
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" /> --%>
 <style type="text/css">
 body {
@@ -87,15 +88,15 @@ fieldset legend {
  
 <%}%>
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesAnalyst.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesAnalyst.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.tablednd_0_5.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/date.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/date.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -513,7 +514,7 @@ function showSearchValuePopup(path,currCondNo){
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
 	//	window.open(encodeURI(url),"",
 				   //"menubar=no,resizable=no,titlebar=no,location=no,toolbar=no,scrollbars=yes,status=no,menubar=no,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	      PopupCenter(encodeURI(url),"","700", "600");
+	      PopupCenterFullHeight(encodeURI(url),"","700");
 	}
 }
 

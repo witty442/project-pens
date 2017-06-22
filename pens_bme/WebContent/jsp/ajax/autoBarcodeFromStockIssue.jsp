@@ -34,7 +34,7 @@ try{
 		}
 		
 		//Get pensItem by Barcode order by pens_item asc and have count qty <> 0
-		 SalesTargetBean bResult = GeneralDAO.getPensItemByBarcodeModelStockIssueIsQtyNotZero(conn, barcode, matCode, issueReqNo, warehouse, boxNo,itemMap);
+		 Barcode bResult = GeneralDAO.getPensItemByBarcodeModelStockIssueIsQtyNotZero(conn, barcode, matCode, issueReqNo, warehouse, boxNo,itemMap);
 		 if(bResult != null){
 	 pensItem = bResult.getPensItem();
 	 totalQtyByBarcodeAndPensItem = bResult.getQty();
@@ -60,7 +60,7 @@ try{
 	session.setAttribute("ITEM_MAP",itemMap);
 		}
 		 
-		SalesTargetBean b = GeneralDAO.searchProductByBarcodeFromStockIssue(conn,request,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);  
+		Barcode b = GeneralDAO.searchProductByBarcodeFromStockIssue(conn,request,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);  
 		
 		if(b != null ){
 		    outputText = b.getBarcode()+"|"+b.getMaterialMaster()+"|"+b.getGroupCode()+"|"+b.getPensItem()+"|"+b.getQty();

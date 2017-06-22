@@ -85,6 +85,11 @@ function loadMe(){
 	<% } %>
 }
 
+function clearForm(path) {
+	document.stockForm.action = path + "/jsp/stockAction.do?do=prepareCustomer"+"&action=new";//clearForm
+	document.stockForm.submit();
+}
+
 function search(path){
 	document.stockForm.action = path + "/jsp/stockAction.do?do=searchCustomer&rf=Y";
 	document.stockForm.submit();

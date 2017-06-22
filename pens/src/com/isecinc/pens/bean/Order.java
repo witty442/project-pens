@@ -96,6 +96,8 @@ public class Order extends I_PO implements Serializable {
 		setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
 		setPrintCountRcp(rst.getInt("print_count_rcp"));
 		
+		setPoNumber(rst.getString("po_number"));
+		
 	}
 
 	/**
@@ -249,8 +251,17 @@ public class Order extends I_PO implements Serializable {
 	
 	private String printDateTimeRcp;
 	private int printCountRcp;
+	private String poNumber;
 	
 	
+	public String getPoNumber() {
+		return poNumber;
+	}
+
+	public void setPoNumber(String poNumber) {
+		this.poNumber = poNumber;
+	}
+
 	public String getPrintDateTimePick() {
 		return printDateTimePick;
 	}

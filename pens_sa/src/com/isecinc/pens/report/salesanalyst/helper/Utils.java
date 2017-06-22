@@ -8,11 +8,17 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
+import com.isecinc.pens.bean.User;
 
 /**
  *	General utilities.
@@ -26,11 +32,20 @@ public class Utils {
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
 	public static final Locale local_th= new Locale("th","TH");
+	
+	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
+	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyy-HHmm";
+	public static final String DD_MMM_YYYY = "dd-MMM-yyyy";
 
 	@SuppressWarnings("unused")
 	private static String DECIMAL_FORMAT ="#.00000000000000000000";
 	private static String CURRENCY_FORMAT ="#,##0.00";
 	private static String NUMBER_FORMAT ="#,##0";
+	
+	public static final String format_current_no_disgit = "#,##0";
+	public static final String format_current_2_disgit = "#,##0.00";
+    public static final String format_current_5_digit = "#,##0.00000";
+	public static final String format_current_6_digit = "#,##0.000000";
 	
 	public static void main(String[] args){
 	    try{	       
@@ -40,7 +55,93 @@ public class Utils {
 	        e.printStackTrace();
 	    }
 	}
+   public static String converToTextSqlIn(String value){
+		
+		List<String> valuesText = new ArrayList<String>() ;
+		String[] values = value.split("[,]");
+		
+		for(String text : values){
+			valuesText.add("'"+text+"'");
+		}
+		
+		return StringUtils.join(valuesText, ","); 
+	}
+	public static double convertStrToDouble(String str){
+		if(isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new Double(str).doubleValue();
+	}
+	public static long convertStrToLong(String str,long defaults){
+		if(isNull(str).equals("")){
+			return defaults;
+		}
+		str = str.replaceAll(",", "");
+		return new Long(str).longValue();
+	}
 	
+	public static double convertStrToDouble2Digit(String str){
+		if(isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new Double(str).doubleValue();
+	}
+	
+	public static boolean userInRole(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleSalesTarget().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	
+	public static boolean statusInCheck(String status,String[] statusCheckArr){
+		boolean r = false;
+		for(int i=0;i<statusCheckArr.length;i++){
+			String statusCheck = statusCheckArr[i].toLowerCase().trim();
+			String statusArr[] = status.split("\\/");
+
+			for(int j =0;j<statusArr.length;j++){
+				String statusArrTemp = statusArr[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( statusCheck.equalsIgnoreCase(statusArrTemp)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	
+	public static String decimalFormat(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
+	public static String decimalFormat(double num,String format,String defaultS){
+		if(num==0 || num == 0.00 || num ==0.0)
+			return defaultS;
+		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
 	/**
 	 * Parse from {@link String} to {@link Date}
 	 * @param dateString the string of date

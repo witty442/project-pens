@@ -5,3 +5,9 @@ CREATE TABLE c_temp_location(
 	create_date timestamp,
 	error varchar(200)
 )
+/** 06/2560 **/
+alter table t_stock_line
+modify create_date date;
+
+alter table t_order 
+add po_number varchar(20);

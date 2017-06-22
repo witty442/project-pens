@@ -11,9 +11,9 @@ system=(request.getParameter("system")==null?"":request.getParameter("system"));
 function=(request.getParameter("function")==null?"":request.getParameter("function"));
 code=(request.getParameter("code")==null?"":request.getParameter("code"));
 
-System.out.println(system);
-System.out.println(function);
-System.out.println(code);
+//System.out.println(system);
+//System.out.println(function);
+//System.out.println(code);
 
 
 if(system.length()>0) system = SystemProperties.getCaption(system,Locale.getDefault());

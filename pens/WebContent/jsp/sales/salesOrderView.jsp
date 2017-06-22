@@ -843,12 +843,22 @@ function stampPrint(){
 <!-- **************************************************************************************************************************************************** -->							
 				<div id="divOrderView" style="">
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+							<%//if(User.TT.equals(user.getType())){%>
+						    <%if(false){%>
 							<tr>
-								<td width="30%"></td>
-								<td width="25%"></td>
+								<td width="30%" align="right">ระบุเลขที่ PO ลูกค้า(ถ้ามี) </td>
+								<td width="25%"><html:text property="order.poNumber" size="20"  readonly="true" styleClass="disableText"/></td>
 								<td width="15%"></td>
 								<td></td>
 							</tr>
+							<%}else{ %>
+							    <tr>
+									<td width="30%" align="right"></td>
+									<td width="25%"></td>
+									<td width="15%"></td>
+									<td></td>
+								</tr>
+							 <%} %>
 							<tr>
 								<td align="right"></td>
 								<td align="left"></td>

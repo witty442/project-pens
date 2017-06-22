@@ -45,7 +45,7 @@ public class MOrder extends I_Model<Order> {
 			"BILL_ADDRESS_ID", "SHIP_ADDRESS_ID", "PRICELIST_ID", "PAYMENT_TERM", "VAT_CODE", "VAT_RATE",
 			"PAYMENT_METHOD", "SHIPPING_DAY", "SHIPPING_TIME", "TOTAL_AMOUNT", "VAT_AMOUNT", "NET_AMOUNT",
 			"INTERFACES", "PAYMENT", "SALES_ORDER_NO", "AR_INVOICE_NO", "USER_ID", "DOC_STATUS", "CREATED_BY",
-			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID","ORA_SHIP_ADDRESS_ID","org"};
+			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID","ORA_SHIP_ADDRESS_ID","org","PO_NUMBER"};
 
 	/**
 	 * Find
@@ -122,7 +122,8 @@ public class MOrder extends I_Model<Order> {
 				ConvertNullUtil.convertToString(order.getCallBeforeSend()),
 				order.getOraBillAddressID(),
 				order.getOraShipAddressID(),
-				order.getOrg()
+				order.getOrg(),
+				order.getPoNumber()
 				};
 		if (super.save(TABLE_NAME, columns, values, order.getId(), conn)) {
 			order.setId(id);

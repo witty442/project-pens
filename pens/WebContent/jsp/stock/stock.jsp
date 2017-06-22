@@ -653,7 +653,7 @@ function popCalendar(thisObj, thisEvent) {
 
 										<td class="td_text_center" width="15%">
 										   <input type='text' name='lines.createDate' value='${lines1.createDate}' id="createDate" onmouseover="popCalendar(this,this)" readonly>
-										   <font color="red">*</font>
+										   
 										</td>
 									    <td class="td_text_center" width="15%">
 									       <input type='text' name='lines.expireDate' value='${lines1.expireDate}' id="expireDate" onmouseover="popCalendar(this,this)" readonly>
