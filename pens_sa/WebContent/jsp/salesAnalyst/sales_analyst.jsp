@@ -42,7 +42,6 @@ System.out.println("screenWidth:"+screenWidth);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" /> 
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle_2.css" type="text/css" /> --%>
 <style type="text/css">
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
@@ -75,17 +74,14 @@ fieldset legend {
 	font-weight: normal;
 	text-decoration: none;
 }
-
  #scroll {
 <%if(!"0".equals(screenWidth)){%>
-    width:<%=screenWidth%>px;
+    width:<%=screenWidth%>px; 
     background:#A3CBE0;
 	border:1px solid #000;
 	overflow:auto;
 	white-space:nowrap;
 	box-shadow:0 0 25px #000;
-<%}else{%>
- 
 <%}%>
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -802,7 +798,6 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
  
  function controlRoleTab(){
 	 var roleTabText =document.getElementsByName("roleTabText")[0];
-	 
 	 var span = document.getElementById('roleTabSpan');
 	 while( span.firstChild ) {
 	     span.removeChild( span.firstChild );
@@ -811,7 +806,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	 if("" ==roleTabText.value){
 		 //show 
 		 document.getElementById("roleTab").style.display = 'block';
-		// document.getElementById("roleTabText").innerHTML = "(Hide Role )";
+		 // document.getElementById("roleTabText").innerHTML = "(Hide Role )";
 		 
 		 span.appendChild( document.createTextNode("(Hide Role Detail") );
 		 
@@ -820,15 +815,13 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	 }else{
 		 //HIDE
 		 document.getElementById("roleTab").style.display = 'none';    
-		// document.getElementById("roleTabText").innerHTML = "(Show Role )";
+		 // document.getElementById("roleTabText").innerHTML = "(Show Role )";
 		 span.appendChild( document.createTextNode("(Show Role Detail)") );
 		 roleTabText.value ="";
 	 }
  }
 
- 
- 
-	//String headerHtml  = SAGenerate.genHeaderReportExportExcel( user,formBean.getSalesBean(),columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
+//String headerHtml  = SAGenerate.genHeaderReportExportExcel( user,formBean.getSalesBean(),columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
  function genHeadTable(){
 	 var columnCount = document.getElementsByName("columnCount")[0].value;
 	 
@@ -905,16 +898,12 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
          txtArea1.document.close();
          txtArea1.focus(); 
          sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
-     }  
-     else                 //other browser not tested on IE 11
+     }else{                 //other browser not tested on IE 11
          sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
-
+     }
      return (sa);
  }
- 
 </script>
-
-
 <!-- Move for new index. -->
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe(); MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -1303,9 +1292,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 										
 										 <button type="button" id="btnExport" onclick="fnExcelReport();" class="newPosBtnLong" style="width:120px;" > Export</button>  
 										 <input type="button" value=" Clear " class="newPosBtnLong" style="width: 120px;" 
-										     onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')" />
-										     
-										 
+										     onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')" />	 
 										  
 										  <a href="javascript:getSQL('${pageContext.request.contextPath}','admin')"  > ...?</a>
 										  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1325,10 +1312,10 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 							<script>
 						
 							</script>
-							<div id ="scroll" >
-							<%out.print(Utils.isNull(session.getAttribute("RESULT"))); %>
-							</div>
 							
+							<div id ="scroll">
+								<%out.print(Utils.isNull(session.getAttribute("RESULT"))); %>
+							</div>
 						    <!-- RESULT -->
 					  </html:form>
 						<!-- BODY -->	

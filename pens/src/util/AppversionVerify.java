@@ -32,15 +32,9 @@ import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.batchwork.DownloadWorker;
 
 public class AppversionVerify {
-
+	private static AppversionVerify app ;
 	protected static Logger logger = Logger.getLogger("PENS");
-	//private static String URL_DROPBOX_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/";
-	//private static String URL_DROPBOX_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/";
-	
-	//private static String URL_DROPBOX_C4_ = "https://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
-	//private static String URL_DROPBOX_C4_2 = "https=://dl.dropbox.com/u/24337336/pens/SalesApp/C4/";
-	
-	public static Map<String,String> urlFileMap = new HashMap<String, String>();
+	public static Map<String,String> initAllMap = new HashMap<String, String>();
 	static String initPathFileDropbox = "https://www.dropbox.com/s/0i7ibswl3qw2s4w/initPathFile.txt?dl=1";
 	/**
 	 * @param args
@@ -49,15 +43,17 @@ public class AppversionVerify {
 		// TODO Auto-generated method stub
 	}
 	
-	static{
-		if(urlFileMap.isEmpty()){
-			urlFileMap = getInitPathFile();
+	public static AppversionVerify getIns(){
+		if(app ==null){
+		   app = new AppversionVerify();
+		   initAllMap = getInitAllToMap();
 		}
+		return app;
 	}
-
-	 public static Map<String,String> getInitPathFile(){
+	
+	 public static Map<String,String> getInitAllToMap(){
 	        Map<String,String> pathFileMap = new HashMap<String, String>();
-	        System.out.println("***Start getInitPathFile***");
+	        logger.info("***Start getInitPathFile***");
 	        try{                   
 	            URL url = new URL(initPathFileDropbox);
 	            url.openConnection();
@@ -69,7 +65,7 @@ public class AppversionVerify {
 	                while ((line = reader.readLine()) != null) {
 	                    //System.out.println(line);
 	                   lineArr = line.split("\\,");
-	                   System.out.println(lineArr[0]+","+lineArr[1]);
+	                   logger.info(lineArr[0]);
 	                   pathFileMap.put(Utils.isNull(lineArr[0]), Utils.isNull(lineArr[1]));
 	                }
 	            } catch (IOException e) {
@@ -95,7 +91,7 @@ public class AppversionVerify {
 			
 			String currentAppVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
 			
-			String appVersionLatest = Utils.isNull(getLatestSalesVersion("Lastest-app-version.txt"));
+			String appVersionLatest = Utils.isNull(initAllMap.get("Lastest-app-version"));
 			String msgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/message-to-sales.txt");
 			String appVerionmsgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/appversion-message-to-sales.txt");
 			
@@ -127,29 +123,35 @@ public class AppversionVerify {
 	
 	
 	/** process run mainpage.jsp footer.jsp */
-	public static String[] checkAppVersion(HttpServletRequest request){
+	 public String[] checkAppVersion(HttpServletRequest request){
 		String[] msg = new String[2];
 		try{
 			if(request.getSession().getAttribute("appVersionCheckMsg") == null){
-			    String localSalesAppPath = getLocalPathSalesApp();
-
-			    //get Latest version from local
-				String appVersionLatest = Utils.isNull(FileUtil.readFile(localSalesAppPath+"Lastest-app-version.txt", "UTF-8"));
-
 				String appVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
-				logger.debug("appVersionLatest :"+appVersionLatest);
-				logger.debug("CurrentAppVersion :"+appVersion);
-				
-				if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
-					logger.debug("AppVersion Not match");
-					//appVersion not match
-					msg[0] =  getAppVersionMessageToSales(request);//SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
-					       
-					msg[1] = "";
-				}else{
+				//Temp Version No Check (Credit only)
+				if(appVersion.indexOf("Credit") != -1 || appVersion.indexOf("Van") != -1 ){
 					msg[0] = "";
 					msg[1] = "";
-				}
+				}else{
+				    String localSalesAppPath = getLocalPathSalesApp();
+	
+				    //get Latest version from local
+					String appVersionLatest = Utils.isNull(FileUtil.readFile(localSalesAppPath+"Lastest-app-version.txt", "UTF-8"));
+					
+					logger.debug("appVersionLatest :"+appVersionLatest);
+					logger.debug("CurrentAppVersion :"+appVersion);
+					
+					if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
+						logger.debug("AppVersion Not match");
+						//appVersion not match
+						msg[0] =  getAppVersionMessageToSales(request);//SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
+						       
+						msg[1] = "";
+					}else{
+						msg[0] = "";
+						msg[1] = "";
+					}
+			     }
 				request.getSession().setAttribute("appVersionCheckMsg",msg);
 				
 				logger.debug("new msg :"+msg[0]+":"+msg[1]);
@@ -269,8 +271,8 @@ public class AppversionVerify {
     /** Software For Sales App **/
     public static void getSoftware4SalesApp(){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath =  urlFileMap.get("Software4SalesApp.zip");
-		String sourcePath2 =  urlFileMap.get("Software4SalesApp.zip");
+		String sourcePath =  initAllMap.get("Software4SalesApp.zip");
+		String sourcePath2 =  initAllMap.get("Software4SalesApp.zip");
         String destPath  = localSalesAppPath+"Software4SalesApp.zip";
         String dest2Path = localSalesAppPath+"Software4SalesApp";
 		try{
@@ -348,13 +350,13 @@ public class AppversionVerify {
 			
     		boolean isLatestVersion = false;
     		if(user.getType().equalsIgnoreCase(User.TT)){
-    		   fileName ="เอกสารแผนงาน ของ Credit";
+    		   fileName ="CREDIT_TALK";
     		   isLatestVersion = isLatestVersionPlan("plan");
     		   
     		   //Get Credit
        		   getPlanSalesApp(localSalesAppPath,isLatestVersion,"CREDIT",localVersion,fileName);
     		}else{
-    		   fileName ="เอกสารแผนงาน ของ Van";
+    		   fileName ="VAN_TALK";
     		   isLatestVersion = isLatestVersionPlan("plan");
     		   
     			//Get VAN
@@ -368,8 +370,8 @@ public class AppversionVerify {
     
     public static void getC4SalesApp(String localSalesAppPath,boolean isLatestVersion,String userType,String localVersion){
 		
-		String sourcePath =  urlFileMap.get("C4-"+userType+".pdf");
-		String sourcePath2 =  urlFileMap.get("C4-"+userType+".pdf");
+		String sourcePath =  initAllMap.get("C4-"+userType+".pdf");
+		String sourcePath2 =  initAllMap.get("C4-"+userType+".pdf");
         String destPath  = localSalesAppPath+"C4-"+userType+".pdf";
 		try{ 
 			logger.info("Start Process Download C4 "+userType);
@@ -433,9 +435,13 @@ public class AppversionVerify {
     
 public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVersion,String userType,String localVersion,String fileName){
 		
-		String sourcePath =  urlFileMap.get(fileName+".pdf");
-		String sourcePath2 =  urlFileMap.get(fileName+".pdf");
-        String destPath  = localSalesAppPath+fileName+".pdf";
+		String sourcePath =  initAllMap.get(fileName);
+        String destPath  = "";
+        if("CREDIT".equalsIgnoreCase(userType)){
+        	destPath  = localSalesAppPath+"เอกสารแผนงาน ของ Credit.pdf";
+        }else if("VAN".equalsIgnoreCase(userType)){
+        	destPath  = localSalesAppPath+"เอกสารแผนงาน ของ Van.pdf";
+        }
 		try{ 
 			logger.info("Start Process Download plan "+userType);
            
@@ -468,7 +474,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 		            reader = url.openStream();
 	            }catch(Exception e){
 	            	logger.error("Error Source1 retry Source2");
-	            	url = new URL(sourcePath2);
+	            	url = new URL(sourcePath);
 		            url.openConnection();
 		            reader = url.openStream();
 	            }
@@ -500,8 +506,8 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
     /** Software SalesAppUpdater.jsr **/
 	public static void getSalesAppUpdater(boolean checkVersion){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath =  urlFileMap.get("SalesAppUpdater.zip");
-		String sourcePath2 =  urlFileMap.get("SalesAppUpdater.zip");
+		String sourcePath =  initAllMap.get("SalesAppUpdater.zip");
+		String sourcePath2 =  initAllMap.get("SalesAppUpdater.zip");
         String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
         String dest2Path = localSalesAppPath+"SalesAppUpdater";
 		try{
@@ -571,7 +577,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 		try{
 			String localSalesAppPath = getLocalPathSalesApp();
 			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+name+"-version.txt", "UTF-8"));
-			String latestVersionInServer = Utils.isNull(getLatestSalesVersion(name+"-version.txt"));
+			String latestVersionInServer = Utils.isNull(initAllMap.get(name+"-version"));
 			
 			logger.info("localVersion["+localVersion+"],latestVersionInServer["+latestVersionInServer+"]");
 			if( !localVersion.equalsIgnoreCase(latestVersionInServer)){ //no Latest Version
@@ -591,7 +597,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 		try{
 			String localSalesAppPath = getLocalPathPensDocument();
 			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+name+"-version.txt", "UTF-8"));
-			String latestVersionInServer = Utils.isNull(getLatestSalesVersion(name+"-version.txt"));
+			String latestVersionInServer = Utils.isNull(initAllMap.get(name+"-version"));
 			
 			logger.info("localVersion["+localVersion+"],latestVersionInServer["+latestVersionInServer+"]");
 			if( !localVersion.equalsIgnoreCase(latestVersionInServer)){ //no Latest Version
@@ -611,7 +617,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 		try{
 			String localSalesAppPath = getLocalPathPensDocument();
 			String localVersion = Utils.isNull(FileUtil.readFile(localSalesAppPath+name+"-version.txt", "UTF-8"));
-			String latestVersionInServer = Utils.isNull(getLatestSalesVersion(name+"-version.txt"));
+			String latestVersionInServer = Utils.isNull(initAllMap.get(name+"-version"));
 			
 			logger.info("localVersion["+localVersion+"],latestVersionInServer["+latestVersionInServer+"]");
 			if( !localVersion.equalsIgnoreCase(latestVersionInServer)){ //no Latest Version
@@ -680,10 +686,10 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 	    }
 	}
 	
-	private static String getLatestSalesVersion(String name){
+	/*private static String getLatestSalesVersion_OLD(String name){
         String appVersion = "";
         try{
-        	String str = urlFileMap.get(name);
+        	String str = initAllMap.get(name);
         	logger.info("url:"+str);
             URL url = new URL(str);
             url.openConnection();
@@ -709,7 +715,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
             e.printStackTrace();
         }
         return appVersion;
-	 }
+	 }*/
 	
 	
 	private  static String getLocalPathSalesApp(){

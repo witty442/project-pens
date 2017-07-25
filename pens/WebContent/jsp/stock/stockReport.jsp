@@ -38,13 +38,6 @@ pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
 List<References> actives= InitialReferences.getReferenes().get(InitialReferences.ACTIVE);
 pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 
-
-String[] msg4 = new String[2];
-if(request.getSession().getAttribute("appVersionCheckMsg") != null){
-	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
-}else{
-	msg4 = AppversionVerify.checkAppVersion(request);
-}
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
 <%@page import="com.isecinc.pens.model.MProvince"%><html>
@@ -112,7 +105,7 @@ function exportToExcel(path){
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="Stock"/>
+				<jsp:param name="function" value="StockReport"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -140,6 +133,11 @@ function exportToExcel(path){
 							&nbsp;&nbsp;
 								ถึงวันที่บันทึกสต๊อก
 							<html:text property="bean.requestDateTo" styleId="requestDateTo"  size="15" styleClass=""/>
+							สถานะ
+							<html:select property="bean.status">
+							  <html:option value="SV">ปกติ(SV)</html:option>
+							  <html:option value="VO">ยกเลิก(VO)</html:option>
+							</html:select>
 							</td>
 						</tr>
 					</table>
@@ -205,17 +203,5 @@ function exportToExcel(path){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
-
-<div id="dialog" title="คำแนะนำ" style="display:none">
-    <p align="center"><b>
-     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=msg4[0]%></a> 
-     OR <%=msg4[1] %></font></b>
-    </p>
-    <%=AppversionVerify.getMessageToSales(request)%>
-	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>
-	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
-	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
-</div>
-
 </body>
 </html>

@@ -44,7 +44,7 @@ public class MStock {
 	
 	public static String ORG_ID_DEFAULT = "84";
 	
-	public static Map<String, String> MOVE_ORDER_TYPE_MAP = new HashMap<String, String>();
+	public static Map<String, String> MOVE_ORDER_TYPE_MAP1= new HashMap<String, String>();
     
     private static double totalAmount = 0;
     
@@ -53,7 +53,7 @@ public class MStock {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
-			//Genearte MoveOrderNo
+			//Generate requestNumber
 			String requestNumber  ="";
 		
 			if("".equals(head.getRequestNumber())){
@@ -81,11 +81,7 @@ public class MStock {
 				// Process normal
 				for(int i =0;i< head.getLineList().size();i++){
 					StockLine line = (StockLine)head.getLineList().get(i);
-				    line.setLineNo((i+1));
-					line.setQty(line.getQty1());
-					line.setUom(line.getUom1());
-					line.setCreatedBy(head.getCreatedBy());
-	
+				    line.setLineId((i+1));
 					insertStockLine(conn,head, line);
 					
 				}//for
@@ -308,9 +304,10 @@ public class MStock {
 		try {
 			StringBuffer sql = new StringBuffer("INSERT INTO t_stock_line( \n");
 			sql.append(" request_number, line_number, inventory_item_id, \n"); 
-			sql.append(" qty, uom, status,amount,   \n");
-			sql.append(" exported, USER_ID, CREATED, CREATED_BY,CREATE_DATE,EXPIRE_DATE) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" uom,uom2, status,amount,exported, USER_ID,  \n");
+			sql.append(" CREATED, CREATED_BY,CREATE_DATE, \n");
+			sql.append(" qty, qty2, qty3, sub,sub2,sub3 ,expire_date,expire_date2,expire_date3) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 
 			//logger.debug("SQL:"+sql);
 			int index = 0;
@@ -318,10 +315,16 @@ public class MStock {
 			ps = conn.prepareStatement(sql.toString());
 			
 			ps.setString(++index, head.getRequestNumber());//request_number
-			ps.setInt(++index, line.getLineNo());//line_number
-			ps.setInt(++index, line.getProduct().getId());//inventory_item_id
-			ps.setBigDecimal(++index, new BigDecimal(line.getQty()));//primary_quantity
-			ps.setString(++index, line.getUom().getId());//uom
+			ps.setInt(++index, line.getLineId());//line_number
+			ps.setInt(++index, Utils.convertStrToInt(line.getInventoryItemId()));//inventory_item_id
+			
+			String[] fullUom = line.getFullUom().split("\\/");
+			ps.setString(++index, fullUom[0]);//uom1
+			if(fullUom.length >1){
+			   ps.setString(++index, fullUom[1]);//uom2
+			}else{
+			   ps.setString(++index, "");//uom2
+			}
 			ps.setString(++index, STATUS_SAVE);//status
 			ps.setBigDecimal(++index, new BigDecimal(line.getAmount()));//amount
 			
@@ -334,7 +337,33 @@ public class MStock {
 			}else{
 			   ps.setNull(++index,java.sql.Types.DATE);
 			}
-			ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getQty())));//primary_quantity
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getQty2())));//primary_quantity
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getQty3())));//primary_quantity
+			
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getSub())));//primary_quantity
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getSub2())));//primary_quantity
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getSub3())));//primary_quantity
+			//expire 1
+			if( !Utils.isNull(line.getExpireDate()).equals("")){
+				logger.debug("expirDate:"+line.getExpireDate());
+				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				logger.debug("expirDate:"+Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			}else{
+				ps.setNull(++index,java.sql.Types.DATE);
+			}
+			//expire 2
+			if( !Utils.isNull(line.getExpireDate2()).equals("")){
+				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate2(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			}else{
+				ps.setNull(++index,java.sql.Types.DATE);
+			}
+			//expire 3
+			if( !Utils.isNull(line.getExpireDate3()).equals("")){
+				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate3(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			}else{
+				ps.setNull(++index,java.sql.Types.DATE);
+			}
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -377,7 +406,7 @@ public class MStock {
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
 			
 			ps.setString(++index, head.getRequestNumber());//request_number
-			ps.setInt(++index, line.getLineNo());//line_number
+			ps.setInt(++index, line.getLineId());//line_number
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -413,7 +442,7 @@ public class MStock {
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
 			
 			ps.setString(++index, line.getRequestNumber());//request_number
-			ps.setInt(++index, line.getLineNo());//line_number
+			ps.setInt(++index, line.getLineId());//line_number
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -543,7 +572,6 @@ public class MStock {
 			conn = new  DBCPConnectionProvider().getConnection(conn);
 			
 			sql.append("\n  SELECT h.* ");
-		
 			sql.append("\n  from t_stock h ");
 			sql.append("\n  where h.request_number ='"+mCriteria.getRequestNumber()+"'");
 			sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
@@ -619,7 +647,7 @@ public class MStock {
 				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code   from t_stock_line l ");
 				sql.append("\n   WHERE l.request_number ='"+mCriteria.getRequestNumber()+"'");
 				sql.append("\n   and l.status ='SV' ");
-				sql.append("\n  ) A ORDER BY A.code asc \n");
+				sql.append("\n  ) A ORDER BY A.line_number asc \n");
 				
 				logger.debug("sql:"+sql);
 				
@@ -631,37 +659,37 @@ public class MStock {
 				  no++;
 				  m.setNo(no);
 				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setLineNo(rst.getInt("line_number"));
+				  m.setLineId(rst.getInt("line_number"));
+				  m.setInventoryItemId(rst.getString("inventory_item_id"));
 				  Product mp = new MProduct().find(rst.getString("inventory_item_id"));
 				  m.setProduct(mp);
 				  m.setProductCode(mp.getCode());
 				  m.setProductName(mp.getName());
 				  
-				  m.setUom1(new MUOM().find(rst.getString("uom")));
-				  //m.setUom2(new MUOM().find(rst.getString("uom2")));
-				  
-				 // logger.debug("uom1:"+rst.getString("uom1")+",uom2:"+rst.getString("uom2"));
-				 // logger.debug("uom1:"+m.getUom1().getCode()+",uom2:"+m.getUom2().getCode());
-				  
 				  //set FullUOM
-				  String  fullUom = Utils.isNull(m.getUom1().getCode());
-				 
-				  m.setFullUom(fullUom);
+				  String  uom1 = Utils.isNull(Utils.isNull(rst.getString("uom")));
+				  String  uom2 = Utils.isNull(Utils.isNull(rst.getString("uom2")));
 				  
-				  m.setQty(rst.getDouble("qty"));
-				  m.setQty1(rst.getDouble("qty"));
-				  m.setQty2(0);
+				  m.setFullUom(uom1+"/"+uom2);
+				  
+				  m.setQty(Utils.convertDoubleToStrDefault(rst.getInt("qty"),""));
+				  m.setQty2(Utils.convertDoubleToStrDefault(rst.getInt("qty2"),""));
+				  m.setQty3(Utils.convertDoubleToStrDefault(rst.getInt("qty3"),""));
+				  
+				  m.setSub(Utils.convertDoubleToStrDefault(rst.getInt("sub"),""));
+				  m.setSub2(Utils.convertDoubleToStrDefault(rst.getInt("sub2"),""));
+				  m.setSub3(Utils.convertDoubleToStrDefault(rst.getInt("sub3"),""));
 				  
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel("Y".equals(m.getStatus())?"ใช้งาน":"ยกเลิก");
 				  m.setExported(rst.getString("exported"));
 				  
+				  m.setExpireDate(Utils.stringValueDefault(rst.getDate("expire_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  m.setExpireDate2(Utils.stringValueDefault(rst.getDate("expire_date2"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  m.setExpireDate3(Utils.stringValueDefault(rst.getDate("expire_date3"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  
 				  m.setUserId(rst.getString("user_id"));
 				  m.setCreatedBy(rst.getString("created_by"));
-				
-				  //m.setAmount1(rst.getDouble("amount1"));
-				  //m.setAmount2(rst.getDouble("amount2"));
-				  //m.setTotalAmount(rst.getDouble("total_amount"));
 				  
 				  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -671,11 +699,7 @@ public class MStock {
 				  
 				  //logger.debug("updated_long["+rst.getLong("updated_long")+"]");
 				  m.setActionDate(m.getCreated());
-				
-				  //Sum TotalAMount
-				//  totalAmount += totalAmount +m.getTotalAmount();
-				  
-				//Check canEdit
+				  //Check canEdit
 				  if( (STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) ){
 					  m.setCanEdit(true);
 				  }
@@ -693,7 +717,6 @@ public class MStock {
 			}
 			return lineList;
 		}
-	  
 	  
 	  /**
 	   * 
@@ -722,8 +745,8 @@ public class MStock {
 				if (rst.next()) {
 				  m = new StockLine();
 				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setLineNo(rst.getInt("line_number"));
-				  m.setQty(rst.getDouble("qty"));
+				  m.setLineId(rst.getInt("line_number"));
+				  m.setQty(Utils.convertDoubleToStrDefault(rst.getDouble("qty"),""));
 				}//while
 				
 			} catch (Exception e) {

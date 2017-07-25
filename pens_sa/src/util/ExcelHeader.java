@@ -42,7 +42,6 @@ public class ExcelHeader {
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
 		
-		
 		EXCEL_HEADER.append("</style> \n");
 		
 	}

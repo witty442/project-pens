@@ -55,8 +55,8 @@ TABLE.tableSearchNoWidth TD {
 	
 }
 .td_text_right{
-	align:right;
+	text-align:right;
 }
 .td_number{
-	text-align:center;
+	text-align:right;
 }

@@ -11,7 +11,7 @@ String custCatNo = (String)request.getParameter("custCatNo");
 List<PopupBean> dataList= null;
 try{
 	if( !Utils.isNull(custCatNo).equals("")){
-		dataList = SalesTargetUtils.searchSalesrepListByCustCatNo(custCatNo,salesChannelNo);
+		dataList = SalesTargetUtils.searchSalesrepListByCustCatNo(salesChannelNo,custCatNo);
 	}
 }catch(Exception e){ 
 	e.printStackTrace();

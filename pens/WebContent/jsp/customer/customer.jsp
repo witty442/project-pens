@@ -31,6 +31,10 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
 List<References> shippingMethod = InitialReferences.getReferenes().get(InitialReferences.SHIPMENT);
 pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE);
+
+List<References> partyTypeList = InitialReferences.getReferenes().get(InitialReferences.PARTY_TYPE);
+pageContext.setAttribute("partyTypeList",partyTypeList,PageContext.PAGE_SCOPE);
+
 %>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -255,9 +259,7 @@ function switchPrintType(){
 								<td align="right">
 								 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
 								 </td>
-								<td align="left">
-									
-								</td>
+								<td align="left"></td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
@@ -267,8 +269,10 @@ function switchPrintType(){
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
 									<html:select property="customer.partyType">
-										<html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
-										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option>
+									    <!-- OLD Code -->
+										<%-- <html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
+										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option> --%>
+									    <html:options collection="partyTypeList" property="key" labelProperty="name"/>
 									</html:select>
 								</td>
 							</tr>

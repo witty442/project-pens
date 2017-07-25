@@ -71,12 +71,12 @@ public class LoginAction extends DispatchAction {
 			
 			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
 			logger.debug("Before ScreenWidth:"+screenWidth);
-			if(Integer.parseInt(screenWidth) < 600){
+			if(Double.parseDouble(screenWidth) < 600){
 				screenWidth = "0";
 			}
-			logger.debug("After Calc ScreenWidth:"+(Integer.parseInt(screenWidth)-50));
+			logger.debug("After Calc ScreenWidth:"+(Double.parseDouble(screenWidth)-50));
 			
-			request.getSession(true).setAttribute("screenWidth", ""+(Integer.parseInt(screenWidth)-50));
+			request.getSession(true).setAttribute("screenWidth", ""+(Double.parseDouble(screenWidth)-50));
 			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat

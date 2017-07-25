@@ -46,7 +46,7 @@ public class SalesTargetUtils {
 				o.setCanPost(true);
 			}
 			//check line readonly
-			logger.debug("status["+o.getStatus()+"]in(Post,Accept]");
+			//logger.debug("status["+o.getStatus()+"]in(Post,Accept]");
 			if(Utils.statusInCheck(o.getStatus(),new String[]{SalesTargetConstants.STATUS_POST,SalesTargetConstants.STATUS_ACCEPT})){
 				o.setLineReadonly("readonly");
 				o.setLineStyle("disableText");
@@ -56,7 +56,7 @@ public class SalesTargetUtils {
 				o.setLineStyle("normalText");
 				o.setLineNumberStyle("enableNumber");
 			}
-			logger.debug("itemCode:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]");
+			//logger.debug("itemCode:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]");
 		//MT
 		}else if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
 			if(   Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_POST )
@@ -64,12 +64,17 @@ public class SalesTargetUtils {
 			 ){
 			  o.setCanAccept(true);
 			  o.setCanReject(true);
+			  
 			}
 			 o.setCanExport(true);
 			 o.setLineReadonly("readonly");
 			 o.setLineStyle("disableText");
 			 o.setLineNumberStyle("disableNumber");
-			 
+			 o.setLineRejectReasonStyle("disableText");
+			 if(o.isCanReject()){
+				 o.setLineRejectReasonStyle("normalText");
+			 }
+			 //logger.debug("item:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]CanReject["+o.isCanReject()+"]CanPost["+o.isCanPost()+"]");
 	    //MTMGR
 		}else if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MTMGR})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTMGR)){
 			
@@ -97,15 +102,19 @@ public class SalesTargetUtils {
 		PopupBean item = new PopupBean();
 		SalesTargetBean period = null;
 		try{
-			//Next Month +2
-			item = new PopupBean();
-			cal.add(Calendar.MONTH, 2);//Current+1
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
-			period = getPeriodList(conn,periodName).get(0);//get Period View
-			item.setKeyName(periodName);
-			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
-			monthYearList.add(item);
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			//if(day >1){ //For TEST
 			
+			if(day>=27){ //prod
+				//Next Month +2
+				item = new PopupBean();
+				cal.add(Calendar.MONTH, 2);//Current+1
+				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				period = getPeriodList(conn,periodName).get(0);//get Period View
+				item.setKeyName(periodName);
+				item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+				monthYearList.add(item);
+			}
 			//Next Month
 			item = new PopupBean();
 			cal = Calendar.getInstance();
@@ -784,11 +793,11 @@ public class SalesTargetUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListByCustCatNo(String custCatNo,String salesChannelNo) throws Exception{
+	public static List<PopupBean> searchSalesrepListByCustCatNo(String salesChannelNo,String custCatNo) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListByCustCatNo(conn, custCatNo,salesChannelNo);
+			return searchSalesrepListByCustCatNo(conn,salesChannelNo,custCatNo);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -797,22 +806,20 @@ public class SalesTargetUtils {
 			}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListByCustCatNo(Connection conn,String custCatNo,String salesChannelNo){
+	public static List<PopupBean> searchSalesrepListByCustCatNo(Connection conn,String salesChannelNo,String custCatNo){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		try{
-			sql.delete(0, sql.length());
 			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id from XXPENS_BI_MST_CUST_SALES M ,XXPENS_BI_MST_SALESREP S ");
 			sql.append("\n  where M.salesrep_code =S.salesrep_code ");
 			sql.append("\n  and cust_cat_no ='"+custCatNo+"'");
 			if( !Utils.isNull(salesChannelNo).equals("")){
 				sql.append("\n  and sales_channel_no ='"+salesChannelNo+"'");
 			}
-			sql.append("\n  ORDER BY M.salesrep_code asc \n");
-			
+			sql.append("\n  ORDER BY M.salesrep_code asc \n");		
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());

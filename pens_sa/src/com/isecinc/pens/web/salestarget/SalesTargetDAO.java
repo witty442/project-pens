@@ -129,11 +129,13 @@ public class SalesTargetDAO {
 		List<SalesTargetBean> items = new ArrayList<SalesTargetBean>();
 		int totalTargetQty = 0;
 		double totalTargetAmount = 0;
+		double totalOrderAmt12Month = 0;
+		double totalOrderAmt3Month = 0;
 		try {
 			//convert Criteria
 			o = convertCriteria(o);
 			
-			sql.append("\n select M.*  ,T.total_target_qty ,T.total_target_amount ,T.status");
+			sql.append("\n select M.*  ,T.total_target_qty ,T.total_target_amount ,T.status,T.amt_avg12 ,T.amt_avg3 ");
 			sql.append("\n ,(select customer_id from XXPENS_BI_MST_CUSTOMER S WHERE S.customer_code = M.customer_code) as customer_id  ");
 			sql.append("\n ,(select salesrep_id from XXPENS_BI_MST_SALESREP S WHERE S.salesrep_code = M.salesrep_code) as salesrep_id  ");
 			sql.append("\n ,(select division from XXPENS_BI_MST_SALES_CHANNEL S WHERE S.sales_channel_no = T.SALES_CHANNEL) as division  ");
@@ -159,6 +161,8 @@ public class SalesTargetDAO {
 			sql.append("\n  select M.salesrep_code,M.salesrep_id");
 			sql.append("\n  , M.customer_code ,M.customer_id ,M.SALES_CHANNEL ,M.brand");
 			sql.append("\n  ,(select max(C.short_name) from XXPENS_BI_MST_CUST_SALES C where C.customer_code = M.customer_code  ) as short_name  ");
+			sql.append("\n  ,(select nvl(sum(amt_avg12),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg12 ");
+			sql.append("\n  ,(select nvl(sum(amt_avg3),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg3 ");
 			sql.append("\n  ,(select nvl(sum(target_qty),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_qty ");
 			sql.append("\n  ,(select nvl(sum(target_amount),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_amount ");
 			sql.append("\n  , M.status ");
@@ -208,6 +212,8 @@ public class SalesTargetDAO {
 			   //get Total Qty
 			   totalTargetQty = totalTargetQty+ rst.getInt("TOTAL_TARGET_QTY");
 			   totalTargetAmount = totalTargetAmount+ rst.getDouble("TOTAL_TARGET_AMOUNT");
+			   totalOrderAmt12Month = totalOrderAmt12Month+ rst.getDouble("amt_avg12");
+			   totalOrderAmt3Month = totalOrderAmt3Month+rst.getDouble("amt_avg3");
 			   
 			   //set Access Action
 			   h = SalesTargetUtils.setAccess(h,user,pageName);
@@ -219,6 +225,8 @@ public class SalesTargetDAO {
 			o.setItems(items);
 			o.setTotalTargetQty(Utils.decimalFormat(totalTargetQty, Utils.format_current_no_disgit));
 			o.setTotalTargetAmount(Utils.decimalFormat(totalTargetAmount, Utils.format_current_2_disgit));
+			o.setTotalOrderAmt12Month(Utils.decimalFormat(totalOrderAmt12Month, Utils.format_current_2_disgit));
+			o.setTotalOrderAmt3Month(Utils.decimalFormat(totalOrderAmt3Month, Utils.format_current_2_disgit));
 			
 		} catch (Exception e) {
 			throw e;
@@ -248,6 +256,8 @@ public class SalesTargetDAO {
 		List<SalesTargetBean> items = new ArrayList<SalesTargetBean>();
 		int totalTargetQty = 0;
 		double totalTargetAmount = 0;
+		double totalOrderAmt12Month =0;
+		double totalOrderAmt3Month =0;
 		boolean canFinish = false;
 		int rowId = 0;
 		try {
@@ -259,6 +269,8 @@ public class SalesTargetDAO {
 			sql.append("\n   select M.* ");
 			sql.append("\n  ,(select max(C.short_name) from XXPENS_BI_MST_CUST_SALES C where C.customer_code = M.customer_code  ) as short_name  ");
 			sql.append("\n  ,(select brand_desc from XXPENS_BI_MST_BRAND S WHERE S.brand_no = M.brand) as brand_name  ");
+			sql.append("\n  ,(select nvl(sum(amt_avg12),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg12 ");
+			sql.append("\n  ,(select nvl(sum(amt_avg3),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg3 ");
 			sql.append("\n  ,(select nvl(sum(target_qty),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_qty ");
 			sql.append("\n  ,(select nvl(sum(target_amount),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_amount ");;
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M  ");
@@ -323,6 +335,8 @@ public class SalesTargetDAO {
 			   //get Total Qty
 			   totalTargetQty = totalTargetQty+ rst.getInt("TOTAL_TARGET_QTY");
 			   totalTargetAmount = totalTargetAmount+ rst.getDouble("TOTAL_TARGET_AMOUNT");
+			   totalOrderAmt12Month += rst.getDouble("amt_avg12");
+			   totalOrderAmt3Month +=rst.getDouble("amt_avg3");
 			   
 			   //set Access Action
 			   h = SalesTargetUtils.setAccess(h,user,pageName);
@@ -341,6 +355,8 @@ public class SalesTargetDAO {
 			o.setItems(items);
 			o.setTotalTargetQty(Utils.decimalFormat(totalTargetQty, Utils.format_current_no_disgit));
 			o.setTotalTargetAmount(Utils.decimalFormat(totalTargetAmount, Utils.format_current_2_disgit));
+			o.setTotalOrderAmt12Month(Utils.decimalFormat(totalOrderAmt12Month, Utils.format_current_2_disgit));
+			o.setTotalOrderAmt3Month(Utils.decimalFormat(totalOrderAmt3Month, Utils.format_current_2_disgit));
 			o.setCanFinish(canFinish);
 		} catch (Exception e) {
 			throw e;
@@ -369,9 +385,13 @@ public class SalesTargetDAO {
 			sql.append("\n  ,M.status ,M.brand ,M.SALES_CHANNEL,M.DIVISION ,M.CUSTOMER_CATEGORY ");
 			sql.append("\n  ,(select max(C.sales_channel_desc) from XXPENS_BI_MST_SALES_CHANNEL C where C.SALES_CHANNEL_NO = M.SALES_CHANNEL  ) as sales_channel_name  ");
 			sql.append("\n  ,(select brand_desc from XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
+			sql.append("\n  ,(select nvl(sum(amt_avg12),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg12 ");
+			sql.append("\n  ,(select nvl(sum(amt_avg3),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as amt_avg3 ");
+		
 			sql.append("\n  ,(select nvl(sum(target_qty),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_qty ");
 			sql.append("\n  ,(select nvl(sum(target_amount),0) from XXPENS_BI_SALES_TARGET_TEMP_L L where L.id=M.id) as total_target_amount ");
 			sql.append("\n  ,(select customer_group from xxpens_ar_cust_group_v L where L.cust_account_id =M.customer_id) as customer_group ");
+			sql.append("\n  ,target_month,target_quarter ,target_year ");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP  M ");
 			sql.append("\n  where 1=1 ");
 			if(cri.getId() !=0)
@@ -388,11 +408,9 @@ public class SalesTargetDAO {
 			if( !Utils.isNull(cri.getTargetMonth()).equals("")){
 				sql.append("\n and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
 			}
-			
 			if( !Utils.isNull(cri.getTargetQuarter()).equals("")){
 				sql.append("\n and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
 			}
-			
 			if( !Utils.isNull(cri.getTargetYear()).equals("")){
 				sql.append("\n and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
 			}
@@ -422,6 +440,12 @@ public class SalesTargetDAO {
 			   h.setCustCatNo(Utils.isNull(rst.getString("CUSTOMER_CATEGORY")));
 			   h.setTotalTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit));
 			   h.setTotalTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_AMOUNT"), Utils.format_current_2_disgit));
+			   h.setTotalOrderAmt12Month(Utils.decimalFormat(rst.getDouble("AMT_AVG12"), Utils.format_current_2_disgit));
+			   h.setTotalOrderAmt3Month(Utils.decimalFormat(rst.getDouble("AMT_AVG3"), Utils.format_current_2_disgit));
+			   h.setTargetMonth(Utils.isNull(rst.getString("target_month")));
+			   h.setTargetQuarter(Utils.isNull(rst.getString("target_quarter")));
+			   h.setTargetYear(Utils.isNull(rst.getString("target_year")));
+			   
 			   h.setPeriod(rst.getString("period"));
 			   //get period
 			   SalesTargetBean period = SalesTargetUtils.getPeriodList(conn,h.getPeriod()).get(0);//get Period View
@@ -497,7 +521,7 @@ public class SalesTargetDAO {
 			   
 			   h.setOrderAmt12Month(Utils.decimalFormat(rst.getDouble("AMT_AVG12"), Utils.format_current_2_disgit)); 
 			   h.setOrderAmt3Month(Utils.decimalFormat(rst.getDouble("AMT_AVG3"), Utils.format_current_2_disgit));  
-			   h.setPrice(Utils.decimalFormat(rst.getDouble("PRICE"), Utils.format_current_no_disgit)); 
+			   h.setPrice(Utils.decimalFormat(rst.getDouble("PRICE"), Utils.format_current_2_disgit)); 
 			   
 			   //set can access
 			   h = SalesTargetUtils.setAccess(h,user,pageName);
@@ -547,7 +571,7 @@ public class SalesTargetDAO {
 	}
 		
 	public static SalesTargetBean convertCriteria(SalesTargetBean o) throws Exception{
-		logger.debug("startDate:"+o.getStartDate());
+		//logger.debug("startDate:"+o.getStartDate());
 		Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
 		Calendar c = Calendar.getInstance();
 		c.setTime(startDate);
@@ -582,7 +606,7 @@ public class SalesTargetDAO {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
-			if ( Utils.userInRole(user,new String[]{User.MKT}) ){
+			if ( Utils.userInRole(user,new String[]{User.MKT,User.ADMIN}) ){
 				h = saveModelByMKT(conn,h);
 			}
 			conn.commit();
@@ -618,6 +642,7 @@ public class SalesTargetDAO {
 				if(h.getItems() != null && h.getItems().size()>0){
 				   for(int i=0;i<h.getItems().size();i++){
 					   SalesTargetBean l = (SalesTargetBean)h.getItems().get(i);
+					 //  logger.debug("itemCode["+l.getItemCode()+"]status["+l.getStatus()+"]");
 					   if( !l.getStatus().equals("DELETE")){
 						   l.setId(h.getId());
 						   lineId++;
@@ -700,7 +725,7 @@ public class SalesTargetDAO {
 	 public static void insertHeadByMKT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			int c =1;
-			logger.debug("insertHeadByMKT ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]");
+			logger.debug("insertHeadByMKT ID["+o.getId()+"]");
 			logger.debug("customerId:"+o.getCustomerId());
 			try{
 				StringBuffer sql = new StringBuffer("");
@@ -832,7 +857,7 @@ public class SalesTargetDAO {
 	 public static void insertItemByMKT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			int c =1;
-			//logger.debug("insertItemByMKT ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]");
+			logger.debug("insertItemByMKT ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]");
 			try{
 			
 				StringBuffer sql = new StringBuffer("");
@@ -902,7 +927,34 @@ public class SalesTargetDAO {
 				}
 			}
 		}
-	 
+	 public static void deleteAllByMKT(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			int c =1;
+			logger.debug("deleteAllByMKT ID["+o.getId()+"]");
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TEMP \n");
+			    sql.append(" WHERE ID =? \n");
+				ps = conn.prepareStatement(sql.toString());
+				ps.setLong(c++, o.getId());
+				ps.executeUpdate();
+				
+				sql = new StringBuffer("");
+				c=1;
+				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TEMP_L \n");
+			    sql.append(" WHERE ID =? \n");
+				ps = conn.prepareStatement(sql.toString());
+				ps.setLong(c++, o.getId());
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
 	 public static void deleteItemByMKT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			int c =1;

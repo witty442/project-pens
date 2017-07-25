@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import util.ExcelHeader;
+import util.SQLHelper;
 
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.Utils;
@@ -24,11 +25,17 @@ public class SalesTargetReport {
 		COLUMNNAME_MAP.put("CUSTOMER_CATEGORY", "ประเภทขาย");
 		COLUMNNAME_MAP.put("SALES_CHANNEL", "ภาคการขาย");
 		COLUMNNAME_MAP.put("SALESREP_CODE", "พนักงานขาย");
-		COLUMNNAME_MAP.put("CUSTOMER_ID", "ร้านค้า");
+		COLUMNNAME_MAP.put("CUSTOMER_CODE", "ร้านค้า");
 		COLUMNNAME_MAP.put("INVENTORY_ITEM_CODE", "SKU");
 	}
 	
-	public static StringBuffer searchReport(SalesTargetBean o){
+	public static StringBuffer searchReport(SalesTargetBean o,boolean excel){
+		return searchReportModel(o, excel);
+	}
+    public static StringBuffer searchReport(SalesTargetBean o){
+		return searchReportModel(o, false);
+	}
+	public static StringBuffer searchReportModel(SalesTargetBean o,boolean excel){
 		SalesTargetBean s = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -41,7 +48,6 @@ public class SalesTargetReport {
 		int r = 0;
 		double totalQty =0;
 		double totalAmount =0;
-		boolean excel = false;
 		try{
 			//create connection
 			conn = DBConnection.getInstance().getConnection();
@@ -57,32 +63,17 @@ public class SalesTargetReport {
 			sql.append("\n  ,XXPENS_BI_SALES_TARGET_TEMP_L D ");
 			sql.append("\n  WHERE 1=1 ");
 			sql.append("\n  AND M.ID=D.ID ");
-			sql.append("\n  AND M.STATUS ='"+SalesTargetConstants.STATUS_FINISH+"'");
-			if( !Utils.isNull(o.getSalesChannelNo()).equals("")){
-				sql.append("\n and M.sales_channel = '"+Utils.isNull(o.getSalesChannelNo())+"'");
-			}
-			if( !Utils.isNull(o.getCustCatNo()).equals("")){
-				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
-			}
-			if( !Utils.isNull(o.getTargetMonth()).equals("")){
-				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
-			}
-			if( !Utils.isNull(o.getTargetQuarter()).equals("")){
-				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
-			}
-			if( !Utils.isNull(o.getTargetYear()).equals("")){
-				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
-			}
-			
-			if( !Utils.isNull(o.getSalesrepCode()).equals("")){
-				sql.append("\n and M.salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"'");
-			}
-			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
-				sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
-			}
-			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-				sql.append("\n and M.customer_code in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")");
-			}
+			//old Code
+			//sql.append("\n  AND M.STATUS ='"+SalesTargetConstants.STATUS_FINISH+"'");
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getStatus()), " and M.STATUS ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getSalesChannelNo()), " and M.sales_channel ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getCustCatNo()), " and M.CUSTOMER_CATEGORY ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getTargetMonth()), " and M.target_month ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getTargetQuarter()), " and M.target_quarter ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getTargetYear()), " and M.target_year ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getSalesrepCode()), " and M.salesrep_code ="));
+			sql.append(SQLHelper.genStrArrCondChkNull(Utils.isNull(o.getBrand()), " and M.brand in "));
+			sql.append(SQLHelper.genStrArrCondChkNull(Utils.isNull(o.getCustomerCode()), " and M.customer_code in"));
 			
 			sql.append("\n GROUP BY "+o.getReportType());
 			sql.append("\n ORDER BY "+o.getReportType());
@@ -134,7 +125,6 @@ public class SalesTargetReport {
 	  return html;
 	}
 	
-	
 	public static StringBuffer searchReportAll(SalesTargetBean o){
 		if(true){
 			//type 2 Vy Customer
@@ -144,8 +134,7 @@ public class SalesTargetReport {
 		}
 		return null;
 	}
-	
-	
+
 	public static StringBuffer searchReportAllByCust(SalesTargetBean o){
 		SalesTargetBean item = null;
 		Connection conn = null;
@@ -361,9 +350,9 @@ public class SalesTargetReport {
 		  }else if("SALESREP_CODE".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.SALESREP_CODE ,";
 			  sql +="\n (select x.SALESREP_DESC from XXPENS_BI_MST_SALESREP X WHERE X.SALESREP_CODE = M.SALESREP_CODE) as SALESREP_CODE_NAME ,";
-		  }else if("CUSTOMER_ID".equalsIgnoreCase(columnNameArr[i])){
-			  sql +="\n M.CUSTOMER_ID ,";
-			  sql +="\n (select x.customer_desc from XXPENS_BI_MST_CUSTOMER X WHERE X.CUSTOMER_ID = M.CUSTOMER_ID) as CUSTOMER_ID_NAME ,";
+		  }else if("CUSTOMER_CODE".equalsIgnoreCase(columnNameArr[i])){
+			  sql +="\n M.CUSTOMER_CODE  ,";
+			  sql +="\n (select x.customer_desc from XXPENS_BI_MST_CUSTOMER X WHERE X.CUSTOMER_CODE = M.CUSTOMER_CODE) as CUSTOMER_CODE_NAME ,";
 		  }else if("INVENTORY_ITEM_CODE".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n D.INVENTORY_ITEM_CODE ,";
 			  sql +="\n (select x.INVENTORY_ITEM_DESC from XXPENS_BI_MST_ITEM X WHERE X.INVENTORY_ITEM_CODE = D.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_CODE_NAME ,";
@@ -390,9 +379,9 @@ public class SalesTargetReport {
 		   h.append("<th >"+c.getCustomerCode()+"</th> \n");
 		}
 		h.append("</tr> \n");
-		
 		return h;
 	}
+	
 	/**
 	 * 
 	 * @param columnNameArr
@@ -416,9 +405,7 @@ public class SalesTargetReport {
 		}
 		h.append("<th >เป้า (หีบ)</th> \n");
 		h.append("<th >เป้า (บาท)</th> \n");
-				
 		h.append("</tr> \n");
-		
 		return h;
 	}
 	/**
@@ -442,7 +429,10 @@ public class SalesTargetReport {
 				className = "num_currency";
 			}else{
 				if("INVENTORY_ITEM_CODE".equalsIgnoreCase(columnNameArr[i])
-				 || "SALESREP_ID".equalsIgnoreCase(columnNameArr[i])){
+				 || "SALESREP_ID".equalsIgnoreCase(columnNameArr[i])
+				 || "CUSTOMER_CODE".equalsIgnoreCase(columnNameArr[i])
+				 || "SALESREP_CODE".equalsIgnoreCase(columnNameArr[i])
+				 ){
 					className ="td_text";
 				}
 			}
@@ -453,7 +443,6 @@ public class SalesTargetReport {
 			}else{
 			   h.append("<td class='"+className+"'>"+ROWVALUE_MAP.get(columnNameArr[i])+"-"+ROWDESC_MAP.get(columnNameArr[i]+"_NAME")+"</td> \n");
 			}
-			
 		}
 		h.append("<td class='"+classNameNumber+"'>"+o.getTargetQty()+"</td> \n");
 		h.append("<td class='"+classNameNumber+"'>"+o.getTargetAmount()+"</td> \n");
@@ -466,7 +455,7 @@ public class SalesTargetReport {
 		String className ="hilight_text";
 		String classNameNumber = "td_number";
 		if(excel){
-			className ="text";
+			className ="colum_head";
 			classNameNumber = "num_currency_bold";
 		}
 		StringBuffer h = new StringBuffer("");

@@ -593,21 +593,20 @@ function clearForm(path){
 								%>
 					    	<table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 						        <tr>
-									<td align="right"  nowrap>จาก วันที่ขาย (As Of)<font color="red">*</font> 
-									&nbsp;&nbsp;
-									<html:text property="onhandSummary.salesDate" styleId="salesDate" readonly="true"/>
-									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									</td>
-									<td align="left" width="50%" nowrap>
-									   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){ %>
-									      ปิดรอบสต็อกล่าสุดวันที่:
-									   	  <html:text property="endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
-									   	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									   	       ข้อมูลขายถึงวันที่:
-									   	  <html:text property="endSaleDate" styleId="endSaleDate" size="20" styleClass="disableText" readonly="true"/> 
-									   <%} %>
-									
-									</td>
+								<td align="right"  nowrap>จาก วันที่ขาย (As Of)<font color="red">*</font> 
+								&nbsp;&nbsp;
+								<html:text property="onhandSummary.salesDate" styleId="salesDate" readonly="true"/>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								</td>
+								<td align="left" width="50%" nowrap>
+								   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){ %>
+								      ปิดรอบสต็อกล่าสุดวันที่:
+								   	  <html:text property="endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
+								   	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								   	       ข้อมูลขายถึงวันที่:
+								   	  <html:text property="endSaleDate" styleId="endSaleDate" size="20" styleClass="disableText" readonly="true"/> 
+								   <%} %>
+								</td>
 								</tr>
 						       <tr>
 									<td align="right"  nowrap>รหัสร้านค้า<font color="red">*</font>
@@ -622,7 +621,9 @@ function clearForm(path){
 								
 								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
 										|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
-										|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) ){%>
+										|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
+										|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page")) 
+										){%>
 									 <tr>
 										<td align="right"  nowrap>วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
 										<html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
@@ -666,7 +667,9 @@ function clearForm(path){
 								       <% if(   "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
 								    		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
 								    		 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
-								    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) ){%>
+								    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
+								    		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page")) 
+								    		 ){%>
 									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
 									    <%} %>
 									 </td>

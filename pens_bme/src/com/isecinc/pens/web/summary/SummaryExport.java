@@ -667,6 +667,9 @@ public class SummaryExport {
 			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
 			h.append("</tr> \n");
 			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >วันที่ล่าสุดที่มีการตรวจนับสต็อก :"+form.getOnhandSummary().getInitDate()+"</td> \n");
+			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
 			h.append("<td align='left' colspan='"+colSpan+"'>Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");

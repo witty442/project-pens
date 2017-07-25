@@ -60,9 +60,34 @@ function popupChangePassword(path){
 	window.open(url,"",
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=260px,status=no,left="+ 50 + ",top=" + 0);
 }
-
+function detectmob() { 
+	 if( navigator.userAgent.match(/Android/i)
+	 || navigator.userAgent.match(/webOS/i)
+	 || navigator.userAgent.match(/iPhone/i)
+	 || navigator.userAgent.match(/iPad/i)
+	 || navigator.userAgent.match(/iPod/i)
+	 || navigator.userAgent.match(/BlackBerry/i)
+	 || navigator.userAgent.match(/Windows Phone/i)
+	 ){
+	    return true;
+	  }
+	 else {
+	    return false;
+	  }
+	}
+	
 function login(path){
-	document.getElementsByName('screenWidth')[0].value = screen.width;
+	var w = 0;
+    if(detectmob()){
+      //alert("Mobile");
+	  var ratio = window.devicePixelRatio || 1;
+	  w = screen.width * ratio;
+	  var h = screen.height * ratio;
+    }else{
+    	w = screen.width;
+    }
+	//alert(w+":"+h);
+	document.getElementsByName('screenWidth')[0].value = w;
 	
     if(Trim(document.getElementsByName('userName')[0].value)==''){
         document.getElementsByName('userName')[0].focus();

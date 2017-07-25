@@ -144,7 +144,7 @@ public class ImportLoadStockInitProcess {
 				java.util.Date salesDateObj = Utils.parse(salesDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				
 				rowNo = 1;
-				row = sheet.getRow(rowNo);
+				row = sheet.getRow(rowNo); 
 				cell = row.getCell((short) 1);
 				storeNo = Utils.isNull(xslUtils.getCellValue(1, cell));
 				cell = row.getCell((short) 2);
@@ -166,11 +166,17 @@ public class ImportLoadStockInitProcess {
 				}
 				
 				/** validate StoreNo **/
-				if( !storeNo.startsWith(storeCodeValidate)){
-					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
-					return mapping.findForward("success");
-				}
-				
+				 if("MTT".equalsIgnoreCase(importType)){
+					if( isStoreCodeCanImport(conn,"MTT",storeNo.substring(0,storeNo.indexOf("-")))==false ){
+						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
+						return mapping.findForward("success");
+					}
+				 }else{
+					if( !storeNo.startsWith(storeCodeValidate)){
+						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
+						return mapping.findForward("success");
+					}
+				 }
 				ps.setString(1, storeNo);
 				ps.setDate(2, new java.sql.Date(salesDateObj.getTime()));
 				ps.setDate(3,new java.sql.Date(new java.util.Date().getTime()));
@@ -399,7 +405,36 @@ public class ImportLoadStockInitProcess {
 
 		return mapping.findForward("success");
 	}
-	
+	public static boolean isStoreCodeCanImport(Connection conn,String storeType,String storeCode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		boolean r= false;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select pens_value  from PENSBME_MST_REFERENCE \n");
+			sql.append(" WHERE reference_code='Customer' and interface_desc='"+storeType+"' \n");
+			sql.append(" and pens_value='"+storeCode+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				logger.debug("ssss");
+				r= true;
+			}
+		logger.debug("result:"+r);
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return r;
+	} 
 	  public static boolean isInitExist(String tableName,String custNo,java.util.Date countStkDate) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;

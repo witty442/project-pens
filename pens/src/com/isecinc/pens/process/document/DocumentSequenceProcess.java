@@ -376,7 +376,7 @@ public abstract class DocumentSequenceProcess {
 			whereCause.append("\n  AND doctype_id = " + docTypeId);
 			whereCause.append("\n  AND current_month = " + curMonth);
 			whereCause.append("\n  AND current_year = " + curYear);
-			whereCause.append("\n AND sales_code = '" + keyNextSeq + "' ");
+			whereCause.append("\n  AND sales_code = '" + keyNextSeq + "' ");
 		
 			DocSequence[] seq = new MDocSequence().search(whereCause.toString());
 		
@@ -386,15 +386,13 @@ public abstract class DocumentSequenceProcess {
 				whereCause = new StringBuffer("");
 				whereCause.append("\n  AND doctype_id = " + docTypeId);
 			    whereCause.append("\n  AND sales_code = '" + keyNextSeq + "' ");
-				
-				
+
 				DocSequence[] docSeqFindOrderType = new MDocSequence().search(whereCause.toString());
 				String orderType = "MM";//Default MM(month) ->DD or MM or YY
 				if(docSeqFindOrderType != null){
 					docSeqFindOrderType[0].getOrderType();
 				}
-				
-				
+
 				DocSequence docSeq = new DocSequence();
 				docSeq.setId(getNexSeqAndChkDuplicate(conn, "c_doctype_sequence", "doctype_sequence_id", 0));
 				docSeq.setOrderType(orderType); //DEFALUT
@@ -420,8 +418,7 @@ public abstract class DocumentSequenceProcess {
 			
 				String orderType = seq[0].getOrderType();
 				logger.debug("orderType["+orderType+"]Year["+d1[0]+":"+seq[0].getCurrentYear()+"]Month["+Integer.parseInt(d1[1])+":"+Integer.parseInt(seq[0].getCurrentMonth())+"]");
-				
-				
+
 				// reset by DD
 				if (orderType.equalsIgnoreCase("DD")) {
 					if (d1[0].equalsIgnoreCase(seq[0].getCurrentYear())
@@ -957,7 +954,7 @@ public abstract class DocumentSequenceProcess {
 		}
 	}
 	
-	//Request_number =S001581001
+	//Request_number =S00158100001
 	protected int getCurrentNextStock(Connection conn ,String salesCode,String currentMonth,String currentYear) throws Exception {
 		int nextValue = 0;
 		PreparedStatement ps = null;
@@ -968,7 +965,9 @@ public abstract class DocumentSequenceProcess {
 					
 			StringBuffer whereCause = new StringBuffer("");
 			whereCause.append("\n select max(a.currentSeq) max_current_seq from( "); 
-			whereCause.append("\n select request_number ,substring(request_number,9,3)  as currentSeq from t_stock ");
+			whereCause.append("\n select request_number ,");
+			whereCause.append("\n CONVERT(substring(request_number,9,4),UNSIGNED INTEGER)  as currentSeq ");
+			whereCause.append("\n from t_stock ");
 			whereCause.append("\n where 1=1 ");
 			whereCause.append("\n and substring(request_number,5,2) = '"+currentYear+"'");
 			whereCause.append("\n and substring(request_number,7,2) = '"+currentMonth+"'");

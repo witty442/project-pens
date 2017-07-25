@@ -35,6 +35,10 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 List<References> shippingMethod = InitialReferences.getReferenes().get(InitialReferences.SHIPMENT);
 pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE);
 
+List<References> partyTypeList = InitialReferences.getReferenes().get(InitialReferences.PARTY_TYPE);
+pageContext.setAttribute("partyTypeList",partyTypeList,PageContext.PAGE_SCOPE);
+
+
 String readOnly = "false";
 String styleClass = "";
 if(role.equalsIgnoreCase(User.TT)){ 
@@ -352,10 +356,12 @@ function setMainCustomer(code, name){
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:select property="customer.partyType" styleId="partyType" >
-										<html:option value=""></html:option>
+									<%-- 	<html:option value=""></html:option>
 										<html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option>
-									</html:select>
+                                    --%>		
+                                     <html:options collection="partyTypeList" property="key" labelProperty="name"/>							
+                                  </html:select>
 								</td>
 							</tr>
 							<tr>

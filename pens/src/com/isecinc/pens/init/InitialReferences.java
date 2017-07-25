@@ -22,6 +22,7 @@ public class InitialReferences extends I_Initial {
 
 	public static final String CUSTOMER_TYPE = "CustomerType";
 	public static final String TERRITORY = "Territory";
+	public static final String PARTY_TYPE = "PartyType";
 	public static final String SALES_GROUP = "SalesGroup";
 	public static final String ORDER_TYPE = "OrderType";
 	public static final String SHIPMENT = "Shipment";

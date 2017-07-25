@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -81,7 +82,18 @@
 		 </ul>
 	</li>
 <%} %>
-
+<%if ( Utils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR}) ){ %>
+	<li><a href="javascript: void(0)" class="parent" ><span>Credit Sales</span></a>
+		<ul>
+			  <li>
+                   <a href="#" class="parent" 
+                   onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_CREDIT%>&action=new';">
+                   <span>1.<bean:message key="ReportStockCredit" bundle="sysprop"/></span>
+                   </a>
+                </li> 
+		</ul>
+	</li> 
+<%}%>
 	<li>
 	   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
 	</li>

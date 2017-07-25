@@ -74,7 +74,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("massageToSales",null);
 			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
-			AppversionVerify.checkAppVersion(request);
+			AppversionVerify.getIns().checkAppVersion(request);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

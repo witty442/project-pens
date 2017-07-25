@@ -44,8 +44,6 @@ pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
-}else{
-	msg4 = AppversionVerify.checkAppVersion(request);
 }
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
@@ -124,7 +122,7 @@ function loadDistrict(){
 <%if("true".equalsIgnoreCase(request.getParameter("showMsg"))){ %>
 
 $(function() {
-	$("#dialog").dialog({ height: 260,width:540,modal:false });
+	$("#dialog").dialog({ height: 300,width:600,modal:false });
   });
  
  function close(){
@@ -480,7 +478,7 @@ $(function() {
      &nbsp;|&nbsp; <%=msg4[1] %></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
-	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>
+	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
 	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
 	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
 </div>

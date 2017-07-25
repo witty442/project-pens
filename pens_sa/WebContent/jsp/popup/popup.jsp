@@ -50,7 +50,7 @@ input[type=radio]
 	String descSearchTxtName = "";
 	
     /** Criteria Name **/
-    if("Brand".equalsIgnoreCase(pageName)){
+    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)){
     	codeSearchTxtName = "Brand";
     	descSearchTxtName = "Brand Name";
     }
@@ -281,10 +281,15 @@ window.onload = function(){
 	</tr>
 </table>
 <!-- RESULT -->
-<%if("Brand".equalsIgnoreCase(pageName)){ %>
+<%if(session.getAttribute("DATA_LIST") != null){ %>
+<%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/BrandResult.jsp" /> 
-<%}else if("Customer".equalsIgnoreCase(pageName)){ %>
+<%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/CustomerResult.jsp" /> 
+<%}else if("ItemStock".equalsIgnoreCase(pageName)){ %>
+     <jsp:include page="popup_sub/ItemResult.jsp" /> 
+<%}}else if(session.getAttribute("search_submit") != null){ %>
+ <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>
 <!-- RESULT -->
 </html:form>

@@ -37,6 +37,7 @@ public class Stock {
 	private String updated; 
 	private String created; 
 	
+	
 	/** Customer */
 	private int customerId;
 	private String customerName;

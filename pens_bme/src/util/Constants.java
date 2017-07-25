@@ -25,6 +25,7 @@ public class Constants {
 	public static final String STORE_TYPE_KING_POWER_2 ="020072";//King Power
 	public static final String STORE_TYPE_KING_POWER_3 ="020068";//King Power
 	public static final String STORE_TYPE_KING_POWER_4 ="020083";//King Power
+	public static final String STORE_TYPE_KING_POWER_5 ="020092";//King Power
 	
 	public static final String STORE_TYPE_FRIDAY_CODE ="020052";
 	public static final String STORE_TYPE_HISHER_CODE = "020051";

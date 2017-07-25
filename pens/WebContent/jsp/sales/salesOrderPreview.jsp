@@ -169,8 +169,7 @@ function stampPrint(){
 						<html:form action="/jsp/saleOrderAction">
 						<jsp:include page="../error.jsp"/>
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							<%//if(User.TT.equals(user.getType())){%>
-						    <%if(false){%>
+							<%if(User.TT.equals(user.getType())){%>
 							<tr>
 								<td width="30%" align="right">ระบุเลขที่ PO ลูกค้า(ถ้ามี) </td>
 								<td width="25%"><html:text property="order.poNumber" size="20"  readonly="true" styleClass="disableText"/></td>

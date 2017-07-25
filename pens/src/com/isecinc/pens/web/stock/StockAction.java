@@ -7,7 +7,9 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +24,8 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Stock;
+import com.isecinc.pens.bean.StockLine;
+import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -84,7 +88,6 @@ public class StockAction extends I_Action {
 		try {
 			 logger.debug("prepare :"+request.getParameter("action"));
 			 User user = (User) request.getSession(true).getAttribute("user");
-			 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 //Clear and init Parametor By moveOrderType  
 				 stockForm.setCustomer(new Customer());
@@ -119,13 +122,13 @@ public class StockAction extends I_Action {
 			 logger.debug("prepare :"+request.getParameter("action"));
 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				 //Clear and init Parametor By moveOrderType  
+				 //Clear and init Parametor   
 				 stockForm.setCustomer(new Customer());
 				 request.getSession().setAttribute("RESULTS",null);
 				 
 			 }else if("exportToExcel".equalsIgnoreCase(request.getParameter("action"))){
 				 excel = true;
-				 html = StockReport.genResultToHtml(request, stockForm,excel);
+				 html = StockReport.genStockReportToHTML(request, stockForm,excel);
 				 request.getSession().setAttribute("RESULTS",html);
 				 
 			     if(html ==null){
@@ -146,7 +149,7 @@ public class StockAction extends I_Action {
 			     }
 			 }else {
 				//search Report 
-				 html = StockReport.genResultToHtml(request, stockForm,excel);
+				 html = StockReport.genStockReportToHTML(request, stockForm,excel);
 				 request.getSession().setAttribute("RESULTS",html);
 				 if(html ==null){
 					 request.setAttribute("Message","ไม่พบข้อมูล");
@@ -235,9 +238,13 @@ public class StockAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			
 			//** get From Session **/
-			//currPage = customerForm.getCurPage();
-			//totalRow = customerForm.getTotalRow();
-			
+			if(Utils.isNull(request.getParameter("search")).equalsIgnoreCase("new")){
+				currPage = 1;
+				totalRow = 0;
+			}else{
+		      currPage = stockForm.getCurPage();
+			  totalRow = stockForm.getTotalRow();
+			}
 			/** Get TotalRow **/
 		    totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
 		    if(totalRow > 0){
@@ -255,7 +262,8 @@ public class StockAction extends I_Action {
 			logger.debug("totalPage:"+totalPage);
 			logger.debug("currPage:"+currPage);
 			
-			end = 50;
+			start = (currPage-1)*MAX_ROW_PAGE;
+			end =  MAX_ROW_PAGE;
 			whereCause +="\n limit "+start+","+end;
 			
 			Customer[] results = new MCustomer().searchOptForStockCustomer(conn,whereCause,user,start);//new method optimize
@@ -288,7 +296,6 @@ public class StockAction extends I_Action {
 
 		return mapping.findForward("prepareCustomer");
 	}
-	
 	/**
 	 * Search
 	 */
@@ -324,6 +331,9 @@ public class StockAction extends I_Action {
 		StockForm stockForm = (StockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+			 //Clear session item in page
+			request.getSession().setAttribute("ITEM_IN_PAGE", null);
+			
 			 Stock bean  = new Stock(); 
 			 //Get Detail Customer by customerId
 			 Customer customer = new MCustomer().find(Utils.isNull(request.getParameter("customer_id")));
@@ -359,6 +369,9 @@ public class StockAction extends I_Action {
 		StockForm stockForm = (StockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+			//Clear session check dup item in page
+			 request.getSession().setAttribute("ITEM_IN_PAGE",null);
+			 
 			 String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
 			 //init Parametor 
 			 stockForm.getBean().setRequestNumber(requestNumber);
@@ -377,6 +390,16 @@ public class StockAction extends I_Action {
 			//init priceListId by User Type
 			 stockForm.getBean().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
 			 
+			//init itemCode in session for check sup
+				if(m.getLineList() != null && m.getLineList().size() >0){
+					 Map<String,String> map = new HashMap<String,String>();
+					 for(int i=0;i<m.getLineList().size();i++){
+						 StockLine item = m.getLineList().get(i);
+						 map.put(item.getProductCode(), item.getProductCode());
+					 }
+			    	 request.getSession().setAttribute("ITEM_IN_PAGE",map);
+				}
+				
 			 //set Btn Display
 			 if("Y".equalsIgnoreCase(m.getExported())){ 
 			    stockForm.getBean().setShowSaveBtn(false);
@@ -473,6 +496,7 @@ public class StockAction extends I_Action {
 		StockForm stockForm = (StockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
+		String uomId= "";
 		try {
 			logger.debug("save-->");
 			String backPage = Utils.isNull(request.getParameter("backPage"));
@@ -486,10 +510,71 @@ public class StockAction extends I_Action {
 				return "new";
 			}
 			
-			Stock m = prepareCreateStock(user, stockForm);
+			Stock m = stockForm.getBean();
+			m.setUserId(user.getId()+"");
+			m.setCreatedBy(user.getUserName());
+			m.setUpdateBy(user.getUserName());
+			 
+			List<StockLine> itemList = new ArrayList<StockLine>();
+			//Set Item
+			String[] lineId = request.getParameterValues("lineId");
+			String[] productCode = request.getParameterValues("productCode");
+			String[] inventoryItemId = request.getParameterValues("inventoryItemId");
+			String[] status = request.getParameterValues("status");
+			String[] fullUom = request.getParameterValues("fullUom");
+			
+			String[] qty = request.getParameterValues("qty");
+			String[] qty2 = request.getParameterValues("qty2");
+			String[] qty3 = request.getParameterValues("qty3");
+			
+			String[] sub = request.getParameterValues("sub");
+			String[] sub2 = request.getParameterValues("sub2");
+			String[] sub3 = request.getParameterValues("sub3");
+			
+			String[] expireDate = request.getParameterValues("expireDate");
+			String[] expireDate2 = request.getParameterValues("expireDate2");
+			String[] expireDate3 = request.getParameterValues("expireDate3");
+			
+			logger.debug("itemCode:"+productCode.length);
+			
+			//add value to Results
+			if(productCode != null && productCode.length > 0){
+				for(int i=0;i<productCode.length;i++){
+					if( !Utils.isNull(productCode[i]).equals("") && !Utils.isNull(status[i]).equals("DELETE")){
+						StockLine l = new StockLine();
+						 logger.debug("lineId:"+lineId[i]);
+						 
+						 l.setLineId(Utils.convertStrToInt(lineId[i]));
+						 l.setProductCode(Utils.isNull(productCode[i]));
+						 l.setInventoryItemId(Utils.isNull(inventoryItemId[i]));
+						 l.setFullUom(fullUom[i]);
+						 
+						 l.setQty(qty[i]);
+						 l.setSub(sub[i]);
+						 l.setExpireDate(Utils.isNull(expireDate[i]));
+						 
+						 l.setQty2(qty2[i]);
+						 l.setSub2(sub2[i]);
+						 l.setExpireDate2(Utils.isNull(expireDate2[i]));
+						 
+						 l.setQty3(qty3[i]);
+						 l.setSub3(sub3[i]);
+						 l.setExpireDate3(Utils.isNull(expireDate3[i]));
+					      
+						 l.setCreatedBy(user.getUserName());
+						 l.setUpdateBy(user.getUserName());
+						 itemList.add(l);
+					}//if
+				}//for
+			}//if
+			//set items list
+			m.setLineList(itemList);
+			
 			MStock mDAO = new MStock();
 			
 			m = mDAO.save(user,m);
+			
+			logger.debug("requestNumber:"+m.getRequestNumber());
 			
 			if("".equals(m.getRequestNumber())){
 				//Fail
@@ -515,8 +600,7 @@ public class StockAction extends I_Action {
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
-					+ e.getMessage());
+			e.printStackTrace();
 			return "new";
 		} finally {
 			try {
@@ -526,43 +610,7 @@ public class StockAction extends I_Action {
 		return "preview";
 	}
 
-    private Stock prepareCreateStock(User user,StockForm mForm) throws Exception {
-    	Stock m = mForm.getBean();
-    	logger.debug("moveOrder1:"+m);
-    	if(m == null ){
-    		logger.debug("moveOrder2:"+mForm.getCriteria().getBean());
-    		m = mForm.getCriteria().getBean();
-    	}
-    	if(m==null){
-    		m = new Stock();
-    	}
-    	//logger.debug("moveOrder:"+mForm.getMoveOrder().getSalesCode()+","+mForm.getMoveOrder().getPdCode()+",");
-    	//logger.debug("moveOrder3:"+m);
-    	
-    	//logger.debug("user:"+user);
-    	
-    	m.setUserId(user.getId()+"");
-    	m.setCreatedBy(user.getUserName());
-    	m.setUpdateBy(user.getUserName());
-    	
-    	m.setLineList(mForm.getLines());
-    	
-    	if( !Utils.isNull(mForm.getLineNoDeleteArray()).equals("")){
-    		String[] lineNoDeleteSplit = Utils.isNull(mForm.getLineNoDeleteArray()).split("\\,");
-    		if(lineNoDeleteSplit != null && lineNoDeleteSplit.length > 0){
-    			List<String> lineNoDeleteList = new ArrayList<String>();
-    			for(int i=0;i<lineNoDeleteSplit.length;i++){
-    				String lineNo = Utils.isNull(lineNoDeleteSplit[i]);
-    				if( !Utils.isNull(lineNo).equals("")){
-    					lineNoDeleteList.add(lineNo);
-    				}
-    			}
-    			m.setLineNoDeleteList(lineNoDeleteList);
-    		}
-    	}
-		return m;
-	}
-    
+   
     private Stock prepareUpdateStock(User user,StockForm mForm) throws Exception {
     	Stock m = mForm.getBean();
     	//logger.debug("moveOrder:"+mForm.getBean().getSalesCode()+","+mForm.getBean().getPdCode()+",");

@@ -81,7 +81,9 @@ public class SummaryAction extends I_Action {
 				 if("sizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
 					|| "sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
 					|| "onhandBigCSP".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
-					|| "reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+					|| "reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
+					|| "OnhandMTTDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))
+						 ){
 					 
 					 oh = new OnhandSummary();
 					 oh.setDispHaveQty("true");

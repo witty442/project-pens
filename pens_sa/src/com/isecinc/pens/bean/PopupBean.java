@@ -27,6 +27,7 @@ public class PopupBean implements Serializable{
 	private String reportValue;
 	private String salesrepCode;
 	private String salesrepId;
+	private String status;
 	
 	public PopupBean(){
 		
@@ -35,9 +36,18 @@ public class PopupBean implements Serializable{
 		if("reportType".equalsIgnoreCase(type)){
 		  setReportType(desc);
 		  setReportValue(value);
+		}else if("status".equalsIgnoreCase(type)){
+			setStatus(value);
 		}
 	}
 	
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getSalesrepCode() {
 		return salesrepCode;
 	}

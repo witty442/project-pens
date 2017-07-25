@@ -73,7 +73,7 @@ for(MoveOrderProductCatalog catalog:catalogs) {
 	if(item != null){
 		qty1 = ""+item.getQty1();
 		qty2 = ""+item.getQty2();
-		lineAmt =""+item.getLineNetAmt();
+		lineAmt =""+item.getLineNetAmt(); 
 		lineAmtText = formatter.format(item.getLineNetAmt());
 	}
 	

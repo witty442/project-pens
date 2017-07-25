@@ -13,9 +13,17 @@ private static final long serialVersionUID = 1L;
 	private String paramValue;
     private String paramLabel;
     private String paramValid;
+    private String validateScript;
 	private Map<String, BatchTaskInfo> paramMap;
     
 	
+	
+	public String getValidateScript() {
+		return validateScript;
+	}
+	public void setValidateScript(String validateScript) {
+		this.validateScript = validateScript;
+	}
 	public String getParamValid() {
 		return paramValid;
 	}

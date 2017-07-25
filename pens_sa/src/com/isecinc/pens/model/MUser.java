@@ -150,7 +150,7 @@ public class MUser extends I_Model<User> {
 			sql.append("  END_DATE,NAME,SOURCE_NAME,\n");
 			sql.append("  ID_CARD_NO,USER_NAME,PASSWORD,\n");
 			sql.append("  CODE,UPDATED,UPDATED_BY,TERRITORY,\n");
-			sql.append("  USER_ID,USER_GROUP_ID,ROLE_SALESTARGET, \n");
+			sql.append("  USER_ID,USER_GROUP_ID,ROLE_SALESTARGET, ROLE_CR_STOCK,\n");
 			sql.append(" (select max(s.user_group_name) from c_group_role s where A.user_group_id = s.user_group_id) as user_group_name \n");
 			sql.append(" FROM c_user_info A  WHERE 1=1 \n");
 			sql.append(whereClause);

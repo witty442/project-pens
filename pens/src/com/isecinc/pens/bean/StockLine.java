@@ -17,7 +17,7 @@ public class StockLine extends I_PO implements Serializable{
 
 	private static final long serialVersionUID = 8286170868166006317L;
 	private String requestNumber ;
-	private String  inventoryItemId; 
+	private String inventoryItemId; 
 	    
 	private String status ;
 	private String statusLabel;
@@ -29,7 +29,9 @@ public class StockLine extends I_PO implements Serializable{
 	private String updated; 
 	private String updateBy;
 	private String actionDate;
-	
+	private String expireDate;
+	private String expireDate2;
+	private String expireDate3;
 	
 	private boolean canEdit = false;
 
@@ -39,7 +41,7 @@ public class StockLine extends I_PO implements Serializable{
 	private int id;
 
 	/** Line No */
-	private int lineNo;
+	private int lineId;
 
 	/** Order Id */
 	private int orderId;
@@ -62,9 +64,13 @@ public class StockLine extends I_PO implements Serializable{
 
 	/** Qty */
 	private double pack;
-	private double qty;
-	private double qty1;
-	private double qty2;
+	private String qty;
+	private String qty2;
+	private String qty3;
+	
+	private String sub;
+	private String sub2;
+	private String sub3;
 
 	/** Amount */
 	private double amount;
@@ -132,12 +138,32 @@ public class StockLine extends I_PO implements Serializable{
 	private String customerCode;
 	private Date orderDate;
 	private String createDate;
-	private String expireDate;
+
 	
 	protected void setDisplayLabel() throws Exception {
 
 	}
 	
+	
+	public String getExpireDate2() {
+		return expireDate2;
+	}
+
+
+	public void setExpireDate2(String expireDate2) {
+		this.expireDate2 = expireDate2;
+	}
+
+
+	public String getExpireDate3() {
+		return expireDate3;
+	}
+
+
+	public void setExpireDate3(String expireDate3) {
+		this.expireDate3 = expireDate3;
+	}
+
 	public String getCreateDate() {
 		return createDate;
 	}
@@ -276,12 +302,17 @@ public class StockLine extends I_PO implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getLineNo() {
-		return lineNo;
+	
+	public int getLineId() {
+		return lineId;
 	}
-	public void setLineNo(int lineNo) {
-		this.lineNo = lineNo;
+
+
+	public void setLineId(int lineId) {
+		this.lineId = lineId;
 	}
+
+
 	public int getOrderId() {
 		return orderId;
 	}
@@ -336,25 +367,67 @@ public class StockLine extends I_PO implements Serializable{
 	public void setPrice2(double price2) {
 		this.price2 = price2;
 	}
-	public double getQty() {
+	
+	public String getQty() {
 		return qty;
 	}
-	public void setQty(double qty) {
+
+
+	public void setQty(String qty) {
 		this.qty = qty;
 	}
-	public double getQty1() {
-		return qty1;
-	}
-	public void setQty1(double qty1) {
-		this.qty1 = qty1;
-	}
-	public double getQty2() {
+
+
+	public String getQty2() {
 		return qty2;
 	}
-	public void setQty2(double qty2) {
+
+
+	public void setQty2(String qty2) {
 		this.qty2 = qty2;
 	}
-	
+
+
+	public String getQty3() {
+		return qty3;
+	}
+
+
+	public void setQty3(String qty3) {
+		this.qty3 = qty3;
+	}
+
+
+	public String getSub() {
+		return sub;
+	}
+
+
+	public void setSub(String sub) {
+		this.sub = sub;
+	}
+
+
+	public String getSub2() {
+		return sub2;
+	}
+
+
+	public void setSub2(String sub2) {
+		this.sub2 = sub2;
+	}
+
+
+	public String getSub3() {
+		return sub3;
+	}
+
+
+	public void setSub3(String sub3) {
+		this.sub3 = sub3;
+	}
+
+
 	public double getAmount() {
 		return amount;
 	}

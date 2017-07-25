@@ -4,9 +4,9 @@ String[] msg1 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg1 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	msg1 = AppversionVerify.checkAppVersion(request) ;
-}
-%>
+	msg1 = AppversionVerify.getIns().checkAppVersion(request) ;
+} 
+%>  
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr height="137px;" >
 		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/header_left.png" border="0"/>

@@ -11,7 +11,7 @@
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
+<%@page import="java.util.List"%> 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
@@ -19,7 +19,7 @@
 
 <jsp:useBean id="batchTaskForm" class="com.isecinc.pens.web.batchtask.BatchTaskForm" scope="session" />
 <%
-	try{
+try{
 User user = (User) session.getAttribute("user");
 String pageName = Utils.isNull(request.getParameter("pageName"));
 String buttonName = "";
@@ -74,6 +74,8 @@ body {
    color: red;
 }
 </style>
+ 
+<%out.println(taskInfo.getValidateScript()); %>
 
 <Script>
     function loadme(){
@@ -88,8 +90,11 @@ body {
 		        String key = (String)its.next();
 		        BatchTaskInfo task = paramMap.get(key);    
 		        if(task.getParamType().equalsIgnoreCase("DATE")){%> 
-		    new Epoch('epoch_popup', 'th', document.getElementById('<%=task.getParamName()%>'));
-		<%}}}%>
+		           new Epoch('epoch_popup', 'th', document.getElementById('<%=task.getParamName()%>'));
+		   <%   }//if
+		     }//while
+		   }//if 
+		   %>
     }
     
 	function disableF5(e) {
@@ -103,28 +108,15 @@ body {
 	
 	/** Start Batch**/
 	function runBatch(path) {
-			var confirmText = "ยืนยัน Process ";
-			<%if( !paramMap.isEmpty()){
-				 Iterator its = paramMap.keySet().iterator();
-				 while(its.hasNext()){
-			        String key = (String)its.next();
-			        BatchTaskInfo task = paramMap.get(key);    
-			        if(task.getParamValid().equalsIgnoreCase("VALID")){%> 
-				    var obj_<%=key%> =  document.getElementById('<%=task.getParamName()%>');
-				   // alert(obj_<%=key%>.value);
-				    if(obj_<%=key%>.value ==""){
-				    	alert("กรุณาระบุ <%=task.getParamLabel()%>");
-				    	obj_<%=key%>.focus();
-				    	return false;
-				    }
-			<%}}}%>
-			
-			 if(confirm(confirmText)){
-				document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=runBatch&action=submited";
-				document.batchTaskForm.submit();
-				return true;
-			}
-			return false; 
+		var confirmText = "ยืนยัน Process ";
+		if(validate()){
+		  if(confirm(confirmText)){
+			document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=runBatch&action=submited";
+			document.batchTaskForm.submit();
+			return true;
+		  }
+		}
+		return false; 
 	}
 	function search(path, type) {
 		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=search";
@@ -297,7 +289,7 @@ body {
 						
 						<!--Generate Parameter -->
 					     <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
-							<tr>
+							
 							<%
 								if( !paramMap.isEmpty()){
 									 Iterator its = paramMap.keySet().iterator();
@@ -305,11 +297,34 @@ body {
 								        String key = (String)its.next();
 								        BatchTaskInfo task = paramMap.get(key);
 							%> 
-								<td width ="50%" align="right"><%=task.getParamLabel() %></td>
-								<td  width ="50%" align="left"><input type="text" name="<%=task.getParamName() %>" id="<%=task.getParamName() %>" value="<%=task.getParamValue() %>"/></td>
-								
-							</tr>
-							<%}} %>
+								<tr>
+								<%if(task.getParamType().equalsIgnoreCase("DATE")|| task.getParamType().equalsIgnoreCase("STRING") ){ %>
+									<td width ="50%" align="right">
+									    <%=task.getParamLabel() %>
+									    <%if(task.getParamValid().equalsIgnoreCase("VALID")){%>
+									       <font color="red">*</font>
+									    <%} %>
+									</td>
+									<td width ="50%" align="left">
+									    <input type="text" name="<%=task.getParamName() %>" id="<%=task.getParamName() %>" 
+									     value="<%=task.getParamValue() %>"/>
+									</td>
+								<%}else if(task.getParamType().equalsIgnoreCase("FROMFILE")){ %>
+									<td width ="50%" align="right">
+									   <%=task.getParamLabel() %>
+									    <%if(task.getParamValid().equalsIgnoreCase("VALID")){%>
+									       <font color="red">*</font>
+									    <%} %>
+									</td>
+									<td width ="50%" align="left">
+									   <input type="file" name="<%=task.getParamName() %>" 
+									     id="<%=task.getParamName() %>"/>
+									</td>
+								<%} %>
+								</tr>
+							<% }//while
+							}//if
+							%>
 						</table>
 
                          <!-- Generate BUTTON -->
@@ -378,6 +393,8 @@ body {
   	</tr>
 </table>
 </body>
-<% }catch(Exception e){e.printStackTrace();} %>
+<%}catch(Exception e){
+	e.printStackTrace();
+} %>
 
 </html>

@@ -10,24 +10,42 @@ function calcTargetAmount(targetQtyObj,rowId){
 		summaryTotal();
 	}
 }
+function clearTotal(){
+	document.getElementsByName("totalOrderAmt12Month")[0].value="";
+	document.getElementsByName("totalOrderAmt3Month")[0].value="";
+	document.getElementsByName("totalTargetAmount")[0].value="";
+	document.getElementsByName("totalTargetQty")[0].value="";
+}
 function summaryTotal(){
+	var totalOrderAmt12Month = 0;
+	var totalOrderAmt3Month =0;
 	var totalTargetAmount = 0;
 	var totalTargetQty = 0;
+	var orderAmt12Month = document.getElementsByName("orderAmt12Month");
+	var orderAmt3Month = document.getElementsByName("orderAmt3Month");
 	var targetAmount = document.getElementsByName("targetAmount");
 	var targetQty = document.getElementsByName("targetQty");
+	
 	for(var i=0;i<targetAmount.length;i++){
 		if(targetQty[i].value != ''){
 		  totalTargetAmount += parseFloat(currenyToNum(targetAmount[i]));
 		  totalTargetQty += parseFloat(currenyToNum(targetQty[i]));
+		
+		  totalOrderAmt12Month += parseFloat(currenyToNum(orderAmt12Month[i]));
+		  totalOrderAmt3Month += parseFloat(currenyToNum(orderAmt3Month[i]));
 		}
 	}
+	
 	//set Show total
+	document.getElementsByName("totalOrderAmt12Month")[0].value=totalOrderAmt12Month;
+	document.getElementsByName("totalOrderAmt3Month")[0].value=totalOrderAmt3Month;
 	document.getElementsByName("totalTargetAmount")[0].value=totalTargetAmount;
 	document.getElementsByName("totalTargetQty")[0].value=totalTargetQty;
 	
+	toCurreny(document.getElementsByName("totalOrderAmt12Month")[0]);
+	toCurreny(document.getElementsByName("totalOrderAmt3Month")[0]);
 	toCurreny(document.getElementsByName("totalTargetAmount")[0]);
 	toCurrenyNoDigit(document.getElementsByName("totalTargetQty")[0]);
-
 }
 function checkProductOnblur(e,itemCodeObj,rowId){
 	 //alert("ONBLUR");
@@ -38,7 +56,6 @@ function checkProductOnblur(e,itemCodeObj,rowId){
 		itemCodeObj.focus();
 	}
 }
-
 //Check enter only
 function  getProductKeypress(e,itemCodeObj,rowId){
 //	alert("keypress");
@@ -199,7 +216,7 @@ function addRow(setFocus){
 	}
 	var rowId = rows;
     var tabIndex = parseFloat(document.getElementById("tabIndex").value);
-   // alert(rowId);
+    //alert(rowId);
 	tabIndex++;
 	
 	//alert("rowId["+rowId+"]");
@@ -260,9 +277,23 @@ function nextRowKeypress(e,rowId){
 	}
 }
 
+function checkRemoveAllRow(){
+	var chk = document.getElementsByName("linechk");
+	var status = document.getElementsByName("status");
+	var itemCode = document.getElementsByName("itemCode");
+	var deleteAllFlag = true;
+	for(var i=chk.length-1;i>=0;i--){
+		if(itemCode[i].value !='' && status[i].value !="DELETE"){
+			deleteAllFlag = false;
+		}
+	}
+	return deleteAllFlag;
+}
+
 function removeRow(path){
+	var msg = "ยืนยันลบข้อมูล";
 	//todo play with type
-	if(confirm("ยืนยันลบข้อมูล")){
+	if(confirm(msg)){
 		var tbl = document.getElementById('tblProduct');
 		var chk = document.getElementsByName("linechk");
 		var status = document.getElementsByName("status");
@@ -276,7 +307,7 @@ function removeRow(path){
 				drow = tbl.rows[i+1];
 				status[i].value ="DELETE";
 				$(drow).hide();
-				bcheck=true;
+				bcheck = true;
 				
 				//alert(itemCode[i].value);
 				ietmCodeArr += itemCode[i].value+"|";
@@ -286,7 +317,7 @@ function removeRow(path){
 			alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;
 		}else{
 			summaryTotal();
-			//clear session product Item In Page
+			//clear session check duplicate
 			var param ="itemCodeArr="+ietmCodeArr;
 			var getData = $.ajax({
 				url: path+"/jsp/ajax/clearSessionProductInPageAjax.jsp",
@@ -297,12 +328,19 @@ function removeRow(path){
 				  returnString = jQuery.trim(getData);
 				}
 			}).responseText;
+			
+			var removeRowAll = checkRemoveAllRow();
+			if(removeRowAll){
+				clearTotal();
+				//if(confirm("ยืนยันลบข้อมูลทั้งหมด")){
+					document.salesTargetForm.action = path + "/jsp/salesTargetAction.do?do=deleteAll";
+					document.salesTargetForm.submit();
+				//}
+			}
 		}
 	}
 	return false;
 }
-
-
 function backToMainPage(path){
 	var form = document.salesTargetForm;
 	form.action = path + "/jsp/mainpage.jsp";

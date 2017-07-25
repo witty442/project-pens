@@ -645,12 +645,78 @@ SELECT.moveOrder.pdCode{
 	font-size: 16px;
 }
 .normalText {
-	
+	color: #000000;
 }
-.disableNumberText {
+.errorText {
+	color: red;
+}
+.errorDisableText {
+	background-color: #DCDCDC;
+	color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	text-align:center;
+}
+.errorDisableTextCenter {
+	background-color: #DCDCDC;
+	color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
+.disableText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+}
+.disableTextCenter {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align:center;
+}
+.disableTextBigBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-weight: bold;
+	font-family: tahoma;
+	font-size: 18px;
+}
+.enableNumber {
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+}
+.errorNumber {
+	background-color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+}
+.enableNumberBold {
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
+}
+.disableNumber {
 	background-color: #DCDCDC;
 	border: 1px solid;
 	border-color: #BEBEBE;
 	color: #000000;
 	text-align: right;
+}
+.disableNumberBold {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
 }

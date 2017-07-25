@@ -114,6 +114,7 @@ function loadCustCatNoList(){
 	}
 }
 function loadSalesrepCodeList(){
+	//alert("loadSalesrepCodeList");
 	var cboDistrict = document.getElementsByName('bean.salesrepCode')[0];
 	var param  ="custCatNo=" + document.getElementsByName('bean.custCatNo')[0].value;
 	    param +="&salesChannelNo=" + document.getElementsByName('bean.salesChannelNo')[0].value;
@@ -144,7 +145,22 @@ function setDataPopupValue(code,desc,pageName){
 		form.customerCode.value = code;
 	}
 } 
-
+function exportToExcel(path){
+	var form = document.salesTargetForm;
+	 if( $('#periodDesc').val()==""){
+		alert("กรุณากรอก เดือน");
+		return false;
+	} 
+	 if( $('#reportType').val()==""){
+		alert("กรุณากรอก รูปแบบ");
+		$('#brand').focus();
+		return false;
+	 } 
+	 
+	form.action = path + "/jsp/salesTargetAction.do?do=exportToExcel";
+	form.submit();
+	return true;
+}
 
 </script>
 
@@ -172,7 +188,7 @@ function setDataPopupValue(code,desc,pageName){
 			</tr>
 			<tr>
                 <td> ภาคการขาย </td>
-				<td colspan="2">
+				<td colspan="3">
 				    <html:select property="bean.salesChannelNo" styleId="salesChannelNo" onchange="loadCustCatNoList()">
 						<html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				    </html:select>
@@ -191,19 +207,28 @@ function setDataPopupValue(code,desc,pageName){
 			</tr>	
 			<tr>
                 <td> แบรนด์ </td>
-				<td colspan="2">
+				<td colspan="3">
 				   <html:text property="bean.brand" styleId="brand" size="20"/>
 				    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','Brand')"/>   
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				    รหัสร้านค้า
 				    <html:text property="bean.customerCode" styleId="customerCode" size="20"/>
 				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','Customer')"/>   
+				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				   สถานะ &nbsp;
+				   <html:select property="bean.status" styleId="status" >
+						<html:options collection="STATUS_LIST" property="status" labelProperty="status"/>
+				    </html:select> 
+				    
 				</td>
 			</tr>	
 	   </table>
 	   <table  border="0" cellpadding="3" cellspacing="0" >
 			<tr>
 				<td align="left">
+				    <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
+					  <input type="button" value="Export To Excel" class="newPosBtnLong"> 
+					</a>
 					<a href="javascript:searchReport('${pageContext.request.contextPath}')">
 					  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 					</a>

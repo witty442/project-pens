@@ -26,12 +26,10 @@ String password =""; */
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
 <style type="text/css">
-<!--
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	background-repeat: repeat;
 }
--->
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -115,7 +113,7 @@ function gologin(e){
 		              <%} %>
 		            </tr>
 		            <tr>
-		            	<td colspan="2">
+		            	<td colspan="2" nowrap>
 		            		Application Version
 		            		<font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 		            	</td>

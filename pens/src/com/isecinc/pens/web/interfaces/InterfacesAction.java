@@ -157,7 +157,7 @@ public class InterfacesAction extends I_Action {
 			
 			//check version
 			request.getSession().setAttribute("appVersionCheckMsg",null);
-			AppversionVerify.checkAppVersion(request);
+			AppversionVerify.getIns().checkAppVersion(request);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

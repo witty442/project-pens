@@ -1,11 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 <%
 SalesTargetBean bean = ((SalesTargetForm)session.getAttribute("salesTargetForm")).getBean();
 %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <script type="text/javascript">
 window.onload = function(){
 	loadMe();
@@ -24,6 +27,50 @@ function loadMe(){
 	      document.getElementsByName('bean.custCatNo')[0].value = '<%=bean.getCustCatNo()%>';
 	<% } %>
 }
+function copyFromLastMonth(path,e){
+	var form = document.salesTargetForm;
+	var pageName = document.getElementsByName("pageName")[0].value;
+	if( $('#periodDesc').val()==""){
+		alert("กรุณากรอก เดือน");
+		return false;
+	 } 
+	 if( $('#brand').val()==""){
+		alert("กรุณากรอก แบรนด์");
+		$('#brand').focus();
+		return false;
+	 } 
+	 if( $('#salesChannelNo').val()==""){
+		 $('#salesChannelNo').focus();
+		alert("กรุณากรอก ภาคการขาย");
+		return false;
+	 } 
+	 if( $('#custCatNo').val()==""){
+		 $('#custCatNo').focus();
+		alert("กรุณากรอก ประเภทขาย");
+		return false;
+	 } 
+	 
+	if(confirm('ยืนยัน Copy From Last Month')){
+	  //To disable f5
+	  $(document).bind("keydown", disableF5);
+	  $(function() {
+		///$("#dialog").dialog({ height: 200,width:650,modal:true });
+		  $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '25%', width: '60%' } }); 
+	   }); 
+	  
+	  form.action = path + "/jsp/salesTargetAction.do?do=copyFromLastMonth&action=new&pageName="+pageName;
+	  form.submit();
+	  return true;
+	}
+	return false;
+}
+
+function disableF5(e) {
+	if (e.which == 116) e.preventDefault(); 
+}
+//To re-enable f5
+$(document).unbind("keydown", disableF5);
+
 function clearForm(path){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;
@@ -36,7 +83,7 @@ function search(path){
 	 if( $('#periodDesc').val()==""){
 		alert("กรุณากรอก เดือน");
 		return false;
-	} 
+	 } 
 	 if( $('#brand').val()==""){
 		alert("กรุณากรอก แบรนด์");
 		$('#brand').focus();
@@ -124,7 +171,23 @@ function loadCustCatNoList(){
 }
 </script>
 
-<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+ <!-- Progress Bar -->
+ <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+ <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+    <tr>
+		<td align="center" width ="100%">
+		   <div style="height:50px;align:center">
+		          กรุณารอสักครู่......
+		   </div>
+		  <div id="progress_bar" style="align:center">
+              <img src="${pageContext.request.contextPath}/images2/waiting.gif" width="100" height="100" />
+          </div>
+		 </td>
+   </tr>
+  </table>   	      
+</div>
+ <!-- Progress Bar -->
+ 
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
 	       <tr>
                 <td> เดือน <font color="red">*</font></td>
@@ -171,7 +234,11 @@ function loadCustCatNoList(){
 					</a>
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
-					</a>						
+					</a>		
+					<!-- Copy From Last Month -->
+					<a href="javascript:copyFromLastMonth('${pageContext.request.contextPath}',event)">
+					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
+					</a>	 					
 				</td>
 			</tr>
 		</table>

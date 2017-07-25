@@ -412,6 +412,20 @@ public class ExportHelper {
 				       dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
 					}
 				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("INT")){
+					logger.debug("colBean.getColumnName():"+colBean.getColumnName());
+					
+					if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+						if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+						   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_current_no_disgit);
+						}else{
+						   dataConvertStr = colBean.getDefaultValue();
+						}
+					}else{
+						if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+						   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_current_no_disgit);
+						}
+					}
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){

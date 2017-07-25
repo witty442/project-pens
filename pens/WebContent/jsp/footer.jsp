@@ -1,7 +1,6 @@
 <%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="util.AppversionVerify"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 
 <%

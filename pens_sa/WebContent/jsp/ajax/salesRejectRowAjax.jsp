@@ -14,8 +14,8 @@ long lineId = Utils.convertStrToLong(request.getParameter("lineId"),0);
 String rejectReason = new String(Utils.isNull(request.getParameter("rejectReason")).getBytes("ISO8859_1"), "UTF-8"); ;
 String outputText = "";
 try{
-	System.out.println("id:"+id+",lineId:"+lineId);
-	System.out.println("rejectReason:"+rejectReason);
+	//System.out.println("id:"+id+",lineId:"+lineId);
+	//System.out.println("rejectReason:"+rejectReason);
 	if( 0 != id && 0 != lineId  ){
 		boolean r = SalesTargetDAO.salesRejectItem(user, id, lineId,rejectReason); 
 		if(r){

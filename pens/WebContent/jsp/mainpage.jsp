@@ -12,7 +12,7 @@ String[] msg2 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg2 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	msg2 = AppversionVerify.checkAppVersion(request);
+	msg2 = AppversionVerify.getIns().checkAppVersion(request);
 }
 
 %>
@@ -79,14 +79,14 @@ body {
      <font color="red"><%=msg2[0] %></font> |&nbsp;&nbsp;<%=msg2[1] %></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
-	<p><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></p>
+	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
 	<p align="center"> <a href="javascript:close();"><input class="freeBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
 	 <a href="javascript:close();"><input class="freeBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
 </div>
 
 <script>
   $(function() {
-	$("#dialog").dialog({ height: 260,width:540,modal:false });
+	$("#dialog").dialog({ height: 300,width:600,modal:false });
   });
  
  function close(){

@@ -134,7 +134,7 @@ public class RunScriptDBAction {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String scriptData = ftpManager.getDownloadFTPFileByName(env.getProperty("path.manual.AllSales")+prefix+"_script.sql","TIS-620");
 			
-			//logger.info("scriptData:"+scriptData);
+			logger.debug("scriptData:"+scriptData);
 			
 			// Excute Script
 			if( !Utils.isNull(scriptData).equals("")){

@@ -31,6 +31,7 @@ public class Utils {
 	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
+	
 	public static final Locale local_th= new Locale("th","TH");
 	
 	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
@@ -111,6 +112,29 @@ public class Utils {
 		return r;
 	}
 	
+	public static boolean userInRoleCreditStock(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleCRStock().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+
+
 	public static boolean statusInCheck(String status,String[] statusCheckArr){
 		boolean r = false;
 		for(int i=0;i<statusCheckArr.length;i++){

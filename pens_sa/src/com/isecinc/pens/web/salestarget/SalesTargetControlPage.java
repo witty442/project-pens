@@ -147,12 +147,15 @@ public class SalesTargetControlPage {
 			dataList.add(new PopupBean("reportType","ภาคการขาย","SALES_CHANNEL"));
 			dataList.add(new PopupBean("reportType","พนักงานขาย","SALESREP_CODE"));
 			dataList.add(new PopupBean("reportType","แบรนด์","BRAND"));
-			dataList.add(new PopupBean("reportType","ร้านค้า","CUSTOMER_ID"));
+			dataList.add(new PopupBean("reportType","ร้านค้า","CUSTOMER_CODE"));
 			dataList.add(new PopupBean("reportType","SKU","INVENTORY_ITEM_CODE"));
 			dataList.add(new PopupBean("reportType","ภาคการขาย / พนักงานขาย / แบรนด์ ","SALES_CHANNEL,SALESREP_CODE,BRAND"));
 			dataList.add(new PopupBean("reportType","ภาคการขาย / พนักงานขาย / แบรนด์ / SKU","SALES_CHANNEL,SALESREP_CODE,BRAND,INVENTORY_ITEM_CODE"));
 			dataList.add(new PopupBean("reportType","พนักงานขาย / แบรนด์ ","SALESREP_CODE,BRAND"));
 			dataList.add(new PopupBean("reportType","พนักงานขาย / แบรนด์ / SKU","SALESREP_CODE,BRAND,INVENTORY_ITEM_CODE"));
+			dataList.add(new PopupBean("reportType","พนักงานขาย /รหัสร้านค้า / แบรนด์ ","SALESREP_CODE,CUSTOMER_CODE,BRAND"));
+			dataList.add(new PopupBean("reportType","พนักงานขาย /รหัสร้านค้า / แบรนด์  / SKU","SALESREP_CODE,CUSTOMER_CODE,BRAND,INVENTORY_ITEM_CODE"));
+			
 			request.getSession().setAttribute("REPORT_TYPE_LIST",dataList);
 			
 			//Cust Cat No List
@@ -189,7 +192,6 @@ public class SalesTargetControlPage {
 			dataList.addAll(custCatList_s);
 			request.getSession().setAttribute("CUST_CAT_LIST",dataList);
 		
-
 			//SALESREP_LIST
 			//add Blank Row
 			dataList = new ArrayList<PopupBean>();
@@ -201,6 +203,17 @@ public class SalesTargetControlPage {
 			List<PopupBean> salesrepList_s = SalesTargetUtils.searchSalesrepListAll(conn);
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
+			
+			//status list
+			dataList = new ArrayList<PopupBean>();
+			dataList.add(new PopupBean("status","",""));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_FINISH));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_ACCEPT));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_UN_ACCEPT));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_POST));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_REJECT));
+			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_OPEN));
+			request.getSession().setAttribute("STATUS_LIST",dataList);
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

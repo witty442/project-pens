@@ -61,19 +61,15 @@ public class Utils {
 	
 	//20081223   09 42 34.572
 	//2008-12-23 09:42:34.572000
-	
-	
-	
+
 	public static void main(String[] args){
 	    try{	   
-	    	System.out.println(isInternetConnect());
+	    	//Utils.decimalFormat(0),Utils.format_current_no_disgit);
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
 	}
 	
-	
-	 
 	public static void stopTomcat(){
 	      String line;
 	      OutputStream stdin = null;
@@ -575,6 +571,14 @@ public class Utils {
 		}
 		str = str.replaceAll(",", "");
 		return Integer.parseInt(str);
+	}
+	
+	public static String convertDoubleToStrDefault(double d,String defaultStr) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 || 0.0==d){
+			return defaultStr;
+		}
+		return decimalFormat(d,format_current_no_disgit);
 	}
 	
 	public static double convertStrToDouble(String str) {

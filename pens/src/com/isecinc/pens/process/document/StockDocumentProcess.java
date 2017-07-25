@@ -54,7 +54,7 @@ public class StockDocumentProcess extends DocumentSequenceProcess {
 		if (docSequence.getOrderType().equalsIgnoreCase("YY"))
 			docNo += String.format("%s", docSequence.getCurrentYear().substring(2));
 		 
-		docNo += String.format("%s", new DecimalFormat("00").format(seq));
+		docNo += String.format("%s", new DecimalFormat("0000").format(seq));
 		
 		if(checkCodeDuplicate(docNo,conn)){
 			return getNextDocumentNo(requestDate,salesCode,activeUserID,conn);

@@ -14,16 +14,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
 //for test
-//SIdUtils.getInstance().clearInstance();
+SIdUtils.getInstance().clearInstance();
 		
 int tabIndex = 0;
 if(salesTargetForm.getBean().getItems() != null){
@@ -50,6 +49,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 	pageNameTemp = "ReportSalesTargetAll";
 }
 //System.out.println("pageNameTemp:"+pageNameTemp);
+
 %>
 <html>
 <head>
@@ -171,9 +171,10 @@ function rejectRow(path,id,lineId,rowId){
 			}).responseText;
 		
 		status.value ="Reject";
+		//set hide action reject
+		document.getElementById("span_reject_action_"+rowId).innerHTML = "";
 	}
 }
-
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -314,6 +315,7 @@ function rejectRow(path,id,lineId,rowId){
 									   <c:if test="${salesTargetForm.bean.canSet == true}">
 										 <c:choose>
 											<c:when test="${results.lineReadonly =='readonly'}">
+											 <input type="checkbox" name="linechk" id="linechk"value="${results.lineId}" disabled/>
 											</c:when>
 											<c:otherwise>
 												 <input type="checkbox" name="linechk" id="linechk"value="${results.lineId}"/>
@@ -327,8 +329,8 @@ function rejectRow(path,id,lineId,rowId){
 									        onkeypress="getProductKeypress(event,this,${results.rowId})"
 										    onkeydown="getProductKeydown(event,this,${results.rowId})"
 										    onchange="checkProductOnblur(event,this,${results.rowId})" 
-										     readonly class="disableText"  tabindex="${tabIndex}"
-										  /> 
+										    readonly class="disableText"  tabindex="${tabIndex}"
+									 /> 
 									</td>
 									<td class="td_text_center" width="19%">
 									   <input type="hidden" name="itemId" id="itemId" value ="${results.itemId}"/>
@@ -358,25 +360,28 @@ function rejectRow(path,id,lineId,rowId){
 									<td class="td_text_center" width="6%">
 									  <input type="text" name="status" id="status" value ="${results.status}" size="6" readonly class="${results.lineStatusStyle}"/>
 									</td>
-									<c:if test="${salesTargetForm.bean.canReject == true}">
+									<c:if test="${results.canReject == true}">
 										<td class="td_text_center" width="10%">
-										  <input type="text" name="remark" id ="remark" value ="${results.remark}" size="20" ${results.lineReadonly} class="${results.lineStyle}" />
+										  <input type="text" name="remark" id ="remark" value ="${results.remark}" 
+										  size="20" ${results.lineReadonly} class="${results.lineStyle}" />
 										</td>
 									</c:if>
-									<c:if test="${salesTargetForm.bean.canReject == false}">
+									<c:if test="${results.canReject == false}">
 										<td class="td_text_center" width="15%">
-										  <input type="text" name="remark" id ="remark" value ="${results.remark}" size="20" ${results.lineReadonly} class="${results.lineStyle}" />
+										  <input type="text" name="remark" id ="remark" value ="${results.remark}" size="20"  class="${results.lineStyle}" />
 										</td>
 									</c:if>
-									<c:if test="${salesTargetForm.bean.canReject == true}">
+									<c:if test="${results.canReject == true}">
 										<td class="td_text_center" width="5%">
 										   <a href="javascript:rejectRow('${pageContext.request.contextPath}',${results.id},${results.lineId},${results.rowId})">
-										   Reject
+										    <span id="span_reject_action_${results.rowId}"> Reject</span>
 										   </a>
 										</td>
 									</c:if>
 									<td class="td_text_center" width="11%">
-									  <input type="text" name="rejectReason" id="rejectReason" value ="${results.rejectReason}" size="18" readonly class="${results.lineRejectReasonStyle}"/>
+										 <input type="text" name="rejectReason" id="rejectReason" 
+									      value ="${results.rejectReason}" size="18"  
+									      class="${results.lineRejectReasonStyle}"/> 
 									</td>
 								</tr>
 						 </c:forEach>
@@ -384,9 +389,16 @@ function rejectRow(path,id,lineId,rowId){
 					<table id="tblProduct" align="center" border="1" width="100%" cellpadding="3" cellspacing="1" class="table_hilight">
 					 <!-- Summary --> 
 						  <tr>
-						    <td class="" align="right" colspan="6" width="50%">
+						    <td class="" align="right" colspan="4" width="29%">
 							  <B> Total</B>
 							</td>
+							<td class="td_text_center" width="7%">
+							 <B>  <input type="text" name="totalOrderAmt12Month" value ="${salesTargetForm.bean.totalOrderAmt12Month}" size="7" readonly class="disableNumberBold"/></B>
+							</td>
+							<td class="td_text_center" width="7%">
+							 <B>  <input type="text" name="totalOrderAmt3Month" value ="${salesTargetForm.bean.totalOrderAmt3Month}" size="7" readonly class="disableNumberBold"/></B>
+							</td>
+								<td class="td_text_center" align="right" width="7%"></td>
 							<td class="td_text_center" width="9%">
 							 <B>  <input type="text" name="totalTargetQty" value ="${salesTargetForm.bean.totalTargetQty}" size="7" readonly class="disableNumberBold"/></B>
 							</td>

@@ -871,9 +871,7 @@ public class SummaryDAO {
 				sql.append("\n  SELECT M.* , \n");
 				sql.append("\n  (select max(M1.interface_desc) from pensbi.PENSBME_MST_REFERENCE M1 ");
 				sql.append("\n   where M1.reference_code = 'SubInv' and M1.pens_value =M.pens_value) as sub_inv ");
-				
 				sql.append("\n  from PENSBME_MST_REFERENCE M");
-				
 				sql.append("\n  where 1=1 and reference_code ='Store' ");
 			
 				if("equals".equals(operation)){
@@ -916,7 +914,8 @@ public class SummaryDAO {
 						sql.append(" and (pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%' \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
-						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%' ) \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%'  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_5+"%' ) \n");
 					}
 				}
 				sql.append("\n  and pens_desc4 ='N' \n");

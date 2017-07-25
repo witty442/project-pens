@@ -446,7 +446,13 @@
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_POS%>');"><span>4.<bean:message key="ImportPos" bundle="sysprop"/></span></a>
 	        </li>
 	         <li>
-	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_BIGC%>');"><span>5.<bean:message key="ImportOrderBigC" bundle="sysprop"/></span></a>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_BIGC_FROM_WACOAL%>');">
+	          <span>5.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_BIGC_FROM_WACOAL%>" bundle="sysprop"/>
+	          </span></a>
+	        </li>
+	        <li>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
+	          <span>6.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
 	       <%} %>
 		</ul>

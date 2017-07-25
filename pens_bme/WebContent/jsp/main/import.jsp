@@ -431,6 +431,11 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="filePosBME"/>
 				</jsp:include>
+			<%}else if("LoadStockInitMTT".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="LoadStockInitMTT"/>
+				</jsp:include>
+				
 			<%}else{%>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBMEFromLotus"/>

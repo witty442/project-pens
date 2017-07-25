@@ -2056,10 +2056,17 @@ public class ExportProcess {
                 "   REQUEST_NUMBER, \n"+
             	"	@rownum:=@rownum+1 	LINE_NUMBER,	\n"+
 	            "	INVENTORY_ITEM_ID,	\n"+
-	            "	QTY,	\n"+
 	            "	UOM,	\n"+
-	            "	CREATE_DATE,	\n"+
-	            "	EXPIRE_DATE \n"+
+	            "	UOM2,	\n"+
+	            "	QTY,	\n"+
+	            "	SUB,	\n"+
+	            "	EXPIRE_DATE, \n"+
+	            "	QTY2,	\n"+
+	            "	SUB2,	\n"+
+	            "	EXPIRE_DATE2, \n"+
+	            "	QTY3,	\n"+
+	            "	SUB3,	\n"+
+	            "	EXPIRE_DATE3 \n"+
 	            "   FROM t_stock_line l ," +
 	            "   (SELECT @rownum:=0) a" +
 	            "   where request_number ='"+requestNumber+"' and status ='SV' ";

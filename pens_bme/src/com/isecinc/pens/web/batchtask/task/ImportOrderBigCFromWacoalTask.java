@@ -23,7 +23,7 @@ import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 
-public class ImportOrderBigCTask implements BatchTaskInterface{
+public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
 	private static String PARAM_AS_OF_DATE = "AS_OF_DATE";
    
@@ -32,12 +32,28 @@ public class ImportOrderBigCTask implements BatchTaskInterface{
 		logger.debug("transactionId:"+monitorModel.getTransactionId());
 	}*/
 	/**
-	 * Return :Param Name|Param label|Param Type|default value|validate$Button Name
+	 * Return :Param Name|Param label|Param Type|default value|validate,xxxx|||$Button Name
 	 */
 	public String getParam(){
 		return "AS_OF_DATE|วันที่เปิด Order Big-C จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
 	}
-	
+	public String getValidateScript(){
+		String script ="";
+		
+		script +="\n <script>";
+		script +="\n function validate(){";
+		script +="\n  var form = document.batchTaskForm;";
+		script +="\n  if(form.AS_OF_DATE.value ==''){";
+		script +="\n    alert('กรุณาระบุ วันที่เปิด Order Big-C จากโรงงาน Wacoal');";
+		script +="\n    form.AS_OF_DATE.focus();";
+		script +="\n    return false;";
+		script +="\n  }";
+		script +="\n  return true";
+		script +="\n }";
+		script +="\n </script>";
+		
+		return script;
+	}
 	public  MonitorBean run(MonitorBean monitorModel){
 		Connection conn = null;
 		Connection connMonitor = null;

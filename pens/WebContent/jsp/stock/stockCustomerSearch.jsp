@@ -43,7 +43,7 @@ String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	msg4 = AppversionVerify.checkAppVersion(request);
+	msg4 = AppversionVerify.getIns().checkAppVersion(request);
 }
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
@@ -91,7 +91,7 @@ function clearForm(path) {
 }
 
 function search(path){
-	document.stockForm.action = path + "/jsp/stockAction.do?do=searchCustomer&rf=Y";
+	document.stockForm.action = path + "/jsp/stockAction.do?do=searchCustomer&search=new";
 	document.stockForm.submit();
 	return true;
 }
@@ -160,7 +160,7 @@ $(function() {
  <%}%>
  
  function gotoPage(path,page){
-		document.stockForm.action = path + "/jsp/customerAction.do?do=searchPage&rf=Y";
+		document.stockForm.action = path + "/jsp/stockAction.do?do=searchCustomer&rf=Y";
 		document.getElementsByName('curPage')[0].value = page;
 		document.stockForm.submit();
 		return true;

@@ -58,6 +58,8 @@ public class SalesTargetBean implements Serializable{
 	//total
 	private String totalTargetQty;
 	private String totalTargetAmount;
+	private String totalOrderAmt12Month;
+	private String totalOrderAmt3Month ;
 	
 	//Control Access Button
 	private boolean canSet= false;
@@ -76,6 +78,18 @@ public class SalesTargetBean implements Serializable{
 	private List<SalesTargetBean> itemsList;
 	
 	
+	public String getTotalOrderAmt12Month() {
+		return totalOrderAmt12Month;
+	}
+	public void setTotalOrderAmt12Month(String totalOrderAmt12Month) {
+		this.totalOrderAmt12Month = totalOrderAmt12Month;
+	}
+	public String getTotalOrderAmt3Month() {
+		return totalOrderAmt3Month;
+	}
+	public void setTotalOrderAmt3Month(String totalOrderAmt3Month) {
+		this.totalOrderAmt3Month = totalOrderAmt3Month;
+	}
 	public String getLineStatusStyle() {
 		return lineStatusStyle;
 	}

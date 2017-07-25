@@ -338,4 +338,60 @@ public class MProduct extends I_Model<Product>{
 		
 		return productL;
 	}
+	
+	public Product getStockProduct(String productCode,User user) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		Product catalog = null;
+		StringBuffer sql = new StringBuffer("");
+		try {
+			int pricelistId = new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId();
+	
+			sql.append("\n SELECT A.* FROM( ");
+			sql.append("\n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE");
+			sql.append("\n , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+			sql.append("\n FROM M_Product pd ");
+			sql.append("\n INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
+			sql.append("\n AND pp1.UOM_ID = pd.UOM_ID ");
+			sql.append("\n LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
+			sql.append("\n AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+			sql.append("\n WHERE pp1.ISACTIVE = 'Y'  AND pp1.PRICELIST_ID = "+pricelistId+" AND pd.code = '"+productCode+"'");
+			sql.append("\n AND ( ");
+			sql.append("\n    pp1.UOM_ID IN ( ");
+			sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+			sql.append("\n     ) ");
+			sql.append("\n     OR");
+			sql.append("\n     pp2.UOM_ID IN ( ");
+			sql.append("\n        SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+			sql.append("\n      ) ");
+			sql.append("\n   )");
+			sql.append(" \n AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+user.getRole().getKey()+"') ");
+			sql.append("\n )A");
+		    sql.append("\n ORDER BY A.PRODUCT_CODE ");
+			logger.debug("sql:"+sql);
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if(rst.next()){
+				catalog = new Product();
+				catalog.setId(rst.getInt("PRODUCT_ID"));
+				catalog.setName(rst.getString("PRODUCT_NAME"));
+				catalog.setCode( rst.getString("PRODUCT_CODE"));
+				catalog.setUom1(rst.getString("UOM1"));
+				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				stmt.close();
+				rst.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return catalog;
+	}
 }

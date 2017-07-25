@@ -82,7 +82,7 @@ public class BatchTaskAction extends I_Action {
 					paramArr = param.split("\\,");
 					for(int i=0;i<paramArr.length;i++){
 					     String[] criArr = paramArr[i].split("\\|");
-					     logger.debug(""+paramArr[i]);
+					     logger.debug("paramName:"+paramArr[i]);
 		
 					     paramItem = new BatchTaskInfo();
 					     paramItem.setParamName(criArr[0]);
@@ -95,8 +95,13 @@ public class BatchTaskAction extends I_Action {
 					 }
 				}
 				taskInfo.setParamMap(paramMap);
-				batchTaskForm.setTaskInfo(taskInfo);
 				
+				//get Script validate
+				String validateScript = getValidateScriptByTaskname(pageName);
+				taskInfo.setValidateScript(validateScript);
+				
+				batchTaskForm.setTaskInfo(taskInfo);
+
 				//clear search results
 				batchTaskForm.setResults(null);
 				batchTaskForm.setMonitorBean(new MonitorBean());
@@ -200,6 +205,26 @@ public class BatchTaskAction extends I_Action {
 		return param;
 	}
 	
+	private String getValidateScriptByTaskname(String taskName){
+		String param = "";
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("getValidateScript", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (String)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
+	
 	private String getDefaultValue(String defaultValue) throws Exception{
 		String r = "";
 		if(defaultValue.equalsIgnoreCase("SYSDATE")){
@@ -207,7 +232,6 @@ public class BatchTaskAction extends I_Action {
 		}
 		return r;
 	}
- 
 	
 	@Override
 	protected void setNewCriteria(ActionForm form) {

@@ -54,7 +54,7 @@ function loadMe(){
 	//new Epoch('epoch_popup', 'th', document.getElementById('requestDateTo'));
 }
 function backsearch(path) {
-	document.stockForm.action = path + "/jsp/stockAction.do?do=prepareCustomer"+"&action=back";//stockCustomerSearch
+	document.stockForm.action = path + "/jsp/stockAction.do?do=prepareCustomer"+"&action=back&search=new";//stockCustomerSearch
 	document.stockForm.submit();
 }
 function clearForm(path) {

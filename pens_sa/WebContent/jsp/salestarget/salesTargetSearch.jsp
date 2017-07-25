@@ -63,7 +63,6 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/salesTarget.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -103,7 +102,6 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 						<!-- BODY -->
 						<html:form action="/jsp/salesTargetAction">
 						<jsp:include page="../error.jsp"/>
-
 						<div align="center">
 						   	<%if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ %>
 						       <jsp:include page="criteria/MKTCriteria.jsp" /> 
@@ -129,22 +127,22 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 					  <%if(User.MTMGR.equalsIgnoreCase(pageName)){ %>
 					  <div align="center">
 						   <table  border="0" cellpadding="3" cellspacing="0" >
-								<tr>
-									<td align="center" >
-									     <c:if test="${salesTargetForm.bean.canFinish == true}">
-											<a href="javascript:salesManagerFinish('${pageContext.request.contextPath}')">
-											  <input type="button" value=" อนุมัติเป้าหมาย " class="newPosBtnLong">
-											</a>
-										 </c:if>
-										<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
-										  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+							<tr>
+								<td align="center" >
+								     <c:if test="${salesTargetForm.bean.canFinish == true}">
+										<a href="javascript:salesManagerFinish('${pageContext.request.contextPath}')">
+										  <input type="button" value=" อนุมัติเป้าหมาย " class="newPosBtnLong">
 										</a>
-									</td>
-									
-								</tr>
+									 </c:if>
+									<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
+									  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+									</a>
+								</td>	
+							 </tr>
 							</table>
-					</div>
-					  <%} }%>
+					    </div>
+					  <%} %>
+					 <%}%>
 					</html:form>
 					<!-- BODY -->
 					</td>

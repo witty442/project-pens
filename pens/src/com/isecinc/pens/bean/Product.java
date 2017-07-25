@@ -74,9 +74,29 @@ public class Product extends I_PO implements Serializable {
 	private UOM uom = new UOM();
 	private String isActive;
 	private ProductCategory productCategory = new ProductCategory();
-
+	private String uom1;
+	private String uom2;
+	
 	/** Product Price **/
 	private ProductPrice[] productPrices = null;
+
+	
+    
+	public String getUom1() {
+		return uom1;
+	}
+
+	public void setUom1(String uom1) {
+		this.uom1 = uom1;
+	}
+
+	public String getUom2() {
+		return uom2;
+	}
+
+	public void setUom2(String uom2) {
+		this.uom2 = uom2;
+	}
 
 	public int getId() {
 		return id;

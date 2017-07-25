@@ -1,6 +1,8 @@
 package com.isecinc.pens.web.popup;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,16 +38,49 @@ public class PopupAction extends I_Action {
 			 logger.debug("prepare action:"+action+",pageName["+pageName+"]");
 			 
 			 if("new".equalsIgnoreCase(action) ){
+				 request.getSession().setAttribute("search_submit", null);
 				 request.getSession().setAttribute("DATA_LIST", null);
 				 popupForm.setCodeSearch("");
 				 popupForm.setDescSearch("");
 				 popupForm.setNo(0);
 				 popupForm.setPageName(pageName);
+				 popupForm.setCriteriaMap(null);
+				 
+				 //set Criteria From Main Page
+				 String[] queryStr = request.getQueryString().split("\\&");
+				// logger.debug("queryStr:"+queryStr);
+				 if(queryStr != null && queryStr.length>0){
+					 Map<String, String> criteriaMap = new HashMap<String, String>();
+					 String paramName = "";
+					 String paramValue = "";
+					 String[] paramNameAll = null;
+					 for(int i=0;i<queryStr.length;i++){
+						
+						 if( !queryStr[i].startsWith("do") && !queryStr[i].startsWith("action") 
+							&& !queryStr[i].startsWith("pageName")){
+							 
+							logger.debug("queryStr[i]:"+queryStr[i]);
+							 
+						    paramNameAll = queryStr[i].split("\\=");
+						    paramName = paramNameAll[0];
+						    if(paramNameAll.length >1){
+						       paramValue = paramNameAll[1];
+						    }else{
+						       paramValue ="";
+						    }
+						    logger.debug(paramName+":"+paramValue);
+						    criteriaMap.put(paramName, paramValue);
+						 }//if
+					 }
+					 popupForm.setCriteriaMap(criteriaMap);
+				 }
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("descs", null);
+				 
 			 }
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -81,8 +116,17 @@ public class PopupAction extends I_Action {
 		try {
 			if("Brand".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchBrandList(popupForm);
+			}else if("BrandStock".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchBrandStockList(popupForm);
 			}else if("Customer".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalesTarget
 				 results = PopupDAO.searchCustomerList(popupForm);
+			}else if("CustomerStock".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For Stock
+				 results = PopupDAO.searchCustomerStockList(popupForm);
+			}else if("ItemStock".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For Stock
+				 results = PopupDAO.searchItemStockList(popupForm);
 			}
 			
 			 if(results != null && results.size() >0){
@@ -90,6 +134,8 @@ public class PopupAction extends I_Action {
 			 }else{
 				 request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
 			 }
+			 //mark flag serch
+			 request.getSession().setAttribute("search_submit", "search");
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

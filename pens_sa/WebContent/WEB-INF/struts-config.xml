@@ -30,7 +30,7 @@
 		<!-- Group ROLE -->
 		<form-bean name="groupRoleForm" type="com.isecinc.pens.web.group.GroupRoleForm" />
 		<form-bean name="salesTargetForm" type="com.isecinc.pens.web.salestarget.SalesTargetForm" />
-		
+		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 	</form-beans>
 	
@@ -115,6 +115,9 @@
 			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
 			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
 
+		</action>
+		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
+			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
 		</action>
 	</action-mappings>
  

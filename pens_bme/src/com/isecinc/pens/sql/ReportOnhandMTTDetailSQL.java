@@ -9,7 +9,6 @@ import util.Constants;
 
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
@@ -128,7 +127,7 @@ public class ReportOnhandMTTDetailSQL {
 					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
-						 sql.append("\n AND V.invoice_date > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND V.invoice_date >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
