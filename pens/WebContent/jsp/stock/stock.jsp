@@ -315,7 +315,7 @@ function backsearch(path) {
 										  
 										</td>
 										
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
@@ -323,7 +323,7 @@ function backsearch(path) {
 											onkeydown="return isNum0to9andpoint(this,event);"
 											class="numberText" />
 										</td>
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
@@ -336,7 +336,7 @@ function backsearch(path) {
 									       <font color="red"></font>
 										</td>
 										
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
@@ -344,7 +344,7 @@ function backsearch(path) {
 											onkeydown="return isNum0to9andpoint(this,event);"
 											class="numberText" />
 										</td>
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
@@ -357,7 +357,7 @@ function backsearch(path) {
 									       <font color="red"></font>
 										</td>
 										
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
@@ -365,7 +365,7 @@ function backsearch(path) {
 											onkeydown="return isNum0to9andpoint(this,event);"
 											class="numberText" />
 										</td>
-										<td class="td_text_number" width="3%">
+										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
 											tabindex="${tabIndex}"
