@@ -36,6 +36,9 @@
 	       </li> --%>
 		</ul>
 	</li> 
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/locationAction.do?do=prepare&action=new';"><span>Location</span></a>
+		
+	</li> 
 	
 <%if ( Utils.userInRole(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
 %>

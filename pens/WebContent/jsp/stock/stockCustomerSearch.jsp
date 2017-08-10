@@ -51,6 +51,7 @@ if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
@@ -97,13 +98,17 @@ function search(path){
 }
 
 function view(path,customer_id){
-	document.stockForm.action = path + "/jsp/stockAction.do?do=prepare&action=searchStock&customer_id="+customer_id;
+	var param ="&customer_id="+customer_id;
+	    param +="&backAvgMonth="+document.getElementsByName('bean.backAvgMonth')[0].value;
+	document.stockForm.action = path + "/jsp/stockAction.do?do=prepare&action=searchStock"+param;
 	document.stockForm.submit();
 	return true;
 }
 
 function createNewStock(path,customerId){
-	document.stockForm.action = path + "/jsp/stockAction.do?do=createNewStock&backPage=stockCustomerSearch&customer_id="+customerId;
+	var param = "&customer_id="+customerId;
+	    param +="&backAvgMonth="+document.getElementsByName('bean.backAvgMonth')[0].value;
+	document.stockForm.action = path + "/jsp/stockAction.do?do=createNewStock&backPage=stockCustomerSearch"+param;
 	document.stockForm.submit();
 	return true;
 }
@@ -206,7 +211,7 @@ $(function() {
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	      	<jsp:include page="../program.jsp">
+	      	 <jsp:include page="../program.jsp">
 				<jsp:param name="function" value="Stock"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
@@ -272,8 +277,13 @@ $(function() {
 								<html:checkbox property="bean.haveStock"></html:checkbox>แสดงเฉพาะรายการที่มีบันทึกสต๊อก
 							</td>
 						</tr>
+						<tr>
+							<td align="right">ใช้ข้อมูลการสั่งซื้อย้อนหลังเฉลี่ย &nbsp;&nbsp;</td>
+							<td align="left" colspan="2">
+								<html:text property="bean.backAvgMonth" size="5" styleClass="normalCenterText"/>&nbsp;เดือน
+							</td>
+						</tr>
 					</table>
-					
 					<br>
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">

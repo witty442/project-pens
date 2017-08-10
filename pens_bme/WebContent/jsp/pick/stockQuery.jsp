@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
@@ -23,17 +24,14 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="stockQueryForm" class="com.isecinc.pens.web.pick.StockQueryForm" scope="session" />
 
-<% 
-%>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stockPickQuery.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stockPickQuery.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -59,9 +57,9 @@ span.pagelinks {
 	font-size: 15px;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -73,7 +71,8 @@ function loadMe(){
 	   && document.getElementsByName('bean.wareHouse')[1].checked ==false 
 	   && document.getElementsByName('bean.wareHouse')[2].checked ==false
 	   && document.getElementsByName('bean.wareHouse')[3].checked ==false
-	   && document.getElementsByName('bean.wareHouse')[4].checked ==false){
+	   && document.getElementsByName('bean.wareHouse')[4].checked ==false
+	   && document.getElementsByName('bean.wareHouse')[5].checked ==false){
 		
 		  document.getElementsByName('bean.wareHouse')[0].checked =true;//default W1
 	}
@@ -180,6 +179,9 @@ function swithWareHouse(){
 	}else if(document.getElementsByName('bean.wareHouse')[4].checked){//W5{
 		loadStatusList('W5');
 		loadSummaryTypeList('W5');
+	}else if(document.getElementsByName('bean.wareHouse')[5].checked){//W5{
+		loadStatusList('W6');
+		loadSummaryTypeList('W6');
 	}
 	
 	loadSummaryTypeListW2(document.getElementsByName('bean.status')[0]);
@@ -284,6 +286,7 @@ function loadSummaryTypeListW2(status){
 										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-<%=PickConstants.getWareHouseDesc("W3") %></html:radio>
 										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-<%=PickConstants.getWareHouseDesc("W4") %></html:radio>
 										<html:radio property="bean.wareHouse" value="W5" onclick="swithWareHouse()">W5-<%=PickConstants.getWareHouseDesc("W5") %></html:radio>
+										<html:radio property="bean.wareHouse" value="W6" onclick="swithWareHouse()">W6-<%=PickConstants.getWareHouseDesc("W6") %></html:radio>
 									</td>
 								</tr>
 						       <tr>

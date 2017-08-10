@@ -50,12 +50,12 @@ if(session.getAttribute("pickTypeList") == null){
 	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W2"));
 	 }else  if("W3".equalsIgnoreCase(wareHouse)){
 	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W3"));
+	 }else  if("W4".equalsIgnoreCase(wareHouse)){
+		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W4")); 
 	 }else  if("W5".equalsIgnoreCase(wareHouse)){
 	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W5"));
-	 }else{
-		 //W4
-		 PopupForm cri = new PopupForm();
-		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(cri,"W4")); 
+	 }else  if("W6".equalsIgnoreCase(wareHouse)){
+		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W6")); 
 	 }
 	session.setAttribute("custGroupList",billTypeList);
 //}

@@ -106,8 +106,7 @@ public class AdminConsoleAction extends I_Action {
 				configInfo += " ----------------------  Host PayInReport(Red Paper) Server @Pens --------------------------------------------------- \n";
 				configInfo +="IP PayInReport : "+env.getProperty("host.payinreport")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
-				
-
+	
 			    configInfoTest = " ";
 			   if("tab_config_info".equalsIgnoreCase(action)){
 					configInfoTest += " ----------------------  Result Test DB PENS Connection ----------------------------------------------------- \n";

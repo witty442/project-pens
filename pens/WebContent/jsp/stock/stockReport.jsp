@@ -38,6 +38,7 @@ pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
 List<References> actives= InitialReferences.getReferenes().get(InitialReferences.ACTIVE);
 pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 
+System.out.println("haveStock:"+stockForm.getBean().getHaveStock());
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
 <%@page import="com.isecinc.pens.model.MProvince"%><html>
@@ -138,6 +139,8 @@ function exportToExcel(path){
 							  <html:option value="SV">ปกติ(SV)</html:option>
 							  <html:option value="VO">ยกเลิก(VO)</html:option>
 							</html:select>
+							
+							 <html:checkbox property="bean.haveStock"></html:checkbox>แสดงเฉพสะรายการที่มีบันทึกยอดนับ 
 							</td>
 						</tr>
 					</table>

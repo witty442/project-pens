@@ -3,6 +3,8 @@ package com.isecinc.pens.web.batchtask;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.struts.upload.FormFile;
+
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.inf.bean.InterfaceBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
@@ -26,10 +28,24 @@ public class BatchTaskForm extends I_Form {
 	private InterfaceBean bean =null;
 	private MonitorBean monitorBean = null;
 	private List<MonitorItemBean> monitorItemList;
+	private MonitorItemBean monitorItem;
 	private BatchTaskInfo taskInfo;
+	private FormFile dataFormFile;
 	private MonitorBean[] results = null;
 	
 	
+	public MonitorItemBean getMonitorItem() {
+		return monitorItem;
+	}
+	public void setMonitorItem(MonitorItemBean monitorItem) {
+		this.monitorItem = monitorItem;
+	}
+	public FormFile getDataFormFile() {
+		return dataFormFile;
+	}
+	public void setDataFormFile(FormFile dataFormFile) {
+		this.dataFormFile = dataFormFile;
+	}
 	public MonitorBean[] getResults() {
 		return results;
 	}

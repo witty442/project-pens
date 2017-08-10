@@ -552,6 +552,10 @@ function currencyToNum(str){
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW5"/>
 				 </jsp:include>
+		     <%}else if("W6".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW6"/>
+				 </jsp:include>
 		     <%} %>
 				 
 	      	<!-- TABLE BODY -->

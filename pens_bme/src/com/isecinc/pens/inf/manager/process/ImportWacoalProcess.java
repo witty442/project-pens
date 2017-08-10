@@ -278,6 +278,7 @@ public class ImportWacoalProcess extends InterfaceUtils{
 	    	  
 	    	  logger.debug("ImportToDB");
 	    	  dataTextLineArr = ftpFileBean.getDataLineText();
+	    	 // logger.debug("dataTextLineArr:"+dataTextLineArr);
 			  // init prepareStatment
 			  logger.debug("sqlInsert:"+tableBean.getPrepareSqlIns());
 			  logger.debug("sqlUpd:"+tableBean.getPrepareSqlUpd());
@@ -295,21 +296,23 @@ public class ImportWacoalProcess extends InterfaceUtils{
 			  }
 			  
 			  totalRos = dataTextLineArr.length;
-			  logger.debug("strTxts length:"+totalRos);
+			  logger.debug("dataTextLineArr length:"+totalRos);
 
 			  for(line = 0;line<totalRos;line++){
 				  error  ="";
 				  try{
 					  lineNo++;
-					  lineStr = dataTextLineArr[line];   	  
+					  lineStr = dataTextLineArr[line];   	
 			    	  if( !Utils.isNull(lineStr).equals("")){
+			    		  logger.debug("lineStr:"+lineStr);
 			    		  
-			    		/*  if(tableBean.getActionDB().indexOf("U") != -1){
+			    		 /* if(tableBean.getActionDB().indexOf("U") != -1){
 				    		  //logger.debug("**********Start Update ******************");
 				    		  psUpdate = InterfaceHelperWacoal.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
 					    	  canExc = psUpdate.executeUpdate();
 					    	  logger.debug("canUpdate:"+canExc);
-			    		  }*/
+			    		  }
+			    		  */
                
 				    	  if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
 				    		  //logger.debug("**********Start Insert ******************");
@@ -328,9 +331,9 @@ public class ImportWacoalProcess extends InterfaceUtils{
 				    	  //stamp log result
 				    	  if(canExc == 0){
 				    		  if(error.equals("Error Duplicate Key")){
-				    		     errorMsg ="NO INSERT DUPLICATE KEY";
-				    		     errorCode = "DuplicateImportFileException";
-				    		     resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:NO INSERT DUPLICATE KEY]").append(Constants.newLine);
+				    		      errorMsg ="NO INSERT DUPLICATE KEY";
+				    		      errorCode = "DuplicateImportFileException";
+				    		      resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:NO INSERT DUPLICATE KEY]").append(Constants.newLine);
 				    		  }else{
 				    			  errorMsg ="NO UPDATE KEY NOT FOUND";
 					    		  errorCode = "NOUPDATE";

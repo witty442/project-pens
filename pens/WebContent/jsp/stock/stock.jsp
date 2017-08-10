@@ -60,6 +60,7 @@ pageContext.setAttribute("shipAddr",shipAddr,PageContext.PAGE_SCOPE);
 <meta http-equiv="Pragma" content="no-cache" /> 
 <meta http-equiv="Expires" content="0" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
@@ -226,11 +227,12 @@ function backsearch(path) {
 									<tr>
 										<td align="right">Remark</td>
 										<td align="left" colspan="3">
-											<html:text property="bean.description" size="90" styleClass="normalText"/>
+											<html:text property="bean.description" size="60" styleClass="normalText"/>
+											&nbsp;&nbsp;&nbsp;
+											ใช้ข้อมูลการสั่งซื้อย้อนหลัง <html:text property="bean.backAvgMonth" size="5"  readonly="true" styleClass="disableTextCenter"/>&nbsp;เดือน
 										</td>
 									</tr>
 									</table>
-									
 							     </td>
 							  </tr>
 							  
@@ -257,6 +259,7 @@ function backsearch(path) {
 					<!-- 					<th rowspan="2">No.</th> -->
 										<th rowspan="2">รหัสสินค้า</th>
 										<th rowspan="2">ชื่อสินค้า</th>
+										<th rowspan="2">ค่าเฉลี่ยยอดสั่งซื้อย้อนหลัง</th>
 										<th rowspan="2">หน่วยนับ</th>
 										<th colspan="3">กลุ่มที่ 1</th>
 										<th colspan="3">กลุ่มที่ 2</th>
@@ -306,9 +309,13 @@ function backsearch(path) {
 											     readonly class="disableText"  tabindex="${tabIndex}"
 											  /> 
 										</td>
+										
 										<td class="td_text"  width="15%">
 										    <input type="hidden" name="inventoryItemId" id="inventoryItemId" value ="${results.inventoryItemId}"/>
 									       <input type="text" name="productName" id="productName" value ="${results.productName}" size="40" readonly class="disableText"/>	
+										</td>
+										<td class="td_text_center"  width="5%">   
+									       <input type="text" name="avgOrderQty" id="avgOrderQty" value ="${results.avgOrderQty}" size="5" readonly class="disableNumber"/>	
 										</td>
 										<td class="td_text_number"  width="5%">
 										 <input type="text" name="fullUom" id="fullUom" value ="${results.fullUom}" size="6" readonly class="disableText"/>	

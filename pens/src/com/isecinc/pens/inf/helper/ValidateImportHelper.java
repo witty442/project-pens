@@ -215,10 +215,10 @@ public class ValidateImportHelper {
 				isRequireField = true;
 			}
 			
-			logger.debug("Exc:"+exe);
+			//logger.debug("Exc:"+exe);
 			/** Case Value Validate NOT NULL **/
 			if(exe){
-				logger.debug("SQL:"+sql);
+				//logger.debug("SQL:"+sql);
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
@@ -227,7 +227,7 @@ public class ValidateImportHelper {
 					result = Utils.isNull(rs.getString(findColumn));
 				}
 				
-				logger.debug("result["+result+"]");
+				//logger.debug("result["+result+"]");
 				
 				/** Validate Exception  */
 				if(result.equals("")){

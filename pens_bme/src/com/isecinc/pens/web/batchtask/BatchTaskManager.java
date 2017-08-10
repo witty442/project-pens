@@ -60,6 +60,11 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 					Map<String,Map> prepareMap = prepareParam(batchTaskForm, request);
 					batchParamMap = prepareMap.get("batchParamMap");
 					monitorModel.setBatchParamMap(batchParamMap);
+					/** case Form File **/
+					logger.debug("dataFromFile:"+batchTaskForm.getDataFormFile());
+					if(batchTaskForm.getDataFormFile() != null){
+						monitorModel.setDataFile(batchTaskForm.getDataFormFile());
+					}
 					
 					//Set User
 					monitorModel.setUser(userLogin);
@@ -87,7 +92,7 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 	}
 
    private Map<String ,Map> prepareParam(BatchTaskForm batchTaskForm, HttpServletRequest request){
-	    Map<String,Map> map = new HashMap<String, Map>();
+	    Map<String,Map> mapAll = new HashMap<String, Map>();
 		Map<String, String> batchParamMap = new HashMap<String, String>();
 		Map<String, BatchTaskInfo> paramMapForm = batchTaskForm.getTaskInfo().getParamMap();
 		try{
@@ -97,8 +102,8 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 				 while(its.hasNext()){
 			        String key = (String)its.next();
 			        BatchTaskInfo task = paramMap.get(key);    
+
 			        String value = Utils.isNull(request.getParameter(task.getParamName()));
-			        
 			        batchParamMap.put(key, value);
 			        
 			        //set new value from screen
@@ -106,12 +111,12 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 			        paramMapForm.put(key, task);
 				 }
 			 }
-			map.put("batchParamMap", batchParamMap);
-			map.put("paramMapForm",paramMapForm);
+			 mapAll.put("batchParamMap", batchParamMap);
+			 mapAll.put("paramMapForm",paramMapForm);
 			 
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
-		return map;
+		return mapAll;
    }
 }

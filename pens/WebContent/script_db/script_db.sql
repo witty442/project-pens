@@ -23,3 +23,24 @@ add (  qty2 decimal(15,5),
 INSERT INTO `c_reference` (`REFERENCE_ID`,`CODE`,`NAME`,`DESCRIPTION`,`VALUE`,`ISACTIVE`) VALUES (2601,'PartyType','บุคคลทั่วไป','Personal','P','Y');
 INSERT INTO `c_reference` (`REFERENCE_ID`,`CODE`,`NAME`,`DESCRIPTION`,`VALUE`,`ISACTIVE`) VALUES (2602,'PartyType','องค์กร/ร้านค้า','Organization','O','Y');
 INSERT INTO `c_reference` (`REFERENCE_ID`,`CODE`,`NAME`,`DESCRIPTION`,`VALUE`,`ISACTIVE`) VALUES (2603,'PartyType','7-11','7-11','S','Y');
+/** 08/2560 **/
+alter table t_stock 
+add(back_avg_month varchar(5));
+
+alter table t_stock_line
+add(avg_order_qty int);
+
+alter table t_stock_line
+modify expire_date date ;
+
+alter table m_customer
+add (lat varchar(100),
+	lng varchar(100)
+	);
+	
+alter table m_customer
+add (trip_day varchar(5),
+	trip_day2 varchar(5),
+	trip_day3 varchar(5)
+	);
+

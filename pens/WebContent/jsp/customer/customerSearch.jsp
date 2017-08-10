@@ -165,24 +165,11 @@ $(function() {
 	 	}
    <%}%>
  }
- 
- function showImage(path,customerId,imageFileName){
-	 
-		//alert(lat+","+lng);
-	 if(imageFileName != "" ){
-		var width= screen.innerWidth-50;
-		var height= screen.innerHeight-50;
-	
-		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
-			
-	}else{
-		alert("ยังไม่ได้ไฟล์ร๔ปภาพ'");
-	}
-}
- 
+
  function MarkLocationMap(path){
 	  var width= window.innerWidth-50;
 	  var height= window.innerHeight-20;
+	 // alert(width+","+height);
 	 PopupCenter(path+"/jsp/location/markLocationMap.jsp?", "Mark location map",width,height); 
 }
  
@@ -273,6 +260,8 @@ $(function() {
 								<html:select property="customer.isActive">
 									<html:options collection="actives" property="key" labelProperty="name"/>
 								</html:select>
+								
+								&nbsp;&nbsp; <html:checkbox property="customer.dispTotalInvoice">แสดงยอดค้างชำระ</html:checkbox>
 							</td>
 						</tr>
 					</table>

@@ -32,6 +32,8 @@
 		<form-bean name="salesTargetForm" type="com.isecinc.pens.web.salestarget.SalesTargetForm" />
 		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
+		
+		<form-bean name="locationForm" type="com.isecinc.pens.web.location.LocationForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -118,6 +120,9 @@
 		</action>
 		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
 			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
+		</action>
+		<action name="locationForm" path="/jsp/locationAction" parameter="do" scope="session" type="com.isecinc.pens.web.location.LocationAction">
+			<forward name="search" path="/jsp/location/locationSearch.jsp" />
 		</action>
 	</action-mappings>
  

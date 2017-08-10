@@ -35,7 +35,7 @@ if(request.getAttribute("warehouseList_scan") == null){
 	List<References> billTypeList1 = new ArrayList<References>();
 	References ref = new References("",""); 
 	billTypeList1.add(ref);
-	billTypeList1.addAll(GeneralDAO.searchWareHouseList("'W2','W3','W4','W5'"));
+	billTypeList1.addAll(GeneralDAO.searchWareHouseList("'W2','W3','W4','W5','W6'"));
 	
 	session.setAttribute("warehouseList_scan",billTypeList1);
 }

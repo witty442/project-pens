@@ -74,7 +74,7 @@ function detectmob() {
 	 else {
 	    return false;
 	  }
-	}
+}
 	
 function login(path){
 	var w = 0;

@@ -51,6 +51,7 @@ public class Utils {
 	
 	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
+	public static final String YY_MM = "yyMM";
 	
 	public static final Locale local_th= new Locale("th","TH");
 	
@@ -576,6 +577,13 @@ public class Utils {
 	public static String convertDoubleToStrDefault(double d,String defaultStr) {
 		//logger.debug("d["+d+"]");
 		if (d ==0 || 0.0==d){
+			return defaultStr;
+		}
+		return decimalFormat(d,format_current_no_disgit);
+	}
+	public static String convertIntToStrDefault(int d,String defaultStr) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 ){
 			return defaultStr;
 		}
 		return decimalFormat(d,format_current_no_disgit);

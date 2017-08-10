@@ -63,6 +63,9 @@ public class StockReport {
 		    sql.append("\n ) c ");
 		    sql.append("\n where h.customer_id =c.customer_id ");
 		    sql.append("\n and h.request_number = l.request_number ");
+		    if( !Utils.isNull(stockForm.getBean().getHaveStock()).equals("")){
+		    	 sql.append("\n and ( l.qty <> 0 or l.qty2 <> 0 or l.qty3 <> 0)");
+		    }
 		    if( !Utils.isNull(stockForm.getBean().getStatus()).equals("")){
 		    	 sql.append("\n and h.status='"+Utils.isNull(stockForm.getBean().getStatus())+"'");
 		    }

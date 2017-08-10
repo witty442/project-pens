@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.customer.CustomerHelper"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -10,7 +11,7 @@
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="customerForm" class="com.isecinc.pens.web.customer.CustomerForm" scope="request" />
 <%
-	String action = (String)request.getParameter("action");
+String action = (String)request.getParameter("action");
 
 String role = ((User)session.getAttribute("user")).getType();
 
@@ -34,6 +35,9 @@ pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE)
 
 List<References> partyTypeList = InitialReferences.getReferenes().get(InitialReferences.PARTY_TYPE);
 pageContext.setAttribute("partyTypeList",partyTypeList,PageContext.PAGE_SCOPE);
+
+//init tripList
+request.setAttribute("tripDayList", CustomerHelper.initTripList());
 
 %>
 <%@page import="java.util.Locale"%>
@@ -68,78 +72,14 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/google_maps.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>" type="text/javascript"></script>
 <script type="text/javascript">
-//API KEY :AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg
-/********************************************** Google Map ***************************************/
-function getLocation(path){
-	var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
-	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName);
-	var width= window.innerWidth;
-	var height= window.innerHeight;
-	//alert(width+","+height);
-	//PopupCenter(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print",width,height);
-	window.open(path+"/jsp/location/findLocation.jsp?run=new&customerName="+customerName, "Find Location", "width="+width+",height="+height+",location=No,resizable=No");
-}
 
- function setLocationValue(location){
-	 $("#location").val(location);
-     //alert(lat+","+lng);
- }
-
- function gotoMap(path){
-	 var location= $("#location").val();
-		//alert(lat+","+lng);
-		if(location != "" ){
-			var locationArr = location.split(",");
-			var lat = locationArr[0];
-			var lng = locationArr[1];
-		    var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
-		    var width= window.innerWidth-100;
-			var height= window.innerHeight-100;
-			
-			PopupCenter(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName, "แสดงแผนที่",width,height);
-	        // window.open("https://www.google.co.th/maps/place/"+location);//version 1
-	}else{
-		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
-	}
-}
- 
- /********************************************** Google Map ***************************************/
-
-  function showImage(path){
-	 var location= $("#location").val();
-		//alert(lat+","+lng);
-	 if(location != "" ){
-		var width= window.innerWidth-100;
-		var height= window.innerHeight-100;
-	
-		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?", "แสดงรูปภาพ",width,height);
-			
-	}else{
-		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
-	}
-}
-  /** Display image after upload **/
-	function readURL(input) {
-      if (input.files && input.files[0]) {
-          var reader = new FileReader();
-
-          reader.onload = function (e) {
-              $('#blah')
-                  .attr('src', e.target.result)
-                  .width(150)
-                  .height(200);
-          };
-          reader.readAsDataURL(input.files[0]);
-      }
-  }
-  /*****************************************/
- 
 function editAddressRow(rowNo){
 	editAddress('${pageContext.request.contextPath}', rowNo);
 }
@@ -252,14 +192,24 @@ function switchPrintType(){
 								<td align="right" colspan="2">
 								  <html:radio property="customer.printType" styleId="printType" value="H" onclick="switchPrintType()"></html:radio>สำนักงานใหญ่ 
 								</td>
-								<td align="left">
+								<td align="left" colspan="3">
 									 <html:radio property="customer.printType" styleId="printType" value="B" onclick="switchPrintType()"></html:radio>สาขาที่
 								     <html:text property="customer.printBranchDesc" size="10" styleId="printBranchDesc" maxlength="5" readonly="true" onkeydown="return inputNum(event);" styleClass="disableText" />
-								</td>
-								<td align="right">
-								 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
+								&nbsp;&nbsp;&nbsp;
+								กำหนดจุด #1
+								<font color="red">*</font>
+								 <html:select property="customer.tripDay">
+										<html:options collection="tripDayList" property="key" labelProperty="name"/>
+									</html:select>
+									&nbsp;จุด #2
+								 <html:select property="customer.tripDay2">
+										<html:options collection="tripDayList" property="key" labelProperty="name"/>
+									</html:select>
+									&nbsp;จุด #3
+								 <html:select property="customer.tripDay3">
+										<html:options collection="tripDayList" property="key" labelProperty="name"/>
+									</html:select>
 								 </td>
-								<td align="left"></td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
@@ -291,6 +241,8 @@ function switchPrintType(){
 								<td align="left" nowrap>
 									<html:text property="customer.taxNo" size="25" maxlength="20"/>
 									 <html:checkbox property="customer.printTax" value="Y">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
+									 &nbsp;&nbsp;
+									 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -551,14 +503,16 @@ function switchPrintType(){
 								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
 								<td align="left" colspan="3">
 									<html:text property="customer.location" size="100" readonly="true" styleId="location" styleClass="disableText" /> 
+								    <html:hidden property="customer.lat" styleId="lat"  /> 
+								    <html:hidden property="customer.lng" styleId="lng"   /> 
 								</td>
 							</tr>
 							<tr>
 							    <td align="right" colspan="2"></td>
 									<td align="left" colspan="3">
 								      <span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
-									 <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');">
-									
+									 <%-- <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');">
+									 --%>
 									 <input type="button" value="แสดงตำแหน่ง " class="newPosBtn" onclick="return gotoMap('${pageContext.request.contextPath}');">
 									 
 								</td>
@@ -567,7 +521,6 @@ function switchPrintType(){
 						</table>
 						<br />
 						
-						customer
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>

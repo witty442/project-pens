@@ -73,6 +73,7 @@ public class StockLine extends I_PO implements Serializable{
 	private String sub3;
 
 	/** Amount */
+	private String avgOrderQty;
 	private double amount;
 	private double amount1;
 	private double amount2;
@@ -140,6 +141,16 @@ public class StockLine extends I_PO implements Serializable{
 	private String createDate;
 
 	
+	public String getAvgOrderQty() {
+		return avgOrderQty;
+	}
+
+
+	public void setAvgOrderQty(String avgOrderQty) {
+		this.avgOrderQty = avgOrderQty;
+	}
+
+
 	protected void setDisplayLabel() throws Exception {
 
 	}

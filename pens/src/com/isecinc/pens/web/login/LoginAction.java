@@ -20,6 +20,7 @@ import util.SessionGen;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
 
@@ -68,6 +69,23 @@ public class LoginAction extends DispatchAction {
 				return mapping.findForward("fail");
 			}
 			request.getSession(true).setAttribute("user", user);
+			
+			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			if(screenWidth.equals("")){
+				screenWidth ="0";
+			}
+			String screenHeight = Utils.isNull(request.getParameter("screenHeight"));
+			if(screenHeight.equals("")){
+				screenHeight ="0";
+			}
+			logger.debug("Before ScreenWidth["+screenWidth+"]");
+			if(Integer.parseInt(screenWidth) < 600){
+				screenWidth = "0";
+			}
+			logger.debug("After Calc ScreenWidth:"+screenWidth);
+			
+			request.getSession(true).setAttribute("screenWidth", screenWidth);
+			request.getSession(true).setAttribute("screenHeight", screenHeight);
 			
 			//clear check version
 			request.getSession().setAttribute("appVersionCheckMsg",null);

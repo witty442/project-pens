@@ -227,8 +227,6 @@ public class ImportManager {
 			countFileMap = ImportHelper.initImportConfig(PATH_CONTROL,FILE_CONTROL_NAME,initConfigMap,conn,patheImport,transType,userRequest,requestTable,importAll);
 			
 			monitorTime.debugUsedTime();
-			
-			
 			monitorTime = new MonitorTime("Split Line To DB");
 			
 			Set s = initConfigMap.keySet();
@@ -283,6 +281,7 @@ public class ImportManager {
 							}else{
 								 //Master Rollback ALL
 								results = imtProcess.importToDB(conn,initConfigMap,tableBean,ftpBean,userRequest);
+
 								logger.debug("ERR:["+results[0]+"]");
 								if( !Utils.isNull(results[0]).equals("")){
 									logger.debug("Insert Monitor Item FAIL TableName:"+tableBean.getTableName());
@@ -313,6 +312,7 @@ public class ImportManager {
 											|| tableBean.getTableName().equalsIgnoreCase("m_contact")
 											|| tableBean.getTableName().equalsIgnoreCase("m_trip")
 											|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
+											|| tableBean.getTableName().equalsIgnoreCase("m_customer_location")
 											){
 										
 										fileMasterImportSuccessList.add(ftpBean); //Add For Delete file and Move to In Processed

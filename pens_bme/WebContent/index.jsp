@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -10,13 +11,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css?v=<%=SessionIdUtils.getInstance().getIdSession() %>">
 <style type="text/css">
 
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/login_temp.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">
 <!--
 function MM_swapImgRestore() { //v3.0
@@ -47,6 +47,51 @@ function gologin(e){
 		login('${pageContext.request.contextPath}');
 	}
 }
+function detectmob() { 
+	 if( navigator.userAgent.match(/Android/i)
+	 || navigator.userAgent.match(/webOS/i)
+	 || navigator.userAgent.match(/iPhone/i)
+	 || navigator.userAgent.match(/iPad/i)
+	 || navigator.userAgent.match(/iPod/i)
+	 || navigator.userAgent.match(/BlackBerry/i)
+	 || navigator.userAgent.match(/Windows Phone/i)
+	 ){
+	    return true;
+	  }
+	 else {
+	    return false;
+	  }
+}
+	
+function login(path){
+	var w = 0;
+	var h = 0;
+   if(detectmob()){
+     //alert("Mobile");
+	  var ratio = window.devicePixelRatio || 1;
+	  w = screen.width * ratio;
+	  h = screen.height * ratio;
+   }else{
+     w = screen.width;
+     h = screen.height;
+   }
+	//alert(w+":"+h);
+	document.getElementsByName('screenWidth')[0].value = w;
+	document.getElementsByName('screenHeight')[0].value = h;
+	
+   if(Trim(document.getElementsByName('userName')[0].value)==''){
+       document.getElementsByName('userName')[0].focus();
+       return false;
+   }
+   if(Trim(document.getElementsByName('password')[0].value)==''){
+   	document.getElementsByName('password')[0].focus();
+       return false;
+   }
+   document.loginForm.action=path+"/login.do?do=login";
+   document.loginForm.submit();
+   return true;
+}
+
 </script>
 </head>
 <body onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_login2.png','${pageContext.request.contextPath}/images2/button_forgotpwd2.png')" topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0">

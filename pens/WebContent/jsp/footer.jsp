@@ -1,32 +1,36 @@
+<%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <%
  String[] msg3 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg3 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }
+String screenWidth= Utils.isNull(session.getAttribute("screenWidth"));
+String screenHeight= Utils.isNull(session.getAttribute("screenHeight"));
 %>
 <script type="text/javascript">
 
 function openPopup(path){
 	
-	var screen_height= window.innerHeight-10;
-	var screen_width = window.innerWidth-20;
-	
-	window.open(path+'/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width='+screen_width+',height='+screen_height+',title=Configuration');
+	var h= <%=screenHeight%>-50;
+	var w = <%=screenWidth%>-50;
+	PopupCenter(path+"/jsp/adminConsole.do?do=process&currentTab=tab_config_info", "Configuration",w,h); 
+	//window.open(path+'/jsp/adminConsole.do?do=process&currentTab=tab_config_info','Configuration','width='+screen_width+',height='+screen_height+"'");
 }
 
 function openDBBackupPopup(path){
 	var w = 400;
 	var h = 200;
 	
-	var left = (screen.width/2)-(w/2);
-	var top = (screen.height/2)-(h/2);
+	var left = (<%=screenWidth%>/2)-(w/2);
+	var top = (<%=screenHeight%>/2)-(h/2);
 	 
-	window.open(path+'/jsp/pop/dbBackupPopup.jsp', 'Backup DB to Local only', ', width='+w+', height='+h+', top='+top+', left='+left);
+	PopupCenter(path+"/jsp/pop/dbBackupPopup.jsp?", "Backup DB to Local only",w,h); 
+	//window.open(path+'/jsp/pop/dbBackupPopup.jsp', 'Backup DB to Local only', ', width='+w+', height='+h+', top='+top+', left='+left);
 	//window.open(path+'/jsp/pop/dbBackupPopup.jsp','','width='+screen_width+',height='+screen_height+',title=Configuration');
 }
 

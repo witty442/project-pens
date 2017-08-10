@@ -246,14 +246,12 @@ public class ExportProcess {
 				dataAppend.append(exportCustProfileDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
 				//add customer contact
 				dataAppend.append(exportCustContactDataDB(conn,rs.getString("customer_id"),userBean,ADDRESS_ID_BILL_TO));
-				
-				
+
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update m_customer set exported = 'Y' WHERE customer_id="+rs.getString("customer_id"));
 		
 			}//while
-			
-			
+
 			tableBean.setExportCount(totalRows);
 			tableBean.setDataStrExport(dataAppend);
 			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
@@ -395,17 +393,19 @@ public class ExportProcess {
 			"   A.address_ID as ADDRESS_ID, \n"+
 			"   'O' AS PARTY_TYPE, \n"+ /** Wait Future Use*/
 			"   M.location, \n"+
-			"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
-			"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longtitude \n"+
-			
-			"	 FROM m_customer M 	\n"+
-			"	 INNER JOIN m_address A 	\n"+
-			"	 ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
-			"	 LEFT OUTER JOIN m_province P 	\n"+
-			"	 ON A.PROVINCE_ID = P.PROVINCE_ID	\n"+
-			"    WHERE M.user_id = "+userBean.getId()+
-			"    AND M.CUSTOMER_ID ="+customerId +
-			"    AND A.PURPOSE IS NOT NULL \n"+
+			//"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
+			//"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longtitude \n"+
+			"   M.trip_day, \n"+
+			"   M.trip_day2, \n"+
+			"   M.trip_day3 \n"+
+			"	FROM m_customer M 	\n"+
+			"	INNER JOIN m_address A 	\n"+
+			"	ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
+			"	LEFT OUTER JOIN m_province P 	\n"+
+			"	ON A.PROVINCE_ID = P.PROVINCE_ID	\n"+
+			"   WHERE M.user_id = "+userBean.getId()+
+			"   AND M.CUSTOMER_ID ="+customerId +
+			"   AND A.PURPOSE IS NOT NULL \n"+
 			"   ORDER BY A.ADDRESS_ID \n";
 			
             logger.debug("Select:"+subSql);
@@ -451,8 +451,6 @@ public class ExportProcess {
 			/*if(totalRows ==1){
 				dataAppend.append(dataAppendLine2);
 			}*/
-			
-			
 			return dataAppend.toString();
 		}catch(Exception e){
 			throw e;
@@ -483,8 +481,11 @@ public class ExportProcess {
 			"	M.NAME  AS CUSTOMER_NAME,	\n"+
 			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
 			"   M.location, \n"+
-			"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
-			"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longitude \n"+
+			//OLD CODE
+			//"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
+			//"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longitude \n"+
+			"   lat as latitude, \n"+
+			"   lng as longitude \n"+
 			"	FROM m_customer M 	\n"+
 			"   WHERE M.user_id = "+userBean.getId()+
 			"   AND M.CUSTOMER_ID ="+customerId +
@@ -2066,11 +2067,12 @@ public class ExportProcess {
 	            "	EXPIRE_DATE2, \n"+
 	            "	QTY3,	\n"+
 	            "	SUB3,	\n"+
-	            "	EXPIRE_DATE3 \n"+
+	            "	EXPIRE_DATE3, \n"+
+	            "	avg_order_qty \n"+
 	            "   FROM t_stock_line l ," +
 	            "   (SELECT @rownum:=0) a" +
-	            "   where request_number ='"+requestNumber+"' and status ='SV' ";
-  
+	            "   where request_number ='"+requestNumber+"' and status ='SV' "+
+                "   and( qty <> 0 or qty2 <> 0 or qty3 <> 0 )" ;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){

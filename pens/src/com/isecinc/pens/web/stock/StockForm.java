@@ -3,19 +3,18 @@ package com.isecinc.pens.web.stock;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections.Factory;
 import org.apache.commons.collections.list.LazyList;
+import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Contact;
 import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.MoveOrder;
-import com.isecinc.pens.bean.MoveOrderLine;
-import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.StockLine;
-import com.isecinc.pens.web.customer.CustomerCriteria;
 
 /**
  * Receipt Form
@@ -173,5 +172,10 @@ public class StockForm extends I_Form {
 		this.resultsCust = resultsCust;
 	}
 	
-	
+	@Override
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		if(getBean() != null){
+			getBean().setHaveStock("");
+		}
+	}
 }

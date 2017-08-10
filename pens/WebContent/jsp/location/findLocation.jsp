@@ -6,7 +6,7 @@
  //String lat = Utils.isNull(request.getParameter("lat"));
  //String lng = Utils.isNull(request.getParameter("lng"));
  String customerName = "ร้าน "+new String(Utils.isNull(request.getParameter("customerName")).getBytes("ISO8859_1"), "TIS-620"); 
- System.out.println("customerName:"+customerName);
+ //System.out.println("customerName:"+customerName);
 %>
 <html>
   <head>
@@ -165,15 +165,18 @@ TABLE.result TD {
     
     function saveLocation(){
     	 var location = document.getElementById("location").value;
-    	
-    	 window.opener.setLocationValue(location);
+    	 var lat = document.getElementById("lat").value;
+    	 var lng = document.getElementById("lng").value;
+    	    
+    	 window.opener.setLocationValue(location,lat,lng);
     	 window.close();
     }
 
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>&callback=initMap&region=TH&language=th">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJUWErumNlehQ6rT4rP52yThSNsYd7bsI&callback=initMap&region=TH&language=th">
     </script>
+    
     <form>
 	    <div id="div" align="center">
 		    <table border="0" width="100%" class="result" cellspacing="3" cellpadding="1">

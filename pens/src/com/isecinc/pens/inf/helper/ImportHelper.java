@@ -316,6 +316,8 @@ public class ImportHelper {
 			/** Case User SALES IMPORT AD_USER FROM SALE_CENTER **/
 			if(tableName.equalsIgnoreCase("authen")){
 				tableName = "ad_user";
+			}else if(tableName.equalsIgnoreCase("m_customer_location")){
+				tableName = "m_customer";
 			}
 		
 		    for ( int i = 0; i < tableBean.getColumnBeanList().size(); i++) {   
@@ -1222,7 +1224,9 @@ public class ImportHelper {
 						|| tableBean.getTableName().equalsIgnoreCase("m_contact")
 						|| tableBean.getTableName().equalsIgnoreCase("m_trip")
 						|| tableBean.getTableName().equalsIgnoreCase("m_sales_target_new")
-						|| tableBean.getTableName().equalsIgnoreCase("m_member_health")){
+						|| tableBean.getTableName().equalsIgnoreCase("m_member_health")
+						|| tableBean.getTableName().equalsIgnoreCase("m_customer_location")
+						){
 					
 					//logger.debug("fileFtpFullName:"+fileFtpFullName);
 					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
@@ -1240,7 +1244,9 @@ public class ImportHelper {
 							}
 						}
 					}//if
-					/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN,m_sales_target_new)**/
+					
+			
+					/** Case Normal Master not in( CUST,CUSTADDR,CUSTCONTACT,TRIP,CN)**/
 				}else{
 					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
 						    if(ImportHelper.isCanGetFtpFile(tableBean, fileFtpFullName,importAll)){

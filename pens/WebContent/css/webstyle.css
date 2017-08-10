@@ -647,6 +647,10 @@ SELECT.moveOrder.pdCode{
 .normalText {
 	color: #000000;
 }
+.normalCenterText {
+	color: #000000;
+	text-align:center;
+}
 .errorText {
 	color: red;
 }

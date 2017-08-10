@@ -234,7 +234,8 @@ public class ExportSQL {
 					"	'"+userBean.getCode()+"' as SALE_CODE ,\n"+
 					"	(SELECT M.CODE FROM m_customer M where M.customer_id = t.customer_id) as CUSTOMER_CODE , \n"+
 					"   t.description,\n"+
-					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME	\n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,	\n"+
+					"   t.back_avg_month \n"+
 				"	from t_stock t \n"+
 				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') and t.status ='SV' \n";
 			}

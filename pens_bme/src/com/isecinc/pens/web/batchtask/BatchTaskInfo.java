@@ -11,6 +11,7 @@ private static final long serialVersionUID = 1L;
 	private String paramName;
 	private String paramType;
 	private String paramValue;
+	private String paramFormFileValue;
     private String paramLabel;
     private String paramValid;
     private String validateScript;
@@ -18,6 +19,12 @@ private static final long serialVersionUID = 1L;
     
 	
 	
+	public String getParamFormFileValue() {
+		return paramFormFileValue;
+	}
+	public void setParamFormFileValue(String paramFormFileValue) {
+		this.paramFormFileValue = paramFormFileValue;
+	}
 	public String getValidateScript() {
 		return validateScript;
 	}

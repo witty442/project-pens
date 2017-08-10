@@ -343,6 +343,7 @@ body {
 							
                         <!-- Batch Task Result--> 
 					    <jsp:include page="batchTaskResult.jsp"></jsp:include>
+					  
 							
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->
@@ -350,12 +351,12 @@ body {
 							 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							    <tr>
 									<td align="left" width ="100%">
-									   <div style="height:50px;align:center">
+									  <div style="height:50px;align:center">
 									     กรุณารอสักครู่......
-									   </div>
-									 <div id="progress" style="height:40px;width:100%;">
-						                    <div id="percent"></div>     
-											<div id="bar"></div>  
+									  </div>
+									  <div id="progress" style="height:40px;width:100%;">
+						                <div id="percent"></div>     
+									    <div id="bar"></div>  
 						              </div>   
 									 </td>
 								</tr>

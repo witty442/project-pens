@@ -311,16 +311,16 @@ public class InterfaceHelperWacoal extends InterfaceUtils{
 	    		
 	    		//DEBUG 
 	    		if(colBean.getTextPosition() >= lineArray.length ){
-	    			logger.debug("i["+i+"]Insert Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value[]pos["+colBean.getTextPosition()+"]");
+	    			//logger.debug("i["+i+"]Insert Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value[]pos["+colBean.getTextPosition()+"]");
 				}else{
-					logger.debug("i["+i+"]Insert Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value["+Utils.isNull(lineArray[colBean.getTextPosition()])+"]pos["+colBean.getTextPosition()+"]");
+					//logger.debug("i["+i+"]Insert Col["+colBean.getColumnName()+"]Type["+colBean.getColumnType()+"]Value["+Utils.isNull(lineArray[colBean.getTextPosition()])+"]pos["+colBean.getTextPosition()+"]");
 				}		
 	    		
 	    		/** Validate Column By Name **/
 	    		if( !Utils.isNull(colBean.getValidateFunc()).equalsIgnoreCase("N")){
 	    			ValidateImportHelper.validate(conn, colBean, lineArray, userBean,tableBean.getTableName());
 	    		}
-	    		logger.debug("parameterIndex:"+parameterIndex);
+	    		//logger.debug("parameterIndex:"+parameterIndex);
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 			    	String idFind = ExternalFunctionHelper.findExternalFunc(conn,tableBean, colBean,lineArray,userBean);	    	

@@ -57,8 +57,14 @@ public class ImportProcess {
 	    	  
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
+	    		  
+	    		  MonitorTime monitorTime1 = new MonitorTime("Start PreFunction.process");
+	    		  
 	    		  logger.info("**** Script "+tableBean.getTableName()+" Pre Function name:"+tableBean.getPreFunction());
 	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
+	    		  
+	    		  //Debug Time
+	 			   monitorTime.debugUsedTime();
 	    	  }
 	    	  
 	    	  logger.debug("ImportToDB");
@@ -148,14 +154,14 @@ public class ImportProcess {
 					    		  //logger.debug("**********Start Update ******************");
 					    		  psUpdate = ImportHelper.spiltLineArrayToUpdateStatement(conn, tableBean, lineStr, psUpdate,userBean);
 						    	  canExc = psUpdate.executeUpdate();
-						    	  logger.debug("canUpdate:"+canExc);
+						    	  //logger.debug("canUpdate:"+canExc);
 				    		  }
 	               
 					    	  if(canExc ==0 && tableBean.getActionDB().indexOf("I") != -1){
 					    		  //logger.debug("**********Start Insert ******************");
 					    		  psInsert = ImportHelper.spiltLineArrayToInsertStatement(conn,tableBean,lineStr,psInsert,userBean);
 						    	  canExc = psInsert.executeUpdate();
-					    	      logger.debug("canIns:"+canExc);
+					    	     // logger.debug("canIns:"+canExc);
 					    	  }
 			    		  }
 

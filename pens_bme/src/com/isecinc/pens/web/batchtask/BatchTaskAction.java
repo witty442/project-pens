@@ -19,6 +19,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 
@@ -144,12 +145,12 @@ public class BatchTaskAction extends I_Action {
 			
 			logger.debug("results Size:"+results.length);
 			if (results != null && results.length > 0) {
+				// Head Monitor 
 				batchTaskForm.setResults(results);
 				
 				//Search interfaceResult (monitorItem)
-				/*MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
-				interfacesForm.setMonitorItemList(monitorItemBeanResult);*/
-			
+				MonitorItemBean monitorItemBean = dao.findMonitorItemBean(user,results[0]);
+				batchTaskForm.setMonitorItem(monitorItemBean);
 			} else {
 				request.setAttribute("Message", "Data not found");
 			}

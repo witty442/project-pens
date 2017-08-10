@@ -44,7 +44,8 @@ public class MCustomer extends I_Model<Customer> {
 	private String[] columns = { COLUMN_ID, "CODE", "NAME", "NAME2", "CUSTOMER_TYPE", "TAX_NO", "TERRITORY", "WEBSITE",
 			"BUSINESS_TYPE", "BIRTHDAY", "CREDIT_CHECK", "PAYMENT_TERM", "VAT_CODE", "PAYMENT_METHOD",
 			"SHIPPING_METHOD", "USER_ID", "ISACTIVE", "CREATED_BY", "UPDATED_BY", "PARENT_CUSTOMER_ID", "PARTY_TYPE",
-			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC","AIRPAY_FLAG","LOCATION","IMAGE_FILE_NAME","IS_CHANGE"};
+			"PRINT_TAX","PRINT_TYPE","PRINT_BRANCH_DESC","PRINT_HEAD_BRANCH_DESC","AIRPAY_FLAG","LOCATION","IMAGE_FILE_NAME",
+			"IS_CHANGE","TRIP_DAY","TRIP_DAY2","TRIP_DAY3"};
 
 	/**
 	 * Find
@@ -207,15 +208,15 @@ public class MCustomer extends I_Model<Customer> {
 		return customerList;
 	}
 	
-	public Customer[] searchOpt(Connection conn,String whereCause,User user,int start) throws Exception {
-		return searchOptModel(conn,whereCause,user,start);
+	public Customer[] searchOpt(Connection conn,String whereCause,User user,int start,String dispTotalInvoice) throws Exception {
+		return searchOptModel(conn,whereCause,user,start,dispTotalInvoice);
 	}
 	
-    public Customer[] searchOpt(String whereCause,User user,int start) throws Exception {
+    public Customer[] searchOpt(String whereCause,User user,int start,String dispTotalInvoice) throws Exception {
 	   Connection conn = null;
 	   try{
 		   conn = new DBCPConnectionProvider().getConnection(conn);
-		   return searchOptModel(conn,whereCause,user,start);
+		   return searchOptModel(conn,whereCause,user,start,dispTotalInvoice);
 	   }catch(Exception e){
 		   throw e;
 	   }finally{
@@ -230,7 +231,7 @@ public class MCustomer extends I_Model<Customer> {
 	 * @throws Exception
 	 * Tunnig Method By Wit
 	 */
-	private Customer[] searchOptModel(Connection conn,String whereCause,User user,int start) throws Exception {
+	private Customer[] searchOptModel(Connection conn,String whereCause,User user,int start,String dispTotalInvoice) throws Exception {
 		
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -351,7 +352,9 @@ public class MCustomer extends I_Model<Customer> {
 				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
 				
 				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
-				m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+				if( !Utils.isNull(dispTotalInvoice).equals("")){
+				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+				}
 				
 				// Order Amount
 				m.setOrderAmount(rst.getInt("order_amount"));
@@ -645,7 +648,10 @@ public class MCustomer extends I_Model<Customer> {
 				ConvertNullUtil.convertToString(customer.getPartyType()).trim(),
 				customer.getPrintTax(),customer.getPrintType(),customer.getPrintBranchDesc(),customer.getPrintHeadBranchDesc(),
 				Utils.isNull(customer.getAirpayFlag()),Utils.isNull(customer.getLocation()),
-				Utils.isNull(customer.getImageFileName()),"Y"
+				Utils.isNull(customer.getImageFileName()),"Y",
+				Utils.isNull(customer.getTripDay()),
+				Utils.isNull(customer.getTripDay2()),
+				Utils.isNull(customer.getTripDay3())
 		      };
 		if (super.save(TABLE_NAME, columns, values, customer.getId(), conn)) {
 			customer.setId(id);

@@ -1,4 +1,41 @@
+ function showImage(path,customerId){
+	 var location= $("#imageFileName").val();
+		//alert(lat+","+lng);
+	 if(location != "" ){
+		var width= window.innerWidth-100;
+		var height= window.innerHeight-100;
+	
+		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
+			
+	}else{
+		alert("ยังไม่ได้บันทึกข้อมูลรูปภาพ'");
+	}
+}
+  
+ /** Display image after upload **/
+	function readURL(input) {
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
 
+          reader.onload = function (e) {
+              $('#blah')
+                  .attr('src', e.target.result)
+                  .width(150)
+                  .height(200);
+          };
+          reader.readAsDataURL(input.files[0]);
+          
+          //Hide old images
+           //$("imageDBDiv").hide();
+          setImageVisible("imageDB",false);
+      }
+  }
+	
+function setImageVisible(id, visible) {
+	var img = document.getElementById(id);
+	img.style.visibility = (visible ? 'visible' : 'hidden');
+}
+/********************************************/
 
 function prepare(path,type,id){
 	if(id!=null){
@@ -52,6 +89,13 @@ function save(path) {
 	{
 		alert('กรุณาระบุชื่อใหม่ เนื่องจากมีความยาวเกินกว่าที่ระบบตั้งค่าไว้');
 		document.getElementsByName('customer.name')[0].focus();
+		return false;
+	}
+	
+	if(document.getElementsByName('customer.tripDay')[0].value == '')
+	{
+		alert('กรุณาระบุ กำหนดจุด #1 ');
+		document.getElementsByName('customer.tripDay')[0].focus();
 		return false;
 	}
 	

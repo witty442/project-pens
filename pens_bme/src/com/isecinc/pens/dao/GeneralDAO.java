@@ -853,30 +853,27 @@ public class GeneralDAO {
 			List<PopupForm> pos = new ArrayList<PopupForm>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
+			int no = 0;
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n select pens_value , pens_desc  ");
 				sql.append("\n FROM PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Customer' ");
-			    sql.append(" and ( pens_desc2 in( '"+wareHouse+"') or pens_desc2 is null) \n");
-				sql.append("\n  ORDER BY Interface_value asc \n");
+			    sql.append("\n and ( pens_desc2 in( '"+wareHouse+"') or pens_desc2 is null) ");
+				sql.append("\n  ORDER BY Interface_value asc ");
 				
 				logger.debug("sql:"+sql);
 				
 				conn = DBConnection.getInstance().getConnection();
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-				int no = 0;
 				while (rst.next()) {
 					PopupForm item = new PopupForm();
 					no++;
 					item.setNo(no);
 					item.setCode(rst.getString("pens_value"));
 					item.setDesc(rst.getString("pens_desc"));
-					
 					pos.add(item);
-					
 				}//while
-
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -887,8 +884,7 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return pos;
-		}
-	 
+	 }
 	 
 	 public static Map<String,String> initWarehouseDesc() {
 			Statement stmt = null;
@@ -1126,12 +1122,12 @@ public class GeneralDAO {
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n select pens_value , pens_desc  ");
-				sql.append("\n FROM ");
-				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Warehouse' ");
+				sql.append("\n FROM PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and reference_code = 'Warehouse' ");
 				if( !Utils.isNull(codeSqlIn).equals("")){
 					sql.append("\n AND PENS_VALUE IN ("+codeSqlIn+")");
 				}
-				sql.append("\n  ORDER BY pens_desc asc \n");
+				sql.append("\n  ORDER BY pens_desc asc");
 				
 				logger.debug("sql:"+sql);
 				

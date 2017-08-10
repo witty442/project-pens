@@ -35,7 +35,7 @@ if(session.getAttribute("wareHouseList2") == null){
 	List<References> wareHouseList = new ArrayList(); 
 	References ref1 = new References("","");
 	wareHouseList.add(ref1);
-	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W3+"','"+PickConstants.WAREHOUSE_W4+"','"+PickConstants.WAREHOUSE_W5+"'"));
+	wareHouseList.addAll(PickConstants.getWareHouseList("'W2','W3','W4','W5','W6'"));
 	
 	session.setAttribute("wareHouseList2",wareHouseList);
 }

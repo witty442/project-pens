@@ -6,10 +6,10 @@
 	<session-factory>
 		<property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
 		<!-- Test Server -->
-        <property name="connection.url">jdbc:oracle:thin:@//192.168.38.186:1529/TEST</property>
+        <!-- <property name="connection.url">jdbc:oracle:thin:@//192.168.38.186:1529/TEST</property> -->
        
 	   	<!-- Production Server -->
-	    <!-- <property name="connection.url">jdbc:oracle:thin:@//192.168.37.185:1521/PENS</property>  -->
+	     <property name="connection.url">jdbc:oracle:thin:@//192.168.37.185:1521/PENS</property> 
 	    
 		<property name="connection.username">pensbi</property>
 		<property name="connection.password">pensbi</property>

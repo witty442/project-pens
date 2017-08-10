@@ -95,9 +95,9 @@ function editStock(path,requestNumber){
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	      	<jsp:include page="../program.jsp">
+	      	<%-- <jsp:include page="../program.jsp">
 				<jsp:param name="function" value="Stock"/>
-			</jsp:include>
+			</jsp:include> --%>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">

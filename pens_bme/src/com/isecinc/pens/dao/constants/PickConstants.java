@@ -43,6 +43,7 @@ public class PickConstants extends Constants{
 	public static String WAREHOUSE_W3 ="W3";//Move
 	public static String WAREHOUSE_W4 ="W4";//Move
 	public static String WAREHOUSE_W5 ="W5";//Move
+	public static String WAREHOUSE_W6 ="W6";//Move
 	
 	public static String WORK_STEP_POST_BYSALE = "Post by Sale";
 	public static String WORK_STEP_PICK_COMPLETE = "Pick Complete";
@@ -122,6 +123,8 @@ public class PickConstants extends Constants{
 			d = wareHouseMap.get("W4");
 		}else if(WAREHOUSE_W5.equals(w)){
 			d = wareHouseMap.get("W5");
+		}else if(WAREHOUSE_W6.equals(w)){
+			d = wareHouseMap.get("W6");
 		}
 		return d;
 	}

@@ -31,7 +31,6 @@ body {
 	background-repeat: repeat;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/login.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 <!--
@@ -62,6 +61,50 @@ function gologin(e){
 	if(e == null || (e != null && e.keyCode == 13)){
 		login('${pageContext.request.contextPath}');
 	}
+}
+function detectmob() { 
+	 if( navigator.userAgent.match(/Android/i)
+	 || navigator.userAgent.match(/webOS/i)
+	 || navigator.userAgent.match(/iPhone/i)
+	 || navigator.userAgent.match(/iPad/i)
+	 || navigator.userAgent.match(/iPod/i)
+	 || navigator.userAgent.match(/BlackBerry/i)
+	 || navigator.userAgent.match(/Windows Phone/i)
+	 ){
+	    return true;
+	 }else {
+	    return false;
+	 }
+}
+	
+function login(path){
+	var w = 0;
+	var h = 0;
+   if(detectmob()){
+     //alert("Mobile");
+	  var ratio = window.devicePixelRatio || 1;
+	   
+	  w = window.innerWidth * ratio;
+	  h = window.innerHeight * ratio;
+   }else{
+     w = screen.width;
+     h = screen.height;
+   }
+	//alert(w+":"+h);
+	document.getElementsByName('screenWidth')[0].value = w;
+	document.getElementsByName('screenHeight')[0].value = h;
+	
+   if(Trim(document.getElementsByName('userName')[0].value)==''){
+       document.getElementsByName('userName')[0].focus();
+       return false;
+   }
+   if(Trim(document.getElementsByName('password')[0].value)==''){
+   	document.getElementsByName('password')[0].focus();
+       return false;
+   }
+   document.loginForm.action=path+"/login.do?do=login";
+   document.loginForm.submit();
+   return true;
 }
 </script>
 </head>
@@ -124,6 +167,8 @@ function gologin(e){
 		            	</td>
 		            </tr>
 		        </table>
+		         <input type="hidden" id = "screenWidth" name="screenWidth" />
+		          <input type="hidden" id = "screenHeight" name="screenHeight" />
 		        </html:form>
 			</td>
         	<td width="523">&nbsp;</td>

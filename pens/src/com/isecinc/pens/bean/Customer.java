@@ -106,10 +106,19 @@ public class Customer extends I_PO implements Serializable {
 		setPrintType(Utils.isNull(rst.getString("PRINT_TYPE")));//Y or N
 		
 		setAirpayFlag(Utils.isNull(rst.getString("AIRPAY_FLAG")));
-		setLocation(Utils.isNull(rst.getString("LOCATION")));
+		//setLocation(Utils.isNull(rst.getString("LOCATION")));//Deprecate
+		setLat(Utils.isNull(rst.getString("lat")));
+		setLng(Utils.isNull(rst.getString("lng")));
+		if( !Utils.isNull(getLat()).equals("") && !Utils.isNull(getLng()).equals("")){
+		  setLocation(getLat()+","+getLng());
+		}
+		
 		//setImageFileBlob(rst.getBlob("image_file"));
 		setImageFileName(Utils.isNull(rst.getString("image_file_name")));
 		
+		setTripDay( Utils.isNull(rst.getString("TRIP_DAY")));
+		setTripDay2( Utils.isNull(rst.getString("TRIP_DAY2")));
+		setTripDay3( Utils.isNull(rst.getString("TRIP_DAY3")));
 	}
 
 	/**
@@ -136,6 +145,36 @@ public class Customer extends I_PO implements Serializable {
 
 	/** Reference from ORCL */
 	private int referencesID;
+	private String lat;
+	private String lng;
+	private String dispTotalInvoice;
+	private String tripDay;
+	private String tripDay2;
+	private String tripDay3;
+	
+	public String getTripDay() {
+		return tripDay;
+	}
+
+	public void setTripDay(String tripDay) {
+		this.tripDay = tripDay;
+	}
+
+	public String getTripDay2() {
+		return tripDay2;
+	}
+
+	public void setTripDay2(String tripDay2) {
+		this.tripDay2 = tripDay2;
+	}
+
+	public String getTripDay3() {
+		return tripDay3;
+	}
+
+	public void setTripDay3(String tripDay3) {
+		this.tripDay3 = tripDay3;
+	}
 
 	/** CODE */
 	private String code;
@@ -264,6 +303,30 @@ public class Customer extends I_PO implements Serializable {
     private String imageFileName;
     
     
+	public String getDispTotalInvoice() {
+		return dispTotalInvoice;
+	}
+
+	public void setDispTotalInvoice(String dispTotalInvoice) {
+		this.dispTotalInvoice = dispTotalInvoice;
+	}
+
+	public String getLat() {
+		return lat;
+	}
+
+	public void setLat(String lat) {
+		this.lat = lat;
+	}
+
+	public String getLng() {
+		return lng;
+	}
+
+	public void setLng(String lng) {
+		this.lng = lng;
+	}
+
 	public String getImageFileName() {
 		return imageFileName;
 	}

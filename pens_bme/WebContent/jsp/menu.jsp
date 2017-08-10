@@ -29,7 +29,7 @@
   String hostDD = "http://"+ipDD+":8081";
   
   String currentIP =InetAddress.getLocalHost().getHostAddress();
-  //System.out.println("Current IP:"+currentIP);
+  System.out.println("Current IP:"+currentIP);
 
   //case Server Test contextPath = pens_bme_test
   if("192.168.38.186".equals(ipProd)){ //For Test
@@ -50,8 +50,8 @@
 	  hostDD = "http://"+ipDD+":8081";
   }
   
- // System.out.println("contextPathProd:"+contextPathProd);
- // System.out.println("contextPathDD:"+contextPathDD);
+  System.out.println("contextPathProd:"+contextPathProd);
+  System.out.println("contextPathDD:"+contextPathDD);
 
 %>
 <script>
@@ -220,23 +220,23 @@
 		</ul>
 	</li>
 <%} %>
-<!-- -------------------------------------------------------------STock Role Wacoal----------------------------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------Stock Role Wacoal----------------------------------------------------------------------------------------------------------------- -->
 
 <!-- WACOAL Menu-->
 <%if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN}) ){%>
 	<li><a  href="javascript: void(0)" class="parent"><span>Wacoal </span></a>
 		<ul> 
-		  <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_STOCK%>');"><span>1.<bean:message key="ImportWacoalStock" bundle="sysprop"/></span></a>
-	         </li>
+		    <li>
+	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_STOCK%>');"><span>1.<bean:message key="ImportWacoalStock" bundle="sysprop"/></span></a>
+	        </li>
 			<li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN%>');"><span>2.<bean:message key="ImportWacoalSaleInReturn" bundle="sysprop"/></span></a>
-	         </li>
-	          <li>
-	          	  <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_SALEOUT_WACOAL%>');"><span>3.<bean:message key="ImportSaleOutWacoal" bundle="sysprop"/></span></a>
-	         </li> 
-	         <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=ReportStockWacoalLotus');"><span>4.<bean:message bundle="sysprop" key="ReportStockWacoalLotus"/></span></a>
+	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_WACOAL_SALESIN_RETURN%>');"><span>2.<bean:message key="ImportWacoalSaleInReturn" bundle="sysprop"/></span></a>
+	        </li>
+	        <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_SALEOUT_WACOAL%>');"><span>3.<bean:message key="ImportSaleOutWacoal" bundle="sysprop"/></span></a>
+	        </li> 
+	        <li>
+			   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=ReportStockWacoalLotus');"><span>4.<bean:message bundle="sysprop" key="ReportStockWacoalLotus"/></span></a>
 			</li>
 		</ul>
 	</li>
@@ -383,7 +383,10 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareHistory&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiryHistory"/></span></a>
 			</li>
-			
+			<%-- <li>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
+	          <span><bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
+	        </li> --%>
 		</ul>
 	</li>
 <%} %>
@@ -506,6 +509,9 @@
 			        </li>
 			         <li>
 				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W5');"><span>8.4 <bean:message bundle="sysprop" key="reqPickStockW5"/></span></a>
+			        </li>
+			        <li>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W6');"><span>8.5 <bean:message bundle="sysprop" key="reqPickStockW6"/></span></a>
 			        </li>
 			    </ul>
 			 </li>

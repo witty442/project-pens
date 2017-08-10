@@ -40,7 +40,7 @@ if(code.equals("null")) code = SystemProperties.getCaption(SystemProperties.CREA
  		  <img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="15" />
  		</td>
 	</tr>
-</table>
+</table> 
 <script>
 	function updateClock() {
 		 var currentdate = new Date(); 
@@ -48,7 +48,7 @@ if(code.equals("null")) code = SystemProperties.getCaption(SystemProperties.CREA
 		                  + (currentdate.getMonth()+1)  + "/" 
 		                  + (currentdate.getFullYear()+543) + " "  
 		                  + currentdate.getHours() + ":"  
-		                  + currentdate.getMinutes();
+		                  + ((""+currentdate.getMinutes()).length==1?"0"+currentdate.getMinutes():currentdate.getMinutes());
 		                  
 	    // set the content of the element with the ID time to the formatted string
 	    document.getElementById('time').innerHTML = ""+datetime;

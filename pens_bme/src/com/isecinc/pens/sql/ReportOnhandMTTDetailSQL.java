@@ -352,6 +352,10 @@ public class ReportOnhandMTTDetailSQL {
 			sql.append("\n  AND M.material_master = SALE_RETURN.material_master AND M.barcode = SALE_RETURN.barcode ");
 			
 			sql.append("\n ) A ");
+			if( !c.getDispHaveQty().equals("")){
+				sql.append("\n WHERE ( A.INIT_SALE_QTY <> 0 OR A.SALE_IN_QTY <> 0 ");
+				sql.append("\n      OR A.SALE_OUT_QTY <> 0 OR A.SALE_RETURN_QTY <> 0 OR A.ONHAND_QTY <> 0)");
+			}
 			sql.append("\n ORDER BY A.group_type,A.MATERIAL_MASTER,A.BARCODE asc ");
 
 			if(logger.isDebugEnabled()){

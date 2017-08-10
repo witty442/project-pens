@@ -36,7 +36,7 @@ public class Stock {
 	private String printDate; 
 	private String updated; 
 	private String created; 
-	
+	private String backAvgMonth;
 	
 	/** Customer */
 	private int customerId;
@@ -61,7 +61,17 @@ public class Stock {
 		return currentDate;
 	}
 
-	
+
+	public String getBackAvgMonth() {
+		return backAvgMonth;
+	}
+
+
+	public void setBackAvgMonth(String backAvgMonth) {
+		this.backAvgMonth = backAvgMonth;
+	}
+
+
 	public String getHaveStock() {
 		return haveStock;
 	}

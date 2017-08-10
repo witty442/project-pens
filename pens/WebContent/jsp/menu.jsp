@@ -64,12 +64,11 @@ User user = (User)session.getAttribute("user");
 					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
 				</li>
 			<%} %>
-			<% if(user.isPDPaid()) {%>
-				<li>
-					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><bean:message key="PD" bundle="sysprop"/></span></a>
-				</li>
-			<% } %>
-			
+		
+			<li>
+			<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><bean:message key="PD" bundle="sysprop"/></span></a>
+			</li>
+
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"><span>ปรับปรุงโปรแกรม SalesApp</span></a>
 			</li>

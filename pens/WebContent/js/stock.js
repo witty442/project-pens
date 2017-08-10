@@ -47,7 +47,7 @@ function checkTableCanSave(){
 	
 	var status = document.getElementsByName("status");
 	var r = true;
-	var groupInsert = true;
+	var groupInsert = false;
 	var rowSelectOne = false;
 	
 	for(var i=0;i<itemCode.length;i++){
@@ -78,23 +78,24 @@ function checkTableCanSave(){
 			  rowSelectOne = true;
 			  
 			 // alert("["+qty[i].value+"]["+sub[i].value+"]["+expireDate[i].value+"]");
-			  if(qty[i].value =='' && qty2[i].value =='' && qty3[i].value ==''
+			  if( qty[i].value =='' && qty2[i].value =='' && qty3[i].value ==''
 				 && sub[i].value =='' && sub2[i].value =='' && sub3[i].value ==''
 				 && expireDate[i].value =='' && expireDate2[i].value =='' && expireDate3[i].value ==''
 				){
-				  alert("กรุณาระบุข้อมูล อย่างน้อย 1 กลุ่ม");
-				  groupInsert = false;
+				  //alert("กรุณาระบุข้อมูล อย่างน้อย 1 กลุ่ม");
+				  /*groupInsert = false;
 				  qty[i].className ='errorNumber';
 				  qty2[i].className ='errorNumber';
 				  qty3[i].className ='errorNumber';
-				  sub[i].className ='errorNumber';
+				  sub[i].className ='errorNumber'; 
 				  sub2[i].className ='errorNumber';
 				  sub3[i].className ='errorNumber';
 				  expireDate[i].className ='errorNumber';
 				  expireDate2[i].className ='errorNumber';
-				  expireDate3[i].className ='errorNumber';
+				  expireDate3[i].className ='errorNumber';*/
 				  
 			  }else{
+				  groupInsert = true;
 				  qty[i].className ='enableNumber';
 				  qty2[i].className ='enableNumber';
 				  qty3[i].className ='enableNumber';
@@ -272,6 +273,9 @@ function addRow(setFocus){
 	    "<td class='td_text'  width='15%'> "+
 	    " <input type='text' tabindex ='-1' name='productName' size='40' readonly class='disableText' />" +
 	    " <input type='hidden' tabindex ='-1' name='inventoryItemId' id='inventoryItemId'/>"+
+	    "</td>"+
+	    "<td class='td_text_center'  width='5%'> "+
+	    " <input type='text' name='avgOrderQty' id='avgOrderQty' value ='' size='5' readonly class='disableNumber'/>" +
 	    "</td>"+
 	    "<td class='td_text_center'  width='5%'> "+
 	    " <input type='text' name='fullUom' id='fullUom' value ='' size='6' readonly class='disableText'/>" +

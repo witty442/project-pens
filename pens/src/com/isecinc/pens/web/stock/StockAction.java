@@ -50,25 +50,28 @@ public class StockAction extends I_Action {
 		String forward = "prepare";
 		StockForm stockForm = (StockForm) form;
 		try {
+			  
 			 logger.debug("prepare :"+request.getParameter("action"));
 			 User user = (User) request.getSession(true).getAttribute("user");
 			 
 			 if("searchStock".equalsIgnoreCase(request.getParameter("action"))){
 				String customerId = Utils.isNull(request.getParameter("customer_id"));
+				String backAvgMonth = Utils.isNull(request.getParameter("backAvgMonth"));
 				
 				MStock mDAO = new MStock();
 				Stock mCri = new Stock();
 				mCri.setUserId(user.getId()+"");
 				mCri.setCustomerId(Utils.convertStrToInt(customerId));
+				mCri.setBackAvgMonth(backAvgMonth);
 				
 				List<Stock> stockList = mDAO.searchStockList(mCri,user);
 				stockForm.setResults(stockList);
 					
 				//Set cri session for Back page
-				request.getSession().setAttribute("criteria_",mCri);
+				request.getSession().setAttribute("criteria_stock_2",mCri);
 				
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
-				 Stock b = (Stock)request.getSession().getAttribute("criteria_");
+				 Stock b = (Stock)request.getSession().getAttribute("criteria_stock_2");
 				 stockForm.getCriteria().setBean(b);
 				 
 				 search(stockForm,request,response); 
@@ -93,13 +96,22 @@ public class StockAction extends I_Action {
 				 stockForm.setCustomer(new Customer());
 				 stockForm.setResultsCust(null);
 				 stockForm.setLines(null);
+				 //
+				 Stock s = new Stock();
+				 s.setBackAvgMonth("3");//default
+				 stockForm.setBean(s);
 				 
 				 //Clear Criteria
-				 request.getSession().setAttribute("criteria_",null);
+				 request.getSession().setAttribute("criteria_cust",null);
 				 
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
 				 Customer b = (Customer)request.getSession().getAttribute("criteria_cust");
-				 stockForm.getCriteria().setCustomer(b);
+			
+				 stockForm.setCustomer(b);
+				 
+				 Stock s = (Stock)request.getSession().getAttribute("criteria_stock");
+				 logger.debug("haveStock:"+s.getHaveStock());
+				 stockForm.setBean(s);
 				 
 				 searchCustomer(mapping,stockForm,request,response); 
 			 }
@@ -117,15 +129,19 @@ public class StockAction extends I_Action {
 		StockForm stockForm = (StockForm) form;
 		StringBuffer html = null;
 		boolean excel = false;
-		 User user = (User) request.getSession(true).getAttribute("user");
+		// User user = (User) request.getSession(true).getAttribute("user");
 		try {
-			 logger.debug("prepare :"+request.getParameter("action"));
+			 logger.debug("stockReport :"+request.getParameter("action"));
 
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 //Clear and init Parametor   
-				 stockForm.setCustomer(new Customer());
 				 request.getSession().setAttribute("RESULTS",null);
+				 stockForm.setCustomer(new Customer());
 				 
+				 Stock s = new Stock();
+				 s.setHaveStock("true");
+				 stockForm.setBean(s);
+
 			 }else if("exportToExcel".equalsIgnoreCase(request.getParameter("action"))){
 				 excel = true;
 				 html = StockReport.genStockReportToHTML(request, stockForm,excel);
@@ -278,6 +294,8 @@ public class StockAction extends I_Action {
 			//customer.setDistrict(district)
 			// Save Criteria customer
 			request.getSession().setAttribute("criteria_cust",customer);
+			//Set cri session for Back page
+			request.getSession().setAttribute("criteria_stock",stockForm.getBean());
 						
 			if (results != null) {
 				stockForm.getCriteria().setSearchResult(results.length);
@@ -335,15 +353,20 @@ public class StockAction extends I_Action {
 			request.getSession().setAttribute("ITEM_IN_PAGE", null);
 			
 			 Stock bean  = new Stock(); 
+			 bean.setBackAvgMonth(Utils.isNull(request.getParameter("backAvgMonth")));
 			 //Get Detail Customer by customerId
 			 Customer customer = new MCustomer().find(Utils.isNull(request.getParameter("customer_id")));
 			 bean.setCustomerId(customer.getId());
-			 bean.setCustomerName(customer.getName()+" "+customer.getName2());
+			 bean.setCustomerName(customer.getCode() +"-"+customer.getName()+" "+customer.getName2());
 			 
 			 bean.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 bean.setCanEdit(true);
 			//init priceListId by User Type
 			 bean.setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
+			
+			 List<StockLine> itemList= new MStock().searchAvgStockLine(bean, user);
+			 //Set Lines
+			 stockForm.setLines(itemList);
 			 
 			 //set Btn Display
 			 bean.setShowSaveBtn(true);
@@ -356,6 +379,10 @@ public class StockAction extends I_Action {
 				 
 			// save token
 			saveToken(request);
+				
+			//Set cri session for Back page
+			request.getSession().setAttribute("criteria_stock",bean);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -411,6 +438,9 @@ public class StockAction extends I_Action {
 			 
 			// save token
 			saveToken(request);
+			
+			//Set cri session for Back page
+			request.getSession().setAttribute("criteria_stock",m);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -521,6 +551,7 @@ public class StockAction extends I_Action {
 			String[] productCode = request.getParameterValues("productCode");
 			String[] inventoryItemId = request.getParameterValues("inventoryItemId");
 			String[] status = request.getParameterValues("status");
+			String[] avgOrderQty = request.getParameterValues("avgOrderQty");
 			String[] fullUom = request.getParameterValues("fullUom");
 			
 			String[] qty = request.getParameterValues("qty");
@@ -548,6 +579,7 @@ public class StockAction extends I_Action {
 						 l.setProductCode(Utils.isNull(productCode[i]));
 						 l.setInventoryItemId(Utils.isNull(inventoryItemId[i]));
 						 l.setFullUom(fullUom[i]);
+						 l.setAvgOrderQty(Utils.isNull(avgOrderQty[i]));
 						 
 						 l.setQty(qty[i]);
 						 l.setSub(sub[i]);

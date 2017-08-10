@@ -74,7 +74,6 @@ public class MStock {
 			}
 	
 			if(head.getLineList() != null && head.getLineList().size() > 0){
-				
 				//delete lines
 				deleteStockLineByRequestNumber(conn, head);
 				
@@ -83,10 +82,8 @@ public class MStock {
 					StockLine line = (StockLine)head.getLineList().get(i);
 				    line.setLineId((i+1));
 					insertStockLine(conn,head, line);
-					
 				}//for
 			}
-			
 			conn.commit();
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -132,8 +129,6 @@ public class MStock {
 				
 				System.out.println("requestDate :"+currentDate.getTime());
 			}
-			
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -242,8 +237,8 @@ public class MStock {
 		try {
 			StringBuffer sql = new StringBuffer("INSERT INTO t_stock( \n");
 			sql.append(" request_number, request_date, description, \n");
-			sql.append(" status,exported, USER_ID, CREATED,CREATED_BY,customer_id) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" status,exported, USER_ID, CREATED,CREATED_BY,customer_id,back_avg_month) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?) \n");
 			  
 			//logger.debug("SQL:"+sql);
 			
@@ -258,6 +253,7 @@ public class MStock {
 			ps.setDate(++index, new java.sql.Date(new Date().getTime()));
 			ps.setString(++index, model.getCreatedBy());
 			ps.setInt(++index, model.getCustomerId());
+			ps.setInt(++index, Utils.convertStrToInt(model.getBackAvgMonth()));
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -306,8 +302,8 @@ public class MStock {
 			sql.append(" request_number, line_number, inventory_item_id, \n"); 
 			sql.append(" uom,uom2, status,amount,exported, USER_ID,  \n");
 			sql.append(" CREATED, CREATED_BY,CREATE_DATE, \n");
-			sql.append(" qty, qty2, qty3, sub,sub2,sub3 ,expire_date,expire_date2,expire_date3) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" qty, qty2, qty3, sub,sub2,sub3 ,expire_date,expire_date2,expire_date3,avg_order_qty) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 
 			//logger.debug("SQL:"+sql);
 			int index = 0;
@@ -364,6 +360,7 @@ public class MStock {
 			}else{
 				ps.setNull(++index,java.sql.Types.DATE);
 			}
+			ps.setBigDecimal(++index, new BigDecimal(Utils.convertStrToDouble(line.getAvgOrderQty())));//abg_order_qty
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -596,6 +593,7 @@ public class MStock {
 			  }
 			  
 			  m.setDescription(rst.getString("description"));
+			  m.setBackAvgMonth(Utils.isNull(rst.getString("back_avg_month")));
 			  
 			  m.setStatus(rst.getString("status"));
 			  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
@@ -665,7 +663,7 @@ public class MStock {
 				  m.setProduct(mp);
 				  m.setProductCode(mp.getCode());
 				  m.setProductName(mp.getName());
-				  
+				  m.setAvgOrderQty(Utils.convertIntToStrDefault(rst.getInt("avg_order_qty"),""));
 				  //set FullUOM
 				  String  uom1 = Utils.isNull(Utils.isNull(rst.getString("uom")));
 				  String  uom2 = Utils.isNull(Utils.isNull(rst.getString("uom2")));
@@ -718,6 +716,122 @@ public class MStock {
 			return lineList;
 		}
 	  
+	  
+	  public List<StockLine> searchAvgStockLine(Stock mCriteria,User user) throws Exception {
+		    Connection conn = null;
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<StockLine> lineList = new ArrayList<StockLine>();
+			StringBuilder sql = new StringBuilder();
+			int no = 0;
+			String arInvoieNoMonth = "";
+			Calendar cal = Calendar.getInstance();
+			try {
+				//Connection
+				conn = DBConnection.getInstance().getConnection();
+				
+				// Calc Back Avg Month
+				String yyMM = "";
+				arInvoieNoMonth ="";
+				for(int i=0;i<Utils.convertStrToInt(mCriteria.getBackAvgMonth());i++){
+					cal.add(Calendar.MONTH, -1);
+					yyMM = Utils.stringValue(cal.getTime(), Utils.YY_MM,Utils.local_th);
+					arInvoieNoMonth +="'"+yyMM+"',";
+				}
+				if( !Utils.isNull(arInvoieNoMonth).equals("")){
+					arInvoieNoMonth = arInvoieNoMonth.substring(0,arInvoieNoMonth.length()-1);
+				}
+
+				sql.append("\n SELECT A.* FROM ( ");
+				sql.append("\n  SELECT ");
+				sql.append("\n  t.product_id ,m.product_code ,m.product_name"); 
+				sql.append("\n  ,m.uom1 ,m.uom2 "); 
+				sql.append("\n  ,CEIL((sum(qty))/"+mCriteria.getBackAvgMonth()+") as avg_order_qty");
+				sql.append("\n  FROM t_order_line t ");
+				sql.append("\n ,( ");
+				sql.append("\n  SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE");
+				sql.append("\n  , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ");
+				sql.append("\n  , pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+				sql.append("\n  FROM M_Product pd ");
+				sql.append("\n  INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
+				sql.append("\n  AND pp1.UOM_ID = pd.UOM_ID ");
+				sql.append("\n  LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
+				sql.append("\n  AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+				sql.append("\n  WHERE pp1.ISACTIVE = 'Y'  AND pp1.PRICELIST_ID = "+mCriteria.getPriceListId());
+				sql.append("\n  AND ( ");
+				sql.append("\n    pp1.UOM_ID IN ( ");
+				sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+				sql.append("\n     ) ");
+				sql.append("\n     OR");
+				sql.append("\n     pp2.UOM_ID IN ( ");
+				sql.append("\n        SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+				sql.append("\n      ) ");
+				sql.append("\n    )");
+				sql.append("\n   AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+user.getRole().getKey()+"') ");
+				sql.append("\n  )m");
+				
+				sql.append("\n   WHERE t.product_id = m.product_id ");
+				sql.append("\n   and t.promotion <> 'Y' ");
+				sql.append("\n   and t.iscancel <> 'Y' ");
+				sql.append("\n   and t.ar_invoice_no is not null ");
+				sql.append("\n   and t.ar_invoice_no <> '' ");
+				sql.append("\n   and ( ");
+				sql.append("\n       t.order_id in( ");
+				sql.append("\n         select order_id from t_order where doc_status ='SV' ");
+				sql.append("\n         and substr(ar_invoice_no,3,4) in ("+arInvoieNoMonth+") ");
+				sql.append("\n         and user_id ="+user.getId());
+				sql.append("\n         and customer_id ="+mCriteria.getCustomerId());
+				sql.append("\n       ) ");
+				sql.append("\n       and   ");
+				sql.append("\n      substr(t.ar_invoice_no,3,4) in ("+arInvoieNoMonth+")");
+				sql.append("\n    ) ");
+				sql.append("\n   group by t.product_id ,m.product_code ,m.product_name,m.uom1 ,m.uom2 "); 
+				sql.append("\n  ) A ORDER BY A.product_code asc \n");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+
+				while (rst.next()) {
+				  StockLine m = new StockLine();
+				  no++;
+				  m.setNo(no);
+				  m.setRequestNumber("");
+				  m.setLineId(no);
+				  m.setInventoryItemId(rst.getString("product_id"));
+				  m.setProductCode(rst.getString("product_code"));
+				  m.setProductName(rst.getString("product_name"));
+				  m.setAvgOrderQty(Utils.convertIntToStrDefault(rst.getInt("avg_order_qty"),""));
+				  
+				  //set FullUOM
+				  String  uom1 = Utils.isNull(Utils.isNull(rst.getString("uom1")));
+				  String  uom2 = Utils.isNull(Utils.isNull(rst.getString("uom2")));
+				   
+				  m.setFullUom(uom1+"/"+uom2);
+				  m.setStatus("SV");
+				  m.setStatusLabel("ใช้งาน");
+				  m.setExported("N");
+				  m.setUserId(user.getId()+"");
+				  m.setCreatedBy(mCriteria.getCreatedBy());
+				  m.setCreated(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setActionDate(m.getCreated());
+			      m.setCanEdit(true);
+
+				  lineList.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return lineList;
+		}
 	  /**
 	   * 
 	   * @param conn

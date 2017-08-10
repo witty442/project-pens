@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.customer.CustomerHelper"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -38,6 +39,8 @@ pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE)
 List<References> partyTypeList = InitialReferences.getReferenes().get(InitialReferences.PARTY_TYPE);
 pageContext.setAttribute("partyTypeList",partyTypeList,PageContext.PAGE_SCOPE);
 
+//init tripList
+request.setAttribute("tripDayList", CustomerHelper.initTripList());
 
 String readOnly = "false";
 String styleClass = "";
@@ -73,96 +76,21 @@ body {
 -->
 </style>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/google_maps.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>" type="text/javascript"></script>
 <script type="text/javascript">
-//API KEY :AIzaSyA1vZ7pnm-fm1dttRBhXwEpUO2iCqduTgg
-/********************************************** Google Map ***************************************/
-function getLocation(path){
-	var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
-	//window.open(path+"/jsp/location/findLocation.jsp?customerName="+customerName);
-	var width= window.innerWidth;
-	var height= window.innerHeight;
-	//alert(width+","+height);
-	//PopupCenter(path+"/jsp/location/findLocationByGPS.jsp?run=new&customerName="+customerName, "Print",width,height);
-	window.open(path+"/jsp/location/findLocation.jsp?run=new&customerName="+customerName, "Print", "width="+width+",height="+height+",location=No,resizable=No");
-}
-
- function setLocationValue(location){
-	 $("#location").val(location);
-     //alert(lat+","+lng);
- }
-
- function gotoMap(path){
-	 var location= $("#location").val();
-		//alert(lat+","+lng);
-		if(location != "" ){
-			var locationArr = location.split(",");
-			var lat = locationArr[0];
-			var lng = locationArr[1];
-		    var customerName = $("#customerCode").val()+"-"+$("#customerName").val();
-		   // window.open(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName);
-		    var width= window.innerWidth-100;
-			var height= window.innerHeight-100;
-	
-			PopupCenter(path+"/jsp/location/showMapDetail.jsp?lat="+lat+"&lng="+lng+"&customerName="+customerName, "แสดงแผนที่",width,height);
-			
-			//window.open("https://www.google.co.th/maps/place/"+location);
-	}else{
-		alert("ยังไม่ได้ระบุตำแหน่งร้านค้านี้  กรุณา 'กดค้นหาตำแหน่ง'");
-	}
-}
- 
- /********************************************** Google Map ***************************************/
- 
- function showImage(path,customerId){
-	 var location= $("#imageFileName").val();
-		//alert(lat+","+lng);
-	 if(location != "" ){
-		var width= window.innerWidth-100;
-		var height= window.innerHeight-100;
-	
-		PopupCenter(path+"/jsp/customer/dispImageLocal.jsp?customerId="+customerId, "แสดงรูปภาพ",width,height);
-			
-	}else{
-		alert("ยังไม่ได้บันทึกข้อมูลรูปภาพ'");
-	}
-}
- 
- /** Display image after upload **/
-	function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('#blah')
-                    .attr('src', e.target.result)
-                    .width(150)
-                    .height(200);
-            };
-            reader.readAsDataURL(input.files[0]);
-            
-            //Hide old images
-             //$("imageDBDiv").hide();
-            setImageVisible("imageDB",false);
-        }
-    }
-	function setImageVisible(id, visible) {
-	    var img = document.getElementById(id);
-	    img.style.visibility = (visible ? 'visible' : 'hidden');
-	}
-/********************************************/
 
 window.onload =function(){
 	var rowAddr = document.getElementsByName('addr.id').length;
@@ -337,16 +265,40 @@ function setMainCustomer(code, name){
 								<td align="right" colspan="2">
 								  <html:radio property="customer.printType" styleId="printType1" value="H" onclick="switchPrintType()"></html:radio>สำนักงานใหญ่ 
 								</td>
-								<td align="left">
+								<td align="left" colspan="3">
 									 <html:radio property="customer.printType" styleId="printType2" value="B" onclick="switchPrintType()"></html:radio>สาขาที่
 								     <html:text property="customer.printBranchDesc"  size="10"  styleId="printBranchDesc" maxlength="5" readonly="true" onkeydown="return inputNum(event);" styleClass="disableText"/>
-								</td>
-								<td align="right">
-								 <html:checkbox property="customer.printHeadBranchDesc" value="Y" styleId="printHeadBranchDesc">พิมพ์สนญ./สาขาที่</html:checkbox>
+								&nbsp;&nbsp;&nbsp;
+								<%if("TT".equalsIgnoreCase(role) || customerForm.getCustomer().getExported().equalsIgnoreCase("Y")){ %>
+									        กำหนดจุด #1
+									    <font color="red"></font>
+										 <html:select property="customer.tripDay"  disabled="true">
+												<html:options collection="tripDayList" property="key" labelProperty="name"/>
+										  </html:select>
+											&nbsp;จุด #2
+										 <html:select property="customer.tripDay2"  disabled="true">
+												<html:options collection="tripDayList" property="key" labelProperty="name"/>
+										  </html:select>
+											&nbsp;จุด #3
+										 <html:select property="customer.tripDay3"  disabled="true">
+												<html:options collection="tripDayList" property="key" labelProperty="name"/>
+										 </html:select>
+									<%}else{ %>
+									         กำหนดจุด #1
+									    <font color="red">*</font>
+										 <html:select property="customer.tripDay" >
+												<html:options collection="tripDayList" property="key" labelProperty="name"/>
+										 </html:select>
+											&nbsp;จุด #2
+										 <html:select property="customer.tripDay2" >
+												<html:options collection="tripDayList" property="key" labelProperty="name"/>
+											</html:select>
+											&nbsp;จุด #3
+										 <html:select property="customer.tripDay3" >
+											<html:options collection="tripDayList" property="key" labelProperty="name"/>
+										 </html:select>
+									<%} %>
 								 </td>
-								<td align="left">
-									
-								</td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><b><bean:message key="Customer.Code" bundle="sysele"/></b>&nbsp;&nbsp;</td>
@@ -382,6 +334,8 @@ function setMainCustomer(code, name){
 								<td align="left" nowrap>
 									<html:text property="customer.taxNo" size="25"  maxlength="20" styleId="taxNo"/>
 									<html:checkbox property="customer.printTax" value="Y" styleId="printTax">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
+								 &nbsp;
+								   <html:checkbox property="customer.printHeadBranchDesc" value="Y" disabled="true">พิมพ์สนญ./สาขาที่</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -701,13 +655,15 @@ function setMainCustomer(code, name){
 								<td align="right" colspan="2">บันทึกตำแหน่งที่ตั้งร้านค้า&nbsp;&nbsp;</td>
 								<td align="left" colspan="3">
 									<html:text property="customer.location" size="100" readonly="true" styleId="location" styleClass="disableText" /> 
+								     <html:hidden property="customer.lat" styleId="lat"  /> 
+								    <html:hidden property="customer.lng" styleId="lng"   /> 
 								</td>
 							</tr>
 							<tr>
 							    <td align="right" colspan="2"></td>
 									<td align="left" colspan="3">
 								      <span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
-									 <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');">
+									 <%--  <input type="button" value="ค้นหาตำแหน่ง" class="newPosBtn" onclick="return getLocation('${pageContext.request.contextPath}');"> --%>
 									<input type="button" value="แสดงตำแหน่ง " class="newPosBtn" onclick="return gotoMap('${pageContext.request.contextPath}');">
 								</td>
 							</tr>
@@ -715,7 +671,7 @@ function setMainCustomer(code, name){
 						</table>
 						<br />
 						<!-- BUTTON -->
-						CustomerViewEdit
+						
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">

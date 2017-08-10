@@ -241,9 +241,9 @@ public class FTPManagerWacoal {
 		                	String dataStreamStr = convertStreamToString(ftp,ftpFileName,realPathTemp,path);
 		                	
 		                	//ftp.completePendingCommand();
-		                	//logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+		                	logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
 
-		                	//logger.debug("dataStreamStrXX:"+dataStreamStr);
+		                	logger.debug("dataStreamStrXX:"+dataStreamStr);
 		                	
 		                    /** Store DataStream in TableBean **/
 		                	String[] dataLineTextArr =  new String(dataStreamStr).split(Constants.newLine);
@@ -297,7 +297,7 @@ public class FTPManagerWacoal {
 	
 	public static String convertStreamToString(FTPClient ftpClient,String ftpFileName,String realPathTemp,String ftpPath) throws IOException {
 	   String data = "";
-       String pathTemp = realPathTemp+"/temp.xls";
+       String pathTemp = realPathTemp+"temp.xls";
      
    
 		logger.debug("Start Step 1 read and and write Excel to Temp Folder :"+pathTemp);
@@ -483,7 +483,7 @@ public class FTPManagerWacoal {
 			                        	dataRow.append(cell + "|");
 			                      }  
 		                }
-		               // logger.debug("dataRow:"+dataRow.toString());
+		                logger.debug("dataRow:"+dataRow.toString());
 		                
 	                     data.append(ftpFileName+"|"+(row.getRowNum()+1)+"|"+dataRow.toString().substring(0,dataRow.toString().length()-1)+'\n'); 
             	  }else{

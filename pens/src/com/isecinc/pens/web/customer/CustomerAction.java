@@ -129,6 +129,7 @@ public class CustomerAction extends I_Action {
 			customer.setDistrict("-1");
 			customerForm.setCustomer(customer);
 
+			
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -215,7 +216,7 @@ public class CustomerAction extends I_Action {
 			end = 50;
 			whereCause +="\n limit "+start+","+end;
 			
-			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start);//new method optimize
+			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			customerForm.setResults(results);
 			customerForm.setTotalPage(totalPage);
 			customerForm.setTotalRow(totalRow);
@@ -305,7 +306,7 @@ public class CustomerAction extends I_Action {
 			
 			whereCause +="\n limit "+start+","+end;
 			
-			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start);//new method optimize
+			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			
 			logger.debug("results.length:"+results.length);
 			
@@ -403,7 +404,7 @@ public class CustomerAction extends I_Action {
 			}
 
 			//Customer[] results = new MCustomer().search(whereCause);
-			Customer[] results = new MCustomer().searchOpt(whereCause,user,0);//new method optimize
+			Customer[] results = new MCustomer().searchOpt(whereCause,user,0,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			customerForm.setResults(results);
 
 			if (results != null) {
