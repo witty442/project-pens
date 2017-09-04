@@ -42,6 +42,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String priQty;
 	private String secQty;
 	private String orderQty;
+	private String avgQty;
 	private String expireDate;
 	private String requestDate;
 	//total
@@ -62,6 +63,14 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private String orderSortType;
     
     
+	public String getAvgQty() {
+		return avgQty;
+	}
+
+	public void setAvgQty(String avgQty) {
+		this.avgQty = avgQty;
+	}
+
 	public String getDispLastUpdate() {
 		return dispLastUpdate;
 	}
@@ -399,7 +408,19 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	  }
 	 
 	  public static class Comparators {
-
+		  public static Comparator<StockBean> AVG_QTY_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	            	 return Integer.parseInt(o1.avgQty) - Integer.parseInt(o2.avgQty);
+	            }
+	        };
+	        public static Comparator<StockBean> AVG_QTY_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	            	 return Integer.parseInt(o2.avgQty) - Integer.parseInt(o1.avgQty);
+	            }
+	        };
+	        
 	        public static Comparator<StockBean> BRAND_ASC = new Comparator<StockBean>() {
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {

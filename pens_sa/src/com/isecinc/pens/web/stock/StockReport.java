@@ -66,8 +66,8 @@ public class StockReport {
 			
 	        //add expire date
 			 if( o.getDispType().equalsIgnoreCase("pri_qty,sec_qty")){
-			     columnAllSql +=",M.expire_date";
-			     columnAllGroupBySql +=",M.expire_date";
+			     columnAllSql +=",M.expire_date,M.avg_qty";
+			     columnAllGroupBySql +=",M.expire_date,M.avg_qty";
 			 }
 			 //
 			 if( !Utils.isNull(o.getDispRequestDate()).equals("")){
@@ -93,7 +93,13 @@ public class StockReport {
 				sql.append("\n and M.sales_code = '"+Utils.isNull(o.getSalesrepCode())+"'");
 			}
 			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
-				sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+				// Brand 504 must show 503494,503544,503681 (Case Special case )
+				if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
+					sql.append("\n and ( M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n     or M.item_no in('503494','503544','503681') )");
+				}else{
+					sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+				}
 			}
 			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
 				sql.append("\n and M.customer_number in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")");
@@ -112,7 +118,6 @@ public class StockReport {
 				sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 				sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
 			}
-
 			sql.append("\n GROUP BY "+columnAllGroupBySql );
 			sql.append("\n ORDER BY "+columnAllGroupBySql);
 			
@@ -158,6 +163,8 @@ public class StockReport {
 			  }else{
 				  item.setExpireDate(Utils.stringValue(rst.getDate("EXPIRE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
+			  
+			  item.setAvgQty(Utils.decimalFormat(rst.getDouble("AVG_QTY"), Utils.format_current_no_disgit)); 
 			  
 			  //add to List
 			  itemList.add(item);
@@ -260,6 +267,12 @@ public class StockReport {
 					 Collections.sort(itemList, StockBean.Comparators.EXPIRE_DATE_DESC);
 				}else{
 					 Collections.sort(itemList, StockBean.Comparators.EXPIRE_DATE_ASC);
+				}
+			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("AVG_QTY")){
+				if("DESC".equals(o.getOrderSortType())){
+					 Collections.sort(itemList, StockBean.Comparators.AVG_QTY_DESC);
+				}else{
+					 Collections.sort(itemList, StockBean.Comparators.AVG_QTY_ASC);
 				}
 			}
 			
@@ -389,6 +402,7 @@ public class StockReport {
 			}
 			h.append("</th> \n");
 		}
+		
 		for(int i=0;i<columnNameArr.length;i++){
 		   h.append(" <th  rowspan='2'  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i]));
 		   if( excel ==false){
@@ -419,6 +433,16 @@ public class StockReport {
 		   }
 		   h.append(" </th> \n");
 		}
+			h.append(" <th rowspan='2' nowrap >");
+			h.append(" ยอดขายเฉลี่ย 3 เดือน");
+			 if( excel ==false){
+				h.append("  &nbsp;&nbsp;");
+				h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('AVG_QTY','ASC') />");
+				h.append("  &nbsp;&nbsp;");
+				h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('AVG_QTY','DESC') />");
+			}
+			h.append("</th> \n");
+		
 		h.append("</tr> \n");
 		h.append("<tr> \n");
 		h.append(" <th nowrap>หีบ");
@@ -500,6 +524,7 @@ public class StockReport {
 		}else{
 		  h.append("<td class='"+classNameCenter+"' width='8%'>"+item.getExpireDate()+"</td> \n");
 		}
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty()+"</td> \n");
 		h.append("</tr> \n");
 		
 		return h;
@@ -524,6 +549,7 @@ public class StockReport {
 		}
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalPriQty, Utils.format_current_no_disgit)+"</td> \n");
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalSecQty, Utils.format_current_no_disgit)+"</td> \n");
+		h.append("<td ></td> \n");
 		h.append("<td ></td> \n");
 		h.append("</tr> \n");
 		

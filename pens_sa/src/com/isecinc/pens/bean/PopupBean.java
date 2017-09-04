@@ -29,6 +29,37 @@ public class PopupBean implements Serializable{
 	private String salesrepId;
 	private String status;
 	
+	private String province;
+	private String provinceName;
+	private String district;
+	private String districtName;
+	
+	
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	
+	public String getProvinceName() {
+		return provinceName;
+	}
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+	public String getDistrict() {
+		return district;
+	}
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+	public String getDistrictName() {
+		return districtName;
+	}
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
 	public PopupBean(){
 		
 	}

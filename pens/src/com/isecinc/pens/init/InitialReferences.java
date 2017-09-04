@@ -50,6 +50,7 @@ public class InitialReferences extends I_Initial {
 	public static final String MOVEORDER = "MoveOrder"; 
 	public static final String BILLPLAN = "BillPlan"; 
 	public static final String BACKDATE_INVOICE = "backdateinvoice"; 
+	public static final String CUST_SHOW_TRIP = "CustShowTrip"; 
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 

@@ -60,10 +60,18 @@ public class PrintPayInServlet extends HttpServlet {
 			String userName = Utils.isNull(request.getParameter("userName"));
 			User user = new MUser().findByUserName(userName);
 			
+			//Choose Printer By User Case Printer default offline
+			String printerName = Utils.isNull(request.getParameter("printerName"));
+			if( !Utils.isNull(printerName).equals("")){
+				logger.info("Printer Choose by user:"+printerName);
+				user.setPrinterName(printerName);
+			}
+			
 			request.getSession().setAttribute("user", user);
-			logger.info("Start PrintPayIn UserName["+user.getUserName()+"]docNo["+docNo+"]");
+			
+			logger.info("PrintPay User["+user.getUserName()+"]docNo["+docNo+"]printer["+user.getPrinterName()+"]");
 			printReport(request, response);
-			logger.info("End PrintPayIn UserName["+user.getUserName()+"]docNo["+docNo+"]");
+			//logger.info(" PrintPay User["+user.getUserName()+"]docNo["+docNo+"]printer["+user.getPrinterName()+"]");
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

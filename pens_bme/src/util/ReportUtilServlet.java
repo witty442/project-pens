@@ -479,11 +479,8 @@ public class ReportUtilServlet extends HttpServlet {
 			String fileJasper, List lstData, HashMap parameterMap, String fileName) throws ServletException,
 			IOException, JRException {
 		File rptFile = null;
-		boolean defaultPrinter = false;
 		User user = (User) request.getSession().getAttribute("user");
 		logger.debug("Print to PRINTER " + fileJasper);
-		String printerInvoiceName = "EPSON LQ-300+ /II ESC/P 2 (PENS_A5)";
-		
 		try {
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = createDataSource(lstData);

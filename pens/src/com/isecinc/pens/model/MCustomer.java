@@ -7,7 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jfree.util.Log;
 
@@ -139,6 +142,58 @@ public class MCustomer extends I_Model<Customer> {
 		return totalRow;
 	}
 	
+	public List<Customer> getTripPage(Connection conn,String whereCause,User user) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Map<Integer,Customer> tripMap = new HashMap<Integer,Customer>();
+		List<Customer> list = null;
+		Customer c = new Customer();
+		try{
+			String sql ="\n  select distinct trip_day,trip_day2,trip_day3 from m_customer ,m_address  "
+					   +"\n  where 1=1 and m_customer.customer_id = m_address.customer_id " +
+			            "\n  and m_address.purpose ='B' "+
+					    "\n  "+whereCause+
+			            "\n  order by trip_day,trip_day2,trip_day3 asc" ;
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				if(rst.getInt("trip_day") != 0){
+				   c = new Customer();
+				   c.setTripDay(rst.getString("trip_day"));
+				   tripMap.put(rst.getInt("trip_day"), c);
+				}
+				if(rst.getInt("trip_day2") != 0){
+				    c = new Customer();
+				    c.setTripDay(rst.getString("trip_day2"));
+				   tripMap.put(rst.getInt("trip_day2"), c);
+				}
+				if(rst.getInt("trip_day3") != 0){
+					c = new Customer();
+					c.setTripDay(rst.getString("trip_day3"));
+				    tripMap.put(rst.getInt("trip_day3"), c);
+				}
+			}
+			
+			//Sort
+			list = new ArrayList<Customer>(tripMap.values());
+			Collections.sort(list, Customer.Comparators.TRIP_ASC);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return list;
+	}
+	
 	public Customer getImageFileName(String customerId) throws Exception {
 
 		Statement stmt = null;
@@ -217,6 +272,22 @@ public class MCustomer extends I_Model<Customer> {
 	   try{
 		   conn = new DBCPConnectionProvider().getConnection(conn);
 		   return searchOptModel(conn,whereCause,user,start,dispTotalInvoice);
+	   }catch(Exception e){
+		   throw e;
+	   }finally{
+			conn.close();
+	   }
+	}
+    
+    public Customer[] searchOptByTrip(Connection conn,String whereCause,User user,String tripBySearchSqlIn,String dispTotalInvoice) throws Exception {
+		return searchOptByTripModel(conn,whereCause,user,tripBySearchSqlIn,dispTotalInvoice);
+	}
+	
+    public Customer[] searchOptByTrip(String whereCause,User user,String  tripBySearchSqlIn,String dispTotalInvoice) throws Exception {
+	   Connection conn = null;
+	   try{
+		   conn = new DBCPConnectionProvider().getConnection(conn);
+		   return searchOptByTripModel(conn,whereCause,user,tripBySearchSqlIn,dispTotalInvoice);
 	   }catch(Exception e){
 		   throw e;
 	   }finally{
@@ -426,6 +497,203 @@ public class MCustomer extends I_Model<Customer> {
 		return array;
 	}
 	
+private Customer[] searchOptByTripModel(Connection conn,String whereCause,User user,String tripBySearchSqlIn,String dispTotalInvoice) throws Exception {
+		
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Customer> custList = new ArrayList<Customer>();
+		Customer[] array = null;
+		int no = 0;
+		try {
+			//Filter display Column
+			String displayActionReceipt ="";
+			String displayActionEditCust  ="";
+			String role = user.getType();
+			if( !role.equalsIgnoreCase(User.TT)){
+				displayActionReceipt ="none";
+			}
+			if( role.equalsIgnoreCase(User.TT)){
+				displayActionEditCust ="none";
+			}
+			
+			
+			String sql = "select distinct m_customer.*  \n";
+			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
+			       
+				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
+				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
+			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
+                   sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
+                   sql+=" ad_user.ROLE,ad_user.ISACTIVE,ad_user.CODE,ad_user.UPDATED,ad_user.UPDATED_BY,ad_user.TERRITORY, \n";
+                   sql+= " ( select count(*) as tot from t_order od where od.customer_id = m_customer.customer_id)  as order_amount \n";
+                  // sql+= " ( select sum(o.net_amount) net_amount from t_order o \n where o.doc_status = 'SV'  and o.CUSTOMER_ID = m_customer.CUSTOMER_ID ) as total_order_amt,\n";
+               
+                  // sql+= " ( select sum(r.receipt_amount) receipt_amount from t_receipt r \n where r.doc_status = 'SV' and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) as total_receipt_amt \n";
+                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX \n";
+                   
+                   sql+= " from m_customer  ,ad_user , \n" ;
+                   sql +="( \n";
+                   sql+="   select distinct customer_id,district_id,line1,line2,line3,line4 ,province_name,postal_code \n";;
+                   sql +="  from m_address where purpose ='B'\n";
+                   sql +=")m_address \n";
+                   sql+= " where m_customer.user_id = ad_user.user_id \n";
+                   sql+= " and m_customer.customer_id = m_address.customer_id \n";
+			       sql+= whereCause;
+			       sql+="\n and (trip_day in("+tripBySearchSqlIn+")  or trip_day2 in("+tripBySearchSqlIn+") or trip_day3 in("+tripBySearchSqlIn+" ))\n";
+			       
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				Customer m = new Customer();
+				no++;
+				m.setNo(no);
+				// Mandatory
+				m.setId(rst.getInt("CUSTOMER_ID"));
+				m.setReferencesID(rst.getInt("REFERENCE_ID"));
+				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
+				m.setCode(rst.getString("CODE").trim());
+				m.setName(rst.getString("NAME").trim());
+				m.setName2(ConvertNullUtil.convertToString(rst.getString("NAME2")).trim());
+				m.setTaxNo(ConvertNullUtil.convertToString(rst.getString("TAX_NO")).trim());
+				m.setWebsite(ConvertNullUtil.convertToString(rst.getString("WEBSITE")).trim());
+				m.setTerritory(ConvertNullUtil.convertToString(rst.getString("TERRITORY")).trim());
+				m.setBusinessType(ConvertNullUtil.convertToString(rst.getString("BUSINESS_TYPE")).trim());
+				// System.out.println(rst.getString("PARENT_CUSTOMER_ID"));
+				if (rst.getInt("PARENT_CUSTOMER_ID") != 0 && rst.getString("PARENT_CUSTOMER_ID") != null) {
+					Customer c = new MCustomer().find(rst.getString("PARENT_CUSTOMER_ID"));
+					m.setParentID(c.getId());
+					m.setParentCode(c.getCode());
+					m.setParentName((c.getName() + " " + c.getName2()).trim());
+				}
+				m.setBirthDay("");
+				if (rst.getTimestamp("BIRTHDAY") != null) {
+					m.setBirthDay(DateToolsUtil.convertToString(rst.getTimestamp("BIRTHDAY")));
+				}
+				m.setCreditCheck(ConvertNullUtil.convertToString(rst.getString("CREDIT_CHECK")).trim());
+				m.setPaymentTerm(ConvertNullUtil.convertToString(rst.getString("PAYMENT_TERM")).trim());
+				m.setVatCode(ConvertNullUtil.convertToString(rst.getString("VAT_CODE")).trim());
+				m.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
+				m.setShippingMethod(ConvertNullUtil.convertToString(rst.getString("SHIPPING_METHOD")).trim());
+				m.setShippingRoute(ConvertNullUtil.convertToString(rst.getString("SHIPPING_ROUTE")).trim());
+				m.setTransitName(ConvertNullUtil.convertToString(rst.getString("TRANSIT_NAME")).trim());
+				
+				/** **/
+				User u = new User();
+				u.setId(rst.getInt("USER_ID"));
+				u.setCode(rst.getString("CODE").trim());
+				u.setName(rst.getString("NAME").trim());
+				u.setType(convertToString(rst.getString("ROLE")).trim());
+				u.setActive(rst.getString("ISACTIVE").trim());
+
+				// oracle fields
+				u.setCategory(convertToString(rst.getString("CATEGORY")).trim());
+				u.setOrganization(convertToString(rst.getString("ORGANIZATION")).trim());
+				u.setSourceName(convertToString(rst.getString("SOURCE_NAME")).trim());
+				u.setIdCardNo(convertToString(rst.getString("ID_CARD_NO")).trim());
+				u.setStartDate(convertToString(rst.getString("START_DATE")).trim());
+				u.setEndDate(convertToString(rst.getString("END_DATE")).trim());
+				u.setTerritory(convertToString(rst.getString("TERRITORY")).trim());
+
+				// sales online fields
+				u.setUserName(convertToString(rst.getString("USER_NAME")).trim());
+				u.setPassword(convertToString(rst.getString("PASSWORD")).trim());
+				u.setConfirmPassword(convertToString(rst.getString("PASSWORD")).trim());
+				
+				u.activeRoleInfo();
+				m.setSalesRepresent(u);
+				/** **/
+				
+				m.setCreditLimit(rst.getDouble("CREDIT_LIMIT"));
+				m.setIsActive(rst.getString("ISACTIVE").trim());
+				m.setInterfaces(rst.getString("INTERFACES").trim());
+				m.setPartyType(ConvertNullUtil.convertToString(rst.getString("PARTY_TYPE")).trim());
+				m.setExported(rst.getString("EXPORTED"));
+
+				String addressSummary  = Utils.isNull(rst.getString("line1"))+" "+Utils.isNull(rst.getString("line2"))+" "+Utils.isNull(rst.getString("line3"));
+				       addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
+				m.setAddressSummary(addressSummary);
+				
+				// Total Invoice
+				//double totalOrderAmt = rst.getDouble("total_order_amt");
+				//double totalReceiptAmt = rst.getDouble("total_receipt_amt");
+				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
+				
+				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
+				if( !Utils.isNull(dispTotalInvoice).equals("")){
+				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+				}
+				
+				// Order Amount
+				m.setOrderAmount(rst.getInt("order_amount"));
+
+				// set display label
+				m.setDisplayLabel();
+				
+				//Show or Display Column
+				
+				//Disp Column Edit Customer
+				m.setDisplayActionEditCust(displayActionEditCust);//disp
+				if( !Utils.isNull(Utils.isNull(rst.getString("image_file_name"))).equals("")){
+				    m.setImageFileName(Utils.isNull(rst.getString("image_file_name")));
+				}else{
+					m.setImageFileName("");
+				}
+				
+				//Can Edit Dust
+				if(role.equalsIgnoreCase(User.ADMIN)){
+					m.setCanActionEditCust(true);
+				}else if(role.equalsIgnoreCase(User.VAN)){
+					if (m.getOrderAmount()== 0){
+					   if (!m.getExported().equalsIgnoreCase("Y")){
+						  m.setCanActionEditCust(true);
+						  m.setCanActionEditCust2(false);
+					   }else{
+						 // m.setDisplayActionEditCust("");
+						   if( role.equalsIgnoreCase(User.VAN)){
+						     m.setCanActionEditCust2(true);
+						   }
+					   }
+					}else{
+						if( role.equalsIgnoreCase(User.VAN)){
+						  m.setCanActionEditCust2(true);
+						}
+					}
+				}else if(role.equalsIgnoreCase(User.TT)){
+					   m.setCanActionEditCust2(true);
+				}
+				
+				//logger.debug("setDisplayActionEditCust:"+m.getDisplayActionEditCust());
+				
+				//displayActionReceipt
+				m.setDisplayActionReceipt(displayActionReceipt);
+				
+				custList.add(m);
+			}
+			
+			//convert to Obj
+			if(custList != null && custList.size() >0){
+				array = new Customer[custList.size()];
+				array = custList.toArray(array);
+			}else{
+				array = null;
+			}
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+			
+		}
+		
+		return array;
+	}
+
 	public Customer[] searchOptForStockCustomer(Connection conn,String whereCause,User user,int start) throws Exception {
 		return searchOptForStockCustomerModel(conn,whereCause,user,start);
 	}

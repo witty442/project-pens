@@ -22,6 +22,7 @@
 		<th width="5%">Row In Excel</th>
 		<th width="10%">Sales Date</th>
 		<th width="10%">Store No</th>
+		<th width="10%">Store Name</th>
 		<th width="10%">Item Wacoal</th>
 		<th width="10%">QTY</th>
 		<th width="30%">Message </th>
@@ -45,6 +46,7 @@
 			<td align="left"><%=ms[3] %></td>
 			<td align="left"><%=ms[4] %></td>
 			<td align="left"><%=ms[5] %></td>
+			<td align="left"><%=ms[6] %></td>
 		</tr>
 	<%} }%>
 	</table>
@@ -60,6 +62,7 @@
 		<th width="5%">Row In Excel</th>
 		<th width="10%">Sales Date</th>
 		<th width="10%">Store No</th>
+		<th width="10%">Store Name</th>
 		<th width="10%">Item Wacoal</th>
 		<th width="10%">QTY</th>
 		<th width="30%">Message </th>
@@ -76,7 +79,7 @@
 			if(i%2==0){
 				tabclass  ="lineO";
 			}
-			totalQty += Utils.convertStrToInt(ms[4] , 0);
+			totalQty += Utils.convertStrToInt(ms[5] , 0);
 	%>
 		<tr class="<%=tabclass%>">
 			<td><%=ms[0] %></td>
@@ -85,10 +88,11 @@
 			<td align="left"><%=ms[3] %></td>
 			<td align="center"><%=ms[4] %></td>
 			<td align="left"><%=ms[5] %></td>
+			<td align="left"><%=ms[6] %></td>
 		</tr>
 	<%} }%>
 	    <tr class="hilight_text">
-			<td colspan="4" align="right"><b>Total Qty</b></td>
+			<td colspan="5" align="right"><b>Total Qty</b></td>
 			<td align="center"><b><%=totalQty %></b></td>
 			<td></td>
 		</tr>

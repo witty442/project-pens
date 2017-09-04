@@ -34,6 +34,7 @@ public class User extends I_PO implements Serializable {
 	public static final String DD_SALES = "DDSALES";
 	public static final String MTMGR = "MTMGR";
 	public static final String STOCKCR = "STOCKCR";
+	public static final String SPIDER = "SPIDER";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -81,7 +82,10 @@ public class User extends I_PO implements Serializable {
 		setRoleSalesTarget(convertToString(rst.getString("ROLE_SALESTARGET")));
 		//set Role Cr stock
 		setRoleCRStock(convertToString(rst.getString("ROLE_CR_STOCK")));
-				
+		
+		//set Role Cr stock
+		setRoleSpider(convertToString(rst.getString("ROLE_SPIDER")));
+		
 		// set display label
 		setDisplayLabel();
   
@@ -184,8 +188,17 @@ public class User extends I_PO implements Serializable {
     private String reNewPassword;
     private String roleSalesTarget;
     private String roleCRStock;
+    private String roleSpider;
     
     
+	public String getRoleSpider() {
+		return roleSpider;
+	}
+
+	public void setRoleSpider(String roleSpider) {
+		this.roleSpider = roleSpider;
+	}
+
 	public String getRoleCRStock() {
 		return roleCRStock;
 	}

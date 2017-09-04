@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.bean.Customer"%>
+<%@page import="java.util.Map"%>
+<%@page import="java.util.Iterator"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -40,6 +43,16 @@ pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
 List<References> actives= InitialReferences.getReferenes().get(InitialReferences.ACTIVE);
 pageContext.setAttribute("actives",actives,PageContext.PAGE_SCOPE);
 
+//Show Cust Show Only have trip
+List<References> custShowTrip = InitialReferences.getReferenes(InitialReferences.CUST_SHOW_TRIP,"Y");
+String custShowTripFlag = "";
+if(custShowTrip != null && custShowTrip.size() >0){
+   //System.out.println("custShowTrip:"+(custShowTrip.get(0)).getKey());
+   custShowTripFlag = custShowTrip.get(0).getKey();
+   if("Y".equalsIgnoreCase(custShowTripFlag)){
+      customerForm.getCustomer().setDispHaveTrip("true");
+   }
+}
 
 String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
@@ -262,6 +275,8 @@ $(function() {
 								</html:select>
 								
 								&nbsp;&nbsp; <html:checkbox property="customer.dispTotalInvoice">แสดงยอดค้างชำระ</html:checkbox>
+								&nbsp;&nbsp; <html:checkbox property="customer.dispHaveTrip">แสดงเฉพาะร้านที่มี Trip</html:checkbox>
+							  
 							</td>
 						</tr>
 					</table>
@@ -277,7 +292,6 @@ $(function() {
 								  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
 									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
 								</a> 
-								
 							</td>
 						</tr>
 					</table>				
@@ -285,18 +299,36 @@ $(function() {
 					<!-- RESULT -->
 					<!-- Paging -->
 					 <c:if test="${customerForm.results != null}">
-						<span class="pagebanner">พบรายการ  ${customerForm.totalRow} รายการ  ,แสดงรายการทั้งหมด </span>
-						 <span class="pagelinks">หน้า
-							<c:forEach var="i" begin="1" end="${customerForm.totalPage}">
-							     <c:if test="${customerForm.curPage != i}">
-								    <a href="javascript:gotoPage('${pageContext.request.contextPath}','${i}')"><c:out value="${i}"/></a>&nbsp;,
-								 </c:if> 
-								 <c:if test="${customerForm.curPage == i}">
-								    &nbsp;<b><c:out value="${i}"/>&nbsp;,</b>
-								 </c:if> 
-						    </c:forEach>
-					    </span>
-					    
+					 
+					 <%if(Utils.isNull(session.getAttribute("dispHaveTrip")).equals("Y")) {%>
+					     <span class="pagebanner">แสดงรายการ Trip </span>
+							 <span class="pagelinks">จุด
+								<%
+								int curPage = customerForm.getCurPage();
+								List<Customer> its= ((List)session.getAttribute("tripPageList"));
+							    for(int i=0;i<its.size();i++){
+							    	int trip =Integer.parseInt(its.get(i).getTripDay());
+							    	if( curPage != trip){
+								 %>
+								     <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=trip%>')"><%=trip%></a>&nbsp;,
+								 <% }else{ %>
+								      &nbsp;<b><%=trip%>&nbsp;,</b>
+								 <% } 
+							     } %>
+						    </span>
+					 <%}else{ %>
+							<span class="pagebanner">พบรายการ  ${customerForm.totalRow} รายการ  ,แสดงรายการทั้งหมด </span>
+							 <span class="pagelinks">หน้า
+								<c:forEach var="i" begin="1" end="${customerForm.totalPage}">
+								     <c:if test="${customerForm.curPage != i}">
+									    <a href="javascript:gotoPage('${pageContext.request.contextPath}','${i}')"><c:out value="${i}"/></a>&nbsp;,
+									 </c:if> 
+									 <c:if test="${customerForm.curPage == i}">
+									    &nbsp;<b><c:out value="${i}"/>&nbsp;,</b>
+									 </c:if> 
+							    </c:forEach>
+						    </span>
+					   <%} %>
 					    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr >
 								<th class="cust_no">No.</th>

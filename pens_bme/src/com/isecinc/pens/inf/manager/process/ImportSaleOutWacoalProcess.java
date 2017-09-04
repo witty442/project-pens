@@ -232,8 +232,8 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBME_WACOAL_SALEOUT \n");
 				sql.append(" (Store_no, Sales_date ,Item_wacoal ,Qty ,  \n");
-				sql.append(" Branch_id, Branch_name, CREATE_DATE,CREATE_USER )  \n");
-				sql.append(" VALUES( ?,?,?,? ,?,?,?,?) \n");
+				sql.append(" Branch_id, Branch_name, CREATE_DATE,CREATE_USER,FILE_NAME )  \n");
+				sql.append(" VALUES( ?,?,?,? ,?,?,?,?,?) \n");
                 
 				logger.debug("sql:"+sql.toString());
 				
@@ -289,13 +289,13 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 						Object cellValue = xslUtils.getCellValue(colNo, cell);
 						
 						if(colNo==0){
-						   storeNo =  Utils.convertToNumberStr((Double)cellValue);
+						   storeNo =  Utils.convertDoubleToStrNoDigit(cellValue);
 						   logger.debug("storeNo:"+storeNo);
 						   ps.setString(1,storeNo+"");
 						   
 						}else if(colNo==1){
 							java.util.Date asOfDate =  (java.util.Date) cellValue;
-						// logger.debug("Date:"+asOfDate);
+						    logger.debug("Date:"+asOfDate);
 							salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
 							logger.debug("salesDate:"+salesDate);
 							ps.setDate(2, new java.sql.Date(asOfDate.getTime()));  
@@ -321,6 +321,7 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 				         s.setRow(i+1);
 				         s.setSalesDate(salesDate);
 				         s.setStoreNo(storeNo);
+				         s.setStoreName("");
 				         s.setQty(qty);
 				         s.setItemWacoal(Item_wacoal);
 				         s.setMessage("ไม่พบข้อมูล Mapping Store no กับ Branch id");
@@ -336,7 +337,7 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 				         s.setRow(i+1);
 				         s.setSalesDate(salesDate);
 				         s.setStoreNo(storeNo);
-				         s.setQty(qty);
+				         s.setStoreName(Utils.isNull(branchId[1]));
 				         s.setItemWacoal(Item_wacoal);
 				         s.setQty(qty);
 				         s.setMessage("Success ");
@@ -351,6 +352,8 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 					 ps.setTimestamp(7, new java.sql.Timestamp(new java.util.Date().getTime()));
 					 //CREATE_USER
 			         ps.setString(8, user.getUserName());
+			         //fileName
+			         ps.setString(9,Utils.isNull(fileName));
 			   
 			         ps.execute();
 				}//for Row
@@ -376,10 +379,12 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 					});
 				  
 				  //Insert Success
+				  String rowMsg = "";
 				  if(successList != null && successList.size() >0){
 					  for(int r=0;r<successList.size();r++){
 						  ImportSummary m = successList.get(r);
-				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getDescription()+","+m.getQty()+","+m.getMessage());
+						  rowMsg = m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage();
+				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",rowMsg);
 					  }
 				  }
 				  
@@ -403,7 +408,8 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 					  if(errorList != null && errorList.size() >0){
 						  for(int r=0;r<errorList.size();r++){
 							  ImportSummary m = errorList.get(r);
-					          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"FAIL",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage());
+							  rowMsg = m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage();
+					          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"FAIL",rowMsg);
 						  }
 					  }
 					 
@@ -413,7 +419,6 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 					  
 			}else{
 
-				
 				importError = false;
 				 /** Success List **/
 				 Iterator it = successMap.keySet().iterator();
@@ -431,10 +436,12 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 					    }
 					});
 				//Insert Success
+				  String rowMsg = "";
 				  if(successList != null && successList.size() >0){
 					  for(int r=0;r<successList.size();r++){
 						  ImportSummary m = successList.get(r);
-				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage());
+						  rowMsg = m.getRow()+","+m.getSalesDate()+","+m.getStoreNo()+","+m.getStoreName()+","+m.getItemWacoal()+","+m.getQty()+","+m.getMessage();
+				          insertMonitorItemResult(conMoni,mi.getId(),m.getRow(),"SUCCESS",rowMsg);
 					  }
 				  }
 				/** Set Count Record **/

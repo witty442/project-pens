@@ -81,10 +81,11 @@ span.pagelinks {
 }
 
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -112,7 +113,10 @@ function loadMe(path){
 function printReportPopup(path){
 	var docNo = document.getElementsByName("bean.docNo");
    // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/popup/printPopup.jsp?report_name=PayInReport&docNo="+docNo[0].value, "Print2", "width=200,height=200,location=No,resizable=No");
+	//window.open(path + "/jsp/popup/printPayPopup.jsp?report_name=PayInReport&docNo="+docNo[0].value, "Print2", "width=400,height=400,location=No,resizable=No");
+	 
+	var url = path+"/jsp/popup/printPayPopup.jsp?report_name=PayInReport&docNo="+docNo;
+	PopupCenter(url,'Printer',800,350);
 }
 
 function clearForm(path){

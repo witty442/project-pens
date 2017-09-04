@@ -28,8 +28,7 @@
 		    </c:choose>
 			<tr>
 			    <td><span class="<c:out value='${tabclass}'/>">${results.transactionId}</span></td>
-				 <td><span class="<c:out value='${tabclass}'/>"> ${results.name}</span></td> 
-				
+				<td><span class="<c:out value='${tabclass}'/>"> ${results.name}</span></td> 
 				<td><span class="<c:out value='${tabclass}'/>"> <fmt:formatDate value="${results.submitDate}" pattern="dd-MM-yyyy HH:ss"></fmt:formatDate ></span></td>
 				<td><span class="<c:out value='${tabclass}'/>">${results.statusDesc}</span></td>
 				<td align="left"><span class="<c:out value='${tabclass}'/>">${results.errorMsg}</span></td>

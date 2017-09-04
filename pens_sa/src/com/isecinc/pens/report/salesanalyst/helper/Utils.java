@@ -133,6 +133,32 @@ public class Utils {
 		}//for 1
 		return r;
 	}
+	
+	public static boolean userInRoleSpider(User user,String[] roles){
+		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleSpider().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
 
 
 	public static boolean statusInCheck(String status,String[] statusCheckArr){
@@ -280,6 +306,18 @@ public class Utils {
 		String dateStr = null;		
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
 		try {
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	
+	public static String stringValueChkNull(Date date, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date ==null)
+				return "";
 			dateStr = ft.format(date);
 		} catch (Exception e) {
 		}

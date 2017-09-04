@@ -1,15 +1,15 @@
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
-<%@page import="com.isecinc.pens.web.location.LocationInitial"%>
-<%@page import="util.SIdUtils"%>
-<%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="util.GoogleMapJavaScriptAPI"%>
-<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="com.isecinc.pens.web.location.LocationInitial"%>
+<%@page import="util.SIdUtils"%>
+<%@page import="com.isecinc.pens.bean.PopupBean"%>
+<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -18,11 +18,8 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
-if(request.getParameter("action") != null){
-    LocationInitial.getInstance().initSession(request);
- }
-
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
+
 java.util.List yearList = null;
 if(session.getAttribute("yearList") != null) 
 	yearList = (java.util.List)session.getAttribute("yearList");
@@ -36,7 +33,6 @@ if(session.getAttribute("screenWidth") != null){
 	screenWidth = (String)session.getAttribute("screenWidth");
 }
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -44,6 +40,7 @@ if(session.getAttribute("screenWidth") != null){
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -53,65 +50,58 @@ body {
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/location.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>" type="text/javascript"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script type="text/javascript">
-
-function loadMe(){
+function loadMe(path){
 	new Epoch('epoch_popup','th',document.getElementById('day'));
 	new Epoch('epoch_popup','th',document.getElementById('dayTo'));
 	chkSearch();
 	chkYear();
-}
-function chkSearch(){
-	   var typeSearch = document.getElementsByName("bean.typeSearch")[0];
-	   //alert(typeSearch.value);
-		disabledObj(document.getElementsByName("bean.day")[0] ,false);
-		disabledObj(document.getElementsByName("bean.dayTo")[0] ,false);
-		
-		var monthList = document.getElementsByName("bean.chkMonth");
-		for(i=0;i<monthList.length;i++){
-	       disabledObj(document.getElementsByName("bean.chkMonth")[i],false);
-	    }
-		
-	   if(typeSearch.value == 'DAY'){
-		   for(i=0;i<monthList.length;i++){
-		      disabledObj(document.getElementsByName("bean.chkMonth")[i],true);
-		   }
-		   
-	    }else  if(typeSearch.value == 'MONTH'){
-	       disabledObj(document.getElementsByName("bean.day")[0] ,true);
-	       disabledObj(document.getElementsByName("bean.dayTo")[0] ,true);
-	    }
+	
+	//popup Map
+	<%if(session.getAttribute("CUST_LOC_LIST") != null){%>
+	  MarkLocationMap(path);
+	<%}%>
+	
+	//hide table DATA
+	if(document.locationForm.dispType.value =='MAP'){
+	   showTable('table_map');
+	   hideTable('table_data');
+	}else{
+	   showTable('table_data');
+	   hideTable('table_map');
 	}
-
-function chkYear(){
-	var year = $('select#yearList').val();
-	var yearList = $('select#yearList option');
-
-	//Month
-	for(var i=0; i<yearList.size();i++){
-		if(yearList[i].value == year){
-			$('tr#'+yearList[i].value).show();
-		}
-		else{
-			$('tr#'+yearList[i].value).hide();
-		}
-	}		
+	
+	// Load SalesrepCodeList By CustCatNo salecChannel
+	<%if( !Utils.isNull(locationForm.getBean().getCustCatNo()).equals("")
+		|| !Utils.isNull(locationForm.getBean().getSalesChannelNo()).equals("")
+			){%>
+	   document.getElementsByName('bean.custCatNo')[0].value = "<%=Utils.isNull(locationForm.getBean().getCustCatNo())%>";
+	   document.getElementsByName('bean.salesChannelNo')[0].value = "<%=Utils.isNull(locationForm.getBean().getSalesChannelNo())%>";
+	   loadSalesrepCodeList('${pageContext.request.contextPath}');
+	   document.getElementsByName('bean.salesrepCode')[0].value = "<%=Utils.isNull(locationForm.getBean().getSalesrepCode())%>";
+	<%} %>
+	
+	// Load Amphur By Province
+	<%if( !Utils.isNull(locationForm.getBean().getProvince()).equals("")){%>
+	   document.getElementsByName('bean.province')[0].value = "<%=Utils.isNull(locationForm.getBean().getProvince())%>";
+	   loadDistrict('${pageContext.request.contextPath}');
+	   document.getElementsByName('bean.district')[0].value = "<%=Utils.isNull(locationForm.getBean().getDistrict())%>";
+	<%} %>
 }
 </script>
 
 </head>
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
+<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
 		<td colspan="3"><jsp:include page="../header.jsp"/></td>
@@ -147,11 +137,8 @@ function chkYear(){
 						<html:form action="/jsp/locationAction">
 						<jsp:include page="../error.jsp"/>
 						<table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
-							<tr>
-							    <td colspan=8 align="left"><b>ข้อมูล ณ วันที่ &nbsp;:&nbsp;<%=(String)session.getAttribute("maxOrderedDate")%>&nbsp;&nbsp;เวลา&nbsp;:<%=(String)session.getAttribute("maxOrderedTime")%></b></td>
-							 </tr>
-							  <tr>
-								  <td colspan="8" align="right">
+						
+							   <tr><td colspan="8" align="right">
 								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
 									<tr class="txt_style" >
 								  	<td width="13%" align="left">รอบเวลา &nbsp;&nbsp;<html:select property="bean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
@@ -175,6 +162,7 @@ function chkYear(){
 								     </tr>
 								   </table>
 								</td></tr>
+								<!-- ###################################### -->
 								<tr><td colspan="8" align="left">
 								     <fieldset>
 								       <legend>เดือน</legend>
@@ -198,6 +186,118 @@ function chkYear(){
                                        </table>
                                        </fieldset>
                                  </td></tr>
+                                 <!-- ###################################### -->
+                                  <tr><td colspan="8" align="right">
+								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+									<tr class="txt_style" >
+								  	  <td width="100%" align="left">ลักษณะการแสดงผล &nbsp;&nbsp;
+								  	  <html:select property="bean.dispType" styleId="dispType" onchange="changeDispCri(this)" styleClass="txt_style">
+								         <html:options collection="dispTypeList" property="key" labelProperty="name"/>
+							           </html:select>
+							          </td>
+							         </tr>
+								   </table>
+								</td></tr>
+								<!-- ###################################### -->
+								<tr><td colspan="8" align="right">
+								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+									<tr class="txt_style" >
+									 <td width="8%" align="right">ประเภทขาย</td>
+								  	<td width="10%" align="left">
+								  	    <html:select property="bean.custCatNo" styleId="custCatNo" styleClass="txt_style" 
+								  	    onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+								       <html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
+							           </html:select>
+							           </td>
+								     <td width="10%" align="right">ภาคการขาย </td>
+								     <td width="10%" align="left">
+								      <html:select property="bean.salesChannelNo" styleId="salesChannelNo" 
+								      onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+						                <html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
+				                      </html:select>
+                                     </td> 
+									<td width="10%" align="right"> พนักงานขาย </td>
+									<td width="20%" align="left">
+									<html:select property="bean.salesrepCode" styleId="salesrepCode" >
+										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
+								    </html:select>
+									</td>
+									<td width="12%" align="right"></td>
+								    <td width="20%" align="left"></td>
+								    </tr>
+								   </table>
+								</td></tr>
+								<!-- ################################## -->
+								<tr><td colspan="8" align="right">
+								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+									<tr class="txt_style" >
+									 <td width="5%" align="right">จังหวัด</td>
+								  	<td width="10%" align="left">
+								  	    <html:select property="bean.province" styleId="province" styleClass="txt_style" onchange="loadDistrict('${pageContext.request.contextPath}');">
+								           <html:options collection="PROVINCE_LIST" property="province" labelProperty="provinceName"/>
+							           </html:select>
+							         </td>
+								     <td width="10%" align="right">อำเภอ</td>
+								     <td width="10%" align="left">
+								      <html:select property="bean.district" styleId="district" >
+						                <%-- <html:options collection="DISTRICT_LIST" property="district" labelProperty="districtName"/> --%>
+				                      </html:select>
+                                     </td> 
+									<td width="10%" align="right"> รหัสร้านค้า </td>
+									<td width="20%" align="left">
+								       <html:text property="bean.customerCode"  styleId="customerCode" size="15"/>
+									  <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerLocation')"/>   
+									</td>
+									<td width="12%" align="right"></td>
+								    <td width="20%" align="left"></td>
+								    </tr>
+								   </table>
+								</td></tr>
+								<!-- ################################## -->
+								<tr><td colspan="8" align="right">
+								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1"  id="table_map">
+									<tr class="txt_style" >
+								  	<td width="15%" align="left">
+								  	     <html:checkbox property="bean.dispAllStore">ร้านค้าทั้งหมด</html:checkbox>
+								  	     &nbsp;
+								  	     <img src="${pageContext.request.contextPath}/icons/chk_store.png" width="32px" height ="32px"/>
+							         </td>
+								     <td width="15%" align="left" colspan="2">
+								     <html:checkbox property="bean.dispAllOrder">ร้านที่ได้ขาย</html:checkbox>
+								     &nbsp;
+								  	     <img src="${pageContext.request.contextPath}/icons/chk_order.png" width="32px" height ="32px"/>
+                                     </td> 
+									<td width="15%" align="left">
+								      <html:checkbox property="bean.dispAllVisit">ร้านที่ได้เยี่ยม</html:checkbox>
+									&nbsp;
+								  	  <img src="${pageContext.request.contextPath}/icons/chk_visit.png" width="32px" height ="32px"/>
+									</td>
+									<td width="20%" align="right"></td>
+								    <td width="20%" align="left"></td>
+								    </tr>
+								   </table>
+								</td></tr>
+							   <!-- ################################## -->
+								<tr><td colspan="8" align="right">
+								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" id="table_data">
+									<tr class="txt_style" >
+								  	<td width="15%" align="left">รูปแบบการแสดงผล </td>
+								     <td width="20%" align="left" colspan="2">
+								     <html:select property="bean.reportType" styleId="reportType" styleClass="txt_style">
+								           <html:options collection="REPORT_TYPE_LIST" property="key" labelProperty="name"/>
+							           </html:select>
+                                     </td> 
+									<td width="10%" align="right">ข้อมูล Trip</td>
+									<td width="25%" align="left">
+									 <html:select property="bean.tripType" styleId="tripType" styleClass="txt_style">
+								           <html:options collection="TRIP_TYPE_LIST" property="key" labelProperty="name"/>
+							           </html:select>
+									</td>
+								    <td width="15%" align="left"></td>
+								    </tr>
+								   </table>
+								</td></tr>
+								<!-- ################################## -->
 							 </table>
 					<br>
 					<!-- BUTTON -->
@@ -205,30 +305,19 @@ function chkYear(){
 						<tr>
 							<td align="center">
 								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
+								<input type="button" value="Export" class="newPosBtn" onclick="exportReport('${pageContext.request.contextPath}')"> 
 								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
-								
-								  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
-									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
-								</a> 
-								
 							</td>
 						</tr>
-					</table>				
-                    
-										
-				<!-- Result -->	
-					<br>
-					<!-- BUTTON -->
-					<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-						<tr>
-							<td align="right">
-								<a href="#" onclick="window.location='./mainpage.jsp'">
-								<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-								<!-- <img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn"> --></a>
-							</td>
-							<td width="10%">&nbsp;</td>
-						</tr>
-					</table>
+					</table>					
+				    <!-- ************************Result ***************************************************-->
+					  <%
+					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
+					  if(request.getSession().getAttribute("RESULTS") != null) {
+					     out.println(request.getSession().getAttribute("RESULTS"));
+					  }
+					  %>
+					<!-- ************************Result ***************************************************-->
 					<!-- Hidden Field -->
 					</html:form>
 					<!-- BODY -->

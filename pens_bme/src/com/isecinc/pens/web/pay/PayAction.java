@@ -339,20 +339,25 @@ public class PayAction extends I_Action {
 	@SuppressWarnings("unchecked")
 	public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
 		
-		logger.debug("Search for report ");
+		logger.debug(" Print PayIn report ");
 		PayForm reportForm = (PayForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		ReportUtilServlet reportServlet = new ReportUtilServlet();
 		HashMap parameterMap = new HashMap();
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
-		 
 		try {
+			//Choose Printer By User Case Printer default offline
+			String printerName = Utils.isNull(request.getParameter("printerName"));
+			if( !Utils.isNull(printerName).equals("")){
+				logger.info("Printer Choose by user:"+printerName);
+				user.setPrinterName(printerName);
+				request.getSession().setAttribute("user",user);
+			}
 			
 			conn = DBConnection.getInstance().getConnection();
 			PayForm aForm = (PayForm) form;
-			String fileType = SystemElements.PRINTER;//SystemElements.PDF;//request.getParameter("fileType");
-			//String fileType =SystemElements.PDF;
+			String fileType = SystemElements.PRINTER;
 			logger.debug("fileType:"+fileType);
 			
 			//Search Again

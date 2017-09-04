@@ -202,12 +202,12 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			String sql = "select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";
-			sql += "from t_order ";
-			sql += "where 1=1 ";
-			sql += "  and customer_id = " + customerId;
-			sql += "  and doc_status = 'SV' ";
-			sql += "  order by order_date desc, order_no desc ";
+			String sql = "\n select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";
+			sql += "\n from t_order ";
+			sql += "\n where 1=1 ";
+			sql += "\n  and customer_id = " + customerId;
+			sql += "\n  and doc_status = 'SV' ";
+			sql += "\n  order by order_date desc, order_no desc ";
 
 			logger.debug("sql:"+sql);
 			

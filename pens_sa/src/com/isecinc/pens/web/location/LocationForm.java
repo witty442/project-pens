@@ -43,7 +43,9 @@ public class LocationForm extends I_Form {
 	}
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 	  if(getBean() !=null){
-		 
+		 getBean().setDispAllStore("");
+		 getBean().setDispAllOrder("");
+		 getBean().setDispAllVisit("");
 	  }
 		
 	}

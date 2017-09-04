@@ -794,7 +794,7 @@ public class Utils {
 	}
 	
 	public static int convertStrToInt(String str,int defaultInt) {
-		if (str ==null || "".equals(str)){
+		if (str.equalsIgnoreCase("null") || str ==null || "".equals(str)){
 			return defaultInt;
 		}
 		str= str.replaceAll("\\,", "");

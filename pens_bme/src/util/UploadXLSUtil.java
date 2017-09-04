@@ -77,7 +77,7 @@ public class UploadXLSUtil {
 						value = cell.getNumericCellValue();
 					} else {
 						RichTextString text = cell.getRichStringCellValue();
-						// logger.debug("column(" + colNo + "): CELL_TYPE_FORMULA(" + cell.getCachedFormulaResultType()
+						 //logger.debug("column(" + colNo + "): CELL_TYPE_FORMULA(" + cell.getCachedFormulaResultType()
 						// + "), value: " + text.getString());
 						value = text.getString();
 					}

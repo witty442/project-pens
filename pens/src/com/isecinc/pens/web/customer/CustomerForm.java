@@ -3,9 +3,13 @@ package com.isecinc.pens.web.customer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.Factory;
 import org.apache.commons.collections.list.LazyList;
+import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.web.I_Form;
@@ -37,8 +41,8 @@ public class CustomerForm extends I_Form implements Serializable{
 	private int curPage;
 	private int totalRow;
 	private int totalPage;
-	
-     
+
+
 	public FormFile getImageFile() {
 		return imageFile;
 	}
@@ -127,7 +131,10 @@ public class CustomerForm extends I_Form implements Serializable{
 	public void setTotalPage(int totalPage) {
 		this.totalPage = totalPage;
 	}
-	
-	
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		  if(getCustomer() !=null){
+			 getCustomer().setDispHaveTrip("");
+		  }
+	}
 
 }

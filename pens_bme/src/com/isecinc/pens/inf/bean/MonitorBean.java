@@ -40,6 +40,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private String errorMsg;
    private String timeInUse;
    private String statusDesc;
+   private String fileName;
    
    private MonitorItemBean monitorItemBean;
    private List monitorItemList;

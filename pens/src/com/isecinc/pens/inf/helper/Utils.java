@@ -54,6 +54,7 @@ public class Utils {
 	public static final String YY_MM = "yyMM";
 	
 	public static final Locale local_th= new Locale("th","TH");
+	public static final String format_num_no_disgit = "#";
 	
 	public static final String format_current_no_disgit = "#,##0";
 	public static final String format_current_2_disgit = "#,##0.00";

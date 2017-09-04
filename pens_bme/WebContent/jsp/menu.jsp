@@ -29,7 +29,7 @@
   String hostDD = "http://"+ipDD+":8081";
   
   String currentIP =InetAddress.getLocalHost().getHostAddress();
-  System.out.println("Current IP:"+currentIP);
+  //System.out.println("Current IP:"+currentIP);
 
   //case Server Test contextPath = pens_bme_test
   if("192.168.38.186".equals(ipProd)){ //For Test
@@ -50,8 +50,8 @@
 	  hostDD = "http://"+ipDD+":8081";
   }
   
-  System.out.println("contextPathProd:"+contextPathProd);
-  System.out.println("contextPathDD:"+contextPathDD);
+  //System.out.println("contextPathProd:"+contextPathProd);
+  //System.out.println("contextPathDD:"+contextPathDD);
 
 %>
 <script>

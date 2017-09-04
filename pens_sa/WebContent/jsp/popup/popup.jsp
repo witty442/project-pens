@@ -284,7 +284,10 @@ window.onload = function(){
 <%if(session.getAttribute("DATA_LIST") != null){ %>
 <%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/BrandResult.jsp" /> 
-<%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)){ %>
+<%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
+		|| "CustomerLocation".equalsIgnoreCase(pageName)
+		){ 
+%>
      <jsp:include page="popup_sub/CustomerResult.jsp" /> 
 <%}else if("ItemStock".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/ItemResult.jsp" /> 

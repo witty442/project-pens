@@ -70,9 +70,10 @@ span.pagelinks {
 }
 
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -81,6 +82,7 @@ function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('dateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('dateTo'));
 }
+
 function clearForm(path){
 	var form = document.payForm;
 	form.action = path + "/jsp/payAction.do?do=clear2";
@@ -98,7 +100,6 @@ function search(path){
 		alert("กรุณาระบุ ประเภท");
 		return false;
 	} */
-	
 	
 	form.action = path + "/jsp/payAction.do?do=search2&action=newsearch";
 	form.submit();
@@ -130,7 +131,9 @@ function openCopy(path,docNo){
 }
 
 function printReport(path,docNo){
-    window.open(path + "/jsp/popup/printPopup.jsp?report_name=PayInReport&docNo="+docNo, "Print2", "width=200,height=200,location=No,resizable=No");
+   var url = path+"/jsp/popup/printPayPopup.jsp?report_name=PayInReport&docNo="+docNo;
+   //, "Print2", "width=800,height=400,location=No,resizable=No");
+	PopupCenter(url,'Printer',800,350);
 }
 
 </script>

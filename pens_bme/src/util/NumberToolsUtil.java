@@ -17,4 +17,15 @@ public class NumberToolsUtil {
 		NumberFormat formatter = new DecimalFormat("#,##0.00");
 		return formatter.format(num);
 	}
+	
+	public static String convertSciToDecimal(String scientificNotation){
+		//String scientificNotation = "8.854922341299E12";
+		Double scientificDouble = Double.parseDouble(scientificNotation);
+		NumberFormat nf = new DecimalFormat("################################################.###########################################");
+		String decimalString = nf.format(scientificDouble);
+		
+		System.out.println(decimalString);
+		return decimalString;
+	}
+	
 }

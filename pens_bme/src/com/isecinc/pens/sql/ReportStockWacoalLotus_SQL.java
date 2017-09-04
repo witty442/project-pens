@@ -40,7 +40,6 @@ public class ReportStockWacoalLotus_SQL {
 				    sql.append("\n ,(select M.branch_name from pensbme_wacoal_store_mapping M where M.branch_id = L.branch_id) as branch_name ");
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_INISTK_WACOAL L WHERE 1=1");
-					//sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -48,7 +47,7 @@ public class ReportStockWacoalLotus_SQL {
 				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
-					sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+					sql.append("\n WHERE  1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -56,7 +55,7 @@ public class ReportStockWacoalLotus_SQL {
 				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
 					sql.append("\n ,substr(L.item_wacoal,0,6) as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
-					sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+					sql.append("\n WHERE 1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -64,7 +63,7 @@ public class ReportStockWacoalLotus_SQL {
 				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
-					sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+					sql.append("\n WHERE  1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
@@ -91,7 +90,7 @@ public class ReportStockWacoalLotus_SQL {
  		        /** Sale In **/
 	 		    sql.append("\n SELECT L.branch_id,L.item as group_type,NVL(SUM(QTY),0) as SALE_IN_QTY ");
 			    sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
-			    sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
@@ -110,7 +109,7 @@ public class ReportStockWacoalLotus_SQL {
 				 /** Sale OUT **/
 	 		    sql.append("\n SELECT L.branch_id,substr(L.item_wacoal,0,6) as group_type,NVL(SUM(QTY),0) as SALE_OUT_QTY ");
 			    sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
-			    sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
@@ -129,7 +128,7 @@ public class ReportStockWacoalLotus_SQL {
 				 /** SALE_RETURN **/
 	 		    sql.append("\n SELECT L.branch_id,L.item as group_type ,NVL(SUM(QTY),0) as SALE_RETURN_QTY ");
 			    sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
-			    sql.append("\n WHERE L.BRANCH_NAME LIKE '"+storeCode+"%'");
+			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }

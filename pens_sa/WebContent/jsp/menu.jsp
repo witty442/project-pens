@@ -36,9 +36,17 @@
 	       </li> --%>
 		</ul>
 	</li> 
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/locationAction.do?do=prepare&action=new';"><span>Location</span></a>
-		
+	
+	<%if ( Utils.userInRoleSpider(user,new String[]{User.ADMIN,User.SPIDER}) ){ %>
+	<li><a href="javascript: void(0)" class="parent"><span>PENS Spider</span></a>
+		<ul>
+			 <li>
+	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/locationAction.do?do=prepare&action=new';">
+	          <span>1.<bean:message key="Location" bundle="sysprop"/></span></a>
+	       </li> 
+		</ul>
 	</li> 
+	<%}%>
 	
 <%if ( Utils.userInRole(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
 %>

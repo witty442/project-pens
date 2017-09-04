@@ -226,12 +226,14 @@ function exportToExcel(path){
 	   <table  border="0" cellpadding="3" cellspacing="0" >
 			<tr>
 				<td align="left">
+				   <a href="javascript:searchReport('${pageContext.request.contextPath}')">
+					  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+					</a>
+					
 				    <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 					  <input type="button" value="Export To Excel" class="newPosBtnLong"> 
 					</a>
-					<a href="javascript:searchReport('${pageContext.request.contextPath}')">
-					  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-					</a>
+					
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
 					</a>						

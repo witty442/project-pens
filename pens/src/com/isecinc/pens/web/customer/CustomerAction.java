@@ -3,6 +3,9 @@ package com.isecinc.pens.web.customer;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -129,7 +132,7 @@ public class CustomerAction extends I_Action {
 			customer.setDistrict("-1");
 			customerForm.setCustomer(customer);
 
-			
+		
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -152,71 +155,111 @@ public class CustomerAction extends I_Action {
         int totalPage = 0;
         int start = 0;
         int end = 50;
+        String tripBySearchSqlIn = "";
 		try {
+			//clear session
+			request.getSession().removeAttribute("tripPageMap");
+			
 			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
 			customerForm.setCriteria(criteria);
 			String whereCause = "";
 			if (customerForm.getCustomer().getTerritory() != null
 					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += " AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
 			}
 			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += " AND m_customer.CODE LIKE '%"
+				whereCause += "\n AND m_customer.CODE LIKE '%"
 						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += " AND m_customer.NAME LIKE '%"
+				whereCause += "\n AND m_customer.NAME LIKE '%"
 						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getIsActive() != null
 					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += " AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
 			}
 			// WIT EDIT :04/08/2554 
 			if(!User.ADMIN.equals(user.getType())){
-			   whereCause += " AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += " AND m_customer.USER_ID = " + user.getId();
+			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
 			}
 			
 			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
-				whereCause += " AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
+				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
 			}
 			
 			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
+				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
+				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
 						 + ")";
 			}
 			
+			//Check Disp have Trip Or no
+			request.getSession().setAttribute("dispHaveTrip", "N");
+			if (  !Utils.isNull(customerForm.getCustomer().getDispHaveTrip()).equals("") ) {
+				whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
+			    request.getSession().setAttribute("dispHaveTrip", "Y");
+			}
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			
 			//** get From Session **/
 			//currPage = customerForm.getCurPage();
 			//totalRow = customerForm.getTotalRow();
 			
-			/** Get TotalRow **/
-		    totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
-		    if(totalRow > 0){
-		    	double t = new Double(totalRow)/new Double(MAX_ROW_PAGE);
-		    	logger.debug("t:"+t);
-		    	BigDecimal totalPageB = new BigDecimal(t);
-		    	totalPageB = totalPageB.setScale(0,BigDecimal.ROUND_UP);
-		    	
-		    	logger.debug("totalPageB:"+totalPageB);
-		    	
-			    totalPage = totalPageB.intValue();
-		    }
-		    
+			/** Get Case Trip **/
+			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
+				
+				//Trip Day 1 - 23 +98
+				List<Customer> tripPageList = new MCustomer().getTripPage(conn, whereCause, user);
+				request.getSession().setAttribute("tripPageList", tripPageList);
+			    totalPage = tripPageList.size();
+			    
+			    // Get Trip Case Search By Customer
+			    if(tripPageList != null && tripPageList.size() >0){
+			    	for(int i=0;i<tripPageList.size();i++){
+			    		//tripBySearchSqlIn += "'"+tripPageList.get(i).getTripDay()+"',";
+			    		// set default CurPage
+			    		if(i==0){
+			    			currPage =Integer.parseInt(tripPageList.get(i).getTripDay());
+			    			break;
+			    		}
+			    	}
+			    	/*if(tripBySearchSqlIn.length() >0){
+			    		tripBySearchSqlIn = tripBySearchSqlIn.substring(0,tripBySearchSqlIn.length()-1);
+			    	}*/
+			    }
+			    
+			}else{
+				totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
+			    if(totalRow > 0){
+			    	double t = new Double(totalRow)/new Double(MAX_ROW_PAGE);
+			    	logger.debug("t:"+t);
+			    	BigDecimal totalPageB = new BigDecimal(t);
+			    	totalPageB = totalPageB.setScale(0,BigDecimal.ROUND_UP);
+			    	
+			    	logger.debug("totalPageB:"+totalPageB);
+			    	
+				    totalPage = totalPageB.intValue();
+			    }
+			}
+			logger.debug("showTrip:"+request.getAttribute("dispHaveTrip"));
 			logger.debug("totalRow:"+totalRow);
 			logger.debug("totalPage:"+totalPage);
 			logger.debug("currPage:"+currPage);
 			
-			end = 50;
-			whereCause +="\n limit "+start+","+end;
-			
-			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+			 Customer[] results = null;
+			 if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
+				String currPageSqlIn = "'"+currPage+"'";
+				results = new MCustomer().searchOptByTrip(conn,whereCause,user,currPageSqlIn,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+			}else{
+				end = 50;
+				whereCause +="\n limit "+start+","+end;
+				
+				results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+			}
 			customerForm.setResults(results);
 			customerForm.setTotalPage(totalPage);
 			customerForm.setTotalRow(totalRow);
@@ -260,34 +303,41 @@ public class CustomerAction extends I_Action {
 			String whereCause = "";
 			if (customerForm.getCustomer().getTerritory() != null
 					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += " AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
 			}
 			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += " AND m_customer.CODE LIKE '%"
+				whereCause += "\n AND m_customer.CODE LIKE '%"
 						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += " AND m_customer.NAME LIKE '%"
+				whereCause += "\n AND m_customer.NAME LIKE '%"
 						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getIsActive() != null
 					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += " AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
 			}
 			// WIT EDIT :04/08/2554 
 			if(!User.ADMIN.equals(user.getType())){
-			   whereCause += " AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += " AND m_customer.USER_ID = " + user.getId();
+			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
+			}
+			
+			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
+				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
 			}
 			
 			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
+				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
+				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
 						 + ")";
 			}
 			
+			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equals("Y") ) {
+			    whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
+			}
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			
 			//** get From Session **/
@@ -303,12 +353,17 @@ public class CustomerAction extends I_Action {
 			end =  MAX_ROW_PAGE;
 			
 			logger.debug("start["+start+"]end["+end+"]");
+
+			Customer[] results = null;
+			if (Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
+				String startTrip = "'"+currPage+"'";
+				results = new MCustomer().searchOptByTrip(conn,whereCause,user,startTrip,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+			}else{
+				whereCause +="\n limit "+start+","+end;
+				results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+			}
 			
-			whereCause +="\n limit "+start+","+end;
-			
-			Customer[] results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
-			
-			logger.debug("results.length:"+results.length);
+			//logger.debug("results.length:"+results.length);
 			
 			customerForm.setResults(results);
 			customerForm.setTotalPage(totalPage);

@@ -3,33 +3,21 @@ package com.isecinc.pens.web.location;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
-import com.isecinc.pens.bean.User;
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
-import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
-import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
-public class LocationInitial {
+public class LocationInitial extends LocationControlPage {
    
 	/**
 	 * WITTY
@@ -37,21 +25,11 @@ public class LocationInitial {
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
 	public   static Map<String,String> MONTH_MAP = new HashMap<String,String>();
-	
 	public static final String TYPE_SEARCH_DAY = "DAY";
 	public static final String TYPE_SEARCH_MONTH = "MONTH";
-	public static final String TABLE_VIEW = "XXPENS_BI_SALES_ANALYSIS_V";
-	
-	//For Prefix ColumnName CALL NO DUP 
-	public static final String NO_DUP_PREFIX = "ND_";
-	
-	public static List<String> MULTI_SELECTION_LIST = new ArrayList<String>();
-	SAGenCondition saGen = new SAGenCondition();
-	SAUtils saU = new SAUtils();
 	private static LocationInitial salesAnalystProcess;
 	
 	public static LocationInitial getInstance(){
-		
 		if(salesAnalystProcess == null){
 			salesAnalystProcess = new LocationInitial();
 			return salesAnalystProcess;
@@ -59,8 +37,6 @@ public class LocationInitial {
 		return salesAnalystProcess;
 	}
 
-
-	
 	public  void initSession(HttpServletRequest requestWeb) {
 		References r = null;
 		HttpSession session = requestWeb.getSession(true);
@@ -68,7 +44,7 @@ public class LocationInitial {
 		int i = 0;
 		try{
 			logger.debug("Initail Session ");
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			
 			/** init TypeSearch ***/
 			List<References> typeSearchList = new ArrayList<References>();
@@ -76,19 +52,20 @@ public class LocationInitial {
 			typeSearchList.add(r);
 			r = new References("MONTH","เดือน");
 			typeSearchList.add(r);
-			//r = new References("QUARTER","ไตรมาส");
-			//typeSearchList.add(r);
-			//r = new References("YEAR","ปี");
-			//typeSearchList.add(r);
 			session.setAttribute("typeSearchList", typeSearchList);
 			
-			/** init year **/
+			/** DispType List **/
+			List<References> dispTypeList = new ArrayList<References>();
+			dispTypeList.add(new References("MAP","แสดงเป็นแผนที่"));
+			dispTypeList.add(new References("DATA","แสดงเป็นข้อมูล"));
+			session.setAttribute("dispTypeList", dispTypeList);
 			
+			/** init year **/
 			List<References> yearL = initYearList(conn," DESC");
 			session.setAttribute("yearList", yearL);
 			
-			List<References> yearLSAC = initYearList(conn," ASC");
-			session.setAttribute("yearListASC", yearLSAC);
+		/*	List<References> yearLSAC = initYearList(conn," ASC");
+			session.setAttribute("yearListASC", yearLSAC);*/
 			
 			for(References year:yearL){
 				String yearKey = year.getKey();
@@ -107,17 +84,81 @@ public class LocationInitial {
 				MONTH_MAP.put(yearKey+"11", "พ.ย. "+yearShow);
 				MONTH_MAP.put(yearKey+"12", "ธ.ค. "+yearShow);
 			}
-		
-			/** init day **/
-			List<References> dayList = new ArrayList<References>();
-			for(i=1;i<=31;i++){
-			   r = new References(""+i,""+i);
-			   dayList.add(r);
-			}
-			session.setAttribute("dayList", dayList);
 
-			//Remove Session RESULT
-			session.setAttribute("RESULT", null);
+			//CUST_CAT_NO_LIST
+			//add Blank Row
+			List<PopupBean> dataList = new ArrayList<PopupBean>();
+			PopupBean item = new PopupBean();
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
+			dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("S");
+			item.setCustCatDesc("Credit Sales");
+			dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("C");
+			item.setCustCatDesc("Van Sales");
+			dataList.add(item);
+			
+			session.setAttribute("CUST_CAT_LIST",dataList);
+			/********************************************************/
+			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn);
+			dataList.addAll(salesChannelList_s);
+			session.setAttribute("SALES_CHANNEL_LIST",dataList);
+			
+			/********************************************************/
+			//SALESREP_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			dataList.addAll(salesrepList_s);
+			session.setAttribute("SALESREP_LIST",dataList);
+			
+			/********************************************************/
+			//PROVINCE_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setProvince("");
+			item.setProvinceName("");
+			dataList.add(item);
+			
+			List<PopupBean> tempList = searchProvinceList(conn,"");
+			dataList.addAll(tempList);
+			session.setAttribute("PROVINCE_LIST",dataList);
+            /********************************************************/
+			
+			/** ReportType List **/
+			List<References> reportTypeList = new ArrayList<References>();
+			reportTypeList.add(new References("report1","ร้านค้า , ที่อยู่ "));
+			reportTypeList.add(new References("report2","ร้านค้า , ที่อยู่ , ที่อยู่ตาม Google"));
+			reportTypeList.add(new References("report3","พนักงานขาย , ร้านค้า ,  ที่อยู่ "));
+			reportTypeList.add(new References("report4","ภาคการขาย , พนักงานขาย , ร้านค้า ,  ที่อยู่ "));
+			reportTypeList.add(new References("report5"," พนักงานขาย  , จังหวัด , อำเภอ , ร้านค้า , ที่อยู่ "));
+			session.setAttribute("REPORT_TYPE_LIST", reportTypeList);
+			/**********************************************************/
+			/** TripType List **/
+			List<References> tripTypeList = new ArrayList<References>();
+			tripTypeList.add(new References("real","แสดงข้อมูลร้านค้าตามการบันทึกจริง"));
+			tripTypeList.add(new References("trip"," แสดงข้อมูลร้านค้าตาม Trip "));
+			session.setAttribute("TRIP_TYPE_LIST", tripTypeList);
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -130,30 +171,5 @@ public class LocationInitial {
 		}
 	}
 	
-	public  List<References> initYearList(Connection conn,String sort) throws Exception{
-		String sql = "";
-		PreparedStatement ps = null;
-		ResultSet rs= null;
-        List<References> yearList = new ArrayList<References>();
-		try{
-			sql = "SELECT DISTINCT ORDER_YEAR from XXPENS_BI_MST_ORDER_DATE ORDER BY ORDER_YEAR "+sort;
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				yearList.add(new References(rs.getString("ORDER_YEAR"), (rs.getInt("ORDER_YEAR")+543)+""));
-			}
-			
-		}catch(Exception e){
-			 throw e;
-		}finally{
-			
-			if(ps != null){
-			   ps.close();ps= null;
-			}
-			if(rs != null){
-			   rs.close();rs=null;
-			}
-		}
-		return yearList;
-	}
+	
 }

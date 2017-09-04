@@ -30,6 +30,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
 import util.Constants;
+import util.NumberToolsUtil;
 import util.UploadXLSUtil;
 
 import com.isecinc.pens.bean.ImportSummary;
@@ -1832,7 +1833,9 @@ public class ImportProcess {
 						///Reference, Unit_Price
 						//code
 						if(colNo==0){
-							ps.setString(index++, Utils.isNull(cellValue));
+							String sciValue = String.valueOf((Double)xslUtils.getCellValue(colNo, cell));
+							logger.debug("sciVal:"+sciValue);
+							ps.setString(index++,NumberToolsUtil.convertSciToDecimal(sciValue));
 						}else if(colNo==1){
 						   //Desc
 							desc = Utils.isNull(cellValue);

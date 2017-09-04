@@ -1,11 +1,9 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
-import java.sql.Blob;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
-
-import org.apache.struts.upload.FormFile;
+import java.util.Comparator;
 
 import util.ConvertNullUtil;
 import util.DateToolsUtil;
@@ -29,7 +27,7 @@ import com.isecinc.pens.model.MUser;
  *          atiz.b : code prefix transient
  * 
  */
-public class Customer extends I_PO implements Serializable {
+public class Customer extends I_PO implements Serializable,Comparable<Customer> {
 
 	private static final long serialVersionUID = -8675517484785667619L;
 
@@ -298,11 +296,18 @@ public class Customer extends I_PO implements Serializable {
 	private String printTax;
 	private String airpayFlag;
 	private String location;
+	private String dispHaveTrip;
     
-   // private Blob imageFileBlob;
     private String imageFileName;
     
-    
+	public String getDispHaveTrip() {
+		return dispHaveTrip;
+	}
+
+	public void setDispHaveTrip(String dispHaveTrip) {
+		this.dispHaveTrip = dispHaveTrip;
+	}
+
 	public String getDispTotalInvoice() {
 		return dispTotalInvoice;
 	}
@@ -776,6 +781,18 @@ public class Customer extends I_PO implements Serializable {
 		this.displayActionEdit = displayActionEdit;
 	}
 	
-	
+	 @Override
+	 public int compareTo(Customer o) {
+	     return Comparators.TRIP_ASC.compare(this, o);
+	  }
+	 
+	 public static class Comparators {
+		public static Comparator<Customer> TRIP_ASC = new Comparator<Customer>() {
+	        @Override
+	        public int compare(Customer o1, Customer o2) {
+	            return Integer.parseInt(o1.getTripDay())-(Integer.parseInt(o2.getTripDay()));
+	        }
+	    };
+	 }
 
 }

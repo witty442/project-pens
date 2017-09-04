@@ -51,7 +51,7 @@ public class GeneralDAO {
 			rst = stmt.executeQuery(sql.toString());
 			
 			if (rst.next()) {
-				branchName = Utils.isNull(rst.getString("pens_value"));
+				branchName = Utils.isNull(rst.getString("branch_name"));
 			}//while
 
 		} catch (Exception e) {

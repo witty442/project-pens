@@ -86,6 +86,7 @@ public class User extends I_PO implements Serializable {
 		setRole(new References(rst.getString("ROLE"), rst.getString("ROLE")));
 		
 		setPrinterName(Utils.isNull(rst.getString("PRINTER_NAME")));
+		setOrgPrinterName(Utils.isNull(rst.getString("PRINTER_NAME")));
 		// set display label
 		setDisplayLabel();
 
@@ -189,8 +190,17 @@ public class User extends I_PO implements Serializable {
     private String reNewPassword;
 	private String dateLogon;
 	private String timeLogon;
-    
+    private String orgPrinterName;
 	
+    
+	public String getOrgPrinterName() {
+		return orgPrinterName;
+	}
+
+	public void setOrgPrinterName(String orgPrinterName) {
+		this.orgPrinterName = orgPrinterName;
+	}
+
 	public String getDateLogon() {
 		return dateLogon;
 	}

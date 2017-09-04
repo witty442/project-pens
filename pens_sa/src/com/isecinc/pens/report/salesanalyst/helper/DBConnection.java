@@ -35,8 +35,6 @@ public class DBConnection {
 		}
 		return _instanceInf;	
 	}
-	
-	
 	public  Connection getConnection_(){		
 		Connection _instanceInf =null;
 		try {	
@@ -48,6 +46,31 @@ public class DBConnection {
 			String url = hibernateConfig.getProperty("connection.url");
 			String username = hibernateConfig.getProperty("connection.username");
 			String password = hibernateConfig.getProperty("connection.password");
+			
+			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			
+			 Class.forName(driver);
+			//DriverManager.setLoginTimeout(600);
+			_instanceInf = DriverManager.getConnection(url,username,password);	
+			//logger.debug("Connection:"+_instanceInf);
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);			
+		}
+		return _instanceInf;	
+	}
+	
+	
+	public  Connection getConnectionApps(){		
+		Connection _instanceInf =null;
+		try {	
+  
+			Configuration hibernateConfig = new Configuration();
+			hibernateConfig.configure();
+			
+			String driver = hibernateConfig.getProperty("connection.driver_class");
+			String url = hibernateConfig.getProperty("connection.url");
+			String username = hibernateConfig.getProperty("connection.apps.username");
+			String password = hibernateConfig.getProperty("connection.apps.password");
 			
 			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			

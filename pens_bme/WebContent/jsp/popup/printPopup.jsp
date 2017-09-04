@@ -57,26 +57,10 @@ function loadMe(_path){
       document.tempForm.action = _path + "/jsp/confirmReturnAction.do?do=printReturnBoxReport&typeReport=<%=typeReport%>&boxNo=<%=boxNo%>";
 	  document.tempForm.submit();
 		
-  <%}else if("PayInReport".equals(reportName)){ 
-		  typeReport = "PayInReport";
-		  docNo = Utils.isNull(request.getParameter("docNo"));
-		   if(request.getLocalAddr().equals("192.168.202.244") 
-			|| request.getLocalName().equals("0.0.0.0")
-				   ){
-	  %>
-	       document.tempForm.action = _path + "/jsp/payAction.do?do=printReport&typeReport=<%=typeReport%>&docNo=<%=docNo%>";
-	       document.tempForm.submit();
-	  <%}else{ %>
-	    
-	       document.tempForm.action = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?typeReport=<%=typeReport%>&docNo=<%=docNo%>&userName=<%=user.getUserName()%>";
-		   document.tempForm.submit();
-	  <%}  }%>
-  
+  <%} %>
+		  
 }
-
-
   //setTimeout(function(){window.close();},60000);
-
 
 </script>
 </head>
