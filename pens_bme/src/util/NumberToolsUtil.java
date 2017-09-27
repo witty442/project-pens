@@ -24,7 +24,7 @@ public class NumberToolsUtil {
 		NumberFormat nf = new DecimalFormat("################################################.###########################################");
 		String decimalString = nf.format(scientificDouble);
 		
-		System.out.println(decimalString);
+		//System.out.println(decimalString);
 		return decimalString;
 	}
 	

@@ -55,8 +55,15 @@ public class Order implements Serializable{
 	private String salesDateTo;
 	private String size;
     private String color;
+	private int rowExcel;
 	
 	
+	public int getRowExcel() {
+		return rowExcel;
+	}
+	public void setRowExcel(int rowExcel) {
+		this.rowExcel = rowExcel;
+	}
 	public double getCreditLimit() {
 		return creditLimit;
 	}

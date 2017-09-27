@@ -287,9 +287,8 @@ body {
 			
 						<jsp:include page="../error.jsp"/>
 						
-						<!--Generate Parameter -->
+						<!-- Generate Parameter By Task Config -->
 					     <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
-							
 							<%
 								if( !paramMap.isEmpty()){
 									 Iterator its = paramMap.keySet().iterator();
@@ -299,24 +298,24 @@ body {
 							%> 
 								<tr>
 								<%if(task.getParamType().equalsIgnoreCase("DATE")|| task.getParamType().equalsIgnoreCase("STRING") ){ %>
-									<td width ="50%" align="right">
+									<td width ="40%" align="right">
 									    <%=task.getParamLabel() %>
 									    <%if(task.getParamValid().equalsIgnoreCase("VALID")){%>
 									       <font color="red">*</font>
 									    <%} %>
 									</td>
-									<td width ="50%" align="left">
+									<td width ="60%" align="left">
 									    <input type="text" name="<%=task.getParamName() %>" id="<%=task.getParamName() %>" 
 									     value="<%=task.getParamValue() %>"/>
 									</td>
 								<%}else if(task.getParamType().equalsIgnoreCase("FROMFILE")){ %>
-									<td width ="50%" align="right">
+									<td width ="40%" align="right">
 									   <%=task.getParamLabel() %>
 									    <%if(task.getParamValid().equalsIgnoreCase("VALID")){%>
 									       <font color="red">*</font>
 									    <%} %>
 									</td>
-									<td width ="50%" align="left">
+									<td width ="60%" align="left">
 									   <input type="file" name="<%=task.getParamName() %>" 
 									     id="<%=task.getParamName() %>"/>
 									</td>
@@ -327,7 +326,7 @@ body {
 							%>
 						</table>
 
-                         <!-- Generate BUTTON -->
+                        <!-- Generate BUTTON By Task Config-->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						    <tr>
 								<td align="center" width ="100%"> &nbsp;</td>
@@ -344,7 +343,7 @@ body {
                         <!-- Batch Task Result--> 
 					    <jsp:include page="batchTaskResult.jsp"></jsp:include>
 					  
-							
+						<!-- Progress Bar -->
 						<div id="dialog" title=" กรุณารอสักครู่......">
 							<!-- PROGRESS BAR-->
 							  <% if( "submited".equals(request.getAttribute("action"))){ %>  

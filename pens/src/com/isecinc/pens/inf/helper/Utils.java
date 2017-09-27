@@ -72,6 +72,15 @@ public class Utils {
 	    }
 	}
 	
+	public static int calcTotalPage(int totalRow,int maxPerPage){
+		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
+		//System.out.println("totalPageF:"+totalPageF);
+		BigDecimal totalPage = new BigDecimal(totalPageF);
+		totalPage = totalPage.setScale(0, BigDecimal.ROUND_UP);
+		
+		return totalPage.intValue();
+	}
+	
 	public static void stopTomcat(){
 	      String line;
 	      OutputStream stdin = null;

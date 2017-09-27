@@ -450,6 +450,18 @@ function resetStore(){
 										  <html:text property="job.rtnAmt" styleId="rtnAmt" size="15"  onblur="isNum2Digit(this)"/>
 									</td>
 								</tr>
+								<%if(jobForm.getMode().equals("edit") || jobForm.getMode().equals("view")){ %>
+									<tr>
+	                                    <td> RTN No </td>
+										<td>	
+										<%if(jobForm.getMode().equals("edit")){ %>			
+											<html:text property="job.rtnNo" styleId="rtnNo" size="15" />
+									    <%}else{ %>
+									        <html:text property="job.rtnNo" styleId="rtnNo" size="15" readonly="true" styleClass="disableText"/>
+									    <%} %>
+										</td>
+									</tr>
+							   <%} %>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >

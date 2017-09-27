@@ -107,9 +107,11 @@ public class BatchTaskAction extends I_Action {
 				batchTaskForm.setResults(null);
 				batchTaskForm.setMonitorBean(new MonitorBean());
 				batchTaskForm.setMonitorItemList(null);
+				batchTaskForm.setMonitorItem(null);
 			}else{
 				batchTaskForm.setMonitorBean(new MonitorBean());
 				batchTaskForm.setMonitorItemList(null);
+				batchTaskForm.setMonitorItem(null);
 			}
 			
 		} catch (Exception e) {
@@ -126,7 +128,6 @@ public class BatchTaskAction extends I_Action {
 		return new BatchTaskManager().runBatch(mapping,form,request,response);
 	}
 	
-
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("BatchTask Search Current Action");
 		BatchTaskForm batchTaskForm = (BatchTaskForm) form;

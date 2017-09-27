@@ -606,7 +606,7 @@ public class SalesTargetDAO {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
-			if ( Utils.userInRole(user,new String[]{User.MKT,User.ADMIN}) ){
+			if ( Utils.userInRoleSalesTarget(user,new String[]{User.MKT,User.ADMIN}) ){
 				h = saveModelByMKT(conn,h);
 			}
 			conn.commit();

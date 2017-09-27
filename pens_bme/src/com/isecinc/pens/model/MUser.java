@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
@@ -75,11 +73,11 @@ public class MUser extends I_Model<User> {
 	 * @throws Exception
 	 */
 	public boolean update(User user, int activeUserID, Connection conn) throws Exception {
-		Object[] values = { user.getId(), ConvertNullUtil.convertToString(user.getPassword()).trim(),
+		Object[] values = { user.getId(), Utils.isNull(user.getPassword()).trim(),
 				user.getUserGroupId(), activeUserID 
-				,Utils.isNull(user.getName()) ,Utils.isNull(user.getUserName())
+				,(user.getName()) ,(user.getUserName())
 				,new java.sql.Timestamp(Utils.parse(user.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())
-				,Utils.isNull(user.getEndDate()).equals("")?null:new java.sql.Timestamp(Utils.parse(user.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
+				,(user.getEndDate()).equals("")?null:new java.sql.Timestamp(Utils.parse(user.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
 		return super.save(TABLE_NAME, columns, values, user.getId(), conn);
 	}
 	

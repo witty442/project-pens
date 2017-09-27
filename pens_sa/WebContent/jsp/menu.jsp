@@ -48,13 +48,13 @@
 	</li> 
 	<%}%>
 	
-<%if ( Utils.userInRole(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
+<%if ( Utils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
 %>
 	<li><a href="javascript: void(0)" class="parent"><span>Sale Target</span></a>
 		<ul>
 	        <li><a class="parent"><span>1.เป้าหมายของ MT</span></a>
 			       <ul>
-			       <%if ( Utils.userInRole(user,new String[]{User.MKT}) ){ %>
+			       <%if ( Utils.userInRoleSalesTarget(user,new String[]{User.MKT}) ){ %>
 					     <li>
 		                    <a href="#" class="parent" 
 		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MKT%>&action=new';">
@@ -62,7 +62,7 @@
 		                    </a>
 		                 </li>
 	                 <%}%>
-	                  <%if ( Utils.userInRole(user,new String[]{User.DD_SALES,User.MT_SALES}) ){ %>
+	                  <%if ( Utils.userInRoleSalesTarget(user,new String[]{User.DD_SALES,User.MT_SALES}) ){ %>
 		                  <li>
 		                    <a href="#" class="parent" 
 		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_SALES%>&action=new';">
@@ -70,7 +70,7 @@
 		                    </a>
 		                 </li> 
 	                 <%}%>
-	                  <%if ( Utils.userInRole(user,new String[]{User.MTMGR}) ){ %>
+	                  <%if ( Utils.userInRoleSalesTarget(user,new String[]{User.MTMGR}) ){ %>
 		                <li>
 		                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MTMGR%>&action=new';">
 		                      <span>1.3 <bean:message key="MTMGR_SalesTarget" bundle="sysprop"/></span>

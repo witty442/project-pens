@@ -90,7 +90,7 @@ public class Utils {
 		return new Double(str).doubleValue();
 	}
 	
-	public static boolean userInRole(User user,String[] roles){
+	public static boolean userInRoleSalesTarget(User user,String[] roles){
 		boolean r = false;
 		for(int i=0;i<roles.length;i++){
 			String roleCheck = roles[i].toLowerCase().trim();

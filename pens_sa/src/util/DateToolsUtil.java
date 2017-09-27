@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class DateToolsUtil {
 
@@ -23,7 +24,46 @@ public class DateToolsUtil {
 	public static final int YEAR = 3;
 	private static final long ONE_HOUR = 60 * 60 * 1000L;
 	private static ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
-
+	
+	
+	public static void main(String[] args) {
+		//System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
+		try{
+			Date date1 = Utils.parse("01/11/2017", Utils.DD_MM_YYYY_WITH_SLASH);
+			Date date2 = Utils.parse("01/01/2018", Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			calcDiffMonthYear(date1,date2);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static int calcDiffMonthYear(Date date1,Date date2){
+	 int diffMonth = 0;
+	 int mm1 = 0;
+	 int yyyy1 = 0;
+	 int mm2 = 0;
+	 int yyyy2 = 0;
+		try{
+		   String date1Str = Utils.stringValue(date1,"MM-yyyy");
+		   String date2Str = Utils.stringValue(date2,"MM-yyyy");
+		   
+		   mm1 = Integer.parseInt(date1Str.substring(0,2));
+		   yyyy1 = Integer.parseInt(date1Str.substring(3,7));
+		   mm2 = Integer.parseInt(date2Str.substring(0,2));
+		   yyyy2 = Integer.parseInt(date2Str.substring(3,7));
+		   //System.out.println("mm1:"+mm1);
+		  // System.out.println("yyyy1:"+yyyy1);
+		   
+		   int diffMonthOfYear = (yyyy2-yyyy1)*12;
+		    diffMonth = (mm2+diffMonthOfYear)-mm1;
+		   
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return  diffMonth;
+	}
+	
 	public static String getToday(Connection con, int format) throws Exception {
 		String stroutput = "";
 
@@ -361,9 +401,7 @@ public class DateToolsUtil {
 		return dateWord;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
-	}
+
 
 	/**
 	 * Check dateTo not over dateFrom.

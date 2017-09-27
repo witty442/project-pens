@@ -83,7 +83,7 @@ public class ImportSaleOutWacoalProcess extends InterfaceUtils{
 				fileType = fileName.substring(fileName.indexOf(".")+1,fileName.length());
 				
 				/** cehck FileName duplicate **/
-				boolean dup = false;//importDAO.importSaleOutWacoalFileNameIsDuplicate(conn, fileName);
+				boolean dup = importDAO.importSaleOutWacoalFileNameIsDuplicate(conn, fileName);
 				if(dup){
 					taskStatusInt = Constants.STATUS_FAIL;
 				}

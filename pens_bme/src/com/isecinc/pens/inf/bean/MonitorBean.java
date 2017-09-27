@@ -28,6 +28,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private   String saleRepCode ;
    private   String transactionType ;
    private   Date submitDate ;
+   private   String submitDateDisp ;
    private   int status ;
    private   int batchTaskStatus ;
    private   Date createDate ;
@@ -67,7 +68,13 @@ private static final long serialVersionUID = -990650039740579753L;
 	private User user;
     
 	
-   public User getUser() {
+   public String getSubmitDateDisp() {
+		return submitDateDisp;
+	}
+	public void setSubmitDateDisp(String submitDateDisp) {
+		this.submitDateDisp = submitDateDisp;
+	}
+public User getUser() {
 		return user;
 	}
 	public void setUser(User user) {

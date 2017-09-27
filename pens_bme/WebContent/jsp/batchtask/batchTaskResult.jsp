@@ -8,10 +8,7 @@
 
 <jsp:useBean id="batchTaskForm" class="com.isecinc.pens.web.batchtask.BatchTaskForm" scope="session" />
 
- <c:if test="${batchTaskForm.results != null}">
-	<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>
-	&nbsp;<span class="searchResult"></span>&nbsp;<bean:message key="Records"  bundle="sysprop"/></div>
-	
+<c:if test="${batchTaskForm.results != null}">
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 		<tr>
         <th> No.</th>
@@ -21,7 +18,6 @@
 		<th> ผู้สร้าง</th>
 		<th> สถานะ</th>
 		<th> วันที่ทำรายการล่าสุด</th>
-		<!-- <th> จำนวนไฟล์</th> -->
 		<th> Message</th>
 		<th> รายละเอียด</th>
 		</tr>
@@ -52,17 +48,22 @@
 					</c:otherwise>
 				   </c:choose>
 				</td>
-				<td> ${results.submitDate}</td>
-				<%-- <td>${results.fileCount}</td> --%>
+				<td> ${results.submitDateDisp}</td>
 				<td align="left"> ${results.errorMsg}</td>
-				<td> 
-				    
-				</td>
+			    <td></td>
 		</tr>
 		</c:forEach>
 	</table>
 </c:if>
+
+<%
+ String pageName = request.getParameter("pageName");
+ //System.out.println("pageName:"+pageName);
+%>
+
+<%if("ImportOrderFromExcel".equalsIgnoreCase(pageName)){ %>
   <jsp:include page="sub/ImportOrderFromExcel_sub.jsp"></jsp:include>
+<%} %>
 
  
 					

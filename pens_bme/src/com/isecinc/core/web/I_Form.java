@@ -57,6 +57,54 @@ public abstract class I_Form extends ActionForm {
 	private String orderBy;
 	private String txtDorA;
 	private String focusFieldId;
+	
+   //Wit Edit 19/09/2017 page
+	private int currPage;
+	private int totalPage;
+	private int totalRecord;
+	private int startRec;
+	private int endRec;
+
+	
+	public int getCurrPage() {
+		return currPage;
+	}
+
+	public void setCurrPage(int currPage) {
+		this.currPage = currPage;
+	}
+
+	public int getStartRec() {
+		return startRec;
+	}
+
+	public void setStartRec(int startRec) {
+		this.startRec = startRec;
+	}
+
+	public int getEndRec() {
+		return endRec;
+	}
+
+	public void setEndRec(int endRec) {
+		this.endRec = endRec;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getTotalRecord() {
+		return totalRecord;
+	}
+
+	public void setTotalRecord(int totalRecord) {
+		this.totalRecord = totalRecord;
+	}
 
 	public String getResultScreen() {
 		return resultScreen;

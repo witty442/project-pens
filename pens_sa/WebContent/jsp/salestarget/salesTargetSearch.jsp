@@ -35,7 +35,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 }else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ 
 	if(role.equalsIgnoreCase(User.DD_SALES)){
 	   pageNameTemp = "DD_SalesTarget";
-	}else if ( Utils.userInRole(user,new String[]{User.MT_SALES}) ){
+	}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
 	   pageNameTemp = "MT_SalesTarget";
 	}
 }else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ 

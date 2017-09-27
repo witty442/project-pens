@@ -105,7 +105,9 @@
 		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
 		
 		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
+		<form-bean name="popupSearchForm" type="com.isecinc.pens.web.popupsearch.PopupSearchForm" />
 		
+		<form-bean name="autoCNForm" type="com.isecinc.pens.web.autocn.AutoCNForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -591,6 +593,7 @@
 		<action name="payForm" path="/jsp/payAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayAction">
 			<forward name="search" path="/jsp/pay/paySearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
+			<forward name="printPayPopup" path="/jsp/popup/printPayPopup.jsp" />
 		</action>
 		
 		<action name="rtForm" path="/jsp/rtAction" parameter="do" scope="session" type="com.isecinc.pens.web.rt.RTAction">
@@ -649,6 +652,15 @@
            <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
 		   <forward name="Fail" path="/jsp/error.jsp"></forward>
         </action>
+        
+         <action name="popupSearchForm" path="/jsp/popupSearchAction" parameter="do" scope="session" type="com.isecinc.pens.web.popupsearch.PopupSearchAction" >
+			<forward name="popup" path="/jsp/popupsearch/popupSearch.jsp" />
+		</action>
+		
+		<action name="autoCNForm" path="/jsp/autoCNAction" parameter="do" scope="session" type="com.isecinc.pens.web.autocn.AutoCNAction">
+			<forward name="search" path="/jsp/autoCN/autoCNSearch.jsp" />
+			<forward name="detail" path="/jsp/autoCN/autoCN.jsp" />
+		</action>
 		
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

@@ -143,8 +143,8 @@ function initForm(readonly,styleClass){
 	    $('#customerName').addClass(styleClass);
 	});
 	$(document).ready(function(){
-	    $('#partyType').attr('readonly', readonly);
-	    $('#partyType').addClass(styleClass);
+	    $('#storeType').attr('readonly', readonly);
+	    $('#storeType').addClass(styleClass);
 	});
 	$(document).ready(function(){
 	    $('#taxNo').attr('readonly', readonly);
@@ -307,7 +307,7 @@ function setMainCustomer(code, name){
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:select property="customer.partyType" styleId="partyType" >
+									<html:select property="customer.businessType" styleId="businessType" disabled="true">
 									<%-- 	<html:option value=""></html:option>
 										<html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option>
@@ -332,10 +332,10 @@ function setMainCustomer(code, name){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left" nowrap>
-									<html:text property="customer.taxNo" size="25"  maxlength="20" styleId="taxNo"/>
+									<html:text property="customer.taxNo" size="25"  maxlength="20" styleId="taxNo" onkeydown="return inputNum2(event,this)"/>
 									<html:checkbox property="customer.printTax" value="Y" styleId="printTax">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
 								 &nbsp;
-								   <html:checkbox property="customer.printHeadBranchDesc" value="Y" disabled="true">พิมพ์สนญ./สาขาที่</html:checkbox>
+								   <html:checkbox property="customer.printHeadBranchDesc" value="Y" >พิมพ์สนญ./สาขาที่</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
@@ -349,9 +349,9 @@ function setMainCustomer(code, name){
 										<html:options collection="territories" property="key" labelProperty="name" />
 									</html:select>
 								</td>
-								<td align="right"><bean:message key="Customer.BusinessType" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right"><%-- <bean:message key="Customer.BusinessType" bundle="sysele"/>&nbsp;&nbsp; --%></td>
 								<td align="left">
-									<html:text property="customer.businessType" size="25" styleId="businessType"/>
+									<%-- <html:text property="customer.businessType" size="25" styleId="businessType"/> --%>
 								</td>
 							</tr>
 							<tr>
@@ -700,6 +700,7 @@ function setMainCustomer(code, name){
 						</jsp:include>
 						<html:hidden property="customer.id"/>
 						<html:hidden property="customer.exported"/>
+						<div title="CustomerViewEdit">..</div>
 						<input type="hidden" name="tf" value="<%=session.getAttribute("tf") %>">
 						<div id="addressList" style="text-align: left;display: none;"></div>
 						<div id="contactList" style="text-align: left;display: none;"></div>

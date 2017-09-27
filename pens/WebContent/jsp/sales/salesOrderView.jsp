@@ -171,26 +171,32 @@ function loadAutoReceipt(){
 	
 	//alert("pt["+pt+"]pm["+pm+"]");
 	
-	if(pt=='IM'&&pm=='CS'){
-		//default radio CS
-		document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
-		changePayType('CS');
-	}else if(pt=='IM'&&pm=='CH'){
-		//default radio CH
-		document.getElementsByName('autoReceipt.paymentType')[1].checked=true;
-		changePayType('CH');
-	}else if(pm=='AP'){
-		//default radio CH
-		document.getElementsByName('autoReceipt.paymentType')[4].checked=true;
-		changePayType('AP');
-	}else{
-		//Wit Edit 26/07/2556 display Credit Pay
-		//document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
-		//changePayType('CR');
-		
-		document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
-		changePayType('CS');
-	}
+	//Case  Default 
+	<%if("Y".equalsIgnoreCase(canReceiptMoreCash)){%>
+	   document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
+	   changePayType('CR');
+	<%}else{%>
+		if(pt=='IM'&&pm=='CS'){
+			//default radio CS
+			document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
+			changePayType('CS');
+		}else if(pt=='IM'&&pm=='CH'){
+			//default radio CH
+			document.getElementsByName('autoReceipt.paymentType')[1].checked=true;
+			changePayType('CH');
+		}else if(pm=='AP'){
+			//default radio CH
+			document.getElementsByName('autoReceipt.paymentType')[4].checked=true;
+			changePayType('AP');
+		}else{
+			//Wit Edit 26/07/2556 display Credit Pay
+			//document.getElementsByName('autoReceipt.paymentType')[3].checked=true;
+			//changePayType('CR');
+			
+			document.getElementsByName('autoReceipt.paymentType')[0].checked=true;
+			changePayType('CS');
+		}
+	<%}%>
 }
 
 function changePayType(type){

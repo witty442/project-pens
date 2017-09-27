@@ -391,7 +391,7 @@ public class ExportProcess {
 			"	M.USER_ID AS SALESREP_ID,	\n"+
 			"	'"+tableBean.getFileFtpNameFull()+"' as FILE_NAME, 	\n"+
 			"   A.address_ID as ADDRESS_ID, \n"+
-			"   M.PARTY_TYPE, \n"+ 
+			"   'O' as PARTY_TYPE, \n"+ //Default Value All By Oracle No Edit
 			"   M.location, \n"+
 			//"   SUBSTRING(M.location,1 , LOCATE(',', M.location)-1) as latitude, \n"+
 			//"   SUBSTRING(M.location, LOCATE(',', M.location)+1,LENGTH(M.location)) as longtitude \n"+

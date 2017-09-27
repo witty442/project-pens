@@ -37,6 +37,15 @@
 	<variable name="v_sum_return_s" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[($F{moveOrderType}.equals("\u0E04\u0E37\u0E19")&&$F{docStatus}.equals("\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19"))?$F{qty2}:0]]></variableExpression>
 	</variable>
+	<variable name="v_sum_cancel" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[($F{docStatus}.equals("\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01"))?$F{totalAmount}:0]]></variableExpression>
+	</variable>
+	<variable name="v_sum_cancel_ctn" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[($F{docStatus}.equals("\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01"))?$F{qty1}:0]]></variableExpression>
+	</variable>
+	<variable name="v_sum_cancel_s" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[($F{docStatus}.equals("\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01"))?$F{qty2}:0]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -289,7 +298,7 @@
 		<band splitType="Stretch"/>
 	</pageFooter>
 	<summary>
-		<band height="95">
+		<band height="120">
 			<line>
 				<reportElement x="0" y="0" width="545" height="1"/>
 				<graphicElement>
@@ -323,7 +332,7 @@
 				<text><![CDATA[สรุปยอด คืน]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="148" y="72" width="77" height="20"/>
+				<reportElement x="148" y="93" width="77" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -376,7 +385,7 @@
 				<text><![CDATA[ =]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="225" y="72" width="15" height="20"/>
+				<reportElement x="225" y="93" width="15" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -403,7 +412,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_return}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="240" y="72" width="104" height="20"/>
+				<reportElement x="240" y="92" width="104" height="20"/>
 				<box rightPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -515,7 +524,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_return_s}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="344" y="72" width="104" height="20"/>
+				<reportElement x="344" y="92" width="104" height="20"/>
 				<box rightPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -529,7 +538,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_req_ctn}-$V{v_sum_return_ctn}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="448" y="72" width="104" height="20"/>
+				<reportElement x="448" y="92" width="104" height="20"/>
 				<box rightPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -541,6 +550,74 @@
 					<font fontName="Angsana New" size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_req_s}-$V{v_sum_return_s}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="148" y="73" width="77" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สรุปยอด ยกเลิก]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="73" width="15" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ =]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="240" y="72" width="104" height="20"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cancel}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="344" y="72" width="104" height="20"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cancel_ctn}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="448" y="72" width="104" height="20"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cancel_s}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

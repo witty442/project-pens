@@ -359,7 +359,6 @@
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
- 
 	 <li><a  href="javascript: void(0)" class="parent"><span>Order</span></a>
 		<ul>
 			<li>
@@ -383,10 +382,10 @@
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareHistory&action=new');"><span><bean:message bundle="sysprop" key="OrderInquiryHistory"/></span></a>
 			</li>
-			<%-- <li>
+			<li>
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
 	          <span><bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
-	        </li> --%>
+	        </li>
 		</ul>
 	</li>
 <%} %>
@@ -453,11 +452,13 @@
 	          <span>5.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_BIGC_FROM_WACOAL%>" bundle="sysprop"/>
 	          </span></a>
 	        </li>
-	        <li>
-	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
-	          <span>6.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
-	        </li>
+	       
 	       <%} %>
+	       <li>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new');">
+	          <span>5.<bean:message key="AutoCN" bundle="sysprop"/>
+	          </span></a>
+	        </li>
 		</ul>
 	</li>
 <%} %>
@@ -641,7 +642,7 @@
   	<li><a  href="javascript: void(0)" class="parent"><span>Document Menu</span></a>
 		<ul>
 			<li>
-			  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/payAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
+			  <a href="#" onclick="javascript:link(false,'<%=contextPathProd%>/jsp/payAction.do?do=prepare2&action=new');"><span>1.<bean:message bundle="sysprop" key="pay"/></span></a>
 			  
 			</li> 
 			<%if ( Utils.userInRole(user,new String[]{User.IT,User.ADMIN}) ){%>

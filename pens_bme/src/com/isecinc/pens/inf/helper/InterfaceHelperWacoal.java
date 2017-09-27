@@ -324,7 +324,7 @@ public class InterfaceHelperWacoal extends InterfaceUtils{
 	    		/** Set Value to Prepare Statement **/
 	    		if( !Utils.isNull(colBean.getExternalFunction()).equals("N")){
 			    	String idFind = ExternalFunctionHelper.findExternalFunc(conn,tableBean, colBean,lineArray,userBean);	    	
-			    	logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
+			    	//logger.info("External Function["+colBean.getExternalFunction()+"] Result ID["+idFind+"]");
 			    	
 			    	ps = setObjectPS(ps,colBean,parameterIndex,idFind);
 			    }else{

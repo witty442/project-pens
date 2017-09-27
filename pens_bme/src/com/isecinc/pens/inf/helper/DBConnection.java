@@ -26,17 +26,17 @@ public class DBConnection {
 	public   Connection getConnection(){		
 		Connection _instanceInf =null;
 		try{
-		   _instanceInf = getConnection1();
+		   _instanceInf = getConnectionModel();
 		}catch(Exception e){
 			// Retry count 1
 			try{
 				logger.info("Retry Conn 1 time");
-			   _instanceInf = getConnection1();
+			   _instanceInf = getConnectionModel();
 			}catch(Exception ee){
 				logger.error(ee.getMessage(),ee);
 				logger.info("Retry Conn 2 time");
 				try{
-				   _instanceInf = getConnection1();
+				   _instanceInf = getConnectionModel();
 				}catch(Exception eee){
 					logger.error(eee.getMessage(),eee);
 				}
@@ -71,7 +71,7 @@ public class DBConnection {
 		return _instanceInf;	
 	}*/
 	
-	public  static Connection getConnection1(){		
+	public   Connection getConnectionModel(){		
 		Connection _instanceInf =null;
 		EnvProperties env = EnvProperties.getInstance();
 		try {	

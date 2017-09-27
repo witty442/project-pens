@@ -1,6 +1,7 @@
 package com.isecinc.pens.inf.manager;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -27,8 +29,11 @@ import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.isecinc.pens.bean.User;
@@ -110,9 +115,7 @@ public class FTPManagerWacoal {
 		   if( !canServer2Active){
 			   this.server = env.getProperty("ftp.ip.server");
 		   }
-		   
 		}
-		
 		logger.debug("After process default server["+server+"]");
 	}
 	
@@ -243,7 +246,7 @@ public class FTPManagerWacoal {
 		                	//ftp.completePendingCommand();
 		                	logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
 
-		                	logger.debug("dataStreamStrXX:"+dataStreamStr);
+		                	//logger.debug("dataStreamStrXX:"+dataStreamStr);
 		                	
 		                    /** Store DataStream in TableBean **/
 		                	String[] dataLineTextArr =  new String(dataStreamStr).split(Constants.newLine);
@@ -291,26 +294,150 @@ public class FTPManagerWacoal {
 				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
-			
 		}
 	}
 	
-	public static String convertStreamToString(FTPClient ftpClient,String ftpFileName,String realPathTemp,String ftpPath) throws IOException {
+	public static String convertStreamToString(FTPClient ftpClient,String ftpFileName,String realPathTemp,String ftpPath) throws Exception {
 	   String data = "";
-       String pathTemp = realPathTemp+"temp.xls";
-     
-   
-		logger.debug("Start Step 1 read and and write Excel to Temp Folder :"+pathTemp);
-		downloadFileBySunFtp(ftpPath,ftpFileName,pathTemp);
-    	logger.debug("End Step 1 read and and write Excel to Temp Folder :");
-
-        
-    	logger.debug("Start Step 2 Convert Excel to Text");
-    	data = convertXlsToText(new File(pathTemp),ftpFileName).toString();
-    	logger.debug("End Step 2 Convert Excel to text");
-    	
+       String pathTemp = realPathTemp+"\\temp.xls";
+       try{
+			logger.debug("Start Step 1 read and and write Excel to Temp Folder :"+pathTemp);
+			downloadFileBySunFtp(ftpPath,ftpFileName,pathTemp);
+	    	logger.debug("End Step 1 read and and write Excel to Temp Folder :");
+		    try{
+		    	logger.info("Start Step 2 Convert xls to Text");
+		    	data = convertXlsToText(new File(pathTemp),pathTemp,ftpFileName).toString();
+		    	logger.info("End Step 2 Convert xls to text");
+		    }catch(Exception ee){
+		    	logger.info("Case Error File Excel invalid Header try to convert to csv");
+		    	pathTemp = realPathTemp+"\\temp.csv";
+		    	
+		    	logger.debug("Start Step 1 read and and write Excel to Temp Folder :"+pathTemp);
+				downloadFileBySunFtp(ftpPath,ftpFileName,pathTemp);
+		    	logger.debug("End Step 1 read and and write Excel to Temp Folder :");
+		    	
+		    	logger.info("Start Step 2 Convert Csv to Text");
+		    	data = convertCsvToText(new File(pathTemp),pathTemp,ftpFileName).toString();
+		    	logger.info("End Step 2 Convert Csv to text");
+		    }
+       }catch(Exception e){
+    	   throw e;
+       }
         return data;
     }
+	
+	private static StringBuffer convertXlsToText(File inputFile,String pathTempName ,String ftpFileName) throws Exception{
+        // For storing data into CSV files
+        StringBuffer data = new StringBuffer();
+        StringBuffer dataRow = new StringBuffer();
+        String rowCheck = "";
+        try {
+	         // Get the workbook object for XLS file
+             HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(inputFile));
+	          HSSFSheet sheet = workbook.getSheetAt(0);
+	        
+	       // OPCPackage pkg = OPCPackage.open(inputFile);
+	       // XSSFWorkbook   wb2 = new XSSFWorkbook(pkg);
+	        //XSSFSheet sheet = wb2.getSheetAt(0); 
+			   
+	        Cell cell;
+	        Row row;
+	
+	        // Iterate through each rows from first sheet
+	        Iterator<Row> rowIterator = sheet.iterator();
+	        while (rowIterator.hasNext())  {
+                row = rowIterator.next();
+                if(row.getCell(0).getCellType() ==Cell.CELL_TYPE_NUMERIC){
+                   rowCheck = String.valueOf(row.getCell(0).getNumericCellValue());
+                }else{
+                   rowCheck = row.getCell(0).getStringCellValue();
+                }
+               // logger.debug("RowNum Check:"+row.getRowNum()+":["+rowCheck+"]");
+                
+                if( row.getRowNum() >0){
+                	 if(!rowCheck.equals("")){
+		                // For each row, iterate through each columns
+		                Iterator<Cell> cellIterator = row.cellIterator();
+		                dataRow = new StringBuffer();
+		                while (cellIterator.hasNext()){
+		                        cell = cellIterator.next();
+		                       // logger.debug("cellType["+cell.getCellType()+"]");
+		                        switch (cell.getCellType())  {
+			                        case Cell.CELL_TYPE_BOOLEAN:
+			                        	 dataRow.append(cell.getBooleanCellValue() + "|");
+			                             break;
+			                                
+			                        case Cell.CELL_TYPE_NUMERIC:
+			                        	//logger.debug(cell.getNumericCellValue());
+			                        	if (HSSFDateUtil.isCellDateFormatted(cell)) {
+			                        		//logger.debug("Date");
+			                                dataRow.append(Utils.stringValue(cell.getDateCellValue(),Utils.DD_MM_YYYY_WITH_SLASH) + "|");
+			                            }else{
+			                        	    dataRow.append( Utils.convertToNumberSpecial(new BigDecimal(cell.getNumericCellValue()))+ "|");
+			                            }
+			                             break;
+			                                
+			                        case Cell.CELL_TYPE_STRING:
+			                        
+			                        	if(StringUtils.isNumeric(cell.getStringCellValue())){
+			                        		dataRow.append( Utils.convertToNumberSpecial(new BigDecimal(cell.getStringCellValue()))+ "|");
+			                        	}else{
+			                        	   dataRow.append(cell.getStringCellValue() + "|");
+			                        	}
+			                            break;
+			                            
+			                        case Cell.CELL_TYPE_BLANK:
+			                        	dataRow.append("" + "|");
+			                            break;
+			                        
+			                        default:
+			                        	dataRow.append(cell + "|");
+			                      }  
+		                }
+		                logger.debug("dataRow:"+dataRow.toString());
+		                
+	                     data.append(ftpFileName+"|"+(row.getRowNum()+1)+"|"+dataRow.toString().substring(0,dataRow.toString().length()-1)+'\n'); 
+            	  }else{
+              	     break;
+                  }
+               }
+	        }
+        }catch (Exception e) {
+           throw e;
+        }
+      return data;
+  }
+	
+	public static StringBuffer convertCsvToText(File inputFile,String pathTempName ,String ftpFileName) throws Exception {
+		StringBuffer data = new StringBuffer();
+        int row =1;
+	    Scanner scanner = null;
+	    InputStream fis = null;
+	    String lineStr = "";
+		 try {
+			  fis = new FileInputStream(inputFile);
+			  scanner = new Scanner(fis, "TIS-620");
+		      while (scanner.hasNextLine()){
+		    	  lineStr = scanner.nextLine();
+		    	  logger.info("lineStr:"+lineStr);
+		    	  if(row <2){
+		    		  logger.debug("["+row+"]["+lineStr+"]");
+		    	  }
+		    	  if(row > 1){
+			    	  lineStr = lineStr.replace("	", "|");
+			    	  data.append(ftpFileName+"|"+row+"|"+lineStr+'\n'); 
+		    	  }
+		          row++;
+		      }
+		}catch(Exception e){
+			throw e;
+		}finally{
+		   scanner.close();
+		   fis.close();
+	    }
+		return data;
+	}
+	
 	
 	/**
 	 * moveFileFTP 
@@ -419,83 +546,7 @@ public class FTPManagerWacoal {
 		}
  }
 	
-	private static StringBuffer convertXlsToText(File inputFile,String ftpFileName) {
-        // For storing data into CSV files
-        StringBuffer data = new StringBuffer();
-        StringBuffer dataRow = new StringBuffer();
-        String rowCheck = "";
-        try {
-	        // Get the workbook object for XLS file
-	        HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(inputFile));
-	        // Get first sheet from the workbook
-	        HSSFSheet sheet = workbook.getSheetAt(0);
-	        Cell cell;
-	        Row row;
 	
-	        // Iterate through each rows from first sheet
-	        Iterator<Row> rowIterator = sheet.iterator();
-	        while (rowIterator.hasNext())  {
-                row = rowIterator.next();
-                if(row.getCell(0).getCellType() ==Cell.CELL_TYPE_NUMERIC){
-                   rowCheck = String.valueOf(row.getCell(0).getNumericCellValue());
-                }else{
-                   rowCheck = row.getCell(0).getStringCellValue();
-                }
-               // logger.debug("RowNum Check:"+row.getRowNum()+":["+rowCheck+"]");
-                
-                if( row.getRowNum() >0){
-                	 if(!rowCheck.equals("")){
-		                // For each row, iterate through each columns
-		                Iterator<Cell> cellIterator = row.cellIterator();
-		                dataRow = new StringBuffer();
-		                while (cellIterator.hasNext()){
-		                        cell = cellIterator.next();
-		                       // logger.debug("cellType["+cell.getCellType()+"]");
-		                        switch (cell.getCellType())  {
-			                        case Cell.CELL_TYPE_BOOLEAN:
-			                        	 dataRow.append(cell.getBooleanCellValue() + "|");
-			                             break;
-			                                
-			                        case Cell.CELL_TYPE_NUMERIC:
-			                        	//logger.debug(cell.getNumericCellValue());
-			                        	if (HSSFDateUtil.isCellDateFormatted(cell)) {
-			                        		//logger.debug("Date");
-			                                dataRow.append(Utils.stringValue(cell.getDateCellValue(),Utils.DD_MM_YYYY_WITH_SLASH) + "|");
-			                            }else{
-			                        	    dataRow.append( Utils.convertToNumberSpecial(new BigDecimal(cell.getNumericCellValue()))+ "|");
-			                            }
-			                             break;
-			                                
-			                        case Cell.CELL_TYPE_STRING:
-			                        
-			                        	if(StringUtils.isNumeric(cell.getStringCellValue())){
-			                        		dataRow.append( Utils.convertToNumberSpecial(new BigDecimal(cell.getStringCellValue()))+ "|");
-			                        	}else{
-			                        	   dataRow.append(cell.getStringCellValue() + "|");
-			                        	}
-			                            break;
-			                            
-			                        case Cell.CELL_TYPE_BLANK:
-			                        	dataRow.append("" + "|");
-			                            break;
-			                        
-			                        default:
-			                        	dataRow.append(cell + "|");
-			                      }  
-		                }
-		                logger.debug("dataRow:"+dataRow.toString());
-		                
-	                     data.append(ftpFileName+"|"+(row.getRowNum()+1)+"|"+dataRow.toString().substring(0,dataRow.toString().length()-1)+'\n'); 
-            	  }else{
-              	     break;
-                  }
-               }
-	        }
-        }catch (Exception e) {
-              e.printStackTrace();
-        }
-      return data;
-  }
 	
 	public void deleteFileFTPByFileName(String path,String fullFileName) throws Exception{
 		FTPClient ftp = null;

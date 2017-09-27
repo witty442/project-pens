@@ -1181,7 +1181,7 @@ public class GeneralDAO {
 				sql.append("\n AND pens_value ='"+storeCode+"' \n");
 				sql.append("\n \n");
 				
-				logger.debug("sql:"+sql);
+				//logger.debug("sql:"+sql);
 
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
@@ -1198,6 +1198,52 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return storeName;
+		}
+	 
+	 public static String getJobName(String jobId,String status) throws Exception {
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnection();
+			 return getJobNameModel(conn,jobId,status);
+		 }catch(Exception e){
+			 throw e;
+		 }finally{
+			 if(conn != null){
+				 conn.close();
+			 }
+		 } 
+	 }
+	 public static String getJobNameModel(Connection conn,String jobId,String status) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String jobName ="";
+			try {
+				sql.append("\n select name FROM ");
+				sql.append("\n PENSBI.PENSBME_PICK_JOB WHERE 1=1 ");
+				sql.append("\n AND job_id ="+jobId);
+				if( !Utils.isNull(status).equals("")){
+					sql.append("\n AND status ='"+jobId+"'");
+				}
+				sql.append("\n \n");
+				
+				//logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					jobName = Utils.isNull(rst.getString("name"));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return jobName;
 		}
 	 
 	 public static String getCustNoOracleModel(Connection conn,String storeCode) throws Exception {

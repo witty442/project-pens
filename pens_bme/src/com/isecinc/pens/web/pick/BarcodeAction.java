@@ -23,8 +23,8 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
-import util.ExcelHeader;
 import util.ReportUtilServlet;
+import util.excel.ExcelHeader;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;

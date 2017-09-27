@@ -111,7 +111,7 @@ function loadMe(path){
 }
 
 function printReportPopup(path){
-	var docNo = document.getElementsByName("bean.docNo");
+	var docNo = document.getElementsByName("bean.docNo")[0].value;
    // window.open(path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId="+customerId[0].value, "Print2", "width=100,height=100,location=No,resizable=No");
 	//window.open(path + "/jsp/popup/printPayPopup.jsp?report_name=PayInReport&docNo="+docNo[0].value, "Print2", "width=400,height=400,location=No,resizable=No");
 	 

@@ -25,8 +25,8 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
-import util.ExcelHeader;
 import util.ReportUtilServlet;
+import util.excel.ExcelHeader;
 import util.pdf.StampBoxNoReportPdf;
 
 import com.isecinc.core.bean.Messages;

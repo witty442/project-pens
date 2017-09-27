@@ -146,7 +146,7 @@ public class LocationReport {
 				sql.append("\n select A.* FROM ( ");
 				sql.append("\n select ");
 				sql.append("\n tc.order_number ,tc.checkin_date ");
-				sql.append("\n ,( CASE WHEN tc.flag ='Y' AND (tc.error_flag is null or tc.error_flag ='') THEN 'Y' ");
+				sql.append("\n ,( CASE WHEN tc.flag ='Y' THEN 'Y' ");
 				sql.append("\n         ELSE '' END) as flag_sales");
 				sql.append("\n ,( CASE WHEN tc.flag ='N' THEN 'Y' ");
 				sql.append("\n         ELSE '' END) as flag_visit");
@@ -194,7 +194,7 @@ public class LocationReport {
 				
 			   //Real
 			   if("real".equalsIgnoreCase(c.getTripType())){
-				    sql.append("\n from xxpens_om_trip_checkin_temp tc , ");
+				    sql.append("\n from xxpens_om_trip_checkin tc , ");
 					sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
 					sql.append("\n xxpens_salesreps_v s , ");
 					sql.append("\n xxpens_bi_mst_customer c  ");
@@ -203,7 +203,6 @@ public class LocationReport {
 					sql.append("\n and cs.code = s.code ");
 					sql.append("\n and cs.primary_salesrep_id = s.salesrep_id ");
 					sql.append("\n and cs.cust_account_id =  c.customer_id  ");
-					sql.append("\n and (tc.error_flag is null or tc.error_flag ='') ");
 					
 					if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 						  Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -234,7 +233,7 @@ public class LocationReport {
 					sql.append("\n xxpens_bi_mst_customer c  ");
 					sql.append("\n left outer join ");
 					sql.append("\n ( ");
-					sql.append("\n select tc.* from xxpens_om_trip_checkin_temp tc where 1=1");
+					sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
 					if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 						  Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 						  String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
@@ -254,7 +253,6 @@ public class LocationReport {
 							condMonth = condMonth.substring(0,condMonth.length()-1);
 							sql.append("\n and to_char(tc.checkin_date,'yyyymm') in("+condMonth+")");
 						}
-				   sql.append("\n  and (tc.error_flag is null or tc.error_flag ='') ");
 				    sql.append("\n )tc  on tc.account_number = c.customer_code ");
 					sql.append("\n where 1=1 ");
 					sql.append("\n and cs.code = s.code ");

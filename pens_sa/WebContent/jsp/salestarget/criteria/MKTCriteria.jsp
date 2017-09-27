@@ -1,4 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
@@ -6,8 +7,12 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 <%
 SalesTargetBean bean = ((SalesTargetForm)session.getAttribute("salesTargetForm")).getBean();
+User user = (User) request.getSession().getAttribute("user");
+//String role = user.getRoleSalesTarget();
+
 %>
 <script type="text/javascript">
 window.onload = function(){
@@ -71,6 +76,10 @@ function disableF5(e) {
 //To re-enable f5
 $(document).unbind("keydown", disableF5);
 
+function copyMonthToMonth(path){
+	var url = path +"/jsp/salestarget/criteria/copyMonthToMonthPopup.jsp";
+	PopupCenter(url,"Copy Month To Month",500,300);
+}
 function clearForm(path){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;
@@ -238,7 +247,13 @@ function loadCustCatNoList(){
 					<!-- Copy From Last Month -->
 					<a href="javascript:copyFromLastMonth('${pageContext.request.contextPath}',event)">
 					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
-					</a>	 					
+					</a>	
+		
+					<%if(Utils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
+						<a href="javascript:copyMonthToMonth('${pageContext.request.contextPath}')">
+						  <input type="button" value="Copy Month To Month" class="newPosBtnLong">
+						</a> 		
+					<%} %>		
 				</td>
 			</tr>
 		</table>

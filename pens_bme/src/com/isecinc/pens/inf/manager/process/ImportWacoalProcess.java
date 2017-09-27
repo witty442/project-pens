@@ -58,7 +58,7 @@ public class ImportWacoalProcess extends InterfaceUtils{
 		MonitorTime monitorTime = null;
 		Map<String, String> batchParamMap = new HashMap<String, String>();
 		try{
-			/** prepare Paramenter **/
+			/** prepare Parameter **/
 			batchParamMap = m.getBatchParamMap();
 			String realPathTemp  = batchParamMap.get(PARAM_REAL_PATH_TEMP);
 			
@@ -78,7 +78,7 @@ public class ImportWacoalProcess extends InterfaceUtils{
 			FTPManagerWacoal ftpManager = new FTPManagerWacoal(env.getProperty("ftp.wacoal.ip.server"), env.getProperty("ftp.wacoal.username"), env.getProperty("ftp.wacoal.password"));
 			ftpManager.canConnectFTPServer();
 			
-			/** Set Trasaction no Auto Commit **/
+			/** Set Transaction no Auto Commit **/
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
@@ -129,7 +129,8 @@ public class ImportWacoalProcess extends InterfaceUtils{
 								String[] results = null;
 								
 								results = importToDB(conn,initConfigMap,tableBean,ftpBean,user,modelItem);
-								logger.debug("Utils.isNull(results[0]):"+Utils.isNull(results[0]));
+								
+								logger.debug("Return Msg:"+Utils.isNull(results[0]));
 								
 								if( !Utils.isNull(results[0]).equals("")){
 									//Task ALL False
@@ -156,7 +157,7 @@ public class ImportWacoalProcess extends InterfaceUtils{
 								modelItem.setErrorCode(Utils.isNull(results[2]));
 								modelItem.setDataCount(Utils.convertStrToInt(results[3]));
 								isExc = true;
-								
+
 								/** verify status */
 								/*if(modelItem.getDataCount() == modelItem.getSuccessCount()){
 									modelItem.setStatus(Constants.STATUS_SUCCESS);
@@ -165,22 +166,21 @@ public class ImportWacoalProcess extends InterfaceUtils{
 									taskStatusInt = Constants.STATUS_FAIL;
 								}*/
 								
+								logger.debug("insertItemDB");
+								//Insert DB
+								modelItem = dao.insertMonitorItem(connMonitor,modelItem);
 							}else{
-								logger.debug("TableName:"+tableBean.getTableName()+":NOT FOUND FILE");
-								taskStatusInt = Constants.STATUS_FAIL;
+								logger.debug("TableName Case 1:"+tableBean.getTableName()+":NOT FOUND FILE");
+								taskStatusInt = Constants.STATUS_SUCCESS;
 								monitorModel.setErrorCode("FileNotFoundException");
 								monitorModel.setErrorMsg("‰¡Ëæ∫‰ø≈Ï");
 							}
-							//Insert DB
-							modelItem = dao.insertMonitorItem(connMonitor,modelItem);
-						    
 						}//for 2
 			        }else{
-			        	logger.debug("TableName:"+tableBean.getTableName()+":NOT FOUND FILE");
-						taskStatusInt = Constants.STATUS_FAIL;
+			        	logger.debug("TableName Case 2:"+tableBean.getTableName()+":NOT FOUND FILE");
+			        	taskStatusInt = Constants.STATUS_SUCCESS;
 						monitorModel.setErrorCode("FileNotFoundException");
 						monitorModel.setErrorMsg("‰¡Ëæ∫‰ø≈Ï");
-						dao.updateMonitor(connMonitor,monitorModel);
 						
 			        }//if 1
 				}//for 1
@@ -194,20 +194,21 @@ public class ImportWacoalProcess extends InterfaceUtils{
 				logger.debug("Move file import success to in-processed");           
 
 				if("PENSBME_INISTK_WACOAL".equalsIgnoreCase(tableNameSelects[0])){
-					  ftpManager.moveFileFTP(env.getProperty("path.import.wacoal.stock"),env.getProperty("path.import.wacoal.stock.in.processed"),fileImportSuccessList);
+					ftpManager.moveFileFTP(env.getProperty("path.import.wacoal.stock"),env.getProperty("path.import.wacoal.stock.in.processed"),fileImportSuccessList);
 				}else{
-					  ftpManager.moveFileFTP(env.getProperty("path.import.wacoal.salesin"),env.getProperty("path.import.wacoal.salesin.in.processed"),fileImportSuccessList);
+					ftpManager.moveFileFTP(env.getProperty("path.import.wacoal.salesin"),env.getProperty("path.import.wacoal.salesin.in.processed"),fileImportSuccessList);
 				}
-
-				/** End process ***/
-				logger.debug("Update Monitor to Success:"+taskStatusInt);
-				monitorModel.setStatus(taskStatusInt);
-				monitorModel.setFileCount(countFileMap);
-				monitorModel.setTransactionType(m.getTransactionType());
-				dao.updateMonitor(connMonitor,monitorModel);
-				
-				//monitorTime.debugUsedTime();
 			}
+			
+			/** End process ***/
+			logger.debug("Update Monitor to Success:"+taskStatusInt);
+			monitorModel.setStatus(taskStatusInt);
+			monitorModel.setFileCount(countFileMap);
+			monitorModel.setTransactionType(m.getTransactionType());
+			dao.updateMonitor(connMonitor,monitorModel);
+			
+			//monitorTime.debugUsedTime();
+			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 			
@@ -289,7 +290,6 @@ public class ImportWacoalProcess extends InterfaceUtils{
 			  if(tableBean.getActionDB().indexOf("U") != -1){
 			     psUpdate = conn.prepareStatement(tableBean.getPrepareSqlUpd());
 			  }
-			
 			  if(tableBean.getActionDB().indexOf("D") != -1){
 				 logger.debug("sqlDelete:"+tableBean.getPrepareSqlDelete());
 			     psDelete = conn.prepareStatement(tableBean.getPrepareSqlDelete());
@@ -416,10 +416,12 @@ public class ImportWacoalProcess extends InterfaceUtils{
 	    return results;
 	}
 	
-
 	private static void insertMonitorItemResult(Connection conn,BigDecimal monitorItemId,String status,String msg,String lineInExcel) throws Exception {
 		PreparedStatement ps = null;
 		try {
+			//debug 
+			//logger.debug("msg:\n"+msg);
+			
 			String sql = "INSERT INTO MONITOR_ITEM_RESULT(MONITOR_ITEM_ID, STATUS, MESSAGE,NO)VALUES(?,?,?,?) ";
 			//logger.info("SQL:"+sql);
 			int index = 0;

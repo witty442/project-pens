@@ -49,3 +49,11 @@ insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ท
 insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','Y');
 
 insert into pens.c_reference values ('2700','CustShowTrip','ShowOnlyTrip','ShowOnlyTrip','Y','Y');
+
+/** 09/2560 
+ * update bussiness_type = party_type
+ **/
+update m_customer set BUSINESS_TYPE = party_type;
+
+
+	

@@ -3,7 +3,6 @@
  */
 package com.isecinc.pens.inf.bean;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
 /**
@@ -20,8 +19,7 @@ public class FTPFileBean implements Serializable{
     private String[]  dataLineText;
     private int fileCount;
     private String dataResultStr;
-    
-    
+
 	public String getDataResultStr() {
 		return dataResultStr;
 	}

@@ -21,8 +21,8 @@ try{
 		}else{
 			SADamageBean bean = SADamageDAO.getInvRefwalFromSaleAnalysis(invRefWal);
 			//Validate Type Invoice 
-			//เลือก B'me  เช็ค invoice ต้องขึ้นต้นด้วย 1
-            // เลือก Wacoal  เช็ค invoice ต้องขึ้นต้นด้วย M
+			//เลือก B'me  เช็ค invoice ต้องขึ้นต้นด้วย 1 or 2
+            //เลือก Wacoal  เช็ค invoice ต้องขึ้นต้นด้วย M
 			if(bean != null ){
 			    outputText  =  bean.getOracleRefId()+"|"+bean.getOracleRefName()+"|"+bean.getTotalDamage();
 			    outputText += "|"+Utils.isNull(bean.getEmpId())+"|"+Utils.isNull(bean.getName())+"|"+Utils.isNull(bean.getSurname());

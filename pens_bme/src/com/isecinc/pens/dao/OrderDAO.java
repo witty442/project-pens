@@ -2222,7 +2222,7 @@ public class OrderDAO {
 			}
 			
 			sql.append(" )a \n ");;
-			sql.append("order by a.seq asc \n");
+			sql.append("order by a.seq ,a.pens_value asc \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    

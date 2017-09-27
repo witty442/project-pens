@@ -159,25 +159,7 @@ function loadMe(){
 			<html:hidden property="order.paymentMethod"/>
 		</td>
 	</tr>
-	<%if(role.equalsIgnoreCase(User.DD)) {%>
-	<tr>
-		<td align="right"><bean:message key="Condition.ShipmentDay" bundle="sysele"/>&nbsp;&nbsp;</td>
-		<td align="left">
-			<html:select property="order.shippingDay" disabled="true" styleClass="disableText">
-				<html:option value="Mon"><bean:message key="Monday" bundle="sysele" /></html:option>
-				<html:option value="Tue"><bean:message key="Tueday" bundle="sysele" /></html:option>
-				<html:option value="Wed"><bean:message key="Wednesday" bundle="sysele" /></html:option>
-				<html:option value="Thu"><bean:message key="Thursday" bundle="sysele" /></html:option>
-				<html:option value="Fri"><bean:message key="Friday" bundle="sysele" /></html:option>
-				<html:option value="Sat"><bean:message key="Saturday" bundle="sysele" /></html:option>
-			</html:select>
-		</td>
-		<td align="right"><bean:message key="Condition.ShipmentTime" bundle="sysele"/>&nbsp;&nbsp;</td>
-		<td align="left">
-			<html:text property="order.shippingTime" size="5" readonly="true" styleClass="disableText"/>
-		</td>
-	</tr>
-	<%} %>
+	
 	<tr>
 		<td colspan="4" align="center">
 		<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
@@ -436,7 +418,6 @@ function loadMe(){
 	<jsp:param name="id" value="${orderForm.order.id}"/>
 </jsp:include>
 </html:form>
-<!-- BODY -->
-					
+<!-- BODY -->	
 </body>
 </html>

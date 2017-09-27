@@ -20,7 +20,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.Constants;
-import util.ExcelHeader;
+import util.excel.ExcelHeader;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;

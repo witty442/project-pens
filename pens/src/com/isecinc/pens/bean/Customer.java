@@ -149,7 +149,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	private String tripDay;
 	private String tripDay2;
 	private String tripDay3;
-	
+
 	public String getTripDay() {
 		return tripDay;
 	}

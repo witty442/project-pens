@@ -347,6 +347,7 @@ public class PayAction extends I_Action {
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
 		try {
+			
 			//Choose Printer By User Case Printer default offline
 			String printerName = Utils.isNull(request.getParameter("printerName"));
 			if( !Utils.isNull(printerName).equals("")){
@@ -354,6 +355,7 @@ public class PayAction extends I_Action {
 				user.setPrinterName(printerName);
 				request.getSession().setAttribute("user",user);
 			}
+			logger.info("Print["+user.getUserName()+"] Date["+new Date()+"]printer["+user.getPrinterName()+"]");
 			
 			conn = DBConnection.getInstance().getConnection();
 			PayForm aForm = (PayForm) form;
@@ -530,6 +532,8 @@ public class PayAction extends I_Action {
 				logger.debug("start report");
 				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName,h.getItems());
 				
+				//set printer success
+				request.setAttribute("printerSuccess", "printerSuccess");
 			}else{
 				
 				request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
@@ -545,8 +549,7 @@ public class PayAction extends I_Action {
 				
 			}
 		}
-		// return null;
-		return null;
+		return  mapping.findForward("printPayPopup");
 	}
 	
 	@Override

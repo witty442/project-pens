@@ -42,11 +42,13 @@ function inputNum(e){
 	var keynum;
 	if(window.event){// IE
 		keynum = e.keyCode;
+		//alert("1:"+keynum);
 	}else if(e.which){// NC//FF//OP
 		keynum = e.which;
+		//alert("2:"+keynum);
 	}
 	
-	//alert(keynum);
+	
 	if(!keynum){return true;}
 	if(keynum==8){return true;}
 	if(keynum==9){return true;}
@@ -138,7 +140,6 @@ function isNum0to9andpointBK(objText, e){// get number and point
 	    return false;
 	 }
 }
-
 
 function inputReal(objText,point,e){
 	var keynum;

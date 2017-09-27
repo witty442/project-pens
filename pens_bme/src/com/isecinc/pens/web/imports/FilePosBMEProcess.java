@@ -24,8 +24,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
-import util.ExcelHeader;
 import util.UploadXLSUtil;
+import util.excel.ExcelHeader;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;

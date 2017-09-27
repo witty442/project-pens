@@ -943,7 +943,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 			        "\n ,BUSINESS_TYPE='"+ConvertNullUtil.convertToString(customer.getBusinessType()).trim()+"'"+
 			        "\n ,BIRTHDAY=?"+
 			        "\n ,PARENT_CUSTOMER_ID="+customer.getParentID()+""+
-			        "\n ,PARTY_TYPE='"+ConvertNullUtil.convertToString(customer.getPartyType()).trim()+"',is_change='Y'"+
+			        "\n ,business_type='"+ConvertNullUtil.convertToString(customer.getPartyType()).trim()+"',is_change='Y'"+
 					"\n  where customer_id ="+ customer.getId();
 			
 			 logger.debug("sql:"+sql);

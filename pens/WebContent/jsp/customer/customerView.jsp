@@ -148,7 +148,7 @@ body {
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:select property="customer.partyType" disabled="true" styleClass="disableText">
+									<html:select property="customer.businessType" disabled="true" styleClass="businessType">
 										<%-- <html:option value=""></html:option>
 										<html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option> --%>
@@ -194,9 +194,9 @@ body {
 										<html:options collection="territories" property="key" labelProperty="name"/>
 									</html:select>
 								</td>
-								<td align="right"><bean:message key="Customer.BusinessType" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right"><%-- <bean:message key="Customer.BusinessType" bundle="sysele"/>&nbsp;&nbsp; --%></td>
 								<td align="left">
-									<html:text property="customer.businessType" size="25" readonly="true" styleClass="disableText"/>
+								<%-- 	<html:text property="customer.businessType" size="25" readonly="true" styleClass="disableText"/> --%>
 								</td>
 							</tr>
 							<tr>
@@ -511,6 +511,7 @@ body {
 						<input type="hidden" name="tf" value="<%=session.getAttribute("tf") %>">
 						<div id="addressList" style="text-align: left;display: none;"></div>
 						<div id="contactList" style="text-align: left;display: none;"></div>
+						<div title="CustomerView">..</div>
 						</html:form>
 						<!-- BODY -->
 					</td>

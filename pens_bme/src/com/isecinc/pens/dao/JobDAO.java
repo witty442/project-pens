@@ -84,7 +84,9 @@ public class JobDAO extends PickConstants{
 			if( !Utils.isNull(o.getCustGroup()).equals("")){
 				sql.append("\n and cust_group like '%"+Utils.isNull(o.getCustGroup())+"%'  ");
 			}
-			
+			if( !Utils.isNull(o.getRtnNo()).equals("")){
+				sql.append("\n and rtn_no = '"+Utils.isNull(o.getRtnNo())+"' ");
+			}
 			sql.append("\n order by job_id desc ");
 			logger.debug("sql:"+sql);
 			
@@ -244,6 +246,7 @@ public class JobDAO extends PickConstants{
 				   
 				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
 				   h.setRtnAmt(Utils.decimalFormat(rst.getDouble("rtn_amt"),Utils.format_current_2_disgit,""));
+				   h.setRtnNo(Utils.isNull(rst.getString("rtn_no"))); 
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
@@ -388,7 +391,9 @@ public class JobDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_JOB \n");
 				sql.append(" (JOB_ID, NAME, OPEN_DATE,   \n");
-				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE,REF_DOC,RTN_QTY,RTN_AMT)  \n");
+				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER "
+						+ ",CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE"
+						+ ",REF_DOC,RTN_QTY,RTN_AMT)  \n");
 			
 			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,? ,?,?) \n");
 				
@@ -413,7 +418,7 @@ public class JobDAO extends PickConstants{
 				ps.setString(c++, Utils.isNull(o.getRefDoc()));
 				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnQty()));
 				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnAmt()));
-				
+
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -497,14 +502,10 @@ public class JobDAO extends PickConstants{
 				sql.append(", REF_DOC = '"+Utils.isNull(o.getRefDoc())+"' \n" );
 				sql.append(", RTN_QTY = "+Utils.convertStrToDouble(o.getRtnQty())+" \n" );
 				sql.append(", RTN_AMT = "+Utils.convertStrToDouble(o.getRtnAmt())+" \n" );
-				
+				sql.append(", RTN_NO = '"+Utils.isNull(o.getRtnNo())+"' \n" );
 				sql.append(" WHERE JOB_ID =? \n" );
                 
 				logger.debug("sql:"+sql.toString());
-				
-				//ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnQty()));
-				//ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnAmt()));
-				
 				ps = conn.prepareStatement(sql.toString());
 					
 				ps.setString(c++, o.getName());

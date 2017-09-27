@@ -93,11 +93,15 @@ public class LockItemOrderDAO {
 				PreparedStatement ps = null;
 				ResultSet rst = null;
 				StringBuilder sql = new StringBuilder();
-				
 				LockItemOrderBean h = null;
 				List<LockItemOrderBean> items = new ArrayList<LockItemOrderBean>();
 				int r = 1;
+				String lockDateStr  ="";
 				try {
+					if( !Utils.isNull(o.getLockDate()).equals("") ){
+					   Date lockDate = Utils.parse(Utils.isNull(o.getLockDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   lockDateStr = Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					}
 				   sql.append("\n select E.* " );
 				   sql.append("\n ,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Customer' AND M.pens_value =E.group_store)as group_store_name" );
 				   sql.append("\n ,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Store' AND M.pens_value =E.store_no)as store_name" );
@@ -105,18 +109,20 @@ public class LockItemOrderDAO {
 				   sql.append("\n  WHERE 1=1");
 				   if( !Utils.isNull(o.getGroupCode()).equals("") ){
 						sql.append("\n and E.group_code ='"+Utils.isNull(o.getGroupCode())+"'");
-				    }
-				   if( !Utils.isNull(o.getLockDate()).equals("") ){
-				      sql.append("\n  and lock_date = ? ");
 				   }
-					sql.append("\n order by E.group_code,E.group_store,E.lock_date asc ");
-					
-					logger.debug("sql:"+sql);
+				   if( !Utils.isNull(o.getGroupStore()).equals("") ){
+						sql.append("\n and E.group_store ='"+Utils.isNull(o.getGroupStore())+"'");
+				   }
+				   if( !Utils.isNull(o.getStoreCode()).equals("") ){
+						sql.append("\n and E.store_no in("+Utils.converToTextSqlIn(o.getStoreCode())+")");
+				   }
+				   if( !Utils.isNull(o.getLockDate()).equals("") ){
+				      sql.append("\n  and lock_date = to_date('"+lockDateStr+"','dd/mm/yyyy') ");
+				   }
+				   sql.append("\n order by E.group_code,E.group_store,E.lock_date asc ");
+				   logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql.toString());
-					if( !Utils.isNull(o.getLockDate()).equals("") ){
-					    ps.setDate(1, new java.sql.Date(Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
-					}
 					rst = ps.executeQuery();
 					
 					while(rst.next()) {
@@ -124,7 +130,6 @@ public class LockItemOrderDAO {
 					   h.setId(rst.getBigDecimal("id"));
 					   h.setGroupCode(Utils.isNull(rst.getString("group_code")));
 					   h.setGroupStore(Utils.isNull(rst.getString("group_store")));
-					  
 					   h.setGroupStoreName(Utils.isNull(rst.getString("group_store_name")));
 					   h.setStoreCode(Utils.isNull(rst.getString("store_no")));
 					   if( !"ALL".equalsIgnoreCase(h.getStoreCode())){
@@ -213,14 +218,16 @@ public class LockItemOrderDAO {
 			String key = "";
 			String oldValue = "";
 			try {
+				Date lockDate = Utils.parse(Utils.isNull(o.getLockDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String lockDateStr = Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				
 				sql.append("\n select group_code, group_store ,store_no from PENSBME_LOCK_ITEM where 1=1");
-				sql.append("\n and group_code = '"+o.getGroupCode()+"' ");
-				sql.append("\n and lock_date = ? ");
+				sql.append("\n and group_code = '"+o.getGroupCode()+"' \n");
+				sql.append("\n and lock_date = to_date('"+lockDateStr+"','dd/mm/yyyy') \n");
 
 				logger.debug("sql:"+sql);
 				
 				ps = conn.prepareStatement(sql.toString());
-				ps.setDate(1, new java.sql.Date(Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 				rst = ps.executeQuery();
 				
 				while(rst.next()) {
@@ -384,6 +391,30 @@ public class LockItemOrderDAO {
 					}
 				}
 				return false;
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+	  }
+	 
+	 public static int deleteLockItem(Connection conn,String groupCode,String groupStore,String storeCode,String lockDateStr) throws Exception{
+			PreparedStatement ps = null;
+			ResultSet rs= null;
+			Date lockDate = Utils.parse(lockDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			StringBuffer sql = new StringBuffer("");
+			try{
+				sql.append("delete FROM PENSBME_LOCK_ITEM \n");
+				sql.append("WHERE group_code= '"+Utils.isNull(groupCode)+"' \n"
+						+ "AND group_store = '"+Utils.isNull(groupStore)+"' \n"
+						+ "AND store_no = '"+Utils.isNull(storeCode)+"' \n"
+						+ "AND lock_date = to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");
+				
+				logger.debug("sql:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+	            return ps.executeUpdate();
 			}catch(Exception e){
 				throw e;
 			}finally{

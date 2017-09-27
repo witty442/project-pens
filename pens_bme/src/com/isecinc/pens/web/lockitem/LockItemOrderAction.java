@@ -53,6 +53,12 @@ public class LockItemOrderAction extends I_Action {
 				request.getSession().setAttribute("StoreCodeToMap", null);
 				request.getSession().setAttribute("groupStoreMapError", null);
 				
+				List<Master> custGroupList = new ArrayList<Master>();
+				Master refP = new Master(); 
+				custGroupList.add(refP);
+				custGroupList.addAll(GeneralDAO.getCustGroupList(""));
+				request.getSession().setAttribute("custGroupList",custGroupList);
+				
 			}else if("back".equals(action)){
 				LockItemOrderBean oldCri = aForm.getBeanCriteria();
 				
@@ -115,6 +121,7 @@ public class LockItemOrderAction extends I_Action {
             String action = Utils.isNull(request.getParameter("action"));
 		
 			logger.debug("prepare edit groupCode:"+groupCode+",groupStore="+groupStore+",storeCode="+storeCode+",action:"+action);
+			logger.debug("lockDate:"+lockDate);
 			
 			//Clear groupStoreMapError Session
 			request.getSession().setAttribute("groupStoreMapError", null);
@@ -142,9 +149,7 @@ public class LockItemOrderAction extends I_Action {
 				
 				//init custGroupList session and no display groupStore is set allStore 
 				request.getSession().setAttribute("custGroupList",GeneralDAO.getCustGroupList(""));
-				
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", "err:"+ e.getMessage());
@@ -202,7 +207,6 @@ public class LockItemOrderAction extends I_Action {
 		return mapping.findForward("detail");
 	}
 	
-	
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
 		User user = (User) request.getSession().getAttribute("user");
@@ -219,6 +223,58 @@ public class LockItemOrderAction extends I_Action {
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("search");
+	}
+	
+	public ActionForward deleteLockItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("deleteLockItem");
+		User user = (User) request.getSession().getAttribute("user");
+		LockItemOrderForm aForm = (LockItemOrderForm) form;
+		String[] keyDeleteArr = null;
+		String groupCode ="";
+		String groupStore = "";
+		String storeCode = "";
+		String lockDate = "";
+		Connection conn = null;
+		int deleteC = 0;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			//keyDelete = mc.getGroupCode()+","+mc.getGroupStore()+","+mc.getStoreCode()+","+mc.getLockDate();
+	        String[] keyDelete = request.getParameterValues("keyDelete");
+	       for(int i=0;i<keyDelete.length;i++){
+	    	   if( !Utils.isNull(keyDelete[i]).equals("")){
+	    		   keyDeleteArr = Utils.isNull(keyDelete[i]).split("\\,");
+	    		   groupCode =keyDeleteArr[0];
+	    		   groupStore = keyDeleteArr[1];
+	    		   storeCode = keyDeleteArr[2];
+	    		   lockDate = keyDeleteArr[3];
+	    		   
+	    		   deleteC = LockItemOrderDAO.deleteLockItem(conn, groupCode, groupStore, storeCode, lockDate);
+	    		   logger.debug("delete groupCode["+groupCode+"]groupStore["+groupStore+"]storeCode["+storeCode+"]lockDate["+lockDate+"]eff["+deleteC+"]");
+	    	   }
+	       }
+          
+	       conn.commit();
+	       
+	       //refresh data
+	        LockItemOrderBean bean = LockItemOrderDAO.searchHead(aForm.getBean());
+			aForm.setBean(bean);
+			aForm.setResultsSearch(aForm.getBean().getItems());
+			
+			if(aForm.getResultsSearch().size() <=0){
+			   request.setAttribute("Message", "ไม่พบข้อมูล");
+			   aForm.setResultsSearch(null);
+			}
+			
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search");
 	}

@@ -16,7 +16,7 @@ EnvProperties env = EnvProperties.getInstance();
 
 //Check Printer Deafualt By User is Online
 boolean printerByUserDefaultIsOnline = PrinterUtils.isPrinterIsOnline(user.getOrgPrinterName());
-System.out.println("printerByUserDefaultIsOnline["+printerByUserDefaultIsOnline+"]");
+System.out.println("printerByUserDefaultIsOnline =["+printerByUserDefaultIsOnline+"]");
 %>
 <html>
 <head>
@@ -30,65 +30,46 @@ function loadMe(_path){
   String reportName = request.getParameter("report_name");
   String typeReport = "PayInReport";
   String docNo = Utils.isNull(request.getParameter("docNo"));
-
-  if(printerByUserDefaultIsOnline && "PayInReport".equals(reportName)){ 
-		 
-		   if(request.getLocalAddr().equals("192.168.202.8") 
-			|| request.getLocalName().equals("0.0.0.0")
-			){
-	  %>
-	         var param = "&typeReport=<%=typeReport%>&docNo=<%=docNo%>"
-	       //  document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
-	        // document.tempForm.submit();
-	        
-	         var submitUrl =  _path + "/jsp/payAction.do?do=printReport"+param;
-	         $.post(submitUrl, $('#tempForm').serialize());
-	      <%}else{ %>
-	          var param = "typeReport=<%=typeReport%>&docNo=<%=docNo%>&userName=<%=user.getUserName()%>";
-	          //document.tempForm.action = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?"+param;
-		     // document.tempForm.submit();
-		     
-		     var submitUrl = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?"+param;
-		      $.post(submitUrl, $('#tempForm').serialize());
-	      <%} %>
-	 <%} %>
-	 
-	  setTimeout(function(){window.close();},10000);
+  String printerSuccess ="";
+  if(request.getAttribute("printerSuccess") != null){
+     printerSuccess = (String)request.getAttribute("printerSuccess");
+  }
+ // System.out.println("printerSuccess:"+printerSuccess);
+ // System.out.println("LocalName:"+request.getLocalName());
+  
+  //Case Printer IS Online Printer Auto
+  if(printerByUserDefaultIsOnline && "PayInReport".equals(reportName) && "".equals(printerSuccess)){ 
+ %>
+         var param = "&typeReport=<%=typeReport%>&docNo=<%=docNo%>"
+     
+        // var submitUrl =  _path + "/jsp/payAction.do?do=printReport"+param;
+         //$.post(submitUrl, $('#tempForm').serialize());
+         
+         document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
+         document.tempForm.submit();
+         
+ <%} %>
+ //after printer close window
+ <%if("printerSuccess".equals(printerSuccess)){%>
+   setTimeout(function(){window.close();},8000);
+ <%}%>
+ 
 }
-
+/** Case Printer offline user choose printer **/
   function printReportByUser(_path){
 	  var printerName = $('input[name="printerName"]:checked').val();
-	   
-	  <%
-		 typeReport = "PayInReport";
-		 if(request.getLocalAddr().equals("192.168.202.8") 
-			|| request.getLocalName().equals("0.0.0.0")
-		   ){
-	  %>
-         var param  = "&typeReport=PayInReport&docNo="+document.getElementsByName("docNo")[0].value;
-             param += "&printerName="+printerName;
-             
-           //alert("1:"+param);
-          // document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
-           //document.tempForm.submit();
-           
-          var submitUrl = document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
-           
-           $.post(submitUrl, $('#tempForm').serialize());
-           
-      <%}else{ %>
-          var param  = "typeReport=PayInReport&docNo="+document.getElementsByName("docNo")[0].value;
-              param += "&printerName="+printerName;
-              
-          //alert("2:"+param);
-         // document.tempForm.action = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?"+param;
-	      //document.tempForm.submit();
-	       var submitUrl = "http://<%=env.getProperty("host.payinreport")%>/printPayInReport?"+param;
-	      $.post(submitUrl, $('#tempForm').serialize());
-	      
-      <%} %>
+      var param  = "&typeReport=PayInReport&docNo="+document.getElementsByName("docNo")[0].value;
+          param += "&printerName="+printerName;
+            
+      //var submitUrl = document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
+     // $.post(submitUrl, $('#tempForm').serialize());
+     
+      document.tempForm.action = _path + "/jsp/payAction.do?do=printReport"+param;
+      document.tempForm.submit();
+         
+     // document.getElementById("btn_print").disabled = true;
       
-      setTimeout(function(){window.close();},10000);
+     // setTimeout(function(){window.close();},9000);
 }
 </script>
 </head>
@@ -101,7 +82,7 @@ function loadMe(_path){
 <input type="hidden" name="docNo" value="<%=docNo%>">
 
 <!-- BUTTON -->
-<%if( !printerByUserDefaultIsOnline){ 
+<%if( !printerByUserDefaultIsOnline && "".equals(printerSuccess)){ 
   List<PrinterBean> listPrinter = PrinterUtils.listPrinterXeroxPayslipIsOnline();
 %>
 	<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -124,9 +105,7 @@ function loadMe(_path){
 		</tr>
 		<tr>
 			<td align="center">
-				<a href="#" onclick="printReportByUser('${pageContext.request.contextPath}')">
-				<input type="button" value=" พิมพ์ " class="newNegBtn">
-				</a>
+				<input type="button" value=" พิมพ์ " id ="btn_print" class="newNegBtn" onclick="printReportByUser('${pageContext.request.contextPath}')">
 				<a href="#" onclick="window.close();">
 				<input type="button" value="ยกเลิก" class="newNegBtn">
 				</a>
@@ -136,13 +115,19 @@ function loadMe(_path){
 <%}else{ %>
 	<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr>
-			<td align="right">
-				
-				<a href="#" onclick="window.close();">
-				<input type="button" value="ยกเลิก" class="newNegBtn">
-				</a>
+			<td align="center"></td>
+		</tr>
+		<tr>
+			<td align="center">
+			  <font size="3" color="green">	กำลังพิมพ์เอกสาร กรุณารอกสักครู่.............</font>
 			</td>
-			<td width="20%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="center">
+			 	<a href="#" onclick="window.close();">
+				<input type="button" value="ปิดหน้าจอนี้" class="newBtn">
+				</a> 
+			</td>
 		</tr>
 	</table>
 <%}%>

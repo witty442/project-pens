@@ -136,8 +136,15 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		List<References> pos = new ArrayList<References>();
 		Statement stmt = null;
 		ResultSet rst = null;
+		StringBuffer sql = new StringBuffer("");
 		try {
-			StringBuffer sql = new StringBuffer("select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
+			sql.append("\n select A.* from (");
+			sql.append("\n select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand ");
+			sql.append("\n from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
+			sql.append("\n AND ISACTIVE = 'Y'"); 
+			sql.append("\n AND PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
+			sql.append("\n AND seg_value1 <> '000' ");
+			sql.append("\n AND seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ");
 			if(u != null){  
 			   sql.append("\n AND PRODUCT_CATEGORY_ID NOT IN ");
 			   sql.append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ");
@@ -153,7 +160,8 @@ public class MProductCategory extends I_Model<ProductCategory> {
 				   sql.append("\n ) ");
 			   }
 			}
-			
+			sql.append("\n )A ");
+			sql.append("\n WHERE A.brand <> '' and A.brand is not null ");
 			logger.info("sql:\n"+sql.toString());
 			
 			stmt = conn.createStatement();
@@ -185,33 +193,32 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		List<References> pos = new ArrayList<References>();
 		Statement stmt = null;
 		ResultSet rst = null;
-		
+		StringBuffer sql = new StringBuffer("");
+		int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 		try {
-			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
-			
-			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
-					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ");
-					   sql.append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ");
-					   sql.append("\n WHERE pdc.ISACTIVE = 'Y' ");
-					   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
-					   sql.append("\n AND pdc.seg_value1 <> '000' ") ;//Except DefaultValue
-					   sql.append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") ;//Except DefaultValue
-					   
-					   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ");
-					   sql.append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ");
-					   sql.append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ");
-					   sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
-					   sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
-					   // product Special
-					   /*if(isCustHaveProductSpecial){
-						   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID in(");
-						   sql.append("\n   select product_category_id from m_product where code in(");
-						   sql.append("\n     select code from m_product_center ");
-						   sql.append("\n    )  ");
-						   sql.append("\n ) ");
-					   }*/
-					   sql.append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ");
-					   sql.append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
+			sql.append("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+			sql.append("\n FROM M_PRODUCT_CATEGORY pdc ");
+		    sql.append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ");
+		    sql.append("\n WHERE pdc.ISACTIVE = 'Y' ");
+		    sql.append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
+		    sql.append("\n AND pdc.seg_value1 <> '000' ") ;//Except DefaultValue
+		    sql.append("\n AND pdc.seg_value1 NOT IN (SELECT c.CODE FROM M_CATALOG c WHERE c.ISEXCLUDE ='Y') ") ;//Except DefaultValue
+		   
+		    sql.append("\n AND pdc.PRODUCT_CATEGORY_ID NOT IN ");
+		    sql.append("\n (SELECT  p2.PRODUCT_CATEGORY_ID  ");
+		    sql.append("\n FROM M_PRODUCT p1 , M_PRODUCT_CATEGORY p2 , M_PRODUCT_UNUSED p3  ");
+		    sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
+		    sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
+		    // product Special
+		    /*if(isCustHaveProductSpecial){
+			   sql.append("\n AND pdc.PRODUCT_CATEGORY_ID in(");
+			   sql.append("\n   select product_category_id from m_product where code in(");
+			   sql.append("\n     select code from m_product_center ");
+			   sql.append("\n    )  ");
+			   sql.append("\n ) ");
+		    }*/
+		    sql.append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ");
+		    sql.append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
 					
 			logger.debug("sql:\n"+sql.toString());
 

@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
@@ -47,10 +48,8 @@ try{
 		
 		 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
 		
-		 totalPage = totalRecord/(no_of_column * no_of_rows);
-		 BigDecimal r = new BigDecimal(totalPage);
-		 r = r.setScale(0,BigDecimal.ROUND_UP);
-		 totalPage = r.intValue();
+		// totalPage = totalRecord/(no_of_column * no_of_rows);
+		   totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
 }catch(Exception e){
 	e.printStackTrace();
 }finally{ 

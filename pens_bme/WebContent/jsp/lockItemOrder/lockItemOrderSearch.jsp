@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.LockItemOrderBean"%>
 <%@page import="java.util.Calendar"%>
@@ -26,9 +27,9 @@ User user = (User) request.getSession().getAttribute("user");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -54,9 +55,10 @@ span.pagelinks {
 }
 
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -111,6 +113,17 @@ function openAdd(path){
 	return true; 
 }
 
+function deleteLockItem(path){
+	var form = document.lockItemOrderForm;
+	var param ="";
+	if(confirm("ยืนยันลบข้อมูล")){
+		form.action = path + "/jsp/lockItemOrderAction.do?do=deleteLockItem";
+		form.submit();
+		return true; 
+	}
+	return false;
+}
+
 function submitSearch(path,e){
 	 var key = e.which;
 	 if(key == 13)  // the enter key code
@@ -118,6 +131,29 @@ function submitSearch(path,e){
 		 search(path);
 	  }
 	}
+function setKeyDelete(index,chkObject){
+	if(chkObject.checked){
+		document.getElementsByName("keyDelete")[index].value = chkObject.value;
+	}else{
+		document.getElementsByName("keyDelete")[index].value ="";
+	}
+}
+function openPopup(path,pageName){
+	var form = document.lockItemOrderForm;
+	var param = "&pageName="+pageName;
+	if("StoreCodeBME" == pageName){
+        param +="&groupStore="+form.groupStore.value;
+	}
+	url = path + "/jsp/popupSearchAction.do?do=prepare&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
+function setDataPopupValue(code,desc,pageName){
+	var form = document.lockItemOrderForm;
+	if("StoreCodeBME" == pageName){
+		form.storeCode.value = code;
+	}
+} 
+
 </script>
 
 </head>		
@@ -167,6 +203,20 @@ function submitSearch(path,e){
 									<td>		
 										 <html:text property="bean.groupCode" styleId="groupCode" size="20" onkeypress="submitSearch('${pageContext.request.contextPath}',event)"/>
 									</td>
+									<td>		
+									    กลุ่มร้านค้า	
+                                      <html:select property="bean.groupStore" styleId="groupStore">
+											<html:options collection="custGroupList" property="pensValue" labelProperty="pensDesc"/>
+									    </html:select>
+									</td>
+								</tr>
+								<tr>
+                                    <td align="right"> รหัสร้านค้า<font color="red"></font></td>
+									<td>		
+										 <html:text property="bean.storeCode" styleId="storeCode" size="20"/>
+										 <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','StoreCodeBME')"/>   
+									</td>
+									<td></td>
 								</tr>
 						   </table>
 						   
@@ -191,9 +241,14 @@ function submitSearch(path,e){
 					  </div>
 
             <c:if test="${lockItemOrderForm.resultsSearch != null}">
-                    
+                        <table id="tblProductDel" align="center" border="0" cellpadding="3" cellspacing="2"  width="100%">
+                         <tr><td >
+                             <input type="button" name="delete" value="  ลบข้อมูล  " onclick="deleteLockItem('${pageContext.request.contextPath}')" class="newPosBtnLong"/>
+                           </td></tr>
+                        </table>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						       <tr>
+						            <th ></th>
 						            <th >Group Code</th><!-- 0 -->
 						            <th >กลุ่มร้านค้า</th><!-- 1 -->
 									<th >ชื่อกลุ่มร้านค้า</th><!-- 3 -->
@@ -206,27 +261,32 @@ function submitSearch(path,e){
 							<% 
 							String tabclass ="lineE";
 							List<LockItemOrderBean> resultList = lockItemOrderForm.getResultsSearch();
-							
+							String keyDelete = "";
 							for(int n=0;n<resultList.size();n++){
 								LockItemOrderBean mc = (LockItemOrderBean)resultList.get(n);
 								if(n%2==0){ 
 									tabclass="lineO";
 								}
+								keyDelete =mc.getGroupCode()+","+mc.getGroupStore()+","+mc.getStoreCode()+","+mc.getLockDate();
 								%>
-									<tr class="<%=tabclass%>"> 
-										<td class="td_text_center" width="6%"><%=mc.getGroupCode()%></td><!-- 1 -->
-										<td class="td_text_center" width="6%"><%=mc.getGroupStore()%></td><!-- 3 -->
-									    <td class="td_text_center" width="10%"><%=mc.getGroupStoreName()%></td><!-- 4 -->
-									    <td class="td_text_center" width="8%"><%=mc.getStoreCode()%></td><!-- 5 -->
-										<td class="td_text_center" width="10%"><%=mc.getStoreName()%></td><!-- 6 -->
-										<td class="td_text_center" width="6%"><%=mc.getLockDate()%></td><!-- 7 -->
-										<td class="td_text_center" width="6%"><%=mc.getUnlockDate()%></td><!-- 8 -->
-										<td class="td_text_center" width="7%">
-                                           <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getGroupCode()%>','<%=mc.getGroupStore()%>','<%=mc.getStoreCode()%>','<%=mc.getLockDate()%>')"> 
-									             แก้ไข
-									           </a>
-                                        </td>
-									</tr>
+								<tr class="<%=tabclass%>"> 
+								    <td class="td_text_center" width="2%">
+								    <input type="checkbox" name="delChk" value="<%=keyDelete%>" onclick="setKeyDelete(<%=n%>,this)">
+								    <input type="hidden" name="keyDelete" id="keyDelete" />
+								    </td><!-- 1 -->
+									<td class="td_text_center" width="6%"><%=mc.getGroupCode()%></td><!-- 1 -->
+									<td class="td_text_center" width="6%"><%=mc.getGroupStore()%></td><!-- 3 -->
+								    <td class="td_text_center" width="10%"><%=mc.getGroupStoreName()%></td><!-- 4 -->
+								    <td class="td_text_center" width="8%"><%=mc.getStoreCode()%></td><!-- 5 -->
+									<td class="td_text_center" width="10%"><%=mc.getStoreName()%></td><!-- 6 -->
+									<td class="td_text_center" width="6%"><%=mc.getLockDate()%></td><!-- 7 -->
+									<td class="td_text_center" width="6%"><%=mc.getUnlockDate()%></td><!-- 8 -->
+									<td class="td_text_center" width="7%">
+                                         <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getGroupCode()%>','<%=mc.getGroupStore()%>','<%=mc.getStoreCode()%>','<%=mc.getLockDate()%>')"> 
+								             แก้ไข
+								      </a>
+                                    </td>
+								</tr>
 							<%} %>
 							 
 					</table>

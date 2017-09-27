@@ -642,6 +642,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 				m.setCreateUser(rs.getString("create_user"));
 				m.setCreateDate(rs.getDate("create_date"));
 				m.setSubmitDate(rs.getTimestamp("submit_date"));
+				m.setSubmitDateDisp(Utils.stringValue(rs.getTimestamp("submit_date"),Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
 	            m.setFileCount(rs.getInt("file_count"));
 	            m.setSuccessCount(rs.getInt("success_count"));
 	            if( !Utils.isNull(rs.getString("error_msg")).equals("")){

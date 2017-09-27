@@ -1,7 +1,5 @@
 package com.isecinc.pens.bean;
 
-import static util.ConvertNullUtil.convertToString;
-
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.util.Calendar;
@@ -57,14 +55,14 @@ public class User extends I_PO implements Serializable {
 		
 		// Mandatory
 		setId(rst.getInt("USER_ID"));
-		setCode(convertToString(rst.getString("CODE")));
-		setName(convertToString(rst.getString("NAME")));
+		setCode(Utils.isNull(rst.getString("CODE")));
+		setName(Utils.isNull(rst.getString("NAME")));
 
 		// oracle fields
-		setCategory(convertToString(rst.getString("CATEGORY")));
-		setOrganization(convertToString(rst.getString("ORGANIZATION")));
-		setSourceName(convertToString(rst.getString("SOURCE_NAME")));
-		setIdCardNo(convertToString(rst.getString("ID_CARD_NO")));
+		setCategory(Utils.isNull(rst.getString("CATEGORY")));
+		setOrganization(Utils.isNull(rst.getString("ORGANIZATION")));
+		setSourceName(Utils.isNull(rst.getString("SOURCE_NAME")));
+		setIdCardNo(Utils.isNull(rst.getString("ID_CARD_NO")));
 	
 		//String dateStr = Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 		if( !Utils.isNull(rst.getString("START_DATE")).equals("")){
@@ -74,12 +72,12 @@ public class User extends I_PO implements Serializable {
 		  setEndDate(Utils.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		}
 		
-		setTerritory(convertToString(rst.getString("TERRITORY")));
+		setTerritory(Utils.isNull(rst.getString("TERRITORY")));
 
 		// sales online fields
-		setUserName(convertToString(rst.getString("USER_NAME")));
-		setPassword(convertToString(rst.getString("PASSWORD")));
-		setConfirmPassword(convertToString(rst.getString("PASSWORD")));
+		setUserName(Utils.isNull(rst.getString("USER_NAME")));
+		setPassword(Utils.isNull(rst.getString("PASSWORD")));
+		setConfirmPassword(Utils.isNull(rst.getString("PASSWORD")));
          
 		setUserGroupId(rst.getInt("USER_GROUP_ID"));
 		

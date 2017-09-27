@@ -238,13 +238,14 @@ public class ImportDAO {
 		boolean dup = false;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select *  from PENSBME_WACOAL_SALEOUT WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
+			sql.append(" select count(*) as c  from PENSBME_WACOAL_SALEOUT WHERE  lower(file_name) ='"+Utils.isNull(fileName).toLowerCase()+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				dup = true;
+				if(rs.getInt("c") > 0)
+				   dup = true;
 			}
 		
 		}catch(Exception e){

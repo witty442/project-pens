@@ -356,14 +356,11 @@ public class Utils {
 		if(s == null || "".equals(s)){
 			return Double.parseDouble("0");
 		}
-		
-		logger.debug("s.indexOf(,):"+s.indexOf(","));
-		
+		//logger.debug("s.indexOf(,):"+s.indexOf(","));
 		if(s.indexOf(",") != -1){
-			s = s.replaceAll(",", "");
-			
+			s = s.replaceAll(",", "");	
 		}
-		logger.debug("s:"+s);
+		//logger.debug("s:"+s);
 	   return Double.parseDouble(s);
 	}
 	

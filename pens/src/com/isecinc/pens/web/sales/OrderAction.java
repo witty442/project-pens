@@ -144,7 +144,6 @@ public class OrderAction extends I_Action {
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
 			orderForm.setCanAirpay(canAirpayFlag);
 			
-			
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");

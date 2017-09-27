@@ -26,9 +26,9 @@ public class PrinterUtils {
 			DocFlavor myFormat = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 	        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
 	        PrintService[] services =PrintServiceLookup.lookupPrintServices(myFormat, aset);
-	        System.out.println("The following printers are available");
+	        //System.out.println("The following printers are available");
 	        for (int i=0;i<services.length;i++) {
-	            System.out.println("  service name: "+services[i].getName());
+	           // System.out.println("  service name: "+services[i].getName());
 	            if(printerName.equalsIgnoreCase(services[i].getName())){
 	            	online = true;
 	            	break;
@@ -50,10 +50,10 @@ public class PrinterUtils {
 			DocFlavor myFormat = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 	        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
 	        PrintService[] services =PrintServiceLookup.lookupPrintServices(myFormat, aset);
-	        System.out.println("The following printers are available");
+	       // System.out.println("The following printers are available");
 	        for (int i=0;i<services.length;i++) {
-	            //System.out.println("  service name: "+services[i].getName());
-	            if(services[i].getName().startsWith("Xerox-Payslip")){
+	           // System.out.println("  service name: "+services[i].getName());
+	           if(services[i].getName().startsWith("Xerox-Payslip")){
 	            	PrinterBean p = new PrinterBean();
 	            	p.setName(services[i].getName());
 	            	if("Xerox-Payslip-1".equalsIgnoreCase(services[i].getName())){

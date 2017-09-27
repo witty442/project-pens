@@ -13,12 +13,17 @@ function convetTxtObjToFloat(obj){
 
 function isNum(obj){
   if(obj.value != ""){
+	  //remove comma
+	obj.value = obj.value.replace(/\,/g,'');
 	if(isNaN(obj.value)){
 		alert('ให้กรอกได้เฉพาะตัวเลขเท่านั้น');
 		obj.value = "";
 		obj.focus();
 		return false;
-	}else{return true;}
+	}else{
+		//if found comma
+		return true;
+	}
    }
   return true;
 }
@@ -73,7 +78,6 @@ function isNotNumeric(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-
 function currenyToNum(object){
 	var temp =  object.value.replace(/\,/g,''); //alert(r);
 	return temp;
@@ -82,6 +86,11 @@ function currenyToNum(object){
 function toCurreny(object){
 	var temp =  object.value.replace(/\,/g,''); //alert(r);
 	object.value = addCommas(Number(toFixed(temp,2)).toFixed(2));
+}
+
+function toCurrenyNoDigit(object){
+	var temp =  object.value.replace(/\,/g,''); //alert(r);
+	object.value = addCommas(Number(temp));
 }
 
 function toFixed(num, pre){

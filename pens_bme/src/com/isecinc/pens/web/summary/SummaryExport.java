@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.ExcelHeader;
+import util.excel.ExcelHeader;
 
 import com.isecinc.pens.bean.DiffStockSummary;
 import com.isecinc.pens.bean.OnhandSummary;

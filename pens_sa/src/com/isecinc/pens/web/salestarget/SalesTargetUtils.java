@@ -7,10 +7,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.C2BConverter;
+
+import util.DateToolsUtil;
 
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
@@ -21,7 +24,11 @@ public class SalesTargetUtils {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
 	public static void main(String[] a){
-		//initMonthYear();
+		try{
+		initPeriodAllYear(3, 4);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -32,7 +39,7 @@ public class SalesTargetUtils {
 	public static SalesTargetBean setAccess(SalesTargetBean o,User user,String pageName){
 		//Set By Role
 		//MKT
-		if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MKT}) && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MKT) ){
+		if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MKT}) && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MKT) ){
 			//CanSet
 			if(  Utils.isNull(o.getStatus()).equals("") 
 			  || Utils.statusInCheck(o.getStatus(),new String[]{SalesTargetConstants.STATUS_OPEN,SalesTargetConstants.STATUS_REJECT})
@@ -58,7 +65,7 @@ public class SalesTargetUtils {
 			}
 			//logger.debug("itemCode:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]");
 		//MT
-		}else if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
+		}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
 			if(   Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_POST )
 	           || Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_UN_ACCEPT )	
 			 ){
@@ -76,7 +83,7 @@ public class SalesTargetUtils {
 			 }
 			 //logger.debug("item:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]CanReject["+o.isCanReject()+"]CanPost["+o.isCanPost()+"]");
 	    //MTMGR
-		}else if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MTMGR})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTMGR)){
+		}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MTMGR})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTMGR)){
 			
 			if( Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_ACCEPT)){
 			    o.setCanFinish(true);
@@ -105,7 +112,7 @@ public class SalesTargetUtils {
 			int day = cal.get(Calendar.DAY_OF_MONTH);
 			//if(day >1){ //For TEST
 			
-			if(day>=27){ //prod
+			/*if(day>=27){ //prod
 				//Next Month +2
 				item = new PopupBean();
 				cal.add(Calendar.MONTH, 2);//Current+1
@@ -114,7 +121,28 @@ public class SalesTargetUtils {
 				item.setKeyName(periodName);
 				item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
 				monthYearList.add(item);
-			}
+			}*/
+			
+			//Next Month
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, 3);//Current+1
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
+			//Next Month
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, 2);//Current+1
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
 			//Next Month
 			item = new PopupBean();
 			cal = Calendar.getInstance();
@@ -145,6 +173,93 @@ public class SalesTargetUtils {
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
+		}
+	 return monthYearList;
+	}
+	public static List<PopupBean> initPeriodAllYear(int prevMonth,int nextMonth) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return initPeriodAllYear(conn,prevMonth,nextMonth);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+			conn.close();
+		}
+		
+	}
+	public static List<PopupBean> initPeriodAllYear(Connection conn,int prevMonthC,int nextMonthC) throws Exception{
+		List<PopupBean> monthYearList = new ArrayList<PopupBean>();
+		Calendar cal = Calendar.getInstance();
+		String periodName = "";
+		PopupBean item = new PopupBean();
+		cal = Calendar.getInstance();
+		String startDate  = "";
+		String endDate;
+		Date currentMonthDate =null;
+		Date prevMonthDate =null;
+		Date nextMonthDate = null;
+		try{
+			//get Current Month
+			currentMonthDate =cal.getTime();
+			
+		   //startMonth = current Month -prevMonth
+			cal.add(Calendar.MONTH, (-1*prevMonthC));
+			prevMonthDate = cal.getTime();
+			
+			logger.debug("prevMonthDate:"+prevMonthDate);
+			logger.debug("currentMonthDate:"+currentMonthDate);
+			
+			int diffMonth = DateToolsUtil.calcDiffMonthYear(prevMonthDate, currentMonthDate);
+			logger.debug("diffMonth:"+diffMonth);
+			
+			//loop prevMonth to Current
+			for(int m=0;m<diffMonth;m++){		
+				//Next Month
+				item = new PopupBean();
+				cal.add(Calendar.MONTH, 1);//
+				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				logger.debug("periodName:"+periodName);
+				
+				startDate = "01-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				
+				item.setKeyName(periodName);
+				item.setValue(periodName+"|"+startDate +"|"+endDate);
+				monthYearList.add(item);
+			
+			}
+			
+			//startMonth = current Month +nextMonth
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, nextMonthC);
+			nextMonthDate = cal.getTime();
+			
+			logger.debug("currentMonthDate:"+currentMonthDate);
+			logger.debug("nextMonthDate:"+nextMonthDate);
+			diffMonth = DateToolsUtil.calcDiffMonthYear(currentMonthDate, nextMonthDate);
+			logger.debug("diffMonth:"+diffMonth);
+			
+			//loop start Current +nextMonth
+			cal = Calendar.getInstance();//reset to Current Date
+			for(int m=0;m<diffMonth;m++){		
+				//Next Month
+				item = new PopupBean();
+				cal.add(Calendar.MONTH, 1);//
+				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				logger.debug("periodName:"+periodName);
+				
+				startDate = "01-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				
+				item.setKeyName(periodName);
+				item.setValue(periodName+"|"+startDate +"|"+endDate);
+				monthYearList.add(item);
+			}
+			
+		}catch(Exception e){
+			throw e;
 		}
 	 return monthYearList;
 	}
@@ -460,7 +575,7 @@ public class SalesTargetUtils {
 			sql.append("\n  SELECT PRICE_LIST_ID from XXPENS_BI_MST_CUST_CAT_MAP M  ");
 			sql.append("\n  where  SALES_CHANNEL_NO ='"+salesChannelNo+"'");
 			sql.append("\n  and  CUST_CAT_NO ='"+custCatNo+"' \n");
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());

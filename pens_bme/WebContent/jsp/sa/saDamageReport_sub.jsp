@@ -90,8 +90,8 @@
 				<th rowspan="2" >วันทีเข้าตรวจนับ</th><!-- 9 -->
 				<th rowspan="2" >ระยะเวลา</th><!-- 9 -->
 				<th rowspan="2" >จำนวนเดือน</th><!-- 9 -->
-				<th rowspan="2" >รวมค่าเฝ้าตู้</th><!-- 9 -->
-				<th rowspan="2" >รวมความเสียหาย</th><!-- 9 -->
+				<th rowspan="2" >ได้ค่าเฝ้าตู้</th><!-- 9 -->
+				<th rowspan="2" >มีความเสียหาย</th><!-- 9 -->
 				<th rowspan="2" >ค่าเฝ้าตู้หักความเสียหาย</th><!-- 9 -->
 				<th colspan="4">การหักค่าความเสียหาย</th><!-- 9 -->
 		   </tr>
@@ -247,8 +247,8 @@
 				<th rowspan="2" >วันทีเข้าตรวจนับ</th><!-- 9 -->
 				<th rowspan="2" >ระยะเวลา</th><!-- 9 -->
 				<th rowspan="2" >จำนวนเดือน</th><!-- 9 -->
-				<th rowspan="2" >รวมค่าเฝ้าตู้</th><!-- 9 -->
-				<th rowspan="2" >รวมความเสียหาย</th><!-- 9 -->
+				<th rowspan="2" >ได้ค่าเฝ้าตู้</th><!-- 9 -->
+				<th rowspan="2" >มีความเสียหาย</th><!-- 9 -->
 				<th rowspan="2" >ค่าเฝ้าตู้หักความเสียหาย</th><!-- 9 -->
 				<th colspan="6">การหักค่าความเสียหาย</th><!-- 9 -->
 		   </tr>
@@ -287,16 +287,13 @@
 		
 		for(int n=0;n<itemList.size();n++){
 			SAReportBean mc = (SAReportBean)itemList.get(n);
-			
-		
-			
+
 			printEmpId= false;
 			genSummary = false;
 			tabclass ="lineE";
 			if(n%2==0)
 				tabclass="lineO";
-			
-			
+
 			if(!mc.getEmpId().equalsIgnoreCase(empIdTemp)){
 				 printEmpId = true;
 			 }else{
