@@ -32,7 +32,7 @@ public class InitialSystemConfig extends I_Initial {
 			sql.append("SELECT * FROM c_sysconfig ");
 			List<SystemConfig> confList = Database.query(sql.toString(), null, SystemConfig.class, conn);
 			for (SystemConfig r : confList) {
-				logger.debug(r);
+				//logger.debug(r);
 				configs.put(r.getName(), r);
 			}
 		} catch (Exception e) {

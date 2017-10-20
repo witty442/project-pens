@@ -186,6 +186,7 @@
 		
 		<!-- Stock Form -->
 		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
+		<form-bean name="clearInvoiceForm" type="com.isecinc.pens.web.clearinvoice.ClearInvoiceForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -739,7 +740,12 @@
 			<forward name="preview" path="/jsp/requisitionProduct/requisitionProduct.jsp" />
 			<forward name="popupPrint" path="/jsp/requisitionProduct/requisitionProduct.jsp" />
 		</action>
-		
+		<!-- ClearInvoice -->
+		<action name="clearInvoiceForm" path="/jsp/clearInvoiceAction" parameter="do" scope="session" type="com.isecinc.pens.web.clearinvoice.ClearInvoiceAction" >
+			<forward name="search" path="/jsp/clearInvoice/clearInvoice.jsp" />
+			<forward name="prepare" path="/jsp/clearInvoice/clearInvoice.jsp" />
+			<forward name="clear" path="/jsp/clearInvoice/clearInvoice.jsp" />
+		</action>
 	</action-mappings>
 
 	<message-resources key="sysprop" parameter="SystemProperties" />

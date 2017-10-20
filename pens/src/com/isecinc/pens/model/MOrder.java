@@ -15,6 +15,7 @@ import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
@@ -22,6 +23,7 @@ import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
 
@@ -179,6 +181,17 @@ public class MOrder extends I_Model<Order> {
 			order.setCreated(getCreated(order.getId(), conn));
 		}
 		return true;
+	}
+	
+	public Order reCalculateHeadAmount(Connection conn,String orderId) throws Exception{
+		try{
+		    Order orderUpdate = find(orderId);
+		    List<OrderLine> orderLines = new MOrderLine().lookUp(conn,orderUpdate.getId());
+		    //recalculate Head Amount
+		    return reCalculateHeadAmount(orderUpdate,orderLines);
+	    }catch(Exception e){
+	    	throw e;
+	    }
 	}
 
 	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) {
@@ -363,19 +376,35 @@ public class MOrder extends I_Model<Order> {
 
 	public List<Order> lookUpByOrderAR(int userId, int customerId, String orderType, String operator, String selected)
 			throws Exception {
+		References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
+		String  creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
+		logger.debug("creditDateFix:"+creditDateFix);
+		String dateCheck = "";
+		if( !"".equalsIgnoreCase(creditDateFix)){
+			java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+		}
+	
 		List<Order> pos = new ArrayList<Order>();
 		if (operator.equalsIgnoreCase("in") && selected.equalsIgnoreCase("")) return pos;
-		String whereCause = "  and interfaces = 'Y' ";
-		whereCause += "  and ar_invoice_no is not null ";
-		whereCause += "  and ar_invoice_no <> '' ";
-		whereCause += "  and order_type = '" + orderType + "' ";
+		String whereCause = "  and interfaces = 'Y' \n";
+		whereCause += "  and ar_invoice_no is not null  \n";
+		whereCause += "  and ar_invoice_no <> ''  \n";
+		whereCause += "  and order_type = '" + orderType + "'  \n";
 		//whereCause += "  and user_id = " + userId; Comment Out Because 
-		whereCause += "  and customer_id = " + customerId;
+		whereCause += "  and customer_id = " + customerId +" \n";
 		/** Wit:Edit 12/05/2011 Add doc_status <> VO **/
-		whereCause += "  and doc_status <> 'VO' ";
+		whereCause += "  and doc_status <> 'VO'  \n";
+		/** Wit Edit 02/10/2017 Case Show Order_date< config date **/
+		whereCause += "  and order_date > "+dateCheck +" \n";
 		
-		if (selected.length() > 0) whereCause += "  and order_id " + operator + " (" + selected + ") ";
-		whereCause += "  order by Ar_invoice_no asc ";
+		if (selected.length() > 0){
+			whereCause += "  and order_id " + operator + " (" + selected + ")  \n";
+		}
+		whereCause += "  order by Ar_invoice_no asc  \n";
+		
+		logger.debug("sql lookUpByOrderAR \n "+whereCause);
+		
 		pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Order.class);
 		return pos;
     }

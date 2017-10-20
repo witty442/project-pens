@@ -31,7 +31,7 @@ public class InitialMessages extends I_Initial {
 			List<Messages> refList = Database.query(sql.toString(), null, Messages.class, conn);
 			// logger.debug(refList);
 			for (Messages r : refList) {
-				logger.debug(r);
+				//logger.debug(r);
 				messages.put(r.getMessageCode(), r);
 			}
 		} catch (Exception e) {

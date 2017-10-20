@@ -8,6 +8,8 @@ import util.AppversionVerify;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
+import com.isecinc.pens.inf.manager.batchwork.DownloadSalesAppWorker;
+import com.isecinc.pens.inf.manager.batchwork.UploadDatabaseBackupWorker;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 
 public class ExternalProcess {
@@ -52,9 +54,11 @@ public class ExternalProcess {
 	public void processExportAfter(HttpServletRequest request,User userLogin){
 		logger.info("--- after ExportProcess Start ---");
 		 
-		//DB BackUp DB and Transafer TO Ftp Server Folder:DB_Backup
-		 logger.info("--- 1.Run Process backup ---");
-		new DBBackUpManager().process(request,userLogin);
+		//DB BackUp DB and Transfer TO Ftp Server Folder:DB_Backup
+		 logger.info("--- 1.Run Process backup By Thread ---");
+		//new DBBackUpManager().process(request,userLogin);//OLD CODE
+		 
+		new UploadDatabaseBackupWorker(userLogin).start();
 		
 		//RunScript From FTP Server Folder :Manual-script
 		 logger.info("--- 2.Run Script export_after ---");

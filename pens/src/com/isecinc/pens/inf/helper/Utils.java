@@ -43,6 +43,7 @@ public class Utils {
 	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
 	public static final String DD_MM_YYYY_HH_mm_ss_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
 	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
+	public static final String YYYY_MM_DD_WITH_LINE = "yyyy-MM-dd";
 	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
@@ -53,9 +54,8 @@ public class Utils {
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	public static final String YY_MM = "yyMM";
 	
-	public static final Locale local_th= new Locale("th","TH");
+	public static final Locale local_th = new Locale("th","TH");
 	public static final String format_num_no_disgit = "#";
-	
 	public static final String format_current_no_disgit = "#,##0";
 	public static final String format_current_2_disgit = "#,##0.00";
     public static final String format_current_5_digit = "#,##0.00000";
@@ -72,6 +72,19 @@ public class Utils {
 	    }
 	}
 	
+   public static boolean isInternetConnect(String urlTest){
+        boolean r = true;
+        try{
+            URL url = new URL(urlTest);
+            url.openConnection();
+            url.openStream();
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return r;
+    }
+	  
 	public static int calcTotalPage(int totalRow,int maxPerPage){
 		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
 		//System.out.println("totalPageF:"+totalPageF);

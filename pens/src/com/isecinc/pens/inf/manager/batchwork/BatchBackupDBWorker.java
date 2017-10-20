@@ -25,7 +25,7 @@ public class BatchBackupDBWorker extends BatchWorker {
 	@Override
 	public void run() {
 		try {
-			new DBBackUpManager().process(request,user);
+			new DBBackUpManager().process(user);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

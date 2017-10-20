@@ -8,12 +8,37 @@ public class Test {
 
 	/**
 	 * @param args
+	 * Output 
+	    *
+	   ***
+	  *****
+	 *******
+	  *****
+	   ***
+	    *
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMM", Locale.US);
-		String today = df.format(new Date());
-	    System.out.println("today:"+today);
+		
+		try{
+		   for(int i=0;i<=7;i++){
+			  
+			   if(i<=3){
+				   System.out.println("*");
+				   for(int j=0;j<=i+1;j++){
+					   //System.out.println("m["+(i%j)+"]");
+				        System.out.print("*");
+				   }		  
+			   }else{
+				   System.out.println("*");
+				   for(int j=8;j>=i+1;j--){
+					   //System.out.println("m["+(i%j)+"]");
+				        System.out.print("*");
+				   }
+			   }
+		   }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 }

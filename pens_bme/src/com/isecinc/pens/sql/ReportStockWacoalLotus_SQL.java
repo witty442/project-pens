@@ -44,7 +44,8 @@ public class ReportStockWacoalLotus_SQL {
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 				    sql.append("\n UNION ALL");
-				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
+				    sql.append("\n SELECT DISTINCT L.branch_id ");
+				    sql.append("\n ,(select M.branch_name from pensbme_wacoal_store_mapping M where M.branch_id = L.branch_id) as branch_name ");
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
 					sql.append("\n WHERE  1=1 ");
@@ -52,7 +53,8 @@ public class ReportStockWacoalLotus_SQL {
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					sql.append("\n UNION ALL");
-				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
+				    sql.append("\n SELECT DISTINCT L.branch_id ");
+				    sql.append("\n ,(select M.branch_name from pensbme_wacoal_store_mapping M where M.branch_id = L.branch_id) as branch_name ");
 					sql.append("\n ,substr(L.item_wacoal,0,6) as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
 					sql.append("\n WHERE 1=1 ");
@@ -60,7 +62,8 @@ public class ReportStockWacoalLotus_SQL {
 						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					sql.append("\n UNION ALL");
-				    sql.append("\n SELECT DISTINCT L.branch_id, branch_name ");
+				    sql.append("\n SELECT DISTINCT L.branch_id");
+				    sql.append("\n ,(select M.branch_name from pensbme_wacoal_store_mapping M where M.branch_id = L.branch_id) as branch_name ");
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
 					sql.append("\n WHERE  1=1 ");

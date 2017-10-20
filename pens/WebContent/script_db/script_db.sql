@@ -1,59 +1,26 @@
-/**012560 */
-CREATE TABLE c_temp_location(
-	lat varchar(40),
-	lng varchar(40),
-	create_date timestamp,
-	error varchar(200)
+
+/** 10/2560 **/
+alter table c_reference modify value varchar(20);
+ 
+insert into pens.c_reference values ('2800','CreditDateFix','CreditDateFix','CreditDateFix','01/01/2560','Y');
+insert into pens.c_reference values ('2801','VanDateFix','VanDateFix','VanDateFix Case PD_PAID NO','01/10/2560','Y');
+
+CREATE TABLE pens.t_receipt_pdpaid_no (
+	ORDER_NO varchar(20) NOT NULL,
+	CUSTOMER_ID int(10),
+	ORDER_DATE date,
+	RECEIPT_AMOUNT decimal(10,2),
+	PDPAID_DATE date,
+	PD_PAYMENTMETHOD varchar(4),
+	CREATED timestamp NOT NULL,
+	CREATED_BY int(10),
+	PRIMARY KEY (ORDER_NO)
 );
-/** 06/2560 **/
-alter table t_stock_line modify create_date date;
-alter table t_order add po_number varchar(20);
-/** 06/2560/Credit **/
-alter table t_stock_line
-add (  qty2 decimal(15,5),
-       qty3 decimal(15,5),
-       sub  decimal(15,5),
-       sub2 decimal(15,5),
-       sub3 decimal(15,5),
-       EXPIRE_DATE2 date,
-       EXPIRE_DATE3 date,
-       uom2 varchar(20)
+CREATE TABLE pens.c_control_code (
+	class_name varchar(50) NOT NULL,
+	method_name varchar(50) NOT NULL,
+	ISACTIVE char(1) ,
+	PRIMARY KEY (class_name,method_name)
 );
-
-
-/** 08/2560 **/
-alter table t_stock 
-add(back_avg_month varchar(5));
-
-alter table t_stock_line
-add(avg_order_qty int);
-
-alter table t_stock_line
-modify expire_date date ;
-
-alter table m_customer
-add (lat varchar(100),
-	lng varchar(100)
-	);
-	
-alter table m_customer
-add (trip_day varchar(5),
-	trip_day2 varchar(5),
-	trip_day3 varchar(5)
-	);
-	
-delete from pens.c_reference where reference_id in (2601,2602,2603);
-insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y');
-insert into pens.c_reference values ('2602','PartyType','ร้านขายยา','ร้านขายยา','D','Y' );
-insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','Y');
-insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','Y');
-
-insert into pens.c_reference values ('2700','CustShowTrip','ShowOnlyTrip','ShowOnlyTrip','Y','Y');
-
-/** 09/2560 
- * update bussiness_type = party_type
- **/
-update m_customer set BUSINESS_TYPE = party_type;
-
-
-	
+insert into pens.c_control_code values ('OrderUtils','canSaveCreditVan','Y');
+insert into pens.c_control_code values ('RunUpdateSalesAppAutoServlet','startDeploySalesAppAuto','N');

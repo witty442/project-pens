@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -34,8 +35,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -61,9 +63,9 @@ span.pagelinks {
 	font-size: 15px;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -191,7 +193,7 @@ function getStoreNameModel(storeCode){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
-                                    <td> Transaction Date</td>
+                                    <td> Transaction Date </td>
 									<td>						
 										  <html:text property="adjustStock.transactionDate" styleId="transactionDate" size="20" />
 									</td>
@@ -235,7 +237,7 @@ function getStoreNameModel(storeCode){
 
             <c:if test="${adjustStockForm.resultsSearch != null}">
                   	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableAjSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
 									<th >Document No</th>
@@ -260,31 +262,31 @@ function getStoreNameModel(storeCode){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_documentNo">
+										<td class="td_text">${results.no}</td>
+										<td class="td_text_center"  width="10%">
 										   ${results.documentNo}
 										</td>
-										<td class="search_transactionDate">${results.transactionDate}</td>
-										<td class="search_storeCode">
+										<td class="td_text">${results.transactionDate}</td>
+										<td class="td_text"  width="10%">
 											${results.storeCode}
 										</td>
-										<td class="search_storeName">
+										<td class="td_text"  width="20%">
 										    ${results.storeName}
 										</td>
 										
-										<td class="search_org">
+										<td class="td_text" width="10%">
 										  ${results.org}/ ${results.subInv}
 										</td>
-										<td class="search_ref">
+										<td class="td_text" width="10%">
 											${results.ref}
 										</td>
-										<td class="search_status">
+										<td class="td_text" width="10%">
 										     ${results.statusDesc}
 										</td>
-										<td class="search_statusMessage">
+										<td class="td_text" width="15%">
 										  ${results.statusMessage}
 										</td>
-										<td class="search_edit">
+										<td class="td_text_center" width="5%">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','view')">
 											          ดู

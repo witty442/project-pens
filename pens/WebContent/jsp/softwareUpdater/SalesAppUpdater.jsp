@@ -22,7 +22,7 @@ body {
 <%
   if(request.getParameter("submit_update") != null){
 	  //Get Folder for Software SalesAppUpdater  
-	  AppversionVerify.getSalesAppUpdater(true);
+	  AppversionVerify.getIns().downloadSalesAppUpdater(true); 
 					   
 	  //Start Software Update Sales App
 	  AppversionVerify.startSalesAppUpdater();

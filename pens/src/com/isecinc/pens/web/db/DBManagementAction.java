@@ -115,7 +115,7 @@ public class DBManagementAction extends I_Action {
 		logger.debug("backupDB");
 		try {
 			  User userB =(User)request.getSession().getAttribute("user");
-			  String[] pathFull = new DBBackUpManager().process(request,userB);
+			  String[] pathFull = new DBBackUpManager().process(userB);
 			  request.setAttribute("Message","Backup DB Success \n Path Backup ->"+pathFull[0]);
 		} catch (Exception e) {
             logger.error(e.getMessage(),e);

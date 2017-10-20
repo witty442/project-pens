@@ -43,10 +43,6 @@ function loadMe(){
 }
 function saveAction(path){
 	var form = document.autoCNForm;
-	if(!checkSelectOne()){
-		alert("กรุณาเลือกข้อมูลอย่างน้อย 1 รายการ");
-		return false;
-	}
 	if(confirm("ยืนยันบันทึกข้อมูล")){
 	  form.action = path + "/jsp/autoCNAction.do?do=save";
 	  form.submit();
@@ -54,18 +50,7 @@ function saveAction(path){
 	}
 	return false;
 }
-function checkSelectOne(){
-	var chk = document.getElementsByName("lineChk");
-	var keyData = document.getElementsByName("keyData");
-    var selectOne = false;
-	for(var i=0;i<chk.length;i++){
-		if(keyData[i].value !='CANCEL' && chk[i].checked){
-			selectOne = true;
-			break;
-		}
-	}
-	return selectOne;
-}
+
 function cancelAction(path){
 	var form = document.autoCNForm;
 	if(confirm("ยืนยันยกเลิกรายการ")){
@@ -83,15 +68,6 @@ function backAction(path){
 	return true;
 }
 
-function setKeyData(index,chkObject){
-	if(chkObject.checked){
-		document.getElementsByName("keyData")[index].value = chkObject.value;	
-		//sum Total Case checked
-		sumTotal();
-	}else{
-		document.getElementsByName("keyData")[index].value ="";
-	}
-}
 function addRowAction(){
 	// $('#myTable tr').length;
 	var rows = $('#tblProduct tr').length-1;
@@ -103,7 +79,7 @@ function addRowAction(){
 	}
 	var rowData ="<tr class='"+tabclass+"'>"+
 	    "<td class='td_text_center' width='5%'> "+
-	     " <input type='checkbox' name='lineChk' value='' onclick='setKeyData("+rowId+",this)''>"+
+	     " <input type='checkbox' name='lineChk'>"+
 	     " <input type='hidden' name='keyData' id='keyData' /> "+
 	     " <input type='hidden' name='rowId' id='rowId' value='"+rowId+"' /> "+
 	    "</td>"+
@@ -117,13 +93,13 @@ function addRowAction(){
 	    "  <input type='text' name='itemName' id='itemName'  value='' size='60' readonly class='disableText'/> "+
 	    "</td>"+
 	    "<td class='td_number' width='10%'> "+
-	    "  <input type='text' name='unitPrice' id='unitPrice'  value='' size='10' class='disableNumber' readonly/> "+
+	    "  <input type='text' name='unitPrice' id='unitPrice'  value='' size='10' class='enableNumber' onblur='isNum2Digit(this);sumTotalInRow("+rowId+")' /> "+
 	    "</td>"+
 	    "<td class='td_number' width='14%'> "+
-	    "  <input type='text' name='qty' id='qty'  value='' size='14' class='enableNumber' onblur='sumTotalInRow(this,"+rowId+")'/> "+
+	    "  <input type='text' name='qty' id='qty'  value='' size='14' class='enableNumber' onblur='isNum(this);sumTotalInRow("+rowId+")'/> "+
 	    "</td>"+
 	    "<td class='td_number' width='16%'> "+
-	    "  <input type='text' name='amount' id='amount'  value='' size='17' class='disableNumber'/> "+
+	    "  <input type='text' name='amount' id='amount'  value='' size='17' class='disableNumber' readonly/> "+
 	    "</td>"+
 	    "</tr>";
 
@@ -131,13 +107,21 @@ function addRowAction(){
     //set focus default
     var pensItem = document.getElementsByName("pensItem");
     pensItem[rowId].focus();
+    
+    //count Total rec
+    document.getElementsByName("totalRec")[0].value =  1+convetTxtObjToFloat(document.getElementsByName("totalRec")[0]);
+	toCurrenyNoDigit(document.getElementsByName("totalRec")[0]);
+    
 }
-function sumTotalInRow(qtyObj,rowId){
+function sumTotalInRow(rowId){
+	var qtyObj =document.getElementsByName("qty")[rowId];
 	var qty = convetTxtObjToFloat(qtyObj);
 	var unitPrice = convetTxtObjToFloat(document.getElementsByName("unitPrice")[rowId]);
 	var amount = qty*unitPrice;
 	document.getElementsByName("amount")[rowId].value = amount;
 	toCurreny(document.getElementsByName("amount")[rowId]);
+	
+	sumTotal(); 
 }
 function sumTotal(){
 	var chk = document.getElementsByName("lineChk");
@@ -146,17 +130,21 @@ function sumTotal(){
 	var keyData = document.getElementsByName("keyData");
     var totalQty = 0;
     var totalAmount = 0;
+    var totalRec = 0;
 	for(var i=0;i<chk.length;i++){
-		if(keyData[i].value !='CANCEL' && chk[i].checked){
+		if(keyData[i].value !='CANCEL'){
 			totalQty += convetTxtObjToFloat(qty[i]);
 			totalAmount +=convetTxtObjToFloat(amount[i]);
+			totalRec++;
 		}
 	}
-	document.getElementsByName("totalQty")[0].value = totalQty;
-	document.getElementsByName("totalAmount")[0].value = totalAmount;
+	document.getElementsByName("bean.totalQty")[0].value = totalQty;
+	document.getElementsByName("bean.totalAmount")[0].value = totalAmount;
+	document.getElementsByName("totalRec")[0].value = totalRec;
 	
-	toCurrenyNoDigit(document.getElementsByName("totalQty")[0]);
-	toCurreny(document.getElementsByName("totalAmount")[0]);
+	toCurrenyNoDigit(document.getElementsByName("bean.totalQty")[0]);
+	toCurreny(document.getElementsByName("bean.totalAmount")[0]);
+	toCurrenyNoDigit(document.getElementsByName("totalRec")[0]);
 } 
  function removeRowAction(path){
 	if(confirm("ยืนยันลบข้อมูล")){
@@ -186,7 +174,7 @@ function sumTotal(){
 	//alert(index);
 	document.getElementsByName("keyData")[index].value ='CANCEL';
 	
-	//sumTotal();
+	sumTotal();
 }
  function checkDupProduct(productCodeNew,curRowId){
 	var pensItem = document.getElementsByName("pensItem");
@@ -342,7 +330,7 @@ function sumTotal(){
 								</tr>
 						   </table>
                     <!-- table data -->
-                    <c:if test="${autoCNForm.resultsSearch != null}">
+           
                       <%if(autoCNForm.getBean().isCanSave()) { %>
 	                        <table id="tblProductDel" align="center" border="0" cellpadding="3" cellspacing="2"  width="100%">
 	                         <tr><td >
@@ -364,6 +352,13 @@ function sumTotal(){
 							String tabclass ="lineE";
 							List<AutoCNBean> resultList = autoCNForm.getResultsSearch();
 							String keyData = "";
+							// Check disble text by view or verify
+							boolean readonly = true;
+							if(autoCNForm.getBean().isCanSave()){
+								readonly = false;
+							}
+							
+							if(resultList != null && resultList.size() >0){
 							for(int n=0;n<resultList.size();n++){
 								AutoCNBean mc = (AutoCNBean)resultList.get(n);
 								if(n%2==0){ 
@@ -374,43 +369,63 @@ function sumTotal(){
 								<tr class="<%=tabclass%>"> 
 								    <td class="td_text_center" width="5%">
 								       <input type="checkbox" name="lineChk" id="lineChk" 
-								        value="<%=keyData%>" onclick="setKeyData(<%=n%>,this)" <%=mc.getLineChk()%>>
+								        value="<%=keyData%>" >
 								       <input type="hidden" name="keyData" id="keyData" value="<%=mc.getKeyData() %>" />
 								       <input type="hidden" name="rowId" id="rowId" value="<%=n%>" />
 								    </td><!-- 1 -->
 									<td class="td_text_center" width="10%">
-									  <input type="text" name="pensItem" id="pensItem" value="<%=mc.getPensItem() %>" size="10" class="disableText"/>
+									  <input type="text" name="pensItem" id="pensItem" readonly value="<%=mc.getPensItem() %>" size="10" class="disableText"/>
 									  <input type="hidden" name="inventoryItemId" id="inventoryItemId" value="<%=mc.getInventoryItemId() %>" size="10"/>
 									</td><!-- 1 -->
 									<td class="td_text" width="45%">
 									    <input type="text" name="itemName" id="itemName"  value="<%=mc.getItemName() %>" size="60" readonly class='disableText'/>
 									</td><!-- 3 -->
 								    <td class="td_number" width="10%">
-								        <input type="text" name="unitPrice" id="unitPrice"  value="<%=mc.getUnitPrice() %>" size="10" readonly class="disableNumber"/>
+								        <input type="text" name="unitPrice" id="unitPrice"  value="<%=mc.getUnitPrice() %>" size="10"
+								         <%if(readonly){ %>
+								             readonly class="disableNumber" 
+								         <%}else{ %> 
+								             class="enableNumber" 
+								             onblur="isNum2Digit(this);sumTotalInRow(<%=n%>)"
+								          <%} %>
+								          />
                                     </td><!-- 4 -->
 								    <td class="td_number" width="14%">
-								        <input type="text" name="qty" id="qty"  value="<%=mc.getQty() %>" size="14" class="enableNumber" onblur="isNum(this);sumTotal()"/>
+								        <input type="text" name="qty" id="qty"  value="<%=mc.getQty() %>" size="14" 
+								         <%if(readonly){ %>
+								             readonly class="disableNumber" 
+								         <%}else{ %> 
+								             class="enableNumber" 
+								             onblur="isNum(this);sumTotalInRow(<%=n%>)"
+								          <%} %>
+								          />
                                     </td><!-- 5 -->
 									<td class="td_number" width="16%">
-                                       <input type="text" name="amount" id="amount" value="<%=mc.getAmount()%>" size="17" class="disableNumber"/>
+                                       <input type="text" name="amount" id="amount" value="<%=mc.getAmount()%>" size="17" class="disableNumber" readonly/>
 									</td><!-- 6 -->
 								</tr>
-							<%} %> 
+							<%} } %> 
 					</table>
 					<table align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						 <tr class="hilight_text">
-					       <td class="td_text_right" width="70%" colspan="4">
+					       <td class="td_text" width="60%" colspan="3">
+					                   จำนวนรายการ&nbsp;
+					          <input type="text" name="totalRec" readonly id="totalRec" value="" size="10"  class="disableNumberBold"/>
+					       </td>
+					       
+					       <td class="td_text_right" width="10%">
 					         Total
 					       </td>
 					        <td class="td_number_bold" width="14%">
-					           <input type="text" name="totalQty" id="totalQty" value="<bean:write name="autoCNForm" property="bean.totalQty" />" size="10"  class="disableNumberBold"/>
+					            <html:hidden property="bean.totalBox" styleId="totalBox" />	
+					            <html:text property="bean.totalQty" styleId="totalQty" size="10"  readonly="true" styleClass="disableNumberBold"/>	
 					        </td>
 					        <td class="td_number_bold" width="16%">  
-					          <input type="text" name="totalAmount" id="totalQty" value="<bean:write name="autoCNForm" property="bean.totalAmount" />" size="15"  class="disableNumberBold"/>
+					           <html:text property="bean.totalAmount" styleId="totalAmount" size="15"  disabled="true" styleClass="disableNumberBold"/>
 					        </td>  
 					    </tr>
 					</table>
-				</c:if>
+	
 				
 		        <!-- ************************Result ***************************************************-->
 	            <table id="tblProductBtn" align="center" border="0" cellpadding="3" cellspacing="2"  width="65%">

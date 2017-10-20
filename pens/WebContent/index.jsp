@@ -169,6 +169,7 @@ function login(path){
 		        </table>
 		         <input type="hidden" id = "screenWidth" name="screenWidth" />
 		          <input type="hidden" id = "screenHeight" name="screenHeight" />
+		          ...
 		        </html:form>
 			</td>
         	<td width="523">&nbsp;</td>

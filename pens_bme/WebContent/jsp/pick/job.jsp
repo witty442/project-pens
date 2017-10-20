@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -21,16 +22,15 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="jobForm" class="com.isecinc.pens.web.pick.JobForm" scope="session" />
 <%
-
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_job.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_job.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -56,10 +56,10 @@ span.pagelinks {
 	font-size: 15px;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -206,7 +206,6 @@ function setStoreMainValue(code,desc,storeNo,subInv,types){
 	   form.storeNo.value = storeNo;
 	   form.subInv.value = subInv;
 	}
-	
 } 
 
 function getCustNameKeypress(e,custCode,fieldName){
@@ -269,8 +268,27 @@ function getCustName(custCode,fieldName){
 				form.subInv.value = "";
 			}
 		}
-	
 }
+
+function validRtnNoInJob(obj){
+	var returnString = "";
+	var form = document.rtForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validRTRtnNoInJobAjax.jsp",
+			data : "rtnNo=" + obj.value,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	if(returnString =='false'){
+		alert("RTN NO ของห้าง เคยมีการบันทึกการใช้งานไปแล้ว");
+	    obj.value ='';
+		obj.focus();
+	}	
+}
+
 function resetStore(){
 	var form = document.jobForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
@@ -455,7 +473,7 @@ function resetStore(){
 	                                    <td> RTN No </td>
 										<td>	
 										<%if(jobForm.getMode().equals("edit")){ %>			
-											<html:text property="job.rtnNo" styleId="rtnNo" size="15" />
+											<html:text property="job.rtnNo" styleId="rtnNo" size="15" onblur="validRtnNoInJob(this)"/>
 									    <%}else{ %>
 									        <html:text property="job.rtnNo" styleId="rtnNo" size="15" readonly="true" styleClass="disableText"/>
 									    <%} %>

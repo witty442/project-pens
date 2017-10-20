@@ -58,7 +58,7 @@ public class ImportProcess {
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
 	    		  
-	    		  MonitorTime monitorTime1 = new MonitorTime("Start PreFunction.process");
+	    		  //MonitorTime monitorTime1 = new MonitorTime("Start PreFunction.process");
 	    		  
 	    		  logger.info("**** Script "+tableBean.getTableName()+" Pre Function name:"+tableBean.getPreFunction());
 	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
@@ -174,7 +174,7 @@ public class ImportProcess {
 				    	  }else{
 				    		 completeRow++;
 				    	  }
-				    	  //initail 
+				    	  //initial 
 				    	  canExc = 0;
 			    	  }
 			       
@@ -185,7 +185,7 @@ public class ImportProcess {
 		    		  errorRow++;
 		    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:"+e.getMessage()+"]").append(Constants.newLine);
 		    		  
-		    		  /** Case Debug No Rollback ALL**/
+		    		  /** Case Debug No Roll back ALL**/
 		    		  if(EnvProperties.getInstance().getProperty("conversion.master.transaction.rollback.all").equals("true")){
 			    		    break;
 			    	  }

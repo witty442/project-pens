@@ -403,9 +403,8 @@ public class ExportManager {
 			   logger.debug("Error:Step Transaction Rollback");
 			   conn.rollback();
 			   
-			   logger.debug("Error:Step delete file in FTP Case Roolback ");
+			   logger.debug("Error:Step delete file in FTP Case Rollback ");
 			   ftpManager.deleteAllFileInFTPCaseRollback(initConfigMap, "");
-			   
 			}
 			/** End process ***/
 			logger.debug("-Update Monitor to Fail ");

@@ -18,11 +18,13 @@ import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
 
@@ -109,9 +111,7 @@ public class MCustomer extends I_Model<Customer> {
 		return isCustHaveProductSpecial;
 	}
 	
-	
 	public int getTotalRowCustomer(Connection conn,String whereCause,User user) throws Exception {
-
 		Statement stmt = null;
 		ResultSet rst = null;
 		int totalRow = 0;
@@ -308,6 +308,7 @@ public class MCustomer extends I_Model<Customer> {
 		ResultSet rst = null;
 		List<Customer> custList = new ArrayList<Customer>();
 		Customer[] array = null;
+		String creditDateFix = "";
 		try {
 			//Filter display Column
 			String displayActionReceipt ="";
@@ -318,8 +319,14 @@ public class MCustomer extends I_Model<Customer> {
 			}
 			if( role.equalsIgnoreCase(User.TT)){
 				displayActionEditCust ="none";
+				
 			}
-			
+			if( !Utils.isNull(dispTotalInvoice).equals("")){
+			   //Get CreditDateFix FROM C_REFERENCE
+			   References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
+			   creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
+			   logger.debug("creditDateFix:"+creditDateFix);
+			}
 			
 			String sql = "select distinct m_customer.*  \n";
 			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
@@ -424,7 +431,8 @@ public class MCustomer extends I_Model<Customer> {
 				
 				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
-				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+					logger.info("calcTotalInvoice");
+				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId(),creditDateFix));
 				}
 				
 				// Order Amount
@@ -504,6 +512,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 		List<Customer> custList = new ArrayList<Customer>();
 		Customer[] array = null;
 		int no = 0;
+		String creditDateFix = "";
 		try {
 			//Filter display Column
 			String displayActionReceipt ="";
@@ -515,7 +524,12 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 			if( role.equalsIgnoreCase(User.TT)){
 				displayActionEditCust ="none";
 			}
-			
+			if( !Utils.isNull(dispTotalInvoice).equals("")){
+				 //Get CreditDateFix FROM C_REFERENCE
+				 References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
+				 creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
+				 logger.debug("creditDateFix:"+creditDateFix);
+			}
 			
 			String sql = "select distinct m_customer.*  \n";
 			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
@@ -620,8 +634,10 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
 				
 				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
+				
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
-				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId()));
+					logger.debug("Calc Total Invoice");
+				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId(),creditDateFix));
 				}
 				
 				// Order Amount

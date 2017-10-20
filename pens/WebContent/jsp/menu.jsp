@@ -30,7 +30,6 @@ User user = (User)session.getAttribute("user");
             </li>
             <%if(!role.equalsIgnoreCase(User.ADMIN)&&!role.equalsIgnoreCase(User.DD)){ %>
             <li>
-            	<!-- <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salestarget.do';"><span><bean:message key="SalesTarget" bundle="sysprop"/></span></a> -->
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salestargetnew.do';"><span><bean:message key="SalesTarget" bundle="sysprop"/></span></a>
             </li>
             <%} %>
@@ -72,6 +71,11 @@ User user = (User)session.getAttribute("user");
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"><span>ปรับปรุงโปรแกรม SalesApp</span></a>
 			</li>
+			<%if( !role.equalsIgnoreCase(User.ADMIN)){ %>
+           	<%-- <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/clearInvoiceAction.do?do=prepare&action=new';"><span><bean:message key="ClearInvoice" bundle="sysprop"/></span></a>
+			</li> --%>
+			<%} %>
 		</ul>
 	</li>
 	<!-- WIT Edit :04/08/2554 -->

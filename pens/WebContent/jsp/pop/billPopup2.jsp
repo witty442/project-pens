@@ -15,7 +15,7 @@ String custId = request.getParameter("cust");
 User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
-
+ 
 List<Order> orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
 double totalCreditNoteAmt = 0; 
 

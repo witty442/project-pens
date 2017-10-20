@@ -134,6 +134,7 @@ public class CustomerForm extends I_Form implements Serializable{
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		  if(getCustomer() !=null){
 			 getCustomer().setDispHaveTrip("");
+			 getCustomer().setDispTotalInvoice("");
 		  }
 	}
 

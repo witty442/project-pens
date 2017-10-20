@@ -93,7 +93,6 @@ public class SearchCustomerPopupAction extends I_Action {
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
 			 }
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

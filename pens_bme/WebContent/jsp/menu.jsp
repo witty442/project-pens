@@ -454,11 +454,13 @@
 	        </li>
 	       
 	       <%} %>
-	       <li>
-	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new');">
-	          <span>5.<bean:message key="AutoCN" bundle="sysprop"/>
-	          </span></a>
-	        </li>
+	        <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+		       <li>
+		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new');">
+		          <span>6.<bean:message key="AutoCN" bundle="sysprop"/>
+		          </span></a>
+		        </li>
+	       <%} %>
 		</ul>
 	</li>
 <%} %>

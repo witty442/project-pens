@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
@@ -1535,6 +1536,7 @@ public class InterfaceDAO {
 	}
 		return updateInt;
 }
+ 
  
  /**
   * isOrderLinePaymentAll

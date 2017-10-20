@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.report.detailedsales.DetailedSalesReport;
 import com.isecinc.pens.report.detailedsales.DetailedSalesReportProcess;
 
@@ -33,20 +34,32 @@ public class CreditControlReportAction extends I_ReportAction<CreditControlRepor
 			throws Exception {
 		
 		CreditControlReportForm reportForm = (CreditControlReportForm)form;
-		CreditControlReportProcess process = new CreditControlReportProcess();
 		User user = (User)request.getSession().getAttribute("user");
 		List<CreditControlReport> listData = null;
-		//Init parameter
+		CreditControlReportProcess process = new CreditControlReportProcess();
+		CreditControlPDPAID_NO_ReportProcess process2 = new CreditControlPDPAID_NO_ReportProcess();
+		//Initial parameter
 		try{
+			
 			parameterMap.put("start_date", reportForm.getCreditControlReport().getStartDate());
 			parameterMap.put("end_date", reportForm.getCreditControlReport().getEndDate());
 			parameterMap.put("user_code",user.getCode());
 			parameterMap.put("user_name",user.getName());
-			parameterMap.put("total_customer", process.getCountCustomer(reportForm.getCreditControlReport(), user, conn));
+			if( Utils.isNull(user.getPdPaid()).equalsIgnoreCase("Y")){
+			    parameterMap.put("total_customer", process.getCountCustomer(reportForm.getCreditControlReport(), user, conn));
+					
+			    parameterMap.put("prev_total_order_amt",process.sumPrevTotalOrderAmt(reportForm.getCreditControlReport(), user, conn));
+			}else{
+			    parameterMap.put("total_customer", process2.getCountCustomer(reportForm.getCreditControlReport(), user, conn));
 			
-			parameterMap.put("prev_total_order_amt",process.sumPrevTotalOrderAmt(reportForm.getCreditControlReport(), user, conn));
-			
-			CreditControlReport report = process.getData(reportForm.getCreditControlReport(), user, conn);
+			    parameterMap.put("prev_total_order_amt",process2.sumPrevTotalOrderAmt(reportForm.getCreditControlReport(), user, conn));
+			} 
+			CreditControlReport report = null;
+			if( Utils.isNull(user.getPdPaid()).equalsIgnoreCase("Y")){
+				report = process.getData(reportForm.getCreditControlReport(), user, conn);
+			}else{
+				report = process2.getData(reportForm.getCreditControlReport(), user, conn);
+			}
 			if(report != null){
 				parameterMap.put("total_order_amt",report.getTotalOrderAmt());
 				

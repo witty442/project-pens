@@ -51,15 +51,15 @@ body {
 -->
 </style>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/webstyle.js"></script>
+	src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+	src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/input.js"></script>
+	src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/pdreceipt.js"></script>
+	src="${pageContext.request.contextPath}/js/pdreceipt.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css"
 	href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -185,8 +185,7 @@ body {
 											</th>
 											<th class="code"><bean:message key="Order.Date" bundle="sysele" />
 											</th>
-											<th class="code"><bean:message key="Trip.CustomerName"
-													bundle="sysele" />
+											<th class="code"><bean:message key="Trip.CustomerName" bundle="sysele" />
 											</th>
 											<th class="code"><bean:message key="Receipt.Amount"
 													bundle="sysele" />

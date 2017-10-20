@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -19,6 +20,7 @@ import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
+import com.isecinc.pens.model.MOrder;
 
 public class UpdateSalesProcess {
   
@@ -179,7 +181,6 @@ public class UpdateSalesProcess {
 				    			  }//if 4 
 				    		  }//if Line
 				    		  
-				    	  
 				    	  //stamp log result
 				    	  if(canExc == 0){
 				    		 errorMsg  = "NO UPDATE KEY NOT FOUND";
@@ -246,10 +247,19 @@ public class UpdateSalesProcess {
 		    		  for(int n=0;n< orderList.size();n++){
 		    			  String  orderId =(String)orderList.get(n);
 		    			  if( !Utils.isNull(orderId).equals("")){
-			    		        updateOrderFlag(conn,orderId, userBean);
-		    			   }
-		    		  }
-				  }
+		    				 //Update Payment Flag
+			    		     updateOrderFlag(conn,orderId, userBean);
+			    		        
+			    		     // Re-Calculate TotalAmount,vatAmount,netAmount
+			    		     try{
+				    		    Order orderUpdate =  new MOrder().reCalculateHeadAmount(conn,orderId);
+				    		    updateAmountInOrderHead(conn,orderUpdate);
+			    		     }catch(Exception eee){
+			    		    	 logger.error(eee.getMessage(),eee);
+			    		     }
+		    			   }//if
+		    		  }//for
+				  }//if
 		    	  
 			  }else if(errorRow > 0){
 				  /**Optional add Result Log */
@@ -308,7 +318,29 @@ public class UpdateSalesProcess {
 	    return results;
 	}
   	
-	
+	public  int updateAmountInOrderHead(Connection conn,Order o) throws Exception{
+	     PreparedStatement ps =null;
+	     int updateInt = 0;
+		 try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" update t_order set total_amount ='"+o.getTotalAmount()+"' ");
+			sql.append(" , vat_amount ='"+o.getVatAmount()+"' ");
+			sql.append(" , net_amount ='"+o.getNetAmount()+"' ");
+			sql.append(" where order_id = "+o.getId()+" \n");
+		    logger.debug("SQL:"+sql.toString());
+		    
+			ps = conn.prepareStatement(sql.toString());
+			updateInt = ps.executeUpdate();	
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+		}
+			return updateInt;
+	}
+	 
 	private boolean isOrderLineCanInsert(TableBean tableBean ,TableBean childBean,User user ,String lineStr) throws Exception{
 		boolean canAccess = false;
 		try{
@@ -348,7 +380,7 @@ public class UpdateSalesProcess {
       (1) ถ้าที่ header payment  = 'Y' ที่ระดับ line จะเท่ากับ   "Y" ด้วย
       (2) ถ้าที่ header payment  = 'N' ที่ระดับ line จะเท่ากับ   "N" ด้วย
      
-     * * Case 2 Order_line PAYMENT ='Y' ALL Receord  
+     * * Case 2 Order_line PAYMENT ='Y' ALL Record 
       (1) update header  payment = 'Y'
      * * Case3 Order Line iscancel =Y ALL Record 
       (1) update doc_status = 'VO'

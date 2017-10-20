@@ -21,6 +21,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ReferenceDAO;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -33,7 +34,7 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class AutoCNAction extends I_Action {
 
-	public static int pageSize = 10;
+	public static int pageSize = 25;
 	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		AutoCNForm aForm = (AutoCNForm) form;
@@ -48,12 +49,13 @@ public class AutoCNAction extends I_Action {
 				ad.setJobStatus("CLOSE");
 				//get cutt job date
 				ad.setCuttOffDate(ReferenceDAO.getValueByRefCode(ReferenceDAO.JOB_CUTT_DATE_REF_CODE, ReferenceDAO.JOB_CUTT_DATE_REF_CODE));
+				ad.setCustGroup(PickConstants.STORE_TYPE_LOTUS_CODE);
 				aForm.setBean(ad);
 				
 				List<Master> custGroupList = new ArrayList<Master>();
 				Master refP = new Master(); 
 				custGroupList.add(refP);
-				custGroupList.addAll(GeneralDAO.getCustGroupList(""));
+				custGroupList.addAll(GeneralDAO.getCustGroupList(PickConstants.STORE_TYPE_LOTUS_CODE));
 				request.getSession().setAttribute("custGroupList",custGroupList);
 				
 			}
@@ -153,9 +155,7 @@ public class AutoCNAction extends I_Action {
 		try {
 			//save old criteria
 			aForm.setBeanCriteria(aForm.getBean());
-			//init connection
-			conn = DBConnection.getInstance().getConnection();
-			
+
             String jobId = Utils.isNull(request.getParameter("jobId"));
             String rtnNo = Utils.isNull(request.getParameter("rtnNo"));
             String custGroup = Utils.isNull(request.getParameter("custGroup"));
@@ -167,7 +167,11 @@ public class AutoCNAction extends I_Action {
 			//Clear groupStoreMapError Session
 			request.getSession().setAttribute("groupStoreMapError", null);
 			
+			//Verify
 			if("edit".equalsIgnoreCase(action)){
+				//init connection
+				conn = DBConnection.getInstance().getConnection();
+				
 				//Find By JobId
 				bean.setJobId(jobId);
 				//get JobName
@@ -178,11 +182,28 @@ public class AutoCNAction extends I_Action {
 				// getStoreName
 				bean.setStoreName(GeneralDAO.getStoreNameModel(conn,bean.getStoreCode()));
 				bean.setMode("edit");
-				bean = AutoCNDAO.searchItemListCaseNew(conn,bean);
-				aForm.setResultsSearch(bean.getItems());
-				bean.setCanSave(true);
+				
+				bean = AutoCNDAO.searchItemListCaseView(conn,bean);
+				if(bean != null && bean.getItems() != null && bean.getItems().size() >0){
+					//Get Date Exist
+					aForm.setResultsSearch(bean.getItems());
+					
+					//Can Save ,Cancel status = APPROVED
+					if(bean.getStatus().equalsIgnoreCase("ERROR") || bean.getStatus().equalsIgnoreCase("APPROVED")){
+					   bean.setCanCancel(true);
+					   bean.setCanSave(true);
+					}
+				}else{
+					// Get New Data
+					bean = AutoCNDAO.searchItemListCaseNew(conn,bean);
+					aForm.setResultsSearch(bean.getItems());
+					bean.setCanSave(true);
+				}
 				aForm.setBean(bean);
-			}else{
+			}else if("view".equalsIgnoreCase(action)){
+				//init connection
+				conn = DBConnection.getInstance().getConnection();
+				
 				//view
 				//Find By JobId
 				bean.setJobId(jobId);
@@ -198,11 +219,33 @@ public class AutoCNAction extends I_Action {
 				aForm.setResultsSearch(bean.getItems());
 				
 				//Can Save ,Cancel status = APPROVED
-				if(bean.getStatus().equalsIgnoreCase("APPROVED")){
+				if(bean.getStatus().equalsIgnoreCase("ERROR") || bean.getStatus().equalsIgnoreCase("APPROVED")){
 				   bean.setCanCancel(true);
 				   bean.setCanSave(true);
 				}
 				aForm.setBean(bean);
+				
+			}else if("viewCN".equalsIgnoreCase(action)){
+				//init connection User Apps
+				conn = DBConnection.getInstance().getConnectionApps();
+				
+				//view CN
+				//Find By JobId
+				bean.setJobId(jobId);
+				//get JobName
+				bean.setJobName(GeneralDAO.getJobNameModel(conn,bean.getJobId(),""));
+				bean.setRtnNo(rtnNo);
+				bean.setCustGroup(custGroup);
+				bean.setStoreCode(storeCode);
+				// getStoreName
+				bean.setStoreName(GeneralDAO.getStoreNameModel(conn,bean.getStoreCode()));
+				bean.setMode("edit");
+				
+				bean = AutoCNDAO.searchItemListCaseViewCN(conn,bean);
+				aForm.setResultsSearch(bean.getItems());
+				aForm.setBean(bean);
+				
+				forward = "detailView";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -290,6 +333,8 @@ public class AutoCNAction extends I_Action {
 			head.setStatus("APPROVED");
 			head.setUserName(user.getUserName());
 			
+			logger.debug("totalQty:"+head.getTotalQty());
+			
 			//get Parametervalues
 			String[] keyDatas = request.getParameterValues("keyData");
 			String[] pensItems = request.getParameterValues("pensItem");
@@ -302,8 +347,8 @@ public class AutoCNAction extends I_Action {
 			
 			for(i=0;i<keyDatas.length;i++){
 				logger.debug("keyData:"+keyDatas[i]);
-				if( !Utils.isNull(keyDatas[i]).equals("") 
-						&& !Utils.isNull(keyDatas[i]).equals("CANCEL") ){
+				if( !Utils.isNull(pensItems[i]).equals("") 
+					&& !Utils.isNull(keyDatas[i]).equals("CANCEL") ){
 					
 				   item = new AutoCNBean();
 				   item.setPensItem(pensItems[i]);

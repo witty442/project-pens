@@ -25,7 +25,7 @@ List<Order> zero = new ArrayList<Order>();
 
 List<Order> orders = new MOrder().lookUp(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
 for(Order r : orders){
-	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r));
+	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r)); 
 	if(r.getCreditAmount()==0)
 		zero.add(r);
 }

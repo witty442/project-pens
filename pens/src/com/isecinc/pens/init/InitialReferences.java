@@ -51,6 +51,8 @@ public class InitialReferences extends I_Initial {
 	public static final String BILLPLAN = "BillPlan"; 
 	public static final String BACKDATE_INVOICE = "backdateinvoice"; 
 	public static final String CUST_SHOW_TRIP = "CustShowTrip"; 
+	public static final String CREDIT_DATE_FIX = "CreditDateFix";
+	public static final String VAN_DATE_FIX = "VanDateFix";
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
@@ -73,7 +75,7 @@ public class InitialReferences extends I_Initial {
 			List<References> refList = Database.query(sql.toString(), null, References.class, conn);
 			// logger.debug(refList);
 			for (References r : refList) {
-				logger.debug(r);
+				//logger.debug(r);
 				if (referenes.get(r.getCode()) == null) {
 					List<References> tr = new ArrayList<References>();
 					tr.add(r);
@@ -115,5 +117,26 @@ public class InitialReferences extends I_Initial {
 			e.printStackTrace();
 		}
 		return filter;
+	}
+	
+	public static References getReferenesByOne(String key,String code) {
+		References re = null;
+		try{
+			List<References> refs =  referenes.get(key);
+			//System.out.println("refs size:"+refs.size());
+			if(refs != null && refs.size() > 0){
+				for(int i=0;i<refs.size();i++){
+					References r = (References)refs.get(i);
+					logger.debug("key["+r.getKey()+"]value["+r.getCode()+"]");
+					if(code.equals(r.getCode())){
+						re = r;
+						break;
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return re;
 	}
 }

@@ -7,14 +7,13 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
+//Id = order_id
 String id = (String)request.getParameter("id");
 
 List<ReceiptLine> rls = new MReceiptLine().lookUpOutstanding(Integer.parseInt(id));
 pageContext.setAttribute("rls",rls,PageContext.PAGE_SCOPE);
 
 %>
-
-
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.ReceiptLine"%>

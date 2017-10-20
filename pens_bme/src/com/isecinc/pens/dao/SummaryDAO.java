@@ -970,14 +970,14 @@ public class SummaryDAO {
 						sql.append(" and branch_id ='"+c.getCodeSearch()+"' \n");
 					}
 					if( !Utils.isNull(c.getDescSearch()).equals("")){
-						sql.append(" and branch_name = '"+c.getDescSearch()+"' \n");
+						sql.append(" and upper(branch_name) = '"+c.getDescSearch().toUpperCase()+"' \n");
 					}
 				}else{
 					if( !Utils.isNull(c.getCodeSearch()).equals("")){
 						sql.append(" and branch_id LIKE '%"+c.getCodeSearch()+"%' \n");
 					}
 					if( !Utils.isNull(c.getDescSearch()).equals("")){
-						sql.append(" and branch_name LIKE '%"+c.getDescSearch()+"%' \n");
+						sql.append(" and upper(branch_name) LIKE '%"+c.getDescSearch().toUpperCase()+"%' \n");
 					}
 				}
 				//storeType (LOTUS OR BIGC)

@@ -5,10 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Date;
-import java.util.Properties;
-
-import oracle.jdbc.driver.OracleConnection;
 
 import org.apache.log4j.Logger;
 
@@ -75,7 +71,6 @@ public class DBConnection {
 		Connection _instanceInf =null;
 		EnvProperties env = EnvProperties.getInstance();
 		try {	
-
 			String driver = env.getProperty("db.driver_class");
 			String url = env.getProperty("db.url");
 			String username = env.getProperty("db.username");
@@ -87,6 +82,28 @@ public class DBConnection {
 			_instanceInf = DriverManager.getConnection(url,username,password);
 			//logger.debug("Connection:"+_instanceInf);
 			
+		}catch (Exception e) {
+			logger.error(e.getMessage(),e);			
+		}
+		return _instanceInf;	
+	}
+	
+	public  Connection getConnectionApps(){		
+		Connection _instanceInf =null;
+		EnvProperties env = EnvProperties.getInstance();
+		try {	
+			
+			String driver = env.getProperty("db.driver_class");
+			String url = env.getProperty("db.url");
+			String username = env.getProperty("db.apps.username");
+			String password = env.getProperty("db.apps.password");
+			
+			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
+			
+			 Class.forName(driver);
+			//DriverManager.setLoginTimeout(600);
+			_instanceInf = DriverManager.getConnection(url,username,password);	
+			//logger.debug("Connection:"+_instanceInf);
 		}catch (Exception e) {
 			logger.error(e.getMessage(),e);			
 		}

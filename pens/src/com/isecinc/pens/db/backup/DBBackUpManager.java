@@ -53,10 +53,10 @@ public class DBBackUpManager {
 	 * @param user
 	 * @return
 	 */
-	public String[] process(HttpServletRequest request,User user ){
+	public String[] process(User user ){
 		String[] resultPath = new String[2];
 		try{
-			resultPath = processBackup(request,user);
+			resultPath = processBackup(user);
 		}catch(OutOfMemoryError e){
 			//countRetryBackup++;
 			System.gc();
@@ -87,7 +87,7 @@ public class DBBackUpManager {
 		return resultPath;
 	}
 	
-	private  String[] processBackup(HttpServletRequest request,User user ) throws OutOfMemoryError{
+	private  String[] processBackup(User user ) throws OutOfMemoryError{
 		Connection conn = null;
 		EnvProperties env = EnvProperties.getInstance();
 		List<List<DBBean>> allList = new ArrayList<List<DBBean>>();
@@ -120,8 +120,8 @@ public class DBBackUpManager {
 			zipFileName = getFileName(schema,user,"zip");
 					
 			// get Path + fileName
-			pathSqlFull = getLocalPath(request)+sqlFileName;
-			pathZipFull = getLocalPath(request)+zipFileName;
+			pathSqlFull = getLocalPath()+sqlFileName;
+			pathZipFull = getLocalPath()+zipFileName;
 
 			conn = DBConnection.getInstance().getConnection();
 			/** Step 1 **/
@@ -194,7 +194,7 @@ public class DBBackUpManager {
 				FileUtil.zipFile(pathSqlFull,pathZipFull,sqlFileName); 
 				
 				//Move DBbackupFile.zip to FtpServer
-				ftpFilePath = getFtpPath(request);
+				ftpFilePath = getFtpPath();
 				rootFtpPath = ftpFilePath;
 				
 				logger.debug("ftpFilePath:"+ftpFilePath);
@@ -284,8 +284,8 @@ public class DBBackUpManager {
 			zipFileName = getFileName(schema,user,"zip");
 					
 			// get Path + fileName
-			pathSqlFull = getLocalPath(request)+sqlFileName;
-			pathZipFull = getLocalPath(request)+zipFileName;
+			pathSqlFull = getLocalPath()+sqlFileName;
+			pathZipFull = getLocalPath()+zipFileName;
 
 			conn = DBConnection.getInstance().getConnection();
 			/** Step 1 **/
@@ -405,7 +405,7 @@ public class DBBackUpManager {
 		return fileName;
 	}
 	
-	private  String getLocalPath(HttpServletRequest request){
+	private  String getLocalPath(){
 		String path = "D:/DB_Backup/";
 		try{
 			File directory = new File(path);
@@ -427,7 +427,7 @@ public class DBBackUpManager {
 		return path;
 	}
 	
-	private  String getFtpPath(HttpServletRequest request){
+	private  String getFtpPath(){
 		String path = "/DB_Backup/"; //PROD Default
 		try{
 			//logger.debug("contextPath:"+request.getLocalAddr());

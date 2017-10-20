@@ -547,5 +547,33 @@ public class JobDAO extends PickConstants{
 			}
 		}
 
-	
+		public static boolean validRtnNoInJob(String rtnNo) throws Exception{
+		    Connection conn = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try{
+				conn = DBConnection.getInstance().getConnection();
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" select count(*) as c from  PENSBME_PICK_JOB where rtn_no ='"+rtnNo+"' \n" );
+                logger.debug("sql:/n"+sql.toString());
+             
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					if(rs.getInt("c")>0){
+						return false;
+					}
+				}
+				return true;
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}
+		}
 }

@@ -4,6 +4,7 @@ String[] msg1 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg1 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
+	//System.out.println("Header.jsp AppVerify ");
 	msg1 = AppversionVerify.getIns().checkAppVersion(request) ;
 } 
 %>  

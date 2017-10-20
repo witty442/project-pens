@@ -19,6 +19,7 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Contact;
@@ -31,6 +32,7 @@ import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MContact;
 import com.isecinc.pens.model.MCustomer;
@@ -59,7 +61,6 @@ public class CustomerAction extends I_Action {
 		CustomerForm customerForm = (CustomerForm) form;
 		Customer customer = null;
 		User user = (User) request.getSession(true).getAttribute("user");
-
 		try {
 			customer = new MCustomer().find(id);
 			if (customer == null) {
@@ -67,7 +68,7 @@ public class CustomerAction extends I_Action {
 			}
 			
 			if(Utils.isNull(customer.getPrintType()).equals("")){
-				customer.setPrintType("H");//Prinetype HEAD BRANCH
+				customer.setPrintType("H");//Printype HEAD BRANCH
 			}
 			
 			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
@@ -155,7 +156,7 @@ public class CustomerAction extends I_Action {
         int totalPage = 0;
         int start = 0;
         int end = 50;
-        String tripBySearchSqlIn = "";
+
 		try {
 			//clear session
 			request.getSession().removeAttribute("tripPageMap");
@@ -252,6 +253,7 @@ public class CustomerAction extends I_Action {
 			
 			 Customer[] results = null;
 			 if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
+			
 				String currPageSqlIn = "'"+currPage+"'";
 				results = new MCustomer().searchOptByTrip(conn,whereCause,user,currPageSqlIn,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			}else{

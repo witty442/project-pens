@@ -15,7 +15,7 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
 <%
-	User user = ((User)session.getAttribute("user"));
+User user = ((User)session.getAttribute("user"));
 String role = user.getType();
 String action = (String)request.getParameter("action");
 if(action == null){

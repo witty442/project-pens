@@ -78,11 +78,10 @@ if(request.getAttribute("orderForm") != null){
   canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
 
-//System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
+System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
 boolean debugMode = session.getAttribute("debug_mode")!= null?((Boolean)session.getAttribute("debug_mode")):false;
 System.out.println("debugMode:"+debugMode);
 %>
-
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.Address"%>
 <%@page import="java.util.ArrayList"%>
@@ -108,7 +107,6 @@ body {
 	/**background-repeat: repeat;**/
 }
 .style1 {color: #004a80}
-
 -->
 .currPage{ border:1px solid #000000; padding-left:4px;padding-right:4px;padding-top:2px; }
 .pageLink{padding-left:4px;padding-right:2px;padding-top:2px; }
@@ -706,7 +704,6 @@ function escapeParameter(param){
 													   <img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>  --%>
 													 <%} %>
 												</c:if>
-											
 										</td>
 									</tr>
 									</c:forEach>

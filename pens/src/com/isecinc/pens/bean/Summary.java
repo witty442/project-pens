@@ -1,9 +1,5 @@
 package com.isecinc.pens.bean;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.isecinc.pens.web.summary.SummaryForm;
 
 public class Summary {
 

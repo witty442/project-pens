@@ -116,7 +116,7 @@ public class OrderAction extends I_Action {
 				customerId = Integer.parseInt(request.getParameter("memberId"));
 				// orderForm.setOrder(new Order());
 				
-			/* Wit Edit: 1307255 :Edit shotcut From CustomerSerach **/
+			/* Wit Edit: 13072558 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
 				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
 				
@@ -127,23 +127,36 @@ public class OrderAction extends I_Action {
 				// go add for customer/member
 				customerId = orderForm.getOrder().getCustomerId();
 			}
+			//prepare Connection 
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			//Check Case VanSale Old order(PayCredit) No Pay disable Pay Credit ALL
+			boolean canSave = true;
+			if(User.VAN.equals(user.getType())){
+			   canSave = OrderUtils.canSaveCreditVan(conn,user, customerId);
+			}
+			logger.info("canSave :"+canSave);
 			
 			//Filter Check Van Can Receipt Cheque Or Credit
-			conn = new DBCPConnectionProvider().getConnection(conn);
 			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,customerId);
 			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,customerId);
 			String canAirpayFlag = CustomerReceiptFilterUtils.canAirpay(conn,customerId);
 			
 			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)
 				||  "Y".equalsIgnoreCase(canAirpayFlag)){
-			  orderForm.setCanReceiptMoreCash("Y");
+			   orderForm.setCanReceiptMoreCash("Y");
 			}else{
-			  orderForm.setCanReceiptMoreCash("N");
+			   orderForm.setCanReceiptMoreCash("N");
 			}
 			
 			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
 			orderForm.setCanAirpay(canAirpayFlag);
 			
+			//Case Pay Old Order All to Allow to pay credit :no disable pay cash only
+			if(canSave==false){
+				orderForm.setCanReceiptMoreCash("N");
+				orderForm.setCanReceiptCredit("N");
+			}
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
@@ -153,7 +166,7 @@ public class OrderAction extends I_Action {
 				if("Y".equalsIgnoreCase(canAirpayFlag)){
 					orderForm.getOrder().setPaymentCashNow(false);
 				}else{
-			      orderForm.getOrder().setPaymentCashNow(true);
+			         orderForm.getOrder().setPaymentCashNow(true);
 				}
 			}
 			
@@ -255,8 +268,7 @@ public class OrderAction extends I_Action {
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			logger.error(e.getMessage(),e);
 			return forward;
 		}finally{
 			if(conn != null){
@@ -358,8 +370,9 @@ public class OrderAction extends I_Action {
 			
 			logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag+",canAirpay:"+canAirpayFlag);
 			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) 
-					||  "Y".equalsIgnoreCase(canAirpayFlag)){
+			if("Y".equalsIgnoreCase(canReceiptChequeFlag) 
+				|| "Y".equalsIgnoreCase(canReceiptCreditFlag) 
+				||  "Y".equalsIgnoreCase(canAirpayFlag)){
 			  orderForm.setCanReceiptMoreCash("Y");
 			}else{
 			  orderForm.setCanReceiptMoreCash("N");

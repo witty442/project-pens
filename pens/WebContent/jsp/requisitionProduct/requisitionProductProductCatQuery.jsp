@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.web.requisitionProduct.RequisitionProductBasket"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -31,10 +32,7 @@ int no_of_total_display = no_of_column * no_of_rows;
 
 int totalRecord = mProductCat.lookUpBrandList(user).size();
 
-int totalPage = totalRecord/(no_of_column * no_of_rows);
-BigDecimal r = new BigDecimal(totalPage);
-r = r.setScale(0,BigDecimal.ROUND_UP);
-totalPage = r.intValue();
+int  totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
 
 /// Find Total Page
 System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");

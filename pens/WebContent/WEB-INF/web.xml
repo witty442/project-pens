@@ -33,13 +33,22 @@
 		<filter-name>login</filter-name>
 		<url-pattern>/jsp/*</url-pattern>
 	</filter-mapping>
-
+	
+	<!-- Run Update SalesApp -->
+     <servlet>
+		<display-name>Run Update SalesApp Auto</display-name>
+		<servlet-name>RunUpdateSalesAppAuto</servlet-name>
+		<servlet-class>com.isecinc.pens.web.RunUpdateSalesAppAutoServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	
    <!-- run First Time Only Running Script DB  -->
+   
 	<servlet>
 		<display-name>Running Script DB</display-name>
 		<servlet-name>RunningScriptDB</servlet-name>
 		<servlet-class>com.isecinc.pens.web.RunScriptDBServlet</servlet-class>
-		<load-on-startup>0</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
 	<!-- Servlet -->

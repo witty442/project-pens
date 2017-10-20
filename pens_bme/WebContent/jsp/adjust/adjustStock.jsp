@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -34,8 +35,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -61,9 +63,9 @@ span.pagelinks {
 	font-size: 15px;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -625,7 +627,7 @@ function checkSelect(chk1,chk2){
 							<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
 						</div>
 				  </c:if>  			
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableAj">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >Seq no</th>
 									<th ><input type="checkbox" name="chkAll"
@@ -655,9 +657,9 @@ function checkSelect(chk1,chk2){
 								
 							
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="seqNo">${results.seqNo}</td>
-										<td class="checkBoxAdjustStock"><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>
-										<td class="itemIssueDesc" nowrap>
+										<td class="td_text">${results.seqNo}</td>
+										<td class="td_text"><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>
+										<td class="td_text" nowrap>
 										   <c:if test="${results.canEdit == true}">
 											    <input type="text" name="itemIssueDesc" id="itemIssueDesc" value ="${results.itemIssueDesc}" size="10" 
 											    onkeypress="getProductKeypress(event,'issue',this,${results.seqNo})"
@@ -672,11 +674,11 @@ function checkSelect(chk1,chk2){
 										   </c:if>
 
 										</td>
-										<td class="itemIssue"><input tabindex="-1" type="text" name="itemIssue" value ="${results.itemIssue}" size="20" readonly class="disableText"/></td>
+										<td class="td_text"><input tabindex="-1" type="text" name="itemIssue" value ="${results.itemIssue}" size="20" readonly class="disableText"/></td>
 										
-										<td class="itemIssueUom"><input tabindex="-1" type="text" name="itemIssueUom" value ="${results.itemIssueUom}" size="3" readonly class="disableText"/></td>
-										<td class="itemIssueRetailNonVat"><input tabindex="-1" type="text" name="itemIssueRetailNonVat" value ="${results.itemIssueRetailNonVat}" size="10" readonly class="disableNumber"/></td>
-										<td class="itemIssueQty">
+										<td class="td_text"><input tabindex="-1" type="text" name="itemIssueUom" value ="${results.itemIssueUom}" size="3" readonly class="disableText"/></td>
+										<td class="td_text"><input tabindex="-1" type="text" name="itemIssueRetailNonVat" value ="${results.itemIssueRetailNonVat}" size="10" readonly class="disableNumber"/></td>
+										<td class="td_text">
 											<c:if test="${results.canEdit == true}">
 											    <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="10" onkeypress="isNum(this)" 
 											     class="enableNumber" onblur="sumTotalIssueQty();calcDiffCost(${results.seqNo})"/>
@@ -686,7 +688,7 @@ function checkSelect(chk1,chk2){
 											</c:if>
 										</td>
 										
-										<td class="itemReceiptDesc"  nowrap>
+										<td class="td_text"  nowrap>
 										  <c:if test="${results.canEdit == true}">
 											    <input type="text" name="itemReceiptDesc" id="itemReceiptDesc" value ="${results.itemReceiptDesc}" size="10"
 											     onkeypress="getProductKeypress(event,'receipt',this,${results.seqNo})"
@@ -700,11 +702,11 @@ function checkSelect(chk1,chk2){
 											     readonly class="disableNumber" />
 										 </c:if>
 										</td>
-										<td class="itemReceipt"><input  tabindex="-1" type="text" name="itemReceipt" value ="${results.itemReceipt}" size="20" readonly class="disableText"/></td>
+										<td class="td_text"><input  tabindex="-1" type="text" name="itemReceipt" value ="${results.itemReceipt}" size="20" readonly class="disableText"/></td>
 										
-										<td class="itemReceiptUom"><input  tabindex="-1" type="text" name="itemReceiptUom" value ="${results.itemReceiptUom}" size="3" readonly class="disableText"/></td>
-										<td class="itemReceiptRetailNonVat"><input  tabindex="-1" type="text" name="itemReceiptRetailNonVat" value ="${results.itemReceiptRetailNonVat}" size="10" readonly class="disableNumber"/></td>
-										<td class="itemReceiptQty">
+										<td class="td_text"><input  tabindex="-1" type="text" name="itemReceiptUom" value ="${results.itemReceiptUom}" size="3" readonly class="disableText"/></td>
+										<td class="td_text"><input  tabindex="-1" type="text" name="itemReceiptRetailNonVat" value ="${results.itemReceiptRetailNonVat}" size="10" readonly class="disableNumber"/></td>
+										<td class="td_text">
 										  <c:if test="${results.canEdit == true}">
 										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="10" onkeypress="isNum(this)" 
 										      class="enableNumber" onblur="sumTotalReceiptQty();calcDiffCost(${results.seqNo});sumTotalDiffCost()"/>
@@ -714,7 +716,7 @@ function checkSelect(chk1,chk2){
 										  </c:if>
 									    </td>
 										  
-										<td class="diffCost"><input  tabindex="-1" type="text" name="diffCost" value ="${results.diffCost}" size="10" readonly class="disableNumber"/></td>
+										<td class="td_text"><input  tabindex="-1" type="text" name="diffCost" value ="${results.diffCost}" size="10" readonly class="disableNumber"/></td>
 	
 									</tr>
 							

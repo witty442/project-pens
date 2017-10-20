@@ -45,19 +45,22 @@ public class AutoCNDAO extends PickConstants{
 			sql.append("\n   ,(select m.pens_desc from  pensbme_mst_reference m ");
 			sql.append("\n      where m.reference_code='Store' and pens_value =j.store_code ) as store_name ");
 			sql.append("\n   ,j.rtn_no ");
-			sql.append("\n   ,(select count(*) as c from pensbme_pick_barcode b where b.job_id = j.job_id group by job_id) as total_box ");
-		    sql.append("\n   ,(select count(*) as c from pensbme_pick_barcode_item bi where bi.job_id = j.job_id group by job_id) as total_qty ");
+			sql.append("\n   ,(select count(*) as c from pensbme_pick_barcode b where b.status not in ('O','AB') and b.job_id = j.job_id group by job_id) as total_box ");
+		    sql.append("\n   ,(select count(*) as c from pensbme_pick_barcode_item bi where bi.status not in ('O','AB') and bi.job_id = j.job_id group by job_id) as total_qty ");
 		    sql.append("\n   ,(select a.status from PENSBME_APPROVE_TO_AUTOCN a ");
 		    sql.append("\n     where a.job_id = j.job_id and a.rtn_no = j.rtn_no");
-		    sql.append("\n     and a.status ='APPROVED'");
-		   // sql.append("\n   and a.cust_group = j.cust_group and a.store_code = j.store_code");
 		    sql.append("\n   ) as status ");
+		    sql.append("\n   ,(select a.intflag from PENSBME_APPROVE_TO_AUTOCN a ");
+		    sql.append("\n     where a.job_id = j.job_id and a.rtn_no = j.rtn_no");
+		    sql.append("\n   ) as status_interface ");
+		    sql.append("\n   ,(select nvl(sum(qty),0) as c from PENSBME_APPROVE_TO_AUTOCN_ITEM bi where bi.job_id = j.job_id group by job_id) as total_save_qty ");
 		    sql.append("\n   from pensbme_pick_job j  ");
 		    sql.append("\n   where 1=1 ");
+		    sql.append("\n   and j.status not in ('O','AB') ");
 		    //Where Condition
 		    sql.append(genWhereSearchJobList(o).toString());
-           sql.append("\n    order by j.job_id desc");
-           sql.append("\n   )A ");
+            sql.append("\n    order by j.job_id desc");
+            sql.append("\n   )A ");
         	// get record start to end 
             if( !allRec){
         	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
@@ -79,13 +82,28 @@ public class AutoCNDAO extends PickConstants{
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setTotalBox(Utils.decimalFormat(rst.getDouble("total_box") ,Utils.format_current_no_disgit));
-			   h.setTotalQty(Utils.decimalFormat(rst.getDouble("total_qty"),Utils.format_current_no_disgit));
+			   if(rst.getInt("total_save_qty") >0){
+				   h.setTotalQty(Utils.decimalFormat(rst.getDouble("total_save_qty"),Utils.format_current_no_disgit));  
+			   }else{
+			      h.setTotalQty(Utils.decimalFormat(rst.getDouble("total_qty"),Utils.format_current_no_disgit));
+			   }
 			   h.setRtnNo(Utils.isNull(rst.getString("rtn_no")));
 			   h.setStatus(Utils.isNull(rst.getString("status")));
+			   //e ,s
+			   if( !Utils.isNull(rst.getString("status_interface")).equals("")){
+				   if( Utils.isNull(rst.getString("status_interface")).equalsIgnoreCase("s")){
+					   h.setStatus("SUCCESS");
+					   h.setCanSave(false);
+				   }else{
+					   h.setStatus("ERROR");
+					   h.setCanSave(true);
+				   }
+			   }else{
+				   h.setCanSave(true);
+			   }
 			   items.add(h);
 			   no++;
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -96,37 +114,74 @@ public class AutoCNDAO extends PickConstants{
 		}
 		return items;
 	}
+	public static AutoCNBean searchItemListCaseNew(Connection conn,AutoCNBean h) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try {
+            sql.append("\n   select ");
+			sql.append("\n   nvl(count(*),0) as total_box");
+		    sql.append("\n  ,(select count(*) as c from pensbme_pick_barcode_item bi where bi.status not in ('O','AB') and bi.job_id = j.job_id group by job_id) as total_qty ");
+		    sql.append("\n   from pensbme_pick_barcode j ");
+		    sql.append("\n   where 1=1 ");
+		    sql.append("\n   and j.status not in ('O','AB') ");
+		    sql.append("\n   and j.job_id="+Utils.isNull(h.getJobId()));
+            sql.append("\n   group by  j.job_id");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+			   h.setTotalQty(Utils.decimalFormat(rst.getDouble("total_qty"),Utils.format_current_no_disgit));
+			   h.setTotalBox(Utils.decimalFormat(rst.getDouble("total_box") ,Utils.format_current_no_disgit));
+			   h.setItems(searchItemDetailListCaseNew(conn, h));
+			}//while
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return h;
+	}
 	
-	public static AutoCNBean searchItemListCaseNew(Connection conn,AutoCNBean o) throws Exception {
+	public static List<AutoCNBean> searchItemDetailListCaseNew(Connection conn,AutoCNBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		AutoCNBean h = null;
 		List<AutoCNBean> items = new ArrayList<AutoCNBean>();
-		double totalQty = 0;
-		double totalAmount = 0;
 		try {
 			sql.append("\n select A.* ");
 			sql.append("\n ,nvl((A.qty * A.unit_price),0) as amount");
 			sql.append("\n from (");
-            sql.append("\n   select ");
-			sql.append("\n   j.pens_item");
-			/*sql.append("\n  ,(select max(m.interface_value) from  pensbme_mst_reference m ");
-			sql.append("\n     where m.reference_code='LotusItem' and pens_value =j.pens_item ) as item_name ");*/
-			sql.append("\n  ,M.INVENTORY_ITEM_DESC as item_name,M.INVENTORY_ITEM_ID ");
-			sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
-			sql.append("\n    where P.product_id =M.INVENTORY_ITEM_ID " );
-			sql.append("\n    and P.primary_uom_code ='Y' " );
-			sql.append("\n    and P.pricelist_id ="+priceListId+") as unit_price");
-			sql.append("\n   ,nvl(count(*),0) as qty");
+            sql.append("\n    select ");
+			sql.append("\n    j.pens_item");
+			sql.append("\n  , M.INVENTORY_ITEM_DESC as item_name,M.INVENTORY_ITEM_ID ");
+			sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
+			sql.append("\n    where customer_code = '"+o.getStoreCode()+"' ");
+			sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
+			sql.append("\n    and rownum = 1 ) as unit_price");
+			
+			/*sql.append("\n  , (SELECT max(P.price) from xxpens_bi_mst_price_list P " );
+			sql.append("\n     where P.product_id =M.INVENTORY_ITEM_ID " );
+			sql.append("\n     and P.primary_uom_code ='Y' " );
+			sql.append("\n     and P.pricelist_id ="+priceListId+") as unit_price");*/
+			
+			sql.append("\n  , nvl(count(*),0) as qty");
 		    sql.append("\n   from pensbme_pick_barcode_item j ,XXPENS_BI_MST_ITEM M ");
 		    sql.append("\n   where 1=1 ");
 			sql.append("\n   and M.INVENTORY_ITEM_CODE =j.pens_item  ");
+			sql.append("\n   and j.status not in('O','AB') ");
 		    //Where Condition
 		    if( !Utils.isNull(o.getJobId()).equals("")){
 		    	 sql.append("\n  and j.job_id="+Utils.isNull(o.getJobId()));
 		    }
-            sql.append("\n    group by  j.pens_item, M.INVENTORY_ITEM_ID,M.INVENTORY_ITEM_DESC ,j.retail_price_bf");
+            sql.append("\n    group by  j.pens_item, M.INVENTORY_ITEM_ID,M.INVENTORY_ITEM_DESC ");
             sql.append("\n    order by j.pens_item");
             sql.append("\n )A ");
             
@@ -145,13 +200,9 @@ public class AutoCNDAO extends PickConstants{
 			   h.setAmount(Utils.decimalFormat(rst.getDouble("amount") ,Utils.format_current_2_disgit));
                h.setKeyData("");
                
-			   totalQty += rst.getDouble("qty");
-			   totalAmount += rst.getDouble("amount");
 			   items.add(h);
 			}//while
-			o.setItems(items);
-			o.setTotalQty(Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
-		    o.setTotalAmount(Utils.decimalFormat(totalAmount,Utils.format_current_2_disgit));
+			
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -160,7 +211,7 @@ public class AutoCNDAO extends PickConstants{
 				ps.close();
 			} catch (Exception e) {}
 		}
-		return o;
+		return items;
 	}
 	
 	public static AutoCNBean searchItemListCaseView(Connection conn,AutoCNBean o) throws Exception {
@@ -174,10 +225,8 @@ public class AutoCNDAO extends PickConstants{
 		String status = "";
 		try {
             sql.append("\n  select ");
-            sql.append("\n  h.status");
+            sql.append("\n  h.status ,h.intflag as status_interface ");
 			sql.append("\n  ,j.pens_item");
-		/*	sql.append("\n  ,(select max(m.interface_value) from  pensbme_mst_reference m ");
-			sql.append("\n     where m.reference_code='LotusItem' and pens_value =j.pens_item ) as item_name ");*/
 			sql.append("\n  ,M.INVENTORY_ITEM_DESC as item_name, M.INVENTORY_ITEM_ID ");
 			sql.append("\n  ,j.unit_price");
 			sql.append("\n  ,j.qty");
@@ -207,14 +256,24 @@ public class AutoCNDAO extends PickConstants{
 			   h.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit));
 			   h.setAmount(Utils.decimalFormat(rst.getDouble("amount") ,Utils.format_current_2_disgit));
 			  
-			   h.setLineChk("checked");
 			   h.setKeyData(h.getPensItem());
 			   totalQty += rst.getDouble("qty");
 			   totalAmount += rst.getDouble("amount");
 			   items.add(h);
 			   
 			   status = Utils.isNull(rst.getString("status"));
-			 
+			   
+			   if( !Utils.isNull(rst.getString("status_interface")).equals("")){
+				   if( Utils.isNull(rst.getString("status_interface")).equalsIgnoreCase("s")){
+					   h.setStatus("SUCCESS");
+					   h.setCanSave(false);
+					   status ="SUCCESS";
+				   }else{
+					   h.setStatus("ERROR");
+					   h.setCanSave(true);
+					   status ="ERROR";
+				   }
+			   }
 			}//while
 			o.setStatus(status);
 			o.setItems(items);
@@ -231,6 +290,56 @@ public class AutoCNDAO extends PickConstants{
 		return o;
 	}
 	
+	public static AutoCNBean searchItemListCaseViewCN(Connection conn,AutoCNBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		AutoCNBean h = null;
+		List<AutoCNBean> items = new ArrayList<AutoCNBean>();
+		try {
+            sql.append("\n  select ");
+            sql.append("\n   h.rma_order ,h.cn_no,h.cn_date");
+			sql.append("\n  ,h.ref_inv ,h.line_number ");
+			sql.append("\n  ,h.segment1 as pens_item,h.description as item_name");
+			sql.append("\n  ,h.ordered_quantity as qty ,h.unit_list_price as unit_price,h.amount");
+		    sql.append("\n  from xxpens_om_rtn_order_ref_v h");
+		    sql.append("\n  where 1=1 ");
+		    sql.append("\n  and h.rtn_no ='"+o.getRtnNo()+"'");
+            sql.append("\n  order by h.rma_order");
+            
+			logger.debug("sql:"+sql);
+
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   h = new AutoCNBean();
+			   h.setSeq(rst.getInt("line_number")+"");
+			   h.setRmaOrder(Utils.isNull(rst.getString("rma_order")));
+			   h.setCnNo(Utils.isNull(rst.getString("cn_no")));
+			   h.setCnDate(Utils.stringValueNull(rst.getDate("cn_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setRefInv(Utils.isNull(rst.getString("ref_inv")));
+			   h.setPensItem(Utils.isNull(rst.getString("pens_item")));
+			   h.setItemName(Utils.isNull(rst.getString("item_name")));
+			   h.setUnitPrice(Utils.decimalFormat(rst.getDouble("unit_price") ,Utils.format_current_2_disgit));
+			   h.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit));
+			   h.setAmount(Utils.decimalFormat(rst.getDouble("amount") ,Utils.format_current_2_disgit));
+			   
+			   items.add(h);
+			 
+			}//while
+			o.setItems(items);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return o;
+	}
 	public static int searchTotalRecJobList(Connection conn,AutoCNBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -241,6 +350,7 @@ public class AutoCNDAO extends PickConstants{
             sql.append("\n select count(*) as c ");
 		    sql.append("\n from pensbme_pick_job j  ");
 		    sql.append("\n where 1=1 ");
+		    sql.append("\n and j.status not in ('O','AB')");
 		    //Where Condition
 		    sql.append(genWhereSearchJobList(o).toString());
          
@@ -267,13 +377,15 @@ public class AutoCNDAO extends PickConstants{
 		StringBuffer sql = new StringBuffer("");
 		sql.append("\n and j.rtn_no is not null ");
 		sql.append("\n and j.store_code is not null ");
-		sql.append("\n and j.status ='"+PickConstants.STATUS_CLOSE+"' ");
 	    if( !Utils.isNull(o.getCustGroup()).equals("")){
 	       sql.append("\n and j.cust_group = '"+Utils.isNull(o.getCustGroup())+"' ");
 	    }
 	    if( !Utils.isNull(o.getStoreCode()).equals("")){
 	       sql.append("\n and j.store_code = '"+Utils.isNull(o.getStoreCode())+"' ");
 	    }
+	    if( !Utils.isNull(o.getJobId()).equals("")){
+		       sql.append("\n and j.job_id = "+Utils.isNull(o.getJobId())+" ");
+		    }
 	    if( !Utils.isNull(o.getRtnNo()).equals("")){
 	       sql.append("\n and j.rtn_no = '"+Utils.isNull(o.getRtnNo())+"' ");
 	    }
@@ -291,6 +403,8 @@ public class AutoCNDAO extends PickConstants{
 			//insert head case edit
 			if( !isHeadExist(conn,head) ){
 			   insertHeadModel(conn, head);
+			}else{
+			  updateHeadModel(conn, head);
 			}
 			
 			//delete item by job_id ,rtn_no
@@ -358,22 +472,50 @@ public class AutoCNDAO extends PickConstants{
 			return r;
 		}
 	 
+	 public static int updateHeadModel(Connection conn,AutoCNBean head) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("insertHeadModel");
+			int c =1;int r = 0;
+			StringBuffer sql = new StringBuffer("");
+			try{
+				sql.append("UPDATE PENSBI.PENSBME_APPROVE_TO_AUTOCN \n");
+				sql.append("SET TOTAL_BOX = ? , TOTAL_QTY =? , UPDATE_DATE = ?, UPDATE_USER = ? \n");
+				sql.append("WHERE JOB_ID =? AND RTN_NO =? \n");
+				
+				//logger.debug("sql:"+sql.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+	
+				ps.setDouble(c++, Utils.convertStrToDouble(head.getTotalBox())); 
+				ps.setDouble(c++, Utils.convertStrToDouble(head.getTotalQty())); 
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setString(c++, head.getUserName());
+				ps.setString(c++, Utils.isNull(head.getJobId()));
+				ps.setString(c++, Utils.isNull(head.getRtnNo())); 
+				
+				r =ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+			return r;
+		}
 	 public static boolean isHeadExist(Connection conn,AutoCNBean head) throws Exception{
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			logger.debug("isHeadExist");
-			int c =1;
 			boolean r =false;
 			StringBuffer sql = new StringBuffer("");
 			try{
 				sql.append("select count(*) as c from PENSBI.PENSBME_APPROVE_TO_AUTOCN \n");
-				sql.append("WHERE job_id = ? and rtn_no = ?  \n");
+				sql.append("WHERE job_id = "+Utils.isNull(head.getJobId())+" and rtn_no = '"+Utils.isNull(head.getRtnNo())+"'  \n");
+				logger.debug("sql:"+sql.toString());
 				
-				//logger.debug("sql:"+sql.toString());
 		        ps = conn.prepareStatement(sql.toString());
-				ps.setString(c++, Utils.isNull(head.getJobId()));
-				ps.setString(c++, Utils.isNull(head.getRtnNo())); 
-	
 				rs = ps.executeQuery();
 				if(rs.next()){
 					if(rs.getInt("c") >0){
@@ -500,10 +642,17 @@ public class AutoCNDAO extends PickConstants{
 				}
 				sql.append("\n select MS.pens_value as pens_item ");
 				sql.append("\n ,M.INVENTORY_ITEM_DESC as item_name,M.INVENTORY_ITEM_ID ");
-				sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
+				
+				/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 				sql.append("\n    where P.product_id =M.INVENTORY_ITEM_ID " );
 				sql.append("\n    and P.primary_uom_code ='Y' " );
 				sql.append("\n    and P.pricelist_id ="+priceListId+") as unit_price");
+				*/
+				sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
+				sql.append("\n    where customer_code = '"+storeCode+"' ");
+				sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
+				sql.append("\n    and rownum = 1 ) as unit_price");
+				
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE MS ,PENSBI.XXPENS_BI_MST_ITEM M ");
 	            sql.append("\n where 1=1 ");

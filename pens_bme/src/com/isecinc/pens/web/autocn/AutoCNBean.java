@@ -20,7 +20,6 @@ public class AutoCNBean {
 	private String totalAmount;
 	private String status;
 	private String pensItem;
-	private String lineChk;
 	private String inventoryItemId;
 	private String itemName;
 	private String unitPrice;
@@ -29,12 +28,48 @@ public class AutoCNBean {
 	private String userName;
 	private String keyData;
 	private List<AutoCNBean> items;
+	private String rmaOrder;
+	private String cnNo;
+	private String cnDate;
+	private String refInv;
+	private String seq;
+	
 	
 	private String mode;
 	private boolean canSave;
 	private boolean canCancel;
 	
 	
+	public String getRmaOrder() {
+		return rmaOrder;
+	}
+	public void setRmaOrder(String rmaOrder) {
+		this.rmaOrder = rmaOrder;
+	}
+	public String getCnNo() {
+		return cnNo;
+	}
+	public void setCnNo(String cnNo) {
+		this.cnNo = cnNo;
+	}
+	public String getCnDate() {
+		return cnDate;
+	}
+	public void setCnDate(String cnDate) {
+		this.cnDate = cnDate;
+	}
+	public String getRefInv() {
+		return refInv;
+	}
+	public void setRefInv(String refInv) {
+		this.refInv = refInv;
+	}
+	public String getSeq() {
+		return seq;
+	}
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
 	public boolean isCanSave() {
 		return canSave;
 	}
@@ -53,12 +88,7 @@ public class AutoCNBean {
 	public void setKeyData(String keyData) {
 		this.keyData = keyData;
 	}
-	public String getLineChk() {
-		return lineChk;
-	}
-	public void setLineChk(String lineChk) {
-		this.lineChk = lineChk;
-	}
+	
 	public String getInventoryItemId() {
 		return inventoryItemId;
 	}

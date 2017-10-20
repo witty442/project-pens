@@ -660,6 +660,7 @@
 		<action name="autoCNForm" path="/jsp/autoCNAction" parameter="do" scope="session" type="com.isecinc.pens.web.autocn.AutoCNAction">
 			<forward name="search" path="/jsp/autoCN/autoCNSearch.jsp" />
 			<forward name="detail" path="/jsp/autoCN/autoCN.jsp" />
+			<forward name="detailView" path="/jsp/autoCN/autoCNView.jsp" />
 		</action>
 		
 	</action-mappings>

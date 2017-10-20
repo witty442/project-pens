@@ -131,9 +131,7 @@ public class FileUtil {
 	       throw e;
 	    }
 	}
-	
-	
-	
+
 	public static String readFile(String fileName,String encoding)  {
     
 	   InputStream is = null;

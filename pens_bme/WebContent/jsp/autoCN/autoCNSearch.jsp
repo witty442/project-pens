@@ -231,7 +231,7 @@ function getCustName(path,storeCode,fieldName,storeType){
 										 <html:text property="bean.jobStatus" styleId="jobStatus" size="10" styleClass="disableText"  readonly="true"/>
 									</td>
 									<td>
-									   Cutt off Job data  &nbsp;&nbsp;
+									   Cut off Job data  &nbsp;&nbsp;
 									    <html:text property="bean.cuttOffDate" styleId="cuttOffDate" size="10" styleClass="disableText"  readonly="true"/>
 									 
 									</td>
@@ -282,11 +282,13 @@ function getCustName(path,storeCode,fieldName,storeType){
 						            <th >Job Id</th><!-- 0 -->
 						            <th >Job Name</th><!-- 1 -->
 									<th >Store Code</th><!-- 3 -->
+									<th >Store Name</th><!-- 3 -->
 									<th >RTN No</th><!-- 4 -->
 									<th >Total Box</th><!-- 5 -->
 									<th >Total Qty</th><!-- 6 -->
 									<th >AutoCN Status</th><!-- 7 -->
 									<th >Action</th><!-- 7 -->
+									<th >View CN</th><!-- 7 -->
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -299,14 +301,15 @@ function getCustName(path,storeCode,fieldName,storeType){
 								%>
 								<tr class="<%=tabclass%>"> 
 									<td class="td_text_center" width="6%"><%=mc.getJobId()%></td><!-- 1 -->
-									<td class="td_text" width="10%"><%=mc.getJobName()%></td><!-- 3 -->
+									<td class="td_text" width="8%"><%=mc.getJobName()%></td><!-- 3 -->
 								    <td class="td_text" width="6%"><%=mc.getStoreCode()%></td><!-- 4 -->
-								    <td class="td_text_center" width="8%"><%=mc.getRtnNo()%></td><!-- 5 -->
+								    <td class="td_text" width="8%"><%=mc.getStoreName()%></td><!-- 4 -->
+								    <td class="td_text_center" width="6%"><%=mc.getRtnNo()%></td><!-- 5 -->
 									<td class="td_text_center" width="6%"><%=mc.getTotalBox()%></td><!-- 6 -->
 									<td class="td_text_center" width="6%"><%=mc.getTotalQty()%></td><!-- 7 -->
-									<td class="td_text_center" width="10%"><%=mc.getStatus()%></td><!-- 8 -->
-									<td class="td_text_center" width="8%">
-									  <%if( Utils.isNull(mc.getStatus()).equals("")){ %>
+									<td class="td_text_center" width="6%"><%=mc.getStatus()%></td><!-- 8 -->
+									<td class="td_text_center" width="6%">
+									  <%if(mc.isCanSave()){ %>
                                          <a href="javascript:openEdit('${pageContext.request.contextPath}'
                                          ,'edit'
                                          ,'<%=mc.getJobId()%>'
@@ -326,16 +329,26 @@ function getCustName(path,storeCode,fieldName,storeType){
 								          </a>
 								      <%} %>
                                     </td>
+                                    <td class="td_text_center" width="6%">
+									  <%if( !mc.isCanSave()){ %>
+                                         <a href="javascript:openEdit('${pageContext.request.contextPath}'
+                                         ,'viewCN'
+                                         ,'<%=mc.getJobId()%>'
+                                         ,'<%=mc.getRtnNo()%>'
+                                         ,'<%=mc.getCustGroup()%>'
+                                         ,'<%=mc.getStoreCode()%>')"> 
+								               View CN
+								         </a>
+								        <%} %>
+								     </td>
 								</tr>
 							<%} %>
 							 
 					</table>
 				</c:if>
 				
-		<!-- ************************Result ***************************************************-->
-					
-					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
-					
+		   <!-- ************************Result ***************************************************-->
+	
 					<!-- hidden field -->
 					</html:form>
 					<!-- BODY -->

@@ -22,7 +22,7 @@
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
 
 <%
-	User user = ((User)session.getAttribute("user"));
+User user = ((User)session.getAttribute("user"));
 String role = user.getType();
 
 String action = (String)request.getParameter("action");
@@ -46,7 +46,6 @@ pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
-
 List<References> w1List = new MOrgRule().getW1RefList("","");
 pageContext.setAttribute("w1List",w1List,PageContext.PAGE_SCOPE);
 
@@ -58,7 +57,6 @@ if(request.getAttribute("orderForm") != null){
   canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
 }
 System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
-
 System.out.println("Message:"+request.getAttribute("Message"));
 
 String saveBtnDisable = "";
@@ -68,7 +66,6 @@ if(request.getAttribute("do_not_save") != null){
 	//saveBtnStyle ="newPosBtnDisable";
 }
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -88,7 +85,6 @@ body {
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>

@@ -2072,7 +2072,7 @@ public class ExportProcess {
 	            "   FROM t_stock_line l ," +
 	            "   (SELECT @rownum:=0) a" +
 	            "   where request_number ='"+requestNumber+"' and status ='SV' "+
-                "   and( qty <> 0 or qty2 <> 0 or qty3 <> 0 )" ;
+                "   and( qty <> 0 or qty2 <> 0 or qty3 <> 0 or sub <> 0 or sub2 <> 0 or sub3 <> 0 )" ;
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){

@@ -4,6 +4,12 @@ function search(path){
 	return true;
 }
 
+function clearForm(path){
+	document.pdReceiptForm.action = path + "/jsp/pdReceipt.do?do=clearForm";
+	document.pdReceiptForm.submit();
+	return true;
+}
+
 function defaultDate(paymentMethod,row,currDate){
 	if(paymentMethod.value!=null && paymentMethod.value.length>0){
 		if(document.getElementsByName("pdReceiptDate")[eval(row-1)].value == null || document.getElementsByName("pdReceiptDate")[eval(row-1)].value.length ==0){
@@ -15,6 +21,9 @@ function defaultDate(paymentMethod,row,currDate){
 }
 
 function save(path){
+	if(!confirm("ยืนยันบันทึกข้อมูล")){
+		return false;
+	}
 	var p_receiptId = "ids=";
 	var p_paymentMethods ="pms=";
 	var p_pdPaidDate ="pdates=";
@@ -65,3 +74,4 @@ function save(path){
 	document.pdReceiptForm.submit();
 	return true;
 }
+
