@@ -16,9 +16,11 @@ import org.apache.log4j.Logger;
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
+import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.isecinc.pens.inf.manager.UpdateSalesManagerHelper;
 
 public class ImportHelper {
 	
@@ -84,21 +86,19 @@ public class ImportHelper {
 							/** add  by Type  **/
 							boolean canAccess = isCanAccess(userBean, tableBean);
 							
-							logger.debug("tableName["+tableBean.getTableName()+":"+requestTable+"]");
+							/*logger.debug("tableName["+tableBean.getTableName()+":"+requestTable+"]");
 							logger.debug("transType:"+transType+":"+tableBean.getTransactionType());
-							logger.debug("userRole:"+userBean.getType()+",CanAccess:"+canAccess);
+							logger.debug("userRole:"+userBean.getType()+",CanAccess:"+canAccess);*/
 							
 							if( ( Utils.isNull(requestTable).equals(tableBean.getTableName()) || Utils.isNull(requestTable).equals(""))
 									&& canAccess && transType.equalsIgnoreCase(tableBean.getTransactionType())){
-								
-								if(!transType.equalsIgnoreCase(Constants.TRANSACTION_WEB_MEMBER_TYPE)){ //WEB-MEMBER NO INIT COLUMN
-									/** init table properties  */
-									tableBean = initColumn(path,tableBean);
-									/** Gen SQL Insert And Update***/
-									tableBean = genPrepareSQL(tableBean,userBean ,transType);
-								}
-								
-								/** Store Data Map **/
+		
+								/** init table properties  */
+								tableBean = initColumn(path,tableBean);
+								/** Gen SQL Insert And Update***/
+								tableBean = genPrepareSQL(tableBean,userBean ,transType);
+
+								/** Store Data To Map **/
 						        tableMap.put(tableBean.getTableName(),tableBean);
 							}
 						} catch (Exception e) {
@@ -108,8 +108,7 @@ public class ImportHelper {
 					}//if 2
 				}//if 1
 			}//while
-			
-			
+	
 			monitorTime.debugUsedTime();
 			
 			monitorTime = new MonitorTime("initImportConfig>>Select Table Last import:[mapFileNameLastImportToTableMap]");
@@ -125,6 +124,73 @@ public class ImportHelper {
 	        monitorTime.debugUsedTime();
 	        return countFileMap;
 		  
+		}catch(Exception e){
+			throw e;
+		} finally {
+			FileUtil.close(br);
+		}
+	}
+	
+	public static  int initImportConfigCaseReImportError(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,String transType,User userBean ,String requestTable,boolean importAll) throws Exception {
+		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
+		EnvProperties env = EnvProperties.getInstance();
+		InterfaceDAO dao = new InterfaceDAO();
+		int countFileMap= 0;
+		try {
+			MonitorTime monitorTime = new MonitorTime("initImportConfig>>read import config");
+			
+			String lineStr = null;
+			while ((lineStr = br.readLine()) != null) {
+				if (!Utils.isBlank(lineStr)) { // exclude blank line
+					String[] cs = lineStr.split("\t");
+					if (!cs[0].startsWith("Seq") && !cs[0].startsWith("#")) { // exclude header, comment
+						TableBean tableBean = new TableBean();
+						try {
+							String[] p = ((String)cs[0]).split(",");
+							tableBean.setTableName(Utils.isNull(p[1].toLowerCase()));
+							tableBean.setFileFtpName(Utils.isNull(p[2]));
+							tableBean.setSource(Utils.isNull(p[3]));
+							tableBean.setDestination(Utils.isNull(p[4]));
+							tableBean.setTransactionType(Utils.isNull(p[5]));
+							tableBean.setAuthen(Utils.isNull(p[6]));
+							tableBean.setChildTable(Utils.isNull(p[7]));
+							tableBean.setActionDB(Utils.isNull(p[8]));
+							tableBean.setPreFunction(Utils.isNull(p[9]));
+							tableBean.setPostFunction(Utils.isNull(p[10]));
+							tableBean.setCheckDupFile(Utils.isNull(p[11]));
+							
+							//** case Transaction set file_ftp_name =user_id **/
+							if(tableBean.getTableName().equals("m_inventory_onhand")){
+								tableBean = dao.getSunInvNameMap(conn,tableBean, userBean);
+							}
+	
+							/** add  by Type  **/
+							boolean canAccess = isCanAccess(userBean, tableBean);
+							
+							/*logger.debug("tableName["+tableBean.getTableName()+":"+requestTable+"]");
+							logger.debug("transType:"+transType+":"+tableBean.getTransactionType());
+							logger.debug("userRole:"+userBean.getType()+",CanAccess:"+canAccess);*/
+							
+							if(canAccess){
+								if(!transType.equalsIgnoreCase(Constants.TRANSACTION_WEB_MEMBER_TYPE)){ //WEB-MEMBER NO INIT COLUMN
+									/** init table properties  */
+									tableBean = initColumn(path,tableBean);
+									/** Gen SQL Insert And Update***/
+									tableBean = genPrepareSQL(tableBean,userBean ,transType);
+								}
+								
+								/** Store Data Map **/
+						        tableMap.put(tableBean.getTableName(),tableBean);
+							}
+						} catch (Exception e) {
+							logger.info("TableName Error:"+tableBean.getTableName());
+							throw e;
+						}
+					}//if 2
+				}//if 1
+			}//while
+			
+	        return countFileMap;
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -226,7 +292,7 @@ public class ImportHelper {
 	 * Desc: Init SQL ,Column List
 	 */
 	public static  TableBean initColumn(String path ,TableBean tableBean) throws Exception {
-		logger.debug("InitColumn tableName:["+tableBean.getTableName()+"]");
+		//logger.debug("InitColumn tableName:["+tableBean.getTableName()+"]");
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+tableBean.getTableName()+".csv"); // Seq, Procedure, Source, Destination
 		List<ColumnBean> columnList = new ArrayList<ColumnBean>();
 		String columnTableAll = "";
@@ -312,7 +378,7 @@ public class ImportHelper {
         List<ColumnBean> columnDeleteKeyList = new ArrayList<ColumnBean>();
 		try{
 			String tableName = tableBean.getTableName();
-			logger.debug("********GenSQL*********************");
+			//logger.debug("********GenSQL*********************");
 			/** Case User SALES IMPORT AD_USER FROM SALE_CENTER **/
 			if(tableName.equalsIgnoreCase("authen")){
 				tableName = "ad_user";
@@ -439,7 +505,7 @@ public class ImportHelper {
         List<ColumnBean> columnDeleteKeyList = new ArrayList<ColumnBean>();
 		try{
 			String tableName = tableBean.getTableName();
-			logger.debug("********GenSQL*********************");
+			//logger.debug("********GenSQL*********************");
 		    for ( int i = 0; i < tableBean.getColumnBeanList().size(); i++) {   
 		    	ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
 	    	   
@@ -571,7 +637,7 @@ public class ImportHelper {
 				tableName = "t_order_line";
 			}
 			
-			logger.debug("********GenSQL*********************");
+			//logger.debug("********GenSQL*********************");
 		    for ( int i = 0; i < tableBean.getColumnBeanList().size(); i++) {   
 		    	ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
 		    	if(colBean.getRoleAction().indexOf(user.getType()) != -1){
@@ -748,6 +814,7 @@ public class ImportHelper {
 		}
 		return ps;
 	}
+	
 	
 	public static  PreparedStatement spiltLineArrayToInsertStatement(Connection conn,TableBean tableBean,String lineStr,PreparedStatement ps,User userBean,ColumnBean[] replaceValues) throws Exception{
 		int i=0;
@@ -1094,7 +1161,7 @@ public class ImportHelper {
 	 * @throws Exception
 	 * Desc: Set Object By Type of Column Value
 	 */
-	private static PreparedStatement setObjectPS(PreparedStatement ps ,ColumnBean colBean,int parameterIndex, String value) throws Exception{
+	public static PreparedStatement setObjectPS(PreparedStatement ps ,ColumnBean colBean,int parameterIndex, String value) throws Exception{
 		
 		if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 			if(!Utils.isNull(value).equals("")){
@@ -1183,7 +1250,7 @@ public class ImportHelper {
 			//logger.debug("TransType:"+transType);
 			if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(transType)){
 				if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
-					if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+					if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll,transType)){
 						canGetFtpFile = true;
 					}else{
 						canGetFtpFile = false;
@@ -1191,7 +1258,7 @@ public class ImportHelper {
 				}
 			}else if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equalsIgnoreCase(transType)){
 					if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
-						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll,transType)){
 							canGetFtpFile = true;
 						}else{
 							canGetFtpFile = false;
@@ -1213,7 +1280,7 @@ public class ImportHelper {
 				    }
 				}else 	if(tableBean.getTableName().equalsIgnoreCase("t_credit_note")){
 					if(fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1){
-						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+						if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll,transType)){
 							canGetFtpFile = true;
 						}else{
 							canGetFtpFile = false;
@@ -1237,7 +1304,7 @@ public class ImportHelper {
 								canGetFtpFile = false;
 							}
 						}else{
-							if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll)){
+							if(ImportHelper.isCanGetFtpFileBySalesCode(user, tableBean, fileFtpFullName,importAll,transType)){
 								canGetFtpFile = true;
 							}else{
 								canGetFtpFile = false;
@@ -1346,7 +1413,8 @@ public class ImportHelper {
 	 * tableName : for mapping ftp file
 	 * ftpFileFullName : file name full in FTP Server ex, -> Case 1) 201010311010-100040-RECEIPT.txt ,Case 2).201010311010-100040-RECEIPT-ALL.txt
 	 */
-	public static boolean isCanGetFtpFileBySalesCode(User user,TableBean tableBean, String ftpFileFullName,boolean importAll) {
+	public static boolean isCanGetFtpFileBySalesCode(User user,TableBean tableBean
+			, String ftpFileFullName,boolean importAll,String transType) {
 		//logger.debug("isCanGetFtpFileBySalesCode");
 		boolean map = false;
 		try{
@@ -1395,17 +1463,25 @@ public class ImportHelper {
 				if(ftpFileTableName3.indexOf(".") != -1){
 					ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
 				}
-				String userId = user.getUserName();//user.getId();//Chang to use SalesCode V101
+				String userId = user.getUserName();//user.getId();//Change to use SalesCode V101
 				
 				/*logger.debug("*******Compare File Get FTP FIle Name*******************");
 				logger.debug("lastImportInt:"+salesFileLastVersionInt+":"+ftpFileVesrionInt1);
 				logger.debug("userId:"+user.getId()+":"+ftpFileTableName2);
 				logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
 				logger.debug("********************************************************");*/
-				if(ftpFileVesrionInt1 > salesFileLastVersionInt 
-					&& (userId).equals(ftpFileTableName2)
-					&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
-					map = true;
+				
+				if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+					//No Check DateTime more than latest import
+					if( (userId).equals(ftpFileTableName2)
+						&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
+						map = true;
+					}
+				}else{
+					if( (userId).equals(ftpFileTableName2)
+						&& salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
+							map = true;
+						}
 				}
 			}
 		}catch(Exception e){
@@ -1603,15 +1679,15 @@ public class ImportHelper {
 				
 				/** Case สร. YYYYMMDDHHMM-SubInv-Sorlor.txt */
 				if(ftpFileFullName.indexOf(Constants.SUB_INV_SOLOR) != -1){
-					if(        ftpFileVersion1 > saleFileVersion1 
-							&& subInvMap.get(subInvName2) != null 
-							&& userCodeName3.equals(Constants.SUB_INV_SOLOR)){
+					//if(        ftpFileVersion1 > saleFileVersion1  // Old Code
+					if(  subInvMap.get(subInvName2) != null 
+						 && userCodeName3.equals(Constants.SUB_INV_SOLOR)){
 						
 						map = true;
 					}
 				}else{
 				/** Van YYYYMMDDHHMM-SubInv-SalesCode.txt */
-					if( ftpFileVersion1 > saleFileVersion1 && subInvMap.get(subInvName2) != null ){
+					if(subInvMap.get(subInvName2) != null ){
 						if(userCodeMap.get(userCodeName3) != null){
 						  map = true;
 						}
@@ -1624,5 +1700,4 @@ public class ImportHelper {
 		}
 		return map;
 	}
-	
 }

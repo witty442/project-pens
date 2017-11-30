@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.AppversionVerify;
+import util.ControlCode;
 import util.MonitorSales;
 
 import com.isecinc.core.bean.Messages;
@@ -146,7 +147,7 @@ public class InterfacesAction extends I_Action {
 			if (results != null && results.length > 0) {
 				interfacesForm.getCriteria().setSearchResult(results.length);
 				interfacesForm.setResults(results);
-				criteria.setMonitorBean(new MonitorBean());
+				criteria.setMonitorBean(results[0]);
 				interfacesForm.setCriteria(criteria);
 			} else {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
@@ -222,8 +223,9 @@ public class InterfacesAction extends I_Action {
 		User userLogin = (User) request.getSession().getAttribute("user");
 		ImportManager importManager =  new ImportManager();
 		User userRequest = new User();
+		boolean canRunBatch = false;
 		try {
-			boolean canRunBatch = false;
+			//clear Task running for next run
 			InterfaceDAO dao = new InterfaceDAO();
 			String status = dao.findControlMonitor(Constants.TYPE_IMPORT);
 			logger.info("status["+status+"]");
@@ -231,6 +233,14 @@ public class InterfacesAction extends I_Action {
 			    canRunBatch = true;
 			}
 		
+			//CheckBok choose ReImport Update Transaction
+			String reimportUpdateTransChk = request.getParameter("reimportUpdateTransChk");
+			logger.debug("reimportUpdateTransChk:"+reimportUpdateTransChk);
+			if( !Utils.isNull(reimportUpdateTransChk).equals("")){
+				//Update Control Code Fore run process
+				ControlCode.updateControlCode("BatchImportWorker", "reimportUpdateTrans", "Y");
+			}
+			
 			if(canRunBatch){
 				
 				logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
@@ -259,8 +269,9 @@ public class InterfacesAction extends I_Action {
 				logger.debug("User Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
 				     
 				MonitorBean m = importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
-			   
-				/** Set for Progress Bar Opoup **/
+				interfacesForm.setMonitorBean(m);
+				
+				/** Set for Progress Bar Popup **/
 				request.setAttribute("action", "submited");
 				request.setAttribute("id", m.getTransactionId());
 				
@@ -325,7 +336,7 @@ public class InterfacesAction extends I_Action {
 			    logger.debug("UserId Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
 	
 				MonitorBean m = exportManager.exportMain(userLogin,userRequest, requestTable,requestTableTransType, request);
-				
+				interfacesForm.setMonitorBean(m);
 				/** Set from Progress Popup **/
 				request.setAttribute("action", "submited");
 				request.setAttribute("id", m.getTransactionId());

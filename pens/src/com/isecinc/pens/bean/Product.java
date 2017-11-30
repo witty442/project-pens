@@ -76,12 +76,21 @@ public class Product extends I_PO implements Serializable {
 	private ProductCategory productCategory = new ProductCategory();
 	private String uom1;
 	private String uom2;
+	private String conversionRate;
 	
 	/** Product Price **/
 	private ProductPrice[] productPrices = null;
 
 	
     
+	public String getConversionRate() {
+		return conversionRate;
+	}
+
+	public void setConversionRate(String conversionRate) {
+		this.conversionRate = conversionRate;
+	}
+
 	public String getUom1() {
 		return uom1;
 	}

@@ -155,6 +155,9 @@ public class ConvertUtils {
 		if(str == null){
 			return 0;
 		}
+		if(str.indexOf(",") != -1){
+			str = str.replaceAll("\\,", "");
+		}
 		return Double.parseDouble(str);
 	}
 	

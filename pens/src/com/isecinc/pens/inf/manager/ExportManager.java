@@ -27,6 +27,8 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchExportWorker;
 import com.isecinc.pens.inf.manager.process.ExportProcess;
+import com.isecinc.pens.inf.manager.process.export.LockboxNormalProcess;
+import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
 
 /**
  * @author WITTY
@@ -226,7 +228,7 @@ public class ExportManager {
 							
 							/** Check Data Found Before Export **/
 							if( modelDetailItem != null && modelDetailItem.length > 0){
-							    tableBean = exProcess.exportSalesReceiptLockBoxHeader(conn, tableBean,userRequest);	
+							    tableBean = new LockboxProcess().exportSalesReceiptLockBoxProcess(conn, tableBean,userRequest);	
 							}
 							
 							logger.info("--End Export t_receipt(lockbox) --");

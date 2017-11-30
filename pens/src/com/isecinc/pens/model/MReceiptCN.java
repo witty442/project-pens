@@ -66,7 +66,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 		}
 		return true;
 	}
-
+	
 	/**
 	 * Lookup with receiptID
 	 * 

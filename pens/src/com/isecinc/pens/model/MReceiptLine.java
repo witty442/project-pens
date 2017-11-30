@@ -109,14 +109,29 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	public List<ReceiptLine> lookUp(int receiptId) {
 		List<ReceiptLine> pos = new ArrayList<ReceiptLine>();
 		try {
-			String whereCause = " AND RECEIPT_ID = " + receiptId + " ORDER BY LINE_NO ";
+			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
+			whereCause += "\n  ORDER BY LINE_NO ";
+			
+			logger.debug("whereCause:"+whereCause);
 			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, ReceiptLine.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return pos;
 	}
-
+	public List<ReceiptLine> lookUp(Connection conn,int receiptId) {
+		List<ReceiptLine> pos = new ArrayList<ReceiptLine>();
+		try {
+			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
+			whereCause += "\n  ORDER BY LINE_NO ";
+			
+			logger.debug("whereCause:"+whereCause);
+			pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, ReceiptLine.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pos;
+	}
 	
 	public double calculateCreditAmount(Order order) throws Exception {
 		Connection conn = null;
@@ -143,7 +158,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		ResultSet rst = null;
 		double creditAmt = NumberToolsUtil.round(order.getNetAmount(), 2, BigDecimal.ROUND_HALF_UP);
 		double paidAmt = 0;
-		logger.debug("Start creditAmt :"+creditAmt);
+		logger.debug("Start creditAmt :"+creditAmt+", ar_invoice_no:"+order.getArInvoiceNo());
 		try {
 			
 			String sql = "\n select SUM(rl.PAID_AMOUNT) as PAID_AMOUNT ";
@@ -154,7 +169,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql += "\n  and rl.receipt_id in (select receipt_id from " + MReceipt.TABLE_NAME + " where doc_status = '"
 					+ Receipt.DOC_SAVE + "' ) ";
 
-			logger.debug("sql:\n"+sql);
+			//logger.debug("sql:\n"+sql);
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
@@ -205,6 +220,11 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
+		ReceiptLine rl;
+		MCreditNote cnDAO = new MCreditNote();
+		MAdjust adjustDAO = new MAdjust();
+		double cnAmt = 0;
+		double adjustAmt = 0;
 		try {
 			References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
 			String  creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
@@ -227,17 +247,18 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
-			ReceiptLine rl;
-			MCreditNote cn = new MCreditNote();
+			
 			while (rst.next()) {
 				rl = new ReceiptLine();
 
 				rl.setOrder(new MOrder().find(rst.getString("order_id")));
 				rl.setInvoiceAmount(rst.getDouble("NET_AMOUNT"));
 				
-				double cnAmt = cn.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
+				cnAmt = cnDAO.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
+				adjustAmt = adjustDAO.getTotalAdjustAmt(rst.getString("ar_invoice_no"));
 				
-				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt);
+				/******************(sum(receipt_line))*****************+(cn)***+(adjust)****/
+				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt+adjustAmt);
 				
 				rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
 				
@@ -310,7 +331,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql.append(" ,COALESCE(M.NET_AMOUNT,0) as NET_AMOUNT  \n");
 			sql.append(" ,COALESCE(R.PAID_AMOUNT,0) as PAID_AMOUNT \n");
 			sql.append(" ,COALESCE(C.CN_AMOUNT,0) as  CN_AMOUNT \n");
-			sql.append(" ,COALESCE(  ( COALESCE(M.NET_AMOUNT,0) -  COALESCE(R.PAID_AMOUNT,0) ) + COALESCE(C.CN_AMOUNT,0) ) as credit_amount_temp \n");
+			sql.append(" ,COALESCE(  ( COALESCE(M.NET_AMOUNT,0) -  "
+					+ "COALESCE(R.PAID_AMOUNT,0) ) + COALESCE(C.CN_AMOUNT,0) + COALESCE(adj.ADJUST_AMOUNT,0)  ) as credit_amount_temp \n");
 			sql.append(" FROM( \n");
 				sql.append(" select order_id,ar_invoice_no, COALESCE(sum(round(net_amount,2)),0) as net_amount \n");
 				sql.append(" from t_order  \n");
@@ -343,10 +365,17 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 				sql.append(" select  ar_invoice_no,COALESCE(sum(total_amount),0)  as cn_amount  \n");
 				sql.append(" from t_credit_note where 1=1  \n");
 				sql.append(" AND ACTIVE = 'Y'  \n");
+				sql.append(" AND DOC_STATUS = 'SV'  \n");
 				sql.append(" AND ar_invoice_no in( \n");
 				sql.append("     select ar_invoice_no from t_credit_note where customer_id = "+customerId+" \n");
 				sql.append("    ) GROUP BY ar_invoice_no \n");
 		   sql.append("  )C   ON M.ar_invoice_no = C.ar_invoice_no \n");
+		   sql.append(" LEFT OUTER JOIN \n");
+			sql.append(" ( \n");
+				sql.append(" select  ar_invoice_no,COALESCE(sum(adjust_amount),0)  as adjust_amount  \n");
+				sql.append(" from t_adjust where 1=1  \n");
+				sql.append(" GROUP BY ar_invoice_no \n");
+		   sql.append("  )adj   ON M.ar_invoice_no = adj.ar_invoice_no \n");
 			sql.append(" )B	 \n");
 			sql.append(")A	 \n");
 			
@@ -359,62 +388,6 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			   creditAmt = rst.getDouble("credit_amount");
 				
 			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		} finally {
-			try {
-				rst.close();
-			} catch (Exception e2) {}
-			try {
-				stmt.close();
-			} catch (Exception e2) {}
-
-		}
-		return creditAmt;
-	}
-	
-	public double lookCreditAmtBK1(Connection conn,int customerId) throws Exception {
-		Statement stmt = null;
-		ResultSet rst = null;
-		double creditAmt  =0;
-		double totalcnAmt = 0;
-		try {
-			String sql = "select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";
-			sql += "from t_order ";
-			sql += "where 1=1 ";
-			sql += "  and customer_id = " + customerId;
-			sql += "  and doc_status = 'SV' ";
-			sql += "  order by order_date desc, order_no desc ";
-
-			logger.debug("sql:"+sql);
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql);
-			ReceiptLine rl;
-			MCreditNote cn = new MCreditNote();
-			while (rst.next()) {
-				rl = new ReceiptLine();
-
-				rl.setOrder(new MOrder().find(rst.getString("order_id")));
-				rl.setInvoiceAmount(rst.getDouble("NET_AMOUNT"));
-				
-				//Get CN
-				double cnAmt = cn.getTotalCreditNoteAmt(rst.getString("ar_invoice_no"));
-				//logger.debug("cnAmt:"+cnAmt);
-				totalcnAmt += cnAmt;
-				//Calc CreditAmount 
-				//rl.setCreditAmount(calculateCreditAmount(conn,rl.getOrder())+cnAmt);
-				
-				//Cale PaidAmount
-				//rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
-				
-				if (rl.getCreditAmount() > 0) {
-					creditAmt += rl.getCreditAmount();
-				}
-			}
-			
-			logger.debug("totalCnAmt:"+totalcnAmt);
 
 		} catch (Exception e) {
 			e.printStackTrace();

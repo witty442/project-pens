@@ -54,10 +54,15 @@ if(custShowTrip != null && custShowTrip.size() >0){
    }
 }
 
+//Get Message CheckVersion
 String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
-	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
-}
+	msg4=  (String[])request.getSession().getAttribute("appVersionCheckMsg");
+}else{
+	System.out.println("Header.jsp AppVerify ");
+	msg4 = AppversionVerify.getIns().checkAppVersion(request) ;
+} 
+
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
 <%@page import="com.isecinc.pens.model.MProvince"%><html>
@@ -495,8 +500,8 @@ $(function() {
 
 <div id="dialog" title="คำแนะนำ" style="display:none">
     <p align="center"><b>
-     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=msg4[0]%></font></a> 
-     &nbsp;|&nbsp; <%=msg4[1] %></b>
+     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=Utils.isNull(msg4[0])%></font></a> 
+     &nbsp;|&nbsp; <%=Utils.isNull(msg4[1]) %></b>
     </p>
     <%=AppversionVerify.getMessageToSales(request)%>
 	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>

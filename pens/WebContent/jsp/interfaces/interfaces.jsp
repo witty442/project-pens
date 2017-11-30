@@ -35,9 +35,7 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Pragma" content="no-cache" /> 
-
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -45,7 +43,6 @@ pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/interfaces.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
-
 
 <!-- Calendar -->
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
@@ -96,12 +93,15 @@ body {
 	//clear cach
 	$.ajaxSetup({cache: false});
 	
+	// Show Option Run Import Trans (Case Error)
+	function setSeimportUpdateTrans(){
+		document.getElementById("reimportUpdateTransDiv").style.display = "block";
+	}
 </Script>
 
 	<!-- ProgressBar -->
 	<% if( "submited".equals(request.getAttribute("action"))){ %>
 	   <script type="text/javascript" language="javascript">
-	   
 	   //To disable f5
 	   $(document).bind("keydown", disableF5);
 	 
@@ -118,7 +118,7 @@ body {
 	   var startTime = new Date();
 	   
 	   function update(status){
-		   
+		  // alert(status);
 	    	 if(status != '1' && status != "-1"){ //Running
 	    		 if(progressCount > 98){
 		    	   progressCount += 0; 
@@ -157,6 +157,7 @@ body {
 	   
 	   window.onload=function(){
     	   var status = document.getElementsByName("monitorBean.status")[0]; 
+    	   //alert(status.value);
     	   if (status.value != "1" && status.value != "-1"){
     		   window.setTimeout("checkStatusProcess();", 800);
     	   }
@@ -262,8 +263,17 @@ body {
 						     <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 								<tr>
 									<td align="right" width ="50%"><b>Import ข้อมูลจากส่วนกลาง<font color="red">*</font> </b></td>
-									<td align="left" width ="50%">
+									<td align="left" width ="50%" nowrap>
 									   <input type="button" name ="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtnLong"  onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','sales')">
+									   &nbsp;&nbsp;<a href="javascript: void(0)" onclick="setSeimportUpdateTrans()">.V.</a>
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width ="50%"></td>
+									<td align="left" width ="50%" nowrap>
+									   <div id="reimportUpdateTransDiv" style="display: none">
+									     <b> <input type="checkbox" name="reimportUpdateTransChk" />Run ReImport Update Transaction(Case Error)</b>
+									   </div>
 									</td>
 								</tr>
 								<tr>
@@ -394,11 +404,11 @@ body {
 								<th> วันที่ทำรายการล่าสุด</th>
 								<th> 
 								   <c:choose>
-									 <c:when test="${interfacesForm.criteria.monitorBean.type == 'IMPORT'}">
-											จำนวนไฟล์สำเร็จ / จำนวนไฟล์ทั้งหมด
+									 <c:when test="${interfacesForm.criteria.monitorBean.type == 'EXPORT'}">
+											   จำนวนไฟล์
 									 </c:when>
 									 <c:otherwise>
-											จำนวนไฟล์ 
+										จำนวนไฟล์สำเร็จ / จำนวนไฟล์ทั้งหมด
 									  </c:otherwise>
 								   </c:choose>
 								</th>
@@ -424,9 +434,9 @@ body {
 								</c:choose>
 								
 								<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}"> 
-						                <td width="5%"> <c:out value='${rows.index+1}'/></td>
+						                <td width="3%"> <c:out value='${rows.index+1}'/></td>
 						                <td width="5%"> ${results.transactionId}</td>
-										<td width="10%"> 
+										<td width="8%"> 
 										 ${results.type}
 										 <input type="hidden" name="transTypeText" value="${results.type}"/>
 										</td>
@@ -442,13 +452,16 @@ body {
 												<c:when test="${results.transactionType == 'WEB-MEMBER'}">
 													ข้อมูล WEB MEMBER
 												</c:when>
+												<c:when test="${results.transactionType == 'UPDATE-RETRANS-SALES'}">
+													ReImport Update Transaction Sale
+												</c:when>
 												<c:otherwise>
 													Update Transaction Sales
 												</c:otherwise>
 										   </c:choose>
 										</td>
-										<td width="10%"> ${results.createUser}</td>
-										<td width="10%"> 
+										<td width="8%"> ${results.createUser}</td>
+										<td width="8%"> 
 										    <input type="hidden" name="statusText" value="${results.status}"/>
 										    <c:choose>
 												<c:when test="${results.status == 1}">
@@ -460,19 +473,19 @@ body {
 										    </c:choose>
 										</td>
 										<td width="10%"> ${results.submitDate}</td>
-										<td width="10%">
+										<td width="16%">
 										  <b>
 											   <c:choose>
-													<c:when test="${results.type == 'IMPORT'}">
-														${results.successCount}/ ${results.fileCount}
+													<c:when test="${results.type == 'EXPORT'}">
+														${results.fileCount}
 													</c:when>
 													<c:otherwise>
-														${results.fileCount}
+														${results.successCount}/ ${results.fileCount}
 													</c:otherwise>
 												</c:choose>
 											</b>
 										</td>
-										<td align="left" width="15%"> ${results.errorMsg}</td>
+										<td align="left" width="17%"> ${results.errorMsg}</td>
 										<td width="10%"> 
 										     <a href="#" onclick="javascript:searchDetail('${pageContext.request.contextPath}','admin','${results.monitorId}');">
 									          <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>

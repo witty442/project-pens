@@ -61,9 +61,12 @@ public class MModifierLine extends I_Model<ModifierLine> {
 	public List<ModifierLine> getRelateModifier(int modifierLineFromId) throws Exception {
 		List<ModifierLine> pos = new ArrayList<ModifierLine>();
 		try {
-			List<ModifierRelation> re = new MModifierRelation().lookUp(modifierLineFromId);
-			for (ModifierRelation r : re) {
-				pos.add(new MModifierLine().find(String.valueOf(r.getLineToId())));
+			List<ModifierRelation> relateList = new MModifierRelation().lookUp(modifierLineFromId);
+			//logger.info("Relate mLineId["+modifierLineFromId+"] Size:"+relateList.size());
+			for (ModifierRelation r : relateList) {
+				ModifierLine mmLine= new MModifierLine().find(String.valueOf(r.getLineToId()));
+				 //  logger.info("Add mLineToId["+mmLine.getId()+"]");
+				pos.add(mmLine);
 			}
 		} catch (Exception e) {
 			throw e;

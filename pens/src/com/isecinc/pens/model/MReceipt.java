@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,8 +20,10 @@ import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Order;
+import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptLine;
@@ -51,7 +54,7 @@ public class MReceipt extends I_Model<Receipt> {
 	private String[] columns = { COLUMN_ID, "RECEIPT_NO", "RECEIPT_DATE", "ORDER_TYPE", "CUSTOMER_ID", "CUSTOMER_NAME",
 			"PAYMENT_METHOD", "BANK", "CHEQUE_NO", "CHEQUE_DATE", "RECEIPT_AMOUNT", "INTERFACES", "DOC_STATUS",
 			"USER_ID", "CREATED_BY", "UPDATED_BY", "CREDIT_CARD_TYPE", "DESCRIPTION", "PREPAID", "APPLY_AMOUNT",
-			"INTERNAL_BANK" ,"ISPDPAID","PDPAID_DATE","PD_PAYMENTMETHOD"};
+			"INTERNAL_BANK" ,"ISPDPAID","PDPAID_DATE","PD_PAYMENTMETHOD","EXPORTED"};
 
 	/**
 	 * Find
@@ -75,6 +78,14 @@ public class MReceipt extends I_Model<Receipt> {
 	 */
 	public Receipt[] search(String whereCause) throws Exception {
 		List<Receipt> pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Receipt.class);
+		if (pos.size() == 0) return null;
+		Receipt[] array = new Receipt[pos.size()];
+		array = pos.toArray(array);
+		return array;
+	}
+
+	public Receipt[] search(Connection conn,String whereCause) throws Exception {
+		List<Receipt> pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, Receipt.class);
 		if (pos.size() == 0) return null;
 		Receipt[] array = new Receipt[pos.size()];
 		array = pos.toArray(array);
@@ -180,9 +191,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		} finally {
 			try {
 				rst.close();
-			} catch (Exception e2) {}
-			try {
 				stmt.close();
+				conn.close();
 			} catch (Exception e2) {}
 		}
 	return array;
@@ -221,7 +231,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
 				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
-				receipt.getIsPDPaid(),DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())),receipt.getPdPaymentMethod()};
+				receipt.getIsPDPaid(),DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())),
+				receipt.getPdPaymentMethod(),Utils.isNull(receipt.getExported())};
 		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}
@@ -463,4 +474,29 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		conn.commit();
 		return receipt.getReceiptNo();
 	}
+	
+	public int getReceiptId(Connection conn,String receiptNo) throws Exception {
+        int receiptId = 0;
+		Statement stmt = null;
+		ResultSet rst = null;
+		try{
+			String sql ="select receipt_id from t_receipt where receipt_no ='"+receiptNo+"' and doc_status ='SV'";
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				receiptId = rst.getInt("receipt_id");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		return receiptId;
+	}
+	
+	
 }

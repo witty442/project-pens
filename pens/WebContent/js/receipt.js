@@ -469,10 +469,12 @@ function setValueToReceitpBy(path, payBy){
 	inputLabel+="<input type='hidden' name='pb.creditType' value='"+payBy.creditType+"'>";
 	inputLabel+="<input type='hidden' name='pb.creditTypeName' value='"+payBy.creditTypeName+"'>";
 	inputLabel+="<input type='hidden' name='pb.seedId' value='"+payBy.seedId+"'>";
+	inputLabel+="<input type='hidden' name='pb.receiveCashDate' value='"+payBy.receiveCashDate+"'>";
 	inputLabel+="<input type='hidden' name='pb.allBillId' >";
 	inputLabel+="<input type='hidden' name='pb.allPaid' >";
 	inputLabel+="<input type='hidden' name='pb.allCNId' >";
 	inputLabel+="<input type='hidden' name='pb.allCNPaid' >";
+
 	
 	tbl.rows[payBy.rows].cells[0].innerHTML = payBy.rows;
 	tbl.rows[payBy.rows].cells[1].innerHTML = checkBoxLabel;
@@ -481,7 +483,7 @@ function setValueToReceitpBy(path, payBy){
 	tbl.rows[payBy.rows].cells[4].innerHTML = payBy.bankName;
 	tbl.rows[payBy.rows].cells[5].innerHTML = payBy.chqNo;
 	tbl.rows[payBy.rows].cells[6].innerHTML = payBy.chqDate;
-	tbl.rows[payBy.rows].cells[7].innerHTML = payBy.creditTypeName;
+	tbl.rows[payBy.rows].cells[7].innerHTML = payBy.receiveCashDate;
 	if(payBy.method=='CS'){
 		//if(checkAmtLessthan1(Number(payBy.recAmount).toFixed(2))){ Comment Out : Write Off When Amount Less Than Zero
 		if (checkAmtLessthanZero(Number(payBy.recAmount).toFixed(2))){
@@ -816,6 +818,7 @@ function createBysList(){
 	var writeoffs=document.getElementsByName('pb.writeOff');
 	var allCNs=document.getElementsByName('pb.allCNId');
 	var allCNpaids=document.getElementsByName('pb.allCNPaid');
+	var receiveCashDate=document.getElementsByName('pb.receiveCashDate');
 	
 	var inputLabel="";
 	if(ids.length==0)
@@ -828,6 +831,8 @@ function createBysList(){
 	
 	var isOnlySalesPaid = true;
 	var no_of_customer_pay_by_cash = 0;
+	var no_of_customer_pay_by_bank_tr = 0;
+	var no_of_customer_pay_by_ch = 0;
 	
 	for(var i=0;i<ids.length;i++){
 		if( (allbills[i].value == null || allbills[i].value.length==0) 
@@ -850,6 +855,8 @@ function createBysList(){
 		inputLabel+="<input type='text' name='bys["+i+"].allPaid' value='"+allpaids[i].value+"'>";
 		inputLabel+="<input type='text' name='bys["+i+"].paymentMethodName' value='"+methodNames[i].value+"'>";
 		inputLabel+="<input type='text' name='bys["+i+"].creditTypeName' value='"+cctNames[i].value+"'>";
+		inputLabel+="<input type='text' name='bys["+i+"].receiveCashDate' value='"+receiveCashDate[i].value+"'>";
+		
 		if(writeoffs[i].checked){
 			inputLabel+="<input type='text' name='bys["+i+"].writeOff' value='Y'>";
 		}else{
@@ -857,6 +864,12 @@ function createBysList(){
 			isOnlySalesPaid = false;
 			if(methods[i].value=="CS"){
 				no_of_customer_pay_by_cash++;
+			}
+			if(methods[i].value=="TR"){
+				no_of_customer_pay_by_bank_tr++;
+			}
+			if(methods[i].value=="CH"){
+				no_of_customer_pay_by_ch++;
 			}
 		}
 		inputLabel+="<input type='text' name='bys["+i+"].allCNId' value='"+allCNs[i].value+"'>";
@@ -870,12 +883,15 @@ function createBysList(){
 		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากมีประเภทการชำระเงินที่เซลจ่ายเพียงรายการเดียว');
 		return false;
 	}
-	
-	if(no_of_customer_pay_by_cash > 1){
-		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากมีประเภทการชำระเงินที่เป็นเงินสดมากกว่า 1 รายการ');
+	if(no_of_customer_pay_by_bank_tr >=1 &&(no_of_customer_pay_by_cash >= 1 || no_of_customer_pay_by_ch >=1)){
+		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากประเภทการชำระเงินที่เป็น เงินโอน ต้องมีเพียงรายดารเดียวเท่านั้น');
 		return false;
-	}
-		
+	}else{
+		if(no_of_customer_pay_by_cash > 1){
+			alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากมีประเภทการชำระเงินที่เป็น เงินสดหรือเงินโอน มากกว่า 1 รายการ');
+			return false;
+		}
+    }	
 	return true;
 }
 

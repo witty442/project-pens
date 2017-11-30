@@ -24,6 +24,7 @@ public class Constants {
 	public static final String TRANSACTION_MASTER_TYPE = "MASTER";
 	public static final String TRANSACTION_TRANS_TYPE = "TRANSACTION";
 	public static final String TRANSACTION_UTS_TRANS_TYPE = "UPDATE-TRANS-SALES";
+	public static final String TRANSACTION_REUTS_TRANS_TYPE = "UPDATE-RETRANS-SALES";
 	public static final String TRANSACTION_WEB_MEMBER_TYPE = "WEB-MEMBER";
 	
 	public static final String TYPE_IMPORT = "IMPORT";

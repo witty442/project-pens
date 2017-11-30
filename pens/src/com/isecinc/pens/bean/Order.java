@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import util.ConvertNullUtil;
 import util.DateToolsUtil;
+import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
@@ -239,6 +240,7 @@ public class Order extends I_PO implements Serializable {
 	private int oraShipAddressID;
 	
 	private double creditNoteAmt;
+	private double adjustAmt;
 	
 	private double openAmt;
 	
@@ -254,6 +256,15 @@ public class Order extends I_PO implements Serializable {
 	private String poNumber;
 	
 	
+	
+	public double getAdjustAmt() {
+		return adjustAmt;
+	}
+
+	public void setAdjustAmt(double adjustAmt) {
+		this.adjustAmt = adjustAmt;
+	}
+
 	public String getPoNumber() {
 		return poNumber;
 	}
@@ -664,7 +675,11 @@ public class Order extends I_PO implements Serializable {
 	}
 
 	public void setOpenAmt() {
-		this.openAmt = this.getCreditAmount()+this.getCreditNoteAmt(); 
+		this.openAmt = NumberToolsUtil.round(this.getCreditAmount()+this.getCreditNoteAmt()+this.getAdjustAmt(), 2, BigDecimal.ROUND_HALF_UP); 
+		/*System.out.println("this.getCreditAmount():"+this.getCreditAmount());
+		System.out.println("this.getCreditNoteAmt():"+this.getCreditNoteAmt());
+		System.out.println("this.getAdjustAmt():"+this.getAdjustAmt());*/
+		//this.openAmt = this.getCreditAmount()+this.getCreditNoteAmt()+this.getAdjustAmt(); 
 	}
 	
 	public double getOpenAmt(){

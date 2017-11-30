@@ -48,6 +48,7 @@ public class References implements Serializable {
 		setCode(rst.getString("CODE"));
 		setKey(rst.getString("VALUE"));
 		setName(rst.getString("NAME"));
+		setDesc(rst.getString("DESCRIPTION"));
 	}
 
 	/**
@@ -65,6 +66,18 @@ public class References implements Serializable {
 
 	/** NAME */
 	private String name;
+
+	/** DESC */
+	private String desc;
+	
+	
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
 
 	public String getKey() {
 		return key;

@@ -53,6 +53,7 @@ public class InitialReferences extends I_Initial {
 	public static final String CUST_SHOW_TRIP = "CustShowTrip"; 
 	public static final String CREDIT_DATE_FIX = "CreditDateFix";
 	public static final String VAN_DATE_FIX = "VanDateFix";
+	public static final String TRANSFER_BANK = "TransferBank";
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 

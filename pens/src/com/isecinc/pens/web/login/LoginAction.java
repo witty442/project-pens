@@ -95,7 +95,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
 			//start BathWork init AppVerify
-			AppversionVerify.getIns().checkAppVersion(request);
+			//AppversionVerify.getIns().checkAppVersion(request);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());

@@ -67,6 +67,7 @@ public class Utils {
 	public static void main(String[] args){
 	    try{	   
 	    	//Utils.decimalFormat(0),Utils.format_current_no_disgit);
+	    	isInternetConnect("https://www.google.co.th");
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -85,13 +86,19 @@ public class Utils {
         return r;
     }
 	  
-	public static int calcTotalPage(int totalRow,int maxPerPage){
-		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
-		//System.out.println("totalPageF:"+totalPageF);
-		BigDecimal totalPage = new BigDecimal(totalPageF);
-		totalPage = totalPage.setScale(0, BigDecimal.ROUND_UP);
-		
-		return totalPage.intValue();
+	public static int calcTotalPage(int totalRow,int maxPerPage) throws Exception{
+		try{
+			double totalPageF = new Double(totalRow)/new Double(maxPerPage);
+			//System.out.println("totalPageF:"+totalPageF);
+			BigDecimal totalPage = new BigDecimal(totalPageF);
+			totalPage = totalPage.setScale(0, BigDecimal.ROUND_UP);
+			
+			/// Find Total Page
+			logger.info("totalRecord["+totalRow+"]/["+(maxPerPage)+"]totalPage["+totalPage+"]");
+			return totalPage.intValue();
+		}catch(Exception e){
+			throw e;
+		}
 	}
 	
 	public static void stopTomcat(){
@@ -368,6 +375,16 @@ public class Utils {
 		return date;
 	}
 	
+	public static Date parseCheckNull(String dateString, String format) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		try {
+			if( !isNull(dateString).equals(""))
+			 date = ft.parse(dateString);
+		} catch (Exception e) {	
+		}
+		return date;
+	}
 	/**
 	 * 
 	 * @param dateString
@@ -412,13 +429,22 @@ public class Utils {
 	public static Date parse(String dateString, String format ,Locale locale) throws Exception {
 		Date date = null;
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-		
 		try {
 			date = ft.parse(dateString);
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}
+		return date;
+	}
+	public static Date parseCheckNull(String dateString, String format ,Locale locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if( !isNull(dateString).equals(""))
+			  date = ft.parse(dateString);
+		} catch (Exception e) {
 			
 		}
-		
 		return date;
 	}
 	
@@ -827,14 +853,32 @@ public class Utils {
 		}
 		return str.toString();
   }
+	public static int excUpdateReInt(Connection conn,String sql) {
+		  return excUpdateModelReInt(conn,sql);
+	}
 	
-	
-	public static String excUpdate(String sql) {
+   public static String excUpdate(String sql) {
+	   Connection conn = null;
+	   try{
+			conn = DBConnection.getInstance().getConnection();
+			  return excUpdateModel(conn,sql);
+	   }catch(Exception e){
+		   logger.error(e.getMessage(),e);
+	   }finally{
+		   try{
+			  if(conn != null){
+				  conn.close();
+			   }
+		   }catch(Exception e){}
+	   }
+	  return "";
+	}
+   
+	public static String excUpdateModel(Connection conn,String sql) {
 	    PreparedStatement ps =null;
-        Connection conn = null;
         StringBuffer str = new StringBuffer("");
 		try{  
-			conn = DBConnection.getInstance().getConnection();
+		
 			String[] sqlArr = sql.split("\\;");
 			if(sqlArr != null && sqlArr.length>0){
 			   for(int i=0;i<sqlArr.length;i++){
@@ -855,14 +899,42 @@ public class Utils {
 				if(ps != null){
 				   ps.close();ps = null;
 				}
-				if(conn != null){
-					conn.close();
-				}
+				
 			}catch(Exception e){
 				logger.error(e.getMessage(),e);
 			}
 		}
 		return str.toString();
+  }
+	
+	public static int excUpdateModelReInt(Connection conn,String sql) {
+	    PreparedStatement ps =null;
+	    int recordUpdate = 0;
+		try{  
+		
+			String[] sqlArr = sql.split("\\;");
+			if(sqlArr != null && sqlArr.length>0){
+			   for(int i=0;i<sqlArr.length;i++){
+				 
+				 if( !isNull(sqlArr[i]).equals("")){
+				     ps = conn.prepareStatement(sqlArr[i]);
+				      recordUpdate = ps.executeUpdate();
+			     }
+			   }
+			}
+		}catch(Exception e){
+	      e.printStackTrace();
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return recordUpdate;
   }
 		
 }

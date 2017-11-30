@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.model.MAdjust"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -18,16 +19,22 @@ List<Order> zero = new ArrayList<Order>();
  
 List<Order> orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
 double totalCreditNoteAmt = 0; 
+double totalAdjustAmt = 0; 
 
 MCreditNote creditNote = new MCreditNote();
+MAdjust adjust = new MAdjust();
 
 for(Order r : orders){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r));
 	
 	totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(r.getArInvoiceNo());
+	totalAdjustAmt = adjust.getTotalAdjustAmt(r.getArInvoiceNo());
+	
 	r.setCreditNoteAmt(totalCreditNoteAmt);
+	r.setAdjustAmt(totalAdjustAmt);
 	r.setOpenAmt();
 	
+	//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
 	if(r.getOpenAmt()<=0)
 		zero.add(r);
 }
@@ -65,14 +72,12 @@ pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
 	
-	
 	function loadMe() {
 		var prepaid=0;
 		var prepaid = Number(window.opener.document.getElementById('receiptAmount').value);
 		var gpp=prepaid;
 		
 		//alert(prepaid);
-
 	}
 
 	function addRow() {

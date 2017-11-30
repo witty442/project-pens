@@ -41,6 +41,8 @@ import com.isecinc.pens.inf.helper.ExportHelper;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.inf.manager.process.bean.FileImportTransBean;
+import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 
 /**
  * @author WITTY
@@ -352,9 +354,7 @@ public class FTPManager {
 			
 		}
 	}
-	
-	
-	
+
 	
 	/**
 	 * getFTPFileByName
@@ -1828,7 +1828,7 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 	 * @throws Exception
 	 * Step Move file and Delete from Source File
 	 */
-	public void moveFileFTP_NEW(String source ,String destination ,List fileImportSuccessList) throws Exception{
+	public void moveFileFTP_NEW(String source ,String destination ,List<FTPFileBean> fileImportSuccessList) throws Exception{
 		FTPClient ftp = null;
 		try {	
 			logger.debug("Move File From :"+source+" TO :"+destination);
@@ -1844,6 +1844,59 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 	        if(fileImportSuccessList != null && fileImportSuccessList.size() > 0){
 				for(int n =0;n<fileImportSuccessList.size();n++){ //for 3
 					FTPFileBean ftpBean = (FTPFileBean)fileImportSuccessList.get(n);	
+					logger.debug("fileNameFull:"+ftpBean.getFileName());
+					
+					//Step1 set Dir Active
+					ftp.changeWorkingDirectory(source);
+					logger.debug("Step1 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					
+					//step 2 
+					ftp.sendCommand("RNFR "+ftpBean.getFileName());
+					logger.debug("RNFR:"+ftpBean.getFileName());
+					logger.debug("step2 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					
+					//step3
+					String repath = destination+ftpBean.getFileName();
+					ftp.sendCommand("RNTO "+repath);
+					logger.debug("RNTO:"+repath);
+					logger.debug("step3 FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					
+				}//for 3
+	        }
+
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+		}
+	}
+	
+	public void moveFileFTP(String source ,String destination ,List<FileImportTransBean> fileImportSuccessList) throws Exception{
+		FTPClient ftp = null;
+		try {	
+			logger.debug("Move File From :"+source+" TO :"+destination);
+			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			
+	        if(fileImportSuccessList != null && fileImportSuccessList.size() > 0){
+				for(int n =0;n<fileImportSuccessList.size();n++){ //for 3
+					FileImportTransBean ftpBean = (FileImportTransBean)fileImportSuccessList.get(n);	
 					logger.debug("fileNameFull:"+ftpBean.getFileName());
 					
 					//Step1 set Dir Active

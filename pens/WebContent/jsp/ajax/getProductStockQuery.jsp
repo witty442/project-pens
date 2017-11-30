@@ -31,7 +31,7 @@ try{
 	     }
 		//if(dup==false){
 		   p = new MProduct().getStockProduct(productCode,user);
-		   outputText = p.getId()+"|"+p.getName()+"|"+p.getUom1()+"/"+p.getUom2();
+		   outputText = p.getId()+"|"+p.getName()+"|"+p.getUom1()+"/"+p.getUom2()+"|"+p.getConversionRate();
 		//}else{
 		//	outputText ="DUPLICATE";
 		//}

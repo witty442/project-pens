@@ -22,11 +22,13 @@ User user = (User) session.getAttribute("user");
 		<th class="costprice"><bean:message key="Receipt.Amount" bundle="sysele"/></th>
 		<th class="name"><bean:message key="Bank" bundle="sysele"/> </th>
 		<th>
-		เลขที่เช็ค/หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์
+		เลขที่เช็ค<!-- /หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์ -->
 		<%-- <bean:message key="Check.No" bundle="sysele"/>/<bean:message key="CreditCardNo" bundle="sysele"/> --%>
 		</th>
 		<th> วันที่หน้าเช็ค/วันที่โอนเงิน <!-- bean:message key="Check.Date" bundle="sysele"/--></th>
-		<th class="costprice"><bean:message key="CreditCardType" bundle="sysele"/></th>
+		<th class="costprice">วันที่รับเงินจากลูกค้า 
+		    <%-- <bean:message key="CreditCardType" bundle="sysele"/> --%>
+		</th>
 		<th>เซลล์จ่าย</th>
 		<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
 		<th class="status"><bean:message key="Receipt.Paid" bundle="sysele"/></th>
@@ -61,12 +63,13 @@ User user = (User) session.getAttribute("user");
 			<input type="hidden" name='pb.allPaid' value="${bys.allPaid}"/>
 			<input type="hidden" name='pb.allCNId' value="${bys.allCNId}"/>
 			<input type="hidden" name='pb.allCNPaid' value="${bys.allCNPaid}"/>
+			<input type="hidden" name='pb.receiveCashDate' value="${bys.receiveCashDate}"/>
 		</td>
 		<td align="right"><fmt:formatNumber pattern="#,##0.00" value="${bys.receiptAmount}"/></td>
 		<td align="left">${bys.bankName}</td>
 		<td align="left">${bys.chequeNo}</td>
 		<td align="center">${bys.chequeDate}</td>
-		<td align="center">${bys.creditCardType}</td>
+		<td align="center">${bys.receiveCashDate}</td>
 		<c:choose>
 		<c:when test="${bys.writeOff eq 'Y'}">
 			<c:set var="writeoffValue" value="checked"/>

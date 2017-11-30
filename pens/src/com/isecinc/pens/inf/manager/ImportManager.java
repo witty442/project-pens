@@ -106,11 +106,11 @@ public class ImportManager {
 			
 			/** insert to monitor_interface **/
 			monitorModel = new MonitorBean();
-			monitorModel.setName("UTS-"+request.getRemoteAddr()+"-"+request.getRemotePort());
+			monitorModel.setName("INF-"+request.getRemoteAddr()+"-"+request.getRemotePort());
 			monitorModel.setType(Constants.TYPE_IMPORT);
 			monitorModel.setStatus(Constants.STATUS_START);
 			monitorModel.setCreateUser(userLogin.getUserName());
-			monitorModel.setTransactionType(Constants.TRANSACTION_UTS_TRANS_TYPE);
+			monitorModel.setTransactionType(Constants.TRANSACTION_MASTER_TYPE);
 			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
 			
 		    //start Thread
@@ -126,7 +126,6 @@ public class ImportManager {
 		}
 	    return monitorModel;
 	}
-	
 	
 	/**
 	 * importFile  
@@ -166,6 +165,40 @@ public class ImportManager {
 	    return monitorModel;
 	}
 
+	public MonitorBean importTxtByUpdateSalesType(BigDecimal transactionId,String transType,User userLogin ,User userRequest,String requestTable,HttpServletRequest request,boolean importAll) throws Exception{
+		Connection connMonitor = null;
+		MonitorBean monitorModel = null;
+		InterfaceDAO dao = new InterfaceDAO();
+		try{
+			connMonitor = DBConnection.getInstance().getConnection();
+			
+			/** insert to monitor_interface **/
+			monitorModel = new MonitorBean();
+			monitorModel.setName("INF-"+request.getRemoteAddr()+"-"+request.getRemotePort());
+			monitorModel.setType(Constants.TYPE_IMPORT);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
+			monitorModel.setTransactionType(transType);
+			monitorModel.setTransactionId(transactionId);
+			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
+			
+			//monitorModel = importFileToDB(monitorModel.getTransactionId(),monitorModel.getMonitorId(), monitorModel.getTransactionType(),userLogin, userRequest, requestTable, request,importAll);
+			if(Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+				 monitorModel =(new UpdateSalesManager()).importFileToDB(monitorModel.getTransactionId(),monitorModel.getMonitorId(),transType, userLogin,userRequest, requestTable, request, importAll);
+			}else{
+			     monitorModel =(new UpdateSalesManager()).importFileToDB(monitorModel.getTransactionId(),monitorModel.getMonitorId(),transType, userLogin,userRequest, requestTable, request, importAll);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(connMonitor != null){
+				connMonitor.close();connMonitor=null;
+			}
+		}
+	    return monitorModel;
+	}
+
+	
 	/**
 	 * importFile
 	 * @param monitorId
@@ -279,7 +312,7 @@ public class ImportManager {
 								
 								isExc = true;
 							}else{
-								 //Master Rollback ALL
+								 //Master Roll back ALL
 								results = imtProcess.importToDB(conn,initConfigMap,tableBean,ftpBean,userRequest);
 
 								logger.debug("ERR:["+results[0]+"]");

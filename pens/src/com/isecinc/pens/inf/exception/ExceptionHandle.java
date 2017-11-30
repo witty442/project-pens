@@ -34,6 +34,7 @@ public class ExceptionHandle {
     	ERROR_MAPPING.put("FindModifierIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Modifier ID");
     	ERROR_MAPPING.put("FindPriceListIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 PriceList ID");
     	ERROR_MAPPING.put("FindModifierLineIdException","\u0E44\u0E21\u0E48\u0E1E\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25 Modifier Line ID");
+    	ERROR_MAPPING.put("CnNoNotFoundException","CN NO Not Found in Master");
     }
 	public static void main (String[] f){
 //		System.out.println(Utils.toUnicodeChar("UNKNOW"));
@@ -87,7 +88,8 @@ public class ExceptionHandle {
 				exceptionCode = "FindPriceListIdException";		
 			}else if( e instanceof FindModifierLineIdException){
 				exceptionCode = "FindModifierLineIdException";	
-				
+			}else if( e instanceof CnNoNotFoundException){
+				exceptionCode = "CnNoNotFoundException";	
 			}else if( e instanceof SQLException){
 				String errMsg = e.getMessage();
 				if(errMsg.indexOf("Data truncation") != -1){

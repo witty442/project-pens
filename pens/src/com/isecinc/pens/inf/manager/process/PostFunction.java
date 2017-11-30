@@ -65,7 +65,7 @@ public class PostFunction {
      	   	    	  
      		    }else{
      		    	
-	   	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction("Post",tableBean.getTableName());
+	   	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction(conn,"post-import-master",tableBean.getTableName());
 	   	    	    try{
 	   	    	    	if(sqlManualList != null && sqlManualList.size() >0){
 		 	    		    for(int i = 0;i< sqlManualList.size();i++){

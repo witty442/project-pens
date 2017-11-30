@@ -42,7 +42,7 @@ public class SequenceHelper {
 			sql.append("SELECT NextValue FROM c_sequence ");
 			sql.append("WHERE NAME = '" + tableName + "' ");
 			stmt = conn.createStatement();
-			logger.debug(sql.toString());
+			//logger.debug(sql.toString());
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
 				nextValue = rst.getInt("nextValue");
@@ -50,7 +50,7 @@ public class SequenceHelper {
 				sql.delete(0, sql.length());
 				sql.append("INSERT INTO c_sequence(NAME,STARTNO,NEXTVALUE) ");
 				sql.append("VALUES('" + tableName + "',1,1)");
-				logger.debug(sql.toString());
+				//logger.debug(sql.toString());
 				stmt.execute(sql.toString());
 				nextValue = 1;
 			}
@@ -58,7 +58,7 @@ public class SequenceHelper {
 			sql.delete(0, sql.length());
 			sql.append("UPDATE c_sequence SET NextValue = NextValue + 1 ");
 			sql.append("WHERE NAME = '" + tableName + "' ");
-			logger.debug(sql.toString());
+			//logger.debug(sql.toString());
 			stmt.execute(sql.toString());
 			// commit
 			conn.commit();

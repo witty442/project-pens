@@ -228,7 +228,6 @@ public class ImportProcess {
 	    		  String[] errors = PostFunction.process(conn, tableBean,userBean);
 	    	  }
 			  
-			  
 			 /** Put to MAP **/	
 			 initConfigMap.put(tableBean.getTableName(), tableBean);
 			 

@@ -10,6 +10,7 @@ import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
 
 /**
@@ -28,7 +29,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 
 	private String[] columns = { COLUMN_ID, "PAYMENT_METHOD", "BANK", "CHEQUE_NO", "CHEQUE_DATE", "RECEIPT_AMOUNT",
 			"CREDIT_CARD_TYPE", "PAID_AMOUNT", "REMAIN_AMOUNT", "RECEIPT_ID", "CREATED_BY", "UPDATED_BY", "SEED_ID",
-			"CREDITCARD_EXPIRED", "WRITE_OFF" };
+			"CREDITCARD_EXPIRED", "WRITE_OFF" ,"receive_Cash_Date" };
 
 	/**
 	 * Find
@@ -79,7 +80,8 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 				DateToolsUtil.convertToTimeStamp(receiptBy.getChequeDate()), receiptBy.getReceiptAmount(),
 				receiptBy.getCreditCardType(), receiptBy.getPaidAmount(), receiptBy.getRemainAmount(),
 				receiptBy.getReceiptId(), activeUserID, activeUserID, receiptBy.getSeedId(),
-				receiptBy.getCreditcardExpired(), receiptBy.getWriteOff() != null ? receiptBy.getWriteOff() : "N" };
+				receiptBy.getCreditcardExpired(), receiptBy.getWriteOff() != null ? receiptBy.getWriteOff() : "N", 
+				(!Utils.isNull(receiptBy.getReceiveCashDate()).equals("")?DateToolsUtil.convertToTimeStamp(receiptBy.getReceiveCashDate()):null)};
 		if (super.save(TABLE_NAME, columns, values, receiptBy.getId(), conn)) {
 			receiptBy.setId(id);
 		}

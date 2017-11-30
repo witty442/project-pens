@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -22,12 +25,13 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
-import com.isecinc.pens.inf.manager.batchwork.DownloadSalesAppWorker;
 import com.isecinc.pens.inf.manager.batchwork.DownloadWorker;
+import com.sun.org.apache.bcel.internal.generic.ISTORE;
 
 public class AppversionVerify {
 	private static AppversionVerify app ;
@@ -42,17 +46,67 @@ public class AppversionVerify {
 	}
 	
 	public static AppversionVerify getIns(){
+		logger.debug("AppVerify:"+app);
 		if(app ==null){
-		   app = new AppversionVerify();
-		   String urlTestInternetConnection = "https://www.google.co.th";
-		   boolean isInternetConnect = Utils.isInternetConnect(urlTestInternetConnection);
-		   logger.info("is internet is connected["+isInternetConnect+"]");
-		   if(isInternetConnect){
-		     initAllMap = getInitAllToMap();
-		  }
+			Connection conn = null;
+			try{
+			   app = new AppversionVerify();
+			   conn = DBConnection.getInstance().getConnection();
+			   // Check 1 time for day and get Config From Dropbox and insert to DB
+			   boolean isToDayCheck = isTodayCheck(conn);
+			   logger.info("isToDayCheck:"+isToDayCheck);
+			   if(isToDayCheck==false){
+				   String urlTestInternetConnection = "https://www.google.co.th";
+				   boolean isInternetConnect = Utils.isInternetConnect(urlTestInternetConnection);
+				   logger.info("is internet is connected["+isInternetConnect+"]");
+				   if(isInternetConnect){
+				      initAllMap = getInitAllToMapToDB(conn);
+				  }
+			   }else{
+				  //get from DB 
+				   initAllMap = getInitAllToMapFromDB(conn);
+			   }
+			}catch(Exception e){
+				
+			}finally{
+				try{
+					
+				}catch(Exception ee){}
+			}
 		}
 		return app;
 	}
+	
+	public static boolean isTodayCheck(Connection conn) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		boolean isTodayeCheck = false;
+		try {
+			String sql = " select count(*) as c from c_control_salesapp_version  \n";
+			       sql+= " where Date(updated) = Date(sysdate()) \n";
+
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql);
+				
+				if(rst.next()){
+					if(rst.getInt("c") >0){
+						isTodayeCheck = true;
+					}
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+				} catch (Exception e2) {}
+				try {
+					stmt.close();
+				} catch (Exception e2) {}
+			}
+		return isTodayeCheck;
+	}
+	
 	public static AppversionVerify clearIns(){
 		app = new AppversionVerify();
 		return app;
@@ -73,7 +127,7 @@ public class AppversionVerify {
     	AppversionVerify.getIns().downloadPlanSalesApp(user);
     	
     	// Start batch Download Pensclient.war from dropbox
-		new DownloadSalesAppWorker().start();
+		//new DownloadSalesAppWorker().start();
     }
     
 	/** process run mainpage.jsp footer.jsp */
@@ -89,18 +143,17 @@ public class AppversionVerify {
 					msg[0] = "";
 					msg[1] = "";
 				}else{
-				    String localSalesAppPath = getLocalPathSalesApp();
-	
-				    //get Latest version from local
-					String appVersionLatest = Utils.isNull(FileUtil.readFile(localSalesAppPath+"Lastest-app-version.txt", "UTF-8"));
+				   
+				    //get Latest version from Server
+					String appVersionLatestInServer = Utils.isNull(initAllMap.get("Lastest-app-version"));
 					
-					logger.debug("appVersionLatest :"+appVersionLatest);
+					logger.debug("appVersionLatestInServer :"+appVersionLatestInServer);
 					logger.debug("CurrentAppVersion :"+appVersion);
 					
-					if( !"".equals(appVersionLatest) && !appVersion.equalsIgnoreCase(appVersionLatest)){
+					if( !"".equals(appVersionLatestInServer) && !appVersion.equalsIgnoreCase(appVersionLatestInServer)){
 						logger.debug("AppVersion Not match");
 						//appVersion not match
-						msg[0] =  getAppVersionMessageToSales(request);//SystemMessages.getCaption("AppVersionNotMatch", new Locale("TH","th"));
+						msg[0] =  getAppVersionMessageToSales(request);
 						       
 						msg[1] = "";
 							
@@ -124,9 +177,9 @@ public class AppversionVerify {
 		return msg;
 	}
    
-	 public static Map<String,String> getInitAllToMap(){
+	 public static Map<String,String> getInitAllToMapToDB(Connection conn){
 	        Map<String,String> pathFileMap = new HashMap<String, String>();
-	        logger.info("***Start getInitPathFile***");
+	        logger.info("***Start getInitPathFile To DB***");
 	        try{                   
 	            URL url = new URL(initPathFileDropbox);
 	            url.openConnection();
@@ -138,7 +191,8 @@ public class AppversionVerify {
 	                while ((line = reader.readLine()) != null) {
 	                    //System.out.println(line);
 	                   lineArr = line.split("\\,");
-	                   logger.info(lineArr[0]);
+	                  // logger.info(lineArr[0]);
+	                   insertControlSalesAppVersion(conn, Utils.isNull(lineArr[0]), Utils.isNull(lineArr[1]));
 	                   pathFileMap.put(Utils.isNull(lineArr[0]), Utils.isNull(lineArr[1]));
 	                }
 	            } catch (IOException e) {
@@ -156,37 +210,62 @@ public class AppversionVerify {
 	        return pathFileMap;
 	  }
 	 
+	 public static Map<String,String> getInitAllToMapFromDB(Connection conn){
+        Map<String,String> pathFileMap = new HashMap<String, String>();
+    	Statement stmt = null;
+    	ResultSet rs = null;
+    	String sql = "";
+        logger.info("***Start getInitPathFile From DataBase***");
+        try{                   
+        	sql = "select config_type ,value from c_control_salesapp_version ";
+        	stmt = conn.createStatement();
+        	rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                 insertControlSalesAppVersion(conn, Utils.isNull(rs.getString("config_type")), Utils.isNull(rs.getString("value")));
+                 pathFileMap.put(Utils.isNull(rs.getString("config_type")), Utils.isNull(rs.getString("value")));
+              }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return pathFileMap;
+	  }
+	 
+	 public static void insertControlSalesAppVersion(Connection conn,String configType,String value) throws Exception {
+			Statement stmt = null;
+			try {
+				String sql = "update c_control_salesapp_version set value ='"+value+"' , updated = sysdate() \n";
+				       sql += "where config_type ='"+configType+"' \n";
+					//logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				int r = stmt.executeUpdate(sql);
+				if(r ==0){
+					sql = "insert into c_control_salesapp_version values('"+configType+"','"+value+"',sysdate()) \n";
+					//logger.debug("sql:"+sql);
+					stmt = conn.createStatement();
+				    r = stmt.executeUpdate(sql);
+				}
+		
+			} catch (Exception e) {
+				throw e;
+			} finally {
+			
+				try {
+					stmt.close();
+				} catch (Exception e2) {}
+			}
+		}
+	 
 	//Process Run After Import:
 	public static void processAfterImport(User user){
-		EnvProperties env = EnvProperties.getInstance();
 		try{
-			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-			
 			String currentAppVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
-			
-			String appVersionLatest = Utils.isNull(initAllMap.get("Lastest-app-version"));
-			String msgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/message-to-sales.txt");
-			String appVerionmsgToSales = ftpManager.getDownloadFTPFileByName("/Manual-script/appversion-message-to-sales.txt");
-			
-			logger.info("appVersionLatest :"+appVersionLatest);
-			logger.info("msgToSales :"+msgToSales);
-			logger.info("appVerionmsgToSales :"+appVerionmsgToSales);
-			
+				
 			String localSalesAppPath = getLocalPathSalesApp();
-			
-			//Write AppVersion Latest
-			FileUtil.writeFile(localSalesAppPath+"Lastest-app-version.txt", appVersionLatest, "UTF-8");
-			
-			//Write Current AppVersion
+
+			//Write Current AppVersion to Local
 			FileUtil.writeFile(localSalesAppPath+"current-app-version.txt", currentAppVersion, "UTF-8");
-			
-			//Write Message To Sales
-			FileUtil.writeFile(localSalesAppPath+"message-to-sales.txt", msgToSales, "UTF-8");
-			
-			//Write App Version Message To Sales
-			FileUtil.writeFile(localSalesAppPath+"appversion-message-to-sales.txt", appVerionmsgToSales, "UTF-8");
-			
-			//** Download Software for netbook sales **/
+		
+			//** Download Software for Tablet sales **/
 			new DownloadWorker(user).start();
 			
 		}catch(Exception e){
@@ -199,8 +278,7 @@ public class AppversionVerify {
 		String msg = "";
 		try{
 			if(request.getSession().getAttribute("massageToSales") == null){
-				String localSalesAppPath = getLocalPathSalesApp();
-				msg = Utils.isNull(FileUtil.readFile(localSalesAppPath+"message-to-sales.txt", "UTF-8"));
+				msg = Utils.isNull(initAllMap.get("message-to-sales"));
 				request.getSession().setAttribute("massageToSales",msg);
 			}else{
 				msg = Utils.isNull(request.getSession().getAttribute("massageToSales"));
@@ -219,8 +297,8 @@ public class AppversionVerify {
 		try{
 			if(request.getSession().getAttribute("appVersionMassageToSales") == null){
 				logger.debug("Session :"+request.getSession().getAttribute("appVersionMassageToSales"));
-				String localSalesAppPath = getLocalPathSalesApp();
-				msg = Utils.isNull(FileUtil.readFile(localSalesAppPath+"appversion-message-to-sales.txt", "UTF-8"));
+				msg = Utils.isNull(initAllMap.get("appversion-message-to-sales"));
+				logger.debug("msg:"+msg);
 				request.getSession().setAttribute("appVersionMassageToSales",msg);
 			}else{
 				msg = Utils.isNull(request.getSession().getAttribute("appVersionMassageToSales"));

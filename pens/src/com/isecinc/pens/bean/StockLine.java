@@ -32,7 +32,7 @@ public class StockLine extends I_PO implements Serializable{
 	private String expireDate;
 	private String expireDate2;
 	private String expireDate3;
-	
+	private String conversionRate;
 	private boolean canEdit = false;
 
 	private int no;
@@ -141,6 +141,16 @@ public class StockLine extends I_PO implements Serializable{
 	private String createDate;
 
 	
+	public String getConversionRate() {
+		return conversionRate;
+	}
+
+
+	public void setConversionRate(String conversionRate) {
+		this.conversionRate = conversionRate;
+	}
+
+
 	public String getAvgOrderQty() {
 		return avgOrderQty;
 	}

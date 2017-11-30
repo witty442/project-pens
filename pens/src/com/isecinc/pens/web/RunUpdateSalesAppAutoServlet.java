@@ -37,20 +37,25 @@ public class RunUpdateSalesAppAutoServlet  extends HttpServlet{
 		String localSalesAppPath ="D:/SalesApp/";
 		try {
 			 //ServletContext sc =  getServletConfig().getServletContext();
-			  String install = FileUtil.readFile(localSalesAppPath+"install.txt", "UTF-8");
+			  /*String install = FileUtil.readFile(localSalesAppPath+"install.txt", "UTF-8");
 			  String controlDeploySalesAppAtStartWindow = FileUtil.readFile(localSalesAppPath+"controlDeploySalesAppAtStartWindow.txt", "UTF-8");
-              
-			  logger.info( "install ["+install+"]");
-			  logger.info( "controlDeploySalesAppAtStartWindow ["+controlDeploySalesAppAtStartWindow+"]");
-			 
-			  if(    Utils.isNull(install).equalsIgnoreCase("runinstall") 
-			      && Utils.isNull(controlDeploySalesAppAtStartWindow).equalsIgnoreCase("true")){
-				  logger.info("startDeploySalesAppAuto()");
+			  boolean startDeploySalesAppAutoDB = ControlCode.canExecuteMethod("RunUpdateSalesAppAutoServlet", "startDeploySalesAppAuto",false);
+				 
+			  logger.info( "install["+install+"]");
+			  logger.info( "controlDeploySalesAppAtStartWindow["+controlDeploySalesAppAtStartWindow+"]");
+			  logger.info( "startDeploySalesAppAutoDB["+startDeploySalesAppAutoDB+"]");
+			  
+			  if(   ( Utils.isNull(install).equalsIgnoreCase("runinstall") 
+			         && Utils.isNull(controlDeploySalesAppAtStartWindow).equalsIgnoreCase("true")
+			        )
+			        ||
+			        startDeploySalesAppAutoDB == true
+			  ){
 				  
-				  if(ControlCode.canExecuteMethod("RunUpdateSalesAppAutoServlet", "startDeploySalesAppAuto")){
-				      startDeploySalesAppAuto();
-				  }
-			  }
+				  logger.info("startDeploySalesAppAuto()");
+				  startDeploySalesAppAuto();
+				  
+			  }*/
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} 

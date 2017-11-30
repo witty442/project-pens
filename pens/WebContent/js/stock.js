@@ -165,6 +165,7 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 	var productName = document.getElementsByName("productName");
 	var inventoryItemId = document.getElementsByName("inventoryItemId");
 	var fullUom = document.getElementsByName("fullUom");
+	var conversionRate = document.getElementsByName("conversionRate");
 	var qty = document.getElementsByName("qty");
 	var ENTERKEY =13;
 	if(e != null && (e.keyCode == ENTERKEY)){
@@ -172,6 +173,7 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 			productName[rowId-1].value = '';
 			inventoryItemId[rowId-1].value = '';
 			fullUom[rowId-1].value = '';
+			conversionRate[rowId-1].value = '';
 		}else{
 			var found = getProductModel(itemCodeObj,rowId);
 			if(found){
@@ -196,6 +198,7 @@ function getProductModel(itemCodeObj,rowId){
 	var productName = document.getElementsByName("productName");
 	var inventoryItemId = document.getElementsByName("inventoryItemId");
 	var fullUom = document.getElementsByName("fullUom");
+	var conversionRate = document.getElementsByName("conversionRate");
 	
 	//pass parameter
 	var param  = "productCode=" + itemCodeObj.value;
@@ -220,6 +223,7 @@ function getProductModel(itemCodeObj,rowId){
 			productName[rowId-1].value = '';
 			inventoryItemId[rowId-1].value = '';
 			fullUom[rowId-1].value = '';
+			conversionRate[rowId-1].value = '';
 		}else if(returnString=='DUPLICATE'){
 			alert("ไม่สามารถกรอก รหัสสินค้าซ้ำได้  "+itemCodeObj.value);
 			itemCodeObj.focus();
@@ -228,12 +232,14 @@ function getProductModel(itemCodeObj,rowId){
 			productName[rowId-1].value = '';
 			inventoryItemId[rowId-1].value = '';
 			fullUom[rowId-1].value = '';
+			conversionRate[rowId-1].value = '';
 		}else{
 			found = true;
 			var s = returnString.split("|");
 			inventoryItemId[rowId-1].value = s[0];
 			productName[rowId-1].value = s[1];
 			fullUom[rowId-1].value = s[2];
+			conversionRate[rowId-1].value = s[3];
 		}
 	return found;
 }
@@ -280,7 +286,10 @@ function addRow(setFocus){
 	    "<td class='td_text_center'  width='5%'> "+
 	    " <input type='text' name='fullUom' id='fullUom' value ='' size='6' readonly class='disableText'/>" +
 	    "</td>"+
-
+	    "<td class='td_text_center'  width='5%'> "+
+	    " <input type='text' name='conversionRate' id='conversionRate' value ='' size='7' readonly class='disableText'/>" +
+	    "</td>"+
+	    
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+

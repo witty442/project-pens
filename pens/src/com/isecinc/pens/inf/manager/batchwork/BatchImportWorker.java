@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
@@ -41,7 +43,6 @@ public class BatchImportWorker extends BatchWorker {
 	   this.setImportAll(importAll);
 	}
 	
-	 
 	@Override
 	public void run() {
 		System.out.println("Start Thread:" + Thread.currentThread().getName());
@@ -54,8 +55,6 @@ public class BatchImportWorker extends BatchWorker {
 					logger.debug(" **********Start Import Update Transaction Sales By Request Table ******************");
 					MonitorBean monitorModel =(new UpdateSalesManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
 					logger.debug(" **********Result Import Control Transaction  By Request Table :"+monitorModel.getStatus()+" ******************");
-				}else if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equals(this.transType)){
-					
 				}else{
 					logger.debug(" **********Start Import Master ,Tranasaction  By Request Table ******************");
 					MonitorBean monitorModel =(new ImportManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
@@ -84,7 +83,7 @@ public class BatchImportWorker extends BatchWorker {
 				new ExternalProcess().processImportBefore(request, userLogin);
 				
 				logger.debug(" **********Start Import Master Table ******************");
-				MonitorBean monitorModel =(new ImportManager()).importTxtByTransType(transactionId,Constants.TRANSACTION_MASTER_TYPE, userLogin,userRequest, requestTable, request, importAll);
+				MonitorBean monitorModel = new ImportManager().importFileToDB(transactionId,monitorId, transType,userLogin, userRequest, requestTable, request,importAll);
 				logger.debug(" **********Result Import Master Table :"+monitorModel.getStatus()+"******************");
 				
                 startTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
@@ -96,9 +95,19 @@ public class BatchImportWorker extends BatchWorker {
 					
 					if(monitorModel.getStatus() == Constants.STATUS_SUCCESS){
 						logger.debug(" **********Start Import Update Transaction Sales ******************");
-						monitorModel =(new UpdateSalesManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
+						
+						monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_UTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
 						logger.debug(" **********Result Import Control Transaction :"+monitorModel.getStatus()+" ******************");
 		                logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
+					}
+					if(ControlCode.canExecuteMethod("BatchImportWorker", "reimportUpdateTrans")){
+					   logger.debug(" **********Start ReImport Update Transaction Sales ******************");
+					   monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_REUTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
+					   logger.debug(" **********Result ReImport Control Transaction :"+monitorModel.getStatus()+" ******************");
+	                   logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
+					
+	       				//Update Control Code Fore run process =false
+	       				ControlCode.updateControlCode("BatchImportWorker", "reimportUpdateTrans", "N");
 					}
 				}
 				

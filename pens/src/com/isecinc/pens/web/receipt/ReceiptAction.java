@@ -75,7 +75,7 @@ public class ReceiptAction extends I_Action {
 				customerId = Integer.parseInt(request.getParameter("memberId"));
 				receiptForm.setReceipt(new Receipt());
 				
-				/* Wit Edit: 1307255 :Edit shotcut From CustomerSerach **/
+				/* Wit Edit: 1307255 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
 				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
 				//reset CriteriaSearch
@@ -252,7 +252,7 @@ public class ReceiptAction extends I_Action {
 				line.setLineNo(i++);
 			}
 
-			// Check Dupplicate Cheque No.
+			// Check Duplicate Cheque No.
 			if(!isChequeNoUnique(receiptForm.getBys(),conn)){
 				request.setAttribute("JSMsg", InitialMessages.getMessages().get(Messages.CHEQUE_DUPLICATE).getDesc());
 				conn.rollback();
@@ -399,9 +399,9 @@ public class ReceiptAction extends I_Action {
 							mReceiptMatch.save(match, userActive.getId(), conn);
 							break;
 						}
-					}
+					}//for all Receipt line
 					idx++;
-				}
+				}//for all bills
 
 				// apply match CN
 				idx = 0;
@@ -418,9 +418,9 @@ public class ReceiptAction extends I_Action {
 						}
 					}
 					idx++;
-				}
+				}//for cnALL
 
-			}
+			}//for receiptBy
 
 			// Trx History
 			TrxHistory trx = new TrxHistory();

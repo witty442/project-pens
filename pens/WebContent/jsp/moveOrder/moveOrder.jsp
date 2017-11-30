@@ -61,7 +61,6 @@ table#productList thead{background:#FFE4CA;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
@@ -76,6 +75,8 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript">
+//clear cach
+$.ajaxSetup({cache: false});
 
 function loadMe(){
 	//alert("loadMe");

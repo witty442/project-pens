@@ -253,7 +253,6 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
-		
 		try {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			

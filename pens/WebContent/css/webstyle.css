@@ -1,5 +1,11 @@
 @charset "utf-8";
 
+input[type="checkbox"]{
+  width: 20px; /*Desired width*/
+  height: 20px; /*Desired height*/
+  cursor: pointer;
+}
+
 .cssstyle {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -85,14 +91,17 @@ button.positive,.buttons a.positive {
 }
 
 .currPageBtn{
-	border: 5px;
+	background-color: #CFCACF;
+	border: 7px solid #CFCACF;
 	font-weight: bold;
+	font-size: 18px;
 }
 .currPageActiveBtn{
 	background-color: #6299c5;
-	border: 5px solid #6299c5;
+	border: 7px solid #6299c5;
 	color: #fff;
 	font-weight: bold;
+	font-size: 18px;
 }
 
 /* NEGATIVE */

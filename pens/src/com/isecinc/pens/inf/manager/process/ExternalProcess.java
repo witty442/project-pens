@@ -56,9 +56,10 @@ public class ExternalProcess {
 		 
 		//DB BackUp DB and Transfer TO Ftp Server Folder:DB_Backup
 		 logger.info("--- 1.Run Process backup By Thread ---");
-		//new DBBackUpManager().process(request,userLogin);//OLD CODE
+		new DBBackUpManager().process(userLogin);
 		 
-		new UploadDatabaseBackupWorker(userLogin).start();
+		 //Backup By Thread
+		//new UploadDatabaseBackupWorker(userLogin).start();
 		
 		//RunScript From FTP Server Folder :Manual-script
 		 logger.info("--- 2.Run Script export_after ---");

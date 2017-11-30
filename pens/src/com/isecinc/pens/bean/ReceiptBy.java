@@ -43,11 +43,14 @@ public class ReceiptBy extends I_PO {
 		setChequeDate("");
 		if (rst.getTimestamp("CHEQUE_DATE") != null)
 			setChequeDate(DateToolsUtil.convertToString(rst.getTimestamp("CHEQUE_DATE")));
+		if (rst.getTimestamp("receive_Cash_Date") != null)
+			setReceiveCashDate(DateToolsUtil.convertToString(rst.getTimestamp("receive_Cash_Date")));
 		setPaidAmount(rst.getDouble("PAID_AMOUNT"));
 		setRemainAmount(rst.getDouble("REMAIN_AMOUNT"));
 		setSeedId(rst.getString("SEED_ID"));
 		setCreditcardExpired(ConvertNullUtil.convertToString(rst.getString("CREDITCARD_EXPIRED")).trim());
 		setWriteOff(rst.getString("WRITE_OFF"));
+		
 		new MReceiptMatch().lookUp(this);
 		new MReceiptMatchCN().lookUp(this);
 		setDisplayLabel();
@@ -61,10 +64,20 @@ public class ReceiptBy extends I_PO {
 			}
 		}
 
-		for (References r : InitialReferences.getReferenes().get(InitialReferences.BANK)) {
-			if (r.getKey().equalsIgnoreCase(getBank())) {
-				setBankName(r.getName());
-				break;
+		// Case TR user bank form bank Transfer Config
+		if(getPaymentMethod().equalsIgnoreCase("TR")){
+			for (References r : InitialReferences.getReferenes().get(InitialReferences.TRANSFER_BANK)) {
+				if (r.getKey().equalsIgnoreCase(getBank())) {
+					setBankName(r.getDesc());
+					break;
+				}
+			}
+		}else{
+			for (References r : InitialReferences.getReferenes().get(InitialReferences.BANK)) {
+				if (r.getKey().equalsIgnoreCase(getBank())) {
+					setBankName(r.getName());
+					break;
+				}
 			}
 		}
 	}
@@ -129,6 +142,16 @@ public class ReceiptBy extends I_PO {
 
 	/** WRITE_OFF */
 	private String writeOff;
+	private String receiveCashDate;
+
+	
+	public String getReceiveCashDate() {
+		return receiveCashDate;
+	}
+
+	public void setReceiveCashDate(String receiveCashDate) {
+		this.receiveCashDate = receiveCashDate;
+	}
 
 	public int getId() {
 		return id;

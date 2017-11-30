@@ -23,7 +23,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 	 * @throws Exception
 	 */
 	public UOMConversion getCurrentConversion(int productId, String uomId) throws Exception {
-		logger.debug("Find UOM conversion on Product : " + productId + " : " + uomId);
+		//logger.debug("Find UOM conversion on Product : " + productId + " : " + uomId);
 		String whereCause = "";
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id = '" + uomId + "' ";
@@ -76,14 +76,14 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 		if (baseUOM != null) {
 			UOMConversion baseConversion = new MUOMConversion().getCurrentConversion(product.getId(), baseUOM.getId());
 			baseRate = baseConversion.getConversionRate();
-			logger.debug(baseUOM);
-			logger.debug(baseConversion);
+			//logger.debug(baseUOM);
+			//logger.debug(baseConversion);
 		}
 		if (uom != null) {
 			UOMConversion conversion = new MUOMConversion().getCurrentConversion(product.getId(), uom.getId());
 			rate = conversion.getConversionRate();
-			logger.debug(uom);
-			logger.debug(conversion);
+			//logger.debug(uom);
+			//logger.debug(conversion);
 		}
 		if (rate == 0) capacity = baseRate;
 		else capacity = baseRate / rate;
@@ -117,7 +117,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 	    	   pack = uc1.getConversionRate();
 	    	}
 	    }
-	    logger.debug("result calc pack["+pack+"]");
+	   // logger.debug("result calc pack["+pack+"]");
 	    return pack;
 	}
 }

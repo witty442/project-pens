@@ -420,12 +420,15 @@ public class ModifierProcess {
 					logger.info("Modifier .." + modifier);
 					logger.info("Modifier Line.." + modifierLine);
 					logger.info("Modifier Attr.." + modifierAttr);
+					logger.info("modifierLine Type:"+modifierLine.getType());
 				}
+				
 				// Discount
 				if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
 					discountProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
 				}
 				// Pricebreak Header
+				
 				if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPricebreakheader())) {
 					priceBreakProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
 				}
@@ -760,7 +763,7 @@ public class ModifierProcess {
 		// get relate line
 		for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
 			if(isDebug){
-			  logger.info("Relate MLines : " + mrline);
+			  logger.info("Relate MLines["+mrline.getId()+"]: " + mrline);
 			  logger.info("Qty["+sumQty+"] to Get Discount.. mLineTo.Attr.ValueFrom" + mrline.getAttr().getValueFrom() + " to "+ mrline.getAttr().getValueTo());
 			}
 			

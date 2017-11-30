@@ -261,6 +261,7 @@ function backsearch(path) {
 										<th rowspan="2">ชื่อสินค้า</th>
 										<th rowspan="2">ค่าเฉลี่ยยอดสั่งซื้อย้อนหลัง</th>
 										<th rowspan="2">หน่วยนับ</th>
+										<th rowspan="2">อัตรา</th>
 										<th colspan="3">กลุ่มที่ 1</th>
 										<th colspan="3">กลุ่มที่ 2</th>
 										<th colspan="3">กลุ่มที่ 3</th>
@@ -318,10 +319,11 @@ function backsearch(path) {
 									       <input type="text" name="avgOrderQty" id="avgOrderQty" value ="${results.avgOrderQty}" size="5" readonly class="disableNumber"/>	
 										</td>
 										<td class="td_text_number"  width="5%">
-										 <input type="text" name="fullUom" id="fullUom" value ="${results.fullUom}" size="6" readonly class="disableText"/>	
-										  
+										 <input type="text" name="fullUom" id="fullUom" value ="${results.fullUom}" size="6" readonly class="disableText"/>	  
 										</td>
-										
+										<td class="td_text_center"  width="5%">
+										 <input type="text" name="conversionRate" id="conversionRate" value ="${results.conversionRate}" size="7" readonly class="disableText"/>	  
+										</td>
 										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"

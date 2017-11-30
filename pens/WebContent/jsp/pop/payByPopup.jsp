@@ -13,6 +13,7 @@ Product Popup for Sales Order
 <%
 List<References> payment= InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 List<References> banks= InitialReferences.getReferenes().get(InitialReferences.BANK);
+List<References> transferBanks= InitialReferences.getReferenes().get(InitialReferences.TRANSFER_BANK);
 
 String seed = String.valueOf(Calendar.getInstance().getTimeInMillis());
 pageContext.setAttribute("seed",seed,PageContext.PAGE_SCOPE);
@@ -63,10 +64,15 @@ function change_payment(val){
 			document.getElementById('div_cheque4').style.display='';
 		}
 		document.getElementById('div_cash').style.display='none';
+		document.getElementById('div_cash2').style.display='none';
+		document.getElementById('div_transfer').style.display='none';
 	}else if(val=='CS'){
 		document.getElementById('div_cash').style.display='';
+		document.getElementById('div_cash2').style.display='';
 		new Epoch('epoch_popup','th',document.getElementById('transCashDate'));
+		new Epoch('epoch_popup','th',document.getElementById('receiveCashDate'));
 		
+		document.getElementById('div_transfer').style.display='none';
 		document.getElementById('div_cheque1').style.display='none';
 		document.getElementById('div_cheque2').style.display='none';
 		document.getElementById('div_cheque3').style.display='none';
@@ -74,6 +80,17 @@ function change_payment(val){
 
 		//WitEdit :17/06/2555 Case :pay by cash add transfer date (save in field cheque_date(t_receipt_by))
 		
+	}else if(val=='TR'){
+		document.getElementById('div_transfer').style.display='';
+		document.getElementById('div_cash').style.display='';
+		new Epoch('epoch_popup','th',document.getElementById('transCashDate'));
+		
+		document.getElementById('div_cash2').style.display='none';
+		document.getElementById('div_cheque1').style.display='none';
+		document.getElementById('div_cheque2').style.display='none';
+		document.getElementById('div_cheque3').style.display='none';
+		document.getElementById('div_cheque4').style.display='none';
+
 	}
 }
 
@@ -84,17 +101,16 @@ function save(path){
 	var chq ="";
 	var chqd = "";
 	var cct = "";
-
+    var receiveCashDate ="";
+    
 	var recamt = $("#receiptAmount").val();
 	//if(recamt=='' || Number(recamt)==0) Comment Out Because 
-	if(recamt=='')
-	{
+	if(recamt==''){
 		alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 		$("#receiptAmount").focus();
 		return false;
 	}
 
-	
 	pay = $("#paymentMethod").val();
 	if(pay=='PD'){
 		bank="";
@@ -108,8 +124,14 @@ function save(path){
 		cct = "";
 		
 		chqd = $("#transCashDate").val();
-		if(chqd=='')
-		{
+		receiveCashDate = $("#receiveCashDate").val();
+		if(receiveCashDate==''){
+			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
+			$("#receiveCashDate").focus();
+			return false;
+		}
+		
+		if(chqd==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#transCashDate").focus();
 			return false;
@@ -122,24 +144,39 @@ function save(path){
 
 		cct = "";
 
-		if(bank=='')
-		{
+		if(bank==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#bank").focus();
 			return false;
 		}
 
-		if(chq=='')
-		{
+		if(chq==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#chequeNo").focus();
 			return false;
 		}
 
-		if(chqd=='')
-		{
+		if(chqd==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#chequeDate").focus();
+			return false;
+		}
+	}else if(pay=='TR'){
+		bank=$("#transfer_bank").val();
+		chq ="";
+		chqd = "";
+		cct = "";
+
+		if(bank==''){
+			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
+			$("#transfer_bank").focus();
+			return false;
+		}
+		
+		chqd = $("#transCashDate").val();
+		if(chqd==''){
+			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
+			$("#transCashDate").focus();
 			return false;
 		}
 		
@@ -149,22 +186,19 @@ function save(path){
 		chqd = "";
 		cct = $("#creditCardType").val();
 
-		if(bank=='')
-		{
+		if(bank==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#bank").focus();
 			return false;
 		}
 
-		if(chq=='')
-		{
+		if(chq==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#chequeNo").focus();
 			return false;
 		}
 
-		if(cct=='')
-		{
+		if(cct==''){
 			alert('กรุณาระบุข้อมูลให้ครบถ้วน');
 			$("#creditCardType").focus();
 			return false;
@@ -175,7 +209,11 @@ function save(path){
 	payBy.method = pay;
 	payBy.methodName =  document.getElementById('paymentMethod').options[document.getElementById('paymentMethod').selectedIndex].text;
 	payBy.bank = bank;
-	payBy.bankName = document.getElementById('bank').options[document.getElementById('bank').selectedIndex].text;
+    if(pay=='TR'){
+	   payBy.bankName = document.getElementById('transfer_bank').options[document.getElementById('transfer_bank').selectedIndex].text;
+    }else{
+       payBy.bankName = document.getElementById('bank').options[document.getElementById('bank').selectedIndex].text;
+    }
 	payBy.chqNo = chq;
 	payBy.chqDate = chqd;
 	payBy.creditType = cct;
@@ -184,6 +222,7 @@ function save(path){
 	else
 		payBy.creditTypeName='';
 		
+	payBy.receiveCashDate = receiveCashDate;
 	payBy.recAmount = recamt;
 	payBy.seedId = $("#seedId").val();
 	
@@ -211,10 +250,10 @@ function save(path){
 				<%for(References r : payment){ %>
 					<%if(user.getType().equalsIgnoreCase(User.TT)){ %>
 					<%if(!r.getKey().equalsIgnoreCase("CR")){ %>
-						<option value="<%=r.getKey() %>"><%=r.getName() %></option>
+						<option value="<%=r.getKey() %>"><%=r.getDesc() %></option>
 					<%} %>
 					<%}else{ %>
-						<option value="<%=r.getKey() %>"><%=r.getName() %></option>
+						<option value="<%=r.getKey() %>"><%=r.getDesc() %></option>
 					<%} %>
 				<%} %>
 			</select>
@@ -224,6 +263,23 @@ function save(path){
 		<td align="right"><bean:message key="Receipt.Amount" bundle="sysele"/><font color="red">*</font></td>
 		<td align="left">
 			<input type="text" id="receiptAmount" name="receiptAmount" size="15" maxlength="20" style="text-align: right;" onkeydown="return isNum0to9andpoint(this, event);"/>
+		</td>
+	</tr>
+	<tr id="div_transfer" style="display: none;">
+		<td align="right">โอนเงินเข้าบัญชี<font color="red">*</font></td>
+		<td align="left">
+			<select name="transfer_bank" id="transfer_bank">
+				<option value=""></option>
+				<%for(References r : transferBanks){ %>
+				  <option value="<%=r.getKey() %>"><%=r.getDesc() %></option>
+				<%} %>
+			</select>
+		</td>
+	</tr>
+	<tr id="div_cash2" style="display: none;">
+		<td align="right">วันที่รับเงินจากลูกค้า <font color="red">*</font></td>
+		<td align="left">
+			<input type="text" id="receiveCashDate" name="receiveCashDate" size="15" readonly="readonly" maxlength="10"/>
 		</td>
 	</tr>
 	<tr id="div_cash" style="display: none;">

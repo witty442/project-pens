@@ -82,9 +82,19 @@ public class Receipt extends I_PO {
 				break;
 			}
 		}
+		//Get Ar_invoice_no
 		String temp = "";
 		for (ReceiptLine l : getReceiptLines()) {
 			temp += ", " + l.getArInvoiceNo();
+		}
+		
+		//Get cn_no 
+		if(getReceiptCNs() != null){
+			for (ReceiptCN l : getReceiptCNs()) {
+				if(l.getCreditNote() != null){
+				   temp += ", " + l.getCreditNote().getCreditNoteNo();
+				}
+			}
 		}
 		if (temp.length() > 0) temp = temp.substring(1).trim();
 		setInvoiceNoLabel(temp);

@@ -88,7 +88,7 @@ public class FileUtil {
 	}
 	
 	public static BufferedReader getBufferReaderFromClassLoader(String filename) throws Exception {
-		logger.debug("fileName:"+filename);
+		//logger.debug("fileName:"+filename);
 		BufferedReader br = null;
 		ClassLoader cl = FileUtil.class.getClassLoader();
 		/*logger.debug("ClassLoader:"+cl);

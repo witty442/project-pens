@@ -15,7 +15,7 @@ import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.process.document.MemberDocumentProcess;
 
 /**
- * @author WITTY
+ * @author WITTY 
  *
  */
 public class ExternalFunctionHelper {
@@ -23,6 +23,7 @@ public class ExternalFunctionHelper {
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
 	public static Map<String, String> RECEIPT_MAP = new HashMap<String, String>();
+
 	/**
 	 * @param args
 	 */
@@ -226,6 +227,7 @@ public class ExternalFunctionHelper {
 					sql.append("  	select receipt_by_id from t_receipt_by  where cheque_no ='"+value+"' \n" );
 					sql.append(" ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' \n" );
 					
+					logger.debug("sql:"+sql.toString());
 					if( !Utils.isNull(value).equals("")){
 						ps = conn.prepareStatement(sql.toString());
 						rs = ps.executeQuery();
@@ -274,8 +276,8 @@ public class ExternalFunctionHelper {
 			
 		    /**
 		     * GET_LINE_NO IN t_receipt By Receipt ID and paid_amount  and get Max(line_no) +1
-		     * FIND_LINE_NO_BY_RECEIPT_ID|1        |4
-		     *                            receiptNo|paidAmount
+		     * FIND_LINE_NO_BY_RECEIPT_ID| 2       | 3
+		     *                            receiptNo|ar_invoice_no
 		     */
 		    }else if(Utils.isNull(colBean.getExternalFunction()).startsWith("FIND_LINE_NO_BY_RECEIPT_ID")){
 		    	findColumn = "next_line_no";
@@ -286,20 +288,24 @@ public class ExternalFunctionHelper {
 		    	//String receiptId = RECEIPT_MAP.get(Utils.isNull(values[0]));
 		    	
 		    	sql.append("\n select l.line_no as "+findColumn);
-		    	sql.append("\n from t_receipt_line l ,t_receipt_match m ,t_receipt_by b where 1=1 ");
-		    	sql.append("\n and l.receipt_line_id = m.receipt_line_id ");
-		    	sql.append("\n and m.receipt_by_id = b.receipt_by_id ");
-		    	sql.append("\n and ( b.paid_amount = "+lineArray[Integer.parseInt(values[2])] +" OR l.paid_amount ="+lineArray[Integer.parseInt(values[2])] +")");
-		    	sql.append("\n and exists ( ");
-		    	sql.append("\n select 'x' as r from ( ");
-		    	sql.append("\n   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' " );		
-				sql.append("\n   union all " );
-				sql.append("\n   select distinct m.receipt_id  from t_receipt_match m ,t_receipt t where m.receipt_by_id in ( " );
-				sql.append("\n  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' " );
-				sql.append("\n    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' " );
-				sql.append("\n   ) r where r.receipt_id = l.receipt_id ");
-				sql.append("\n ) ");
+		    	sql.append("\n from t_receipt_line l where 1=1 ");
+		    	sql.append("\n and receipt_id in ( ");
+		    	sql.append("\n   select receipt_id FROM t_receipt WHERE receipt_no = '"+lineArray[Integer.parseInt(values[1])]+"' " );	
+		    	sql.append("\n   and doc_status ='SV' ");
 		    	
+                sql.append("\n   union all " );
+				
+				sql.append("\n   select distinct m.receipt_id  ");
+				sql.append("\n   from t_receipt_match m ,t_receipt t ");
+				sql.append("\n   where m.receipt_by_id in ( " );
+				sql.append("\n  	 select receipt_by_id from t_receipt_by ");
+			    sql.append("\n       where cheque_no ='"+lineArray[Integer.parseInt(values[1])]+"' " );
+				sql.append("\n    ) and t.receipt_id = m.receipt_id  and t.doc_status ='SV' " );
+				sql.append("\n ) ");
+				
+				sql.append("\n and ar_invoice_no ='"+lineArray[Integer.parseInt(values[2])]+"'");
+
+
 		    	//Find by receiptId and compare paidAmount
 		    	if( !Utils.isNull(values[1]).equals("") && !Utils.isNull(values[2]).equals("")){
 					ps = conn.prepareStatement(sql.toString());

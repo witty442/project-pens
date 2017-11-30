@@ -363,6 +363,12 @@ public class ExportHelper {
 		return "";//dao.getSunInventory(conn, userBean);
 	}
 	
+/*	public static String covertToFormatExport(ColumnBean colBean,ResultSet rs,String paymentMethod) throws Exception{
+		return covertToFormatExportModel(colBean, rs,paymentMethod);
+	}
+	public static String covertToFormatExport(ColumnBean colBean,ResultSet rs) throws Exception{
+		return covertToFormatExportModel(colBean, rs,"");
+	}*/
 	/**
 	 * covertDataToExport
 	 * @param colBean

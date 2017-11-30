@@ -56,7 +56,6 @@ public abstract class DocumentSequenceProcess {
 	
 	/**
 	 * Get Next Sequence
-	 * 
 	 * @param salesCode
 	 * @param docType
 	 * @param activeUserId
@@ -90,14 +89,14 @@ public abstract class DocumentSequenceProcess {
 				whereCause.append("\n AND sales_code = '' ");
 			}
 
-			System.out.println("sql:"+whereCause.toString());
+			logger.debug("sql:"+whereCause.toString());
 			
 			DocSequence[] seq = new MDocSequence().search(whereCause.toString());
 			if (seq == null){
 				//throw new Exception(
 						//"\u0E01\u0E23\u0E38\u0E13\u0E32\u0E2A\u0E23\u0E49\u0E32\u0E07\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E01\u0E48\u0E2D\u0E19\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23...");
 			
-				System.out.println("No set update : insert new Record ");
+				logger.debug("No set update : insert new Record ");
 				
 				//get OrderType
 				whereCause = new StringBuffer("");
@@ -128,7 +127,7 @@ public abstract class DocumentSequenceProcess {
 				docSeq.setSalesCode(salesCode);
 				
 				// insert here
-				System.out.println("Insert ");
+				logger.debug("Insert new sequence");
 				new MDocSequence().saveNew(docSeq, activeUserID, conn);
 				
 				docSequence = docSeq;
@@ -186,7 +185,7 @@ public abstract class DocumentSequenceProcess {
 					nextValue = seq[0].getCurrentNext();
 					seq[0].setCurrentNext(seq[0].getCurrentNext() + 1);
 					// update here
-					System.out.println("Update ");
+					logger.debug("Update currentNext:"+seq[0].getCurrentNext());
 					new MDocSequence().update(seq[0], activeUserID, conn);
 				}
 	

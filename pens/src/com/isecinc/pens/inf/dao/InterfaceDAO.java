@@ -142,10 +142,10 @@ public class InterfaceDAO {
 			" success_count)"+
 			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 			  
-			logger.debug("SQL:"+sql);
-			logger.debug("SucessCound:"+model.getSuccessCount());
+			//logger.debug("SQL:"+sql);
+			//logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				   model.setId(new BigDecimal(SequenceHelper.getNextValue("monitor_item")));
+				 model.setId(new BigDecimal(SequenceHelper.getNextValue("monitor_item")));
 			}
 			
 			int index = 0;
@@ -1170,7 +1170,7 @@ public class InterfaceDAO {
 		sql.append("  ) s  \n");
 		sql.append(" ON s.id = monitor_item.id and s.table_name = monitor_item.table_name \n");
 		
-	    logger.debug("SQL:"+sql);
+	    //logger.debug("SQL:"+sql);
 	    
 		ps = conn.prepareStatement(sql.toString());
 		rs = ps.executeQuery();

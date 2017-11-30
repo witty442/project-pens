@@ -25,7 +25,7 @@ public class PreFunction {
 
   	    	 if("Y".equalsIgnoreCase(tableBean.getPreFunction())){
    	    		    logger.debug("process prefunction Name:"+tableBean.getPreFunction());
- 	  	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction("Pre",tableBean.getTableName());
+ 	  	    	    List<String> sqlManualList = FunctionHelper.readSQlExternalFunction(conn,"pre-import-master",tableBean.getTableName());
  	  	    	    try{
  	  	    	    	if(sqlManualList != null && sqlManualList.size() >0){
 	 		    		    for(int i = 0;i< sqlManualList.size();i++){

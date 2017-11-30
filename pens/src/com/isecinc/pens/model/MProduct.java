@@ -17,6 +17,7 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.moveorder.MoveOrderProductCatalog;
 import com.isecinc.pens.web.requisitionProduct.RequisitionProductCatalog;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
@@ -345,6 +346,7 @@ public class MProduct extends I_Model<Product>{
 		ResultSet rst = null;
 		Product catalog = null;
 		StringBuffer sql = new StringBuffer("");
+		String conversionRate = "";
 		try {
 			int pricelistId = new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId();
 	
@@ -381,6 +383,9 @@ public class MProduct extends I_Model<Product>{
 				catalog.setCode( rst.getString("PRODUCT_CODE"));
 				catalog.setUom1(rst.getString("UOM1"));
 				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+				
+				
+				 catalog.setConversionRate(getConversionRate(catalog.getId(),catalog.getUom1(),catalog.getUom2()));
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -393,5 +398,21 @@ public class MProduct extends I_Model<Product>{
 		}
 		
 		return catalog;
+	}
+	
+	public  String getConversionRate(int productId,String uom1,String uom2) throws Exception{
+		String conversionRate = "";
+		try{
+			 UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(productId, uom1);
+			 conversionRate = Utils.decimalFormat(uc1.getConversionRate(),Utils.format_num_no_disgit);
+			 if( !Utils.isNull(uom2).equals("")){
+				  UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(productId, uom2);
+				  conversionRate += "/"+Utils.decimalFormat(uc2.getConversionRate(),Utils.format_num_no_disgit);
+			 }
+			 return conversionRate;
+		}catch(Exception e){
+			throw e;
+		}
+		
 	}
 }

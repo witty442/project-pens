@@ -669,6 +669,7 @@ public class MStock {
 				  String  uom2 = Utils.isNull(Utils.isNull(rst.getString("uom2")));
 				  
 				  m.setFullUom(uom1+"/"+uom2);
+				  m.setConversionRate(new MProduct().getConversionRate(Utils.convertStrToInt(m.getInventoryItemId()),uom1,uom2));
 				  
 				  m.setQty(Utils.convertDoubleToStrDefault(rst.getInt("qty"),""));
 				  m.setQty2(Utils.convertDoubleToStrDefault(rst.getInt("qty2"),""));
@@ -792,7 +793,6 @@ public class MStock {
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-
 				while (rst.next()) {
 				  StockLine m = new StockLine();
 				  no++;
@@ -809,6 +809,7 @@ public class MStock {
 				  String  uom2 = Utils.isNull(Utils.isNull(rst.getString("uom2")));
 				   
 				  m.setFullUom(uom1+"/"+uom2);
+				  m.setConversionRate(new MProduct().getConversionRate(Utils.convertStrToInt(m.getInventoryItemId()),uom1,uom2));
 				  m.setStatus("SV");
 				  m.setStatusLabel("ใช้งาน");
 				  m.setExported("N");

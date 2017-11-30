@@ -167,17 +167,18 @@ function loadMe(){
 								<th class="code"><bean:message key="Order.Payment" bundle="sysele"/></th>
 								<th class="name"><bean:message key="Description"  bundle="sysele"/></th>
 								<%if(user.getRole().getKey().equalsIgnoreCase(User.VAN)){ %>
-								<th class="status"><bean:message key="Order.Paid"  bundle="sysele"/></th>
+								  <th class="status"><bean:message key="Order.Paid"  bundle="sysele"/></th>
 								<%} %>
 								<th class="status"><bean:message key="Exported"  bundle="sysele"/></th>
 								<th class="status"><bean:message key="Interfaces"  bundle="sysele"/></th>
 								<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-								<th class="name"><bean:message key="Bill.No"  bundle="sysele"/></th>
+								  <th class="name"><bean:message key="Bill.No"  bundle="sysele"/>/ใบลดหนี้
+								  </th>
 								<%} %>
 								<th class="status"><bean:message key="Status" bundle="sysele"/></th>
 								<%if(role.equalsIgnoreCase(User.DD)){ %>
-								<th class="status">แบ่งชำระเป็นรายการ</th>
-								<th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
+								  <th class="status">แบ่งชำระเป็นรายการ</th>
+								  <th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
 								<%} %>
 								<%if(!role.equalsIgnoreCase(User.DD)){ %>
 								<th class="status"><bean:message key="Edit" bundle="sysprop"/></th>

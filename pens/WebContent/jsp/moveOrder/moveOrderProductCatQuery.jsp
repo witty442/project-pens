@@ -8,10 +8,11 @@
 <%@page import="java.util.List"%>
 <%@page import="java.math.BigDecimal"%>
 <%
+try{
 User user = ((User)session.getAttribute("user"));
 String pageId_param = request.getParameter("pageId");
 
-String custId = request.getParameter("custId");
+String custId = request.getParameter("custId"); 
 MoveOrderBasket basket = (MoveOrderBasket)session.getAttribute(custId);
 if(basket == null ){
 	basket = new MoveOrderBasket();	
@@ -23,7 +24,7 @@ if(StringUtils.isEmpty(pageId_param))
 int pageId = Integer.valueOf(pageId_param);
 
 MProductCategory mProductCat = new MProductCategory();
-List<References> productCatL = mProductCat.lookUpBrandListCaseMoveOrder(pageId,user);
+List<References> productCatL = mProductCat.lookUpBrandListCaseMoveOrder(pageId,user); 
 
 int no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 int no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
@@ -33,27 +34,21 @@ int totalRecord = mProductCat.lookUpBrandList(user).size();
 
 int totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
 
-/// Find Total Page
-System.out.println("totalRecord["+totalRecord+"]/["+(no_of_column * no_of_rows)+"]totalPage["+totalPage+"]");
-
 if(productCatL != null && productCatL.size() > 0){
 %>
 <table>
 <tr>
-<td class="paging" colspan="<%=no_of_column%>">หน้าที่
+<td class="paging" colspan="<%=no_of_column%>">&nbsp;&nbsp;&nbsp; หน้าที่
 <%  int id = 1 ;
 	for(int no = 0 ; no < totalPage;no++ ) {  
 		int id_param = id-1;
-		System.out.println("id:"+id);
 		String className = "currPageBtn";
 		if(id_param == pageId)
 			className = "currPageActiveBtn";
 %>
-<%-- <a href="#" onclick="loadProductCat(<%=id_param%>)">&nbsp;<span class="<%=className%>"><%=id%></span></a> --%>
-<input type="button" name="xx" value="<%=id%>" onclick="loadProductCat(<%=id_param%>)" class="<%=className%>"/>
+&nbsp;&nbsp;&nbsp;<input type="button" name="xx" value="<%=id%>" onclick="loadProductCat(<%=id_param%>)" class="<%=className%>"/>
 <%       //  no = no + no_of_total_display;
-         id++;
-
+       id++;
 	}//for
 %> 
 </td>
@@ -102,3 +97,8 @@ function imgError(source){
     return true;
 }
 </script>
+<%}catch(Exception e) {
+	e.printStackTrace();
+}
+
+%>
