@@ -225,3 +225,5 @@ insert into pens.c_lockbox values (4,'LCK04',2306,123);
 insert into pens.c_lockbox values (5,'LCK05',2303,123);				
 insert into pens.c_lockbox values (6,'LCK06',2305,123);		
 insert into pens.c_lockbox values (7,'LCK07',2302,123);	
+
+test;
