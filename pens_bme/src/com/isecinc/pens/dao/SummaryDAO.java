@@ -908,7 +908,9 @@ public class SummaryDAO {
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%' \n" );
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
 						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
-						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%')  \n");
+						sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%'  \n");
+						sql.append("     OR pens_value LIKE '020092%'  \n");
+						sql.append("     OR pens_value LIKE '020095%')  \n");
 						
 					}else if(storeType.equalsIgnoreCase("king")){
 						sql.append(" and (pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%' \n");
@@ -1127,19 +1129,33 @@ public class SummaryDAO {
 			return initDate;
 		}
 	  
+	  public Date searchInitDateWacoalStock(Connection conn,String brandchId) throws Exception {
+		 return searchInitDateWacoalStockModel(conn, brandchId);
+	  }
 	  public Date searchInitDateWacoalStock(String brandchId) throws Exception {
+		  Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+		    return searchInitDateWacoalStockModel(conn, brandchId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	  }
+	  
+	  public Date searchInitDateWacoalStockModel(Connection conn,String brandchId) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			Date initDate = null;
 			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n  SELECT distinct trunc(max(check_date)) as Count_stk_date from PENSBME_INISTK_WACOAL \n");
 				sql.append("\n  where 1=1 and branch_id ='"+brandchId+"' \n");
 				
-				logger.debug("sql:"+sql);
-				conn = DBConnection.getInstance().getConnection();
+				//logger.debug("sql:"+sql);
+			
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()) {
@@ -1153,7 +1169,6 @@ public class SummaryDAO {
 				try {
 					rst.close();
 					stmt.close();
-					conn.close();
 				} catch (Exception e) {}
 			}
 			return initDate;
@@ -1520,6 +1535,86 @@ public class SummaryDAO {
 			return pos;
 		}
 	  
+	 
+	  public OnhandSummary searchReportStockWacoalLotus(SummaryForm f,OnhandSummary c,User user) throws Exception{
+		   Statement stmt = null;
+			ResultSet rst = null;
+			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+		    double saleInQtyTemp = 0;
+		    double saleReturnQtyTemp = 0;
+		    double saleOutQtyTemp = 0;
+		    double adjustQtyTemp =0;
+		    double stockShortQtyTemp = 0;
+		    double onhandQtyTemp = 0;
+		    double onhand_amt = 0;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+                sql = ReportOnhandLotus_SQL.genSQL(conn, c, f.getSummaryType());
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					OnhandSummary item = new OnhandSummary();
+					
+					item.setStoreCode(rst.getString("customer_code"));
+					item.setStoreName(rst.getString("customer_desc"));
+					if("PensItem".equalsIgnoreCase(f.getSummaryType())){
+					   item.setPensItem(rst.getString("pens_item"));
+					}
+					item.setGroup(rst.getString("group_type"));
+					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
+					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("ADJUST_QTY"),Utils.format_current_no_disgit));
+					item.setStockShortQty(Utils.decimalFormat(rst.getDouble("STOCK_SHORT_QTY"),Utils.format_current_no_disgit));
+					item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price_bf"),Utils.format_current_2_disgit));
+					item.setOnhandAmt(Utils.decimalFormat(rst.getDouble("onhand_amt"),Utils.format_current_2_disgit));
+					 
+					
+					saleInQtyTemp += Utils.convertStrToDouble(item.getSaleInQty());
+					saleReturnQtyTemp +=Utils.convertStrToDouble(item.getSaleReturnQty());
+					saleOutQtyTemp +=Utils.convertStrToDouble(item.getSaleOutQty());
+					adjustQtyTemp +=Utils.convertStrToDouble(item.getAdjustQty());
+					stockShortQtyTemp +=Utils.convertStrToDouble(item.getStockShortQty());
+					onhandQtyTemp +=Utils.convertStrToDouble(item.getOnhandQty());
+					onhand_amt += rst.getDouble("onhand_amt");
+							
+					pos.add(item);
+					
+				}//while
+				
+				//Summary
+				OnhandSummary item = new OnhandSummary();
+				item.setStoreCode("");
+				if("PensItem".equalsIgnoreCase(f.getSummaryType())){
+				   item.setPensItem("");
+				}
+				item.setGroup("");
+				item.setSaleInQty(Utils.decimalFormat(saleInQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(saleReturnQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(saleOutQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
+				item.setAdjustQty(Utils.decimalFormat(adjustQtyTemp,Utils.format_current_no_disgit));
+				item.setStockShortQty(Utils.decimalFormat(stockShortQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandAmt(Utils.decimalFormat(onhand_amt,Utils.format_current_2_disgit));
+				c.setSummary(item);
+
+				c.setItemsList(pos);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return c;
+	    }
 	  /** Compare by pens_group_item **/
 	  public OnhandSummary searchOnhandLotus(SummaryForm f,OnhandSummary c,User user) throws Exception{
 		   Statement stmt = null;
@@ -1600,12 +1695,99 @@ public class SummaryDAO {
 			}
 			return c;
 	    }
-	  public OnhandSummary searchReportStockWacoalLotus(SummaryForm f,User user,Date initDate,Date asOfDate) throws Exception{
+	  
+	  public OnhandSummary searchReportStockWacoalLotusAllBranch(SummaryForm f,User user,Date asOfDate) throws Exception{
+		  Connection conn = null;
+		  Statement stmt = null;
+		  ResultSet rst = null;
+		  StringBuilder sql = new StringBuilder();
+		  double saleInitQtyTemp = 0;
+		  double saleInQtyTemp = 0;
+		  double saleReturnQtyTemp = 0;
+		  double saleOutQtyTemp = 0;
+		  double onhandQtyTemp = 0;
+		  OnhandSummary c = f.getOnhandSummary();
+		  List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
+		  Date initDate = null;
+		  try{
+				conn = DBConnection.getInstance().getConnection();
+				//get Store Code All 
+				sql.append("\n SELECT DISTINCT AA.* FROM(");
+			    sql.append("\n SELECT DISTINCT L.branch_id ");
+				sql.append("\n FROM  PENSBME_INISTK_WACOAL L WHERE 1=1");
+			    sql.append("\n UNION ALL");
+			    sql.append("\n SELECT DISTINCT L.branch_id ");
+				sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
+				sql.append("\n WHERE  1=1 ");
+				sql.append("\n UNION ALL");
+			    sql.append("\n SELECT DISTINCT L.branch_id ");
+				sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
+				sql.append("\n WHERE 1=1 ");
+				sql.append("\n UNION ALL");
+			    sql.append("\n SELECT DISTINCT L.branch_id");
+				sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
+				sql.append("\n WHERE  1=1 ");
+				
+				sql.append("\n )AA order by AA.branch_id asc ");
+				logger.debug("sql:"+sql.toString());
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					initDate = new SummaryDAO().searchInitDateWacoalStock(conn,Utils.isNull(rst.getString("branch_id")));
+					
+					OnhandSummary onhandSummary = f.getOnhandSummary();
+					onhandSummary.setPensCustCodeFrom(Utils.isNull(rst.getString("branch_id")));
+					f.setOnhandSummary(onhandSummary);
+					OnhandSummary itemStore = searchReportStockWacoalLotusModel(conn, f, user, initDate, asOfDate);
+					pos.addAll(itemStore.getItemsList());
+							
+					saleInitQtyTemp += Utils.convertStrToDouble(itemStore.getInitSaleQty());
+					saleInQtyTemp += Utils.convertStrToDouble(itemStore.getSaleInQty());
+					saleReturnQtyTemp +=Utils.convertStrToDouble(itemStore.getSaleReturnQty());
+					saleOutQtyTemp +=Utils.convertStrToDouble(itemStore.getSaleOutQty());
+					onhandQtyTemp +=Utils.convertStrToDouble(itemStore.getOnhandQty());
+				}//while
+				
+				//Summary
+				OnhandSummary item = new OnhandSummary();
+				item.setStoreCode("");
+				item.setGroup("");
+				item.setInitDate("");
+				item.setSaleInQty(Utils.decimalFormat(saleInQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(saleReturnQtyTemp,Utils.format_current_no_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(saleOutQtyTemp,Utils.format_current_no_disgit));
+				item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
+				item.setInitSaleQty(Utils.decimalFormat(saleInitQtyTemp,Utils.format_current_no_disgit));
+				c.setSummary(item);
+                
+				//set data list
+				c.setItemsList(pos);
+				
+				return c;
+		  }catch(Exception e){
+			throw e;
+		  }finally{
+			  conn.close();
+		  }
+	  }
+	  public OnhandSummary searchReportStockWacoalLotusOneBranch(SummaryForm f,User user,Date initDate,Date asOfDate) throws Exception{
+		  Connection conn = null;
+		  try{
+			  conn = DBConnection.getInstance().getConnection();
+			  return searchReportStockWacoalLotusModel(conn, f, user, initDate, asOfDate);
+		  }catch(Exception e){
+			  throw e;
+		  }finally{
+			  conn.close();
+		  }
+	  }
+	  
+	  public OnhandSummary searchReportStockWacoalLotusModel(Connection conn,SummaryForm f,User user,Date initDate,Date asOfDate) throws Exception{
 		   Statement stmt = null;
 			ResultSet rst = null;
 			List<OnhandSummary> pos = new ArrayList<OnhandSummary>();
 			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
 			double saleInitQtyTemp = 0;
 		    double saleInQtyTemp = 0;
 		    double saleReturnQtyTemp = 0;
@@ -1614,7 +1796,7 @@ public class SummaryDAO {
 		    OnhandSummary c = f.getOnhandSummary();
 		    String initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			try {
-				conn = DBConnection.getInstance().getConnection();
+				logger.debug("storeCode:"+f.getOnhandSummary().getPensCustCodeFrom());
                 sql = ReportStockWacoalLotus_SQL.genSQL(conn, c,initDate,asOfDate);
 				
 				stmt = conn.createStatement();
@@ -1662,7 +1844,6 @@ public class SummaryDAO {
 				try {
 					rst.close();
 					stmt.close();
-					conn.close();
 				} catch (Exception e) {}
 			}
 			return c;

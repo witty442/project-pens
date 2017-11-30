@@ -160,7 +160,7 @@ public class MoveWarehouseActionV1 extends I_Action {
 			//Copy some data to new job
 			Job oldJob = new Job();
 			oldJob.setJobId(h.getJobId());
-			Job newJob = JobDAO.search(conn,oldJob);
+			Job newJob = JobDAO.searchJobDetail(conn,oldJob);
 			
 		    //Set new Data job new
 			newJob.setJobId(h.getNewJobId());//

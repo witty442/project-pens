@@ -98,7 +98,7 @@ public class ReportStockWacoalLotus_SQL {
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
-					 sql.append("\n AND L.bill_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND L.bill_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND L.bill_date  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");
 				}else{
 					 sql.append("\n AND L.bill_date  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");
@@ -117,7 +117,7 @@ public class ReportStockWacoalLotus_SQL {
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
-					 sql.append("\n AND L.sales_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND L.sales_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND L.sales_date  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");
 				}else{
 					 sql.append("\n AND L.sales_date  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");
@@ -136,7 +136,7 @@ public class ReportStockWacoalLotus_SQL {
 				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
-					 sql.append("\n AND L.document_date_sdh  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND L.document_date_sdh  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND L.document_date_sdh  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");
 				}else{
 					 sql.append("\n AND L.document_date_sdh  <= to_date('"+christAsOfDateStr+"','dd/mm/yyyy')  ");

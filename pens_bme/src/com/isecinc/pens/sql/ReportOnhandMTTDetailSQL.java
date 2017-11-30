@@ -127,7 +127,7 @@ public class ReportOnhandMTTDetailSQL {
 					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
-						 sql.append("\n AND V.invoice_date >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND V.invoice_date > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -186,7 +186,7 @@ public class ReportOnhandMTTDetailSQL {
 				sql.append("\n AND L.status <> '"+PickConstants.STATUS_CANCEL+"'");
 					
 					if(initDate != null){
-						 sql.append("\n AND L.sale_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -226,7 +226,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n  )MI ");
 						sql.append("\n WHERE MI.BARCODE = M.BARCODE  ");
 						if(initDate != null){
-							 sql.append("\n AND M.order_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -262,7 +262,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
 						
 						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.ISSUE_REQ_DATE  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -290,7 +290,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
 						
 						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+							 sql.append("\n AND M.ISSUE_REQ_DATE  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}else{
 							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -328,7 +328,7 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n AND I.STATUS IN( '"+PickConstants.STATUS_RETURN+"' )");
 					
 					if(initDate != null){
-						 sql.append("\n AND J.close_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND J.close_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");

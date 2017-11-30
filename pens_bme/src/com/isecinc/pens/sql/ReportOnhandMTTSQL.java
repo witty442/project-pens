@@ -64,7 +64,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_3+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -106,7 +107,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_3+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1 ");
@@ -132,6 +134,7 @@ public class ReportOnhandMTTSQL {
 						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_2)
 						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_3)
 						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_4)
+						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_5)
 					){
 						sql.append("\n  L.CUST_NO as customer_code ");
 						sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE " +
@@ -189,7 +192,8 @@ public class ReportOnhandMTTSQL {
 				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
 				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%'");
 				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_3+"%'");
-				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%')");
+				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%'");
+				sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 				sql.append("\n   AND M.reference_code ='Store' ");
 		        sql.append("\n  ) M ");
 				sql.append("\n WHERE 1=1 ");
@@ -219,7 +223,8 @@ public class ReportOnhandMTTSQL {
 					if( Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER)
 						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_2)
 						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_3)
-						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_4) ){
+						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_4)
+						|| Utils.isNull(c.getPensCustCodeFrom()).startsWith(Constants.STORE_TYPE_KING_POWER_5) ){
 						
 						sql.append("\n L.CUST_NO as customer_code,L.PENS_ITEM, ");
 				        sql.append("\n L.GROUP_CODE as group_type, ");
@@ -236,7 +241,7 @@ public class ReportOnhandMTTSQL {
 					}
 
 					if(initDate != null){
-						 sql.append("\n AND L.sale_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -273,7 +278,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_3+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -285,7 +291,7 @@ public class ReportOnhandMTTSQL {
 					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
-						 sql.append("\n AND V.invoice_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND V.invoice_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND V.invoice_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND V.invoice_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -322,7 +328,8 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_2+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_3+"%'");
-					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%')");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_4+"%'");
+					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE 1=1   ");
@@ -334,7 +341,7 @@ public class ReportOnhandMTTSQL {
 					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
-						 sql.append("\n AND V.invoice_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND V.invoice_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND V.invoice_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
 						 sql.append("\n AND V.invoice_date   <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");

@@ -285,7 +285,7 @@ public class BarcodeAction extends I_Action {
 			//Validate Job in not close
 			Job job = new Job();
 			job.setJobId(aForm.getJob().getJobId());
-			job = JobDAO.search(job);
+			job = JobDAO.searchJobDetail(job);
 			
 			if(job != null && job.getStatus().equals(JobDAO.STATUS_CANCEL)){
 				request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลได้  Job["+job.getJobId()+"-"+job.getName()+"] มีสถานะเป็น CANCEL");

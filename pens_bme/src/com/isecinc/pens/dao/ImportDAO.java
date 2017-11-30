@@ -676,8 +676,8 @@ public class ImportDAO {
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%'  \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
-					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%' ) \n");
-					 
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_5+"%' ) \n");
 				}
 			}
 			

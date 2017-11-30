@@ -53,15 +53,29 @@
   //System.out.println("contextPathProd:"+contextPathProd);
   //System.out.println("contextPathDD:"+contextPathDD);
 
+  //System.out.println("webPath:"+webPath);
+  //System.out.println("currentIP:"+currentIP);
 %>
 <script>
-
-  function link(isProd,url){
+  <!--For Test Only -->
+ <%if(webPath.equalsIgnoreCase("/pens_bme_test") 
+	|| "192.168.202.8".equalsIgnoreCase(currentIP)){ %>
+	 function link(isProd,url){
+		 linkModelTest(false,url);
+	 }
+ <%}else {%>
+	 function link(isProd,url){
+		 linkModel(isProd,url);
+	 }
+ <%}%>
+ 
+ <!--Production -->
+ function linkModel(isProd,url){
 	  var newUrl ;
 	  <% 
-	    	// Link to Isec Server  DDServer To IsecServer
-	    	//input  : /jsp/mcAction.do?do=prepareMCStaff&action=new
-	    	//output : login.do?do=loginCrossServer&pathRedirect=payAction|prepare2|new
+	    // Link to Isec Server  DDServer To IsecServer
+	    //input  : /jsp/mcAction.do?do=prepareMCStaff&action=new
+	    //output : login.do?do=loginCrossServer&pathRedirect=payAction|prepare2|new
 	    	
 	   // System.out.println("LocalAddress:"+request.getLocalAddr()+","+InetAddress.getLocalHost().getHostAddress());
 	    if(InetAddress.getLocalHost().getHostAddress().equalsIgnoreCase(ipDD)){
@@ -112,9 +126,11 @@
 		    	 window.location = encodeURI(url);
 		    }
 		<%}%>
-		
+   }
+ 
+  function linkModelTest(isProd,url){
+	window.location = encodeURI(url);	
   }
-  
 </script>
 
 <ul id="nav">
@@ -315,6 +331,7 @@
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTT');"><span>8.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTT"/></span></a>
 			</li>  
+			
 			 <li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandMTTDetail');"><span>9.<bean:message bundle="sysprop" key="SummaryBMEOnhandMTTDetail"/></span></a>
 			</li>

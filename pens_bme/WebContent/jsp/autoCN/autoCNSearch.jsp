@@ -233,7 +233,14 @@ function getCustName(path,storeCode,fieldName,storeType){
 									<td>
 									   Cut off Job data  &nbsp;&nbsp;
 									    <html:text property="bean.cuttOffDate" styleId="cuttOffDate" size="10" styleClass="disableText"  readonly="true"/>
-									 
+									 &nbsp;&nbsp;
+									 Status 
+									  <html:select property="bean.status" styleId="status">
+											<html:option value=""></html:option>
+											<html:option value="APPROVED">APPROVED</html:option>
+											<html:option value="SUCCESS">SUCCESS</html:option>
+											<html:option value="ERROR">ERROR</html:option>
+									    </html:select>	
 									</td>
 								</tr>
 						   </table>

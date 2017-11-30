@@ -39,6 +39,7 @@ public class AutoCNDAO extends PickConstants{
 		try {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n  select S.* from (");
             sql.append("\n   select ");
 			sql.append("\n   j.job_id ,j.name ");
 			sql.append("\n   ,j.store_code ,j.cust_group");
@@ -59,8 +60,13 @@ public class AutoCNDAO extends PickConstants{
 		    sql.append("\n   and j.status not in ('O','AB') ");
 		    //Where Condition
 		    sql.append(genWhereSearchJobList(o).toString());
-            sql.append("\n    order by j.job_id desc");
+		    
+            sql.append("\n     order by j.job_id desc");
+            sql.append("\n   )S WHERE 1=1 ");
+            //Where Status Condition
+		    sql.append(genWhereSearchJobListStatus(o).toString());
             sql.append("\n   )A ");
+            
         	// get record start to end 
             if( !allRec){
         	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
@@ -347,20 +353,33 @@ public class AutoCNDAO extends PickConstants{
 		AutoCNBean h = null;
 	    int totalRec = 0;
 		try {
-            sql.append("\n select count(*) as c ");
+            sql.append("\n select count(*) as c from(");
+            sql.append("\n select S.* from( ");
+    	    sql.append("\n   select (select a.status from PENSBME_APPROVE_TO_AUTOCN a ");
+		    sql.append("\n     where a.job_id = j.job_id and a.rtn_no = j.rtn_no");
+		    sql.append("\n   ) as status ");
+		    sql.append("\n   ,(select a.intflag from PENSBME_APPROVE_TO_AUTOCN a ");
+		    sql.append("\n     where a.job_id = j.job_id and a.rtn_no = j.rtn_no");
+		    sql.append("\n   ) as status_interface ");
 		    sql.append("\n from pensbme_pick_job j  ");
 		    sql.append("\n where 1=1 ");
 		    sql.append("\n and j.status not in ('O','AB')");
 		    //Where Condition
 		    sql.append(genWhereSearchJobList(o).toString());
-         
+		   
+		    sql.append("\n ) S where 1=1");
+		    //Where Status Condition
+		    sql.append(genWhereSearchJobListStatus(o).toString());
+		    
+		    sql.append("\n ) A ");
+		    
 			logger.debug("sql:"+sql);
 
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
 			if(rst.next()) {
-			 totalRec = rst.getInt("c");
+			   totalRec = rst.getInt("c");
 			}//while
  
 		} catch (Exception e) {
@@ -395,7 +414,24 @@ public class AutoCNDAO extends PickConstants{
 	    }
 		 return sql;
 	}
-	
+	public static StringBuffer genWhereSearchJobListStatus(AutoCNBean o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		if(Utils.isNull(o.getStatus()).equals("")){
+	    	//"" and APPROVED
+	    	sql.append("\n   AND (S.status is null or S.status ='APPROVED')");
+	    	sql.append("\n   AND ( S.status_interface is null)");
+	    }else if(Utils.isNull(o.getStatus()).equals("APPROVED")){
+	    	//"" and APPROVED
+	    	sql.append("\n   AND S.status ='APPROVED'");
+	    	sql.append("\n   AND ( S.status_interface is null)");
+	    	
+	    }else  if(Utils.isNull(o.getStatus()).equals("SUCCESS")){
+	    	sql.append("\n   AND (S.status_interface ='S')");
+	    }else  if(Utils.isNull(o.getStatus()).equals("ERROR")){
+	    	sql.append("\n   AND (S.status_interface ='E')");
+	    }
+		return sql;
+	}
 	public static void save(Connection conn,AutoCNBean head) throws Exception{
 		int i=0;
 		AutoCNBean item = null;
@@ -404,7 +440,7 @@ public class AutoCNDAO extends PickConstants{
 			if( !isHeadExist(conn,head) ){
 			   insertHeadModel(conn, head);
 			}else{
-			  updateHeadModel(conn, head);
+			   updateHeadModel(conn, head);
 			}
 			
 			//delete item by job_id ,rtn_no
@@ -479,7 +515,7 @@ public class AutoCNDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			try{
 				sql.append("UPDATE PENSBI.PENSBME_APPROVE_TO_AUTOCN \n");
-				sql.append("SET TOTAL_BOX = ? , TOTAL_QTY =? , UPDATE_DATE = ?, UPDATE_USER = ? \n");
+				sql.append("SET TOTAL_BOX = ? , TOTAL_QTY =?, INTFLAG='' , CREATE_DATE =? ,UPDATE_DATE = ?, UPDATE_USER = ? \n");
 				sql.append("WHERE JOB_ID =? AND RTN_NO =? \n");
 				
 				//logger.debug("sql:"+sql.toString());
@@ -488,6 +524,7 @@ public class AutoCNDAO extends PickConstants{
 	
 				ps.setDouble(c++, Utils.convertStrToDouble(head.getTotalBox())); 
 				ps.setDouble(c++, Utils.convertStrToDouble(head.getTotalQty())); 
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, head.getUserName());
 				ps.setString(c++, Utils.isNull(head.getJobId()));

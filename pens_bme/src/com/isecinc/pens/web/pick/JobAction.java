@@ -23,7 +23,6 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
-import com.isecinc.pens.dao.OnhandDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -37,7 +36,7 @@ import com.isecinc.pens.web.popup.PopupForm;
  */
 public class JobAction extends I_Action {
 
-	public static int pageSize = 90;
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	
@@ -74,9 +73,6 @@ public class JobAction extends I_Action {
 				custGroupList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
 				request.getSession().setAttribute("custGroupList",custGroupList);
 				
-			}else if("back".equals(action)){
-				aForm.setJob(aForm.getJobCriteria());
-				aForm.setResultsSearch(JobDAO.searchHead(aForm.getJob()));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -89,7 +85,7 @@ public class JobAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	/*public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		JobForm aForm = (JobForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -109,8 +105,81 @@ public class JobAction extends I_Action {
 			
 		}
 		return mapping.findForward("search2");
+	}*/
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		JobForm aForm = (JobForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnectionApps();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setJob(aForm.getJobCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(JobDAO.searchJobListTotalRec(conn,aForm.getJob()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			   
+				List<Job> items = JobDAO.searchJobList(conn,aForm.getJob(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<Job> items = JobDAO.searchJobList(conn,aForm.getJob(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		return mapping.findForward("search2");
 	}
-	
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
 		JobForm aForm = (JobForm) form;
@@ -144,12 +213,13 @@ public class JobAction extends I_Action {
 			
             String jobId = Utils.isNull(request.getParameter("jobId"));
             String mode = Utils.isNull(request.getParameter("mode"));
+            logger.debug("jobId:"+jobId+",mode:"+mode);
             
 			if( !"".equals(jobId)){
 				logger.debug("prepare edit jobId:"+jobId);
 				Job c = new Job();
 				c.setJobId(jobId);
-				Job aS = JobDAO.search(c);
+				Job aS = JobDAO.searchJobDetail(c);
 				
 				aForm.setResults(aS.getItems());
 				aForm.setJob(aS);
@@ -242,7 +312,7 @@ public class JobAction extends I_Action {
 			conn.commit();
 
 			//search
-			aForm.setJob(JobDAO.search(h));
+			aForm.setJob(JobDAO.searchJobDetail(h));
 			
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
@@ -281,7 +351,7 @@ public class JobAction extends I_Action {
 			conn.commit();
 
 			//search
-			aForm.setJob(JobDAO.search(h));
+			aForm.setJob(JobDAO.searchJobDetail(h));
 			
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
@@ -329,7 +399,7 @@ public class JobAction extends I_Action {
 			conn.commit();
 
 			//search
-			aForm.setJob(JobDAO.search(h));
+			aForm.setJob(JobDAO.searchJobDetail(h));
 			
 			request.setAttribute("Message", "ยกเลิกรายการเรียบร้อยแล้ว");
 			

@@ -3,6 +3,10 @@ package com.isecinc.pens.web.pick;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionMapping;
+
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.Job;
@@ -49,5 +53,10 @@ public class JobForm extends I_Form {
 		Job = job;
 	}
     
+	@Override
+	public void reset(ActionMapping mapping, HttpServletRequest request) {
+		if(getJob() !=null)
+			getJob().setDispAutoCN("");
+	}
     
 }

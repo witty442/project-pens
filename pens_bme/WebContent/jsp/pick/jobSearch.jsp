@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.Job"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
@@ -37,27 +38,6 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
@@ -171,6 +151,12 @@ function resetStore(){
 		form.storeNo.value = "";
 		form.subInv.value = "";
 	}
+}
+function gotoPage(path,currPage){
+	var form = document.jobForm;
+	form.action = path + "/jsp/jobAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
 }
 </script>
 
@@ -291,7 +277,10 @@ function resetStore(){
                                     <td> RTN No</td>
 									<td>				
 										  <html:text property="job.rtnNo" styleId="rtnNo" size="15" />
+										  &nbsp;&nbsp;&nbsp;
+										  <html:checkbox property="job.dispAutoCN">แสดงรายที่ Auto CN แล้ว</html:checkbox>
 									</td>
+									
 								</tr>
 						   </table>
 						   
@@ -315,7 +304,30 @@ function resetStore(){
 					  </div>
 
             <c:if test="${jobForm.resultsSearch != null}">
-                  	
+                  	    <% 
+					   int totalPage = jobForm.getTotalPage();
+					   int totalRecord = jobForm.getTotalRecord();
+					   int currPage =  jobForm.getCurrPage();
+					   int startRec = jobForm.getStartRec();
+					   int endRec = jobForm.getEndRec();
+					   int no = startRec;
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -329,63 +341,64 @@ function resetStore(){
 									<th> ยอดเงิน (ตาม RTN)</th>
 									<th >Job Status</th>
 									<th >Job Close Date</th>
+									<th >Auto CN</th>
 									<th >แก้ไข</th>						
 							   </tr>
-							<c:forEach var="results" items="${jobForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="td_text_center" width="3%">${results.no}</td>
+							<% 
+							String tabclass ="lineE";
+							List<Job> resultList = jobForm.getResultsSearch();
+							for(int n=0;n<resultList.size();n++){
+								Job item = (Job)resultList.get(n);
+								if(n%2==0){ 
+									tabclass="lineO";
+								}
+								%>
+									<tr class="<%=tabclass%>">
+										<td class="td_text_center" width="3%"><%=no %></td>
 										<td class="td_text_center" width="8%">
-										   ${results.openDate}
+										   <%=item.getOpenDate() %>
 										</td>
-										<td class="td_text_center" width="5%">${results.wareHouse}</td>
-										<td class="td_text" width="7%">${results.custGroupDesc}</td>
-										<td class="td_text" width="3%">${results.jobId}</td>
+										<td class="td_text_center" width="5%"><%=item.getWareHouse() %></td>
+										<td class="td_text" width="7%"><%=item.getCustGroupDesc() %></td>
+										<td class="td_text" width="3%"> <%=item.getJobId() %></td>
 										<td class="td_text" width="17%">
-											${results.name}
+											 <%=item.getName() %>
 										</td>
 										<td class="td_text" width="8%">
-											${results.refDoc}
+											 <%=item.getRefDoc() %>
 										</td>
 										<td class="td_text" width="4%">
-											${results.rtnQty}
+											 <%=item.getRtnQty() %>
 										</td>
 										<td class="td_text" width="4%">
-											${results.rtnAmt}
+											 <%=item.getRtnAmt() %>
 										</td>
 										<td class="td_text"  width="5%">
-										    ${results.statusDesc}
+										     <%=item.getStatusDesc() %>
 										</td>
-										
 										<td class="td_text_center" width="5%">
-										  ${results.closeDate}
+										   <%=item.getCloseDate() %>
 										</td>
-										<td class="td_text_center" width="10%">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.jobId}','view')">
-											          ดู
+										<td class="td_text_center" width="5%"> 
+										  <%if( Utils.isNull(item.getAutoCN()).equalsIgnoreCase("Y")){ %>
+										     <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									       <%} %>
+										</td>
+										<td class="td_text_center" width="5%">
+										 <%if(item.isCanEdit()==false){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getJobId()%>','view')">
+											      View
 											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.jobId}','edit')">
+										  <%}%>
+										  <%if(item.isCanEdit()==true){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getJobId()%>','edit')">
 											          แก้ไข
 											  </a>
-										  </c:if>
+										  <%} no++;%>
 										</td>
 									</tr>
-							
-							  </c:forEach>
-					</table>
-								
-								
+							<%}//for %>
+					</table>			
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >

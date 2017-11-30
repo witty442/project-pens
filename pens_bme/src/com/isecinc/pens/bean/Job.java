@@ -30,7 +30,9 @@ public class Job implements Serializable{
 	private String rtnQty;
 	private String rtnAmt;
 	private String rtnNo;
-	
+	private String dispAutoCN;
+	private String cnNo;
+	private String autoCN;
 	private List<Job> items;
     
 	//optional
@@ -38,6 +40,25 @@ public class Job implements Serializable{
 	private boolean canCancel = false;
 	
 	
+	public String getAutoCN() {
+		return autoCN;
+	}
+	public void setAutoCN(String autoCN) {
+		this.autoCN = autoCN;
+	}
+	
+	public String getDispAutoCN() {
+		return dispAutoCN;
+	}
+	public void setDispAutoCN(String dispAutoCN) {
+		this.dispAutoCN = dispAutoCN;
+	}
+	public String getCnNo() {
+		return cnNo;
+	}
+	public void setCnNo(String cnNo) {
+		this.cnNo = cnNo;
+	}
 	public String getRtnNo() {
 		return rtnNo;
 	}

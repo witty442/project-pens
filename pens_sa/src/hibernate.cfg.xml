@@ -8,7 +8,7 @@
 		<!-- Test Server -->
         <!-- <property name="connection.url">jdbc:oracle:thin:@//192.168.38.186:1529/TEST</property> -->
        
-	   	<!-- Production Server -->
+	   	<!-- Production Server --> 
 	     <property name="connection.url">jdbc:oracle:thin:@//192.168.37.185:1521/PENS</property> 
 	    
 		<property name="connection.username">pensbi</property>

@@ -225,6 +225,7 @@ public class SummaryAction extends I_Action {
 				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
 					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					
 					Date initDate = new SummaryDAO().searchInitDateWacoalStock(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
 					logger.debug("initDate:"+initDate);
@@ -241,7 +242,12 @@ public class SummaryAction extends I_Action {
 					}
 					if(pass){
 						List<OnhandSummary> results = null;
-						OnhandSummary re = new SummaryDAO().searchReportStockWacoalLotus(summaryForm,user,initDate,asOfDate);
+						 OnhandSummary re = null;
+						if("ALL".equalsIgnoreCase(summaryForm.getOnhandSummary().getPensCustCodeFrom())){
+							re = new SummaryDAO().searchReportStockWacoalLotusAllBranch(summaryForm,user,asOfDate);
+						}else{
+						    re = new SummaryDAO().searchReportStockWacoalLotusOneBranch(summaryForm,user,initDate,asOfDate);
+						}
 						if(re != null){
 							results = re.getItemsList();	
 							request.getSession().setAttribute("summary",re.getSummary());

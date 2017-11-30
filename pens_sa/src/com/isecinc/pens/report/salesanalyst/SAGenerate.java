@@ -107,9 +107,11 @@ public class SAGenerate {
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				
 				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				debug.debug("sql Month:"+sql.toString());
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
+				    debug.debug("execute sql Month:");
 				    
 				    /** Gen Html Code **/
 				    resultList.add(genReportHtml(contextPath,groupByBean,colGroupList,setDispCol(salesBean),rs,salesBean.getSummaryType()));
@@ -169,6 +171,7 @@ public class SAGenerate {
 		  return resultList;
 		}catch(Exception e){
 			debug.info(e.getMessage());
+			e.printStackTrace();
 			throw e;
 		}finally{
 			
@@ -502,7 +505,7 @@ public class SAGenerate {
 				found = true;
 				isFoundDataInRow = false;
 				StringBuffer rowNoHtml = new StringBuffer("");
-
+                debug.debug("rs next");
 				if("Invoice_Date".equalsIgnoreCase(groupByBean.getName())){
 					String dateStr = Utils.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					debug.debug("dateStr:"+dateStr);

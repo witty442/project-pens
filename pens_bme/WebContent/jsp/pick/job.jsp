@@ -77,7 +77,7 @@ function clearForm(path){
 
 function back(path){
 	var form = document.jobForm;
-	form.action = path + "/jsp/jobAction.do?do=prepare2&action=back";
+	form.action = path + "/jsp/jobAction.do?do=search2&action=back";
 	form.submit();
 	return true;
 }
@@ -476,6 +476,8 @@ function resetStore(){
 											<html:text property="job.rtnNo" styleId="rtnNo" size="15" onblur="validRtnNoInJob(this)"/>
 									    <%}else{ %>
 									        <html:text property="job.rtnNo" styleId="rtnNo" size="15" readonly="true" styleClass="disableText"/>
+									        &nbsp; &nbsp; &nbsp;CN NO&nbsp;
+									        <html:text property="job.cnNo" styleId="cnNo" size="60" readonly="true" styleClass="disableText"/>
 									    <%} %>
 										</td>
 									</tr>

@@ -23,74 +23,78 @@ public class JobDAO extends PickConstants{
 
 	protected static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
-
-	public static List<Job> searchHead(Job o ) throws Exception {
+	
+	public static int searchJobListTotalRec(Connection conn,Job o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
+		int totalRec = 0;
+		try {
+			sql.append("\n select count(*) as c from (");
+			sql.append("\n    select j.* ");
+			sql.append("\n    ,( select (case when v.intflag='S' then 'Y' ELSE '' END)");
+			sql.append("\n      from PENSBI.PENSBME_APPROVE_TO_AUTOCN v ");
+			sql.append("\n      where v.rtn_no = J.rtn_no ) as auto_cn ");
+			sql.append("\n    from PENSBI.PENSBME_PICK_JOB J  ");
+			sql.append("\n )A where 1=1 ");
+			//genWHereCond
+			sql.append(genWhereCondSearchHead(o));
+		
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()){
+				totalRec = rst.getInt("c");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	
+	public static List<Job> searchJobList(Connection conn,Job o,boolean allRec,int currPage,int pageSize ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
 		Job h = null;
 		List<Job> items = new ArrayList<Job>();
 		int r = 1;
 		int c = 1;
 		try {
-
-			sql.append("\n select J.* " +
-			        " \n ,(select M.Interface_desc " +
-			        " \n   from PENSBME_MST_REFERENCE M WHERE 1=1 " +
-			        " \n  and M.pens_value =J.cust_group  and M.reference_code = 'Idwacoal') as cust_group_desc "+
-			       
-			        " \n  ,(SELECT m.pens_desc from PENSBME_MST_REFERENCE m "+
-					" \n    where 1=1  and j.store_code = m.pens_value and m.reference_code ='Store') as store_name "+
-			        
-					"\n from PENSBME_PICK_JOB J    ");
-			sql.append("\n where 1=1   ");
-			
-			if( !Utils.isNull(o.getJobId()).equals("")){
-				sql.append("\n and job_id = "+Utils.isNull(o.getJobId())+"");
-			}
-			if( !Utils.isNull(o.getRefDoc()).equals("")){
-				sql.append("\n and ref_doc = '"+Utils.isNull(o.getRefDoc())+"'");
-			}
-			
-			if( !Utils.isNull(o.getWareHouse()).equals("")){
-				sql.append("\n and warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
-			}
-			
-			if( !Utils.isNull(o.getName()).equals("")){
-				sql.append("\n and name like '%"+Utils.isNull(o.getName())+"%'  ");
-			}
-			
-			if( !Utils.isNull(o.getStoreCode()).equals("")){
-				sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
-			}
-			if( !Utils.isNull(o.getStoreNo()).equals("")){
-				sql.append("\n and store_no = '"+Utils.isNull(o.getStoreNo())+"'  ");
-			}
-			if( !Utils.isNull(o.getSubInv()).equals("")){
-				sql.append("\n and sub_inv = '"+Utils.isNull(o.getSubInv())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getStatus()).equals("")){
-				sql.append("\n and STATUS = '"+Utils.isNull(o.getStatus())+"' ");
-			}
-			if( !Utils.isNull(o.getOpenDate()).equals("")){
-				sql.append("\n and OPEN_DATE = ? ");
-			}
-			if( !Utils.isNull(o.getCloseDate()).equals("")){
-				sql.append("\n and CLOSE_DATE = ? ");
-			}
-			
-			if( !Utils.isNull(o.getCustGroup()).equals("")){
-				sql.append("\n and cust_group like '%"+Utils.isNull(o.getCustGroup())+"%'  ");
-			}
-			if( !Utils.isNull(o.getRtnNo()).equals("")){
-				sql.append("\n and rtn_no = '"+Utils.isNull(o.getRtnNo())+"' ");
-			}
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n select B.* FROM( " );
+			sql.append("\n   select J.* " );
+			sql.append("\n   ,(select M.Interface_desc from PENSBI.PENSBME_MST_REFERENCE m " );
+	        sql.append("\n     where M.pens_value =J.cust_group  and M.reference_code = 'Idwacoal') as cust_group_desc ");
+            sql.append("\n   ,( SELECT m.pens_desc from PENSBI.PENSBME_MST_REFERENCE m ");
+			sql.append("\n     where j.store_code = m.pens_value and m.reference_code ='Store') as store_name ");
+		    sql.append("\n   ,( select (case when v.intflag='S' then 'Y' ELSE '' END)");
+			sql.append("\n     from PENSBI.PENSBME_APPROVE_TO_AUTOCN v ");
+			sql.append("\n     where v.rtn_no = J.rtn_no) as auto_cn ");	
+			sql.append("\n   from PENSBI.PENSBME_PICK_JOB J ");
+			sql.append("\n  )B where 1=1   ");
+			//genWHereCond
+			sql.append(genWhereCondSearchHead(o));
+	
 			sql.append("\n order by job_id desc ");
+			sql.append("\n   )A ");
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+			}
 			logger.debug("sql:"+sql);
 			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			
 			if( !Utils.isNull(o.getOpenDate()).equals("")){
@@ -111,20 +115,17 @@ public class JobDAO extends PickConstants{
 				   h.setCustGroupDesc(Utils.isNull(rst.getString("cust_group_desc")));
 				   h.setJobId(rst.getString("job_id"));
 				   h.setOpenDate(Utils.stringValue(rst.getTimestamp("open_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   
-				   if(rst.getDate("close_date") !=null){
-				      h.setCloseDate(Utils.stringValue(rst.getDate("close_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   }
+				   h.setCloseDate(Utils.stringValueNull(rst.getDate("close_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));  
 				   h.setName(Utils.isNull(rst.getString("name"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
 				   h.setStatusMessage(Utils.isNull(rst.getString("status_message"))); 
-				   
 				   h.setStoreCode(Utils.isNull(rst.getString("store_code"))); 
 				   h.setStoreName(Utils.isNull(rst.getString("store_name"))); 
 				   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
+				   h.setAutoCN(Utils.isNull(rst.getString("auto_cn")));
 				   
 				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
 				   h.setRtnAmt(Utils.decimalFormat(rst.getDouble("rtn_amt"),Utils.format_current_2_disgit,""));
@@ -147,15 +148,59 @@ public class JobDAO extends PickConstants{
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
+				
 			} catch (Exception e) {}
 		}
 		return items;
 	}
 	
-	public static Job search(Connection conn,Job o ) throws Exception {
+	public static StringBuffer genWhereCondSearchHead(Job o){
+		StringBuffer sql = new StringBuffer("");
+		if( !Utils.isNull(o.getJobId()).equals("")){
+			sql.append("\n and job_id = "+Utils.isNull(o.getJobId())+"");
+		}
+		if( !Utils.isNull(o.getRefDoc()).equals("")){
+			sql.append("\n and ref_doc = '"+Utils.isNull(o.getRefDoc())+"'");
+		}
+		if( !Utils.isNull(o.getWareHouse()).equals("")){
+			sql.append("\n and warehouse = '"+Utils.isNull(o.getWareHouse())+"'");
+		}
+		if( !Utils.isNull(o.getName()).equals("")){
+			sql.append("\n and name like '%"+Utils.isNull(o.getName())+"%'  ");
+		}	
+		if( !Utils.isNull(o.getStoreCode()).equals("")){
+			sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+		}
+		if( !Utils.isNull(o.getStoreNo()).equals("")){
+			sql.append("\n and store_no = '"+Utils.isNull(o.getStoreNo())+"'  ");
+		}
+		if( !Utils.isNull(o.getSubInv()).equals("")){
+			sql.append("\n and sub_inv = '"+Utils.isNull(o.getSubInv())+"'  ");
+		}
+		if( !Utils.isNull(o.getStatus()).equals("")){
+			sql.append("\n and STATUS = '"+Utils.isNull(o.getStatus())+"' ");
+		}
+		if( !Utils.isNull(o.getOpenDate()).equals("")){
+			sql.append("\n and OPEN_DATE = ? ");
+		}
+		if( !Utils.isNull(o.getCloseDate()).equals("")){
+			sql.append("\n and CLOSE_DATE = ? ");
+		}
+		if( !Utils.isNull(o.getCustGroup()).equals("")){
+			sql.append("\n and cust_group like '%"+Utils.isNull(o.getCustGroup())+"%'  ");
+		}
+		if( !Utils.isNull(o.getRtnNo()).equals("")){
+			sql.append("\n and rtn_no = '"+Utils.isNull(o.getRtnNo())+"' ");
+		}
+		if( !Utils.isNull(o.getDispAutoCN()).equals("")){
+			sql.append("\n and auto_cn = 'Y' ");
+		}
+		return sql;
+	}
+	
+	public static Job searchJobDetail(Connection conn,Job o ) throws Exception {
 		try{
-			return searchModel(conn, o);
+			return searchJobDetailModel(conn, o);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -163,11 +208,11 @@ public class JobDAO extends PickConstants{
 		}
 	}
 	
-	public static Job search(Job o ) throws Exception {
+	public static Job searchJobDetail(Job o ) throws Exception {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchModel(conn, o);
+			return searchJobDetailModel(conn, o);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -177,7 +222,7 @@ public class JobDAO extends PickConstants{
 		}
 	}
 	
-	public static Job searchModel(Connection conn,Job o ) throws Exception {
+	public static Job searchJobDetailModel(Connection conn,Job o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -221,7 +266,6 @@ public class JobDAO extends PickConstants{
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
-			  
 				   h = new Job();
 				   h.setNo(r);
 				   h.setJobId(rst.getString("job_id"));
@@ -262,6 +306,10 @@ public class JobDAO extends PickConstants{
 					   h.setCanEdit(false); 
 			       }
 			  
+				   //get CN NO 
+				   if( !Utils.isNull(h.getRtnNo()).equals("")){
+					   h.setCnNo(getCNNO(conn,Utils.isNull(h.getRtnNo())));
+				   }
 			   r++;
 			   
 			}//while
@@ -275,6 +323,32 @@ public class JobDAO extends PickConstants{
 			} catch (Exception e) {}
 		}
 		return h;
+	}
+	public static String getCNNO(Connection conn,String rtnNo) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String cnNo = "";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select cn_no from xxpens_om_rtn_order_ref_v h where rtn_no ='"+rtnNo+"' \n" );
+            logger.debug("sql:\n"+sql.toString());
+         
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				cnNo += rs.getString("cn_no")+",";
+			}
+			if( !Utils.isNull(cnNo).equals("")){
+				cnNo = cnNo.substring(0,cnNo.length()-1);
+			}
+			return cnNo;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
 	}
 	
 	public static Job save(Job h,User user) throws Exception{
@@ -311,10 +385,8 @@ public class JobDAO extends PickConstants{
 				  
 				 //Process Onhand  by pens_item in job
 				  OnhandDAO.processBanlanceOnhandFromBarcodeByJobId(conn,user.getUserName(),h);
-				  
 				}
 			}
-			
 			conn.commit();
 			
 			return h;
@@ -330,7 +402,6 @@ public class JobDAO extends PickConstants{
 	
 	public static Job saveCaseMoveWarehouse(Connection conn,Job h,User user) throws Exception{
 		try{
-
 			//check documentNo
 			if(Utils.isNull(h.getJobId()).equals("")){
 				//Gen JobId
@@ -381,8 +452,7 @@ public class JobDAO extends PickConstants{
 		   }
 		  return seq;
 	}
-		 
-	 
+
 	 private static void saveModel(Connection conn,Job o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("Insert");

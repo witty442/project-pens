@@ -80,7 +80,6 @@ function getCustNameKeypress(path,e,custCode,fieldName){
 	}
 }
 
-
 function getCustName(path,custCode,fieldName,storeType){
 	var returnString = "";
 	var form = document.summaryForm;
