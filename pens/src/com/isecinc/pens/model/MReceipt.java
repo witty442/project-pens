@@ -214,8 +214,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
 						+ new ReceiptDocumentProcess().getNextDocumentNo(receipt.getSalesRepresent().getCode(), prefix,
-								activeUserID, conn));
-			
+								activeUserID, conn));	
 		} else {
 			id = receipt.getId();
 		}
