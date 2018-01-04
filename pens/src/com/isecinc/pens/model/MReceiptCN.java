@@ -83,7 +83,9 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 		}
 		return pos;
 	}
-
+    
+	//Add Adjust By ar_invoice_no
+	
 	/**
 	 * Delete
 	 * 
@@ -107,7 +109,59 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 		}
 		return true;
 	}
+	
+	public double getTotalReceiptCNAmt(Connection conn) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		double cnPaidAmt = 0;
+		try {
+			String sql = "select SUM(rl.PAID_AMOUNT) as cn_amt ";
+			sql += "from t_receipt_cn rl, t_credit_note o ";
+			sql += "where 1=1 ";
+			sql += " and rl.credit_note_id = o.credit_note_id ";
+			sql += " and o.active = 'Y' ";
+			sql += " and o.doc_status = 'SV' ";
+			sql += " and rl.receipt_id in ("
+					+ " select receipt_id from " + MReceipt.TABLE_NAME + ""
+					+ " where doc_status = '"+ Receipt.DOC_SAVE 
+					+ "' ) ";
 
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while (rst.next()) {
+				cnPaidAmt += rst.getDouble("PAID_AMOUNT");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		return cnPaidAmt;
+	}
+
+	public double calculateCNCreditAmount(CreditNote cn) throws Exception {
+		Connection conn = null;
+		try{
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			return calculateCNCreditAmountModel(conn, cn);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			try{
+				conn.close();
+			}catch(Exception ee){}
+		}
+	}
+	
+	public double calculateCNCreditAmount(Connection conn,CreditNote cn) throws Exception {
+		return calculateCNCreditAmountModel(conn, cn);
+	}
 	/**
 	 * Calculate Credit Amount
 	 * 
@@ -115,19 +169,18 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	 * @return
 	 * @throws Exception
 	 */
-	public double calculateCreditAmount(CreditNote cn) throws Exception {
-		Connection conn = null;
+	public double calculateCNCreditAmountModel(Connection conn,CreditNote cn) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		double creditAmt = cn.getTotalAmount();
 		double paidAmt = 0;
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+
 			String sql = "select rl.PAID_AMOUNT ";
 			sql += "from t_receipt_cn rl, t_credit_note o ";
 			sql += "where rl.credit_note_id = " + cn.getId();
 			sql += "  and rl.credit_note_id = o.credit_note_id ";
-			sql += "  and o.active = 'Y' ";
+			sql += "  and o.active = 'Y' and o.doc_status ='SV' ";
 			sql += "  and rl.receipt_id in (select receipt_id from " + MReceipt.TABLE_NAME + " where doc_status = '"
 					+ Receipt.DOC_SAVE + "' ) ";
 
@@ -137,6 +190,8 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 				creditAmt -= rst.getDouble("PAID_AMOUNT");
 				paidAmt += rst.getDouble("PAID_AMOUNT");
 			}
+			//logger.debug("Calc creditAmt:"+creditAmt);
+			
 			cn.setCreditAmount(creditAmt);
 			cn.setPaidAmount(paidAmt);
 			cn.setRemainAmount(creditAmt - paidAmt);
@@ -150,9 +205,6 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 			} catch (Exception e2) {}
 			try {
 				stmt.close();
-			} catch (Exception e2) {}
-			try {
-				conn.close();
 			} catch (Exception e2) {}
 		}
 		return creditAmt;

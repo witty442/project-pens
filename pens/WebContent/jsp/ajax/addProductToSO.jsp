@@ -31,7 +31,6 @@ if(basket != null ){
 	String json = new String(basket.getJSON().toString());
 	
 	//System.out.println(json);
-	
 	session.removeAttribute(custId);
 %>
 <%=json%>

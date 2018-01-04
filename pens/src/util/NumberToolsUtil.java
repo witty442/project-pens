@@ -22,10 +22,8 @@ public class NumberToolsUtil {
 	
 	public static void main(String[] a){
 		try{
-			String v ="001";
-			String r = NumberToolsUtil.decimalFormat(Integer.parseInt(v),NumberToolsUtil.format_current_five_digit);
-			System.out.println(r);
-			
+			double creditAmt  = 10.;
+			System.out.println(NumberToolsUtil.getDoubleDigit(creditAmt, 2));
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -58,5 +56,21 @@ public class NumberToolsUtil {
 	    BigDecimal bd = new BigDecimal(Double.toString(d));
 	    bd = bd.setScale(decimalPlace,roundType);
 	    return bd.doubleValue();
+	  }
+	
+	public static double getDoubleDigit(double d, int decimalPlace){
+	    String doubleStr = "";
+	    String doubleStrTemp = Double.toString(d);
+	    System.out.println("doubleStrTemp:"+doubleStrTemp);
+	    if(doubleStrTemp.indexOf(".") != -1){
+	    	doubleStr = doubleStrTemp.substring(0,doubleStrTemp.indexOf("."))+".";
+	    	if(doubleStrTemp.indexOf(".")+3 < doubleStrTemp.length()){
+	    		doubleStr +=doubleStrTemp.substring(doubleStrTemp.indexOf(".")+1,doubleStrTemp.indexOf(".")+3);
+	    	}else{
+	    		doubleStr +=doubleStrTemp.substring(doubleStrTemp.indexOf(".")+1,doubleStrTemp.length());
+	    	}
+	    }
+	    System.out.println("doubleStr:"+doubleStr);
+	    return new Double(doubleStr);
 	  }
 }

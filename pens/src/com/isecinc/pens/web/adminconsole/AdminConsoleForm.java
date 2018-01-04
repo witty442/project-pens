@@ -37,8 +37,15 @@ public class AdminConsoleForm extends I_Form {
   String resultBKDB = "";
   String resultClearDB = "";
   String resultClearCustDup = "";
+  String resultAddDB = "";
   
   
+public String getResultAddDB() {
+	return resultAddDB;
+}
+public void setResultAddDB(String resultAddDB) {
+	this.resultAddDB = resultAddDB;
+}
 public String getResultClearCustDup() {
 	return resultClearCustDup;
 }

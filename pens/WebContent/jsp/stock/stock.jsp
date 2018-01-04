@@ -19,8 +19,6 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="stockForm" class="com.isecinc.pens.web.stock.StockForm" scope="request" />
 <%
-//for test
-//SessionGen.getInstance().clearInstance();
 
 int tabIndex = 0;
 if(stockForm.getResults() != null){
@@ -104,10 +102,10 @@ table#productList tbody td.number{text-align:right;}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css?v=<%=SessionGen.getInstance().getIdSession()%>"" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/tablesorter.css" />
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes_for_page_stock.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>

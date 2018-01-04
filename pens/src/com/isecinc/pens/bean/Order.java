@@ -59,6 +59,7 @@ public class Order extends I_PO implements Serializable {
 		setShippingDay(ConvertNullUtil.convertToString(rst.getString("SHIPPING_DAY")).trim());
 		setShippingTime(ConvertNullUtil.convertToString(rst.getString("SHIPPING_TIME")).trim());
 		setTotalAmount(rst.getDouble("TOTAL_AMOUNT"));
+		setTotalAmountNonVat(rst.getDouble("TOTAL_AMOUNT_NON_VAT"));
 		setVatAmount(rst.getDouble("VAT_AMOUNT"));
 		setNetAmount(rst.getDouble("NET_AMOUNT"));
 		setInterfaces(rst.getString("INTERFACES").trim());
@@ -98,7 +99,6 @@ public class Order extends I_PO implements Serializable {
 		setPrintCountRcp(rst.getInt("print_count_rcp"));
 		
 		setPoNumber(rst.getString("po_number"));
-		
 	}
 
 	/**
@@ -163,7 +163,10 @@ public class Order extends I_PO implements Serializable {
 
 	/** Total Amount */
 	private double totalAmount;
-
+	
+	/** Total Amount Non Vat*/
+	private double totalAmountNonVat;
+	
 	/** Vat Amount */
 	private double vatAmount;
 
@@ -256,7 +259,15 @@ public class Order extends I_PO implements Serializable {
 	private String poNumber;
 	
 	
-	
+	public double getTotalAmountNonVat() {
+		return totalAmountNonVat;
+	}
+
+	public void setTotalAmountNonVat(double totalAmountNonVat) {
+		this.totalAmountNonVat = totalAmountNonVat;
+	}
+
+
 	public double getAdjustAmt() {
 		return adjustAmt;
 	}
@@ -675,11 +686,13 @@ public class Order extends I_PO implements Serializable {
 	}
 
 	public void setOpenAmt() {
-		this.openAmt = NumberToolsUtil.round(this.getCreditAmount()+this.getCreditNoteAmt()+this.getAdjustAmt(), 2, BigDecimal.ROUND_HALF_UP); 
+		this.openAmt = NumberToolsUtil.round((this.getCreditAmount()+(this.getCreditNoteAmt()+this.getAdjustAmt())), 2, BigDecimal.ROUND_HALF_UP); 
 		/*System.out.println("this.getCreditAmount():"+this.getCreditAmount());
 		System.out.println("this.getCreditNoteAmt():"+this.getCreditNoteAmt());
 		System.out.println("this.getAdjustAmt():"+this.getAdjustAmt());*/
 		//this.openAmt = this.getCreditAmount()+this.getCreditNoteAmt()+this.getAdjustAmt(); 
+		
+		//System.out.println("openAmt:"+this.getOpenAmt());
 	}
 	
 	public double getOpenAmt(){

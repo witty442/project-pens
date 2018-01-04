@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
@@ -290,6 +291,36 @@ public class RunScriptDBAction {
 			
 		}
 		return success;
+	}
+	
+	public static String runScriptDBUpdateAll(HttpServletRequest sc ,Connection conn){
+		String r = "";
+		String path = "";
+		try{
+			r +="\n *** Start runScriptDBUpdaterAll ***";
+			path = sc.getRealPath(path_script_db);
+		   //Read script from /script_db/script_db_all.sql
+			String pathScriptDB = path+"/script_db_all.sql";
+			logger.debug("read path:"+pathScriptDB);
+			String dataFile = FileUtil.readFile(pathScriptDB, "TIS-620");
+			
+			//Read Current
+			pathScriptDB = path+"/script_db.sql";
+			logger.debug("read path:"+pathScriptDB);
+			dataFile += FileUtil.readFile(pathScriptDB, "TIS-620");
+			
+			//logger.info("Data File:"+dataFile);
+			
+		   //run script split by ";"
+			r += excUpdate(conn,dataFile);
+			r +="\n *** End runScriptDBUpdaterAll ***";
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			
+		}
+		return r;
 	}
 	
 	/**

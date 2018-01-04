@@ -624,20 +624,20 @@ function calPrice(fieldName){
 
 										<td nowrap colspan="3">รวม</td>
 										<td nowrap><input type="text" name="totalNewCtn"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										<td nowrap><input type="text" name="totalNewAmount"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										
 										<td nowrap><input type="text" name="totalStockCtn"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										<td nowrap><input type="text" name="totalStockQty"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										<td nowrap><input type="text" name="totalBorrowCtn"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										<td nowrap><input type="text" name="totalBorrowQty"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
 										<td nowrap><input type="text" name="totalBorrowAmount"
-											size="8" class="disableNumberText" /></td>
+											size="8" class="disableNumber" /></td>
                                        <td></td>
 									</tr>
 								</table>

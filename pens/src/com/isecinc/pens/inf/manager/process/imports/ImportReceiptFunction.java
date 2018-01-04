@@ -1,8 +1,10 @@
 package com.isecinc.pens.inf.manager.process.imports;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import com.isecinc.pens.inf.helper.ImportBean;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.helper.ValidateImportHelper;
+import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MReceiptCN;
@@ -44,6 +47,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
+import com.sun.org.apache.bcel.internal.generic.ISUB;
 
 public class ImportReceiptFunction {
 	protected static  Logger logger = Logger.getLogger("PENS");
@@ -51,14 +55,13 @@ public class ImportReceiptFunction {
 	public static Map<String, ReceiptFunctionBean> RECEIPT_HEAD_MAP = new HashMap<String, ReceiptFunctionBean>();
 	public static Map<String, Double> RECEIPT_LINE_MAP = new HashMap<String, Double>();//<ReceipNo-arInvoiceNo,paidAmount>
 	
-	public int  processReceiptBatch(Connection conn,TableBean tableBean,User user,String lineStr,int canExc) throws Exception{
+	public int  processReceiptBatch(Connection conn,KeyNoImportTransBean keyNoBean,User user,String lineStr,int canExc) throws Exception{
 		//0 line type
 		String batchNo = "";//1
 		String receiptNo = "";//2
 		double totalReceiptAmount = 0;//4
 		String docStatus = "";
-		logger.debug("fileName:"+tableBean.getFileFtpName());
-		logger.debug("fileNameFull:"+tableBean.getFileFtpNameFull());
+		logger.debug("fileName:"+keyNoBean.getFileName());
 		try{
 			String[] lineStrArray = (lineStr+" ").split(Constants.delimeterPipe);
 			
@@ -77,7 +80,11 @@ public class ImportReceiptFunction {
 				logger.debug("#Case 0 VO all Batch#");
 		
 				/** Find Receipt Detail **/
-				ReceiptFunctionBean receipt = findReceiptByReceiptNo(conn,receiptNo,""); 
+				ReceiptFunctionBean receipt = null;
+				if( !Utils.isNull(receiptNo).equals("")){
+				   receipt = findReceiptByReceiptNo(conn,receiptNo,"",0,""); 
+				}
+				
 				if(receipt ==null){
 					throw new FindReceiptIdException("Cannot find ReceiptId By Receipt no["+receiptNo+"]");
 				}
@@ -85,12 +92,15 @@ public class ImportReceiptFunction {
 				updateCancelReceipt(conn, receipt,receiptBatch.getDocStatus());
 			}else{
 				//Check all line is vo all
-				boolean isCancelAllReceipt = ImportReceiptHelper.isReceiptCancelAll(conn, receiptNo, tableBean.getFileFtpNameFull());
-				
+				boolean isCancelAllReceipt = ImportReceiptHelper.isReceiptCancelAllBatch(conn, batchNo, keyNoBean.getFileName());
+				logger.debug("Batch isCancelAllReceipt:"+isCancelAllReceipt);
 				if(isCancelAllReceipt){
 					receiptBatch.setDocStatus("VO");
 					/** Find Receipt Detail **/
-					ReceiptFunctionBean receipt = findReceiptByReceiptNo(conn,receiptNo,""); 
+					ReceiptFunctionBean receipt = null;
+					if( !Utils.isNull(receiptNo).equals("")){
+					   receipt = findReceiptByReceiptNo(conn,receiptNo,"",0,""); 
+					}
 					if(receipt ==null){
 						throw new FindReceiptIdException("Cannot find ReceiptId By Receipt no["+receiptNo+"]");
 					}
@@ -105,7 +115,7 @@ public class ImportReceiptFunction {
 			throw e;
 		}
 	}
-	public int  processReceiptHead(Connection conn,TableBean tableBean,User user,String lineStr,int canExc) throws Exception{
+	public int  processReceiptHead(Connection conn,KeyNoImportTransBean keyNoBean,User user,String lineStr,int canExc) throws Exception{
 		ReceiptFunctionBean receipt = null;
 		double totalReceiptAmountOracle =0;
 		//0 Type line
@@ -119,7 +129,6 @@ public class ImportReceiptFunction {
 		String paymentMethod = "";//8
 		String chequeNo = "";
 		try{
-			
 			String[] lineStrArray = (lineStr+" ").split(Constants.delimeterPipe);
 			
 			/**Get Receipt For Set data To Receipt Line **/
@@ -134,6 +143,8 @@ public class ImportReceiptFunction {
 			
 			logger.debug("paymentMethod["+paymentMethod+"]");
 			
+			int customerId = getCustomerId(conn, customerCode);
+					
 			/** Get Total Form Batch Line */
 			Receiptbatch receiptBatch = RECEIPT_BATCH_MAP.get(batchNo); 
 			totalReceiptAmountOracle = receiptBatch.getTotalReceiptAmount();
@@ -150,9 +161,18 @@ public class ImportReceiptFunction {
 			}
 			
 			/** Find Receipt Detail **/
-			receipt = findReceiptByReceiptNo(conn,receiptNo,paymentMethod); 
+			receipt = findReceiptByReceiptNo(conn,receiptNo,paymentMethod,customerId,"SV"); 
 			
-			/** receipt Not found Create New **/
+			//Case VO Find By Doc_status SV
+			/** Sample case
+			 *  B|102478|RS30160070013|13072017|82605.66|SV
+				H|102478|03593498|Y|VO|32024011|13072017|104481|àªç¤
+				H|102478|03593498|Y|SV|32024011|13072017|82605.66|àªç¤
+			 */
+			if(receipt==null && "VO".equalsIgnoreCase(docStatus)){
+				receipt = findReceiptByReceiptNo(conn,receiptNo,paymentMethod,customerId,"VO"); 
+			}
+			/** receipt found **/
 			if(receipt != null && receipt.getReceiptId() != 0){
 				logger.debug("DocStatus["+docStatus+"]");
 				logger.debug("ReceiptAmountOracle["+totalReceiptAmountOracle+"]:["+receipt.getReceiptAmount()+"]ReceiptAmount(SalesApp)");
@@ -217,11 +237,12 @@ public class ImportReceiptFunction {
 						 logger.debug("# Start delete receipt_line By receipy_by_id["+receipt.getReceiptById()+"]#");
 						 //delete t_receipt_cn
 						 //delete t_receipt_match_cn
-						 //delete t_receipt_line
+						 //delete t_receipt_line all(receipt_by)
 						 //delete t_receipt_match
 						 deleteReceiptByReceiptByIdCaseSVReceiptByMoreOne(conn,receipt.getReceiptId(),receipt.getReceiptById());
 						
 						 //Update t_receipt (by receiptNo)
+						 //set mark_flag last import
 						 logger.debug("#start update amount t_receipt #");
 						 updateReceipt(conn, receipt, paidAmount);
 						 
@@ -331,8 +352,6 @@ public class ImportReceiptFunction {
 					logger.debug("ReceiptId:"+receipt.getReceiptId());
 					logger.debug("ReceiptLineId:"+receipt.getReceiptLineId());
 					logger.debug("ReceiptById:"+receipt.getReceiptById());
-					logger.debug("ReceiptByIdWriteOff:"+receipt.getReceiptByIdWriteOff());
-					logger.debug("ReceiptMatchIdWriteOff:"+receipt.getReceiptMatchIdWriteOff());
 					logger.debug("*********/processReceiptHead*******");
 				  }
 			}else{ 
@@ -348,15 +367,15 @@ public class ImportReceiptFunction {
 				receiptSave.setPrepaid("N");
 				receiptSave.setInterfaces(interfaces);
 				receiptSave.setDocStatus(docStatus);
-				logger.debug("fileName:"+tableBean.getFileFtpNameFull());
-				if(Utils.isNull(tableBean.getFileFtpName()).indexOf("RECEIPTORCL") != -1){
+				logger.debug("fileName:"+keyNoBean.getFileName());
+				if(Utils.isNull(keyNoBean.getFileName()).indexOf("RECEIPTORCL") != -1){
 				   receiptSave.setDescription(receiptNo);
 				}
 				//Get Customer
 				Customer cust = findCustomer(conn,customerCode);
 				if(cust != null){
 				   receiptSave.setCustomerId(cust.getId());
-				   receiptSave.setCustomerName(cust.getName());
+				   receiptSave.setCustomerName(customerCode+"-"+cust.getName());
 				}else{
 				   throw new FindCustomerException("Customer Code["+customerCode+"] not found in m_customer");
 				}
@@ -366,8 +385,26 @@ public class ImportReceiptFunction {
 				receiptSave.setPaymentMethod(paymentMethod);
 				receiptSave.setSalesRepresent(user);
 				try{
+					//check duplicate Case Sample
+					/**
+					 *  B|102478|RS30160070013|13072017|82605.66|SV
+						H|102478|03593498|Y|VO|32024011|13072017|104481|àªç¤
+						H|102478|03593498|Y|SV|32024011|13072017|82605.66|àªç¤
+					 */
+				 boolean isDupReceiptNo = isDupReceiptNo(conn, receiptSave.getReceiptNo());
+				 logger.debug("isDupReceiptNo["+receiptSave.getReceiptNo()+"]["+isDupReceiptNo+"]");
+				 if(isDupReceiptNo){
+					 //gen New Receipt No
+						receiptSave.setReceiptNo("R"
+								+ new ReceiptDocumentProcess().getNextDocumentNo(receiptSave.getSalesRepresent().getCode(), "",
+										receiptSave.getSalesRepresent().getId(), conn));
+					// set receiptNo(oracle for check ref 
+					receiptSave.setDescription(receiptNo);
+				 }
+				  
 			      //save to DB
-				  new MReceipt().save(receiptSave, 999, conn);
+				  boolean save= new MReceipt().save(receiptSave, 999, conn);
+				  logger.debug("Save Receipt Result :"+save);
 				}catch(Exception ee){
 					ee.printStackTrace();
 				}
@@ -396,7 +433,7 @@ public class ImportReceiptFunction {
 			}//if
 				
 			//Set Detail For Receipt line (receiptNo ,cheueNo)
-			logger.debug("PutToMap ReceiptId:"+receipt.getReceiptId());
+			logger.debug("PutToMap receiptNo["+receiptNo+"] ReceiptId:"+receipt.getReceiptId());
 			RECEIPT_HEAD_MAP.put(receiptNo, receipt);
 		
 		}catch(Exception e){
@@ -405,7 +442,7 @@ public class ImportReceiptFunction {
 		return canExc;
 	}
 	
-	public int  processReceiptLine(Connection conn,TableBean tableBean,User user,String lineStr,PreparedStatement ps,int canExc) throws Exception{
+	public int  processReceiptLine(Connection conn,KeyNoImportTransBean keyNoBean,User user,String lineStr,PreparedStatement ps,int canExc,BigDecimal importTransId) throws Exception{
 		String batchNo = "";
 		String receiptNo = "";
 		String arInvoiceNo = "";
@@ -461,10 +498,34 @@ public class ImportReceiptFunction {
 							|| receiptHead.getCaseType().equalsIgnoreCase("RECEIPT_MORE_RECEIPT") 
 							|| receiptHead.getCaseType().equalsIgnoreCase("RECEIPT_NEW") 
 								 ){
-							    //Case ArInvoceNo 1 2 paymentMethod (paidAmount=1+2)
-							     
-							     double sumPaidAmountByArInvoiceNo = 0;
-							     String key = receiptHead.getReceiptNo()+"-"+arInvoiceNo;
+							    //Case1 1 invoice 2 receiptBy (CH,CS) (paidAmount=1+2)
+							    /** Sample  **/
+								//B|105317|RS40360090023|21092017|87034|SV
+								//H|105317|23810098|Y|SV|44004008|21092017|86901|àªç¤
+								//L|105317|23810098|21600701428|266566460|38065.08
+								//H|105317|RS40360090023|Y|SV|44004008|21092017|133|à§Ô¹Ê´
+								//L|105317|RS40360090023|21600701428|266566460|133
+							 
+							    //Case2 1 invoice 2 receiptBy (CH,CH)
+								 /*
+								 B|102803|RS30460070017|20072017|140029|SV
+								 H|102803|45929008|Y|SV|30618032|20072017|60029|àªç¤
+								 L|102803|45929008|21600401598|S30460040053|20651
+								 L|102803|45929008|21600401656|S30460040057|45359.87
+								 L|102803|45929008|21600401657|S30460040058|26750
+								 L|102803|45929008|21600401989|265165009|45298.74
+								 L|102803|45929008|23600400537|9210426|-253.78
+								 L|102803|45929008|23600400538|9210425|-509.99
+								 L|102803|45929008|23600500286|9211203|-18404
+								 L|102803|45929008|23600600230|9211827|-3177.9
+								 L|102803|45929008|23600600238|9211825|-2998.14
+								 L|102803|45929008|23600700053|9212297|-52686.8
+								 H|102803|45929100|Y|SV|30618032|20072017|80000|àªç¤
+								 L|102803|45929100|21600401989|265165009|80000
+								 */
+							 
+							     /*double sumPaidAmountByArInvoiceNo = 0;
+							     String key = receiptHead.getPaymentMethod()+"-"+receiptHead.getReceiptNo()+"-"+arInvoiceNo;
 							     logger.debug("Key SumPaidAmount:"+key);
 								 if(RECEIPT_LINE_MAP.get(key) == null){
 									 sumPaidAmountByArInvoiceNo = paidAmount;
@@ -475,19 +536,19 @@ public class ImportReceiptFunction {
 									    RECEIPT_LINE_MAP.put(key, sumPaidAmountByArInvoiceNo);
 									 }
 								 }
-							 
-							     //Calc Amount By Ar invoice
-							     ReceiptDataLine receiptDataLine = calcReceiptLineAmount(conn,receiptHead.getReceiptId(),arInvoiceNo, paidAmount);
+								  logger.debug("Key SumPaidAmountValue["+sumPaidAmountByArInvoiceNo+"]");*/
+								  
 						    	 //insert receipt_line
 						    	 ReceiptLine receiptLine = new ReceiptLine();
 						    	 receiptLine.setReceiptId(receiptHead.getReceiptId());
 						    	 receiptLine.setLineNo(findLineNoReceiptLine(conn,receiptHead.getReceiptId()));
 						    	 receiptLine.setArInvoiceNo(arInvoiceNo);
 						    	 receiptLine.setSalesOrderNo(salesOrderNo);
-						    	 receiptLine.setInvoiceAmount(receiptDataLine.getInvoiceAmount());
-						    	 receiptLine.setCreditAmount(receiptDataLine.getCreditAmount());
-						    	 receiptLine.setPaidAmount(sumPaidAmountByArInvoiceNo);
-						    	 receiptLine.setRemainAmount(receiptDataLine.getRemainAmount());
+						    	 receiptLine.setInvoiceAmount(0);
+						    	 receiptLine.setCreditAmount(0);
+						    	 receiptLine.setPaidAmount(0);
+						    	 receiptLine.setRemainAmount(0);
+						    	 receiptLine.setImportTransId(importTransId);
 						    	 Order order = new Order();
 						    	 order.setId(findOrderId(conn, arInvoiceNo));//ar_invoice_no
 						    	 receiptLine.setOrder(order);
@@ -495,7 +556,16 @@ public class ImportReceiptFunction {
 						    	 OrderLine orderLine = new OrderLine();
 						    	 orderLine.setId(findOrderLineId(conn, arInvoiceNo));
 						    	 receiptLine.setOrderLine(orderLine);
-						    	 boolean saveLine = new MReceiptLine().save(receiptLine, 999, conn);
+						    	 boolean saveLine = new MReceiptLine().saveCaseImportReceipt(receiptLine, 999, conn);
+						    	 
+						    	 //Update Amount in t_recipt_line
+						    	 //Calc Amount By AR_invoice after insert receipt line (for case 1 invoice apply 2 by )
+							     ReceiptDataLine receiptDataLine = calcReceiptLineAmount(conn,receiptHead.getReceiptId(),receiptLine.getId(),arInvoiceNo, paidAmount,importTransId);
+						    	 receiptLine.setInvoiceAmount(receiptDataLine.getInvoiceAmount());
+						    	 receiptLine.setCreditAmount(receiptDataLine.getCreditAmount());
+						    	 receiptLine.setPaidAmount(paidAmount);
+						    	 receiptLine.setRemainAmount(receiptDataLine.getRemainAmount());
+						    	 updateReceiptLine(conn, receiptLine);
 						    	 
 						    	 //insert receipt_match
 						    	 ReceiptMatch match = new ReceiptMatch();
@@ -524,83 +594,63 @@ public class ImportReceiptFunction {
 		int canExc = 0;
 		double amount  =0;
 		try{
-			//get Min ReceiptLineId for apply Match Write Off
-			receiptHead = findReceiptLine(conn,receiptHead);
-			
 			logger.debug("*** Start createReceiptLineWriteOff **");
 			logger.debug("CaseType:"+receiptHead.getCaseType());
 			logger.debug("receiptId:"+receiptHead.getReceiptId());
-			logger.debug("receiptByIdWriteOff:"+receiptHead.getReceiptByIdWriteOff());
-			logger.debug("receiptMatchIdWriteOff:"+receiptHead.getReceiptMatchIdWriteOff());
-			logger.debug("receiptLineId:"+receiptHead.getReceiptLineId());
 			logger.debug("*********************************************");
 			
 			amount = Utils.convertStrToDouble(lineStrArr[5]);
 		
-			 if( receiptHead.getReceiptLineId() != 0 ){ 
-			  if(receiptHead.getReceiptByIdWriteOff() != 0
-				  && receiptHead.getReceiptMatchIdWriteOff() != 0){
-					logger.debug("Update Write Off");
-			    	
-					ReceiptBy receiptBy = new ReceiptBy();
-					receiptBy.setId(receiptHead.getReceiptByIdWriteOff());
-					receiptBy.setReceiptAmount(amount);
-					receiptBy.setPaidAmount(amount);
-					receiptBy.setRemainAmount(0);
-					receiptBy.setReceiptId(receiptHead.getReceiptId());
-					receiptBy.setWriteOff("Y");
-					receiptBy.setPaymentMethod("CS");
-					receiptBy.setChequeDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					
-					boolean saveReceiptBy = new MReceiptBy().save(receiptBy, 999, conn);	
-					logger.debug("receiptById:"+receiptBy.getId());
-					
-					ReceiptMatch receiptMatch = new ReceiptMatch();
-					receiptMatch.setId(receiptHead.getReceiptMatchIdWriteOff());
-					receiptMatch.setReceiptId(receiptBy.getReceiptId());
-					receiptMatch.setReceiptLineId(receiptHead.getReceiptLineId());
-					receiptMatch.setReceiptById(receiptBy.getId());
-					receiptMatch.setPaidAmount(amount);
-					boolean saveReceiptMatch = new MReceiptMatch().save(receiptMatch, 999, conn);
-					logger.debug("receiptLineId:"+receiptHead.getReceiptLineId());
-					
-					if(saveReceiptBy && saveReceiptMatch){
-						canExc = 1;
-					}
-					logger.debug("canUpdate Writeoff Line:"+canExc);
-			  }else{
-				   logger.debug("Insert Write Off");
-			    	
-					ReceiptBy receiptBy = new ReceiptBy();
-					receiptBy.setReceiptAmount(amount);
-					receiptBy.setPaidAmount(amount);
-					receiptBy.setRemainAmount(0);
-					receiptBy.setReceiptId(receiptHead.getReceiptId());
-					receiptBy.setWriteOff("Y");
-					receiptBy.setPaymentMethod("CS");
-					receiptBy.setChequeDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					
-					boolean saveReceiptBy = new MReceiptBy().save(receiptBy, 999, conn);	
-					logger.debug("receiptById:"+receiptBy.getId());
-					
-					ReceiptMatch receiptMatch = new ReceiptMatch();
-					receiptMatch.setId(receiptHead.getReceiptMatchIdWriteOff());
-					receiptMatch.setReceiptId(receiptBy.getReceiptId());
-					receiptMatch.setReceiptLineId(receiptHead.getReceiptLineId());
-					receiptMatch.setReceiptById(receiptBy.getId());
-					receiptMatch.setPaidAmount(amount);
-					boolean saveReceiptMatch = new MReceiptMatch().save(receiptMatch, 999, conn);
-					
-					if(saveReceiptBy && saveReceiptMatch){
-						canExc = 1;
-					}
-					logger.debug("canInsert Writoff Line:"+canExc);
-			  }
-			  
-			  // Update paidAmount (t_receipt_line) by sum(paid_amount) t_receipt_match (receipt_line_id)
-			  ImportReceiptHelper.updatePaidAmountRecepitLine(conn, receiptHead);
-		 }
+			int del = deleteLineWriteOff(conn, receiptHead);
+			logger.debug("Delete Write Off Result:"+del);
 			
+		    logger.debug("Start Insert Write Off");
+		  
+		    /** Insert Receipt By **/
+			ReceiptBy receiptBy = new ReceiptBy();
+			receiptBy.setReceiptAmount(amount);
+			receiptBy.setPaidAmount(amount);
+			receiptBy.setRemainAmount(0);
+			receiptBy.setReceiptId(receiptHead.getReceiptId());
+			receiptBy.setWriteOff("Y");
+			receiptBy.setPaymentMethod("CS");
+			receiptBy.setChequeDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			
+			boolean saveReceiptBy = new MReceiptBy().save(receiptBy, 999, conn);	
+			logger.debug("SaveReceiptById:"+receiptBy.getId());
+			
+			/** insert receipt_line **/
+	    	ReceiptLine receiptLine = new ReceiptLine();
+	    	receiptLine.setId(0);
+	    	receiptLine.setReceiptId(receiptHead.getReceiptId());
+	    	receiptLine.setLineNo(findLineNoReceiptLine(conn,receiptHead.getReceiptId()));
+	    	receiptLine.setArInvoiceNo(Utils.isNull(lineStrArr[3]));
+	    	receiptLine.setSalesOrderNo("");
+	    	receiptLine.setInvoiceAmount(amount);
+	    	receiptLine.setCreditAmount(amount);
+	    	receiptLine.setPaidAmount(amount);
+	    	receiptLine.setRemainAmount(0);
+	    	Order order = new Order();
+	    	order.setId(0);
+	    	receiptLine.setOrder(order);
+	    	boolean saveLine = new MReceiptLine().save(receiptLine, 999, conn);
+	    	logger.debug("saveReceiptLine:"+saveLine +"receiptLineId["+receiptLine.getId()+"]");
+	    	
+	    	/** Insert Receipt Match **/
+			ReceiptMatch receiptMatch = new ReceiptMatch();
+			receiptMatch.setId(0);
+			receiptMatch.setReceiptId(receiptBy.getReceiptId());
+			receiptMatch.setReceiptLineId(receiptLine.getId());
+			receiptMatch.setReceiptById(receiptBy.getId());
+			receiptMatch.setPaidAmount(amount);
+			boolean saveReceiptMatch = new MReceiptMatch().save(receiptMatch, 999, conn);
+			logger.debug("saveReceiptMatch:"+saveLine +"receiptMatchId["+receiptMatch.getId()+"]");
+			
+			if(saveLine && saveReceiptBy && saveReceiptMatch){
+				canExc = 1;
+			}
+			logger.debug("canInsert Writoff Line:"+canExc);
+			  
 		}catch(Exception e){
 			throw e;
 		}
@@ -745,7 +795,8 @@ public class ImportReceiptFunction {
 		return receiptById;
 	}
 	
-	public ReceiptFunctionBean findReceiptByReceiptNo(Connection conn,String receiptNo,String paymentMethod) throws Exception{
+	public ReceiptFunctionBean findReceiptByReceiptNo(Connection conn,String receiptNo
+			,String paymentMethod,int customerId,String docStatus) throws Exception{
 		ReceiptFunctionBean receipt = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -764,10 +815,25 @@ public class ImportReceiptFunction {
 			sql.append(" 	select t.receipt_id,receipt_no,receipt_date");
 			sql.append(" 	,t.order_type,t.customer_id,t.customer_name,t.receipt_amount,t.apply_amount");
 			sql.append(" 	FROM t_receipt t WHERE t.receipt_no = '"+receiptNo+"' \n" );
+			
+			if( !Utils.isNull(docStatus).equals("")){
+				sql.append(" 	and t.doc_status = '"+docStatus+"' \n" );
+			}
+			
+			if(customerId != 0){
+			   sql.append(" 	and customer_id = "+customerId+" \n" );
+			}
 			sql.append(" 	union \n" );
 			sql.append(" 	select t.receipt_id,receipt_no,receipt_date");
 			sql.append(" 	,t.order_type,t.customer_id,t.customer_name,t.receipt_amount,t.apply_amount");
-			sql.append(" 	FROM t_receipt t WHERE t.receipt_id in( \n" );
+			sql.append(" 	FROM t_receipt t where 1=1 \n");
+			if( !Utils.isNull(docStatus).equals("")){
+				sql.append(" 	and t.doc_status = '"+docStatus+"' \n" );
+			}
+			if(customerId != 0){
+			   sql.append(" 	and customer_id = "+customerId+" \n" );
+			}
+			sql.append("    and t.receipt_id in( \n" );
 			sql.append("   	select distinct m.receipt_id  from t_receipt_match m  \n");
 			sql.append("    	where m.receipt_by_id in ( \n" );
 			sql.append("  	  	  select receipt_by_id from t_receipt_by  where cheque_no ='"+receiptNo+"' \n" );
@@ -788,6 +854,7 @@ public class ImportReceiptFunction {
 				receipt.setReceiptAmount(rs.getDouble("receipt_amount"));
 				receipt.setPaidAmount(rs.getDouble("apply_amount"));
 				receipt.setCountReceiptBy(rs.getInt("count_receipt_by"));
+				receipt.setPaymentMethod(paymentMethod);
 				
 				if(Utils.isNull(paymentMethod).equalsIgnoreCase("CH")){
 					//ReceiptNo = ChequeNo
@@ -796,9 +863,6 @@ public class ImportReceiptFunction {
 				
 				// getReceipt(write_off <> Y) By detail For insert new
 				receipt = findReceiptByDetail(conn,receipt,paymentMethod);
-				
-				// getReceiptById (Write_off =Y)
-				receipt = findReceiptByIdWriteOff(conn,receipt);
 
 			}
 		}catch(Exception e){
@@ -823,6 +887,33 @@ public class ImportReceiptFunction {
 			sql.append("\n ,created =sysdate(),created_by =999,updated =null ,updated_by =0 ,INTERFACES='Y' ");
 			sql.append("\n where receipt_id ="+receipt.getReceiptId());
 			   
+			logger.debug("sql:"+sql.toString());
+			ps =conn.prepareStatement(sql.toString());
+			r = ps.executeUpdate();
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}finally{
+			if(ps !=null){
+				ps.close();
+			}
+		}
+		return r;
+	}
+	
+	public int updateReceiptLine(Connection conn,ReceiptLine receiptLine) throws Exception{
+		PreparedStatement ps =null;
+		StringBuffer sql = new StringBuffer("");
+		int r = 0;
+		try{
+			sql.append("\n update t_receipt_line set");
+			sql.append("\n  invoice_amount = "+receiptLine.getInvoiceAmount());
+			sql.append("\n ,credit_amount ="+receiptLine.getCreditAmount() );
+			sql.append("\n ,paid_amount ="+receiptLine.getPaidAmount() );
+			sql.append("\n ,remain_amount ="+receiptLine.getRemainAmount() );
+			sql.append("\n ,updated =sysdate() ,updated_by =007 ");
+			sql.append("\n where receipt_id ="+receiptLine.getReceiptId());
+			sql.append("\n and receipt_line_id ="+receiptLine.getId());
+			
 			logger.debug("sql:"+sql.toString());
 			ps =conn.prepareStatement(sql.toString());
 			r = ps.executeUpdate();
@@ -934,7 +1025,7 @@ public class ImportReceiptFunction {
 		StringBuffer sql = new StringBuffer("");
 		int r = 0;
 		try{
-			sql.append("\n update t_receipt set doc_status ='"+docStatus+"'");
+			sql.append("\n update t_receipt set doc_status ='"+docStatus+"' , receipt_no =concat(receipt_no,'_VO')");
 			sql.append("\n ,updated =sysdate() ,updated_by =999 ,INTERFACES='Y' ");
 			sql.append("\n where receipt_id ="+receipt.getReceiptId());
 			   
@@ -950,6 +1041,35 @@ public class ImportReceiptFunction {
 		}
 		return r;
 	}
+	
+	public boolean isDupReceiptNo(Connection conn,String receiptNo) throws Exception {
+		//logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
+		Statement stmt = null;
+		ResultSet rst = null;
+		try {
+			int tot = 0;
+			stmt = conn.createStatement();
+			String sql = "SELECT COUNT(*) as TOT FROM t_receipt" ;
+			sql += " WHERE receipt_no='" + receiptNo + "'";
+			logger.debug(sql);
+			rst = stmt.executeQuery(sql);
+			if (rst.next()) {
+				tot = rst.getInt("TOT");
+			}
+			if (tot > 0) return true;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return false;
+	}
+	
 	@Deprecated
 	public ReceiptFunctionBean copyReceiptToReceiptHis(Connection conn,ReceiptFunctionBean receipt) throws Exception{
 		StringBuffer sql = new StringBuffer("");
@@ -1453,11 +1573,22 @@ public class ImportReceiptFunction {
 		}
 		return receipt;
 	}
-	public ReceiptFunctionBean findReceiptByIdWriteOff(Connection conn,ReceiptFunctionBean receipt) throws Exception{
+	/**
+	 * Delete ReceiptMatch,receiptBy (write_off)
+	 * @param conn
+	 * @param receipt
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteLineWriteOff(Connection conn,ReceiptFunctionBean receipt) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
+		String sqlDelete = "";
+		int r= 0;
 		try{
+			logger.debug("deleteLineWriteOff");
+			
 			sql.append("\n select bys.receipt_by_id , m.receipt_match_id ");
 			sql.append("\n from t_receipt_match m,t_receipt_by bys");
 			sql.append("\n where m.receipt_by_id = bys.receipt_by_id");
@@ -1465,11 +1596,16 @@ public class ImportReceiptFunction {
 			sql.append("\n and bys.write_off = 'Y' ");
 
 			logger.debug("sql:"+sql.toString());
-			ps =conn.prepareStatement(sql.toString());
+			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				receipt.setReceiptByIdWriteOff(rs.getInt("receipt_by_id"));
-				receipt.setReceiptMatchIdWriteOff(rs.getInt("receipt_match_id"));
+				sqlDelete = "delete from t_receipt_by where receipt_by_id ="+rs.getInt("receipt_by_id")+";";
+				int d = Utils.excUpdateReInt(conn, sqlDelete);
+				logger.debug("delete receipt_by_id["+rs.getInt("receipt_by_id")+"] result["+d+"]");
+				
+				sqlDelete = "delete from t_receipt_match where receipt_match_id ="+rs.getInt("receipt_match_id")+";";
+				d = Utils.excUpdateReInt(conn, sqlDelete);
+				logger.debug("delete receipt_match_id["+rs.getInt("receipt_match_id")+"] result["+d+"]");
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -1481,7 +1617,7 @@ public class ImportReceiptFunction {
 				rs.close();
 			}
 		}
-		return receipt;
+		return r;
 	}
 	
 	public Customer findCustomer(Connection conn,String customerCode) throws Exception{
@@ -1686,13 +1822,6 @@ public class ImportReceiptFunction {
 			sql.append("\n  ) ");
 			sql.append("\n )and  receipt_id ="+receiptId +";");
 			
-			/** Delete receipt_line wrong data not found in Match **/
-			/*sql.append("\n delete  from t_receipt_line where receipt_line_id not in( ");
-			sql.append("\n  select receipt_line_id  from t_receipt_match where receipt_by_id  in( ");
-			sql.append("\n      select receipt_by_id from t_receipt_by where receipt_id ="+receiptId);
-			sql.append("\n      and  receipt_by_id ="+receiptById);
-			sql.append("\n  ) ");
-			sql.append("\n )and  receipt_id ="+receiptId +";");*/
 			
 			sql.append("\n delete from t_receipt_match where receipt_by_id  in( ");
 			sql.append("\n    select receipt_by_id from t_receipt_by where receipt_id ="+receiptId);
@@ -1756,14 +1885,47 @@ public class ImportReceiptFunction {
 		return receiptNo;
 	}
 	
-	public ReceiptDataLine calcReceiptLineAmount(Connection conn,int receiptId,String arInvoiceNo,double paidAmountOracle) throws Exception{
+	public int getCustomerId(Connection conn,String customerCode) throws Exception{
+		int  customerId = 0;
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			if( !Utils.isNull(customerCode).equals("")){
+				sql.append(" select customer_id FROM m_customer c WHERE code = '"+customerCode+"' \n" );
+				sql.append(" and isactive ='Y'" );
+
+				logger.debug("sql:"+sql.toString());
+				ps =conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					customerId= rs.getInt("customer_id");
+				}
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}finally{
+			if(ps !=null){
+				ps.close();
+			}
+			if(rs !=null){
+				rs.close();
+			}
+		}
+		return customerId;
+	}
+	
+	public ReceiptDataLine calcReceiptLineAmount(Connection conn,int receiptId,int receiptLineId,String arInvoiceNo,double paidAmountOracle,BigDecimal importTransId) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
 		ReceiptDataLine receiptLine = new ReceiptDataLine();
 		double invoiceAmount = 0;
 		try{
+			//1 invoice apply 2 receipt
 			if( !Utils.isNull(arInvoiceNo).equals("")){
+				logger.debug("Step 1 ar_invoice_no apply not same receipt_no");
+				
 				sql.append(" select receipt_line_id,t.invoice_amount ,t.credit_amount,t.remain_amount \n");
 				sql.append(" FROM t_receipt_line t WHERE t.ar_invoice_no = '"+arInvoiceNo+"' \n" );
 				sql.append(" and t.receipt_id < "+receiptId +"\n"); /** < receuptId */
@@ -1782,9 +1944,63 @@ public class ImportReceiptFunction {
 					
 					invoiceAmount = rs.getDouble("invoice_amount");
 				}
+				logger.debug("After Step 1 invoiceAmount["+invoiceAmount+"]");
 			}
 			
+			
+			/** 2 invoice apply 1 receipt 2 receiptLine **/
+		    /** Sample 1 **/
+			//B|105317|RS40360090023|21092017|87034|SV
+			//H|105317|23810098|Y|SV|44004008|21092017|86901|àªç¤
+			//L|105317|23810098|21600701428|266566460|38065.08
+			//H|105317|RS40360090023|Y|SV|44004008|21092017|133|à§Ô¹Ê´
+			//L|105317|RS40360090023|21600701428|266566460|133
+		 
+			/** Sample 2 ***/
+			//B|106592|RS30360100033|24102017|473156|SV
+			//H|106592|48583967|Y|SV|37325015|24102017|200000|àªç¤
+			//L|106592|48583967|21600901719|266366271|200000
+			//H|106592|48583968|Y|SV|37325015|24102017|241566|àªç¤
+			//L|106592|48583968|21600900455|270069976|37304.82
+			//L|106592|48583968|21600901719|266366271|204261.18
+			//H|106592|RS30360100033|Y|VO|37325015|24102017|31590|à§Ô¹Ê´
+			//H|106592|RS30360100033|Y|SV|37325015|24102017|31590|à§Ô¹Ê´
+			//L|106592|RS30360100033|21600901719|266366271|66838.42
+			//L|106592|RS30360100033|24601000048||-31428
+			//L|106592|RS30360100033|25600800058||-2166.49
+			//L|106592|RS30360100033|25600900047||-1653.93
+			
 			if(invoiceAmount <= 0.0 ){
+				logger.debug("Step 2 ar_invoice_no apply same receipt_no");
+				
+				sql = new StringBuffer("");
+				sql.append(" select receipt_line_id,t.invoice_amount ,t.credit_amount,t.remain_amount \n");
+				sql.append(" FROM t_receipt_line t WHERE t.ar_invoice_no = '"+arInvoiceNo+"' \n" );
+				sql.append(" and t.receipt_id = "+receiptId +"\n"); /** < receiptId */
+				sql.append(" and t.receipt_line_id < "+receiptLineId +"\n"); /** <> owner receiptLineId */
+				sql.append(" and t.receipt_id in( \n" );
+				sql.append(" 	  select receipt_id from t_receipt where doc_status ='SV' \n" );
+				sql.append(" ) and import_trans_id = "+importTransId );
+				sql.append(" order by t.receipt_line_id desc" );
+				
+				logger.debug("sql:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					logger.debug("receipt_line_id:"+rs.getInt("receipt_line_id"));
+					receiptLine.setInvoiceAmount(rs.getDouble("invoice_amount"));
+					receiptLine.setCreditAmount(rs.getDouble("remain_amount"));
+					receiptLine.setRemainAmount(rs.getDouble("remain_amount")-paidAmountOracle);
+					
+					invoiceAmount = rs.getDouble("invoice_amount");
+				}
+				logger.debug("After Step 2 invoiceAmount["+invoiceAmount+"]");
+			}
+			
+			
+			/** 3 not found in receipt **/
+			if(invoiceAmount <= 0.0 ){
+				logger.debug("Step 3 ");
 				// Not found is first Receipt
 				sql = new StringBuffer();
 				sql.append(" select t.net_amount \n");
@@ -1799,7 +2015,9 @@ public class ImportReceiptFunction {
 				   receiptLine.setCreditAmount(rs.getDouble("net_amount"));
 				   receiptLine.setRemainAmount(rs.getDouble("net_amount")-paidAmountOracle);
 				}
+				logger.debug("After Step 3 invoiceAmount["+invoiceAmount+"]");
 			}
+			
 			
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -1890,8 +2108,6 @@ public class ImportReceiptFunction {
 		private String orderType;
 		private int countReceiptBy;
 		private int receiptById;
-		private int receiptByIdWriteOff;
-		private int receiptMatchIdWriteOff;
 		private String paymentMethod;
 		private String bank;
 		private String chequeNo;
@@ -1916,18 +2132,6 @@ public class ImportReceiptFunction {
 		}
 		public void setRemainAmount(double remainAmount) {
 			this.remainAmount = remainAmount;
-		}
-		public int getReceiptMatchIdWriteOff() {
-			return receiptMatchIdWriteOff;
-		}
-		public void setReceiptMatchIdWriteOff(int receiptMatchIdWriteOff) {
-			this.receiptMatchIdWriteOff = receiptMatchIdWriteOff;
-		}
-		public int getReceiptByIdWriteOff() {
-			return receiptByIdWriteOff;
-		}
-		public void setReceiptByIdWriteOff(int receiptByIdWriteOff) {
-			this.receiptByIdWriteOff = receiptByIdWriteOff;
 		}
 		public int getCountReceiptBy() {
 			return countReceiptBy;

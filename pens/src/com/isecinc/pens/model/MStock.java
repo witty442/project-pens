@@ -751,14 +751,20 @@ public class MStock {
 				sql.append("\n  FROM t_order_line t ");
 				sql.append("\n ,( ");
 				sql.append("\n  SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE");
-				sql.append("\n  , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ");
-				sql.append("\n  , pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+				sql.append("\n  , pp1.UOM_ID as UOM1 , pp2.UOM_ID as UOM2 ");
 				sql.append("\n  FROM M_Product pd ");
-				sql.append("\n  INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
-				sql.append("\n  AND pp1.UOM_ID = pd.UOM_ID ");
-				sql.append("\n  LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
-				sql.append("\n  AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
-				sql.append("\n  WHERE pp1.ISACTIVE = 'Y'  AND pp1.PRICELIST_ID = "+mCriteria.getPriceListId());
+				
+				sql.append("\n  INNER JOIN (");
+				sql.append("\n    select distinct Product_ID,uom_id ,ISACTIVE from M_Product_Price ");
+				sql.append("\n    where ISACTIVE = 'Y' ");
+				sql.append("\n  )pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID ");
+				
+				sql.append("\n  LEFT JOIN (");
+				sql.append("\n    select distinct Product_ID,uom_id ,ISACTIVE from M_Product_Price ");
+				sql.append("\n    where ISACTIVE = 'Y' ");
+				sql.append("\n  )pp2 ON pd.Product_ID = pp2.Product_ID AND pp2.UOM_ID <> pd.UOM_ID ");
+			
+				sql.append("\n  WHERE 1=1");
 				sql.append("\n  AND ( ");
 				sql.append("\n    pp1.UOM_ID IN ( ");
 				sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");

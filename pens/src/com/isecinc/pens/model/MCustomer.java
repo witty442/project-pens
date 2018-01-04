@@ -432,7 +432,7 @@ public class MCustomer extends I_Model<Customer> {
 				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
 					logger.info("calcTotalInvoice");
-				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId(),creditDateFix));
+				   m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,m.getId(),creditDateFix));
 				}
 				
 				// Order Amount
@@ -628,18 +628,11 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				       addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
 				m.setAddressSummary(addressSummary);
 				
-				// Total Invoice
-				//double totalOrderAmt = rst.getDouble("total_order_amt");
-				//double totalReceiptAmt = rst.getDouble("total_receipt_amt");
-				//m.setTotalInvoice(totalOrderAmt-totalReceiptAmt);
-				
-				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
-				
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
 					logger.debug("Calc Total Invoice");
-				   m.setTotalInvoice(new MReceiptLine().lookCreditAmt(conn,m.getId(),creditDateFix));
+				    m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,m.getId(),creditDateFix));
 				}
-				
+		
 				// Order Amount
 				m.setOrderAmount(rst.getInt("order_amount"));
 

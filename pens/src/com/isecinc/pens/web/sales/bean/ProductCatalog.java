@@ -12,8 +12,17 @@ public class ProductCatalog implements Comparable{
 	private int qty1;
 	private int qty2;
 	private double lineNetAmt;
-
+    private String taxable;
 	
+    
+	public String getTaxable() {
+		return taxable;
+	}
+
+	public void setTaxable(String taxable) {
+		this.taxable = taxable;
+	}
+
 	public String getTarget() {
 		return target;
 	}

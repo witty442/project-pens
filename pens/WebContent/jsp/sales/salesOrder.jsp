@@ -119,8 +119,6 @@ table#productList thead{background:#FFE4CA;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
 
-
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 
@@ -315,7 +313,7 @@ function addProductToSalesOrder(){
 	products = eval(data);
 	//alert(products);
 	//alert(products.length);
-	//alert(products[0].amount1);
+	//alert(products[0].taxable);
 	
 	//Load data from screen to product screen
 	
@@ -356,6 +354,8 @@ function addProductToSalesOrder(){
 			product.id = "";
 			product.row = "";
 			
+			product.taxable = products[i].taxable;
+			
 			addProduct('${pageContext.request.contextPath}', product);
 		}
 	}
@@ -379,7 +379,8 @@ function addProductToBasket(){
 	var price2s = document.getElementsByName("price2");
 	var lineAmts = document.getElementsByName("totalLineAmt");
 	var custId = document.getElementById("order.customerId").value;
-
+	var taxables = document.getElementsByName("taxable");
+	
 	var categoryCode = document.getElementById("categoryCode").value;
 	var selected = false;
 
@@ -400,7 +401,8 @@ function addProductToBasket(){
 					  +"&price2="+price2s[i].value
 					  +"&qty1="+qty1s[i].value
 					  +"&qty2="+qty2s[i].value
-					  +"&lineAmt="+lineAmts[i].value,
+					  +"&lineAmt="+lineAmts[i].value
+					  +"&taxable="+taxables[i].value,
 				async: false,
 				success: function(getData){
 					var status = jQuery.trim(getData);
@@ -570,7 +572,8 @@ function escapeParameter(param){
 										<th class="costprice"><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
 										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>							
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<th class="status"><%-- <bean:message key="Edit" bundle="sysprop"/> --%></th>
+										<th class="status">ภาษี</th>
+										<th class="status">โปรโมชั่น</th>
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -627,6 +630,7 @@ function escapeParameter(param){
 											<input type='hidden' name='lines.promo' value='${lines1.promotion}'>
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
+											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
 										</td>
 										<td align="center">
 											<c:choose>
@@ -693,7 +697,11 @@ function escapeParameter(param){
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
 										<td align="center">
-											
+											<c:if test="${lines1.taxable=='Y'}">
+												   <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">								
+											</c:if>
+										</td>
+										<td align="center">
 												<c:if test="${lines1.promotion=='N'}">
 											         <%if(debugMode==true) {%>
 													   <%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
@@ -718,7 +726,7 @@ function escapeParameter(param){
 							</tr>
 							<tr>
 								<td></td><td></td>
-								<td align="right"><bean:message key="TotalAmount" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right">ยอดรวมก่อนภาษี &nbsp;&nbsp;</td>
 								<td align="left">
 									<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									 <html:hidden property="order.totalAmount"/>	
@@ -733,6 +741,14 @@ function escapeParameter(param){
 								<td align="left">
 									<input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									<html:hidden property="order.vatAmount"/>
+								</td>
+							</tr>
+							<tr>
+								<td></td><td></td>
+								<td align="right">ยอดรวมที่ไม่เสียภาษี&nbsp;&nbsp;</td>
+								<td align="left">
+									<input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
+									<html:hidden property="order.totalAmountNonVat"/>
 								</td>
 							</tr>
 							<tr>
@@ -887,6 +903,6 @@ function escapeParameter(param){
 </div>
 </body>
 </html>
- 
+
 <div id="brand-dialog"></div>
 <div id="selectProduct" >No Product To Display!</div>

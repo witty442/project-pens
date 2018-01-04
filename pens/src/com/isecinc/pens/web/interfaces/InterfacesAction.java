@@ -152,14 +152,9 @@ public class InterfacesAction extends I_Action {
 			} else {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
-			
-			
+
 			interfacesForm.getMonitorBean().setTimeInUse(timeInUse);
-			
-			//check version
-			request.getSession().setAttribute("appVersionCheckMsg",null);
-			AppversionVerify.getIns().checkAppVersion(request);
-			
+		
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -361,61 +356,6 @@ public class InterfacesAction extends I_Action {
 		return mapping.findForward("success");
 	}
 	
-	
-	/**
-	 * Import To DB
-	 */
-	public ActionForward updateSalesTransaction1(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Import :updateSalesTransaction");
-		InterfacesForm interfacesForm = (InterfacesForm) form;
-		User userLogin = (User) request.getSession().getAttribute("user");
-		UpdateSalesManager importManager =  new UpdateSalesManager();
-		User userRequest = new User();
-		try {
-			logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-			
-			/** Import Update Sales Transaction */
-			logger.debug("importAll:"+interfacesForm.getMonitorBean().isImportAll());
-			 String requestTable = "";
-	         String requestTableTransType = "";
-		     if( !Utils.isNull(interfacesForm.getMonitorBean().getRequestUpdateSalesTable()).equals("")){
-				String[] exportArray = interfacesForm.getMonitorBean().getRequestUpdateSalesTable().split("\\|");
-				requestTable = exportArray[0];
-				requestTableTransType = exportArray[1];
-				
-				/** Case Admin Update By Request Table Replace UserId*/
-				String whereClause = "AND USER_NAME LIKE '%"+interfacesForm.getMonitorBean().getRequestImportUpdateUserName()+"%'";
-				if(Utils.isNull(interfacesForm.getMonitorBean().getRequestImportUpdateUserName()).equals("")){
-					whereClause = "AND USER_NAME LIKE '%ADMIN%'";
-				}
-				User[] results = new MUser().search(whereClause);
-				if(results != null && results.length >0){
-					userRequest = results[0];
-				}
-			 }
-		     
-		    logger.debug("requestUpdateSalesTable:"+interfacesForm.getMonitorBean().getRequestUpdateSalesTable());
-		    logger.debug("UserId Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
-		     
-			MonitorBean m = importManager.importMain(userLogin,userRequest, requestTable, request, interfacesForm.getMonitorBean().isImportAll());
-		    
-			/** Set for Progress Bar */
-			request.setAttribute("action", "submited");
-			request.setAttribute("id", m.getTransactionId());
-			
-			/** Chekc For ProgressBar  **/
-			request.setAttribute("transaction_count", "1");
-			
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return mapping.findForward("success");
-	}
-	
-	
-	
-	
 	/**
 	 * 
 	 * @param mapping
@@ -427,37 +367,46 @@ public class InterfacesAction extends I_Action {
 	 */
 	public ActionForward getLog(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("getLog");
-		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		int i = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		String pathFull = "";
+		String htmlCode = "";
+		String fileName = "";
 		try {
-			 String fileName = request.getParameter("fileName")+"-"+user.getUserName()+".log";
+			 fileName = request.getParameter("fileName")+"-"+user.getUserName()+".log";
 			 String transType = request.getParameter("transType");
 			 if(Constants.TRANSACTION_MASTER_TYPE.equals(transType)){
 				 pathFull =  env.getProperty("path.master.sales.in.result")+fileName;
 			 }else if(Constants.TRANSACTION_TRANS_TYPE.equals(transType)){
 				 pathFull =  env.getProperty("path.transaction.sales.in.result")+fileName;
 			 }else if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
-				 pathFull =  env.getProperty("path.transaction.sales.in.result")+fileName;
+				// pathFull =  env.getProperty("path.transaction.sales.in.result")+fileName;
+				//get from table t_temp_import_trans
+				 fileName = request.getParameter("fileName");
 			 }
-			 logger.debug("fileName:"+fileName);
-			 logger.debug("transaType:"+transType);
-			 logger.debug("pathFull:"+pathFull);
 			 
-			 FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-		     //DISPLAY CSV FILE 
-			// ftpManager.getDownloadFTPFileByName(pathFull,response);
-			
-			 String dataLog = ftpManager.getDownloadFTPFileByName(pathFull);
-			// logger.debug("DataLOG:"+dataLog);
-			 String htmlCode = "";
-			 if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
-				 htmlCode = ConvertUtils.genHTMLCodeTransaction(dataLog).toString();
+			 if(Constants.TRANSACTION_MASTER_TYPE.equals(transType)
+				|| Constants.TRANSACTION_TRANS_TYPE.equals(transType)){
+				 logger.debug("fileName:"+fileName);
+				 logger.debug("transaType:"+transType);
+				 logger.debug("pathFull:"+pathFull);
+				 
+				 FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			     //DISPLAY CSV FILE 
+				// ftpManager.getDownloadFTPFileByName(pathFull,response);
+				
+				 String dataLog = ftpManager.getDownloadFTPFileByName(pathFull);
+				// logger.debug("DataLOG:"+dataLog);
+				  htmlCode = ConvertUtils.genHTMLCode(dataLog).toString(); 
 			 }else{
-				 htmlCode = ConvertUtils.genHTMLCode(dataLog).toString(); 
+				 //Case TRANSACTION_UTS_TRANS_TYPE
+				 //get Logs from table t_temp_import_trans
+				 String dataLog = InterfaceDAO.getUpdateTransLogs(fileName).toString();
+				 if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
+					 htmlCode = ConvertUtils.genHTMLCodeUpdateTransLogs(dataLog).toString();
+				 }
 			 }
+			 
 			 //logger.debug("htmlCode:"+htmlCode);
 		     request.setAttribute("DATA_LOGS", htmlCode);
 		     request.setAttribute("LOGS_NAME",fileName );

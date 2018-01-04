@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="java.sql.Connection"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -19,16 +21,25 @@ User user = (User) session.getAttribute("user");
 
 List<CreditNote> zero = new ArrayList<CreditNote>();
 
-List<CreditNote> cns = new ArrayList<CreditNote>();
-cns = new MCreditNote().lookUpForReceipt(user.getId(),selected,customerId); 
-for(CreditNote r : cns){
-	r.setCreditAmount(new MReceiptCN().calculateCreditAmount(r));
-	if(r.getCreditAmount()==0)
-		zero.add(r);
-}
-//remove zero credit
-for(CreditNote r : zero){
-	cns.remove(r);
+List<CreditNote> cns = new ArrayList<CreditNote>(); 
+Connection conn = null;
+try{
+	conn = DBConnection.getInstance().getConnection();
+	cns = new MCreditNote().lookUpForReceipt(conn,user.getId(),selected,Integer.parseInt(customerId)); 
+	for(CreditNote cn : cns){
+		cn.setCreditAmount(new MReceiptCN().calculateCNCreditAmount(conn,cn));
+		System.out.println("creditAmt:"+cn.getCreditAmount());
+		if(cn.getCreditAmount()==0) 
+			zero.add(cn); 
+	}
+	//remove zero credit
+	for(CreditNote r : zero){
+		cns.remove(r);
+	}
+}catch(Exception e){
+	e.printStackTrace();
+}finally{
+	conn.close();
 }
 pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 %>

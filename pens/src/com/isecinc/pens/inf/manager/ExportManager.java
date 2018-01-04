@@ -27,7 +27,6 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchExportWorker;
 import com.isecinc.pens.inf.manager.process.ExportProcess;
-import com.isecinc.pens.inf.manager.process.export.LockboxNormalProcess;
 import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
 
 /**
@@ -73,7 +72,7 @@ public class ExportManager {
 		int statusTaskAll = Constants.STATUS_SUCCESS;
 		FTPManager ftpManager = null;
 		try{
-			//initail FTP Manager
+			//initial FTP Manager
 			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			
 			/** Connection Monitor */
@@ -387,8 +386,8 @@ public class ExportManager {
 			}//for
 			
 			logger.info("Step Upload ALL File To FTP Server");
-			ftpManager.uploadAllFileToFTP_OPT2(userLogin,initConfigMap, "");
-
+			ftpManager.uploadAllFileToFTP(userLogin,initConfigMap, "");
+			
 			logger.info("Step Success Transaction Commit");
 			conn.commit();
 			

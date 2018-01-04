@@ -59,6 +59,7 @@ window.onload  = function(){
 
 function switchTabOnload(currentTab){
 	//alert("onload:"+currentTab);
+
 	if(currentTab =='tab_config_info' || currentTab ==''){
 		//alert('tab_config_info');
 		document.getElementById("div_config_info").style.visibility = 'visible';
@@ -67,6 +68,8 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
 		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
+		document.getElementById("div_add_db").style.visibility = "hidden";
+		
 		document.getElementById("id_config_info").className = "tab_selected_style";
 	}
 	if(currentTab =='tab_execute'){
@@ -77,6 +80,8 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
 		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
+		document.getElementById("div_add_db").style.visibility = "hidden";
+		
 		document.getElementById("id_execute").className = "tab_selected_style";
 		
 	}
@@ -88,6 +93,8 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
 		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
+		document.getElementById("div_add_db").style.visibility = "hidden";
+		
 		document.getElementById("id_query").className = "tab_selected_style";
 	}
 	if(currentTab =='tab_backupdb'){
@@ -97,8 +104,9 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
 		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
-		document.getElementById("div_backupdb").style.visibility = 'visible';
+		document.getElementById("div_add_db").style.visibility = "hidden";
 		
+		document.getElementById("div_backupdb").style.visibility = 'visible';
 		document.getElementById("id_backupdb").className = "tab_selected_style";
 	}
 	
@@ -109,8 +117,9 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
-		document.getElementById("div_cleardb").style.visibility = "visible";
+		document.getElementById("div_add_db").style.visibility = "hidden";
 		
+		document.getElementById("div_cleardb").style.visibility = "visible";
 		document.getElementById("id_cleardb").className = "tab_selected_style";
 	}
 	if(currentTab =='tab_clearcust_dup'){
@@ -120,9 +129,22 @@ function switchTabOnload(currentTab){
 		document.getElementById("div_execute").style.visibility = 'hidden';
 		document.getElementById("div_backupdb").style.visibility = 'hidden';
 		document.getElementById("div_cleardb").style.visibility = "hidden";
+		document.getElementById("div_add_db").style.visibility = "hidden";
 		
 		document.getElementById("div_clearcust_dup").style.visibility = "visible";
 		document.getElementById("id_clearcust_dup").className = "tab_selected_style";
+	}
+	if(currentTab =='tab_add_db'){
+		//alert('tab_backupdb');
+		document.getElementById("div_config_info").style.visibility = 'hidden';
+		document.getElementById("div_query").style.visibility = 'hidden';
+		document.getElementById("div_execute").style.visibility = 'hidden';
+		document.getElementById("div_cleardb").style.visibility = "hidden";
+		document.getElementById("div_clearcust_dup").style.visibility = "hidden";
+		document.getElementById("div_backupdb").style.visibility = 'hidden';
+		
+		document.getElementById("div_add_db").style.visibility = "visible";
+		document.getElementById("id_add_db").className = "tab_selected_style";
 	}
 }
 
@@ -163,11 +185,16 @@ function submitBT(path){
 	if(currentTab =='tab_clearcust_dup'){
 		queryStr +="&action=tab_clearcust_dup";
 	}
-	
+	if(currentTab =='tab_add_db'){
+		queryStr +="&action=tab_add_db";
+	}
 	//alert("quertStr:"+queryStr);
 	
 	document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
     document.adminConsoleForm.submit();
+}
+function addSlqToeSQL(sqlUtils){
+	document.getElementById("eSQL").value = sqlUtils.value;
 }
 </script>
 
@@ -189,6 +216,7 @@ function submitBT(path){
 	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Duplicate Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
+	<INPUT TYPE="button" class="tab_style" id ="id_add_db" name ="tab_add_db"  VALUE="Add New DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_add_db')">
 	
     <div id="div_msg" style="display:none"> 
 		    <br/><br/>
@@ -208,7 +236,7 @@ function submitBT(path){
 	  
 	   <div id="div_query"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <BR>
-		   <span class="h1_style"> Quary Tab </span> :
+		   <span class="h1_style"> Query Tab </span> :
 	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
 	        <BR><br>
 		    Please enter your text SQL 1:<BR>
@@ -231,10 +259,15 @@ function submitBT(path){
 	      <BR>
 		     <span class="h1_style">Execute Tab </span> :
 	         <INPUT TYPE="button" class="button2_style" name ="B_EXECUTE"  VALUE="Submit Execute DB" onclick="submitBT('<%=request.getContextPath()%>');">
+		     &nbsp; &nbsp;<b>เลือก SQl ที่ใช้บ่อย:</b>
+		     <select id="sqlUtils" onchange="addSlqToeSQL(this)">
+			  <option value=""></option>
+			  <option value="delete from monitor; delete from monitor_item;delete from monitor_item_detail;">ClearMonitorImportExport</option>
+			</select>
 		  <BR>
 		    Please enter your text SQL To Execute:
 		  <BR>
-		   <html:textarea property="eSQL" style=" width :100%;" rows="12"/>
+		   <html:textarea property="eSQL" styleId="eSQL" style=" width :100%;" rows="12"/>
 		  <BR>
 		  <BR>
 		   -- Result Execute SQL --
@@ -268,7 +301,15 @@ function submitBT(path){
 		   <html:textarea property="resultClearCustDup" style=" width :100%;" rows="40"/>
 		  <br>
 	  </div>
-  
+      <div id="div_add_db" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
+		  <BR>
+		  <span class="h1_style">Add New Script DB </span> :
+		   <INPUT class="button2_style" TYPE="button" name ="B_AddNewDB"  
+		   VALUE="Submit" onclick="submitBT('<%=request.getContextPath()%>');">
+		  <BR>
+		   <html:textarea property="resultAddDB" style=" width :100%;" rows="40"/>
+		  <br>
+	  </div>
 </html:form>
 </body>
 </html>

@@ -132,6 +132,39 @@ public class ConvertUtils {
 	  }
 	  return str;
   }
+  public static StringBuffer genHTMLCodeUpdateTransLogs(String dataStr) {
+	  StringBuffer str = new StringBuffer("");
+	  try{
+		  if(dataStr != null){
+			  String[] dataArray = dataStr.split("\n");
+			  str.append("<table align='center' border='0' cellpadding='3' cellspacing='1' class='result'>");
+			
+	          /***  gen Header Detail***************/
+	          if(dataArray != null && dataArray.length > 0){
+		          /***  gen Detail ***************/
+		          for(int line =0;line<dataArray.length;line++){
+		        	  //System.out.println("dataLine:"+dataArray[line]);
+		        	  String[] dataLineArray = dataArray[line].split(",");
+		        	  //System.out.println("dataLineArray length:"+dataLineArray.length);
+		        	  String styleClass = (line%2==0)?"lineE":"lineO";
+		      
+		        	  str.append("<tr class='"+styleClass+"'>"); 
+		        	  for(int c=0;c<dataLineArray.length;c++){
+				         str.append("<td>");
+				         str.append(c>dataLineArray.length-1?"":dataLineArray[c]);
+				         str.append("</td>");
+		        	  }//for column
+			        str.append("</tr>");
+		        }//for rows
+		        /***  gen Detail ***************/
+	          }
+			  str.append("</table>");
+		  }
+	  }catch(Exception e){
+		  e.printStackTrace();
+	  }
+	  return str;
+  }
   
 	public static int convertToInt(String str) throws Exception{
 		if(str == null){

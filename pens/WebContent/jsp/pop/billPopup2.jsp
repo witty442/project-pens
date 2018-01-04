@@ -12,42 +12,38 @@
 String selected = request.getParameter("selected");
 if(selected==null)selected="";
 String custId = request.getParameter("cust");
-
 User user = (User) session.getAttribute("user");
-
-List<Order> zero = new ArrayList<Order>();
  
-List<Order> orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
+List<Order> ordersAll = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
 double totalCreditNoteAmt = 0; 
 double totalAdjustAmt = 0; 
 
+List<Order> orders  = new ArrayList<Order>();
 MCreditNote creditNote = new MCreditNote();
 MAdjust adjust = new MAdjust();
 
-for(Order r : orders){
+for(Order r : ordersAll){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r));
 	
 	totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(r.getArInvoiceNo());
-	totalAdjustAmt = adjust.getTotalAdjustAmt(r.getArInvoiceNo());
+	
+	totalAdjustAmt = adjust.getTotalAdjustAmtInvoice(r.getArInvoiceNo());  
 	
 	r.setCreditNoteAmt(totalCreditNoteAmt);
 	r.setAdjustAmt(totalAdjustAmt);
 	r.setOpenAmt();
 	
 	//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
-	if(r.getOpenAmt()<=0)
-		zero.add(r);
-}
-//remove zero credit
-for(Order r : zero){
-	orders.remove(r);
+	//remove zero credit
+	if(r.getOpenAmt() > 0.01){
+		orders.add(r);
+	}
 }
 
 pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 %>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
@@ -71,7 +67,6 @@ pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
-	
 	function loadMe() {
 		var prepaid=0;
 		var prepaid = Number(window.opener.document.getElementById('receiptAmount').value);
@@ -79,9 +74,7 @@ pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 		
 		//alert(prepaid);
 	}
-
 	function addRow() {
-
 		var retArry = new Array();
 		var bill;
 

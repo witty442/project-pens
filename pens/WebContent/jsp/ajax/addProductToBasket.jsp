@@ -16,6 +16,7 @@ String price2 = request.getParameter("price2");
 String qty1 = request.getParameter("qty1");
 String qty2 = request.getParameter("qty2");
 String linenetAmt = request.getParameter("lineAmt");
+String taxable = request.getParameter("taxable");
 
 Basket basket = (Basket)session.getAttribute(custId);
 if(basket == null ){
@@ -30,6 +31,7 @@ item.setUom1(uom1);
 item.setUom2(uom2);
 item.setPrice1(Double.valueOf(price1));
 item.setPrice2(Double.valueOf(price2));
+item.setTaxable(taxable);
 if(StringUtils.isEmpty(qty1.trim()))
 	qty1 = "0";
 item.setQty1(Integer.parseInt(qty1));

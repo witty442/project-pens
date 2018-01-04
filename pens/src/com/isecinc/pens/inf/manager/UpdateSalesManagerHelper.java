@@ -48,6 +48,7 @@ public class UpdateSalesManagerHelper {
 			}
 			sql.append("\n group by file_name ");
 			sql.append("\n order by file_name ");
+			
 			//logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -79,10 +80,9 @@ public class UpdateSalesManagerHelper {
 		StringBuffer sql = new StringBuffer();
 		List<KeyNoImportTransBean> dataList = new ArrayList<KeyNoImportTransBean>();
 		try{
-			sql.append("\n select key_no,receipt_no,count(*) as c from t_temp_import_trans");
+			sql.append("\n select distinct key_no from t_temp_import_trans");
 			sql.append("\n where table_name ='"+tableName+"'");
 			sql.append("\n and file_name ='"+fileName+"'");
-			sql.append("\n group by key_no,receipt_no ");
 			sql.append("\n order by key_no ");
 			//logger.debug("sql:"+sql.toString());
 			
@@ -90,10 +90,9 @@ public class UpdateSalesManagerHelper {
 			rs = ps.executeQuery();
 			while(rs.next()){
 				KeyNoImportTransBean item = new KeyNoImportTransBean();
-				item.setFileName(fileName);
 				item.setTableName(tableName);
+				item.setFileName(fileName);
 				item.setKeyNo(Utils.isNull(rs.getString("key_no")));
-				item.setReceiptNo(Utils.isNull(rs.getString("receipt_no")));
 				//get All LineStr by Key No
 				item.setLineList(getLineStrByKeyNo(conn, tableName, fileName, item.getKeyNo()));
 				dataList.add(item);
@@ -115,24 +114,71 @@ public class UpdateSalesManagerHelper {
 		ResultSet rs =null;
 		StringBuffer sql = new StringBuffer();
 		List<LineImportTransBean> dataList = new ArrayList<LineImportTransBean>();
+	    boolean foundHeadVO = false;
+	    double countNewSeqCaseVO = 1;
 		try{
-			sql.append("\n select key_no,line_str ,seq from t_temp_import_trans");
+			sql.append("\n select key_no,receipt_no,line_str ,seq from t_temp_import_trans");
 			sql.append("\n where table_name ='"+tableName+"'");
 			sql.append("\n and file_name ='"+fileName+"'");
 			sql.append("\n and key_no ='"+keyNo+"'");
 			sql.append("\n order by seq ");
+			
 			//logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			while(rs.next()){
 				LineImportTransBean item = new LineImportTransBean();
-				item.setFileName(fileName);
 				item.setTableName(tableName);
+				item.setFileName(fileName);
 				item.setKeyNo(keyNo);
-				item.setSeq(rs.getLong("seq"));
+				item.setReceiptNo(Utils.isNull(rs.getString("receipt_no")));
+				item.setSeq(rs.getDouble("seq"));
 				item.setLineStr(Utils.isNull(rs.getString("line_str")));
 				dataList.add(item);
+				
+				//Check found HEAD VO 
+				if(item.getLineStr().startsWith("H") && item.getLineStr().indexOf("VO") != -1){
+					foundHeadVO = true;
+					//update seq h|VO to 1.1->1.2-1.3
+					countNewSeqCaseVO += 0.1;
+					logger.debug("countNewSeqCaseVO:"+countNewSeqCaseVO);
+					updateSeqNewCaseFoundVoidDAO(conn, fileName, tableName, keyNo, rs.getDouble("seq"), countNewSeqCaseVO);
+				}
+			}
+			
+			/** Case Found H|VO Must move row to first row **/
+			/*
+			 B|101218|RS00560060014|12062017|6981.84|SV
+			 H|101218|RS00560060014|Y|SV|00241010|12062017|6981.84|�Թʴ
+			 L|101218|RS00560060014|21600500499|S00560050018|4266.96
+			 L|101218|RS00560060014|21600502255|S00560050058|2714.88
+			 H|101218|RS00560060014|Y|VO|00241010|12062017|6981.84|�Թʴ
+			 */
+			if(foundHeadVO){
+				logger.info("Found H|VO");
+				dataList = new ArrayList<LineImportTransBean>();
+				sql = new StringBuffer("");
+				sql.append("\n select key_no,receipt_no,line_str ,seq from t_temp_import_trans");
+				sql.append("\n where table_name ='"+tableName+"'");
+				sql.append("\n and file_name ='"+fileName+"'");
+				sql.append("\n and key_no ='"+keyNo+"'");
+				sql.append("\n order by seq ");
+				
+				//logger.debug("sql:"+sql.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				while(rs.next()){
+					LineImportTransBean item = new LineImportTransBean();
+					item.setTableName(tableName);
+					item.setFileName(fileName);
+					item.setKeyNo(keyNo);
+					item.setReceiptNo(Utils.isNull(rs.getString("receipt_no")));
+					item.setSeq(rs.getLong("seq"));
+					item.setLineStr(Utils.isNull(rs.getString("line_str")));
+					dataList.add(item);
+				}
 			}
 		}catch(Exception e){
 			throw e;
@@ -146,6 +192,7 @@ public class UpdateSalesManagerHelper {
 		}
 		return dataList;
 	}
+	
 	
 	public void insertDataFileToTemp(Connection conn,LinkedHashMap<String,TableBean> initConfigMap) throws Exception{
 		try{
@@ -280,7 +327,7 @@ public class UpdateSalesManagerHelper {
 			sql.append("\n (file_name,table_name,line_str,created,key_no,seq"
 					+ ",error_msg,import_type,amount,receipt_no,doc_status)");
 			sql.append("\n values(?,?,?,?,?,?,?,?,?,?,?)");
-			logger.debug("sql:"+sql.toString());
+			//logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
 			ps.setString(1, fileName);
@@ -304,8 +351,8 @@ public class UpdateSalesManagerHelper {
 			}
 		}
 	}
-	public void updateStatusLineToTempImportDAO(Connection conn,String fileName,String tableName
-			,String keyNo,long seq,String errMsg) throws Exception{
+	public void updateStatusFailLineToTempImportDAO(Connection conn,String fileName,String tableName
+			,String keyNo,double seq,String errMsg) throws Exception{
 		PreparedStatement  ps = null;
 		StringBuffer sql = new StringBuffer();
 		try{
@@ -326,6 +373,27 @@ public class UpdateSalesManagerHelper {
 		}
 	}
 
+	public void updateStatusSuccessLineToTempImportDAO(Connection conn,String fileName,String tableName
+			,String keyNo,double seq,String errMsg) throws Exception{
+		PreparedStatement  ps = null;
+		StringBuffer sql = new StringBuffer();
+		try{
+			sql.append("\n update t_temp_import_trans");
+			sql.append("\n set error_msg = '"+errMsg+"',import_type='SUCCESS'");
+			sql.append("\n where table_name ='"+tableName+"' and file_name ='"+fileName+"'");
+			sql.append("\n and key_no ='"+keyNo+"' and seq ="+seq);
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			ps.executeUpdate();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();
+			}
+		}
+	}
 	public void  deleteTempImportByFileName(Connection conn,String fileName) throws Exception{
 		PreparedStatement  ps = null;
 		StringBuffer sql = new StringBuffer();
@@ -413,7 +481,7 @@ public class UpdateSalesManagerHelper {
 			sql.append("\n where table_name='"+tableName+"'");
 			sql.append("\n and file_name ='"+fileName+"'");
 			sql.append("\n and key_no ='"+keyNo+"'");
-			logger.debug("sql:"+sql.toString());
+			//logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
 			ps.executeUpdate();
@@ -523,6 +591,29 @@ public class UpdateSalesManagerHelper {
 			ps.setString(1, tableName);
 			ps.executeUpdate();
 			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();
+			}
+		}
+	}
+	
+	/** Update seq new Case H|VO for move to second line */
+	public void updateSeqNewCaseFoundVoidDAO(Connection conn,String fileName,String tableName
+			,String keyNo,double seq,double newSeq) throws Exception{
+		PreparedStatement  ps = null;
+		StringBuffer sql = new StringBuffer();
+		try{
+			sql.append("\n update t_temp_import_trans");
+			sql.append("\n set seq = "+newSeq);
+			sql.append("\n where table_name ='"+tableName+"' and file_name ='"+fileName+"'");
+			sql.append("\n and key_no ='"+keyNo+"' and seq ="+seq);
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			ps.executeUpdate();
 		}catch(Exception e){
 			throw e;
 		}finally{

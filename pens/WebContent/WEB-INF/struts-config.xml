@@ -358,6 +358,7 @@
 			<forward name="viewPopup" path="/jsp/sales/salesOrderViewPopup.jsp" />
 			<forward name="cancelOrderPopup" path="/jsp/pop/cancelOrderPopup.jsp" />
 			<forward name="print" path="/jsp/pop/printPopup.jsp" />
+			<forward name="print2" path="/jsp/pop/print2Popup.jsp" />
 		</action>
 
 		<!-- TRIP -->

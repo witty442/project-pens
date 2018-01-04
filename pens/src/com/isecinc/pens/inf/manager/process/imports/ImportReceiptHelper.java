@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.Adjust;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptLine;
@@ -20,13 +20,12 @@ import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction.Receip
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptLine;
-import com.isecinc.pens.web.receipt.ReceiptForm;
 
 public class ImportReceiptHelper {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
-	public static boolean isReceiptCancelAll(Connection conn,String receiptNo,String filName) throws Exception{
+	public static boolean isReceiptCancelAllBatch(Connection conn,String keyNo,String filName) throws Exception{
 		PreparedStatement  ps = null;
 		ResultSet rs =null;
 		StringBuffer sql = new StringBuffer();
@@ -34,7 +33,7 @@ public class ImportReceiptHelper {
 		try{
 			sql.append("\n select count(*) as c from t_temp_import_trans");
 			sql.append("\n where file_name ='"+filName+"'");
-			sql.append("\n and  receipt_no ='"+receiptNo+"'");
+			sql.append("\n and  key_no ='"+keyNo+"'");
 			sql.append("\n and  line_str like 'H%'");
 			sql.append("\n and  doc_status ='SV' ");
 			
@@ -42,6 +41,7 @@ public class ImportReceiptHelper {
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
+				logger.debug("count c["+rs.getInt("c")+"]");
 			  if(rs.getInt("c") >0){
 				  cancelAll = false;
 			  }
@@ -65,18 +65,21 @@ public class ImportReceiptHelper {
 		try{
 			if( !receiptNoMap.isEmpty()){
 			  conn = DBConnection.getInstance().getConnection();
-			  Iterator its = receiptNoMap.keySet().iterator();
+			  Iterator<String> its = receiptNoMap.keySet().iterator();
 	  		  while(its.hasNext()){
 	  			  String  receiptNo =(String)its.next();
 	  			  logger.debug("ReCalc Sum(paid_amount) receipt_line to apply_amount in t_receipt ReceiptNo["+receiptNo+"]");
 	  			  if( !Utils.isNull(receiptNo).equals("")){
+	  				 int receiptId = new MReceipt().getReceiptId(conn, receiptNo);
+	  				 
+	  				  //Delete Receipt line is wrong  and not apply receipt by
+	  				  deleteReceiptLineWrongData(conn, receiptId);
 	  				  
 	    		      // Re-Calculate ReceiptLine amount and update to t_receipt
-	    		      int receiptId = new MReceipt().getReceiptId(conn, receiptNo);
 		    		  Receipt receiptUpdate = reCalculateApplyAmount(conn,receiptId);
-	    		    	
-		    		  updateApplyAmountInReceiptHead(conn,receiptUpdate);
-		    		  
+	    		      if(receiptUpdate != null){
+		    		     updateApplyAmountInReceiptHead(conn,receiptUpdate);
+	    		      }
 	  			   }//if
 	  		  }//for
 			}//if
@@ -90,41 +93,7 @@ public class ImportReceiptHelper {
 		  }catch(Exception ee){}
 		}
 	}
-	
-	public  static int updatePaidAmountRecepitLine(Connection conn,ReceiptFunctionBean o) throws Exception{
-	     PreparedStatement ps =null;
-	     int updateInt = 0;
-		 try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" update t_receipt_line  \n");
-			sql.append(" set paid_amount = \n");
-			
-			sql.append(" (select  COALESCE(sum(paid_amount),0) \n");
-			sql.append("   from t_receipt_match  \n");
-			sql.append("   where receipt_id = "+o.getReceiptId()+" \n");
-			sql.append("   and receipt_line_id = "+o.getReceiptLineId()+" )\n");
-			
-            sql.append(", remain_amount = \n");
-			sql.append("  credit_amount - (select  COALESCE(sum(paid_amount),0) \n");
-			sql.append("   from t_receipt_match  \n");
-			sql.append("   where receipt_id = "+o.getReceiptId()+" \n");
-			sql.append("   and receipt_line_id = "+o.getReceiptLineId()+" )\n");
-			
-			sql.append(" where receipt_id = "+o.getReceiptId()+" \n");
-			sql.append(" and receipt_line_id = "+o.getReceiptLineId()+" \n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			updateInt = ps.executeUpdate();	
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-		}
-		return updateInt;
-	}
+
 	
 	public  static int updateApplyAmountInReceiptHead(Connection conn,Receipt o) throws Exception{
 	     PreparedStatement ps =null;
@@ -145,6 +114,24 @@ public class ImportReceiptHelper {
 			}
 		}
 		return updateInt;
+	}
+	
+	/** Delete Receipt_line is user key error and old data wrong **/
+	public static void deleteReceiptLineWrongData(Connection conn,int receiptId) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		try{
+			/** Delete receipt_line wrong data not found in Match **/
+			sql.append("\n delete from t_receipt_line where receipt_line_id not in( ");
+			sql.append("\n  select receipt_line_id  from t_receipt_match where receipt_by_id  in( ");
+			sql.append("\n      select receipt_by_id from t_receipt_by where receipt_id ="+receiptId);
+			sql.append("\n  ) ");
+			sql.append("\n )and  receipt_id ="+receiptId +";");
+			
+			int r = Utils.excUpdateReInt(conn, sql.toString());
+			logger.debug("deleteReceiptLineWrongData receiptId["+receiptId+"] result["+r+"]");
+	    }catch(Exception e){
+	    	throw e;
+	    }
 	}
 	
 	public static Receipt reCalculateApplyAmount(Connection conn,int receiptId) throws Exception{

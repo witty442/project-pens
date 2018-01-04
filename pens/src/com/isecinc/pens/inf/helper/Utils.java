@@ -66,8 +66,10 @@ public class Utils {
 
 	public static void main(String[] args){
 	    try{	   
-	    	//Utils.decimalFormat(0),Utils.format_current_no_disgit);
-	    	isInternetConnect("https://www.google.co.th");
+	    	double r = 0.001;
+	    	if(r > 0){
+	    		System.out.println("more than 0");
+	    	}
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }

@@ -58,6 +58,24 @@ public abstract class I_Model<T> implements Serializable {
 			} catch (Exception e2) {}
 		}
 	}
+	
+	protected T find(Connection conn,String id, String tableName, String columnID, Class<T> classes) throws Exception {
+		// logger.debug("Find " + this.getClass());
+		T t = null;
+		try {
+			String sql = "SELECT * FROM " + tableName + " WHERE " + columnID + " = ? ";
+			//logger.debug("sql:"+sql+",id:"+id);
+			
+			List<T> ts = Database.query(sql, new Object[] { id }, classes, conn);
+			if (ts.size() > 0) {
+				t = ts.get(0);
+			}
+			return t;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+		}
+	}
 
 	/**
 	 * Search

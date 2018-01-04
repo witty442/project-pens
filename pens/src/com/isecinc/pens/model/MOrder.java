@@ -19,6 +19,7 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
+import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -47,7 +48,8 @@ public class MOrder extends I_Model<Order> {
 			"BILL_ADDRESS_ID", "SHIP_ADDRESS_ID", "PRICELIST_ID", "PAYMENT_TERM", "VAT_CODE", "VAT_RATE",
 			"PAYMENT_METHOD", "SHIPPING_DAY", "SHIPPING_TIME", "TOTAL_AMOUNT", "VAT_AMOUNT", "NET_AMOUNT",
 			"INTERFACES", "PAYMENT", "SALES_ORDER_NO", "AR_INVOICE_NO", "USER_ID", "DOC_STATUS", "CREATED_BY",
-			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID","ORA_SHIP_ADDRESS_ID","org","PO_NUMBER"};
+			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID"
+			,"ORA_SHIP_ADDRESS_ID","org","PO_NUMBER","TOTAL_AMOUNT_NON_VAT"};
 
 	/**
 	 * Find
@@ -60,6 +62,9 @@ public class MOrder extends I_Model<Order> {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Order.class);
 	}
 
+	public Order find(Connection conn,String id) throws Exception {
+		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Order.class);
+	}
 	/**
 	 * Search
 	 * 
@@ -125,7 +130,8 @@ public class MOrder extends I_Model<Order> {
 				order.getOraBillAddressID(),
 				order.getOraShipAddressID(),
 				order.getOrg(),
-				order.getPoNumber()
+				order.getPoNumber(),
+				order.getTotalAmountNonVat()
 				};
 		if (super.save(TABLE_NAME, columns, values, order.getId(), conn)) {
 			order.setId(id);
@@ -196,6 +202,8 @@ public class MOrder extends I_Model<Order> {
 
 	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) {
 		BigDecimal totalAmountDec = new BigDecimal("0");
+		BigDecimal totalAmountNonVatDec = new BigDecimal("0");
+		BigDecimal totalAmountTemp = new BigDecimal("0");
 		BigDecimal lineAmount = new BigDecimal("0");
 		BigDecimal lineDiscount = new BigDecimal("0");
 		
@@ -210,17 +218,32 @@ public class MOrder extends I_Model<Order> {
 				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
 				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
 				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+				//Non Vat
+				
+				if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
+					totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
+				}
 			}
 
 			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
 			
-			VatDec = (VatCodeDec.multiply(totalAmountDec)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
+			logger.debug("totalAmountDec:"+totalAmountDec);
+			logger.debug("totalAmountNonVatDec:"+totalAmountNonVatDec);
+			
+			//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
+			totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
+			totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			logger.debug("Result totalAmountTemp:"+totalAmountTemp);
+			
+			VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
 			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
 			
 			//recalc vatAmount
 			VatDec = NetDec.subtract(totalAmountDec).setScale(2,BigDecimal.ROUND_HALF_UP);
 			
 			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
+			order.setTotalAmountNonVat(new Double(df.format(totalAmountNonVatDec.doubleValue())));
 			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
 			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
 			
@@ -231,6 +254,125 @@ public class MOrder extends I_Model<Order> {
 		}
 		return order;
 	}
+	
+	public Order reCalculateHeadAmountCaseImport(Connection conn,String orderId) throws Exception{
+		try{
+		    Order orderUpdate = find(orderId);
+		    List<OrderLine> orderLines = new MOrderLine().lookUp(conn,orderUpdate.getId());
+		    //recalculate Head Amount
+		    return reCalculateHeadAmountCaseImport(conn,orderUpdate,orderLines);
+	    }catch(Exception e){
+	    	throw e;
+	    }
+	}
+
+	public Order reCalculateHeadAmountCaseImport(Connection conn,Order order, List<OrderLine> lines) {
+		BigDecimal totalAmountDec = new BigDecimal("0");
+		BigDecimal totalAmountNonVatDec = new BigDecimal("0");
+		BigDecimal totalAmountTemp = new BigDecimal("0");
+		BigDecimal lineAmount = new BigDecimal("0");
+		BigDecimal lineDiscount = new BigDecimal("0");
+		
+		BigDecimal VatCodeDec = new BigDecimal("7");
+		BigDecimal VatDec = new BigDecimal(0);
+		BigDecimal NetDec = new BigDecimal(0);
+		DecimalFormat df = new DecimalFormat("###0.00");
+		try{
+			//get OrderLine 
+			for (OrderLine l : lines) {
+				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
+				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+				//Non Vat
+				//get Product is taxable
+				Product product = new MProduct().find(conn,String.valueOf(l.getProduct().getId()));
+				if( !Utils.isNull(product.getTaxable()).equalsIgnoreCase("Y")){
+					totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
+				}
+			}
+
+			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			logger.debug("totalAmountDec:"+totalAmountDec);
+			logger.debug("totalAmountNonVatDec:"+totalAmountNonVatDec);
+			
+			//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
+			totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
+			totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			logger.debug("Result totalAmountTemp:"+totalAmountTemp);
+			
+			VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
+			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			//recalc vatAmount
+			VatDec = NetDec.subtract(totalAmountDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
+			order.setTotalAmountNonVat(new Double(df.format(totalAmountNonVatDec.doubleValue())));
+			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
+			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
+			
+		}catch(Exception e){
+		   logger.debug(e.getMessage(),e);
+		}finally{
+			
+		}
+		return order;
+	}
+	
+	//Recalc Net Amount From DB After save DB
+		public Order reCalculateHeadAmountDB(Connection conn, Order order) {
+			BigDecimal totalAmountDec = new BigDecimal("0");
+			BigDecimal totalAmountNonVatDec = new BigDecimal("0");
+			BigDecimal totalAmountTemp = new BigDecimal("0");
+			BigDecimal lineAmount = new BigDecimal("0");
+			BigDecimal lineDiscount = new BigDecimal("0");
+			
+			BigDecimal VatCodeDec = new BigDecimal("7");
+			BigDecimal VatDec = new BigDecimal(0);
+			BigDecimal NetDec = new BigDecimal(0);
+			try{
+				//get OrderLine 
+				List<OrderLine> newlines = new MOrderLine().lookUp(conn,order.getId());
+				DecimalFormat df = new DecimalFormat("###0.00");
+				
+				for (OrderLine l : newlines) {
+					//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
+					lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+					lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+					totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+					
+					//Non Vat
+					if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
+						totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
+					}
+				}
+
+				totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
+				
+				//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
+				totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
+				totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
+				
+				VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
+				NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
+				
+				//recalc vatAmount
+				VatDec = NetDec.subtract(totalAmountDec);
+				
+				order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
+				order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
+				order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
+				
+			}catch(Exception e){
+			   logger.debug(e.getMessage(),e);
+			}finally{
+				
+			}
+			return order;
+		}
 	
 	public String validateProductIngroup(Connection conn,List<OrderLine> lines) throws Exception {
 		String productCodeInvalid ="";
@@ -281,47 +423,6 @@ public class MOrder extends I_Model<Order> {
 			}
 		}
 		return productGroup;
-	}
-
-	//Recalc Net Amount From DB After save DB
-	public Order reCalculateHeadAmountDB(Connection conn, Order order) {
-		BigDecimal totalAmountDec = new BigDecimal("0");
-		BigDecimal lineAmount = new BigDecimal("0");
-		BigDecimal lineDiscount = new BigDecimal("0");
-		
-		BigDecimal VatCodeDec = new BigDecimal("7");
-		BigDecimal VatDec = new BigDecimal(0);
-		BigDecimal NetDec = new BigDecimal(0);
-		try{
-			//get OrderLine 
-			List<OrderLine> newlines = new MOrderLine().lookUp(conn,order.getId());
-			DecimalFormat df = new DecimalFormat("###0.00");
-			
-			for (OrderLine l : newlines) {
-				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
-				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-			}
-
-			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			VatDec = (VatCodeDec.multiply(totalAmountDec)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
-			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			//recalc vatAmount
-			VatDec = NetDec.subtract(totalAmountDec);
-			
-			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
-			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
-			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
-			
-		}catch(Exception e){
-		   logger.debug(e.getMessage(),e);
-		}finally{
-			
-		}
-		return order;
 	}
 	
 	public List<OrderLine> reCalculateLineAmountInLinesBeforeCalcPromotion(List<OrderLine> lines) throws Exception {
@@ -391,11 +492,10 @@ public class MOrder extends I_Model<Order> {
 		whereCause += "  and ar_invoice_no is not null  \n";
 		whereCause += "  and ar_invoice_no <> ''  \n";
 		whereCause += "  and order_type = '" + orderType + "'  \n";
-		//whereCause += "  and user_id = " + userId; Comment Out Because 
 		whereCause += "  and customer_id = " + customerId +" \n";
 		/** Wit:Edit 12/05/2011 Add doc_status <> VO **/
 		whereCause += "  and doc_status <> 'VO'  \n";
-		/** Wit Edit 02/10/2017 Case Show Order_date< config date **/
+		/** Wit Edit 02/10/2017 Case Show Order_date > config date **/
 		whereCause += "  and order_date > "+dateCheck +" \n";
 		
 		if (selected.length() > 0){
@@ -726,6 +826,41 @@ public class MOrder extends I_Model<Order> {
 				conn.close();conn=null;
 			}
 		}
+	}
+	
+	/**
+	 * Check Order is have vat
+	 * @param conn
+	 * @param orderId
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean isOrderHaveVat(Connection conn,int orderId) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		boolean haveVat = true;
+		try{
+			String sql ="select count(*) as c from t_order_line where order_id="+orderId +" and taxable ='N'";
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				if(rst.getInt("c") >0){
+					haveVat = false;
+				}
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		return haveVat;
 	}
 	
 }

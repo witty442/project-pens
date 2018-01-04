@@ -1,5 +1,6 @@
 package com.isecinc.pens.inf.manager.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,7 +45,7 @@ public class UpdateSalesProcess {
 	 * @return
 	 * @throws Exception
 	 */
-	public  String[] importToDB(Connection conMonitor,Connection conn,LinkedHashMap initConfigMap,TableBean tableBean,KeyNoImportTransBean keyNoBean,User userBean) throws Exception {
+	public  ResultImportBean importToDB(BigDecimal transId,Connection conMonitor,Connection conn,LinkedHashMap initConfigMap,TableBean tableBean,KeyNoImportTransBean keyNoBean,User userBean) throws Exception {
 	    PreparedStatement psUpdateH = null;
 	    PreparedStatement psInsH = null;
 	    PreparedStatement psUpdateD = null;
@@ -60,10 +61,10 @@ public class UpdateSalesProcess {
         String errorCode="";String errorMsg="";
         String firstErrorMsg ="";
         String firstErrorCode = "";
-        String[] results = new String[4];
+        ResultImportBean resultImportBean = null;
         TableBean childBean = null;
-        String fileName = "";
         UpdateSalesManagerHelper helper = new UpdateSalesManagerHelper();
+        String receiptNoAll = "";
 	    try {  
 	    	  /**  init prepareStatment Ins H **/
 	    	  if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(tableBean.getPrepareSqlIns()).equals("")){
@@ -107,6 +108,7 @@ public class UpdateSalesProcess {
 					  canExc = 0;
 					  lineBean = keyNoBean.getLineList().get(line);
 					  lineStr = lineBean.getLineStr();
+					  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 				    		  //**Check Header Or Line**/
 			    		      logger.debug("lineStr["+lineStr+"]");
@@ -115,7 +117,7 @@ public class UpdateSalesProcess {
 				    		  if(lineStr.startsWith("B")){  
 				    			  if(tableBean.getTableName().startsWith("t_receipt")){
 			    					  logger.debug("********Start Update Batch(t_receipt) *********************");
-					    		      canExc = new ImportReceiptFunction().processReceiptBatch( conn, tableBean, userBean, lineStr,canExc);
+					    		      canExc = new ImportReceiptFunction().processReceiptBatch(conn, keyNoBean, userBean, lineStr,canExc);
 						    	      logger.debug("********End Update Batch (t_receipt) canUpdate:"+canExc +"");
 				    			  }				    		  
 				    		  
@@ -125,7 +127,7 @@ public class UpdateSalesProcess {
 				    				  
 				    				  if(tableBean.getTableName().startsWith("t_receipt")){
 				    					  logger.debug("********Start Update H(t_receipt) *********************");
-						    		      canExc = new ImportReceiptFunction().processReceiptHead(conn, tableBean, userBean, lineStr,canExc);
+						    		      canExc = new ImportReceiptFunction().processReceiptHead(conn, keyNoBean, userBean, lineStr,canExc);
 							    	      logger.debug("********End Update H (t_receipt) canUpdate:"+canExc +"");
 							    	      
 				    				  }else{
@@ -193,7 +195,7 @@ public class UpdateSalesProcess {
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpd())){
 					    					  /** Create Receipt Line ONLY **/
 					    					  if(childBean.getTableName().startsWith( "t_receipt_line") ){ 
-                                            	  canExc = new ImportReceiptFunction().processReceiptLine(conn, childBean, userBean, lineStr, psUpdateD,canExc);
+                                            	  canExc = new ImportReceiptFunction().processReceiptLine(conn, keyNoBean, userBean, lineStr, psUpdateD,canExc,transId);
                                             	  logger.debug("canUpdate(receipt_line) Line:"+canExc);
                                               }else{
 					    					     logger.debug("**********Start Update L normal ******************");
@@ -222,24 +224,27 @@ public class UpdateSalesProcess {
 				    		  
 				    	  //stamp log result
 				    	  if(canExc == 0){
-				    		 errorMsg  = "NO UPDATE KEY NOT FOUND";
-				    		 errorCode = "NOUPDATE";
-				    		 resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->WARNING:NO UPDATE CANNOT FIND KEY UPDATE 001]").append(Constants.newLine);
-				    	     errorRow++;
+				    		  errorMsg  = "NO UPDATE KEY NOT FOUND";
+				    		  errorCode = "NOUPDATE";
+				    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->WARNING:NO UPDATE CANNOT FIND KEY UPDATE 001]").append(Constants.newLine);
+				    	      errorRow++;
 				    	     
-				    	     // Add First Error To Save In monitor_item
-				    	     if(firstErrorMsg.equals("")){
+				    	      // Add First Error To Save In monitor_item
+				    	      if(firstErrorMsg.equals("")){
 				    		     firstErrorMsg  = "NO UPDATE KEY NOT FOUND";
 				    		     firstErrorCode = "NOUPDATE";
 				    		  }
 				    	     
-				    	     //Insert Line to t_temp_import_trans
-				    	     helper.updateStatusLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
+				    	      //Insert Line to t_temp_import_trans
+				    	      helper.updateStatusFailLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
 				    	  }else{
-				    		 errorCode = "";
-				    		 completeRow++;
+				    		  errorCode = "";
+				    		  completeRow++;
 				    		  //Insert Line to t_temp_import_trans
-				    		 helper.updateStatusLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
+				    		  helper.updateStatusSuccessLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
+				    		 
+				    		  //set for return Calc receipt Head
+							  receiptNoAll += lineBean.getReceiptNo()+"|";
 				    	  }
 				    	  allRow++;
 				    	  //initial
@@ -262,7 +267,7 @@ public class UpdateSalesProcess {
 		    		  } 
 		    		  
 		    		 //Insert Line to t_temp_import_trans
-		    		  helper.updateStatusLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
+		    		  helper.updateStatusFailLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
 		    	  } 
 			  }//for
 			  
@@ -296,9 +301,9 @@ public class UpdateSalesProcess {
 		    				 //Update Payment Flag
 			    		     updateOrderFlag(conn,orderId, userBean);
 			    		        
-			    		     // Re-Calculate TotalAmount,vatAmount,netAmount
+			    		     // Re-Calculate TotalAmount,TotalAmountNonVat,vatAmount,netAmount
 			    		     try{
-				    		    Order orderUpdate =  new MOrder().reCalculateHeadAmount(conn,orderId);
+				    		    Order orderUpdate =  new MOrder().reCalculateHeadAmountCaseImport(conn,orderId);
 				    		    updateAmountInOrderHead(conn,orderUpdate);
 			    		     }catch(Exception eee){
 			    		    	 logger.error(eee.getMessage(),eee);
@@ -338,11 +343,22 @@ public class UpdateSalesProcess {
 			  }	
 			 /** Put to MAP **/	
 			 initConfigMap.put(tableBean.getTableName(), tableBean);
-			 
+		
+		/*	 OLD CODE
 			 results[0] = firstErrorMsg;
 			 results[1] = firstErrorCode;
 			 results[2] = completeRow+"";
 			 results[3] = (completeRow+errorRow)+"";
+			 results[4] = receiptNoAll;//ReceiptNo|xxxxx|xxxx
+		*/
+			 /** Return Result import **/
+			 resultImportBean = new ResultImportBean();
+			 resultImportBean.setFirstErrorMsg(firstErrorMsg);
+			 resultImportBean.setFirstErrorCode(firstErrorCode);
+			 resultImportBean.setSuccessRow(completeRow);
+			 resultImportBean.setAllRow((completeRow+errorRow));
+			 resultImportBean.setReceiptNoAll(receiptNoAll);
+			 
 	    } catch(Exception e){
 		     throw e;
 	    }finally{
@@ -362,7 +378,7 @@ public class UpdateSalesProcess {
 		    	psInsD.close();psInsD=null;
 		    }
 	    }
-	    return results;
+	    return resultImportBean;
 	}
   	
 	public  int updateAmountInOrderHead(Connection conn,Order o) throws Exception{

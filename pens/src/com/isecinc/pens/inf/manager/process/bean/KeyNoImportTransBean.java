@@ -12,18 +12,10 @@ public class KeyNoImportTransBean implements Serializable{
 	private String fileName;
     private String tableName;
     private String keyNo;
-    /** Option Rceipt file */
-    private String receiptNo;
-    
+
     private List<LineImportTransBean> lineList;
     
-    
-	public String getReceiptNo() {
-		return receiptNo;
-	}
-	public void setReceiptNo(String receiptNo) {
-		this.receiptNo = receiptNo;
-	}
+  
 	public String getFileName() {
 		return fileName;
 	}

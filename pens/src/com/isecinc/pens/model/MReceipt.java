@@ -215,6 +215,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				receipt.setReceiptNo("R"
 						+ new ReceiptDocumentProcess().getNextDocumentNo(receipt.getSalesRepresent().getCode(), prefix,
 								activeUserID, conn));
+			
 		} else {
 			id = receipt.getId();
 		}
@@ -236,6 +237,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}
+		logger.debug("Create New ReceiptId:"+receipt.getId());
 		return true;
 	}
 
@@ -269,7 +271,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
 				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
-				receipt.getIsPDPaid() , DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())) , receipt.getPdPaymentMethod()};
+				receipt.getIsPDPaid() , DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())) 
+				, receipt.getPdPaymentMethod(),""};
 		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}

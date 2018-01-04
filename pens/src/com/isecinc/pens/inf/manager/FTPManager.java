@@ -816,7 +816,7 @@ public class FTPManager {
 	                	//Upload by step by one file
 	                	try{
 	                		logger.info("Step 1 upload NORMALMODE");
-	                		uploadAllFileToFTP_OPT2_BY_FILE(path,fileExportBean);
+	                		uploadAllFileToFTP_BY_FILE(path,fileExportBean);
 	                	}catch(Exception e){
 	                		logger.debug("Step 2 Try ftp upload use passivemode");
 	                		 uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE(path,fileExportBean);
@@ -827,7 +827,7 @@ public class FTPManager {
 	            	//Upload by step by one file
 	            	try{
 	            		logger.info("Step 1 upload NORMALMODE ");
-	            		uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);
+	            		uploadAllFileToFTP_BY_FILE(path,tableBean);
 		            }catch(Exception e){
 	            		logger.debug("Step 2 Try ftp upload use passivemode");
 	            		uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE(path,tableBean);
@@ -850,7 +850,7 @@ public class FTPManager {
 	 * @param path
 	 * @throws Exception
 	 */
-	public void uploadAllFileToFTP_OPT2(User userBean,LinkedHashMap<String,TableBean> controlTableMap,String path) throws Exception{
+	public void uploadAllFileToFTP(User userBean,LinkedHashMap<String,TableBean> controlTableMap,String path) throws Exception{
 		try {		
 			Set s = controlTableMap.keySet();
 			Iterator it = s.iterator();
@@ -863,7 +863,7 @@ public class FTPManager {
 					/** Case Export Customer Export Location **/
 				
 					if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-            	        uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);
+            	        uploadAllFileToFTP_BY_FILE(path,tableBean);
 					}
             	     
             	     /** Upload image file to Ftp Server **/
@@ -881,12 +881,12 @@ public class FTPManager {
 		                	TableBean fileExportBean =(TableBean)tableBean.getFileExportList().get(f);
 		                	//Upload by step by one file
 		                	
-		                	uploadAllFileToFTP_OPT2_BY_FILE(path,fileExportBean);
+		                	uploadAllFileToFTP_BY_FILE(path,fileExportBean);
 		                }//for
 		                
 		            }else if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
 		            	//Upload by step by one file
-		            	uploadAllFileToFTP_OPT2_BY_FILE(path,tableBean);	
+		            	uploadAllFileToFTP_BY_FILE(path,tableBean);	
 					}else{
 						// Data not Found
 						logger.info(fileControlName+":Data not found");
@@ -899,9 +899,9 @@ public class FTPManager {
 			
 		}	
 	}
-	
+
 	/** Process Work on Window 8(tablet not work V107(tablet) **/
-	private void uploadAllFileToFTP_OPT2_BY_FILE(String path,TableBean tableBean) throws Exception{
+	private void uploadAllFileToFTP_BY_FILE(String path,TableBean tableBean) throws Exception{
 		FTPClient ftp = null;
 		String reply = "";
 		Writer w = null;
@@ -2180,7 +2180,7 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 		}	
 	}
 	
-	public void uploadBackUpDBZipFileToFTP_BK(User user,String ftpParentPath,String fileName,String localFile) throws Exception{
+	public void uploadBackUpDBZipFileToFTP_BK1(User user,String ftpParentPath,String fileName,String localFile) throws Exception{
 		FTPClient ftp = null;
 		File file = null;
 	    InputStream fis = null;
@@ -2294,7 +2294,7 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 	 * @throws Exception
 	 * Upload Zip To FTP Server
 	 */
-	public void uploadBackUpDBZipFileToFTP_OPT2_BK(User user,String ftpFilePath,String localFile) throws Exception{
+	public void uploadBackUpDBZipFileToFTP_BK2(User user,String ftpFilePath,String localFile) throws Exception{
 		
 		DataOutputStream dos = null;
 		sun.net.TelnetOutputStream tos = null;
@@ -2334,7 +2334,7 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 		}
 	}
 	
-public void uploadBackUpDBZipFileToFTP_OPT3(String rootFtpPath, String ftpFilePath,String localFile) throws Exception{
+public void uploadBackUpDBZipFileToFTP(String rootFtpPath, String ftpFilePath,String localFile) throws Exception{
 		
 		DataOutputStream dos = null;
 		sun.net.TelnetOutputStream tos = null;

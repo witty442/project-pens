@@ -521,7 +521,7 @@ public class OrderAction extends I_Action {
 	
 	/**
 	 * Pre-Save 
-	 * :Caculate Promotion 
+	 * :Calculate Promotion 
 	 */
 	public ActionForward preSave(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -537,7 +537,7 @@ public class OrderAction extends I_Action {
 			// remove promotion line
 			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
 			
-			// Set Disply To Prepare Save Order Line (no promotion Lines)
+			// Set Display To Prepare Save Order Line (no promotion Lines)
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
             
 			// Add Promotion Line only From orderFrom to promotionLine
@@ -1179,19 +1179,22 @@ public class OrderAction extends I_Action {
 	private Order[] checkCreditNote(Order[] results) {
 		// TODO Auto-generated method stub
 		Order[] orders = new Order[results.length];
-		int i = 0;
-		for(Order order : results){
-			order.setHasCreditNote(false);
-			if(!StringUtils.isEmpty(order.getArInvoiceNo())){
-				double creditNoteAmt = new MCreditNote().getTotalCreditNoteAmt(order.getArInvoiceNo());
-				if(creditNoteAmt < 0)
-					order.setHasCreditNote(true);
+		try{
+			int i = 0;
+			for(Order order : results){
+				order.setHasCreditNote(false);
+				if(!StringUtils.isEmpty(order.getArInvoiceNo())){
+					double creditNoteAmt = new MCreditNote().getTotalCreditNoteAmt(order.getArInvoiceNo());
+					if(creditNoteAmt < 0)
+						order.setHasCreditNote(true);
+				}
+				
+				orders[i] = order;
+				i++;
 			}
-			
-			orders[i] = order;
-			i++;
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
-		
 		return orders;
 	}
 
@@ -1254,13 +1257,20 @@ public class OrderAction extends I_Action {
 		Customer customer = null;
 		Address address = null;
 		List<Address> addresses = new ArrayList<Address>();
+		double totalAmount = 0;
+		double totalVatAmount = 0;
+		double totalNetAmount = 0;
 		try {
 			boolean baddr = false;
 			String fileType = request.getParameter("fileType");
-			String orderId = request.getParameter("id");
+			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
-            
+			String i = Utils.isNull(request.getParameter("i"));
+			
 			logger.debug("fileType:"+fileType);
+			logger.debug("orderId:"+orderId);
+			logger.debug("visitDate:"+visitDate);
+			logger.debug("i:"+i);
 			
 			// Re-set value to order form.
 			// order = new MOrder().find(String.valueOf(reportForm.getOrder().getId()));
@@ -1316,7 +1326,6 @@ public class OrderAction extends I_Action {
 				taxInvoice.setCode(user.getCode());
 				taxInvoice.setName(user.getName());
 
-			
 				taxInvoice.setCustomerCode(customer.getCode());
 				taxInvoice.setCustomerName(customer.getName());
 				
@@ -1333,48 +1342,219 @@ public class OrderAction extends I_Action {
 				// Summary
 				taxInvoice.setTotalAmount(line.getLineAmount() - line.getDiscount());
 				taxInvoice.setVatAmount(line.getVatAmount());
-				//taxInvoice.setNetAmount(line.getTotalAmount());
-							
-				
-				//BigDecimal totalAmount = new BigDecimal(taxInvoice.getTotalAmount());
-				//BigDecimal vatAmount = new BigDecimal(taxInvoice.getVatAmount());
-				//BigDecimal netAmount = totalAmount.add(vatAmount);
-				
 				taxInvoice.setNetAmount(taxInvoice.getTotalAmount()+taxInvoice.getVatAmount());
-				//taxInvoice.setNetAmount(netAmount.doubleValue());
-
+				
+				totalAmount += line.getTotalAmount();
+				totalVatAmount += line.getVatAmount();
+				totalNetAmount += taxInvoice.getTotalAmount()+taxInvoice.getVatAmount();
 				lstData.add(taxInvoice);
 			}
 			// parameterMap.put("p_next_visit", request.getParameter("nextVisitDate"));
 			parameterMap.put("p_next_visit", visitDate);
+			
+			parameterMap.put("p_sum_total_amount",Utils.decimalFormat(totalAmount,Utils.format_current_2_disgit));
+			parameterMap.put("p_sum_total_vat", Utils.decimalFormat(totalVatAmount,Utils.format_current_2_disgit));
+			parameterMap.put("p_sum_total_net",Utils.decimalFormat(totalNetAmount,Utils.format_current_2_disgit));
+			
+			conn = DBConnection.getInstance().getConnection();
+			boolean haveVat = new MOrder().isOrderHaveVat(conn, order.getId());
+			logger.debug("haveVat:"+haveVat);
+			if(haveVat==false){
+				parameterMap.put("p_vatcode", "-");
+				parameterMap.put("p_sum_total_vat","0.00");
+			}
 
 			String fileName = "tax_invoice_report";
 			//WIT Edit :21/07/2011 :Special Case Show PDF user another report tax_invoice_pdf_report 
-			//beacuse : print and pdf not support same fonts
+			//because : print and pdf not support same fonts
 			if (fileType.equals(SystemElements.PDF)) {
 				fileName = "tax_invoice_pdf_report";
 			}
 			String fileJasper = BeanParameter.getReportPath() + fileName;
 
+			logger.debug("fileName:"+fileName);
 			// for sale user.
-			if (request.getParameter("i") != null && request.getParameter("i").equals("0")) {
+			if (i.equals("0")) {
+				logger.debug("print 1 Receipt_TaxInvoice");
 				parameterMap.put("report_title", bundle.getString("Receipt_TaxInvoice"));
 				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+		
+				// set for print report Shipment Report
+				request.setAttribute("report_name", "printReport2");
+				request.setAttribute("i", "1");
+				request.setAttribute("orderId", orderId);
+				request.setAttribute("visitDate", visitDate);
+				request.setAttribute("fileType", fileType);
 			} else {
 				// for customer.
+				logger.debug("print 2 Shipment_TaxInvoice");
 				parameterMap.put("report_title", bundle.getString("Shipment_TaxInvoice"));
 				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
 			}
+			
 		} catch (Exception e) {
+			//e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 		} finally {
 			try {
-				// conn.close();
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("print2");
+	}
+	
+	public ActionForward printReport2(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.debug("Search for report2 : " + this.getClass());
+		OrderForm reportForm = (OrderForm) form;
+		// TaxInvoiceReportProcess process = new TaxInvoiceReportProcess();
+		User user = (User) request.getSession().getAttribute("user");
+		TaxInvoiceReport taxInvoice = new TaxInvoiceReport();
+		ReportUtilServlet reportServlet = new ReportUtilServlet();
+		HashMap parameterMap = new HashMap();
+		List<TaxInvoiceReport> lstData = null;
+		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
+		Connection conn = null;
+		Order order = null;
+		List<OrderLine> lines = null;
+		Customer customer = null;
+		Address address = null;
+		List<Address> addresses = new ArrayList<Address>();
+		double totalAmount = 0;
+		double totalVatAmount = 0;
+		double totalNetAmount = 0;
+		try {
+			boolean baddr = false;
+			String fileType = request.getParameter("fileType");
+			String orderId = request.getParameter("orderId");
+			String visitDate = request.getParameter("visitDate");
+			String i = Utils.isNull(request.getParameter("i"));
+			
+			logger.debug("fileType:"+fileType);
+			logger.debug("orderId:"+orderId);
+			logger.debug("visitDate:"+visitDate);
+			logger.debug("i:"+i);
+			
+			// Re-set value to order form.
+			// order = new MOrder().find(String.valueOf(reportForm.getOrder().getId()));
+			order = new MOrder().find(orderId);
+			reportForm.setOrder(order);
+			lines = new MOrderLine().lookUp(reportForm.getOrder().getId());
+			reportForm.setLines(new OrderProcess().fillLinesShow(lines));
+			lines = reportForm.getLines();
+			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
+
+			customer = new MCustomer().find(String.valueOf(order.getCustomerId()));
+			addresses = new MAddress().lookUp(customer.getId());
+			
+			for (Address addr : addresses) {
+				if (addr.getPurpose().equalsIgnoreCase("S")) {
+					address = addr;
+					baddr = true;
+					break;
+				}
+			}
+			if (!baddr) {
+				for (Address addr : addresses) {
+					if (addr.getPurpose().equalsIgnoreCase("B")) {
+						address = addr;
+						baddr = true;
+						break;
+					}
+				}
+			}
+
+			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? ReportHelper.convertOrderNoForReport(receiptNo) : ReportHelper.convertOrderNoForReport(order.getOrderNo()));
+			
+			parameterMap.put("p_vatcode", order.getVatCode());
+			parameterMap.put("p_address", address.getLineString());
+			parameterMap.put("p_orderDate", order.getOrderDate());
+			parameterMap.put("p_code", user.getCode());
+			parameterMap.put("p_name", user.getName());
+			parameterMap.put("p_taxNo", BeanParameter.getPensTaxNo());
+			
+			parameterMap.put("p_customerCode", customer.getCode());
+			parameterMap.put("p_customerName", customer.getName());
+			parameterMap.put("p_custTaxNo", "".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo()));
+
+			lstData = new ArrayList<TaxInvoiceReport>();
+			int id = 1;
+			for (OrderLine line : lines) {
+				taxInvoice = new TaxInvoiceReport();
+				taxInvoice.setOrderID(String.valueOf(order.getId()));
+				taxInvoice.setId(id++);
+				taxInvoice.setAddress(address.getLineString());
+				taxInvoice.setOrderDate(order.getOrderDate());
+				taxInvoice.setTaxNo("Tax No in Line");
+				taxInvoice.setCode(user.getCode());
+				taxInvoice.setName(user.getName());
+
+				taxInvoice.setCustomerCode(customer.getCode());
+				taxInvoice.setCustomerName(customer.getName());
+				
+				taxInvoice.setProductCode(line.getProduct().getCode());
+				taxInvoice.setProductName(line.getProduct().getName());
+				taxInvoice.setUomId(line.getProduct().getUom().getId());
+				taxInvoice.setMainQty(new Double(line.getQty1()).intValue());
+				taxInvoice.setSubQty(new Double(line.getQty2()).intValue());
+				taxInvoice.setAddQty(new Double(line.getQty2()).intValue());
+				taxInvoice.setSalePrice(line.getLineAmount());
+				taxInvoice.setPercentDiscount(0);
+				taxInvoice.setDiscount(line.getDiscount());
+				taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
+				// Summary
+				taxInvoice.setTotalAmount(line.getLineAmount() - line.getDiscount());
+				taxInvoice.setVatAmount(line.getVatAmount());
+				taxInvoice.setNetAmount(taxInvoice.getTotalAmount()+taxInvoice.getVatAmount());
+				
+				totalAmount += line.getTotalAmount();
+				totalVatAmount += line.getVatAmount();
+				totalNetAmount += taxInvoice.getTotalAmount()+taxInvoice.getVatAmount();
+				lstData.add(taxInvoice);
+			}
+			// parameterMap.put("p_next_visit", request.getParameter("nextVisitDate"));
+			parameterMap.put("p_next_visit", visitDate);
+			
+			parameterMap.put("p_sum_total_amount",Utils.decimalFormat(totalAmount,Utils.format_current_2_disgit));
+			parameterMap.put("p_sum_total_vat", Utils.decimalFormat(totalVatAmount,Utils.format_current_2_disgit));
+			parameterMap.put("p_sum_total_net",Utils.decimalFormat(totalNetAmount,Utils.format_current_2_disgit));
+			
+			conn = DBConnection.getInstance().getConnection();
+			boolean haveVat = new MOrder().isOrderHaveVat(conn, order.getId());
+			logger.debug("haveVat:"+haveVat);
+			if(haveVat==false){
+				parameterMap.put("p_vatcode", "-");
+				parameterMap.put("p_sum_total_vat","0.00");
+			}
+
+			String fileName = "tax_invoice_report";
+			//WIT Edit :21/07/2011 :Special Case Show PDF user another report tax_invoice_pdf_report 
+			//because : print and pdf not support same fonts
+			if (fileType.equals(SystemElements.PDF)) {
+				fileName = "tax_invoice_pdf_report";
+			}
+			String fileJasper = BeanParameter.getReportPath() + fileName;
+
+			logger.debug("fileName:"+fileName);
+			
+			// for customer.
+			logger.debug("print 2 Shipment_TaxInvoice");
+			parameterMap.put("report_title", bundle.getString("Shipment_TaxInvoice"));
+			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+
+			request.setAttribute("printShipment_TaxInvoiceSuccess", "success");
+		} catch (Exception e) {
+			//e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				 conn.close();
 			} catch (Exception e2) {}
 		}
 		// return null;
-		return null;
+		return mapping.findForward("print2");
 	}
 	
 	public ActionForward printReportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1394,8 +1574,6 @@ public class OrderAction extends I_Action {
 		Address address = null;
 		List<Address> addresses = new ArrayList<Address>();
 		String fileName = "tax_invoice_summary_report";
-		String caseReport ="2";//for 
-		
 		try {
 			boolean baddr = false;
 			String fileType =  request.getParameter("fileType");
@@ -1571,9 +1749,14 @@ public class OrderAction extends I_Action {
 			logger.debug("order.getNetAmount():"+order.getNetAmount());
 			
 			parameterMap.put("p_sum_total_amount", order.getTotalAmount());
-			parameterMap.put("p_sum_total_vat", order.getVatAmount());
+			parameterMap.put("p_sum_total_vat",Utils.decimalFormat(order.getVatAmount(),Utils.format_current_2_disgit));
 			parameterMap.put("p_sum_total_net", order.getNetAmount());
 			
+			boolean haveVat = new MOrder().isOrderHaveVat(conn, order.getId());
+			if(haveVat==false){
+				parameterMap.put("p_vatcode", "-");
+				parameterMap.put("p_sum_total_vat","0.00");
+			}
 			
 			/*if("copy".equalsIgnoreCase(reportType)){
 				if("2".equalsIgnoreCase(caseReport)){
@@ -1640,6 +1823,7 @@ public class OrderAction extends I_Action {
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		ReportUtilServlet reportServlet = new ReportUtilServlet();
 		Connection conn = null;
+		boolean isBillhaveVat = true;
 		try{
 			
 			orderForm = (OrderForm)request.getSession().getAttribute("order_from_to_print");
@@ -1674,6 +1858,12 @@ public class OrderAction extends I_Action {
 				no++;
 				
 				lstData.add(b);
+				
+				//check bill is have vat or not
+				if(Utils.isNull(line.getTaxable()).equalsIgnoreCase("N")){
+					isBillhaveVat = false;
+				}
+				
 			}
 			logger.debug("List Data Size:"+lstData.size());
 			
@@ -1687,11 +1877,20 @@ public class OrderAction extends I_Action {
 			logger.debug("order.getVatAmount():"+orderForm.getOrder().getVatAmount());
 			logger.debug("order.getNetAmount():"+orderForm.getOrder().getNetAmount());
 			
+			
 			parameterMap.put("p_sum_total_amount", orderForm.getOrder().getTotalAmount());
 			parameterMap.put("p_sum_total_vat", orderForm.getOrder().getVatAmount());
 			parameterMap.put("p_sum_total_net", orderForm.getOrder().getNetAmount());
 			
-			parameterMap.put("p_vatcode", orderForm.getOrder().getVatCode());
+			//Case No vat
+			if(isBillhaveVat==false){
+			   parameterMap.put("p_vatcode","-");
+			   parameterMap.put("p_sum_total_vat", "0.00");
+			}else{
+			   //case have vat
+			   parameterMap.put("p_vatcode", orderForm.getOrder().getVatCode());
+			   parameterMap.put("p_sum_total_vat",Utils.decimalFormat(orderForm.getOrder().getVatAmount(),Utils.format_current_2_disgit));
+			}
 			parameterMap.put("totalLine", lstData.size()+"");
 			parameterMap.put("userName", user.getName());
 			parameterMap.put("custName", orderForm.getOrder().getCustomerName());

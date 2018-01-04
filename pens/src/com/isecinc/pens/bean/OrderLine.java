@@ -57,6 +57,7 @@ public class OrderLine extends I_PO implements Serializable {
 		setIscancel(ConvertNullUtil.convertToString(rst.getString("ISCANCEL")));
 		setTripNo(rst.getInt("TRIP_NO"));
 		setPromotionFrom(ConvertNullUtil.convertToString(rst.getString("PROMOTION_FROM")));
+		setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
 		try {
 			setNeedExport(rst.getString("NEED_EXPORT"));
 		} catch (Exception e) {}
@@ -187,9 +188,17 @@ public class OrderLine extends I_PO implements Serializable {
 	private String status;
 	
 	private String cancelDate;
+	private String taxable;
 	
 	
-	
+	public String getTaxable() {
+		return taxable;
+	}
+
+	public void setTaxable(String taxable) {
+		this.taxable = taxable;
+	}
+
 	public String getCancelDate() {
 		return cancelDate;
 	}

@@ -667,14 +667,29 @@ public class InterfaceDAO {
 	            m.setFileCount(rs.getInt("file_count"));
 	            m.setSuccessCount(rs.getInt("success_count"));
 	            m.setErrorMsg(rs.getString("error_disp"));
-	            if(Utils.isNull(m.getErrorMsg()).equals("")){
-	            	logger.debug("errorCode:"+rs.getString("error_code"));
-	            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
-	            	logger.debug("errorMsg:"+errorMsg);
-	            	 if( !Utils.isNull(errorMsg).equals("")){
-	            	    ExceptionHandle.insertErrorCode(rs.getString("error_code"),errorMsg );
-	            	    m.setErrorMsg(errorMsg);
-	            	 }
+	            
+	            //Case status = success UPDATE-TRANS-SALES Check fileCount=successCount
+	            if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+	            	if( m.getFileCount()==m.getSuccessCount()){
+	            		m.setStatus(Constants.STATUS_SUCCESS);
+	            	}else{
+	            		m.setStatus(Constants.STATUS_FAIL);
+	            	}
+	            }
+	            
+	            if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+	            	//Show Log from table t_temp_import_trans
+	            	
+	            }else{
+		            if(Utils.isNull(m.getErrorMsg()).equals("")){
+		            	logger.debug("errorCode:"+rs.getString("error_code"));
+		            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
+		            	logger.debug("errorMsg:"+errorMsg);
+		            	 if( !Utils.isNull(errorMsg).equals("")){
+		            	    ExceptionHandle.insertErrorCode(rs.getString("error_code"),errorMsg );
+		            	    m.setErrorMsg(errorMsg);
+		            	 }
+		            }
 	            }
 				monitorList.add(m);
 			}
@@ -770,7 +785,6 @@ public class InterfaceDAO {
 				m.setCreateDate(rs.getDate("create_date"));
 				m.setSubmitDate(rs.getTimestamp("submit_date"));
 
-				
 				MonitorItemBean item = new  MonitorItemBean();
 				item.setId(rs.getBigDecimal("id"));
 				item.setTableName(rs.getString("table_name"));
@@ -783,13 +797,19 @@ public class InterfaceDAO {
                 item.setFileSize(rs.getString("file_size"));
 				item.setErrorMsg(rs.getString("error_disp"));
 				item.setErrorCode(rs.getString("error_code"));
-				if( !Utils.isNull(item.getErrorCode()).equals("") && Utils.isNull(item.getErrorMsg()).equals("")){
-	            	logger.debug("errorCode:"+rs.getString("error_code"));
-	            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
-	            	logger.debug("errorMsg:"+errorMsg);
-	            	ExceptionHandle.insertErrorCode(conn,rs.getString("error_code"),errorMsg );
-	            	item.setErrorMsg(errorMsg);
-	            }
+				
+				//Case Update Transaction Get Log From t_temp_import_trans
+				if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+					 
+				}else{
+					if( !Utils.isNull(item.getErrorCode()).equals("") && Utils.isNull(item.getErrorMsg()).equals("")){
+		            	logger.debug("errorCode:"+rs.getString("error_code"));
+		            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
+		            	logger.debug("errorMsg:"+errorMsg);
+		            	ExceptionHandle.insertErrorCode(conn,rs.getString("error_code"),errorMsg );
+		            	item.setErrorMsg(errorMsg);
+		            }
+				}
 				m.setMonitorItemBean(item);
 				
 				monitorList.add(m);
@@ -968,7 +988,41 @@ public class InterfaceDAO {
 		return itemBean;
 	} 
 	
+	public static StringBuffer getUpdateTransLogs(String fileName) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Connection conn = null;
+		StringBuffer logs = new StringBuffer();
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from t_temp_import_trans where file_name ='"+fileName+"' \n");
 	
+		    logger.debug("SQL:"+sql.toString());
+		    conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				logs.append(rs.getString("line_str")+",");
+				String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_msg")));
+				logs.append(errorMsg+"\n");
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return logs;
+	} 
 	
 	public MonitorBean updateMonitor(Connection conn,MonitorBean model) throws Exception {
 		boolean result = false;

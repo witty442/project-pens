@@ -100,9 +100,20 @@ body {
 <script type="text/javascript">
 
 function loadMe(){
-	document.getElementById("tempTotalAmount").value = addCommas(Number(document.getElementsByName("order.totalAmount")[0].value).toFixed(2));
-	document.getElementById("tempVatAmount").value = addCommas(Number(document.getElementsByName("order.vatAmount")[0].value).toFixed(2));
+	var totalAmountHaveVat = Number(document.getElementsByName("order.totalAmount")[0].value)
+	-Number(document.getElementsByName("order.totalAmountNonVat")[0].value);
+	
+	//alert(totalAmountHaveVat);
+	//TotalAmount is have vat
+	document.getElementById("tempTotalAmount").value = addCommas(Number(totalAmountHaveVat).toFixed(2));
+	document.getElementById("tempTotalAmountNonVat").value = addCommas(Number(Number(document.getElementsByName("order.totalAmountNonVat")[0].value)).toFixed(2));
 	document.getElementById("tempNetAmount").value = addCommas(Number(document.getElementsByName("order.netAmount")[0].value).toFixed(2)); 
+	
+	if(Number(document.getElementsByName("order.vatAmount")[0].value)==0){
+		document.getElementById("tempVatAmount").value ="-";
+	}else{
+		document.getElementById("tempVatAmount").value = addCommas(Number(document.getElementsByName("order.vatAmount")[0].value).toFixed(2));
+	}
 
 	//WIT EDIT :20110804
 	<%if( ("true").equals(util.ConvertNullUtil.convertToString(request.getAttribute("popup_autoreceipt")))){ %>
@@ -125,9 +136,15 @@ function setNextVisit(path, visitDate, fileType){
 	document.getElementsByName('fileType')[0].value = fileType;
 	document.getElementsByName('nextVisitDate')[0].value = visitDate;
 	
-	window.open(path + "/jsp/saleOrderAction.do?do=printReport&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&visitDate="+visitDate+"&fileType="+fileType, "Print1", "width=100,height=100,location=No,resizable=No");
-	window.open(path + "/jsp/saleOrderAction.do?do=printReport&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&visitDate="+visitDate+"&fileType="+fileType, "Print2", "width=100,height=100,location=No,resizable=No");
+	//window.open(path + "/jsp/saleOrderAction.do?do=printReport&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&visitDate="+visitDate+"&fileType="+fileType, "Print1", "width=100,height=100,location=No,resizable=No");
+	//window.open(path + "/jsp/saleOrderAction.do?do=printReport&i="+(i++)+"&id="+document.getElementsByName('order.id')[0].value+"&visitDate="+visitDate+"&fileType="+fileType, "Print2", "width=100,height=100,location=No,resizable=No");
+	var param  = "report_name=printReport";
+	    param += "&orderId="+document.getElementsByName('order.id')[0].value;
+	    param += "&i=0";
+	    param += "&visitDate="+visitDate+"&fileType="+fileType;
 	
+	  PopupCenter(path + "/jsp/pop/printPopup.jsp?"+param,"Print",700,300);
+	  
 	return true;
 }
 
@@ -950,6 +967,7 @@ function stampPrint(){
 										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
 										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
+										<th>ภาษี</th>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
 
 									</tr>
@@ -1021,7 +1039,11 @@ function stampPrint(){
 										
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
-										
+										<td align="center">
+											<c:if test="${lines1.taxable=='Y'}">
+												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+											</c:if>
+										</td>
 										<td align="center">
 											<c:if test="${lines1.promotion=='Y'}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
@@ -1041,7 +1063,7 @@ function stampPrint(){
 							</tr>
 							<tr>
 								<td></td><td></td>
-								<td align="right"><bean:message key="TotalAmount" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right">ยอดรวมก่อนภาษี &nbsp;&nbsp;</td>
 								<td align="left">
 									<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									<html:hidden property="order.totalAmount"/>
@@ -1053,6 +1075,14 @@ function stampPrint(){
 								<td align="left">
 									<input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									<html:hidden property="order.vatAmount"/>
+								</td>
+							</tr>
+							<tr>
+								<td></td><td></td>
+								<td align="right">ยอดเงินรวมที่ไม่เสียภาษี&nbsp;&nbsp;</td>
+								<td align="left">
+									<input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
+									<html:hidden property="order.totalAmountNonVat"/>
 								</td>
 							</tr>
 							<tr>

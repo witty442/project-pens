@@ -143,7 +143,7 @@ public class UpdateSalesProcess_BK {
 				    				  
 				    				  if(tableBean.getTableName().startsWith("t_receipt")){
 				    					  logger.debug("********Start Update H(t_receipt) *********************");
-						    		      canExc = new ImportReceiptFunction().processReceiptHead( conn, tableBean, userBean, lineStr,canExc);
+						    		      //canExc = new ImportReceiptFunction().processReceiptHead( conn, tableBean, userBean, lineStr,canExc);
 							    	      logger.debug("********End Update H (t_receipt) canUpdate:"+canExc +"");
 							    	      
 				    				  }else{
@@ -215,7 +215,7 @@ public class UpdateSalesProcess_BK {
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpd())){
 					    					  /** Create Receipt Line ONLY **/
                                               if(  "t_receipt_line".equalsIgnoreCase(childBean.getTableName()) ){  
-                                            	  canExc = new ImportReceiptFunction().processReceiptLine(conn, childBean, userBean, lineStr, psUpdateD,canExc);
+                                            	 // canExc = new ImportReceiptFunction().processReceiptLine(conn, childBean, userBean, lineStr, psUpdateD,canExc);
                                              }else{
 					    					     logger.debug("**********Start Update L normal ******************");
 							    			     psUpdateD = ImportHelper.spiltLineArrayToUpdateStatement(conn, childBean, lineStr, psUpdateD,userBean);

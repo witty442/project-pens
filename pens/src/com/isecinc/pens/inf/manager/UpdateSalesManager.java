@@ -36,6 +36,7 @@ import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
+import com.isecinc.pens.inf.manager.process.ResultImportBean;
 import com.isecinc.pens.inf.manager.process.UpdateSalesProcess;
 import com.isecinc.pens.inf.manager.process.bean.FileImportTransBean;
 import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
@@ -110,7 +111,7 @@ public class UpdateSalesManager {
 		EnvProperties env = EnvProperties.getInstance();
 		int countFileMap = 0;
 		UpdateSalesManagerHelper helper = new UpdateSalesManagerHelper();
-		String[] results = null;
+		ResultImportBean resultImportBean = null;
 		List<FileImportTransBean> dataFileList = null;//FileImportTransBean
 		List<KeyNoImportTransBean> dataKeyNoList = null;
 		List<FileImportTransBean> fileImportSuccessList = new ArrayList<FileImportTransBean>();
@@ -118,10 +119,12 @@ public class UpdateSalesManager {
 		Map<String,String> fileImportSuccessMap = new HashMap<String,String> ();
 		Map<String,String> fileImportErrorMap = new HashMap<String,String> ();
 		Map<String,String> receiptNoMap = new HashMap<String, String>();
+		List<KeyNoImportTransBean> keyNoDeleteList = new ArrayList<KeyNoImportTransBean>();
 		int dataCount = 0;
 		int successCount = 0;
 		String errorMsg="";
 		String errorCode = "";
+		String receiptNoAll = "";
 		try{
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			/** Connection Monitor */
@@ -199,46 +202,47 @@ public class UpdateSalesManager {
 								conn.setAutoCommit(false);
 								Savepoint savepoint =  conn.setSavepoint(keyNoBean.getKeyNo());
 								
-								results = null;
-								results = imtProcess.importToDB(connMonitor,conn,initConfigMap,tableBean,keyNoBean,userRequest);
+								resultImportBean = null;
+								resultImportBean = imtProcess.importToDB(transactionId,connMonitor,conn,initConfigMap,tableBean,keyNoBean,userRequest);
 								 
-								logger.debug("keyNo["+keyNoBean.getKeyNo()+"]result["+Utils.isNull(results[0])+"]");
-								if( !Utils.isNull(results[0]).equals("")){
+								logger.debug("keyNo["+keyNoBean.getKeyNo()+"]result["+Utils.isNull(resultImportBean.getFirstErrorMsg())+"]");
+								
+								if( !Utils.isNull(resultImportBean.getFirstErrorMsg()).equals("")){
 									//Task ALL Fail
 									taskStatusInt = Constants.STATUS_FAIL; //Status Header
-							        errorMsg = Utils.isNull(results[0]);
-									errorCode = Utils.isNull(results[1]);
-									successCount +=ConvertUtils.convertToInt(results[2]);
-									dataCount +=ConvertUtils.convertToInt(results[3]);
+							        errorMsg = Utils.isNull(resultImportBean.getFirstErrorMsg());
+									errorCode = Utils.isNull(resultImportBean.getFirstErrorCode());
+									successCount +=resultImportBean.getSuccessRow();
+									dataCount +=resultImportBean.getAllRow();
 									
 									logger.debug("Transaction Rollback By savepoint["+savepoint+"]");
 									conn.rollback(savepoint);
 									
-									//table :table t_bill_plan,t_adjust
+									// table :table t_bill_plan,t_adjust
 									// no save :Clear Temp data Error in t_temp_import_trans
 									if(keyNoBean.getTableName().toLowerCase().startsWith("t_bill_plan")
 										|| keyNoBean.getTableName().toLowerCase().startsWith("t_adjust")	
 									){
 									   logger.debug("delete t_temp_import_trans keyNo["+keyNoBean.getKeyNo()+"] Case table["+keyNoBean.getTableName()+"]");
-									   helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
+									   keyNoDeleteList.add(keyNoBean);
 									}
 								}else{
 									//Task Item Success
 									taskStatusInt = Constants.STATUS_SUCCESS;
-									errorMsg = Utils.isNull(results[0]);
-								    errorCode = Utils.isNull(results[1]);
-									successCount +=ConvertUtils.convertToInt(results[2]);
-									dataCount +=ConvertUtils.convertToInt(results[3]);
+									errorMsg = Utils.isNull(resultImportBean.getFirstErrorMsg());
+								    errorCode = Utils.isNull(resultImportBean.getFirstErrorCode());
+									successCount +=resultImportBean.getSuccessRow();
+									dataCount +=resultImportBean.getAllRow();
 								
 									logger.debug("Transaction Commit");
 									conn.commit();
 									
 									//Clear data success in t_temp_import_trans
-									helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
-								   
+									// keyNoDeleteList.add(keyNoBean);
+									 
 									/** Case Table t_receipt : Case cancel cheque 1 to do calc ReceiptAmount from Receipt line**/
 									if(keyNoBean.getTableName().toLowerCase().startsWith("t_receipt")){
-										receiptNoMap.put(keyNoBean.getReceiptNo(), keyNoBean.getReceiptNo());
+										receiptNoAll += Utils.isNull(resultImportBean.getReceiptNoAll());
 									}
 								}
 								isExc = true;
@@ -279,12 +283,32 @@ public class UpdateSalesManager {
 		        }//if	
 			}//for 1
 			
-			/**** Case Receipt Cancel i line must calc sum line to Head *************/
+			/**** Case Receipt Cancel i line must calc sum line to Head **************/
+			//Clear receptNo dup
+			if( Utils.isNull(receiptNoAll).length() >0){
+				String[] receiptNoAllArr = receiptNoAll.split("\\|");
+				for(int r=0;r<receiptNoAllArr.length;r++){
+					if( !Utils.isNull(receiptNoAllArr[r]).equals("")){
+			            receiptNoMap.put(receiptNoAllArr[r], receiptNoAllArr[r]);
+					}
+				}
+			}
+			/** Calc Amount Receipt **/
+			/** Delete receipt line wrong data **/
 			  if( !receiptNoMap.isEmpty()){
 				  ImportReceiptHelper.recalcReceiptHead(receiptNoMap);
 			  }//if
 			/*************************************************************************/
 			  
+			/**** Clear data t_temp_import_trans *************************************/
+			if(keyNoDeleteList != null && keyNoDeleteList.size() >0){
+				logger.debug("Start delete t_temp_import_trans");
+				for(int d=0;d<keyNoDeleteList.size();d++){
+					KeyNoImportTransBean keyNoBean = keyNoDeleteList.get(d);
+				    helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
+				}
+			}
+			/*************************************************************************/
 			logger.debug("isExc:"+isExc);
 			
 			/** Check Is Execute and No error **/
@@ -321,7 +345,8 @@ public class UpdateSalesManager {
 			/** Optional Step Write Result Logs Process By File Name **/
 			if("true".equals(EnvProperties.getInstance().getProperty("ftp.export.logs.result.enable"))){
 				logger.info("**** Step Write Log Result In Ftp Server ******");
-			    ftpManager.uploadFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
+			    //ftpManager.uploadFileToFTP( EnvProperties.getInstance().getProperty("path.transaction.sales.in.result"), initConfigMap,userLogin);
+			    
 			}
 
 			monitorModel.setMonitorItemList(monitorItemList);

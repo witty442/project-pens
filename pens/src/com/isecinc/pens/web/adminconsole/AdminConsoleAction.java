@@ -1,5 +1,7 @@
 package com.isecinc.pens.web.adminconsole;
 
+import java.sql.Connection;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,9 +16,11 @@ import org.hibernate.cfg.Configuration;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 
 /**
  * Member Receipt Action
@@ -99,13 +103,14 @@ public class AdminConsoleAction extends I_Action {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }
 						
-					configInfoTest += "\n ----------------------  Result Test GPS Connection ------------------------------------------------------------- \n";
+					/*configInfoTest += "\n ----------------------  Result Test GPS Connection ------------------------------------------------------------- \n";
 						try {   
 							 // SerialTest2.test();
 							  configInfoTest += "\n Test GPS Start ";
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }
+				    */
 			   }		
 			   
 			   logger.debug(configInfo);
@@ -189,8 +194,22 @@ public class AdminConsoleAction extends I_Action {
 				  } 
 			
 			request.setAttribute("currentTab", currentTab);
-		   }
 			
+			}else if(currentTab.equals("tab_add_db") && "tab_add_db".equalsIgnoreCase(action)){
+				String resultBKDB = "";
+				Connection conn = null;
+				  try {   
+					  conn = DBConnection.getInstance().getConnection();
+					  
+				      resultBKDB =RunScriptDBAction.runScriptDBUpdateAll(request, conn);
+				      adForm.setResultAddDB(resultBKDB);
+				      
+				  } catch(Exception e) {
+				     e.printStackTrace();
+				  }finally{
+					  conn.close();
+				  }
+			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());

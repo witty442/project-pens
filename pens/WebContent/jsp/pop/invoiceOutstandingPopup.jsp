@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -9,8 +10,9 @@
 <%
 //Id = order_id
 String id = (String)request.getParameter("id");
+User user = (User) request.getSession(true).getAttribute("user");
 
-List<ReceiptLine> rls = new MReceiptLine().lookUpOutstanding(Integer.parseInt(id));
+List<ReceiptLine> rls = new MReceiptLine().lookUpOutstanding(Integer.parseInt(id),user);
 pageContext.setAttribute("rls",rls,PageContext.PAGE_SCOPE);
 
 %>

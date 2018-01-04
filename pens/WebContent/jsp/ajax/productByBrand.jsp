@@ -116,6 +116,7 @@ for(ProductCatalog catalog:catalogs) {
 	<input name="productName" type="hidden" value="<%=catalog.getProductNameDisplay()%>" />
 	<input name="productCode" type="hidden" value="<%=catalog.getProductCode()%>" />
 	<input name="productId" type="hidden" value="<%=catalog.getProductId()%>" />
+	<input name="taxable" type="hidden" value="<%=catalog.getTaxable()%>" />
 </td>
 </tr>
 <% 

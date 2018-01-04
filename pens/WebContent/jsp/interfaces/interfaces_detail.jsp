@@ -179,10 +179,14 @@
 									<td align="left"> 
 									    <c:choose>
 											<c:when test="${results.monitorItemBean.errorMsg == ''}">
-												${results.monitorItemBean.errorMsg}
+												 <a href ="javascript:getLog('${pageContext.request.contextPath}','${results.transactionType}','${results.monitorItemBean.fileName}')">
+												 Logs
+												 </a>
 											</c:when>
 											<c:otherwise>
-											   <a href ="javascript:getLog('${pageContext.request.contextPath}','${results.transactionType}','${results.monitorItemBean.fileName}')">${results.monitorItemBean.errorMsg}</a>
+											   <a href ="javascript:getLog('${pageContext.request.contextPath}','${results.transactionType}','${results.monitorItemBean.fileName}')">
+											   ${results.monitorItemBean.errorMsg} Logs
+											   </a>
 											</c:otherwise>
 										</c:choose>
 									</td>

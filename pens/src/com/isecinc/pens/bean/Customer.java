@@ -16,6 +16,7 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MUser;
+import com.isecinc.pens.model.MReceiptSummary;
 
 
 /**
@@ -88,8 +89,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setExported(rst.getString("EXPORTED"));
 
 		// Total Invoice
-		//setTotalInvoice(new MCustomer().getInvoiceAmount(getId()));
-		setTotalInvoice( new MReceiptLine().lookCreditAmt(getId()));
+		setTotalInvoice( MReceiptSummary.lookCreditAmtByCustomerId(getId()));
 		
 		// Order Amount
 		setOrderAmount(new MOrder().lookUpByCustomer(getId()));

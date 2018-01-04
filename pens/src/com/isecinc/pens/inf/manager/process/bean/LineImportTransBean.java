@@ -12,14 +12,21 @@ public class LineImportTransBean implements Serializable{
 	private String fileName;
     private String tableName;
     private String keyNo;
+    private String receiptNo;
     private String lineStr;
-    private long seq;
+    private double seq;
     
     
-	public long getSeq() {
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
+	}
+	public double getSeq() {
 		return seq;
 	}
-	public void setSeq(long seq) {
+	public void setSeq(double seq) {
 		this.seq = seq;
 	}
 	public String getFileName() {

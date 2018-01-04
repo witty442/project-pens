@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -30,9 +31,12 @@
 <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
 <script type="text/javascript">
-
+<%
+ System.out.println("reportName:"+request.getParameter("report_name"));
+ System.out.println("reportNameAttr:"+Utils.isNull(request.getAttribute("report_name")));
+%>
 function loadMe(_path){
-	
+	//MZ320
    <%
 	if("list_order_product".equals(request.getParameter("report_name"))){
 		String customerId = request.getParameter("customerId");
@@ -41,17 +45,48 @@ function loadMe(_path){
 		document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printListOrderProductReport&customerId=<%=customerId%>";
 		document.orderForm.submit();
 		
+	//MZ320
   <%}else if("tax_invoice_summary".equals(request.getParameter("report_name"))){ 
-	  String orderId = request.getParameter("orderId");
-	  String reportType = request.getParameter("reportType");
+	   String orderId = request.getParameter("orderId");
+	   String reportType = request.getParameter("reportType");
   %>
 
-     document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
-	 document.orderForm.submit();
-  <%} %>
+      document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
+	  document.orderForm.submit();
+	
+	//report LQ300 Receipt_TaxInvoice first report
+  <%}else if("printReport".equals(request.getParameter("report_name"))){ 
+	   String orderId = request.getParameter("orderId");
+	   String i = request.getParameter("i");
+	   String visitDate = request.getParameter("visitDate");
+	   String fileType = request.getParameter("fileType");
+  %>
+	   var param  = "do=printReport";
+	   param += "&orderId=<%=orderId%>";
+	   param += "&i=<%=i%>";
+	   param += "&visitDate=<%=visitDate%>&fileType=<%=fileType%>";
+	   
+	   <%if(fileType.equalsIgnoreCase("PDF")){%>
+	     setTimeout(function(){printReport2();},3000);
+	   <%}%>
+       document.orderForm.action = _path + "/jsp/saleOrderAction.do?"+param;
+	   document.orderForm.submit();
+	   
+	    function printReport2(){
+		   var param  = "do=printReport2";
+		   param += "&orderId=<%=orderId%>";
+		   param += "&i=1";
+		   param += "&visitDate=<%=visitDate%>&fileType=<%=fileType%>";
+		   //alert("printReport2");
+		   
+	       document.orderForm.action = _path + "/jsp/saleOrderAction.do?"+param;
+		   document.orderForm.submit(); 
+	   } 
+  <%}else{ %>
+  
+       setTimeout(function(){window.close();},20000);
+  <%}%>
 }
-
-setTimeout(function(){window.close();},5000);
 
 </script>
 </head>
@@ -69,9 +104,16 @@ setTimeout(function(){window.close();},5000);
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
 		<td align="right">
-			
+			กำลังพิมพ์ 
+			<%if( Utils.isNull(request.getParameter("report_name")).equalsIgnoreCase("list_order_product")){ %>
+			   ใบหยิบของ
+			<%}else if( Utils.isNull(request.getParameter("report_name")).equalsIgnoreCase("tax_invoice_summary")){ %>
+			 ใบเสร็จ (เครื่องพิมพ์เล็ก)
+			<%}else if( Utils.isNull(request.getParameter("report_name")).equalsIgnoreCase("printReport")){ %>
+			 ใบเสร็จ (เครื่องพิมพ์ใหญ่)
+			<%} %>
 			<a href="#" onclick="window.close();">
-			<input type="button" value="ยกเลิก" class="newNegBtn">
+			<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
 			</a>
 		</td>
 		<td width="20%">&nbsp;</td>

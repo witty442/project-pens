@@ -15,14 +15,14 @@ String invoiceNo = request.getParameter("invoiceNo");
 User user = (User) session.getAttribute("user");
 List<CreditNote> creditNoteL = new ArrayList<CreditNote>();
 
-creditNoteL = new MCreditNote().lookUp(invoiceNo);
+creditNoteL = new MCreditNote().lookUp(invoiceNo); 
 pageContext.setAttribute("creditNoteL",creditNoteL,PageContext.PAGE_SCOPE);
 %>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.CreditNote"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.isecinc.pens.model.MCreditNote"%>
+<%@page import="com.isecinc.pens.model.MCreditNote"%> 
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.model.MReceiptCN"%><html>
 <head>

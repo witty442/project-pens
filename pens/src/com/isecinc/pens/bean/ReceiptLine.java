@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import util.ConvertNullUtil;
@@ -82,6 +83,17 @@ public class ReceiptLine extends I_PO {
 	private OrderLine orderLine = new OrderLine();
 
 	// private String complete="N";
+
+	private BigDecimal importTransId;
+	
+	
+	public BigDecimal getImportTransId() {
+		return importTransId;
+	}
+
+	public void setImportTransId(BigDecimal importTransId) {
+		this.importTransId = importTransId;
+	}
 
 	public int getId() {
 		return id;

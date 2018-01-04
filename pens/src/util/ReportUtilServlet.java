@@ -667,9 +667,8 @@ public class ReportUtilServlet extends HttpServlet {
 			IOException, JRException {
 		File rptFile = null;
 		boolean defaultPrinter = false;
-		
 		logger.debug("Print to PRINTER " + fileJasper);
-		String printerInvoiceName = "EPSON LQ-300+ /II ESC/P 2 (PENS_A5)";
+		String printerInvoiceName = "";
 		try {
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = createDataSource(lstData);
@@ -701,19 +700,40 @@ public class ReportUtilServlet extends HttpServlet {
 			if("tax_invoice_report".equalsIgnoreCase(fileName)){
 				PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
 				printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));
-		        
+				//Default Printer EPSON(PENS_A5)
+				printerInvoiceName = "EPSON LQ-300+ /II ESC/P 2 (PENS_A5)";
 		        //check Printer PENS_A5 is Exist
 		        logger.debug("Case tax_invoice_report :new printerName:"+printerInvoiceName);
-		        
 		        logger.debug("Step 1 Check Printer PENS_A5 is Exist");
 		        try{
 		        	logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5");
-
+                    /***************************************************************/
+		        	PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
+					if (services == null || services.length < 1) {
+						  throw new  Exception("printer Exception");
+					}
+					
+					int selectedService = 0;
+					/* Scan found services to see if anyone suits our needs */
+					for(int i = 0; i < services.length;i++){
+					   if( services[i].getName().toUpperCase().contains(printerInvoiceName.toUpperCase())
+						  ){
+					      logger.debug("Found Printer Name["+services[i].getName().toUpperCase()+"]");
+						  /*If the service is named as what we are querying we select it */
+					      selectedService = i;
+					      break;
+					   }
+					}
+					
+					printServiceDefaultAttributeSet = services[selectedService].getAttributes();
+					logger.info("Selected PrinterName:"+services[selectedService].getName());
+							
+		        	/***************************************************************/
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
-		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
+		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
 		
@@ -722,11 +742,9 @@ public class ReportUtilServlet extends HttpServlet {
 					logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5 End exported");
 					
 		        }catch(Exception e){
-		        	
                     logger.debug("print tax_invoice_report Error not found printer name:"+printerInvoiceName);
 		        	logger.debug("tax_invoice_report Step 2 User Printer defalut ");
 		        	
-
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
@@ -754,8 +772,10 @@ public class ReportUtilServlet extends HttpServlet {
 					int selectedService = 0;
 					/* Scan found services to see if anyone suits our needs */
 					for(int i = 0; i < services.length;i++){
-					   if(services[i].getName().toUpperCase().contains("ZDesigner MZ 320".toUpperCase())){
-					      logger.debug("Slected Printer Name["+services[i].getName().toUpperCase()+"]");
+					   if(   services[i].getName().toUpperCase().contains("ZDesigner MZ 320".toUpperCase())
+						  || services[i].getName().toUpperCase().contains("ZDesigner iMZ320".toUpperCase())
+						  ){
+					      logger.debug("Selected Printer Name["+services[i].getName().toUpperCase()+"]");
 						  /*If the service is named as what we are querying we select it */
 					      selectedService = i;
 					      break;

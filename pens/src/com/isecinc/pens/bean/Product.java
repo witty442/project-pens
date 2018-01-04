@@ -7,6 +7,7 @@ import util.ConvertNullUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MProductCategory;
 import com.isecinc.pens.model.MUOM;
@@ -42,7 +43,7 @@ public class Product extends I_PO implements Serializable {
 		setUom(new MUOM().find(rst.getString("UOM_ID")));
 		setIsActive(rst.getString("ISACTIVE").trim());
 		setProductCategory(new MProductCategory().find(String.valueOf(rst.getInt("PRODUCT_CATEGORY_ID"))));
-
+		setTaxable( Utils.isNull(rst.getString("taxable")));
 		// set display label
 		setDisplayLabel();
 
@@ -77,12 +78,21 @@ public class Product extends I_PO implements Serializable {
 	private String uom1;
 	private String uom2;
 	private String conversionRate;
+	private String taxable;
 	
 	/** Product Price **/
 	private ProductPrice[] productPrices = null;
 
 	
     
+	public String getTaxable() {
+		return taxable;
+	}
+
+	public void setTaxable(String taxable) {
+		this.taxable = taxable;
+	}
+
 	public String getConversionRate() {
 		return conversionRate;
 	}

@@ -212,7 +212,7 @@ public class DBBackUpManager {
 				
 				logger.debug("Upload Zip File To FTP Server");
 				FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
-				ftpManager.uploadBackUpDBZipFileToFTP_OPT3(rootFtpPath, ftpFilePath, pathZipFull);
+				ftpManager.uploadBackUpDBZipFileToFTP(rootFtpPath, ftpFilePath, pathZipFull);
 			}
 
             /*if(tableUnAvaiableList != null && tableUnAvaiableList.size() > 0){

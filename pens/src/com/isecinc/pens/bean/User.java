@@ -10,6 +10,7 @@ import java.util.List;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
+import com.jcraft.jsch.Logger;
 
 /**
  * User
@@ -88,6 +89,7 @@ public class User extends I_PO implements Serializable {
 	 * Active Role Info
 	 */
 	public void activeRoleInfo() {
+		
 		List<References> ref = new ArrayList<References>();
 		// customer type, sales group, order type
 		if (getType().equalsIgnoreCase(ADMIN)) {
@@ -101,6 +103,7 @@ public class User extends I_PO implements Serializable {
 		} else if (getType().equalsIgnoreCase(NB)) {
 			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_DD);
 		}
+		
 		for (References r : ref) {
 			if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
 				setCustomerType(r);
@@ -110,6 +113,8 @@ public class User extends I_PO implements Serializable {
 				setOrderType(r);
 			}
 		}
+		//System.out.println("activeRoleInfo:type{"+getType()+"}ref{"+ref+"}orderType{"+getOrderType()+"}");
+		
 		for (References r : InitialReferences.getReferenes().get(InitialReferences.ROLE)) {
 			if (r.getKey().equalsIgnoreCase(getType())) {
 				setRole(r);

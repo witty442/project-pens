@@ -1,10 +1,9 @@
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="util.AppversionVerify"%>
-<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
-<title>Update Sales App System</title>
+<title>Update SalesApp System</title>
 
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
@@ -103,8 +102,13 @@ body {
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
 							<td align="center">
+							   <a href="https://www.dropbox.com/s/8hh7wlihrmrizxf/pensclient.war?dl=1">
+								  <input type="button" name ="submit_download" 
+								  value="ดาวน์โหลด pensclient.war"  class="newPosBtn"> 
+								</a>
 								<a href="#">
-								  <input type="submit" name ="submit_update" value="อัพเดตโปรแกรม SalesApp" > 
+								  <input type="submit" name ="submit_update"   class="newPosBtn"
+								  value="อัพเดตโปรแกรม SalesApp" > 
 								</a>
 							</td>
 						</tr>

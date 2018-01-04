@@ -101,7 +101,7 @@ function loadProductCat(page){
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/moveOrder/moveOrderProductCatQuery.jsp",
-			data : "pageId=" +page+"&custId="+custId,
+			data : "searchType=byPage&pageId=" +page+"&custId="+custId,
 			async: false,
 			success: function(getData){
 				var htmlText = jQuery.trim(getData);
@@ -133,6 +133,31 @@ function loadProducts(brandCode){
 	$(document).ready(function() {
 	    $("#selectProduct").dialog("open");
 	});
+}
+
+function loadProductsByBrand(brandCode){
+	//alert("brandCode:"+brandCode.value);
+	if(brandCode.value != ""){
+		var orderDate ="";// document.getElementById("orderDate").value;
+		var pricelistId = document.getElementById("moveOrder.priceListId").value;
+		var custId = 0;//document.getElementById("order.customerId").value;
+		
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/moveOrder/moveOrderProductByBrand.jsp",
+				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+				async: false,
+				success: function(getData){
+					var htmlText = jQuery.trim(getData);
+					document.getElementById('selectProduct').innerHTML = htmlText;
+				}
+			}).responseText;
+		});
+		
+		$(document).ready(function() {
+		    $("#selectProduct").dialog("open");
+		});
+	}
 }
 
 function lockScreen() {
@@ -194,7 +219,7 @@ $(function(){
 		}); 
 	 
 	 var btns = " <div align='center'>"
-         +" <input onclick='addProductToSalesOrder()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
+         +" <input onclick='addProductToSalesOrder()' class ='newPosBtn' type='button' name='ok' value='           OK1.           ' />"
          +" <input onclick='brandDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";

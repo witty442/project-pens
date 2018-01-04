@@ -258,6 +258,7 @@ function stampPrint(){
 <!--										<th><bean:message key="Overall" bundle="sysele"/></th>-->
 										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>					
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
+										<th>ภาษี</th>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
@@ -314,6 +315,7 @@ function stampPrint(){
 											<input type='hidden' name='lines.promo' value='${lines1.promotion}'>
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
+											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
 										</td>
 										<td align="center">
 									        ${lines1.fullUom}
@@ -366,6 +368,11 @@ function stampPrint(){
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
 										<td align="center">
+											<c:if test="${lines1.taxable=='Y'}">
+												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+											</c:if>
+										</td>
+										<td align="center">
 											<c:if test="${lines1.promotion=='Y'}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:if>
@@ -384,7 +391,7 @@ function stampPrint(){
 							</tr>
 							<tr>
 								<td></td><td></td>
-								<td align="right"><bean:message key="TotalAmount" bundle="sysele"/>&nbsp;&nbsp;</td>
+								<td align="right">ยอดรวมก่อนภาษี &nbsp;&nbsp;</td>
 								<td align="left">
 									<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									<html:hidden property="order.totalAmount"/>
@@ -396,6 +403,14 @@ function stampPrint(){
 								<td align="left">
 									<input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
 									<html:hidden property="order.vatAmount"/>
+								</td>
+							</tr>
+							<tr>
+								<td></td><td></td>
+								<td align="right">ยอดรวมที่ไม่เสียภาษี&nbsp;&nbsp;</td>
+								<td align="left">
+									<input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
+									<html:hidden property="order.totalAmountNonVat"/>
 								</td>
 							</tr>
 							<tr>
