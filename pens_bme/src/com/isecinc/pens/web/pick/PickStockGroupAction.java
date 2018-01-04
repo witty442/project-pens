@@ -9,11 +9,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -676,7 +678,7 @@ public class PickStockGroupAction extends I_Action {
 			PickStock h = aForm.getBean();
 			h = PickStockGroupDAO.searchPickStockItemByIssueReqNo4Report(conn, h);
 			
-			StringBuffer htmlTable = genHTML(h);	 
+			StringBuffer htmlTable = genExcelHTML(h);	 
 			
 			java.io.OutputStream out = response.getOutputStream();
 			response.setHeader("Content-Disposition", "attachment; filename="+Utils.genFileName("pick_group")+".xls");
@@ -701,7 +703,6 @@ public class PickStockGroupAction extends I_Action {
 		return mapping.findForward("prepareByGroup");
 	}
 	
-	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		PickStockForm aForm = (PickStockForm) form;
@@ -724,7 +725,7 @@ public class PickStockGroupAction extends I_Action {
 		return mapping.findForward("prepareByGroup");
 	}
 
-	private StringBuffer genHTML(PickStock p){
+	private StringBuffer genExcelHTML(PickStock p){
 		StringBuffer h = new StringBuffer("");
 		try{
 			//Header
@@ -733,7 +734,7 @@ public class PickStockGroupAction extends I_Action {
 			
 			h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				h.append("<td align='left' colspan='7'><b>"+title+" </b></td> \n");
+				h.append("<td align='left' colspan='12'><b>"+title+" </b></td> \n");
 				h.append("</tr> \n");
 			h.append("</table> \n");
 
@@ -746,33 +747,37 @@ public class PickStockGroupAction extends I_Action {
 					 h.append("<td><b>Job Id</b></td> \n");
 					 h.append("<td><b>Job Name</b></td> \n");
 					 h.append("<td><b>เลขที่กล่อง </b></td> \n");
+					 h.append("<td><b>Barcode </b></td> \n");
 					 h.append("<td><b>Wacoal Mat</b></td> \n");
 					 h.append("<td><b>Group Code</b></td> \n");
 					 h.append("<td><b>Pens Item </b></td> \n");
 					 h.append("<td><b>QTY ที่เบิก </b></td> \n");
-					 h.append("<td>Issue req</td> \n");
-					 h.append("<td>ร้านค้า</td> \n");
-					 h.append("<td>Sun Inv</td> \n");
+					 h.append("<td><b>Issue req</b></td> \n");
+					 h.append("<td><b>Invoice no</b></td> \n");
+					 h.append("<td><b>ร้านค้า</b></td> \n");
+					 h.append("<td><b>Sun Inv</b></td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<dataList.size();i++){
 					PickStock s = (PickStock)dataList.get(i);
 				   h.append("<tr> \n");
 				   h.append("<td>"+s.getJobId()+"&nbsp;</td> \n");
-				   h.append("<td>"+s.getJobName()+"</td> \n");
-				   h.append("<td>"+s.getBoxNo()+"</td> \n");
-				   h.append("<td>"+s.getMaterialMaster()+"</td> \n");
-				   h.append("<td>"+s.getGroupCode()+"&nbsp;</td> \n");
-				   h.append("<td>"+s.getPensItem()+"</td> \n");
+				   h.append("<td class='text'>"+s.getJobName()+"</td> \n");
+				   h.append("<td class='text'>"+s.getBoxNo()+"</td> \n");
+				   h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+				   h.append("<td class='text'>"+s.getMaterialMaster()+"</td> \n");
+				   h.append("<td class='text'>"+s.getGroupCode()+"&nbsp;</td> \n");
+				   h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
 				   h.append("<td>"+s.getQty()+"</td> \n");
 				   h.append("<td class='text'>"+p.getIssueReqNo()+"</td> \n");
+				   h.append("<td class='text'>"+p.getInvoiceNo()+"</td> \n");
 				   h.append("<td class='text'>"+p.getStoreCode()+"-"+p.getStoreName()+"</td> \n");
 				   h.append("<td class='text'>"+p.getSubInv()+"</td> \n");
 				   h.append("</tr>");
 				}//for 
 				
 				h.append("<tr> \n");
-				h.append("<td colspan='6' align='right'><b>Total</b></td> \n");
+				h.append("<td colspan='7' align='right'><b>Total</b></td> \n");
 				h.append("<td><b>"+p.getTotalQty()+"</b></td> \n");
 				h.append("</tr>");	
 			h.append("</table> \n");

@@ -32,12 +32,14 @@ public class PickStock implements Serializable{
 	private String storeNo;
 	private String custGroup;
 	private String custGroupDesc;
+	private String invoiceNo;
 	
 	//Line
 	private int lineId;
 	private String jobId;
 	private String jobName;
 	private String boxNo;
+	private String barcode;
 	private String pensItem;
 	private String materialMaster;
 	private String groupCode;
@@ -89,6 +91,18 @@ public class PickStock implements Serializable{
 	private String issueReqNoTo;
 	
 	
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public String getIssueReqDateFrom() {
 		return issueReqDateFrom;
 	}

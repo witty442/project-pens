@@ -333,7 +333,8 @@
 			<forward name="addRow" path="/jsp/adjust/adjustStockSA.jsp" />
 		</action>
 		
-		<action name="pickStockForm" path="/jsp/pickStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickStockAction">
+		<action name="pickStockForm" path="/jsp/pickStockAction" parameter="do" scope="session" 
+		type="com.isecinc.pens.web.pick.PickStockAction">
 			<forward name="search2" path="/jsp/pick/pickStockSearch.jsp" />
 			<forward name="prepare2" path="/jsp/pick/pickStockSearch.jsp" />
 			<forward name="clear2" path="/jsp/pick/pickStockSearch.jsp" />
@@ -345,7 +346,8 @@
 			<forward name="addRow" path="/jsp/pick/pickStock.jsp" />
 		</action>
 		
-		<action name="pickStockGroupForm" path="/jsp/pickStockGroupAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickStockGroupAction">
+		<action name="pickStockGroupForm" path="/jsp/pickStockGroupAction" parameter="do" scope="session" 
+		type="com.isecinc.pens.web.pick.PickStockGroupAction">
 			<forward name="search" path="/jsp/pick/pickStockGroupSearch.jsp" />
 			<forward name="prepareByGroup" path="/jsp/pick/pickStockByGroup.jsp" />
 			
@@ -491,7 +493,8 @@
 		
 		</action>
 		
-		<action name="confPickStockForm" path="/jsp/confPickStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ConfPickStockAction">
+		<action name="confPickStockForm" path="/jsp/confPickStockAction" parameter="do" scope="session" 
+		type="com.isecinc.pens.web.pick.ConfPickStockAction">
 			<forward name="search2" path="/jsp/pick/confPickStockSearch.jsp" />
 			<forward name="prepare2" path="/jsp/pick/confPickStockSearch.jsp" />
 			<forward name="clear2" path="/jsp/pick/confPickStockSearch.jsp" />
@@ -502,7 +505,8 @@
 			<forward name="addRow" path="/jsp/pick/confPickStock.jsp" />
 		</action>
 		
-		<action name="confPickStockAllForm" path="/jsp/confPickStockAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ConfPickStockAllAction">
+		<action name="confPickStockAllForm" path="/jsp/confPickStockAllAction" parameter="do" scope="session" 
+		type="com.isecinc.pens.web.pick.ConfPickStockAllAction">
 			<forward name="search2" path="/jsp/pick/confPickStockSearchAll.jsp" />
 			<forward name="prepare2" path="/jsp/pick/confPickStockSearchAll.jsp" />
 			<forward name="clear2" path="/jsp/pick/confPickStockSearchAll.jsp" />

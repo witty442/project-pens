@@ -339,9 +339,11 @@ function isSelectOne(){
 										<html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
+									    &nbsp;&nbsp;
+									    Invoice No &nbsp;
+									     <html:text property="bean.invoiceNo" styleId="invoiceNo" styleClass="normalText" size="20"/>	
 						           </td>
-								   <td align="right"></td>
-								   <td align="right"></td>
+								   
 								</tr>
 								<tr>
 									<td >รหัสร้านค้า

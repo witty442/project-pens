@@ -91,7 +91,7 @@ public class PickStockDAO extends PickConstants{
 			//check documentNo
 			if(Utils.isNull(h.getIssueReqNo()).equals("")){
 				//Gen issueReqNo
-				h.setIssueReqNo(genIssueReqNo(conn,tDate));
+				h.setIssueReqNo(genIssueReqNoCaseSaveBox(conn,tDate));
 				h.setIssueReqStatus(STATUS_OPEN);
 				h.setPickType(PickConstants.PICK_TYPE_BOX);
 				
@@ -430,8 +430,8 @@ public class PickStockDAO extends PickConstants{
 		int c = 1;
 		try {
 			sql.append("\n SELECT * ");
-			sql.append("\n from PENSBME_PICK_STOCK    \n");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n from PENSBME_PICK_STOCK    ");
+			sql.append("\n where 1=1   ");
 			
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
 				sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
@@ -458,8 +458,11 @@ public class PickStockDAO extends PickConstants{
 			if( !Utils.isNull(o.getPickType()).equals("")){
 				sql.append("\n and pick_type= '"+Utils.isNull(o.getPickType())+"'  ");
 			}
+			if( !Utils.isNull(o.getInvoiceNo()).equals("")){
+				sql.append("\n and invoice_no= '"+Utils.isNull(o.getInvoiceNo())+"'  ");
+			}
 			
-			sql.append("\n order by issue_req_no DESC ");
+			sql.append("\n order by  issue_req_date DESC ,issue_req_no DESC ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -699,6 +702,16 @@ public class PickStockDAO extends PickConstants{
 		try {
 			sql.append("\n select i.job_id,i.box_no,i.MATERIAL_MASTER,i.group_code,i.pens_item ,count(*) as qty ");
 			sql.append("\n ,(select max(name) from PENSBME_PICK_JOB j where j.job_id = i.job_id) as job_name ");
+			
+			sql.append("\n ,(select h.invoice_no from PENSBI.PENSBME_PICK_STOCK h ");
+			sql.append("\n   where h.issue_req_no= '"+Utils.isNull(o.getIssueReqNo())+"' )as invoice_no ");
+
+			sql.append("\n ,(select max(h.barcode) from PENSBI.PENSBME_ONHAND_BME_LOCKED h ");
+			sql.append("\n   where h.MATERIAL_MASTER=i.MATERIAL_MASTER");
+			sql.append("\n   and h.group_item =i.group_code ");
+			sql.append("\n   and h.pens_item =i.pens_item ");
+			sql.append("\n ) as barcode ");
+
 			sql.append("\n from PENSBI.PENSBME_PICK_STOCK_I i ");
 			sql.append("\n where 1=1 ");
 			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
@@ -714,7 +727,6 @@ public class PickStockDAO extends PickConstants{
 
 			while(rst.next()) {
 			   h = new PickStock();
-			
 			   h.setJobId(rst.getString("job_id"));
 			   h.setJobName(rst.getString("job_name"));
 			   h.setBoxNo(rst.getString("box_no"));
@@ -722,6 +734,8 @@ public class PickStockDAO extends PickConstants{
 			   h.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
 			   h.setGroupCode(rst.getString("group_code"));
 			   h.setPensItem(rst.getString("pens_item"));
+			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
+			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no")));
 			   
 			   h.setQty(Utils.decimalFormat(rst.getInt("qty"), Utils.format_current_no_disgit));
 			   h.setQtyInt(rst.getInt("qty"));
@@ -801,12 +815,10 @@ public class PickStockDAO extends PickConstants{
 			sql.append("\n where 1=1   ");
 			sql.append("\n and issue_req_no = '"+h.getIssueReqNo()+"'");
 
-			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
 			if(rst.next()) {
-			   
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   if(rst.getDate("issue_req_date") != null){
 				  String dateStr = Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -824,6 +836,7 @@ public class PickStockDAO extends PickConstants{
 			   h.setStoreName(Utils.isNull(rst.getString("store_name"))); 
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
+			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no"))); 
 			   
 			   if(rst.getDate("confirm_issue_date") != null){
 				   String dateStr = Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -1717,6 +1730,24 @@ public class PickStockDAO extends PickConstants{
 		  return orderNo;
 	}
 	 
+	 //Start S
+	 private static String genIssueReqNoCaseSaveBox(Connection conn,Date tDate) throws Exception{
+		   String orderNo = "";
+		   try{
+			   String today = df.format(tDate);
+			   String[] d1 = today.split("/");
+			   int curYear = Integer.parseInt(d1[0].substring(2,4));
+			   int curMonth = Integer.parseInt(d1[1]);
+			 
+			   //get Seq
+			   int seq = SequenceProcess.getNextValue(conn,"STOCK", "ISSUE_REQ_NO",tDate);
+			   
+			   orderNo = "S"+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("0000").format(seq);
+		   }catch(Exception e){
+			   throw e;
+		   }
+		  return orderNo;
+	}
 
 	private static void savePickStockHeadModel(Connection conn,PickStock o) throws Exception{
 		PreparedStatement ps = null;

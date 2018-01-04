@@ -18,6 +18,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.excel.ExcelHeader;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
@@ -743,7 +745,7 @@ public class PickStockAction extends I_Action {
 			PickStock h = aForm.getBean();
 			h = PickStockDAO.searchPickStockItemByIssueReqNo4Report(conn, h);
 			
-			StringBuffer htmlTable = genHTML(h);	 
+			StringBuffer htmlTable = genReportHtml(h);	 
 			
 			java.io.OutputStream out = response.getOutputStream();
 			response.setHeader("Content-Disposition", "attachment; filename="+Utils.genFileName("pick")+".xls");
@@ -786,15 +788,16 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("clear");
 	}
 
-	private StringBuffer genHTML(PickStock p){
+	private StringBuffer genReportHtml(PickStock p){
 		StringBuffer h = new StringBuffer("");
 		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
 			//Header
 			String title = "ใบเบิกเลขที่ :"+p.getIssueReqNo();
 			
 			h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				h.append("<td align='left' colspan='10'><b>"+title+" </b></td> \n");
+				h.append("<td align='left' colspan='11'><b>"+title+" </b></td> \n");
 				h.append("</tr> \n");
 			h.append("</table> \n");
 
@@ -807,6 +810,7 @@ public class PickStockAction extends I_Action {
 					 h.append("<td><b>Job Id</b></td> \n");
 					 h.append("<td><b>Job Name</b></td> \n");
 					 h.append("<td><b>เลขที่กล่อง </b></td> \n");
+					 h.append("<td><b>Barcode</b></td> \n");
 					 h.append("<td><b>Wacoal Mat</b></td> \n");
 					 h.append("<td><b>Group Code</b></td> \n");
 					 h.append("<td><b>Pens Item </b></td> \n");
@@ -814,6 +818,7 @@ public class PickStockAction extends I_Action {
 					 h.append("<td>Issue req</td> \n");
 					 h.append("<td>ร้านค้า</td> \n");
 					 h.append("<td>Sub Inv</td> \n");
+					 h.append("<td>Invoice No</td> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<dataList.size();i++){
@@ -822,6 +827,7 @@ public class PickStockAction extends I_Action {
 				   h.append("<td>"+s.getJobId()+"&nbsp;</td> \n");
 				   h.append("<td>"+s.getJobName()+"</td> \n");
 				   h.append("<td>"+s.getBoxNo()+"</td> \n");
+				   h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
 				   h.append("<td>"+s.getMaterialMaster()+"</td> \n");
 				   h.append("<td>"+s.getGroupCode()+"&nbsp;</td> \n");
 				   h.append("<td>"+s.getPensItem()+"</td> \n");
@@ -829,6 +835,7 @@ public class PickStockAction extends I_Action {
 				   h.append("<td class='text'>"+p.getIssueReqNo()+"</td> \n");
 				   h.append("<td class='text'>"+p.getStoreCode()+"-"+p.getStoreName()+"</td> \n");
 				   h.append("<td class='text'>"+p.getSubInv()+"</td> \n");
+				   h.append("<td class='text'>"+p.getInvoiceNo()+"</td> \n");
 				   h.append("</tr>");
 				}//for 
 				

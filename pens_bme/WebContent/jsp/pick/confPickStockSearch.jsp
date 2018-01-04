@@ -333,13 +333,14 @@ function isSelectOne(){
 								</tr>
 								<tr>
                                     <td> กลุ่มร้านค้า  </td>		
-								    <td>
+								    <td colspan="3">
 										<html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
+									    &nbsp;&nbsp;&nbsp;
+									    Invoice No &nbsp;<html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" />
 						           </td>
-								   <td align="right"></td>
-								   <td align="right"></td>
+						
 								</tr>
 								<tr>
 									<td >รหัสร้านค้า

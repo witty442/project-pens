@@ -30,7 +30,8 @@ public class ReqPickStock implements Serializable{
 	private String deliveryDate;
 	private int totalCtn;
 	private String exported;
-
+	private String invoiceNo;
+	
 	//Line
 	private int lineId;
 	private String pensItem;
@@ -78,6 +79,12 @@ public class ReqPickStock implements Serializable{
 	
 	
 	
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public boolean isDisableCustGroup() {
 		return disableCustGroup;
 	}

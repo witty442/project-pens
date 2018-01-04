@@ -1337,6 +1337,8 @@ public class OrderAction extends I_Action {
 				   h.append("<td>QTY </td>");
 				   h.append("<td>Whole Price</td>");
 				   h.append("<td>Retail Price</td>");
+				   h.append("<td>Invoice No</td>");
+				   h.append("<td>Order Lot No</td>");
 	            h.append("</tr>");    
 	            
 	            if(orderResult.getOrderItemList() != null && orderResult.getOrderItemList().size() > 0){
@@ -1345,13 +1347,15 @@ public class OrderAction extends I_Action {
 	            		h.append("<tr> \n");    
 		            		h.append("<td>"+o.getStoreCode()+"</td>");
 		  				    h.append("<td>"+o.getOrderDate()+"</td>");
-		  				    h.append("<td>"+o.getItem()+"</td>");
-		  				    h.append("<td>"+o.getGroupCode()+"</td>");
-		  				    h.append("<td>"+o.getMaterialMaster()+"</td>");
+		  				    h.append("<td class='text'>"+o.getItem()+"</td>");
+		  				    h.append("<td class='text'>"+o.getGroupCode()+"</td>");
+		  				    h.append("<td class='text'>"+o.getMaterialMaster()+"</td>");
 		  				    h.append("<td class='text'>"+o.getBarcode()+"</td>");
 		  				    h.append("<td class='num'>"+o.getQty()+"</td>");
-		  				    h.append("<td>"+o.getWholePriceBF()+"</td>");
-		  				    h.append("<td>"+o.getRetailPriceBF()+"</td>");
+		  				    h.append("<td class='num'>"+o.getWholePriceBF()+"</td>");
+		  				    h.append("<td class='num'>"+o.getRetailPriceBF()+"</td>");
+		  				  h.append("<td class='text'>"+o.getInvoiceNo()+"</td>");
+		  				  h.append("<td class='text'>"+o.getOrderLotNo()+"</td>");
 	  				    h.append("</tr> "); 
 	            	}
 	            }

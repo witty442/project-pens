@@ -31,6 +31,7 @@ public class Order implements Serializable{
 	private String qty;
 	private String validFrom;
 	private String validTo;
+	private String invoiceNo;
 	
 	private String materialMaster;
     private String onhandQty;
@@ -58,6 +59,12 @@ public class Order implements Serializable{
 	private int rowExcel;
 	
 	
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public int getRowExcel() {
 		return rowExcel;
 	}

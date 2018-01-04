@@ -429,6 +429,9 @@ function sumQty(){
 							              
 										 รวมจำนวนหีบ  <font color="red"></font>
 										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15"  readonly="true" styleClass="disableText"/>
+										&nbsp;&nbsp;
+										Invoice No &nbsp;<html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
+							              
 										</td>
 									</tr>	
 								</c:if>

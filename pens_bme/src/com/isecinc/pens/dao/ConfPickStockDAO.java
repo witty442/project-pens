@@ -107,6 +107,9 @@ public class ConfPickStockDAO extends PickConstants{
 			if( !Utils.isNull(o.getStoreCode()).equals("")){
 				sql.append("\n and CUSTOMER_NO = '"+Utils.isNull(o.getStoreCode())+"'  ");
 			}
+			if( !Utils.isNull(o.getInvoiceNo()).equals("")){
+				sql.append("\n and INVOICE_NO = '"+Utils.isNull(o.getInvoiceNo())+"'  ");
+			}
 			if( !Utils.isNull(o.getIssueReqDate()).equals("")){
 				Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
@@ -138,6 +141,7 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setStoreCode(Utils.isNull(rst.getString("customer_no")));
 			   h.setWareHouse(Utils.isNull(rst.getString("warehouse")));
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no")));
 			   
 			   if(rst.getDate("need_date") != null){
 			     h.setNeedDate(Utils.stringValue(rst.getDate("need_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -701,7 +705,6 @@ public class ConfPickStockDAO extends PickConstants{
 			sql.append("\n where 1=1   ");
 			sql.append("\n and issue_req_no = '"+h.getIssueReqNo()+"'");
 
-			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
@@ -728,6 +731,7 @@ public class ConfPickStockDAO extends PickConstants{
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 			   h.setWareHouse(Utils.isNull(rst.getString("warehouse"))); 
+			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no"))); 
 			   
 			   if(rst.getDate("delivery_date") != null){
 				   h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));

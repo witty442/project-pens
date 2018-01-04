@@ -448,6 +448,13 @@ function resetStore(){
 									<td></td><td></td>
 								</tr>
 								<tr>
+                                    <td > Invoice No</td>
+                                    <td>
+						               <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
+									</td>
+									<td></td><td></td>
+								</tr>
+								<tr>
                                     <td > หมายเหตุ </td>
                                     <td colspan="2"> 
                                       <html:text property="bean.remark" styleId="remark" size="60" />

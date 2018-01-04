@@ -410,8 +410,8 @@ function sumQty(){
                                       <html:text property="bean.remark" styleId="remark" size="60" readonly="true" styleClass="disableText"/>
                                      </td>
 								</tr>	
-								  <c:if test="${confPickStockAllForm.bean.canEditDeliveryDate == true}">
-									<tr>
+								<tr>
+								   <c:if test="${confPickStockAllForm.bean.canEditDeliveryDate == true}">
 	                                    <td> วันที่พร้อมจัดส่ง <font color="red">*</font></td>
 										<td colspan="3">
 							               <html:text property="bean.deliveryDate" styleId="deliveryDate" size="10" />
@@ -419,8 +419,8 @@ function sumQty(){
 										 รวมจำนวนหีบ  <font color="red">*</font>
 										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15" onblur="isNum(this)" onchange="isNum(this)"/>
 										</td>
-									</tr>	
-								</c:if>
+									</c:if>
+								</tr>	
 								<c:if test="${confPickStockAllForm.bean.canEditDeliveryDate == false}">
 									<tr>
 	                                    <td> วันที่พร้อมจัดส่ง <font color="red"></font></td>
@@ -432,6 +432,12 @@ function sumQty(){
 										</td>
 									</tr>	
 								</c:if>
+								<tr>
+                                    <td>Invoice No</td>
+									<td colspan="3">
+									  <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
+									</td>
+								</tr>	
 						   </table>
 					  </div>
 

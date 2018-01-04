@@ -199,15 +199,15 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
                                     <td>
-                                      Issue request Date <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
+                                      Issue request Date &nbsp;<html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
                                      </td>
 									<td>						
-									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
+									 Issue request No &nbsp; <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
 									</td>
 								</tr>
 								 <tr>
                                     <td>
-                                      Issue request status
+                                      Issue request status&nbsp;
                                       <html:select property="bean.issueReqStatus">
 											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
 									    </html:select>
@@ -217,7 +217,7 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 									</td>
 								</tr>
 								<tr>
-                                    <td > Confrim Issue Date
+                                    <td > Confrim Issue Date&nbsp;
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20"/>
 									</td>
 									<td> Pick Type
@@ -227,7 +227,12 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 									  </td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> หมายเหตุ
+                                    <td colspan="2"> Invoice No &nbsp;
+						               <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" />
+									</td>
+								</tr>
+								<tr>
+                                    <td colspan="2"> หมายเหตุ &nbsp;
 						               <html:text property="bean.remark" styleId="remark" size="50" />
 									</td>
 								</tr>

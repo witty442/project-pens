@@ -326,14 +326,21 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 
 					/** Loop insert By Store code **/ 
 					if(colNo >= 5){
-						totalQtyInRow += Utils.convertStrToInt(Utils.convertDoubleStrToStr(cellObjValue.toString()));
+						logger.debug("row["+r+"]col["+colNo+"]value["+cellObjValue+"]");
+						if(cellObjValue != null){
+						  totalQtyInRow += Utils.convertStrToInt(Utils.convertDoubleStrToStr(cellObjValue.toString()));
+						}
 						String storeCode = columnNoMapStoreCode.get(""+colNo);
 						orderTemp = new Order();
 						orderTemp.setMaterialMaster(mat);
 						orderTemp.setRowExcel(r+1);
 						orderTemp.setStoreCode(storeCode);
 						orderTemp.setStoreType(storeCode.substring(0,storeCode.indexOf("-")));
-						orderTemp.setQty(""+Utils.convertStrToInt(Utils.convertDoubleStrToStr(cellObjValue.toString())));
+						if(cellObjValue != null){
+						   orderTemp.setQty(""+Utils.convertStrToInt(Utils.convertDoubleStrToStr(cellObjValue.toString())));
+						}else{
+						   orderTemp.setQty("0");
+						}
 						logger.debug("read 1 StoreCode["+storeCode+"]");
 						
 						orderSaveMap.put(storeCode, orderTemp);

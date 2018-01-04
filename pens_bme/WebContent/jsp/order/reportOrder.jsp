@@ -245,28 +245,43 @@ function resetStore(){
 					    <div align="center">
 					     <table align="center" border="0" cellpadding="3" cellspacing="0" >
 					        <tr>
-                                 <td> กลุ่มร้านค้า <font color="red">*</font>
-									 <html:select property="order.custGroup" styleId="custGroup" onchange="resetStore()">
+                                <td  align="right"> กลุ่มร้านค้า <font color="red">*</font></td>
+								<td>
+								     <html:select property="order.custGroup" styleId="custGroup" onchange="resetStore()">
 										<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 								    </html:select>
 								</td>
 							</tr>
 							<tr>
-								<td >รหัสร้านค้า
+								<td  align="right">รหัสร้านค้า </td>
+								<td>
 								  <html:text property="order.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 								  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
-								  <html:text property="order.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+								  <html:text property="order.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="40"/>
 								
 								  <html:hidden property="order.subInv" styleId="subInv"/>
 								  <html:hidden property="order.storeNo" styleId="storeNo"/>
 								</td>
 							</tr>
 							<tr>
-								<td >
+								<td align="right">
 								    วันที่ Order <font color="red">*</font>
+								 </td>
+								 <td>
 								  <html:text property="order.salesDateFrom" styleId="salesDateFrom" size="20" />
 								 - 
 								  <html:text property="order.salesDateTo" styleId="salesDateTo" size="20" />
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+								   Invoice No<font color="red"></font>
+								</td>
+								<td >
+								  <html:text property="order.invoiceNo" styleId="invoiceNo" size="20" />
+								 &nbsp;&nbsp; 
+								 Order lot no 
+								  <html:text property="order.orderLotNo" styleId="orderLotNo" size="20" />
 								</td>
 							</tr>
 					   </table>
@@ -342,6 +357,8 @@ function resetStore(){
 		                  <th width="3%">QTY</th>
 		                  <th width="3%">Whole Price</th>
 		                  <th width="3%">Retail Price</th>
+		                  <th width="5%">Invoice No</th>
+		                  <th width="5%">Order Lot No</th>
 		               </tbody>    
 					 <!-- HEAD -->
 					 
@@ -369,6 +386,8 @@ function resetStore(){
 							<td><%=o.getQty()%></td>
 							<td><%=o.getWholePriceBF()%></td>
 							<td><%=o.getRetailPriceBF()%></td>
+							<td><%=o.getInvoiceNo()%></td>
+							<td><%=o.getOrderLotNo()%></td>
 						 </tr>
 						<%  
 						 no++;

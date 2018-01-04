@@ -358,8 +358,12 @@ public class OrderDAO {
         int totalRow = 0;
 		StringBuilder sql = new StringBuilder();
 		try {
-			sql.append(" SELECT count(*) as total_row  from PENSBME_ORDER    \n");
-			sql.append(" where 1=1  \n");
+			sql.append(" SELECT count(*) as total_row  \n");
+			sql.append(" FROM (   \n");
+			sql.append("  select distinct  h.store_code,h.order_date,h.item,h.group_code,h.barcode \n");
+			sql.append("  ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,h.invoice_no,h.order_lot_no \n");
+			sql.append("  from PENSBME_ORDER h    \n");
+			sql.append("  where 1=1  \n");
 			
 			if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
 				&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
@@ -385,7 +389,14 @@ public class OrderDAO {
 			if( !Utils.isNull(o.getStoreCode()).equals("")){
 				sql.append(" and store_code = '"+Utils.isNull(o.getStoreCode())+"'  \n");
 			}
-			
+			if( !Utils.isNull(o.getInvoiceNo()).equals("")){
+				sql.append(" and invoice_no = '"+Utils.isNull(o.getInvoiceNo())+"'  \n");
+			}
+			if( !Utils.isNull(o.getOrderLotNo()).equals("")){
+				sql.append(" and order_lot_no = '"+Utils.isNull(o.getOrderLotNo())+"'  \n");
+			}
+			sql.append("  )A    \n");
+	
 			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
@@ -563,9 +574,9 @@ public class OrderDAO {
 			sql.append("\n SELECT a.*, rownum r__ ");
 			sql.append("\n FROM ( ");
 			sql.append("\n  SELECT s.* FROM( ");
-				sql.append("\n  SELECT h.store_code,h.order_date,h.item,h.group_code,h.barcode" );
-				sql.append("\n       ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");	
-				sql.append("\n       ,(select max(L.material_master) from PENSBME_ONHAND_BME_LOCKED L ");
+				sql.append("\n  SELECT h.store_code,h.order_date,h.item,h.group_code,h.barcode " );
+				sql.append("\n   ,h.invoice_no,h.order_lot_no ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");	
+				sql.append("\n   ,(select max(L.material_master) from PENSBME_ONHAND_BME_LOCKED L ");
 				sql.append("\n         where L.barcode = h.barcode) as material_master ");
 				sql.append("\n  from PENSBME_ORDER h where 1=1  ");
 				
@@ -593,7 +604,14 @@ public class OrderDAO {
 				if( !Utils.isNull(o.getStoreCode()).equals("")){
 					sql.append(" and h.store_code = '"+Utils.isNull(o.getStoreCode())+"'  \n");
 				}
-				sql.append("group by h.store_code,h.order_date,h.item,h.group_code,h.barcode,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF");
+				if( !Utils.isNull(o.getInvoiceNo()).equals("")){
+					sql.append(" and invoice_no = '"+Utils.isNull(o.getInvoiceNo())+"'  \n");
+				}
+				if( !Utils.isNull(o.getOrderLotNo()).equals("")){
+					sql.append(" and order_lot_no = '"+Utils.isNull(o.getOrderLotNo())+"'  \n");
+				}
+				sql.append("\n group by h.store_code,h.order_date,h.item,h.group_code,h.barcode");
+				sql.append("\n ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,h.invoice_no,h.order_lot_no");
 				sql.append("\n  ) s  ");
 				sql.append("\n order by s.store_code,s.order_date,s.item,s.group_code,s.barcode asc  ");
 				sql.append("\n ) a  ");
@@ -618,7 +636,8 @@ public class OrderDAO {
 				item.setMaterialMaster(rst.getString("material_master"));
 				item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+" ");
 				item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("Retail_Price_BF"),Utils.format_current_2_disgit)+" ");
-				
+				item.setInvoiceNo(Utils.isNull(rst.getString("invoice_no")));
+				item.setOrderLotNo(Utils.isNull(rst.getString("order_lot_no")));
 				orderItemList.add(item);
 			}//while
 
