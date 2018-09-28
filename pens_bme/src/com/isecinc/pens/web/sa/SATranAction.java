@@ -24,8 +24,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SAEmpDAO;
 import com.isecinc.pens.dao.SATranDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action

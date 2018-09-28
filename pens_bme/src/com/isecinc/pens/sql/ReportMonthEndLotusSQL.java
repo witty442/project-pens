@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BMECControlDAO;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class ReportMonthEndLotusSQL {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -19,7 +19,7 @@ public class ReportMonthEndLotusSQL {
 	 public static StringBuilder genSQL(Connection conn,OnhandSummary c,User user,String summaryType) throws Exception{
 			StringBuilder sql = new StringBuilder();
 			try {
-				BMEControlBean control = BMECControlDAO.calcMonthEndOnhandDateLotusAsOf(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+				BMEControlBean control = ControlConstantsDB.calcMonthEndOnhandDateLotusAsOf(conn,c.getPensCustCodeFrom(),c.getSalesDate());
 				
 				if("GroupCode".equalsIgnoreCase(summaryType)){
 					sql.append("\n SELECT A.customer_code,A.customer_desc ,A.group_type ");

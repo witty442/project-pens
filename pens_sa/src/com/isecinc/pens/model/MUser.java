@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Locale;
 
 import util.ConvertNullUtil;
+import util.DBConnection;
+import util.Utils;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 /**
  * I_Model Class

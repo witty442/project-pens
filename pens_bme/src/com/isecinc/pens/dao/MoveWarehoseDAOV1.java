@@ -19,7 +19,7 @@ import com.isecinc.pens.bean.MoveWarehouse;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class MoveWarehoseDAOV1 extends PickConstants{
 	

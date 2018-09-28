@@ -40,10 +40,10 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY
@@ -864,6 +864,93 @@ public class FTPManager {
 					    FileUtil.writeFile(fileTemp, tableBean.getDataStrExport().toString());*/
 					    /******************************************************************/
 					    
+					    /** Close Command FTP **/
+					    try{
+						    logger.info(" Start completePendingCommand ");
+							boolean completed = ftp.completePendingCommand();
+							String ftpResponse = ftp.getReplyString();
+							logger.info("ftpResponse["+ftpResponse+"]");
+						    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					        logger.error(e.getMessage(),e);
+					    }
+					    
+					    //SITE CHMOD 777 201011101437-SALESREP.txt
+					    /** Set Permission File ***/
+					    try{
+						    logger.info(" Start CHMOD 777 ");
+						    ftp.sendSiteCommand("CHMOD 777 "+pathFull);
+						    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    }catch(Exception e){
+					    	logger.error(e.getMessage(),e);	
+					    }
+					}else{
+						// Data not Found
+						logger.info("Data not found");
+					}
+		
+			} catch (SocketException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (UnknownHostException e) {
+				throw new FTPException("Could not connect to FTP server");
+			} catch (IOException e) {
+				throw new FTPException(e.getLocalizedMessage());
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new FTPException(e.getMessage());
+			} finally {
+				if(w != null){
+					//w.close();
+				}
+				if(out != null){
+				  // out.close();
+				}
+				if(ftp != null && ftp.isConnected()) {
+					try{
+						ftp.logout();
+						ftp.disconnect();
+						//logger.info("ftp disconnect : "+ftp.getReplyString());
+						ftp = null;
+					}catch(Exception e){
+						logger.error(e.getMessage(),e);
+					}
+				}
+			}	
+		}
+		
+		public void uploadFileToFTP(String pathFull,StringBuffer dataStr) throws Exception{
+			FTPClient ftp = null;
+			String reply = "";
+			Writer w = null;
+			OutputStream out = null;
+			logger.info("uploadAllFileToFTP_OPT2_BY_FILE");
+			try {		
+				ftp = new FTPClient();
+				ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+				ftp.connect(server);
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+				
+				if(!ftp.login(userFtp, passwordFtp)){
+					throw new FTPException("FTP Username or password invalid! ");
+				}
+	
+				if(dataStr != null && dataStr.toString().length() >0){		
+						logger.info("Write To pathFull:"+pathFull);
+						out = ftp.storeFileStream(pathFull);
+					    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+					    
+					    /** new Code ******************************************************/
+					    logger.info("Start Write OutputStreamWriter data:");
+					    w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
+					    w.write(dataStr.toString());
+					    w.flush();
+					    w.close();
+					    
+					    logger.info("End Write OutputStreamWriter data:");
+					    
+					    out.flush();
+					    out.close();
+						
 					    /** Close Command FTP **/
 					    try{
 						    logger.info(" Start completePendingCommand ");

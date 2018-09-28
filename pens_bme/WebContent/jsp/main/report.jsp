@@ -1,5 +1,5 @@
 <%@page import="com.isecinc.pens.web.report.ReportProcess"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>

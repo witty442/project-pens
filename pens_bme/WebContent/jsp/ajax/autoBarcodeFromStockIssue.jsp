@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.bean.Barcode"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="java.sql.Connection"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%
@@ -36,28 +36,27 @@ try{
 		//Get pensItem by Barcode order by pens_item asc and have count qty <> 0
 		 Barcode bResult = GeneralDAO.getPensItemByBarcodeModelStockIssueIsQtyNotZero(conn, barcode, matCode, issueReqNo, warehouse, boxNo,itemMap);
 		 if(bResult != null){
-	 pensItem = bResult.getPensItem();
-	 totalQtyByBarcodeAndPensItem = bResult.getQty();
+			 pensItem = bResult.getPensItem();
+			 totalQtyByBarcodeAndPensItem = bResult.getQty();
 		 } 
          System.out.println("*********No remian Qty <> 0 pensItem:"+pensItem+",remain Qty:"+totalQtyByBarcodeAndPensItem);
-		
-		
+
 		keyMap = barcode+pensItem;
 		System.out.println("keyMap:"+keyMap);
 		
 		//Set count Qty by Barcode+pensItem
 		if(session.getAttribute("ITEM_MAP") != null){
-	itemMap = (Map)session.getAttribute("ITEM_MAP");
-	if(itemMap.get(keyMap) != null){
-		int totalQtyByBarcodePensItem = Utils.convertStrToInt(itemMap.get(keyMap)) +1;//count totalQty
-		itemMap.put(keyMap, String.valueOf(totalQtyByBarcodePensItem));
-	}else{
-		itemMap.put(keyMap, "1");
-	}
-	session.setAttribute("ITEM_MAP",itemMap);
+			itemMap = (Map)session.getAttribute("ITEM_MAP");
+			if(itemMap.get(keyMap) != null){
+				int totalQtyByBarcodePensItem = Utils.convertStrToInt(itemMap.get(keyMap)) +1;//count totalQty
+				itemMap.put(keyMap, String.valueOf(totalQtyByBarcodePensItem));
+			}else{
+				itemMap.put(keyMap, "1");
+			}
+			session.setAttribute("ITEM_MAP",itemMap);
 		}else{
-	itemMap.put(keyMap, "1");
-	session.setAttribute("ITEM_MAP",itemMap);
+			itemMap.put(keyMap, "1");
+			session.setAttribute("ITEM_MAP",itemMap);
 		}
 		 
 		Barcode b = GeneralDAO.searchProductByBarcodeFromStockIssue(conn,request,barcode,matCode,issueReqNo,warehouse,boxNo,pensItem);  

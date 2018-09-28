@@ -18,6 +18,7 @@ import com.isecinc.pens.inf.bean.ImageFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExportHelper;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.Utils;
@@ -840,22 +841,14 @@ public class ExportProcess {
 		}
 	}
 
-
-		
-	/** User Normal
-	 * readTableSalesReceiptHeader
-	 * @param conn
-	 * @param tableBean
-	 * @return
-	 * @throws Exception
-	 */
-	public   TableBean exportSalesReceiptHeaderVan(Connection conn,TableBean tableBean,User userBean) throws Exception{
+	
+	public   TableBean exportPDReceiptHis(Connection conn,TableBean tableBean,User userBean) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
+		 String lastAppen = Constants.delimeterPipeStr;
         int countTrans = 0;
-        String lastAppen = Constants.delimeterPipeStr;
+        int i=0;
         List<String> sqlUpdateExportFlagList = new ArrayList<String>(); 
 		try{
 			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
@@ -878,11 +871,9 @@ public class ExportProcess {
 				
 				/** Add New Line **/
 				dataAppend.append(Constants.newLine);//new line
-				//add Receipt Line Detail
-				dataAppend.append(exportSalesReceiptItem(conn,countTrans,rs.getString("receipt_id"),rs.getString("receipt_no")));
 				
 				/** Set Data For Update ExportFlag **/
-				sqlUpdateExportFlagList.add("update t_receipt set exported = 'Y' WHERE receipt_id="+rs.getString("receipt_id"));
+				sqlUpdateExportFlagList.add("update t_pd_receipt_his set exported = 'Y' WHERE order_no='"+rs.getString("order_no")+"'");
 			}//while		
 			
 			tableBean.setExportCount(countTrans);
@@ -900,349 +891,6 @@ public class ExportProcess {
 				rs.close();rs= null;
 			}
 		}
-	}
-
-	/**
-	 * readTableSaleReceiptItem
-	 * @param conn
-	 * @param receiptId
-	 * @return
-	 * @throws Exception
-	 */
-	private   StringBuffer exportSalesReceiptItem(Connection conn,int countTrans,String receiptId,String receiptNo) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-        int no = 0;
-		try{
-            /** Get Column Detail Receipt **/
-            TableBean orderDBean = new TableBean();
-            orderDBean.setTableName("t_receipt_line");
-            List colOrderList = ExportHelper.initColumn(orderDBean);
-   
-         // Pasuwat Wang-arrayagul 
-			// Create Credit Note Line Sent To Oracle
-            String sql ="	Select 		\n"+
-            "	   'D'	AS	RECORD_TYPE	,	\n"+
-            "		@rownum:=@rownum+1  	AS	LINE_NO ,	\n"+
-            "		'"+receiptNo+"'	AS	RECEIPT_NUMBER,		\n"+
-            "		t_credit_note.credit_note_no	AS	AR_INVOICE_NO	,	\n"+
-            "		null	AS	SALES_ORDER_NO	,		\n"+
-            "		t_credit_note.total_amount	AS	INVOICE_AMOUNT	,	\n"+
-            "		t_receipt_cn.CREDIT_AMOUNT	AS	CREDIT_AMOUNT	,	\n"+
-            "		t_receipt_match_cn.PAID_AMOUNT	AS	PAID_AMOUNT	,	\n"+
-            "		t_receipt_cn.REMAIN_AMOUNT	AS	REMAIN_AMOUNT	,	\n"+
-            "		null	AS	DESCRIPTION	,	\n"+
-            "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
-            "	    null as order_number, \n"+
-            
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)  AS PAYMENT_METHOD ,\n"+
-            
-            "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
-            "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
-            /******** new Requirement ************************************/
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
-            "       ''	AS	BANK_BRANCH, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_no)	AS	CHEQUE_NO, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.credit_card_type)	AS	CREDIT_CARD_TYPE ,	 \n"+
-            /******** new Requirement ************************************/
-            /** WIT Add 07/03/2011  **/
-            "       '' AS ORDER_LINE_ID \n"+
-            
-            "		FROM 		\n"+
-            "		t_receipt_cn ,	\n"+
-            "		t_receipt_match_cn, 	\n"+
-            "		t_receipt_by,		\n"+
-            "	    t_credit_note,            \n"+
-            "       t_receipt ,			\n"+	
-            "		ad_user,			\n"+
-            "	    (SELECT @rownum:=0) rowsnum    \n"+
-            "		where 1=1		    \n"+
-            "		and t_receipt.receipt_id = t_receipt_cn.receipt_id and t_receipt.user_id = ad_user.user_id \n"+
-            "		and t_receipt_match_cn.receipt_cn_ID = t_receipt_cn.receipt_cn_ID	\n"+
-            "	    and t_receipt_match_cn.receipt_by_ID = t_receipt_by.receipt_by_ID		\n"+
-            "       and t_credit_note.credit_note_id = t_receipt_cn.credit_note_id  \n"+
-            "	    and t_receipt_cn.receipt_id ="+receiptId;
-			
-			logger.debug("SQL for Credit Note:"+sql);
-            
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
-					no++;
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}	
-					
-				}//for
-				
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-				
-			}//while
-			
-            sql ="	Select 		\n"+
-            "	   'D'	AS	RECORD_TYPE	,	\n"+
-            "		@rownum:=@rownum+1  	AS	LINE_NO ,	\n"+
-            "		'"+receiptNo+"'	AS	RECEIPT_NUMBER,		\n"+
-            "		t_receipt_line.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
-            "		t_receipt_line.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
-            "		t_receipt_line.INVOICE_AMOUNT	AS	INVOICE_AMOUNT	,	\n"+
-            "		t_receipt_line.CREDIT_AMOUNT	AS	CREDIT_AMOUNT	,	\n"+
-            "		t_receipt_match.PAID_AMOUNT	AS	PAID_AMOUNT	,	\n"+
-            "		t_receipt_line.REMAIN_AMOUNT	AS	REMAIN_AMOUNT	,	\n"+
-            "		t_receipt_line.DESCRIPTION	AS	DESCRIPTION	, 	\n"+
-            "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
-            "	    t_order.order_no as order_number, \n"+
-            
-		    /** if(PD_PAID ==Y){
-		     *   if(T_RECEIPT.ISPDPAID ==null){
-		     *      payment_method ='PD_CR'
-		     *   }
-		     *  }else{
-		     *    if(t_receipt_by.PAYMENT_METHOD=='AP'){ //Airpay = CS
-		     *       payment_method = 'CS'
-		     *    }else{
-		     *      payment_method =t_receipt_by.PAYMENT_METHOD
-		     *    }
-		     *  }
-		     * 
-		     * **/
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),IF(t_receipt_by.PAYMENT_METHOD='AP','CS',t_receipt_by.PAYMENT_METHOD))  AS PAYMENT_METHOD ,\n"+
-            
-            "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
-            "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
-            /******** new Requirement ************************************/
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
-            "       ''	AS	BANK_BRANCH, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,IF(t_receipt_by.PAYMENT_METHOD='AP',null,t_receipt_by.cheque_no) )	AS	CHEQUE_NO, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.credit_card_type)	AS	CREDIT_CARD_TYPE ,	 \n"+
-            /******** new Requirement ************************************/
-            /** WIT Add 07/03/2011  **/
-            "       '' AS ORDER_LINE_ID \n"+
-            "		FROM 		\n"+
-            "		t_receipt_line ,	\n"+
-            "		t_receipt_match, 	\n"+
-            "		t_receipt_by,		\n"+
-            "	    t_order,             \n"+
-            "       t_receipt ,			\n"+	
-            "		ad_user,			\n"+
-            "	    (SELECT @rownum:= "+totalRows+") rowsnum    \n"+
-            "		where 1=1		    \n"+
-            "		and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.user_id = ad_user.user_id \n"+
-            "		and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID	\n"+
-            "	    and t_receipt_match.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID		\n"+
-            "       and t_receipt_line.order_id = t_order.order_id  \n"+
-            "	    and t_receipt_line.receipt_id ="+receiptId;
-
-            logger.debug("SQL:"+sql);
-            
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
-					no++;
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}	
-					
-				}//for
-				
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-				
-			}//while
-			
-			countTrans += totalRows;
-			logger.debug("countTrans:"+countTrans);	
-			
-			return dataAppend;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-
-	
-	/**
-	 * exportSalesReceiptCaseUserTypeDD
-	 * @param conn
-	 * @param tableBean
-	 * @param userBean
-	 * @return
-	 * @throws Exception
-	 */
-	public   TableBean exportSalesReceiptCaseUserTypeDD(Connection conn,TableBean tableBean,User userBean) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int countTrans = 0;
-        List<String> sqlUpdateExportFlagList = new ArrayList<String>(); 
-		try{
-			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
-			rs = ps.executeQuery();
-			while(rs.next()){
-				countTrans++;
-				TableBean lineBean = exportSalesReceiptLineCaseUserTypeDD(conn, userBean, rs.getString("receipt_id"), rs.getString("receipt_no"));
-				
-				dataAppend.append(lineBean.getDataStrExport()); 
-				
-				/** Set Data For Update ExportFlag **/
-				sqlUpdateExportFlagList.add("update t_receipt set exported = 'Y' WHERE receipt_id="+rs.getString("receipt_id"));
-				
-			}//while		
-			
-			tableBean.setExportCount(countTrans);
-			tableBean.setDataStrExport(dataAppend);
-			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
-			
-			return tableBean;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-	/**
-	 * exportSalesReceiptLine
-	 * @param conn
-	 * @param tableBean
-	 * @param userBean
-	 * @param userId
-	 * @return
-	 * @throws Exception
-	 */
-	private TableBean exportSalesReceiptLineCaseUserTypeDD(Connection conn,User userBean,String receiptId,String receiptNo) throws Exception {
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-		String lastAppen = Constants.delimeterPipeStr;
-		int totalRows = 0;
-		int i = 0;
-		logger.debug("exportSalesReceiptLineCaseUserTypeDD");
-		try {
-			/** Init Manual t_receipt_line ***/
-			TableBean lineBean = new TableBean();
-			lineBean.setTableName("t_receipt_line");
-			lineBean.setColumnBeanList(ExportHelper.initColumn(lineBean));
-			
-			String sql ="	Select 		\n"+
-            "	   'D'	AS	RECORD_TYPE	,	\n"+
-            "		@rownum:=@rownum+1  	AS	LINE_NO ,	\n"+
-            "		'"+receiptNo+"'	AS	RECEIPT_NUMBER,		\n"+
-            "		t_receipt_line.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
-            "		t_receipt_line.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
-            "		t_receipt_line.INVOICE_AMOUNT	AS	INVOICE_AMOUNT	,	\n"+
-            "		t_receipt_line.CREDIT_AMOUNT	AS	CREDIT_AMOUNT	,	\n"+
-            "		t_receipt_by.PAID_AMOUNT	AS	PAID_AMOUNT	,	\n"+
-            "		t_receipt_line.REMAIN_AMOUNT	AS	REMAIN_AMOUNT	,	\n"+
-            "		t_receipt_line.DESCRIPTION	AS	DESCRIPTION	, 	\n"+
-            "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
-            "	    t_order.order_no as order_number, \n"+
-            "	    t_receipt_by.PAYMENT_METHOD AS PAYMENT_METHOD ,\n"+
-            "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
-            "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
-            /******** new Requirement ************************************/
-            "       t_receipt_by.bank	AS	BANK, \n"+	
-            "       ''	AS	BANK_BRANCH, \n"+	
-            "       t_receipt_by.cheque_no	AS	CHEQUE_NO, \n"+	
-            "       t_receipt_by.cheque_date	AS	CHEQUE_DATE, \n"+	
-            "       t_receipt_by.credit_card_type	AS	CREDIT_CARD_TYPE,	 \n"+
-            /******** new Requirement ************************************/
-            /** WIT Add 07/03/2011  **/
-            "       (SELECT t_order_line.line_no from t_order_line  \n" +
-            "         WHERE t_order_line.order_line_id = t_receipt_line.order_line_id) AS ORDER_LINE_ID \n"+
-            
-            "		FROM 		\n"+
-            "		t_receipt_line ,	\n"+
-            "		t_receipt_match, 	\n"+
-            "		t_receipt_by,		\n"+
-            "	    t_order,             \n"+
-            "	    (SELECT @rownum:=0) rowsnum    \n"+
-            "		where 1=1		    \n"+
-            "		and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID	\n"+
-            "	    and t_receipt_match.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID		\n"+
-            "       and t_receipt_line.order_id = t_order.order_id  \n"+
-            "	    and t_receipt_line.receipt_id ="+receiptId;
-		
-			logger.debug("SQL:" + sql);
-		
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				totalRows++;
-				for (i = 0; i < lineBean.getColumnBeanList().size(); i++) { 
-					ColumnBean colBean = (ColumnBean) lineBean.getColumnBeanList().get(i);
-					if (i == lineBean.getColumnBeanList().size() - 1) {
-						lastAppen = "";
-					} else {
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if (colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")) {
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean, rs));
-					} else {
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean, rs)).append(lastAppen);
-					}
-		
-				}// for
-		
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-		
-			}// while
-			
-			lineBean.setExportCount(totalRows);
-			lineBean.setDataStrExport(dataAppend);
-		
-			return lineBean;
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			if (ps != null) {
-				ps.close();
-				ps = null;
-			}
-			if (rs != null) {
-				rs.close();
-				rs = null;
-			}
-		}
-
 	}
 
 	/**
@@ -1301,6 +949,82 @@ public class ExportProcess {
 			tableBean.setDataStrExport(dataAppend);
 			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
 		
+			return tableBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
+	/**
+	 * exportProdShow
+	 * @param conn
+	 * @param tableBean
+	 * @param userBean
+	 * @return
+	 * @throws Exception 
+	 * VAN ONLY
+	 */
+	public  TableBean exportProdShow(Connection conn,TableBean tableBean,User userBean) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
+        List<ImageFileBean> imageFileListAll = new ArrayList<ImageFileBean>();
+        String pathLocalImageProdShow = EnvProperties.getInstance().getProperty("path.image.prodshow.local");
+        ExportBean exportBean = null;
+		try{
+            logger.debug("Select:"+tableBean.getPrepareSqlSelect());
+			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				//Add Order Header
+				for(i=0;i<tableBean.getColumnBeanList().size();i++){
+					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+					if(i==tableBean.getColumnBeanList().size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					//logger.debug("colName["+colBean.getColumnName()+"]");
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+                    }else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}	
+				}//for
+				/** Add New Line **/
+				dataAppend.append(Constants.newLine);//new line
+				
+				/** add Order Line Detail */
+				exportBean = exportProdShowLine(conn,rs.getString("order_no"),pathLocalImageProdShow);
+				if(exportBean != null){
+				   dataAppend.append(exportBean.getDataExportBuff());
+				   imageFileListAll.addAll(exportBean.getImageFileList());
+				}
+				
+				/** Set Data For Update InterfacesFlag **/
+				sqlUpdateExportFlagList.add("update t_prod_show set exported ='Y' WHERE order_no = '"+rs.getString("order_no")+"'");
+				
+			}//while
+			logger.debug("totalRows:"+totalRows);
+
+			tableBean.setExportCount(totalRows);
+			tableBean.setDataStrExport(dataAppend);
+			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+		    tableBean.setImageFileList(imageFileListAll);
+		    
+
 			return tableBean;
 		}catch(Exception e){
 			throw e;
@@ -1554,6 +1278,83 @@ public class ExportProcess {
 		}
 	}
 	
+	private   ExportBean exportProdShowLine(Connection conn,String orderNo,String pathLocalImageProdShow)
+			throws Exception{
+		ExportBean exportBean = new ExportBean();
+		List<ImageFileBean> imageFileList = new ArrayList<ImageFileBean>();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+        int i = 0;
+        String lastAppen = Constants.delimeterPipeStr;
+        int totalRows = 0;
+		try{
+            /** Get Column Detail Order **/
+            TableBean orderDBean = new TableBean();
+            orderDBean.setTableName("t_prod_show_line");
+            List colOrderList = ExportHelper.initColumn(orderDBean);
+            String sql = "select 'D' AS	RECORD_TYPE, \n"+
+                "   ORDER_NO, \n"+
+            	"	@rownum:=@rownum+1 	LINE_NUMBER,	\n"+
+	            "	brand,	\n"+
+	            "	pic1,	\n"+
+	            "	pic2,	\n"+
+	            "	pic3	\n"+
+	            "   FROM t_prod_show_line l ," +
+	            "   (SELECT @rownum:=0) a" +
+	            "   where order_no ='"+orderNo+"' ";
+  
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				totalRows++;
+				for(i=0;i<colOrderList.size();i++){
+					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
+					if(i==colOrderList.size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}	
+					//Add Image Pic1 ,pic2 ,pic3 to ImageList
+					if(colBean.getColumnName().equalsIgnoreCase("pic1")
+					  || colBean.getColumnName().equalsIgnoreCase("pic2")
+					  || colBean.getColumnName().equalsIgnoreCase("pic3")){
+						
+						if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+							ImageFileBean im = new ImageFileBean();
+							im.setGenerateImageFileName(rs.getString(colBean.getColumnName()));
+							im.setImageFileName(pathLocalImageProdShow+rs.getString(colBean.getColumnName()));
+							imageFileList.add(im);
+						}
+					}
+				}//for
+				/** Gen New Line **/
+				dataAppend.append(Constants.newLine);
+				
+			}//while
+			logger.debug("totalRows:"+totalRows);	
+			
+			exportBean.setDataExportBuff(dataAppend);
+			exportBean.setImageFileList(imageFileList);
+			
+			return exportBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
 	private   StringBuffer exportStockLine(Connection conn,String requestNumber,List<String> sqlUpdateExportFlagList) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -1685,244 +1486,11 @@ public class ExportProcess {
 		}
 	}
 	
-	/**
-	 * readTableSaleOrder
-	 * @param conn
-	 * @param tableBean
-	 * @return
-	 * @throws Exception
-	 */
-	public   TableBean exportSaleOrder(Connection conn,TableBean tableBean,User userBean) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
-		try{
-            logger.debug("Select:"+tableBean.getPrepareSqlSelect());
-			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				//Add Order Header
-				for(i=0;i<tableBean.getColumnBeanList().size();i++){
-					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
-					if(i==tableBean.getColumnBeanList().size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					//logger.debug("colName["+colBean.getColumnName()+"]");
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}	
-				}//for
-				/** Add New Line **/
-				dataAppend.append(Constants.newLine);//new line
-				/** add Order Line Detail */
-				dataAppend.append(exportSalesOrderLine(conn,rs.getString("order_id"),sqlUpdateExportFlagList));
-				
-				/** add Order Payment Detail   Case DD Only */
-				if(User.DD.equalsIgnoreCase(userBean.getType())){
-				  dataAppend.append(exportSalesOrderPayment(conn,userBean,rs.getString("order_id")));
-				}
-				
-				/** Set Data For Update InterfacesFlag **/
-				sqlUpdateExportFlagList.add("update t_order set exported ='Y' WHERE order_id = "+rs.getString("order_id"));
-				
-			}//while
-			logger.debug("totalRows:"+totalRows);
-
-			tableBean.setExportCount(totalRows);
-			tableBean.setDataStrExport(dataAppend);
-			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
-		
-			return tableBean;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-
-	/**
-	 * readTableSaleOrderPayment
-	 * @param conn
-	 * @param orderId
-	 * @return
-	 * @throws Exception
-	 * WAIT : Spec
-	 */
-	private   StringBuffer exportSalesOrderPayment(Connection conn,User user,String orderId) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-		try{
-            /** Get Column Detail Order **/
-            TableBean orderDBean = new TableBean();
-            orderDBean.setTableName("t_order_payment");
-            List colOrderList = ExportHelper.initColumn(orderDBean);
-
-            String sql  ="	select 			\n"+
-            "	'P'	AS	RECORD_TYPE ,	\n"+
-            "	o.ORDER_NO	AS	ORDER_NUMBER,	\n"+
-            "	''	AS	ORDER_LINE_NO ,	\n"+
-            "	@rownum:=@rownum+1  AS	PAYMENT_NUMBER,		\n"+
-            "	'ORDER'	AS	PAYMENT_LEVEL_CODE,	\n"+
-            "	'PREPAY'	AS	PAYMENT_COLLECTION_EVENT,	\n"+
-            "	rb.PAYMENT_METHOD	AS	PAYMENT_TYPE_CODE,	\n"+
-            "	rm.PAID_AMOUNT	AS	PREPAID_AMOUNT,	\n"+
-            "	rb.CHEQUE_NO AS	CHECK_NUMBER,		\n"+
-            "	'' AS	RECEIPT_METHOD_ID 		\n"+
-            "	from			\n"+
-            "	t_receipt_match rm, 			\n"+
-            "	t_receipt_by rb, 			\n"+
-            "	t_receipt_line rl, 			\n"+
-            "	t_receipt r,			\n"+
-            "	t_order o ,    			\n"+
-            "  (SELECT @rownum:=0) a \n"+
-            "	where	1=1		\n"+
-            "	and r.DOC_STATUS = 'SV'			\n"+
-            "	and rm.RECEIPT_ID = r.RECEIPT_ID			\n"+
-            "	and rm.RECEIPT_BY_ID = rb.RECEIPT_BY_ID			\n"+
-            "	and rm.RECEIPT_LINE_ID = rl.RECEIPT_LINE_ID			\n"+
-            "	and rl.ORDER_ID = o.ORDER_ID			\n"+
-            "	and r.ORDER_TYPE = '"+ExportHelper.getOrderType(user)+"' \n"+
-            "   and o.ORDER_ID ="+orderId;
-            
-            logger.debug("SQL:"+sql);
-            
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}	
-				}//for
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-			}//while
-			logger.debug("totalRows:"+totalRows);	
-			return dataAppend;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-
-	/**
-	 * readTableSaleOrderLine
-	 * @param conn
-	 * @param orderId
-	 * @return
-	 * @throws Exception
-	 */
-	private   StringBuffer exportSalesOrderLine(Connection conn,String orderId,List<String> sqlUpdateExportFlagList) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-		try{
-            /** Get Column Detail Order **/
-            TableBean orderDBean = new TableBean();
-            orderDBean.setTableName("t_order_line");
-            List colOrderList = ExportHelper.initColumn(orderDBean);
-            String sql = "select 'D' AS	RECORD_TYPE, \n"+
-                "   h.ORDER_NO	AS	ORDER_NUMBER, \n"+
-            	"	d.LINE_NO	AS	LINE_NO,	\n"+
-	            "	d.PRODUCT_ID	AS	PRODUCT_ID,	\n"+
-	            "	d.UOM_ID	AS	UOM_ID,	\n"+
-	            "	d.QTY	AS	QTY,	\n"+
-	            "	d.PRICE	AS	PRICE,	\n"+
-	            "	d.LINE_AMOUNT	AS	LINE_AMOUNT, \n"+
-	            "	d.DISCOUNT	AS	DISCOUNT,	\n"+
-	            "	d.TOTAL_AMOUNT	AS	TOTAL_AMOUNT, \n"+
-	            "	(select max(value) from c_reference where code ='OrgID') AS ORG_ID,	\n"+
-	            "	''	AS	WAREHOUSE,	\n"+
-	            "	a.CODE	AS	SUBINVENTORY,	\n"+
-	            "	d.REQUEST_DATE	AS	REQUEST_DATE,	\n"+
-	            "	d.SHIPPING_DATE	AS	SHIPPING_DATE,	\n"+
-	            "	d.PROMOTION	AS	PROMOTION,	\n"+
-	            "	d.VAT_AMOUNT	AS	VAT_AMOUNT,	\n"+
-	            "   d.ORDER_LINE_ID AS ORDER_LINE_ID, \n"+
-	            "   d.ORG AS ORG , \n"+
-	            "   d.SUB_INV AS SUB_INV \n"+
-	            "	FROM t_order_line d 	\n"+
-	            "	inner join t_order h	\n"+
-	            "	on d.ORDER_ID = h.ORDER_ID	\n"+
-	            "	left outer join ad_user a	\n"+
-	            "	on h.USER_ID = a.USER_ID	\n"+
-	            "   WHERE d.order_id ="+orderId+
-	            "   and d.promotion = 'N' \n";
-  
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}		
-				}//for
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-				
-				/** Set Data For Update Exported Flag ='Y' **/
-				sqlUpdateExportFlagList.add("UPDATE t_order_line set exported ='Y' WHERE ORDER_LINE_ID ="+rs.getString("ORDER_LINE_ID"));
-				
-			}//while
-			logger.debug("totalRows:"+totalRows);	
-			return dataAppend;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-
+	
+	
+	
+	
+	
 	/**
 	 * 
 	 * @param conn
@@ -2072,361 +1640,6 @@ public class ExportProcess {
 		}
 	}
 
-	
-	
-	/**
-	 * exportSaleOrderCaseDD
-	 * @param conn
-	 * @param tableBean
-	 * @return
-	 * @throws Exception
-	 */
-	public  TableBean exportOrderCaseDDMain(Connection conn,TableBean tableBean,User userBean) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-        int totalRows = 0;
-        TableBean orderAllBean = new TableBean();
-        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
-		try{
-			logger.debug("exportSaleOrderCaseDD");
-            logger.debug("SQL:"+tableBean.getPrepareSqlSelect());
-			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
-			rs = ps.executeQuery();
-			while(rs.next()){
-				String orderId = rs.getString("order_id");
-				logger.debug("Order_id:"+orderId);
-				/** Check Export All or Line **/
-				if(isDDExportOrderLineOnly(conn,orderId)){
-					logger.debug("Export Order Line Only");
-					/** Export Line Only **/
-					orderAllBean = exportSalesOrderLineCaseDD(conn,orderId,sqlUpdateExportFlagList);
-				}else{
-					logger.debug("Export Order ALL");
-					/** Export ALL **/
-					orderAllBean.setTableName("t_order");
-					/** init table properties  */
-					orderAllBean.setColumnBeanList(ExportHelper.initColumn(ExportManager.PATH_CONTROL,orderAllBean));
-				    orderAllBean.setFileFtpNameFull(tableBean.getFileFtpNameFull());
-					orderAllBean = exportSaleOrderCaseDD(conn, orderAllBean, userBean,orderId);
-				}
-			}//while
-			
-			logger.debug("totalRows:"+totalRows);
-			
-			tableBean.setTableName(orderAllBean.getTableName());
-			tableBean.setExportCount(orderAllBean.getExportCount());
-			tableBean.setDataStrExport(orderAllBean.getDataStrExport());
-			tableBean.setSqlUpdateExportFlagList(orderAllBean.getSqlUpdateExportFlagList());
-			
-		
-			
-			return tableBean;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-	
-/**
- * exportSaleOrderCaseDD
- * @param conn
- * @param tableBean
- * @param userBean
- * @return
- * @throws Exception
- * 
- */
-	private   TableBean exportSaleOrderCaseDD(Connection conn,TableBean tableBean,User userBean,String orderId) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-        List<String> sqlUpdateExportFlagList = new ArrayList<String>();
-		try{
-			String sql ="	select 	order_id,			\n"+
-			"	'H'	AS	RECORD_TYPE	,	\n"+
-			"	t.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
-			"	t.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
-			"	t.ORDER_DATE	AS	ORDER_DATE	,	\n"+
-			"	t.ORDER_TIME	AS	ORDER_TIME	,	\n"+
-			"	t.CUSTOMER_ID	AS	CUSTOMER_ID	,	\n"+
-			"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
-			"	m.NAME	AS	CUSTOMER_NAME	,	\n"+
-			/** OLD CODE **/
-			"	t.SHIP_ADDRESS_ID	AS	SHIP_TO_SITE_USE_ID , \n"+
-			"	t.BILL_ADDRESS_ID	AS	BILL_TO_SITE_USE_ID	, \n"+
-			 
-			/** NEW CODE **/
-			/*"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID),0) <> 0 \n"+
-			"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.SHIP_ADDRESS_ID)) \n"+ 
-			"	     ELSE CONCAT(CONCAT(m.code,'-') , t.SHIP_ADDRESS_ID) \n"+ 
-			"	END AS SHIP_TO_SITE_USE_ID, \n"+
-			
-			"	CASE WHEN IFNULL((SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID),0) <> 0 \n"+
-			"	     THEN CONCAT(CONCAT(m.code,'-') , (SELECT A.REFERENCE_ID FROM m_address A WHERE A.ADDRESS_ID =t.BILL_ADDRESS_ID)) \n"+ 
-			"	     ELSE CONCAT(CONCAT(m.code,'-') , t.BILL_ADDRESS_ID) \n"+ 
-			"	END AS BILL_TO_SITE_USE_ID, \n"+*/
-			
-			"	t.PAYMENT_TERM	AS	PAYMENT_TERM	,	\n"+
-			"	t.USER_ID	AS	SALESREP_ID	,	\n"+
-			"	t.PRICELIST_ID	AS	PRICELIST_ID	,	\n"+
-			"	(select max(value) from c_reference where code ='OrgID') AS ORG_ID	,	\n"+
-			"	t.VAT_CODE	AS	VAT_CODE	,	\n"+
-			"	t.VAT_RATE	AS	VAT_RATE 	,	\n"+
-			"	t.PAYMENT_METHOD	AS	PAYMENT_METHOD	,	\n"+
-			"	t.SHIPPING_DAY	AS	SHIPPING_DAY	,	\n"+
-			"	t.SHIPPING_TIME	AS	SHIPPING_TIME	,	\n"+
-			"	t.TOTAL_AMOUNT	AS	TOTAL_AMOUNT	,	\n"+
-			"	t.VAT_AMOUNT	AS	VAT_AMOUNT	,	\n"+
-			"	t.NET_AMOUNT	AS	NET_AMOUNT	,	\n"+
-			"	t.PAYMENT	AS	PAYMENT	,	\n"+
-			"	t.SALES_ORDER_NO	AS	SALES_ORDER_NO	,	\n"+
-			"	t.AR_INVOICE_NO	AS	AR_INVOICE_NO	,	\n"+
-			"	t.DOC_STATUS	AS	DOC_STATUS	,	\n"+
-			"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME		\n"+
-
-			"	FROM t_order t ,m_customer m	\n"+
-			"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
-			"   and  t.order_id = "+orderId+" \n";
-			
-			
-            logger.debug("Select:"+sql);
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				//Add Order Header
-				for(i=0;i<tableBean.getColumnBeanList().size();i++){
-					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
-					if(i==tableBean.getColumnBeanList().size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					//logger.debug("colName["+colBean.getColumnName()+"]");
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}	
-				}//for
-				/** Add New Line **/
-				dataAppend.append(Constants.newLine);//new line
-				
-				/** add Order Line Detail */
-				dataAppend.append(exportSalesOrderLineCaseDD(conn,rs.getString("order_id"),sqlUpdateExportFlagList).getDataStrExport());
-				
-				/** add Order Payment Detail   Case DD Only */
-		        dataAppend.append(exportSalesOrderPayment(conn,userBean,rs.getString("order_id")));
-
-				/** Set Data For Update InterfacesFlag **/
-				sqlUpdateExportFlagList.add("update t_order set exported ='Y' WHERE order_id = "+rs.getString("order_id"));
-				
-			}//while
-			logger.debug("totalRows:"+totalRows);
-
-			tableBean.setExportCount(totalRows);
-			tableBean.setDataStrExport(dataAppend);
-			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
-		
-			return tableBean;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-
-	
-	/**
-	 * 
-	 * @param conn
-	 * @param orderId
-	 * @return
-	 * @throws Exception
-	 */
-	private   TableBean exportSalesOrderLineCaseDD(Connection conn,String orderId,List<String> sqlUpdateExportFlagList) throws Exception{
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		StringBuffer dataAppend = new StringBuffer("");
-        int i = 0;
-        String lastAppen = Constants.delimeterPipeStr;
-        int totalRows = 0;
-        TableBean tableBean = new TableBean();
-		try{
-			logger.debug("exportSalesOrderLineOnlyCaseDD");
-            /** Get Column Detail Order **/
-            TableBean orderDBean = new TableBean();
-            orderDBean.setTableName("t_order_line");
-            List colOrderList = ExportHelper.initColumn(orderDBean);
-            String sql = "select 'D' AS	RECORD_TYPE, \n"+
-                "   h.ORDER_NO	AS	ORDER_NUMBER, \n"+
-            	"	d.LINE_NO	AS	LINE_NO,	\n"+
-	            "	d.PRODUCT_ID	AS	PRODUCT_ID,	\n"+
-	            "	d.UOM_ID	AS	UOM_ID,	\n"+
-	            "	d.QTY	AS	QTY,	\n"+
-	            "	d.PRICE	AS	PRICE,	\n"+
-	            "	d.LINE_AMOUNT	AS	LINE_AMOUNT, \n"+
-	            "	d.DISCOUNT	AS	DISCOUNT,	\n"+
-	            "	d.TOTAL_AMOUNT	AS	TOTAL_AMOUNT, \n"+
-	            "	83	AS	ORG_ID,	\n"+
-	            "	''	AS	WAREHOUSE,	\n"+
-	            "	a.CODE	AS	SUBINVENTORY,	\n"+
-	            "	d.REQUEST_DATE	AS	REQUEST_DATE,	\n"+
-	            "	d.SHIPPING_DATE	AS	SHIPPING_DATE,	\n"+
-	            "	d.PROMOTION	AS	PROMOTION,	\n"+
-	            "	d.VAT_AMOUNT	AS	VAT_AMOUNT,	\n"+
-	            "   d.ORDER_LINE_ID \n"+
-	            "	FROM t_order_line d 	\n"+
-	            "	inner join t_order h	\n"+
-	            "	on d.ORDER_ID = h.ORDER_ID	\n"+
-	            "	left outer join ad_user a	\n"+
-	            "	on h.USER_ID = a.USER_ID	\n"+
-	            "   WHERE d.order_id ="+orderId+
-	            "   and d.promotion = 'N' \n"+
-	            "   and d.EXPORTED = 'N' \n"+
-	            /** Add 03/03/2011 :WITTY **/
-	            "   and d.need_export = 'Y' \n";
-            
-            logger.debug("SQL:"+sql);
-            
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			while(rs.next()){
-				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
-						lastAppen = "";
-					}else{
-						lastAppen = Constants.delimeterPipeStr;
-					}
-					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
-					}else{
-						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
-					}		
-				}//for
-				/** Gen New Line **/
-				dataAppend.append(Constants.newLine);
-				
-				/** Set Data For Update Exported Flag **/
-				sqlUpdateExportFlagList.add("update t_order_line set exported = 'Y' WHERE order_line_id="+rs.getString("order_line_id"));
-			}//while
-			logger.debug("totalRows:"+totalRows);	
-			
-			tableBean.setTableName("t_order_line");
-			tableBean.setExportCount(totalRows);
-			tableBean.setDataStrExport(dataAppend);
-			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
-			
-			return tableBean;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-	/**
-	 * isDDExportOrderLineOnly
-	 * @param orderId
-	 * @return
-	 * @throws Exception
-	 * Desc: check Order_header ->Exported =Y  and Order_line one line have Exported ='N' 
-	 */
-	private static boolean isDDExportOrderLineOnly(Connection conn,String orderId) throws Exception{
-		boolean r = false;
-		String sql  = "";
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try{
-			sql  = " select count(h.order_id) as count	\n"
-			      +" FROM t_order h ,t_order_line d	\n"
-			      +" where  h.order_id = d.order_id	\n"
-			      +" and h.exported ='Y'	\n"
-			      +" and d.exported ='N'  	\n"
-			      +" and h.order_id ="+orderId+" \n";
-			
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("count") > 0){
-					r = true;
-				}
-			}
-			return r;
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-			//logger.error(e.getMessage(),e);
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-	
-	/**
-	 * isDDExportReceiptLineOnly
-	 * @param conn
-	 * @param receiptId
-	 * @return
-	 * @throws Exception
-	 * Check DD Can Export Receipt Line Only
-	 */
-	private static boolean isDDExportReceiptLineOnly(Connection conn,String receiptId) throws Exception{
-		boolean r = false;
-		String sql  = "";
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try{
-			sql  = " select count(*) as c from t_receipt_line l \n"+
-				   " where l.receipt_id = "+receiptId +" \n"+
-			       " and ( order_line_id is not null) \n";
-			
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-			if(rs.next()){
-				if(rs.getInt("count") > 0){
-					r = true;
-				}
-			}
-			return r;
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-			//logger.error(e.getMessage(),e);
-		}finally{
-			if(ps != null){
-				ps.close();ps= null;
-			}
-			if(rs != null){
-				rs.close();rs= null;
-			}
-		}
-	}
-	
 	// Export Sales Order To Temp2
 	public   TableBean exportSaleOrderTemp2(Connection conn,TableBean tableBean,User userBean) throws Exception{
 		PreparedStatement ps = null;

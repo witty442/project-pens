@@ -12,12 +12,11 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
-import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.helper.ValidateImportHelper;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class InterfaceHelperExcel extends InterfaceUtils{
 	
@@ -97,8 +96,8 @@ public class InterfaceHelperExcel extends InterfaceUtils{
 							
 							col.setColumnName(Utils.isNull(p[0]));
 							col.setAction(Utils.isNull(p[1]));
-							col.setTextPosition(ConvertUtils.convertToInt(Utils.isNull(p[2])));
-							col.setTextLength(ConvertUtils.convertToInt(Utils.isNull(p[3])));
+							col.setTextPosition(Utils.convertToInt(Utils.isNull(p[2])));
+							col.setTextLength(Utils.convertToInt(Utils.isNull(p[3])));
 							col.setColumnType(Utils.isNull(p[4]));
 							col.setDefaultValue(Utils.isNull(p[5]));
 							col.setExternalFunction(Utils.isNull(p[6]));
@@ -593,7 +592,7 @@ public class InterfaceHelperExcel extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("DOUBLE")){
 			
 			if(!Utils.isNull(value).equals("")){
-				ps.setDouble(parameterIndex, ConvertUtils.convertToDouble(value));
+				ps.setDouble(parameterIndex, Utils.convertToDouble(value));
 				
 				//ps.setString(parameterIndex, (value));
 			}else{
@@ -604,7 +603,7 @@ public class InterfaceHelperExcel extends InterfaceUtils{
 			}
 		}else if(colBean.getColumnType().equalsIgnoreCase("INTEGER")){
 			if(!Utils.isNull(value).equals("")){
-				ps.setInt(parameterIndex,ConvertUtils.convertToInt(value));
+				ps.setInt(parameterIndex,Utils.convertToInt(value));
 			}else{
 			    ps.setNull(parameterIndex,java.sql.Types.INTEGER);	
 			}
@@ -617,7 +616,7 @@ public class InterfaceHelperExcel extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("VARCHAR")){
 			if(!Utils.isNull(value).equals("")){
 				//ps.setString(parameterIndex, Utils.ASCIIToUnicode(ConvertUtils.convertToString(value)));
-				ps.setString(parameterIndex, ConvertUtils.convertToString(value));
+				ps.setString(parameterIndex, Utils.isNull(value));
 			}else{
 				if( !Utils.isNull(colBean.getDefaultValue()).equals("")){
 					if (Utils.isNull(colBean.getDefaultValue()).equals(Constants.COLUMN_BLANK)){
@@ -633,7 +632,7 @@ public class InterfaceHelperExcel extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("CHAR")){
 			if(!Utils.isNull(value).equals("")){
 				//ps.setString(parameterIndex, Utils.ASCIIToUnicode(ConvertUtils.convertToString(value)) );
-				ps.setString(parameterIndex, ConvertUtils.convertToString(value));
+				ps.setString(parameterIndex, Utils.isNull(value));
 			}else{
 				
 				if( !Utils.isNull(colBean.getDefaultValue()).equals("")){

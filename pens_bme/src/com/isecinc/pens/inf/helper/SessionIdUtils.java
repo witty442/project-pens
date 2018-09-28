@@ -2,6 +2,8 @@ package com.isecinc.pens.inf.helper;
 
 import java.util.Date;
 
+import com.pens.util.Utils;
+
 public class SessionIdUtils {
     private static SessionIdUtils _instance;
     private  String idSession = "";

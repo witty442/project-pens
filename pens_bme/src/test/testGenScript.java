@@ -3,7 +3,7 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.isecinc.pens.inf.helper.FileUtil;
+import com.pens.util.FileUtil;
 
 public class testGenScript {
 

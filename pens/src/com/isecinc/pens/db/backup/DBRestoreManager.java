@@ -1,22 +1,14 @@
 package com.isecinc.pens.db.backup;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.Configuration;
 
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.FileUtil;

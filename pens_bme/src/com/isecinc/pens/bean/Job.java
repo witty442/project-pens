@@ -9,6 +9,7 @@ public class Job implements Serializable{
 	 */
 	private static final long serialVersionUID = 5099205821083784403L;
 	private int no;
+	private String year;
 	private String jobId;
 	private String openDate;
 	private String custGroup;
@@ -33,6 +34,7 @@ public class Job implements Serializable{
 	private String dispAutoCN;
 	private String cnNo;
 	private String autoCN;
+	private String grNo;
 	private List<Job> items;
     
 	//optional
@@ -40,6 +42,18 @@ public class Job implements Serializable{
 	private boolean canCancel = false;
 	
 	
+	public String getYear() {
+		return year;
+	}
+	public void setYear(String year) {
+		this.year = year;
+	}
+	public String getGrNo() {
+		return grNo;
+	}
+	public void setGrNo(String grNo) {
+		this.grNo = grNo;
+	}
 	public String getAutoCN() {
 		return autoCN;
 	}

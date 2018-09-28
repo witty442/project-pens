@@ -21,24 +21,26 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-import util.excel.ExcelHeader;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.autocn.AutoCNBean;
+import com.isecinc.pens.web.autocn.AutoCNForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -48,10 +50,9 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class BarcodeAction extends I_Action {
 
-	public static int pageSize = 90;
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
-	
-	
+
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare2");
 		BarcodeForm aForm = (BarcodeForm) form;
@@ -65,17 +66,6 @@ public class BarcodeAction extends I_Action {
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				
 				aForm.setJob(ad);
-			}else if("back".equals(action)){
-				//OLD Code
-				aForm.setJob(BarcodeDAO.searchHead(aForm.getJobCriteria()));
-				if( aForm.getJob().getItems() != null && aForm.getJob().getItems().size() >0){
-				   aForm.setResultsSearch(aForm.getJob().getItems());
-				}else{
-				   aForm.setResultsSearch(null);
-				}
-				//New Code
-				//aForm.setResultsSearch(aForm.getResultsSearchPrev());
-				
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -88,21 +78,68 @@ public class BarcodeAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
+	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		BarcodeForm aForm = (BarcodeForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
 		try {
-			Barcode b = aForm.getJob();
-			if(b.getJobId().equals("")){
-				b.setName("");
-			}
-			aForm.setJob(BarcodeDAO.searchHead(aForm.getJob()));
-			aForm.setResultsSearch(aForm.getJob().getItems());
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setJob(aForm.getJobCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(BarcodeDAO.getTotalRecBarcodeList(conn,aForm.getJob()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<Barcode> items = BarcodeDAO.searchBarcodeList(conn,aForm.getJob(),allRec,currPage,pageSize);
+				//Get Sum Total qty (get in newsearch)
+			    aForm.getJob().setTotalQtyDisp(Utils.decimalFormat(BarcodeDAO.getTotalQtyBarcodeList(conn, aForm.getJob()),Utils.format_current_no_disgit));
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<Barcode> items = BarcodeDAO.searchBarcodeList(conn,aForm.getJob(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,7 +147,9 @@ public class BarcodeAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search2");
 	}
@@ -159,10 +198,14 @@ public class BarcodeAction extends I_Action {
 				c.setBoxNo(boxNo);
 				
 				Barcode aS = BarcodeDAO.search(c);
-				
+				//Validate Can Edit GR NO
+				if( !Utils.isNull(aS.getGrNo()).equals("")){
+				  aS.setCanEditGrNo(BarcodeDAO.canEditGrNo(aS.getGrNo()));
+				}else{
+				  aS.setCanEditGrNo(true);
+				}
 				aForm.setResults(aS.getItems());
 				aForm.setJob(aS);
-
 				aForm.setMode(mode);//Mode Edit
 			}else{
 				
@@ -170,6 +213,7 @@ public class BarcodeAction extends I_Action {
 				aForm.setResults(new ArrayList<Barcode>());
 				Barcode ad = new Barcode();
 				ad.setCanEdit(true);
+				ad.setCanEditGrNo(true);
 				ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				aForm.setJob(ad);
 				
@@ -234,14 +278,9 @@ public class BarcodeAction extends I_Action {
 	 * Save
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Connection conn = null;
 		BarcodeForm aForm = (BarcodeForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
 			Barcode h = aForm.getJob();
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
@@ -298,11 +337,9 @@ public class BarcodeAction extends I_Action {
 			}
             
 			//save
-			BarcodeDAO.save(h);
+			String boxNo = BarcodeDAO.save(h);
+			h.setBoxNo(boxNo);
 			
-			//commit
-			conn.commit();
-
 			//search
 			h = BarcodeDAO.search(h);
 			logger.debug("h:"+h+",items:"+h.getItems().size());
@@ -315,23 +352,39 @@ public class BarcodeAction extends I_Action {
 			//Set Criteria for search
 			aForm.getJobCriteria().setJobId(h.getJobId());
 		} catch (Exception e) {
-			conn.rollback();
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
-			try {
-				
-			} catch (Exception e2) {}
 			return "prepare";
 		} finally {
-			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
-			} catch (Exception e2) {}
 		}
 		return "search";
 	}
 	
+	public ActionForward saveGrNo(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveGrNo");
+		Connection conn = null;
+		BarcodeForm aForm = (BarcodeForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			Barcode h = aForm.getJob();
+			h.setCreateUser(user.getUserName());
+			h.setUpdateUser(user.getUserName());
+			
+			BarcodeDAO.updateGrNoInHead(conn, h);
+			request.setAttribute("Message", "บันทึก GR No เรียบร้อยแล้ว");
+			conn.commit();
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			conn.close();
+		}
+		return mapping.findForward("prepare");
+	}
 
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");

@@ -12,12 +12,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import util.DBConnection;
 import util.SIdUtils;
+import util.Utils;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.login.LoginProcess;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 /**
  * Login Action Class
@@ -55,7 +55,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
 			User user = null;
-			conn = DBConnection.getInstance().getConnection_();
+			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
             
 			if (user == null) {
@@ -76,7 +76,7 @@ public class LoginAction extends DispatchAction {
 			}
 			logger.debug("After Calc ScreenWidth:"+(Double.parseDouble(screenWidth)-50));
 			
-			request.getSession(true).setAttribute("screenWidth", ""+(Double.parseDouble(screenWidth)-50));
+			request.getSession(true).setAttribute("screenWidth", ""+(Double.parseDouble(screenWidth)-100));
 			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat

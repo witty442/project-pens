@@ -1,46 +1,23 @@
-<%@page import="util.Constants"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-
 <html>
 <head>
 <title></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
-<style type="text/css">
-input[type=checkbox]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
-input[type=radio]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
 	String types = Utils.isNull(request.getParameter("types"));
@@ -58,7 +35,6 @@ input[type=radio]
 	 	System.out.println("queryStr:"+queryStr);
 	    currentPage = request.getParameter(queryStr)==null?"1":request.getParameter(queryStr);
 	 }
-	 
     System.out.println("codes:"+codes);
 %>
 <script type="text/javascript">
@@ -68,7 +44,6 @@ function searchPopup(path, type) {
     document.popupForm.submit();
    return true;
 }
-
 function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
 	document.getElementsByName("descs")[0].value = 'ALL,';
@@ -237,7 +212,6 @@ function setChkInPage(){
 window.onload = function(){
 	setChkInPage();
 }
-
 </script>
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -260,7 +234,7 @@ window.onload = function(){
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td nowrap><b>รายละเอียด</b></td>
+		<td nowrap><b>รายละเอียด </b></td>
 		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
 	</tr>
 </table>
@@ -276,18 +250,13 @@ window.onload = function(){
 	</tr>
 </table>
 <!-- RESULT -->
-<display:table style="width:100%;" id="item" name="requestScope.CUSTOMER_LIST" 
-    defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
-    	
-    <display:column  style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
-		<input type ="checkbox" name="chCheck" id="chCheck" onclick="saveSelectedInPage(${item.no})"  />
-		<input type ="hidden" name="code_temp" value="<bean:write name="item" property="code"/>" />
-		<input type ="hidden" name="desc" value="<bean:write name="item" property="desc"/>" />
-	 </display:column>
-    											    
-    <display:column  title="รหัส" property="code"  sortable="false" class="code"/>
-    <display:column  title="รายละเอียด" property="desc" sortable="false" class="desc"/>								
-</display:table>	
+<%if(request.getAttribute("CUSTOMER_LIST") != null){ %>
+   <%if("robinson".equalsIgnoreCase(storeType)){ %>
+        <jsp:include page="search_customer_sub/searchCustomerRobinsonResult.jsp" /> 
+   <%}else { %>
+       <jsp:include page="search_customer_sub/searchCustomerResult.jsp" /> 
+    <%} %>
+<%} %>
 <!-- RESULT -->
 </html:form>
 </body>

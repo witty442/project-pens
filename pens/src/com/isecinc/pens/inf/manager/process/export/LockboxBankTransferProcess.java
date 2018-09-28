@@ -318,10 +318,14 @@ public class LockboxBankTransferProcess {
 	           sql += "   t_receipt_by.bank AS Attribute_1 , \n"+
 	                  "   t_receipt_by.CHEQUE_NO AS Attribute_2,	\n"+ 
 	                  "   t_receipt_by.CHEQUE_DATE AS Attribute_3,  	\n";
+            }else if(payMethod.equalsIgnoreCase("TR")){
+        	   sql += "   '' AS Attribute_1 , \n"+
+                      "   '' AS Attribute_2,	\n"+ 
+                      "   t_receipt_by.CHEQUE_DATE AS Attribute_3,  \n";
             }else{
-        	 sql += "   '' AS Attribute_1 , \n"+
-                    "   '' AS Attribute_2,	\n"+ 
-                    "   '' AS Attribute_3,  \n";
+         	   sql += "  '' AS Attribute_1, \n"+
+                      "  '' AS Attribute_2,	\n"+ 
+                      "  '' AS Attribute_3,  \n";
             }
             sql +="   '"+userBean.getCode()+"' AS Attribute_4,  	\n"+ //SALES_CODE
             "   '-' AS Attribute_5,  	\n"+ //TEMP_INVOICE WAIT
@@ -373,9 +377,10 @@ public class LockboxBankTransferProcess {
 				
 				/** Append payment Overflow **/
 				dataAppend.append(
-						exportSalesReceiptLockBoxBatchPaymentOverflow(conn,userBean, lockBoxNumber, batchName, 
-						                                               rs.getString("Payment_Number"),rs.getString("Item_Number")
-						                                               ,rs.getString("payment_method_code"),receiptId ,receiptById));
+						exportSalesReceiptLockBoxBatchPaymentOverflow(
+						 conn,userBean, lockBoxNumber, batchName 
+						,rs.getString("Payment_Number"),rs.getString("Item_Number")
+						,rs.getString("payment_method_code"),receiptId ,receiptById));
 			}//while
 			
 			return dataAppend;

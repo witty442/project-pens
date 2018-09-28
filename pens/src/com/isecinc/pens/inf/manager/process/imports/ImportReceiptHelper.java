@@ -68,7 +68,7 @@ public class ImportReceiptHelper {
 			  Iterator<String> its = receiptNoMap.keySet().iterator();
 	  		  while(its.hasNext()){
 	  			  String  receiptNo =(String)its.next();
-	  			  logger.debug("ReCalc Sum(paid_amount) receipt_line to apply_amount in t_receipt ReceiptNo["+receiptNo+"]");
+	  			  //logger.debug("ReCalc Sum(paid_amount) receipt_line to apply_amount in t_receipt ReceiptNo["+receiptNo+"]");
 	  			  if( !Utils.isNull(receiptNo).equals("")){
 	  				 int receiptId = new MReceipt().getReceiptId(conn, receiptNo);
 	  				 
@@ -102,7 +102,7 @@ public class ImportReceiptHelper {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" update t_receipt set apply_amount ="+o.getApplyAmount());
 			sql.append(" where receipt_id = "+o.getId()+" \n");
-		    logger.debug("SQL:"+sql.toString());
+		    //logger.debug("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
 			updateInt = ps.executeUpdate();	
@@ -128,7 +128,7 @@ public class ImportReceiptHelper {
 			sql.append("\n )and  receipt_id ="+receiptId +";");
 			
 			int r = Utils.excUpdateReInt(conn, sql.toString());
-			logger.debug("deleteReceiptLineWrongData receiptId["+receiptId+"] result["+r+"]");
+			//logger.debug("deleteReceiptLineWrongData receiptId["+receiptId+"] result["+r+"]");
 	    }catch(Exception e){
 	    	throw e;
 	    }

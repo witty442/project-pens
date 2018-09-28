@@ -3,7 +3,7 @@
   <display-name>BME Application.</display-name>
   <filter>
     <filter-name>Set Character Encoding</filter-name>
-    <filter-class>util.SetCharacterEncodingFilterUtil</filter-class>
+    <filter-class>com.pens.util.SetCharacterEncodingFilterUtil</filter-class>
     <init-param>
       <param-name>encoding</param-name>
       <param-value>TIS-620</param-value>

@@ -1,7 +1,9 @@
 package com.isecinc.pens.web.batchtask;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +18,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 public class BatchTaskManager {
 	
@@ -30,7 +33,6 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		logger.debug("runBatch");
 		BatchTaskForm batchTaskForm = (BatchTaskForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
-		BatchTaskProcessManager processManager =  new BatchTaskProcessManager();
 		BatchTaskDAO dao = new BatchTaskDAO();
 		boolean canRunBatch = false;
 		EnvProperties env = EnvProperties.getInstance();
@@ -57,10 +59,10 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 					
 					/** Set Param Batch Map **/
 					Map<String, String> batchParamMap = new HashMap<String, String>();
-					Map<String,Map> prepareMap = prepareParam(batchTaskForm, request);
-					batchParamMap = prepareMap.get("batchParamMap");
+					Map<String,Object> prepareMap = prepareParam(batchTaskForm, request);
+					batchParamMap = (Map)prepareMap.get("batchParamMap");
 					monitorModel.setBatchParamMap(batchParamMap);
-					/** case Form File **/
+					/** Case Form File **/
 					logger.debug("dataFromFile:"+batchTaskForm.getDataFormFile());
 					if(batchTaskForm.getDataFormFile() != null){
 						monitorModel.setDataFile(batchTaskForm.getDataFormFile());
@@ -69,21 +71,24 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 					//Set User
 					monitorModel.setUser(userLogin);
 					
-					//set param BatchtaskInfo on screen
-					Map<String, BatchTaskInfo> paramMapForm = prepareMap.get("paramMapForm");
-					batchTaskForm.getTaskInfo().setParamMap(paramMapForm);
+					//set param BatchTaskInfo on screen
+					//OLD code
+					//Map<String, BatchTaskInfo> paramMapForm = prepareMap.get("paramMapForm");
+					//batchTaskForm.getTaskInfo().setParamMap(paramMapForm);
+					
+					//New Code
+					List<BatchTaskInfo> paramListForm = (List)prepareMap.get("paramListForm");
+					batchTaskForm.getTaskInfo().setParamList(paramListForm);
 
 					//create Batch Task
-					MonitorBean m = processManager.createBatchTask(monitorModel,userLogin,request);
+					MonitorBean m = createBatchTask(monitorModel,userLogin,request);
 				   
 					/** Set for Progress Bar Opoup **/
 					request.setAttribute("action", "submited");
 					request.setAttribute("id", m.getTransactionId());
-
 				}else{
 					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
 				}
-			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -91,7 +96,58 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		return mapping.findForward("search");
 	}
 
-   private Map<String ,Map> prepareParam(BatchTaskForm batchTaskForm, HttpServletRequest request){
+	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
+		Connection connMonitor = null;
+		BatchTaskDAO dao = new BatchTaskDAO();
+		try{
+			connMonitor = DBConnection.getInstance().getConnection();
+			
+			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
+			
+		    //start Thread
+			new BatchTaskProcessWorker(monitorModel).start();
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(connMonitor != null){
+				connMonitor.close();
+				connMonitor=null;
+			}
+		}
+	    return monitorModel;
+	}
+
+	/** NEW **/
+   private Map<String ,Object> prepareParam(BatchTaskForm batchTaskForm, HttpServletRequest request){
+	    Map<String,Object> mapAll = new HashMap<String, Object>();
+		Map<String, String> batchParamMap = new HashMap<String, String>();
+		List<BatchTaskInfo> paramListForm = batchTaskForm.getTaskInfo().getParamList();
+		try{
+			List<BatchTaskInfo> paramList = batchTaskForm.getTaskInfo().getParamList();
+			 if( paramList != null && paramList.size() >0){
+				 for(int i=0;i<paramList.size();i++){
+			        BatchTaskInfo task = paramList.get(i); 
+
+			        String value = Utils.isNull(request.getParameter(task.getParamName()));
+			        batchParamMap.put(task.getParamName(), value);
+			        
+			        //set new value from screen
+			        task.setParamValue(value);
+			        paramListForm.set(i, task);
+				 }
+			 }
+			 mapAll.put("batchParamMap", batchParamMap);
+			 mapAll.put("paramListForm",paramListForm);
+			 
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return mapAll;
+   }
+   
+   /** OLD **/
+   private Map<String ,Map> prepareParam_OLD(BatchTaskForm batchTaskForm, HttpServletRequest request){
 	    Map<String,Map> mapAll = new HashMap<String, Map>();
 		Map<String, String> batchParamMap = new HashMap<String, String>();
 		Map<String, BatchTaskInfo> paramMapForm = batchTaskForm.getTaskInfo().getParamMap();
@@ -104,6 +160,7 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 			        BatchTaskInfo task = paramMap.get(key);    
 
 			        String value = Utils.isNull(request.getParameter(task.getParamName()));
+			        logger.debug("request.getparameter("+task.getParamName()+")value("+value+")");
 			        batchParamMap.put(key, value);
 			        
 			        //set new value from screen
@@ -118,5 +175,5 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 			logger.error(e.getMessage(),e);
 		}
 		return mapAll;
-   }
+  }
 }

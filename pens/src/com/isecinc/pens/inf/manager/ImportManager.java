@@ -11,8 +11,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
@@ -30,6 +28,7 @@ import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
 import com.isecinc.pens.inf.manager.process.ImportProcess;
+import com.pens.utils.meter.MonitorTime;
 
 /**
  * @author WITTY
@@ -238,7 +237,7 @@ public class ImportManager {
 			monitorModel.setMonitorId(monitorId);
 			monitorModel.setTransactionType(transType);
 			
-			/** Check Status FTP Server Alive  if Cant Connection Throw Exception*/
+			/** Check Status FTP Server Alive  if Can't Connection Throw Exception*/
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			ftpManager.canConnectFTPServer();
 			
@@ -326,7 +325,7 @@ public class ImportManager {
 									//Task All False
 									taskStatusInt = Constants.STATUS_FAIL;
 									
-									//Control Transaction Rollback ALL Case Master Table 
+									//Control Transaction Roll back ALL Case Master Table 
 					    			if(tableBean.getTransactionType().equals(Constants.TRANSACTION_MASTER_TYPE)){
 					    				rollBackFlag = true;
 										stepBreak = true; //break All Loop

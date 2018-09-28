@@ -3,8 +3,10 @@ package com.isecinc.pens.web.batchtask;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,9 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.batchtask.task.BatchTaskListBean;
+import com.pens.util.Utils;
 
 /**
  * 
@@ -61,6 +64,7 @@ public class BatchTaskAction extends I_Action {
 		String pageName = Utils.isNull(request.getParameter("pageName"));
 		String[] paramArr = null;
 		Map<String ,BatchTaskInfo> paramMap = new HashMap<String, BatchTaskInfo>();
+		List<BatchTaskInfo> paramList = new ArrayList<BatchTaskInfo>();
 		BatchTaskInfo paramItem = null;
 		logger.debug("BatchTask Prepare Form No ID");
 		try {
@@ -76,9 +80,12 @@ public class BatchTaskAction extends I_Action {
 				//Get BatchTask INIT
 				BatchTaskInfo taskInfo = new BatchTaskInfo();
 				String[] paramAll = getParamByTaskname(pageName).split("\\$");
+				
+				//Button Name
 				String param = paramAll[0];
 				taskInfo.setButtonName(paramAll[1]);
 				
+				//Parameter All
 				if( !Utils.isNull(param).equals("")){
 					paramArr = param.split("\\,");
 					for(int i=0;i<paramArr.length;i++){
@@ -92,10 +99,26 @@ public class BatchTaskAction extends I_Action {
 					     paramItem.setParamValue(getDefaultValue(criArr[3]));
 					     paramItem.setParamValid(criArr[4]);
 					     
-					     paramMap.put(paramItem.getParamName(),paramItem);
-					 }
-				}
-				taskInfo.setParamMap(paramMap);
+					     //paramMap.put(paramItem.getParamName(),paramItem); //old code
+					     paramList.add(paramItem);
+					 }//for
+					
+					/** INIT LISTBOX DATA TO SESSION FRO DISPLAY **/
+				     if(param.indexOf("LIST") !=-1){
+				    	 List<BatchTaskListBean> listBoxBean = getParamListBoxByTaskname(pageName);
+				    	 if(listBoxBean != null && listBoxBean.size() >0){
+				    		 for(int i=0;i<listBoxBean.size();i++){
+				    			 BatchTaskListBean listBoxItem = listBoxBean.get(i);
+				    			 logger.debug("keySessionName:"+listBoxItem.getListBoxName());
+				    	         request.getSession().setAttribute(listBoxItem.getListBoxName(), listBoxItem.getListBoxData());
+				    		 }
+				    	 }
+				     }
+				     
+				}//if
+				//set to TaskInfo
+				//taskInfo.setParamMap(paramMap);//old code
+				taskInfo.setParamList(paramList);
 				
 				//get Script validate
 				String validateScript = getValidateScriptByTaskname(pageName);
@@ -205,6 +228,26 @@ public class BatchTaskAction extends I_Action {
 			logger.error(e.getMessage(),e);
 		}
 		return param;
+	}
+	
+	private List<BatchTaskListBean> getParamListBoxByTaskname(String taskName){
+		List<BatchTaskListBean> listBoxBean = new ArrayList<BatchTaskListBean>();
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("getParamListBox", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   listBoxBean = (List<BatchTaskListBean>)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return listBoxBean;
 	}
 	
 	private String getValidateScriptByTaskname(String taskName){

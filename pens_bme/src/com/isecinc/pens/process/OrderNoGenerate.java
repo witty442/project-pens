@@ -5,14 +5,19 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.helper.SequenceProcessAll;
 
 public class OrderNoGenerate {
   protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 	
-   public static String genOrderNoKEY(Connection conn ,Date orderDate,String code) throws Exception{
+   public static String genOrderNoKEY(Date orderDate,String code) throws Exception{
 	   String orderNo = "";
+	   Connection conn = null;
 	   try{
+		   conn = DBConnection.getInstance().getConnection();
 		   String today = df.format(orderDate);
 		   String[] d1 = today.split("/");
 		   int curYear = Integer.parseInt(d1[0].substring(2,4));
@@ -24,6 +29,10 @@ public class OrderNoGenerate {
 		   orderNo = code+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("00").format(seq);
 	   }catch(Exception e){
 		   throw e;
+	   }finally{
+		   if(conn !=null){
+			   conn.close();conn=null;
+		   }
 	   }
 	  return orderNo;
    }

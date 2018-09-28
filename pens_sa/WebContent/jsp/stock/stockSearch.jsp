@@ -1,6 +1,6 @@
 
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>

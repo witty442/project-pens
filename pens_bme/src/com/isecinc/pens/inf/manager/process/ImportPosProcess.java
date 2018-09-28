@@ -13,8 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -24,8 +22,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
-
-import util.UploadXLSUtil;
 
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Master;
@@ -38,8 +34,10 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.UploadXLSUtil;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportPosProcess extends InterfaceUtils{
 
@@ -55,7 +53,7 @@ public class ImportPosProcess extends InterfaceUtils{
 		int taskStatusInt = Constants.STATUS_SUCCESS;
 		int countFileMap = 0;
 		MonitorTime monitorTime = null;
-		Map<String, String> batchParamMap = new HashMap<String, String>();
+		Map<String, String> batchParamMap = null;
 	    String fileName = "";
 	    String fileType = "";
 	    ImportDAO importDAO  = new ImportDAO();

@@ -101,12 +101,12 @@ public class BatchImportWorker extends BatchWorker {
 		                logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
 					}
 					if(ControlCode.canExecuteMethod("BatchImportWorker", "reimportUpdateTrans")){
-					   logger.debug(" **********Start ReImport Update Transaction Sales ******************");
-					   monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_REUTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
-					   logger.debug(" **********Result ReImport Control Transaction :"+monitorModel.getStatus()+" ******************");
-	                   logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
+					    logger.debug(" **********Start ReImport Update Transaction Sales ******************");
+					    monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_REUTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
+					    logger.debug(" **********Result ReImport Control Transaction :"+monitorModel.getStatus()+" ******************");
+	                    logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
 					
-	       				//Update Control Code Fore run process =false
+	       				//Run 1 time and Update Control Code Fore run process =false
 	       				ControlCode.updateControlCode("BatchImportWorker", "reimportUpdateTrans", "N");
 					}
 				}

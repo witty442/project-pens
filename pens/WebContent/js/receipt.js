@@ -192,9 +192,13 @@ function deleteBill(path){
 		tbl.rows[i+1].cells[8].innerHTML = iconLabel;
 	}
 }
-
+var countSave = 0;
 function save(path,type) {
-
+	/** Validate Press Save duplicate */
+    if(countSave > 0){
+    	return false;
+    }
+	countSave++;
 	if(document.getElementsByName('receipt.internalBank')[0].value==''){
 		alert('ใส่ข้อมูลการฝากเงินเข้าบัญชี');
 		document.getElementsByName('receipt.internalBank')[0].focus();
@@ -227,6 +231,7 @@ function save(path,type) {
 	if(validateReceiptByAmtCash_USER_TT(type) == false){
 		return false;
 	}
+
 	
 	document.receiptForm.action = path + "/jsp/receiptAction.do?do=save";
 	document.receiptForm.submit();
@@ -562,6 +567,13 @@ function deleteRecpBy(path){
 	}
 	
 	calculateAll();
+	
+	//validate delete receiptByAll-> enable cr_btn and cn_btn
+	//alert(chk.length);
+	if(chk.length==0){
+		// enable Button add cr,cn
+		enableAddCRandCN();
+	}
 }
 
 function calculateAll(){
@@ -593,7 +605,7 @@ function calculateAll(){
 		document.getElementById('totalCNAmount').value = Number(totalCNAmt).toFixed(2);
 	
 	if(document.getElementById('totalCNAmountFMT'))
-	document.getElementById('totalCNAmountFMT').value = addCommas(Number(totalCNAmt).toFixed(2));
+	   document.getElementById('totalCNAmountFMT').value = addCommas(Number(totalCNAmt).toFixed(2));
 	
 	// total Receipt
 	var recamt = document.getElementsByName('pb.recAmount');
@@ -798,6 +810,18 @@ function fillApply(seed,allbill,allpaid){
 	calculateAll();
 }
 
+/** Disable Add CR and CN Case ApplyAll **/
+function disableAddCRandCN(){
+	document.getElementById("cr_btn").style.visibility = 'hidden';
+	document.getElementById("cn_btn").style.visibility = 'hidden';
+}
+
+/** enable Add CR and CN Case ApplyAll **/
+function enableAddCRandCN(){
+	document.getElementById("cr_btn").style.visibility = 'visible';
+	document.getElementById("cn_btn").style.visibility = 'visible';
+}
+
 /** Create Bill Lazy List */
 function createBysList(){
 	var divlines = document.getElementById('ByList');
@@ -821,8 +845,7 @@ function createBysList(){
 	var receiveCashDate=document.getElementsByName('pb.receiveCashDate');
 	
 	var inputLabel="";
-	if(ids.length==0)
-	{
+	if(ids.length==0){
 		alert('ใส่ข้อมูลประเภทการชำระ');
 		return false;
 	}
@@ -883,11 +906,14 @@ function createBysList(){
 		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากมีประเภทการชำระเงินที่เซลจ่ายเพียงรายการเดียว');
 		return false;
 	}
-	if(no_of_customer_pay_by_bank_tr >=1 &&(no_of_customer_pay_by_cash >= 1 || no_of_customer_pay_by_ch >=1)){
+	if(no_of_customer_pay_by_bank_tr >=1 &&( no_of_customer_pay_by_cash >= 1 || no_of_customer_pay_by_ch >=1)){
+		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากประเภทการชำระเงินที่เป็น เงินโอน ต้องมีเพียงรายการเดียวเท่านั้น');
+		return false;
+	}else if(no_of_customer_pay_by_bank_tr >= 2){
 		alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากประเภทการชำระเงินที่เป็น เงินโอน ต้องมีเพียงรายดารเดียวเท่านั้น');
 		return false;
 	}else{
-		if(no_of_customer_pay_by_cash > 1){
+		if(no_of_customer_pay_by_cash >= 2){
 			alert('ไม่สามารถบันทึกรายการรับเงินได้ เนื่องจากมีประเภทการชำระเงินที่เป็น เงินสดหรือเงินโอน มากกว่า 1 รายการ');
 			return false;
 		}

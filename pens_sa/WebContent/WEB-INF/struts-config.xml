@@ -34,6 +34,9 @@
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
 		
 		<form-bean name="locationForm" type="com.isecinc.pens.web.location.LocationForm" />
+		<form-bean name="prodShowForm" type="com.isecinc.pens.web.prodshow.ProdShowForm" />
+		<form-bean name="moveOrderForm" type="com.isecinc.pens.web.moveorder.MoveOrderForm" />
+		<form-bean name="promotionForm" type="com.isecinc.pens.web.promotion.PromotionForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -116,13 +119,23 @@
 		<action name="salesTargetForm" path="/jsp/salesTargetAction" parameter="do" scope="session" type="com.isecinc.pens.web.salestarget.SalesTargetAction">
 			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
 			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
-
+		</action>
+		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction">
+			<forward name="search" path="/jsp/prodshow/prodShowSearch.jsp" />
+		</action>
+		<action name="promotionForm" path="/jsp/promotionAction" parameter="do" scope="session" type="com.isecinc.pens.web.promotion.PromotionAction">
+			<forward name="search" path="/jsp/promotion/promotionSearch.jsp" />
+		</action>
+		<action name="moveOrderForm" path="/jsp/moveOrderAction" parameter="do" scope="session" type="com.isecinc.pens.web.moveorder.MoveOrderAction">
+			<forward name="search" path="/jsp/moveorder/moveOrderSearch.jsp" />
 		</action>
 		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
 			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
 		</action>
 		<action name="locationForm" path="/jsp/locationAction" parameter="do" scope="session" type="com.isecinc.pens.web.location.LocationAction">
-			<forward name="search" path="/jsp/location/locationSearch.jsp" />
+			<forward name="spider" path="/jsp/location/locationSearch.jsp" />
+			<forward name="monitorSpider" path="/jsp/location/monitorSpiderSearch.jsp" />
+			<forward name="monitorSpiderDetail" path="/jsp/location/monitorSpiderDetail.jsp" />
 		</action>
 	</action-mappings>
  

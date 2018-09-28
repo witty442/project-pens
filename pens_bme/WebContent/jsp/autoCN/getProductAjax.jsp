@@ -2,7 +2,7 @@
 <%@page import="com.isecinc.pens.web.autocn.AutoCNBean"%>
 <%@page import="com.isecinc.pens.dao.AutoCNDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%

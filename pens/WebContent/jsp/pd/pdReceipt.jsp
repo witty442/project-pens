@@ -165,7 +165,11 @@ body {
 											href="javascript:clearForm('${pageContext.request.contextPath}')">
 												<input type="button" value="Clear" class="newNegBtn">
 												<!-- <img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn"> -->
-										</a></td>
+										</a>
+										<a href="#" onclick="window.close();">
+										   <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong">
+										</a>
+										</td>
 									</tr>
 								</table>
 								<c:if test="${pdReceiptForm.pdReceipts != null}">
@@ -211,7 +215,7 @@ body {
 												<td><c:out value='${rows.index+1}'/></td>
 												<td>${results.receiptNo}</td>
 												<td>${results.receiptDate}</td>
-												<td>${results.customerName}</td>
+												<td align="left">${results.customerName}</td>
 												<td><fmt:formatNumber pattern="#,##0.00" value="${results.receiptAmount}"/></td>
 												<td>
 													<input name="receiptId" type="hidden" value="${results.id}" />

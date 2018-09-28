@@ -15,8 +15,8 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.Utils;
 
 /**
  * User Action Class

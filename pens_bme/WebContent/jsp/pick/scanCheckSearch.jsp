@@ -1,14 +1,13 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
@@ -18,74 +17,24 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="scanCheckForm" class="com.isecinc.pens.web.pick.ScanCheckForm" scope="session" />
-
 <%
-if(request.getAttribute("barcodeStatusList_scan") == null){
-	List<References> billTypeList = new ArrayList();
-	billTypeList.addAll(PickConstants.getScanCheckoutStatusList());
-	session.setAttribute("barcodeStatusList_scan",billTypeList);
-}
-
-if(request.getAttribute("warehouseList_scan") == null){
-	List<References> billTypeList1 = new ArrayList<References>();
-	References ref = new References("",""); 
-	billTypeList1.add(ref);
-	billTypeList1.addAll(GeneralDAO.searchWareHouseList("'W2','W3','W4','W5','W6'"));
-	
-	session.setAttribute("warehouseList_scan",billTypeList1);
-}
-
-if(request.getAttribute("custGroupList_scan") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
-	
-	session.setAttribute("custGroupList_scan",billTypeList);
-}
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
 
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -127,7 +76,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.scanCheckForm;
+	form.action = path + "/jsp/scanCheckAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,issueReqNo,boxNo,warehouse,mode){
 	var form = document.scanCheckForm;
 	form.action = path + "/jsp/scanCheckAction.do?do=prepare&issueReqNo="+issueReqNo+"&boxNo="+boxNo+"&mode="+mode+"&warehouse="+warehouse;
@@ -372,7 +326,29 @@ function resetStore(){
       <c:if test="${scanCheckForm.bean.summaryType == 'box'}">
 
             <c:if test="${scanCheckForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = scanCheckForm.getTotalPage();
+					   int totalRecord = scanCheckForm.getTotalRecord();
+					   int currPage =  scanCheckForm.getCurrPage();
+					   int startRec = scanCheckForm.getStartRec();
+					   int endRec = scanCheckForm.getEndRec();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -394,33 +370,28 @@ function resetStore(){
 										<c:set var="tabclass" value="lineE"/>
 									</c:otherwise>
 								</c:choose>
-								
 									<tr class="<c:out value='${tabclass}'/>">
 										<td class="td_text_center" width="5%">${results.no}</td>
-										<td class="td_text_center" width="7%">${results.boxNo}
-										</td>
-										<td class="td_text_center" width="7%">${results.issueReqNo}
-										</td>
+										<td class="td_text_center" width="7%">${results.boxNo}</td>
+										<td class="td_text_center" width="7%">${results.issueReqNo}</td>
 										<td class="td_text_center" width="7%">${results.checkOutDate}</td>
-										<td class="td_text_center" width="5%">${results.wareHouse}
-										</td>
+										<td class="td_text_center" width="5%">${results.wareHouse}</td>
 										<td class="td_text" width="19%">${results.storeCode}-${results.storeName}</td>
 										<td class="td_text_right" width="10%" align="right">${results.totalQty}</td>
 							            <td class="td_text_center" width="10%">${results.statusDesc}</td>
 										<td class="td_text_center" width="10%">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.boxNo}','${results.wareHouse}','view')">
-											          ดู
+											        <font size="2" > ดู</font>
 											  </a>
 										  </c:if>
 										  <c:if test="${results.canEdit == true}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.boxNo}','${results.wareHouse}','edit')">
-											          แก้ไข
+											         <font size="2" >แก้ไข</font>
 											  </a>
 										  </c:if>
 										</td>
 									</tr>
-							
 							  </c:forEach>
 							  
 							  <tr class="">
@@ -443,7 +414,30 @@ function resetStore(){
 	</c:if>
 	
 	 <c:if test="${scanCheckForm.bean.summaryType == 'detail'}">
-            <c:if test="${scanCheckForm.resultsSearch != null}">    
+            <c:if test="${scanCheckForm.resultsSearch != null}"> 
+            <% 
+					   int totalPage = scanCheckForm.getTotalPage();
+					   int totalRecord = scanCheckForm.getTotalRecord();
+					   int currPage =  scanCheckForm.getCurrPage();
+					   int startRec = scanCheckForm.getStartRec();
+					   int endRec = scanCheckForm.getEndRec();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>   
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>

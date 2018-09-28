@@ -18,8 +18,8 @@ import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class ConfFinishDAO extends PickConstants{
 
@@ -39,26 +39,8 @@ public class ConfFinishDAO extends PickConstants{
 		}
 	}
 	
-	public static List<ReqFinish> searchHead(Connection conn,ReqFinish o,boolean getItems ) throws Exception {
-		return searchHeadModel(conn, o, getItems);
-	}
-	
-	public static List<ReqFinish> searchHead(ReqFinish o,boolean getItems ) throws Exception {
-		Connection conn = null;
-		try{
-			conn = DBConnection.getInstance().getConnection();
-			
-			return searchHeadModel(conn, o, getItems);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(conn != null){
-				conn.close();
-			}
-		}
-	}
 		
-	public static List<ReqFinish> searchHeadModel(Connection conn,ReqFinish o,boolean getItems ) throws Exception {
+	public static List<ReqFinish> searchHead(Connection conn,ReqFinish o,boolean getItems,boolean allRec,int currPage,int pageSize ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -67,44 +49,32 @@ public class ConfFinishDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n select i.* from PENSBME_REQ_FINISHING i \n");
-			sql.append("\n where 1=1   \n");
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				sql.append("\n and i.REQUEST_DATE = ? ");
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n    select i.* from PENSBME_REQ_FINISHING i \n");
+			sql.append("\n    where 1=1   \n");
+			//Gen Where Cond
+			sql.append(genWhereSql(o));
+			sql.append("\n   order by i.request_no desc ");
+			sql.append("\n   )A ");
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
 			}
-			if( !Utils.isNull(o.getConfirmDate()).equals("")){
-				sql.append("\n and i.CONFIRM_DATE = ? ");
-			}
-			
-			if( !Utils.isNull(o.getStatus()).equals("")){
-				sql.append("\n and i.status = '"+Utils.isNull(o.getStatus())+"'");
-			}
-			
-			if( !Utils.isNull(o.getRequestNo()).equals("")){
-				sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
-			}
-			if( !Utils.isNull(o.getWareHouse()).equals("")){
-				sql.append("\n and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
-			}
-			
-			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
-			}
-			if( !Utils.isNull(o.getConfirmDate()).equals("")){
-				Date tDate  = Utils.parse(o.getConfirmDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
-			}
-			
 			rst = ps.executeQuery();
 
+			//Calc No
+			r = ((currPage-1)*pageSize)+1;
 			while(rst.next()) {
 				   h = new ReqFinish();
+				 
 				   h.setNo(r);
 				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setConfirmDate(Utils.stringValue(rst.getTimestamp("confirm_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -144,6 +114,66 @@ public class ConfFinishDAO extends PickConstants{
 		return items;
 	}
 	
+	public static int searchTotalHead(Connection conn,ReqFinish o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ReqFinish h = null;
+		int totalRec = 0;
+		int r = 1;
+		int c = 1;
+		try {
+			sql.append("\n select count(*) as c from PENSBME_REQ_FINISHING i \n");
+			sql.append("\n where 1=1   \n");
+			//Gen Where Cond
+			sql.append(genWhereSql(o));
+			sql.append("\n order by i.request_no desc ");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+				 totalRec = rst.getInt("c");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	private static StringBuffer genWhereSql(ReqFinish o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		if( !Utils.isNull(o.getRequestDate()).equals("")){
+			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n and i.REQUEST_DATE = to_date('"+tDateStr+"','dd/mm/yyyy') ");
+		}
+		if( !Utils.isNull(o.getConfirmDate()).equals("")){
+			Date tDate  = Utils.parse(o.getConfirmDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n and i.CONFIRM_DATE = to_date('"+tDateStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getStatus()).equals("")){
+			sql.append("\n and i.status = '"+Utils.isNull(o.getStatus())+"'");
+		}
+		
+		if( !Utils.isNull(o.getRequestNo()).equals("")){
+			sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+		}
+		if( !Utils.isNull(o.getWareHouse()).equals("")){
+			sql.append("\n and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
+		}
+		
+		return sql;
+	}
 	
 	public static List<ReqFinish> searchItemByGroupCode(Connection conn,ReqFinish o ) throws Exception {
 		PreparedStatement ps = null;
@@ -546,6 +576,31 @@ public class ConfFinishDAO extends PickConstants{
 				}
 			}
 		}
-		
-	
+	 public static boolean canConfirmFinishing(Connection conn,String requestNo) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			boolean canConfirm = true;
+			try {
+				sql.append("\n select count(*) as c from PENSBI.PENSBME_REQ_FINISHING i ");
+				sql.append("\n where 1=1 and request_no ='"+requestNo+"' and confirm_date is not null ");
+				sql.append("\n and status ='"+PickConstants.STATUS_FINISH+"'"); 
+				logger.debug("sql:"+sql);
+				ps = conn.prepareStatement(sql.toString());
+				rst = ps.executeQuery();
+				if(rst.next()) {
+					 if(rst.getInt("c") >0){
+						 canConfirm= false;
+					 }
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+			return canConfirm;
+		}
 }

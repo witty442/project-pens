@@ -14,15 +14,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.EncyptUtils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.SessionIdUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.EncyptUtils;
+import com.pens.util.Utils;
 
 /**
  * Login Action Class

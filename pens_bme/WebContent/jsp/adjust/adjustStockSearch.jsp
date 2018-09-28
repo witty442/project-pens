@@ -1,15 +1,9 @@
+<%@page import="com.isecinc.pens.bean.AdjustStock"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="com.isecinc.pens.bean.StoreBean"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.dao.ImportDAO"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
@@ -18,17 +12,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="adjustStockForm" class="com.isecinc.pens.web.adjuststock.AdjustStockForm" scope="session" />
-
-<%
-
-%>
 
 <html>
 <head>
@@ -40,34 +25,14 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -98,6 +63,13 @@ function search(path){
 	return true;
 }
 
+function gotoPage(path,currPage){
+	var form = document.adjustStockForm;
+	form.action = path + "/jsp/adjustStockAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
+
 function openEdit(path,documentNo,mode){
 	var form = document.adjustStockForm;
 	form.action = path + "/jsp/adjustStockAction.do?do=prepare&documentNo="+documentNo+"&mode="+mode;
@@ -109,9 +81,10 @@ function openPopupCustomer(path,types,storeType){
     var param = "&types="+types;
         param += "&storeType="+storeType;
     
-	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	var url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
+	//window.open(encodeURI(url),"",
+			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",700);
 }
 
 function setStoreMainValue(code,desc,types){
@@ -236,7 +209,30 @@ function getStoreNameModel(storeCode){
 					  </div>
 
             <c:if test="${adjustStockForm.resultsSearch != null}">
-                  	
+                  	 <% 
+					   int totalPage = adjustStockForm.getTotalPage();
+					   int totalRecord = adjustStockForm.getTotalRecord();
+					   int currPage =  adjustStockForm.getCurrPage();
+					   int startRec = adjustStockForm.getStartRec();
+					   int endRec = adjustStockForm.getEndRec();
+					   int no = startRec;
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -251,56 +247,55 @@ function getStoreNameModel(storeCode){
 									<th >Status Message</th>	
 									<th >แก้ไข</th>						
 							   </tr>
-							<c:forEach var="results" items="${adjustStockForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="td_text">${results.no}</td>
+							<% 
+							String tabclass ="";
+							List<AdjustStock> resultList = adjustStockForm.getResultsSearch();
+							for(int n=0;n<resultList.size();n++){
+								AdjustStock item = (AdjustStock)resultList.get(n);
+								if(n%2==0){ 
+									tabclass="lineO";
+								}else{
+									tabclass ="lineE";
+								}
+								%>
+								<tr class="<%=tabclass%>">
+										<td class="td_text"><%=no %></td>
 										<td class="td_text_center"  width="10%">
-										   ${results.documentNo}
+										   <%=item.getDocumentNo() %>
 										</td>
-										<td class="td_text">${results.transactionDate}</td>
+										<td class="td_text"><%=item.getTransactionDate() %></td>
 										<td class="td_text"  width="10%">
-											${results.storeCode}
+											<%=item.getStoreCode() %>
 										</td>
 										<td class="td_text"  width="20%">
-										    ${results.storeName}
-										</td>
-										
-										<td class="td_text" width="10%">
-										  ${results.org}/ ${results.subInv}
+										  <%=item.getStoreName() %>
 										</td>
 										<td class="td_text" width="10%">
-											${results.ref}
+										   <%=item.getOrg() %>/ <%=item.getSubInv() %>
 										</td>
 										<td class="td_text" width="10%">
-										     ${results.statusDesc}
+											 <%=item.getRef() %>
+										</td>
+										<td class="td_text" width="10%">
+										      <%=item.getStatusDesc() %>
 										</td>
 										<td class="td_text" width="15%">
-										  ${results.statusMessage}
+										   <%=item.getStatusMessage() %>
 										</td>
 										<td class="td_text_center" width="5%">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','view')">
-											          ดู
+										 <% if(item.isCanEdit()==false){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', ' <%=item.getDocumentNo() %>','view')">
+											       <font size="2"><b>     ดู </b></font>
 											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','edit')">
-											          แก้ไข
+										  <% }else if(item.isCanEdit()==true){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', ' <%=item.getDocumentNo() %>','edit')">
+											       <font size="2"><b>    แก้ไข</b></font>
 											  </a>
-										  </c:if>
+										  <%} %>
 										</td>
 									</tr>
 							
-							  </c:forEach>
+							 <% no++;}//for %>
 					</table>
 								
 								

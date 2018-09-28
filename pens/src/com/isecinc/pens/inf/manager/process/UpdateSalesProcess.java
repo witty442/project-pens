@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -29,12 +31,14 @@ import com.isecinc.pens.inf.manager.UpdateSalesManagerHelper;
 import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 import com.isecinc.pens.inf.manager.process.bean.LineImportTransBean;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
+import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction2;
 import com.isecinc.pens.model.MOrder;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.utils.LoggerUtils;
 
 public class UpdateSalesProcess {
   
 	public static Logger logger = Logger.getLogger("PENS");
+	//public static LoggerUtils logger = new LoggerUtils("UpdateSalesProcess");
 	/**
 	 * importToDB
 	 * @param conn
@@ -45,7 +49,9 @@ public class UpdateSalesProcess {
 	 * @return
 	 * @throws Exception
 	 */
-	public  ResultImportBean importToDB(BigDecimal transId,Connection conMonitor,Connection conn,LinkedHashMap initConfigMap,TableBean tableBean,KeyNoImportTransBean keyNoBean,User userBean) throws Exception {
+	public  ResultImportBean importToDB(BigDecimal transId,Connection conMonitor,Connection conn
+			,LinkedHashMap initConfigMap,TableBean tableBean
+			,KeyNoImportTransBean keyNoBean,User userBean) throws Exception {
 	    PreparedStatement psUpdateH = null;
 	    PreparedStatement psInsH = null;
 	    PreparedStatement psUpdateD = null;
@@ -57,15 +63,24 @@ public class UpdateSalesProcess {
 	    String lineStr = "";
         int line=0;int lineNo = 0;
         int canExc = 0;int totalRos = 0;
-        int completeRow = 0;int allRow=0;;int errorRow= 0;
+        int successRow = 0;int allRow=0;int errorRow= 0;
         String errorCode="";String errorMsg="";
-        String firstErrorMsg ="";
-        String firstErrorCode = "";
+        String firstErrorMsg ="";String firstErrorCode = "";
         ResultImportBean resultImportBean = null;
         TableBean childBean = null;
         UpdateSalesManagerHelper helper = new UpdateSalesManagerHelper();
         String receiptNoAll = "";
+        ImportReceiptFunction importReceipt1 = new ImportReceiptFunction();
+        ImportReceiptFunction2 importReceipt2 = new ImportReceiptFunction2();
+        boolean useImportReceipt2 = false;
+        LineImportTransBean lineBean = null;
 	    try {  
+	    	  /** For case new code config to use new Method **/
+	    	  if(ControlCode.canExecuteMethod("UpdateSalesProcess", "ImportReceiptFunction2")){
+	    		  useImportReceipt2 = true;
+	    		  logger.debug("User method:ImportReceiptFunction ** 2 **");
+	    	  }
+	    	  
 	    	  /**  init prepareStatment Ins H **/
 	    	  if(Utils.isNull(tableBean.getActionDB()).indexOf("I") != -1 && !Utils.isNull(tableBean.getPrepareSqlIns()).equals("")){
 			     logger.debug("sqlIns_H:"+tableBean.getPrepareSqlIns());
@@ -99,26 +114,32 @@ public class UpdateSalesProcess {
 					  psInsD = conn.prepareStatement(childBean.getPrepareSqlIns());
 				  }
 			  }
-			  LineImportTransBean lineBean = null;
+			  
 			  totalRos = keyNoBean.getLineList().size();
-			  logger.debug("strTxts length:"+totalRos);
+			  logger.debug("totalRos:"+totalRos);
 			  for(line = 0;line<totalRos;line++){
 				  try{
 					  lineNo++;
+					  /*Count All Record */
+					  allRow++;//logger.debug("allRow["+allRow+"]");
 					  canExc = 0;
 					  lineBean = keyNoBean.getLineList().get(line);
 					  lineStr = lineBean.getLineStr();
 					  
 			    	  if( !Utils.isNull(lineStr).equals("")){
 				    		  //**Check Header Or Line**/
-			    		      logger.debug("lineStr["+lineStr+"]");
+			    		      logger.debug("seq["+lineBean.getSeq()+"],lineStr["+lineStr+"]");
 			    		      
 			    		      /** Update B (receipt only) **/
 				    		  if(lineStr.startsWith("B")){  
 				    			  if(tableBean.getTableName().startsWith("t_receipt")){
 			    					  logger.debug("********Start Update Batch(t_receipt) *********************");
-					    		      canExc = new ImportReceiptFunction().processReceiptBatch(conn, keyNoBean, userBean, lineStr,canExc);
-						    	      logger.debug("********End Update Batch (t_receipt) canUpdate:"+canExc +"");
+			    					  if(useImportReceipt2){
+					    		         canExc = importReceipt2.processReceiptBatch(conn, keyNoBean, userBean, lineStr,canExc);
+				    			      }else{
+				    			    	 canExc = importReceipt1.processReceiptBatch(conn, keyNoBean, userBean, lineStr,canExc); 
+				    			      }
+			    					  logger.debug("********End Update Batch (t_receipt) canUpdate:"+canExc +"");
 				    			  }				    		  
 				    		  
 			    		      /** Update H **/
@@ -127,7 +148,11 @@ public class UpdateSalesProcess {
 				    				  
 				    				  if(tableBean.getTableName().startsWith("t_receipt")){
 				    					  logger.debug("********Start Update H(t_receipt) *********************");
-						    		      canExc = new ImportReceiptFunction().processReceiptHead(conn, keyNoBean, userBean, lineStr,canExc);
+				    					  if(useImportReceipt2){
+				    						 canExc = importReceipt2.processReceiptHead(conn, keyNoBean, userBean, lineStr,canExc);
+				    					  }else{
+						    		         canExc = importReceipt1.processReceiptHead(conn, keyNoBean, userBean, lineStr,canExc);
+				    					  }
 							    	      logger.debug("********End Update H (t_receipt) canUpdate:"+canExc +"");
 							    	      
 				    				  }else{
@@ -147,6 +172,7 @@ public class UpdateSalesProcess {
 				    			  /** Insert Head **/
 				    			  if(canExc == 0 && tableBean.getActionDB().indexOf("I") != -1 && !"".equals(tableBean.getPrepareSqlIns()) ){
 				    				  if(tableBean.getTableName().startsWith("t_receipt")){
+				    					  
 				    				  }else{
 					    				  logger.debug("**********Start Insert H ******************");
 						    		      psInsH = ImportHelper.spiltLineArrayToInsertStatement(conn, tableBean, lineStr, psInsH,userBean);
@@ -176,6 +202,7 @@ public class UpdateSalesProcess {
 				    				  
 				    				  /** Case Special t_order only**/
 				    				  if(isOrderLineCanInsert(tableBean, childBean, userBean, lineStr)){
+				    					  logger.debug("isOrderLineCanInsert :true");
 					    				  /** Update Line **/
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpdCS())){
 						    				  logger.debug("**********Start Update L CS ******************");
@@ -195,13 +222,17 @@ public class UpdateSalesProcess {
 					    				  if(tableBean.getActionDB().indexOf("U") != -1 && !"".equals(childBean.getPrepareSqlUpd())){
 					    					  /** Create Receipt Line ONLY **/
 					    					  if(childBean.getTableName().startsWith( "t_receipt_line") ){ 
-                                            	  canExc = new ImportReceiptFunction().processReceiptLine(conn, keyNoBean, userBean, lineStr, psUpdateD,canExc,transId);
-                                            	  logger.debug("canUpdate(receipt_line) Line:"+canExc);
+					    						  if(useImportReceipt2){
+					    							 canExc = importReceipt2.processReceiptLine(conn, keyNoBean, userBean, lineStr, psUpdateD,canExc,transId);
+					    						  }else{
+					    						     canExc = importReceipt1.processReceiptLine(conn, keyNoBean, userBean, lineStr, psUpdateD,canExc,transId);
+					    						  }
+					    						  logger.debug("canUpdate(receipt_line) Line:"+canExc);
                                               }else{
 					    					     logger.debug("**********Start Update L normal ******************");
 							    			     psUpdateD = ImportHelper.spiltLineArrayToUpdateStatement(conn, childBean, lineStr, psUpdateD,userBean);
 									    	     canExc = psUpdateD.executeUpdate();
-									    	     logger.debug("canUpdate Line:"+canExc);
+									    	     logger.debug("canUpdate L:"+canExc);
                                              }
 					    				  }
 					    				  
@@ -212,9 +243,24 @@ public class UpdateSalesProcess {
 					    					  }else{
 						    					  if(canExc ==0){
 									    			  logger.debug("**********Start Insert L normal  ******************");
-									    			  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
-									    			  canExc = psInsD.executeUpdate();
-											    	  logger.debug("canInsert Line:"+canExc);
+									    			  if(childBean.getTableName().startsWith( "t_order_line") ){  
+									    				  //validate product_id <> 0 or null position[6]
+									    				  String[] lineArray = (lineStr+" ").split(Constants.delimeterPipe);
+									    				  //logger.debug("iscancel:"+lineArray[5]);
+									    				  //logger.debug("productId:"+lineArray[6]);
+									    				  if( !Utils.isNull(lineArray[6]).equals("") && !Utils.isNull(lineArray[6]).equals("0")){
+									    				      psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
+										    			      canExc = psInsD.executeUpdate();
+												    	      logger.debug("orderLine canInsert L:"+canExc);
+												    	  }else{
+												    		  canExc = 1; 
+												    	  }
+									    			  }else{
+									    				  psInsD = ImportHelper.spiltLineArrayToInsertStatement(conn, childBean, lineStr, psInsD,userBean);
+										    			  canExc = psInsD.executeUpdate();
+												    	  logger.debug("canInsert L:"+canExc);
+									    			  }
+									    			 
 									    		 } 
 					    					  }
 					    				  }//if insert
@@ -228,6 +274,7 @@ public class UpdateSalesProcess {
 				    		  errorCode = "NOUPDATE";
 				    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->WARNING:NO UPDATE CANNOT FIND KEY UPDATE 001]").append(Constants.newLine);
 				    	      errorRow++;
+				    	      //logger.debug("errorRow["+errorRow+"]");
 				    	     
 				    	      // Add First Error To Save In monitor_item
 				    	      if(firstErrorMsg.equals("")){
@@ -239,14 +286,15 @@ public class UpdateSalesProcess {
 				    	      helper.updateStatusFailLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
 				    	  }else{
 				    		  errorCode = "";
-				    		  completeRow++;
+				    		  successRow++;
+				    		  //logger.debug("successRow["+successRow+"]");
 				    		  //Insert Line to t_temp_import_trans
 				    		  helper.updateStatusSuccessLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
 				    		 
-				    		  //set for return Calc receipt Head
+				    		  //set for return Calculate receipt Head
 							  receiptNoAll += lineBean.getReceiptNo()+"|";
 				    	  }
-				    	  allRow++;
+				    	
 				    	  //initial
 				    	  canExc = 0;
 			    	  }//if 1
@@ -255,6 +303,7 @@ public class UpdateSalesProcess {
 		    		  errorMsg ="Error:Line{"+lineNo+"}:{LineText:"+lineStr+"}{ErrorMsg:"+e.getMessage()+"}";
 		    		  errorCode = ExceptionHandle.getExceptionCode(e);
 		    		  errorRow++;
+		    		  logger.debug("errorRow["+errorRow+"]");
 		    		  resultTxt.append(lineStr.replaceAll("\\|", ",")).append(",[LINE["+lineNo+"]->ERROR:"+e.getMessage()+"]").append(Constants.newLine);
 		    		  
 		    		  logger.error(errorMsg,e);
@@ -268,8 +317,9 @@ public class UpdateSalesProcess {
 		    		  
 		    		 //Insert Line to t_temp_import_trans
 		    		  helper.updateStatusFailLineToTempImportDAO(conMonitor,keyNoBean.getFileName(),tableBean.getTableName(),lineBean.getKeyNo(),lineBean.getSeq(),errorCode);
-		    	  } 
-			  }//for
+		    	  }//Exception
+				  
+			  }//for lineStr array
 			  
 			  if(errorRow <=0){
 	    		  /** Get Order From List from Text ORDER.txt **/
@@ -316,7 +366,7 @@ public class UpdateSalesProcess {
 				  /**Optional add Result Log */
 				  resultTxt.append("----------------------------------").append("\n");
 				  resultTxt.append("Total Rows :"+keyNoBean.getLineList().size()).append("\n");
-				  resultTxt.append("Success Rows :"+completeRow).append("\n");
+				  resultTxt.append("Success Rows :"+successRow).append("\n");
 				  resultTxt.append("Error Rows :"+errorRow).append("\n");
 				  StringBuffer columnHeader = new StringBuffer("");
 				  columnHeader.append("H -"+tableBean.getColumnTableAll()+",ERROR_MSG").append("\n");
@@ -344,21 +394,14 @@ public class UpdateSalesProcess {
 			 /** Put to MAP **/	
 			 initConfigMap.put(tableBean.getTableName(), tableBean);
 		
-		/*	 OLD CODE
-			 results[0] = firstErrorMsg;
-			 results[1] = firstErrorCode;
-			 results[2] = completeRow+"";
-			 results[3] = (completeRow+errorRow)+"";
-			 results[4] = receiptNoAll;//ReceiptNo|xxxxx|xxxx
-		*/
 			 /** Return Result import **/
 			 resultImportBean = new ResultImportBean();
 			 resultImportBean.setFirstErrorMsg(firstErrorMsg);
 			 resultImportBean.setFirstErrorCode(firstErrorCode);
-			 resultImportBean.setSuccessRow(completeRow);
-			 resultImportBean.setAllRow((completeRow+errorRow));
+			 resultImportBean.setSuccessRow(successRow);
+			 resultImportBean.setErrorRow(errorRow);
+			 resultImportBean.setAllRow(allRow);
 			 resultImportBean.setReceiptNoAll(receiptNoAll);
-			 
 	    } catch(Exception e){
 		     throw e;
 	    }finally{
@@ -473,7 +516,7 @@ public class UpdateSalesProcess {
 				dao.updatePaymentInOrder(conn, orderId, Constants.PAYMENT_FLAG_Y);
 			}
 			
-			/** Check Line is cencel All  and update order doc_status ='VO' */
+			/** Check Line is cancel All  and update order doc_status ='VO' */
 			if(dao.isOrderLineCancelAll(conn, orderId)){
 				logger.debug("Order Line Cancel All : doc_status ='VO'  ");
 				dao.updateDocStatusInOrder(conn, orderId, "VO");

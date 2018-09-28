@@ -1,9 +1,10 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.bean.PickStock"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -15,10 +16,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 
 <jsp:useBean id="addItemPickStockForm" class="com.isecinc.pens.web.pick.AddItemPickStockForm" scope="session" />
 
@@ -27,38 +25,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/req_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -204,15 +178,15 @@ function currencyToNum(str){
                <input type="hidden" id="path" value="${pageContext.request.contextPath}"/>
                  
 			   <div align="center">
-				    <table align="center" border="0" cellpadding="3" cellspacing="0" >
-				        <tr>
-                            <td colspan="3" align="center"><font size="3"><b>เบิกสินค้า ราย Item</b></font></td>
+				    <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+				        <tr class="topic_style">
+                            <th colspan="4" align="center"><font size="3"><b>เบิกสินค้า ราย Item</b></font></th>
 					   </tr>
-                             <tr>
-                                  <td>Group Code</td>
-                                   <td>
-                                     <html:text property="bean.groupCode" styleId="groupCode" size="20" readonly="true" styleClass="disableText"/>
-                                   </td>
+                       <tr>
+                             <td align="right">Group Code</td>
+                             <td align="left">
+                                  <html:text property="bean.groupCode" styleId="groupCode" size="20" readonly="true" styleClass="disableText"/>
+                             </td>
 							<td align="right">Pens Item </td>
 							<td align="left">
 							 <html:text property="bean.pensItem" styleId="pensItem" size="20" readonly="true" styleClass="disableText"/>	  
@@ -258,7 +232,7 @@ function currencyToNum(str){
 					<%} %>
 					
 					<tr class=""> 
-							<td class="data_barcode" colspan="2" align="right">รวมทั้งสิ้น :</td>
+							<td class="data_barcode" colspan="2" align="right"><b>รวมทั้งสิ้น :</b></td>
 							<td class="data_onhandQty">
 							   <html:text property="bean.totalOnhandQty" styleId="totalOnhandQty" size="20" styleClass="disableNumber"/>
 							</td>
@@ -289,27 +263,27 @@ function currencyToNum(str){
 			<!-- ************************Result ***************************************************-->
 			</html:form>
 			<!-- BODY -->
-					<script>
-					  <%if(session.getAttribute("saved") !=null){%>
-				           //alert($('#totalQty'));
-				           
-					       if($('#totalQty').val() =='0'){
-					    	   sumQty = "";
-					       }else{
-					    	   sumQty = $('#totalQty').val();
-					       }
-					       
-					       var rowIndex = $('#rowIndex').val(); //document.getElementsByName("bean.rowIndex")[0].value;
-					       var issueReqNo = $('#issueReqNo').val();//document.getElementsByName("bean.issueReqNo")[0].value;
-					       var actionDB = $('#actionDB').val() ;//document.getElementsByName("bean.status")[0].value;
-					       var totalOnhandQty = $('#totalOnhandQty').val();
-					       var path = $('#path').val();
-					       
-					      // alert(totalOnhandQty);
-					       
-					       window.opener.setReqPickMain(rowIndex,issueReqNo,sumQty,totalOnhandQty,actionDB,path);
-					 	   window.close();
-				 <% }%>
-					</script>
+			<script>
+			  <%if(session.getAttribute("saved") !=null){%>
+		           //alert($('#totalQty'));
+		           
+			       if($('#totalQty').val() =='0'){
+			    	   sumQty = "";
+			       }else{
+			    	   sumQty = $('#totalQty').val();
+			       }
+			       
+			       var rowIndex = $('#rowIndex').val(); //document.getElementsByName("bean.rowIndex")[0].value;
+			       var issueReqNo = $('#issueReqNo').val();//document.getElementsByName("bean.issueReqNo")[0].value;
+			       var actionDB = $('#actionDB').val() ;//document.getElementsByName("bean.status")[0].value;
+			       var totalOnhandQty = $('#totalOnhandQty').val();
+			       var path = $('#path').val();
+			       
+			      // alert(totalOnhandQty);
+			       
+			       window.opener.setReqPickMain(rowIndex,issueReqNo,sumQty,totalOnhandQty,actionDB,path);
+			 	   window.close();
+		 <% }%>
+		</script>
 </body>
 </html>

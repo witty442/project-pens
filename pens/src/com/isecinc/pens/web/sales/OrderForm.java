@@ -46,37 +46,24 @@ public class OrderForm extends I_Form {
 	private OrderLine memberNewLine = new OrderLine();
 	
 	private String autoReceiptFlag;
-	
-	private String canReceiptMoreCash;
-	private String canReceiptCredit;
-	private String canAirpay;
-	
+	private String receiptCreditFlag;//1 :can,0 : cannot,-1 :no pay prev bill
+	private double custCreditLimit;
 	private String mode ="";
-	
-	
-    
-	public String getCanAirpay() {
-		return canAirpay;
+
+	public double getCustCreditLimit() {
+		return custCreditLimit;
 	}
 
-	public void setCanAirpay(String canAirpay) {
-		this.canAirpay = canAirpay;
+	public void setCustCreditLimit(double custCreditLimit) {
+		this.custCreditLimit = custCreditLimit;
 	}
 
-	public String getCanReceiptCredit() {
-		return canReceiptCredit;
+	public String getReceiptCreditFlag() {
+		return receiptCreditFlag;
 	}
 
-	public void setCanReceiptCredit(String canReceiptCredit) {
-		this.canReceiptCredit = canReceiptCredit;
-	}
-
-	public String getCanReceiptMoreCash() {
-		return canReceiptMoreCash;
-	}
-
-	public void setCanReceiptMoreCash(String canReceiptMoreCash) {
-		this.canReceiptMoreCash = canReceiptMoreCash;
+	public void setReceiptCreditFlag(String receiptCreditFlag) {
+		this.receiptCreditFlag = receiptCreditFlag;
 	}
 
 	public String getMode() {

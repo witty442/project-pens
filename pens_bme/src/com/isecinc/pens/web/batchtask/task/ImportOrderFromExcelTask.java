@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -24,9 +22,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
-
-import util.DBCPConnectionProvider;
-import util.UploadXLSUtil;
 
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.GenCNBean;
@@ -41,12 +36,14 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.UploadXLSUtil;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -99,7 +96,7 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 			/** Connection Monitor */
 			connMonitor = DBConnection.getInstance().getConnection();
 
-			/** Set Trasaction no Auto Commit **/
+			/** Set Transaction no Auto Commit **/
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 		
@@ -421,7 +418,7 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 	                    	if(orderNoMap.get(orderSave.getStoreCode()) ==null){
 	                    		/** Gen New OrderNoKey **/
 	                    		logger.debug("Gen New OrderNoKey["+orderSave.getStoreCode()+"]");
-	                    	    orderNo = OrderNoGenerate.genOrderNoKEY(conn, orderDate, orderSave.getStoreCode());
+	                    	    orderNo = OrderNoGenerate.genOrderNoKEY(orderDate, orderSave.getStoreCode());
 	                    	    keyBean= new OrderKeyBean(orderNo,barOnBox);
 	                    	    
 	                    	    orderNoMap.put(orderSave.getStoreCode(), keyBean);
@@ -549,19 +546,19 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 		try{
 			if("OSHOPPING".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_OSHOPPING";
-				storeTypeItemCode = util.Constants.STORE_TYPE_OSHOPPING_ITEM;
+				storeTypeItemCode = com.isecinc.pens.dao.constants.Constants.STORE_TYPE_OSHOPPING_ITEM;
 			}else if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_7CATALOG";
-				storeTypeItemCode = util.Constants.STORE_TYPE_7CATALOG_ITEM;
+				storeTypeItemCode = com.isecinc.pens.dao.constants.Constants.STORE_TYPE_7CATALOG_ITEM;
 			}else if("TVDIRECT".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_TVDIRECT";
-				storeTypeItemCode = util.Constants.STORE_TYPE_TVD_ITEM;
+				storeTypeItemCode = com.isecinc.pens.dao.constants.Constants.STORE_TYPE_TVD_ITEM;
 			}else if("FRIDAY".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_FRIDAY";
-				storeTypeItemCode = util.Constants.STORE_TYPE_FRIDAY_ITEM;
+				storeTypeItemCode = com.isecinc.pens.dao.constants.Constants.STORE_TYPE_FRIDAY_ITEM;
 			}else{
 				tableName = "PENSBME_ONHAND_BME";
-				storeTypeItemCode = util.Constants.STORE_TYPE_LOTUS_ITEM;
+				storeTypeItemCode = com.isecinc.pens.dao.constants.Constants.STORE_TYPE_LOTUS_ITEM;
 			}
 			
 			StringBuffer sql = new StringBuffer("");
@@ -642,7 +639,6 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 			sql.append("\n WHERE trunc(order_date) =to_date('"+orderDateStr+"','dd/mm/yyyy')");
 			logger.debug("sql:"+sql);
 			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 

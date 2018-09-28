@@ -8,8 +8,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.pens.web.location.LocationControlPage;
 
 public class PopupDAO {
@@ -105,6 +106,51 @@ public class PopupDAO {
 			}
 			return pos;
 		}
+	 public static List<PopupForm> searchBrandProdShowList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.append("\n SELECT distinct M.brand ,B.brand_desc from APPS.XXPENS_OM_PRODSHOW_DT M, PENSBI.XXPENS_BI_MST_BRAND B");
+				sql.append("\n where 1=1  ");
+				sql.append("\n and M.brand = B.brand_no ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and M.brand ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and B.brand_desc LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY M.brand asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("brand"));
+					item.setDesc(rst.getString("brand_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	
 	 public static List<PopupForm> searchCustomerList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -184,6 +230,133 @@ public class PopupDAO {
 				
 				logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("customer_code"));
+					item.setDesc(rst.getString("customer_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 
+	 public static List<PopupForm> searchCustomerVanProdShowList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				logger.debug("searchCustomerStockList");
+				//criteria
+				String salesChannelNo = Utils.isNull(c.getCriteriaMap().get("salesChannelNo"));
+				String salesrepCode = Utils.isNull(c.getCriteriaMap().get("salesrepCode"));
+				logger.debug("salesChannelNo:"+salesChannelNo);
+				logger.debug("salesrepCode:"+salesrepCode);
+				
+				sql.append("\n SELECT distinct c.account_number as customer_code ");
+				sql.append("\n ,c.party_name as customer_desc " );
+				sql.append("\n FROM XXPENS_OM_PRODSHOW_MST H");
+				sql.append("\n ,XXPENS_OM_PRODSHOW_DT D"); 
+				sql.append("\n ,xxpens_ar_customer_all_v C");
+				sql.append("\n WHERE H.order_number = D.order_number");
+				sql.append("\n AND C.account_number = H.customer_number");
+				//Only customer van
+				sql.append("\n and H.order_number LIKE 'V%' ");
+				
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and C.account_number ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and C.party_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				if( !Utils.isNull(salesChannelNo).equals("")){
+					sql.append("\n and substr(H.order_number,2,1) = '"+salesChannelNo+"' ");
+				}
+				if( !Utils.isNull(salesrepCode).equals("")){
+					sql.append("\n and substr(H.order_number,1,4) = '"+salesrepCode+"' ");
+				}
+				sql.append("\n  ORDER BY c.account_number asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("customer_code"));
+					item.setDesc(rst.getString("customer_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 public static List<PopupForm> searchCustomerCreditPromotionList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				logger.debug("searchCustomerStockList");
+				//criteria
+				String salesChannelNo = Utils.isNull(c.getCriteriaMap().get("salesChannelNo"));
+				String salesrepCode = Utils.isNull(c.getCriteriaMap().get("salesrepCode"));
+				logger.debug("salesChannelNo:"+salesChannelNo);
+				logger.debug("salesrepCode:"+salesrepCode);
+				
+				sql.append("\n SELECT distinct c.account_number as customer_code ");
+				sql.append("\n ,c.party_name as customer_desc " );
+				sql.append("\n FROM xxpens_om_req_promotion_mst H");
+				sql.append("\n ,xxpens_ar_customer_all_v C ");
+				sql.append("\n WHERE 1=1");
+				sql.append("\n AND C.account_number = H.customer_number");
+			
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and C.account_number ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and C.party_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				if( !Utils.isNull(salesChannelNo).equals("")){
+					sql.append("\n and substr(H.request_no,2,1) = '"+salesChannelNo+"' ");
+				}
+				if( !Utils.isNull(salesrepCode).equals("")){
+					sql.append("\n and substr(H.request_no,1,4) = '"+salesrepCode+"' ");
+				}
+				
+				sql.append("\n  ORDER BY c.account_number asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				int no = 0;
@@ -334,6 +507,64 @@ public class PopupDAO {
 					item.setNo(no);
 					item.setCode(rst.getString("item_no"));
 					item.setDesc(rst.getString("item_name"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	
+	 public static List<PopupForm> searchItemCreditPromotionList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				logger.debug("searchItemCreditPromotionList");
+				//criteria
+				String brand = Utils.isNull(c.getCriteriaMap().get("brand"));
+				logger.debug("brand:"+brand);
+
+				sql.append("\n SELECT A.* FROM (");
+				sql.append("\n  SELECT distinct M.product_code " );
+				sql.append("\n  ,(select max(inventory_item_desc) from PENSBI.XXPENS_BI_MST_ITEM I ");
+				sql.append("\n    where I.inventory_item_code = M.product_code ) as product_name " );
+				sql.append("\n  from xxpens_om_req_promotion_dt1 M ");
+				sql.append("\n )A ");
+				sql.append("\n  where 1=1  ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and A.product_code ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and A.item_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				if( !Utils.isNull(brand).equals("")){
+					sql.append("\n and substr(A.product_code,1,3) = '"+brand+"' ");
+				}
+				
+				sql.append("\n  ORDER BY A.product_code asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("product_code"));
+					item.setDesc(rst.getString("product_name"));
 					pos.add(item);
 					
 				}//while

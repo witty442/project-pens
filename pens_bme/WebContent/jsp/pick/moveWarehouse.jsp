@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.bean.PickStock"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -44,26 +44,6 @@ if(session.getAttribute("wareHouseList") == null){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -155,9 +135,15 @@ function save(path){
 		return false;
 	} */
 	
-	form.action = path + "/jsp/moveWarehouseAction.do?do=save";
-	form.submit();
-	return true;
+	if(confirm("ยืนยันทำรายการ")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
+		form.action = path + "/jsp/moveWarehouseAction.do?do=save";
+		form.submit();
+		return true;
+	}
+	return false;
 }
 
 function isNum(obj){
@@ -575,3 +561,6 @@ function checkOpenDate(){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

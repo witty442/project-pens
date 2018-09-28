@@ -7,7 +7,7 @@ import java.sql.Statement;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class ControlInterfaceICC {
 	private static Logger logger = Logger.getLogger("PENS");

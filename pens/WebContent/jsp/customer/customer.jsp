@@ -198,17 +198,18 @@ function switchPrintType(){
 								&nbsp;&nbsp;&nbsp;
 								กำหนดจุด #1
 								<font color="red">*</font>
-								 <html:select property="customer.tripDay">
+								 <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="true" styleClass="disableText" />
+								 <%-- <html:select property="customer.tripDay" >
 										<html:options collection="tripDayList" property="key" labelProperty="name"/>
 									</html:select>
 									&nbsp;จุด #2
-								 <html:select property="customer.tripDay2">
+								 <html:select property="customer.tripDay2" disabled="true">
 										<html:options collection="tripDayList" property="key" labelProperty="name"/>
 									</html:select>
 									&nbsp;จุด #3
-								 <html:select property="customer.tripDay3">
+								 <html:select property="customer.tripDay3" disabled="true">
 										<html:options collection="tripDayList" property="key" labelProperty="name"/>
-									</html:select>
+									</html:select> --%>
 								 </td>
 							</tr>
 							<tr>
@@ -495,7 +496,7 @@ function switchPrintType(){
 								<td align="left" colspan="3">
 								     <img id="blah" /> 
 									 <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
-									       <img src="${pageContext.request.contextPath }/photoServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
+									       <img src="${pageContext.request.contextPath }/photoCustomerServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
 									<%} %>
 								</td>
 							</tr>

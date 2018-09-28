@@ -60,7 +60,7 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String branchId;
 	private String branchName;
 	
-	
+
 	public String getBranchId() {
 		return branchId;
 	}

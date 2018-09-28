@@ -3,29 +3,18 @@
 <%@page import="com.isecinc.pens.bean.MoveStockWarehouseBean"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Date"%>
-<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
-<%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="java.util.Calendar"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="moveStockWarehouseForm" class="com.isecinc.pens.web.pick.MoveStockWarehouseForm" scope="session" />
@@ -45,14 +34,6 @@ System.out.println("screenHeight:"+screenHeight);
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRole().getKey();
 
-if(session.getAttribute("wareHouseList") == null){
-	List<References> wareHouseList = new ArrayList();
-	References ref1 = new References("","");
-	wareHouseList.add(ref1);
-	wareHouseList.addAll(JobDAO.getWareHouseList("'W2','W3','W4','W5'"));
-	
-	session.setAttribute("wareHouseList",wareHouseList);
-}
 %>
 <html>
 <head>
@@ -236,7 +217,7 @@ function gotoPage(path,pageNumber){
 						   end = totalRow;
 						}
 				  %>
-					   <div align="center">
+					   <div align="left">
 						   <span class="pagebanner">รายการทั้งหมด  <%=totalRow %> รายการ, แสดงรายการที่  <%=(start) %> ถึง  <%=end %>.</span>
 						   <span class="pagelinks">
 							หน้าที่ 
@@ -254,7 +235,7 @@ function gotoPage(path,pageNumber){
 							</span>
 					  </div>
             
-					  <table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="80%">
+					  <table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 					       <tr>
 					            <th >วันที่ทำรายการ</th>
 					            <th >FROM W/H</th>

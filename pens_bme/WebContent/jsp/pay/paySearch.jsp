@@ -3,31 +3,21 @@
 <%@page import="java.util.Calendar"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="payForm" class="com.isecinc.pens.web.pay.PayForm" scope="session" />
-
 <%
 User user = (User) request.getSession().getAttribute("user");
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -37,30 +27,7 @@ User user = (User) request.getSession().getAttribute("user");
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-
 .day {
   width: 14%;
 }
@@ -105,7 +72,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.payForm;
+	form.action = path + "/jsp/payAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function newDoc(path){
 	 var form = document.payForm;
 	var param ="";
@@ -214,7 +186,29 @@ function printReport(path,docNo){
 					  </div>
 
             <c:if test="${payForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = payForm.getTotalPage();
+					   int totalRecord = payForm.getTotalRecord();
+					   int currPage =  payForm.getCurrPage();
+					   int startRec = payForm.getStartRec();
+					   int endRec = payForm.getEndRec();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
 						       <tr>
 						            <th >เลขที่เอกสาร</th>

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.Configuration;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
@@ -452,9 +451,8 @@ public class DBBackUpManager {
 		try{
 			// Get Schema From Connection URL 
 			// jdbc:mysql://localhost:3306/pens?useUnicode=true&amp;characterEncoding=UTF-8
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			String url = hibernateConfig.getProperty("connection.url");
+			EnvProperties env = EnvProperties.getInstance();
+			String url = env.getProperty("connection.url");
 			schema = url.substring(url.lastIndexOf("/")+1,url.indexOf("?"));
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -625,6 +623,7 @@ public class DBBackUpManager {
 	    boolean foundRecord = false;
 	    int i = 0;
 		try{
+			//logger.debug("Generate table:"+tableName);
 			sql.append(" DESCRIBE "+s+tableName+s+" \n");
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();

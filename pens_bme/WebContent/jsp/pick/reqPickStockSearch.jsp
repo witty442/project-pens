@@ -1,10 +1,10 @@
-<%@page import="util.Constants"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -12,53 +12,14 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <% 
-String wareHouse = reqPickStockForm.getBean().getWareHouse();
-if(session.getAttribute("statusIssueReqList") == null){
-	List<References> billTypeList = new ArrayList();
-	References ref = new References("","");
-	billTypeList.add(ref);
-	billTypeList.addAll(PickConstants.getRequestStatusW2ListInPageReqPickStock());
-	session.setAttribute("statusIssueReqList",billTypeList);
-}
-
-if(session.getAttribute("pickTypeList") == null){
-	List<References> pickTypeList = new ArrayList();
-	References ref = new References("","");
-	pickTypeList.add(ref);
-	pickTypeList.addAll(PickConstants.getPickTypeList());
-	session.setAttribute("pickTypeList",pickTypeList);
-}
-
-//if(session.getAttribute("custGroupList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	 if("W2".equalsIgnoreCase(wareHouse)){
-	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W2"));
-	 }else  if("W3".equalsIgnoreCase(wareHouse)){
-	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W3"));
-	 }else  if("W4".equalsIgnoreCase(wareHouse)){
-		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W4")); 
-	 }else  if("W5".equalsIgnoreCase(wareHouse)){
-	     billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W5"));
-	 }else  if("W6".equalsIgnoreCase(wareHouse)){
-		 billTypeList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),"W6")); 
-	 }
-	session.setAttribute("custGroupList",billTypeList);
-//}
+String wareHouse = Utils.isNull(request.getParameter("wareHouse"));
 %>
 
 <html>
@@ -66,41 +27,18 @@ if(session.getAttribute("pickTypeList") == null){
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>"" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>"" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>"" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<style type="text/css"></style>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>""></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>""></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>""></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('issueReqDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('confirmIssueDate'));
@@ -124,7 +62,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.reqPickStockForm;
+	form.action = path + "/jsp/reqPickStockAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,documentNo,issueReqStatus){
 	var form = document.reqPickStockForm;
 	form.action = path + "/jsp/reqPickStockAction.do?do=prepare&mode=save&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
@@ -167,8 +110,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	    
-	      	
+
 	      	   <%if("W2".equalsIgnoreCase(wareHouse)){ %>
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW2"/>
@@ -184,6 +126,10 @@ function openConfirm(path,documentNo,issueReqStatus){
 			  <%}else if("W5".equalsIgnoreCase(wareHouse)){ %>
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW5"/>
+				 </jsp:include>
+		     <%}else if("W7".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW7"/>
 				 </jsp:include>
 		     <%} %>
 			
@@ -206,7 +152,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						         <tr>
                                     <td colspan="2" align="center"> 
-                                      <font size="3"><b>Request เบิกสินค้าจากคลัง  ${reqPickStockForm.bean.wareHouse}</b></font>
+                                      <font size="3"><b> Request เบิกสินค้าจากคลัง  ${reqPickStockForm.bean.wareHouse}</b></font>
                                      </td>
 								</tr>
 						       <tr>
@@ -259,7 +205,29 @@ function openConfirm(path,documentNo,issueReqStatus){
 					  </div>
 
             <c:if test="${reqPickStockForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = reqPickStockForm.getTotalPage();
+					   int totalRecord = reqPickStockForm.getTotalRecord();
+					   int currPage =  reqPickStockForm.getCurrPage();
+					   int startRec = reqPickStockForm.getStartRec();
+					   int endRec = reqPickStockForm.getEndRec();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >Issue Req Date</th>
@@ -305,12 +273,12 @@ function openConfirm(path,documentNo,issueReqStatus){
 										<td class="td_text_center"  width="8%">
 											 <c:if test="${results.canEdit == false}">
 												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
-												          ดู
+												       <font size="2">   ดู</font>
 												  </a>
 											  </c:if>
 											  <c:if test="${results.canEdit == true}">
 												  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
-												          แก้ไข
+												         <font size="2"> แก้ไข</font>
 												  </a>
 											  </c:if>
 		
@@ -318,7 +286,7 @@ function openConfirm(path,documentNo,issueReqStatus){
 											<td class="td_text_center"  width="8%">
 												<c:if test="${results.canConfirm == true}">
 												  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}')">
-												          ยืนยัน
+												       <font size="2">  ยืนยัน</font>
 												  </a>
 											  </c:if>	
 										</td>

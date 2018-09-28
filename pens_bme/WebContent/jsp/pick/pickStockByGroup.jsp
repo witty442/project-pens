@@ -1,26 +1,18 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.bean.PickStock"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="pickStockGroupForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <%
@@ -36,26 +28,6 @@ String pageName = pickStockGroupForm.getBean().getPage();
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
@@ -63,7 +35,6 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	// new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
 	sumTotal();
@@ -71,7 +42,6 @@ function loadMe(){
 	  sumTotalIssue();
 	 <%}%>
 }
-
 function search(path){
 	var form = document.pickStockGroupForm;
     var groupCodeFrom =$('#groupCodeFrom').val();
@@ -90,14 +60,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
 function clear(path){
 	var form = document.pickStockGroupForm;
 	form.action = path + "/jsp/pickStockGroupAction.do?do=clear";
 	form.submit();
 	return true;
 }
-
 function back(path){
 	var form = document.pickStockGroupForm;
 	form.action = path + "/jsp/pickStockGroupAction.do?do=prepare2&action=back";
@@ -110,9 +78,17 @@ function exportExcel(path){
 	form.submit();
 	return true;
 }
-
+function exportBarcodeToExcel(path){
+	var form = document.pickStockGroupForm;
+	form.action = path + "/jsp/pickStockGroupAction.do?do=exportBarcodeToExcel";
+	form.submit();
+	return true;
+}
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.pickStockGroupForm;
 		form.action = path + "/jsp/pickStockGroupAction.do?do=cancelAction";
 		form.submit();
@@ -124,6 +100,9 @@ function cancel(path){
 function confirmAction(path){
 	var form = document.pickStockGroupForm;
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/pickStockGroupAction.do?do=confirmAction";
 		 form.submit();
 		 return true;
@@ -134,6 +113,9 @@ function confirmAction(path){
 function completeAction(path){
 	var form = document.pickStockGroupForm;
 	if(confirm("ยันยันการ Complete ข้อมูล")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/pickStockGroupAction.do?do=completeAction";
 		 form.submit();
 		 return true;
@@ -144,6 +126,9 @@ function completeAction(path){
 function cancelIssueAction(path){
 	var form = document.pickStockGroupForm;
 	if(confirm("ยันยันการ Cancel Issue รายการนี้")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/pickStockGroupAction.do?do=cancelIssueAction";
 		 form.submit();
 		 return true;
@@ -186,6 +171,9 @@ function save(path){
 	}  */
 	
 	if(confirm("ยันยันการบันทึกข้อมูล")){
+	  /**Control Save Lock Screen **/
+	  startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/pickStockGroupAction.do?do=saveByGroup";
 	   form.submit();
 	   return true;
@@ -762,10 +750,8 @@ function isNum(obj){
 								 <div align="left">
 									 
 								</div>
-								
 						</c:if>
 
-ssss
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >
@@ -774,7 +760,7 @@ ssss
 					 
 					                      <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
 											<%--  <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')"> --%>
-											   <input type="button" value="    Cancel Issue     " class="" disabled> 
+											   <input type="button" value="    Cancel Issue     " class="disablePosBtnLong" disabled> 
 											 <!-- </a> -->  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										   </c:if>	
 										   
@@ -797,7 +783,7 @@ ssss
 										</c:if>
 										 <c:if test="${pickStockGroupForm.bean.canCancel == true}">
 											<%--  <a href="javascript:cancel('${pageContext.request.contextPath}')"> --%>
-											   <input type="button" value="    ยกเลิก     " class="" disabled> 
+											   <input type="button" value="    ยกเลิก     " class="disablePosBtnLong" disabled> 
 											 <!-- </a> -->  
 										 </c:if>
 										 
@@ -814,7 +800,17 @@ ssss
 										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 										</a>	
-																
+										&nbsp;
+										<c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">  
+											 <a href="javascript:exportBarcodeToExcel('${pageContext.request.contextPath}')">
+											   <input type="button" value="Export Barcode To Excel" class="newPosBtnLong"> 
+											 </a>
+										 </c:if>		
+										  <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'O'}">
+											  <a href="javascript:exportBarcodeToExcel('${pageContext.request.contextPath}')">
+											   <input type="button" value="Export Barcode To Excel" class="newPosBtnLong"> 
+											 </a>  
+										 </c:if>					
 										</td>
 									</tr>
 						</table>
@@ -851,3 +847,6 @@ ssss
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

@@ -27,6 +27,9 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchExportWorker;
 import com.isecinc.pens.inf.manager.process.ExportProcess;
+import com.isecinc.pens.inf.manager.process.export.ExportOrder;
+import com.isecinc.pens.inf.manager.process.export.ExportReceipt;
+import com.isecinc.pens.inf.manager.process.export.ExportReqPromotion;
 import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
 
 /**
@@ -111,27 +114,41 @@ public class ExportManager {
 					   }
 					   logger.info("--End Export m_customer --");
 					   
+					   /** Export Customer Location and image only ischange ='Y' **/
 					}else if(tableBean.getTableName().equalsIgnoreCase("m_customer_location")){
 						logger.info("--Start Export m_customer_location --");
-						   /** Count Record and Prepare Monitor_item_detail(Data Export) */
-						   modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
-						   
-						   /** Check Data Found Before Export **/
-						   if(modelDetailItem != null && modelDetailItem.length > 0){
-						      tableBean = exProcess.exportCustomerLocation(conn,tableBean,userRequest);
-						   }
+					    /** Count Record and Prepare Monitor_item_detail(Data Export) */
+					    modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					   
+					    /** Check Data Found Before Export **/
+					    if(modelDetailItem != null && modelDetailItem.length > 0){
+					      tableBean = exProcess.exportCustomerLocation(conn,tableBean,userRequest);
+					    }
+					    
 						logger.info("--End Export m_customer_location --");
+						
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_order")){
 						logger.info("--Start Export t_order --");
 						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
 						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
 					    /** Check Data Found Before Export **/
 						if(modelDetailItem != null && modelDetailItem.length > 0){
-						   tableBean = exProcess.exportSaleOrder(conn,tableBean,userRequest);	
+						   tableBean = new ExportOrder().exportSaleOrder(conn,tableBean,userRequest);	
 						}
 						
 						logger.info("--End Export t_order --");
+					
+					/** Export t_req_promotion **/
+					}else if(tableBean.getTableName().equalsIgnoreCase("t_req_promotion")){
+						logger.info("--Start Export t_req_promotion --");
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+						    tableBean = new ExportReqPromotion().exportReqPromotion(conn,tableBean,userRequest);	
+						}
 						
+						logger.info("--End Export t_req_promotion --");
 					/** T_MOVE_ORDER **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_move_order")){
 						logger.info("--Start Export t_move_order --");
@@ -145,6 +162,18 @@ public class ExportManager {
 						
 						logger.info("--Start Export t_move_order --");
 						
+						/** T_PROD_SHOW **/	
+					}else if(tableBean.getTableName().equalsIgnoreCase("t_prod_show")){
+						logger.info("--Start Export t_move_order --");
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+						   userRequest = userRequest!=null?userRequest:userLogin;
+						   tableBean = exProcess.exportProdShow(conn,tableBean,userRequest);	
+						}
+						
+						logger.info("--Start Export t_move_order --");
 					/** T_STOCK **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_stock")){
 						logger.info("--Start Export t_stock --");
@@ -182,21 +211,6 @@ public class ExportManager {
 						}
 						
 						logger.info("--End Export t_bill_plan --");
-						
-					/** Case Export Order Line Only User Role DD **/
-					}else if(tableBean.getTableName().equalsIgnoreCase("t_order_dd")){
-						logger.info("--Start Export t_order_dd --");
-						
-						/** Gen SQL Select **/
-						tableBean.setPrepareSqlSelect(ExportSQL.genSqlOrderCaseUserTypeDD(tableBean, userRequest));
-						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
-						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), ExportHelper.getRealNameTable(tableBean.getTableName()));	
-					    /** Check Data Found Before Export **/
-						if(modelDetailItem != null && modelDetailItem.length > 0){
-						     tableBean = exProcess.exportOrderCaseDDMain(conn,tableBean,userRequest);	
-						}
-						
-						logger.info("--End Export t_order_dd --");
 						
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_visit")){
 						logger.info("--Start Export t_visit --");
@@ -240,7 +254,7 @@ public class ExportManager {
 						   
 						    /** Check Data Found Before Export **/
 						    if( modelDetailItem != null && modelDetailItem.length > 0){
-							    tableBean = exProcess.exportSalesReceiptHeaderVan(conn, tableBean,userRequest);	
+							    tableBean = new ExportReceipt().exportSalesReceiptHeaderVan(conn, tableBean,userRequest);	
 						    } 
 						    logger.info("--End Export t_receipt--");
 						}
@@ -260,19 +274,20 @@ public class ExportManager {
 						    }
                 		}
                 		logger.info("--End Export t_receipt_rec--");
-                	}else if(tableBean.getTableName().equalsIgnoreCase("t_receipt_dd")){
-                		logger.info("--Start Export t_receipt_dd--");
-                		
-						/** Gen Select SQL  **/
-						tableBean.setPrepareSqlSelect(ExportSQL.genSqlSalesReceiptLineCaseUserTypeDD(tableBean, userRequest));
-						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
-						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());
-						 /** Check Data Found Before Export **/
-					    if( modelDetailItem != null && modelDetailItem.length > 0){
-						   tableBean = exProcess.exportSalesReceiptCaseUserTypeDD(connMonitor, tableBean, userRequest);
-					    }
-					    logger.info("--End Export t_receipt_dd--");
+                	}else if(tableBean.getTableName().equalsIgnoreCase("t_pd_receipt_his")){
+                		if(User.VAN.equalsIgnoreCase(userRequest.getType())){
+	                		logger.info("--Start Export t_pd_receipt_his--");
+	                		
+	                		/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+							modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());
+							 /** Check Data Found Before Export **/
+						    if( modelDetailItem != null && modelDetailItem.length > 0){
+							   tableBean = exProcess.exportPDReceiptHis(connMonitor, tableBean, userRequest);
+						    }
+						    logger.info("--End Export t_pd_receipt_his--");
+                		}
 					}
+					
 					// 2011/11/30 Create New Export File
 					// New Export File To Temp2
 					else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec")){

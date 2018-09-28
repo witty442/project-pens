@@ -86,69 +86,6 @@
 							</display:table>
                     </c:if>
    
-                      <c:if test="${summaryForm.onhandSummaryMTTDetailResults != null}">
-
-						<br/>
-							<display:table style="width:100%;"  id="item" name="sessionScope.summaryForm.onhandSummaryMTTDetailResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="#" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" style="width:10%;"/>
-							    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" />
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
-							    <display:column  title="Group" property="group"  sortable="false"/>	
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
-							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
-							    <display:column  title="Barcode" property="barcode"  sortable="false" />
-							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
-							    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" />	
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />		    				
-							</display:table>
-                    </c:if>
-                    
-                      <c:if test="${summaryForm.onhandSummarySizeColorBigCResults != null}">
-
-						<br/>
-							<display:table style="width:100%;"  id="item" name="sessionScope.summaryForm.onhandSummarySizeColorBigCResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="#" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false"/>
-							    <display:column  title="SubInv" property="subInv"  sortable="false" />
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false"/>
-							    <display:column  title="Group" property="group"  sortable="false"/>	
-							    <display:column  title="PensItem" property="pensItem"  sortable="false" />
-							    <display:column  title="Material Master" property="materialMaster"  sortable="false" />
-							    <display:column  title="Barcode" property="barcode"  sortable="false" />
-							    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" />	
-							    <display:column  title="Trans In Qty" property="transInQty"  sortable="false" />	
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
-							    <display:column  title="Adjust Qty" property="adjustSaleQty"  sortable="false" />
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />	
-							    				
-							</display:table>
-                    </c:if>
-
-                     <c:if test="${summaryForm.onhandBigCResults != null}">
-
-						<br/>
-							<display:table style="width:100%;"  id="item" name="sessionScope.summaryForm.onhandBigCResults" defaultsort="0" defaultorder="descending" class="resultDisp"
-							    requestURI="#" sort="list" pagesize="50">	
-							    
-							    <display:column  title="รหัสร้านค้า" property="storeCode"  sortable="false" class="bigc_storeCode"/>
-							    <display:column  title="Sub Inv" property="subInv"  sortable="false" class="bigc_subInv"/>
-							    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="bigc_storeName"/>
-							    <display:column  title="Group" property="group"  sortable="false" class="bigc_group"/>	
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="bigc_pensItem"/>	
-							    <display:column  title="Transfer In Qty" property="transInQty"  sortable="false" class="bigc_transInQty"/>	
-							    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="bigc_saleReturnQty"/>
-							    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="bigc_saleOutQty"/>	
-							    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="bigc_onhandQty"/>	
-							    				
-							</display:table>
-                    </c:if>
-                    
                     <c:if test="${summaryForm.onhandSummaryLotusPeriodResults != null}">
 
 						<br/>

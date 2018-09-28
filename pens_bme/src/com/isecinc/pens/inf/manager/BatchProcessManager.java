@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
@@ -21,7 +19,6 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchProcessWorker;
 import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
 import com.isecinc.pens.inf.manager.process.GenerateHISHER;
@@ -32,9 +29,11 @@ import com.isecinc.pens.inf.manager.process.ImportPosProcess;
 import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalProcess;
 import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
-import com.isecinc.pens.process.SequenceProcess;
-import com.isecinc.pens.summary.process.GenerateEndDateLotus;
+import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.summary.process.GenerateReportEndDateLotus;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 /**
  * @author WITTY
@@ -568,7 +567,7 @@ public class BatchProcessManager {
 	
 	public  MonitorBean processGenStockEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		try{
-			return GenerateEndDateLotus.processGenStockEndDateLotus(monitorModel, user, request);
+			return GenerateStockEndDateLotus.processGenStockEndDateLotus(monitorModel, user, request);
 		}catch(Exception e){
 			throw e;
 		}

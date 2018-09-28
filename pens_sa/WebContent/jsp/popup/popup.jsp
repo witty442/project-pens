@@ -1,5 +1,5 @@
 <%@page import="util.SIdUtils"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@page import="util.Constants"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -14,26 +14,9 @@
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<style type="text/css">
-input[type=checkbox]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 
-input[type=radio]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
+<style type="text/css">
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -46,13 +29,27 @@ input[type=radio]
 
     String currentPage = "1";
     String hideAll = Utils.isNull(request.getParameter("hideAll"));
+    String headName ="";
     String codeSearchTxtName = "";
 	String descSearchTxtName = "";
 	
     /** Criteria Name **/
-    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)){
+    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
+       || "BrandProdShow".equalsIgnoreCase(pageName)	){
+    	headName = "แบรนด์("+pageName+")";
     	codeSearchTxtName = "Brand";
     	descSearchTxtName = "Brand Name";
+    }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
+      || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
+      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)){
+    	headName = "ร้านค้า("+pageName+")";
+    	codeSearchTxtName = "Customer Code";
+    	descSearchTxtName = "Customer Name";
+    }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
+    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)	){
+    	headName = "รหัสสินค้า("+pageName+")";
+    	codeSearchTxtName = "รหัสสินค้า";
+    	descSearchTxtName = "ชื่อสินค้า";
     }
     
     /** Store Select MutilCode in each Page **/
@@ -256,7 +253,7 @@ window.onload = function(){
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px" class="txt1">
 		<th width="15%" >&nbsp;</th> 
-		<th width="90%" ><b>ค้นหาข้อมูล <%=pageName%></b></th>
+		<th width="90%" ><b>ค้นหาข้อมูล <%=headName%></b></th>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b><%=codeSearchTxtName %></b>  </td>
@@ -282,14 +279,16 @@ window.onload = function(){
 </table>
 <!-- RESULT -->
 <%if(session.getAttribute("DATA_LIST") != null){ %>
-<%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)){ %>
+<%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
+	|| "BrandProdShow".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/BrandResult.jsp" /> 
 <%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
-		|| "CustomerLocation".equalsIgnoreCase(pageName)
+		|| "CustomerLocation".equalsIgnoreCase(pageName) || "CustomerVanProdShow".equalsIgnoreCase(pageName)
+		|| "CustomerCreditPromotion".equalsIgnoreCase(pageName)
 		){ 
 %>
      <jsp:include page="popup_sub/CustomerResult.jsp" /> 
-<%}else if("ItemStock".equalsIgnoreCase(pageName)){ %>
+<%}else if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName) ){ %>
      <jsp:include page="popup_sub/ItemResult.jsp" /> 
 <%}}else if(session.getAttribute("search_submit") != null){ %>
  <font size="2" color="red">ไม่พบข้อมูล</font>

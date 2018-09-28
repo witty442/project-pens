@@ -9,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
@@ -21,6 +19,7 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManagerHelper;
+import com.pens.utils.meter.MonitorTime;
 
 public class ImportHelper {
 	
@@ -57,7 +56,7 @@ public class ImportHelper {
 		InterfaceDAO dao = new InterfaceDAO();
 		try {
 			MonitorTime monitorTime = new MonitorTime("initImportConfig>>read import config");
-			
+			logger.debug("initImportConfig Get Download from FTP");
 			String lineStr = null;
 			while ((lineStr = br.readLine()) != null) {
 				if (!Utils.isBlank(lineStr)) { // exclude blank line
@@ -133,12 +132,12 @@ public class ImportHelper {
 	
 	public static  int initImportConfigCaseReImportError(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,String transType,User userBean ,String requestTable,boolean importAll) throws Exception {
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
-		EnvProperties env = EnvProperties.getInstance();
+		//EnvProperties env = EnvProperties.getInstance();
 		InterfaceDAO dao = new InterfaceDAO();
 		int countFileMap= 0;
 		try {
-			MonitorTime monitorTime = new MonitorTime("initImportConfig>>read import config");
-			
+			//MonitorTime monitorTime = new MonitorTime("initImportConfig>>read import config");
+			logger.debug("initImportConfigCaseReImportError get Data from t_temp_import_trans");
 			String lineStr = null;
 			while ((lineStr = br.readLine()) != null) {
 				if (!Utils.isBlank(lineStr)) { // exclude blank line

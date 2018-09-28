@@ -1,13 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.isecinc.pens.web.batchtask.task.BatchTaskListBean"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskInfo"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -16,7 +17,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 <jsp:useBean id="batchTaskForm" class="com.isecinc.pens.web.batchtask.BatchTaskForm" scope="session" />
 <%
 try{
@@ -24,9 +24,11 @@ User user = (User) session.getAttribute("user");
 String pageName = Utils.isNull(request.getParameter("pageName"));
 String buttonName = "";
 BatchTaskInfo taskInfo = batchTaskForm.getTaskInfo();
-Map<String,BatchTaskInfo> paramMap = null;
+//Map<String,BatchTaskInfo> paramMap = null;//old code
+List<BatchTaskInfo> paramList = null;
 if(taskInfo != null){
-	paramMap = taskInfo.getParamMap();
+	//paramMap = taskInfo.getParamMap();//old code
+	paramList = taskInfo.getParamList();
 	buttonName = taskInfo.getButtonName();
 }
 %>
@@ -84,11 +86,9 @@ body {
        	<%}%>
        	
        	//load calendar parameter date
-       	<%if( !paramMap.isEmpty()){
-			 Iterator its = paramMap.keySet().iterator();
-			 while(its.hasNext()){
-		        String key = (String)its.next();
-		        BatchTaskInfo task = paramMap.get(key);    
+       	<%if( paramList != null && paramList.size() >0){
+			 for(int n=0;n<paramList.size();n++){
+		        BatchTaskInfo task = paramList.get(n);   
 		        if(task.getParamType().equalsIgnoreCase("DATE")){%> 
 		           new Epoch('epoch_popup', 'th', document.getElementById('<%=task.getParamName()%>'));
 		   <%   }//if
@@ -290,11 +290,9 @@ body {
 						<!-- Generate Parameter By Task Config -->
 					     <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
 							<%
-								if( !paramMap.isEmpty()){
-									 Iterator its = paramMap.keySet().iterator();
-									 while(its.hasNext()){
-								        String key = (String)its.next();
-								        BatchTaskInfo task = paramMap.get(key);
+							if( paramList != null && paramList.size() >0){
+								for(int p=0;p<paramList.size();p++){
+								     BatchTaskInfo task = paramList.get(p);
 							%> 
 								<tr>
 								<%if(task.getParamType().equalsIgnoreCase("DATE")|| task.getParamType().equalsIgnoreCase("STRING") ){ %>
@@ -307,6 +305,36 @@ body {
 									<td width ="60%" align="left">
 									    <input type="text" name="<%=task.getParamName() %>" id="<%=task.getParamName() %>" 
 									     value="<%=task.getParamValue() %>"/>
+									</td>
+								<%}else if(task.getParamType().indexOf("LIST") != -1){ %>
+									<td width ="40%" align="right">
+									    <%=task.getParamLabel() %>
+									    <%if(task.getParamValid().equalsIgnoreCase("VALID")){%>
+									       <font color="red">*</font>
+									    <%} %>
+									</td>
+									<td width ="60%" align="left">
+									<%
+									String keySessionName = task.getParamType();
+									System.out.println("keySessionName:"+keySessionName);
+									 if(session.getAttribute(keySessionName) != null){
+										 List<BatchTaskListBean> listBox = (List<BatchTaskListBean>)session.getAttribute(keySessionName);
+									%>
+									    <select name="<%=task.getParamName() %>" id="<%=task.getParamName() %>">
+									    
+										    <%for(int i=0;i<listBox.size();i++){ 
+										    	BatchTaskListBean data = listBox.get(i);
+										    	
+										    	if(task.getParamValue().equalsIgnoreCase(data.getValue())){
+										    %>
+									               <option value="<%=data.getValue() %>" selected><%=data.getDisp() %></option>
+									        <%  }else{ %>
+									               <option value="<%=data.getValue() %>"><%=data.getDisp() %></option>
+									        <%  }//if %>
+									       <%}//for %>
+									 </select>
+									<% }//if
+									 %>
 									</td>
 								<%}else if(task.getParamType().equalsIgnoreCase("FROMFILE")){ %>
 									<td width ="40%" align="right">
@@ -321,9 +349,10 @@ body {
 									</td>
 								<%} %>
 								</tr>
-							<% }//while
-							}//if
-							%>
+						<% 
+						   }//for
+						}//if
+						%>
 						</table>
 
                         <!-- Generate BUTTON By Task Config-->

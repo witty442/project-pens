@@ -1,8 +1,8 @@
+<%@page import="util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="java.sql.Connection"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.DBConnection"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.*"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -17,7 +17,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title>ค้นหาข้อมูล</title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag_screen.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag_screen.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
 <style type="text/css">
 <!--
 .style1 {color: #004a80}
@@ -435,12 +437,12 @@ function loadDataFromMain(){
 	<tr>
 		<td align="left">
 			<c:if test="${isMultiSelect}" >
-				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectMultiple()" style="width:80px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtnLong"  onclick="selectMultiple()" style="width:80px;"/>
 			</c:if>
 			<c:if test="${!isMultiSelect}" >
-				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectOneRadio()" style="width:80px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtnLong"  onclick="selectOneRadio()" style="width:80px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:80px;"/>
+			<input type="button" name="close" value="Close" class="newPosBtnLong"  onclick="javascript:window.close();" style="width:80px;"/>
 		</td>
 	</tr>
 </table>

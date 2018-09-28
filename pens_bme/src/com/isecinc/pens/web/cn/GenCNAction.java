@@ -23,8 +23,8 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -86,9 +86,7 @@ public class GenCNAction extends I_Action {
 		GenCNForm aForm = (GenCNForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
-		Connection conn = null;
 		try {
-			conn = DBConnection.getInstance().getConnection();
 			GenCNBean p = GenCNDAO.searchHead(aForm.getBean());
 			boolean foundError = p.isFoundError();
 			
@@ -122,9 +120,7 @@ public class GenCNAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			if(conn != null){
-			   conn.close();conn = null;
-			}
+			
 		}
 		return "search";
 	}
@@ -186,7 +182,10 @@ public class GenCNAction extends I_Action {
 			String[] groupCode = request.getParameterValues("groupCode");
 			String[] pensItem = request.getParameterValues("pensItem");
 			String[] qty = request.getParameterValues("qty");
-			
+			String[] barcode = request.getParameterValues("barcode");
+			String[] wholePriceBF = request.getParameterValues("wholePriceBF");
+			String[] retailPriceBF = request.getParameterValues("retailPriceBF");
+			String[] materialMaster = request.getParameterValues("materialMaster");
 			logger.debug("groupCode:"+groupCode.length);
 			
 			//add value to Results
@@ -201,12 +200,10 @@ public class GenCNAction extends I_Action {
 						 l.setGroupCode(Utils.isNull(groupCode[i]));
 						 l.setPensItem(Utils.isNull(pensItem[i]));
 						 
-						 Barcode b = GeneralDAO.searchProductByGroupCodeModelBMELocked(conn, l.getGroupCode());
-						 
-						 l.setBarcode(Utils.isNull(b.getBarcode()));
-						 l.setMaterialMaster(Utils.isNull(b.getMaterialMaster()));
-						 l.setWholePriceBF(Utils.isNull(b.getWholePriceBF()));
-						 l.setRetailPriceBF(Utils.isNull(b.getRetailPriceBF()));
+						 l.setBarcode(Utils.isNull(barcode[i]));
+						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
+						 l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
+						 l.setRetailPriceBF(Utils.isNull(retailPriceBF[i]));
 						
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());

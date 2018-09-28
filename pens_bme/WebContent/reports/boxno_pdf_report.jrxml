@@ -52,7 +52,7 @@
 	<columnHeader>
 		<band height="19" splitType="Stretch">
 			<staticText>
-				<reportElement x="237" y="1" width="104" height="18"/>
+				<reportElement x="217" y="1" width="124" height="18"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="1.0" lineStyle="Solid"/>
@@ -66,7 +66,7 @@
 				<text><![CDATA[QTY]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="1" width="53" height="18"/>
+				<reportElement x="0" y="1" width="67" height="18"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="1.0" lineStyle="Solid"/>
@@ -80,7 +80,7 @@
 				<text><![CDATA[ลำดับที่]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="149" y="1" width="88" height="18"/>
+				<reportElement x="67" y="1" width="150" height="18"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="1.0" lineStyle="Solid"/>
@@ -93,26 +93,12 @@
 				</textElement>
 				<text><![CDATA[Group]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="53" y="1" width="96" height="18"/>
-				<box>
-					<pen lineStyle="Solid"/>
-					<topPen lineWidth="1.0" lineStyle="Solid"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[PensItem]]></text>
-			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="17" splitType="Stretch">
 			<textField pattern="">
-				<reportElement x="149" y="0" width="88" height="17"/>
+				<reportElement x="67" y="0" width="150" height="17"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>
@@ -126,7 +112,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{groupCode}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="0" y="0" width="53" height="17"/>
+				<reportElement x="0" y="0" width="67" height="17"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>
@@ -140,7 +126,7 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{no}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="237" y="0" width="91" height="17"/>
+				<reportElement x="217" y="0" width="111" height="17"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>
@@ -166,20 +152,6 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[]]></textFieldExpression>
-			</textField>
-			<textField pattern="">
-				<reportElement x="53" y="0" width="96" height="17"/>
-				<box>
-					<pen lineStyle="Solid"/>
-					<topPen lineWidth="0.0" lineStyle="Solid"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{pensItem}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

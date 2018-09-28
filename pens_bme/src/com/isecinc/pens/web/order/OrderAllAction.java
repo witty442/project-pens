@@ -18,8 +18,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.Constants;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
@@ -28,12 +26,13 @@ import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.OrderAllDAO;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.gendate.OrderDateUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -294,7 +293,7 @@ public class OrderAllAction extends I_Action {
 		                        	String barOnBox = "";
 		                        	OrderKeyBean keyBean = null;
 		                        	if(mapOrderNoByStoreMap.get(o.getStoreCode()) ==null){
-		                        	    orderNo = OrderNoGenerate.genOrderNoKEY(conn, orderDate, store.getStoreCode());
+		                        	    orderNo = OrderNoGenerate.genOrderNoKEY(orderDate, store.getStoreCode());
 		                        	    keyBean= new OrderKeyBean(orderNo,barOnBox);
 		                        	    
 		                        	    mapOrderNoByStoreMap.put(o.getStoreCode(), keyBean);
@@ -498,7 +497,7 @@ public class OrderAllAction extends I_Action {
 		                        	String barOnBox = "";
 		                        	OrderKeyBean keyBean = null;
 		                        	if(mapOrderNoByStoreMap.get(o.getStoreCode()) ==null){
-		                        	    orderNo = OrderNoGenerate.genOrderNoKEY(conn, orderDate, store.getStoreCode());
+		                        	    orderNo = OrderNoGenerate.genOrderNoKEY(orderDate, store.getStoreCode());
 		                        	    keyBean= new OrderKeyBean(orderNo,barOnBox);
 		                        	    
 		                        	    mapOrderNoByStoreMap.put(o.getStoreCode(), keyBean);

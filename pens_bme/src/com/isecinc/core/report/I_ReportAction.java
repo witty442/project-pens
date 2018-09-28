@@ -14,9 +14,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.BeanParameter;
-
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.BeanParameter;
 
 /**
  * I_ReportAction Class

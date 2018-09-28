@@ -1,5 +1,5 @@
 <%@page import="com.isecinc.pens.bean.TransactionSummary"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -56,12 +56,12 @@ System.out.println("currentPage:"+currentPage);
 	}
 </style>
 </head>
-     <c:if test="${summaryForm.page == 'Tops'}">
+     <c:if test="${summaryForm.page == 'tops'}">
      <c:if test="${summaryForm.resultsTrans != null}">
 
 		<br/>
 			<div id ="scroll" >
-				<display:table style="width:100%;"  id="item" name="sessionScope.summaryForm.resultsTrans" defaultsort="0" defaultorder="descending"  class="resultDisp"
+				<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.resultsTrans" defaultsort="0" defaultorder="descending"  class="resultDisp"
 					    requestURI="#" sort="list" pagesize="50">	
 					    
 					           <display:column  title="Sales Date" property="salesDate"  sortable="false" class="tops_salesDate" style="width:10%;"/>

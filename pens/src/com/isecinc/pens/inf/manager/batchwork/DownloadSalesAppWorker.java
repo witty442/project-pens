@@ -9,7 +9,7 @@ public class DownloadSalesAppWorker extends Thread{
 	
 	@Override
 	public void run() {
-		AppversionVerify.getIns().downloadSalesAppWar();
+		AppversionVerify.getApp().downloadSalesAppWar();
 	}
 
 }

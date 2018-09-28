@@ -15,9 +15,9 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.popup.ConditionFilterBean;
 import com.isecinc.pens.web.popup.DisplayBean;
+import com.pens.util.Utils;
 
 public class ReportProcess {
    

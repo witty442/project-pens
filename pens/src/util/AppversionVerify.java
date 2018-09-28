@@ -36,7 +36,7 @@ import com.sun.org.apache.bcel.internal.generic.ISTORE;
 public class AppversionVerify {
 	private static AppversionVerify app ;
 	protected static Logger logger = Logger.getLogger("PENS");
-	public static Map<String,String> initAllMap = new HashMap<String, String>();
+	public static Map<String,String> initAllMap = null;
 	static String initPathFileDropbox = "https://www.dropbox.com/s/0i7ibswl3qw2s4w/initPathFile.txt?dl=1";
 	/**
 	 * @param args
@@ -45,36 +45,50 @@ public class AppversionVerify {
 		// TODO Auto-generated method stub
 	}
 	
-	public static AppversionVerify getIns(){
+	public static AppversionVerify getApp(){
 		logger.debug("AppVerify:"+app);
 		if(app ==null){
-			Connection conn = null;
-			try{
-			   app = new AppversionVerify();
-			   conn = DBConnection.getInstance().getConnection();
-			   // Check 1 time for day and get Config From Dropbox and insert to DB
-			   boolean isToDayCheck = isTodayCheck(conn);
-			   logger.info("isToDayCheck:"+isToDayCheck);
-			   if(isToDayCheck==false){
-				   String urlTestInternetConnection = "https://www.google.co.th";
-				   boolean isInternetConnect = Utils.isInternetConnect(urlTestInternetConnection);
-				   logger.info("is internet is connected["+isInternetConnect+"]");
-				   if(isInternetConnect){
-				      initAllMap = getInitAllToMapToDB(conn);
-				  }
-			   }else{
-				  //get from DB 
-				   initAllMap = getInitAllToMapFromDB(conn);
-			   }
-			}catch(Exception e){
-				
-			}finally{
-				try{
-					
-				}catch(Exception ee){}
+		   app = new AppversionVerify();
+		   if(initAllMap==null){
+				initAllMap = getInitAllToMapToDB();
+			}
+		}else{
+			if(initAllMap==null){
+				initAllMap = getInitAllToMapToDB();
 			}
 		}
 		return app;
+	}
+	
+	public void initAppVersion(){
+		logger.info("initAppVersion");
+		Connection conn = null;
+		try{
+		   conn = DBConnection.getInstance().getConnection();
+		   // Check 1 time for day and get Config From Dropbox and insert to DB
+		   boolean isToDayCheck = isTodayCheck(conn);
+		   logger.info("isToDayCheck:"+isToDayCheck);
+		   if(isToDayCheck==false){
+			   String urlTestInternetConnection = "https://www.google.co.th";
+			   boolean isInternetConnect = Utils.isInternetConnect(urlTestInternetConnection);
+			   logger.info("is internet is connected["+isInternetConnect+"]");
+			   if(isInternetConnect){
+				   if(initAllMap==null){
+					   initAllMap =  new HashMap<String, String>();
+				   }
+			      initAllMap = getInitAllToMapToDB(conn);
+			  }
+		   }
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+	
 	}
 	
 	public static boolean isTodayCheck(Connection conn) throws Exception {
@@ -107,36 +121,21 @@ public class AppversionVerify {
 		return isTodayeCheck;
 	}
 	
-	public static AppversionVerify clearIns(){
-		app = new AppversionVerify();
-		return app;
-	}
-	
-	  /** Download Software After Import  separate Thread **/
-    public static void downloadSoftware(User user){
-    	logger.info("downloadSoftware");
-    	
-    	AppversionVerify.clearIns();
-    	
-    	AppversionVerify.getIns().downloadSalesAppUpdater(true);
-    	
-    	AppversionVerify.getIns().downloadSoftware4SalesApp();
-    	
-    	AppversionVerify.getIns().downloadC4SalesApp(user);
-    	
-    	AppversionVerify.getIns().downloadPlanSalesApp(user);
-    	
-    	// Start batch Download Pensclient.war from dropbox
-		//new DownloadSalesAppWorker().start();
-    }
-    
 	/** process run mainpage.jsp footer.jsp */
 	 public String[] checkAppVersion(HttpServletRequest request){
 		logger.info("checkAppVersion");
 		String[] msg = new String[2];
+		Connection conn = null;
 		try{
 			logger.debug("request:"+request.getSession());
 			if(request.getSession().getAttribute("appVersionCheckMsg") == null){
+				//get from DB 
+				if(initAllMap==null){
+					conn = DBConnection.getInstance().getConnection();
+					initAllMap =  new HashMap<String, String>();
+				    initAllMap = getInitAllToMapFromDB(conn);
+				}
+				   
 				String appVersion = SystemProperties.getCaption("AppVersion", new Locale("TH","th"));
 				//Temp Version No Check (Credit only)
 				if(appVersion.indexOf("Credit") != -1 || appVersion.indexOf("Van") != -1 ){
@@ -173,11 +172,59 @@ public class AppversionVerify {
 		}catch(Exception e){
 			e.printStackTrace();
 			request.getSession().setAttribute("appVersionCheckMsg","e");
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}catch(Exception ee){}
 		}
 		return msg;
 	}
-   
-	 public static Map<String,String> getInitAllToMapToDB(Connection conn){
+  
+	public static AppversionVerify clearIns(){
+		app = new AppversionVerify();
+		return app;
+	}
+	
+	  /** Download Software After Import  separate Thread **/
+    public static void downloadSoftware(User user){
+    	logger.info("downloadSoftware");
+    	
+    	AppversionVerify.clearIns();
+    	
+    	AppversionVerify.getApp().downloadSalesAppUpdater(true);
+    	
+    	AppversionVerify.getApp().downloadSoftware4SalesApp();
+    	
+    	AppversionVerify.getApp().downloadC4SalesApp(user);
+    	
+    	AppversionVerify.getApp().downloadPlanSalesApp(user);
+    	
+    	// Start batch Download Pensclient.war from dropbox
+		//new DownloadSalesAppWorker().start();
+    }
+    
+    public static Map<String,String> getInitAllToMapToDB(){
+    	Connection conn = null;
+    	Map<String,String> dataMap = null;
+    	try{
+    		conn = DBConnection.getInstance().getConnection();
+    		dataMap= getInitAllToMapToDBModel(conn);
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}finally{
+    		try{
+    		  conn.close();
+    		}catch(Exception ee){}
+    	}
+        return dataMap;
+    }
+    public static Map<String,String> getInitAllToMapToDB(Connection conn){
+    	return getInitAllToMapToDBModel(conn);
+    }
+    
+	 public static Map<String,String> getInitAllToMapToDBModel(Connection conn){
 	        Map<String,String> pathFileMap = new HashMap<String, String>();
 	        logger.info("***Start getInitPathFile To DB***");
 	        try{                   
@@ -366,55 +413,57 @@ public class AppversionVerify {
     /** Software For Sales App **/
     public  void downloadSoftware4SalesApp(){
 		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath =  initAllMap.get("Software4SalesApp.zip");
-		String sourcePath2 =  initAllMap.get("Software4SalesApp.zip");
-        String destPath  = localSalesAppPath+"Software4SalesApp.zip";
-        String dest2Path = localSalesAppPath+"Software4SalesApp";
-		try{
-			                                         
-			boolean isLatestVersion = isLatestVersion("Software4SalesApp");
-			logger.info("isLatestVersion:"+isLatestVersion);
-			if( !isLatestVersion){
-				logger.info("download Software4SalesApp");
-				
-				String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
-				System.out.println(logs);
-				URL url = null;
-	            InputStream reader = null;
-	            try{
-		            url = new URL(sourcePath);
-		            url.openConnection();
-		            reader = url.openStream();
-	            }catch(Exception e){
-	            	logger.error("Error Source1 retry Source2");
-	            	url = new URL(sourcePath2);
-		            url.openConnection();
-		            reader = url.openStream();
-	            }
-	
-	            FileOutputStream writer = new FileOutputStream(destPath);
-	            byte[] buffer = new byte[1024];
-	            //int totalBytesRead = 0;
-	            int bytesRead = 0;
-	            while ((bytesRead = reader.read(buffer)) > 0){  
-	              writer.write(buffer, 0, bytesRead);
-	              //buffer = new byte[153600];
-	            }
-	            writer.close();
-	            reader.close();
-	            
-	            FileUtils.deleteDirectory(new File(dest2Path));
-	            
-	            unzipFileIntoDirectory(destPath,dest2Path);
-	            
-	          //delete Zip file
-	            //logger.info("delete :"+destPath);
-	           // FileUtil.deleteFile(destPath);
-			}else{
-				logger.info("Software4SalesApp is no update");
+		if(initAllMap != null){
+			String sourcePath =  initAllMap.get("Software4SalesApp.zip");
+			String sourcePath2 =  initAllMap.get("Software4SalesApp.zip");
+	        String destPath  = localSalesAppPath+"Software4SalesApp.zip";
+	        String dest2Path = localSalesAppPath+"Software4SalesApp";
+			try{
+				                                         
+				boolean isLatestVersion = isLatestVersion("Software4SalesApp");
+				logger.info("isLatestVersion:"+isLatestVersion);
+				if( !isLatestVersion){
+					logger.info("download Software4SalesApp");
+					
+					String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
+					System.out.println(logs);
+					URL url = null;
+		            InputStream reader = null;
+		            try{
+			            url = new URL(sourcePath);
+			            url.openConnection();
+			            reader = url.openStream();
+		            }catch(Exception e){
+		            	logger.error("Error Source1 retry Source2");
+		            	url = new URL(sourcePath2);
+			            url.openConnection();
+			            reader = url.openStream();
+		            }
+		
+		            FileOutputStream writer = new FileOutputStream(destPath);
+		            byte[] buffer = new byte[1024];
+		            //int totalBytesRead = 0;
+		            int bytesRead = 0;
+		            while ((bytesRead = reader.read(buffer)) > 0){  
+		              writer.write(buffer, 0, bytesRead);
+		              //buffer = new byte[153600];
+		            }
+		            writer.close();
+		            reader.close();
+		            
+		            FileUtils.deleteDirectory(new File(dest2Path));
+		            
+		            unzipFileIntoDirectory(destPath,dest2Path);
+		            
+		          //delete Zip file
+		            //logger.info("delete :"+destPath);
+		           // FileUtil.deleteFile(destPath);
+				}else{
+					logger.info("Software4SalesApp is no update");
+				}
+			}catch(Exception e){
+				e.printStackTrace();
 			}
-		}catch(Exception e){
-			e.printStackTrace();
 		}
 	}
     
@@ -452,6 +501,7 @@ public class AppversionVerify {
     		   
     		   //Get Credit
        		   getPlanSalesApp(localSalesAppPath,isLatestVersion,"CREDIT",localVersion,fileName);
+       		   
     		}else{
     		   fileName ="VAN_TALK";
     		   isLatestVersion = isLatestVersionPlan("plan");
@@ -577,7 +627,7 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
 	            }
 	
 	            /******************************************************/
-	        	logger.info("Write File to Local ");  
+	        	logger.info("Write File to Local plan-version.txt:"+destPath);  
 	            FileOutputStream writer = new FileOutputStream(destPath);
 	            byte[] buffer = new byte[1024];
 	            //int totalBytesRead = 0;
@@ -602,72 +652,74 @@ public static void getPlanSalesApp(String localSalesAppPath,boolean isLatestVers
     
     /** Software SalesAppUpdater.jar **/
 	public  void downloadSalesAppUpdater(boolean checkVersion){
-		String localSalesAppPath = getLocalPathSalesApp();
-		String sourcePath  =  initAllMap.get("SalesAppUpdater.zip");
-		String sourcePath2 =  initAllMap.get("SalesAppUpdater.zip");
-        String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
-        String dest2Path = localSalesAppPath+"SalesAppUpdater";
-		try{
-			boolean canDownload = false;
-			if(checkVersion == true){
-				boolean isLatestVersion = isLatestVersion("SalesAppUpdater");
-				logger.info("isLatestVersion:"+isLatestVersion);
-				
-				if(!isLatestVersion){
-					canDownload = true;
+		if(initAllMap != null){
+			String localSalesAppPath = getLocalPathSalesApp();
+			String sourcePath  =  initAllMap.get("SalesAppUpdater.zip");
+			String sourcePath2 =  initAllMap.get("SalesAppUpdater.zip");
+	        String destPath  = localSalesAppPath+"SalesAppUpdater.zip";
+	        String dest2Path = localSalesAppPath+"SalesAppUpdater";
+			try{
+				boolean canDownload = false;
+				if(checkVersion == true){
+					boolean isLatestVersion = isLatestVersion("SalesAppUpdater");
+					logger.info("isLatestVersion:"+isLatestVersion);
+					
+					if(!isLatestVersion){
+						canDownload = true;
+					}else{
+						canDownload = false;
+					}
+					
 				}else{
-					canDownload = false;
+					canDownload = true;
 				}
 				
-			}else{
-				canDownload = true;
+				if(canDownload){
+					logger.info("download SalesAppUpdater");
+					
+					String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
+					System.out.println(logs);
+					URL url = null;
+		            InputStream reader = null;
+		            try{
+			            url = new URL(sourcePath);
+			            url.openConnection();
+			            reader = url.openStream();
+		            }catch(Exception e){
+		            	logger.error("Error Source1 retry Source2");
+		            	url = new URL(sourcePath2);
+			            url.openConnection();
+			            reader = url.openStream();
+		            }
+		            
+		            FileOutputStream writer = new FileOutputStream(destPath);
+		            byte[] buffer = new byte[1024];
+		            //int totalBytesRead = 0;
+		            int bytesRead = 0;
+		            while ((bytesRead = reader.read(buffer)) > 0){  
+		              writer.write(buffer, 0, bytesRead);
+		            //  buffer = new byte[153600];
+		            }
+		            writer.close();
+		            reader.close();
+		            
+		            //delete old folder
+		            FileUtils.deleteDirectory(new File(dest2Path+"SalesAppUpdater"));
+		            
+		            //unzip Folder to Tomcat Path
+		            logs += "\n           UnZip...From("+destPath+"SalesAppUpdater.zip) to ("+dest2Path+"SalesAppUpdater)";
+		           // System.out.println(logs);
+		            unzipFileIntoDirectory(destPath,dest2Path);
+		            
+		            //delete Zip file
+		           // logger.info("delete :"+destPath);
+		            //FileUtil.deleteFile(destPath);
+				}else{
+					logger.info("SalesAppUpdater is no update");
+				}
+			}catch(Exception e){
+				e.printStackTrace();
 			}
-			
-			if(canDownload){
-				logger.info("download SalesAppUpdater");
-				
-				String logs = "\n           Download File From http...From("+sourcePath+") to ("+destPath+")";
-				System.out.println(logs);
-				URL url = null;
-	            InputStream reader = null;
-	            try{
-		            url = new URL(sourcePath);
-		            url.openConnection();
-		            reader = url.openStream();
-	            }catch(Exception e){
-	            	logger.error("Error Source1 retry Source2");
-	            	url = new URL(sourcePath2);
-		            url.openConnection();
-		            reader = url.openStream();
-	            }
-	            
-	            FileOutputStream writer = new FileOutputStream(destPath);
-	            byte[] buffer = new byte[1024];
-	            //int totalBytesRead = 0;
-	            int bytesRead = 0;
-	            while ((bytesRead = reader.read(buffer)) > 0){  
-	              writer.write(buffer, 0, bytesRead);
-	            //  buffer = new byte[153600];
-	            }
-	            writer.close();
-	            reader.close();
-	            
-	            //delete old folder
-	            FileUtils.deleteDirectory(new File(dest2Path+"SalesAppUpdater"));
-	            
-	            //unzip Folder to Tomcat Path
-	            logs += "\n           UnZip...From("+destPath+"SalesAppUpdater.zip) to ("+dest2Path+"SalesAppUpdater)";
-	           // System.out.println(logs);
-	            unzipFileIntoDirectory(destPath,dest2Path);
-	            
-	            //delete Zip file
-	           // logger.info("delete :"+destPath);
-	            //FileUtil.deleteFile(destPath);
-			}else{
-				logger.info("SalesAppUpdater is no update");
-			}
-		}catch(Exception e){
-			e.printStackTrace();
 		}
 	}
 	

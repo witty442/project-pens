@@ -1,13 +1,11 @@
 package com.isecinc.pens.web.pay;
 
 import java.sql.Connection;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +15,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.Constants;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
@@ -29,8 +22,12 @@ import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PayDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -40,32 +37,43 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class PayAction extends I_Action {
 
-	public static int pageSize = 90;
-	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
+	public static int pageSize = 30;
 	public static String STATUS_SAVE ="SV";
 	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare2");
 		PayForm aForm = (PayForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				PayBean ad = new PayBean();
 				ad.setCreateUser(user.getUserName());
-				
 				aForm.setBean(ad);
+				
+				//init session ListBox
+				List<PopupForm> billTypeList = new ArrayList<PopupForm>();
+				PopupForm ref = new PopupForm("",""); 
+				billTypeList.add(ref);
+				billTypeList.addAll(PayDAO.searchDeptList(new PopupForm(),""));
+				request.getSession().setAttribute("deptList",billTypeList);
+				
 			}else if("back".equals(action)){
+				conn = DBConnection.getInstance().getConnection();
+				
 				PayBean cri  =aForm.getBeanCriteria();
 				cri.setDocNo("");
-				aForm.setBean(PayDAO.searchHead(cri,false));
+				aForm.setBean(PayDAO.searchHead(conn,cri,false,false,1,pageSize));
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			
+			if(conn !=null){
+				conn.close();conn=null;
+			}
 		}
 		return mapping.findForward("search");
 	}
@@ -75,14 +83,63 @@ public class PayAction extends I_Action {
 		PayForm aForm = (PayForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
 		try {
-			PayBean b = aForm.getBean();
-			aForm.setBean(PayDAO.searchHead(aForm.getBean(),false));
-			aForm.setResultsSearch(aForm.getBean().getItems());
-
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(PayDAO.searchTotalHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+				PayBean paybean = PayDAO.searchHead(conn,aForm.getBean(),false,allRec,currPage,pageSize);
+				List<PayBean> items = paybean.getItems();
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    PayBean paybean = PayDAO.searchHead(conn,aForm.getBean(),false,allRec,currPage,pageSize);
+				List<PayBean> items = paybean.getItems();
+				aForm.setResultsSearch(items);
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,7 +147,9 @@ public class PayAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search");
 	}
@@ -134,7 +193,9 @@ public class PayAction extends I_Action {
 				//copy data 
 				PayBean c = new PayBean();
 				c.setDocNo(docNo);
-				PayBean bean = PayDAO.searchHead(c,true).getItems().get(0);
+				//PayBean bean = PayWhiteDAO.searchHead(c,true).getItems().get(0);
+				PayBean bean = PayDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
+				
 				bean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setDocNo("");
 				
@@ -150,7 +211,8 @@ public class PayAction extends I_Action {
 				PayBean c = new PayBean();
 				c.setDocNo(docNo);
 				if( !Utils.isNull(docNo).equals("")){
-				  PayBean bean = PayDAO.searchHead(c,true).getItems().get(0);
+				  //PayBean bean = PayWhiteDAO.searchHead(c,true).getItems().get(0);
+				  PayBean bean = PayDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
 				  aForm.setBean(bean);
 				}else{
 				   c.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -279,8 +341,8 @@ public class PayAction extends I_Action {
 			}
 			
 			//Search Again
-			PayBean bean = PayDAO.searchHead(conn,h,true).getItems().get(0);
-		
+			//PayBean bean = PayWhiteDAO.searchHead(conn,h,true).getItems().get(0);
+			PayBean bean = PayDAO.searchHead(conn,h,true,false,1,pageSize).getItems().get(0);
 		    aForm.setBean(bean);
 			
 			conn.commit();
@@ -367,7 +429,8 @@ public class PayAction extends I_Action {
 			PayBean cri = new PayBean();
 			cri.setDocNo(docNo);
 			
-			PayBean h = PayDAO.searchHead(conn,cri,true).getItems().get(0);
+			//PayBean h = PayWhiteDAO.searchHead(conn,cri,true).getItems().get(0);
+			PayBean h = PayDAO.searchHead(conn,cri,true,false,1,pageSize).getItems().get(0);
 			logger.debug("result:"+h.getDocNo());
 			
 			if(h != null){
@@ -534,14 +597,17 @@ public class PayAction extends I_Action {
 				
 				//set printer success
 				request.setAttribute("printerSuccess", "printerSuccess");
+				logger.info("Print report PayIn Success");
 			}else{
 				
 				request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
 				return  mapping.findForward("detail");
 			}
 		} catch (Exception e) {
+			logger.info("Print report PayIn Error");
 			e.printStackTrace();
 			request.setAttribute("Message", e.getMessage());
+			
 		} finally {
 			try {
 				 conn.close();

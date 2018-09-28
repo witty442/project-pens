@@ -1,6 +1,8 @@
 package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,13 +13,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveStockWarehoseDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -36,6 +40,14 @@ public class MoveStockWarehouseAction extends I_Action {
 			if("new".equalsIgnoreCase(action)){
 				aForm.setBean(new MoveStockWarehouseBean());
 				aForm.setResultsSearch(null);
+				
+				//init Session Variable
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref1 = new References("","");
+				wareHouseList.add(ref1);
+				wareHouseList.addAll(JobDAO.getWareHouseList("'W2','W3','W4','W5'"));
+				request.getSession().setAttribute("wareHouseList",wareHouseList);
+				
 			}else{
 				//back Search
 				aForm.setBean(aForm.getBeanCriteria());
@@ -60,11 +72,11 @@ public class MoveStockWarehouseAction extends I_Action {
 			int totalPage = 0;
 			int pageNumber = 1;
 			try {
+				conn = DBConnection.getInstance().getConnection();
+				
 				if("newsearch".equalsIgnoreCase(action)){
-					conn = DBConnection.getInstance().getConnection();
-
 					pageNumber = 1;
-					totalRow =  MoveStockWarehoseDAO.searchTotalRowMoveStockHis(aForm.getBean());
+					totalRow =  MoveStockWarehoseDAO.searchTotalRowMoveStockHis(conn,aForm.getBean());
 					totalPage = Utils.calcTotalPage(totalRow, pageSize);
 					
 					aForm.setTotalPage(totalPage);
@@ -76,7 +88,7 @@ public class MoveStockWarehouseAction extends I_Action {
 				logger.debug("totalPage:"+aForm.getTotalPage());
 				
 				//search by start ,end rownum 
-				data = MoveStockWarehoseDAO.searchMoveStockHis(aForm.getBean(),pageNumber,pageSize);
+				data = MoveStockWarehoseDAO.searchMoveStockHis(conn,aForm.getBean(),pageNumber,pageSize);
 				
 				if(data != null && data.size() >0){
 					aForm.setResultsSearch(data);
@@ -107,7 +119,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			//save old critiria
+			//save old criteria
 			aForm.setBeanCriteria(aForm.getBean());
 			
 			String action = Utils.isNull(request.getParameter("action"));
@@ -161,7 +173,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			MoveStockWarehouseBean p = MoveStockWarehoseDAO.searchMoveStock(aForm.getBean());
+			MoveStockWarehouseBean p = MoveStockWarehoseDAO.searchMoveStock(conn,aForm.getBean());
 			if(p.getItems() != null && p.getItems().size() >0){
 				aForm.setResults(p.getItems());
 				p.setCanEdit(true);
@@ -193,7 +205,7 @@ public class MoveStockWarehouseAction extends I_Action {
         String msg  = "";
         String pensItemOld = "";
 		try {
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			conn.setAutoCommit(false);
 			
 			MoveStockWarehouseBean h = aForm.getBean();
@@ -220,6 +232,12 @@ public class MoveStockWarehouseAction extends I_Action {
 		    	//del Update Stock Finish warehouse from
 		    	MoveStockWarehoseDAO.delStockFinishFromWarehouse(conn, h);
 		    	
+		    	//add Transfer Finishing warehouse 
+		    	//gen new Transfer_no and default transfer_date = current date
+		    	h.setTransferNo(MoveStockWarehoseDAO.genTransferNo(new Date()));
+		    	h.setTransferDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		    	MoveStockWarehoseDAO.processUpdateStockTransferFinishingToWarehouse(conn, h);
+		    	
 		    	//add Update Stock Finish warehouse To
 		    	MoveStockWarehoseDAO.processUpdateStockFinishToWarehouse(conn, h);
 		    	
@@ -235,8 +253,10 @@ public class MoveStockWarehouseAction extends I_Action {
 			//set to form
 			aForm.setBean(h);
 			
+			//add msg to show
 			request.setAttribute("Message",msg);
 			
+			//commit transaction
 			conn.commit();
 		} catch (Exception e) {
 			conn.rollback();

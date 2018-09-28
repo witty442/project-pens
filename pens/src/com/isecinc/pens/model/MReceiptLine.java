@@ -140,7 +140,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
 			whereCause += "\n  ORDER BY LINE_NO ";
 			
-			logger.debug("whereCause:"+whereCause);
+			//logger.debug("whereCause:"+whereCause);
 			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, ReceiptLine.class);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -153,7 +153,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
 			whereCause += "\n  ORDER BY LINE_NO ";
 			
-			logger.debug("whereCause:"+whereCause);
+			//logger.debug("whereCause:"+whereCause);
 			pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, ReceiptLine.class);
 		} catch (Exception e) {
 			e.printStackTrace();

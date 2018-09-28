@@ -18,8 +18,8 @@ import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class ConfirmReturnWacoalDAO extends PickConstants{
 

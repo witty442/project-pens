@@ -103,9 +103,10 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css?v=<%=SessionGen.getInstance().getIdSession()%>"" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/page_stock/epoch.js"></script>
+
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/tablesorter.css" />
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes_for_page_stock.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
@@ -131,8 +132,6 @@ function backsearch(path) {
 	<%}%>
 	document.stockForm.submit();
 }
-
-
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">

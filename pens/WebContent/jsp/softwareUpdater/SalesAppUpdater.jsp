@@ -1,3 +1,4 @@
+
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="util.AppversionVerify"%>
@@ -8,7 +9,9 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
+<%
 
+%>
 <style type="text/css">
 <!--
 body {
@@ -21,7 +24,7 @@ body {
 <%
   if(request.getParameter("submit_update") != null){
 	  //Get Folder for Software SalesAppUpdater  
-	  AppversionVerify.getIns().downloadSalesAppUpdater(true); 
+	  AppversionVerify.getApp().downloadSalesAppUpdater(true); 
 					   
 	  //Start Software Update Sales App
 	  AppversionVerify.startSalesAppUpdater();
@@ -102,14 +105,14 @@ body {
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
 							<td align="center">
-							   <a href="https://www.dropbox.com/s/8hh7wlihrmrizxf/pensclient.war?dl=1">
+							   <a href="https://www.dropbox.com/s/z2z6904qm5x46s3/pensclient.war?dl=1">
 								  <input type="button" name ="submit_download" 
 								  value="´ÒÇ¹ìâËÅ´ pensclient.war"  class="newPosBtn"> 
 								</a>
-								<a href="#">
+								<!-- <a href="#">
 								  <input type="submit" name ="submit_update"   class="newPosBtn"
 								  value="ÍÑ¾à´µâ»Ãá¡ÃÁ SalesApp" > 
-								</a>
+								</a> -->
 							</td>
 						</tr>
 					</table>

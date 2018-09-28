@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetUtils"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>

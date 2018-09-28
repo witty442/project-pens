@@ -1,5 +1,4 @@
 <%@page import="com.isecinc.pens.bean.Customer"%>
-<%@page import="java.util.Map"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@page import="util.SessionGen"%>
@@ -15,7 +14,6 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display_cust" %>
 
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -60,7 +58,7 @@ if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg4=  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
 	System.out.println("Header.jsp AppVerify ");
-	msg4 = AppversionVerify.getIns().checkAppVersion(request) ;
+	msg4 = AppversionVerify.getApp().checkAppVersion(request) ;
 } 
 
 %>
@@ -155,17 +153,13 @@ $(function() {
  
  <%}else{%>
  
- 
  <%}%>
- 
  function gotoPage(path,page){
 		document.customerForm.action = path + "/jsp/customerAction.do?do=searchPage&rf=Y";
 		document.getElementsByName('curPage')[0].value = page;
 		document.customerForm.submit();
 		return true;
 	}
- 
- 
 //change pv
  function changePV(pvid){
 	 var disId = parseInt(document.getElementsByName('customer.district')[0].value);
@@ -190,7 +184,11 @@ $(function() {
 	 // alert(width+","+height);
 	 PopupCenter(path+"/jsp/location/markLocationMap.jsp?", "Mark location map",width,height); 
 }
- 
+ function exportToExcel(path){
+		document.customerForm.action = path + "/jsp/customerAction.do?do=exportToExcel";
+		document.customerForm.submit();
+		return true;
+	}
 </script>
 
 </head>
@@ -297,6 +295,10 @@ $(function() {
 								  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
 									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
 								</a> 
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="#" onclick="return exportToExcel('${pageContext.request.contextPath}');">
+								 <b>....</b>
+								</a> 
 							</td>
 						</tr>
 					</table>				
@@ -350,9 +352,11 @@ $(function() {
 								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
 								  <th class="cust_actionReceipt">ทำจัดรายการ</th>
 								<%} %>
-								<% //if( role.equalsIgnoreCase(User.VAN)){ %>
+								<%if( role.equalsIgnoreCase(User.VAN)){ %>
 								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
-								<%//} %>
+								<%}else{ %>
+								   <th class="cust_actionEditCust" >เปิดบิลพิเศษ</th>
+								<%} %>
 								<th class="cust_actionView">แสดง</th>
 								<th class="cust_actionEdit">ทำรายการ</th>
 								<th>แสดงรูปร้านค้า</th>
@@ -385,60 +389,85 @@ $(function() {
 								</td>
 								<td class="cust_status"><c:out value='${item.activeLabel}'/></td>
 								<td class="cust_actionOrder">
+			 					    <c:if test="${item.isActive=='Y'}">
 								    <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${item.id})">
 							           <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
 							        </a> 
+							        </c:if>
 								</td>
 								
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
 									<td class="cust_actionReceipt">
 									 <c:if test="${item.displayActionReceipt==''}">
+									   <c:if test="${item.isActive=='Y'}">
 									    <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${item.id}');">
 									         <img src="${pageContext.request.contextPath}/images2/b_receipt.jpg" width="32" height="32" border="0" class="newPicBtn"/>
 									    </a>
+									    </c:if>
 									 </c:if>
 									</td>
 									<td class="cust_actionReceipt">
+									 <c:if test="${item.isActive=='Y'}">
 									    <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
 									       <%-- <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/> --%>
 									       จัดรายการ
 									    </a>
+									    </c:if>
 									</td>
 								<%} %>
 								<% if( role.equalsIgnoreCase(User.VAN)){ %>
 									<td class="cust_actionEditCust">
 									   <c:if test="${item.displayActionEditCust==''}">
 										   <c:if test="${item.canActionEditCust=='true'}">
+										     <c:if test="${item.isActive=='Y'}">
 									          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${item.id}');">
 											     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
 											  </a>
+											  </c:if>
 											</c:if>
 											<c:if test="${item.canActionEditCust2=='true'}">
+											 <c:if test="${item.isActive=='Y'}">
 									          <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
 											     <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
 											  </a>
+											  </c:if>
 											</c:if>
 									   </c:if>
 									</td>
 							<% }else if( role.equalsIgnoreCase(User.TT)){ %>
-								<td class="cust_actionEditCust">
+							   <!-- Edit Customer -->
+								<%-- <td class="cust_actionEditCust">
 							        <c:if test="${item.canActionEditCust2=='true'}">
+							           <c:if test="${item.isActive=='Y'}">
 									        <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
 											    <img border=0 src="${pageContext.request.contextPath}/icons/user_edit.gif">
 									       </a>
+									    </c:if>
 									</c:if>
+								</td> --%>
+								<!-- Order Special -->
+								<td class="cust_actionEditCust">
+									 <c:if test="${item.isActive=='Y'}">
+								      <a href="#" onclick="toCreateNewOrderSpecial('${pageContext.request.contextPath}','add',${item.id})">
+							            <img src="${pageContext.request.contextPath}/images2/b_order_special.png" width="32" height="32" border="0" class="newPicBtn">
+							          </a> 
+							        </c:if>
 								</td>
 							<%} %>
 							
 								<td class="cust_actionView">
+								 <c:if test="${item.isActive=='Y'}">
 								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
 									   <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
 									</a>
+									</c:if>
 								</td>
 								<td class="cust_actionEdit">
-								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
+								  <c:if test="${item.isActive=='Y'}">
+								    <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
 									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
-								   </a>
+								    </a>
+								  </c:if>
 								</td>
 								<td class="cust_actionEdit">
 						

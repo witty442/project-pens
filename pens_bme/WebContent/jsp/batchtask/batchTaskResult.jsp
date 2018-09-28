@@ -63,6 +63,10 @@
 
 <%if("ImportOrderFromExcel".equalsIgnoreCase(pageName)){ %>
   <jsp:include page="sub/ImportOrderFromExcel_sub.jsp"></jsp:include>
+<%}else if("ImportBarcodeMasterFromExcel".equalsIgnoreCase(pageName)){ %>
+  <jsp:include page="sub/ImportBarcodeMasterFromExcel_sub.jsp"></jsp:include>
+<%}else if("ImportOrderToOracleFromExcel".equalsIgnoreCase(pageName)){ %>
+  <jsp:include page="sub/ImportOrderToOracleFromExcel_sub.jsp"></jsp:include>
 <%} %>
 
  

@@ -1,26 +1,18 @@
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="confFinishForm" class="com.isecinc.pens.web.pick.ConfFinishForm" scope="session" />
-
 <%
  String mode = confFinishForm.getMode();
 if(session.getAttribute("typeDispList") == null){
@@ -32,50 +24,30 @@ if(session.getAttribute("typeDispList") == null){
 	session.setAttribute("typeDispList",billTypeList);
 }
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_confFinish.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
+
+<!-- Control Save Lock Screen -->
 <script type="text/javascript">
 
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('confirmDate'));
-
+   new Epoch('epoch_popup', 'th', document.getElementById('confirmDate'));
 }
 function clearForm(path){
 	var form = document.confFinishForm;
@@ -83,7 +55,6 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
 		var form = document.confFinishForm;
@@ -93,27 +64,23 @@ function cancel(path){
 	}
 	return false;
 }
-
 function back(path){
 	var form = document.confFinishForm;
 	form.action = path + "/jsp/confFinishAction.do?do=prepare2&action=back";
 	form.submit();
 	return true;
 }
-
 function viewDisp(path){
 	var form = document.confFinishForm;
 	form.action = path + "/jsp/confFinishAction.do?do=viewDisp";
 	form.submit();
 	return true;
 }
-
 function printGroupCodeBoxReport(path,requestNo){
 	window.open(path + "/jsp/printGroupCodeBoxAction.do?do=prepare&requestNo="+requestNo, "Print GroupCode Box", "width=500,height=400,location=No,resizable=No");
 }
-
-
 function save(path){
+	
 	var form = document.confFinishForm;
 	var requestDate =$('#requestDate').val();
 	var confirmDate =$('#confirmDate').val();
@@ -131,6 +98,9 @@ function save(path){
 	}
 	
 	if(confirm("ยันยัน Confirm To Finishing")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		form.action = path + "/jsp/confFinishAction.do?do=save";
 		form.submit();
 		return true;
@@ -151,9 +121,7 @@ function checkCompareDate(DateFrom, DateTo){
 		return true;
 	}
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -236,11 +204,10 @@ function checkCompareDate(DateFrom, DateTo){
                                     </td>
                                 </tr>
 						   </table>
-						   
 				 <!-- Table Data -->
 				<c:if test="${confFinishForm.results != null}">
 		
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="80%">
 						    <tr>
 								<th >ลำดับที่</th>
 								<c:choose>
@@ -264,18 +231,18 @@ function checkCompareDate(DateFrom, DateTo){
 								</c:choose>
 									<tr class="<c:out value='${tabclass}'/>">
 										
-										<td class="data_no"> ${results.no}</td>
+										<td class="td_text_center" width="10%"> ${results.no}</td>
 										
 										 <c:choose>
 											<c:when test="${confFinishForm.bean.typeDisp == 'Box'}">
-												<td class="data_boxNo"> ${results.boxNo}</td>
+												<td class="td_text_center" width="15%"> ${results.boxNo}</td>
 											</c:when>
 											<c:otherwise>
-												<td class="data_groupCode"> ${results.groupCode}</td>
+												<td class="td_text_center" width="15%"> ${results.groupCode}</td>
 											</c:otherwise>
 									      </c:choose>      
 										
-										<td class="data_qty" align="center">
+										<td class="td_text_right" width="10%">
 										   ${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 										</td>
@@ -294,34 +261,29 @@ function checkCompareDate(DateFrom, DateTo){
 						</div>
 						
 				</c:if>
-						   <!-- Table Data -->
-						   <table  border="0" cellpadding="3" cellspacing="0" >
-								<tr>
-									<td align="left">
-									     <c:if test="${confFinishForm.bean.canPrint == true}">
-											<a href="javascript:printGroupCodeBoxReport('${pageContext.request.contextPath}','${confFinishForm.bean.requestNo}')">
-											  <input type="button" value=" พิมพ์ใบปะกล่อง " class="newPosBtnLong"> 
-											 </a>
-										 </c:if>	
-										 
-										 <c:if test="${confFinishForm.bean.canEdit == true}">
-											<a href="javascript:save('${pageContext.request.contextPath}')">
-											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
-											 </a>
-										 </c:if>
-										 	
-	
-										<a href="javascript:back('${pageContext.request.contextPath}','','add')">
-										  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
-										</a>	
-										
-									</td>
-								</tr>
-							</table>
-					  </div>
+					   <!-- Table Data -->
+					   <table  border="0" cellpadding="3" cellspacing="0" >
+							<tr><td align="left">
+						     <c:if test="${confFinishForm.bean.canPrint == true}">
+								<a href="javascript:printGroupCodeBoxReport('${pageContext.request.contextPath}','${confFinishForm.bean.requestNo}')">
+								  <input type="button" value=" พิมพ์ใบปะกล่อง " class="newPosBtnLong"> 
+								 </a>
+							 </c:if>	
+							 <c:if test="${confFinishForm.bean.canEdit == true}">
+								<a href="javascript:save('${pageContext.request.contextPath}')">
+								  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
+								 </a>
+							 </c:if>
+							<a href="javascript:back('${pageContext.request.contextPath}','','add')">
+							  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
+							</a>
+						   </td></tr>
+						</table>
+					</div>
 					<!-- ************************Result ***************************************************-->
 					
 					<!-- hidden field -->
+					<input type="hidden" id="status_save" name="status_save"/>
 					</html:form>
 					<!-- BODY -->
 					</td>
@@ -349,3 +311,6 @@ function checkCompareDate(DateFrom, DateTo){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

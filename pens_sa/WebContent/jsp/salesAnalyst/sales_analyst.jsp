@@ -1,9 +1,8 @@
-<%@page import="util.SIdUtils"%>
+<%@page import="util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.Locale"%>
@@ -11,12 +10,11 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils" %>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 <%
 if(request.getParameter("action") != null){
     SAInitial.getInstance().initSession(request);
- }
+}
 
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
 java.util.List yearList = null;
@@ -73,6 +71,16 @@ fieldset legend {
 	font-size: 14px;
 	font-weight: normal;
 	text-decoration: none;
+}
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 2px;
 }
  #scroll {
 <%if(!"0".equals(screenWidth)){%>
@@ -639,7 +647,6 @@ function loadValueOnchange(e, field,change){
 	default: break;
 	}
 	
-	
 	if(condType.val() == 0){
 		alert("โปรดเลือก ประเภทขอบเขตข้อมูล");
 		return;
@@ -648,7 +655,6 @@ function loadValueOnchange(e, field,change){
 	if(condCode.val() !=""){
 		loadValue(e, field,change);
 	}
-	
 }
 
 //call ajax
@@ -946,18 +952,15 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 						<html:hidden property="salesBean.returnString"/>
 						<input type="hidden" name="roleTabText" id="roleTabText"/>
 			            <jsp:include page="../error.jsp"/>	
-			               <fieldset>
-			                <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+                            <!-- Criteria -->
+                        
+                            <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
 			                  <tr><td>
                                <%out.println(Utils.isNull(session.getAttribute("USER_ROLE_INFO"))); %>
                               </td></tr>
                             </table>
-                           </fieldset>
-                           
-                           <fieldset>
-			                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
+                            <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
 			                  <tr><td>
-			                  
 		                            <fieldset>
 		                             <legend><b>รูปแบบการค้นหาที่ใช้ประจำ</b></legend>
 					                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
@@ -968,73 +971,81 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 									            </html:select>
 		                                  </td>
 		                                  <td width="65%" align="left">
-		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="newPosBtnLong" style="width: 180px;" 
-												     onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" />
+		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="btnSmallLong" style="width: 185px;" 
+											onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" />
 										 </td>
 		                              </tr>
 		                            </table>
 		                           </fieldset>
                                 </td> </tr>
                             </table>
-                           </fieldset>
-                           
-                            <!-- Criteria -->
-                            <fieldset>
-                           
-                            <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
-									<tr><td colspan=8 align="left"><b>ข้อมูล ณ วันที่ &nbsp;:&nbsp;<%=(String)session.getAttribute("maxOrderedDate")%>&nbsp;&nbsp;เวลา&nbsp;:<%=(String)session.getAttribute("maxOrderedTime")%></b></td>
-									</tr>
-									<tr>
-									  <td colspan="8" align="right">
-									    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
-										<tr class="txt_style" >
-									  	<td width="13%" align="left">รอบเวลา &nbsp;&nbsp;<html:select property="salesBean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
-									         <html:options collection="typeSearchList" property="key" labelProperty="name"/>
-								           </html:select>
-								           </td>
-									     <td width="6%" align="right">วันที่</td>
-									     <td width="27%" align="left">
-									      <html:text property="salesBean.day" readonly="true" styleId="day" size="15"></html:text>&nbsp;&nbsp;-&nbsp;&nbsp;<html:text property="salesBean.dayTo" readonly="true" styleId="dayTo" size="15"></html:text>
-                                        </td> 
-										<td width="2%" align="right">ปี</td>
-										<td width="6%" align="left">
-										  <html:select property="salesBean.year" styleId="yearList" onchange="chkYear()" styleClass="txt_style">
-									         <html:options collection="yearList" property="key" labelProperty="name"/>
-							              </html:select>
+                            
+                          <table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
+						    <tr><td align="left">
+						     <fieldset>
+                                 <table width="80%" border="0" align="left" cellpadding="3" cellspacing="1">
+										<tr><td align="left">
+											<font size="2"><b><u>ข้อมูล ณ วันที่ &nbsp;:&nbsp;<%=(String)session.getAttribute("maxOrderedDate")%>
+											&nbsp;&nbsp;เวลา&nbsp;:<%=(String)session.getAttribute("maxOrderedTime")%>
+											</u></b></font>
 										</td>
-									    <td width="8%" align="right">จัดกลุ่มตาม</td>
-									    <td width="20%" align="left">
-									        <html:select property="salesBean.groupBy" styleClass="txt_style">
-										         <html:options collection="groupByList" property="key" labelProperty="name"/>
-								            </html:select>
-                                        </td>
-                                       
-                                       <input type="hidden" name="maxOrderedDate" value=<%=(String)session.getAttribute("maxOrderedDate")%> id="maxOrderedDate"/>
-                                       <input type="hidden" name="maxOrderedTime" value=<%=(String)session.getAttribute("maxOrderedTime")%> id="maxOrderedTime"/>
-									</tr>
-										</table>
-									  </td>
-                                    </tr>
+										</tr>
+										<tr>
+										  <td align="right">
+										    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+											<tr class="txt_style" >
+										  	<td width="13%" align="left" nowrap><b>รอบเวลา </b>
+										  	      &nbsp;&nbsp;
+										  	    <html:select property="salesBean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
+										         <html:options collection="typeSearchList" property="key" labelProperty="name"/>
+									           </html:select>
+									           </td>
+										     <td width="6%" align="right"><b>วันที่</b></td>
+										     <td width="27%" align="left" nowrap>
+										      <html:text property="salesBean.day" readonly="true" styleId="day" size="12"> </html:text>
+										      &nbsp;&nbsp;-&nbsp;&nbsp;
+										      <html:text property="salesBean.dayTo" readonly="true" styleId="dayTo" size="12"></html:text>
+	                                        </td> 
+											<td width="2%" align="right"><b>ปี</b></td>
+											<td width="6%" align="left">
+											  <html:select property="salesBean.year" styleId="yearList" onchange="chkYear()" styleClass="txt_style">
+										         <html:options collection="yearList" property="key" labelProperty="name"/>
+								              </html:select>
+											</td>
+										    <td width="8%" align="right" nowrap><b>จัดกลุ่มตาม</b></td>
+										    <td width="20%" align="left">
+										        <html:select property="salesBean.groupBy" styleClass="txt_style">
+											         <html:options collection="groupByList" property="key" labelProperty="name"/>
+									            </html:select>
+									            
+									            <input type="hidden" name="maxOrderedDate" value=<%=(String)session.getAttribute("maxOrderedDate")%> id="maxOrderedDate"/>
+	                                            <input type="hidden" name="maxOrderedTime" value=<%=(String)session.getAttribute("maxOrderedTime")%> id="maxOrderedTime"/>
+	                                        </td>
+										    </tr>
+											</table>
+										</td></tr>
+									  </table>
+									 </fieldset>
+								   </td></tr>
 									
-									<tr>
-									  <td colspan="8" align="left">
+									<tr><td colspan="8" align="left">
 									     <fieldset>
 									       <legend>เดือน</legend>
 										    <table width="100%" border="0">
 										    <c:forEach var="item" items="${yearList}" >
 	                                         <tr id="${item.key}" class="txt_style" >
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}01</html:multibox>ม.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}02</html:multibox>ก.พ.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}03</html:multibox>มี.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}04</html:multibox>เม.ย.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}05</html:multibox>พ.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}06</html:multibox>มิ.ย.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}07</html:multibox>ก.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}08</html:multibox>ส.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}09</html:multibox>ก.ย.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}10</html:multibox>ต.ค.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}11</html:multibox>พ.ย.</td>
-	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}12</html:multibox>ธ.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}01</html:multibox>&nbsp;ม.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}02</html:multibox>&nbsp;ก.พ.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}03</html:multibox>&nbsp;มี.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}04</html:multibox>&nbsp;เม.ย.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}05</html:multibox>&nbsp;พ.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}06</html:multibox>&nbsp;มิ.ย.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}07</html:multibox>&nbsp;ก.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}08</html:multibox>&nbsp;ส.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}09</html:multibox>&nbsp;ก.ย.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}10</html:multibox>&nbsp;ต.ค.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}11</html:multibox>&nbsp;พ.ย.</td>
+	                                          <td width="5%"><html:multibox  property="salesBean.chkMonth">${item.key}12</html:multibox>&nbsp;ธ.ค.</td>
 	                                         </tr>
 	                                         </c:forEach>
                                         </table>
@@ -1048,10 +1059,10 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 										    <table width="100%" border="0">
 										     <c:forEach var="item" items="${yearList}" >
 		                                         <tr id="${item.key}_Q" class="txt_style" >
-		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}1</html:multibox>ไตรมาส 1</td>
-		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}2</html:multibox>ไตรมาส 2</td>
-		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}3</html:multibox>ไตรมาส 3</td>
-		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}4</html:multibox>ไตรมาส 4</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}1</html:multibox>&nbsp;ไตรมาส 1</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}2</html:multibox>&nbsp;ไตรมาส 2</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}3</html:multibox>&nbsp;ไตรมาส 3</td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkQuarter">${item.key}4</html:multibox>&nbsp;ไตรมาส 4</td>
 		                                         </tr>
 		                                     </c:forEach>
                                            </table>
@@ -1069,7 +1080,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	                                            	  com.isecinc.core.bean.References ref=(com.isecinc.core.bean.References)yearListASC.get(i);
 	                                              
 		                                         %>
-		                                          <td width="5%"><html:multibox  property="salesBean.chkYear"><%=ref.getKey()%></html:multibox><%=ref.getName() %></td>
+		                                          <td width="5%"><html:multibox  property="salesBean.chkYear"><%=ref.getKey()%></html:multibox>&nbsp;<%=ref.getName() %></td>
 	                                         <%}} %>
 	                                         </tr>
                                         </table>
@@ -1087,9 +1098,9 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	                            <legend>เงื่อนไขในการเลือกข้อมูล</legend>
 		                            <table width="100%"  border="0" cellpadding="1" cellspacing="1" >
 		                              <tr nowarp="nowarp" class="txt_style" >
-		                                <td align="left" width="20%">ขอบเขตข้อมูล </td>
+		                                <td align="left" width="20%"><b>ขอบเขตข้อมูล</b> </td>
 		                                <td align="center" width="5%">=</td>
-		                                <td align="left" width="75%">ข้อมูลเงื่อนไข</td>
+		                                <td align="left" width="75%"><b>ข้อมูลเงื่อนไข</b></td>
 		                              </tr>
 		                              <tr nowarp="nowarp" class="txt_style" >
 		                                <td align="left">
@@ -1204,9 +1215,9 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 			                              	</td>
 			                              </tr>
 			                              <tr class="txt_style" >
-			                                <td align="left">ประเภทข้อมูล</td>
-			                                <td align="left">หน่วย</td>
-			                                <td align="left">เปรียบเทียบ</td>
+			                                <td align="left"><b>ประเภทข้อมูล</b></td>
+			                                <td align="left"><b>หน่วย</b></td>
+			                                <td align="left"><b>เปรียบเทียบ</b></td>
 			                              </tr>
 			                              <tr class="txt_style" >
 			                                <td align="left">

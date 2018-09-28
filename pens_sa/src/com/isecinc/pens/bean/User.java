@@ -10,10 +10,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import util.Utils;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.model.MGroupRole;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 
 /**
@@ -35,6 +36,8 @@ public class User extends I_PO implements Serializable {
 	public static final String MTMGR = "MTMGR";
 	public static final String STOCKCR = "STOCKCR";
 	public static final String SPIDER = "SPIDER";
+	public static final String PRODSHOW = "PRODSHOW";
+	public static final String VANDOC = "VANDOC";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -85,6 +88,9 @@ public class User extends I_PO implements Serializable {
 		
 		//set Role Cr stock
 		setRoleSpider(convertToString(rst.getString("ROLE_SPIDER")));
+		
+		setRoleProdShow(convertToString(rst.getString("ROLE_PRODSHOW")));
+		setRoleVanDoc(convertToString(rst.getString("ROLE_VANDOC")));
 		
 		// set display label
 		setDisplayLabel();
@@ -189,8 +195,26 @@ public class User extends I_PO implements Serializable {
     private String roleSalesTarget;
     private String roleCRStock;
     private String roleSpider;
+    private String roleProdShow;
+    private String roleVanDoc;
     
     
+	public String getRoleProdShow() {
+		return roleProdShow;
+	}
+
+	public void setRoleProdShow(String roleProdShow) {
+		this.roleProdShow = roleProdShow;
+	}
+
+	public String getRoleVanDoc() {
+		return roleVanDoc;
+	}
+
+	public void setRoleVanDoc(String roleVanDoc) {
+		this.roleVanDoc = roleVanDoc;
+	}
+
 	public String getRoleSpider() {
 		return roleSpider;
 	}

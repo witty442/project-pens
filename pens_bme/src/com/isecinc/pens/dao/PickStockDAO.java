@@ -22,8 +22,8 @@ import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class PickStockDAO extends PickConstants{
 	
@@ -419,99 +419,139 @@ public class PickStockDAO extends PickConstants{
 		}
 	}
 
-	public static List<PickStock> searchHead(PickStock o ) throws Exception {
+	public static int searchTotaRecHead(Connection conn,PickStock o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
-		PickStock h = null;
-		List<PickStock> items = new ArrayList<PickStock>();
-		int r = 1;
-		int c = 1;
+		int totalRec = 1;
 		try {
-			sql.append("\n SELECT * ");
-			sql.append("\n from PENSBME_PICK_STOCK    ");
+			sql.append("\n SELECT count(*) as c from PENSBME_PICK_STOCK  ");
 			sql.append("\n where 1=1   ");
-			
-			if( !Utils.isNull(o.getIssueReqNo()).equals("")){
-				sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getIssueReqStatus()).equals("")){
-				sql.append("\n and issue_req_status = '"+Utils.isNull(o.getIssueReqStatus())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getIssueReqDate()).equals("")){
-				Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				
-				sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
-			}
-			
-			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
-				Date tDate  = Utils.parse(o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				
-				sql.append("\n and CONFIRM_ISSUE_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
-			}
-			
-			if( !Utils.isNull(o.getPickType()).equals("")){
-				sql.append("\n and pick_type= '"+Utils.isNull(o.getPickType())+"'  ");
-			}
-			if( !Utils.isNull(o.getInvoiceNo()).equals("")){
-				sql.append("\n and invoice_no= '"+Utils.isNull(o.getInvoiceNo())+"'  ");
-			}
-			
-			sql.append("\n order by  issue_req_date DESC ,issue_req_no DESC ");
+			//Add Condition
+			sql.append(genWhereSql(o));
 			logger.debug("sql:"+sql);
-			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
-			  
-				   h = new PickStock();
-				  
-				   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
-				   h.setIssueReqStatus(Utils.isNull(rst.getString("issue_req_status")));
-				   h.setIssueReqStatusDesc(getStatusReqDesc(h.getIssueReqStatus()));
-
-				   h.setConfirmIssueDate(Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)); 
-				   h.setRemark(Utils.isNull(rst.getString("remark")));
-				   h.setPickUser(Utils.isNull(rst.getString("pick_user")));
-				   h.setPickType(Utils.isNull(rst.getString("pick_type")));
-				   h.setPickTypeDesc(getStatusDesc(h.getPickType()));
-				   h.setSubPickType(Utils.isNull(rst.getString("sub_pick_type")));
-				   
-				   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_ISSUED) || Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_CANCEL) ){
-					   h.setCanEdit(false);
-				   }else{
-					   h.setCanEdit(true); 
-				   }
-				   
-				   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_OPEN) ){
-					   h.setCanConfirm(true);
-				   }
- 
-			   items.add(h);
-			   r++;
-			   
+				totalRec = rst.getInt("c");
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	
+	public static List<PickStock> searchHead(Connection conn,PickStock o ,boolean allRec ,int currPage,int pageSize) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		PickStock h = null;
+		List<PickStock> items = new ArrayList<PickStock>();
+		int r = 1;
+		int c = 1;
+		try {
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+				sql.append("\n SELECT * from PENSBME_PICK_STOCK  ");
+				sql.append("\n where 1=1   ");
+				//Add Condition\
+				sql.append(genWhereSql(o));
+				sql.append("\n order by  issue_req_date DESC ,issue_req_no DESC ");
+			sql.append("\n   )A ");
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+			}
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   h = new PickStock();
+			   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
+			   h.setIssueReqStatus(Utils.isNull(rst.getString("issue_req_status")));
+			   h.setIssueReqStatusDesc(getStatusReqDesc(h.getIssueReqStatus()));
+
+			   h.setConfirmIssueDate(Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)); 
+			   h.setRemark(Utils.isNull(rst.getString("remark")));
+			   h.setPickUser(Utils.isNull(rst.getString("pick_user")));
+			   h.setPickType(Utils.isNull(rst.getString("pick_type")));
+			   h.setPickTypeDesc(getStatusDesc(h.getPickType()));
+			   h.setSubPickType(Utils.isNull(rst.getString("sub_pick_type")));
+			   
+			   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_ISSUED) || Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_CANCEL) ){
+				   h.setCanEdit(false);
+			   }else{
+				   h.setCanEdit(true); 
+			   }
+			   
+			   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_OPEN) ){
+				   h.setCanConfirm(true);
+			   }
+
+			   items.add(h);
+			   r++;
+			   
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
 			} catch (Exception e) {}
 		}
 		return items;
 	}
 	
+	public static StringBuilder genWhereSql(PickStock o ) throws Exception {
+		StringBuilder sql = new StringBuilder();
+		if( !Utils.isNull(o.getIssueReqNo()).equals("")){
+			sql.append("\n and issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'  ");
+		}
+		
+		if( !Utils.isNull(o.getIssueReqStatus()).equals("")){
+			sql.append("\n and issue_req_status = '"+Utils.isNull(o.getIssueReqStatus())+"'  ");
+		}
+		
+		if( !Utils.isNull(o.getIssueReqDate()).equals("")){
+			Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
+			Date tDate  = Utils.parse(o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n and CONFIRM_ISSUE_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getPickType()).equals("")){
+			sql.append("\n and pick_type = '"+Utils.isNull(o.getPickType())+"'  ");
+		}
+		if( !Utils.isNull(o.getInvoiceNo()).equals("")){
+			sql.append("\n and invoice_no = '"+Utils.isNull(o.getInvoiceNo())+"'  ");
+		}
+		if( !Utils.isNull(o.getCustGroup()).equals("")){
+			sql.append("\n and cust_group = '"+Utils.isNull(o.getCustGroup())+"'  ");
+		}
+		if( !Utils.isNull(o.getStoreCode()).equals("")){
+			sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+		}
+		
+		return sql;
+	}
 	//barcode status = close or null()
 	public static List<PickStock> searchBarcodeItemInStock(Connection conn,PickStock o ) throws Exception {
 		PreparedStatement ps = null;

@@ -4,7 +4,7 @@
 <%@page import="com.isecinc.pens.bean.Master"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>
@@ -27,6 +27,7 @@ try{
 		if(ret != null &&  ret.size() >0){
 			PopupForm p = ret.get(0);
 			outputText = p.getDesc()+"|"+p.getStoreNo()+"|"+p.getSubInv();
+			System.out.println("customerName:"+p.getDesc());
 		}else{
 		   outputText ="";
 		}

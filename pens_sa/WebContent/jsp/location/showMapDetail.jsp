@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>

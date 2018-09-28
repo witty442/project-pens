@@ -14,8 +14,8 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.SummaryDAO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -77,7 +77,9 @@ public class SearchStockIssuePopupAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			 String status = Utils.isNull(request.getParameter("status"));
-			 List<PopupForm> results = GeneralDAO.searchStockIssue(popupForm, status,"");
+			 String mode = Utils.isNull(request.getParameter("mode"));
+			 logger.debug("mode:"+mode);
+			 List<PopupForm> results = GeneralDAO.searchStockIssue(popupForm, status,mode);
 			 
 			 if(results != null && results.size() >0){
 				 request.setAttribute("JOB_LIST", results);

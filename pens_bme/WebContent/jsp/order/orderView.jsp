@@ -1,7 +1,8 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.StoreBean"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
@@ -11,19 +12,11 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
@@ -38,7 +31,6 @@ if(session.getAttribute("billTypeList") == null){
   List<References> billTypeList = importDAO.getBillTypeList();
   session.setAttribute("billTypeList",billTypeList);
 }
-
 
 if(session.getAttribute("regionList") == null){
    List<References> regionList = importDAO.getRegionList();
@@ -58,40 +50,18 @@ int pageNumber = 1;
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('orderDate'));
 	 <%if(request.getAttribute("Message") != null){ %>
@@ -170,6 +140,21 @@ function clearForm(path){
 	return true;
 }
 
+function genAutoPOHH(path){
+	var form = document.orderForm;
+	var orderDate =$('#storeType').val();
+	if(orderDate !="020051"){
+		alert("ปุ่มนี้ สำหรับกรณีของ His&Her เท่านั้น ");
+		return false;
+	}
+	var orderDate =$('#region').val();
+	if(orderDate !=""){
+		alert("ต้องทำการเลือกข้อมูล ของทุกภาคพร้อมกัน กรุณาเลือกใหม่ ");
+		return false;
+	}
+	form.action = path + "/jsp/orderAction.do?do=genAutoPOHH";
+	form.submit();
+}
 
 </script>
 </head>
@@ -214,11 +199,14 @@ function clearForm(path){
 						<jsp:include page="../error.jsp"/>
 						<% if(session.getAttribute("results") != null){ %> 
 						    <div align="left">
+						     <%if(request.getAttribute("Message") != null){ %>
+		                       <font size="2" color="red"><%=Utils.isNull(request.getAttribute("Message"))%></font>
+	                          <%} %>
 						     <table align="left" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
 									<td >
 									     ห้าง &nbsp;&nbsp; 
-									     <html:select property="order.storeType">
+									     <html:select property="order.storeType" styleId="storeType">
 											<html:options collection="storeTypeList" property="key" labelProperty="name"/>
 									     </html:select>
 									</td>
@@ -232,7 +220,7 @@ function clearForm(path){
 								<tr>
 									<td >
 									     ภาค &nbsp;&nbsp; 
-									     <html:select property="order.region">
+									     <html:select property="order.region" styleId='region'>
 											<html:options collection="regionList" property="key" labelProperty="name"/>
 									     </html:select>
 									</td>
@@ -343,12 +331,17 @@ function clearForm(path){
 								<a href="javascript:exportDetailToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export Detail To Excel" class="newPosBtnLong">
 								</a>
-									<a href="javascript:exportSummaryAllToExcel('${pageContext.request.contextPath}')">
+								<a href="javascript:exportSummaryAllToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export สรุปยอดรวมทุกห้าง" class="newPosBtnLong">
 								</a>
 								<%-- <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export To Excel" class="newPosBtnLong">
-								</a> --%>						
+								</a> --%>	
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="javascript:genAutoPOHH('${pageContext.request.contextPath}')">
+								  <input type="button" value="Gen Order His&her for Generate PO at ORACLE" class="newPosBtnLong">
+								</a>					
 							</td>
 						</tr>
 					</table>
@@ -461,7 +454,7 @@ function clearForm(path){
 						<%} %>
 						<tr class="<%=classStyle%>">
 						       <td><%=no%></td>
-						       <td><input type="text" name="groupCode" value="<%=o.getGroupCode()%>" readonly size="5" class="disableText"></td>
+						       <td><input type="text" name="groupCode" value="<%=o.getGroupCode()%>" readonly size="10" class="disableText"></td>
 						       <td><input type="text" name="itemDesc" value="<%=o.getItemDisp()%>" readonly size="4" class="disableText"></td>
 						       <td><input type="text" name="item" value="<%=o.getItem()%>" readonly size="6" class="disableText"></td>
 						       <td><input type="text" name="onhandQty_<%=i%>" id="onhandQty_<%=i%>"  readonly value="<%=o.getOnhandQty()%>" size="3" class="disableText"></td>	
@@ -509,7 +502,7 @@ function clearForm(path){
 						
 			}//if StoreList != null	
 						%>
-					
+					OrderView
                     <!-- ************************Result ***************************************************-->
 
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
@@ -542,5 +535,6 @@ function clearForm(path){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+orderView
 </body>
 </html>

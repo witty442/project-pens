@@ -1,28 +1,17 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="jobForm" class="com.isecinc.pens.web.pick.JobForm" scope="session" />
-<%
-%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -30,40 +19,17 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_job.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('openDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('closeDate'));
@@ -74,14 +40,12 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function back(path){
 	var form = document.jobForm;
 	form.action = path + "/jsp/jobAction.do?do=search2&action=back";
 	form.submit();
 	return true;
 }
-
 function cancel(path){
 	var form = document.jobForm;
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
@@ -91,7 +55,6 @@ function cancel(path){
 	}
 	return false;
 }
-
 function save(path){
 	var form = document.jobForm;
 	var openDate =$('#openDate').val();
@@ -141,13 +104,15 @@ function save(path){
 		}
 	}
 	if(confirm("ยันยันการบันทึกข้อมูล")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		form.action = path + "/jsp/jobAction.do?do=save";
 		form.submit();
 		return true;
 	}
 	return false;
 }
-
 function saveRefDoc(path){
 	var form = document.jobForm;
 	if(confirm("ยันยันการบันทึกข้อมูล")){
@@ -157,7 +122,6 @@ function saveRefDoc(path){
 	}
 	return false;
 }
-
 function checkCloseDate(DateFrom, DateTo){
 	if(DateFrom=='' || DateTo==''){return true;}
 	DateFrom = DateFrom.split("/");
@@ -171,7 +135,6 @@ function checkCloseDate(DateFrom, DateTo){
 		return true;
 	}
 }
-
 function openPopupCustomer(path,types,storeType){
 	var form = document.jobForm;
 	var storeGroup = form.custGroup.value;
@@ -181,10 +144,10 @@ function openPopupCustomer(path,types,storeType){
         param += "&storeGroup="+storeGroup;
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			 //  "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"Store Search",600);
 }
-
 function setStoreMainValue(code,desc,storeNo,subInv,types){
 	var form = document.jobForm;
 	//alert(form);
@@ -207,7 +170,6 @@ function setStoreMainValue(code,desc,storeNo,subInv,types){
 	   form.subInv.value = subInv;
 	}
 } 
-
 function getCustNameKeypress(e,custCode,fieldName){
 	var form = document.jobForm;
 	if(e != null && e.keyCode == 13){
@@ -223,7 +185,6 @@ function getCustNameKeypress(e,custCode,fieldName){
 		}
 	}
 }
-
 function getCustName(custCode,fieldName){
 	var returnString = "";
 	var form = document.jobForm;
@@ -343,7 +304,7 @@ function resetStore(){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 							     <tr>
-	                                 <td colspan="1" align="center"> <b>รายละเอียด Job </b> </td>		
+	                                 <td colspan="2" align="center" class="criteria_h_style"> <b><u>รายละเอียด Job </u></b> </td>		
 								</tr>
 						       <tr>
                                     <td> Open Date<font color="red">*</font></td>
@@ -423,10 +384,10 @@ function resetStore(){
 									</td>
 								</tr>	
 								<tr>
-                                    <td> Job Name</td>
+                                    <td> Job Name <font color="red">*</font></td>
 									<td >
 									 <c:if test="${jobForm.job.canEdit == true}">
-						                 <html:text property="job.name" styleId="name" size="50" /><font color="red">*</font>
+						                 <html:text property="job.name" styleId="name" size="50" />
 						             </c:if>
 						            <c:if test="${jobForm.job.canEdit == false}">
 						                 <html:text property="job.name" styleId="name" size="50" readonly="true" styleClass="disableText" />
@@ -470,14 +431,28 @@ function resetStore(){
 								</tr>
 								<%if(jobForm.getMode().equals("edit") || jobForm.getMode().equals("view")){ %>
 									<tr>
-	                                    <td> RTN No </td>
+	                                    <td> RTN No / GR No </td>
 										<td>	
 										<%if(jobForm.getMode().equals("edit")){ %>			
-											<html:text property="job.rtnNo" styleId="rtnNo" size="15" onblur="validRtnNoInJob(this)"/>
+											<html:text property="job.rtnNo" styleId="rtnNo" size="25" onblur="validRtnNoInJob(this)"/>
 									    <%}else{ %>
-									        <html:text property="job.rtnNo" styleId="rtnNo" size="15" readonly="true" styleClass="disableText"/>
-									        &nbsp; &nbsp; &nbsp;CN NO&nbsp;
-									        <html:text property="job.cnNo" styleId="cnNo" size="60" readonly="true" styleClass="disableText"/>
+									        <html:text property="job.rtnNo" styleId="rtnNo" size="90" readonly="true" styleClass="disableText"/>   
+									    <%} %>
+										</td>
+									</tr>
+							   <%} %>
+							   
+								<%if(jobForm.getMode().equals("edit") || jobForm.getMode().equals("view")){ %>
+									<tr>
+	                                    <td> CN No </td>
+										<td>	
+										<%if(jobForm.getMode().equals("edit")){ %>
+										    <html:textarea property="job.cnNo" styleId="cnNo" cols="100" rows="1" readonly="true" styleClass="disableText">
+									        </html:textarea>	
+									    <%}else{ %>
+									       <%--  <html:text property="job.cnNo" styleId="cnNo" size="90" readonly="true" styleClass="disableText"/> --%>
+									        <html:textarea property="job.cnNo" styleId="cnNo" cols="100" rows="6" readonly="true" styleClass="disableText">
+									        </html:textarea>
 									    <%} %>
 										</td>
 									</tr>
@@ -547,3 +522,6 @@ function resetStore(){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

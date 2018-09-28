@@ -121,6 +121,8 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 				//Test 
 				//result.setTargetQty(stn.getBaseQty()+"/"+stn.getSubQty());
 				
+				logger.debug("Qty1:"+stn.getBaseQty()+",qty2:"+stn.getSubQty());
+				
 				result.setSalesQty(setQtyStr(stn.getProduct().getId()+"", stn.getBaseQty(), stn.getSubQty()) );
 				
 				result.setSalesAmt(BigDecimal.valueOf(stn.getSoldAmount()));

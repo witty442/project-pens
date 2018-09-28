@@ -12,10 +12,18 @@ public class ResultImportBean {
 	
 	private String firstErrorMsg;
 	private String firstErrorCode;
+	private int errorRow;
 	private int successRow;
 	private int allRow;
 	private String receiptNoAll;
 	
+	
+	public int getErrorRow() {
+		return errorRow;
+	}
+	public void setErrorRow(int errorRow) {
+		this.errorRow = errorRow;
+	}
 	public String getFirstErrorMsg() {
 		return firstErrorMsg;
 	}

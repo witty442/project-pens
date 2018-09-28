@@ -19,24 +19,26 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-import util.excel.ExcelHeader;
-
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfPickStockDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -55,7 +57,6 @@ public class ConfPickStockAllAction extends I_Action {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
 				request.getSession().setAttribute("results", null);
-				request.getSession().setAttribute("custGroupList", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
 				request.getSession().setAttribute("totalAllQty",null);
 				request.getSession().setAttribute("curPageQtyMap",null);
@@ -65,10 +66,28 @@ public class ConfPickStockAllAction extends I_Action {
 				ad.setStatus(PickConstants.STATUS_POST);
 				aForm.setBean(ad);
 				
+				//init Listbox Session
+				List<References> statusIssueReqList2 = new ArrayList<References>();
+				References ref = new References("","");
+				statusIssueReqList2.add(ref);
+				statusIssueReqList2.addAll(PickConstants.getRequestStatusW2ListInPageConfPickStock());
+				request.getSession().setAttribute("statusIssueReqList2",statusIssueReqList2);
+				
+				List<PopupForm> custGroupList = new ArrayList<PopupForm>();
+				PopupForm refP = new PopupForm("",""); 
+				custGroupList.add(refP);
+				custGroupList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+				request.getSession().setAttribute("custGroupList",custGroupList);
+				
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref1 = new References("","");
+				wareHouseList.add(ref1);
+				wareHouseList.addAll(PickConstants.getWareHouseList("",""));
+				request.getSession().setAttribute("wareHouseList2",wareHouseList);
+				
 			}else if("back".equals(action)){
 				//clear session data
 				request.getSession().setAttribute("results", null);
-				request.getSession().setAttribute("custGroupList", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
 				request.getSession().setAttribute("totalAllQty",null);
 				request.getSession().setAttribute("curPageQtyMap",null);
@@ -710,7 +729,6 @@ public class ConfPickStockAllAction extends I_Action {
 				
 				//Clear session 
 				request.getSession().setAttribute("results", null);
-				request.getSession().setAttribute("custGroupList", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
 				request.getSession().setAttribute("totalAllQty",null);
 				request.getSession().setAttribute("curPageQtyMap",null);
@@ -1081,18 +1099,12 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 	}
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
-		
 		logger.debug("exportToExcel: ");
 		ConfPickStockForm reportForm = (ConfPickStockForm) form;
-		User user = (User) request.getSession().getAttribute("user");
 		Connection conn = null;
 		StringBuffer h = new StringBuffer("");
 		int colSpan = 6;
 		try {
-	
-			String fileType = SystemElements.PDF;
-			logger.debug("fileType:"+fileType);
-
 			ReqPickStock bean = reportForm.getBean();
 			if(bean != null){
 				//logger.debug("ReqPickStock:"+h);
@@ -1187,6 +1199,71 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 		return null;
 	}
 	
+	public ActionForward exportBarcodeToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		logger.debug("exportBarcodeToExcel: ");
+		ConfPickStockForm reportForm = (ConfPickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		StringBuffer h = new StringBuffer("");
+		int qty = 0;
+		int n=0;
+		try {
+			ReqPickStock bean = reportForm.getBean();
+			if(bean != null){
+				//logger.debug("ReqPickStock:"+h);
+				h.append(ExcelHeader.EXCEL_HEADER);
+				
+				//Gen Report
+				conn = DBConnection.getInstance().getConnection();
+				ReqPickStock pAllItem = ConfPickStockDAO.getStockIssueItemCaseNoEdit(conn, bean,0,true);//
+				List<ReqPickStock> items = pAllItem.getItems();
+
+				if(items != null && items.size() >0){
+					h.append("<table border='1'> \n");
+					h.append("<tr> \n");
+					    h.append("<td>Barcode</td> \n");
+						h.append("<td>MaterialMaster</td> \n");
+						h.append("<td>PensItem.</td> \n");
+					h.append("</tr>");
+					for(int i=0 ;i<items.size();i++){
+						ReqPickStock item = items.get(i);
+						qty = item.getIssueQtyInt();
+						for(n=0;n<qty;n++){
+							h.append("<tr> \n");
+							    h.append("<td class='text'>"+item.getBarcode()+"</td> \n");
+								h.append("<td>"+item.getMaterialMaster()+"</td> \n");
+								h.append("<td>"+item.getPensItem()+"</td> \n");
+						    h.append("</tr>");
+						}
+					}
+					
+					java.io.OutputStream out = response.getOutputStream();
+					response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+					response.setContentType("application/vnd.ms-excel");
+					
+					Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+					w.write(h.toString());
+				    w.flush();
+				    w.close();
+	
+				    out.flush();
+				    out.close();
+				}
+			}else{
+				
+				request.setAttribute("Message", "ไม่พบข้อมูล  ");
+				return  mapping.findForward("prepare");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return null;
+	}
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		ConfPickStockForm aForm = (ConfPickStockForm) form;

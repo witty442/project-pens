@@ -13,16 +13,15 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import util.BahtText;
-
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.NSBean;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.nissin.NSConstant;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.rt.RTConstant;
+import com.pens.util.BahtText;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 
 public class NSDAO {

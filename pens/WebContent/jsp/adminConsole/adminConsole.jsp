@@ -215,7 +215,7 @@ function addSlqToeSQL(sqlUtils){
 	<INPUT TYPE="button" class="tab_style" id ="id_execute" name ="tab_execute"  VALUE="Execute DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_execute')">
 	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
-	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Duplicate Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
+	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Dup Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
 	<INPUT TYPE="button" class="tab_style" id ="id_add_db" name ="tab_add_db"  VALUE="Add New DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_add_db')">
 	
     <div id="div_msg" style="display:none"> 
@@ -263,6 +263,8 @@ function addSlqToeSQL(sqlUtils){
 		     <select id="sqlUtils" onchange="addSlqToeSQL(this)">
 			  <option value=""></option>
 			  <option value="delete from monitor; delete from monitor_item;delete from monitor_item_detail;">ClearMonitorImportExport</option>
+			  <option value="delete from t_temp_import_trans;">ClearTempImport</option>
+			  <option value="delete from c_control_run_script_db;">ClearControlRunScriptDB</option>
 			</select>
 		  <BR>
 		    Please enter your text SQL To Execute:

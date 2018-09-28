@@ -140,7 +140,7 @@ function exportToExcel(path){
 							  <html:option value="VO">ยกเลิก(VO)</html:option>
 							</html:select>
 							
-							 <html:checkbox property="bean.haveStock"></html:checkbox>แสดงเฉพสะรายการที่มีบันทึกยอดนับ 
+							 <html:checkbox property="bean.haveStock"></html:checkbox>แสดงเฉพาะรายการที่มีบันทึกยอดนับ 
 							</td>
 						</tr>
 					</table>

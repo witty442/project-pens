@@ -51,6 +51,16 @@
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>
+  
+  <servlet>
+	   <servlet-name>PhotoServlet</servlet-name>
+	   <servlet-class>util.PhotoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	   <servlet-name>PhotoServlet</servlet-name>
+	   <url-pattern>/photoServlet</url-pattern>
+  </servlet-mapping>
+	
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>
@@ -67,5 +77,5 @@
         <taglib-uri>http://displaytag.sourceforge.net/</taglib-uri>
         <taglib-location>/WEB-INF/displaytag-11.tld</taglib-location>
     </taglib>
-	</jsp-config>
+  </jsp-config>
 </web-app>

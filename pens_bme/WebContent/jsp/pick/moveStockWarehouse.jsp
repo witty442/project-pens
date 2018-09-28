@@ -1,41 +1,20 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.MoveStockWarehouseBean"%>
 <%@page import="com.isecinc.pens.bean.MoveWarehouse"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="com.isecinc.pens.bean.ReqPickStock"%>
-<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="com.isecinc.pens.bean.PickStock"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-
 <jsp:useBean id="moveStockWarehouseForm" class="com.isecinc.pens.web.pick.MoveStockWarehouseForm" scope="session" />
 <%
 List<MoveStockWarehouseBean> resultList =(List<MoveStockWarehouseBean>) moveStockWarehouseForm.getResults();
-
-if(session.getAttribute("wareHouseList") == null){
-	List<References> wareHouseList = new ArrayList();
-	References ref1 = new References("","");
-	wareHouseList.add(ref1);
-	wareHouseList.addAll(JobDAO.getWareHouseList("'W2','W3','W4','W5'"));
-	
-	session.setAttribute("wareHouseList",wareHouseList);
-}
 %>
 <html>
 <head>
@@ -68,6 +47,8 @@ function loadMe(){
 	  %>
 	    alert("<%=(String)request.getAttribute("Message")%>");
 	    //clear old data
+	    document.getElementsByName('bean.transferNo')[0].value="";
+	    document.getElementsByName('bean.transferDate')[0].value="";
 		document.getElementsByName('bean.materialMaster')[0].value="";
 		loadPensItemModel("");
 		document.getElementsByName('bean.onhandQty')[0].value ="";
@@ -125,9 +106,7 @@ function loadPensItemModel(pensItem){
 				}
 			}).responseText;
 		});
-	
 }
-
 function setOnhandQtyByPensItem(pensItem){
 	//alert(pensItem.value);
 	var pensItemTemp = pensItem.value;
@@ -201,6 +180,9 @@ function save(path){
 	}
 	
 	if(confirm("กรุณายืนยันการโอนสินค้า")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		form.action = path + "/jsp/moveStockWarehouseAction.do?do=save";
 		form.submit();
 		return true;
@@ -341,8 +323,13 @@ function isNum(obj){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						        <tr>
-                                  <td colspan="3" align="center"><font size="3"><b></b></font></td>
-							   </tr>
+                                    <td align="right">Transfer No<font color="red"></font></td>
+                                      <td>
+                                          <html:text property="bean.transferNo" styleId="transferNo" styleClass="disableText" size="20"/>
+                                          Date :
+                                          <html:text property="bean.transferDate" styleId="transferDate"  styleClass="disableText" size="15"/>
+                                     </td>
+								</tr>  
 							    <tr>
                                     <td align="right"> Move From Warehouse<font color="red">*</font></td>
                                       <td>
@@ -497,3 +484,6 @@ function isNum(obj){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

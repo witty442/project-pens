@@ -46,7 +46,7 @@ try{
 	   <font size="5"><b>รูปภาพร้าน <%=Utils.isNull(c.getName())+" "+Utils.isNull(c.getName2()) %></b></font>
 	  </div>
 	  <div id="imageDisp" align="center">
-	   <img id="imageDB" src="${pageContext.request.contextPath }/photoServlet?customerId=<%=customerId %>" border="0"/>
+	   <img id="imageDB" src="${pageContext.request.contextPath }/photoCustomerServlet?customerId=<%=customerId %>" border="0"/>
 	 </div>
 <br/>
 </body>

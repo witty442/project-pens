@@ -1,0 +1,8 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,Position: Start,Position: End,FillSymbol
+RECORD_TYPE,N,0,CHAR,,N           ,0,0,0
+order_no,N,1,CHAR,,N,0,0,0
+LINE_NUMBER,N,2,CHAR,,N,0,0,0
+brand,N,3,CHAR,,N,0,0,0
+pic1,N,4,CHAR,,N,0,0,0
+pic2,N,5,CHAR,,N,0,0,0
+pic3,N,6,CHAR,,N,0,0,0

@@ -19,15 +19,15 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
 import util.DateToolsUtil;
+import util.Utils;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class SAInitial {
    
@@ -1311,7 +1311,7 @@ public class SAInitial {
 				
 				//แบรนด์ --> สินค้า (SKU) OK
 				//Brand_Group->Brand->Sku
-				if("inventory_item_id".equalsIgnoreCase(condType)){ // edit by tutiya r.
+				if("inventory_item_id".equalsIgnoreCase(condType)){ 
                     
 					if(filterBean.getCurrCondNo().equals("2")){
 						if ("Brand".equals(filterBean.getCondType1())){
@@ -1881,6 +1881,7 @@ public class SAInitial {
 					if(debug)logger.debug("sql:"+sql);
 					
 					ps = conn.prepareStatement(sql);
+					rs = ps.executeQuery();
 					while(rs.next()){
 						no++;
 						returnList.add(new DisplayBean(no,rs.getString("SHIP_TO_SITE_USE_ID"),rs.getString("SHIP_TO_SITE_USE_ID"),rs.getString("CUSTOMER_SHIP_TO_ADDRESS")));

@@ -204,7 +204,6 @@ function loadMainCustomer(e){
 		});
 	}
 }
-
 function showMainCustomer(path,id,custId){
 	window.open(path + "/jsp/pop/view/customerViewPopup.jsp?uId="+id+"&main='Y'&id="+custId, "Customer List", "width=500,height=350,location=No,resizable=No");
 }
@@ -213,8 +212,6 @@ function setMainCustomer(code, name){
 	$('#parentName').val(name);
 	loadMainCustomer(null);
 }
-
-
 </script>
 </head>
 <body  topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -272,7 +269,8 @@ function setMainCustomer(code, name){
 								<%if("TT".equalsIgnoreCase(role) || customerForm.getCustomer().getExported().equalsIgnoreCase("Y")){ %>
 									        กำหนดจุด #1
 									    <font color="red"></font>
-										 <html:select property="customer.tripDay"  disabled="true">
+									    <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="true" styleClass="disableText" />
+										 <%-- <html:select property="customer.tripDay"  disabled="true">
 												<html:options collection="tripDayList" property="key" labelProperty="name"/>
 										  </html:select>
 											&nbsp;จุด #2
@@ -282,21 +280,22 @@ function setMainCustomer(code, name){
 											&nbsp;จุด #3
 										 <html:select property="customer.tripDay3"  disabled="true">
 												<html:options collection="tripDayList" property="key" labelProperty="name"/>
-										 </html:select>
+										 </html:select> --%>
 									<%}else{ %>
 									         กำหนดจุด #1
 									    <font color="red">*</font>
-										 <html:select property="customer.tripDay" >
+									    <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="true" styleClass="disableText" />
+										 <%-- <html:select property="customer.tripDay" disabled="true">
 												<html:options collection="tripDayList" property="key" labelProperty="name"/>
 										 </html:select>
 											&nbsp;จุด #2
-										 <html:select property="customer.tripDay2" >
+										 <html:select property="customer.tripDay2" disabled="true">
 												<html:options collection="tripDayList" property="key" labelProperty="name"/>
 											</html:select>
 											&nbsp;จุด #3
-										 <html:select property="customer.tripDay3" >
+										 <html:select property="customer.tripDay3" disabled="true">
 											<html:options collection="tripDayList" property="key" labelProperty="name"/>
-										 </html:select>
+										 </html:select> --%>
 									<%} %>
 								 </td>
 							</tr>
@@ -633,7 +632,7 @@ function setMainCustomer(code, name){
 								     <img id="blah" /> 
 								  
 									   <%if( !Utils.isNull(customerForm.getCustomer().getImageFileName()).equals("")){ %>
-									       <img id="imageDB" src="${pageContext.request.contextPath }/photoServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
+									       <img id="imageDB" src="${pageContext.request.contextPath }/photoCustomerServlet?customerId=${customerForm.customer.id}" width="150" height="200" border="0"/>
 									   <%} %>
 								</td>
 							</tr>

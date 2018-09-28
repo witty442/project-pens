@@ -2,25 +2,18 @@
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.bean.PickStock"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <%
 String wareHouse = reqPickStockForm.getBean().getWareHouse();
@@ -39,34 +32,14 @@ if("".equals(screentHeight)){
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/req_pick_stock.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/epoch_styles.css" type="text/css"/>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -78,7 +51,6 @@ function loadMe(){
 	 <%if(session.getAttribute("results") != null) {%>
 	    sumQtyOnfirst();
 	    sumQty();
-	   
 	  <%}%>
 }
 function clearForm(path){
@@ -112,6 +84,9 @@ function save(path){
 	if(validateForm()){
 		var issueReqNo =$('#issueReqNo').val();
 		if(issueReqNo != ""){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 		   form.action = path + "/jsp/reqPickStockAction.do?do=save";
 		   form.submit();
 		   return true;
@@ -187,6 +162,9 @@ function cancel(path){
 function confirmAction(path){
 	var form = document.reqPickStockForm;
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/reqPickStockAction.do?do=confirmAction";
 		 form.submit();
 		 return true;
@@ -354,8 +332,10 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	     param += "&index="+index;
 	        
 		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
-		window.open(encodeURI(url),"",
-				   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
+		//window.open(encodeURI(url),"",
+				   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
+		var adjustDelFromFullHeight = -10;
+		PopupCenterFullHeightCustom(url, "Add Request Pick Item", 680,adjustDelFromFullHeight);
 	}
 	return false;
 }
@@ -497,7 +477,6 @@ function resetStore(path){
 	  //change data pick by custGroup
 		getNewData(path,form.issueReqNo.value,form.status.value);
 	}
-	
 }
 
 function getNewData(path,documentNo,issueReqStatus){
@@ -512,10 +491,7 @@ function currencyToNum(str){
 	var temp =  str.replace(/\,/g,''); //alert(r);
 	return parseInt(temp);
 }
-
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -556,6 +532,10 @@ function currencyToNum(str){
 		     <%}else if("W6".equalsIgnoreCase(wareHouse)){ %>
 	      	     <jsp:include page="../program.jsp">
 				    <jsp:param name="function" value="reqPickStockW6"/>
+				 </jsp:include>
+		      <%}else if("W7".equalsIgnoreCase(wareHouse)){ %>
+	      	     <jsp:include page="../program.jsp">
+				    <jsp:param name="function" value="reqPickStockW7"/>
 				 </jsp:include>
 		     <%} %>
 				 
@@ -732,17 +712,17 @@ function currencyToNum(str){
 							%>
 							      <tr id="<%=o.getLineItemId()%>" class="<%=classStyle%>"> 
 							         
-							            <td class="data_groupCode"><%=o.getGroupCode()%>
+							            <td class="td_text_center" width="10%"><%=o.getGroupCode()%>
 							             <input tabindex="-1" type="hidden" name="groupCode" value ="<%=o.getOnhandQty()%>"/>
 							            </td>
-							            <td class="data_pensItem"> <%=o.getPensItem() %> </td>
+							            <td class="td_text_center" width="10%"> <%=o.getPensItem() %> </td>
 										
-										<td class="data_onhandQty">
+										<td class="td_text_center" width="10%">
 										    <input tabindex="-1" type="text" name="onhandQty" value ="<%=o.getOnhandQty()%>" class="disableNumber"
 											    readonly/>
 										   
 										</td>
-										<td class="data_qty">
+										<td class="td_text_center" width="10%">
 											  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
 											    class="disableNumber"
 											    readonly
@@ -750,7 +730,7 @@ function currencyToNum(str){
 							                    onchange="validateQty(this,<%=i%>)"
 											  />		 
 										</td>
-										 <td class="data_groupCode">
+										 <td class="td_text_center" width="10%">
 										      <a href="javascript:addItemPickStock('${pageContext.request.contextPath}',<%=index%>,'<%=Utils.isNull(o.getGroupCode())%>','<%=Utils.isNull(o.getPensItem())%>')">
 											      <input type="button" value="ระบุจำนวน" class="newPosBtnLong"> 
 											   </a>
@@ -763,10 +743,10 @@ function currencyToNum(str){
 							
 							<tr id="" class="">
 							         
-							            <td class="data_groupCode"></td>
-							            <td class="data_pensItem"> </td>
-										<td class="data_barcode">รวมทั้งสิ้น  </td>
-										<td class="data_qty">
+							            <td class="td_text_center" width="10%"></td>
+							            <td class="td_text_center" width="10%"> </td>
+										<td class="td_text_right" width="10%">รวมทั้งสิ้น  </td>
+										<td class="td_text_center" width="10%">
 										 <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber"/>
 										 
 										 <!-- totalQtyAll: --><input type="hidden" name="totalQtyAll" id="totalQtyAll" value="${reqPickStockForm.bean.totalQty}"/>
@@ -776,10 +756,9 @@ function currencyToNum(str){
 							  </tr>
 						</table>
 					
-				<%} %>		
+				<%} %>	
 					
-					
-					<%if(session.getAttribute("resultsView") != null) {%>
+				<%if(session.getAttribute("resultsView") != null) {%>
 					 <!-- Page -->
 					<% if(session.getAttribute("totalPage") != null){ 
 					
@@ -953,3 +932,6 @@ function currencyToNum(str){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

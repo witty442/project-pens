@@ -1,7 +1,8 @@
 
+<%@page import="util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -38,7 +39,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 }else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ 
 	if(role.equalsIgnoreCase(User.DD_SALES)){
 	   pageNameTemp = "DD_SalesTarget";
-	}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
+	}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
 	   pageNameTemp = "MT_SalesTarget";
 	}
 }else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ 

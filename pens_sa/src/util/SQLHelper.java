@@ -4,8 +4,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
-
 public class SQLHelper {
 	protected static Logger logger = Logger.getLogger("PENS");
 	

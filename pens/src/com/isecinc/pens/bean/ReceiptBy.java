@@ -57,13 +57,22 @@ public class ReceiptBy extends I_PO {
 	}
 
 	protected void setDisplayLabel() throws Exception {
-		for (References r : InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD)) {
-			if (r.getKey().equalsIgnoreCase(getPaymentMethod())) {
-				setPaymentMethodName(r.getName());
-				break;
+		if(getPaymentMethod().equalsIgnoreCase("TR")){
+			for (References r : InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD)) {
+				if (r.getKey().equalsIgnoreCase(getPaymentMethod())) {
+					setPaymentMethodName(r.getDesc());
+					break;
+				}
+			}
+		}else{	
+			for (References r : InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD)) {
+				if (r.getKey().equalsIgnoreCase(getPaymentMethod())) {
+					setPaymentMethodName(r.getName());
+					break;
+				}
 			}
 		}
-
+		
 		// Case TR user bank form bank Transfer Config
 		if(getPaymentMethod().equalsIgnoreCase("TR")){
 			for (References r : InitialReferences.getReferenes().get(InitialReferences.TRANSFER_BANK)) {

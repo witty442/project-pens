@@ -44,6 +44,7 @@ import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptHelper;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.process.SequenceProcess;
+import com.pens.utils.LoggerUtils;
 
 /**
  * @author WITTY
@@ -52,12 +53,15 @@ import com.isecinc.pens.process.SequenceProcess;
 public class UpdateSalesManager {
    
 	public static Logger logger = Logger.getLogger("PENS");
+	//public static LoggerUtils logger = new LoggerUtils("UpdateSalesManager");
+	
 	public static Object IMPORT_Q = new Object();
 	public static String  PATH_CONTROL = "inf-config/table-mapping-transaction/";
 	public static String  FILE_CONTROL_NAME = "control_transaction.csv";
 	public static String  PATH_IMPORT = EnvProperties.getInstance().getProperty("path.transaction.sales.in");
 	
-
+    public static boolean debug = true;
+    
 	public MonitorBean importMain(User userLogin,User userRequest,String requestTable,HttpServletRequest request,boolean importAll) throws Exception{
 		Connection connMonitor = null;
 		MonitorBean monitorModel = null;
@@ -97,6 +101,8 @@ public class UpdateSalesManager {
 	 * @param request
 	 * @return
 	 * @throws Exception
+	 * t_order , t_visit ,t_order_orcl
+       t_receipt , t_receipt_orcl ,t_bill_plan ,t_adjust
 	 */
 	public  MonitorBean importFileToDB(BigDecimal transactionId ,BigDecimal monitorId,String transType,User userLogin ,User userRequest,String requestTable,HttpServletRequest request,boolean importAll) throws Exception{
 		Connection conn = null;
@@ -119,7 +125,6 @@ public class UpdateSalesManager {
 		Map<String,String> fileImportSuccessMap = new HashMap<String,String> ();
 		Map<String,String> fileImportErrorMap = new HashMap<String,String> ();
 		Map<String,String> receiptNoMap = new HashMap<String, String>();
-		List<KeyNoImportTransBean> keyNoDeleteList = new ArrayList<KeyNoImportTransBean>();
 		int dataCount = 0;
 		int successCount = 0;
 		String errorMsg="";
@@ -169,7 +174,7 @@ public class UpdateSalesManager {
 				TableBean tableBean = (TableBean) initConfigMap.get(tableName);
 				logger.info("---Import TableName:"+tableBean.getTableName()+"---");
 				logger.debug("Get Data File By Table Name");
-				dataFileList = helper.getDataFileFromTempListByTable(conn, transType,tableName);	
+				dataFileList = helper.getDataFileFromTempListByTable(connMonitor, transType,tableName);	
 				
 		        if(dataFileList != null && dataFileList.size() > 0){
 		        	logger.debug("dataFileList Size["+dataFileList.size()+"]");
@@ -198,6 +203,10 @@ public class UpdateSalesManager {
 						if(dataKeyNoList != null && dataKeyNoList.size() >0){
 							for(int m=0;m<dataKeyNoList.size();m++){
 								KeyNoImportTransBean keyNoBean = dataKeyNoList.get(m);
+								//debug
+								// logger.debug("keyNoBean:"+keyNoBean.getKeyNo());
+								// logger.debug("keyNoBean LineList Size:"+keyNoBean.getLineList().size());
+								
 								//Set RollBack Point
 								conn.setAutoCommit(false);
 								Savepoint savepoint =  conn.setSavepoint(keyNoBean.getKeyNo());
@@ -216,15 +225,17 @@ public class UpdateSalesManager {
 									dataCount +=resultImportBean.getAllRow();
 									
 									logger.debug("Transaction Rollback By savepoint["+savepoint+"]");
+									logger.debug("KeyNo["+keyNoBean.getKeyNo()+"]dataCount["+resultImportBean.getAllRow()+"]successCount["+resultImportBean.getSuccessRow()+"]");
 									conn.rollback(savepoint);
 									
-									// table :table t_bill_plan,t_adjust
-									// no save :Clear Temp data Error in t_temp_import_trans
-									if(keyNoBean.getTableName().toLowerCase().startsWith("t_bill_plan")
-										|| keyNoBean.getTableName().toLowerCase().startsWith("t_adjust")	
-									){
+									if(Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+										//Case ReImport Fail: No delete t_temp_import_trans_error
+									}else{
+									   //Case Error Move data to t_temp_import_trans_error
+									   helper.moveToTempImportErrorByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
+									   //Delete t_temp_import_trans
 									   logger.debug("delete t_temp_import_trans keyNo["+keyNoBean.getKeyNo()+"] Case table["+keyNoBean.getTableName()+"]");
-									   keyNoDeleteList.add(keyNoBean);
+									   helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
 									}
 								}else{
 									//Task Item Success
@@ -235,11 +246,19 @@ public class UpdateSalesManager {
 									dataCount +=resultImportBean.getAllRow();
 								
 									logger.debug("Transaction Commit");
+									logger.debug("KeyNo["+keyNoBean.getKeyNo()+"]dataCount["+resultImportBean.getAllRow()+"]successCount["+resultImportBean.getSuccessRow()+"]");
 									conn.commit();
 									
-									//Clear data success in t_temp_import_trans
-									// keyNoDeleteList.add(keyNoBean);
-									 
+									if(Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+									   /**** Clear data t_temp_import_trans_err By KeyNo ********************************/
+									   logger.debug("Start delete t_temp_import_trans_err key_no:"+keyNoBean.getKeyNo());
+									   helper.deleteTempImportErrByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
+									}else{
+										/**** Clear data t_temp_import_trans By KeyNo ********************************/
+										logger.debug("Start delete t_temp_import_trans key_no:"+keyNoBean.getKeyNo());
+										helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
+									}
+									
 									/** Case Table t_receipt : Case cancel cheque 1 to do calc ReceiptAmount from Receipt line**/
 									if(keyNoBean.getTableName().toLowerCase().startsWith("t_receipt")){
 										receiptNoAll += Utils.isNull(resultImportBean.getReceiptNoAll());
@@ -251,8 +270,8 @@ public class UpdateSalesManager {
 							logger.debug("Ftp File TableName:"+tableBean.getTableName()+":NOT FOUND FILE");
 						}
 						
-						logger.debug("DataCount["+dataCount+"]");
-						logger.debug("SuccessCount["+successCount+"]");
+						logger.debug("By fileName DataCount["+dataCount+"]");
+						logger.debug("By fileName SuccessCount["+successCount+"]");
 						
 						/** verify status by check record import vs line form Text*/
 						if(dataCount == successCount){
@@ -284,7 +303,7 @@ public class UpdateSalesManager {
 			}//for 1
 			
 			/**** Case Receipt Cancel i line must calc sum line to Head **************/
-			//Clear receptNo dup
+			/** Clear receptNo dup **/
 			if( Utils.isNull(receiptNoAll).length() >0){
 				String[] receiptNoAllArr = receiptNoAll.split("\\|");
 				for(int r=0;r<receiptNoAllArr.length;r++){
@@ -299,30 +318,27 @@ public class UpdateSalesManager {
 				  ImportReceiptHelper.recalcReceiptHead(receiptNoMap);
 			  }//if
 			/*************************************************************************/
-			  
-			/**** Clear data t_temp_import_trans *************************************/
-			if(keyNoDeleteList != null && keyNoDeleteList.size() >0){
-				logger.debug("Start delete t_temp_import_trans");
-				for(int d=0;d<keyNoDeleteList.size();d++){
-					KeyNoImportTransBean keyNoBean = keyNoDeleteList.get(d);
-				    helper.deleteTempImportByKey(connMonitor, keyNoBean.getFileName(),keyNoBean.getTableName(), keyNoBean.getKeyNo());
-				}
-			}
-			/*************************************************************************/
+	
 			logger.debug("isExc:"+isExc);
 			
 			/** Check Is Execute and No error **/
 			if(isExc){
 				/** Case Transaction Import By User_id by FileName  and after import move File to  Sales-In-Processed */
 				if(fileImportSuccessList != null && fileImportSuccessList.size() >0){
-				   logger.info("Move File To Sales-In-Processed");
-				   ftpManager.moveFileFTP(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.processed"), fileImportSuccessList);
+					/** Case ReImport No Mover File **/
+					if( !Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+				       logger.info("Move File To Sales-In-Processed");
+				       ftpManager.moveFileFTP(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.processed"), fileImportSuccessList);
+					}
 				}
 				
 				/** Case Import File Error Move To Sales-In-Error */
 				if(fileImportErrorList != null && fileImportErrorList.size() >0){
-				   logger.info("Move File To Sales-In-Processed");
-				   ftpManager.moveFileFTP(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.error"), fileImportErrorList);
+					/** Case ReImport No Mover File **/
+					if( !Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
+				      logger.info("Move File To Sales-In-Processed");
+				      ftpManager.moveFileFTP(env.getProperty("path.transaction.sales.in"), env.getProperty("path.transaction.sales.in.error"), fileImportErrorList);
+					}
 				}
 				
 				/** End process ***/

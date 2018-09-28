@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Date"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 User user = (User)session.getAttribute("user");

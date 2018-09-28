@@ -7,8 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -690,6 +692,47 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 	return newLinesList;
 }
 
+public List<OrderLine> sumQtyProductPromotionDuplicate(List<OrderLine> promotionLines) throws Exception {
+	List<OrderLine> orderLineList = new ArrayList<OrderLine>();
+	Map<String,OrderLine> orderLineMap = new HashMap<String, OrderLine>();
+	String key = "";//productCode+"-'+uom_id
+	int i=0;
+	logger.info("----------sumQtyProductPromotionDuplicate-----------------------");
+	try {
+		if(promotionLines != null && promotionLines.size()>0){
+			while (i < promotionLines.size()) {
+				OrderLine orderLineCurr = promotionLines.get(i);
+				
+				key = orderLineCurr.getProduct().getCode()+"-"+orderLineCurr.getUom().getCode();
+				logger.info("keyMap:"+key);
+				if(orderLineMap.get(key)== null){
+					orderLineMap.put(key, orderLineCurr);
+				}else{
+					OrderLine orderLinePrev = orderLineMap.get(key);
+					//sum qty
+					double qty = orderLinePrev.getQty() + orderLineCurr.getQty();
+					double qty1 = orderLinePrev.getQty1() + orderLineCurr.getQty1();
+					double qty2 = orderLinePrev.getQty2() + orderLineCurr.getQty2();
+					orderLinePrev.setQty(qty);
+					orderLinePrev.setQty1(qty1);
+					orderLinePrev.setQty2(qty2);
+					//Set new Qty
+					orderLineMap.put(key, orderLinePrev);
+				}
+				i++;
+			}//while
+			
+			//Convert ro OrderLineList
+			orderLineList = new ArrayList<OrderLine>(orderLineMap.values());
+		}
+	logger.info("------------sumQtyProductPromotion--------------------");
+	} catch (Exception e) {
+		throw e;
+	}
+	return orderLineList;
+}
+
+
 public void debug(List<OrderLine> lines) throws Exception {
 	OrderLine chkLine = null;
 	int i=0;
@@ -697,6 +740,7 @@ public void debug(List<OrderLine> lines) throws Exception {
 	try {
 		while (i < lines.size()) {
 			chkLine = lines.get(i);
+			logger.info("********************************************************************************");
 			logger.info("productCode["+chkLine.getProduct().getCode()+"] ,isPromotion["+chkLine.getPromotion()+"]");
 			logger.info("uom["+chkLine.getUom()+"] ,uom1["+chkLine.getUom1()+"] ,uom2["+chkLine.getUom2()+"]");
 			logger.info("qty["+chkLine.getQty()+"] ,qty1["+chkLine.getQty1()+"] ,qty2["+chkLine.getQty2()+"]");
@@ -776,12 +820,12 @@ public void debug(List<OrderLine> lines) throws Exception {
 	public List<OrderLine> fillLinesShowBlankUOM(Connection conn,String pricelistID, List<OrderLine> lines){
 		List<OrderLine> newLines = new ArrayList<OrderLine>();
 		try{
-            debug.debug(" ****Start fillLinesShowBlankUOM****");
+            //debug.debug(" ****Start fillLinesShowBlankUOM****");
 			for(OrderLine l:lines){
-				debug.debug("uom1["+l.getUom1().getCode()+"]uom2["+Utils.isNull(l.getUom1().getCode())+"]");
+				//debug.debug("uom1["+l.getUom1().getCode()+"]uom2["+Utils.isNull(l.getUom1().getCode())+"]");
 				
 				if( Utils.isNull(l.getUom1().getCode()).equals("") ||  Utils.isNull(l.getUom2().getCode()).equals("") ){
-				   debug.debug("getUom product:"+l.getProduct().getCode());
+				   //debug.debug("getUom product:"+l.getProduct().getCode());
 				   
 				   OrderLine lineUom = getUOM(conn,pricelistID ,String.valueOf(l.getProduct().getId()));
 				   
@@ -805,7 +849,7 @@ public void debug(List<OrderLine> lines) throws Exception {
 				}
 			}
 			
-			debug.debug(" **** end fillLinesShowBlankUOM****");
+			//debug.debug(" **** end fillLinesShowBlankUOM****");
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -954,10 +998,13 @@ public void debug(List<OrderLine> lines) throws Exception {
 		// re-save
 		order.setPayment("Y");
 		
-		if("N".equals(receipt.getIsPDPaid()))
+		//edit 14/03/2561 Case Van no save receipt(credit)
+		/*no change is_cash in order */
+		/*if("N".equals(receipt.getIsPDPaid())){
 			order.setIsCash("N");
-		else
+		}else{
 			order.setIsCash("Y");
+		}*/
 		
 		new MOrder().save(order, user.getId(), conn);
 

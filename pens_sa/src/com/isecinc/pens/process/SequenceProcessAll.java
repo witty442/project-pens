@@ -8,7 +8,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
+import util.DBConnection;
 
 /**
  * SequenceProcess Class

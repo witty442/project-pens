@@ -12,10 +12,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
 import util.ExcelHeader;
-
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
+import util.Utils;
 
 public class StockReport {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -108,15 +107,30 @@ public class StockReport {
 				sql.append("\n and M.item_no in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
 			}
 			//request date
-			if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
-				Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
-				logger.debug("startDate:"+startDate);
-				String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MMM_YYYY);
-				String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
-				
-				sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
-				sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+			//TypeSerch Month
+			if(Utils.isNull(o.getTypeSearch()).equals("month")){
+				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
+					logger.debug("startDate:"+startDate);
+					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MMM_YYYY);
+					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+					sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+				}
+			}else{
+				//TypeSearch Day From To
+				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					logger.debug("startDate:"+startDate);
+					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+					sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+				}
 			}
 			sql.append("\n GROUP BY "+columnAllGroupBySql );
 			sql.append("\n ORDER BY "+columnAllGroupBySql);

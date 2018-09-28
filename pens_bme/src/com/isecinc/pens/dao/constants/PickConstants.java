@@ -1,17 +1,17 @@
 package com.isecinc.pens.dao.constants;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import util.Constants;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class PickConstants extends Constants{
 
+	
 	public static String STATUS_OPEN ="O";
 	public static String STATUS_CLOSE ="C";
 	public static String STATUS_CANCEL ="AB";
@@ -44,6 +44,7 @@ public class PickConstants extends Constants{
 	public static String WAREHOUSE_W4 ="W4";//Move
 	public static String WAREHOUSE_W5 ="W5";//Move
 	public static String WAREHOUSE_W6 ="W6";//Move
+	public static String WAREHOUSE_W7 ="W7";//Move
 	
 	public static String WORK_STEP_POST_BYSALE = "Post by Sale";
 	public static String WORK_STEP_PICK_COMPLETE = "Pick Complete";
@@ -58,6 +59,32 @@ public class PickConstants extends Constants{
 	@Deprecated
 	public static String SUB_PICK_TYPE_PART_BOX ="PBOX";
 	
+	public static String getStoreGroupName(String storeGroup){
+		if(storeGroup.equals(STORE_TYPE_LOTUS_CODE)){
+			return "LOTUS";
+		}else 	if(storeGroup.equals(STORE_TYPE_BIGC_CODE)){
+			return "BIGC";
+		}else 	if(storeGroup.equals(STORE_TYPE_TOPS_CODE)){
+			return "TOPS";		
+		}else 	if(storeGroup.equals(STORE_TYPE_FRIDAY_CODE)){
+			return "FRIDAY";
+		}else 	if(storeGroup.equals(STORE_TYPE_TVD_CODE)){
+			return "TV-DIRECT";
+		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_1)){
+			return "MTT";
+		}else 	if(storeGroup.equals(STORE_TYPE_KING_POWER)){
+			return "KING Power";
+		}else 	if(storeGroup.equals(STORE_TYPE_HISHER_CODE)){
+			return "HIS-HER";
+		}else 	if(storeGroup.equals(STORE_TYPE_PENS)){
+			return "กลุ่มภายใน PENS";
+		}else 	if(storeGroup.equals(STORE_TYPE_GRAND_SALE)){
+			return "Grand Sale";
+		}else 	if(storeGroup.equals(STORE_TYPE_WIENNA)){
+			return "Wienna - เวียนนา";
+		}
+		return "";
+	}
 	
 	public static String getStatusDesc(String status){
 		String d = "";
@@ -125,13 +152,15 @@ public class PickConstants extends Constants{
 			d = wareHouseMap.get("W5");
 		}else if(WAREHOUSE_W6.equals(w)){
 			d = wareHouseMap.get("W6");
+		}else if(WAREHOUSE_W7.equals(w)){
+			d = wareHouseMap.get("W7");
 		}
 		return d;
 	}
 	
 	public static List<References> getWareHouseList() {
 		try{
-		    return GeneralDAO.searchWareHouseList("");
+		    return GeneralDAO.searchWareHouseList("","");
 		}catch(Exception e){
 			
 		}
@@ -140,13 +169,19 @@ public class PickConstants extends Constants{
 	
 	public static List<References> getWareHouseList(String codeSqlIn) {
 		try{
-		    return GeneralDAO.searchWareHouseList(codeSqlIn);
+		    return GeneralDAO.searchWareHouseList(codeSqlIn,"");
 		}catch(Exception e){
 			
 		}
 		return null;
 	}
-	
+	public static List<References> getWareHouseList(String codeSqlIn,String codeSqlnotIn) throws Exception{
+		try{
+		    return GeneralDAO.searchWareHouseList(codeSqlIn,codeSqlnotIn);
+		}catch(Exception e){
+			throw e;
+		}
+	}
 	
 	public static List<References> getJobStatusList(){
 		List<References> statusList = new ArrayList<References>();
@@ -243,8 +278,8 @@ public class PickConstants extends Constants{
 	
 	public static List<References> getIssueReqStatusW3List(){
 		List<References> statusList = new ArrayList<References>();
-		statusList.add(new References(STATUS_NEW, getStatusDesc(STATUS_NEW)));
-		statusList.add(new References(STATUS_USED, getStatusDesc(STATUS_USED)));
+		statusList.add(new References(STATUS_OPEN, getStatusDesc(STATUS_OPEN)));
+		statusList.add(new References(STATUS_ISSUED, getStatusDesc(STATUS_ISSUED)));
 		statusList.add(new References(STATUS_CANCEL, getStatusDesc(STATUS_CANCEL)));
 		
 		return statusList;

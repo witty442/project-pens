@@ -18,8 +18,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.excel.ExcelHeader;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
@@ -30,8 +28,9 @@ import com.isecinc.pens.dao.PickStockDAO;
 import com.isecinc.pens.dao.PickStockGroupDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -40,7 +39,8 @@ import com.isecinc.pens.init.InitialMessages;
  * 
  */
 public class PickStockAction extends I_Action {
-
+	public static int pageSize = 60;
+	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare2");
 		PickStockForm aForm = (PickStockForm) form;
@@ -65,27 +65,30 @@ public class PickStockAction extends I_Action {
 				aForm.setBean(ad);
 				 
 			}else if("back".equals(action)){
+				//init connection
+				conn = DBConnection.getInstance().getConnection();
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(PickStockDAO.searchHead(aForm.getBean()));
+				
+				aForm.setResultsSearch(PickStockDAO.searchHead(conn,aForm.getBean(),false,1,pageSize));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message",e.getMessage());
 			throw e;
 		}finally{
 			if(conn != null){
-			  conn.close();conn=null;
+			   conn.close();conn=null;
 			}
 		}
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	/*public ActionForward search2_bk(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		PickStockForm aForm = (PickStockForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			aForm.setResultsSearch(PickStockDAO.searchHead(aForm.getBean()));
+			//aForm.setResultsSearch(PickStockDAO.searchHead(aForm.getBean()));
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
 			   aForm.setResultsSearch(null);
@@ -97,6 +100,80 @@ public class PickStockAction extends I_Action {
 			throw e;
 		}finally{
 			
+		}
+		return mapping.findForward("search2");
+	}*/
+	
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		PickStockForm aForm = (PickStockForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			//init connection
+			conn = DBConnection.getInstance().getConnection();
+			
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(PickStockDAO.searchTotaRecHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<PickStock> items = PickStockDAO.searchHead(conn,aForm.getBean(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<PickStock> items = PickStockDAO.searchHead(conn,aForm.getBean(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search2");
 	}
@@ -732,8 +809,6 @@ public class PickStockAction extends I_Action {
 		return dataSaveMapAll;
 	}
 	
-	
-	
 	public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("exportExcel");
 		PickStockForm aForm = (PickStockForm) form;
@@ -770,7 +845,41 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("clear");
 	}
 	
-	
+	public ActionForward exportBarcodeToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportBarcodeToExcel");
+		PickStockForm aForm = (PickStockForm) form;
+		//User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			
+			PickStock h = aForm.getBean();
+			h = PickStockDAO.searchPickStockItemByIssueReqNo4Report(conn, h);
+			
+			StringBuffer htmlTable = genBarcodeReportHtml(h);	 
+			
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename="+Utils.genFileName("pick")+".xls");
+			response.setContentType("application/vnd.ms-excel");
+			
+			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+			w.write(htmlTable.toString());
+		    w.flush();
+		    w.close();
+
+		    out.flush();
+		    out.close();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("clear");
+	}
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		PickStockForm aForm = (PickStockForm) form;
@@ -852,6 +961,39 @@ public class PickStockAction extends I_Action {
 		return h;
 	}
 	
+	private StringBuffer genBarcodeReportHtml(PickStock p){
+		StringBuffer h = new StringBuffer("");
+		int r = 0;
+		int qty = 0;
+		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
+			if(p.getItems()!= null){
+			    List<PickStock> dataList =p.getItems();
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+					 h.append("<td><b>Barcode</b></td> \n");
+					 h.append("<td><b>Materail Master</b></td> \n");
+					 h.append("<td><b>Pens Item </b></td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<dataList.size();i++){
+					PickStock s = (PickStock)dataList.get(i);
+					qty = s.getQtyInt();
+					for(r=0;r<qty;r++){
+					    h.append("<tr> \n");
+					    h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+					    h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+					    h.append("<td>"+s.getPensItem()+"</td> \n");
+					    h.append("</tr>");
+					}
+				}//for 
+			h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

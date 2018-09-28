@@ -1,13 +1,7 @@
 package com.isecinc.pens.inf.helper;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.text.DecimalFormat;
-
-import org.hibernate.cfg.Configuration;
 
 /**
  * @author WITTY
@@ -263,9 +257,7 @@ public class ConvertUtils {
 		String str = "";
 		EnvProperties env= EnvProperties.getInstance();
 		try{
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			String url = hibernateConfig.getProperty("connection.url");
+			String url = env.getProperty("connection.url");
 			
 			str += "DataBase:"+url +" \n";
 			str += " ,FTP Server:"+env.getProperty("ftp.ip.server")+" ,UserFTP:"+env.getProperty("ftp.username")+"";

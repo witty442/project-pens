@@ -5,7 +5,7 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils" %>
+<%@page import="util.Utils"%>
 <%@page import="com.isecinc.pens.model.MRole"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.Locale"%>

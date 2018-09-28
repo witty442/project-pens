@@ -1,53 +1,21 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="confPickStockAllForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
 <% 
-if(session.getAttribute("statusIssueReqList2") == null){
-	List<References> billTypeList = new ArrayList();
-	References ref = new References("","");
-	billTypeList.add(ref);
-	billTypeList.addAll(PickConstants.getRequestStatusW2ListInPageConfPickStock());
-	session.setAttribute("statusIssueReqList2",billTypeList);
-}
-
-if(session.getAttribute("custGroupList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
-	
-	session.setAttribute("custGroupList",billTypeList);
-}
-if(session.getAttribute("wareHouseList2") == null){
-	List<References> wareHouseList = new ArrayList();
-	References ref1 = new References("","");
-	wareHouseList.add(ref1);
-	wareHouseList.addAll(PickConstants.getWareHouseList("'"+PickConstants.WAREHOUSE_W2+"','"+PickConstants.WAREHOUSE_W3+"','"+PickConstants.WAREHOUSE_W4+"'"));
-	
-	session.setAttribute("wareHouseList2",wareHouseList);
-}
 %>
 
 <html>
@@ -55,41 +23,17 @@ if(session.getAttribute("wareHouseList2") == null){
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('issueReqDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('statusDate'));
@@ -148,7 +92,6 @@ function openPopupCustomer(path,types,storeType){
 }
 
 function setStoreMainValue(code,desc,storeNo,subInv,types){
-
 	var form = document.confPickStockAllForm;
 	//alert(form);
 	form.storeCode.value = code;
@@ -201,39 +144,37 @@ function getCustName(custCode,fieldName){
 				}
 			}).responseText;
 		
-		if("storeCode" == fieldName){
-			if(returnString !=''){
-				var retArr = returnString.split("|");
-				form.storeName.value = retArr[0];
-				
-				if(retArr[1]=='' || retArr[2]==''){
-					if(retArr[1]==''){
-						alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
-					}
-					if(retArr[2]==''){
-						alert("ไม่พบข้อมูล Sub Inventory  ไม่สามารถทำงานต่อได้");
-					}
-					form.storeCode.value = '';
-					form.storeName.value = "";
-					form.storeNo.value = "";
-					form.subInv.value = "";
-				}else{
-					form.storeNo.value = retArr[1];
-					form.subInv.value = retArr[2];
+	if("storeCode" == fieldName){
+		if(returnString !=''){
+			var retArr = returnString.split("|");
+			form.storeName.value = retArr[0];
+			
+			if(retArr[1]=='' || retArr[2]==''){
+				if(retArr[1]==''){
+					alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 				}
-				
-			}else{
-				alert("ไม่พบข้อมูล");
-				form.storeCode.focus();
-				form.storeCode.value ="";
+				if(retArr[2]==''){
+					alert("ไม่พบข้อมูล Sub Inventory  ไม่สามารถทำงานต่อได้");
+				}
+				form.storeCode.value = '';
 				form.storeName.value = "";
 				form.storeNo.value = "";
 				form.subInv.value = "";
+			}else{
+				form.storeNo.value = retArr[1];
+				form.subInv.value = retArr[2];
 			}
+			
+		}else{
+			alert("ไม่พบข้อมูล");
+			form.storeCode.focus();
+			form.storeCode.value ="";
+			form.storeName.value = "";
+			form.storeNo.value = "";
+			form.subInv.value = "";
 		}
-	
+	}
 }
-
 function resetStore(){
 	var form = document.confPickStockAllForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
@@ -245,7 +186,6 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
-
 function printBillMiniAll(path){
 	var form = document.confPickStockAllForm;
 	if(!isSelectOne()){
@@ -256,14 +196,12 @@ function printBillMiniAll(path){
 	form.submit();
 	return true;
 }
-
 function checkAll(chkObj){
 	var chk = document.getElementsByName("linechk");
 	for(var i=0;i<chk.length;i++){
 		chk[i].checked = chkObj.checked;
 	}
 }
-
 function isSelectOne(){
 	var selected = false;
 	var chk = document.getElementsByName("linechk");
@@ -275,7 +213,6 @@ function isSelectOne(){
 	}
 	return selected;
 }
-
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -457,29 +394,33 @@ function isSelectOne(){
 										</td>
 										<td class="td_text_center" width="15%">
 											 <c:if test="${results.canEdit == false}">
-												  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
-												          รายละเอียด
-												  </a>
+											    <font size="2">
+													  <a href="javascript:openView('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
+													          รายละเอียด
+													  </a>
+												  </font>
 											  </c:if>
 											  <c:if test="${results.canEdit == true}">
-												  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
-												     แก้ไข
-												  </a>
+											     <font size="2">
+													  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
+													     แก้ไข
+													  </a>
+												  </font>
 											  </c:if>
 										</td>
 										<td class="td_text_center" width="15%">
-											
 											  <c:if test="${results.canConfirm == true}">
-												  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
-												     Confirm
-												  </a>
+											     <font size="2">
+													  <a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.status}','${results.wareHouse}')">
+													     Confirm
+													  </a>
+												  </font>
 											  </c:if>
 										</td>
 									</tr>
 							  </c:forEach>
 					</table>
-								
-								
+		
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >

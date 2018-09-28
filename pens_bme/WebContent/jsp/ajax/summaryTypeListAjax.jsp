@@ -7,7 +7,7 @@
  String status = request.getParameter("status");
 
 if("W1".equals(wareHouse) || "W3".equals(wareHouse) 
-	|| "W4".equals(wareHouse) || "W5".equals(wareHouse) 
+	|| "W4".equals(wareHouse) || "W5".equals(wareHouse) || "W7".equals(wareHouse) 
 	||  "W6".equals(wareHouse) 
 	|| ( "W2".equals(wareHouse) 
 		  && ( "SCANNING".equals(status) || "ONHAND".equals(status))

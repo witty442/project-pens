@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
+import util.Utils;
 
 public class StockBean implements Comparable<StockBean>,Serializable{
 
@@ -15,6 +15,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private static final long serialVersionUID = -4104083172800233911L;
 	private long id;
 	private long rowId;
+	private String typeSearch;
 	private String startDate;
 	private String endDate;
 	private String brand;
@@ -63,6 +64,15 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private String orderSortType;
     
     
+    
+	public String getTypeSearch() {
+		return typeSearch;
+	}
+
+	public void setTypeSearch(String typeSearch) {
+		this.typeSearch = typeSearch;
+	}
+
 	public String getAvgQty() {
 		return avgQty;
 	}

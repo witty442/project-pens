@@ -3,6 +3,7 @@ package com.isecinc.pens.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +14,9 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class MoveStockWarehoseDAO extends PickConstants{
 	
@@ -22,16 +24,13 @@ public class MoveStockWarehoseDAO extends PickConstants{
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 
 	
-	public static int searchTotalRowMoveStockHis(MoveStockWarehouseBean bean) throws Exception {
+	public static int searchTotalRowMoveStockHis(Connection conn,MoveStockWarehouseBean bean) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		int totalRow = 0;
-		Connection conn = null;
 		try {
-		    conn = DBConnection.getInstance().getConnection();
-		    
-			sql.append("\n SELECT count(*) as c FROM PENSBME_MOVE_STOCK_FINISH_HIS");
+			sql.append("\n SELECT count(*) as c FROM PENSBI.PENSBME_MOVE_STOCK_FINISH_HIS");
 			sql.append("\n WHERE 1=1");
 			if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
 			    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -70,24 +69,21 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return totalRow;
 	}
 	
-	public static List<MoveStockWarehouseBean> searchMoveStockHis(MoveStockWarehouseBean bean,int pageNumber,int pageSize) throws Exception {
+	public static List<MoveStockWarehouseBean> searchMoveStockHis(Connection conn,MoveStockWarehouseBean bean,int pageNumber,int pageSize) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<MoveStockWarehouseBean> pos = new ArrayList<MoveStockWarehouseBean>();
-		Connection conn = null;
 		try {
-		    conn = DBConnection.getInstance().getConnection();
 		    sql.append("\n SELECT * FROM( \n");
 			sql.append("\n SELECT a.*, rownum r__ \n");
 			sql.append("\n FROM ( \n");
-				sql.append("\n SELECT * FROM PENSBME_MOVE_STOCK_FINISH_HIS");
+				sql.append("\n SELECT * FROM PENSBI.PENSBME_MOVE_STOCK_FINISH_HIS");
 				sql.append("\n WHERE 1=1");
 				if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
 				    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -139,17 +135,15 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return pos;
 	}
 	
-	public static MoveStockWarehouseBean searchMoveStock(MoveStockWarehouseBean o ) throws Exception {
+	public static MoveStockWarehouseBean searchMoveStock(Connection conn,MoveStockWarehouseBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
 		MoveStockWarehouseBean h = null;
 		List<MoveStockWarehouseBean> items = new ArrayList<MoveStockWarehouseBean>();
 		int no=1;
@@ -160,7 +154,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("\n   SELECT M2.* FROM (");
 		    	sql.append("\n   SELECT M.BARCODE,M.MATERIAL_MASTER,M.group_code,NVL(SUM(onhand_qty),0) as onhand_qty,0 as qty FROM ( ");
 				sql.append("\n  	select BARCODE,MATERIAL_MASTER,group_code,(nvl(onhand_qty,0)-nvl(issue_qty,0)) as onhand_qty  ");
-				sql.append("\n  	from PENSBME_STOCK_FINISHED ");
+				sql.append("\n  	from PENSBI.PENSBME_STOCK_FINISHED ");
 				sql.append("\n  	where 1=1   ");
 				sql.append("\n      and warehouse ='"+o.getWarehouseFrom()+"'");
 				if( !Utils.isNull(o.getGroupCodeSearch()).equals("")){
@@ -169,7 +163,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 				sql.append("\n      UNION ALL ");
 				 // substract from Stock issue status = O(Open) POST ,BEF
 				sql.append("\n 		SELECT BARCODE,MATERIAL_MASTER,group_code ,(-1* nvl(req_qty,0) ) as onhand_qty ");
-				sql.append("\n 		FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+				sql.append("\n 		FROM PENSBI.PENSBME_STOCK_ISSUE h, PENSBI.PENSBME_STOCK_ISSUE_ITEM i  ");
 				sql.append("\n 		WHERE 1=1  ");
 				sql.append("\n      and h.warehouse ='"+o.getWarehouseFrom()+"'");
 				sql.append("\n 		AND h.issue_req_no = i.issue_req_no ");
@@ -185,8 +179,6 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("\n  )M  ");
 		
 			logger.debug("sql:"+sql);
-			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 
@@ -215,7 +207,6 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return o;
@@ -226,7 +217,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		int r = 0;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY - ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY - ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
 			sql.append(" WHERE  material_Master = ?  and warehouse=? and pens_item = ?\n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -256,7 +247,6 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			if(update==0){
 				insertStockFinishToWarehouse(conn,o);
 			}
-			
 		}catch(Exception e){
 			throw e;
 		}
@@ -266,7 +256,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		int r = 0;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY + ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
+			sql.append(" UPDATE PENSBI.PENSBME_STOCK_FINISHED SET ONHAND_QTY =(ONHAND_QTY + ?),UPDATE_DATE=?,UPDATE_USER = ? \n");
 			sql.append(" WHERE  material_Master = ?  and warehouse=? and pens_item  =?\n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -295,7 +285,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		int index = 1;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" INSERT INTO PENSBME_STOCK_FINISHED \n");
+			sql.append(" INSERT INTO PENSBI.PENSBME_STOCK_FINISHED \n");
 			sql.append("( PENS_ITEM, \n");
 			sql.append("  MATERIAL_MASTER,  \n");
 			sql.append("  BARCODE,  \n");
@@ -315,7 +305,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("  sysdate as CREATE_DATE, \n"); 
 			sql.append("  '"+o.getUpdateUser()+"' as CREATE_USER, \n");
 			sql.append("  '"+o.getWarehouseTo()+"' as WAREHOUSE \n");
-			sql.append("  FROM  PENSBME_STOCK_FINISHED \n");
+			sql.append("  FROM  PENSBI.PENSBME_STOCK_FINISHED \n");
 			sql.append("WHERE  material_Master = ?  and warehouse=? and pens_item = ? \n" );
 
 			logger.debug("sql:"+sql.toString());
@@ -343,11 +333,11 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		List<PopupForm> pos = new ArrayList<PopupForm>();
 		Connection conn = null;
 		try {
-		    conn = DBConnection.getInstance().getConnection();
+		    conn = DBConnection.getInstance().getConnectionApps();
 		    
 			sql.append("\n    SELECT M.material_master,pens_item, sum(M.onhand_qty) as onhand_qty FROM( ");
 			sql.append("\n        SELECT material_master,pens_item ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
-			sql.append("\n  	  from PENSBME_STOCK_FINISHED WHERE 1=1 ");
+			sql.append("\n  	  from PENSBI.PENSBME_STOCK_FINISHED WHERE 1=1 ");
 			sql.append("\n 		  AND material_master ='"+mat+"'");
 			sql.append("\n 	      AND warehouse ='"+warehouse+"'");
 			sql.append("\n  	  GROUP BY material_master ,pens_item ");
@@ -355,7 +345,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			/*sql.append("\n         UNION ALL ");
 			
 			sql.append("\n 		   SELECT material_master,( (-1) * sum(req_qty) )as onhand_qty");
-			sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 		   FROM PENSBI.PENSBME_STOCK_ISSUE h, PENSBI.PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 		   WHERE 1=1  ");
 			sql.append("\n 	       AND h.warehouse ='"+p.getWarehouseFrom()+"'");
 			sql.append("\n 		   AND h.issue_req_no = i.issue_req_no ");
@@ -399,7 +389,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		
 			sql.append("\n       SELECT M.material_master, sum(M.onhand_qty) as onhand_qty FROM( ");
 			sql.append("\n         SELECT material_master ,(nvl(sum(onhand_qty),0)-nvl(sum(issue_qty),0)) as onhand_qty ");
-			sql.append("\n  	   from PENSBME_STOCK_FINISHED WHERE 1=1 ");
+			sql.append("\n  	   from PENSBI.PENSBME_STOCK_FINISHED WHERE 1=1 ");
 			sql.append("\n 		   AND material_master ='"+p.getMaterialMaster()+"'");
 			sql.append("\n 	       AND warehouse ='"+p.getWarehouseFrom()+"'");
 			sql.append("\n 	       AND pens_item ='"+p.getPensItem()+"'");
@@ -408,7 +398,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			/*sql.append("\n         UNION ALL ");
 			
 			sql.append("\n 		   SELECT material_master,( (-1) * sum(req_qty) )as onhand_qty");
-			sql.append("\n 		   FROM PENSBME_STOCK_ISSUE h, PENSBME_STOCK_ISSUE_ITEM i  ");
+			sql.append("\n 		   FROM PENSBI.PENSBME_STOCK_ISSUE h, PENSBI.PENSBME_STOCK_ISSUE_ITEM i  ");
 			sql.append("\n 		   WHERE 1=1  ");
 			sql.append("\n 	       AND h.warehouse ='"+p.getWarehouseFrom()+"'");
 			sql.append("\n 		   AND h.issue_req_no = i.issue_req_no ");
@@ -446,7 +436,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		logger.debug("insertMoveStockFinishHistory");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" INSERT INTO PENSBME_MOVE_STOCK_FINISH_HIS \n");
+			sql.append(" INSERT INTO PENSBI.PENSBME_MOVE_STOCK_FINISH_HIS \n");
 			sql.append(" (warehouse_from,warehouse_to,MATERIAL_MASTER,create_date,create_user,transfer_qty,pens_item) \n");
 		    sql.append(" values(?,?,?,?,?,?,?) \n");
 			
@@ -471,4 +461,149 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		}
 	}
 	
+	public static void processUpdateStockTransferFinishingToWarehouse(Connection conn,MoveStockWarehouseBean o) throws Exception{
+		try{
+			//Warehouse From del--
+			insertStockTransferFinishingFromWarehouse(conn,o);
+			
+			//Warehouse To add+
+			insertStockTransferFinishingToWarehouse(conn,o);
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	
+	public static int insertStockTransferFinishingFromWarehouse(Connection conn,MoveStockWarehouseBean o) throws Exception{
+		PreparedStatement ps = null;
+		int r = 0;
+		try{
+			Date transferDate = Utils.parse(o.getTransferDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String transferDateStr = Utils.stringValue(transferDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" INSERT INTO PENSBI.PENSBME_TRANSFER_FINISHING \n");
+			sql.append("( TRANSFER_NO, \n");
+			sql.append("  TRANSFER_DATE, \n");
+			sql.append("  PENS_ITEM, \n");
+			sql.append("  MATERIAL_MASTER,  \n");
+			sql.append("  BARCODE,  \n");
+			sql.append("  GROUP_CODE, \n"); 
+			sql.append("  TRANSFER_QTY, \n"); 
+			sql.append("  CREATE_DATE, \n"); 
+			sql.append("  CREATE_USER, \n");
+			sql.append("  WAREHOUSE \n");
+			sql.append(") \n");
+			
+			sql.append("SELECT \n");
+			sql.append(" '"+o.getTransferNo()+"' as TRANSFER_NO, \n");
+			sql.append("  to_date('"+transferDateStr+"','dd/mm/yyyy') as TRANSFER_DATE, \n");
+			sql.append("  PENS_ITEM, \n");
+			sql.append("  MATERIAL_MASTER,  \n");
+			sql.append("  BARCODE,  \n");
+			sql.append("  GROUP_CODE, \n"); 
+			sql.append("  ((-1)*"+o.getTransferQty()+") as TRANSFER_QTY, \n"); 
+			sql.append("  sysdate as CREATE_DATE, \n"); 
+			sql.append("  '"+o.getUpdateUser()+"' as CREATE_USER, \n");
+			sql.append("  '"+o.getWarehouseFrom()+"' as WAREHOUSE \n");
+			sql.append("  FROM  PENSBI.PENSBME_STOCK_FINISHED \n");
+			sql.append(" WHERE  material_Master = ?  and warehouse=? and pens_item = ? \n" );
+
+			logger.debug("sql:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+		
+			ps.setString(1, o.getMaterialMaster());
+			ps.setString(2, o.getWarehouseFrom());
+			ps.setString(3, o.getPensItem());
+			
+			r = ps.executeUpdate();
+			return r;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	
+	public static int insertStockTransferFinishingToWarehouse(Connection conn,MoveStockWarehouseBean o) throws Exception{
+		PreparedStatement ps = null;
+		int r = 0;
+		try{
+			Date transferDate = Utils.parse(o.getTransferDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String transferDateStr = Utils.stringValue(transferDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" INSERT INTO PENSBI.PENSBME_TRANSFER_FINISHING \n");
+			sql.append("( TRANSFER_NO, \n");
+			sql.append("  TRANSFER_DATE, \n");
+			sql.append("  PENS_ITEM, \n");
+			sql.append("  MATERIAL_MASTER,  \n");
+			sql.append("  BARCODE,  \n");
+			sql.append("  GROUP_CODE, \n"); 
+			sql.append("  TRANSFER_QTY, \n"); 
+			sql.append("  CREATE_DATE, \n"); 
+			sql.append("  CREATE_USER, \n");
+			sql.append("  WAREHOUSE \n");
+			sql.append(") \n");
+			
+			sql.append("SELECT \n");
+			sql.append(" '"+o.getTransferNo()+"' as TRANSFER_NO, \n");
+			sql.append("  to_date('"+transferDateStr+"','dd/mm/yyyy') as TRANSFER_DATE, \n");
+			sql.append("  PENS_ITEM, \n");
+			sql.append("  MATERIAL_MASTER,  \n");
+			sql.append("  BARCODE,  \n");
+			sql.append("  GROUP_CODE, \n"); 
+			sql.append("  "+o.getTransferQty()+" as TRANSFER_QTY, \n"); 
+			sql.append("  sysdate as CREATE_DATE, \n"); 
+			sql.append("  '"+o.getUpdateUser()+"' as CREATE_USER, \n");
+			sql.append("  '"+o.getWarehouseTo()+"' as WAREHOUSE \n");
+			sql.append("  FROM  PENSBI.PENSBME_STOCK_FINISHED \n");
+			sql.append("WHERE  material_Master = ?  and warehouse=? and pens_item = ? \n" );
+
+			logger.debug("sql:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			
+			ps.setString(1, o.getMaterialMaster());
+			ps.setString(2, o.getWarehouseFrom());
+			ps.setString(3, o.getPensItem());
+			
+			r = ps.executeUpdate();
+			return r;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
+	
+	// ( Running :  TRyymmxxxxX  เช่น TR570300001 )			
+		 public static String genTransferNo(Date date) throws Exception{
+	       String docNo = "";
+	       Connection conn = null;
+			   try{
+				   conn = DBConnection.getInstance().getConnection(); 
+				   
+				   String today = df.format(date);
+				   String[] d1 = today.split("/");
+				   int curYear = Integer.parseInt(d1[0].substring(0,4));
+				   int curMonth = Integer.parseInt(d1[1]);
+				 
+				 //get Seq
+				   int seq = SequenceProcess.getNextValue(conn,"TRANSFER_NO","TRANSFER_NO",date);
+				   
+				   docNo = "TR"+new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("00000").format(seq);
+			  
+			   }catch(Exception e){
+				   throw e;
+			   }finally{
+				   if(conn !=null){
+					   conn.close();conn=null;
+				   }
+			   }
+			  return docNo;
+		}
 }

@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -33,13 +31,13 @@ import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.process.PreFunction;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportExcelProcess extends InterfaceUtils{
 	private static Logger logger = Logger.getLogger("PENS");
@@ -156,7 +154,7 @@ public class ImportExcelProcess extends InterfaceUtils{
 									
 									/** Update Monitor Item To Success **/
 									modelItem.setErrorMsg(Utils.isNull(results[0]));
-									modelItem.setSuccessCount(ConvertUtils.convertToInt(results[1]));
+									modelItem.setSuccessCount(Utils.convertToInt(results[1]));
 									modelItem.setErrorCode(Utils.isNull(results[2]));
 									modelItem.setDataCount(Utils.convertStrToInt(results[3]));
 									isExc = true;

@@ -12,14 +12,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Constants;
-
 import com.isecinc.pens.bean.AdjustStock;
+import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.Order;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class AdjustStockDAO {
 	
@@ -105,36 +105,84 @@ public class AdjustStockDAO {
 		}
 	}
 	
-	public static List<AdjustStock> searchHead(AdjustStock o ) throws Exception {
+	public static int searchHeadListTotalRec(Connection conn,AdjustStock o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
-		AdjustStock h = null;
-		List<AdjustStock> items = new ArrayList<AdjustStock>();
-		int r = 1;
-		int c = 1;
+		int totalRec = 0;
 		try {
-			sql.append("\n SELECT DISTINCT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
-			sql.append("\n   STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
-			sql.append("\n from PENSBME_ADJUST_INVENTORY    \n");
+			sql.append("\n SELECT count(*) as c from PENSBI.PENSBME_ADJUST_INVENTORY    \n");
 			sql.append("\n where 1=1   \n");
-			
 			if( !Utils.isNull(o.getDocumentNo()).equals("")){
 				sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
 			}
-			
 			if( !Utils.isNull(o.getStoreCode()).equals("")){
 				sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
 			}
-			
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and TRANSACTION_DATE = ? ");
 			}
 			sql.append("\n order by document_no asc ");
 			logger.debug("sql:"+sql);
 			
-			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			if( !Utils.isNull(o.getTransactionDate()).equals("")){
+				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				ps.setDate(1,new java.sql.Date(tDate.getTime()));
+			}
+			
+			rst = ps.executeQuery();
+			if(rst.next()){
+				totalRec = rst.getInt("c");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	
+	public static List<AdjustStock> searchHeadList(Connection conn,AdjustStock o ,boolean allRec,int currPage,int pageSize ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		AdjustStock h = null;
+		List<AdjustStock> items = new ArrayList<AdjustStock>();
+		int r = 1;
+		int c = 1;
+		try {
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+				sql.append("\n SELECT DISTINCT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+				sql.append("\n   STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
+				sql.append("\n from PENSBI.PENSBME_ADJUST_INVENTORY    \n");
+				sql.append("\n where 1=1   \n");
+				if( !Utils.isNull(o.getDocumentNo()).equals("")){
+					sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
+				}
+				if( !Utils.isNull(o.getStoreCode()).equals("")){
+					sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+				}
+				if( !Utils.isNull(o.getTransactionDate()).equals("")){
+					sql.append("\n and TRANSACTION_DATE = ? ");
+				}
+			   sql.append("\n order by document_no desc ");
+			sql.append("\n   )A ");
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+			}
+			logger.debug("sql:"+sql);
+			
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -142,9 +190,7 @@ public class AdjustStockDAO {
 			}
 			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
-			  
 				   h = new AdjustStock();
 				   h.setNo(r);
 				   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
@@ -176,7 +222,6 @@ public class AdjustStockDAO {
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return items;

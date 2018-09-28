@@ -1,5 +1,4 @@
-
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.dao.PayDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.bean.MCBean"%>
@@ -8,7 +7,7 @@
 <%@page import="java.util.ArrayList"%>
 <%
 String deptId = Utils.isNull((String)request.getParameter("deptId"));
-System.out.println("deptId:"+deptId);
+//System.out.println("deptId:"+deptId);
 
 List<PopupForm> sectionList = new ArrayList<PopupForm>();
 try{

@@ -1,6 +1,7 @@
 
+<%@page import="util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -13,11 +14,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
 //for test clear session
@@ -35,7 +33,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 }else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ 
 	if(role.equalsIgnoreCase(User.DD_SALES)){
 	   pageNameTemp = "DD_SalesTarget";
-	}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
+	}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
 	   pageNameTemp = "MT_SalesTarget";
 	}
 }else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ 

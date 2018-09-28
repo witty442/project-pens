@@ -41,7 +41,12 @@
 		<servlet-class>com.isecinc.pens.web.RunScriptDBServlet</servlet-class>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
-	
+	<!-- PordShow Servlet -->
+	<servlet>
+		<display-name>ProdShow Servlet</display-name>
+		<servlet-name>ProdShowServlet</servlet-name>
+		<servlet-class>com.isecinc.pens.web.prodshow.ProdShowServlet</servlet-class>
+	</servlet>
 	<!-- Run Update SalesApp -->
   <!--   <servlet>
 		<display-name>Run Update SalesApp Auto</display-name>
@@ -74,39 +79,27 @@
 	</servlet>
 	<servlet>
 	    <servlet-name>PhotoServlet</servlet-name>
-	    <servlet-class>util.PhotoServlet</servlet-class>
+	    <servlet-class>com.isecinc.pens.web.servlet.PhotoServlet</servlet-class>
 	</servlet>
-
-	<!-- Member Import  -->
 	<servlet>
-		<servlet-name>memberImportOrderReceipt</servlet-name>
-		<servlet-class>com.isecinc.pens.web.dataimports.member.OrderReceiptServlet</servlet-class>
+	    <servlet-name>PhotoCustomerServlet</servlet-name>
+	    <servlet-class>com.isecinc.pens.web.servlet.PhotoCustomerServlet</servlet-class>
 	</servlet>
-
-	<!-- Print Sticker -->
-	<servlet>
-		<servlet-name>printSticker</servlet-name>
-		<servlet-class>com.isecinc.pens.web.report.printsticker.PrintStickerServlet</servlet-class>
-	</servlet>
-
-	<!-- Member Import  -->
-	<servlet-mapping>
-		<servlet-name>memberImportOrderReceipt</servlet-name>
-		<url-pattern>/jsp/mior</url-pattern>
-	</servlet-mapping>
-
+	
+	<!-- Servlet Mapping-->
+    <servlet-mapping>
+      <servlet-name>ProdShowServlet</servlet-name>
+      <url-pattern>/jsp/prodShowServlet</url-pattern>
+    </servlet-mapping>  
+    
 	<servlet-mapping>
 	    <servlet-name>PhotoServlet</servlet-name>
 	    <url-pattern>/photoServlet</url-pattern>
 	</servlet-mapping>
-
-	<!-- Print Sticker  -->
-	<servlet-mapping>
-		<servlet-name>printSticker</servlet-name>
-		<url-pattern>/jsp/printSticker</url-pattern>
+    <servlet-mapping>
+	    <servlet-name>PhotoCustomerServlet</servlet-name>
+	    <url-pattern>/photoCustomerServlet</url-pattern>
 	</servlet-mapping>
-
-	<!-- Servlet Mapping-->
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>

@@ -14,11 +14,11 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BMECControlDAO;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class GenerateMonthEndLotus {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -37,7 +37,7 @@ public class GenerateMonthEndLotus {
 			conn.setAutoCommit(false);
 			
 			//validate 
-			results = BMECControlDAO.canGenMonthEndLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
+			results = ControlConstantsDB.canGenMonthEndLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
 			
 			if(results[0].equals("false")){
 				return results;
@@ -114,7 +114,7 @@ public class GenerateMonthEndLotus {
 			Date asofDate = null;
 			boolean unionAllFlag = false;
 			try {
-				onhandDateAsOfConfigStr = BMECControlDAO.getOnhandDateLotusAsOf(conn);
+				onhandDateAsOfConfigStr = ControlConstantsDB.getOnhandDateAsOfControl(conn,ControlConstantsDB.TYPE_ONHAND_DATE_LOTUS_AS_OF);
 				onhandDateAsOfConfig = Utils.parse(onhandDateAsOfConfigStr,Utils.DD_MM_YYYY_WITHOUT_SLASH);
 				
 				//prepare parameter

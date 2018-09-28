@@ -1,10 +1,8 @@
 package com.isecinc.pens.imports.process;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,18 +27,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
-import util.DBCPConnectionProvider;
-import util.UploadXLSUtil;
-
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.imports.ImportForm;
-import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.UploadXLSUtil;
+import com.pens.util.Utils;
 
 public class ImportLoadStockInitProcess {
 	/** Logger */
@@ -48,13 +43,6 @@ public class ImportLoadStockInitProcess {
 	
 	public static ActionForward importProcess(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response,String importType) {
 		Connection conn = null;
-		StringBuffer whereCause = null;
-		String errorDesc = null;
-		int id = 0;
-		int allCount = 0;
-		int successCount = 0;
-	    int errorCount = 0;
-		String forward = "view";
 		ImportForm importForm = (ImportForm) form;
         UploadXLSUtil xslUtils = new UploadXLSUtil();
 	    PreparedStatement ps = null;
@@ -62,10 +50,8 @@ public class ImportLoadStockInitProcess {
 	    User user = (User) request.getSession().getAttribute("user");
 	    String fileName = "";
 	    String fileType = "";
-	    ImportDAO importDAO = new ImportDAO();
 	    List<ImportSummary> successList = new ArrayList<ImportSummary>();
 	    List<ImportSummary> errorList = new ArrayList<ImportSummary>();
-	 
 	    Map<String, ImportSummary> successMap = new HashMap<String, ImportSummary>();
 	    Map<String, ImportSummary> errorMap = new HashMap<String, ImportSummary>();
 	    boolean importError = false;
@@ -75,11 +61,9 @@ public class ImportLoadStockInitProcess {
 		int sheetNo = 0; // xls sheet no. or name
 		int rowNo = 0; // row of begin data
 		int maxColumnNo = 3; // max column of data per row
-		
 		Workbook wb1 = null;
 		XSSFWorkbook wb2 = null;
 		Sheet sheet = null;
-		
 		Row row = null;
 		Cell cell = null;
 		String salesDate = "";
@@ -90,9 +74,7 @@ public class ImportLoadStockInitProcess {
 		String pensItem = "";
 		String barcode = "";
 		String mat = "";
-		
 		int index = 0;
-        int no = 0;
         double totalQty = 0;
 		try {
             if("Lotus".equalsIgnoreCase(importType)){
@@ -185,14 +167,13 @@ public class ImportLoadStockInitProcess {
 				
 				rowNo = rowNo+2;
 				
-                //Insert Detaik INIT
+                //Insert Detail INIT
 				sql = new StringBuffer("");
 				sql.append(" INSERT INTO "+tableInitOnhandName+" \n");
-				sql.append("(CUST_NO, COUNT_STK_DATE, GROUP_CODE, MATERIAL_MASTER, QTY,PENS_ITEM,BARCODE, CREATE_DATE, CREATE_USER)\n");
+				sql.append("(CUST_NO, COUNT_STK_DATE, MATERIAL_MASTER, QTY,GROUP_CODE,PENS_ITEM,BARCODE, CREATE_DATE, CREATE_USER)\n");
 				sql.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) \n"); //1-9
 				ps = conn.prepareStatement(sql.toString());
 				  
-			
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
 	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
 	            
@@ -231,25 +212,33 @@ public class ImportLoadStockInitProcess {
 						}else if(colNo==1){
 						   //Mat
 							mat = Utils.isNull(cellValue);
-                            groupCode  = mat.substring(0,6);
+                            //groupCode  = mat.substring(0,6);//OLD CODE
 							
-							ps.setString(index++, groupCode);//GROUP_CODE 3
-						    ps.setString(index++, mat);//MAT 4
+							//NEW CODE 03/04/2018 
+							/*product = GeneralDAO.searchProductByMat(conn,storeType,mat); 
+							if(product != null){
+								groupCode = product.getGroupCode();
+								logger.debug("groupCode:"+groupCode);
+							}*/
+							
+						    ps.setString(index++, mat);//MAT 3
 						}else if(colNo==2){
 						  //qty
 						   qty = Utils.decimalFormat(Utils.isDoubleNull(cellValue),Utils.format_current_no_disgit);
-						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));//QTY 5
+						   ps.setDouble(index++,Utils.isDoubleNull(cellValue));//QTY 4
 						   
 						   totalQty += Utils.isDoubleNull(cellValue);
 						}
 					}//for column
 					
 					// Find PensItem by MaterialMaster
-					Barcode master = GeneralDAO.searchProductByMat(mat);
+					Barcode master = GeneralDAO.searchProductByMat(conn,mat);
 					if(master != null){
 						 pensItem = master.getPensItem();
 						 barcode = master.getBarcode();
+						 groupCode = master.getGroupCode();
 						 
+						 ps.setString(index++, groupCode);//GROUP_CODE 5
 						 ps.setString(index++, pensItem);//PENS_ITEM 6
 						 ps.setString(index++, barcode);//BARCODE 7
 					}else{

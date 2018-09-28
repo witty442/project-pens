@@ -79,7 +79,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 	function loadMe() {
 		prepaid = Number(<%=recAmt%>);
 		gpp=prepaid;
-		//alert(prepaid);
+		//alert("prepaid:"+prepaid);
 
 		//get paid at opener
 		var orders = window.opener.document.getElementsByName('bill.orderId');
@@ -113,8 +113,8 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 			}
 		}
 
-		//alert(allBills);
-		//alert(allPaids);
+		//alert("allBills:"+allBills.value);
+		//alert("allPaids:"+allPaids.value);
 		if(Trim(allBills).value!=''){
 			b = allBills.value.split(',');
 			//alert(b);
@@ -172,7 +172,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		
 		if(Trim(allBills).value!=''){
 			b = allBills.value.split(',');
-			//alert(b);
+			
 			for(i=0;i<cns.length;i++){
 				for(j=0;j<b.length;j++){
 					if(cnbills[i].value==b[j]){
@@ -225,7 +225,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 				prepaid=0;
 			}else{
 				objtxt[row].value=Number(objcrd[row].value).toFixed(2);
-				prepaid-=Number(objcrd[row].value).toFixed(2);
+				prepaid -=Number(objcrd[row].value).toFixed(2);
 			}
 		} else {
 			prepaid+= Number(objtxt[row].value).toFixed(2);
@@ -372,6 +372,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		var totalApplyAmt = Number(totalPaid) + Number(totalCNPaid);
 		totalApplyAmt = Number(totalApplyAmt).toFixed(2);
 		
+		//alert("totalApplyAmt:"+totalApplyAmt+"|limitApplyAmt:"+limitApplyAmt);
 		if(totalApplyAmt > limitApplyAmt){
 			alert("จำนวนเงินที่ตัดชำระมากกว่าจำนวนเงินที่รับชำระ");
 			return false;
@@ -387,6 +388,8 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 
 		window.opener.fillApply('${seed}',allBillId,allPaid);
 		window.opener.fillCN('${seed}',allCNId,allCNPaid);
+		// disable Button add cr,cn
+		window.opener.disableAddCRandCN();
 		
 		window.close();
 		return true;

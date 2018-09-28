@@ -16,7 +16,7 @@ import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.SATranBean;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class SATranDAO {
 

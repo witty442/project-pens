@@ -120,7 +120,7 @@
 	<detail>
 		<band height="14" splitType="Stretch">
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="45" height="14"/>
+				<reportElement x="0" y="0" width="54" height="14"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>
@@ -134,7 +134,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{groupCode}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="57" y="0" width="314" height="14"/>
+				<reportElement x="66" y="0" width="300" height="14"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>
@@ -148,7 +148,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{materialMaster}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="45" y="0" width="12" height="14"/>
+				<reportElement x="54" y="0" width="12" height="14"/>
 				<box>
 					<pen lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid"/>

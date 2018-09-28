@@ -1,6 +1,5 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="util.Constants"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -38,6 +37,18 @@
     	titleSearch = "ร้านค้า";
     	codeSearchTxtName = "รหัสร้านค้า";
     	descSearchTxtName = "ชื่อร้านค้า";
+    }else if("FIND_GroupCode_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
+    	titleSearch = "Group In Style Mapping";
+    	codeSearchTxtName = "Group Code";
+    	descSearchTxtName = "";
+    }else if("FIND_StyleNo_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
+    	titleSearch = "Article In Style Mapping";
+    	codeSearchTxtName = "Article";
+    	descSearchTxtName = "";
+    }else if("FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
+    	titleSearch = "PensItem In Style Mapping";
+    	codeSearchTxtName = "Pens Item";
+    	descSearchTxtName = "";
     }
     
     /** Store Select MutilCode in each Page **/
@@ -260,15 +271,17 @@ window.onload = function(){
 		<th width="90%" ><b>ค้นหาข้อมูล <%=titleSearch%></b></th>
 	</tr>
 	<tr height="21px" class="txt1">
-		<td width="15%" ><b><%=codeSearchTxtName %></b>  </td>
+		<td width="15%" nowrap><b><%=codeSearchTxtName %></b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
 		<input type="button" name="search"  class="newPosBtnLong"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>')" />
 		</td>
 	</tr>
-	<tr height="21px" class="txt1">
-		<td nowrap><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
-	</tr>
+	<%if("StoreCodeBME".equalsIgnoreCase(pageName)){ %>
+		<tr height="21px" class="txt1">
+			<td nowrap><b><%=descSearchTxtName %></b></td>
+			<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
+		</tr>
+	<%} %>
 </table>
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
@@ -289,6 +302,11 @@ window.onload = function(){
 <%if(session.getAttribute("DATA_LIST") != null){ %>
    <%if("StoreCodeBME".equalsIgnoreCase(pageName)){ %>
         <jsp:include page="popup_sub/storeCodeResult.jsp" /> 
+   <%}else if("FIND_GroupCode_IN_StyleMappingLotus".equalsIgnoreCase(pageName)
+		  || "FIND_StyleNo_IN_StyleMappingLotus".equalsIgnoreCase(pageName)
+		  || "FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){ %>
+        <jsp:include page="popup_sub/FIND_StyleMappingLotus_Result.jsp" /> 
+ 
    <%}else if(session.getAttribute("search_submit") != null){ %>
         <font size="2" color="red">ไม่พบข้อมูล</font>
     <%} %>

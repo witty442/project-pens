@@ -1,9 +1,8 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.bean.PickStock"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -26,47 +25,25 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/conf_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	<%if(confPickStockAllForm.getBean().isCanEditDeliveryDate()){%>
 	   new Epoch('epoch_popup','th',document.getElementById('deliveryDate'));
 	<%}%>
 }
-
 function print(path){
 	var form = document.confPickStockAllForm;
 	form.action = path + "/jsp/confPickStockAllAction.do?do=print";
@@ -91,7 +68,6 @@ function printByGroupCode(path){
 	form.submit();
 	return true;
 }
-
 function clearForm(path){
 	var form = document.confPickStockAllForm;
 	form.action = path + "/jsp/confPickStockAllAction.do?do=clear";
@@ -104,9 +80,11 @@ function back(path){
 	form.submit();
 	return true;
 }
-
 function cancelAction(path){
 	if(confirm("ยืนยันยกเลิก Request นี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.confPickStockAllForm;
 		form.action = path + "/jsp/confPickStockAllAction.do?do=cancelAction";
 		form.submit();
@@ -114,14 +92,18 @@ function cancelAction(path){
 	}
 	return false;
 }
-
 function exportExcel(path){
 	var form = document.confPickStockAllForm;
 	form.action = path + "/jsp/confPickStockAllAction.do?do=exportToExcel";
 	form.submit();
 	return true;
 }
-
+function exportBarcodeToExcel(path){
+	var form = document.confPickStockAllForm;
+	form.action = path + "/jsp/confPickStockAllAction.do?do=exportBarcodeToExcel";
+	form.submit();
+	return true;
+}
 function confirmPick(path){
 	var form = document.confPickStockAllForm;
 	//validate delivery date
@@ -138,6 +120,9 @@ function confirmPick(path){
 	}
 	
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
+	   /**Control Save Lock Screen **/
+	   startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/confPickStockAllAction.do?do=confirmAction";
 	   form.submit();
 	   return true;
@@ -162,6 +147,9 @@ function saveDeliveryDate(path){
 	}
 	
 	if(confirm("กรุณายันยัน บันทึกข้อมูล วันที่จัดส่ง ")){
+	   /**Control Save Lock Screen **/
+	   startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/confPickStockAllAction.do?do=saveDeliveryDateAction";
 	   form.submit();
 	   return true;
@@ -172,6 +160,9 @@ function saveDeliveryDate(path){
 function savePick(path){
 	var form = document.confPickStockAllForm;
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
+	   /**Control Save Lock Screen **/
+	   startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/confPickStockAllAction.do?do=saveAction";
 	   form.submit();
 	   return true;
@@ -181,6 +172,9 @@ function savePick(path){
 
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.confPickStockAllForm;
 		form.action = path + "/jsp/confPickStockAllAction.do?do=cancel";
 		form.submit();
@@ -192,6 +186,9 @@ function cancel(path){
 function confirmAction(path){
 	var form = document.confPickStockAllForm;
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/confPickStockAllAction.do?do=confirmAction";
 		 form.submit();
 		 return true;
@@ -225,7 +222,6 @@ function gotoPage(path,pageNumber){
    form.submit();
     return true;
 }
-
 
 function isNum(obj){
   if(obj.value != ""){
@@ -512,19 +508,18 @@ function sumQty(){
 							   }
 							%>
 							    <tr id="<%=o.getLineItemId()%>" class="<%=classStyle%>"> 
-						            <td class="data_groupCode"><%=o.getGroupCode()%>
+						            <td class="td_text_center" width="10%"><%=o.getGroupCode()%>
 						              <input tabindex="-1" type="hidden" name="groupCode" value ="<%=o.getOnhandQty()%>"/>
 						            </td>
-						            <td class="data_pensItem"> <%=o.getPensItem() %> </td>
-									<td class="data_materialMaster"> <%=o.getMaterialMaster() %> </td>
-									<td class="data_barcode"> <%=o.getBarcode() %> </td>
+						            <td class="td_text_center" width="10%"> <%=o.getPensItem() %> </td>
+									<td class="td_text_center" width="10%"> <%=o.getMaterialMaster() %> </td>
+									<td class="td_text_center" width="10%"> <%=o.getBarcode() %> </td>
 
-									<td class="data_qty">
+									<td class="td_text_right" width="10%">
 										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
-										    class="disableNumber" readonly="true"
-										   />		 
+										    class="disableNumber" readonly />		 
 									</td>
-									<td class="data_issueQty">
+									<td class="td_text_right" width="10%">
 									  <c:choose>
 									     <c:when test="${confPickStockAllForm.bean.canEdit == true}">
 										      <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
@@ -546,17 +541,15 @@ function sumQty(){
 					
 					
 					<div align="right">
-						<table  border="0" cellpadding="3" cellspacing="0" >
+						<table  border="0" cellpadding="3" cellspacing="0" class="">
 							<tr>
-								<td align="right"><span class="pagelinks">รวมทั้งสิ้น :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>	</td>
-								<td>
-								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" styleClass="disableNumber" readonly="true"/>
-								     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td align="right" width="40%"><b>รวมทั้งสิ้น :	</b></td>
+								<td  width="10%" align="right">
+								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="16" styleClass="disableNumberBold" readonly="true"/>
 								</td>
-								
-								<td>
-								   <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber" readonly="true"/>
-								   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td  width="10%" align="right">
+								   <html:text property="bean.totalQty" styleId="totalQty" size="16" styleClass="disableNumberBold" readonly="true"/>
+								  
 								   <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value="${confPickStockAllForm.bean.totalQtyNotInCurPage}"/>
 								   <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>	
 								</td>
@@ -616,6 +609,12 @@ function sumQty(){
 								 <a href="javascript:printBillMini('${pageContext.request.contextPath}')">
 									  <input type="button" value=" พิมพ์ ใบเดินบิล" class="newPosBtnLong"> 
 									</a>
+									&nbsp;
+								<c:if test="${confPickStockAllForm.bean.canPrint == true}">
+									  <a href="javascript:exportBarcodeToExcel('${pageContext.request.contextPath}')">
+										 <input type="button" value="Export Barcode To Excel" class="newPosBtnLong"> 
+									</a>  
+								 </c:if>
 								</td>
 							</tr>
 						</table>
@@ -653,3 +652,6 @@ function sumQty(){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

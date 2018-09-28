@@ -1,18 +1,12 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="com.isecinc.pens.web.order.OrderAction"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.StoreBean"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -22,14 +16,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="adjustStockForm" class="com.isecinc.pens.web.adjuststock.AdjustStockForm" scope="session" />
-
-<%
-
-%>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -40,34 +27,14 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -122,6 +89,53 @@ function sumTotalDiffCost(){
 	document.getElementsByName("totalDiffCost")[0].value = num.toFixed(2);
 }
 
+function validateData(){
+	var pass = true;
+	var table = document.getElementById('tblProduct');
+	var rows = table.getElementsByTagName("tr"); 
+	
+	if(rows.length ==1){
+		return false;
+	}
+	
+	var itemIssueDesc = document.getElementsByName("itemIssueDesc");
+	var itemIssue = document.getElementsByName("itemIssue");
+	
+	var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
+	var itemReceipt = document.getElementsByName("itemReceipt");
+	
+	//alert(itemIssue.length);
+	
+	var errorList = new Object();
+	for(var i= 0;i<itemIssueDesc.length;i++){
+		var rowObj = new Object();
+		var lineClass ="lineE";
+		if(i%2==0){
+			lineClass = "lineO";
+		}
+		//alert(itemIssue[i].value );
+		
+		if(itemIssueDesc[i].value != ""){
+			if( itemIssue[i].value =="" ){
+			  rows[i+1].className ='lineError';
+			  pass = false;
+			}
+		}
+		if(itemReceiptDesc[i].value != "" ){
+			if(itemReceipt[i].value ==""){
+			  rows[i+1].className ='lineError';
+			  pass = false;
+			}
+		}
+		//no error
+		if(pass){
+			rows[i+1].className =lineClass;
+		}
+		//alert("rows["+i+"]:"+rows[i].className);
+	}// for
+	return pass ;
+}
+//deprecate
 function validateItems(){
 	var pass = true;
 	var table = document.getElementById('tblProduct');
@@ -192,7 +206,7 @@ function save(path){
 		return false;
 	}
 	
-	var pass = true;//validateItems();
+	var pass = validateData();//validateItems();
 	if(pass){
 	   form.action = path + "/jsp/adjustStockAction.do?do=save";
 	   form.submit();
@@ -251,9 +265,10 @@ function verifyData(path){
 function openPopupProduct(path,seqNo,types){
 	var param = "&page=searchPensItemByGroupPopup";
 	    param += "&types="+types+"&seqNo="+seqNo;
-	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	var url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
+	//window.open(encodeURI(url),"",
+			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",700);
 }
 function setProductMainValue(seqNo,types,groupCode,pensItem,price){
 	//alert("seqNo:"+seqNo);
@@ -331,7 +346,8 @@ function getProductModel(type,groupCode,seqNo){
 	if('issue' == type){
 		if(returnString==''){
 			alert("ไม่พบข้อมูล item "+groupCode.value);
-			itemCode.focus();
+			groupCode.value ="";
+			groupCode.focus();
 			
 			itemIssue[seqNo-1].value = '';
 		    itemIssue[seqNo-1].value = '';
@@ -346,7 +362,8 @@ function getProductModel(type,groupCode,seqNo){
 	}else{
 		if(returnString==''){
            alert("ไม่พบข้อมูล item "+groupCode.value);
-		   itemCode.focus();
+           groupCode.value ="";
+           groupCode.focus();
 			   
 		   itemReceipt[seqNo-1].value = '';
 		   itemReceipt[seqNo-1].value = '';
@@ -403,9 +420,10 @@ function openPopupCustomer(path,types,storeType){
     var param = "&types="+types;
         param += "&storeType="+storeType;
     
-	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	var url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
+	//window.open(encodeURI(url),"",
+			   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",700);
 }
 
 function setStoreMainValue(code,desc,types){
@@ -480,6 +498,7 @@ function checkSelect(chk1,chk2){
 	}
 	return;
 }
+
 </script>
 
 </head>		

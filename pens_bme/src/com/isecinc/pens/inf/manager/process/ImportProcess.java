@@ -20,7 +20,7 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class ImportProcess {
   

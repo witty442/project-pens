@@ -1,5 +1,5 @@
-<%@page import="util.Constants"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -89,12 +89,12 @@ function selectOneRadio(){
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px" class="txt1">
 		<th width="15%" >&nbsp;</th>
-		<th width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=Constants.getStoreGroupName(storeGroup)%>)</b></th>
+		<th width="90%" ><b>ค้นหาข้อมูลร้านค้า ( <%=PickConstants.getStoreGroupName(storeGroup)%>)</b></th>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="20%" ><b>รหัส</b>  </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
-		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
+		<input type="button" name="search" value="Search" class="newPosBtnLong" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
@@ -106,7 +106,7 @@ function selectOneRadio(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
+			<input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:80px;" class="newPosBtnLong" />
 			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:80px;"  class="newPosBtnLong" />
 		</td>
 	</tr>

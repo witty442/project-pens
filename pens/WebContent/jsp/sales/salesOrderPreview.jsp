@@ -1,13 +1,6 @@
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -19,8 +12,14 @@
 <%@page import="com.isecinc.pens.model.MAddress"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
-
 <%
 User user = ((User)session.getAttribute("user"));
 String role = user.getType();
@@ -49,14 +48,17 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 List<References> w1List = new MOrgRule().getW1RefList("","");
 pageContext.setAttribute("w1List",w1List,PageContext.PAGE_SCOPE);
 
-//Filter Can Receipt More Cash
+List<References> vanPaymentMethod = InitialReferences.getReferenes().get(InitialReferences.VAN_PAYMENT_METHOD);
+pageContext.setAttribute("vanPaymentMethod",vanPaymentMethod,PageContext.PAGE_SCOPE);
+
+//Filter Can Receipt More Cash //1:can, 0: cannot, -1:no pay prev bill
 OrderForm orderFrom = null;
-String canReceiptMoreCash = "N";
+String receiptCreditFlag = "0";
 if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
-  canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
+  receiptCreditFlag = Utils.isNull(orderFrom.getReceiptCreditFlag());
 }
-System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
+
 System.out.println("Message:"+request.getAttribute("Message"));
 
 String saveBtnDisable = "";
@@ -72,6 +74,8 @@ if(request.getAttribute("do_not_save") != null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
+
 <style type="text/css">
 <!--
 body {
@@ -89,6 +93,8 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 
 <script type="text/javascript">
 function loadMe(){
@@ -126,6 +132,61 @@ function stampPrint(){
 	printDateTimePick.value = currentDateStr;
 	
 }
+function validateVanPaymentMethod(){
+	var r = true;
+	var vanPaymentMethod = document.getElementsByName("order.vanPaymentMethod")[0];
+	if(vanPaymentMethod.value =='CREDIT'){
+		<%if(receiptCreditFlag.equalsIgnoreCase("0")){%>
+		     //alert("ร้านค้านี้ ยังไม่ได้เปิดสิทธิ์ ให้ขายเชื่อ ได้ กรุณาแจ้งทางผู้จัดการหรือซุปเปอร์ ให้ทำเรื่องเปิดสิทธิ์การขายเชื่อ");
+		     
+		     $("#error-dialog").dialog("open");
+		     jQuery("#error-dialog-message").text("ร้านค้านี้ ยังไม่ได้เปิดสิทธิ์ ให้ขายเชื่อ ได้ กรุณาแจ้งทางผู้จัดการหรือซุปเปอร์ ให้ทำเรื่องเปิดสิทธิ์การขายเชื่อ");
+		     r = false;
+		<%}if(receiptCreditFlag.equalsIgnoreCase("-1")){%>
+		    //alert("ร้านค้านี้ ยังมีบิลเก่า ที่ยังไม่ได้เก็บเงิน  ต้องเก็บเงินบิลเก่าก่อน จึงสามารถเปิดบิลขายเชื่อใหม่");
+		    
+		    $("#error-dialog").dialog("open");	    
+		     jQuery("#error-dialog-message").text("ร้านค้านี้ ยังมีบิลเก่า ที่ยังไม่ได้เก็บเงิน  ต้องเก็บเงินบิลเก่าก่อน จึงสามารถเปิดบิลขายเชื่อใหม่");
+	        r = false;
+		<%}%>
+	}
+	return r;
+}
+function validateVanCreditLimit(){
+	var r = true;
+	var vanPaymentMethod = document.getElementsByName("order.vanPaymentMethod")[0];
+	var custCreditLimit = document.getElementsByName("custCreditLimit")[0];
+	var netAmount = document.getElementsByName("order.netAmount")[0];
+	if(vanPaymentMethod.value =='CREDIT'){
+		//alert("creditLimit["+custCreditLimit.value+"]:netAmount["+netAmount.value+"]") ;
+		if(parseFloat(netAmount.value) > parseFloat(custCreditLimit.value)){
+		   //alert("creditLimit["+parseFloat(custCreditLimit.value)+"]:netAmount["+parseFloat(netAmount.value)+"]") ;
+		   $("#error-dialog").dialog("open");
+		   jQuery("#error-dialog-message").text("ยอดเงินที่ขาย เกินวงเงินที่กำหนด ไม่สามารถทำรายการขายได้ วงเงินที่ขายได้ของร้านนี้ ("+custCreditLimit.value+")");
+		   r = false;
+		}
+	}
+	return r;
+}
+
+$(function(){
+	 //error-dailog_message
+    $('#error-dialog').dialog({
+					autoOpen: false,
+					modal:true,
+					width: 300,
+					height:80,
+					title:"Error Message",
+					position:'center',
+					resizable: false,
+					dialogClass: 'brandDialog',
+					buttons: {"ปิด.": 
+						function() { 
+						   $(this).dialog("close"); 
+					     } 
+					}
+				});
+});
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -428,23 +489,13 @@ function stampPrint(){
 								<td></td>
 								<%if(User.VAN.equals(user.getType())){%>
 									<td class="textSpecial">
-									    <%
-										  if("N".equals(canReceiptMoreCash)){
-										%>
-											  <input type="checkbox" name="tempCheck" checked disabled/>  บันทึกรับเงินสดทันที
-											  <html:checkbox property="order.paymentCashNow" styleId="paymentCashNow"/>
-											  
-											  <script>
-											   document.getElementById("paymentCashNow").style.display = 'none';
-											   </script>
-									    <%}else{ %>
-											  <html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที
-									    <%
-										 } 											
-									    %> 
-									
+										     ชำระโดย
+										 <html:select property="order.vanPaymentMethod">
+											<html:options collection="vanPaymentMethod" property="key" labelProperty="name"/>
+										</html:select>
 								   </td>
-								<%}else if(User.TT.equals(user.getType())){%>
+								<%}else if(User.TT.equals(user.getType())){%>	
+							       <html:hidden property="order.vanPaymentMethod"/>
 								<!-- New Issue 15/05/2555 Add Bill Place -->
 								<td nowrap>
 									    สถานที่ออกสินค้า/พิมพ์บิล :
@@ -529,7 +580,7 @@ function stampPrint(){
 								</td>
 							</tr>
 						</table>
-						SalesOrderPreview
+						<span title="SalesOrderPreview">...</span>
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
 						<html:hidden property="autoReceipt.paymentMethod"/>
@@ -540,9 +591,8 @@ function stampPrint(){
 						<html:hidden property="autoReceipt.internalBank"/>
 						<!--  -->
 						<!--  Can Receipt Credit (VAN)-->
-						<html:hidden property="canReceiptMoreCash"/>
-						<html:hidden property="canReceiptCredit"/>
-						<html:hidden property="canAirpay"/>
+						<html:hidden property="receiptCreditFlag"/>
+					    <html:hidden property="custCreditLimit"/>
 					
 						<html:hidden property="deletedId"/>
 						<html:hidden property="order.orderType"/>
@@ -589,3 +639,4 @@ function stampPrint(){
 </table>
 </body>
 </html>
+<div id="error-dialog"><div id="error-dialog-message" style="color:red;"></div></div>

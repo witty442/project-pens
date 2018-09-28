@@ -23,9 +23,9 @@ import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ReqReturnWacoalForm;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -54,7 +54,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ReqReturnWacoalDAO.searchHead(aForm.getBean(),false));
+				//aForm.setResultsSearch(ReqReturnWacoalDAO.searchHead(aForm.getBean(),false));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -75,7 +75,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 		try {
 			ReqReturnWacoal b = aForm.getBean();
 			aForm.setBean(b);
-			aForm.setResultsSearch(ReqReturnWacoalDAO.searchHead(aForm.getBean(),false));
+			//aForm.setResultsSearch(ReqReturnWacoalDAO.searchHead(aForm.getBean(),false));
 			
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -135,7 +135,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 				c.setRequestDate(requestDate);
 				c.setRequestNo(requestNo);
 				
-				List<ReqReturnWacoal> listData = ReqReturnWacoalDAO.searchHead(c,true);
+				List<ReqReturnWacoal> listData = null;//ReqReturnWacoalDAO.searchHead(c,true);
 				ReqReturnWacoal h = null;
 				if(listData != null && listData.size() >0){
 				   h = (ReqReturnWacoal)listData.get(0);
@@ -282,7 +282,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 			
 			List<ReqReturnWacoal> allList = new ArrayList<ReqReturnWacoal>();
 			//search data
-			List<ReqReturnWacoal> saveData = ReqReturnWacoalDAO.searchHead(h,true);
+			List<ReqReturnWacoal> saveData = null;//ReqReturnWacoalDAO.searchHead(h,true);
 			h = (ReqReturnWacoal)saveData.get(0);
 			   
 			// All barcode status CLOSE
@@ -349,7 +349,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 			ReqReturnWacoal h = aForm.getBean();
 			
 			//update status barcode to close (old status)
-			List<ReqReturnWacoal> saveData = ReqReturnWacoalDAO.searchHead(h,true);
+			List<ReqReturnWacoal> saveData =null;// ReqReturnWacoalDAO.searchHead(h,true);
 			if(saveData != null && saveData.size()>0){
 			   ReqReturnWacoal oldReq = (ReqReturnWacoal)saveData.get(0);
 			   for(int i=0;i<oldReq.getItems().size();i++){
@@ -388,7 +388,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 			
 			
 			//Search Data
-			List<ReqReturnWacoal> listData = ReqReturnWacoalDAO.searchHead(h,true);
+			List<ReqReturnWacoal> listData = null;//ReqReturnWacoalDAO.searchHead(h,true);
 			ReqReturnWacoal beanSearch = null;
 			if(listData != null && listData.size() >0){
 				beanSearch = (ReqReturnWacoal)listData.get(0);

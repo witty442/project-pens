@@ -43,7 +43,7 @@ String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg4 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	msg4 = AppversionVerify.getIns().checkAppVersion(request);
+	msg4 = AppversionVerify.getApp().checkAppVersion(request);
 }
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>

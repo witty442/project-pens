@@ -3,6 +3,7 @@ package com.isecinc.pens.web.receipt;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -130,7 +131,6 @@ public class ReceiptAction extends I_Action {
 			throws Exception {
 		ReceiptForm receiptForm = (ReceiptForm) form;
 		Receipt receipt = null;
-
 		try {
 			receipt = new MReceipt().find(id);
 			logger.debug("receipt:"+receipt+",id:"+id);
@@ -185,7 +185,6 @@ public class ReceiptAction extends I_Action {
 
 			whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' ";
 			whereCause += " AND CUSTOMER_ID = " + receiptForm.getReceipt().getCustomerId() + " ";
-
 			whereCause += " AND USER_ID = " + user.getId();
 
 			if (receiptForm.getReceipt().getSearchInvoiceNo() != null
@@ -220,6 +219,11 @@ public class ReceiptAction extends I_Action {
 		ReceiptForm receiptForm = (ReceiptForm) form;
 		int receiptId = 0;
 		try {
+			/** For Test delay process **/
+			/*logger.debug("start Sleep 1 Minute");
+			TimeUnit.MINUTES.sleep(1);
+			logger.debug("End Sleep 1 Minute");*/
+			
 			// User user = (User) request.getSession().getAttribute("user");
 			receiptId = receiptForm.getReceipt().getId();
 
@@ -273,7 +277,7 @@ public class ReceiptAction extends I_Action {
 				return "prepare";
 			}
 
-			// Delete Line
+			// Delete Receipt Line,update order, Before Create new 
 			if (ConvertNullUtil.convertToString(receiptForm.getDeletedId()).trim().length() > 0) {
 				// reverse payment flag to line
 				String[] ids = receiptForm.getDeletedId().substring(1).trim().split(",");
@@ -291,8 +295,8 @@ public class ReceiptAction extends I_Action {
 						ol.setNeedExport("N");
 						ol.setInterfaces("N");
 						mOrderLine.save(ol, userActive.getId(), conn);
-					}
-				}
+					}//for 2
+				}//for 1
 				
 				/** Delete Match Line by receipt_line_id :WIT Edit 07/04/2011**/
 				new MReceiptMatch().deleteByReceiptLineId(receiptForm.getDeletedId().substring(1).trim(), conn);
@@ -301,7 +305,7 @@ public class ReceiptAction extends I_Action {
 				new MReceiptLine().delete(receiptForm.getDeletedId().substring(1).trim(), conn);
 			}
 
-			// Save Lines
+			// Save Lines ,Update Order Flag
 			Order order;
 			i = 1;
 			MReceiptLine mReceiptLine = new MReceiptLine();
@@ -311,7 +315,9 @@ public class ReceiptAction extends I_Action {
 			for (ReceiptLine line : receiptForm.getLines()) {
 				line.setLineNo(i++);
 				line.setReceiptId(receipt.getId());
-				if (receiptId == 0) line.setId(0);
+				if (receiptId == 0){
+					line.setId(0);
+				}
 				mReceiptLine.save(line, userActive.getId(), conn);
 
 				order = new MOrder().find(String.valueOf(line.getOrder().getId()));
@@ -335,8 +341,8 @@ public class ReceiptAction extends I_Action {
 					ol.setNeedExport("N");
 					ol.setInterfaces("N");
 					mOrderLine.save(ol, userActive.getId(), conn);
-				}
-			}
+				}//for
+			}//while
 
 			// Delete Match CN
 			MReceiptMatchCN mReceiptMatchCN = new MReceiptMatchCN();

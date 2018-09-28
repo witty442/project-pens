@@ -53,6 +53,12 @@ TABLE.tableSearchNoWidth TD {
 	font-weight: bold;
 }
 
+.header_text {
+	height: 30px;
+	font-weight: bold;
+	font-size: 16px;
+}
+
 .td_text{
 	text-align: left;
 }
@@ -87,7 +93,7 @@ span.pagebanner {
 	margin-top: 10px;
 	display: block;
 	border-bottom: none;
-	font-size: 15px;
+	font-size: 16px;
 }
 
 span.pagelinks {
@@ -98,6 +104,26 @@ span.pagelinks {
 	display: block;
 	border-top: none;
 	margin-bottom: -1px;
-	font-size: 15px;
+	font-size: 16px;
+}
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
 }
 

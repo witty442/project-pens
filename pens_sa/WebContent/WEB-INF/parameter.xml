@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <parameter>
 	<!-- Report Param -->
-	<database>mysql</database>
-	<contextName>pens</contextName>
-      <reportPath>C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\pens_client\reports\</reportPath>
+	<database>oracle</database>
+	<contextName>pens_sa</contextName>
+    <!--   <reportPath>C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\pens_client\reports\</reportPath>
       <logo>C:\Program Files\Apache Software Foundation\Tomcat 6.0\webapps\pens_client\images\pens_logo_en.jpg</logo>
-	  <penstaxno>3034010670</penstaxno>
+	  <penstaxno>3034010670</penstaxno> -->
 
 	<!-- Modifier -->
 	<modifier>

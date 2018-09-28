@@ -2,8 +2,6 @@ package util;
 
 import java.util.Date;
 
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
-
 public class SIdUtils {
     private static SIdUtils _instance;
     private  String idSession = "";

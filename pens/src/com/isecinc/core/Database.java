@@ -43,6 +43,7 @@ public class Database {
 			int i = 1;
 			if (parameters != null) {
 				for (Object p : parameters) {
+					//logger.debug("Parameter:"+p.toString());
 					if (p != null) pstmt.setObject(i++, p);
 				}
 			}

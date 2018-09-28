@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DBCPConnectionProvider;
+import util.DBConnection;
 
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SystemConfig;
@@ -77,7 +77,7 @@ public class SysConfigAction extends I_Action {
 			SystemConfig config3 = InitialSystemConfig.getConfigs().get(InitialReferences.ROUND_DELIVER);
 			SystemConfig config4 = InitialSystemConfig.getConfigs().get(InitialReferences.MEMBER_TYPE);
 
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			// Begin Trans
 			new MSysConfig().save(new SystemConfig(config1.getId(), config1.getName(), alertPeriod),

@@ -2,26 +2,17 @@
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="pickStockGroupForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <% 
@@ -47,7 +38,6 @@ if(session.getAttribute("custGroupList") == null){
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
-
 String pageName = pickStockGroupForm.getBean().getPage();
 %>
 
@@ -60,29 +50,6 @@ String pageName = pickStockGroupForm.getBean().getPage();
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
@@ -118,7 +85,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.pickStockGroupForm;
+	form.action = path + "/jsp/pickStockGroupAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,documentNo,issueReqStatus){
 	var form = document.pickStockGroupForm;
 	form.action = path + "/jsp/pickStockGroupAction.do?do=prepareByGroup&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
@@ -221,9 +193,7 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -270,42 +240,58 @@ function resetStore(){
                         <div align="center">
 						<%if("req".equalsIgnoreCase(pageName)){ %>
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
-						       <tr>
-                                    <td>
-                                      Issue request Date <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
-                                     </td>
-									<td>						
-									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
-									</td>
+								<tr>
+                                    <td align="right">Issue request Date </td>
+                                    <td><html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" /></td>
+									<td align="right"> Issue request No </td>
+									<td> <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	</td>
 								</tr>
 								 <tr>
-                                    <td>
-                                      Issue request status
+                                    <td  align="right">Issue request status</td>
+                                     <td>
                                       <html:select property="bean.issueReqStatus">
 											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
 									    </html:select>
                                      </td>
-									<td>						
-									 ผู้เบิก <html:text property="bean.pickUser" styleId="pickUser" size="20" />	  
-									</td>
+									<td  align="right">	 ผู้เบิก </td>
+									<td> <html:text property="bean.pickUser" styleId="pickUser" size="20" /></td>
 								</tr>
 								<tr>
-                                    <td > Confrim Issue Date
+                                    <td align="right"> Confrim Issue Date</td>
+									<td > 
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20"/>
 									</td>
-									<td> Pick Type
+									<td align="right"> Pick Type </td>
+									 <td> 
 									    <html:select property="bean.pickType">
 											<html:options collection="pickTypeList" property="key" labelProperty="name"/>
 									    </html:select>
 									  </td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> Invoice No
-						               <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" />
+                                    <td align="right"> กลุ่มร้านค้า  </td>
+                                    <td>
+										<html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
+											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+									    </html:select>
+						           </td >
+						           <td align="right">Invoice No </td>
+						           <td > <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" /></td>
+								</tr>
+								<tr>
+									<td  align="right">รหัสร้านค้า </td>
+									<td colspan="3">
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
+									
+									 <html:hidden property="bean.subInv" styleId="subInv" />
+						             <html:hidden property="bean.storeNo" styleId="storeNo" />
 									</td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> หมายเหตุ
+                                    <td align="right"> หมายเหตุ</td>
+									<td colspan="3" > 
 						               <html:text property="bean.remark" styleId="remark" size="50" />
 									</td>
 								</tr>
@@ -368,7 +354,6 @@ function resetStore(){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
@@ -398,7 +383,29 @@ function resetStore(){
 					  </div>
 
             <c:if test="${pickStockGroupForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = pickStockGroupForm.getTotalPage();
+					   int totalRecord = pickStockGroupForm.getTotalRecord();
+					   int currPage =  pickStockGroupForm.getCurrPage();
+					   int startRec = pickStockGroupForm.getStartRec();
+					   int endRec = pickStockGroupForm.getEndRec();
+					%>
+					    
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
                   	<%if("req".equalsIgnoreCase(pageName)){ %>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
@@ -448,6 +455,7 @@ function resetStore(){
 										  ${results.remark}
 										</td>
 										<td class="td_text_center">
+										   <font size="2">
 										    <c:if test="${results.pickType == 'GROUP'}">
 											    <c:if test="${results.canEdit == false}">
 													  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
@@ -460,8 +468,10 @@ function resetStore(){
 													  </a>
 												  </c:if>
 										    </c:if>  
+										    </font>
 										</td>
 										<td class="td_text_center">
+										   <font size="2">
 										    <c:if test="${results.pickType == 'GROUP'}">			    
 											     <c:if test="${results.canConfirm == true}">
 													<a href="javascript:openConfirm('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
@@ -469,6 +479,7 @@ function resetStore(){
 													</a>
 												  </c:if>
 										    </c:if> 
+										    </font>
 										</td>
 									</tr>
 							
@@ -527,7 +538,8 @@ function resetStore(){
 										  ${results.remark}
 										</td>
 										<td class="td_text_center" width="10%">
-									       <c:if test="${results.canComplete == false}">
+										    <font size="2">
+									           <c:if test="${results.canComplete == false}">
 												  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.issueReqNo}','${results.issueReqStatus}')">
 												          ดู
 												  </a>
@@ -537,6 +549,7 @@ function resetStore(){
 												          แก้ไข
 												  </a>
 											  </c:if>
+											 </font>
 										</td>
 									</tr>
 							

@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class DateToolsUtil {
 
@@ -436,5 +435,11 @@ public class DateToolsUtil {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		return c;
+	}
+	
+	public static int getDayOfDate(Date date) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return c.get(Calendar.DAY_OF_MONTH);
 	}
 }

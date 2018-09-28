@@ -19,12 +19,12 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.dao.SearchTaskDAO;
 import com.isecinc.pens.scheduler.forms.SearchTaskForm;
 import com.isecinc.pens.scheduler.utils.DateUtil;
+import com.pens.util.Utils;
 
 public class SearchTaskAction extends  I_Action
 {

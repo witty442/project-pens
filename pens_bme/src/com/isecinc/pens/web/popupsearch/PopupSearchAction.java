@@ -14,8 +14,8 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -115,7 +115,12 @@ public class PopupSearchAction extends I_Action {
 		List<PopupSearchForm> results = null;
 		try {
 			if("StoreCodeBME".equalsIgnoreCase(popupForm.getPageName()) ){
-				 results = PopupSearchDAO.searchStoreCodeBMEList(popupForm);
+				results = PopupSearchDAO.searchStoreCodeBMEList(popupForm);
+			}else if("FIND_GroupCode_IN_StyleMappingLotus".equalsIgnoreCase(popupForm.getPageName()) 
+				|| "FIND_StyleNo_IN_StyleMappingLotus".equalsIgnoreCase(popupForm.getPageName()) 
+				|| "FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(popupForm.getPageName()) ){
+				
+				results = PopupSearchDAO.searchStyleMappingLotusList(popupForm);
 			}
 			
 			 if(results != null && results.size() >0){

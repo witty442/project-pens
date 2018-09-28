@@ -133,6 +133,11 @@ function loadMe(){
 						   
 						   	
 						   	<display:column  title="สถานะ" property="statusDesc"  sortable="false" class="moverOrder.status"/>	
+						   	<display:column title="โอนข้อมูลแล้ว">
+						   		<c:if test="${item.exported =='Y'}">
+							   	   <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+								</c:if>
+						   	</display:column>
 						   	<display:column title="แก้ไข/ดู ข้อมูล">
 				
 						       	<c:if test="${item.canEdit =='true'}">

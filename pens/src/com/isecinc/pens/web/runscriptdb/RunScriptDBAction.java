@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
@@ -69,13 +71,20 @@ public class RunScriptDBAction {
 			if(day==5){
 				purgDataSalesTarget(conn);	
 			}
+			//delete t_temp_import_trans_err back 4 month
+			if(day==10){
+				purgDataTempImportTransErr(conn);
+			}
 			
 			//clear Task running for next run
 			InterfaceDAO dao = new InterfaceDAO();
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_EXPORT);
 
-			//Update location is unvalid format
+			//Update location is invalid format
+			
+			//delete t_order_line product_id is null or product_id = 0 or product_id =''
+			deleteOrderLineProductIdInvalid(conn);
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -89,6 +98,14 @@ public class RunScriptDBAction {
 	}
 	
 	public static void runManualScriptProcess(String prefix,User user){
+		if(ControlCode.canExecuteMethod("RunScriptDBAction", "runManualScriptProcessOLD")){
+			runManualScriptProcessOLD(prefix,user);
+		}else{
+			runManualScriptProcessNew(prefix,user);
+		}
+	}
+	
+	public static void runManualScriptProcessOLD(String prefix,User user){
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
@@ -119,6 +136,65 @@ public class RunScriptDBAction {
 		}
 	}
 	
+	public static void runManualScriptProcessNew(String prefix,User user){
+		EnvProperties env = EnvProperties.getInstance();
+		Connection conn = null;
+		try{
+			logger.info("Start runManualScriptProcessNew");
+			conn = DBConnection.getInstance().getConnection();
+			
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			
+			/** Run ManualScript By Sales Type VAN or Credit **/
+			logger.debug("role:"+user.getRole().getKey());
+			String salesType = "van";
+			if("TT".equals(user.getRole().getKey())){
+				salesType  ="credit";
+			}
+			
+			//Get All Manual-script by prefix
+			String[] scriptData = ftpManager.getManualScriptImportExport(prefix,salesType,user.getCode(),"TIS-620");
+			
+			// 1> Execute Script AllSales
+			logger.debug("AllSales scriptData "+prefix+":"+scriptData[0]);
+			if( !Utils.isNull(scriptData[0]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[0]));
+				logger.info("AllSales scriptData "+prefix+" resultExeSctipt:\n "+resultStr);
+			}
+			
+			// 2> Execute Script BySales
+			logger.debug("SalesType scriptData "+prefix+":"+scriptData[1]);
+			if( !Utils.isNull(scriptData[1]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[1]));
+				logger.info("SalesType scriptData "+prefix+" resultExeSctipt:\n"+resultStr);
+			}
+			
+			// 3> Execute Script BySales
+			logger.debug("BySales["+user.getUserName()+"] scriptData "+prefix+":"+scriptData[2]);
+			if( !Utils.isNull(scriptData[2]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[2]));
+				logger.info("BySales["+user.getUserName()+"] scriptData "+prefix+" resultExeSctipt: \n"+resultStr);
+				
+				//Case BySales Move file to inProcess
+				// delete and Create new  File Ftp To In Process
+				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+user.getUserName()+".sql");
+			
+				//rename fileName
+				String fileName = "script_"+user.getUserName()+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn= null;
+				}
+			}catch(Exception e){}
+		}
+	}
 	
 	/**
 	 * 
@@ -137,7 +213,7 @@ public class RunScriptDBAction {
 			
 			logger.debug("scriptData:"+scriptData);
 			
-			// Excute Script
+			// Execute Script
 			if( !Utils.isNull(scriptData).equals("")){
 				String resultStr = excUpdate(conn,Utils.isNull(scriptData));
 				logger.debug("resultExeSctipt:"+resultStr);
@@ -263,6 +339,38 @@ public class RunScriptDBAction {
 			logger.debug(excUpdate(conn,sql.toString()));
 			
 			logger.info("*** Success PurgData m_sales_target_new back 2 month ***************");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return success;
+  }
+	
+	private static boolean deleteOrderLineProductIdInvalid(Connection conn){
+		boolean success = false;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			logger.info("*** Start deleteOrderLineProductIdInvalid ***\n");
+			sql.append(" delete from pens.t_order_line where product_id is null or product_id =0 or product_id ='0' \n");
+			logger.info("TotalRec:"+excUpdate(conn,sql.toString())+"\n");
+			logger.info("*** Success deleteOrderLineProductIdInvalid ***\n");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return success;
+  }
+	
+	private static boolean purgDataTempImportTransErr(Connection conn){
+		boolean success = false;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			logger.debug("*** Start PurgData t_temp_import_trans_err back 4 month ***************");
+			
+			sql.append(" delete from t_temp_import_trans_err  \n");
+			sql.append(" where created < SUBDATE(NOW(),INTERVAL 4 MONTH)  \n");
+
+			logger.debug(excUpdate(conn,sql.toString()));
+			
+			logger.info("*** Success PurgData t_temp_import_trans_err back 4 month ***************");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

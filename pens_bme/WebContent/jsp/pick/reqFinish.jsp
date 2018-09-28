@@ -1,6 +1,5 @@
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -8,7 +7,6 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -17,50 +15,25 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqFinishForm" class="com.isecinc.pens.web.pick.ReqFinishForm" scope="session" />
-
 <%
  String mode = reqFinishForm.getMode();
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_reqReturnWacoal.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
 
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -122,15 +95,15 @@ function save(path){
 	}
 	
 	if(confirm("ยันยันการบันทึกข้อมูล")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/reqFinishAction.do?do=save";
 	   form.submit();
 	   return true;
 	}
-	
 	return false;
 }
-
-
 function checkAll(chkObj){
 	var chk = document.getElementsByName("linechk");
 	for(var i=0;i<chk.length;i++){
@@ -305,7 +278,7 @@ function sumTotal(chkObj){
 								
 									<tr class="<c:out value='${tabclass}'/>">
 										
-										<td class="data_chk">
+										<td class="td_text_center" width="5%">
 											<c:choose>
 												<c:when test="${results.selected == 'true'}">
 													 <input type="checkbox" name="linechk"  onclick="sumTotal()" checked/>		
@@ -314,24 +287,19 @@ function sumTotal(chkObj){
 													 <input type="checkbox" name="linechk"  onclick="sumTotal()"/>		
 												</c:otherwise>
 											</c:choose>
-								
-										 							  
+													  
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
-								
 										</td>
-										<td class="data_boxNo" align="center">${results.boxNo}
+										<td class="td_text_center" width="10%">${results.boxNo}
 											<input type="hidden" name="boxNo" value ="${results.boxNo}" size="40" readonly class="disableText"/>
-											
 										</td>
-										<td class="data_qty" align="center">${results.qty}
+										<td class="td_text_right" width="10%">${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 										</td>
-										<td class="data_jobName" align="center">${results.jobId}-${results.jobName}
+										<td class="td_text" width="15%">${results.jobId}-${results.jobName}
 										   <input type="hidden" name="jobId" value ="${results.jobId}" size="20" readonly class="disableText"/>
 										</td>
-										
 									</tr>
-							
 							  </c:forEach>
 					</table>
 					
@@ -403,3 +371,6 @@ function sumTotal(chkObj){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

@@ -18,8 +18,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.MoveWarehoseDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action

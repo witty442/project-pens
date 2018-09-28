@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.batchtask;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 public class BatchTaskInfo implements Serializable {
@@ -16,9 +17,15 @@ private static final long serialVersionUID = 1L;
     private String paramValid;
     private String validateScript;
 	private Map<String, BatchTaskInfo> paramMap;
-    
+	private List<BatchTaskInfo> paramList;
 	
 	
+	public List<BatchTaskInfo> getParamList() {
+		return paramList;
+	}
+	public void setParamList(List<BatchTaskInfo> paramList) {
+		this.paramList = paramList;
+	}
 	public String getParamFormFileValue() {
 		return paramFormFileValue;
 	}

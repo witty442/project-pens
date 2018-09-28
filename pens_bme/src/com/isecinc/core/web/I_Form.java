@@ -64,8 +64,16 @@ public abstract class I_Form extends ActionForm {
 	private int totalRecord;
 	private int startRec;
 	private int endRec;
+	private int pageSize;
 
-	
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
 	public int getCurrPage() {
 		return currPage;
 	}

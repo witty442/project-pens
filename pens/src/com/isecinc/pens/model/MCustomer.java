@@ -63,6 +63,39 @@ public class MCustomer extends I_Model<Customer> {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Customer.class);
 	}
 
+	public Customer findByWhereCond(String whereSql) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return findByWhereCond(conn, whereSql);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public Customer findByWhereCond(Connection conn ,String whereSql) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Customer p = null;
+		try{
+			String sql ="\n select * from m_customer "+whereSql ;
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				p = new Customer(rst);
+			}
+			return p;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
 	/**
 	 * Search
 	 * 

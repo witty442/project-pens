@@ -1,5 +1,9 @@
 package com.isecinc.pens.web.popup;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +17,9 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SummaryDAO;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -36,6 +42,8 @@ public class SearchGroupPopupAction extends I_Action {
 				 request.setAttribute("results", null);
 				 popupForm.setCode("");
 				 popupForm.setDesc("");
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
 				 popupForm.setNo(0);
 				 
 				 request.getSession().setAttribute("codes", null);
@@ -82,10 +90,16 @@ public class SearchGroupPopupAction extends I_Action {
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		PopupForm popupForm = (PopupForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		SummaryDAO dao = new SummaryDAO();
+		List<PopupForm> results = null;
 		try {
-			 List<PopupForm> results = dao.searchGroupMaster(popupForm);
+			String storeType = Utils.isNull(request.getParameter("storeType"));
+			logger.debug("storeType:"+storeType);
+			
+			 if("tops".equalsIgnoreCase(storeType)){
+				 results = searchGroupCodeListTypeTops(popupForm);
+			 }else{
+			     results = searchGroupCodeList(popupForm);
+			 }
 			 if(results != null && results.size() >0){
 				 request.setAttribute("GROUP_LIST", results);
 			 }else{
@@ -100,7 +114,94 @@ public class SearchGroupPopupAction extends I_Action {
 		}
 		return "search";
 	}
+	
+  public static List<PopupForm> searchGroupCodeList(PopupForm c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try {
+			sql.append("  SELECT distinct material_master from pensbme_style_mapping where 1=1 \n");
 
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append(" and material_master LIKE '%"+c.getCodeSearch()+"%' \n");
+			}
+			if( !Utils.isNull(c.getDescSearch()).equals("")){
+				sql.append(" and material_master LIKE '%"+c.getDescSearch()+"%' \n");
+			}
+			
+			sql.append("  ORDER BY material_master asc \n");
+			
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
+			while (rst.next()) {
+				PopupForm item = new PopupForm();
+				no++;
+				item.setNo(no);
+				item.setCode(rst.getString("material_master"));
+				item.setDesc(rst.getString("material_master"));
+				pos.add(item);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
+
+  public static List<PopupForm> searchGroupCodeListTypeTops(PopupForm c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try {
+			sql.append("  SELECT pens_desc2 from PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'TOPSitem' \n");
+
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append(" and pens_desc2 LIKE '%"+c.getCodeSearch()+"%' \n");
+			}
+			if( !Utils.isNull(c.getDescSearch()).equals("")){
+				sql.append(" and pens_desc2 LIKE '%"+c.getDescSearch()+"%' \n");
+			}
+			
+			sql.append("  ORDER BY pens_desc2 asc \n");
+			
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
+			while (rst.next()) {
+				PopupForm item = new PopupForm();
+				no++;
+				item.setNo(no);
+				item.setCode(rst.getString("pens_desc2"));
+				item.setDesc(rst.getString("pens_desc2"));
+				pos.add(item);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
 	
 	/**
 	 * Save

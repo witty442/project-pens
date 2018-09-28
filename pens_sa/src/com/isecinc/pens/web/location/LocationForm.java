@@ -13,9 +13,18 @@ public class LocationForm extends I_Form {
     private List<LocationBean> results = new ArrayList<LocationBean>();
     
     private String pageName;
+    private String detailType;
     private LocationBean bean ;
     private LocationBean beanCriteria ;
     
+    
+	
+	public String getDetailType() {
+		return detailType;
+	}
+	public void setDetailType(String detailType) {
+		this.detailType = detailType;
+	}
 	public List<LocationBean> getResults() {
 		return results;
 	}
@@ -43,7 +52,7 @@ public class LocationForm extends I_Form {
 	}
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 	  if(getBean() !=null){
-		 getBean().setDispAllStore("");
+		 getBean().setDispAllNoOrder("");
 		 getBean().setDispAllOrder("");
 		 getBean().setDispAllVisit("");
 	  }

@@ -1,27 +1,20 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="pickStockForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <% 
 if(session.getAttribute("statusIssueReqList") == null){
@@ -52,37 +45,14 @@ if(session.getAttribute("custGroupList") == null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -109,6 +79,12 @@ function search(path){
 	form.action = path + "/jsp/pickStockAction.do?do=search2&action=newsearch";
 	form.submit();
 	return true;
+}
+function gotoPage(path,currPage){
+	var form = document.pickStockForm;
+	form.action = path + "/jsp/pickStockAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
 }
 
 function openEdit(path,documentNo,issueReqStatus){
@@ -152,7 +128,114 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 	form.submit();
 	return true;
 }
+function resetStore(){
+	var form = document.pickStockForm;
+	var storeGrouptext = $("#custGroup option:selected").text();
+	
+	if(storeGrouptext != ''){
+		form.storeCode.value = "";
+		form.storeName.value = "";
+		form.storeNo.value = "";
+		form.subInv.value = "";
+	}
+}
+function openPopupCustomer(path,types,storeType){
+	var form = document.pickStockForm;
+	var storeGroup = form.custGroup.value;
+	
+    var param = "&types="+types;
+        param += "&storeType="+storeType;
+        param += "&storeGroup="+storeGroup;
+    
+	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
+	window.open(encodeURI(url),"",
+			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+}
 
+function setStoreMainValue(code,desc,storeNo,subInv,types){
+	var form = document.pickStockForm;
+	//alert(form);
+	form.storeCode.value = code;
+	form.storeName.value = desc;
+	
+	if(storeNo=='' || subInv==''){
+		if(storeNo==''){
+			alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
+		}
+		if(subInv==''){
+			alert("ไม่พบข้อมูล Sub Inventory  ไม่สามารถทำงานต่อได้");
+		}
+		form.storeCode.value = '';
+		form.storeName.value = "";
+		form.storeNo.value = "";
+		form.subInv.value = "";
+	}else{
+	   form.storeNo.value = storeNo;
+	   form.subInv.value = subInv;
+	}
+} 
+
+function getCustNameKeypress(e,custCode,fieldName){
+	var form = document.pickStockForm;
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			if("storeCode" == fieldName){
+				form.storeCode.value = '';
+				form.storeName.value = "";
+				form.storeNo.value = "";
+				form.subInv.value = "";
+			}
+		}else{
+		  getCustName(custCode,fieldName);
+		}
+	}
+}
+
+function getCustName(custCode,fieldName){
+	var returnString = "";
+	var form = document.pickStockForm;
+	var storeGroup = form.custGroup.value;
+		var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameWithSubInvAjax.jsp",
+				data : "custCode=" + custCode.value+"&storeGroup="+storeGroup,
+				async: false,
+				cache: false,
+				success: function(getData){
+				  returnString = jQuery.trim(getData);
+				}
+			}).responseText;
+		
+		if("storeCode" == fieldName){
+			if(returnString !=''){
+				var retArr = returnString.split("|");
+				form.storeName.value = retArr[0];
+				
+				if(retArr[1]=='' || retArr[2]==''){
+					if(retArr[1]==''){
+						alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
+					}
+					if(retArr[2]==''){
+						alert("ไม่พบข้อมูล Sub Inventory  ไม่สามารถทำงานต่อได้");
+					}
+					form.storeCode.value = '';
+					form.storeName.value = "";
+					form.storeNo.value = "";
+					form.subInv.value = "";
+				}else{
+					form.storeNo.value = retArr[1];
+					form.subInv.value = retArr[2];
+				}
+				
+			}else{
+				alert("ไม่พบข้อมูล");
+				form.storeCode.focus();
+				form.storeCode.value ="";
+				form.storeName.value = "";
+				form.storeNo.value = "";
+				form.subInv.value = "";
+			}
+		}
+}
 </script>
 
 </head>		
@@ -198,41 +281,57 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
-                                    <td>
-                                      Issue request Date &nbsp;<html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
-                                     </td>
-									<td>						
-									 Issue request No &nbsp; <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
-									</td>
+                                    <td align="right">Issue request Date </td>
+                                    <td><html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" /></td>
+									<td align="right"> Issue request No </td>
+									<td> <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	</td>
 								</tr>
 								 <tr>
-                                    <td>
-                                      Issue request status&nbsp;
+                                    <td  align="right">Issue request status</td>
+                                     <td>
                                       <html:select property="bean.issueReqStatus">
 											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
 									    </html:select>
                                      </td>
-									<td>						
-									 ผู้เบิก <html:text property="bean.pickUser" styleId="pickUser" size="20" />	  
-									</td>
+									<td  align="right">	 ผู้เบิก </td>
+									<td> <html:text property="bean.pickUser" styleId="pickUser" size="20" /></td>
 								</tr>
 								<tr>
-                                    <td > Confrim Issue Date&nbsp;
+                                    <td align="right"> Confrim Issue Date</td>
+									<td > 
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20"/>
 									</td>
-									<td> Pick Type
+									<td align="right"> Pick Type </td>
+									 <td> 
 									    <html:select property="bean.pickType">
 											<html:options collection="pickTypeList" property="key" labelProperty="name"/>
 									    </html:select>
 									  </td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> Invoice No &nbsp;
-						               <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" />
+                                    <td align="right"> กลุ่มร้านค้า  </td>
+                                    <td>
+										<html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
+											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
+									    </html:select>
+						           </td >
+						           <td align="right">Invoice No </td>
+						           <td > <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" /></td>
+								</tr>
+								<tr>
+									<td  align="right">รหัสร้านค้า </td>
+									<td colspan="3">
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
+									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
+									
+									 <html:hidden property="bean.subInv" styleId="subInv" />
+						             <html:hidden property="bean.storeNo" styleId="storeNo" />
 									</td>
 								</tr>
 								<tr>
-                                    <td colspan="2"> หมายเหตุ &nbsp;
+                                    <td align="right"> หมายเหตุ</td>
+									<td colspan="3" > 
 						               <html:text property="bean.remark" styleId="remark" size="50" />
 									</td>
 								</tr>
@@ -269,7 +368,29 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 					  </div>
 
             <c:if test="${pickStockForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = pickStockForm.getTotalPage();
+					   int totalRecord = pickStockForm.getTotalRecord();
+					   int currPage =  pickStockForm.getCurrPage();
+					   int startRec = pickStockForm.getStartRec();
+					   int endRec = pickStockForm.getEndRec();
+					%>
+					    
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >Issue Req Date</th>
@@ -292,25 +413,25 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_issueReqDate">
+										<td class="td_text_center" width="10%">
 										   ${results.issueReqDate}
 										</td>
-										<td class="search_issueReqNo">${results.issueReqNo}</td>
-										<td class="search_issueReqStatus">
+										<td class="td_text_center" width="10%">${results.issueReqNo}</td>
+										<td class="td_text_center" width="10%">
 											${results.issueReqStatusDesc}
 										</td>
-										<td class="search_confirmIssueDate">
+										<td class="td_text_center" width="10%">
 										    ${results.confirmIssueDate}
 										</td>
 										
-										<td class="search_pickType">
+										<td class="td_text_center" width="10%">
 										  ${results.pickTypeDesc}
 										</td>
-									    <td class="search_remark">
+									    <td class="td_text" width="20%">
 										  ${results.remark}
 										</td>
-										<td class="search_edit">
-										
+										<td class="td_text_center" width="10%">
+										  <font size="2">
 											 <c:if test="${results.pickType == 'ITEM'}">
 												<c:choose>
 													<c:when test="${results.subPickType == 'PBOX'}">
@@ -352,9 +473,10 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 														  </a>
 													  </c:if>
 											    </c:if>
-											  
+											  </font>
 											</td>
-											<td class="search_edit2">
+											<td class="td_text_center" width="10%">
+											 <font size="2">
 											 <c:if test="${results.pickType == 'ITEM'}">
 												<c:choose>
 													<c:when test="${results.subPickType == 'PBOX'}">
@@ -381,6 +503,7 @@ function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 														</a>
 													  </c:if>
 											    </c:if> 
+											  </font>
 										</td>
 									</tr>
 							

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.init.InitialParameter;
+
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration
  * 
@@ -25,7 +27,10 @@ public class WebInitialServlet extends HttpServlet {
 		logger.debug("Initial Pens App...");
 		Connection conn = null;
 		try {
-            
+			logger.info("Initial System Parameter");
+			InitialParameter initParam = new InitialParameter();
+			initParam.init(getInitParameter("parameterfile"), getServletContext());
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();

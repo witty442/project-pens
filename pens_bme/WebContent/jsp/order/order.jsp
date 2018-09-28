@@ -1,12 +1,10 @@
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="util.Constants"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.bean.StoreBean"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.util.ArrayList"%>
@@ -16,28 +14,19 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 
-
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
-
 <%
 List<StoreBean> storeList = null;
 if(session.getAttribute("storeList") != null){
 	storeList = (List<StoreBean>)session.getAttribute("storeList");
 }
-
 int start = 0;
 int end = 0;
 int pageNumber = 1;
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -45,37 +34,17 @@ int pageNumber = 1;
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -84,12 +53,21 @@ function loadMe(){
 		 alert("<%=Utils.isNull(request.getAttribute("Message"))%>");
 	 <%} %>
 	 
+	 //popup Order error
+	 <%if(request.getSession().getAttribute("ORDER_ERROR") != null){ %>
+	     var url = "${pageContext.request.contextPath}/jsp/order/orderError.jsp";
+	     //$.blockUI();
+	     PopupCenterFullHeightCustom(url,"Display Error",window.innerWidth-500,-100);
+	 <%}%>
+	 
 	 <%if( Utils.isNull(request.getAttribute("validateStore")).equals("false")){ %>
         //alert("ร้านค้า  Over Credit Limit ");
         deleteOrderInPage();
      <%} %>
 }
-
+function unblockUI(){
+	$.unblockUI();
+}
 function deleteOrderInPage(){
 	var orderDate =$('#orderDate').val();
 	var getData = $.ajax({
@@ -125,6 +103,9 @@ function save(path){
 		return false;
 	}
 	
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
+	
 	form.action = path + "/jsp/orderAction.do?do=save&pageNumber="+pageNumber;
 	form.submit();
 	return true;
@@ -141,6 +122,8 @@ function gotoPage(path,pageNumber){
 			alert("กรุณากรอกวันที่ Order");
 			return false;
 		}
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
 		
 		form.action = path + "/jsp/orderAction.do?do=search&action=save&pageNumber="+pageNumber+"&prevPageNumber="+prevPageNumber;
 		form.submit();
@@ -151,6 +134,7 @@ function gotoPage(path,pageNumber){
 
 function exportToText(path){
 	var form = document.orderForm;
+	
 	form.action = path + "/jsp/orderAction.do?do=exportToText";
 	form.submit();
 	return true;
@@ -158,6 +142,7 @@ function exportToText(path){
 
 function exportToTextAll(path){
 	var form = document.orderForm;
+	
 	form.action = path + "/jsp/orderAction.do?do=exportToTextAll";
 	form.submit();
 	return true;
@@ -544,7 +529,7 @@ function sumQtyInRow(row){
 						String key = "";
 						String value ="";
 						int tabindex = 0;
-						int no= start;
+						int no = start;
 						String titleDisp ="";
 						for(int i=0;i<orderItemList.size();i++){
 						   Order o = (Order) orderItemList.get(i);
@@ -577,7 +562,7 @@ function sumQtyInRow(row){
 						<%} %>
 						<tr class="<%=classStyle%>">
 						       <td><%=no%></td>
-						       <td><input type="text" name="groupCode" value="<%=o.getGroupCode()%>" readonly size="5" class="disableText"></td>
+						       <td><input type="text" name="groupCode" value="<%=o.getGroupCode()%>" readonly size="10" class="disableText"></td>
 						       <td><input type="text" name="itemDesc" value="<%=o.getItemDisp()%>" readonly size="4" class="disableText"></td>
 						       <td><input type="text" name="item" value="<%=o.getItem()%>" readonly size="6" class="disableText"></td>
 						       <td><input type="text" name="onhandQty_<%=i%>" id="onhandQty_<%=i%>"  readonly value="<%=o.getOnhandQty()%>" size="3" class="disableText"></td>	
@@ -590,7 +575,9 @@ function sumQtyInRow(row){
 						      
 						       </td>
 						       <!--  For By Store -->
-						        <%if(o.getStoreItemList() != null && o.getStoreItemList().size()>0){ 
+						        <%
+						        //System.out.println("StoreListItemList Size:"+o.getStoreItemList().size());
+						        if(o.getStoreItemList() != null && o.getStoreItemList().size()>0){ 
 						        	String readOnly = "";
 						        	String className = "";
 						        	for(int c=0;c<o.getStoreItemList().size();c++){
@@ -693,3 +680,6 @@ function sumQtyInRow(row){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+ <jsp:include page="../controlSaveLockScreen.jsp"/> 
+<!-- Control Save Lock Screen -->

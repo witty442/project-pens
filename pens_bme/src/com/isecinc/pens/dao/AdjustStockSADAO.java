@@ -12,14 +12,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Constants;
-
 import com.isecinc.pens.bean.AdjustStockSA;
 import com.isecinc.pens.bean.Order;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class AdjustStockSADAO {
 	

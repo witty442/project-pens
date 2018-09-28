@@ -20,11 +20,12 @@ import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.ReferenceDAO;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -48,7 +49,7 @@ public class AutoCNAction extends I_Action {
 				AutoCNBean ad = new AutoCNBean();
 				ad.setJobStatus("CLOSE");
 				//get cutt job date
-				ad.setCuttOffDate(ReferenceDAO.getValueByRefCode(ReferenceDAO.JOB_CUTT_DATE_REF_CODE, ReferenceDAO.JOB_CUTT_DATE_REF_CODE));
+				ad.setCuttOffDate(ControlConstantsDB.getValueByConCode(ControlConstantsDB.JOB_CUTT_DATE_LOTUS_REF_CODE, ControlConstantsDB.JOB_CUTT_DATE_LOTUS_REF_CODE));
 				ad.setCustGroup(PickConstants.STORE_TYPE_LOTUS_CODE);
 				aForm.setBean(ad);
 				
@@ -424,32 +425,53 @@ public class AutoCNAction extends I_Action {
 	}
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("export");
+		logger.debug("exportToExcel");
 		AutoCNForm aForm = (AutoCNForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		StringBuffer htmlTable = new StringBuffer("");
 		String fileName ="data.xls";
-		boolean found = false;
+		StringBuffer h = new StringBuffer("");
+		Connection conn = null;
 		try {
-			logger.debug("PageAction:"+request.getParameter("page"));
-	
-			AutoCNBean cri = aForm.getBean();
-			
-			/*htmlTable = SAExportExcel.genSARewardTranReport(cri,user);
-			if( !"".equals(htmlTable.toString())){
-				found = true;
-			}*/
-			
-			if(found){
+			conn = DBConnection.getInstance().getConnection();
+			List<AutoCNBean> items = AutoCNDAO.searchJobList(conn,aForm.getBean(),true,0,pageSize);
+			if(items != null && items.size() >0){
+				h.append(ExcelHeader.EXCEL_HEADER);
+				h.append("<table border='1'> \n");
+				h.append("<tr class='colum_head'> \n");
+				  h.append("<td>Job Id</td> \n");
+				  h.append("<td>Job Name</td> \n");
+				  h.append("<td>Store Code</td> \n");
+				  h.append("<td>Store Name</td> \n");
+				  h.append("<td>RTN NO</td> \n");
+				  h.append("<td>Total Box</td> \n");
+				  h.append("<td>Total Qty</td> \n");
+				  h.append("<td>AutoCN Status</td> \n");
+				h.append("</tr> \n");
+				for(int i=0;i<items.size();i++){
+					AutoCNBean s = (AutoCNBean)items.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getJobId()+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getJobName())+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getStoreCode())+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getStoreName())+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getRtnNo())+"</td> \n");
+					  h.append("<td class='num'>"+s.getTotalBox()+"</td> \n");
+					  h.append("<td class='num'>"+s.getTotalQty()+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getStatus())+"</td> \n");
+					h.append("</tr> \n");
+				}//for
+				h.append("</table> \n");
+			    
+				//logger.debug("table str: \n"+h.toString());
+				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
 				response.setContentType("application/vnd.ms-excel");
 				
 				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
-				w.write(htmlTable.toString());
+				w.write(h.toString());
 			    w.flush();
 			    w.close();
-	
+
 			    out.flush();
 			    out.close();
 			}else{
@@ -458,6 +480,10 @@ public class AutoCNAction extends I_Action {
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
 		}
 		return mapping.findForward("search");
 	}

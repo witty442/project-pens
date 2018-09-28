@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -24,10 +22,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
 
-import util.UploadXLSUtil;
-
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Master;
+import com.isecinc.pens.bean.ProductBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.bean.MonitorBean;
@@ -38,8 +35,10 @@ import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.UploadXLSUtil;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportTransactionLotusProcess extends InterfaceUtils{
 
@@ -233,9 +232,7 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 	    Map<String, ImportSummary> errorMap = new HashMap<String, ImportSummary>();
 	    boolean importError = false;
 		try {
-
 			if (dataFile != null) {
-
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBME_SALES_FROM_LOTUS( \n");
 				sql.append(" VENDOR, NAME, AP_TYPE, LEASE_VENDOR_TYPE,  \n");
@@ -276,7 +273,6 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 				Cell cell = null;
 				String salesDate = "";
 				String storeNo = "";
-				String groupNo = "";
 				String storeName = "";
 				String description ="";
 				String qty = "";
@@ -284,8 +280,6 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 				String lotusItem = "";
 				double netSalesIncVat = 0;
 				double apAmount = 0;
-				
-	            int no = 0;
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
 	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
 	            
@@ -296,14 +290,14 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 					Cell cellCheck = row.getCell((short) 0);
 					Object cellCheckValue = xslUtils.getCellValue(0, cellCheck);
 					String rowCheck = Utils.convertDoubleToStr(Utils.isDoubleNull(cellCheckValue));
-					logger.debug("rowCheck["+rowCheck+"]");
+					logger.debug("rowNo["+i+"]rowCheck["+rowCheck+"]");
 					if("0".equals(rowCheck)){
 						break;
 					}
 					
 					for (int colNo = 0; colNo < maxColumnNo; colNo++) {
 						cell = row.getCell((short) colNo);
-						logger.debug("row["+i+"]col[("+colNo+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
+						//logger.debug("row["+i+"]col[("+colNo+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
 						
 						Object cellValue = xslUtils.getCellValue(colNo, cell);
 						
@@ -337,7 +331,6 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 						   //DESCRIPTION
 						   description = Utils.isNull(cellValue);
 						   ps.setString(8, description);
-						   groupNo = description.substring(0,6);
 						   lotusItem = description.substring(0,10);
 						}else if(colNo==8){
 						  //COL
@@ -409,8 +402,9 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 			         ps.setString(27, user.getUserName());
 			         
 			         Master mStore = importDAO.getMasterMapping(conn, "Store", storeNo);
-			         Master mGroup = importDAO.getMasterMapping(conn, "Group", groupNo);
-			         
+			         //New
+			         ProductBean productBean = importDAO.getProductStyleMapping(conn,styleNo);
+			        
 			         String pensItem = "";
 			         /** case Start with  'W' no check "WB7805D4BL"**/
 			         if(lotusItem.startsWith("W")){
@@ -436,26 +430,24 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 					         // PENS_CUST_DESC VARCHAR2(100),O
 					         ps.setString(29,storeNo); 
 				         }
-				         if(mGroup !=null){
-					          // PENS_GROUP VARCHAR2(30),
-					          ps.setString(30, mGroup.getPensValue());
-					          // PENS_GROUP_TYPE VARCHAR2(30),
-					          ps.setString(31, groupNo);//m.getPensDesc());
-					     }else if(mGroup ==null){
-						     ps.setString(30, groupNo);//m.getPensDesc());
-					         ps.setString(31, groupNo);//m.getPensDesc());
+				         if( productBean != null){
+					          ps.setString(30, Utils.isNull(productBean.getProductGroup())); // PENS_GROUP VARCHAR2(30),
+					          ps.setString(31, productBean.getGroupCode()); // PENS_GROUP_TYPE VARCHAR2(30),
+					     }else if(productBean==null){
+						     ps.setString(30, ""); // PENS_GROUP VARCHAR2(30),
+					         ps.setString(31, ""); // PENS_GROUP_TYPE VARCHAR2(30),
 					     } 
 				         
 			         }else{
-				         pensItem = importDAO.getItemByInterfaceValueTypeLotusCase1(conn, util.Constants.STORE_TYPE_LOTUS_ITEM, lotusItem);
+				         pensItem = productBean != null?productBean.getPensItem():"";//importDAO.getItemByInterfaceValueTypeLotusCase1(conn, util.Constants.STORE_TYPE_LOTUS_ITEM, lotusItem);
 	
-				         if(Utils.isNull(pensItem).equals("")){
+				         /*if(Utils.isNull(pensItem).equals("")){
 				        	 lotusItem = lotusItem.substring(0,6);
 				        	 pensItem = importDAO.getItemByInterfaceValueTypeLotusCase2(conn, util.Constants.STORE_TYPE_LOTUS_ITEM, lotusItem);
-				         }
+				         }*/
 
-				         if(mStore != null && mGroup != null && !Utils.isNull(pensItem).equals("")){
-				        	   //Add Success Msg
+				         if(mStore != null && productBean != null && !Utils.isNull(pensItem).equals("")){
+				        	 //Add Success Msg
 					         ImportSummary s = new ImportSummary();
 					         s.setRow(i+1);
 					         s.setSalesDate(salesDate);
@@ -478,17 +470,15 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 					         // PENS_CUST_DESC VARCHAR2(100),O
 					         ps.setString(29,storeNo); 
 				         }
-				         if(mGroup !=null){
-					          // PENS_GROUP VARCHAR2(30),
-					          ps.setString(30, mGroup.getPensValue());
-					          // PENS_GROUP_TYPE VARCHAR2(30),
-					          ps.setString(31, groupNo);//m.getPensDesc());
-					     }else if(mGroup ==null){
-						     ps.setString(30, groupNo);//m.getPensDesc());
-					         ps.setString(31, groupNo);//m.getPensDesc());
+				         if(productBean !=null){
+					          ps.setString(30, Utils.isNull(productBean.getProductGroup())); // PENS_GROUP VARCHAR2(30),
+					          ps.setString(31, productBean.getGroupCode());// PENS_GROUP_TYPE VARCHAR2(30),
+					     }else if(productBean ==null){
+						     ps.setString(30, "");//m.getPensDesc());
+					         ps.setString(31, "");//m.getPensDesc());
 					     } 
 				         
-				         if(mStore ==null || mGroup==null || Utils.isNull(pensItem).equals("")){
+				         if(mStore ==null || productBean==null || Utils.isNull(pensItem).equals("")){
 				        	 //Add Error Msg
 					         importError = true;
 					         ImportSummary s = new ImportSummary();
@@ -503,13 +493,13 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 					         if(mStore ==null){
 					        	 ms +="ไม่พบข้อมูล STORE NAME";
 					         }
-					         if(mGroup==null){
+					         if(productBean==null){
 					        	 ms +="ไม่พบข้อมูล Group";
 					         }
 					         if(Utils.isNull(pensItem).equals("")){
 					        	 ms +="ไม่พบข้อมูล Pens Item"; 
 					         }
-					         s.setMessage(ms);
+					         s.setMessage(ms +" ใน STYLE MAPPING");
 					         errorMap.put(i+"", s);
 				         }  
 			         }
@@ -625,7 +615,7 @@ public class ImportTransactionLotusProcess extends InterfaceUtils{
 			    mi.setFailCount(errorList.size());
 			}
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 			//request.setAttribute("Message","ข้อมูลไฟล์ไม่ถูกต้อง:"+e.toString());
 			importError = true;
 		} finally {

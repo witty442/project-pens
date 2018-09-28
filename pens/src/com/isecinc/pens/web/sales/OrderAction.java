@@ -24,6 +24,7 @@ import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
+import util.ControlCode;
 import util.ConvertNullUtil;
 import util.CustomerReceiptFilterUtils;
 import util.DBCPConnectionProvider;
@@ -63,7 +64,6 @@ import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.process.modifier.ModifierControl;
 import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
@@ -101,8 +101,7 @@ public class OrderAction extends I_Action {
 			request.getSession().setAttribute("debug_mode", debug.isDebugEnable());
 			
 			User user = (User) request.getSession(true).getAttribute("user");
-			Customer customer = null;
-			int orderId = orderForm.getOrder().getId();
+		//	int orderId = orderForm.getOrder().getId();
 
 			int customerId = 0;
 			if (request.getParameter("customerId") != null) {
@@ -129,46 +128,41 @@ public class OrderAction extends I_Action {
 			}
 			//prepare Connection 
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			
+			// get Customer Info
+			Customer customer = new MCustomer().find(String.valueOf(customerId));
 			//Check Case VanSale Old order(PayCredit) No Pay disable Pay Credit ALL
-			boolean canSave = true;
+			boolean canSaveCasePayPrevBill = true;
 			if(User.VAN.equals(user.getType())){
-			   canSave = OrderUtils.canSaveCreditVan(conn,user, customerId);
-			}
-			logger.info("canSave :"+canSave);
+				canSaveCasePayPrevBill = OrderUtils.canSaveCreditVan(conn,user, customerId);
+			    logger.info("canSave :"+canSaveCasePayPrevBill);
+				
+				//Filter Check Van Can Receipt Cheque Or Credit Flag
+				//1:can, 0: cannot, -1:no pay prev bill
+				String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,customerId);
+				String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,customerId);
+				
+				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
+					//Check Prev bill is pay
+					if(canSaveCasePayPrevBill==false){
+				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+					}else{
+					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					}
+				}else{
+				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
+				}
+				
+				//wit edit VAN :default receipt Cash 
+				 orderForm.getOrder().setVanPaymentMethod("CASH");
+				 
+				//set creditLimit from customer
+				 //logger.debug("CustCreditLimit:"+customer.getCreditLimit());
+				 orderForm.setCustCreditLimit(customer.getCreditLimit());
+			}//if
 			
-			//Filter Check Van Can Receipt Cheque Or Credit
-			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,customerId);
-			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,customerId);
-			String canAirpayFlag = CustomerReceiptFilterUtils.canAirpay(conn,customerId);
-			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)
-				||  "Y".equalsIgnoreCase(canAirpayFlag)){
-			   orderForm.setCanReceiptMoreCash("Y");
-			}else{
-			   orderForm.setCanReceiptMoreCash("N");
-			}
-			
-			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
-			orderForm.setCanAirpay(canAirpayFlag);
-			
-			//Case Pay Old Order All to Allow to pay credit :no disable pay cash only
-			if(canSave==false){
-				orderForm.setCanReceiptMoreCash("N");
-				orderForm.setCanReceiptCredit("N");
-			}
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
-			
-			//wit edit VAN :default Auto receipt Cash 
-			if(User.VAN.equals(user.getType())){
-				if("Y".equalsIgnoreCase(canAirpayFlag)){
-					orderForm.getOrder().setPaymentCashNow(false);
-				}else{
-			         orderForm.getOrder().setPaymentCashNow(true);
-				}
-			}
 			
 			// default date time
 			orderForm.getOrder().setOrderDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
@@ -241,7 +235,6 @@ public class OrderAction extends I_Action {
 			if (!user.getCustomerType().getKey().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
 				// TT & VAN
 				// Default from customer
-				customer = new MCustomer().find(String.valueOf(customerId));
 				orderForm.getOrder().setCustomerId(customer.getId());
 				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
 				orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
@@ -364,32 +357,32 @@ public class OrderAction extends I_Action {
 
 			//Filter Check Van Can Receipt Cheque Or Credit
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
-			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
-			String canAirpayFlag = CustomerReceiptFilterUtils.canAirpay(conn,orderForm.getOrder().getCustomerId());
 			
-			logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag+",canAirpay:"+canAirpayFlag);
-			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) 
-				|| "Y".equalsIgnoreCase(canReceiptCreditFlag) 
-				||  "Y".equalsIgnoreCase(canAirpayFlag)){
-			  orderForm.setCanReceiptMoreCash("Y");
-			}else{
-			  orderForm.setCanReceiptMoreCash("N");
-			}
-			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
-			orderForm.setCanAirpay(canAirpayFlag);
-
-			//wit edit VAN :default Auto receipt Cash 
 			if(User.VAN.equals(user.getType())){
-			  if(Utils.isNull(canAirpayFlag).equalsIgnoreCase("Y")){
-				orderForm.getOrder().setPaymentCashNow(false);
-			  }else{
-			     orderForm.getOrder().setPaymentCashNow(true);
-			  }
-			}
-			
-			debug.debug("CanReceiptMoreCash:"+orderForm.getCanReceiptMoreCash());
+				boolean canSaveCasePayPrevBill = OrderUtils.canSaveCreditVan(conn,user, order.getCustomerId());
+				String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+				String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+				
+				logger.debug("canSaveCasePayPrevBill:"+canSaveCasePayPrevBill);
+				logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+				
+				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
+					//Check Prev bill is pay
+					if(canSaveCasePayPrevBill==false){
+				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+					}else{
+					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					}
+				}else{
+				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
+				}
+				
+				// get Customer Info
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				//set creditLimit from customer
+				orderForm.setCustCreditLimit(customer.getCreditLimit());
+				 
+			}//if van
 			
 			// Prepare order line to Edit
 			/** Promotion Process add add to Lines */
@@ -480,24 +473,36 @@ public class OrderAction extends I_Action {
 			
 			//Filter Check Van Can Receipt Cheque Or Credit
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
-			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
 			
-			logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
-			
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
-			  orderForm.setCanReceiptMoreCash("Y");
-			}else{
-			  orderForm.setCanReceiptMoreCash("N");
-			}
-			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
-			
-			logger.debug("CanReceiptMoreCash:"+orderForm.getCanReceiptMoreCash());
-			
-			//wit edit VAN :default Auto receipt Cash 
 			if(User.VAN.equals(user.getType())){
-			  orderForm.getOrder().setPaymentCashNow(true);
+				boolean canSaveCasePayPrevBill = OrderUtils.canSaveCreditVan(conn,user, order.getCustomerId());
+				String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+				String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+				
+				logger.debug("canSaveCasePayPrevBill:"+canSaveCasePayPrevBill);
+				logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+				
+				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
+					//Check Prev bill is pay
+					if(canSaveCasePayPrevBill==false){
+				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+					}else{
+					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					}
+				}else{
+				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
+				}
+				
+				// get Customer Info
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				//set creditLimit from customer
+				orderForm.setCustCreditLimit(customer.getCreditLimit());
 			}
+			
+			/*//wit edit VAN :default Auto receipt Cash 
+			if(User.VAN.equals(user.getType())){
+			  orderForm.getOrder().setVanPaymentMethod("CASH");
+			}*/
 			
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
@@ -526,6 +531,7 @@ public class OrderAction extends I_Action {
 	public ActionForward preSave(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Connection conn = null;
+		OrderProcess orderProcess = new OrderProcess();
 		try {
 			OrderForm orderForm = (OrderForm) form;
 			conn = new DBCPConnectionProvider().getConnection(conn);
@@ -564,7 +570,7 @@ public class OrderAction extends I_Action {
 	
 			//Merge to 1 Line to Show
 			logger.info("fillLinesShow LINE NORMAL");
-			List<OrderLine> odLines = new OrderProcess().fillLinesShow(orderForm.getLines());
+			List<OrderLine> odLines = orderProcess.fillLinesShow(orderForm.getLines());
 
 			//add Line Blank UOM (1 or 2)
 			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines);
@@ -577,15 +583,23 @@ public class OrderAction extends I_Action {
 			List<OrderLine> promotionLines = null;
 			
 			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
-			logger.info("CalcC4 Method:"+ModifierControl.getCalcC4Control());
+			boolean exeOrderProcessfillLinesShowPromotion = ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion");
+			logger.info("CalcC4 OrderProcess fillLinesShowPromotion:"+exeOrderProcessfillLinesShowPromotion);
 			
-			if("2".equalsIgnoreCase(ModifierControl.getCalcC4Control()) ){
-				promotionLines = new OrderProcess().fillLinesShowPromotion(modProcess.getAddLines());
-		    }else{
-		        // default 1
-		        promotionLines = new OrderProcess().fillLinesShow(modProcess.getAddLines());
-		    }
-		
+			if(exeOrderProcessfillLinesShowPromotion){
+				promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
+			}else{
+				  // default 1
+		        promotionLines = orderProcess.fillLinesShow(modProcess.getAddLines());
+			}
+			
+			/** sum(qty1,qty2) Duplicate product promotion **/
+		//	if(ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion")){//CurrentVersion
+		//	if(ControlCode.canExecuteMethod("OrderProcess", "sumQtyProductPromotionDuplicate")){
+			   //Pass 
+			   promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
+		//	}
+			
 			logger.info("Debug after promotion");
 			new OrderProcess().debug(promotionLines);
 			
@@ -658,17 +672,30 @@ public class OrderAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			User userActive = (User) request.getSession().getAttribute("user");
 			
-			//Filter Check Van Can Receipt Cheque Or Credit
-			String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
-			String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
-			if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
-			   orderForm.setCanReceiptMoreCash("Y");
-			}else{
-			   orderForm.setCanReceiptMoreCash("N");
+			if(User.VAN.equals(userActive.getType())){
+				boolean canSaveCasePayPrevBill = OrderUtils.canSaveCreditVan(conn,userActive, orderForm.getOrder().getCustomerId());
+				String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+				String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+				
+				logger.debug("canSaveCasePayPrevBill:"+canSaveCasePayPrevBill);
+				logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+				
+				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
+					//Check Prev bill is pay
+					if(canSaveCasePayPrevBill==false){
+				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+					}else{
+					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					}
+				}else{
+				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
+				}
+				// get Customer Info
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				//set creditLimit from customer
+				orderForm.setCustCreditLimit(customer.getCreditLimit());
 			}
 			
-			orderForm.setCanReceiptCredit(canReceiptCreditFlag);
-	
 			/** Promotion Process add add to Lines */
 			// remove promotion line
 			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
@@ -721,6 +748,7 @@ public class OrderAction extends I_Action {
 		String org = "";
 		String subInv ="";
 		OrgRuleBean orgRuleBean;
+		User user = (User) request.getSession(true).getAttribute("user");
 		try {
 			//clear Session Temp to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print",null);
@@ -798,10 +826,6 @@ public class OrderAction extends I_Action {
 			order.setTotalAmount(tt.doubleValue());
 			order.setVatAmount(vt.doubleValue());
 			order.setNetAmount(nt.doubleValue());
-			
-			//System.out.println("kkk"+order.getVatAmount());
-			// order.setOrderType(userActive.getOrderType().getKey());
-
 			// set interfaces & payment & docstatus
 			order.setInterfaces("N");
 			order.setPayment("N");
@@ -844,7 +868,7 @@ public class OrderAction extends I_Action {
 			// Re-Calculate totalAmount vatAmount netAmount From lines
 			order = new MOrder().reCalculateHeadAmount(order, orderForm.getLines());
 			            
-			//For comapre after save 
+			//For compare after save 
 			double beforeSave_NetAmount = order.getNetAmount(); 
 			
 			// Save Order
@@ -899,15 +923,6 @@ public class OrderAction extends I_Action {
 			   new MOrder().save(order, userActive.getId(), conn);
 			}
 
-			// auto create receipt with member
-			logger.info("AutoReceiptFlag:"+orderForm.getAutoReceiptFlag());
-			
-			if (orderForm.getAutoReceiptFlag().equalsIgnoreCase("Y")) {
-				String creditCardExpired = "";
-				new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), orderForm
-						.getBys(), creditCardExpired, userActive, conn);
-			}
-
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_ORDER);
@@ -918,9 +933,10 @@ public class OrderAction extends I_Action {
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--
 
-			/** WIT Edit 20110804 ****************************************/
-			/** Case Van and User choose payCashNow -> createAutoReceipt**/
-			if (userActive.getRole().getKey().equals(User.VAN) && orderForm.getOrder().isPaymentCashNow()) {
+			logger.debug("VanPaymentMethod:"+orderForm.getOrder().getVanPaymentMethod());
+			/** Case Van and User choose Cash -> createAutoReceipt**/
+			if (userActive.getRole().getKey().equals(User.VAN) 
+					&& "CASH".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod())) {
 				 logger.debug("CreateAutoReceipt Case Van pay Cash");
 				 
 				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
@@ -944,14 +960,55 @@ public class OrderAction extends I_Action {
 				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
 				 receiptByList.add(receiptBy);
 				 //process auto receipt cash
+				 
+				 //set order isCash =Y
+				 order.setIsCash("Y");
+				 
 				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
 				 //set msg 
-				 msg = SystemMessages.getCaption("SaveOrderReceiptSuccess", Utils.local_th);
+				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+			
+			}else if (userActive.getRole().getKey().equals(User.VAN) && user.isPDPaid()
+					&& "CREDIT".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod())) {
+				
+				logger.debug("CreateAutoReceipt Case Van pay Credit");
+				
+				//Case Sale set PDPAID =Y -> Pay Credit set receipt ispdpaid =N
+				 orderForm.getAutoReceipt().setIsPDPaid("N");
+				 
+				//set receipt 
+				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
+				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
+				 
+				 /** Set ReceiptBy Manual **/
+				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
+				 ReceiptBy receiptBy = new ReceiptBy();
+				 receiptBy.setId(0);
+				 receiptBy.setPaymentMethod("CS");
+				 receiptBy.setCreditCardType("");
+				 receiptBy.setBank("");
+				 receiptBy.setChequeNo("");
+				 receiptBy.setChequeDate("");
+				 receiptBy.setReceiptAmount(order.getNetAmount());
+				 receiptBy.setSeedId("");
+				 receiptBy.setAllBillId(String.valueOf(order.getId()));
+				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
+				 receiptByList.add(receiptBy);
+				 //process auto receipt 
+				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
+				
+				 //set msg 
+				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+				
 			}else{
+				//Case Van PD_PAID=N ->Don't create Receipt
 				if(userActive.getRole().getKey().equals(User.VAN)){
-				    msg  = SystemMessages.getCaption("SaveSucessAndCreateReceipt", Utils.local_th);
+				    msg  = SystemMessages.getCaption("SaveSucess", Utils.local_th);
 				}
 			}
+			
 			/** WIT Edit 20110804 ****************************************/
             //set Merge to 1 Line to show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
@@ -1052,7 +1109,7 @@ public class OrderAction extends I_Action {
 
 			logger.info("action:"+Utils.isNull(request.getParameter("actionSave")));
 			
-		   //Case Van pd+paid =Y and and payment method ='CR' Create AutoReceipt actionSave='saveAutoReceipt' 
+		   //Case Van pd_paid =Y and and payment method ='CR' Create AutoReceipt actionSave='saveAutoReceipt' 
 	       if(Utils.isNull(request.getParameter("actionSave")).equalsIgnoreCase("saveAutoReceipt")){
 				String creditCardExpired = "";
 				if (user.getType().equalsIgnoreCase(User.VAN)) {
@@ -1102,7 +1159,6 @@ public class OrderAction extends I_Action {
 		} finally {
 			try {
 				if(conn != null){
-					conn.setAutoCommit(true);
 					conn.close();
 				}
 			} catch (Exception e2) {}

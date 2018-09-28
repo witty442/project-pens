@@ -36,12 +36,20 @@ public class MAdjust extends I_Model<Adjust> {
 	}
 	public double getTotalAdjustAmtInvoice(String arInvoiceNo){
 		Connection conn = null;
+		double totalAdjustAmt = 0;
 		try{
 			conn = DBConnection.getInstance().getConnection();
+			totalAdjustAmt =  getTotalAdjustAmtInvoiceModel(conn, arInvoiceNo);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception ee){}
 		}
-		return getTotalAdjustAmtInvoiceModel(conn, arInvoiceNo);
+	   return totalAdjustAmt;
 	}
 	
 	public double getTotalAdjustAmtInvoice(Connection conn,String arInvoiceNo){

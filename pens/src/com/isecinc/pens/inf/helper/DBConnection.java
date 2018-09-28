@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.Configuration;
 
 public class DBConnection {
    
@@ -23,6 +22,7 @@ public class DBConnection {
 	
 	public  Connection getConnection(){		
 		Connection _instanceInf =null;
+		EnvProperties env = EnvProperties.getInstance();
 		try {	
 			
 			/*Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -37,13 +37,11 @@ public class DBConnection {
                 DriverManager.deregisterDriver(driver);
             }*/
             
-			Configuration hibernateConfig = new Configuration();
-			hibernateConfig.configure();
-			
-			String driver = hibernateConfig.getProperty("connection.driver_class");
-			String url = hibernateConfig.getProperty("connection.url");
-			String username = hibernateConfig.getProperty("connection.username");
-			String password = hibernateConfig.getProperty("connection.password");
+		   
+			String driver = env.getProperty("connection.driver_class");
+			String url = env.getProperty("connection.url");
+			String username = env.getProperty("connection.username");
+			String password = env.getProperty("connection.password");
 			
 			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			

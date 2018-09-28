@@ -3,7 +3,7 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.util.List;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class ReqFinish implements Serializable{
 	

@@ -15,16 +15,22 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.AutoSubBigCDAO;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqFinishDAO;
+import com.isecinc.pens.dao.ReqReturnWacoalDAO;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.autosub.AutoSubBigCBean;
+import com.isecinc.pens.web.autosub.AutoSubBigCForm;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -34,9 +40,8 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class ReqFinishAction extends I_Action {
 
-
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
-	
 	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare2");
@@ -51,9 +56,24 @@ public class ReqFinishAction extends I_Action {
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				
 				aForm.setBean(ad);
+				
+				//INIT Session
+				List<References> billTypeList = new ArrayList<References>();
+				References ref = new References("","");
+				billTypeList.add(ref);
+				billTypeList.addAll(ReqReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
+				request.getSession().setAttribute("statusReqReturnW2List",billTypeList);
+			
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref2 = new References("","");
+				wareHouseList.add(ref2);
+				wareHouseList.addAll(JobDAO.getWareHouseList());
+				request.getSession().setAttribute("wareHouseList2",wareHouseList);
+				
 			}else if("back".equals(action)){
+				conn = DBConnection.getInstance().getConnection();
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ReqFinishDAO.searchHead(aForm.getBean(),false));
+				aForm.setResultsSearch(ReqFinishDAO.searchHead(conn,aForm.getBean(),false,false,1,pageSize));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -65,20 +85,71 @@ public class ReqFinishAction extends I_Action {
 		}
 		return mapping.findForward("prepare2");
 	}
-	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		ReqFinishForm aForm = (ReqFinishForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
 		try {
-			ReqFinish b = aForm.getBean();
-			aForm.setBean(b);
-			aForm.setResultsSearch(ReqFinishDAO.searchHead(aForm.getBean(),false));
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
 			
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			//init connection
+			conn = DBConnection.getInstance().getConnection();
+			//set Page size 
+			aForm.setPageSize(pageSize);
+			
+			//Case New Search
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(ReqFinishDAO.searchTotalHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    boolean getItem = false;
+				List<ReqFinish> items = ReqFinishDAO.searchHead(conn,aForm.getBean(),getItem,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			//Case Goto page
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    boolean getItem = false;
+				List<ReqFinish> items = ReqFinishDAO.searchHead(conn,aForm.getBean(),getItem,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,7 +157,9 @@ public class ReqFinishAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search2");
 	}
@@ -134,7 +207,10 @@ public class ReqFinishAction extends I_Action {
 				c.setRequestDate(requestDate);
 				c.setRequestNo(requestNo);
 				
-				List<ReqFinish> listData = ReqFinishDAO.searchHead(c,true);
+				conn = DBConnection.getInstance().getConnection();
+				boolean getItem = true;
+				List<ReqFinish> listData = ReqFinishDAO.searchHead(conn,c,getItem,false,1,pageSize);
+				//List<ReqFinish> listData = ReqFinishDAO.searchHead(c,true);
 				ReqFinish h = null;
 				if(listData != null && listData.size() >0){
 				   h = (ReqFinish)listData.get(0);
@@ -165,7 +241,6 @@ public class ReqFinishAction extends I_Action {
 				
 				aForm.setMode(mode);//Mode Add new
 			
-				
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -282,7 +357,8 @@ public class ReqFinishAction extends I_Action {
 			//search refresh disp
 			List<ReqFinish> allList = new ArrayList<ReqFinish>();
 			//search data
-			List<ReqFinish> saveData = ReqFinishDAO.searchHead(h,true);
+			boolean getItem = true;
+			List<ReqFinish> saveData = ReqFinishDAO.searchHead(conn,h,getItem,false,1,pageSize);
 			h = (ReqFinish)saveData.get(0);
 			   
 			// All barcode status CLOSE
@@ -359,7 +435,8 @@ public class ReqFinishAction extends I_Action {
 			ReqFinish h = aForm.getBean();
 			
 			//update status barcode to close (old status)
-			List<ReqFinish> saveData = ReqFinishDAO.searchHead(h,true);
+			boolean getItem = true;
+			List<ReqFinish> saveData = ReqFinishDAO.searchHead(conn,h,getItem,false,1,pageSize);
 			if(saveData != null && saveData.size()>0){
 			   ReqFinish oldReq = (ReqFinish)saveData.get(0);
 			   for(int i=0;i<oldReq.getItems().size();i++){
@@ -395,7 +472,7 @@ public class ReqFinishAction extends I_Action {
 			conn.commit();
 			
 			//Search Data
-			List<ReqFinish> listData = ReqFinishDAO.searchHead(h,true);
+			List<ReqFinish> listData = ReqFinishDAO.searchHead(conn,h,getItem,false,1,pageSize);
 			ReqFinish beanSearch = null;
 			if(listData != null && listData.size() >0){
 				beanSearch = (ReqFinish)listData.get(0);

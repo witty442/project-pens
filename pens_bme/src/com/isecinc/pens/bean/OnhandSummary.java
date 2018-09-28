@@ -1,8 +1,9 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
-public class OnhandSummary implements Serializable{
+public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
 
 	/**
 	 * 
@@ -60,14 +61,21 @@ public class OnhandSummary implements Serializable{
     private String beginingQty;
 	private String dispHaveQty;
     private String initDate;
-
+    
     private String scanQty;
     private String diffAmt;
+    private String storeNo;
     
     private List<OnhandSummary> itemsList;
     private OnhandSummary summary;
     
-    
+   
+	public String getStoreNo() {
+		return storeNo;
+	}
+	public void setStoreNo(String storeNo) {
+		this.storeNo = storeNo;
+	}
 	public String getOnhandAmt() {
 		return onhandAmt;
 	}
@@ -371,5 +379,25 @@ public class OnhandSummary implements Serializable{
 		this.retailPriceBF = retailPriceBF;
 	}
 	
+	 public int compareTo(OnhandSummary o) {
+	     return Comparators.STORE_CODE_GROUP_ASC.compare(this, o);
+	  }
+	 
+	 public static class Comparators {
+		  public static Comparator<OnhandSummary> STORE_CODE_GROUP_ASC = new Comparator<OnhandSummary>() {
+	            @Override
+	            public int compare(OnhandSummary o1, OnhandSummary o2) {
+	            	int order1= o1.getStoreCode().compareTo(o2.getStoreCode());
+	            	
+	            	if (order1 == 0) {
+	                    // Strings are equal, sort by Group
+	                    return o1.getGroup().compareTo(o2.getGroup());
+	                }else {
+	                    return order1;
+	                }
+	            }
+	        };
+	      
+	 }
 	
 }

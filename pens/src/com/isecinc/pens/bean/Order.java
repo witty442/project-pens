@@ -98,7 +98,10 @@ public class Order extends I_PO implements Serializable {
 		setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
 		setPrintCountRcp(rst.getInt("print_count_rcp"));
 		
-		setPoNumber(rst.getString("po_number"));
+		setPoNumber(Utils.isNull(rst.getString("po_number")));
+		setVanPaymentMethod(Utils.isNull(rst.getString("van_payment_method")));
+		//09/2561 wit edit
+		setIsPromotionSpecial(Utils.isNull(rst.getString("is_promotion_special")).equals("")?"N":Utils.isNull(rst.getString("is_promotion_special")));
 	}
 
 	/**
@@ -247,18 +250,33 @@ public class Order extends I_PO implements Serializable {
 	
 	private double openAmt;
 	
-	//Display Optional
+	//Display Optional no DB
 	private String placeOfBilled;
 	private String org;
-	
 	private String printDateTimePick;
 	private int printCountPick;
-	
 	private String printDateTimeRcp;
 	private int printCountRcp;
 	private String poNumber;
+	private String vanPaymentMethod;
+    private String isPromotionSpecial;
 	
 	
+	public String getIsPromotionSpecial() {
+		return isPromotionSpecial;
+	}
+
+	public void setIsPromotionSpecial(String isPromotionSpecial) {
+		this.isPromotionSpecial = isPromotionSpecial;
+	}
+	public String getVanPaymentMethod() {
+		return vanPaymentMethod;
+	}
+
+	public void setVanPaymentMethod(String vanPaymentMethod) {
+		this.vanPaymentMethod = vanPaymentMethod;
+	}
+
 	public double getTotalAmountNonVat() {
 		return totalAmountNonVat;
 	}

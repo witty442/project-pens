@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.bean.Master"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>
@@ -24,7 +24,7 @@ try{
 		PopupForm popupForm = new PopupForm();
 		popupForm.setCodeSearch(code);
 		popupForm.setWareHouse(warehouse);
-		popupForm.setBoxNo(boxNo); 
+		popupForm.setBoxNo(boxNo);
 		
 		List<PopupForm> results = GeneralDAO.searchStockIssue(popupForm,status,mode); 
 		
@@ -37,7 +37,9 @@ try{
 		if(results != null && results.size()>0){
 			PopupForm p = (PopupForm)results.get(0);
 		    
-		    outputText = p.getStoreCode()+"|"+p.getStoreName()+"|"+p.getWareHouse()+"|"+p.getRequestor()+"|"+p.getIssueReqDate()+"|"+p.getCustGroup()+"|"+p.getRemark()+"|"+p.getTotalReqQty()+"|"+p.getTotalQty();
+		    outputText = p.getStoreCode()+"|"+p.getStoreName()+"|"+p.getWareHouse()
+		    		+"|"+p.getRequestor()+"|"+p.getIssueReqDate()+"|"+p.getCustGroup()
+		    		+"|"+p.getRemark()+"|"+p.getTotalReqQty()+"|"+p.getTotalQty();
 		}else{
 		    outputText ="";
 		}

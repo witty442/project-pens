@@ -23,19 +23,22 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import util.Constants;
-
+import com.isecinc.pens.bean.AutoPOHH;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.exception.LogisticException;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.order.OrderAction;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceHelper;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.helper.SequenceProcessAll;
 
 public class OrderDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -93,13 +96,11 @@ public class OrderDAO {
 	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,String tableName) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
-		
 		List<Order> pos = new ArrayList<Order>();
 		StringBuilder sql = new StringBuilder();
 		try {
 			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
-			sql.delete(0, sql.length());
 			sql.append("\n  SELECT *  from PENSBME_ONHAND_BME  ");
 			sql.append("\n  where 1=1 AND onhand_qty <> 0 and status <> 'ERROR' ORDER BY ITEM ASC ");
 	
@@ -175,7 +176,6 @@ public class OrderDAO {
 		return pos;
 	}
 	
-	
 	public List<Order> prepareNewOrder(Connection conn,Order o,List<StoreBean> storeList,User user,int pageNumber,int pageSize,String tableName,String itemType) throws Exception {
 		logger.debug("prepareNewOrder");
 		PreparedStatement ps = null;
@@ -185,10 +185,10 @@ public class OrderDAO {
 		try {
 			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
-			sql.append("\n SELECT * FROM( \n");
-			sql.append("\n SELECT a.*, rownum r__ \n");
+			sql.append("\n SELECT * FROM( ");
+			sql.append("\n SELECT a.*, rownum r__ ");
 			sql.append("\n FROM ( \n");
-			sql.append("\n  SELECT s.* FROM(  \n");
+			sql.append("\n  SELECT s.* FROM(  ");
 				sql.append("\n SELECT h.* ");
 				sql.append("\n ,h.item as item_wacoal ");
 				sql.append("\n ,( h.onhand_qty - (select nvl(sum(o.qty),0)  from pensbme_order o  where 1=1  "); 
@@ -205,7 +205,7 @@ public class OrderDAO {
 				sql.append("\n where 1=1 AND onhand_qty <> 0 and status <> 'ERROR'  ");
 				
 				if( !Utils.isNull(o.getGroupCode()).equals("")){
-					sql.append("\n and group_item = '"+Utils.isNull(o.getGroupCode())+"'  ");
+					sql.append("\n and group_item LIKE '"+Utils.isNull(o.getGroupCode())+"%'  ");
 				}
 				/** Case HISHER show only barcode in PENSBME_BARCODE_IN_ICC 26/01/2559 **/
 				if(PickConstants.STORE_TYPE_HISHER_CODE.equalsIgnoreCase(o.getStoreType())){
@@ -237,8 +237,8 @@ public class OrderDAO {
 			   
 			while (rst.next()) {
 				Order item = new Order();
-				item.setBarcode(rst.getString("BARCODE"));
-				item.setBillType(o.getBillType());
+				item.setBarcode(Utils.isNull(rst.getString("BARCODE")));
+				item.setBillType(Utils.isNull(o.getBillType()));
 				item.setOnhandQty(rst.getString("remain_onhand_QTY"));
 				
 				item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+" ");
@@ -262,13 +262,13 @@ public class OrderDAO {
 					for(int c =0;c<storeList.size();c++){
 						s = (StoreBean)storeList.get(c);
 						
-						keyMap = item.getBarcode()+"_"+s.getStoreCode()+"_"+item.getBillType();
+						keyMap = Utils.isNull(item.getBarcode())+"_"+Utils.isNull(s.getStoreCode())+"_"+Utils.isNull(item.getBillType());
 						//logger.debug("KeyMap["+keyMap+"]");
 						store = storeBeanOrderMap.get(keyMap)!=null?(StoreBean)storeBeanOrderMap.get(keyMap):null;
 						if(store!= null){
 							store.setStoreDisp(s.getStoreDisp());
 							store.setStoreName(s.getStoreName());
-							//System.out.println("StoreCode["+order.getStoreCode()+"]OrderNo["+order.getOrderNo()+"]item["+order.getItem()+"]qty["+order.getQty()+"]");
+							//logger.debug("StoreCode["+store.getStoreCode()+"]OrderNo["+store.getOrderNo()+"]item["+store.getItem()+"]qty["+store.getQty()+"]");
 
 							lineQty += Utils.convertStrToInt(store.getQty());
 						}else{
@@ -717,6 +717,7 @@ public class OrderDAO {
 			if(storeOrderList != null && storeOrderList.size() >0){
 				for(int i=0;i<storeOrderList.size();i++){
 					Order o = (Order)storeOrderList.get(i);
+					o.setUpdateUser(user.getUserName());
 					if(o.getCountOrderNoByStoreCode() > MAX_ORDER_SPLIT_ORDER_NO){
 						logger.debug("Case Order Item over maxSplitOrderNo ->Split order_no");
 						//update order by barcode
@@ -786,7 +787,7 @@ public class OrderDAO {
 				o.setOrderNo(rst.getString("order_no"));//key
 				o.setBillType(rst.getString("bill_type"));//key
 				o.setBarcode(rst.getString("barcode"));//key
-				o.setUpdateUser(user.getUserName());
+				o.setUpdateUser(user.getUserName()+"(updateLotNo)");
 				
 				logger.debug("no["+no+"]MAX["+MAX_ORDER_SPLIT_ORDER_NO+"]");
 				if(no==1){
@@ -1890,29 +1891,28 @@ public class OrderDAO {
 		return m;
 	} 
 	
-	public Map<String, OrderKeyBean> getOrderNoMap(Connection conn,String storeType,Date orderDate) throws Exception{
+	public Map<String, OrderKeyBean> getOrderNoByStoreMap(Connection conn,String storeType,Date orderDate) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Map<String, OrderKeyBean> orderNoMapByStore = new HashMap<String, OrderKeyBean>();
 		try{
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select order_no,bar_on_box,store_code from PENSBME_ORDER WHERE trunc(order_date) =? and store_type= ? \n");
+			sql.append(" select order_no,bar_on_box,store_code \n");
+			sql.append(" from PENSBME_ORDER \n");
+			sql.append(" WHERE trunc(order_date) =to_date('"+orderDateStr+"','dd/mm/yyyy') \n");
+			sql.append(" and store_type ='"+storeType+"'\n");
 			
 		    logger.debug("SQL:"+sql.toString());
-		    
 		    logger.debug("orderDate["+orderDate+"]");
 		    logger.debug("storeType["+storeType+"]");
 		    
 			ps = conn.prepareStatement(sql.toString());
-			
-			ps.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime()));
-			ps.setString(2, storeType);
-			
-			
 			rs = ps.executeQuery();
 			while(rs.next()){
-				OrderKeyBean orderKey= new OrderKeyBean(rs.getString("order_no"),rs.getString("bar_on_box"));
-				orderNoMapByStore.put(rs.getString("store_code"),orderKey );
+				OrderKeyBean orderKey= new OrderKeyBean(Utils.isNull(rs.getString("order_no")),Utils.isNull(rs.getString("bar_on_box")));
+				orderNoMapByStore.put(Utils.isNull(rs.getString("store_code")),orderKey );
 			}
 		}catch(Exception e){
 	      throw e;
@@ -1928,7 +1928,41 @@ public class OrderDAO {
 		return orderNoMapByStore;
 	} 
 	
-	
+	public  String getOrderNoDBByStoreCode(Connection conn,String storeType,Date orderDate,String storeCode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String orderNo = "";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select distinct order_no from PENSBME_ORDER WHERE trunc(order_date) =? and store_type= ? and store_code = ? \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+		    logger.debug("orderDate["+orderDate+"]");
+		    logger.debug("storeType["+storeType+"]");
+		    logger.debug("storeCode["+storeCode+"]");
+		    
+			ps = conn.prepareStatement(sql.toString());
+			
+			ps.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime()));
+			ps.setString(2, storeType);
+			ps.setString(3, storeCode);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				orderNo = Utils.isNull(rs.getString("order_no"));
+			}
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return orderNo;
+	} 
 	public static Map<String,StoreBean> getStoreBeanOrderMap(Connection conn,String storeType,Date orderDate) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -1957,8 +1991,8 @@ public class OrderDAO {
 				m.setStoreCode(Utils.isNull(rs.getString("store_code")));
 				m.setItem(Utils.isNull(rs.getString("item")));
 				m.setQty(Utils.isNull(rs.getString("qty")));
-				m.setBarcode(rs.getString("barcode"));
-				m.setBillType(rs.getString("bill_type"));
+				m.setBarcode(Utils.isNull(rs.getString("barcode")));
+				m.setBillType(Utils.isNull(rs.getString("bill_type")));
 				
 				keyMap = m.getBarcode()+"_"+m.getStoreCode()+"_"+m.getBillType();
 				map.put(keyMap, m);
@@ -2027,7 +2061,18 @@ public class OrderDAO {
 	
 	public static void saveOrder(Connection conn,Order o) throws Exception{
 		try{
-			saveOrderModel(conn, o);
+			if(idOrderLineExist(conn, o)){
+				updateOrderModel(conn,o);
+			}else{
+			    insertOrderModel(conn, o);
+			    
+			  //For Test insert dup
+			  /* Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   String orderNo = OrderNoGenerate.genOrderNoKEY(orderDate, Utils.isNull(o.getStoreCode()));
+			   o.setOrderNo(orderNo);
+			   insertOrderModel(conn, o);*/
+			   
+			}
 		}catch(java.sql.SQLIntegrityConstraintViolationException e){
 			logger.debug("Exception Uniq Constraint Update Order ");
 			logger.debug("OrderNo["+o.getOrderNo()+"]");
@@ -2035,17 +2080,47 @@ public class OrderDAO {
 			logger.debug("StoreCode["+o.getStoreCode()+"]");
 			logger.debug("barcode["+o.getBarcode()+"]");
 			logger.debug("BillType["+o.getBillType()+"]");
-			//e.printStackTrace();
-			//Case Error Exception Uniq Constaint
-			//Update 
-			try{
-			    updateOrder(conn,o);
-			}catch(Exception ee){
-				ee.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 	}
-	public static void saveOrderModel(Connection conn,Order o) throws Exception{
+	public static boolean idOrderLineExist(Connection conn,Order o) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+        boolean exist = false;
+		try{
+			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			StringBuffer sql = new StringBuffer("");
+			sql.append("select count(*) as c from pensbi.pensbme_order where 1=1 \n");
+			sql.append(" and trunc(order_date) = to_date('"+orderDateStr+"','dd/mm/yyyy') \n");
+			sql.append(" and order_no ='"+o.getOrderNo()+"'\n");
+			sql.append(" and store_code ='"+o.getStoreCode()+"'\n");
+			sql.append(" and barcode ='"+o.getBarcode()+"'\n");
+			sql.append(" and bill_type ='"+o.getBillType()+"'\n");
+		    logger.debug("SQL:"+sql.toString());
+		    
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				if(rs.getInt("c")>0){
+					exist = true;
+				}
+			}
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return exist;
+	} 
+	public static void insertOrderModel(Connection conn,Order o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("Insert");
 		try{
@@ -2054,13 +2129,14 @@ public class OrderDAO {
 			sql.append(" (ORDER_NO,ORDER_DATE, STORE_TYPE, \n" );
 			sql.append(" STORE_CODE, GROUP_CODE, ITEM, \n" );
 			sql.append(" BARCODE, EXPORTED, CREATE_DATE, \n");
-			sql.append(" CREATE_USER,QTY,BILL_TYPE,VALID_FROM,VALID_TO,Whole_Price_BF,Retail_Price_BF,BAR_ON_BOX) \n");
-			sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?,?,?,?,?,?) \n");
+			sql.append(" CREATE_USER,QTY,BILL_TYPE,VALID_FROM,VALID_TO");
+			sql.append(",Whole_Price_BF,Retail_Price_BF,BAR_ON_BOX) \n");
+			sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? ,? ,? ) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
-				
-			int index =1;
+	
 			Date orderDate = Utils.parse( o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			BigDecimal id= SequenceProcess.getNextValueBig("ID_BME_ORDER");
 			
 			ps.setString(1, o.getOrderNo());
 			ps.setTimestamp(2, new java.sql.Timestamp(orderDate.getTime()));
@@ -2076,13 +2152,10 @@ public class OrderDAO {
 			ps.setString(12, Utils.isNull(o.getBillType()));
 			ps.setString(13, Utils.isNull(o.getValidFrom()));
 			ps.setString(14, Utils.isNull(o.getValidTo()));
-			
 			ps.setDouble(15, Utils.strToDouble(o.getWholePriceBF()));
 			ps.setDouble(16, Utils.strToDouble(o.getRetailPriceBF()));
 			ps.setString(17, o.getBarOnBox());
-			
 			ps.executeUpdate();
-			
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -2092,7 +2165,7 @@ public class OrderDAO {
 		}
 	}
 
-	public static void updateOrder(Connection conn,Order o) throws Exception{
+	public static void updateOrderModel(Connection conn,Order o) throws Exception{
 		PreparedStatement ps = null;
 	//	logger.debug("Update");
 		try{
@@ -2107,7 +2180,7 @@ public class OrderDAO {
 			//Date orderDate = Utils.parse( o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			ps.setBigDecimal(1, new BigDecimal(o.getQty()));
-			ps.setString(2, o.getUpdateUser());
+			ps.setString(2, o.getUpdateUser()+"(upOrNoLine)");
 			ps.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
 			ps.setString(4, o.getOrderNo());
 			ps.setString(5, o.getStoreCode());
@@ -2191,7 +2264,7 @@ public class OrderDAO {
 		}
 	}
 	
-	public static void deleteOrder(Connection conn,Order o) throws Exception{
+	public static void deleteOrderModel(Connection conn,Order o) throws Exception{
 		PreparedStatement ps = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
@@ -2231,13 +2304,13 @@ public class OrderDAO {
 			sql.append("  and substr(m.pens_value, 0, 6) ='"+storeType+"' \n");
 			
 			if( !Utils.isNull(region).equals("")){
-			  sql.append("\n  and m.sequence = "+region);
+			  sql.append("  and m.sequence = "+region +"\n");
 			}
 			
-			sql.append("\n and m.pens_desc4 ='"+billType+"'");
+			sql.append(" and m.pens_desc4 ='"+billType+"'\n");
 			
 			if( !Utils.isNull(storeCodeWhereIn).equals("''") ){
-				 sql.append("\n  and m.pens_value in( "+storeCodeWhereIn+")");
+				 sql.append("  and m.pens_value in( "+storeCodeWhereIn+") \n");
 			}
 			
 			sql.append(" )a \n ");;
@@ -2254,8 +2327,11 @@ public class OrderDAO {
 				m.setBillType(Utils.isNull(rs.getString("pens_desc4")));
 				m.setValidFrom(Utils.isNull(rs.getString("pens_desc5")));
 				m.setValidTo(Utils.isNull(rs.getString("pens_desc6")));
-				m.setCustGroup(m.getStoreCode().substring(0,m.getStoreCode().indexOf("-")));
-				
+				if(m.getStoreCode().indexOf("-") != -1){
+				   m.setCustGroup(m.getStoreCode().substring(0,m.getStoreCode().indexOf("-")));
+				}else{
+				   m.setCustGroup(m.getStoreCode().substring(0,m.getStoreCode().length()));
+				}
 				if( !Utils.isNull(m.getStoreName()).equals("")){
 					//m.setStoreDisp(m.getStoreName().substring(0,8)+" "+m.getStoreName().substring(9,m.getStoreName().length()));
 					String disp = Utils.isNull(m.getStoreName().substring(m.getStoreName().indexOf("-")+1,m.getStoreName().length()));
@@ -2427,10 +2503,225 @@ public class OrderDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			
 		}
-	
 	} 
+	
+	public static List<StoreBean> getCustomerCodeListInOrder(Connection conn,Order o) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<StoreBean> customerCodelist = new ArrayList<StoreBean>();
+		StringBuilder sql = new StringBuilder();
+		try {
+			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n  SELECT distinct store_code"
+					+ ",(select max(pens_desc) from PENSBME_MST_REFERENCE M WHERE reference_code='Store' "
+					+ "  and M.pens_value = O.store_code) as store_name "
+					+ "from PENSBME_ORDER  O");
+			sql.append("\n  where 1=1 AND store_type ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+			sql.append("\n  and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+			logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				StoreBean storeBean = new StoreBean();
+				storeBean.setStoreCode(Utils.isNull(rst.getString("store_code")));
+				storeBean.setStoreName(Utils.isNull(rst.getString("store_name")));
+				customerCodelist.add(storeBean);
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return customerCodelist;
+	}
+	
+	public static AutoPOHH getDataAutoPOHH(Connection conn,Order o) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		AutoPOHH  r = null;
+		StringBuilder sql = new StringBuilder();
+		String statusCheck = "";
+		try {
+			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n SELECT distinct intflag from PENSBME_AUTOPO_HH  ");
+			sql.append("\n where cust_group ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+			sql.append("\n and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+			   r = new AutoPOHH();
+			   r.setOrderDate(orderDateStr);
+			   r.setCustGroup(Constants.STORE_TYPE_HISHER_CODE);
+			   if( Utils.isNull(rst.getString("intflag")).equalsIgnoreCase("s")){
+				   statusCheck = "S";
+			   }
+			}//while
+			
+			//Check status =S only case E:no gen again
+			if(r !=null){
+				if(Utils.isNull(statusCheck).equalsIgnoreCase("S")){
+					r.setCanSave(false);
+				}else{
+					r.setCanSave(true);
+				}
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return r;
+	}
+	
+	public static String validateGroupCodeIn_xxpens_po_hisher_items(Connection conn,Order o) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		String groupCodeError = "";
+		try {
+			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			//Select order data
+			sql.append("\n  SELECT distinct group_code from PENSBI.PENSBME_ORDER O ");
+			sql.append("\n  where store_type ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+			sql.append("\n  and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+			sql.append("\n  and group_code not in(");
+			sql.append("\n   select group_code from APPS.xxpens_po_hisher_items");
+			sql.append("\n  )");
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				groupCodeError +=Utils.isNull(rst.getString("group_code"))+",";
+			}//while
+			
+		    if(groupCodeError.length() >0){
+		    	groupCodeError = groupCodeError.substring(0,groupCodeError.length()-1);
+		    }
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return groupCodeError;
+	}
+	
+	public static boolean genAutoPOHH(Connection conn,Order o,AutoPOHH dataPOHHCheck) throws Exception {
+		Statement stmtDel = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		PreparedStatement psInsHH = null;
+		PreparedStatement psInsHHItem = null;
+		boolean r = true;
+		StringBuilder sqlDeleteH = new StringBuilder();
+		StringBuilder sql = new StringBuilder();
+		try {
+			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			//Check old data  exist
+			if(dataPOHHCheck != null){
+				if( dataPOHHCheck.isCanSave()){
+					//delete AutoPO HH Item
+					sqlDeleteH.append("\n  delete from PENSBI.PENSBME_AUTOPO_HH_ITEM  ");
+					sqlDeleteH.append("\n  where cust_group ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+					sqlDeleteH.append("\n  and customer_code ='"+o.getStoreCode()+"'");
+					sqlDeleteH.append("\n  and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+					stmtDel =conn.createStatement();
+					stmtDel.executeUpdate(sqlDeleteH.toString());
+					
+					//update AutoPO HH 
+					sql = new StringBuilder();
+					sql.append("\n  update PENSBI.PENSBME_AUTOPO_HH ");
+					sql.append("\n  set update_date = to_date('"+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+					sql.append("\n  ,update_user = '"+o.getCreateUser()+"'");
+					sql.append("\n  where cust_group ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+					sql.append("\n  and customer_code ='"+o.getStoreCode()+"'");
+					sql.append("\n  and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+					stmtDel =conn.createStatement();
+					stmtDel.executeUpdate(sql.toString());
+				}
+			}else{
+				//Insert new AutoPO HH 
+				sql = new StringBuilder();
+				sql.append("\n INSERT INTO PENSBI.PENSBME_AUTOPO_HH ");
+				sql.append("\n (ORDER_DATE, CUST_GROUP, CREATE_DATE, CREATE_USER,STATUS,CUSTOMER_CODE,CUSTOMER_NAME) ");
+				sql.append("\n  VALUES (?,?,?,?,?,?,?) ");
+				psInsHH = conn.prepareStatement(sql.toString());
+				psInsHH.setDate(1, new java.sql.Date(orderDate.getTime()));
+				psInsHH.setString(2, o.getStoreType());
+				psInsHH.setDate(3, new java.sql.Date(new Date().getTime()));
+				psInsHH.setString(4, o.getCreateUser());
+				psInsHH.setString(5, "APPROVED");
+				psInsHH.setString(6, o.getStoreCode());
+				psInsHH.setString(7, o.getStoreName());
+				psInsHH.executeUpdate();
+			}
+			
+			//Insert AutoPO HH ITEM
+			if(dataPOHHCheck==null ||( dataPOHHCheck != null && dataPOHHCheck.isCanSave()) ){
+				sql = new StringBuilder();
+				sql.append("\n INSERT INTO PENSBI.PENSBME_AUTOPO_HH_ITEM ");
+				sql.append("\n (ORDER_DATE, CUST_GROUP, CUSTOMER_CODE,GROUP_CODE,PENS_ITEM,QTY) ");
+				sql.append("\n  VALUES (?,?,?,?,?,?) ");
+				psInsHHItem = conn.prepareStatement(sql.toString());
+			
+				//Select order data
+				sql = new StringBuilder();
+				sql.append("\n  SELECT order_date,store_type as cust_group ,store_code as customer_code");
+				sql.append("\n  ,(SELECT pens_desc FROM PENSBME_MST_REFERENCE M ");
+				sql.append("\n    WHERE M.pens_value =O.store_code and reference_code ='Store') as customer_name");
+				sql.append("\n  ,group_code,item as pens_item,sum(qty) as qty from PENSBME_ORDER O ");
+				sql.append("\n  where store_type ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
+				sql.append("\n  and store_code ='"+o.getStoreCode()+"'");
+				sql.append("\n  and order_date = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+				sql.append("\n  group by order_date,store_type,store_code,group_code,item ");
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					psInsHHItem.setDate(1, new java.sql.Date(orderDate.getTime()));
+					psInsHHItem.setString(2, o.getStoreType());
+					psInsHHItem.setString(3, Utils.isNull(rst.getString("customer_code")));
+					psInsHHItem.setString(4, Utils.isNull(rst.getString("GROUP_CODE")));
+					psInsHHItem.setString(5, Utils.isNull(rst.getString("PENS_ITEM")));
+					psInsHHItem.setInt(6, rst.getInt("QTY"));
+					
+					psInsHHItem.executeUpdate();
+				}//while
+			}//if
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				stmtDel.close();
+				psInsHH.close();
+				psInsHHItem.close();
+			} catch (Exception e) {}
+		}
+		return r;
+	}
 	
 	private static String appendCustType(String custType){
 		if("G".equals(Utils.isNull(custType))){

@@ -9,10 +9,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
+import util.DBConnection;
 
 import com.isecinc.core.Database;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 
 /**
  * I_Model Class

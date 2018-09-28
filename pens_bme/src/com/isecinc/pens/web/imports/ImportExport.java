@@ -4,10 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.excel.ExcelHeader;
-
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.summary.process.GenerateEndDateLotus;
+import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class ImportExport {
 	
@@ -28,7 +27,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			h.append("<td align='left' colspan='"+colspan+"'>รหัสร้าน :"+form.getStoreCode()+" - "+Utils.isNull(request.getParameter("storeName"))+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"'>วันที่ตรวจนับ :"+GenerateEndDateLotus.getEndDateStockTemp(form.getStoreCode())+"</td> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>วันที่ตรวจนับ :"+GenerateStockEndDateLotus.getEndDateStockTemp(form.getStoreCode())+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			  h.append("<td>Group</td> \n");

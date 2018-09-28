@@ -5,9 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import util.ExcelHeader;
+import util.Utils;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class SalesTargetExport {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -386,7 +386,7 @@ public class SalesTargetExport {
 					h.append("<td class='text' width='10%'>"+item.getRemark()+"</td> \n");
 					h.append("<td class='text' width='10%'>"+item.getRejectReason()+"</td> \n");
 				h.append("</tr> \n");
-		    }
+		    }//for
 			h.append("</table> \n");
 			}
 		   return h;

@@ -320,6 +320,24 @@ public class InterfaceDAO {
 					   item.setCode(rs.getString("bill_plan_no"));
 					   item.setType(type);
 					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("t_pd_receipt_his")){
+					   item.setCustomerCode(rs.getString("customer_code"));
+					   item.setCustomerName("");
+					   item.setCode(rs.getString("order_no"));
+					   item.setType(type);
+					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("t_prod_show")){
+					   item.setCustomerCode(rs.getString("customer_no"));
+					   item.setCustomerName("");
+					   item.setCode(rs.getString("order_no"));
+					   item.setType(type);
+					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("t_req_promotion")){
+					   item.setCustomerCode("");
+					   item.setCustomerName("");
+					   item.setCode(rs.getString("request_no"));
+					   item.setType(type);
+					   item.setAmount(0); 
 				   }
 				   itemList.add(item);
 				}
@@ -458,6 +476,7 @@ public class InterfaceDAO {
 	public void updateControlStatusMonitor(Connection conn,BigDecimal transactionId,BigDecimal monitorId,String status) throws Exception {
 		PreparedStatement ps = null;
 		try {
+			logger.info("update Endtask status:"+status);
 			String sql = "UPDATE monitor SET  channel = ? WHERE MONITOR_ID = ? and transaction_id = ?";
 			
 			logger.debug("SQL:"+sql);
@@ -988,14 +1007,14 @@ public class InterfaceDAO {
 		return itemBean;
 	} 
 	
-	public static StringBuffer getUpdateTransLogs(String fileName) throws Exception{
+	public static StringBuffer getUpdateTransErrLogs(String fileName) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		Connection conn = null;
 		StringBuffer logs = new StringBuffer();
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from t_temp_import_trans where file_name ='"+fileName+"' \n");
+			sql.append(" select * from t_temp_import_trans_err where file_name ='"+fileName+"' \n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -1006,8 +1025,7 @@ public class InterfaceDAO {
 				logs.append(rs.getString("line_str")+",");
 				String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_msg")));
 				logs.append(errorMsg+"\n");
-			}
-			
+			}	
 		}catch(Exception e){
 	      throw e;
 		}finally{

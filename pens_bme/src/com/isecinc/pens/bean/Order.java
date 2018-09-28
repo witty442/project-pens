@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -57,8 +58,8 @@ public class Order implements Serializable{
 	private String size;
     private String color;
 	private int rowExcel;
-	
-	
+
+
 	public String getInvoiceNo() {
 		return invoiceNo;
 	}

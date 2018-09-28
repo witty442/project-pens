@@ -2,7 +2,7 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Calendar"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -65,7 +65,7 @@ function backAction(path){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="AutoCN"/>
+				<jsp:param name="function" value="AutoCNLotus"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">

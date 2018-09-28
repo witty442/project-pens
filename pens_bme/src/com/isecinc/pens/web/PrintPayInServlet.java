@@ -17,19 +17,18 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PayDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialParameter;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.web.pay.PayForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
 
 
 public class PrintPayInServlet extends HttpServlet {
@@ -99,8 +98,8 @@ public class PrintPayInServlet extends HttpServlet {
 			PayBean cri = new PayBean();
 			cri.setDocNo(docNo);
 			
-			PayBean h = PayDAO.searchHead(conn,cri,true).getItems().get(0);
-			
+			//PayBean h = PayDAO.searchHead(conn,cri,true).getItems().get(0);
+			 PayBean h = PayDAO.searchHead(conn,cri,true,false,1,30).getItems().get(0);
 			logger.debug("result:"+h.getDocNo());
 			
 			if(h != null){

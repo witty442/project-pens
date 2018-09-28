@@ -12,7 +12,7 @@ String[] msg2 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg2 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	msg2 = AppversionVerify.getIns().checkAppVersion(request);
+	msg2 = AppversionVerify.getApp().checkAppVersion(request);
 }
 
 %>

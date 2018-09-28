@@ -11,6 +11,7 @@ public class ImageFileBean implements Serializable{
 	
 	private String imageFileName;
 	private String generateImageFileName;
+	
 	public String getImageFileName() {
 		return imageFileName;
 	}

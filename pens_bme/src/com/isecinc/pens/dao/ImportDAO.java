@@ -9,14 +9,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Constants;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.MasterBean;
 import com.isecinc.pens.bean.OnhandSummary;
+import com.isecinc.pens.bean.ProductBean;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY
@@ -664,13 +664,21 @@ public class ImportDAO {
 			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeNo+"' and reference_code ='"+refCode+"' \n");
 			
 			if( !Utils.isNull(storeType).equalsIgnoreCase("")){
-				if(storeType.equalsIgnoreCase("lotus")){
+				if(storeType.equalsIgnoreCase("lotus") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_LOTUS_CODE)){
 					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_LOTUS_CODE+"%' \n");
-				}else if(storeType.equalsIgnoreCase("bigc")){
+				}else if(storeType.equalsIgnoreCase("bigc") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_BIGC_CODE)){
 					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_BIGC_CODE+"%' \n");
-				}else if(storeType.equalsIgnoreCase("tops")){
+				}else if(storeType.equalsIgnoreCase("tops") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_TOPS_CODE)){
 					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_TOPS_CODE+"%' \n");
-				}else if(storeType.equalsIgnoreCase("MTT")){
+				}else if(storeType.equalsIgnoreCase("MTT")
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_MTT_CODE_1)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_HISHER_CODE)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_2)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_3)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_4)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_5)
+				){
 					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
 					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%'  \n");
@@ -689,7 +697,6 @@ public class ImportDAO {
 				m.setPensValue(rs.getString("pens_value"));
 				m.setPensDesc(rs.getString("pens_desc"));
 			}
-		
 		}catch(Exception e){
 	      throw e;
 		}finally{
@@ -699,7 +706,6 @@ public class ImportDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			
 		}
 		return m;
 	} 
@@ -731,7 +737,6 @@ public class ImportDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			
 		}
 		return m;
 	} 
@@ -864,16 +869,17 @@ public class ImportDAO {
 		String item = "";
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select pens_desc3  from PENSBME_MST_REFERENCE WHERE reference_code ='"+storeType+"' and interface_value ='"+code+"' \n");
+			sql.append(" select pens_value  from PENSBME_MST_REFERENCE WHERE reference_code ='"+storeType+"' and interface_value ='"+code+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				item = Utils.isNull(rs.getString("pens_desc3"));
+				item = Utils.isNull(rs.getString("pens_value"));
 			}
 		
 		}catch(Exception e){
+			e.printStackTrace();
 	      throw e;
 		}finally{
 			if(ps != null){
@@ -887,6 +893,41 @@ public class ImportDAO {
 		return item;
 	} 
 	
+	public ProductBean getProductStyleMapping(Connection conn ,String styleNo) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		ProductBean item = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from PENSBME_STYLE_MAPPING WHERE style ='"+styleNo+"' \n");
+			
+		    logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				item = new ProductBean();
+				item.setGroupCode(Utils.isNull(rs.getString("material_master")));
+				item.setPensItem(Utils.isNull(rs.getString("pens_item")));
+				item.setStyleNo(Utils.isNull(rs.getString("style")));
+				//Get PENS_GROUP
+		        if(item != null){
+		            Master mGroup = getMasterMapping(conn, "Group", item.getGroupCode());
+		            item.setProductGroup(mGroup!=null?mGroup.getPensValue():"");
+		        }
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return item;
+	} 
 	public OnhandSummary getItemByMaterialMaster(Connection conn ,String matrialMaster) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rst = null;
@@ -949,6 +990,7 @@ public class ImportDAO {
 			}
 		
 		}catch(Exception e){
+			e.printStackTrace();
 	      throw e;
 		}finally{
 			if(ps != null){

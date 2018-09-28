@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,16 +16,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfFinishDAO;
+import com.isecinc.pens.dao.ConfirmReturnWacoalDAO;
+import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqFinishDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.pick.process.ControlOhand;
+import com.isecinc.pens.pick.process.ControlOnhandBean;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -34,7 +40,7 @@ import com.isecinc.pens.pick.process.OnhandProcess;
  */
 public class ConfFinishAction extends I_Action {
 
-
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -46,12 +52,25 @@ public class ConfFinishAction extends I_Action {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
-				ReqFinish ad = new ReqFinish();
+				aForm.setBean(new ReqFinish());
 				
-				aForm.setBean(ad);
+				//INIT SESSION
+				List<References> billTypeList = new ArrayList<References>();
+				References ref = new References("","");
+				billTypeList.add(ref);
+				billTypeList.addAll(ConfirmReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
+				request.getSession().setAttribute("statusReqFinishList",billTypeList);
+			
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref2 = new References("","");
+				wareHouseList.add(ref2);
+				wareHouseList.addAll(JobDAO.getWareHouseList());
+				request.getSession().setAttribute("wareHouseList2",wareHouseList);
+				
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ConfFinishDAO.searchHead(aForm.getBean(),false));
+				conn = DBConnection.getInstance().getConnection();
+				aForm.setResultsSearch(ConfFinishDAO.searchHead(conn,aForm.getBean(),false,false,1,pageSize));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -69,14 +88,60 @@ public class ConfFinishAction extends I_Action {
 		ConfFinishForm aForm = (ConfFinishForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
 		try {
-			ReqFinish b = aForm.getBean();
-			aForm.setBean(b);
-			aForm.setResultsSearch(ConfFinishDAO.searchHead(aForm.getBean(),false));
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
 			
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(ConfFinishDAO.searchTotalHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+				List<ReqFinish> items = ConfFinishDAO.searchHead(conn,aForm.getBean(),false,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<ReqFinish> items = ConfFinishDAO.searchHead(conn,aForm.getBean(),false,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -84,7 +149,9 @@ public class ConfFinishAction extends I_Action {
 					+ e.getMessage());
 			throw e;
 		}finally{
-			
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search2");
 	}
@@ -201,7 +268,7 @@ public class ConfFinishAction extends I_Action {
 		Connection conn = null;
 		ConfFinishForm aForm = (ConfFinishForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		try {
+		try { 
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
@@ -210,6 +277,12 @@ public class ConfFinishAction extends I_Action {
 			h.setConfirmDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
+			
+			//Validate Can Confirm Finishing
+			if( !ConfFinishDAO.canConfirmFinishing(conn, h.getRequestNo())){
+				request.setAttribute("Message","ไม่สามารถ Confirm ข้อมูลได้  RequestNo["+h.getRequestNo()+"] เนื่องจากมีการ Confirm ข้อมูลไปแล้ว");
+				return "search";
+			}
 			
 			//Step 1 update status REQ_FINISHING ,REQ_FINISHING_BARCODE ,PICK_BARCODE,PICK_BARCODE_ITEM to FINISH(F)
 			ConfFinishDAO.save(conn, h);
@@ -229,8 +302,10 @@ public class ConfFinishAction extends I_Action {
 			}
 			
 			//Step 2 Balance onhand from REQ_FINISHING by warehouse
-			OnhandProcess.processBalanceOnhand(h.getWareHouse(),h.getRequestNo(),user.getUserName());
+		    OnhandProcess.processBalanceOnhand(h.getWareHouse(),h.getRequestNo(),user.getUserName());
 			
+			//test delay 
+			//TimeUnit.SECONDS.sleep(30);
 		} catch (Exception e) {
 			logger.error("RollBack:"+e.getMessage(),e);
 			conn.rollback();

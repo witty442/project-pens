@@ -9,6 +9,7 @@ package util;
  * @CurrentVersion 1.0
  * 
  */
+import java.awt.print.PrinterJob;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -698,42 +699,21 @@ public class ReportUtilServlet extends HttpServlet {
 
 			/** Case print Tax Invoice **/
 			if("tax_invoice_report".equalsIgnoreCase(fileName)){
-				PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
-				printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));
 				//Default Printer EPSON(PENS_A5)
 				printerInvoiceName = "EPSON LQ-300+ /II ESC/P 2 (PENS_A5)";
+				PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
+				printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));
+				
 		        //check Printer PENS_A5 is Exist
 		        logger.debug("Case tax_invoice_report :new printerName:"+printerInvoiceName);
 		        logger.debug("Step 1 Check Printer PENS_A5 is Exist");
 		        try{
 		        	logger.debug("tax_invoice_report Step 1 Fix printer PENS_A5");
-                    /***************************************************************/
-		        	PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-					if (services == null || services.length < 1) {
-						  throw new  Exception("printer Exception");
-					}
-					
-					int selectedService = 0;
-					/* Scan found services to see if anyone suits our needs */
-					for(int i = 0; i < services.length;i++){
-					   if( services[i].getName().toUpperCase().contains(printerInvoiceName.toUpperCase())
-						  ){
-					      logger.debug("Found Printer Name["+services[i].getName().toUpperCase()+"]");
-						  /*If the service is named as what we are querying we select it */
-					      selectedService = i;
-					      break;
-					   }
-					}
-					
-					printServiceDefaultAttributeSet = services[selectedService].getAttributes();
-					logger.info("Selected PrinterName:"+services[selectedService].getName());
-							
-		        	/***************************************************************/
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
-		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
+		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
 		
@@ -749,7 +729,7 @@ public class ReportUtilServlet extends HttpServlet {
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
-					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
+					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
 		
@@ -763,47 +743,39 @@ public class ReportUtilServlet extends HttpServlet {
 					|| "tax_invoice_summary_new_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)){
 				try{
-					printerInvoiceName = "ZDesigner MZ 320";
-					PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-					if (services == null || services.length < 1) {
-						  throw new  Exception("printer Exception");
-					}
-					
-					int selectedService = 0;
-					/* Scan found services to see if anyone suits our needs */
-					for(int i = 0; i < services.length;i++){
-					   if(   services[i].getName().toUpperCase().contains("ZDesigner MZ 320".toUpperCase())
-						  || services[i].getName().toUpperCase().contains("ZDesigner iMZ320".toUpperCase())
-						  ){
-					      logger.debug("Selected Printer Name["+services[i].getName().toUpperCase()+"]");
-						  /*If the service is named as what we are querying we select it */
-					      selectedService = i;
-					      break;
-					   }
-					}
-					
-					printServiceDefaultAttributeSet = services[selectedService].getAttributes();
-					logger.info("PrinterName:"+services[selectedService].getName());
+					//Select Printer Small Is online
+					/*if(ControlCode.canExecuteMethod("PrinterUtils", "selectPrinterSmallIsOnlineCheckOnline")){
+						printerInvoiceName = PrinterUtils.selectPrinterSmallIsOnlineCheckOnline();
+						if(Utils.isNull(printerInvoiceName).equals("")){
+							//throw new Exception("ERROR Cannot Find Printer Small");
 							
-					//PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
-					//printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));//Hardcode 
+							//default printer name
+							logger.info("No Found Printer is online use default printer(ZDesigner MZ 320) ");
+							printerInvoiceName="ZDesigner MZ 320";
+						}
+					}else{*/
+						//select from 3 printerName no check online
+					    printerInvoiceName = PrinterUtils.selectPrinterSmall();
+					//}
+					logger.info("Selected PrinterName:"+printerInvoiceName);
+							
+					PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
+					printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));//Hardcode 
 					
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
 					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
-				     
-					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
+					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);
 		
 					logger.debug("Start Printer Normal exported...");
-			
 					exporter.exportReport();
-		
 					logger.debug("End printer Normal exported");
 				}catch(Exception e){
 				   e.printStackTrace();
+				   request.setAttribute("ERROR_MSG", "ไม่พบเครื่องพิมพ์ กรุณาตรวจสอบว่าเครื่องพิมพ์ทำงานหรือไม่ โปรดเช็คสายเสียบแน่นหรือไม่ ถ้าไม่ได้ลองทำการ รีสตาร์ท เครื่อง 1 ครั้ง ");
 				}
 		     /** Normal **/
 			}else{

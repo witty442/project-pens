@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class ManagePath {
 

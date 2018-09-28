@@ -401,7 +401,7 @@ public class InterfacesAction extends I_Action {
 			 }else{
 				 //Case TRANSACTION_UTS_TRANS_TYPE
 				 //get Logs from table t_temp_import_trans
-				 String dataLog = InterfaceDAO.getUpdateTransLogs(fileName).toString();
+				 String dataLog = InterfaceDAO.getUpdateTransErrLogs(fileName).toString();
 				 if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
 					 htmlCode = ConvertUtils.genHTMLCodeUpdateTransLogs(dataLog).toString();
 				 }
@@ -420,7 +420,6 @@ public class InterfacesAction extends I_Action {
 	
 	public ActionForward getTextFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("getLog");
-		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		int i = 0;
 		EnvProperties env = EnvProperties.getInstance();

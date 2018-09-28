@@ -13,12 +13,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.C2BConverter;
 
+import util.DBConnection;
 import util.DateToolsUtil;
+import util.UserUtils;
+import util.Utils;
 
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class SalesTargetUtils {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -39,7 +40,7 @@ public class SalesTargetUtils {
 	public static SalesTargetBean setAccess(SalesTargetBean o,User user,String pageName){
 		//Set By Role
 		//MKT
-		if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MKT}) && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MKT) ){
+		if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MKT}) && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MKT) ){
 			//CanSet
 			if(  Utils.isNull(o.getStatus()).equals("") 
 			  || Utils.statusInCheck(o.getStatus(),new String[]{SalesTargetConstants.STATUS_OPEN,SalesTargetConstants.STATUS_REJECT})
@@ -65,7 +66,7 @@ public class SalesTargetUtils {
 			}
 			//logger.debug("itemCode:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]");
 		//MT
-		}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
+		}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
 			if(   Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_POST )
 	           || Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_UN_ACCEPT )	
 			 ){
@@ -83,7 +84,7 @@ public class SalesTargetUtils {
 			 }
 			 //logger.debug("item:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]CanReject["+o.isCanReject()+"]CanPost["+o.isCanPost()+"]");
 	    //MTMGR
-		}else if ( Utils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MTMGR})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTMGR)){
+		}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MTMGR})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTMGR)){
 			
 			if( Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_ACCEPT)){
 			    o.setCanFinish(true);
@@ -354,7 +355,11 @@ public class SalesTargetUtils {
 			sql.append("\n  ) P ON M.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  where M.INVENTORY_ITEM_CODE ='"+itemCode+"' ");
 			// 504 ,821 ,833 No check dup in page
-			if( !brand.equalsIgnoreCase("504") && !brand.equalsIgnoreCase("821") && !brand.equalsIgnoreCase("833")){
+			if( !brand.equalsIgnoreCase("504") 
+			   && !brand.equalsIgnoreCase("821") 
+			   && !brand.equalsIgnoreCase("833")
+			   && !brand.equalsIgnoreCase("505")
+			   ){
 			   sql.append("\n  AND M.INVENTORY_ITEM_CODE LIKE '"+brand+"%' ");
 			}
 			

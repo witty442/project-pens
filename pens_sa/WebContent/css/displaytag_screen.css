@@ -129,27 +129,6 @@ span.rtf {
 	background-image: url(../img/ico_file_rtf.png);
 }
 
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 2px 4px 2px 4px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 2px 4px 2px 4px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-}
-
-
 .group-1 {
     font-weight:bold;
     padding-bottom:10px;

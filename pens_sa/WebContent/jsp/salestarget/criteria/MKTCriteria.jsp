@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.*"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -249,7 +249,7 @@ function loadCustCatNoList(){
 					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
 					</a>	
 		
-					<%if(Utils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
+					<%if(UserUtils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
 						<a href="javascript:copyMonthToMonth('${pageContext.request.contextPath}')">
 						  <input type="button" value="Copy Month To Month" class="newPosBtnLong">
 						</a> 		

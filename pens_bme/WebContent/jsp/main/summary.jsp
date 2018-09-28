@@ -1,25 +1,17 @@
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%> 
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-
 <jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -37,15 +29,6 @@
 	String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
 	String pageName = Utils.isNull(request.getParameter("page"));
 %>
-
-<style type="text/css">
-body {
-	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
-	/**background-repeat: repeat;**/
-}
-.style1 {color: #004a80}
--->
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
@@ -74,27 +57,30 @@ function loadMe(){
         new Epoch('epoch_popup', 'th', document.getElementById('countDateTo'));
     <%} else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
         new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
-    <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%> 
-	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
-	<%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%> 
-	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
-	<%}else if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))
-			|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))) {%>
-	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
-     <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+	<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
+	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
+	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
+	    
+    <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
     		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
     		 || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
     		 || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+    		 || "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))
     		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
     		 || "ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))
+    		 || "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandTops".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
+ 			 || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
     		 ) {%>
-	    new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
-	 <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
-	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
-	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateTo'));
+	     new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}%>
 }
 
@@ -176,7 +162,22 @@ function search(path){
 		   return false;
 	   }
 	   
-   <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+   <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
+		   || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandTops".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+		   || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
+		   || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
+		   || "ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))
+		   || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+		   || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+		   || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
+		   || "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))
+	 ) {%>
 	   var asOfDateFrom = form.salesDate.value;
 	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
 	   
@@ -188,18 +189,19 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   } 
-   <%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
-		   var asOfDateFrom = form.salesDate.value;
-		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-		   
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-			   return false;
-		   } 
+	   /**Case Select All Store ->insert groupCode */
+	   <%if( "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+	       || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+	       || "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))
+	   ){%>
+	      var group = form.group.value;
+	      if(pensCustCodeFrom=='ALL' && group ==''){
+	    	  alert("กรุณากรอกข้อมูล Group กรณีเลือก ALL ร้านค้า");
+	    	  form.group.focus();
+	    	  return false;
+	      }
+	   <%}%>
+	   
    <%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {%>
 	   var asOfDateFrom = form.asOfDateFrom.value;
 	   var asOfDateTo = form.asOfDateTo.value;
@@ -213,32 +215,7 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   }   
-   <%}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
-		   var asOfDateFrom = form.salesDate.value;
-		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-		   
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-			   return false;
-		   }   
-	<%}else if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))
-			|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))) {%>
-		   var asOfDateFrom = form.salesDate.value;
-		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-		   
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-			   return false;
-		   }    
-	   
+   
 	 <%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 		   var asOfDateFrom = form.asOfDateFrom.value;
 		   var asOfDateTo = form.asOfDateTo.value;
@@ -263,30 +240,6 @@ function search(path){
 		    alert("กรุณาเลือกข้อมูล Location");
 		    return false;
 	      } 
-	<%}else if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
-		   var asOfDateFrom = form.salesDate.value;
-		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-		   
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
-			   return false;
-		   } 
-	 <%}else if("ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
-		   var asOfDateFrom = form.salesDate.value;
-		   var pensCustCodeFrom = form.pensCustCodeFrom.value;
-		   
-		   if(asOfDateFrom ==""){ 
-			   alert("กรุณากรอกข้อมูลวันที่ As Of");
-			   return false;
-		   }
-		    if(pensCustCodeFrom ==""){ 
-			   alert("กรุณากรอกข้อมูล Branch ID");
-			   return false;
-		   } 
 	 <% }%>
 	
 	form.action = path + "/jsp/summaryAction.do?do=search&page=<%=request.getParameter("page")%>";
@@ -323,7 +276,7 @@ function genMonthEnd(path,storeType){
    }
 }
 
-function genEndDate(path){
+function genEndDateLotus(path){
 	var form = document.summaryForm;
 	var asOfDateFrom = form.salesDate.value;
 	var pensCustCodeFrom = form.pensCustCodeFrom.value;
@@ -395,11 +348,10 @@ function genReportEndDate(path){
   	    	if(returnString =='END_STOCK_LOTUS_NOT_FOUND'){
   	    		alert("ต้องทำการ End Date Stock จริงอย่างน้อย 1 ครั้ง ");
   	    	}else if(returnString =='END_STOCK_LOTUS_DATE_MUST_MORE_THAN_ENDING_DATE'){
-  	    		alert("ต้องระบ วันที่ขาย(as of) ให้มากกว่า วันที่ปิดสต๊อกล่าสุด ");
+  	    		alert("ต้องระบุ วันที่ขาย(as of) ให้มากกว่า วันที่ปิดสต๊อกล่าสุด ");
   	    	}
   	    	return false;
   	    }
-  	    
   	    
         if(confirm("กรุณายืนยันการ  Data เปรียบเทียบนับสต็อก")){
 			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
@@ -450,6 +402,10 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandLotus"/>
 				</jsp:include>
+			<%}else if("onhandTops".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEOnhandTops"/>
+				</jsp:include>
 			<%}else if("monthEndLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEMonthEndLotus"/>
@@ -494,6 +450,10 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandMTT"/>
 				</jsp:include>
+			<%}else if("onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEOnhandKing"/>
+				</jsp:include>
 			<%}else if("onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEOnhandMTTDetail"/>
@@ -515,12 +475,22 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMESizeColorLotus"/>
 				</jsp:include>
-		
+		    <%}else if("sizeColorKing".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMESizeColorKing"/>
+				</jsp:include>
 			 <%}else if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="reportEndDateLotus"/>
 				</jsp:include>
-		
+			<%}else if("onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="onhandAsOf_Robinson"/>
+				</jsp:include>
+		    <%}else if("onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="onhandAsOf_Robinson"/>
+				</jsp:include>
 			<%}else{ %>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="<%=pageName %>"/>
@@ -569,26 +539,38 @@ function clearForm(path){
 								|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+								|| "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))
 								|| "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
-								) {
+								|| "onhandTops".equalsIgnoreCase(request.getParameter("page"))
+							    || "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))
+							    || "onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+							    || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
+						 ){
 							
 								String hideAll = "";
-								if(    "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
-									|| "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
-									|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
-									|| "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
-								) {
+								if(   "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))
+									||"reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
+								){
 									hideAll = "true";
 								}
 							    storeType ="lotus";//defualt
-								if("onhandBigC".equalsIgnoreCase(request.getParameter("page"))
-								  || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
-								  || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
+								if(   "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
+								   || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
+								   || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
 								){
 									storeType="bigc";
-								}else if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))){
+								}else if(  "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+										|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page"))){
 									storeType="MTT";
+								}else if("onhandTops".equalsIgnoreCase(request.getParameter("page"))){
+									storeType="TOPS";
+								}else if("onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+										|| "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))){
+									storeType="ROBINSON";
+								}else if( "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
+										|| "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))){
+									storeType="DUTYFREE";
 								}
 								%>
 					    	<table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
@@ -610,8 +592,9 @@ function clearForm(path){
 								</tr>
 						       <tr>
 									<td align="right"  nowrap>รหัสร้านค้า<font color="red">*</font>
-									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
+									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>
+									    &nbsp;
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
 									<td align="left" width="30%"  nowrap> 
@@ -619,21 +602,21 @@ function clearForm(path){
 									</td>
 								</tr>
 								
-								<% if("sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
+								<% if(     "sizeColorBigC".equalsIgnoreCase(request.getParameter("page")) 
 										|| "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+										|| "sizeColorKing".equalsIgnoreCase(request.getParameter("page"))
 										|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
 										|| "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page")) 
-										){%>
+									){%>
 									 <tr>
 										<td align="right"  nowrap>วันที่ล่าสุดที่มีการตรวจนับสต็อก<font color="red"></font>
 										<html:text property="onhandSummary.initDate" styleId="initDate" size="20" styleClass="disableText" readonly="true"/> 
 										</td>	
-										<td align="left" width="30%"> 
-										 
-										</td>
+										<td align="left" width="30%"> </td>
 									</tr>
 								<%} %>
-								<% if("onhandMTT".equalsIgnoreCase(request.getParameter("page")) ){%>
+								<% if(   "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+									  || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page")) ){%>
 									 <tr>
 										<td align="right"  nowrap>วันที่ล่าสุดที่มีการ Load ข้อมูลนับสต็อก 
 										
@@ -649,18 +632,34 @@ function clearForm(path){
 									<td align="right" width="30%"  nowrap>
 									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
 									     &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
+									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from','<%=storeType %>')"/>
 									</td>
 									<td align="left" width="30%"  nowrap>
 									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
-									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
+									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to','<%=storeType %>')"/>   
 									</td>
 								</tr>
 								<tr>
 									<td align="right" width="30%"  nowrap>Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									    <html:text property="onhandSummary.group" styleId="group" />
 									    &nbsp;
-									    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
+									    <% if( "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
+									        || "onhandLotus".equalsIgnoreCase(request.getParameter("page")) 
+									        || "onhandTops".equalsIgnoreCase(request.getParameter("page"))
+									        || "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))
+									        || "onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+									        || "sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))
+									        || "sizeColorBigC".equalsIgnoreCase(request.getParameter("page"))
+									        || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
+									       ){ 
+									       /** Select One group **/
+									       %>
+									       <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}','selectOne','<%=storeType%>')"/>
+									    <%}else{ 
+									    	 /** Select Multi group **/
+									    %>
+									       <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}','','<%=storeType%>')"/>
+									    <%} %>
 									     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
 									  </td>
 									<td align="left" width="30%">  
@@ -669,24 +668,29 @@ function clearForm(path){
 								    		 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
 								    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
 								    		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page")) 
+								    		 || "onhandBigC".equalsIgnoreCase(request.getParameter("page")) 
 								    		 ){%>
 									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
 									    <%} %>
 									 </td>
 							   </tr>
-							    <% if("sizeColorLotus_XX".equalsIgnoreCase(request.getParameter("page")) 
-								    	 || "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
-								    	 || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
-								    	 || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))  
-								    	 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
-								    	 || "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
-							    		){%>
+							    <% if(    "sizeColorLotus_XX".equalsIgnoreCase(request.getParameter("page")) 
+								       || "onhandLotus".equalsIgnoreCase(request.getParameter("page"))
+								       || "onhandBigCSP".equalsIgnoreCase(request.getParameter("page")) 
+								       || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))  
+								       || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
+								       || "onhandMTT".equalsIgnoreCase(request.getParameter("page")) 
+								       || "onhandTops".equalsIgnoreCase(request.getParameter("page"))
+								       || "onhandAsOfRobinson".equalsIgnoreCase(request.getParameter("page"))
+								       || "onhandAsOf_Robinson".equalsIgnoreCase(request.getParameter("page"))
+								       || "onhandAsOfKing".equalsIgnoreCase(request.getParameter("page"))
+							    	){%>
 									   <tr>
 											<td align="right" width="30%"  nowrap>แสดงตาม &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											       <html:select property="summaryType">
-													 <html:option value="GroupCode">Group Code</html:option>
-													 <html:option value="PensItem">Pens Item</html:option>
-											      </html:select>
+											    <html:select property="summaryType">
+												   <html:option value="GroupCode">Group Code</html:option>
+												   <html:option value="PensItem">Pens Item</html:option>
+											     </html:select>
 											 </td>
 											<td align="left" width="30%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>    
 									   </tr>
@@ -694,12 +698,14 @@ function clearForm(path){
 							  </table>
 						<%}else if("bmeTrans".equalsIgnoreCase(request.getParameter("page"))) {
 							    storeType ="";
-								%>
+						%>
 							 <jsp:include page="criteria/BmeTransCriteria.jsp" /> 
 						<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 						     <jsp:include page="criteria/OnhandLotusPeriodCriteria.jsp" /> 
-					   <%}else if("ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+						     
+					    <%}else if("ReportStockWacoalLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 					         <jsp:include page="criteria/ReportStockWacoalLotusCriteria.jsp" /> 
+					         
 						<%} %>
 
 					<br>
@@ -709,10 +715,10 @@ function clearForm(path){
 							<td align="center" width="80%">
 								<a href="javascript:search('${pageContext.request.contextPath}')">
 								  <input type="button" value="ค้นหา" class="newPosBtn"> 
-								</a>
+								</a>&nbsp;
 								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 								  <input type="button" value="Clear" class="newPosBtn">
-								</a>
+								</a>&nbsp;
 								<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
@@ -721,7 +727,7 @@ function clearForm(path){
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))){%>
 								   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 								 
-									<a href="javascript:genEndDate('${pageContext.request.contextPath}')">
+									<a href="javascript:genEndDateLotus('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
 									</a>
 								<%}} %>
@@ -741,9 +747,8 @@ function clearForm(path){
 						</tr>
 					</table>
 			</div>
-					
-					<!-- ****** RESULT ***************************************************************** -->
-				    
+					<%-- Page:${summaryForm.page} --%>
+				<!-- ****** RESULT ***************************************************************** -->
                    <c:choose>
                        <c:when test="${summaryForm.page == 'ReportStockWacoalLotus'}">
                           <jsp:include page="subreports/subReportStockWacoalLotus.jsp" /> 
@@ -754,14 +759,35 @@ function clearForm(path){
 				      <c:when test="${summaryForm.page == 'onhandLotus'}">
                            <jsp:include page="subreports/subReportOnhandLotus.jsp" /> 
                       </c:when>
+                       <c:when test="${summaryForm.page == 'onhandTops'}">
+                           <jsp:include page="subreports/subReportOnhandTops.jsp" /> 
+                      </c:when>
+                       <c:when test="${summaryForm.page == 'onhandAsOfRobinson'}">
+                           <jsp:include page="subreports/subReportOnhandAsOfRobinson.jsp" /> 
+                      </c:when>
+                       <c:when test="${summaryForm.page == 'onhandAsOf_Robinson'}">
+                           <jsp:include page="subreports/subReportOnhandAsOf_Robinson.jsp" /> 
+                      </c:when>
                       <c:when test="${summaryForm.page == 'sizeColorLotus'}">
                         <jsp:include page="subreports/subReportSizeColorLotus.jsp" /> 
+                      </c:when>
+                      <c:when test="${summaryForm.page == 'sizeColorBigC'}">
+                        <jsp:include page="subreports/subReportSizeColorBigC.jsp" /> 
                       </c:when>
                        <c:when test="${summaryForm.page == 'monthEndLotus'}">
                         <jsp:include page="subreports/subReportMonthEndLotus.jsp" /> 
 	                   </c:when>
 	                   <c:when test="${summaryForm.page == 'onhandMTT'}">
 	                       <jsp:include page="subreports/subReportOnhandMTT.jsp" /> 
+	                   </c:when>
+	                    <c:when test="${summaryForm.page == 'onhandMTTDetail'}">
+	                       <jsp:include page="subreports/subReportOnhandMTTDetail.jsp" /> 
+	                   </c:when>
+	                    <c:when test="${summaryForm.page == 'onhandAsOfKing'}">
+	                       <jsp:include page="subreports/subReportOnhandAsOfKing.jsp" /> 
+	                   </c:when>
+	                    <c:when test="${summaryForm.page == 'sizeColorKing'}">
+	                       <jsp:include page="subreports/subReportOnhandSizeColorKing.jsp" /> 
 	                   </c:when>
 	                   <c:when test="${summaryForm.page == 'reportEndDateLotus'}">
 	                        <jsp:include page="subreports/subReportEndDateLotus.jsp" /> 
@@ -772,11 +798,14 @@ function clearForm(path){
 	                   <c:when test="${summaryForm.page == 'BigC'}">
 	                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
 	                   </c:when>
-	                   <c:when test="${summaryForm.page == 'Tops'}">
+	                   <c:when test="${summaryForm.page == 'tops'}">
 	                        <jsp:include page="subreports/subReportSalesTops.jsp" /> 
 	                   </c:when>
 	                   <c:when test="${summaryForm.page == 'king'}">
 	                        <jsp:include page="subreports/subReportSalesKing.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'onhandBigC'}">
+	                         <jsp:include page="subreports/subReportOnhandAsOf_BigC.jsp" /> 
 	                   </c:when>
 				      <c:otherwise>
 				         <!-- ALL SUB Report By old code -->
@@ -790,7 +819,7 @@ function clearForm(path){
 					
 					<!-- hidden field -->
 					<input type="hidden" name="page" value="<%=request.getParameter("page") %>"/>
-					 <input type="hidden" name="storeType" id="storeType" value="<%=storeType%>"/>
+					<input type="hidden" name="storeType" id="storeType" value="<%=storeType%>"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.scheduler.bean.BatchTaskDTO;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.scheduler.utils.EnvSchedulerProperties;
+import com.pens.util.Utils;
 
 public class SearchTaskDAO {
 

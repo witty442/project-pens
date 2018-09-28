@@ -45,7 +45,7 @@ function search(path){
 	  //case show By Type Map Valid check to show
 	  var validCheck = false;
 	  if(document.getElementById("dispType").value =='MAP'){
-		  if(document.getElementsByName("bean.dispAllStore")[0].checked){
+		  /*if(document.getElementsByName("bean.dispAllStore")[0].checked){
 			  validCheck = true; 
 		  }
 		  if(document.getElementsByName("bean.dispAllOrder")[0].checked){
@@ -53,12 +53,12 @@ function search(path){
 		  }
 		  if(document.getElementsByName("bean.dispAllVisit")[0].checked){
 			  validCheck = true; 
-		  }
+		  }*/
 		 
 		  if(validCheck==false){
-			  alert("กรุณาเลือกการแสดงข้อมูลแผนที่อย่างน้อย 1 อย่าง");
+			 /* alert("กรุณาเลือกการแสดงข้อมูลแผนที่อย่างน้อย 1 อย่าง");
 			  chkShow[0].focus();
-			  return false;
+			  return false;*/
 		  }
 	  }
 	  

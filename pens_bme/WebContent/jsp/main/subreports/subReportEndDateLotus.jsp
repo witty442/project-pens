@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -44,7 +44,7 @@ System.out.println("currentPage:"+currentPage);
 			    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text" style="width:5%"/>
 			    <display:column  title="ชื่อสาขา" property="storeName"  sortable="false" class="td_text" style="width:10%"/>
 			    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text"  style="width:5%"/>	 
-			    <display:column  title="Group" property="group"  sortable="false" class="td_text"  style="width:6%"/>	
+			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center"  style="width:6%"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_number"  style="width:8%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number"  style="width:8%"/>	
 			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number"  style="width:8%"/>
@@ -83,7 +83,7 @@ System.out.println("currentPage:"+currentPage);
 			    
 			    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text"  style="width:8%"/> 
 			    <display:column  title="ชื่อสาขา" property="storeName"  sortable="false" class="td_text"  style="width:12%"/> 
-			    <display:column  title="Group" property="group"  sortable="false" class="td_text" style="width:8%"/>	
+			    <display:column  title="Group" property="group"  sortable="false" class="td_text_center" style="width:8%"/>	
 			    <display:column  title="Begining Qty" property="beginingQty"  sortable="false" class="td_number" style="width:8%"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="td_number" style="width:8%"/>	
 			    <display:column  title="Sale Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>

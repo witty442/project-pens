@@ -19,15 +19,14 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.salesanalyst.SAGenCondition;
 import com.isecinc.pens.web.salesanalyst.SAUtils;
 import com.isecinc.pens.web.salesanalyst.SecurityHelper;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 
 
 public class SAInitial {
@@ -1820,7 +1819,7 @@ public class SAInitial {
 		return getDescModel(conn,condType, code);
 	}
 	
-	public  String getDescX(String condType,String code)throws Exception{
+	public  String getDesc(String condType,String code)throws Exception{
 		Connection conn = null;
 		try{
 			conn =DBConnection.getInstance().getConnection();

@@ -21,6 +21,7 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.ReceiptLine;
+import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
@@ -49,7 +50,7 @@ public class MOrder extends I_Model<Order> {
 			"PAYMENT_METHOD", "SHIPPING_DAY", "SHIPPING_TIME", "TOTAL_AMOUNT", "VAT_AMOUNT", "NET_AMOUNT",
 			"INTERFACES", "PAYMENT", "SALES_ORDER_NO", "AR_INVOICE_NO", "USER_ID", "DOC_STATUS", "CREATED_BY",
 			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID"
-			,"ORA_SHIP_ADDRESS_ID","org","PO_NUMBER","TOTAL_AMOUNT_NON_VAT"};
+			,"ORA_SHIP_ADDRESS_ID","org","PO_NUMBER","TOTAL_AMOUNT_NON_VAT","VAN_PAYMENT_METHOD","IS_PROMOTION_SPECIAL"};
 
 	/**
 	 * Find
@@ -64,6 +65,39 @@ public class MOrder extends I_Model<Order> {
 
 	public Order find(Connection conn,String id) throws Exception {
 		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Order.class);
+	}
+	public Order findByWhereCond(String whereSql) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return findByWhereCond(conn, whereSql);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public Order findByWhereCond(Connection conn ,String whereSql) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Order p = null;
+		try{
+			String sql ="\n select * from t_order "+whereSql ;
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				p = new Order(rst);
+			}
+			return p;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
 	}
 	/**
 	 * Search
@@ -131,7 +165,9 @@ public class MOrder extends I_Model<Order> {
 				order.getOraShipAddressID(),
 				order.getOrg(),
 				order.getPoNumber(),
-				order.getTotalAmountNonVat()
+				order.getTotalAmountNonVat(),
+				ConvertNullUtil.convertToString(order.getVanPaymentMethod()),
+				Utils.isNull(order.getIsPromotionSpecial()).equals("")?"N":Utils.isNull(order.getIsPromotionSpecial()).equals("")
 				};
 		if (super.save(TABLE_NAME, columns, values, order.getId(), conn)) {
 			order.setId(id);
@@ -149,7 +185,7 @@ public class MOrder extends I_Model<Order> {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean saveImportOrder(Order order, int activeUserID, Connection conn) throws Exception {
+	public boolean saveImportOrder2(Order order, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (order.getId() == 0) {
 			id = SequenceProcess.getNextValue(TABLE_NAME);
@@ -475,7 +511,7 @@ public class MOrder extends I_Model<Order> {
 		return pos;
 	}
 
-	public List<Order> lookUpByOrderAR(int userId, int customerId, String orderType, String operator, String selected)
+	public List<Order> lookUpByOrderAR(Connection conn,int userId, int customerId, String orderType, String operator, String selected)
 			throws Exception {
 		References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
 		String  creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
@@ -505,7 +541,7 @@ public class MOrder extends I_Model<Order> {
 		
 		logger.debug("sql lookUpByOrderAR \n "+whereCause);
 		
-		pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, Order.class);
+		pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, Order.class);
 		return pos;
     }
 	

@@ -2,6 +2,7 @@ package com.isecinc.pens.web.pick;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +25,9 @@ import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -51,28 +52,36 @@ public class JobAction extends I_Action {
 				aForm.setResultsSearch(null);
 				Job ad = new Job();
 				//ad.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
-				
+				 
+				Calendar c = Calendar.getInstance();
+				int year = c.get(Calendar.YEAR);
+				ad.setYear(year+"");
 				aForm.setJob(ad);
 				
 				//Set Session List
-				List<References> wareHouseList = new ArrayList();
+				List<References> wareHouseList = new ArrayList<References>();
 				References ref = new References("","");
 				wareHouseList.add(ref);
 				wareHouseList.addAll(JobDAO.getWareHouseList());
 				request.getSession().setAttribute("wareHouseList",wareHouseList);
 
-				List<References> jobStatusList = new ArrayList();
+				List<References> jobStatusList = new ArrayList<References>();
 				ref = new References("","");
 				jobStatusList.add(ref);
 				jobStatusList.addAll(JobDAO.getJobStatusList());
 				request.getSession().setAttribute("jobStatusList",jobStatusList);
 		
-				List<PopupForm> custGroupList = new ArrayList();
+				List<PopupForm> custGroupList = new ArrayList<PopupForm>();
 				PopupForm refP = new PopupForm("",""); 
 				custGroupList.add(refP);
 				custGroupList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
 				request.getSession().setAttribute("custGroupList",custGroupList);
 				
+				List<References> yearList = new ArrayList<References>();
+				ref = new References("","");
+				yearList.add(ref);
+				yearList.addAll(JobDAO.getYearList());
+				request.getSession().setAttribute("yearList",yearList);
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -85,27 +94,6 @@ public class JobAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	/*public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("search2");
-		JobForm aForm = (JobForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			aForm.setResultsSearch(JobDAO.searchHead(aForm.getJob()));
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return mapping.findForward("search2");
-	}*/
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		JobForm aForm = (JobForm) form;
@@ -119,6 +107,7 @@ public class JobAction extends I_Action {
 			logger.debug("action:"+action);
 			
 			conn = DBConnection.getInstance().getConnectionApps();
+			
 			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
 				//case  back
 				if("back".equalsIgnoreCase(action)){
@@ -188,7 +177,9 @@ public class JobAction extends I_Action {
 			aForm.setJob(new Job());
 			
 			Job ad = new Job();
-			//ad.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			Calendar c = Calendar.getInstance();
+			int year = c.get(Calendar.YEAR);
+			ad.setYear(year+"");
 			aForm.setJob(ad);
 			
 		} catch (Exception e) {
@@ -214,7 +205,6 @@ public class JobAction extends I_Action {
             String jobId = Utils.isNull(request.getParameter("jobId"));
             String mode = Utils.isNull(request.getParameter("mode"));
             logger.debug("jobId:"+jobId+",mode:"+mode);
-            
 			if( !"".equals(jobId)){
 				logger.debug("prepare edit jobId:"+jobId);
 				Job c = new Job();
@@ -226,7 +216,6 @@ public class JobAction extends I_Action {
 
 				aForm.setMode(mode);//Mode Edit
 			}else{
-				
 				logger.debug("prepare new documentNo");
 				aForm.setResults(new ArrayList<Job>());
 				Job ad = new Job();
@@ -235,7 +224,6 @@ public class JobAction extends I_Action {
 				
 				aForm.setJob(ad);
 				aForm.setMode(mode);//Mode Add new
-				
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -346,7 +334,7 @@ public class JobAction extends I_Action {
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
 			
-			JobDAO.updateModel(conn,h);
+			JobDAO.updateRefDocModel(conn,h);
 			
 			conn.commit();
 
@@ -364,13 +352,6 @@ public class JobAction extends I_Action {
 			}
 		}
 		return mapping.findForward("search");
-	}
-	
-	private AdjustStock createNewAdjustStock(AdjustStock lastAd){
-		AdjustStock aNew = new AdjustStock();
-		aNew.setSeqNo(lastAd.getSeqNo()+1);
-		
-		return aNew;
 	}
 	
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {

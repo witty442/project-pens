@@ -1,9 +1,11 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.isecinc.pens.bean.ReqFinish"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -11,57 +13,37 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqFinishForm" class="com.isecinc.pens.web.pick.ReqFinishForm" scope="session" />
 <%
-if(session.getAttribute("statusReqReturnW2List") == null){
-	List<References> billTypeList = new ArrayList();
-	References ref = new References("","");
-	billTypeList.add(ref);
-	billTypeList.addAll(ReqReturnWacoalDAO.getRequestStatusW2ListInPageReqFinish());
-	session.setAttribute("statusReqReturnW2List",billTypeList);
-}
-if(session.getAttribute("wareHouseList2") == null){
-	List<References> wareHouseList = new ArrayList(); 
-	References ref1 = new References("","");
-	wareHouseList.add(ref1);
-	wareHouseList.addAll(PickConstants.getWareHouseList("'W2','W3','W4','W5','W6'"));
-	
-	session.setAttribute("wareHouseList2",wareHouseList);
-}
+
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_reqReturnWacoal.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css"></style>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('requestDate'));
 }
-
 function clearForm(path){
 	var form = document.reqFinishForm;
 	form.action = path + "/jsp/reqFinishAction.do?do=clear2";
@@ -81,6 +63,12 @@ function openEdit(path,requestDate,requestNo,mode){
 	form.action = path + "/jsp/reqFinishAction.do?do=prepare&requestDate="+requestDate+"&requestNo="+requestNo+"&mode="+mode;
 	form.submit();
 	return true;
+}
+function gotoPage(path,currPage){
+	var form = document.reqFinishForm;
+	form.action = path + "/jsp/reqFinishAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
 }
 </script>
 </head>		
@@ -181,7 +169,30 @@ function openEdit(path,requestDate,requestNo,mode){
 					  </div>
 
             <c:if test="${reqFinishForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = reqFinishForm.getTotalPage();
+					   int totalRecord = reqFinishForm.getTotalRecord();
+					   int currPage =  reqFinishForm.getCurrPage();
+					   int startRec = reqFinishForm.getStartRec();
+					   int endRec = reqFinishForm.getEndRec();
+					   int pageSize = reqFinishForm.getPageSize();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -191,44 +202,38 @@ function openEdit(path,requestDate,requestNo,mode){
 									<th >Remark</th>
 									<th >Action</th>						
 							   </tr>
-							<c:forEach var="results" items="${reqFinishForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_requestDate">
-										   ${results.requestDate}
-										</td>
-										<td class="search_requestNo">${results.requestNo}</td>
-										<td class="search_status">
-											${results.statusDesc}
-										</td>
-										<td class="search_remark">
-										    ${results.remark}
-										</td>
-										
-										<td class="search_edit" align="center">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestDate}','${results.requestNo}','view')">
-											          ดู
+							<% 
+							int no = (currPage-1)*pageSize;
+							String tabclass ="lineE";
+							List<ReqFinish> resultList = reqFinishForm.getResultsSearch();
+							for(int n=0;n<resultList.size();n++){
+								ReqFinish mc = (ReqFinish)resultList.get(n);
+								if(n%2==0){ 
+									tabclass="lineO";
+								}
+								no++;
+								%>
+									<tr class="<%=tabclass%>">
+										<td class="td_text_center" width="5%"><%=no%></td>
+										<td class="td_text_center" width="10%"><%=mc.getRequestDate() %></td>
+										<td class="td_text_center" width="10%"><%=mc.getRequestNo()%></td>
+										<td class="td_text_center" width="10%"><%=mc.getStatusDesc()%></td>
+										<td class="td_text" width="15%"><%=mc.getRemark() %></td>
+										<td class="td_text_center" width="10%">
+										 <%if(mc.isCanEdit()==false) {%>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getRequestDate()%>','<%=mc.getRequestNo()%>','view')">
+											       <font size="2">  ดู </font> 
 											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestDate}','${results.requestNo}','edit')">
-											          แก้ไข
+										  <%} %>
+										   <%if(mc.isCanEdit()==true){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getRequestDate()%>','<%=mc.getRequestNo()%>','edit')">
+											       <font size="2">    แก้ไข</font>
 											  </a>
-										  </c:if>
+										 <%} %>
 										</td>
 									</tr>
 							
-							  </c:forEach>
+							 <%} %>
 					</table>
 				</c:if>
 					<!-- ************************Result ***************************************************-->

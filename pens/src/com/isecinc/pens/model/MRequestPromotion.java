@@ -588,6 +588,7 @@ public class MRequestPromotion {
 				sql.append("\n (select p.name from ad_user p where p.user_id = h.user_id) as sales_desc ");
 				sql.append("\n ,(select p.name from m_customer p where p.code = h.customer_code) as customer_name ");
 				sql.append("\n ,(select p.brand_desc from m_brand p where p.brand_no = h.product_catagory) as product_catagory_name ");
+				sql.append("\n ,h.exported ");
 				sql.append("\n  from t_req_promotion h ");
 				sql.append("\n  where 1=1 ");
 				if(!Utils.isNull(mCriteria.getRequestNo()).equals("")){
@@ -633,6 +634,7 @@ public class MRequestPromotion {
 				  m.setPromotionStartDate(Utils.stringValue(rst.getDate("promotion_start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setPromotionEndDate(Utils.stringValue(rst.getDate("promotion_end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setRemark(Utils.isNull(rst.getString("remark")));
+				  m.setExported(Utils.isNull(rst.getString("exported")));
 				  
 				  List<References> ref = InitialReferences.getReferenes(InitialReferences.TERRITORY,user.getTerritory());
 				  String territory = ref != null && ref.size() >0?(ref.get(0).getName()):"";
@@ -647,9 +649,15 @@ public class MRequestPromotion {
 					  m.setCanGenFile(false);
 					  m.setCanCancel(false);
 				  }else{
-					  m.setCanEdit(true);
-					  m.setCanGenFile(true);
-					  m.setCanCancel(true);
+					  if(!"Y".equalsIgnoreCase(m.getExported())){
+					     m.setCanEdit(true);
+					     m.setCanGenFile(true);
+					     m.setCanCancel(true);
+					  }else{
+						 m.setCanEdit(false);
+						 m.setCanGenFile(false);
+						 m.setCanCancel(false);
+					  }
 				  }
 				  
 				  if(getItem){

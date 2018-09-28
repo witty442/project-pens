@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.bean.PickStock"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -237,7 +237,7 @@ function isNum(obj){
 				       <!-- Table Data -->
 				<c:if test="${genCNForm.results != null}">
 		
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch" width="60%">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch" width="50%">
 						    <tr>
 								<th >LineNo</th>
 								<th >Pens Item</th>
@@ -258,16 +258,18 @@ function isNum(obj){
 										 <input type="text" name="lineId" value="${results.lineId}" readonly class="disableText" size="5"/>
 										</td>
 										<td class="td_text_center"  width="15%">
-											<input type="text" name="pensItem" value ="${results.pensItem}" size="8" readonly class="disableText"/>
+											<input type="text" name="pensItem" value ="${results.pensItem}" size="10" readonly class="disableText"/>
 										</td>
 										<td class="td_text_center"  width="15%">
-											<input type="text" name="groupCode" value ="${results.groupCode}" size="8" readonly class="disableText"/>
+											<input type="text" name="groupCode" value ="${results.groupCode}" size="15" readonly class="disableText"/>
 										</td>
 										<td class="td_text_center" width="5%">
-										   <input type="text" name="qty" value ="${results.qty}" size="20" readonly class="disableNumber"/>
-										    
+										    <input type="text" name="qty" value ="${results.qty}" size="20" readonly class="disableNumber"/>
+										    <input type="hidden" name="wholePriceBF" value ="${results.wholePriceBF}" />
+										    <input type="hidden" name="retailPriceBF" value ="${results.retailPriceBF}" />
+										    <input type="hidden" name="barcode" value ="${results.barcode}" />
+										    <input type="hidden" name="materialMaster" value ="${results.materialMaster}" />
 										</td>
-										
 									</tr>
 							  </c:forEach>
 					</table>
@@ -279,28 +281,25 @@ function isNum(obj){
 						</div> 
 						
 					<div align="center">
-						   <!-- Table Data -->
-						   <table  border="0" cellpadding="3" cellspacing="0" >
-								<tr>
-									<td align="center">
-									   
-										 <c:if test="${genCNForm.bean.canEdit == true}">
-											<a href="javascript:save('${pageContext.request.contextPath}')">
-											  <input type="button" value="    Generate      " class="newPosBtnLong"> 
-											 </a>
-										 </c:if>	
-									     
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-											  <input type="button" value="    Clear      " class="newPosBtnLong"> 
-									    </a>
-											
-									</td>
-								</tr>
-							</table>
+					   <!-- Table Data -->
+					   <table  border="0" cellpadding="3" cellspacing="0" >
+							<tr>
+								<td align="center">   
+								 <c:if test="${genCNForm.bean.canEdit == true}">
+									<a href="javascript:save('${pageContext.request.contextPath}')">
+									  <input type="button" value="    Generate      " class="newPosBtnLong"> 
+									 </a>
+								 </c:if>	
+							     
+								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+									  <input type="button" value="    Clear      " class="newPosBtnLong"> 
+							    </a>		
+								</td>
+							</tr>
+					</table>
 				</div>
 				
 				</c:if>
-		
 					<!-- ************************Result ***************************************************-->
 					
 					<!-- hidden field -->

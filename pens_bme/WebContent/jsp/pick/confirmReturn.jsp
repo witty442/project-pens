@@ -1,6 +1,4 @@
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -13,18 +11,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="confirmReturnWacoalForm" class="com.isecinc.pens.web.pick.ConfirmReturnWacoalForm" scope="session" />
-
 <%
  String mode = confirmReturnWacoalForm.getMode();
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -32,32 +23,10 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_confirmReturnWacoal.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
@@ -78,6 +47,9 @@ function clearForm(path){
 
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.confirmReturnWacoalForm;
 		form.action = path + "/jsp/confirmReturnAction.do?do=cancel";
 		form.submit();
@@ -125,6 +97,9 @@ function save(path){
 	} */
 	
 	if(confirm("ยันยันการบันทึกข้อมูล")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		form.action = path + "/jsp/confirmReturnAction.do?do=save";
 		form.submit();
 		return true;
@@ -238,20 +213,20 @@ function save(path){
 								
 									<tr class="<c:out value='${tabclass}'/>">
 										
-										<td class="data_no"> ${results.no}</td>
-										<td class="data_boxNo" align="center">
+										<td class="td_text_center" width="5%"> ${results.no}</td>
+										<td class="td_text_center" width="10%">
 										   ${results.boxNo}
 										   <input type="hidden" name="boxNo" value ="${results.boxNo}" size="40" readonly class="disableText"/>
 										</td>
-										<td class="data_qty" align="center">
+										<td class="td_text_center"  width="10%">
 										   ${results.qty}
 										   <input type="hidden" name="qty" value ="${results.qty}" size="20" readonly class="disableText"/>
 										</td>
-										<td class="data_jobName" align="left">
+										<td class="td_text" width="20%">
 										   ${results.jobName}
 										    <input type="hidden" name="jobId" value ="${results.jobId}" size="20" readonly class="disableText"/>
 										</td>
-										<td class="data_edit" align="center">
+										<td class="td_text_center"  width="10%">
 										 <c:if test="${confirmReturnWacoalForm.bean.canPrint == true}">
 											  <a href="javascript:printControlReturnBoxByBox('${pageContext.request.contextPath}','${results.boxNo}')">
 												          พิมพ์
@@ -339,3 +314,6 @@ function save(path){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

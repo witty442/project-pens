@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
@@ -83,7 +86,7 @@ public class SecurityHelper {
 			html +="<fieldset>";
 			html +="<legend><b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"]</b></legend> ";
 			html +="<div id='roleTab' style='display: block;'>";
-			html +="<table border='0' align='center' width='80%'>\n";
+			html +="<table border='0' align='left' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
 			String roles[] = new String[5];

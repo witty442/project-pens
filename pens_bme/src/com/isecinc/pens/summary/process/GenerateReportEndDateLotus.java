@@ -5,19 +5,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.OnhandSummary;
+import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.BMECControlDAO;
+import com.isecinc.pens.dao.StoreDAO;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
@@ -25,10 +27,11 @@ import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.sql.ReportEndDateLotusSQL;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.meter.MonitorTime;
 
 public class GenerateReportEndDateLotus {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -41,8 +44,7 @@ public class GenerateReportEndDateLotus {
 		MonitorTime monitorTime = null;
 		int taskStatusInt = Constants.STATUS_START;
 		try{
-			
-			/** prepare Paramenter **/
+			/** prepare Parameter **/
 			batchParamMap = monitorModel.getBatchParamMapObj();
 			OnhandSummary summary = (OnhandSummary)batchParamMap.get("ONHAND_SUMMARY");
 			logger.debug("customerCode:"+summary.getPensCustCodeFrom());
@@ -149,47 +151,63 @@ public class GenerateReportEndDateLotus {
 	    StringBuilder sql = new StringBuilder();
 	    int result =0;
 	    int c =1;
+	    List<StoreBean> storeList = null;
 		try{
 			Date asofDate = Utils.parse(cri.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String asOfDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
-	
-			//delete old month by yearMonth
-			String sqlDel = "delete from PENSBME_ENDDATE_STOCK_TEMP where store_code ='"+cri.getPensCustCodeFrom()+"'";
-			logger.debug("sqlDel:"+sqlDel);
-			psDel = conn.prepareStatement(sqlDel);
-			psDel.execute();
 			
-			//gen sql
-			sql = ReportEndDateLotusSQL.genSQL(conn, cri, user, "GroupCode","GenReportEndDate");
-			
-			//sql insert 
-			String sqlIns = "INSERT INTO PENSBME_ENDDATE_STOCK_TEMP" +
-					"( STORE_CODE, ENDING_DATE, GROUP_CODE" +
-					", SALE_IN_QTY, SALE_OUT_QTY, SALE_RETURN_QTY" +
-					", ADJUST_QTY, SHORT_QTY, ENDING_QTY" +
-					", CREATE_USER, CREATE_DATE ,Begining_qty) "+
-					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-			psIns = conn.prepareStatement(sqlIns.toString());
-			ps = conn.prepareStatement(sql.toString());
-			rst = ps.executeQuery();
-			while(rst.next()){
-				
-				psIns.setString(1, rst.getString("customer_code"));
-				psIns.setDate(2,new java.sql.Date(asofDate.getTime()));
-				psIns.setString(3, rst.getString("group_type"));
-				psIns.setDouble(4, rst.getDouble("sale_in_qty"));
-				psIns.setDouble(5, rst.getDouble("sale_out_qty"));
-				psIns.setDouble(6, rst.getDouble("sale_return_qty"));
-				psIns.setDouble(7, rst.getDouble("ADJUST_QTY"));
-				psIns.setDouble(8, rst.getDouble("STOCK_SHORT_QTY"));
-				psIns.setDouble(9, rst.getDouble("onhand_qty"));
-				psIns.setString(10, user.getUserName());
-				psIns.setTimestamp(11, new java.sql.Timestamp(new Date().getTime()));
-				psIns.setDouble(12, rst.getDouble("BEGINING_qty"));
-				
-				psIns.executeUpdate();
+			if( !Utils.isNull(cri.getPensCustCodeFrom()).equals("ALL")){
+				//Get By Store
+				storeList =  new ArrayList<StoreBean>();
+				StoreBean storeBean = new StoreBean();
+				storeBean.setStoreCode(cri.getPensCustCodeFrom());
+				storeList.add(storeBean);
+			}else{
+				//Get AllStore Lotus
+				storeList = StoreDAO.getStoreList(conn, PickConstants.STORE_TYPE_LOTUS_CODE);
 			}
+			
+			if(storeList != null && storeList.size() >0){
+				for(int i=0;i<storeList.size();i++){
+				//delete old month by yearMonth
+				String sqlDel = "delete from PENSBME_ENDDATE_STOCK_TEMP where store_code ='"+cri.getPensCustCodeFrom()+"'";
+				logger.debug("sqlDel:"+sqlDel);
+				psDel = conn.prepareStatement(sqlDel);
+				psDel.execute();
+				
+				//gen sql
+				sql = ReportEndDateLotusSQL.genSQL(conn, cri, user, "GroupCode","GenReportEndDate");
+				
+				//sql insert 
+				String sqlIns = "INSERT INTO PENSBME_ENDDATE_STOCK_TEMP" +
+						"( STORE_CODE, ENDING_DATE, GROUP_CODE" +
+						", SALE_IN_QTY, SALE_OUT_QTY, SALE_RETURN_QTY" +
+						", ADJUST_QTY, SHORT_QTY, ENDING_QTY" +
+						", CREATE_USER, CREATE_DATE ,Begining_qty) "+
+						"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				psIns = conn.prepareStatement(sqlIns.toString());
+				
+				ps = conn.prepareStatement(sql.toString());
+				rst = ps.executeQuery();
+				while(rst.next()){
+					
+					psIns.setString(1, rst.getString("customer_code"));
+					psIns.setDate(2,new java.sql.Date(asofDate.getTime()));
+					psIns.setString(3, rst.getString("group_type"));
+					psIns.setDouble(4, rst.getDouble("sale_in_qty"));
+					psIns.setDouble(5, rst.getDouble("sale_out_qty"));
+					psIns.setDouble(6, rst.getDouble("sale_return_qty"));
+					psIns.setDouble(7, rst.getDouble("ADJUST_QTY"));
+					psIns.setDouble(8, rst.getDouble("STOCK_SHORT_QTY"));
+					psIns.setDouble(9, rst.getDouble("onhand_qty"));
+					psIns.setString(10, user.getUserName());
+					psIns.setTimestamp(11, new java.sql.Timestamp(new Date().getTime()));
+					psIns.setDouble(12, rst.getDouble("BEGINING_qty"));
+					
+					psIns.executeUpdate();
+				}
+			  }//for
+			}//if
 			result = Constants.STATUS_SUCCESS;
 		
 			monitorItemBean.setStatus(result);

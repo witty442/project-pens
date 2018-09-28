@@ -14,6 +14,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
@@ -22,9 +25,7 @@ import com.isecinc.pens.report.salesanalyst.ProfileProcess;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAGenerate;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 
 /**

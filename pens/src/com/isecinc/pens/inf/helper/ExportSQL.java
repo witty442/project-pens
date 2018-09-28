@@ -84,7 +84,7 @@ public class ExportSQL {
 					"	t.ORA_SHIP_ADDRESS_ID	AS	ORA_SHIP_ADDRESS_ID	,	\n"+
 					"	'"+tableBean.getFileFtpNameFull()+"'	AS	FILE_NAME ,		\n"+
 					"   t.org as ORG ,t.created, t.print_datetime_pick, \n"+
-					"   t.po_number \n"+
+					"   t.po_number ,COALESCE(t.iscash,'N') as iscash \n"+
 					"	FROM t_order t ,m_customer m	\n"+
 					"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
 					"   and  m.user_id = "+userBean.getId()+" \n"+
@@ -238,6 +238,49 @@ public class ExportSQL {
 					"   t.back_avg_month \n"+
 				"	from t_stock t \n"+
 				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') and t.status ='SV' \n";
+			
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_pd_receipt_his")){
+				str ="select \n"+
+					"  'H' AS RECORD_TYPE, \n"+
+					"	t.ORDER_NO  , \n"+
+					"	t.ORDER_DATE ,\n"+
+					"	(SELECT M.CODE FROM m_customer M where M.customer_id = t.customer_id) as CUSTOMER_CODE , \n"+
+					"   t.RECEIPT_AMOUNT,\n"+
+					"   t.PD_PAYMENTMETHOD, \n"+
+					"   t.PDPAID_DATE, \n"+
+					"   t.CREATED, \n"+
+					"   t.CREATED_BY \n"+
+				"	from t_pd_receipt_his t \n"+
+				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n";
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_prod_show")){
+				str ="select \n"+
+					"  'H' AS RECORD_TYPE, \n"+
+					"	t.ORDER_NO  , \n"+
+					"	t.CUSTOMER_NO ,\n"+
+					"	t.DOC_DATE ,\n"+
+					"   t.REMARK, \n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME \n"+
+				"	from t_prod_show t \n"+
+				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n";
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_req_promotion")){
+				str ="select \n"+
+					"  'H' AS RECORD_TYPE, \n"+
+					"  '"+userBean.getId()+"' AS SALESREP_ID, \n"+
+					"	t.REQUEST_NO  , \n"+
+					"	t.REQUEST_DATE ,\n"+
+					"	t.PRODUCT_CATAGORY ,\n"+
+					"   t.PRODUCT_TYPE, \n"+
+					"   t.CUSTOMER_CODE, \n"+
+					"   t.PHONE, \n"+
+					"   t.NAME, \n"+
+					"   t.PROMOTION_START_DATE, \n"+
+					"   t.PROMOTION_END_DATE, \n"+
+					"   t.PRINT_DATE, \n"+
+					"   t.remark, \n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME \n"+
+				"	from t_req_promotion t \n"+
+				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
+				"   and status ='SV' ";
 			}
 			return str;
 		}catch(Exception e){

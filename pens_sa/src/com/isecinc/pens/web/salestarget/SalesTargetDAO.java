@@ -12,10 +12,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
+import util.UserUtils;
+import util.Utils;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class SalesTargetDAO {
 
@@ -606,7 +608,7 @@ public class SalesTargetDAO {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
-			if ( Utils.userInRoleSalesTarget(user,new String[]{User.MKT,User.ADMIN}) ){
+			if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MKT,User.ADMIN}) ){
 				h = saveModelByMKT(conn,h);
 			}
 			conn.commit();

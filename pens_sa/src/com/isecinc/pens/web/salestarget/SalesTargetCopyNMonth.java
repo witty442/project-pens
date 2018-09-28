@@ -11,9 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.pens.process.SequenceProcessAll;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class SalesTargetCopyNMonth {
 

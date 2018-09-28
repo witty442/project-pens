@@ -7,15 +7,15 @@
 	background: #7d7d7d url(../images2/gradient.png) repeat-x 0 -110px;
 	line-height: 100%;
 
-	border-radius: 2em;
-	-webkit-border-radius: 2em;
-	-moz-border-radius: 2em;
+	border-radius: 1em;
+	-webkit-border-radius: 1em;
+	-moz-border-radius: 1em;
 
 	-webkit-box-shadow: 0 1px 3px rgba(0,0,0, .4);
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0, .4);
 }
 #nav li {
-	margin: 0 5px;
+	margin: 0 0;
 	padding: 0 0 8px;
 	float: left;
 	position: relative;
@@ -59,7 +59,7 @@
 	color: #e7e5e5;
 	text-decoration: none;
 	display: block;
-	padding:  8px 15px;
+	padding:  8px 14px;
 	margin: 0;
 
 	-webkit-border-radius: 1.6em;

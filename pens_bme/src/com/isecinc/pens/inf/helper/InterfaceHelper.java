@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
@@ -19,6 +17,9 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
+import com.pens.util.meter.MonitorTime;
 
 public class InterfaceHelper extends InterfaceUtils{
 	
@@ -338,8 +339,8 @@ public class InterfaceHelper extends InterfaceUtils{
 							
 							col.setColumnName(Utils.isNull(p[0]));
 							col.setAction(Utils.isNull(p[1]));
-							col.setTextPosition(ConvertUtils.convertToInt(Utils.isNull(p[2])));
-							col.setTextLength(ConvertUtils.convertToInt(Utils.isNull(p[3])));
+							col.setTextPosition(Utils.convertToInt(Utils.isNull(p[2])));
+							col.setTextLength(Utils.convertToInt(Utils.isNull(p[3])));
 							col.setColumnType(Utils.isNull(p[4]));
 							col.setDefaultValue(Utils.isNull(p[5]));
 							col.setExternalFunction(Utils.isNull(p[6]));
@@ -391,7 +392,7 @@ public class InterfaceHelper extends InterfaceUtils{
 							
 							col.setColumnName(Utils.isNull(p[0]));
 							col.setAction(Utils.isNull(p[1]));
-							col.setTextPosition(ConvertUtils.convertToInt(Utils.isNull(p[2])));
+							col.setTextPosition(Utils.convertToInt(Utils.isNull(p[2])));
 							col.setColumnType(Utils.isNull(p[3]));
 							col.setDefaultValue(Utils.isNull(p[4]));
 							col.setExternalFunction(Utils.isNull(p[5]));
@@ -929,7 +930,7 @@ public class InterfaceHelper extends InterfaceUtils{
 				String num = valueAll.substring(0,colBean.getTextLength()-2);
 				String digit =  valueAll.substring(colBean.getTextLength()-2,colBean.getTextLength());
 				value = num+"."+digit;
-				ps.setDouble(parameterIndex, ConvertUtils.convertToDouble(value));
+				ps.setDouble(parameterIndex, Utils.convertToDouble(value));
 				
 				//ps.setString(parameterIndex, (value));
 			}else{
@@ -946,7 +947,7 @@ public class InterfaceHelper extends InterfaceUtils{
 				String num = valueAll.substring(0,colBean.getTextLength()-4);
 				String digit =  valueAll.substring(colBean.getTextLength()-4,colBean.getTextLength());
 				value = num+"."+digit;
-				ps.setDouble(parameterIndex, ConvertUtils.convertToDouble(value));
+				ps.setDouble(parameterIndex, Utils.convertToDouble(value));
 				
 				//ps.setString(parameterIndex, (value));
 			}else{
@@ -957,7 +958,7 @@ public class InterfaceHelper extends InterfaceUtils{
 			}
 		}else if(colBean.getColumnType().equalsIgnoreCase("INTEGER")){
 			if(!Utils.isNull(value).equals("")){
-				ps.setInt(parameterIndex,ConvertUtils.convertToInt(value));
+				ps.setInt(parameterIndex,Utils.convertToInt(value));
 			}else{
 			    ps.setNull(parameterIndex,java.sql.Types.INTEGER);	
 			}
@@ -970,7 +971,7 @@ public class InterfaceHelper extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("VARCHAR")){
 			if(!Utils.isNull(value).equals("")){
 				//ps.setString(parameterIndex, Utils.ASCIIToUnicode(ConvertUtils.convertToString(value)));
-				ps.setString(parameterIndex, ConvertUtils.convertToString(value));
+				ps.setString(parameterIndex, Utils.isNull(value));
 			}else{
 				if( !Utils.isNull(colBean.getDefaultValue()).equals("")){
 					if (Utils.isNull(colBean.getDefaultValue()).equals(Constants.COLUMN_BLANK)){
@@ -986,7 +987,7 @@ public class InterfaceHelper extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("CHAR")){
 			if(!Utils.isNull(value).equals("")){
 				//ps.setString(parameterIndex, Utils.ASCIIToUnicode(ConvertUtils.convertToString(value)) );
-				ps.setString(parameterIndex, ConvertUtils.convertToString(value));
+				ps.setString(parameterIndex, Utils.isNull(value));
 			}else{
 				
 				if( !Utils.isNull(colBean.getDefaultValue()).equals("")){

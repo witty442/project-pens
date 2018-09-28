@@ -199,7 +199,7 @@ public class MCreditNote extends I_Model<CreditNote> {
 			whereCause += "\n AND CREDIT_NOTE_ID IN(";
 			whereCause += "\n   select credit_note_id from t_receipt_cn where receipt_id = "+receiptId;
 			whereCause += "\n )";
-			logger.debug("whereCause:"+whereCause);
+			//logger.debug("whereCause:"+whereCause);
 			
 			ps = conn.prepareStatement(whereCause);
 		    rs =ps.executeQuery();
@@ -240,6 +240,7 @@ public class MCreditNote extends I_Model<CreditNote> {
 			else 
 				whereCause += "  AND 1=2 ";
 			whereCause += " ORDER BY CREDIT_NOTE_NO ";
+			logger.debug("whereCaluse:"+whereCause);
 			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, CreditNote.class);
 		} catch (Exception e) {
 			e.printStackTrace();

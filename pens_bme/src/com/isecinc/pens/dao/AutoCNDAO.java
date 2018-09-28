@@ -11,17 +11,16 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Constants;
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.LockItemOrderBean;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcessAll;
 
 public class AutoCNDAO extends PickConstants{
 	
@@ -167,7 +166,7 @@ public class AutoCNDAO extends PickConstants{
 			sql.append("\n from (");
             sql.append("\n    select ");
 			sql.append("\n    j.pens_item");
-			sql.append("\n  , M.INVENTORY_ITEM_DESC as item_name,M.INVENTORY_ITEM_ID ");
+			sql.append("\n  , M.description as item_name,M.INVENTORY_ITEM_ID ");
 			sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
 			sql.append("\n    where customer_code = '"+o.getStoreCode()+"' ");
 			sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
@@ -179,15 +178,15 @@ public class AutoCNDAO extends PickConstants{
 			sql.append("\n     and P.pricelist_id ="+priceListId+") as unit_price");*/
 			
 			sql.append("\n  , nvl(count(*),0) as qty");
-		    sql.append("\n   from pensbme_pick_barcode_item j ,XXPENS_BI_MST_ITEM M ");
+		    sql.append("\n   from pensbme_pick_barcode_item j ,xxpens_om_item_mst_v M ");
 		    sql.append("\n   where 1=1 ");
-			sql.append("\n   and M.INVENTORY_ITEM_CODE =j.pens_item  ");
+			sql.append("\n   and M.segment1 =j.pens_item  ");
 			sql.append("\n   and j.status not in('O','AB') ");
 		    //Where Condition
 		    if( !Utils.isNull(o.getJobId()).equals("")){
 		    	 sql.append("\n  and j.job_id="+Utils.isNull(o.getJobId()));
 		    }
-            sql.append("\n    group by  j.pens_item, M.INVENTORY_ITEM_ID,M.INVENTORY_ITEM_DESC ");
+            sql.append("\n    group by  j.pens_item, M.INVENTORY_ITEM_ID,M.description ");
             sql.append("\n    order by j.pens_item");
             sql.append("\n )A ");
             
@@ -233,15 +232,15 @@ public class AutoCNDAO extends PickConstants{
             sql.append("\n  select ");
             sql.append("\n  h.status ,h.intflag as status_interface ");
 			sql.append("\n  ,j.pens_item");
-			sql.append("\n  ,M.INVENTORY_ITEM_DESC as item_name, M.INVENTORY_ITEM_ID ");
+			sql.append("\n  ,M.description as item_name, M.INVENTORY_ITEM_ID ");
 			sql.append("\n  ,j.unit_price");
 			sql.append("\n  ,j.qty");
 			sql.append("\n  ,(j.unit_price*j.qty) as amount");
 		    sql.append("\n  from PENSBME_APPROVE_TO_AUTOCN h, PENSBME_APPROVE_TO_AUTOCN_ITEM j ");
-		    sql.append("\n  ,XXPENS_BI_MST_ITEM M ");
+		    sql.append("\n  ,xxpens_om_item_mst_v M ");
 		    sql.append("\n  where 1=1 ");
 		    sql.append("\n  and h.job_id = j.job_id and h.rtn_no = j.rtn_no ");
-			sql.append("\n  and M.INVENTORY_ITEM_CODE =j.pens_item  ");
+			sql.append("\n  and M.segment1 =j.pens_item  ");
 		    //Where Condition
 		    if( !Utils.isNull(o.getJobId()).equals("")){
 		    	 sql.append("\n  and j.job_id="+Utils.isNull(o.getJobId()));
@@ -364,6 +363,7 @@ public class AutoCNDAO extends PickConstants{
 		    sql.append("\n from pensbme_pick_job j  ");
 		    sql.append("\n where 1=1 ");
 		    sql.append("\n and j.status not in ('O','AB')");
+		    
 		    //Where Condition
 		    sql.append(genWhereSearchJobList(o).toString());
 		   
@@ -678,7 +678,7 @@ public class AutoCNDAO extends PickConstants{
 					itemType ="FridayItem";
 				}
 				sql.append("\n select MS.pens_value as pens_item ");
-				sql.append("\n ,M.INVENTORY_ITEM_DESC as item_name,M.INVENTORY_ITEM_ID ");
+				sql.append("\n ,M.description as item_name,M.INVENTORY_ITEM_ID ");
 				
 				/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 				sql.append("\n    where P.product_id =M.INVENTORY_ITEM_ID " );
@@ -691,9 +691,9 @@ public class AutoCNDAO extends PickConstants{
 				sql.append("\n    and rownum = 1 ) as unit_price");
 				
 				sql.append("\n FROM ");
-				sql.append("\n PENSBI.PENSBME_MST_REFERENCE MS ,PENSBI.XXPENS_BI_MST_ITEM M ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE MS ,PENSBI.xxpens_om_item_mst_v M ");
 	            sql.append("\n where 1=1 ");
-		        sql.append("\n and M.INVENTORY_ITEM_CODE = MS.pens_value ");
+		        sql.append("\n and M.segment1 = MS.pens_value ");
 				sql.append("\n and MS.reference_code ='"+itemType+"' ");
 				
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
@@ -728,7 +728,5 @@ public class AutoCNDAO extends PickConstants{
 			}
 			return b;
 		}
-	  
-	
-	    
+    
 }

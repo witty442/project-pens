@@ -29,10 +29,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
-import util.Constants;
-import util.NumberToolsUtil;
-import util.UploadXLSUtil;
-
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.MasterBean;
@@ -41,11 +37,14 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
+import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
+import com.pens.util.FileUtil;
+import com.pens.util.NumberToolsUtil;
+import com.pens.util.UploadXLSUtil;
+import com.pens.util.Utils;
 
 /**
  * ImportAction Class
@@ -1250,7 +1249,7 @@ public class ImportProcess {
 				fileType = fileName.substring(fileName.indexOf(".")+1,fileName.length());
 				conn = DBConnection.getInstance().getConnection();
 				
-				/** cehck FileName duplicate **/
+				/** check FileName duplicate **/
 				boolean dup = importDAO.importTopsFileNameIsDuplicate(conn, fileName);
 				if(dup){
 					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  Upload ไปแล้ว");
@@ -1789,7 +1788,10 @@ public class ImportProcess {
 				Row row = null;
 				Cell cell = null;
 				String salesDate = importForm.getImportDate();
-				String storeGroup = importForm.getStoreCode().substring(0,importForm.getStoreCode().indexOf("-"));//"020056";
+				String storeGroup = importForm.getStoreCode();//"020056";
+				if(Utils.isNull(importForm.getStoreCode()).indexOf("-") != -1){
+					storeGroup = importForm.getStoreCode().substring(0,importForm.getStoreCode().indexOf("-"));
+			     }
 				String storeNo = importForm.getStoreCode();//"020056-1";
 				//String storeName = "020056-1";
 				String qty = "";
@@ -2425,7 +2427,7 @@ public class ImportProcess {
 		return mapping.findForward("success");
 	}
 	
-	public ActionForward importFromWacoal(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward importOhhandLotusFromWacoal(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("Import :Excel");
 		ImportForm importForm = (ImportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -2434,6 +2436,7 @@ public class ImportProcess {
 		int failCount = 0;
 	    Connection conn = null;
 	    PreparedStatement ps = null;
+	    PreparedStatement psBmeLocked = null;
 	    PreparedStatement psDelete = null;
 	    ImportDAO importDAO = new ImportDAO();
 	    List<ImportSummary> successList = new ArrayList<ImportSummary>();
@@ -2442,14 +2445,12 @@ public class ImportProcess {
 	    boolean importError = false;
 	    boolean lineError = false;
 	    BigDecimal bigZero = new BigDecimal("0");
+		StringBuffer sql = new StringBuffer("");
 		try {
-			
 			String noCheckError = Utils.isNull(request.getParameter("NO_CHECK_ERROR"));
-			 
 			conn = DBConnection.getInstance().getConnection();
-			//conn = new DBCPConnectionProvider().getConnection(conn);
-			
             conn.setAutoCommit(false);
+            
 			FormFile dataFile = importForm.getDataFile();
 			
 			/** Step 1 Validate Name Date of File ,Must more than old import  **/
@@ -2459,7 +2460,6 @@ public class ImportProcess {
 			String lastFileNameImport = importDAO.getLastFileNameImport(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
 				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(9,17),Utils.YYYY_MM_DD_WITHOUT_SLASH);
-				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
 					return mapping.findForward("success");
@@ -2471,12 +2471,10 @@ public class ImportProcess {
 			  logger.debug("contentType: " + dataFile.getContentType());
 			  logger.debug("fileName: " + dataFile.getFileName());
 
-			  
 			  /** Delete All before Import **/
 			  psDelete = conn.prepareStatement("delete from PENSBME_ONHAND_BME");
 			  psDelete.executeUpdate();
 	
-			  StringBuffer sql = new StringBuffer("");
 			  sql.append("INSERT INTO PENSBME_ONHAND_BME( \n");
 			  sql.append(" AS_OF_DATE, MATERIAL_MASTER, BARCODE, \n");
 			  sql.append(" ONHAND_QTY, WHOLE_PRICE_BF, RETAIL_PRICE_BF,  \n");
@@ -2485,9 +2483,18 @@ public class ImportProcess {
 			  
 			  ps = conn.prepareStatement(sql.toString());
 			  
+			  sql = new StringBuffer("");
+			  sql.append("INSERT INTO PENSBME_ONHAND_BME_LOCKED( \n");
+			  sql.append(" AS_OF_DATE, MATERIAL_MASTER, BARCODE, \n");
+			  sql.append(" ONHAND_QTY, WHOLE_PRICE_BF, RETAIL_PRICE_BF,  \n");
+			  sql.append(" ITEM, ITEM_DESC, CREATE_DATE, CREATE_USER,FILE_NAME,GROUP_ITEM,STATUS,MESSAGE,PENS_ITEM) \n");
+			  sql.append(" VALUES( ?,?,?, ?,?,? ,?,?,?,? ,?,?,?,?,?)");
+			  
+			  psBmeLocked = conn.prepareStatement(sql.toString());
+			  
 			  String dataFileStr = FileUtil.readFile2(dataFile.getInputStream(), "tis-620");
 			  //replace '?' in index =0
-			 // dataFileStr = dataFileStr.substring(1,dataFileStr.length());
+			  //dataFileStr = dataFileStr.substring(1,dataFileStr.length());
 			  logger.debug("dataFileStr:"+dataFileStr);
 			  
 	    	  String[] dataStrArray = dataFileStr.split("\n");
@@ -2652,18 +2659,15 @@ public class ImportProcess {
 				        	 //Case QTY =0  no validate item
 				        	 MasterBean mb = importDAO.getMasterBeanByBarcode(conn,Constants.STORE_TYPE_LOTUS_ITEM, barcode);
 					         groupItem = mb!=null?mb.getGroup():"";
-					         
 				         }
 				         
-				        
 				         message = "";
 				         
 				         if(lineError){
 				        	 importError = true;
 				        	 s.setErrorMsgList(errorMsgList);
 				        	 errorList.add(s);
-				        	 
-				        	 
+
 				        	 /** set Message TO Save **/
 				        	 for(int e=0;e<errorMsgList.size();e++){
 				        		 Message me = (Message)errorMsgList.get(e);
@@ -2678,7 +2682,6 @@ public class ImportProcess {
 				         
 				         //Check Status and Message
 				         status = lineError?"ERROR":"SUCCESS";
-				         
 				         
 				         //Line No Error
 				         if(lineError==false || "NO_CHECK_ERROR".equalsIgnoreCase(noCheckError)){
@@ -2701,17 +2704,42 @@ public class ImportProcess {
 					         allCount++;
 					         
 					         ps.executeUpdate();
+					         
+					        // logger.debug("mat["+materialMaster+"]onhandQty["+onhandQtyValid+"]");
+					         
+					         //Case onhandQty ==0 no insert bme_locked
+					         if(onhandQtyValid.compareTo(bigZero) != 0 ){
+						         //Check barcodeExist BMELocked
+						         if( !GeneralDAO.isExistBarcodeInBMELocked(conn, barcode,materialMaster,groupItem,pensItem)){
+						        	 //insert New Barcode BMELOCKED
+						        	 psBmeLocked.setDate(1, new java.sql.Date(fileNameAsOfDate.getTime()));
+						        	 psBmeLocked.setString(2, Utils.isNull(materialMaster));
+						        	 psBmeLocked.setString(3, Utils.isNull(barcode));
+						        	 psBmeLocked.setBigDecimal(4, new BigDecimal("0"));
+						        	 psBmeLocked.setBigDecimal(5, new BigDecimal(wholePriceBF+"."+wholePriceBF2Digit));
+						        	 psBmeLocked.setBigDecimal(6, new BigDecimal(retailPriceBF+"."+retailPriceBF2Digit));
+						        	 psBmeLocked.setString(7, Utils.isNull(item));
+						        	 psBmeLocked.setString(8, Utils.isNull(itemDesc));
+						        	 psBmeLocked.setTimestamp(9, new java.sql.Timestamp(new java.util.Date().getTime()));
+						        	 psBmeLocked.setString(10, user.getUserName());
+						        	 psBmeLocked.setString(11, fileName);
+						        	 psBmeLocked.setString(12, groupItem);
+						        	 psBmeLocked.setString(13, status);
+						        	 psBmeLocked.setString(14, message);
+						        	 psBmeLocked.setString(15, pensItem);
+						        	 
+						        	 psBmeLocked.executeUpdate();
+						         }//if
+					         }//if
 				         }
-				         
 					  }catch(Exception e){
 					     failCount++;
-					     e.printStackTrace();
+					     logger.error(e.getMessage(),e);
 					     importError=true;
 					  }
 		         }//if
 		      }//while
 
-		      
 		     importForm.setSummaryErrorList(errorList);
 			 importForm.setSummarySuccessList(successList);
 			  
@@ -2724,11 +2752,12 @@ public class ImportProcess {
 				 conn.commit();
 			 }else{
 				 if(importError){
-					  request.setAttribute("Message","Upload ไฟล์ "+fileName+" ไม่สำเร็จ กรุณาแก้ไขข้อมูลแล้วทำการ Import ใหม่");
-					  logger.debug("Transaction Rollback");
+					request.setAttribute("Message","Upload ไฟล์ "+fileName+" ไม่สำเร็จ กรุณาแก้ไขข้อมูลแล้วทำการ Import ใหม่");
+					logger.debug("Transaction Rollback");
 					  
-					  if( "".equalsIgnoreCase(noCheckError))
+					   if( "".equalsIgnoreCase(noCheckError)){
 				         conn.rollback();
+					   }
 					}else{
 					   request.setAttribute("Message","Upload ไฟล์ "+fileName+" สำเร็จ");
 					   logger.debug("Transaction Commit");
@@ -2755,7 +2784,7 @@ public class ImportProcess {
 		return mapping.findForward("success");
 	}
 	
-	public ActionForward importFridayFromWacoal(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward importOnhandFridayFromWacoal(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("importFridayFromWacoal :Text");
 		ImportForm importForm = (ImportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -2764,6 +2793,7 @@ public class ImportProcess {
 		int failCount = 0;
 	    Connection conn = null;
 	    PreparedStatement ps = null;
+	    PreparedStatement psBmeLocked = null;
 	    PreparedStatement psDelete = null;
 	    ImportDAO importDAO = new ImportDAO();
 	    List<ImportSummary> successList = new ArrayList<ImportSummary>();
@@ -2773,7 +2803,6 @@ public class ImportProcess {
 	    boolean lineError = false;
 	    BigDecimal bigZero = new BigDecimal("0");
 		try {
-			
 			String noCheckError = Utils.isNull(request.getParameter("NO_CHECK_ERROR"));
 			 
 			conn = DBConnection.getInstance().getConnection();
@@ -2782,7 +2811,6 @@ public class ImportProcess {
 			
 			/** Step 1 Validate Name Date of File ,Must more than old import  **/
 			//FRIDAY_OH_20130923.txt
-			//LOTUS
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(10,18));
 			
@@ -2799,15 +2827,14 @@ public class ImportProcess {
 			}
 			
 			if (dataFile != null) {
-			  
 			  logger.debug("contentType: " + dataFile.getContentType());
 			  logger.debug("fileName: " + dataFile.getFileName());
 
-			  
 			  /** Delete All before Import **/
 			  psDelete = conn.prepareStatement("delete from PENSBME_ONHAND_BME_FRIDAY");
-			  psDelete.executeUpdate();
-	
+			  int d = psDelete.executeUpdate();
+	          logger.debug("delete PENSBME_ONHAND_BME_FRIDAY :"+d);
+			  
 			  StringBuffer sql = new StringBuffer("");
 			  sql.append("INSERT INTO PENSBME_ONHAND_BME_FRIDAY( \n");
 			  sql.append(" AS_OF_DATE, MATERIAL_MASTER, BARCODE, \n");
@@ -2816,6 +2843,15 @@ public class ImportProcess {
 			  sql.append(" VALUES( ?,?,?, ?,?,? ,?,?,?,? ,?,?,?,?,?)");
 			  
 			  ps = conn.prepareStatement(sql.toString());
+			  
+			  sql = new StringBuffer("");
+			  sql.append("INSERT INTO PENSBME_ONHAND_BME_LOCKED_FRI( \n");
+			  sql.append(" AS_OF_DATE, MATERIAL_MASTER, BARCODE, \n");
+			  sql.append(" ONHAND_QTY, WHOLE_PRICE_BF, RETAIL_PRICE_BF,  \n");
+			  sql.append(" ITEM, ITEM_DESC, CREATE_DATE, CREATE_USER,FILE_NAME,GROUP_ITEM,STATUS,MESSAGE,PENS_ITEM) \n");
+			  sql.append(" VALUES( ?,?,?, ?,?,? ,?,?,?,? ,?,?,?,?,?)");
+			  
+			  psBmeLocked = conn.prepareStatement(sql.toString());
 			  
 			  String dataFileStr = FileUtil.readFile2(dataFile.getInputStream(), "tis-620");
 			  //replace '?' in index =0
@@ -3031,6 +3067,33 @@ public class ImportProcess {
 					         allCount++;
 					         
 					         ps.executeUpdate();
+					         
+                             // logger.debug("mat["+materialMaster+"]onhandQty["+onhandQtyValid+"]");
+					         
+					         //Case onhandQty ==0 no insert bme_locked
+					         if(onhandQtyValid.compareTo(bigZero) != 0 ){
+						         //Check barcodeExist BMELocked
+					        	 if( !GeneralDAO.isExistBarcodeInBMELockedFri(conn, barcode,materialMaster,groupItem,pensItem)){
+						        	 //insert New Barcode BMELOCKED
+						        	 psBmeLocked.setDate(1, new java.sql.Date(fileNameAsOfDate.getTime()));
+						        	 psBmeLocked.setString(2, Utils.isNull(materialMaster));
+						        	 psBmeLocked.setString(3, Utils.isNull(barcode));
+						        	 psBmeLocked.setBigDecimal(4, new BigDecimal("0"));
+						        	 psBmeLocked.setBigDecimal(5, new BigDecimal(wholePriceBF+"."+wholePriceBF2Digit));
+						        	 psBmeLocked.setBigDecimal(6, new BigDecimal(retailPriceBF+"."+retailPriceBF2Digit));
+						        	 psBmeLocked.setString(7, Utils.isNull(item));
+						        	 psBmeLocked.setString(8, Utils.isNull(itemDesc));
+						        	 psBmeLocked.setTimestamp(9, new java.sql.Timestamp(new java.util.Date().getTime()));
+						        	 psBmeLocked.setString(10, user.getUserName());
+						        	 psBmeLocked.setString(11, fileName);
+						        	 psBmeLocked.setString(12, groupItem);
+						        	 psBmeLocked.setString(13, status);
+						        	 psBmeLocked.setString(14, message);
+						        	 psBmeLocked.setString(15, pensItem);
+						        	 
+						        	 psBmeLocked.executeUpdate();
+						         }//if
+					         }//if
 				         }
 				         
 					  }catch(Exception e){

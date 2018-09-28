@@ -5,13 +5,9 @@ import java.sql.Connection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import manual.cleardb.ClearDB;
-import manual.cleardb.ClearDupDB;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.hibernate.cfg.Configuration;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -21,6 +17,8 @@ import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
+import com.pens.utils.manual.cleardb.ClearDB;
+import com.pens.utils.manual.cleardb.ClearDupDB;
 
 /**
  * Member Receipt Action
@@ -67,13 +65,12 @@ public class AdminConsoleAction extends I_Action {
 				String configInfoTest ="";
 				
 				EnvProperties env = EnvProperties.getInstance();
-				Configuration hibernateConfig = new Configuration();
-				hibernateConfig.configure();
-		
-				String url = hibernateConfig.getProperty("connection.url");
-				String username = hibernateConfig.getProperty("connection.username");
-				String password = hibernateConfig.getProperty("connection.password");
+				
+				String url = env.getProperty("connection.url");
+				String username = env.getProperty("connection.username");
+				String password = env.getProperty("connection.password");
 				configInfo += "*****Config Type:"+env.getProperty("config.type")+"************************\n";
+				configInfo += "\n Printer LQ300 NAME : EPSON LQ-300+ /II ESC/P 2 (PENS_A5)\n\n";
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
@@ -90,7 +87,7 @@ public class AdminConsoleAction extends I_Action {
 			   if("tab_config_info".equalsIgnoreCase(action)){
 					configInfoTest += "\n ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
 						 try {   
-							 configInfoTest += " \n "+ test.TestALL.testDBCon();
+							 configInfoTest += " \n "+ com.pens.test.TestALL.testDBCon();
 						  } catch(Exception e) {
 							  configInfoTest += " \n error:>> "+e.getMessage();
 						  }
@@ -98,7 +95,7 @@ public class AdminConsoleAction extends I_Action {
 						 
 					configInfoTest += "\n ----------------------  Result Test FTP Connection ------------------------------------------------------------- \n";
 						try {   
-							 configInfoTest += " \n "+ test.TestALL.testFTPCon();
+							 configInfoTest += " \n "+ com.pens.test.TestALL.testFTPCon();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }

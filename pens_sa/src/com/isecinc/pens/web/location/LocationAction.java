@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +15,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.CConstants;
+import util.Utils;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.CConstantsBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 import com.isecinc.pens.web.stock.StockBean;
 import com.isecinc.pens.web.stock.StockConstants;
 import com.isecinc.pens.web.stock.StockForm;
@@ -74,18 +78,72 @@ public class LocationAction extends I_Action {
 			throws Exception {
 		User user = (User) request.getSession().getAttribute("user");
 		LocationForm aForm = (LocationForm) form;
+		String pageName = Utils.isNull(request.getParameter("pageName"));
+		String forwardPage = "";
 		try{
-			if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
-				/** Init Data ***/
-			    LocationInitial.getInstance().initSession(request);
-			    aForm.setBean(new LocationBean());
-			    request.getSession().removeAttribute("CUST_LOC_LIST");
-			    request.getSession().removeAttribute("RESULTS");
-			 }
+			if("".equals(pageName)){
+				pageName = aForm.getPageName();
+			}
+			logger.debug("pageName:"+pageName);
+			if("spider".equalsIgnoreCase(pageName)){
+				if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
+					/** Init Data ***/
+				    LocationInitial.getInstance().initSession(request);
+				    LocationBean bean = new LocationBean();
+				    //default check display
+				    bean.setCustCatNo("C");//VanSale
+				    bean.setDispAllNoOrder("true");
+				    bean.setDispAllOrder("true");
+				    bean.setDispAllVisit("true");
+				    //for test 
+				    /*if(logger.isDebugEnabled()){
+					    bean.setDay("03/07/2561");
+					    bean.setCustCatNo("C");
+					    bean.setSalesChannelNo("2");
+					    bean.setSalesrepCode("100021084");//V201
+				    }*/
+				    aForm.setBean(bean);
+				    aForm.setPageName(pageName);
+				    request.getSession().removeAttribute("CUST_LOC_LIST");
+				    request.getSession().removeAttribute("RESULTS");
+				    
+				    forwardPage="spider";
+				 }
+			}else if("monitorSpider".equalsIgnoreCase(pageName)){
+				logger.debug("action:"+Utils.isNull(request.getParameter("action")));
+				if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
+					
+					/** Init Data ***/
+				    LocationInitial.getInstance().initSessionMonitorSpider(request);
+				    
+				    LocationBean bean =new LocationBean();
+				    bean.setCustCatNo("C");//VanSale
+				    //for test 
+				    /*if(logger.isDebugEnabled()){
+					    bean.setDay("04/07/2561");
+					    bean.setCustCatNo("C");
+					    bean.setSalesChannelNo("2");
+					    bean.setSalesrepCode("100021084");//V201
+					   // bean.setSalesrepCode("100021079");//V101
+				    }*/
+				    aForm.setBean(bean);
+				    aForm.setPageName(pageName);
+				    request.getSession().removeAttribute("CUST_LOC_LIST");
+				    request.getSession().removeAttribute("RESULTS");
+				    /** Clear Session Detail Page */
+					request.getSession().removeAttribute("RESULTS_DETAIL");
+					
+				    forwardPage="monitorSpider";
+				 }else{
+					forwardPage="monitorSpider";
+					/** Clear Session Detail Page */
+					request.getSession().removeAttribute("RESULTS_DETAIL");
+				 }
+			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
-		return "search";
+		return forwardPage;
 	}
 
 	/**
@@ -129,45 +187,69 @@ public class LocationAction extends I_Action {
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		LocationForm aForm = (LocationForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		List<LocationBean> allList = new ArrayList<LocationBean>();
+		String forwardPage = "";
 		try {
-			request.getSession().removeAttribute("CUST_LOC_LIST");
-			request.getSession().removeAttribute("RESULTS");
+			logger.debug("search pageName:"+aForm.getPageName());
 			
-			LocationBean bean = aForm.getBean();
-			
-			if("MAP".equalsIgnoreCase(bean.getDispType())){
-				//search Customer Location
-				if( !Utils.isNull(bean.getDispAllStore()).equals("") ){
-					allList.addAll(LocationDAO.searchCustomerLocationList(bean));
-				}
-				//search Check in Location
-				if(   !"".equalsIgnoreCase(Utils.isNull(bean.getDispAllOrder())) 
-				   || !"".equalsIgnoreCase(Utils.isNull(bean.getDispAllVisit()))){
-					
-				   allList.addAll(LocationDAO.searchCustomerCheckInList(bean));
-				}
-				if(allList != null && allList.size() >0){
-				    request.getSession().setAttribute("CUST_LOC_LIST", allList);
-				}else {
-					request.setAttribute("Message", "ไม่พบข้อมูล");
-				}
-
-			}else if("DATA".equalsIgnoreCase(bean.getDispType())){
+			if("spider".equalsIgnoreCase(aForm.getPageName())){
+				forwardPage ="spider";
+				List<LocationBean> allList = new ArrayList<LocationBean>();
+				request.getSession().removeAttribute("CUST_LOC_LIST");
+				request.getSession().removeAttribute("RESULTS");
+				
+				LocationBean bean = aForm.getBean();
+				if("MAP".equalsIgnoreCase(bean.getDispType())){
+					//search Check in Location 3 Type NoOrder,Order,Visit
+					if(   !"".equalsIgnoreCase(Utils.isNull(bean.getDispAllOrder())) 
+					   || !"".equalsIgnoreCase(Utils.isNull(bean.getDispAllVisit()))
+					   || !"".equalsIgnoreCase(Utils.isNull(bean.getDispAllNoOrder()))){
+						
+					    allList.addAll(LocationDAO.searchCustomerCheckInMapList(bean));
+					    
+					    logger.debug("LocationList Size:"+allList.size());
+					}else{
+						//search Customer Location only 2 Type P,B ,null
+						allList.addAll(LocationDAO.searchCustomerLocationList(bean));
+						
+						logger.debug("LocationList Size:"+allList.size());
+					}
+					if(allList != null && allList.size() >0){
+					    request.getSession().setAttribute("CUST_LOC_LIST", allList);
+					}else {
+						request.setAttribute("Message", "ไม่พบข้อมูล");
+					}
+	
+				}else if("DATA".equalsIgnoreCase(bean.getDispType())){
+					boolean excel = false;
+					StringBuffer html = LocationReport.searchCustomerCheckInDataList(bean,excel);
+					if(html.length() >0){
+				       request.getSession().setAttribute("RESULTS", html);
+					}else{
+					   request.setAttribute("Message", "ไม่พบข้อมูล");
+					}
+				}// oracle
+			}else if("monitorSpider".equalsIgnoreCase(aForm.getPageName())){
+				forwardPage ="monitorSpider";
+				String path = request.getContextPath();
+				
+				//get constants config all by ref_code
+				Map<String, CConstantsBean> constantsMap = (Map<String, CConstantsBean>)request.getSession().getAttribute("CONSTANTS_MAP");
+				
+				LocationBean bean = aForm.getBean();
 				boolean excel = false;
-				StringBuffer html = LocationReport.searchCustomerCheckInList(bean,excel);
+				StringBuffer html = MonitorSpiderReport.searchMonitorReport(path,bean,excel,constantsMap);
 				if(html.length() >0){
 			       request.getSession().setAttribute("RESULTS", html);
 				}else{
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
-			}// oracle
-			
+				
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{}
-		return "search";
+		return forwardPage;
 	}
 	
 	public ActionForward exportReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -177,21 +259,53 @@ public class LocationAction extends I_Action {
 		LocationForm aForm = (LocationForm) form;
 		StringBuffer resultHtmlTable = null;
 		String pageName = aForm.getPageName();
-		try {
-			boolean excel = true;
-			resultHtmlTable = LocationReport.searchCustomerCheckInList(aForm.getBean(),excel);
-		    			
-			java.io.OutputStream out = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment; filename=data.xls");
-			response.setContentType("application/vnd.ms-excel");
-			
-			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
-			w.write(resultHtmlTable.toString());
-		    w.flush();
-		    w.close();
-
-		    out.flush();
-		    out.close();
+		try {	
+			if("spider".equalsIgnoreCase(aForm.getPageName())){
+				boolean excel = true;
+				resultHtmlTable = LocationReport.searchCustomerCheckInDataList(aForm.getBean(),excel);
+			    			
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(resultHtmlTable.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+			    
+			}else if("monitorSpider".equalsIgnoreCase(aForm.getPageName())){
+				boolean excel = true;
+                String path = request.getContextPath();
+				LocationBean bean = aForm.getBean();
+				
+				//get constants config all by ref_code
+				Map<String, CConstantsBean> constantsMap = (Map<String, CConstantsBean>)request.getSession().getAttribute("CONSTANTS_MAP");
+				if(request.getSession().getAttribute("RESULTS") != null){
+					resultHtmlTable = (StringBuffer)request.getSession().getAttribute("RESULTS");
+				}else{
+				    resultHtmlTable = MonitorSpiderReport.searchMonitorReport(path,bean,excel,constantsMap);
+				}
+				if(resultHtmlTable.length() >0){
+			       request.getSession().setAttribute("RESULTS", resultHtmlTable);
+				}else{
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				}
+			    			
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(resultHtmlTable.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -201,6 +315,67 @@ public class LocationAction extends I_Action {
 		}
 		return null;
 	}
+	
+	public ActionForward viewDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.debug("viewDetail : ");
+		LocationForm aForm = (LocationForm) form;
+		StringBuffer result= null;
+		try {	
+			String detailType = Utils.isNull(request.getParameter("detailType"));
+			String salesrepId = Utils.isNull(request.getParameter("salesrepId"));
+			String tripDate = Utils.isNull(request.getParameter("tripDate"));
+			logger.debug("detailType:"+detailType);
+			aForm.setDetailType(detailType);
+			
+			//Criteria Link
+			LocationBean bean = new LocationBean();
+			bean.setSalesrepCode(salesrepId);
+			bean.setDay(tripDate);
+			
+			//Criteria from Screen Search
+			bean.setCustCatNo(aForm.getBean().getCustCatNo());
+			bean.setSalesChannelNo(aForm.getBean().getSalesChannelNo());
+			bean.setProvince(aForm.getBean().getProvince());
+			bean.setDistrict(aForm.getBean().getDistrict());
+			bean.setCustomerCode(aForm.getBean().getCustomerCode());
+			bean.setCustomerType(aForm.getBean().getCustomerType());
+			
+			if("CustNotEqualTrip".equalsIgnoreCase(detailType)){
+				result = MonitorSpiderReport.searchCustNoEqualsTrip(bean, false);
+				logger.debug("result size:"+result.length());
+				if(result.length()>0){
+					request.getSession().setAttribute("RESULTS_DETAIL", result);
+				}else{
+					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
+				}
+			}else if("CustNotEqualMasLocation".equalsIgnoreCase(detailType)){
+				result = MonitorSpiderReport.searchCustNotEqualMstLocDetail(bean, false);
+				//logger.debug("result size:"+result.length());
+				if(result.length()>0){
+					request.getSession().setAttribute("RESULTS_DETAIL", result);
+				}else{
+					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
+				}
+			}else if("CustDetail".equalsIgnoreCase(detailType)){
+				result = MonitorSpiderReport.searchCustDetail(bean, false);
+				//logger.debug("result size:"+result.length());
+				if(result.length()>0){
+					request.getSession().setAttribute("RESULTS_DETAIL", result);
+				}else{
+					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				// conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("monitorSpiderDetail");
+	}
+	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

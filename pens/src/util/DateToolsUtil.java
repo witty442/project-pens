@@ -36,6 +36,12 @@ public class DateToolsUtil {
 
 		return stroutput;
 	}
+	
+	public static String getDayOfDate(Date date) throws Exception {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		return String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+	}
 
 	public static String getToday(Connection con, int len, int format) throws Exception {
 		String stroutput = "";

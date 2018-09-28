@@ -42,7 +42,7 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY

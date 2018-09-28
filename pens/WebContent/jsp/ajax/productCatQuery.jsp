@@ -21,45 +21,41 @@ int totalRecord =0;
 int totalPage = 0;
 Basket basket = null;
 try{
-	    conn = DBConnection.getInstance().getConnection();
-		User user = ((User)session.getAttribute("user"));
-		String pageId_param = request.getParameter("pageId");
-		
-		String custId = request.getParameter("custId");
-		boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
-		System.out.println("isCustHaveProductSpecial:"+isCustHaveProductSpecial);
-		
-		basket = (Basket)session.getAttribute(custId);
-		if(basket == null ){
-			basket = new Basket();	
-		}
-		
-		if(StringUtils.isEmpty(pageId_param))
-			pageId_param = "0";
-		
-		pageId = Integer.valueOf(pageId_param);
-		
-		MProductCategory mProductCat = new MProductCategory();
-		 productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
-		
-		 no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
-		 no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
-		 no_of_total_display = no_of_column * no_of_rows;
-		
-		 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
-		
-		// totalPage = totalRecord/(no_of_column * no_of_rows);
-		   totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
-}catch(Exception e){
-	e.printStackTrace();
-}finally{ 
-	if(conn != null){
-		conn.close();
+    conn = DBConnection.getInstance().getConnection();
+	User user = ((User)session.getAttribute("user"));
+	String pageId_param = request.getParameter("pageId");
+	
+	String custId = request.getParameter("custId");
+	boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
+	System.out.println("isCustHaveProductSpecial:"+isCustHaveProductSpecial);
+	
+	basket = (Basket)session.getAttribute(custId);
+	if(basket == null ){
+		basket = new Basket();	
 	}
-}
+	
+	if(StringUtils.isEmpty(pageId_param))
+		pageId_param = "0";
+	
+	pageId = Integer.valueOf(pageId_param);
+	
+	MProductCategory mProductCat = new MProductCategory();
+	 productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
+	
+	 no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
+	 no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
+	 no_of_total_display = no_of_column * no_of_rows;
+	
+	 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
+	
+	// totalPage = totalRecord/(no_of_column * no_of_rows);
+	   totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
+	   
+	//List All Brand
+	List<References> brandAllList = mProductCat.lookUpBrandAllListNew(user);
 
-/// Find Total Page
-//System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
+    /// Find Total Page
+   //System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
 
 if(productCatL != null && productCatL.size() > 0){
 %>
@@ -81,6 +77,19 @@ if(productCatL != null && productCatL.size() > 0){
 
 	}//for
 %> 
+&nbsp;&nbsp;&nbsp;&nbsp;
+<font size="3">
+	Brand List :<select onchange="loadProductsByBrand(this)" id="brandSelect">
+	 <option value="">กรุณาเลือก Brand</option>
+	  <%if(brandAllList != null && brandAllList.size() >0) { 
+	     for(int r=0;r<brandAllList.size();r++){
+	    	 References brandRef = brandAllList.get(r);
+	    	// System.out.println("brandCode:"+brandRef.getCode());
+	  %>
+	     <option value="<%=brandRef.getCode()%>"><%=brandRef.getCode()+"-"+brandRef.getName()%></option>
+	  <%} }%>
+	</select>
+</font>
 </td>
 </tr>
 <% 	int idx = 0; 
@@ -116,7 +125,18 @@ if(productCatL != null && productCatL.size() > 0){
 <span id="msg" class="errormsg">
 No Record Found!
 </span>
-<% } %>
+<%
+   } 
+
+}catch(Exception e){
+	e.printStackTrace();
+}finally{ 
+	if(conn != null){
+		conn.close();
+	}
+}
+
+%>
 <script>
 function imgError(source){
     source.src = '${pageContext.request.contextPath}/images/img_not_found.jpg';

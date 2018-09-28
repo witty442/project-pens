@@ -14,6 +14,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -74,8 +75,14 @@ public class SearchProductPopupAction extends I_Action {
 		PopupForm popupForm = (PopupForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		SummaryDAO dao = new SummaryDAO();
+		List<PopupForm> results = null;
 		try {
-			 List<PopupForm> results = dao.searchProductFromORCL(popupForm);
+			 String storeType = Utils.isNull(request.getParameter("storeType"));
+			 if("tops".equalsIgnoreCase(storeType)){
+				 results = dao.searchProductTops(popupForm);
+			 }else{
+			     results = dao.searchProductFromORCL(popupForm);
+			 }
 			 if(results != null && results.size() >0){
 				 request.setAttribute("PRODUCT_LIST", results);
 			 }else{

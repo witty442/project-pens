@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.pens.util.FileUtil;
+
 /**
  * @author WITTY
  *
@@ -28,7 +30,7 @@ public final class EnvProperties extends Properties{
 	private static final int END_VAR_PATTERN_CHAR_COUNT = 1;
 	private static final Pattern pat = Pattern.compile(VAR_PATTERN);
 	private static final String propName ="inf-config/inf-env.properties";
-
+    
 	private EnvProperties() throws IOException {
 		reload();
 	}
@@ -70,8 +72,9 @@ public final class EnvProperties extends Properties{
 	 */
 	public static synchronized EnvProperties getInstance() {
 		try {
-			if(_instance == null)
+			if(_instance == null){
 				_instance = new EnvProperties();
+			}
 		}catch(IOException e) {
 			logger.error("Cannot load properties file");
 			e.printStackTrace();
@@ -98,7 +101,6 @@ public final class EnvProperties extends Properties{
 		}
 	}
 	  
-	
 	public static void main(String[] argv) {
 		String value= EnvProperties.getInstance().getProperty("DB2.SCHEMA");
 		System.out.println(value);

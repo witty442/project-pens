@@ -12,7 +12,7 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css" type="text/css">
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <script language="javascript">
 	function downloadLog(){
 		//alert("cc:"+document.form1.fileName.value);

@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.AppversionVerify;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.SessionGen;
@@ -21,8 +20,6 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.batchwork.DownloadSalesAppWorker;
-import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
 
@@ -94,8 +91,9 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("massageToSales",null);
 			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
-			//start BathWork init AppVerify
-			//AppversionVerify.getIns().checkAppVersion(request);
+		
+			// Start init Appversion Versity
+			//new AppversionVerifyWorker().start();
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());

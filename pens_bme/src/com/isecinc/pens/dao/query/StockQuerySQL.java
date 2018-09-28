@@ -2,7 +2,7 @@ package com.isecinc.pens.dao.query;
 
 import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class StockQuerySQL extends PickConstants{
 

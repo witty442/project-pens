@@ -19,8 +19,8 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.imports.process.ImportLoadStockInitProcess;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * ImportAction Class
@@ -152,6 +152,7 @@ public class ImportAction extends I_Action {
 		ImportProcess process = new ImportProcess();
 		
         if("lotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	
         	return process.importFromLotus(mapping, importForm, request, response);
         }else  if("tops".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
@@ -177,10 +178,10 @@ public class ImportAction extends I_Action {
             return process.importReturnWacoal(mapping, importForm, request, response);    
             
         }else if("onhandLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
-        	return process.importFromWacoal(mapping, importForm, request, response);
+        	return process.importOhhandLotusFromWacoal(mapping, importForm, request, response);
         	
         }else if("onhandFriday".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
-        	return process.importFridayFromWacoal(mapping, importForm, request, response);
+        	return process.importOnhandFridayFromWacoal(mapping, importForm, request, response);
         	
         }else if("onhandTVDirect".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	return process.importFridayFromTVDirect(mapping, importForm, request, response);

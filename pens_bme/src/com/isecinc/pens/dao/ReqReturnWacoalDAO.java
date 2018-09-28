@@ -13,10 +13,12 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ReqReturnWacoal;
+import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.isecinc.pens.web.pick.ReqReturnWacoalAction;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class ReqReturnWacoalDAO extends PickConstants{
 
@@ -35,50 +37,55 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			e.printStackTrace();
 		}
 	}
-	public static List<ReqReturnWacoal> searchHead(ReqReturnWacoal o,boolean getItems ) throws Exception {
+	
+	public static int searchTotalRecHead(Connection conn ,ReqReturnWacoal o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
+		int totalRec = 1;
+		try {
+			sql.append("\n select count(*) as c from PENSBI.PENSBME_PICK_REQ_RETURN i \n");
+			sql.append("\n where 1=1   \n");
+            //Add Criteria
+			sql.append(genWhereSqlSearchHead(o));
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()) {
+			   totalRec = rst.getInt("c");
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	
+	public static List<ReqReturnWacoal> searchHead(Connection conn,ReqReturnWacoal o,boolean getItems ,boolean allRec ,int currPage,int pageSize) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
 		ReqReturnWacoal h = null;
 		List<ReqReturnWacoal> items = new ArrayList<ReqReturnWacoal>();
 		int r = 1;
 		int c = 1;
 		try {
-
 			sql.append("\n select i.* from PENSBI.PENSBME_PICK_REQ_RETURN i \n");
 			sql.append("\n where 1=1   \n");
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				sql.append("\n and i.REQUEST_DATE = ? ");
-			}
-			
-			if( !Utils.isNull(o.getStatus()).equals("")){
-				sql.append("\n and i.request_status = '"+Utils.isNull(o.getStatus())+"'");
-			}
-			
-			if( !Utils.isNull(o.getRequestNo()).equals("")){
-				sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
-			}
-			
+            //Add Criteria
+			sql.append(genWhereSqlSearchHead(o));
 			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
-			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
-			}
-			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
 				   h = new ReqReturnWacoal();
 				   h.setNo(r);
 				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("request_status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("request_status")))); 
@@ -100,22 +107,33 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				
 			   items.add(h);
 			   r++;
-			   
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return items;
 	}
 	
-	
+	public static StringBuffer genWhereSqlSearchHead(ReqReturnWacoal o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		if( !Utils.isNull(o.getStatus()).equals("")){
+			sql.append("\n and i.request_status = '"+Utils.isNull(o.getStatus())+"'");
+		}
+		if( !Utils.isNull(o.getRequestNo()).equals("")){
+			sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+		}
+		if( !Utils.isNull(o.getRequestDate()).equals("")){
+			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n and i.REQUEST_DATE = to_date('"+tDateStr+"','dd/mm/yyyy')");
+		}
+		return sql;
+	}
 	public static List<ReqReturnWacoal> searchItem(Connection conn,ReqReturnWacoal o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -293,7 +311,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				}
 			}else{
 				//update status barcode to close (old status)
-				List<ReqReturnWacoal> saveData = ReqReturnWacoalDAO.searchHead(h,true);
+				List<ReqReturnWacoal> saveData = ReqReturnWacoalDAO.searchHead(conn,h,true,false,1,ReqReturnWacoalAction.pageSize);
 				if(saveData != null && saveData.size()>0){
 				   ReqReturnWacoal oldReq = (ReqReturnWacoal)saveData.get(0);
 				   for(int i=0;i<oldReq.getItems().size();i++){
@@ -341,7 +359,6 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				   }
 				}
 			}
-			
 			conn.commit();
 		}catch(Exception e){
 		  conn.rollback();

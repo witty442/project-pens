@@ -5,29 +5,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
-import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
-import com.isecinc.pens.bean.MoveOrderLine;
-import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.Summary;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.modifier.ModifierControl;
-import com.isecinc.pens.process.order.OrderProcess;
-import com.isecinc.pens.report.invoicedetail.InvoiceDetailReport;
-import com.isecinc.pens.web.summary.SummaryForm;
 
 public class MSummary {
 
@@ -65,7 +55,6 @@ public class MSummary {
 	    	List<Summary> summaryList = new ArrayList<Summary>();
 	    	List<OrderLine> orderLines = new ArrayList<OrderLine>();
 	    	Connection conn = null;
-	    	
 	    	try{
 	    		conn = new DBCPConnectionProvider().getConnection(conn);
 	    		codeControl = getMethodCalcTargetControl(conn);

@@ -32,7 +32,11 @@ function toCreateNewOrder(path,type,id){
 	document.customerForm.submit();
 	return true;
 }
-
+function toCreateNewOrderSpecial(path,type,id){
+	document.customerForm.action = path + "/jsp/saleOrderSpecialAction.do?do=prepare&shotcut_customerId=" + id+"&action="+type;
+	document.customerForm.submit();
+	return true;
+}
 function toCreateNewReceipt(path,type,id){
 	document.customerForm.action = path + "/jsp/receiptAction.do?do=prepare&shotcut_customerId=" + id+"&action="+type;
 	document.customerForm.submit();

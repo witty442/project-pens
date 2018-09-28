@@ -48,6 +48,9 @@
 		<!-- SALES ORDER -->
 		<form-bean name="orderForm" type="com.isecinc.pens.web.sales.OrderForm" />
 		
+		<!-- SALES Special  ORDER -->
+		<form-bean name="orderSpecialForm" type="com.isecinc.pens.web.salesspecial.OrderSpecialForm" />
+		
 		<!-- TRIP -->
 		<form-bean name="tripForm" type="com.isecinc.pens.web.trip.TripForm" />
 		
@@ -187,6 +190,7 @@
 		<!-- Stock Form -->
 		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
 		<form-bean name="clearInvoiceForm" type="com.isecinc.pens.web.clearinvoice.ClearInvoiceForm" />
+		<form-bean name="prodShowForm" type="com.isecinc.pens.web.prodshow.ProdShowForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -359,6 +363,25 @@
 			<forward name="cancelOrderPopup" path="/jsp/pop/cancelOrderPopup.jsp" />
 			<forward name="print" path="/jsp/pop/printPopup.jsp" />
 			<forward name="print2" path="/jsp/pop/print2Popup.jsp" />
+		</action>
+		
+		<!-- SALES SPECIAL ORDER -->
+		<action name="orderSpecialForm" path="/jsp/saleOrderSpecial" forward="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
+		<action name="orderSpecialForm" path="/jsp/saleOrderSpecialAction" parameter="do"
+			scope="request" type="com.isecinc.pens.web.salesspecial.OrderSpecialAction">
+			<forward name="search" path="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
+			<forward name="prepare" path="/jsp/salesspecial/salesSpecialOrder.jsp" />
+			<forward name="prepareEditOrder" path="/jsp/salesspecial/salesSpecialOrder.jsp" />
+			<forward name="prepareEditReceipt" path="/jsp/salesspecial/salesSpecialOrderView.jsp" />
+			<forward name="re-search" path="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
+			<forward name="clearform" path="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
+			<forward name="view" path="/jsp/salesspecial/salesSpecialOrderView.jsp" />
+			<forward name="pre-save" path="/jsp/salesspecial/salesSpecialOrderPreview.jsp" />
+			<forward name="viewPopup" path="/jsp/salesspecial/salesSpecialOrderViewPopup.jsp" />
+			
+			<forward name="cancelOrderPopup" path="/jsp/salesspecial/pop/cancelOrderPopup.jsp" />
+			<forward name="print" path="/jsp/salesspecial/pop/printPopup.jsp" />
+			<forward name="print2" path="/jsp/salesspecial/pop/print2Popup.jsp" />
 		</action>
 
 		<!-- TRIP -->
@@ -746,6 +769,10 @@
 			<forward name="search" path="/jsp/clearInvoice/clearInvoice.jsp" />
 			<forward name="prepare" path="/jsp/clearInvoice/clearInvoice.jsp" />
 			<forward name="clear" path="/jsp/clearInvoice/clearInvoice.jsp" />
+		</action>
+		<!-- Prod Show -->
+		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction" >
+			<forward name="prepare" path="/jsp/prodshow/prodShow.jsp" />
 		</action>
 	</action-mappings>
 

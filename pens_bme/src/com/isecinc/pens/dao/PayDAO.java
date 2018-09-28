@@ -12,27 +12,26 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.BahtText;
-
 import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.BahtText;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class PayDAO {
 
 	 private static Logger logger = Logger.getLogger("PENS");
 
-	 public static PayBean searchHead(Connection conn,PayBean o,boolean getTrans ) throws Exception {
-		  return searchHeadModel(conn, o,getTrans);
+	 public static PayBean searchHead(Connection conn,PayBean o,boolean getTrans ,boolean allRec ,int currPage,int pageSize) throws Exception {
+		 return searchHeadModel(conn, o,getTrans,allRec,currPage,pageSize);
 		}
 	   
-	   public static PayBean searchHead(PayBean o ,boolean getTrans) throws Exception {
+	   public static PayBean searchHead(PayBean o ,boolean getTrans,boolean allRec ,int currPage,int pageSize) throws Exception {
 		   Connection conn = null;
 		   try{
 			  conn = DBConnection.getInstance().getConnection();
-			  return searchHeadModel(conn, o,getTrans);
+			  return searchHeadModel(conn, o,getTrans,allRec,currPage,pageSize);
 		   }catch(Exception e){
 			   throw e;
 		   }finally{
@@ -40,21 +39,19 @@ public class PayDAO {
 		   }
 		}
 	   
-		public static PayBean searchHeadModel(Connection conn,PayBean o ,boolean getTrans) throws Exception {
-				PreparedStatement ps = null;
-				ResultSet rst = null;
-				StringBuilder sql = new StringBuilder();
-				PayBean h = null;
-				List<PayBean> items = new ArrayList<PayBean>();
-				int r = 1;
-				Date dateFrom=null;
-				Date dateTo = null;
-				try {
+		public static int searchTotalHead(Connection conn,PayBean o ) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			int totalRec = 0;
+			Date dateFrom=null;
+			Date dateTo = null;
+			try {
+				sql.append("\n select count(*) as c from(");
 				   sql.append("\n select h.* ");
 				   sql.append("\n ,(select d.dept_name from doc_department d where d.dept_id =h.dept_id) as dept_name ");
 				   sql.append("\n ,(select d.section_name from doc_section d where d.dept_id =h.dept_id and d.section_id = h.section_id) as section_name ");
 				   sql.append("\n from doc_tran h where 1=1 ");
-				   
 					if( !Utils.isNull(o.getCreateUser()).equals("")){
 						sql.append("\n and h.create_user = '"+Utils.isNull(o.getCreateUser())+"'");
 					}
@@ -69,88 +66,148 @@ public class PayDAO {
 					   dateTo  = Utils.parse(o.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}
 					sql.append("\n order by h.doc_no desc ");
-					logger.debug("sql:"+sql);
-					ps = conn.prepareStatement(sql.toString());
-					
+	            sql.append("\n   )A ");
+				logger.debug("sql:"+sql);
+				ps = conn.prepareStatement(sql.toString());
+				
+				if( !Utils.isNull(o.getDateFrom()).equals("") && !Utils.isNull(o.getDateTo()).equals("")){
+					ps.setDate(1, new java.sql.Date(dateFrom.getTime()));
+					ps.setDate(2, new java.sql.Date(dateTo.getTime()));
+				}
+				rst = ps.executeQuery();
+				if(rst.next()) {
+					totalRec = rst.getInt("c");
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+			return totalRec;
+		}
+		
+		public static PayBean searchHeadModel(Connection conn,PayBean o ,boolean getTrans,boolean allRec ,int currPage,int pageSize) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			PayBean h = null;
+			List<PayBean> items = new ArrayList<PayBean>();
+			int r = 1;
+			Date dateFrom=null;
+			Date dateTo = null;
+			try {
+				sql.append("\n select M.* from (");
+				sql.append("\n select A.* ,rownum as r__ from (");
+				   sql.append("\n select h.* ");
+				   sql.append("\n ,(select d.dept_name from doc_department d where d.dept_id =h.dept_id) as dept_name ");
+				   sql.append("\n ,(select d.section_name from doc_section d where d.dept_id =h.dept_id and d.section_id = h.section_id) as section_name ");
+				   sql.append("\n from doc_tran h where 1=1 ");
+					if( !Utils.isNull(o.getCreateUser()).equals("")){
+						sql.append("\n and h.create_user = '"+Utils.isNull(o.getCreateUser())+"'");
+					}
+					if( !Utils.isNull(o.getDocNo()).equals("")){
+						sql.append("\n and h.doc_no = '"+Utils.isNull(o.getDocNo())+"'");
+					}
 					if( !Utils.isNull(o.getDateFrom()).equals("") && !Utils.isNull(o.getDateTo()).equals("")){
-						ps.setDate(1, new java.sql.Date(dateFrom.getTime()));
-						ps.setDate(2, new java.sql.Date(dateTo.getTime()));
+						sql.append("\n and h.doc_date >= ?");
+						sql.append("\n and h.doc_date <= ?");
+						
+					   dateFrom  = Utils.parse(o.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   dateTo  = Utils.parse(o.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					}
+					sql.append("\n order by h.doc_no desc ");
+	            sql.append("\n   )A ");
+	            
+	        	// get record start to end 
+	            if( !allRec){
+	        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+	            } 
+		        sql.append("\n )M  ");
+		        if( !allRec){
+					sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+				}
+				logger.debug("sql:"+sql);
+				ps = conn.prepareStatement(sql.toString());
+				
+				if( !Utils.isNull(o.getDateFrom()).equals("") && !Utils.isNull(o.getDateTo()).equals("")){
+					ps.setDate(1, new java.sql.Date(dateFrom.getTime()));
+					ps.setDate(2, new java.sql.Date(dateTo.getTime()));
+				}
+				
+				rst = ps.executeQuery();
+				while(rst.next()) {
+				   h = new PayBean();
+				   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
+				   h.setDocDate(Utils.stringValue(rst.getDate("doc_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setPayToName(Utils.isNull(rst.getString("pay_to_name")));
+				   h.setDeptId(Utils.isNull(rst.getString("dept_id")));
+				   h.setDeptName(Utils.isNull(rst.getString("dept_name")));
+				   h.setSectionId(Utils.isNull(rst.getString("section_id")));
+				   h.setSectionName(Utils.isNull(rst.getString("section_name")));
+				   h.setStatus(Utils.isNull(rst.getString("status")));
+				   h.setPaymethod(Utils.isNull(rst.getString("pay_method")));
+				   h.setDR_AC_NO(Utils.isNull(rst.getString("DR_AC_NO")));
+				   h.setDR_DESC(Utils.isNull(rst.getString("DR_DESC")));
+					if( Utils.isNull(h.getPaymethod()).equals("C")){
+						h.setCashFlag("on");
 					}
 					
-					rst = ps.executeQuery();
-					while(rst.next()) {
-					   h = new PayBean();
-					   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
-					   h.setDocDate(Utils.stringValue(rst.getDate("doc_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					   h.setPayToName(Utils.isNull(rst.getString("pay_to_name")));
-					   h.setDeptId(Utils.isNull(rst.getString("dept_id")));
-					   h.setDeptName(Utils.isNull(rst.getString("dept_name")));
-					   h.setSectionId(Utils.isNull(rst.getString("section_id")));
-					   h.setSectionName(Utils.isNull(rst.getString("section_name")));
-					   h.setStatus(Utils.isNull(rst.getString("status")));
-					   h.setPaymethod(Utils.isNull(rst.getString("pay_method")));
-					   
-					   h.setDR_AC_NO(Utils.isNull(rst.getString("DR_AC_NO")));
-					   h.setDR_DESC(Utils.isNull(rst.getString("DR_DESC")));
-
-						if( Utils.isNull(h.getPaymethod()).equals("C")){
-							h.setCashFlag("on");
-						}
-						
-						if( Utils.isNull(h.getPaymethod()).equals("CH")){
-							h.setChequeFlag("on");
-						}
-						
-					   if(rst.getDouble("DR_AMOUNT") !=0.00){
-					     h.setDR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_AMOUNT"))));
-					   }
-					   
-					   if(rst.getDouble("DR_INPUT_TAX_AMOUNT") !=0.00){
-					      h.setDR_INPUT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_INPUT_TAX_AMOUNT"))));
-					   }
-					   if(rst.getDouble("DR_TOTAL") !=0.00){
-					      h.setDR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_TOTAL"))));
-					   }
-					   
-					   h.setCR_AC_NO(Utils.isNull(rst.getString("CR_AC_NO")));
-					   h.setCR_DESC(Utils.isNull(rst.getString("CR_DESC")));
-					   if(rst.getDouble("CR_AMOUNT") !=0.00){
-					      h.setCR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_AMOUNT"))));
-					   }
-					   if(rst.getDouble("CR_ACC_WT_TAX_AMOUNT") !=0.00){
-					      h.setCR_ACC_WT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_ACC_WT_TAX_AMOUNT"))));
-					   }
-					   if(rst.getDouble("CR_TOTAL") !=0.00){
-					      h.setCR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_TOTAL"))));
-					   }
-					   h.setCanPrint(true);
-					  
-		               //get Trans head
-		               if(getTrans){
-		            	   PayBean itemBean = searchTranDetailList(conn, h);
-		       
-		            	   h.setTotalAmount(Utils.convertToCurrencyStr(itemBean.getTotalAmountDouble()));
-						   h.setTotalAmountLetter(new BahtText(itemBean.getTotalAmountDouble()).toString());
-		            	   h.setItems(itemBean.getItems());
-		               }
-		               
-					   items.add(h);
-					   r++;
-					}//while
+					if( Utils.isNull(h.getPaymethod()).equals("CH")){
+						h.setChequeFlag("on");
+					}
 					
-					//set Result 
-					o.setItems(items);
-				} catch (Exception e) {
-					throw e;
-				} finally {
-					try {
-						rst.close();
-						ps.close();
-					} catch (Exception e) {}
-				}
-			return o;
-		}
-	
+				   if(rst.getDouble("DR_AMOUNT") !=0.00){
+				     h.setDR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_AMOUNT"))));
+				   }
+				   
+				   if(rst.getDouble("DR_INPUT_TAX_AMOUNT") !=0.00){
+				      h.setDR_INPUT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_INPUT_TAX_AMOUNT"))));
+				   }
+				   if(rst.getDouble("DR_TOTAL") !=0.00){
+				      h.setDR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("DR_TOTAL"))));
+				   }
+				   
+				   h.setCR_AC_NO(Utils.isNull(rst.getString("CR_AC_NO")));
+				   h.setCR_DESC(Utils.isNull(rst.getString("CR_DESC")));
+				   if(rst.getDouble("CR_AMOUNT") !=0.00){
+				      h.setCR_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_AMOUNT"))));
+				   }
+				   if(rst.getDouble("CR_ACC_WT_TAX_AMOUNT") !=0.00){
+				      h.setCR_ACC_WT_TAX_AMOUNT(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_ACC_WT_TAX_AMOUNT"))));
+				   }
+				   if(rst.getDouble("CR_TOTAL") !=0.00){
+				      h.setCR_TOTAL(Utils.convertToCurrencyStr(Utils.isNull(rst.getString("CR_TOTAL"))));
+				   }
+				   h.setCanPrint(true);
+				  
+	               //get Trans head
+	               if(getTrans){
+	            	   PayBean itemBean = searchTranDetailList(conn, h);
+	       
+	            	   h.setTotalAmount(Utils.convertToCurrencyStr(itemBean.getTotalAmountDouble()));
+					   h.setTotalAmountLetter(new BahtText(itemBean.getTotalAmountDouble()).toString());
+	            	   h.setItems(itemBean.getItems());
+	               }
+	               
+				   items.add(h);
+				   r++;
+				}//while
+				
+				//set Result 
+				o.setItems(items);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+		return o;
+	}
 	public static PayBean searchTranDetailList(Connection conn,PayBean o) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;

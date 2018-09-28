@@ -21,19 +21,22 @@ public class ExternalProcess {
 		  logger.info("--- Import Before Process Start ---");
 		   
 		  //RunScript From FTP Server Folder :Manual-script
-		  logger.info("--- 1.Run Script import_before ---");
+		  logger.info("--- 1.Start Run Script import_before ---");
 		  RunScriptDBAction.runManualScriptProcess("import_before",userLogin);
+		  logger.info("--- 1.End Run Script import_before ---");
 	}
 	
 	public void processImportAfter(HttpServletRequest request,User userLogin){
 		  logger.info("--- After importProcess Start ---");
 		  
-		  logger.info("--- 1.Run Script import_after ---");
-		  RunScriptDBAction.runManualScriptProcess("import_after",userLogin);	
-		  
+		  logger.info("--- 1.Start Run Script import_after ---");
+		  RunScriptDBAction.runManualScriptProcess("import_after",userLogin);
+		  logger.info("--- 1.End Run Script import_after ---");
+		 
 		  //Get AppVersion and MessageToSales
-		  logger.info("--- 2.Run processAfterImport ---");
+		  logger.info("--- 2.Start Run processAfterImport ---");
 		  AppversionVerify.processAfterImport(userLogin);
+		  logger.info("--- 2.End Run processAfterImport ---");
 	}
 
 	/******* export *********************************************/
@@ -41,13 +44,15 @@ public class ExternalProcess {
 		 logger.info("--- Before ExportProcess Start ---");
 		   
 		 //RunScript From FTP Server Folder :Manual-script
-		 logger.info("--- 1.Run Script export_before ---");
+		 logger.info("--- 1.Start Run Script export_before ---");
 		 RunScriptDBAction.runManualScriptProcess("export_before",userLogin);
+		 logger.info("--- 1.End Run Script export_before ---");
 		 
 		 //Generate Receipt case User:Van ,have order and not Gen Receipt (default cash receipt)
 		 if("VAN".equalsIgnoreCase(userLogin.getType())){
-			logger.info("--- 2.Run genAutoReceiptCash ---");
-		    GenerateAutoReceiptVan.genAutoReceiptCash(userLogin);
+			 logger.info("--- 2.Start Run genAutoReceiptCash ---");
+		     GenerateAutoReceiptVan.genAutoReceiptCash(userLogin);
+		     logger.info("--- 2.End Run genAutoReceiptCash ---");
 		 }
 	}
 	
@@ -62,8 +67,9 @@ public class ExternalProcess {
 		//new UploadDatabaseBackupWorker(userLogin).start();
 		
 		//RunScript From FTP Server Folder :Manual-script
-		 logger.info("--- 2.Run Script export_after ---");
+		logger.info("--- 2.Start Run Script export_after ---");
 		RunScriptDBAction.runManualScriptProcess("export_after",userLogin);
+		logger.info("--- 2.End Run Script export_after ---");
 		
 		//Run SalesAppVersion to Ftp Server
 		//logger.info("--- 2.Run uploadSalesAppVersion ---");

@@ -1,4 +1,13 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
+<%@page import="com.isecinc.pens.inf.helper.ImportHelper"%>
+<%@page import="com.isecinc.pens.inf.helper.ExportHelper"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -7,6 +16,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="interfacesForm" class="com.isecinc.pens.web.interfaces.InterfacesForm" scope="request" />
+<%-- <jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" /> --%>
 <%
 User user = (User) session.getAttribute("user");
 String role = ((User)session.getAttribute("user")).getType();
@@ -20,16 +30,10 @@ pageContext.setAttribute("importUpdateSalesList",importSalesUpdateList,PageConte
 
 List<References> exportList = ExportHelper.readConfigTableExport();
 pageContext.setAttribute("exportList",exportList,PageContext.PAGE_SCOPE);
+
+String screenWidth= Utils.isNull(session.getAttribute("screenWidth"));
+String screenHeight= Utils.isNull(session.getAttribute("screenHeight"));
 %>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="com.isecinc.pens.inf.helper.ImportHelper"%>
-<%@page import="com.isecinc.pens.inf.helper.ExportHelper"%>
-<jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" />
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -96,6 +100,13 @@ body {
 	// Show Option Run Import Trans (Case Error)
 	function setSeimportUpdateTrans(){
 		document.getElementById("reimportUpdateTransDiv").style.display = "block";
+	}
+	function openPopupAdminConsole(path){
+		
+		var h= <%=screenHeight%>-50;
+		var w = <%=screenWidth%>-50;
+		PopupCenter(path+"/jsp/adminConsole.do?do=process&currentTab=tab_config_info", "Configuration",w,h); 
+		//window.open(path+'/jsp/adminConsole.do?do=process&currentTab=tab_config_info','Configuration','width='+screen_width+',height='+screen_height+"'");
 	}
 </Script>
 
@@ -265,14 +276,14 @@ body {
 									<td align="right" width ="50%"><b>Import ข้อมูลจากส่วนกลาง<font color="red">*</font> </b></td>
 									<td align="left" width ="50%" nowrap>
 									   <input type="button" name ="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtnLong"  onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','sales')">
-									   &nbsp;&nbsp;<a href="javascript: void(0)" onclick="setSeimportUpdateTrans()">.V.</a>
+									   &nbsp;&nbsp;<a href="javascript: void(0)" onclick="setSeimportUpdateTrans()"><b>[...]</b></a>
 									</td>
 								</tr>
 								<tr>
 									<td align="right" width ="50%"></td>
 									<td align="left" width ="50%" nowrap>
 									   <div id="reimportUpdateTransDiv" style="display: none">
-									     <b> <input type="checkbox" name="reimportUpdateTransChk" />Run ReImport Update Transaction(Case Error)</b>
+									     <b> <input type="checkbox" name="reimportUpdateTransChk" />Run Re Import Transaction(Case Error)</b>
 									   </div>
 									</td>
 								</tr>
@@ -380,14 +391,17 @@ body {
 								<td align="center" width ="100%">
 								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong" style="width: 180px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
 								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-								    &nbsp;&nbsp;&nbsp;<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole.do?do=process&currentTab=tab_config_info','','width=700px,height=400px')" title="ตรวจสอบ FTP Connection"><b>?</b></a>
+								    &nbsp;&nbsp;&nbsp;
+								    <a href ="javascript:openPopup('${pageContext.request.contextPath}')" 
+								    title="ตรวจสอบ FTP Connection"><b>?</b>
+								    </a>
 								</td>
 							</tr>
 						</table>
                         <br/>
 						<div id="dispMsg" style="" align="center">
 						  ..
-						</div> 
+						</div>  
 					   <!-- RESULT -->
 					   <c:if test="${interfacesForm.results != null}">
 							<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>

@@ -38,13 +38,13 @@ import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.web.export.ExcelStyle;
 import com.isecinc.pens.web.export.ExportTimeSheetGroup;
 import com.isecinc.pens.web.export.HssfExcelStyle;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class GenerateOrderExcel extends InterfaceUtils{
 	private static Logger logger = Logger.getLogger("PENS");
@@ -746,7 +746,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n 		FROM PENSBME_ORDER O  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
-			sql.append("\n   		ON  P.group_code = O.group_code ");
+			sql.append("\n   		ON  P.group_code = O.group_code  ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
@@ -762,7 +762,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
-			sql.append("\n 		    ON P.group_code = I.group_code ");
+			sql.append("\n 		    ON P.group_code = I.group_code  ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
 			sql.append("\n 		WHERE 1=1 ");

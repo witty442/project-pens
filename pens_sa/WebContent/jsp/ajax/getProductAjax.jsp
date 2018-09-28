@@ -4,7 +4,7 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>
@@ -43,11 +43,11 @@ try{
 	     }
 		
 		if(dup==false){
-		  SalesTargetBean p = SalesTargetUtils.getProduct(priceListId, period, custCatNo, customerId, salesrepId, itemCode,brand);
-		  if(p != null){
-		    outputText = p.getItemCode()+"|"+p.getItemId()+"|"+p.getItemName()+"|"+p.getPrice()+"|"+p.getOrderAmt12Month()+"|"+p.getOrderAmt3Month();
+		   SalesTargetBean p = SalesTargetUtils.getProduct(priceListId, period, custCatNo, customerId, salesrepId, itemCode,brand);
+		   if(p != null){
+		      outputText = p.getItemCode()+"|"+p.getItemId()+"|"+p.getItemName()+"|"+p.getPrice()+"|"+p.getOrderAmt12Month()+"|"+p.getOrderAmt3Month();
 		    
-		    //System.out.println("outputText:"+outputText);
+		      //System.out.println("outputText:"+outputText);
 		  }
 		}else{
 			outputText ="DUPLICATE";

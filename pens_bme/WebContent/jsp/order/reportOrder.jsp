@@ -1,7 +1,7 @@
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -76,30 +76,35 @@ span.pagelinks {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
 }
-
 function search(path){
 	var form = document.orderForm;
-	var salesDateFrom =$('#salesDateFrom').val();
-	var custGroup =$('#custGroup').val();
+	var salesDateFrom =$('#salesDateFrom');
+	var salesDateTo =$('#salesDateTo');
+	var custGroup =$('#custGroup');
 	
-	if(salesDateFrom ==""){
-		alert("กรุณากรอก");
+	if(custGroup.val() ==""){
+		alert("กรุณาเลือก กลุ่มร้านค้า");
+		custGroup.focus();
 		return false;
 	}
-	if(salesDateFrom ==""){
-		alert("กรุณากรอกวันที่ Order");
+	if(salesDateFrom.val() ==""){
+		alert("กรุณากรอกวันที่ Order From");
+		salesDateFrom.focus();
+		return false;
+	}
+	if(salesDateTo.val() ==""){
+		alert("กรุณากรอกวันที่ Order To");
+		salesDateTo.focus();
 		return false;
 	}
 	form.action = path + "/jsp/orderAction.do?do=searchReportOrder&action=newsearch";
 	form.submit();
 	return true;
 }
-
 function gotoPage(path,pageNumber){
 	var form = document.orderForm;
 	form.action = path + "/jsp/orderAction.do?do=searchReportOrder&pageNumber="+pageNumber;
@@ -107,14 +112,56 @@ function gotoPage(path,pageNumber){
 	return true;
 	
 }
-
 function exportToExcel(path){
 	var form = document.orderForm;
+	var salesDateFrom =$('#salesDateFrom');
+	var salesDateTo =$('#salesDateTo');
+	var custGroup =$('#custGroup');
+	
+	if(custGroup.val() ==""){
+		alert("กรุณาเลือก กลุ่มร้านค้า");
+		custGroup.focus();
+		return false;
+	}
+	if(salesDateFrom.val() ==""){
+		alert("กรุณากรอกวันที่ Order From");
+		salesDateFrom.focus();
+		return false;
+	}
+	if(salesDateTo.val() ==""){
+		alert("กรุณากรอกวันที่ Order To");
+		salesDateTo.focus();
+		return false;
+	}
 	form.action = path + "/jsp/orderAction.do?do=exportReportOrderToExcel";
 	form.submit();
 	return true;
 }
-
+function exportBarcodeToExcel(path){
+	var form = document.orderForm;
+	var salesDateFrom =$('#salesDateFrom');
+	var salesDateTo =$('#salesDateTo');
+	var custGroup =$('#custGroup');
+	
+	if(custGroup.val() ==""){
+		alert("กรุณาเลือก กลุ่มร้านค้า");
+		custGroup.focus();
+		return false;
+	}
+	if(salesDateFrom.val() ==""){
+		alert("กรุณากรอกวันที่ Order From");
+		salesDateFrom.focus();
+		return false;
+	}
+	if(salesDateTo.val() ==""){
+		alert("กรุณากรอกวันที่ Order To");
+		salesDateTo.focus();
+		return false;
+	}
+	form.action = path + "/jsp/orderAction.do?do=exportBarcodeToExcel";
+	form.submit();
+	return true;
+}
 function clearForm(path){
 	var form = document.orderForm;
 	form.action = path + "/jsp/orderAction.do?do=prepareReportOrder&action=new";
@@ -189,7 +236,7 @@ function getCustName(custCode,fieldName){
 }
 
 function resetStore(){
-	var form = document.mttForm;
+	var form = document.orderForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
 	
 	if(storeGrouptext != ''){
@@ -297,7 +344,10 @@ function resetStore(){
 									</a>					
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 									  <input type="button" value="   Clear   " class="newPosBtnLong">
-									</a>						
+									</a>		
+									<a href="javascript:exportBarcodeToExcel('${pageContext.request.contextPath}')">
+									  <input type="button" value="Export Barcode To Excel" class="newPosBtnLong">
+									</a>			
 								</td>
 							</tr>
 					  </table>

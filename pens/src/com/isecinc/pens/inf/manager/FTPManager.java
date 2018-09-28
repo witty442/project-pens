@@ -398,8 +398,7 @@ public class FTPManager {
 		}
 	}
 	
-	public String  getDownloadFTPFileByName(String pathFullName,String encoding) throws Exception
-	{
+	public String  getDownloadFTPFileByName(String pathFullName,String encoding) throws Exception{
 		FTPClient ftp = null;
 		String dataStreamStr = "";
 		try {			
@@ -419,6 +418,63 @@ public class FTPManager {
 		} catch (SocketException e) {
 			throw new FTPException("Could not connect to FTP server");
 		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
+	
+	
+	public String[]  getManualScriptImportExport(String prefix,String salesType,String salesCode,String encoding) throws Exception{
+		FTPClient ftp = null;
+		String[] dataStreamStr = new String[3];
+		String pathFullName = "";
+		try {			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			//ftp.setFileType(FTPClient.);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			
+			//1 AllSales/import_before_script.sql
+			pathFullName =env.getProperty("path.manual.AllSales")+prefix+"_script.sql";
+			logger.debug("AllSales pathGetFileFull:"+pathFullName);
+			dataStreamStr[0] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
+			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
+			
+			ftp.completePendingCommand();
+			
+			//2 SalesType/van_import_after_script.sql
+			pathFullName =env.getProperty("path.manual.BySalesType")+salesType+"_"+prefix+"_script.sql";
+			logger.debug("SalesType pathGetFileFull:"+pathFullName);
+			dataStreamStr[1] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
+			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
+			
+			ftp.completePendingCommand();
+			
+			//3 BySales/import_before/V207_script.sql
+			pathFullName = env.getProperty("path.manual.BySales")+prefix+"/script_"+salesCode+".sql";
+			logger.debug("BySales pathGetFileFull:"+pathFullName);
+			dataStreamStr[2] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
+			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
+			
+			return dataStreamStr;
+		} catch (SocketException e) {
+			e.printStackTrace();
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
 			throw new FTPException("Could not connect to FTP server");
 		} catch (IOException e) {
 			throw new FTPException(e.getLocalizedMessage());
@@ -869,9 +925,23 @@ public class FTPManager {
             	     /** Upload image file to Ftp Server **/
 					if(tableBean.getImageFileList() != null && tableBean.getImageFileList().size() >0){
 						try{
-            	            uploadImageAllToFTP(userBean ,tableBean);
+							uploadImageAllFileToFTP(userBean,tableBean);
 						}catch(Exception e){
-							logger.info("No throw Exception Error uploaf image:"+e.getMessage());
+							logger.info("No throw Exception Error upload image:"+e.getMessage());
+						}
+					}
+				}else if("PRODSHOW".equalsIgnoreCase(fileControlName)){
+					/** Case Export Customer Export ProdShow Export Txt and Images **/
+					if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
+            	        uploadAllFileToFTP_BY_FILE(path,tableBean);
+					}
+            	     /** Upload image by file to FTP Server **/
+					if(tableBean.getImageFileList() != null && tableBean.getImageFileList().size() >0){
+						try{
+							uploadImageAllFileToFTP(userBean,tableBean);
+						}catch(Exception e){
+							e.printStackTrace();
+							logger.info("No throw Exception Error upload image:"+e.getMessage());
 						}
 					}
 				}else{
@@ -1007,20 +1077,28 @@ public class FTPManager {
 	}
 	
 
-	private void uploadImageAllToFTP(User user,TableBean tableBean) throws Exception{
+	private void uploadImageAllFileToFTP(User user,TableBean tableBean) throws Exception{
 		FTPClient ftp = null;
 		String replyMsg = "";
 		int replayCode = 0;
 		Writer w = null;
 		OutputStream out = null;
-		logger.info("uploadImageAllToFTP");
+		logger.info("uploadImageAllFileToFTP");
 		String path = "";
-		String overWrite = "";
+		//String overWrite = "";
 		try {		
 			/** Get init config **/
-			path = EnvProperties.getInstance().getProperty("path.master.customer.images");
-			overWrite = EnvProperties.getInstance().getProperty("path.master.customer.images.overwrite");
-					
+			logger.debug("uploadImageAllFileToFTP tableName:"+tableBean.getTableName());
+			logger.debug("imageFileList size :"+tableBean.getImageFileList().size());
+			
+			if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
+			   path = EnvProperties.getInstance().getProperty("path.master.customer.images");
+			}else if("t_prod_show".equalsIgnoreCase(tableBean.getTableName())){
+			   path = EnvProperties.getInstance().getProperty("path.transaction.sales.out.photo");
+			}
+			//overWrite = EnvProperties.getInstance().getProperty("path.master.customer.images.overwrite");
+			logger.debug("path:"+path);
+			
 			ftp = new FTPClient();
 			//ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
 			ftp.connect(server);
@@ -1034,22 +1112,27 @@ public class FTPManager {
 			}
 			 
 			 if(tableBean.getImageFileList() != null && tableBean.getImageFileList().size() >0){
-					logger.info("Write To Path:"+path);
+					//logger.info("Write To Path:"+path);
 					//check isExist ? Create Folder by UserCode
-					String pathCheck = path+ user.getUserName();
-					ftp.changeWorkingDirectory(pathCheck);
-					replayCode = ftp.getReplyCode();
-					
-					if (replayCode == 550) {
-						//Create Folder
-						logger.debug("not found Folder :mkdir:"+path+user.getUserName());
-						ftp.changeWorkingDirectory(path);
-						ftp.makeDirectory(user.getUserName());
+					 if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
+						String pathCheck = path+ user.getUserName();
+						ftp.changeWorkingDirectory(pathCheck);
+						replayCode = ftp.getReplyCode();
 						
+						if (replayCode == 550) {
+							//Create Folder
+							logger.debug("not found Folder :mkdir:"+path+user.getUserName());
+							ftp.changeWorkingDirectory(path);
+							ftp.makeDirectory(user.getUserName());
+						}
+					 }
+					if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
 						ftp.changeWorkingDirectory(path+user.getUserName());
-					}else{
-						ftp.changeWorkingDirectory(path+user.getUserName());
+						logger.debug("path:"+path+user.getUserName());
+					}else if("t_prod_show".equalsIgnoreCase(tableBean.getTableName())){
+						ftp.changeWorkingDirectory(path);
 					}
+					
 					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
 
 					for(int i=0;i<tableBean.getImageFileList().size();i++){
@@ -1072,30 +1155,6 @@ public class FTPManager {
 						   logger.info("The is uploaded successfully.");
 						}
 						
-						/***** Method 2******************************************************/
-					/*	File localFile = new File(im.getImageFileName());
-						String remoteFile = im.getGenerateImageFileName();
-						InputStream inputStream = new FileInputStream(localFile);
-			 
-			            System.out.println("Start uploading second file");
-			            OutputStream outputStream = ftp.storeFileStream(remoteFile);
-			            byte[] bytesIn = new byte[4096];
-			            int read = 0;
-			 
-			            while ((read = inputStream.read(bytesIn)) != -1) {
-			                outputStream.write(bytesIn, 0, read);
-			            }
-			            inputStream.close();
-			            outputStream.close();*/
-						
-	                    /*******METHOD3 *****************************************************/
-						//String pathFtpFileFull = pathCheck+"/"+im.getGenerateImageFileName();
-						//String pathLocalFileFull = im.getImageFileName();
-						
-						//uploadImageByFileName(pathFtpFileFull,pathLocalFileFull);
-						/********************************************************************/
-						
-						 
 					    /** Close Command FTP **/
 					   /* try{
 						    logger.info(" Start completePendingCommand ");
@@ -1106,11 +1165,115 @@ public class FTPManager {
 					    }catch(Exception e){
 					        logger.error(e.getMessage(),e);
 					    }*/
-			        }
+			        }//for
 				}else{
 					// Data not Found
 					logger.info("Data not found");
 				}
+	
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(w != null){
+				//w.close();
+			}
+			if(out != null){
+			  // out.close();
+			}
+			if(ftp != null && ftp.isConnected()) {
+				try{
+					ftp.logout();
+					ftp.disconnect();
+					logger.info("ftp disconnect : "+ftp.getReplyString());
+					ftp = null;
+				}catch(Exception e){
+					logger.error(e.getMessage(),e);
+				}
+			}
+		}	
+	}
+	
+	private void uploadImageOneFileToFTP(User user,TableBean tableBean,ImageFileBean imageFileBean) throws Exception{
+		FTPClient ftp = null;
+		String replyMsg = "";
+		int replayCode = 0;
+		Writer w = null;
+		OutputStream out = null;
+		logger.info("uploadImageAllToFTP");
+		String path = "";
+		//String overWrite = "";
+		try {		
+			/** Get init config **/
+			logger.debug("uploadImageOneToFTP tableName:"+tableBean.getTableName());
+			
+			if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
+			   path = EnvProperties.getInstance().getProperty("path.master.customer.images");
+			}else if("t_prod_show".equalsIgnoreCase(tableBean.getTableName())){
+			   path = EnvProperties.getInstance().getProperty("path.transaction.sales.out.photo");
+			}
+			//overWrite = EnvProperties.getInstance().getProperty("path.master.customer.images.overwrite");
+			logger.debug("path:"+path);
+			
+			ftp = new FTPClient();
+			//ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+			ftp.connect(server);
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			ftp.enterLocalPassiveMode();
+
+			//logger.info("connection timeout:"+ftp.getConnectTimeout());
+			
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			 
+			 if(imageFileBean != null){
+				//logger.info("Write To Path:"+path);
+				//check isExist ? Create Folder by UserCode
+				if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
+					String pathCheck = path+ user.getUserName();
+					ftp.changeWorkingDirectory(pathCheck);
+					replayCode = ftp.getReplyCode();
+					
+					if (replayCode == 550) {
+						//Create Folder
+						logger.debug("not found Folder :mkdir:"+path+user.getUserName());
+						ftp.changeWorkingDirectory(path);
+						ftp.makeDirectory(user.getUserName());
+					}
+				}
+				if("m_customer_location".equalsIgnoreCase(tableBean.getTableName())){
+					ftp.changeWorkingDirectory(path+user.getUserName());
+					logger.debug("path:"+path+user.getUserName());
+				}else if("t_prod_show".equalsIgnoreCase(tableBean.getTableName())){
+					ftp.changeWorkingDirectory(path);
+				}
+				
+				logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				logger.info("Write imageFileName:"+imageFileBean.getGenerateImageFileName());
+				ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			    
+			    /***** Method 1 ******************************************************/
+			    File localFile = new File(imageFileBean.getImageFileName());
+				String remoteFile = imageFileBean.getGenerateImageFileName();
+				InputStream inputStream = new FileInputStream(localFile);
+				
+				logger.info("Start uploading  file");
+				boolean done = ftp.storeFile(remoteFile, inputStream);
+				if(done){
+				   inputStream.close();
+				   logger.info("Upload Image File FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
+				   logger.info("The is uploaded successfully.");
+				}	
+			}else{
+				// Data not Found
+				logger.info("Data not found");
+			}
 	
 		} catch (SocketException e) {
 			throw new FTPException("Could not connect to FTP server");

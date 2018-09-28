@@ -18,13 +18,15 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ReqReturnWacoal;
+import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqReturnDAO;
+import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -34,7 +36,7 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class ReqReturnAction extends I_Action {
 
-
+	public static int pageSize = 60;
 	//public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	
@@ -53,7 +55,14 @@ public class ReqReturnAction extends I_Action {
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ReqReturnDAO.searchHead(aForm.getBean(),false));
+				//aForm.setResultsSearch(ReqReturnDAO.searchHead(aForm.getBean(),false));
+				
+				conn = DBConnection.getInstance().getConnection();
+				
+				boolean allRec = false;
+				boolean getItems = false;
+				List<ReqReturnWacoal> items  = ReqReturnDAO.searchHead(conn,aForm.getBeanCriteria(),getItems,allRec,1,pageSize);
+				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -66,7 +75,7 @@ public class ReqReturnAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward search2_BK(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		ReqReturnWacoalForm aForm = (ReqReturnWacoalForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -74,7 +83,7 @@ public class ReqReturnAction extends I_Action {
 		try {
 			ReqReturnWacoal b = aForm.getBean();
 			aForm.setBean(b);
-			aForm.setResultsSearch(ReqReturnDAO.searchHead(aForm.getBean(),false));
+			//aForm.setResultsSearch(ReqReturnDAO.searchHead(aForm.getBean(),false));
 			
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -90,7 +99,80 @@ public class ReqReturnAction extends I_Action {
 		}
 		return mapping.findForward("prepare2");
 	}
-	
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		ReqReturnWacoalForm aForm = (ReqReturnWacoalForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		boolean getItems = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(ReqReturnDAO.searchTotalRecHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<ReqReturnWacoal> items  = ReqReturnDAO.searchHead(conn,aForm.getBean(),getItems,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<ReqReturnWacoal> items  = ReqReturnDAO.searchHead(conn,aForm.getBean(),getItems,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		return mapping.findForward("prepare2");
+	}
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
 		ReqReturnWacoalForm aForm = (ReqReturnWacoalForm) form;
@@ -126,6 +208,9 @@ public class ReqReturnAction extends I_Action {
             String requestNo = Utils.isNull(request.getParameter("requestNo"));
             String mode = Utils.isNull(request.getParameter("mode"));
             
+            //init Conn
+            conn = DBConnection.getInstance().getConnection();
+            
 			if( !"".equals(requestDate) && !"".equals(requestNo)){
 				List<ReqReturnWacoal> allList = new ArrayList<ReqReturnWacoal>();	
 				
@@ -134,7 +219,11 @@ public class ReqReturnAction extends I_Action {
 				c.setRequestDate(requestDate);
 				c.setRequestNo(requestNo);
 				
-				List<ReqReturnWacoal> listData = ReqReturnDAO.searchHead(c,true);
+				//List<ReqReturnWacoal> listData = ReqReturnDAO.searchHead(c,true);
+				boolean allRec = false;
+				boolean getItems = true;
+				List<ReqReturnWacoal> listData  = ReqReturnDAO.searchHead(conn,c,getItems,allRec,1,pageSize);
+				
 				ReqReturnWacoal h = null;
 				if(listData != null && listData.size() >0){
 				   h = (ReqReturnWacoal)listData.get(0);
@@ -277,7 +366,12 @@ public class ReqReturnAction extends I_Action {
 			
 			List<ReqReturnWacoal> allList = new ArrayList<ReqReturnWacoal>();
 			//search data
-			List<ReqReturnWacoal> saveData = ReqReturnDAO.searchHead(h,true);
+			//List<ReqReturnWacoal> saveData = ReqReturnDAO.searchHead(h,true);
+			
+			boolean allRec = false;
+			boolean getItems = true;
+			List<ReqReturnWacoal> saveData  = ReqReturnDAO.searchHead(conn,h,getItems,allRec,1,pageSize);
+			
 			h = (ReqReturnWacoal)saveData.get(0);
 			   
 			// All barcode status CLOSE
@@ -361,7 +455,12 @@ public class ReqReturnAction extends I_Action {
 			conn.commit();
 			
 			//Search Data
-			List<ReqReturnWacoal> listData = ReqReturnDAO.searchHead(h,true);
+			//List<ReqReturnWacoal> listData = ReqReturnDAO.searchHead(h,true);
+			
+			boolean allRec = false;
+			boolean getItems = true;
+			List<ReqReturnWacoal> listData  = ReqReturnDAO.searchHead(conn,h,getItems,allRec,1,pageSize);
+			
 			ReqReturnWacoal beanSearch = null;
 			if(listData != null && listData.size() >0){
 				beanSearch = (ReqReturnWacoal)listData.get(0);

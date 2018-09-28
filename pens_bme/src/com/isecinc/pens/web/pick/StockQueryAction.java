@@ -18,12 +18,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.StockQueryDAO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -43,15 +45,18 @@ public class StockQueryAction extends I_Action {
 			throws Exception {
 		String forward = "prepare";
 		StockQueryForm aForm = (StockQueryForm) form;
-		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equalsIgnoreCase(action)){
 				aForm.setBean(new StockQuery());
-			}else{
 				
+				//Set Session List
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref = new References("","");
+				wareHouseList.add(ref);
+				wareHouseList.addAll(JobDAO.getWareHouseList());
+				request.getSession().setAttribute("wareHouseList",wareHouseList);
 			}
-		
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -67,7 +72,6 @@ public class StockQueryAction extends I_Action {
 	 */
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		StockQueryForm summaryForm = (StockQueryForm) form;
 		try {
 			logger.debug("prepare 2");
 			
@@ -100,7 +104,6 @@ public class StockQueryAction extends I_Action {
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}
 			aForm.setBean(b);
-			
 		} catch (Exception e) {
 			aForm.setResults(null);
 			e.printStackTrace();

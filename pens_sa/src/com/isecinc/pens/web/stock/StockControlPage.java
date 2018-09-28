@@ -16,10 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 import com.isecinc.pens.web.salestarget.SalesTargetBean;
 
 public class StockControlPage {
@@ -111,8 +112,11 @@ public class StockControlPage {
 		ResultSet rst = null;
 		Date requestDate = null;
 		try{
-			sql.append("select distinct to_char(request_date,'mm/yyyy') as r"
-					+ " from xxpens_om_check_order_v order by to_char(request_date,'mm/yyyy') desc");
+			sql.append("select distinct r ,r2 from( \n");
+			sql.append("select to_char(request_date,'mm/yyyy') as r \n"
+					+ ", to_number(to_char(request_date,'yyyymm') ) as r2 \n"
+					+ " from xxpens_om_check_order_v \n"
+					+ " ) order by r2 desc \n");
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while(rst.next()){

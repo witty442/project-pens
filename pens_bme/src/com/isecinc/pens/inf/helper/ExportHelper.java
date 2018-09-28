@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
+import com.pens.util.Utils;
 
 public class ExportHelper extends InterfaceUtils{
 

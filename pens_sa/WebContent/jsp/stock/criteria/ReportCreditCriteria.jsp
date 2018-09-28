@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.web.stock.StockForm"%>
 <%@page import="com.isecinc.pens.web.stock.StockBean"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.*"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%
@@ -17,8 +17,24 @@ function loadMe(){
 	var form = document.stockForm;
 	
 	//setDateMonth
-	setPeriodDate(form.periodDesc);
-	
+	<%if( "month".equals(Utils.isNull(bean.getTypeSearch()))|| "".equals(Utils.isNull(bean.getTypeSearch()))) { %>
+	    setPeriodDate(form.periodDesc);
+	    document.getElementById("div_month").style.visibility  = "visible";
+	    document.getElementById("div_day").style.visibility  = "hidden";
+	    form.startDate.className ="disableText";
+	    form.endDate.className ="disableText";
+	    form.startDate.readOnly =true;
+	    form.endDate.readOnly =true;
+	<%}else{%>
+	    document.getElementById("div_month").style.visibility  = "hidden";
+	    document.getElementById("div_day").style.visibility  = "visible";
+		form.startDate.className ="enableText";
+		form.endDate.className ="enableText";
+		form.startDate.readOnly =false;
+		form.endDate.readOnly =false;
+		new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+		new Epoch('epoch_popup', 'th', document.getElementById('endDate'));
+	<%}%>
 	<%if( !"".equals(Utils.isNull(bean.getSalesChannelNo())) || !"".equals(Utils.isNull(bean.getCustCatNo())) ) { %>
          document.getElementsByName('bean.salesChannelNo')[0].value = "<%=bean.getSalesChannelNo()%>";
          document.getElementsByName('bean.custCatNo')[0].value = "<%=bean.getCustCatNo()%>";
@@ -26,6 +42,38 @@ function loadMe(){
 	     document.getElementsByName('bean.salesrepCode')[0].value = '<%=bean.getSalesrepCode()%>';
 	<% } %>
 }
+function setTypeSerch(typeSerch){
+	var form = document.stockForm;
+	//alert(periodDesc);
+	var periodDesc = form.periodDesc;
+	if(typeSerch.value =='month'){
+	   form.period.value = periodDesc.value.split("|")[0];
+	   form.startDate.value = periodDesc.value.split("|")[1];
+	   form.endDate.value = periodDesc.value.split("|")[2]; 
+	   
+	   //disable startDate endDate
+	   document.getElementById("div_month").style.visibility  = "visible";
+	   document.getElementById("div_day").style.visibility  = "hidden";
+	   form.startDate.className ="disableText";
+	   form.endDate.className ="disableText";
+	   form.startDate.readOnly =true;
+	   form.endDate.readOnly =true;
+	}else{
+		form.period.value = "";
+		form.startDate.value = "";
+		form.endDate.value = "";
+		
+		document.getElementById("div_month").style.visibility  = "hidden";
+		document.getElementById("div_day").style.visibility  = "visible";
+		form.startDate.className ="enableText";
+		form.endDate.className ="enableText";
+		form.startDate.readOnly =false;
+		form.endDate.readOnly =false;
+		new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+		new Epoch('epoch_popup', 'th', document.getElementById('endDate'));
+	}
+}
+
 function setPeriodDate(periodDesc){
 	var form = document.stockForm;
 	//alert(periodDesc);
@@ -43,10 +91,18 @@ function clearForm(path){
 }
 function searchReport(path){
 	var form = document.stockForm;
-	 if( $('#periodDesc').val()==""){
-		alert("กรุณาระบุ เดือน");
-		return false;
-	} 
+	//alert(form.startDate.value);
+    if(form.typeSearch.value =="day"){
+		if(form.startDate.value =="" || form.endDate.value ==""){
+			alert("กรุณาระบุ วันที่ From-To");
+			return false;
+		}
+	}else{
+		if( $('#periodDesc').val()==""){
+			alert("กรุณาระบุ เดือน");
+			return false;
+		} 
+	}
 	 if( $('#dispType').val()==""){
 		alert("กรุณาระบุ แสดงตาม");
 		$('#dispType').focus();
@@ -162,21 +218,27 @@ function setDataPopupValue(code,desc,pageName){
 } 
 </script>
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
+           
 	       <tr>
-                <td> เดือน <font color="red">*</font></td>
+                <td> เลือกรอบเวลา <font color="red">*</font></td>
 				<td>					
-					 <html:select property="bean.periodDesc" styleId="periodDesc" onchange="setPeriodDate(this)">
-						<html:options collection="PERIOD_LIST" property="value" labelProperty="keyName"/>
+					 <html:select property="bean.typeSearch" styleId="typeSearch" onchange="setTypeSerch(this)">
+						<html:option value="month">เดือน</html:option>
+						<html:option value="day">วัน</html:option>
 				    </html:select>
-				     <html:hidden property="bean.period" styleId="period"/>
 				</td>
-				<td> 
-				     <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass="disableText"/>
+				<td colspan="2" nowrap> 
+				   <span id="div_month">
+					        เดือน <font color="red">*</font>
+					     <html:select property="bean.periodDesc" styleId="periodDesc" onchange="setPeriodDate(this)">
+							<html:options collection="PERIOD_LIST" property="value" labelProperty="keyName"/>
+					    </html:select>
+				    </span>
+				     <html:hidden property="bean.period" styleId="period"/>
+					 <span id="div_day">วันที่ &nbsp;</span>
+				    <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass="disableText"/>
 				        -
 					<html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass="disableText"/>
-				</td>
-				<td>	
-				
 				</td>
 			</tr>
 			<tr>

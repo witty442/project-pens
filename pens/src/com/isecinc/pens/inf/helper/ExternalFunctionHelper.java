@@ -109,8 +109,7 @@ public class ExternalFunctionHelper {
 				insertSQl.append("		 from m_district \n");
 				insertSQl.append("		 where province_id in(select province_id from m_province where NAME LIKE '%"+Utils.replaceProvinceNameNotMatch(lineArray[Integer.parseInt(values[2])])+"%' ) \n");
 				insertSQl.append("  ) as CODE \n");
-				
-				
+
 				if(Utils.isNull(lineArray[Integer.parseInt(values[1])]).equals("") || Utils.isNull(lineArray[Integer.parseInt(values[2])]).equals("")){
 					exe = false;
 				}
@@ -191,7 +190,7 @@ public class ExternalFunctionHelper {
 					exe = false;
 				}	
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ORDER_ID_MANUAL")){
-				/** GET_ORDER_ID CASE Manual Form Oracl and Regen OrderNo  **/
+				/** GET_ORDER_ID CASE Manual Form Oracle and Regen OrderNo  **/
 				findColumn = "ORDER_ID";
 				value = getReplcaeNewOrderNo(value);
 				sql.append(" select "+findColumn+" FROM t_order WHERE order_no = '"+value+"'" );		

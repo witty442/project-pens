@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
+import util.Utils;
 
 public class LocationBean implements Serializable{
 	private static final long serialVersionUID = -4104083172800233911L;
@@ -21,6 +21,7 @@ public class LocationBean implements Serializable{
 	private String district;
 	private String customerCode;
 	private String customerName;
+	private String customerType;
 	private String custCatNo;
 	private String salesChannelNo;
 	private String salesrepCode;
@@ -28,6 +29,7 @@ public class LocationBean implements Serializable{
 	private String dispAllStore;
 	private String dispAllOrder;
 	private String dispAllVisit;
+	private String dispAllNoOrder;
 	
 	private String lat;
 	private String lng;
@@ -40,8 +42,63 @@ public class LocationBean implements Serializable{
 	private String orderDate;
 	private String orderNo;
 	private String visitDate;
+	private String custLat;
+	private String custLng;
 	
+	//option
+	private String startDate;
+	private String endDate;
+
 	
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getCustLat() {
+		return custLat;
+	}
+
+	public void setCustLat(String custLat) {
+		this.custLat = custLat;
+	}
+
+	public String getCustLng() {
+		return custLng;
+	}
+
+	public void setCustLng(String custLng) {
+		this.custLng = custLng;
+	}
+
+	public String getDispAllNoOrder() {
+		return dispAllNoOrder;
+	}
+
+	public void setDispAllNoOrder(String dispAllNoOrder) {
+		this.dispAllNoOrder = dispAllNoOrder;
+	}
+
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
 	public String getOrderDate() {
 		return orderDate;
 	}

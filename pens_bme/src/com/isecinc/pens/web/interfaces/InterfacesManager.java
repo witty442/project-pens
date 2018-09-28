@@ -12,8 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
-import util.BeanParameter;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
@@ -23,12 +21,13 @@ import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.BatchProcessManager;
 import com.isecinc.pens.inf.manager.process.GenerateHISHER;
 import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.BeanParameter;
+import com.pens.util.Utils;
 
 public class InterfacesManager {
 	

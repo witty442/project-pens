@@ -1,8 +1,7 @@
 <%@page import="com.isecinc.pens.web.autocn.AutoCNBean"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.List"%>
-<%@page import="java.util.Calendar"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -18,7 +17,6 @@ User user = (User) request.getSession().getAttribute("user");
 %>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
@@ -45,6 +43,12 @@ function clearForm(path){
 function search(path){
 	var form = document.autoCNForm;
 	form.action = path + "/jsp/autoCNAction.do?do=search2&action=newsearch";
+	form.submit();
+	return true;
+}
+function exportToExcel(path){
+	var form = document.autoCNForm;
+	form.action = path + "/jsp/autoCNAction.do?do=exportToExcel";
 	form.submit();
 	return true;
 }
@@ -182,7 +186,7 @@ function getCustName(path,storeCode,fieldName,storeType){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="AutoCN"/>
+				<jsp:param name="function" value="AutoCNLotus"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -251,6 +255,9 @@ function getCustName(path,storeCode,fieldName,storeType){
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
+										<a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
+										  <input type="button" value="  Export  " class="newPosBtnLong"> 
+										</a>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -284,7 +291,7 @@ function getCustName(path,storeCode,fieldName,storeType){
 						</span>
 					</div>
 					
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
 						            <th >Job Id</th><!-- 0 -->
 						            <th >Job Name</th><!-- 1 -->
@@ -304,6 +311,8 @@ function getCustName(path,storeCode,fieldName,storeType){
 								AutoCNBean mc = (AutoCNBean)resultList.get(n);
 								if(n%2==0){ 
 									tabclass="lineO";
+								}else{
+									tabclass ="lineE";
 								}
 								%>
 								<tr class="<%=tabclass%>"> 

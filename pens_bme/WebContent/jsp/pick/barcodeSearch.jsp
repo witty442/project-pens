@@ -1,8 +1,7 @@
+<%@page import="com.isecinc.pens.bean.Barcode"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -15,14 +14,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="barcodeForm" class="com.isecinc.pens.web.pick.BarcodeForm" scope="session" />
-
 <%
 if(session.getAttribute("barcodeStatusList") == null){
 	List<References> billTypeList = new ArrayList();
@@ -32,7 +26,6 @@ if(session.getAttribute("barcodeStatusList") == null){
 	session.setAttribute("barcodeStatusList",billTypeList);
 }
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -40,37 +33,15 @@ if(session.getAttribute("barcodeStatusList") == null){
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_barcode.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -111,7 +82,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.barcodeForm;
+	form.action = path + "/jsp/barcodeAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,jobId,boxNo,mode){
 	var form = document.barcodeForm;
 	form.action = path + "/jsp/barcodeAction.do?do=prepare&jobId="+jobId+"&boxNo="+boxNo+"&mode="+mode;
@@ -122,8 +98,9 @@ function openEdit(path,jobId,boxNo,mode){
 function openJobPopup(path){
     var param = "";
 	url = path + "/jsp/searchJobPopupAction.do?do=prepare3&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+	//		   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",500);
 }
 
 function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHouse,wareHouseDesc){
@@ -282,8 +259,8 @@ function getJobNameModel(code){
 						               <html:text property="job.remark" styleId="remark" size="80" />
 						              Scan By User
 						               <html:text property="job.createUser" styleId="createUser" size="20" />
-						               
-						               <html:checkbox property="job.includeCancel">แสดงรายการที่ยกเลิกด้วย</html:checkbox>
+						               &nbsp;&nbsp;
+						               <html:checkbox property="job.includeCancel">&nbsp; แสดงรายการที่ยกเลิกด้วย</html:checkbox>
 									</td>
 								</tr>	
 						   </table>
@@ -310,7 +287,30 @@ function getJobNameModel(code){
 					  </div>
 
             <c:if test="${barcodeForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = barcodeForm.getTotalPage();
+					   int totalRecord = barcodeForm.getTotalRecord();
+					   int currPage =  barcodeForm.getCurrPage();
+					   int startRec = barcodeForm.getStartRec();
+					   int endRec = barcodeForm.getEndRec();
+					%>
+					    
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
+						
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -326,62 +326,57 @@ function getJobNameModel(code){
 									<th >User Created</th>
 									<th >Action</th>						
 							   </tr>
-							<c:forEach var="results" items="${barcodeForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
+								<% 
+								int no = startRec-1;
+								String tabclass ="";
+								List<Barcode> resultList = barcodeForm.getResultsSearch();
+								for(int n=0;n<resultList.size();n++){
+									no++;
+									Barcode mc = (Barcode)resultList.get(n);
+									if(n%2==0){ 
+									   tabclass="lineO";
+									}else{
+									   tabclass ="lineE";
+									}
+								%>
 								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_boxNo">
-										  ${results.boxNo}
+									<tr class="<%=tabclass%>">
+										<td class="td_text_center" width="3%"><%=no %></td>
+										<td class="td_text" width="5%"><%=mc.getBoxNo() %></td>
+										<td class="td_text" width="5%"><%=mc.getTransactionDate() %></td>
+										<td class="td_text" width="5%"><%=mc.getJobId() %></td>
+										<td class="td_text" width="13%"><%=mc.getName() %></td>
+										<td class="td_text" width="8%"><%=mc.getStoreCode() %></td>
+										<td class="td_text" width="5%">
+											<%=mc.getSubInv() %>
 										</td>
-										<td class="search_transactionDate">
-										   ${results.transactionDate}
+										<td class="td_text" width="5%">
+											<%=mc.getStoreNo() %>
 										</td>
-										<td class="search_jobId">${results.jobId}</td>
-										<td class="search_name">
-											${results.name}
+										<td class="td_text_right" width="5%">
+										    <%=mc.getQty() %>
 										</td>
-										<td class="search_storeCode">
-											${results.storeCode}
+										<td class="td_text_center" width="5%">
+										   <%=mc.getStatusDesc() %>
 										</td>
-										<td class="search_subInv">
-											${results.subInv}
+										<td class="td_text_center" width="5%">
+										    <%=mc.getCreateUser() %>
 										</td>
-										<td class="search_storeNo">
-											${results.storeNo}
-										</td>
-										<td class="search_qty">
-										    ${results.qty}
-										</td>
-										<td class="search_status">
-										    ${results.statusDesc}
-										</td>
-										<td class="search_status">
-										    ${results.createUser}
-										</td>
-										<td class="search_edit">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.jobId}','${results.boxNo}','view')">
-											          ดู
+										<td class="td_text_center" width="5%">
+										 <% if(mc.isCanEdit()==false){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getJobId() %>','<%=mc.getBoxNo() %>','view')">
+											         <font size="2"><b>ดู </b></font>
 											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.jobId}','${results.boxNo}','edit')">
-											          แก้ไข
+										 <%} %>
+										  <% if(mc.isCanEdit()==true){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getJobId() %>','<%=mc.getBoxNo() %>','edit')">
+											        <font size="2"><b> แก้ไข</b></font>
 											  </a>
-										  </c:if>
+										 <%} %>
 										</td>
 									</tr>
-							
-							  </c:forEach>
-							  
+								<%}//for %>
+						   <!-- Summary -->
 							  <tr class="">
 							       <td class=""></td> 
 								   <td class=""></td> 
@@ -394,7 +389,7 @@ function getJobNameModel(code){
 									  <B> Total </B>
 									</td>
 									<td class="hilight_text" align="right">
-									 <B>  ${barcodeForm.job.totalQty}</B>
+									 <B>  ${barcodeForm.job.totalQtyDisp}</B>
 									</td>
 									<td class=""></td>
 									<td class=""></td>

@@ -19,23 +19,24 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ConfirmReturnWacoal;
 import com.isecinc.pens.bean.ControlReturnReport;
 import com.isecinc.pens.bean.PickStock;
+import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfirmReturnDAO;
+import com.isecinc.pens.dao.ReqReturnDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -45,7 +46,7 @@ import com.isecinc.pens.init.InitialMessages;
  */
 public class ConfirmReturnAction extends I_Action {
 
-
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	
@@ -64,7 +65,11 @@ public class ConfirmReturnAction extends I_Action {
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ConfirmReturnDAO.searchHead(aForm.getBean(),false));
+				//aForm.setResultsSearch(ConfirmReturnDAO.searchHead(aForm.getBean(),false));
+				
+				conn = DBConnection.getInstance().getConnection();
+				List<ConfirmReturnWacoal> items  = ConfirmReturnDAO.searchHead(conn,aForm.getBeanCriteria(),false,false,1,pageSize);
+				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -77,7 +82,7 @@ public class ConfirmReturnAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward search2_bk(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		ConfirmReturnWacoalForm aForm = (ConfirmReturnWacoalForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -85,7 +90,7 @@ public class ConfirmReturnAction extends I_Action {
 		try {
 			ConfirmReturnWacoal b = aForm.getBean();
 			aForm.setBean(b);
-			aForm.setResultsSearch(ConfirmReturnDAO.searchHead(aForm.getBean(),false));
+			//aForm.setResultsSearch(ConfirmReturnDAO.searchHead(aForm.getBean(),false));
 			
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -98,6 +103,81 @@ public class ConfirmReturnAction extends I_Action {
 			throw e;
 		}finally{
 			
+		}
+		return mapping.findForward("prepare2");
+	}
+	
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		ConfirmReturnWacoalForm aForm = (ConfirmReturnWacoalForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		boolean getItems = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(ConfirmReturnDAO.searchTotalRecHead(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<ConfirmReturnWacoal> items  = ConfirmReturnDAO.searchHead(conn,aForm.getBean(),getItems,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<ConfirmReturnWacoal> items  = ConfirmReturnDAO.searchHead(conn,aForm.getBean(),getItems,allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("prepare2");
 	}

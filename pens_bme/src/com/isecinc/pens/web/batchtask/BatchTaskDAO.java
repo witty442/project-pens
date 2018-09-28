@@ -24,11 +24,10 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
@@ -1160,7 +1159,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 				 m.setCode(rs.getString("code"));
 				 m.setType(rs.getString("type"));
 				 m.setAmount(rs.getDouble("amount"));
-				 m.setAmountStr(ConvertUtils.convertToCurrencyStr(rs.getDouble("amount")));
+				 m.setAmountStr(Utils.convertToCurrencyStr(rs.getDouble("amount")));
 				 itemList.add(m);
 			}
 			

@@ -11,7 +11,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY
@@ -49,11 +49,11 @@ public class ValidateImportHelperExcel {
 			if(Utils.isNull(colBean.getValidateFunc()).equalsIgnoreCase("VALIDATE_PENS_ITEM")){
 				
 				ImportDAO importDAO = new ImportDAO();
-				 String pensItem = importDAO.getItemByInterfaceValueTypeLotusCase1(conn, util.Constants.STORE_TYPE_LOTUS_ITEM, value);
+				 String pensItem = importDAO.getItemByInterfaceValueTypeLotusCase1(conn, com.isecinc.pens.dao.constants.Constants.STORE_TYPE_LOTUS_ITEM, value);
 					
 		         if(Utils.isNull(pensItem).equals("")){
 		        	 value = value.substring(0,6);
-		        	 pensItem = importDAO.getItemByInterfaceValueTypeLotusCase2(conn, util.Constants.STORE_TYPE_LOTUS_ITEM, value);
+		        	 pensItem = importDAO.getItemByInterfaceValueTypeLotusCase2(conn, com.isecinc.pens.dao.constants.Constants.STORE_TYPE_LOTUS_ITEM, value);
 		         }
 		         if(Utils.isNull(pensItem).equals("")){
 				

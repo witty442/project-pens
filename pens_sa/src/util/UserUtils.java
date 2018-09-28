@@ -1,0 +1,153 @@
+package util;
+
+import com.isecinc.pens.bean.User;
+
+public class UserUtils {
+	public static boolean userInRoleSalesTarget(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleSalesTarget().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	
+	public static boolean userInRoleCreditStock(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleCRStock().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	
+	public static boolean userInRoleSpider(User user,String[] roles){
+		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleSpider().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	public static boolean userInRoleProdShow(User user,String[] roles){
+		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleProdShow().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	public static boolean userInRoleVanDoc(User user,String[] roles){
+		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleVanDoc().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+	
+	public static boolean userInRole_1(User user,String[] roles){
+		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRoleSpider().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
+	}
+
+
+}

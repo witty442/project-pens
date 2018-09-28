@@ -20,9 +20,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveWarehoseDAOV1;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.MoveWarehouseForm;
+import com.pens.util.Utils;
 
 /**
  * Summary Action

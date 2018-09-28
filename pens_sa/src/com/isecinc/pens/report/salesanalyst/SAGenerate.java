@@ -18,13 +18,13 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
+import util.DBConnection;
 import util.DateToolsUtil;
 import util.Debug;
+import util.Utils;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 import com.sun.corba.se.spi.extension.ZeroPortPolicy;
 
 

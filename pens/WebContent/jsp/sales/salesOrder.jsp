@@ -1,13 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="util.CustomerReceiptFilterUtils"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.Date"%>
@@ -15,6 +15,12 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.pens.bean.Address"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.model.MAddress"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
 <%
 User user = ((User)session.getAttribute("user"));
@@ -70,24 +76,22 @@ pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
-//Filter Can Receipt More Cash
+List<References> vanPaymentMethod = InitialReferences.getReferenes().get(InitialReferences.VAN_PAYMENT_METHOD);
+pageContext.setAttribute("vanPaymentMethod",vanPaymentMethod,PageContext.PAGE_SCOPE);
+
+//Filter Can Receipt More Cash //1:can, 0: cannot, -1:no pay prev bill
 OrderForm orderFrom = null;
-String canReceiptMoreCash = "N";
+String receiptCreditFlag = "0";
 if(request.getAttribute("orderForm") != null){
   orderFrom = (OrderForm)request.getAttribute("orderForm");
-  canReceiptMoreCash = orderFrom.getCanReceiptMoreCash();
+  receiptCreditFlag = Utils.isNull(orderFrom.getReceiptCreditFlag());
 }
 
-System.out.println("canReceiptMoreCash:"+canReceiptMoreCash);
+System.out.println("receiptCreditFlag:"+receiptCreditFlag);
 boolean debugMode = session.getAttribute("debug_mode")!= null?((Boolean)session.getAttribute("debug_mode")):false;
 System.out.println("debugMode:"+debugMode);
 %>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.bean.Address"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="com.isecinc.pens.model.MAddress"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%><html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
@@ -121,7 +125,6 @@ table#productList tbody td.number{text-align:right;}
 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -187,6 +190,31 @@ function loadProducts(brandCode){
 	$(document).ready(function() {
 	    $("#selectProduct").dialog("open");
 	});
+}
+
+function loadProductsByBrand(brandCode){
+	//alert("brandCode:"+brandCode.value);
+	if(brandCode.value != ""){
+		var orderDate = document.getElementById("orderDate").value;
+		var pricelistId = document.getElementById("order.priceListId").value;
+		var custId = document.getElementById("order.customerId").value;
+		
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/productByBrand.jsp",
+				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+				async: false,
+				success: function(getData){
+					var htmlText = jQuery.trim(getData);
+					document.getElementById('selectProduct').innerHTML = htmlText;
+				}
+			}).responseText;
+		});
+		
+		$(document).ready(function() {
+		    $("#selectProduct").dialog("open");
+		});
+	}
 }
 
 function loadMe(){
@@ -287,6 +315,23 @@ $(function(){
 
       $(".productDialog").children(".ui-dialog-titlebar").append(btns);
       
+      //error-dailog_message
+	    $('#error-dialog').dialog({
+						autoOpen: false,
+						modal:true,
+						width: 300,
+						height:80,
+						title:"Error Message",
+						position:'center',
+						resizable: false,
+						dialogClass: 'brandDialog',
+						buttons: {"ปิด.": 
+								function() { 
+								   $(this).dialog("close"); 
+								   unlockScreen();
+							     } 
+							}
+					});
 });
 
 function addProductToSalesOrder(){
@@ -429,6 +474,42 @@ function addProductToBasket(){
 
 function escapeParameter(param){
 	return param.replace("%","%25");
+}
+function validateVanPaymentMethod(){
+	var r = true;
+	var vanPaymentMethod = document.getElementsByName("order.vanPaymentMethod")[0];
+	if(vanPaymentMethod.value =='CREDIT'){
+		<%if(receiptCreditFlag.equalsIgnoreCase("0")){%>
+		     //alert("ร้านค้านี้ ยังไม่ได้เปิดสิทธิ์ ให้ขายเชื่อ ได้ กรุณาแจ้งทางผู้จัดการหรือซุปเปอร์ ให้ทำเรื่องเปิดสิทธิ์การขายเชื่อ");
+			 
+			 $("#error-dialog").dialog("open");
+		     jQuery("#error-dialog-message").text("ร้านค้านี้ ยังไม่ได้เปิดสิทธิ์ ให้ขายเชื่อ ได้ กรุณาแจ้งทางผู้จัดการหรือซุปเปอร์ ให้ทำเรื่องเปิดสิทธิ์การขายเชื่อ");
+		     r = false;
+		<%}if(receiptCreditFlag.equalsIgnoreCase("-1")){%>
+		    //alert("ร้านค้านี้ ยังมีบิลเก่า ที่ยังไม่ได้เก็บเงิน  ต้องเก็บเงินบิลเก่าก่อน จึงสามารถเปิดบิลขายเชื่อใหม่");
+		   
+		    $("#error-dialog").dialog("open");	    
+		    jQuery("#error-dialog-message").text("ร้านค้านี้ ยังมีบิลเก่า ที่ยังไม่ได้เก็บเงิน  ต้องเก็บเงินบิลเก่าก่อน จึงสามารถเปิดบิลขายเชื่อใหม่");
+	        r = false;
+		<%}%>
+	}
+	return r;
+}
+function validateVanCreditLimit(){
+	var r = true;
+	var vanPaymentMethod = document.getElementsByName("order.vanPaymentMethod")[0];
+	var custCreditLimit = document.getElementsByName("custCreditLimit")[0];
+	var netAmount = document.getElementsByName("order.netAmount")[0];
+	if(vanPaymentMethod.value =='CREDIT'){
+		//alert("creditLimit["+custCreditLimit.value+"]:netAmount["+netAmount.value+"]") ;
+		if(parseFloat(netAmount.value) > parseFloat(custCreditLimit.value)){
+		   //alert("creditLimit["+parseFloat(custCreditLimit.value)+"]:netAmount["+parseFloat(netAmount.value)+"]") ;
+		   $("#error-dialog").dialog("open");
+		   jQuery("#error-dialog-message").text("ยอดเงินที่ขาย เกินวงเงินที่กำหนด ไม่สามารถทำรายการขายได้ วงเงินที่ขายได้ของร้านนี้ ("+custCreditLimit.value+")");
+		   r = false;
+		}
+	}
+	return r;
 }
 </script>
 </head>
@@ -765,22 +846,14 @@ function escapeParameter(param){
 							<tr>
 								<td></td>
 								<td class="textSpecial">
-								<%
-								if(User.VAN.equals(user.getType())){
-									  if("N".equals(canReceiptMoreCash)){
-									%>
-									      <input type="checkbox" name="tempCheck" checked disabled/>
-										   บันทึกรับเงินสดทันที
-										  <html:checkbox property="order.paymentCashNow" styleId="paymentCashNow"/>
-										  <script>
-										   document.getElementById("paymentCashNow").style.display = 'none';
-										   </script>
-								    <%}else{ %>
-										  <html:checkbox property="order.paymentCashNow"/> บันทึกรับเงินสดทันที
-								     <%
-									 } 		
-								} 
-								%>
+								<%if(User.VAN.equals(user.getType())){%>  
+								     ชำระโดย
+								  <html:select property="order.vanPaymentMethod">
+										<html:options collection="vanPaymentMethod" property="key" labelProperty="name"/>
+									</html:select>
+							    <%}else{ %>
+							       <html:hidden property="order.vanPaymentMethod"/>
+							    <%} %>
 								</td>
 								<td></td>
 								<td valign="top">
@@ -843,8 +916,8 @@ function escapeParameter(param){
 								</td>
 							</tr>
 						</table>
-						SaleOrder
-						
+				
+						<span title="SalesOrder">...</span>
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
 						<html:hidden property="autoReceipt.paymentMethod"/>
@@ -862,12 +935,13 @@ function escapeParameter(param){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported" value="N"/>
 						<html:hidden property="order.isCash" value="N"/>
+					   
+							
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						
 						<!--  Can Receipt Credit (VAN)-->
-						<html:hidden property="canReceiptMoreCash"/>
-						<html:hidden property="canReceiptCredit"/>
-						<html:hidden property="canAirpay"/>
+						<html:hidden property="receiptCreditFlag"/>
+					    <html:hidden property="custCreditLimit"/>
 							
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>
@@ -884,7 +958,6 @@ function escapeParameter(param){
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_4.gif"/></td>
 		            <td background="${pageContext.request.contextPath}/images2/boxcont1_7.gif"></td>
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_3.gif"/></td>
-	          	</tr>
     		</table>
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
@@ -906,3 +979,4 @@ function escapeParameter(param){
 
 <div id="brand-dialog"></div>
 <div id="selectProduct" >No Product To Display!</div>
+<div id="error-dialog"><div id="error-dialog-message" style="color:red;"></div></div>

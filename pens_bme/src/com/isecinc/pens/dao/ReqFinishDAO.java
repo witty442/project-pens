@@ -19,8 +19,8 @@ import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class ReqFinishDAO extends PickConstants{
 
@@ -62,13 +62,11 @@ public class ReqFinishDAO extends PickConstants{
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		
 		int r = 1;
 		int c = 1;
 		try {
-
-			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING i \n");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING i ");
+			sql.append("\n where 1=1   ");
 			
 			if( !Utils.isNull(h.getRequestDate()).equals("")){
 				sql.append("\n and i.REQUEST_DATE = ? ");
@@ -84,17 +82,13 @@ public class ReqFinishDAO extends PickConstants{
 			
 			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
-			
-			
 			ps = conn.prepareStatement(sql.toString());
-			
 			if( !Utils.isNull(h.getRequestDate()).equals("")){
 				Date tDate  = Utils.parse(h.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
 	
 				   h.setNo(r);
@@ -120,17 +114,13 @@ public class ReqFinishDAO extends PickConstants{
 				   }else{
 					   h.setCanPrint(false); 
 				   }
-				  
 				   
 				//get Items
 				if(getItems){
 					h.setItems(searchItem(conn, h));
 				}
-
 			   r++;
-			   
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -142,61 +132,73 @@ public class ReqFinishDAO extends PickConstants{
 		return h;
 	}
 	
-	public static List<ReqFinish> searchHead(ReqFinish o,boolean getItems ) throws Exception {
+	public static int searchTotalHead(Connection conn,ReqFinish o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
+		int totalRec = 0;
+		int c = 1;
+		try {
+			sql.append("\n select count(*) as c from PENSBI.PENSBME_REQ_FINISHING i \n");
+			sql.append("\n where 1=1   \n");
+			sql.append(genWhereSqlSearchHead(o));
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()) {
+				 totalRec = rst.getInt("c");
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	
+	
+	
+	public static List<ReqFinish> searchHead(Connection conn,ReqFinish o,boolean getItems ,boolean allRec ,int currPage,int pageSize) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
 		ReqFinish h = null;
 		List<ReqFinish> items = new ArrayList<ReqFinish>();
 		int r = 1;
-		int c = 1;
 		try {
-			sql.append("\n select i.* from PENSBI.PENSBME_REQ_FINISHING i \n");
-			sql.append("\n where 1=1   \n");
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				sql.append("\n and i.REQUEST_DATE = ? ");
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n 		select i.* from PENSBI.PENSBME_REQ_FINISHING i ");
+			sql.append("\n 		where 1=1   ");
+			sql.append(genWhereSqlSearchHead(o));
+			sql.append("\n 		order by i.request_no desc ");
+            sql.append("\n   )A ");
+            
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
 			}
-			
-			if( !Utils.isNull(o.getStatus()).equals("")){
-				sql.append("\n and i.status = '"+Utils.isNull(o.getStatus())+"'");
-			}
-			
-			if( !Utils.isNull(o.getRequestNo()).equals("")){
-				sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
-			}
-			if( !Utils.isNull(o.getWareHouse()).equals("")){
-				sql.append("\n and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
-			}
-			
-			sql.append("\n order by i.request_no desc ");
 			logger.debug("sql:"+sql);
-			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
-			}
-			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
 				   h = new ReqFinish();
 				   h.setNo(r);
 				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
 				   h.setRemark(Utils.isNull(rst.getString("remark"))); 
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
-				   
 				   h.setWareHouse(Utils.isNull(rst.getString("WAREHOUSE"))); 
-				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_OPEN) ){
 					   h.setCanEdit(true);
 				   }else{
@@ -210,21 +212,39 @@ public class ReqFinishDAO extends PickConstants{
 				
 			   items.add(h);
 			   r++;
-			   
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			try {
 				rst.close();
 				ps.close();
-				conn.close();
 			} catch (Exception e) {}
 		}
 		return items;
 	}
-	
+
+	private static StringBuffer genWhereSqlSearchHead(ReqFinish o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		if( !Utils.isNull(o.getRequestDate()).equals("")){
+			//BudishDate
+			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateChristStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n 		and i.request_date = to_date('"+dateChristStr+"','dd/mm/yyyy')");
+		}
+		if( !Utils.isNull(o.getStatus()).equals("")){
+			sql.append("\n 		and i.status = '"+Utils.isNull(o.getStatus())+"'");
+		}
+		if( !Utils.isNull(o.getRequestNo()).equals("")){
+			sql.append("\n 		and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+		}
+		if( !Utils.isNull(o.getWareHouse()).equals("")){
+			sql.append("\n 		and i.WAREHOUSE = '"+Utils.isNull(o.getWareHouse())+"'");
+		}
+		
+		
+		return sql;
+	}
 	
 	public static List<ReqFinish> searchItem(Connection conn,ReqFinish o ) throws Exception {
 		PreparedStatement ps = null;

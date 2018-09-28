@@ -9,8 +9,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.Utils;
 
 public class PopupDAO {
 	private static Logger logger = Logger.getLogger("PENS");

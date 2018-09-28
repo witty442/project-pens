@@ -13,9 +13,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
+import util.CConstants;
+import util.DBConnection;
+
 import com.isecinc.core.bean.References;
+import com.isecinc.pens.bean.CConstantsBean;
 import com.isecinc.pens.bean.PopupBean;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
 
 public class LocationInitial extends LocationControlPage {
    
@@ -91,7 +94,7 @@ public class LocationInitial extends LocationControlPage {
 			PopupBean item = new PopupBean();
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
-			dataList.add(item);
+			//dataList.add(item);
 			
 			item = new PopupBean();
 			item.setCustCatNo("S");
@@ -158,6 +161,7 @@ public class LocationInitial extends LocationControlPage {
 			List<References> tripTypeList = new ArrayList<References>();
 			tripTypeList.add(new References("real","แสดงข้อมูลร้านค้าตามการบันทึกจริง"));
 			tripTypeList.add(new References("trip"," แสดงข้อมูลร้านค้าตาม Trip "));
+			tripTypeList.add(new References("NotEqualTrip"," แสดงข้อมูลร้านค้าไม่ตรงตามTrip "));
 			session.setAttribute("TRIP_TYPE_LIST", tripTypeList);
 			
 		}catch(Exception e){
@@ -171,5 +175,87 @@ public class LocationInitial extends LocationControlPage {
 		}
 	}
 	
+	public  void initSessionMonitorSpider(HttpServletRequest requestWeb) {
+		References r = null;
+		HttpSession session = requestWeb.getSession(true);
+		Connection conn = null;
+		int i = 0;
+		try{
+			logger.debug("Initail Session ");
+			conn = DBConnection.getInstance().getConnectionApps();
+
+			//CUST_CAT_NO_LIST
+			//add Blank Row
+			List<PopupBean> dataList = new ArrayList<PopupBean>();
+			PopupBean item = new PopupBean();
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
+			//dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("S");
+			item.setCustCatDesc("Credit Sales");
+			dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("C");
+			item.setCustCatDesc("Van Sales");
+			dataList.add(item);
+			
+			session.setAttribute("CUST_CAT_LIST",dataList);
+			/********************************************************/
+			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn);
+			dataList.addAll(salesChannelList_s);
+			session.setAttribute("SALES_CHANNEL_LIST",dataList);
+			
+			/********************************************************/
+			//SALESREP_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			dataList.addAll(salesrepList_s);
+			session.setAttribute("SALESREP_LIST",dataList);
+			
+			/********************************************************/
+			//PROVINCE_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setProvince("");
+			item.setProvinceName("");
+			dataList.add(item);
+			
+			List<PopupBean> tempList = searchProvinceList(conn,"");
+			dataList.addAll(tempList);
+			session.setAttribute("PROVINCE_LIST",dataList);
+            /********************************************************/
+			/** Init AVG Distinace Valid **/
+			//get constants config all by ref_code
+			Map<String, CConstantsBean> constantsMap = CConstants.getConstantsList(conn, CConstants.SPIDER_REF_CODE);
+			session.setAttribute("CONSTANTS_MAP",constantsMap);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			 	DBConnection.getInstance().closeConn(conn, null, null);
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+	}
 	
 }

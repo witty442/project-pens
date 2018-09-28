@@ -28,9 +28,36 @@ public class PopupSearchForm extends ActionForm implements Serializable{
     private String code;
     private String desc;
     private String groupStore;
+    private String groupCode;
+    private String styleNo;
+    private String pensItem;
     private Map<String, String> criteriaMap;
     
     
+	public String getGroupStore() {
+		return groupStore;
+	}
+	public void setGroupStore(String groupStore) {
+		this.groupStore = groupStore;
+	}
+	public String getGroupCode() {
+		return groupCode;
+	}
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+	public String getStyleNo() {
+		return styleNo;
+	}
+	public void setStyleNo(String styleNo) {
+		this.styleNo = styleNo;
+	}
+	public String getPensItem() {
+		return pensItem;
+	}
+	public void setPensItem(String pensItem) {
+		this.pensItem = pensItem;
+	}
 	public Map<String, String> getCriteriaMap() {
 		return criteriaMap;
 	}

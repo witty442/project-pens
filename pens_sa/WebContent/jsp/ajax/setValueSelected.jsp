@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<%@ page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="util.Utils"%>
 <%
 String codes = Utils.isNull(request.getParameter("codes"));
 String keys = Utils.isNull(request.getParameter("keys"));

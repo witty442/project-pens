@@ -61,11 +61,6 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -85,7 +80,6 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		var creditamts=window.opener.document.getElementsByName('bill.creditAmt');
 		var paidamts = window.opener.document.getElementsByName('bill.paidAmt');
 
-		
 		var allBills = window.opener.document.getElementsByName('pb.allBillId')[<%=row%>-1];
 		var allPaids = window.opener.document.getElementsByName('pb.allPaid')[<%=row%>-1];
 		var b;
@@ -161,7 +155,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		
 		if(Trim(allBills).value!=''){
 			b = allBills.value.split(',');
-			//alert(b);
+	
 			for(i=0;i<cns.length;i++){
 				for(j=0;j<b.length;j++){
 					if(cnbills[i].value==b[j]){
@@ -170,6 +164,8 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 						cnpaids2[i].value = allPaids.value.split('|')[j];
 						cncrds[i].value = Number(cncrds[i].value)+Number(cnpaids2[i].value);
 						tbl.rows[j+1].cells[3].innerHTML = addCommas(Number(cncrds[j].value).toFixed(2));
+					}else{
+						//alert(cnbills[i].value+":"+b[j]);
 					}					
 				}
 			}

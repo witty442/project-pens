@@ -18,8 +18,8 @@ import com.isecinc.pens.bean.PriceListMasterBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class PriceListMasterDAO extends PickConstants{
 

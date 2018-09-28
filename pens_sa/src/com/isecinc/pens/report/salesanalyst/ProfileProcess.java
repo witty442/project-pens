@@ -7,12 +7,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.GroupRole;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 public class ProfileProcess {
 

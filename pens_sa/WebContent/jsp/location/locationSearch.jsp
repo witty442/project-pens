@@ -1,11 +1,11 @@
+
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
 <%@page import="com.isecinc.pens.web.location.LocationInitial"%>
+<%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
@@ -19,7 +19,7 @@
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
-
+//String path = request.getP
 java.util.List yearList = null;
 if(session.getAttribute("yearList") != null) 
 	yearList = (java.util.List)session.getAttribute("yearList");
@@ -49,6 +49,17 @@ body {
 }
 .style1 {color: #004a80}
 -->
+
+fieldset { border:1px solid black }
+
+legend {
+  padding: 0.2em 0.5em;
+  border:1px solid green;
+  color:green;
+  font-size:90%;
+  text-align:left;
+  }
+  
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -56,6 +67,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/location.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -139,48 +151,49 @@ function loadMe(path){
 						<table width="80%" border="0" align="center" cellpadding="3" cellspacing="1">
 						
 							   <tr><td colspan="8" align="right">
-								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
-									<tr class="txt_style" >
-								  	<td width="13%" align="left">รอบเวลา &nbsp;&nbsp;<html:select property="bean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
-								         <html:options collection="typeSearchList" property="key" labelProperty="name"/>
-							           </html:select>
-							           </td>
-								     <td width="6%" align="right">วันที่</td>
-								     <td width="27%" align="left">
-								      <html:text property="bean.day" readonly="true" styleId="day" size="15"/>
-								      &nbsp;&nbsp;-&nbsp;&nbsp;
-								      <html:text property="bean.dayTo" readonly="true" styleId="dayTo" size="15"/>
-                                     </td> 
-									<td width="2%" align="right">ปี</td>
-									<td width="6%" align="left">
-									  <html:select property="bean.year" styleId="yearList" onchange="chkYear()" styleClass="txt_style">
-								         <html:options collection="yearList" property="key" labelProperty="name"/>
-						              </html:select>
-									</td>
-								    <td width="8%" align="right"></td>
-								    <td width="20%" align="left"></td>
-								     </tr>
-								   </table>
+							        <fieldset>
+									    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+										<tr class="txt_style" >
+									  	<td width="13%" align="left"><b>รอบเวลา</b> &nbsp;&nbsp;<html:select property="bean.typeSearch" onchange="chkSearch()" styleClass="txt_style">
+									         <html:options collection="typeSearchList" property="key" labelProperty="name"/>
+								           </html:select>
+								           </td>
+									     <td width="6%" align="right"><b>วันที่</b></td>
+									     <td width="27%" align="left">
+									      <html:text property="bean.day" readonly="true" styleId="day" size="15"/>
+									      &nbsp;&nbsp;-&nbsp;&nbsp;
+									      <html:text property="bean.dayTo" readonly="true" styleId="dayTo" size="15"/>
+	                                     </td> 
+										<td width="2%" align="right"><b>ปี</b></td>
+										<td width="6%" align="left">
+										  <html:select property="bean.year" styleId="yearList" onchange="chkYear()" styleClass="txt_style">
+									         <html:options collection="yearList" property="key" labelProperty="name"/>
+							              </html:select>
+										</td>
+									    <td width="8%" align="right"></td>
+									    <td width="20%" align="left"></td>
+									     </tr>
+									   </table>
+								   </fieldset>
 								</td></tr>
 								<!-- ###################################### -->
 								<tr><td colspan="8" align="left">
 								     <fieldset>
-								       <legend>เดือน</legend>
-									    <table width="100%" border="0">
+									    <table width="100%" border="0"  class="disable_text">
 									    <c:forEach var="item" items="${yearList}" >
                                          <tr id="${item.key}" class="txt_style" >
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}01</html:multibox>ม.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}02</html:multibox>ก.พ.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}03</html:multibox>มี.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}04</html:multibox>เม.ย.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}05</html:multibox>พ.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}06</html:multibox>มิ.ย.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}07</html:multibox>ก.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}08</html:multibox>ส.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}09</html:multibox>ก.ย.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}10</html:multibox>ต.ค.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}11</html:multibox>พ.ย.</td>
-                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}12</html:multibox>ธ.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}01</html:multibox>&nbsp;ม.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}02</html:multibox>&nbsp;ก.พ.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}03</html:multibox>&nbsp;มี.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}04</html:multibox>&nbsp;เม.ย.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}05</html:multibox>&nbsp;พ.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}06</html:multibox>&nbsp;มิ.ย.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}07</html:multibox>&nbsp;ก.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}08</html:multibox>&nbsp;ส.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}09</html:multibox>&nbsp;ก.ย.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}10</html:multibox>&nbsp;ต.ค.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}11</html:multibox>&nbsp;พ.ย.</td>
+                                          <td width="5%"><html:multibox  property="bean.chkMonth">${item.key}12</html:multibox>&nbsp;ธ.ค.</td>
                                          </tr>
                                          </c:forEach>
                                        </table>
@@ -188,106 +201,114 @@ function loadMe(path){
                                  </td></tr>
                                  <!-- ###################################### -->
                                   <tr><td colspan="8" align="right">
-								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
-									<tr class="txt_style" >
-								  	  <td width="100%" align="left">ลักษณะการแสดงผล &nbsp;&nbsp;
-								  	  <html:select property="bean.dispType" styleId="dispType" onchange="changeDispCri(this)" styleClass="txt_style">
-								         <html:options collection="dispTypeList" property="key" labelProperty="name"/>
-							           </html:select>
-							          </td>
-							         </tr>
-								   </table>
+                                    <fieldset>
+									    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
+										<tr class="txt_style" >
+									  	  <td width="100%" align="left"><b>ลักษณะการแสดงผล </b>&nbsp;&nbsp;
+									  	  <html:select property="bean.dispType" styleId="dispType" onchange="changeDispCri(this)" styleClass="txt_style">
+									         <html:options collection="dispTypeList" property="key" labelProperty="name"/>
+								           </html:select>
+								          </td>
+								         </tr>
+									   </table>
+								   </fieldset>
 								</td></tr>
 								<!-- ###################################### -->
 								<tr><td colspan="8" align="right">
+								  <fieldset>
 								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
 									<tr class="txt_style" >
-									 <td width="8%" align="right">ประเภทขาย</td>
-								  	<td width="10%" align="left">
+								  	 <td width="20%" align="left" nowrap>
+								  	     <b>ประเภทขาย</b>&nbsp;&nbsp;
 								  	    <html:select property="bean.custCatNo" styleId="custCatNo" styleClass="txt_style" 
 								  	    onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
 								       <html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
 							           </html:select>
 							           </td>
-								     <td width="10%" align="right">ภาคการขาย </td>
+								     <td width="10%" align="right"  nowrap><b>ภาคการขาย</b> </td>
 								     <td width="10%" align="left">
 								      <html:select property="bean.salesChannelNo" styleId="salesChannelNo" 
 								      onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
 						                <html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				                      </html:select>
                                      </td> 
-									<td width="10%" align="right"> พนักงานขาย </td>
+									<td width="10%" align="right" nowrap> <b>พนักงานขาย</b> </td>
 									<td width="20%" align="left">
 									<html:select property="bean.salesrepCode" styleId="salesrepCode" >
 										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
 								    </html:select>
 									</td>
-									<td width="12%" align="right"></td>
+									<td width="10%" align="right"></td>
 								    <td width="20%" align="left"></td>
 								    </tr>
 								   </table>
+								   </fieldset>
 								</td></tr>
 								<!-- ################################## -->
 								<tr><td colspan="8" align="right">
+								   <fieldset>
 								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1">
 									<tr class="txt_style" >
-									 <td width="5%" align="right">จังหวัด</td>
-								  	<td width="10%" align="left">
+								  	<td width="15%" align="left" nowrap>
+								  	    <b>จังหวัด</b> &nbsp;&nbsp;
 								  	    <html:select property="bean.province" styleId="province" styleClass="txt_style" onchange="loadDistrict('${pageContext.request.contextPath}');">
 								           <html:options collection="PROVINCE_LIST" property="province" labelProperty="provinceName"/>
 							           </html:select>
 							         </td>
-								     <td width="10%" align="right">อำเภอ</td>
+								     <td width="10%" align="right" nowrap><b>อำเภอ</b></td>
 								     <td width="10%" align="left">
 								      <html:select property="bean.district" styleId="district" >
 						                <%-- <html:options collection="DISTRICT_LIST" property="district" labelProperty="districtName"/> --%>
 				                      </html:select>
                                      </td> 
-									<td width="10%" align="right"> รหัสร้านค้า </td>
-									<td width="20%" align="left">
+									<td width="10%" align="right" nowrap> <b>รหัสร้านค้า</b> </td>
+									<td width="15%" align="left"  nowrap>
 								       <html:text property="bean.customerCode"  styleId="customerCode" size="15"/>
 									  <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerLocation')"/>   
 									</td>
-									<td width="12%" align="right"></td>
-								    <td width="20%" align="left"></td>
+									<td width="25%" align="right" nowrap> 
+									 <b>ประเภทร้านค้า</b>&nbsp;
+										     <html:select property="bean.customerType" styleId="customerType" styleClass="txt_style">
+									            <html:option value="">ร้านค้าทั้งหมด</html:option>
+									            <html:option value="P">ร้านโชห่วย</html:option>
+									            <html:option value="B">ร้านธงฟ้า</html:option>
+								            </html:select>
+									</td>
+								    <td width="12%" align="left"></td>
 								    </tr>
 								   </table>
+								   </fieldset>
 								</td></tr>
 								<!-- ################################## -->
 								<tr><td colspan="8" align="right">
+							    	<fieldset>
 								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1"  id="table_map">
-									<tr class="txt_style" >
-								  	<td width="15%" align="left">
-								  	     <html:checkbox property="bean.dispAllStore">ร้านค้าทั้งหมด</html:checkbox>
-								  	     &nbsp;
-								  	     <img src="${pageContext.request.contextPath}/icons/chk_store.png" width="32px" height ="32px"/>
-							         </td>
-								     <td width="15%" align="left" colspan="2">
-								     <html:checkbox property="bean.dispAllOrder">ร้านที่ได้ขาย</html:checkbox>
-								     &nbsp;
-								  	     <img src="${pageContext.request.contextPath}/icons/chk_order.png" width="32px" height ="32px"/>
-                                     </td> 
-									<td width="15%" align="left">
-								      <html:checkbox property="bean.dispAllVisit">ร้านที่ได้เยี่ยม</html:checkbox>
-									&nbsp;
-								  	  <img src="${pageContext.request.contextPath}/icons/chk_visit.png" width="32px" height ="32px"/>
-									</td>
-									<td width="20%" align="right"></td>
-								    <td width="20%" align="left"></td>
-								    </tr>
+									  <tr class="txt_style" >
+							              <td  width="20%" align="right" valign="bottom" nowrap>
+                                               <html:checkbox property="bean.dispAllNoOrder">&nbsp;<b>ร้านค้าที่ไม่ได้ขาย</b></html:checkbox>
+									  	       <img src="${pageContext.request.contextPath}/icons/chk_no_order.png" width="16px" height ="16px"/>
+									      </td>
+									      <td  width="20%" align="right" valign="bottom" nowrap>
+                                             <html:checkbox property="bean.dispAllOrder">&nbsp;<b>ร้านที่ได้ขาย</b></html:checkbox>
+									  	     <img src="${pageContext.request.contextPath}/icons/chk_order.png" width="16px" height ="16px"/>
+									      </td>
+									     <td  width="20%" align="right" valign="bottom" nowrap>
+										      <html:checkbox property="bean.dispAllVisit">&nbsp;<b>ร้านที่ได้เยี่ยม</b></html:checkbox>
+										  	  <img src="${pageContext.request.contextPath}/icons/chk_visit.png" width="16px" height ="16px"/>  
+	                                     </td> 
+										<td width="15%" align="left"> </td>
+									  </tr>
 								   </table>
-								</td></tr>
-							   <!-- ################################## -->
-								<tr><td colspan="8" align="right">
-								    <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" id="table_data">
+								   
+								   <!-- Table DATA -->
+								   <table width="100%" border="0" align="center" cellpadding="3" cellspacing="1" id="table_data">
 									<tr class="txt_style" >
-								  	<td width="15%" align="left">รูปแบบการแสดงผล </td>
-								     <td width="20%" align="left" colspan="2">
+								     <td width="35%" align="left" colspan="3"><b>รูปแบบการแสดงผล</b>
 								     <html:select property="bean.reportType" styleId="reportType" styleClass="txt_style">
 								           <html:options collection="REPORT_TYPE_LIST" property="key" labelProperty="name"/>
 							           </html:select>
                                      </td> 
-									<td width="10%" align="right">ข้อมูล Trip</td>
+									<td width="10%" align="right"><b>ข้อมูล Trip</b></td>
 									<td width="25%" align="left">
 									 <html:select property="bean.tripType" styleId="tripType" styleClass="txt_style">
 								           <html:options collection="TRIP_TYPE_LIST" property="key" labelProperty="name"/>
@@ -296,18 +317,27 @@ function loadMe(path){
 								    <td width="15%" align="left"></td>
 								    </tr>
 								   </table>
+								   
+								  </fieldset>
 								</td></tr>
-								<!-- ################################## -->
+							   <!-- ################################## -->
 							 </table>
 					<br>
 					<!-- BUTTON -->
-					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
+					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body"  width="100%">
 						<tr>
-							<td align="center">
-								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
-								<input type="button" value="Export" class="newPosBtn" onclick="exportReport('${pageContext.request.contextPath}')"> 
-								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
+							<td align="center" width="80%">
+								<input type="button" value="ค้นหา" class="newPosBtnLong" onclick="search('${pageContext.request.contextPath}')">
+								<input type="button" value="Export" class="newPosBtnLong" onclick="exportReport('${pageContext.request.contextPath}')"> 
+								<input type="button" value="Clear" class="newPosBtnLong" onclick="clearForm('${pageContext.request.contextPath}')">
+							 
+							 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							 <img src="${pageContext.request.contextPath}/icons/generalshop.png" width="32px" height ="32px"/><b>ร้านโชห่วย</b>
+							   <img src="${pageContext.request.contextPath}/icons/blueflagicon.png" width="32px" height ="32px"/><b>ร้านธงฟ้า</b>
 							</td>
+							
 						</tr>
 					</table>					
 				    <!-- ************************Result ***************************************************-->

@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 
-import util.BundleUtil;
+import com.pens.util.BundleUtil;
 
 /**
  * I_System

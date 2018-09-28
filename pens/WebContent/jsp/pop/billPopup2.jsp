@@ -1,5 +1,16 @@
+<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MAdjust"%>
 <%@page import="util.SessionGen"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.pens.bean.Order"%>
+<%@page import="com.isecinc.pens.model.MOrder"%>
+<%@page import="com.isecinc.pens.model.MReceiptLine"%>
+<%@page import="com.isecinc.pens.model.MCreditNote"%>
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -13,44 +24,47 @@ String selected = request.getParameter("selected");
 if(selected==null)selected="";
 String custId = request.getParameter("cust");
 User user = (User) session.getAttribute("user");
- 
-List<Order> ordersAll = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
-double totalCreditNoteAmt = 0; 
-double totalAdjustAmt = 0; 
-
-List<Order> orders  = new ArrayList<Order>();
-MCreditNote creditNote = new MCreditNote();
-MAdjust adjust = new MAdjust();
-
-for(Order r : ordersAll){
-	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r));
+Connection conn = null;
+try{
+	//init Connection 
+	conn = DBConnection.getInstance().getConnection();
 	
-	totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(r.getArInvoiceNo());
+	List<Order> ordersAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
+	double totalCreditNoteAmt = 0; 
+	double totalAdjustAmt = 0; 
+	 
+	List<Order> orders  = new ArrayList<Order>();
+	MCreditNote creditNote = new MCreditNote();
+	MAdjust adjust = new MAdjust();
 	
-	totalAdjustAmt = adjust.getTotalAdjustAmtInvoice(r.getArInvoiceNo());  
-	
-	r.setCreditNoteAmt(totalCreditNoteAmt);
-	r.setAdjustAmt(totalAdjustAmt);
-	r.setOpenAmt();
-	
-	//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
-	//remove zero credit
-	if(r.getOpenAmt() > 0.01){
-		orders.add(r);
+	for(Order r : ordersAll){
+		r.setCreditAmount(new MReceiptLine().calculateCreditAmount(conn,r));
+		
+		totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(conn,r.getArInvoiceNo());
+		
+		totalAdjustAmt = adjust.getTotalAdjustAmtInvoice(conn,r.getArInvoiceNo());  
+		
+		r.setCreditNoteAmt(totalCreditNoteAmt);
+		r.setAdjustAmt(totalAdjustAmt);
+		r.setOpenAmt();
+		
+		//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
+		//remove zero credit
+		if(r.getOpenAmt() > 0.01){
+			orders.add(r);
+		}
+	}
+	pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
+}catch(Exception e){
+	e.printStackTrace();
+}finally{
+	if(conn != null){
+		conn.close();conn=null;
 	}
 }
 
-pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 %>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.model.MOrder"%>
-<%@page import="com.isecinc.pens.model.MReceiptLine"%>
-<%@page import="com.isecinc.pens.model.MCreditNote"%>
-<%@page import="java.util.ArrayList"%><html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
@@ -108,7 +122,15 @@ pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
 	<jsp:param name="function" value=""/>
 	<jsp:param name="code" value="ใบแจ้งหนี้"/>
 </jsp:include>
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td align="center">
+					<input type="button" value="บันทึก" class="newPosBtn" onclick="addRow();">
 
+					<input type="button" value="ยกเลิก" class="newNegBtn" onclick="window.close();">
+				</td>
+			</tr>
+		</table>
 <!-- <div style="overflow:auto;height:300px;"> -->
 		<table align="center" border="0" cellpadding="0" cellspacing="1" width="100%" class="result">
 			<tr>

@@ -24,9 +24,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ReqPickStockForm;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -66,7 +66,7 @@ public class ReqPickStockActionV1 extends I_Action {
                 
 			}else if("back".equals(action)){
 				aForm.setBean(aForm.getBeanCriteria());
-				aForm.setResultsSearch(ReqPickStockDAO.searchHead(aForm.getBean()));
+				//aForm.setResultsSearch(ReqPickStockDAO.searchHead(aForm.getBean()));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message",e.getMessage());
@@ -85,7 +85,7 @@ public class ReqPickStockActionV1 extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {
-			aForm.setResultsSearch(ReqPickStockDAO.searchHead(aForm.getBean()));
+			//aForm.setResultsSearch(ReqPickStockDAO.searchHead(aForm.getBean()));
 			if(aForm.getResultsSearch().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
 			   aForm.setResultsSearch(null);

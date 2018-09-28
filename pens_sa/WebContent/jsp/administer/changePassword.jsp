@@ -1,4 +1,5 @@
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.Utils"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -14,7 +15,9 @@
 <%@page import="com.isecinc.pens.web.user.UserForm"%>
 <jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" />
 <%@page import="com.isecinc.pens.model.MGroupRole"%>
-
+<%
+ String userName = ((User)session.getAttribute("user")).getUserName();
+%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -107,6 +110,14 @@ function logout(path){
 								<td align="right"></td>
 								<td align="left"></td>
 							</tr> 
+							<tr>
+								<td align="right">รหัสผู้ใช้ :</td>
+								<td align="left">
+								 <b> <%=userName%></b>
+								</td>
+								<td align="right"></td>
+								<td align="left"></td>
+							</tr>
 							<tr>
 								<td align="right">รหัสผ่านเก่า<font color="red">*</font></td>
 								<td align="left">

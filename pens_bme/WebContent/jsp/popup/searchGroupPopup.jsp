@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -43,6 +43,7 @@ input[type=radio]
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
 	String types = Utils.isNull(request.getParameter("types"));
+    String storeType = Utils.isNull(request.getParameter("storeType"));
     String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
     
     /** Store Select MutilCode in each Page **/
@@ -242,6 +243,7 @@ window.onload = function(){
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <html:form action="/jsp/searchGroupPopupAction">
+<input type="hidden" name="storeType" value="<%=storeType %>"/>
 <input type="hidden" name="types" value="<%=types %>"/>
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />

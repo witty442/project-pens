@@ -3,30 +3,19 @@
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="jobForm" class="com.isecinc.pens.web.pick.JobForm" scope="session" />
-<%
-%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -37,15 +26,14 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 
+<script type="text/javascript">
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('openDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('closeDate'));
@@ -56,21 +44,18 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function search(path){
 	var form = document.jobForm;
 	form.action = path + "/jsp/jobAction.do?do=search2&action=newsearch";
 	form.submit();
 	return true;
 }
-
 function openEdit(path,jobId,mode){
 	var form = document.jobForm;
 	form.action = path + "/jsp/jobAction.do?do=prepare&jobId="+jobId+"&mode="+mode;
 	form.submit();
 	return true;
 }
-
 function openPopupCustomer(path,types,storeType){
 	var form = document.jobForm;
 	var storeGroup = form.custGroup.value;
@@ -80,10 +65,10 @@ function openPopupCustomer(path,types,storeType){
         param += "&storeGroup="+storeGroup;
     
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",700);
 }
-
 function setStoreMainValue(code,desc,storeNo,subInv,types){
 	var form = document.jobForm;
 	//alert(form);
@@ -194,104 +179,86 @@ function gotoPage(path,currPage){
 	      		<tr>
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
 		            <td bgcolor="#f8f8f8">
-		            
 						<!-- BODY -->
 						<html:form action="/jsp/jobAction">
 						<jsp:include page="../error.jsp"/>
-
 						   <div align="center">
-						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
+						    <table align="center" border="0" cellpadding="3" cellspacing="0" width="40%">
 						       <tr>
-	                                 <td colspan="1" align="center"> <b>ค้นหา Job </b> </td>		
-								</tr>
+	                               <td colspan="4" align="center" class="criteria_h_style"> <b><u>ค้นหา Job </u></b> </td>		
+							   </tr>
 						       <tr>
-                                    <td> Open Date</td>
-									<td>						
-										  <html:text property="job.openDate" styleId="openDate" size="20" />
+                                    <td align="right" nowrap width="5%" class="criteria_style"> Open Date</td>
+									<td  width="5%">						
+										  <html:text property="job.openDate" styleId="openDate" size="15" />
+									</td >
+									<td align="right"  width="5%" nowrap  class="criteria_style"> Job On Year</td>
+									<td  width="25%">						
+										  <html:select property="job.year" styleId="year" >
+											<html:options collection="yearList" property="key" labelProperty="name"/>
+									    </html:select> 
 									</td>
 								</tr>
-								<tr>
-                                    <td> บันทึกเข้าคลัง</td>
-									<td>						
+							 	<tr>
+                                    <td align="right" nowrap width="5%"  class="criteria_style"> บันทึกเข้าคลัง</td>
+									<td width="5%">						
 										 <html:select property="job.wareHouse" styleId="wareHouse" >
 											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
 									    </html:select>
 									</td>
-								</tr>
-								<tr>
-                                    <td> กลุ่มร้านค้า</td>
-									<td>						
-										 <html:select property="job.custGroup" styleId="custGroup" onchange="resetStore()">
+									<td align="right"  width="5%" nowrap  class="criteria_style"> กลุ่มร้านค้า</td>
+									<td width="25%" nowrap> 
+									    <html:select property="job.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
 									</td>
 								</tr>
 								<tr>
-									<td >รหัสร้านค้า
-									</td>
-									<td align="left"> 
-									 <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+                                    <td align="right" nowrap width="5%"  class="criteria_style">รหัสร้านค้า</td>
+									<td width="35%" nowrap colspan="3"  class="criteria_style">						
+										 <html:text property="job.storeCode" styleId="storeCode" size="15" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
+									    &nbsp;&nbsp;&nbsp;&nbsp; Sub Inv&nbsp;
+									     <html:text property="job.subInv" styleId="subInv" size="10" readonly="true" styleClass="disableText"/>
+						                &nbsp;&nbsp;&nbsp;&nbsp;Store No&nbsp;
+						                 <html:text property="job.storeNo" styleId="storeNo" size="10" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>
 								<tr>
-                                    <td> Sub Inventory</td>
-									<td >
-						               <html:text property="job.subInv" styleId="subInv" size="20" readonly="true" styleClass="disableText"/>
-						                Store No
-						                 <html:text property="job.storeNo" styleId="storeNo" size="20" readonly="true" styleClass="disableText"/>
-									</td>
-								</tr>	
-								
-								<tr>
-                                    <td> Job Id</td>
-									<td >
+                                    <td align="right" nowrap width="5%"  class="criteria_style"> Job Id</td>
+									<td width="35%" nowrap  colspan="3"  class="criteria_style">
 						               <html:text property="job.jobId" styleId="jobId" size="10" />
 						                Job Name
 						                 <html:text property="job.name" styleId="name" size="40" />
-									</td>
-								</tr>	
-									
-								<tr>
-                                    <td> Job Status</td>
-									<td >
+									    &nbsp;&nbsp;&nbsp;&nbsp;Job Status &nbsp;
 						               <html:select property="job.status">
 											<html:options collection="jobStatusList" property="key" labelProperty="name"/>
 									    </html:select>
+									    &nbsp;&nbsp;Close Date
+									     <html:text property="job.closeDate" styleId="closeDate" size="15" />
 									</td>
 								</tr>	
+							
 								<tr>
-                                    <td> Close Date</td>
-									<td>						
-										  <html:text property="job.closeDate" styleId="closeDate" size="20" />
+                                    <td nowrap width="5%"  class="criteria_style"> เอกสารอ้างอิง</td>
+									 <td  nowrap  width="35%" colspan="3"  class="criteria_style"> 
+									 <html:text property="job.refDoc" styleId="refDoc" size="40" />
+									 RTN No
+									  <html:text property="job.rtnNo" styleId="rtnNo" size="15" />
+									  &nbsp;&nbsp;&nbsp;
+									  <html:checkbox property="job.dispAutoCN">&nbsp;แสดงรายที่ Auto CN/Sub Transfer แล้ว</html:checkbox>
 									</td>
-								</tr>
-								<tr>
-                                    <td> เอกสารอ้างอิง</td>
-									<td>				
-										  <html:text property="job.refDoc" styleId="refDoc" size="40" />
-									</td>
-								</tr>
-								<tr>
-                                    <td> RTN No</td>
-									<td>				
-										  <html:text property="job.rtnNo" styleId="rtnNo" size="15" />
-										  &nbsp;&nbsp;&nbsp;
-										  <html:checkbox property="job.dispAutoCN">แสดงรายที่ Auto CN แล้ว</html:checkbox>
-									</td>
-									
-								</tr>
+								</tr> 
+								 
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
 										</a>
-										
 										<a href="javascript:openEdit('${pageContext.request.contextPath}','','add')">
 										  <input type="button" value="   เพิ่มรายการใหม่   " class="newPosBtnLong">
 										</a>	
@@ -304,7 +271,7 @@ function gotoPage(path,currPage){
 					  </div>
 
             <c:if test="${jobForm.resultsSearch != null}">
-                  	    <% 
+                  	 <% 
 					   int totalPage = jobForm.getTotalPage();
 					   int totalRecord = jobForm.getTotalRecord();
 					   int currPage =  jobForm.getCurrPage();
@@ -341,16 +308,18 @@ function gotoPage(path,currPage){
 									<th> ยอดเงิน (ตาม RTN)</th>
 									<th >Job Status</th>
 									<th >Job Close Date</th>
-									<th >Auto CN</th>
+									<th >Auto CN/SubTransfer</th>
 									<th >แก้ไข</th>						
 							   </tr>
 							<% 
-							String tabclass ="lineE";
+							String tabclass ="";
 							List<Job> resultList = jobForm.getResultsSearch();
 							for(int n=0;n<resultList.size();n++){
 								Job item = (Job)resultList.get(n);
 								if(n%2==0){ 
 									tabclass="lineO";
+								}else{
+									tabclass ="lineE";
 								}
 								%>
 									<tr class="<%=tabclass%>">

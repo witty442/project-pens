@@ -19,24 +19,26 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-import util.excel.ExcelHeader;
-
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfPickStockDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -65,10 +67,28 @@ public class ConfPickStockAction extends I_Action {
 				ad.setStatus(PickConstants.STATUS_POST);
 				aForm.setBean(ad);
 				
+				//init Listbox Session
+				List<References> statusIssueReqList2 = new ArrayList<References>();
+				References ref = new References("","");
+				statusIssueReqList2.add(ref);
+				statusIssueReqList2.addAll(PickConstants.getRequestStatusW2ListInPageConfPickStock());
+				request.getSession().setAttribute("statusIssueReqList2",statusIssueReqList2);
+				
+				List<PopupForm> custGroupList = new ArrayList<PopupForm>();
+				PopupForm refP = new PopupForm("",""); 
+				custGroupList.add(refP);
+				custGroupList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+				request.getSession().setAttribute("custGroupList",custGroupList);
+				
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref1 = new References("","");
+				wareHouseList.add(ref1);
+				wareHouseList.addAll(PickConstants.getWareHouseList("",""));
+				request.getSession().setAttribute("wareHouseList2",wareHouseList);
+				
 			}else if("back".equals(action)){
 				//clear session data
 				request.getSession().setAttribute("results", null);
-				request.getSession().setAttribute("custGroupList", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
 				request.getSession().setAttribute("totalAllQty",null);
 				request.getSession().setAttribute("curPageQtyMap",null);
@@ -283,12 +303,10 @@ public class ConfPickStockAction extends I_Action {
 				
 				totalQtyAll = Utils.convertStrToInt((String)request.getSession().getAttribute("totalAllQty"));
 				totalQtyNotInCurPage = totalQtyAll - totalCurPageQty;
-				
 			}
 			
 			if (results != null  && results.size() >0) {
 				request.getSession(true).setAttribute("results", results);
-
 			} else {
 				request.getSession().setAttribute("results", null);
 				request.setAttribute("Message", "ไม่พบข่อมูล");
@@ -439,7 +457,7 @@ public class ConfPickStockAction extends I_Action {
 	    }
 	}
 	
-	/** Save Data prev page **/
+	/** Save Data Prev Page **/
 	private Map<String, ReqPickStock> setDataSaveMap(HttpServletRequest request,ConfPickStockForm aForm){
 	    User user = (User) request.getSession().getAttribute("user");
 	    //Data Disp Per Page
@@ -461,7 +479,6 @@ public class ConfPickStockAction extends I_Action {
 			for(int i=0;i<results.size();i++){
 				 ReqPickStock l = (ReqPickStock)results.get(i);
 				 l.setIssueQty(issueQty[i]);
-				 
 				 l.setUpdateUser(user.getUserName());
 				 l.setCreateUser(user.getUserName());
 				 
@@ -471,14 +488,12 @@ public class ConfPickStockAction extends I_Action {
 				 //Key Map  
 				 String key = aForm.getBean().getIssueReqNo()+"_"+l.getBarcode()+"_"+l.getMaterialMaster()+"_"+l.getGroupCode()+"_"+l.getPensItem();
 				 dataSaveMapAll.put(key, l); 
-				 
 			}//for
 		}//if
 
 		//data to display
 		request.getSession().setAttribute("results",results);
 		request.getSession().setAttribute("dataSaveMapAll",dataSaveMapAll);
-		
 		return dataSaveMapAll;
 	}
 
@@ -560,7 +575,14 @@ public class ConfPickStockAction extends I_Action {
 			ReqPickStock h = aForm.getBean();
 			h.setStatus(ConfPickStockDAO.STATUS_ISSUED);//ISSUE
 			h.setUpdateUser(user.getUserName());
-		
+			
+			//validate count(*) in pensbme_scan_checkout_item vs sum(issue_qty) in pensbme_stock_issue_item
+			//<> error cannot confirm please check qty
+			if( !ConfPickStockDAO.validateScanCheckOutVsStockIssue(h.getIssueReqNo())){
+				request.setAttribute("Message", "ไม่สามารถยืนยันรายการได้ เนื่องจากยอดรวม Scan Checkout ไม่เท่ากับ ยอด Qty ที่เบิกได้จริง");
+				return mapping.findForward("clear");
+			}
+			
 			//update status stock_issue
 			ConfPickStockDAO.confirmStausStockIssue(conn, h);
 			
@@ -569,7 +591,6 @@ public class ConfPickStockAction extends I_Action {
 			
 			//update req_qty=qty ,qty
 			if(dataSaveMapAll != null && !dataSaveMapAll.isEmpty()){
-				
 				 Iterator its =  dataSaveMapAll.keySet().iterator();
 					while(its.hasNext()){
 					   String key = (String)its.next();
@@ -677,6 +698,14 @@ public class ConfPickStockAction extends I_Action {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
+			//Validate is ScanCheckOut
+			ScanCheckBean scanCheckBean = new ScanCheckBean();
+			scanCheckBean.setIssueReqNo(aForm.getBean().getIssueReqNo());
+			if( !ScanCheckDAO.isDataExist(conn, scanCheckBean)){
+			   request.setAttribute("Message", "Request นี้ยังไม่มีการ Scan check out กรุณาตรวจสอบ");
+			   return mapping.findForward("clear");
+			}
+			
 			ReqPickStock h = aForm.getBean();
 			h.setStatus(ConfPickStockDAO.STATUS_BEF);//BEF
 			h.setUpdateUser(user.getUserName());
@@ -708,12 +737,10 @@ public class ConfPickStockAction extends I_Action {
 			}
 
 			if(validate){
-			
 				conn.commit();
 				
 				//Clear session 
 				request.getSession().setAttribute("results", null);
-				request.getSession().setAttribute("custGroupList", null);
 				request.getSession().setAttribute("dataSaveMapAll", null);
 				request.getSession().setAttribute("totalAllQty",null);
 				request.getSession().setAttribute("curPageQtyMap",null);

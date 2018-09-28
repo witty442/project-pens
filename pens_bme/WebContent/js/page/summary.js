@@ -22,14 +22,14 @@ function openPopupBranchAll(path,types,storeType,hideAll){
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepareBranch&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
 }
-function openPopupGroup(path){
-    var param = "";
+function openPopupGroup(path,selectOne,storeType){
+    var param = "&selectOne="+selectOne+"&storeType="+storeType;
 	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
 }
 
-function openPopupProduct(path,types){
-	var param = "&types="+types;
+function openPopupProduct(path,types,storeType){
+	var param = "&types="+types+"&storeType="+storeType;
 	url = path + "/jsp/searchProductPopupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
 }

@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import meter.MonitorTime;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
@@ -27,14 +25,14 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportBillICC extends InterfaceUtils{
 	private static Logger logger = Logger.getLogger("PENS");
@@ -154,7 +152,7 @@ public class ImportBillICC extends InterfaceUtils{
 								
 								/** Update Monitor Item To Success **/
 								modelItem.setDataCount(Utils.convertStrToInt(results[3]));
-								modelItem.setSuccessCount(ConvertUtils.convertToInt(results[1]));
+								modelItem.setSuccessCount(Utils.convertToInt(results[1]));
 								modelItem.setErrorMsg(Utils.isNull(results[0]));
 								modelItem.setErrorCode(Utils.isNull(results[2]));
 								

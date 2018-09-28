@@ -64,7 +64,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 		}
 		//logger.debug("logoff["+req.getParameter("logoff")+"]");
 		if (!logoff.equals("")) {
-			//logger.debug("login off...");
+			logger.debug("login off...");
 
 			// for logoff link
 			// do when logoff is not null
@@ -76,7 +76,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 			// have user
 			chain.doFilter(request, response);
 		} else {
-			//logger.debug("no user...");
+			logger.debug("no user...");
 			// no user in session
 			req.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.CREDENTIAL_REQUIRE, Locale.getDefault()));
 			RequestDispatcher rd = config.getServletContext().getRequestDispatcher("/index.jsp");

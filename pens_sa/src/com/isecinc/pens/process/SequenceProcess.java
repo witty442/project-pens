@@ -6,9 +6,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-
-import util.DBCPConnectionProvider;
+import util.DBConnection;
 
 /**
  * SequenceProcess Class

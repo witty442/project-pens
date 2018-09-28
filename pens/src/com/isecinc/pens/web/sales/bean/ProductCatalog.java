@@ -13,8 +13,17 @@ public class ProductCatalog implements Comparable{
 	private int qty2;
 	private double lineNetAmt;
     private String taxable;
-	
+    private String isPromotionSpecial;
     
+    
+	public String getIsPromotionSpecial() {
+		return isPromotionSpecial;
+	}
+
+	public void setIsPromotionSpecial(String isPromotionSpecial) {
+		this.isPromotionSpecial = isPromotionSpecial;
+	}
+
 	public String getTaxable() {
 		return taxable;
 	}

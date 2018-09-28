@@ -3,7 +3,7 @@
 <%@page import="com.isecinc.pens.model.MUser"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.inf.dao.InterfaceDAO" %>
-
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.*" %>
 <%@page import="com.isecinc.pens.inf.bean.*" %>
 <%
@@ -23,7 +23,7 @@ try{
 	}else{
 		s ="Success";
 	}
-	//System.out.println("Check Status DateTime["+(new Date())+"]TransId["+id+"]Status["+s+"]statisId["+status+"]");
+	System.out.println("Check Status DateTime["+(new Date())+"]TransId["+id+"]Status["+s+"]statisId["+status+"]");
 }catch(Exception e){
 	e.printStackTrace();
 }finally{

@@ -6,15 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.excel.ExcelHeader;
-
 import com.isecinc.pens.bean.DiffStockSummary;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.PhysicalSummary;
 import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.summary.process.GenerateEndDateLotus;
+import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class SummaryExport {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -185,7 +184,228 @@ public class SummaryExport {
 		}
 		return h;
 	}
-	
+	public StringBuffer genOnhandTopsHTML(String page,HttpServletRequest request,SummaryForm form,User user,List<OnhandSummary> list){
+		StringBuffer h = new StringBuffer("");
+		String colspan ="12";
+		String bStart = "";
+		String bEnd = "";
+		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				colspan ="11";
+			}
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand at Tops(As Of)</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(list != null){
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<th>รหัสร้านค้า</th> \n");
+				  h.append("<th>ชื่อร้านค้า</th> \n");
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+				    h.append("<th>PensItem</th> \n");
+				  }
+				  h.append("<th>Group</th> \n");
+				  h.append("<th>Sale In Qty</th> \n");
+				  h.append("<th>Sale Return Qty </th> \n");
+				  h.append("<th>Sales Out Qty </th> \n");
+				  h.append("<th>Adjust </th> \n");
+				  h.append("<th>Stock short </th> \n");
+				  h.append("<th>Onhand Qty </th> \n");
+				  h.append("<th>Price List</th> \n");
+				  h.append("<th>Amount </th> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					     h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  }
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getRetailPriceBF()+bEnd+"</td> \n");
+					  h.append("<td class='currency'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
+					h.append("</tr>");
+					
+					logger.debug("onhandQty:"+s.getOnhandQty());
+				}
+				/** Summary **/
+				bStart ="<b>";
+				bEnd ="</b>";
+				OnhandSummary s = (OnhandSummary)request.getSession().getAttribute("summary");
+				h.append("<tr> \n");
+				 
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
+				  }else{
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
+				  }
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td class='currency_bold'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
+				h.append("</tr>");
+				
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	public StringBuffer genOnhandRobinsonHTML(String page,HttpServletRequest request,SummaryForm form,User user,List<OnhandSummary> list){
+		StringBuffer h = new StringBuffer("");
+		String colspan ="13";
+		String bStart = "";
+		String bEnd = "";
+		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				colspan ="12";
+			}
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand at Robinson(As Of)</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(list != null){
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<th>รหัสร้านค้า</th> \n");
+				  h.append("<th>ชื่อร้านค้า</th> \n");
+				  h.append("<th>Store No</th> \n");
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+				    h.append("<th>PensItem</th> \n");
+				  }
+				  h.append("<th>Group</th> \n");
+				  h.append("<th>Sale In Qty</th> \n");
+				  h.append("<th>Sale Return Qty </th> \n");
+				  h.append("<th>Sales Out Qty </th> \n");
+				  h.append("<th>Adjust </th> \n");
+				  h.append("<th>Stock short </th> \n");
+				  h.append("<th>Onhand Qty </th> \n");
+				  h.append("<th>Price List</th> \n");
+				  h.append("<th>Amount </th> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreNo()+"</td> \n");
+					  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					     h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  }
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
+					  h.append("<td class='num_currency'>"+bStart+s.getRetailPriceBF()+bEnd+"</td> \n");
+					  h.append("<td class='currency'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
+					h.append("</tr>");
+					
+					logger.debug("onhandQty:"+s.getOnhandQty());
+				}
+				/** Summary **/
+				bStart ="<b>";
+				bEnd ="</b>";
+				OnhandSummary s = (OnhandSummary)request.getSession().getAttribute("summary");
+				h.append("<tr> \n");
+				 
+				  if("PensItem".equalsIgnoreCase(form.getSummaryType())){
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
+				  }else{
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;</td> \n");
+					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
+				  }
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td class='currency_bold'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
+				h.append("</tr>");
+				
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
 	public StringBuffer genReportStockWacoalLotusHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		String colspan ="9";
@@ -545,7 +765,6 @@ public class SummaryExport {
 	
 	public StringBuffer genOnhandMTTHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
-		String a= "@";
 		String colspan = "10";
 		try{
 			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
@@ -637,19 +856,191 @@ public class SummaryExport {
 		return h;
 	}
 	
+	public StringBuffer genOnhandAsOfKingHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String colspan = "10";
+		try{
+			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				colspan = "9";
+			}
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			//Header
+			h.append("<table border='1'> \n");
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand DutyFree</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td class='colum_head'  align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
+			 	    
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td class='colum_head'>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td class='colum_head'>CustNo(Oracle)</td> \n");
+				  h.append("<td class='colum_head'>ชื่อร้านค้า</td> \n");
+				  h.append("<td class='colum_head'>Group</td> \n");
+				  if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				    h.append("<td class='colum_head'>PensItem</td> \n");
+				  }
+				  h.append("<td class='colum_head'>Initial Stock</td> \n");
+				  h.append("<td class='colum_head'>Sale In Qty</td> \n");
+				  h.append("<td class='colum_head'>Sale Out Qty</td> \n");
+				  h.append("<td class='colum_head'>Return Qty </td> \n");
+				  h.append("<td class='colum_head'>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getCustNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+					    h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  }
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
+					h.append("</tr>");
+				}
+				OnhandSummary sum = (OnhandSummary)request.getSession().getAttribute("summary");
+				   h.append("<tr> \n");
+				      if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+					    h.append("<td class='colum_head' colspan='5' align='right'>รวม</td> \n");
+					  }else{
+						h.append("<td class='colum_head' colspan='4' align='right'>รวม</td> \n");  
+					  }
+					  h.append("<td class='num_currency_bold'>"+sum.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getOnhandQty()+"</td> \n");
+				   h.append("</tr>");
+				
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
+	public StringBuffer genOnhandAsOfRobinsonHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String colspan = "10";
+		try{
+			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				colspan = "9";
+			}
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			//Header
+			h.append("<table border='1'> \n");
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand Robinson</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td class='colum_head'  align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td  class='colum_head' align='left' colspan='"+colspan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
+			 	    
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td class='colum_head'>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td class='colum_head'>CustNo(Oracle)</td> \n");
+				  h.append("<td class='colum_head'>ชื่อร้านค้า</td> \n");
+				  h.append("<td class='colum_head'>Group</td> \n");
+				  if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+				    h.append("<td class='colum_head'>PensItem</td> \n");
+				  }
+				  h.append("<td class='colum_head'>Initial Stock</td> \n");
+				  h.append("<td class='colum_head'>Sale In Qty</td> \n");
+				  h.append("<td class='colum_head'>Sale Out Qty</td> \n");
+				  h.append("<td class='colum_head'>Return Qty </td> \n");
+				  h.append("<td class='colum_head'>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getCustNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+					    h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  }
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
+					h.append("</tr>");
+				}
+				OnhandSummary sum = (OnhandSummary)request.getSession().getAttribute("summary");
+				   h.append("<tr> \n");
+				      if( !"GroupCode".equalsIgnoreCase(form.getSummaryType())){
+					    h.append("<td class='colum_head' colspan='5' align='right'>รวม</td> \n");
+					  }else{
+						h.append("<td class='colum_head' colspan='4' align='right'>รวม</td> \n");  
+					  }
+					  h.append("<td class='num_currency_bold'>"+sum.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getOnhandQty()+"</td> \n");
+				   h.append("</tr>");
+				
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+	
 	public StringBuffer genOnhandMTTDetailHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
-		String a= "@";
 		String colSpan ="12";
 		try{
-			h.append("<style> \n");
-			h.append(" .num { \n");
-			h.append("  mso-number-format:General; \n");
-			h.append(" } \n");
-			h.append(" .text{ \n");
-			h.append("   mso-number-format:'"+a+"'; \n");
-			h.append(" } \n");
-			h.append("</style> \n");
+			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			//Header
 			h.append("<table border='1'> \n");
@@ -702,12 +1093,12 @@ public class SummaryExport {
 				for(int i=0;i<list.size();i++){
 					OnhandSummary s = (OnhandSummary)list.get(i);
 					h.append("<tr> \n");
-					  h.append("<td>"+s.getStoreCode()+"</td> \n");
-					  h.append("<td>"+s.getCustNo()+"</td> \n");
-					  h.append("<td>"+s.getStoreName()+"</td> \n");
-					  h.append("<td>"+s.getGroup()+"</td> \n");
-					  h.append("<td>"+s.getPensItem()+"</td> \n");
-					  h.append("<td>"+s.getMaterialMaster()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getCustNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='text'>"+s.getMaterialMaster()+"</td> \n");
 					  h.append("<td class='text'>"+Utils.isNull(s.getBarcode())+"</td> \n");
 					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
@@ -724,19 +1115,90 @@ public class SummaryExport {
 		return h;
 	}
 	
+	public StringBuffer genOnhandSizeColorKingHTML(HttpServletRequest request,SummaryForm form,User user){
+		StringBuffer h = new StringBuffer("");
+		String a= "@";
+		String colSpan ="12";
+		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงาน Stock B'me Stock onhand - DutyFree ( ระดับสี/ไซร์ ) </td> \n");
+			
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >วันที่ล่าสุดที่มีการตรวจนับสต็อก :"+form.getOnhandSummary().getInitDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
+			    h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<td>รหัสร้านค้า(Bme)</td> \n");
+				  h.append("<td>CustNo(Oracle)</td> \n");
+				  h.append("<td>ชื่อร้านค้า</td> \n");
+				  h.append("<td>Group</td> \n");
+				  h.append("<td>PensItem</td> \n");
+				  h.append("<td>Materila Master</td> \n");
+				  h.append("<td>Barcode</td> \n");
+				  h.append("<td>Initial Stock</td> \n");
+				  h.append("<td>Sale In Qty</td> \n");
+				  h.append("<td>Sale Out Qty</td> \n");
+				  h.append("<td>Return Qty </td> \n");
+				  h.append("<td>Onhand Qty </td> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					OnhandSummary s = (OnhandSummary)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getCustNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='text'>"+s.getMaterialMaster()+"</td> \n");
+					  h.append("<td class='text'>"+Utils.isNull(s.getBarcode())+"</td> \n");
+					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
+					h.append("</tr>");
+				}
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
 	public StringBuffer genBigCSizeColorHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
 		String colSpan= "13";
 		try{
-			h.append("<style> \n");
-			h.append(" .num { \n");
-			h.append("  mso-number-format:General; \n");
-			h.append(" } \n");
-			h.append(" .text{ \n");
-			h.append("   mso-number-format:'"+a+"'; \n");
-			h.append(" } \n");
-			h.append("</style> \n");
+			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			//Header
 			h.append("<table border='1'> \n");
@@ -768,8 +1230,8 @@ public class SummaryExport {
 			
 			h.append("</table> \n");
 			
-			if(form.getOnhandSummarySizeColorBigCResults() != null){
-			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandSummarySizeColorBigCResults();
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
 			    
 			    h.append("<table border='1'> \n");
 				h.append("<tr> \n");
@@ -1009,35 +1471,39 @@ public class SummaryExport {
 	
 	public StringBuffer genOnhandBigCHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
+		String colSpan = "11";
 		try{
+			//Style Class
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-		    h.append("<td align='left' colspan='9'>รายงาน B'me Stock on-hand at BigC(As Of) </td> \n");
+		    h.append("<td align='left' colspan='"+colSpan+"'>รายงาน B'me Stock on-hand at BigC(As Of) </td> \n");
 			
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getOnhandSummary().getSalesDate()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getOnhandSummary().getPensCustCodeFrom()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >Pens Item From:"+form.getOnhandSummary().getPensItemFrom()+"  Pens Item To:"+form.getOnhandSummary().getPensItemTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >Group:"+form.getOnhandSummary().getGroup()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
 
-			if(form.getOnhandBigCResults() != null){
-			    List<OnhandSummary> list = (List<OnhandSummary>)form.getOnhandBigCResults();
+			if(form.getResults() != null){
+			    List<OnhandSummary> list = (List<OnhandSummary>)form.getResults();
 			    
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
@@ -1046,9 +1512,12 @@ public class SummaryExport {
 				  h.append("<td>ชื่อสาขา</td> \n");
 				  h.append("<td>Group</td> \n");
 				  h.append("<td>Pens Item</td> \n");
+				  h.append("<td>Initial Qty</td> \n");
 				  h.append("<td>Trans In Qty</td> \n");
 				  h.append("<td>Return Qty </td> \n");
-				  h.append("<td>Sales Out Qty </td> \n");
+				  h.append("<td>SalesOut+StockShort Qty </td> \n");
+				  h.append("<td>Adjust Qty </td> \n");
+				/*  h.append("<td>Stock Short Qty </td> \n");*/
 				  h.append("<td>Onhand Qty </td> \n");
 				 
 				h.append("</tr> \n");
@@ -1056,18 +1525,39 @@ public class SummaryExport {
 				for(int i=0;i<list.size();i++){
 					OnhandSummary s = (OnhandSummary)list.get(i);
 					h.append("<tr> \n");
-					  h.append("<td>&nbsp;"+s.getStoreCode()+"</td> \n");
-					  h.append("<td>"+s.getSubInv()+"</td> \n");
-					  h.append("<td>&nbsp;"+s.getStoreName()+"</td> \n");
-					  h.append("<td>"+s.getGroup()+"</td> \n");
-					  h.append("<td>&nbsp;"+s.getPensItem()+"</td> \n");
-					  h.append("<td>"+s.getTransInQty()+"</td> \n");
-					  h.append("<td>"+s.getSaleReturnQty()+"</td> \n");
-					  h.append("<td>"+s.getSaleOutQty()+"</td> \n");
-					  h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getSubInv()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStoreName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTransInQty()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getAdjustQty()+"</td> \n");
+					 /* h.append("<td class='currency'>"+s.getStockShortQty()+"</td> \n");*/
+					  h.append("<td class='currency'>"+s.getOnhandQty()+"</td> \n");
 					  
 					h.append("</tr>");
-				}
+				}//for
+				
+				OnhandSummary ss = (OnhandSummary)request.getSession().getAttribute("summary");
+				logger.debug("summary:"+ss);
+				h.append("<tr> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td class='colum_head'><b>รวม</b></td> \n");
+				  h.append("<td class='currency_bold'>"+ss.getInitSaleQty()+"</td> \n");
+				  h.append("<td class='currency_bold'>"+ss.getTransInQty()+"</td> \n");
+				  h.append("<td class='currency_bold'>"+ss.getSaleReturnQty()+"</td> \n");
+				  h.append("<td class='currency_bold'>"+ss.getSaleOutQty()+"</td> \n");
+				  h.append("<td class='currency_bold'>"+ss.getAdjustQty()+"</td> \n");
+				  /*h.append("<td class='currency_bold'>"+ss.getStockShortQty()+"</td> \n");*/
+				  h.append("<td class='currency_bold'>"+ss.getOnhandQty()+"</td> \n");
+
+				h.append("</tr>");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){
@@ -1642,24 +2132,28 @@ public class SummaryExport {
 	
 	public StringBuffer genBigCHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
+		String colSpan="34";
 		try{
+			//css Excel
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33'>รายงานข้อมูลรายละเอียดขาย B'ME จาก BIGC</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลรายละเอียดขาย B'ME จาก BIGC</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >จากวันที่ขาย:"+form.getTransactionSummary().getSalesDateFrom()+"  ถึง วันที่ขาย:"+form.getTransactionSummary().getSalesDateTo()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getTransactionSummary().getSalesDateFrom()+"  ถึง วันที่ขาย:"+form.getTransactionSummary().getSalesDateTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >จากรหัสร้านค้า:"+form.getTransactionSummary().getPensCustCodeFrom()+"  ถึงรหัสร้านค้า:"+form.getTransactionSummary().getPensCustCodeTo()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getTransactionSummary().getPensCustCodeFrom()+"</td> \n");
 			h.append("</tr> \n");
 
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >File Name:"+form.getTransactionSummary().getFileName()+"</td>\n");
+			h.append("<td align='left' colspan='"+colSpan+"' >File Name:"+form.getTransactionSummary().getFileName()+"</td>\n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -1683,6 +2177,7 @@ public class SummaryExport {
 					h.append("<th>TOTAL WHOLE PRICE BF</th> \n");
 					h.append("<th>Pens Group</th>\n");
 					h.append("<th>Pens Group Type</th> \n");
+					h.append("<th>Pens Item</th> \n");
 					h.append("<th>Sales Year</th>\n");
 					h.append("<th>Sales Month</th>  \n");
 					h.append("<th>file Name</th>\n");
@@ -1698,30 +2193,31 @@ public class SummaryExport {
 				for(int i=0;i<list.size();i++){
 					TransactionSummary s = (TransactionSummary)list.get(i);
 					h.append("<tr> \n");
-						h.append("<td>"+Utils.isNull(s.getSalesDate())+"</td>\n");
-						h.append("<td>"+Utils.isNull(s.getPensCustCode())+"</td>\n");
-						h.append("<td>"+Utils.isNull(s.getPensCustDesc())+"</td> \n");
-						h.append("<td>"+Utils.isNull(s.getStoreNo())+"</td> \n");
-						h.append("<td>"+Utils.isNull(s.getStoreName())+" </td> \n");
-						h.append("<td>"+Utils.isNull(s.getStyleNo())+"</td>  \n");
-						h.append("<td>"+Utils.isNull(s.getDescription())+"</td> \n");
-						h.append("<td>"+Utils.isNull(s.getQty())+"</td> \n");
-						h.append("<td>&nbsp;"+Utils.isNull(s.getWholePriceBF())+"</td> \n");
-						h.append("<td>&nbsp;"+Utils.isNull(s.getRetailPriceBF())+"</td> \n");
-						h.append("<td>&nbsp;"+Utils.isNull(s.getTotalWholePriceBF())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getSalesDate())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getPensCustCode())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getPensCustDesc())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getStoreNo())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getStoreName())+" </td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getStyleNo())+"</td>  \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getDescription())+"</td> \n");
+						h.append("<td class='currency'>"+Utils.isNull(s.getQty())+"</td> \n");
+						h.append("<td class='currency'>"+Utils.isNull(s.getWholePriceBF())+"</td> \n");
+						h.append("<td class='currency'>"+Utils.isNull(s.getRetailPriceBF())+"</td> \n");
+						h.append("<td class='currency'>"+Utils.isNull(s.getTotalWholePriceBF())+"</td> \n");
 
-						h.append("<td>"+Utils.isNull(s.getPensGroup())+"</td>\n");
-						h.append("<td>"+Utils.isNull(s.getPensGroupType())+"</td> \n");
-						h.append("<td>"+Utils.isNull(s.getSalesYear())+"</td>\n");
-						h.append("<td>"+Utils.isNull(s.getSalesMonth())+"</td>  \n");
-						h.append("<td>"+Utils.isNull(s.getFileName())+"</td>\n");
-						h.append("<td>"+Utils.isNull(s.getVendor())+"</td> \n");
-						h.append("<td>"+Utils.isNull(s.getName())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getPensGroup())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getPensGroupType())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getPensItem())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getSalesYear())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getSalesMonth())+"</td>  \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getFileName())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getVendor())+"</td> \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getName())+"</td>\n");
 					
-						h.append("<td>"+Utils.isNull(s.getGpPercent())+"</td> \n");
+						h.append("<td class='currency'>"+Utils.isNull(s.getGpPercent())+"</td> \n");
 						
-						h.append("<td>"+Utils.isNull(s.getCreateDate())+"</td>  \n");
-						h.append("<td>"+Utils.isNull(s.getCreateUser())+"</td>\n");
+						h.append("<td class='text'>"+Utils.isNull(s.getCreateDate())+"</td>  \n");
+						h.append("<td class='text'>"+Utils.isNull(s.getCreateUser())+"</td>\n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");

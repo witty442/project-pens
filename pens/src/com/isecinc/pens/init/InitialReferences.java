@@ -31,6 +31,7 @@ public class InitialReferences extends I_Initial {
 	public static final String ROLE = "Role";
 	public static final String VAT_CODE = "VatCode";
 	public static final String PAYMENT_METHOD = "PaymentMethod";
+	public static final String VAN_PAYMENT_METHOD = "VanPaymentMethod";
 	public static final String PAYMENT_TERM = "PaymentTerm";
 	public static final String UNCLOSED_REASON = "UnclosedReason";
 	public static final String ROLE_TT = "RoleTT";
@@ -54,6 +55,7 @@ public class InitialReferences extends I_Initial {
 	public static final String CREDIT_DATE_FIX = "CreditDateFix";
 	public static final String VAN_DATE_FIX = "VanDateFix";
 	public static final String TRANSFER_BANK = "TransferBank";
+	public static final String ProdShowFileSize = "ProdShowFileSize";
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
@@ -65,7 +67,7 @@ public class InitialReferences extends I_Initial {
 	public void init(Connection conn) {
 		try {
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' ");
+			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' \n");
 			
 			//*** WIT Edit 29/07/2554 : not Show BBL InternalBank  *******************************//
 			sql.append(" AND REFERENCE_ID NOT IN(  \n");

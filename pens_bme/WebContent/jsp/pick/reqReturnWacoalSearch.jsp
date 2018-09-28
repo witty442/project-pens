@@ -1,8 +1,9 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -10,16 +11,11 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="reqReturnWacoalForm" class="com.isecinc.pens.web.pick.ReqReturnWacoalForm" scope="session" />
 
@@ -37,16 +33,16 @@ if(session.getAttribute("statusReqReturnList") == null){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_reqReturnWacoal.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -68,7 +64,12 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.reqReturnWacoalForm;
+	form.action = path + "/jsp/reqReturnWacoalAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,requestDate,requestNo,mode){
 	var form = document.reqReturnWacoalForm;
 	form.action = path + "/jsp/reqReturnWacoalAction.do?do=prepare&requestDate="+requestDate+"&requestNo="+requestNo+"&mode="+mode;
@@ -120,7 +121,7 @@ function openEdit(path,requestDate,requestNo,mode){
 						   <div align="center">
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						       <tr>
-                                    <td> Request Date</td>
+                                    <td>Request Date</td>
 									<td>					
 										 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
 									</td>
@@ -162,7 +163,29 @@ function openEdit(path,requestDate,requestNo,mode){
 					  </div>
 
             <c:if test="${reqReturnWacoalForm.resultsSearch != null}">
-                  	
+                  	<% 
+					   int totalPage = reqReturnWacoalForm.getTotalPage();
+					   int totalRecord = reqReturnWacoalForm.getTotalRecord();
+					   int currPage =  reqReturnWacoalForm.getCurrPage();
+					   int startRec = reqReturnWacoalForm.getStartRec();
+					   int endRec = reqReturnWacoalForm.getEndRec();
+					%>
+					   
+					<div align="left">
+					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
+					   <span class="pagelinks">
+						หน้าที่ 
+						 <% 
+							 for(int r=0;r<totalPage;r++){
+								 if(currPage ==(r+1)){
+							 %>
+			 				   <strong><%=(r+1) %></strong>
+							 <%}else{ %>
+							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
+							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+						 <% }} %>				
+						</span>
+					</div>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -183,27 +206,27 @@ function openEdit(path,requestDate,requestNo,mode){
 								</c:choose>
 								
 									<tr class="<c:out value='${tabclass}'/>">
-										<td class="search_no">${results.no}</td>
-										<td class="search_requestDate">
+										<td class="td_text_center" width="5%">${results.no}</td>
+										<td class="td_text_center" width="10%">
 										   ${results.requestDate}
 										</td>
-										<td class="search_requestNo">${results.requestNo}</td>
-										<td class="search_status">
+										<td  class="td_text_center" width="10%">${results.requestNo}</td>
+										<td  class="td_text_center" width="10%">
 											${results.statusDesc}
 										</td>
-										<td class="search_remark">
+										<td  class="td_text" width="15%">
 										    ${results.remark}
 										</td>
 										
-										<td class="search_edit" align="center">
+										<td  class="td_text_center" width="10%">
 										 <c:if test="${results.canEdit == false}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestDate}','${results.requestNo}','view')">
-											          ดู
+											       <font size="2"> ดู</font>  
 											  </a>
 										  </c:if>
 										  <c:if test="${results.canEdit == true}">
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestDate}','${results.requestNo}','edit')">
-											          แก้ไข
+											       <font size="2"> แก้ไข</font>
 											  </a>
 										  </c:if>
 										</td>

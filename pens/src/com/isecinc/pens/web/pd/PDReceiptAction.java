@@ -103,20 +103,21 @@ public class PDReceiptAction extends I_Action {
 		String pdates = request.getParameter("pdates");
 		Connection conn = null;
 		User user = (User)request.getSession().getAttribute("user");
+		MOrder mOrder = new MOrder();
+		MReceipt mReceipt = new MReceipt();
+		int idx = 0;
 		try{
 			if(!StringUtils.isEmpty(ids)){
 		
 				String[] pm = pms.split("[,]");
 				String[] pdate = pdates.split("[,]");
-				int idx = 0;
 				
 				conn = new DBCPConnectionProvider().getConnection(null);
 				conn.setAutoCommit(false);
 				
 				//Case PD_PAID =N
 				if( !Utils.isNull(user.getPdPaid()).equalsIgnoreCase("Y")){
-					MOrder mOrder = new MOrder();
-					MReceipt mReceipt = new MReceipt();
+					logger.debug("PD PAID = N ");
 					for(String id:ids.split("[,]")){
 						Order order = mOrder.find(id);
 						Receipt receiptSave = new Receipt();
@@ -127,28 +128,51 @@ public class PDReceiptAction extends I_Action {
 						receiptSave.setPdPaymentMethod(pm[idx]);
 						receiptSave.setPdPaidDate(pdate[idx]);
 						receiptSave.setIsPDPaid("Y");
-						idx++;
-						
+			
+						//Save to DB
 						mReceipt.saveReceiptCasePDPaidNo(conn,receiptSave,user);
+						
+						/** Save Receipt History **/
+						mReceipt.savePDReceiptHis(conn,receiptSave,user);
+						
+						idx++;
 					}//for
 				}else{
 					//Case PD_PAID =Y
-					MReceipt mReceipt = new MReceipt();
+					logger.debug("PD PAID = Y ");
 					for(String id:ids.split("[,]")){
 						Receipt receipt = mReceipt.find(id);
 						receipt.setPdPaymentMethod(pm[idx]);
 						receipt.setPdPaidDate(pdate[idx]);
 						receipt.setIsPDPaid("Y");
-						idx++;
+
+						//Save to DB
+						mReceipt.updateReceiptFromPDReceipt(receipt, user.getId(), conn);
 						
-						mReceipt.saveWOCheckDup(receipt, user.getId(), conn);
+						/** Save Receipt History **/
+						/** Case Van PD_PAID =Y  (order_no = receipt_no) **/
+						Order order = mOrder.findByWhereCond(conn,"where order_no ='"+receipt.getReceiptNo()+"'");
+						logger.debug("orderNo:"+order.getOrderNo());
+						Receipt receiptSave = new Receipt();
+						receiptSave.setReceiptNo(order.getOrderNo());
+						receiptSave.setReceiptDate(order.getOrderDate());
+						receiptSave.setCustomerId(order.getCustomerId());
+						receiptSave.setReceiptAmount(order.getNetAmount());
+						receiptSave.setPdPaymentMethod(pm[idx]);
+						receiptSave.setPdPaidDate(pdate[idx]);
+						
+						//Save To DB
+						mReceipt.savePDReceiptHis(conn,receiptSave,user);
+						
+						idx++;
 					}//for
 				}//if
+				
 			}//if ids
-			
+	
 			conn.commit();
 			request.setAttribute("Message","บันทึกข้อมูลเรียบร้อยแล้ว");
-			
+			logger.debug("Conn commit");
 		}catch(Exception e){
 			conn.rollback();
 			logger.error(e.getMessage(),e);

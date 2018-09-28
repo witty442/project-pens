@@ -38,6 +38,7 @@ public class RequestPromotion implements Serializable{
 	private String updateBy;
 	private String userId;
 	private String territory;
+	private String exported;
 	private User user = new User();;
 	
 	private boolean canEdit = false;
@@ -51,6 +52,12 @@ public class RequestPromotion implements Serializable{
 
     
 	
+	public String getExported() {
+		return exported;
+	}
+	public void setExported(String exported) {
+		this.exported = exported;
+	}
 	public String getProductCatagoryDesc() {
 		return productCatagoryDesc;
 	}

@@ -18,12 +18,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.DBConnection;
+import util.Utils;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.helper.DBConnection;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 /**
  * Summary Action
@@ -467,7 +468,7 @@ public class SalesTargetAction extends I_Action {
 					h.setStatus(SalesTargetConstants.STATUS_FINISH);
 					h.setUpdateUser(user.getUserName());
 					
-					//update status POST
+					//update status FINISH
 					SalesTargetDAO.updateStatusHeadByMKT(conn, h);
 					SalesTargetDAO.updateStatusItemByMKTByID(conn, h);
 				}
@@ -525,7 +526,7 @@ public class SalesTargetAction extends I_Action {
 					response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 					response.setContentType("application/vnd.ms-excel");
 					
-					Writer w = new BufferedWriter(new OutputStreamWriter(out,"TIS-620")); 
+					Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
 					w.write(resultHtmlTable.toString());
 				    w.flush();
 				    w.close();

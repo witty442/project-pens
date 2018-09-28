@@ -14,11 +14,12 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.ConfirmReturnWacoal;
 import com.isecinc.pens.bean.ControlReturnReport;
 import com.isecinc.pens.bean.PickStock;
+import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 public class ConfirmReturnDAO extends PickConstants{
 
@@ -44,18 +45,7 @@ public class ConfirmReturnDAO extends PickConstants{
 		}
 	}
 	
-	public static List<ConfirmReturnWacoal> searchHead(ConfirmReturnWacoal o,boolean getItems ) throws Exception {
-		Connection conn = null;
-		try{
-			conn = DBConnection.getInstance().getConnection();
-			return searchHeadModel(conn,o,getItems);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			conn.close();
-		}
-	}
-	public static List<ConfirmReturnWacoal> searchHeadModel(Connection conn,ConfirmReturnWacoal o,boolean getItems ) throws Exception {
+	public static List<ConfirmReturnWacoal> searchHead(Connection conn,ConfirmReturnWacoal o,boolean getItems,boolean allRec ,int currPage,int pageSize ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -64,71 +54,42 @@ public class ConfirmReturnDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			String requestDateStr = "";
-			String returnDateStr = "";
-			
-			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				requestDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+				sql.append("\n SELECT A.* FROM( ");
+					sql.append("\n select R.*  ");
+					sql.append(" ,(select NVL(count(distinct B.box_no),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_box \n");
+					sql.append(" ,(select NVL(count(*),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_qty \n");
+					sql.append("\n from PENSBI.PENSBME_PICK_RETURN R ");
+					sql.append("\n where 1=1  ");
+					sql.append(genWhereSqlSearchHead(o));
+				sql.append("\n ) A ");
+				sql.append("\n order by A.request_no desc ");
+			sql.append("\n   )A ");
+			// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
 			}
-			if( !Utils.isNull(o.getReturnDate()).equals("")){
-				Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
-			}
-			
-			sql.append("\n SELECT A.* FROM( ");
-				sql.append("\n select R.*  ");
-				sql.append(" ,(select NVL(count(distinct B.box_no),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_box \n");
-				sql.append(" ,(select NVL(count(*),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_qty \n");
-				sql.append("\n from PENSBI.PENSBME_PICK_RETURN R ");
-				sql.append("\n where 1=1  ");
-				
-				if( !Utils.isNull(o.getRequestDate()).equals("")){
-					sql.append("\n and R.REQUEST_DATE = to_date('"+requestDateStr+"','dd/mm/yyyy') ");
-				}
-				
-				if( !Utils.isNull(o.getStatus()).equals("")){
-					sql.append("\n and R.status = '"+Utils.isNull(o.getStatus())+"'");
-				}
-				
-				if( !Utils.isNull(o.getRequestNo()).equals("")){
-					sql.append("\n and R.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
-				}
-			
-				if( !Utils.isNull(o.getReturnDate()).equals("")){
-					sql.append("\n and R.RETURN_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
-				}
-				
-				if( !Utils.isNull(o.getReturnNo()).equals("")){
-					sql.append("\n and R.return_no = '"+Utils.isNull(o.getReturnNo())+"'");
-				}
-				
-				
-				if( !Utils.isNull(o.getCnNo()).equals("")){
-					sql.append("\n and R.CN_NO = '"+Utils.isNull(o.getCnNo())+"'");
-				}
-					
-			sql.append("\n ) A ");
-			sql.append("\n order by A.request_no desc ");
 			logger.debug("sql:"+sql);
-			
-		
+
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-
+            //Clac Start No
+			r = Utils.calcStartNoInPage(currPage, pageSize);
 			while(rst.next()) {
 				   h = new ConfirmReturnWacoal();
 				   h.setNo(r+"");
 				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
 				   h.setRemark(Utils.isNull(rst.getString("return_remark"))); 
-				   
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
-				   
 				   h.setReturnDate(Utils.stringValue(rst.getTimestamp("return_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setReturnNo(Utils.isNull(rst.getString("return_no")));
 				   h.setCnNo(Utils.isNull(rst.getString("CN_NO")));
@@ -170,6 +131,68 @@ public class ConfirmReturnDAO extends PickConstants{
 		}
 		return items;
 	}
+	
+	public static int searchTotalRecHead(Connection conn,ConfirmReturnWacoal o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalRec = 1;
+		try {
+			sql.append("\n SELECT count(*) as c FROM( ");
+				sql.append("\n select R.*  ");
+				sql.append(" ,(select NVL(count(distinct B.box_no),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_box \n");
+				sql.append(" ,(select NVL(count(*),0) FROM PENSBME_PICK_RETURN_I B WHERE B.request_no = R.request_no group by B.request_no) as total_qty \n");
+				sql.append("\n from PENSBI.PENSBME_PICK_RETURN R ");
+				sql.append("\n where 1=1  ");
+				sql.append(genWhereSqlSearchHead(o));
+			sql.append("\n ) A ");
+			sql.append("\n order by A.request_no desc ");
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			if(rst.next()) {
+               totalRec = rst.getInt("c");
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	public static StringBuffer genWhereSqlSearchHead(ConfirmReturnWacoal o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+
+		if( !Utils.isNull(o.getRequestDate()).equals("")){
+			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String requestDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n and R.REQUEST_DATE = to_date('"+requestDateStr+"','dd/mm/yyyy') ");
+		}
+		if( !Utils.isNull(o.getStatus()).equals("")){
+			sql.append("\n and R.status = '"+Utils.isNull(o.getStatus())+"'");
+		}
+		if( !Utils.isNull(o.getRequestNo()).equals("")){
+			sql.append("\n and R.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
+		}
+		if( !Utils.isNull(o.getReturnDate()).equals("")){
+			Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\n and R.RETURN_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
+		}
+		if( !Utils.isNull(o.getReturnNo()).equals("")){
+			sql.append("\n and R.return_no = '"+Utils.isNull(o.getReturnNo())+"'");
+		}
+		if( !Utils.isNull(o.getCnNo()).equals("")){
+			sql.append("\n and R.CN_NO = '"+Utils.isNull(o.getCnNo())+"'");
+		}
+		return sql;
+	}
+	
 	public static List<ConfirmReturnWacoal> searchHeadFromReqDetail(ConfirmReturnWacoal o,boolean getItems ) throws Exception {
 		Connection conn = null;
 		try{

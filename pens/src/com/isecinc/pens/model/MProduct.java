@@ -17,6 +17,7 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.moveorder.MoveOrderProductCatalog;
 import com.isecinc.pens.web.requisitionProduct.RequisitionProductCatalog;
@@ -46,6 +47,31 @@ public class MProduct extends I_Model<Product>{
 	 */
 	public Product find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Product.class);
+	}
+	public Product findOpt(String id) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		Product p = null;
+		try{
+			String sql ="\n select * from m_product where product_id ="+id ;
+			//logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				p = new Product(rst);
+			}
+			return p;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+		        conn.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
 	}
 
 	public Product find(Connection conn,String id) throws Exception {

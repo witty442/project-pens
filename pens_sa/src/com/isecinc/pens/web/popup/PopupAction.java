@@ -11,11 +11,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.Utils;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.helper.Utils;
 
 /**
  * Summary Action
@@ -116,17 +117,37 @@ public class PopupAction extends I_Action {
 		try {
 			if("Brand".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchBrandList(popupForm);
+				 
 			}else if("BrandStock".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchBrandStockList(popupForm);
+				 
+			}else if("BrandProdShow".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchBrandProdShowList(popupForm);
+				 
 			}else if("Customer".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalesTarget
 				 results = PopupDAO.searchCustomerList(popupForm);
+				 
 			}else if("CustomerStock".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock
 				 results = PopupDAO.searchCustomerStockList(popupForm);
+				 
+			}else if("CustomerVanProdShow".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For ProdShow Van
+				 results = PopupDAO.searchCustomerVanProdShowList(popupForm);
+				 
+			}else if("CustomerCreditPromotion".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For Promotion Credit
+				 results = PopupDAO.searchCustomerCreditPromotionList(popupForm);
+				 
 			}else if("ItemStock".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock
 				 results = PopupDAO.searchItemStockList(popupForm);
+				 
+			}else if("ItemCreditPromotion".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For Stock
+				 results = PopupDAO.searchItemCreditPromotionList(popupForm);
+				 
 			}else if("CustomerLocation".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock
 				 results = PopupDAO.searchCustomerLocationList(popupForm);

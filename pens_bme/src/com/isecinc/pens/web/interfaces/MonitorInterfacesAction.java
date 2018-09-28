@@ -19,7 +19,6 @@ import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.init.InitialMessages;
@@ -179,9 +178,9 @@ public class MonitorInterfacesAction extends I_Action {
 			// logger.debug("dataLog:"+dataLog);
 			 String htmlCode = "";
 			 if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
-				 htmlCode = ConvertUtils.genHTMLCodeTransaction(dataLog).toString();
+				 htmlCode = MonitorExport.genHTMLCodeTransaction(dataLog).toString();
 			 }else{
-				 htmlCode = ConvertUtils.genHTMLCode(dataLog).toString(); 
+				 htmlCode = MonitorExport.genHTMLCode(dataLog).toString(); 
 			 }
 			 //logger.debug("htmlCode:"+htmlCode);
 		     request.setAttribute("DATA_LOGS", htmlCode);

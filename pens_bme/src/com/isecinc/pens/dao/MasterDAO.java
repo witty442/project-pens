@@ -5,11 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.apache.log4j.Logger;
+
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceHelper;
+import com.pens.util.helper.SequenceProcess;
+import com.pens.util.helper.SequenceProcessAll;
 
 public class MasterDAO {
-
+	public static Logger logger = Logger.getLogger("PENS");
 	/**
 	 * @param args
 	 */
@@ -17,14 +22,36 @@ public class MasterDAO {
 		// TODO Auto-generated method stub
 
 	}
-	//(action,referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc,pensDesc2, createUser,pensDesc3,sequence,status);
+	
+	public String save(Connection conn,String action,String referenceCode,String interfaceValue,String interfaceDesc,String pensValue
+			,String pensDesc,String pensDesc2,String createUser,String pensDesc3
+			,String sequence ,String status){
+		return saveModel(conn, action, referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc, pensDesc2, createUser, pensDesc3, sequence, status);
+	}
 	public String save(String action,String referenceCode,String interfaceValue,String interfaceDesc,String pensValue
 			,String pensDesc,String pensDesc2,String createUser,String pensDesc3
 			,String sequence ,String status){
 		Connection conn = null;
-		String msg ="";
 		try{
 			conn = DBConnection.getInstance().getConnection();
+			return saveModel(conn, action, referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc, pensDesc2, createUser, pensDesc3, sequence, status);
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+		return "";
+	}
+	//(action,referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc,pensDesc2, createUser,pensDesc3,sequence,status);
+	public String saveModel(Connection conn,String action,String referenceCode,String interfaceValue,String interfaceDesc,String pensValue
+			,String pensDesc,String pensDesc2,String createUser,String pensDesc3
+			,String sequence ,String status){
+		String msg ="";
+		try{
 			boolean dup = isDuplicate(conn, referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc);
 			if("add".equalsIgnoreCase(action)){
 				msg = saveMaster(conn, referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc,pensDesc2, createUser,pensDesc3,sequence,status);
@@ -38,15 +65,8 @@ public class MasterDAO {
 			   msg = deleteMaster(conn, referenceCode, interfaceValue);
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error(e);
 		}finally{
-			try{
-				if(conn !=null){
-				  conn.close();conn=null;
-				}
-			}catch(Exception e){
-				
-			}
 		}
 		return msg;
 	}
@@ -55,32 +75,35 @@ public class MasterDAO {
 		
 		PreparedStatement ps = null;
 		String msg = "";
+		int id = 0;
 		try{
-			//boolean dup = isDuplicate(conn, referenceCode, interfaceValue, interfaceDesc, pensValue, pensDesc);
-			//if(!dup){
-				StringBuffer sql = new StringBuffer(" INSERT INTO PENSBME_MST_REFERENCE\n"); 
-				sql.append("(REFERENCE_CODE, INTERFACE_VALUE, INTERFACE_DESC, PENS_VALUE, PENS_DESC,PENS_DESC2, CREATE_DATE, CREATE_USER,PENS_DESC3,SEQUENCE,STATUS) \n");
-				sql.append("VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,?) \n");
-				
-			    ps = conn.prepareStatement(sql.toString());
-			    
-			    ps.setString(1, Utils.isNull(referenceCode));
-			    ps.setString(2, Utils.isNull(interfaceValue));
-			    ps.setString(3, Utils.isNull(interfaceDesc));
-			    ps.setString(4, Utils.isNull(pensValue));
-			    ps.setString(5, Utils.isNull(pensDesc));
-			    ps.setString(6, Utils.isNull(pensDesc2));
-			    ps.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
-			    ps.setString(8, Utils.isNull(createUser));
-			    ps.setString(9, Utils.isNull(pensDesc3));
-			    ps.setString(10, Utils.isNull(sequence));
-			    ps.setString(11, Utils.isNull(status));
-			    ps.execute();
+		    id = SequenceProcess.getNextValue("PENSBME_MST_REFERENCE");
 		    
-		        msg = "บันทึกข้อมูลเรียบร้อยแล้ว";
-			//}else{
-				//msg ="ไม่สามารถบันทึกข้อมูลนี้ เนื่องจากเป็นข้อมูลซ้ำ";
-			//}
+			StringBuffer sql = new StringBuffer(" INSERT INTO PENSBME_MST_REFERENCE\n"); 
+			sql.append("(REFERENCE_CODE, INTERFACE_VALUE, INTERFACE_DESC, "
+					+ "PENS_VALUE, PENS_DESC,PENS_DESC2, "
+					+ "CREATE_DATE, CREATE_USER,PENS_DESC3,"
+					+ "SEQUENCE,STATUS,ID) \n");
+			sql.append("VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,?,?) \n");
+			
+		    ps = conn.prepareStatement(sql.toString());
+		    
+		    ps.setString(1, Utils.isNull(referenceCode));
+		    ps.setString(2, Utils.isNull(interfaceValue));
+		    ps.setString(3, Utils.isNull(interfaceDesc));
+		    ps.setString(4, Utils.isNull(pensValue));
+		    ps.setString(5, Utils.isNull(pensDesc));
+		    ps.setString(6, Utils.isNull(pensDesc2));
+		    ps.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
+		    ps.setString(8, Utils.isNull(createUser));
+		    ps.setString(9, Utils.isNull(pensDesc3));
+		    ps.setString(10, Utils.isNull(sequence));
+		    ps.setString(11, Utils.isNull(status));
+		    ps.setInt(12, id);
+		    ps.execute();
+	    
+	        msg = "บันทึกข้อมูลเรียบร้อยแล้ว";
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			msg = e.getMessage();

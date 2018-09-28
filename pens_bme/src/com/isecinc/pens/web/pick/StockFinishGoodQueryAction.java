@@ -18,13 +18,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.StockQueryDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -54,6 +56,12 @@ public class StockFinishGoodQueryAction extends I_Action {
 				
 				//init Warehouse Desc
 				
+				//Set Session List
+				List<References> wareHouseList = new ArrayList<References>();
+				References ref = new References("","");
+				wareHouseList.add(ref);
+				wareHouseList.addAll(JobDAO.getWareHouseList());
+				request.getSession().setAttribute("wareHouseList",wareHouseList);
 			}
 		
 		} catch (Exception e) {

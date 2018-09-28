@@ -1,11 +1,13 @@
 package com.isecinc.pens.web.customer;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,9 +19,9 @@ import org.apache.struts.action.ActionMapping;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.ExcelHeader;
 
 import com.isecinc.core.bean.Messages;
-import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Contact;
@@ -32,7 +34,6 @@ import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MContact;
 import com.isecinc.pens.model.MCustomer;
@@ -133,7 +134,9 @@ public class CustomerAction extends I_Action {
 			customer.setDistrict("-1");
 			customerForm.setCustomer(customer);
 
-		
+			//default TripDay1 = day of currentDate
+			customer.setTripDay(DateToolsUtil.getDayOfDate(new Date()));
+			
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -387,6 +390,118 @@ public class CustomerAction extends I_Action {
 			}catch(Exception e){
 				
 			}
+		}
+		return mapping.findForward("search"); 
+	}
+	
+	
+	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		CustomerForm customerForm = (CustomerForm) form;
+		try {
+			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
+			customerForm.setCriteria(criteria);
+			String whereCause = "";
+			if (customerForm.getCustomer().getTerritory() != null
+					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
+				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+			}
+			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
+				whereCause += "\n AND m_customer.CODE LIKE '%"
+						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
+				whereCause += "\n AND m_customer.NAME LIKE '%"
+						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+						+ "%' ";
+			}
+			if (customerForm.getCustomer().getIsActive() != null
+					&& !customerForm.getCustomer().getIsActive().equals("")) {
+				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+			}
+			// WIT EDIT :04/08/2554 
+			if(!User.ADMIN.equals(user.getType())){
+			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
+			}
+			
+			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
+				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
+			}
+			
+			if (customerForm.getCustomer().getSearchProvince() != 0) {
+				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
+				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
+						 + ")";
+			}
+			
+			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equals("Y") ) {
+			    whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
+			}
+			whereCause +=" order by m_customer.code asc";
+			//logger.debug("whereCause:"+whereCause);
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			Customer[] results  = new MCustomer().searchOpt(conn,whereCause,user,0,"dispTotalInvoice");
+			if(results != null){
+				//get Excel
+				StringBuffer h = new StringBuffer("");
+				h.append(ExcelHeader.EXCEL_HEADER);
+				h.append("<table border='1'> \n");
+				h.append("<tr><td colspan='5'>รายงานยอดหนี้คงค้าง</td> </tr> \n");
+				h.append("</table> \n");
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				h.append(" <td>No</td> \n");
+				h.append(" <td>หมายเลขลูกค้า</td> \n");
+				h.append(" <td>ชื่อ</td> \n");
+				h.append(" <td>วงเงินสินเชื่อ</td> \n");
+				h.append(" <td>ยอดบิลค้างชำระ</td> \n");
+				h.append("</tr> \n");
+				for(int i=0;i<results.length;i++){
+					Customer c = results[i];
+					h.append("<tr> \n");
+					h.append(" <td class='num'>"+c.getNo()+"</td> \n");
+					h.append(" <td class='text'>"+c.getCode()+"</td> \n");
+					h.append(" <td class='text'>"+c.getName()+"</td> \n");
+					h.append(" <td class='currency'>"+c.getCreditLimit()+"</td> \n");
+					h.append(" <td class='currency'>"+c.getTotalInvoice()+"</td> \n");
+					h.append("</tr> \n");
+				}
+				h.append("</table> \n");
+				
+				//export to excel
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(h.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+			    
+			}else{
+				request.setAttribute("Message","Data not found");
+			}
+			
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
+					+ e.getMessage());
+			try {
+				conn.rollback();
+			} catch (Exception e2) {}
+			e.printStackTrace();
+			return mapping.findForward("search"); 
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
 		}
 		return mapping.findForward("search"); 
 	}
@@ -850,6 +965,7 @@ public class CustomerAction extends I_Action {
 		}
 		return mapping.findForward("view"); 
 	}
+
 
 	@Override
 	protected void setNewCriteria(ActionForm form) {

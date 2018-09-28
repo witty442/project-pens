@@ -1,4 +1,3 @@
-<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr height="137px;">
 		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/header_left.png" border="0"/>

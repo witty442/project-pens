@@ -32,9 +32,12 @@ if(code.equals("null")){
 	<tr>
  		<td width="41" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
    		<td style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
-   			<strong><%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %></strong>
+   			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   			<font size="2"><strong>
+   			  <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+   			</strong>
+   			</font>
    		</td>
-   		
 	</tr>
  	<tr>
  		<td colspan="3"><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="15" /></td>

@@ -1,62 +1,40 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.bean.PickStock"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="confPickStockForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/conf_pick_stock.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -107,6 +85,9 @@ function back(path){
 
 function cancelAction(path){
 	if(confirm("ยืนยันยกเลิก Request นี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.confPickStockForm;
 		form.action = path + "/jsp/confPickStockAction.do?do=cancelAction";
 		form.submit();
@@ -138,6 +119,9 @@ function confirmPick(path){
 	}
 	
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
+	   /**Control Save Lock Screen **/
+	   startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/confPickStockAction.do?do=confirmAction";
 	   form.submit();
 	   return true;
@@ -162,6 +146,9 @@ function saveDeliveryDate(path){
 	}
 	
 	if(confirm("กรุณายันยัน บันทึกข้อมูล วันที่จัดส่ง ")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 	   form.action = path + "/jsp/confPickStockAction.do?do=saveDeliveryDateAction";
 	   form.submit();
 	   return true;
@@ -172,6 +159,9 @@ function saveDeliveryDate(path){
 function savePick(path){
 	var form = document.confPickStockForm;
 	if(confirm("กรุณายันยัน เบิกข้อมูลจากคลัง")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+			
 	   form.action = path + "/jsp/confPickStockAction.do?do=saveAction";
 	   form.submit();
 	   return true;
@@ -181,6 +171,9 @@ function savePick(path){
 
 function cancel(path){
 	if(confirm("ยืนยันการยกเลิกรายการนี้")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.confPickStockForm;
 		form.action = path + "/jsp/confPickStockAction.do?do=cancel";
 		form.submit();
@@ -192,6 +185,9 @@ function cancel(path){
 function confirmAction(path){
 	var form = document.confPickStockForm;
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		
 		 form.action = path + "/jsp/confPickStockAction.do?do=confirmAction";
 		 form.submit();
 		 return true;
@@ -225,7 +221,6 @@ function gotoPage(path,pageNumber){
    form.submit();
     return true;
 }
-
 
 function isNum(obj){
   if(obj.value != ""){
@@ -483,7 +478,7 @@ function sumQty(){
 						</span>
 					</div>
 					<%} %>
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						     <tr>					            
 				                    <th >GroupCode</th>
 				                    <th >PensItem</th>
@@ -497,7 +492,7 @@ function sumQty(){
 							int tabindex = 0;
 							int no= start;
 							String titleDisp ="";
-							int index = 0;
+							//int index = 0;
 							
 							for(int i=0;i<resultList.size();i++){
 							   ReqPickStock o = (ReqPickStock) resultList.get(i);
@@ -509,51 +504,50 @@ function sumQty(){
 							   }
 							%>
 							    <tr id="<%=o.getLineItemId()%>" class="<%=classStyle%>"> 
-						            <td class="data_groupCode"><%=o.getGroupCode()%>
+						            <td class="td_text_center" width="10%"><%=o.getGroupCode()%>
 						              <input tabindex="-1" type="hidden" name="groupCode" value ="<%=o.getOnhandQty()%>"/>
 						            </td>
-						            <td class="data_pensItem"> <%=o.getPensItem() %> </td>
-									<td class="data_materialMaster"> <%=o.getMaterialMaster() %> </td>
-									<td class="data_barcode"> <%=o.getBarcode() %> </td>
+						            <td class="td_text_center" width="10%"> <%=o.getPensItem() %> </td>
+									<td class="td_text_center" width="20%"> <%=o.getMaterialMaster() %> </td>
+									<td class="td_text_center" width="20%"> <%=o.getBarcode() %> </td>
 
-									<td class="data_qty">
-										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  
-										    class="disableNumber" readonly="true"
+									<td class="td_text_right" width="20%">
+										  <input tabindex="-1" type="text" name="reqQty" value ="<%=Utils.isNull(o.getQty()) %>" size="25"  
+										    class="disableNumber" readonly
 										   />		 
 									</td>
-									<td class="data_issueQty">
+									<td class="td_text_right" width="20%">
 									  <c:choose>
 									     <c:when test="${confPickStockForm.bean.canEdit == true}">
-										      <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-											    class="disableNumber" readonly="true"
+										      <input tabindex="1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="25"  
+											    class="disableNumber" readonly
 											    onkeypress="chkQtyKeypress(this,event,<%=i%>)"
 							                    onchange="validateQty(this,<%=i%>)"/>	
 									     </c:when>
 									     <c:otherwise>
-										       <input tabindex="-1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="20"  
-											    class="disableNumber" readonly="true"/>
+										       <input tabindex="-1" type="text" name="issueQty" value ="<%=Utils.isNull(o.getIssueQty()) %>" size="25"  
+											    class="disableNumber" readonly/>
 									     </c:otherwise>
 									  </c:choose>
 									</td>
 							  </tr>
 							<% 
-							index++;
+							//index++;
 							} %>
 						</table>
 					
 					
 					<div align="right">
-						<table  border="0" cellpadding="3" cellspacing="0" >
+						<table  border="0" cellpadding="3" cellspacing="0" class="tableSearchNoWidth" width="100%">
 							<tr>
-								<td align="right"><span class="pagelinks">รวมทั้งสิ้น :  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>	</td>
-								<td>
-								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" styleClass="disableNumber" readonly="true"/>
-								     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td align="right" width="80%"><b>รวมทั้งสิ้น :  
+								   <html:text property="bean.totalReqQty" styleId="totalReqQty" size="20" styleClass="disableNumberBold" readonly="true"/>
+								  </b>
 								</td>
 								
-								<td>
-								   <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumber" readonly="true"/>
-								   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<td align="right" width="20%">
+								   <html:text property="bean.totalQty" styleId="totalQty" size="20" styleClass="disableNumberBold" readonly="true"/>
+								 
 								   <!-- totalQtyNotInCurPage: --><input type="hidden" name="totalQtyNotInCurPage" id="totalQtyNotInCurPage" value="${confPickStockForm.bean.totalQtyNotInCurPage}"/>
 								   <!-- curPageQty: --><input type="hidden" name = "curPageQty" id="curPageQty"/>	
 								</td>
@@ -589,7 +583,7 @@ function sumQty(){
 								 </c:if>
 								  <c:if test="${confPickStockForm.bean.canEdit == true}">
 									<a href="javascript:savePick('${pageContext.request.contextPath}')">
-									  <input type="button" value=" บันทึก    " class="newPosBtnLong"> 
+									  <input type="button" value=" บันทึก    " class="newPosBtnLong">
 									 </a>
 								 </c:if>
 								 
@@ -650,3 +644,6 @@ function sumQty(){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

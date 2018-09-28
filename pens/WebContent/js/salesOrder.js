@@ -42,6 +42,13 @@ function cancelOrder(path){
     document.orderForm.submit();
     return true;
 }
+function manageProdShow(path,orderNo){
+	if(orderNo!=null){
+	  document.orderForm.action = path + "/jsp/prodshow/prodShow.jsp?action=new&orderNo="+orderNo;
+	}
+	document.orderForm.submit();
+	return true;
+}
 
 function openCancelOrderPopup(path,orderNo,id,payment){
 	window.open(path + "/jsp/pop/cancelOrderPopup.jsp?id="+id+"&orderNo="+orderNo+"&payment="+payment, "Edit Shipping Date.", "width=400,height=260,location=No,resizable=No");
@@ -168,7 +175,12 @@ function presave(path) {
 		alert('ไม่มีที่อยู่แบบ Bill to ไม่สามารถบันทึกข้อมูลได้');
 		return false;
 	}
-
+    //Validate Van Payment method
+	if( !validateVanPaymentMethod()){return false;}
+	
+	//Validate Van Credit Limit
+	if( !validateVanCreditLimit()){return false;}
+	
 	if(!createProductList()){return false;}
 	
 	//Validate item vat and no vat not in same bill
@@ -236,6 +248,11 @@ function autoReceiptNew(path,type,canReceiptMoreCash) {
 
 function save(path,role) {
 	var paymentCashNow = document.getElementsByName('order.paymentCashNow')[0];
+	//Validate Van Payment method
+	if( !validateVanPaymentMethod()){return false;}
+	//Validate Van Credit Limit
+	if( !validateVanCreditLimit()){return false;}
+	
 	if(!createProductList()){return false;}
 	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=save";
 	document.orderForm.submit();

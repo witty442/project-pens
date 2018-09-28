@@ -7,6 +7,8 @@ public class MoveStockWarehouseBean implements Serializable{
 
 	private static final long serialVersionUID = 9211619557079034456L;
 	
+	private String transferNo;
+	private String transferDate;
 	private String warehouseFrom;
 	private String warehouseTo;
 	private String dateFrom;
@@ -35,7 +37,22 @@ public class MoveStockWarehouseBean implements Serializable{
 	private List<MoveStockWarehouseBean> items;
 
 	
-	
+	public String getTransferNo() {
+		return transferNo;
+	}
+
+	public void setTransferNo(String transferNo) {
+		this.transferNo = transferNo;
+	}
+
+	public String getTransferDate() {
+		return transferDate;
+	}
+
+	public void setTransferDate(String transferDate) {
+		this.transferDate = transferDate;
+	}
+
 	public String getCreateDate() {
 		return createDate;
 	}

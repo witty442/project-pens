@@ -19,12 +19,11 @@ public class Barcode implements Serializable{
 	private String remark;
 	private String wareHouseDesc;
 	private String wareHouse;
-	
+	private String grNo;
 	private String createUser;
 	private String updateUser;
 	private List<Barcode> items;
     
-	
 	private int lineId;
 	private String barcodeReadonly;
 	private String barcodeStyle ;
@@ -39,9 +38,11 @@ public class Barcode implements Serializable{
 	//optional
 	private boolean canEdit = false;
 	private boolean canCancel = false;
+	private boolean canEditGrNo = false;
 	private int qty;
 	private int qtyTemp;
 	private int totalQty;
+	private String totalQtyDisp;
 	
 	private String pensItemFrom;
 	private String pensItemTo;
@@ -59,6 +60,24 @@ public class Barcode implements Serializable{
 	private String includeCancel;
 	
 	
+	public String getTotalQtyDisp() {
+		return totalQtyDisp;
+	}
+	public void setTotalQtyDisp(String totalQtyDisp) {
+		this.totalQtyDisp = totalQtyDisp;
+	}
+	public boolean isCanEditGrNo() {
+		return canEditGrNo;
+	}
+	public void setCanEditGrNo(boolean canEditGrNo) {
+		this.canEditGrNo = canEditGrNo;
+	}
+	public String getGrNo() {
+		return grNo;
+	}
+	public void setGrNo(String grNo) {
+		this.grNo = grNo;
+	}
 	public int getQtyTemp() {
 		return qtyTemp;
 	}

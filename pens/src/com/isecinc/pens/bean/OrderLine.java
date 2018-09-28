@@ -8,8 +8,10 @@ import util.ConvertNullUtil;
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
+import com.jcraft.jsch.Logger;
 
 /**
  * OrderLine
@@ -37,8 +39,11 @@ public class OrderLine extends I_PO implements Serializable {
 		setId(rst.getInt("ORDER_LINE_ID"));
 		setLineNo(rst.getInt("LINE_NO"));
 		setOrderId(rst.getInt("ORDER_ID"));
-		setProduct(new MProduct().find(rst.getString("PRODUCT_ID")));
-		setUom(new MUOM().find(rst.getString("UOM_ID")));
+		if(rst.getString("PRODUCT_ID")==null || Utils.isNull(rst.getString("PRODUCT_ID")).equals("")){
+		   System.out.println("OrderId["+rst.getInt("ORDER_ID")+"] Find ProductId:"+rst.getString("PRODUCT_ID")+" IS NULL");
+		}
+		setProduct(new MProduct().findOpt(rst.getString("PRODUCT_ID")));
+		setUom(new MUOM().findOpt(rst.getString("UOM_ID")));
 		setPrice(rst.getDouble("PRICE"));
 		setQty(rst.getDouble("QTY"));
 		setLineAmount(rst.getDouble("LINE_AMOUNT"));
@@ -73,6 +78,9 @@ public class OrderLine extends I_PO implements Serializable {
 			setOrg(rst.getString("ORG"));
 			setSubInv(rst.getString("SUB_INV"));
 		} catch (Exception e) {}
+		
+		//09/2561 wit edit
+		setIsPromotionSpecial(Utils.isNull(rst.getString("is_promotion_special")).equals("")?"N":Utils.isNull(rst.getString("is_promotion_special")));
 	}
 
 	protected void setDisplayLabel() throws Exception {
@@ -189,8 +197,17 @@ public class OrderLine extends I_PO implements Serializable {
 	
 	private String cancelDate;
 	private String taxable;
+	private String isPromotionSpecial;
 	
 	
+	public String getIsPromotionSpecial() {
+		return isPromotionSpecial;
+	}
+
+	public void setIsPromotionSpecial(String isPromotionSpecial) {
+		this.isPromotionSpecial = isPromotionSpecial;
+	}
+
 	public String getTaxable() {
 		return taxable;
 	}

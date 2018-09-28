@@ -19,11 +19,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ReportUtilServlet;
-import util.excel.ExcelHeader;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
@@ -32,12 +27,18 @@ import com.isecinc.pens.bean.RTBean;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.RTDAO;
 import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ReqPickStockForm;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -62,8 +63,15 @@ public class RTAction extends I_Action {
 				RTBean ad = new RTBean();
 				ad.setNoPicRcv("true");
 				ad.setCreateUser(user.getUserName());
-				
 				aForm.setBean(ad);
+				
+				//Init session ListBox
+				List<PopupForm> billTypeList = new ArrayList<PopupForm>();
+				PopupForm ref = new PopupForm("",""); 
+				billTypeList.add(ref);
+				billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+				request.getSession().setAttribute("custGroupList",billTypeList);
+				
 			}else if("back".equals(action)){
 				RTBean cri  =aForm.getBeanCriteria();
 				cri.setDocNo("");

@@ -1,23 +1,16 @@
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
+<%@page import="com.isecinc.pens.inf.helper.Constants"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="barcodeForm" class="com.isecinc.pens.web.pick.BarcodeForm" scope="session" />
 <%
@@ -27,41 +20,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_barcode.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('openDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('closeDate'));
@@ -98,15 +68,21 @@ function cancel(path){
 	}
 	return false;
 }
-
 function back(path){
 	var form = document.barcodeForm;
-	form.action = path + "/jsp/barcodeAction.do?do=prepare2&action=back";
+	form.action = path + "/jsp/barcodeAction.do?do=search2&action=back";
 	form.submit();
 	return true;
 }
 
+var countSave = 0;
 function save(path){
+	//alert(countSave);
+	/** Check Save duplicate */
+    if(countSave > 0){
+    	return false;
+    }
+    countSave++;
 	var form = document.barcodeForm;
 	var jobId =$('#jobId').val();
 	var storeCode =$('#storeName').val();
@@ -135,17 +111,32 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	}
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	
 	form.action = path + "/jsp/barcodeAction.do?do=save";
 	form.submit();
 	return true;
 }
+function saveGrNo(path){
+	var form = document.barcodeForm;
+	var grNo =$('#grNo').val();
+	
+	if(grNo ==""){
+		alert("กรุณากรอก GR No");
+		return false;
+	}
+	form.action = path + "/jsp/barcodeAction.do?do=saveGrNo";
+	form.submit();
+	return true;
+}
 
 function openJobPopup(path){
-    var param = "";
+    var param = "&status=<%=PickConstants.STATUS_OPEN%>";
 	url = path + "/jsp/searchJobPopupAction.do?do=prepare3&action=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	//window.open(encodeURI(url),"",
+	//		   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url,"",500);
 }
 
 function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHouse,wareHouseDesc){
@@ -247,9 +238,7 @@ function getJobNameModel(code){
 		form.wareHouse.value = "";
 		form.wareHouseDesc.value = "";
 	}
-	
 }
-
 function addRow(){
 	// $('#myTable tr').length;
 	var rows = $('#tblProduct tr').length-1;
@@ -263,16 +252,16 @@ function addRow(){
 	//alert("lineId["+lineId+"]");
 	
 	var rowData ="<tr class='"+className+"'>"+
-	    "<td class='data_linechk'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
-	    "<td class='data_barcode'> <input type='text' name='barcode' size='30'  "+
+	    "<td class='td_text_center' width='10%'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' name='barcode' size='30'  "+
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
 	
 	    " />  </td>"+
-	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='30' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
-	    "<td class='data_groupCode'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
-	    "<td class='data_pensItem'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='20' /></td>"+
-	    "<td class='data_wholePriceBF'> <input type='text' tabindex ='-1' name='wholePriceBF' readonly class='disableNumber' size='20' /></td>"+
-	    "<td class='data_retailPriceBF'> <input type='text' tabindex ='-1' name='retailPriceBF' readonly class='disableNumber' size='20'/></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' /></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='wholePriceBF' readonly class='disableNumber' size='20' /></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='retailPriceBF' readonly class='disableNumber' size='20'/></td>"+
 	    
 	    "</tr>";
 
@@ -281,8 +270,6 @@ function addRow(){
     var barcode = document.getElementsByName("barcode");
     barcode[lineId-1].focus();
 }
-
-
 function calcTotalRow(){
 	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
 	var barcodeLastRow = document.getElementsByName("barcode")[rows-1]; //alert(barcodeLastRow.value);
@@ -293,7 +280,6 @@ function calcTotalRow(){
     var totalRow = document.getElementsByName("totalRow");
     totalRow[0].value = rows;
 }
-
 function removeRow(){
 	//todo play with type
 	var tbl = document.getElementById('tblProduct');
@@ -309,7 +295,6 @@ function removeRow(){
 		}
 	}
 	if(!bcheck){alert('เลือกข้อมูลอย่างน้อย 1 รายการ');return false;}
-	
 }
 function checkAll(chkObj){
 	var chk = document.getElementsByName("linechk");
@@ -330,9 +315,7 @@ function getProductKeypress(e,barcodeObj,lineId){
 	var retailPriceBF = document.getElementsByName("retailPriceBF");
 	
 	if(e != null && e.keyCode == 13){
-	
 		if(barcodeObj.value ==''){
-			
 			materialMaster[lineId-1].value = '';
 			groupCode[lineId-1].value = '';
 			pensItem[lineId-1].value = '';
@@ -342,7 +325,6 @@ function getProductKeypress(e,barcodeObj,lineId){
 			var found = getProductModel(barcodeObj,lineId);
 			if(found){
 				calcTotalRow();
-				
 				//Add New Row Auto
 				addRow();
 				
@@ -578,11 +560,11 @@ function getProductModelByMat(matObj,lineId){
 								</tr>	
 								<tr>
                                     <td> 
-                                                                                                                                            รหัสร้านค้า    
+                                                                                                         รหัสร้านค้า    
                                     </td>
 									<td colspan="3">
 									   <html:text property="job.storeCode" styleId="storeCode" size="20" readonly="true" styleClass="disableText"/>
-									   -<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="20"/>
+									   &nbsp;&nbsp;&nbsp;&nbsp;<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="20"/>
 									   Sub Inventory
 						               <html:text property="job.subInv" styleId="subInv" size="10" readonly="true" styleClass="disableText"/>
 						               Store No
@@ -598,6 +580,26 @@ function getProductModelByMat(matObj,lineId){
 						               <c:if test="${barcodeForm.job.canEdit == false}">  
 						                  <html:text property="job.remark" styleId="remark" size="90" readonly="true" styleClass="disableText"/>
 						              </c:if>
+						              <!-- Show Only Hisher StoreCode -->
+						              <%
+						              if( !mode.equalsIgnoreCase("add")){
+							              if(barcodeForm.getJob().getStoreCode().startsWith(PickConstants.STORE_TYPE_HISHER_CODE)){ %>
+								              &nbsp; GR NO(His&Her) 
+								              <c:choose>
+		                                         <c:when test="${barcodeForm.job.canEditGrNo == true}">
+		                                             <html:text property="job.grNo" styleId="grNo" size="20" />
+		                                         </c:when>
+		                                         <c:otherwise>   
+		                                             <html:text property="job.grNo" styleId="grNo" size="20" readonly="true" styleClass="disableText" />
+		                                         </c:otherwise>
+		                                      </c:choose>
+                                      <%
+							              }
+                                      }else{
+                                      %>
+                                         &nbsp; GR NO(His&Her) 
+                                         <html:text property="job.grNo" styleId="grNo" size="20" />
+                                      <%} %>
 									</td>
 								</tr>	
 								
@@ -638,40 +640,39 @@ function getProductModelByMat(matObj,lineId){
 										<%-- <td class="data_no">
 										   <input type="text" name="lineId" value ="${results.lineId}" size="5" readonly class="disableText"/>
 										</td> --%>
-										<td class="data_chk">
+										<td  class='td_text_center' width='10%'>
 										  <input type="checkbox" name="linechk" value="${results.lineId}"/>
 										</td>
-										<td class="data_barcode">
+										<td class='td_text_center' width='10%'>
 										    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="30" 
 											    onkeypress="getProductKeypress(event,this,${results.lineId})"
 											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
 											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
 											    />
                                         </td>
-										<td class="data_materialMaster">
+										<td class='td_text_center' width='10%'>
 											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" name="materialMaster" value ="${results.materialMaster}" size="25"/>
 										</td>
-										<td class="data_groupCode">
+										<td class='td_text_center' width='10%'>
 										   <input type="text" name="groupCode" value ="${results.groupCode}" size="30" readonly class="disableText"/>
 										</td>
-										<td class="data_pensItem">
+										<td class='td_text_center' width='10%'>
 										   <input type="text" name="pensItem" value ="${results.pensItem}" size="15" readonly class="disableText"/>
 										</td>
-										<td class="data_wholePriceBF">
+										<td class='td_text_center' width='10%'>
 										   <input type="text" name="wholePriceBF" value ="${results.wholePriceBF}" size="20" readonly class="disableNumber"/>
 										</td>
-										<td class="data_retailPriceBF">
+										<td class='td_text_center' width='10%'>
 										   <input type="text" name="retailPriceBF" value ="${results.retailPriceBF}" size="20" readonly class="disableNumber"/>
 										</td>
-										<td class="data_status">${results.statusDesc}</td>
+										<td class='td_text_center' width='10%'>${results.statusDesc}</td>
 									</tr>
 							
 							  </c:forEach>
 					</table>
-						 <div align="left">
-							<font size="3"> <b>สรุปยอดจำนวนตัว <input type="text" name ="totalRow" class="disableNumber" value="" readonly/></b>	</font>
-							 
-						</div>
+					 <div align="left">
+						<font size="3"> <b>สรุปยอดจำนวนตัว <input type="text" name ="totalRow" class="disableNumber" value="" readonly/></b>	</font>	 
+					</div>
 				</c:if>
 						   <!-- Table Data -->
 						   <table  border="0" cellpadding="3" cellspacing="0" >
@@ -688,14 +689,18 @@ function getProductModelByMat(matObj,lineId){
 											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
 											 </a>
 										 </c:if>
-										 
+										 <c:if test="${barcodeForm.job.canEdit == false}">
+											 <c:if test="${barcodeForm.job.canEditGrNo == true}">
+												<a href="javascript:saveGrNo('${pageContext.request.contextPath}')">
+												  <input type="button" value="  บันทึก GR NO  " class="newPosBtnLong"> 
+												 </a>
+											 </c:if>
+										 </c:if>
 										 <c:if test="${barcodeForm.job.status != 'AB'}"> <!-- AB = CANCEL -->
 											<a href="javascript:printReport('${pageContext.request.contextPath}')">
 											  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
 											</a>
 										</c:if>
-										
-										
 										
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
@@ -750,3 +755,6 @@ function getProductModelByMat(matObj,lineId){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

@@ -6,11 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -23,12 +21,10 @@ import com.isecinc.pens.inf.bean.MonitorItemResultBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+import com.pens.util.Utils;
+import com.pens.util.helper.SequenceProcess;
 
 /**
  * @author WITTY
@@ -1160,7 +1156,7 @@ public class InterfaceDAO extends InterfaceUtils{
 				 m.setCode(rs.getString("code"));
 				 m.setType(rs.getString("type"));
 				 m.setAmount(rs.getDouble("amount"));
-				 m.setAmountStr(ConvertUtils.convertToCurrencyStr(rs.getDouble("amount")));
+				 m.setAmountStr(Utils.convertToCurrencyStr(rs.getDouble("amount")));
 				 itemList.add(m);
 			}
 			

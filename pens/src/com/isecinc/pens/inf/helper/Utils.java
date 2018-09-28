@@ -329,7 +329,7 @@ public class Utils {
 	}
 	/**
 	 * 
-	 * @param provinceName  Exception Chrecter "¨."
+	 * @param provinceName  Exception Character "¨."
 	 * @return
 	 */
 	public static String replaceProvinceNameNotMatch(String provinceName){
@@ -346,7 +346,7 @@ public class Utils {
 	
 	/**
 	 * 
-	 * @param districtName Exception Chrecter "Í.", "à¢µ."
+	 * @param districtName Exception Character "Í.", "à¢µ."
 	 * @return
 	 */
 	public static String replaceDistrictNameNotMatch(String districtName){
@@ -913,11 +913,9 @@ public class Utils {
 	    PreparedStatement ps =null;
 	    int recordUpdate = 0;
 		try{  
-		
 			String[] sqlArr = sql.split("\\;");
 			if(sqlArr != null && sqlArr.length>0){
 			   for(int i=0;i<sqlArr.length;i++){
-				 
 				 if( !isNull(sqlArr[i]).equals("")){
 				     ps = conn.prepareStatement(sqlArr[i]);
 				      recordUpdate = ps.executeUpdate();

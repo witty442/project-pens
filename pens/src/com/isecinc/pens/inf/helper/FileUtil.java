@@ -317,15 +317,12 @@ public class FileUtil {
 	/**
 	 * get file content full path
 	 */
-	
 
 	public static void close(BufferedReader br) throws IOException {
 		if (br != null) {
 			br.close();br=null;
 		}
 	}
-
-	
 
 	public static File createFile(String fileName, byte[] fileData) throws FileNotFoundException, IOException {
 		createParentDir(fileName);
@@ -365,7 +362,18 @@ public class FileUtil {
 			dir.mkdirs();
 		}
 	}
-
+	public static void deleteFileAllInDir(String dirName) {
+		// create dir
+		File f = new File(dirName);
+		File dir = new File(f.getAbsolutePath());
+		if (dir.exists()) {
+			String[]entries = f.list();
+			for(String s: entries){
+			    File currentFile = new File(f.getPath(),s);
+			    currentFile.delete();
+			}
+		}
+	}
 	public static void createParentDir(String fileName) {
 		// create dir
 		File f = new File(fileName);
@@ -391,24 +399,6 @@ public class FileUtil {
 		}
 	}
 	
-	public static void deleteFile2(String fileName) {
-		File f = null;
-		try{
-		   f = new File(fileName);
-		   boolean success = f.delete();
-		   if(!success){
-			   logger.info("deleteFile "+fileName+" fail");
-		   }
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage(),e);
-		}finally{
-			if( f != null){
-				f = null;
-			}
-		}
-	}
-
 	
 	public static String getQueryStr(String path,String table) throws Exception {
 		String r = "";

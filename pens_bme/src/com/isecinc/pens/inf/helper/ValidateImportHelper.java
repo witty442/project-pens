@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY

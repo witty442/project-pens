@@ -13,7 +13,7 @@ import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.dao.query.StockQuerySQL;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class StockQueryDAO extends PickConstants{
 
@@ -209,7 +209,23 @@ public class StockQueryDAO extends PickConstants{
  			}else if("FINISHGOODS".equals(o.getStatus())){
  				 groupFromBarcode = "'"+STATUS_FINISH+"'";
  			}
- 		}
+         }else if(o.getWareHouse().equals("W7")){
+ 			
+ 			if("ALL".equals(o.getStatus())){
+ 				groupFromBarcode = "'"+STATUS_OPEN+"','"+STATUS_CLOSE+"','"+STATUS_WORK_IN_PROCESS+"','"+STATUS_FINISH+"','"+STATUS_CANCEL+"'"; 
+ 				 groupFromStockPick = "'"+STATUS_ISSUED+"'";
+ 			}else if("SCANNING".equals(o.getStatus())){
+ 				 groupFromBarcode = "'"+STATUS_OPEN+"'";
+ 			}else if("ONHAND".equals(o.getStatus())){
+ 				groupFromBarcode = "'"+STATUS_CLOSE+"'";
+ 			}else if("ISSUED".equals(o.getStatus())){
+ 				groupFromStockPick = "'"+STATUS_ISSUED+"'";
+ 			}else if("FINISHING".equals(o.getStatus())){
+ 				 groupFromBarcode = "'"+STATUS_WORK_IN_PROCESS+"'";
+ 			}else if("FINISHGOODS".equals(o.getStatus())){
+ 				 groupFromBarcode = "'"+STATUS_FINISH+"'";
+ 			}
+         }
 		
 		logger.debug("groupFromBarcode:"+groupFromBarcode);
 		logger.debug("groupFromStockIssue:"+groupFromStockIssue);
@@ -379,7 +395,7 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n 			UNION ALL ");
 				
-				//** Stock ISSUE  substract status OPEN(O) ,P POST B BEF**/
+				//** Stock ISSUE  subtract status OPEN(O) ,P POST B BEF**/
 				sql.append("\n 			select  l.material_master ,l.group_code,l.pens_item,l.barcode,'A' as status ,(-1*sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n 			from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n 			where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
@@ -401,7 +417,7 @@ public class StockQueryDAO extends PickConstants{
 				
 				sql.append("\n UNION ALL ");
 				
-				/** Stock Reservse **/
+				/** Stock Reserve **/
 				sql.append("\n select l.material_master ,l.group_code,l.pens_item,l.barcode,'RE' as status ,(sum(nvl(req_qty,0))) as qty ");
 				sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
 				sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");

@@ -3,7 +3,7 @@
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -11,17 +11,14 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="stockQueryForm" class="com.isecinc.pens.web.pick.StockQueryForm" scope="session" />
 
 <html>
@@ -31,31 +28,9 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/pick_stockPickQuery.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
@@ -67,14 +42,9 @@ span.pagelinks {
 function loadMe(){
 	// new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
 
-	if(   document.getElementsByName('bean.wareHouse')[0].checked==false 
-	   && document.getElementsByName('bean.wareHouse')[1].checked ==false 
-	   && document.getElementsByName('bean.wareHouse')[2].checked ==false
-	   && document.getElementsByName('bean.wareHouse')[3].checked ==false
-	   && document.getElementsByName('bean.wareHouse')[4].checked ==false
-	   && document.getElementsByName('bean.wareHouse')[5].checked ==false){
+	if(   document.getElementsByName('bean.wareHouse')[0].value =='' ){
 		
-		  document.getElementsByName('bean.wareHouse')[0].checked =true;//default W1
+		  document.getElementsByName('bean.wareHouse')[0].value ='W1';//default W1
 	}
 	
 	swithWareHouse();
@@ -164,7 +134,7 @@ function swithWareHouse(){
 	//alert(document.getElementsByName('bean.wareHouse')[0].checked);
 	//alert(document.getElementsByName('bean.wareHouse')[0].value);
 	
-	if(document.getElementsByName('bean.wareHouse')[0].checked){//W1
+	/* if(document.getElementsByName('bean.wareHouse')[0].checked){//W1
 		loadStatusList('W1');
 		loadSummaryTypeList('W1');
 	}else if(document.getElementsByName('bean.wareHouse')[1].checked){//W2{
@@ -182,8 +152,12 @@ function swithWareHouse(){
 	}else if(document.getElementsByName('bean.wareHouse')[5].checked){//W5{
 		loadStatusList('W6');
 		loadSummaryTypeList('W6');
-	}
+	} */
 	
+	//Load Criteria by WareHouse
+	loadStatusList(document.getElementsByName('bean.wareHouse')[0].value);
+	loadSummaryTypeList(document.getElementsByName('bean.wareHouse')[0].value);
+	//Load W2 criteria
 	loadSummaryTypeListW2(document.getElementsByName('bean.status')[0]);
 }
 
@@ -218,7 +192,7 @@ function loadSummaryTypeList(wareHouse){
 }
 
 function loadSummaryTypeListW2(status){
-	if(document.getElementsByName('bean.wareHouse')[1].checked ==true){
+	if(document.getElementsByName('bean.wareHouse')[0].value =='W2'){
 		
 		var cboProvince = document.getElementsByName('bean.summaryType')[0];
 		$(function(){
@@ -281,12 +255,9 @@ function loadSummaryTypeListW2(status){
 						        <tr>
                                     <td> Warehouse</td>
 									<td colspan="3">					
-										<html:radio property="bean.wareHouse" value="W1" onclick="swithWareHouse()">W1-<%=PickConstants.getWareHouseDesc("W1") %></html:radio>
-										<html:radio property="bean.wareHouse" value="W2" onclick="swithWareHouse()">W2-<%=PickConstants.getWareHouseDesc("W2") %></html:radio>
-										<html:radio property="bean.wareHouse" value="W3" onclick="swithWareHouse()">W3-<%=PickConstants.getWareHouseDesc("W3") %></html:radio>
-										<html:radio property="bean.wareHouse" value="W4" onclick="swithWareHouse()">W4-<%=PickConstants.getWareHouseDesc("W4") %></html:radio>
-										<html:radio property="bean.wareHouse" value="W5" onclick="swithWareHouse()">W5-<%=PickConstants.getWareHouseDesc("W5") %></html:radio>
-										<html:radio property="bean.wareHouse" value="W6" onclick="swithWareHouse()">W6-<%=PickConstants.getWareHouseDesc("W6") %></html:radio>
+										 <html:select property="bean.wareHouse" styleId="wareHouse" onclick="swithWareHouse()">
+											<html:options collection="wareHouseList" property="key" labelProperty="name"/>
+									    </html:select>
 									</td>
 								</tr>
 						       <tr>
@@ -392,31 +363,31 @@ function loadSummaryTypeListW2(status){
 										</c:otherwise>
 									</c:choose>
 									<tr class="<c:out value='${tabclass}'/>">
-										    <td class="search_groupCode">${results.no}</td>
-											<td class="search_groupCode">${results.wareHouse}</td>
-											<td class="search_groupCode">${results.groupCode}</td>
-											<td class="search_pensItem">
+										    <td class="td_text_center" width="5%">${results.no}</td>
+											<td class="td_text_center" width="5%">${results.wareHouse}</td>
+											<td class="td_text_center" width="5%">${results.groupCode}</td>
+											<td class="td_text_center" width="5%">
 												${results.pensItem}
 											</td>
-											<td class="search_materialMaster">
+											<td class="td_text_center" width="5%">
 											   ${results.materialMaster}
 											</td>
-											<td class="search_barcode">
+											<td class="td_text_center" width="5%">
 											    ${results.barcode}
 											</td>
-								            <td class="search_boxNo">${results.boxNo}</td>
-								            <td class="search_status">
+								            <td class="td_text_center" width="5%">${results.boxNo}</td>
+								            <td class="td_text_center" width="5%">
 											  ${results.jobId}
 											</td>
-											<td class="search_jobname">
+											<td class="td_text" width="10%">
 											  ${results.name}
 											</td>
 											<c:if test="${stockQueryForm.bean.wareHouse =='W3'}">
-												<td class="search_jobname">
+												<td class="td_text" width="10%">
 												  ${results.remark}
 												</td>
 											</c:if>
-											<td class="search_status">
+											<td class="td_text_center" width="5%">
 											  ${results.statusDesc}
 											</td>
 									</tr>
@@ -438,7 +409,7 @@ function loadSummaryTypeListW2(status){
 					</c:if>
 					
 					<c:if test="${stockQueryForm.bean.summaryType =='SummaryByBox'}">
-							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch2">
+							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							       <tr>
 							            <th >Warehouse.</th>
 										<th >เลขที่กล่อง</th>
@@ -456,12 +427,12 @@ function loadSummaryTypeListW2(status){
 									</c:choose>
 									
 										<tr class="<c:out value='${tabclass}'/>">
-										    <td class="search_groupCode">${results.wareHouse}</td>
-											<td class="search2_boxNo">${results.boxNo}</td>
-											<td class="search2_jobname">
+										    <td class="td_text_center" width="5%">${results.wareHouse}</td>
+											<td class="td_text_center" width="10%">${results.boxNo}</td>
+											<td class="td_text" width="15%">
 											  ${results.name}
 											</td>
-											<td class="search2_qty">
+											<td class="td_text_right" width="10%">
 											  ${results.onhandQty}
 											</td>
 										</tr>
@@ -469,15 +440,15 @@ function loadSummaryTypeListW2(status){
 							       <tr>
 							            <td ></td>
 										<td ></td>
-										<td class="search2_boxNo"><b>Total QTY</b></td>	
-										<td class="search3_groupCode" align="center"><b>${stockQueryForm.bean.totalQty}</b></td>					
+										<td class="td_text_right" width="15%"><b>Total QTY</b></td>	
+										<td class="td_text_right" width="10%"><b>${stockQueryForm.bean.totalQty}</b></td>					
 								   </tr>
 						</table>
 						
 					</c:if>
 					
 					<c:if test="${stockQueryForm.bean.summaryType =='SummaryByPensItem'}">
-							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch3">
+							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							       <tr>
 							            <th >Warehouse.</th>
 										<th >Pens Item</th>
@@ -495,12 +466,12 @@ function loadSummaryTypeListW2(status){
 									</c:choose>
 									
 										<tr class="<c:out value='${tabclass}'/>">
-										    <td class="search_groupCode">${results.wareHouse}</td>
-											<td class="search3_pensItem">${results.pensItem}</td>
-											<td class="search3_groupCode">
+										    <td class="td_text_center" width="5%">${results.wareHouse}</td>
+											<td class="td_text_center" width="5%">${results.pensItem}</td>
+											<td class="td_text_center" width="10%">
 											  ${results.groupCode}
 											</td>
-											<td class="search3_qty">
+											<td class="td_text_right" width="10%">
 											  ${results.onhandQty}
 											</td>
 										</tr>
@@ -508,8 +479,8 @@ function loadSummaryTypeListW2(status){
 								 <tr>
 										<td ></td>
 										<td ></td>
-										<td class="search3_pensItem"><b>Total QTY</b></td>	
-										<td class="search3_groupCode" align="center"><b>${stockQueryForm.bean.totalQty}</b></td>					
+										<td class="td_text_right" width="10%"><b>Total QTY</b></td>	
+										<td class="td_text_right" width="10%"><b>${stockQueryForm.bean.totalQty}</b></td>					
 								   </tr>
 						</table>
 					</c:if>

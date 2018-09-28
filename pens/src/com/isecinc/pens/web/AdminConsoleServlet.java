@@ -2,19 +2,16 @@ package com.isecinc.pens.web;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.Configuration;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 
 
 public class AdminConsoleServlet  extends HttpServlet{
@@ -77,12 +74,10 @@ public class AdminConsoleServlet  extends HttpServlet{
 	
 			if(currentTab.equals("tab_config_info") ){
 				EnvProperties env = EnvProperties.getInstance();
-				Configuration hibernateConfig = new Configuration();
-				hibernateConfig.configure();
 		
-				String url = hibernateConfig.getProperty("connection.url");
-				String username = hibernateConfig.getProperty("connection.username");
-				String password = hibernateConfig.getProperty("connection.password");
+				String url = env.getProperty("connection.url");
+				String username = env.getProperty("connection.username");
+				String password = env.getProperty("connection.password");
 		
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
@@ -100,7 +95,7 @@ public class AdminConsoleServlet  extends HttpServlet{
 			   if("tab_config_info".equalsIgnoreCase(action)){
 					configInfoTest += "\n ----------------------  Result Test DB Connection -------------------------------------------------------------- \n";
 						 try {   
-							 configInfoTest += " \n "+ test.TestALL.testDBCon();
+							 configInfoTest += " \n "+ com.pens.test.TestALL.testDBCon();
 						  } catch(Exception e) {
 							  configInfoTest += " \n error:>> "+e.getMessage();
 						  }
@@ -108,7 +103,7 @@ public class AdminConsoleServlet  extends HttpServlet{
 						 
 					configInfoTest += "\n ----------------------  Result Test FTP Connection ------------------------------------------------------------- \n";
 						try {   
-							 configInfoTest += " \n "+ test.TestALL.testFTPCon();
+							 configInfoTest += " \n "+ com.pens.test.TestALL.testFTPCon();
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }

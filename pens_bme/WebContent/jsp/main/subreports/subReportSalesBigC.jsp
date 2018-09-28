@@ -1,5 +1,5 @@
 <%@page import="com.isecinc.pens.bean.TransactionSummary"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -75,6 +75,7 @@ System.out.println("currentPage:"+currentPage);
 							    <display:column  title="TOTAL Whole Price BF" property="totalWholePriceBF"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Pens Group" property="pensGroup"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false"  class="td_text" style="width:5%"/>	
+							    <display:column  title="Pens Item" property="pensItem"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Sales Year" property="salesYear"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Sales Month" property="salesMonth"  sortable="false"  class="td_text" style="width:5%"/>			
 							    <display:column  title="file Name" property="fileName"  sortable="false"  class="td_text" style="width:5%"/>	

@@ -1,7 +1,6 @@
 package com.isecinc.pens.process.modifier;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -13,6 +12,7 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import util.BeanParameter;
+import util.ControlCode;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
@@ -28,7 +28,6 @@ import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Qualifier;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MModifier;
 import com.isecinc.pens.model.MModifierAttr;
@@ -428,7 +427,6 @@ public class ModifierProcess {
 					discountProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
 				}
 				// Pricebreak Header
-				
 				if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPricebreakheader())) {
 					priceBreakProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
 				}
@@ -437,10 +435,12 @@ public class ModifierProcess {
 					shipDate = oline.getShippingDate();
 					requestDate = oline.getRequestDate();
 					
-					if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
-						 promotionalGoodProcess2(oline.getQty());
+					//if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
+					if(ControlCode.canExecuteMethod("ModifierProcess", "promotionalGoodProcessNew")){
+						 //New Code
+						 promotionalGoodProcessNew(oline.getQty());
 					}else{
-					     //default 1
+					     //default 1 (old code)
 					     promotionalGoodProcess(oline.getQty());
 				    }
 				}
@@ -575,10 +575,12 @@ public class ModifierProcess {
 					// Promotional Good
 					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPromotiongood())) {
 						
-						if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
-						    promotionalGoodProcess2(sumQty);
+						//if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
+						 if(ControlCode.canExecuteMethod("ModifierProcess", "promotionalGoodProcessNew")){
+							//New Code
+							promotionalGoodProcessNew(sumQty);
 						}else{
-						     //default 1
+						     //default (old code)
 							promotionalGoodProcess(sumQty);
 					    }
 						
@@ -1033,9 +1035,9 @@ public class ModifierProcess {
 	 * @return promotion good discount & add lines
 	 * @throws Exception
 	 */
-	private double promotionalGoodProcess2(double sumQty) throws Exception {
+	private double promotionalGoodProcessNew(double sumQty) throws Exception {
 		if(isDebug){
-		  logger.info("---- Start Promotional Good Process ----");
+		  logger.info("---- Start Promotional Good Process (NEW) ----");
 		}
 		
 		OrderLine oLine;

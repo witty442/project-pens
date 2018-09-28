@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import util.BeanParameter;
-import util.DBCPConnectionProvider;
+import util.DBConnection;
 
 /**
  * I_ReportAction Class
@@ -53,7 +53,7 @@ public abstract class I_ReportAction<E> extends DispatchAction {
 
 		try {
 			
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			if (conn != null) {
 				lstData = searchReport(form, request, response, parameterMap, conn);
 			}

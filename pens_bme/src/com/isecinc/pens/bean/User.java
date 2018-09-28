@@ -8,7 +8,7 @@ import java.util.Locale;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 
 /**
@@ -29,6 +29,8 @@ public class User extends I_PO implements Serializable {
 	public static final String SALE = "SALE";
 	public static final String MT_SALE = "MTSALE";
 	public static final String REDDOC = "REDDOC";
+	public static final String WHITEDOC = "WHITEDOC";
+	public static final String WHITEDIT = "WHITEDIT";
 	public static final String REDEDIT = "REDEDIT";
 	public static final String NISSINTEAM ="NISSINTEAM";
 	public static final String PENSTEAM ="PENSTEAM";

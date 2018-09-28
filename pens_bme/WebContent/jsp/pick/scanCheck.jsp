@@ -1,23 +1,18 @@
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="scanCheckForm" class="com.isecinc.pens.web.pick.ScanCheckForm" scope="session" />
 <%
@@ -28,37 +23,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<style type="text/css"></style>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -125,6 +98,8 @@ function newBox(path){
 		alert("ไม่พบข้อมูล รหัสร้านค้า ไม่สามารถทำงานต่อได้  ");
 		return false;
 	}
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	
 	form.action = path + "/jsp/scanCheckAction.do?do=newBox";
 	form.submit();
@@ -152,8 +127,14 @@ function back(path){
 	form.submit();
 	return true;
 }
-
+var countSave = 0;
 function save(path){
+	/** Check Save duplicate */
+	 if(countSave > 0){
+	    return false;
+	 }
+	 countSave++;
+	    
 	var form = document.scanCheckForm;
 	var issueReqNo =$('#issueReqNo').val();
 	var storeCode =$('#storeName').val();
@@ -177,20 +158,25 @@ function save(path){
 		alert("ไม่พบข้อมูล รหัสร้านค้า ไม่สามารถทำงานต่อได้  ");
 		return false;
 	}
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	
 	form.action = path + "/jsp/scanCheckAction.do?do=save";
 	form.submit();
 	return true;
 }
 
-function openIssuePopup(path){
-    var param = "";
-	url = path + "/jsp/searchStockIssuePopupAction.do?do=prepare&act       ion=new"+param;
-	window.open(encodeURI(url),"",
-			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=700px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+function openIssuePopup(path,mode){
+    var param  = "&status=<%=PickConstants.STATUS_POST%>";
+        param += "&mode="+mode;
+	url = path + "/jsp/searchStockIssuePopupAction.do?do=prepare&action=new"+param;
+	//window.open(encodeURI(url),"",
+			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=700px,height=540px,status=no,left="+ 50 + ",top=" + 0);
+	PopupCenterFullHeight(url, '', '700');
 }
 
-function setStoreMainValue(code,storeCode,storeName,wareHouse,requestor,issueReqDate,custGroup,remark,totalReqQty,totalQty){
+function setStoreMainValue(code,storeCode,storeName,wareHouse,requestor
+		,issueReqDate,custGroup,remark,totalReqQty,totalQty){
 
 	document.getElementsByName("bean.issueReqNo")[0].value = code;
 		
@@ -235,7 +221,7 @@ function getIssueModel(code,warehouse,boxNo){
 	var returnString = "";
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/autoStockIssue.jsp",
-			data : "code=" + code+"&warehouse="+warehouse+"&boxNo="+boxNo+"&mode=<%=mode%>",
+			data : "code=" + code+"&warehouse="+warehouse+"&boxNo="+boxNo+"&mode=<%=mode%>&status=<%=PickConstants.STATUS_POST%>",
 			async: false,
 			cache: false,
 			success: function(getData){
@@ -273,7 +259,6 @@ function getIssueModel(code,warehouse,boxNo){
 		document.getElementsByName("totalQtyTemp")[0].value = '0';
 	    document.getElementsByName("bean.totalQty")[0].value = '0';
 	}
-	
 }
 
 function addRow(path){
@@ -295,7 +280,7 @@ function addRow(path){
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
 	
 	    " />  </td>"+
-	    "<td class='td_text_right' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25'  onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='td_text_center' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25'  onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' />"+ 
 	    "  <input type='hidden' tabindex ='-1' id='status' name='status' value='' /></td>"+
@@ -758,7 +743,7 @@ function getProductModelByMat(matObj,lineId){
 									             <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" 
 							                               onkeypress="getIssueKeypress(event,this)"/> 
 							                      <font color="red">*</font>
-							                     <input type="button" name="x1" value="..." onclick="openIssuePopup('${pageContext.request.contextPath}')"/>
+							                     <input type="button" name="x1" value="..." onclick="openIssuePopup('${pageContext.request.contextPath}','<%=mode%>')"/>
 											 </td>
 									    </c:when>
 										<c:otherwise>    
@@ -941,3 +926,6 @@ function getProductModelByMat(matObj,lineId){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->
