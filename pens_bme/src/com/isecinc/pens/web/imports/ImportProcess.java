@@ -2230,6 +2230,7 @@ public class ImportProcess {
 			         String pensItem = importDAO.getItemByBarcodeTypeBigC(conn,"BigCitem", barcode);
 			        
 			         if(mStore != null && !Utils.isNull(pensItem).equals("")){
+			        	 logger.debug("StoreName:"+mStore.getInterfaceDesc());
 			        	 //Set StoreName
 			        	 ps.setString(7, Utils.isNull(mStore.getInterfaceDesc()));
 			        	 
@@ -2243,6 +2244,8 @@ public class ImportProcess {
 				         s.setQty(qty.toString());
 				         s.setMessage("Success");
 				         successMap.put(i+"", s);
+			         }else{
+			        	 //ps.setString(7, "");
 			         }
 			         
 			         if(mStore !=null){
