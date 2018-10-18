@@ -232,8 +232,17 @@ body {
 										<c:if test="${results.exported=='N'}">
 											<c:if test="${results.docStatus=='SV'}">
 												<c:if test="${results.payment=='N'}">
-													<a href="#" onclick="javascript:prepareEditOrder('${pageContext.request.contextPath}','edit','${results.id}');">
-												    <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
+												    <c:choose>
+													<c:when test="${results.promotionSP == true}">
+						                               <a href="#" onclick="javascript:prepareEditOrderSP('${pageContext.request.contextPath}','edit','${results.id}');">
+												       <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
+													</c:when>
+													<c:otherwise>
+														<a href="#" onclick="javascript:prepareEditOrder('${pageContext.request.contextPath}','edit','${results.id}');">
+												       <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
+													</c:otherwise>
+												    </c:choose>
+													
 												</c:if>
 											</c:if>
 										</c:if>

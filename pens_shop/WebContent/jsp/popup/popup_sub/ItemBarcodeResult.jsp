@@ -23,7 +23,7 @@
    <display:table style="width:100%;" id="item" name="sessionScope.DATA_LIST" 
     defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
     <display:column  style="text-align:center;" title="เลือกข้อมูล"  sortable="false" class="chk">
-		<input type ="radio" name="chCheck" id="chCheck" onclick="saveSelectedInPage(${item.no})"  />
+		<input type ="radio" name="chCheck" id="chCheck" />
 		<input type ="hidden" name="code_temp" value="<bean:write name="item" property="code2"/>" />
 		<input type ="hidden" name="desc" value="<bean:write name="item" property="desc"/>" />
 	 </display:column>							    

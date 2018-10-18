@@ -20,6 +20,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.imports.process.ImportLoadStockInitProcess;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.imports.sub.ImportOnhandPensShop;
 import com.pens.util.Utils;
 
 /**
@@ -188,6 +189,9 @@ public class ImportAction extends I_Action {
         	
         }else if("onhand7Catalog".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	return process.import7CatalogFromWacoal(mapping, importForm, request, response);
+        	
+        }else if("onhandPensShop".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	return new ImportOnhandPensShop().importData(mapping, importForm, request, response);
         	
         }else if("onhandOShopping".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	return process.importOShoppingFromWacoal(mapping, importForm, request, response);

@@ -27,11 +27,10 @@ if(action == null){
 	action = "";
 }
 
-List<References> vatcodes = InitialReferences.getReferenes().get(InitialReferences.VAT_CODE);
-pageContext.setAttribute("vatcodes",vatcodes,PageContext.PAGE_SCOPE);
-
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
+
+
 %>
 <html>
 <head>
@@ -42,7 +41,12 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
 
-<style type="text/css"></style>
+<style type="text/css">
+.h1{
+ font-size: 20px;
+ font-weight: bold;
+}
+</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -113,21 +117,13 @@ function changePaymentMethod(paymentMethod){
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-  	<tr>
-		<td colspan="3"><jsp:include page="../headerNew.jsp"/></td>
-	</tr>
+  	
   	<tr id="framerow">
   		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	    	<jsp:include page="../menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
@@ -169,29 +165,28 @@ function changePaymentMethod(paymentMethod){
 							<tr>
 								<td align="right">&nbsp;&nbsp;ชื่อ-นามสกุล<font color="red"></font></td>
 								<td align="left" colspan="3">
-									<html:text property="order.customerBillName" size="40" styleClass="normalText"/>		
+									<html:text property="order.customerBillName" size="40" styleClass="\" autoComplete=\"off"/>		
 								</td>
 							</tr>
 							<tr>
 								<td align="right">ที่อยู่<font color="red"></font></td>
 								<td align="left" colspan="3">
-									<html:text property="order.addressDesc" size="80" styleClass="normalText"/>
+									<html:text property="order.addressDesc" size="80"  styleClass="\" autoComplete=\"off" />
 								</td>
 							</tr>
 							<tr>
 								<td align="right">บัตรประชาชน<font color="red"></font></td>
 								<td align="left" colspan="2">
-									<html:text property="order.idNo" size="20" styleClass="normalText"/>
+									<html:text property="order.idNo" size="20" maxlength="13" 
+									onkeydown="return inputNum(event);" styleClass="\" autoComplete=\"off" />
 									&nbsp;&nbsp;&nbsp;&nbsp;
 									Passport No &nbsp;
-									<html:text property="order.passportNo" size="20" styleClass="normalText"/>
+									<html:text property="order.passportNo" size="20" styleClass="\" autoComplete=\"off" />
 								    &nbsp;&nbsp;&nbsp;&nbsp;  
 							</td> 
 							 <td align="left">   
 								         อัตราภาษี &nbsp;
-								    <html:select property="order.vatCode" disabled="true" onchange="calculatePrice();" styleClass="disableText">
-										<html:options collection="vatcodes" property="key" labelProperty="name"/>
-									</html:select>
+									<html:text property="order.vatCode" value="7" readonly="true" size="2" styleClass="disableText"/>
 									
 									<html:hidden property="order.priceListId" styleId="order.priceListId"/>
 									<html:hidden property="order.paymentTerm"/>
@@ -201,21 +196,26 @@ function changePaymentMethod(paymentMethod){
 							</tr> 
 							<tr>
 								<td colspan="4" align="center">
-								<div id="divTableProduct" style="width: 100%; height: 200px; overflow-y: scroll;">
-								<table id="tblProduct" align="center" border="0" cellpadding="3" 
-								cellspacing="1" class="tableSearch">
+								<div id="divTableProductHead" style="width: 100%; height:50px; overflow-y: scroll;">
+								<table id="tblProductHead" align="left" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
-										<th>ลำดับ</th>
-										<th>ชื่อสินค้า</th>
-										<th>หน่วยนับ</th>
-										<th>จำนวน</th>
-										<th>ราคาต่อหน่วย</th>
-										<th>ยอดรวม</th>
-										<th>ส่วนลด</th>
-										<th>ยอดรวม หลังหักส่วนลด</th>
-										<th>ภาษี</th>
-										<th>โปรโมชั่น</th>
+										<th class="td_text_center" width="9%">ลำดับ</th>
+										<th class="td_text_center" width="1%"></th>
+										<th class="td_text_center" width="20%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="10%">หน่วยนับ</th>
+										<th class="td_text_center" width="10%">จำนวน</th>
+										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
+										<th class="td_text_center" width="10%">ยอดรวม</th>
+										<th class="td_text_center" width="10%">ส่วนลด</th>
+										<th class="td_text_center" width="10%">ยอดรวม หลังหักส่วนลด</th>
+										<th class="td_text_center" width="5%">ภาษี</th>
+										<th class="td_text_center" width="5%">โปรโมชั่น</th>
 									</tr>
+								</table>
+								</div>
+								<div id="divTableProduct" style="width: 100%; height: 270px; overflow-y: scroll;">
+								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+									
 								<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
 										<c:when test="${rows1.index %2 == 0}">
@@ -226,7 +226,8 @@ function changePaymentMethod(paymentMethod){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td class="td_text_center" width="10%">${lines1.lineNo}</td>
+										<td class="td_text_center" width="9%">${lines1.lineNo}</td>
+										<td class="td_text_center" width="1%"></td>
 										<td class="td_text" width="20%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
@@ -270,6 +271,7 @@ function changePaymentMethod(paymentMethod){
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
+											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
 										<td class="td_text_center" width="10%">${lines1.fullUom}</td>
 										<td class="td_text_right" width="10%">
@@ -309,8 +311,13 @@ function changePaymentMethod(paymentMethod){
 										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/>
 										</td>
-										<td class="td_text_right" width="10%">
-											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
+										<td class="td_text_right" width="10%">${lines1.promotion}:
+										   <c:if test="${lines1.promotion=='N'}">
+											 <fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
+										   </c:if>
+										    <c:if test="${lines1.promotion=='S'}">
+										        0.00000	
+										    </c:if>
 										</td>
 										<td class="td_text_center" width="5%">
 											<c:if test="${lines1.taxable=='Y'}">
@@ -318,9 +325,7 @@ function changePaymentMethod(paymentMethod){
 											</c:if>
 										</td>
 										<td class="td_text_center" width="5%">
-											<c:if test="${lines1.promotion=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
+											${lines1.promotion}
 										</td>
 									</tr>
 									</c:forEach>
@@ -333,11 +338,11 @@ function changePaymentMethod(paymentMethod){
 							   <table id="tblProductSummary" align="left" border="0" cellpadding="3" 
 							   cellspacing="1" width="100%" bgcolor="#D3D3D3">
 							      <tr>
-									<td class="td_text_right" width="40%" colspan="4"><b>รวมจำนวน</b></td>
+									<td class="td_text_right" width="40%" colspan="5"><span class="h1">รวมจำนวน</span></td>
 									<td  class="td_text_right" width="10%">
 									   <!-- <input type="text" name="totalQty" id="totalQty" size="10" 
 									   class="disableBoldNumber"> -->
-									  <b> <span id="totalQty"></span></b>
+									  <b> <span id="totalQty" class="h1"></span></b>
 									</td>
 									<td class="td_text_right" width="10%"></td>
 									<td class="td_text_right" width="10%"></td>
@@ -376,10 +381,29 @@ function changePaymentMethod(paymentMethod){
 									           size="30" maxlength="16" onkeydown="return inputNum(event);"/>
 									         </span>
 									      </td>
-									      <td align="left">
+									      <td align="left" nowrap>
 									        <span id="div_credit_4" style="display:none" align="center">
-									           <html:text property="order.creditCardExpireDate" styleId="creditCardExpireDate" 
-									            size="15" maxlength="5" styleClass="\" autoComplete=\"off"  />
+									          <%--  <html:text property="order.creditCardExpireDate" styleId="creditCardExpireDate" 
+									            size="15" maxlength="5" styleClass="\" autoComplete=\"off"  /> --%>
+									            
+									            <html:select property="order.creditcardMonthExpire" styleId="creditcardMonthExpire">
+										           <html:option value="01">01</html:option>
+										           <html:option value="02">02</html:option>
+										           <html:option value="03">03</html:option>
+										           <html:option value="04">04</html:option>
+										           <html:option value="05">05</html:option>
+										           <html:option value="06">06</html:option>
+										           <html:option value="07">07</html:option>
+										           <html:option value="08">08</html:option>
+										           <html:option value="09">09</html:option>
+										           <html:option value="10">10</html:option>
+										           <html:option value="11">11</html:option>
+										           <html:option value="12">12</html:option>
+					 				            </html:select> 
+					 				            /
+					 				            <html:select property="order.creditcardYearExpire" styleId="creditcardYearExpire">
+										            <html:options collection="CAREDITCARD_YEAR_EXPIRE_LIST" property="key" labelProperty="name"/>
+									            </html:select> 
 									        </span>
 									      </td>
 									    </tr>
@@ -389,11 +413,12 @@ function changePaymentMethod(paymentMethod){
 									 <tr>
 									   <td colspan="4" align="right">
 									       <input type="button" value="แก้ไขสินค้า" class="newPosBtn" onclick="return backadd('${pageContext.request.contextPath}');">
-											
+											&nbsp;&nbsp;&nbsp;
 											<% if(request.getAttribute("do_not_save") == null){%>
-											   <input type="button" value="บันทึก" class="newPosBtnLong" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')">
+											   <input type="button" value="  บันทึก   " class="newPosBtnLong" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>')">
+											&nbsp;&nbsp;&nbsp;
 											<%} %>
-											<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+											<input type="button" value=" ยกเลิก  " class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
 									   </td>
 									 </tr>
 								   </table>
@@ -403,28 +428,28 @@ function changePaymentMethod(paymentMethod){
 									    <tr>
 									      <td align="right" nowrap><b>ยอดรวมก่อนภาษี</b></td>
 									      <td align="left">
-									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
 										     <html:hidden property="order.totalAmount"/>
 									      </td>
 									    </tr>
 									    <tr>
 									       <td align="right" nowrap><b>ภาษี</b></td>
 									       <td align="left">
-									         <input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
 									         <html:hidden property="order.vatAmount"/>
 									       </td>
 									    </tr>
 									    <tr>
 									       <td align="right" nowrap><b>ยอดรวมที่ไม่เสียภาษี</b></td>
 									       <td align="left">
-									           <input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
+									           <input type="text" id="tempTotalAmountNonVat" size="22" name="tempTotalAmountNonVat" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
 									           <html:hidden property="order.totalAmountNonVat"/>
 									       </td>
 									    </tr>
 									    <tr>
-									       <td align="right" nowrap><b>ยอดสุทธิ</b></td>
+									       <td align="right" nowrap><b><font size ="3">ยอดสุทธิ</font></b></td>
 									       <td align="left">
-									          <input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+									          <input type="text" id="tempNetAmount" name="tempNetAmount" size="15" readonly="readonly" class="disableBoldBigBlueText" style="text-align: right;"/>
 									           <html:hidden property="order.netAmount"/>
 									       </td>
 									    </tr>

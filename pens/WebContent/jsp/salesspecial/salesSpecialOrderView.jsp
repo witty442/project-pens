@@ -60,6 +60,7 @@ pageContext.setAttribute("vanPaymentMethod",vanPaymentMethod,PageContext.PAGE_SC
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css">
 <!--
@@ -314,24 +315,22 @@ function stampPrint(){
 									<html:hidden property="order.paymentMethod"/>
 								</td>
 							</tr>
-							
 							<tr>
 								<td colspan="4" align="center">
 								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 									<tr>
-										<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-										<th><bean:message key="Product.Name" bundle="sysele"/></th>
-										<th><bean:message key="Product.UOM" bundle="sysele"/></th>
-										<th><bean:message key="Quantity" bundle="sysele"/></th>
-										<th><bean:message key="Price.Unit" bundle="sysele"/></th>
-										<th><bean:message key="Total" bundle="sysele"/></th>
-										<th><bean:message key="Discount" bundle="sysele"/></th>
-										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
-										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
-										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<th>¿“…’</th>
-										<th><bean:message key="Promotion" bundle="sysele"/></th>
-
+										<th class="td_text_center" width="5%"><bean:message key="No" bundle="sysprop"/></th>
+										<th class="td_text_center" width="15%"><bean:message key="Product.Name" bundle="sysele"/></th>
+										<th class="td_text_center" width="5%"><bean:message key="Product.UOM" bundle="sysele"/></th>
+										<th class="td_text_center" width="5%"><bean:message key="Quantity" bundle="sysele"/></th>
+										<th class="td_text_center" width="10%"><bean:message key="Price.Unit" bundle="sysele"/></th>
+										<th class="td_text_center" width="10%"><bean:message key="Total" bundle="sysele"/></th>
+										<th class="td_text_center" width="10%"><bean:message key="Discount" bundle="sysele"/></th>
+										<th class="td_text_center" width="10%"><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
+										<th class="td_text_center" width="5%"><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
+										<th class="td_text_center" width="5%"><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
+										<th class="td_text_center" width="3%">¿“…’</th>
+										<th class="td_text_center" width="3%"><bean:message key="Promotion" bundle="sysele"/></th>
 									</tr>
 									<c:forEach var="lines1" items="${orderSpecialForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -343,9 +342,9 @@ function stampPrint(){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td>${rows1.index + 1}</td>
-										<td align="left">${lines1.product.code} ${lines1.product.name}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${rows1.index + 1}</td>
+										<td class="td_text" width="15%">${lines1.product.code} ${lines1.product.name}</td>
+										<td class="td_text_right" width="5%">
 											<c:choose>
 												<c:when test="<%=orderSpecialForm.getOrder().getOrderType().equals(User.DD) %>">
 													${lines1.uom.code}&nbsp;${lines1.uom1.code}
@@ -355,8 +354,7 @@ function stampPrint(){
 												</c:otherwise>
 											</c:choose>
 										</td>
-										<td align="right">
-											
+										<td class="td_text_right" width="10%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -374,10 +372,8 @@ function stampPrint(){
 													<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
 												</c:otherwise>
 											</c:choose>
-											
 										</td>
-										<td align="right">
-											
+										<td class="td_text_right" width="10%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
@@ -389,29 +385,26 @@ function stampPrint(){
 											</c:choose>											
 										
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00" value="${lines1.discount}"/>
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
 										
-										<td align="center">${lines1.shippingDate}</td>
-										<td align="center">${lines1.requestDate}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${lines1.shippingDate}</td>
+										<td class="td_text_center" width="5%">${lines1.requestDate}</td>
+										<td class="td_text_center" width="3%">
 											<c:if test="${lines1.taxable=='Y'}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:if>
 										</td>
-										<td align="center">
-											<c:if test="${lines1.promotion=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
+										<td class="td_text_center" width="3%">
+											${lines1.promotion}
 										</td>
-										
 										
 									</tr>
 									</c:forEach>
@@ -605,7 +598,6 @@ function stampPrint(){
 							<jsp:param name="id" value="${orderSpecialForm.order.id}"/>
 						</jsp:include>
 					  </div>
-	                  SalesOrderView
 						</html:form>
 						<!-- BODY -->
 					</td>

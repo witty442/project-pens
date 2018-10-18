@@ -79,7 +79,7 @@ public class MPriceList extends I_Model<PriceList> {
 	
 	public PriceList getMayaPriceList() throws Exception {
 		String whereCause = "and isactive = 'Y' ";
-		whereCause += "  and name = 'MAYA Pricelist' ";
+		//whereCause += "  and name = 'MAYA Pricelist' ";
 		logger.info("xx:"+whereCause);
 		PriceList[] pls = search(whereCause);
 		if (pls != null) {

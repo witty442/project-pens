@@ -78,9 +78,6 @@ public class OrderLine extends I_PO implements Serializable {
 			setOrg(rst.getString("ORG"));
 			setSubInv(rst.getString("SUB_INV"));
 		} catch (Exception e) {}
-		
-		//09/2561 wit edit
-		setIsPromotionSpecial(Utils.isNull(rst.getString("is_promotion_special")).equals("")?"N":Utils.isNull(rst.getString("is_promotion_special")));
 	}
 
 	protected void setDisplayLabel() throws Exception {
@@ -139,6 +136,7 @@ public class OrderLine extends I_PO implements Serializable {
 	private double totalAmount;
 	private double totalAmount1;
 	private double totalAmount2;
+	
 
 	/** Shipping */
 	private String shippingDate;
@@ -197,15 +195,14 @@ public class OrderLine extends I_PO implements Serializable {
 	
 	private String cancelDate;
 	private String taxable;
-	private String isPromotionSpecial;
-	
-	
-	public String getIsPromotionSpecial() {
-		return isPromotionSpecial;
+	private double sellingPrice;
+
+	public double getSellingPrice() {
+		return sellingPrice;
 	}
 
-	public void setIsPromotionSpecial(String isPromotionSpecial) {
-		this.isPromotionSpecial = isPromotionSpecial;
+	public void setSellingPrice(double sellingPrice) {
+		this.sellingPrice = sellingPrice;
 	}
 
 	public String getTaxable() {

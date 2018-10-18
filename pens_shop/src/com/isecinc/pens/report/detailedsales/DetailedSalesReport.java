@@ -33,12 +33,18 @@ public class DetailedSalesReport implements Serializable{
 	private String startDate;
 	private String endDate;
 	private String pdPaid;
-	
+	private String paymentMethod;
 	private String orderType;
 	
 	private int sortType = 1;
 	
 	
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
 	public String getNo() {
 		return no;
 	}

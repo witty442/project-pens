@@ -4,6 +4,7 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="239"/>
 	<parameter name="p_report_title" class="java.lang.String"/>
+	<parameter name="p_address_pens" class="java.lang.String"/>
 	<parameter name="custName" class="java.lang.String"/>
 	<parameter name="custAddress1" class="java.lang.String"/>
 	<parameter name="custAddress2" class="java.lang.String"/>
@@ -54,14 +55,14 @@
 				</textElement>
 				<text><![CDATA[ลูกค้า:]]></text>
 			</staticText>
-			<staticText>
+	        <textField pattern="">
 				<reportElement x="0" y="24" width="199" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="6" isBold="false"/>
 				</textElement>
-				<text><![CDATA[662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
- โทร. 0-2294-7300 โทรสาร. 0-2294-7560 สำนักงานใหญ่]]></text>
-			</staticText>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{p_address_pens}]]></textFieldExpression>
+			</textField>
+
 			<textField pattern="">
 				<reportElement x="130" y="57" width="69" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">

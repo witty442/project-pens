@@ -165,7 +165,7 @@ public class MRequestPromotion {
 		}
 	}
 
-	
+	/** case Update set exported ='N' allway can edit alltime */
 	public RequestPromotion updateReqPromotion(Connection conn,RequestPromotion head) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -174,7 +174,7 @@ public class MRequestPromotion {
 			StringBuffer sql = new StringBuffer("update t_req_promotion \n");
 			sql.append(" set  name=? ,remark = ? \n"); 
 			sql.append(" ,updated =? ,updated_by = ? ,product_catagory =? ,product_type =? ," +
-					" customer_code =?,phone =? ,promotion_start_date =? ,promotion_end_date =?\n"); 
+					" customer_code =?,phone =? ,promotion_start_date =? ,promotion_end_date =? ,exported ='N' \n"); 
 			sql.append(" where request_no =?  \n");
 
 			//logger.debug("SQL:"+sql);
@@ -655,7 +655,7 @@ public class MRequestPromotion {
 					     m.setCanCancel(true);
 					  }else{
 						 m.setCanEdit(false);
-						 m.setCanGenFile(false);
+						 m.setCanGenFile(true);
 						 m.setCanCancel(false);
 					  }
 				  }

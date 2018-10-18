@@ -2,34 +2,71 @@ package com.isecinc.pens.web.admin;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
+import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
 import util.Debug;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
+import com.isecinc.pens.bean.Product;
+import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
+import com.isecinc.pens.model.MPriceList;
+import com.isecinc.pens.model.MProduct;
+import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.process.administer.ManageOrderReceiptProcess;
+import com.isecinc.pens.web.sales.OrderCriteria;
+import com.isecinc.pens.web.sales.OrderForm;
+import com.isecinc.pens.web.sales.OrderUtils;
 
 public class ManageOrderReceiptAction extends I_Action {
 
 	public Debug debug = new Debug(true);
 	
+	/**
+	 * Prepare without ID
+	 */
+	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String forward = "prepare";
+		ManageOrderReceiptForm manageOrderReceiptForm = (ManageOrderReceiptForm) form;
+		//String action = request.getParameter("action") != null ? (String) request.getParameter("action") : "";
+		logger.debug("prepare ManageOrder");
+		try {
+			manageOrderReceiptForm.setDocumentDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			logger.debug("sss:documentDate:"+manageOrderReceiptForm.getDocumentDate());
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			return forward;
+		}finally{
+			
+		}
+		return forward;
+	}
+
 	@Override
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ManageOrderReceiptForm manageOrderReceiptForm = (ManageOrderReceiptForm) form;

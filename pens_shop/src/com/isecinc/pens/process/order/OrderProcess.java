@@ -195,6 +195,7 @@ public class OrderProcess {
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
+						line.setSellingPrice(odLine.getSellingPrice());
 						
 						newLines.add(line);
 					}
@@ -221,6 +222,8 @@ public class OrderProcess {
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
+						line.setSellingPrice(odLine.getSellingPrice());
+						
 						newLines.add(line);
 					}
 				i++;
@@ -248,6 +251,9 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 		try {
 			while (i < lines.size()) {
 				chkLine = lines.get(i);
+				logger.debug("totalAmount:"+chkLine.getTotalAmount());
+				logger.debug("totalAmount1:"+chkLine.getTotalAmount1());
+				
 				// First add.
 				if (firstAdd) {
 					// Aneak.t 24/01/2011
@@ -274,6 +280,7 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 					line.setLineAmount(chkLine.getLineAmount());
 					line.setDiscount(chkLine.getDiscount());
 					line.setTotalAmount(chkLine.getTotalAmount());
+					line.setSellingPrice(chkLine.getSellingPrice());
 					
 					if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 						line.setVatAmount1(chkLine.getVatAmount());
@@ -358,7 +365,8 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 						line.setLineAmount(chkLine.getLineAmount() + newLinesList.get(prvIndex).getLineAmount());
 						line.setDiscount(chkLine.getDiscount() + newLinesList.get(prvIndex).getDiscount());
 						line.setTotalAmount(chkLine.getTotalAmount() + newLinesList.get(prvIndex).getTotalAmount());
-
+						line.setSellingPrice(chkLine.getSellingPrice() + newLinesList.get(prvIndex).getSellingPrice());
+						
 						// Set value to previous
 						line.setUom1(newLinesList.get(prvIndex).getUom1());
 						line.setPrice1(newLinesList.get(prvIndex).getPrice1());
@@ -406,6 +414,7 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 						line.setLineAmount(chkLine.getLineAmount());
 						line.setDiscount(chkLine.getDiscount());
 						line.setTotalAmount(chkLine.getTotalAmount());
+						line.setSellingPrice(chkLine.getSellingPrice());
 						
 						if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 							line.setVatAmount1(chkLine.getVatAmount());
@@ -470,6 +479,9 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 	try {
 		while (i < lines.size()) {
 			chkLine = lines.get(i);
+			
+			logger.debug("chkLine.getTotalAmount():"+chkLine.getTotalAmount());
+			
 			// First add.
 			if (firstAdd) {
 				// Aneak.t 24/01/2011
@@ -531,7 +543,8 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 				line.setCustomerCode(chkLine.getCustomerCode());
 				line.setOrderDate(chkLine.getOrderDate());
 				line.setStatus(chkLine.getStatus());
-
+				line.setTaxable(chkLine.getTaxable());
+				
 				newLinesList.add(line);
 				firstAdd = false;
 				prvIndex = 0;
@@ -612,6 +625,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setCustomerCode(chkLine.getCustomerCode());
 					line.setOrderDate(chkLine.getOrderDate());
 					line.setStatus(chkLine.getStatus());
+					line.setTaxable(chkLine.getTaxable());
 					
 					//set prev Qty 
 					newLinesList.set(prvIndex, line);
@@ -673,6 +687,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setCustomerCode(chkLine.getCustomerCode());
 					line.setOrderDate(chkLine.getOrderDate());
 					line.setStatus(chkLine.getStatus());
+					line.setTaxable(chkLine.getTaxable());
 					
 					newLinesList.add(line);
 					prvIndex++;
@@ -691,6 +706,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 	}
 	return newLinesList;
 }
+
 
 public List<OrderLine> sumQtyProductPromotionDuplicate(List<OrderLine> promotionLines) throws Exception {
 	List<OrderLine> orderLineList = new ArrayList<OrderLine>();
@@ -858,7 +874,15 @@ public void debug(List<OrderLine> lines) throws Exception {
 		}
 		return newLines;
 	}
-
+	
+	public String sumTotalQty(List<OrderLine> lines) throws Exception {
+		int totalQty = 0;
+		for(OrderLine l:lines){
+			totalQty += l.getQty();
+		}
+		return totalQty+"";
+	}
+	
 	private boolean checkFullUOM(String fullUOM) throws Exception {
 		if (fullUOM == null || fullUOM.equals("")) { return false; }
 
@@ -871,7 +895,62 @@ public void debug(List<OrderLine> lines) throws Exception {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 
+	 * @param conn
+	 * @param orderNo = receiptNo
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteReceiptExistByOrderNo(Connection conn ,String orderNo) throws Exception{
+		int receiptId= 0;
+		try{
+			receiptId = getReceiptIdByOrderNo(conn,orderNo);
+			if(receiptId != 0){
+				deleteReceiptByReceiptId(conn,receiptId);
+			}
+		}catch(Exception e){
+			throw e;
+		}
+		return receiptId;
+	}
+	
+	/** Delete All Receipt**/
+	public int deleteReceiptByReceiptId(Connection conn,int receiptId) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		int r=0;
+		try{
+			/** Delete Receipt **/
+			sql.append("\n delete from t_receipt_by where receipt_id ="+receiptId +";");
+			sql.append("\n delete from t_receipt_match where receipt_id ="+receiptId +";");
+			sql.append("\n delete from t_receipt_line where receipt_id ="+receiptId +";");
+			sql.append("\n delete from t_receipt where receipt_id ="+receiptId +";");
+			
+			//logger.debug("sql:"+sql.toString());
+			Utils.excUpdateReInt(conn,sql.toString());
+			
+		}catch(Exception e){
+			logger.error(e.getMessage());
+		}finally{
+			
+		}
+		return r;
+	}
+	public int getReceiptIdByOrderNo(Connection conn ,String orderNo) throws Exception{
+		int receiptId= 0;
+		String whereCause = "";
+		try{
+			whereCause =" and receipt_no ='"+orderNo+"' and doc_status='SV' ";
+			Receipt[] receipt = new MReceipt().search(conn, whereCause);
+			if(receipt != null && receipt[0] != null){
+				receiptId = receipt[0].getId();
+			}
+		}catch(Exception e){
+			throw e;
+		}
+		return receiptId;
+	}
 
 	/**
 	 * Create Auto Receipt
@@ -902,7 +981,7 @@ public void debug(List<OrderLine> lines) throws Exception {
 		receipt.setPaymentMethod(order.getPaymentMethod());
 		// Customer
 		receipt.setCustomerId(order.getCustomerId());
-		receipt.setCustomerName(order.getCustomerName());
+		receipt.setCustomerName(order.getCustomerBillName());
 		// Receipt Amount
 		receipt.setReceiptAmount(0);
 		// Sales Reps --current user who's create record--

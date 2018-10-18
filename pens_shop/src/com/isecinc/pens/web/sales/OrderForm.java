@@ -49,6 +49,16 @@ public class OrderForm extends I_Form {
 	private String receiptCreditFlag;//1 :can,0 : cannot,-1 :no pay prev bill
 	private double custCreditLimit;
 	private String mode ="";
+    private String totalQty;
+    
+    
+	public String getTotalQty() {
+		return totalQty;
+	}
+
+	public void setTotalQty(String totalQty) {
+		this.totalQty = totalQty;
+	}
 
 	public double getCustCreditLimit() {
 		return custCreditLimit;

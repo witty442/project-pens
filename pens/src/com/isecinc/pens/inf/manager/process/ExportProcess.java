@@ -28,6 +28,38 @@ public class ExportProcess {
 
 	public static Logger logger = Logger.getLogger("PENS");
 
+	 /**
+	  * updateInterfaceCustomer
+	  * @param conn
+	  * @param model
+	  * @return
+	  * @throws Exception
+	  */
+	 public int updateExportFlag(Connection conn,User userBean,List<String> sqlUpdateExportFlagList) throws Exception {
+			Statement st = null;
+			String sql= "";
+			int countUpdate =0;
+			try {
+				if(sqlUpdateExportFlagList != null && sqlUpdateExportFlagList.size() >0 ){
+					st = conn.createStatement();
+					for (int i = 0;i<sqlUpdateExportFlagList.size() ; i++) {
+					    sql = (String)sqlUpdateExportFlagList.get(i);
+						logger.debug("updateSQL:"+sql);
+						st.addBatch(sql);
+				    }
+					
+				    countUpdate = st.executeBatch().length;
+				    logger.debug("Result Update:"+countUpdate);
+				}
+			} catch (Exception ex) {
+				throw ex;
+			} finally {
+				if(st != null){
+					st.close();st = null;
+				}
+			}
+			return countUpdate;
+		}
 	/**
 	 * readTableDataDB
 	 * @param conn

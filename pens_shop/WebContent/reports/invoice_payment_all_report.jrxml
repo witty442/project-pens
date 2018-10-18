@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="shipment_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.5"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="invoice_payment_all_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="receipt_date" class="java.lang.String"/>
@@ -22,14 +22,14 @@
 	<field name="status" class="java.lang.String"/>
 	<field name="writeOff" class="java.lang.String"/>
 	<field name="isPDPaid" class="java.lang.String"/>
-	<variable name="v_sum_receipt_amount" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[($F{status}.equals("VO") || $F{isPDPaid} != null)?0d:$F{receiptAmount}]]></variableExpression>
+	<variable name="v_sum_cash_amount" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[($F{status}.equals("VO") || $F{paymentMethod} != 'CS')?0d:$F{receiptAmount}]]></variableExpression>
 	</variable>
 	<variable name="v_sum_receipt_cancel_amount" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{status}.equals("SV")?0:$F{receiptAmount}]]></variableExpression>
 	</variable>
-	<variable name="v_sum_receipt_amount_pdpaid" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{isPDPaid} != null?$F{receiptAmount}:0d]]></variableExpression>
+	<variable name="v_sum_creditcard_amount" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[($F{status}.equals("VO") || $F{paymentMethod} != 'CR')?0d:$F{receiptAmount}]]></variableExpression>
 	</variable>
 	<background>
 		<band splitType="Stretch"/>
@@ -226,7 +226,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[ร้านค้า]]></text>
+				<text><![CDATA[ลูกค้า]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="409" y="0" width="74" height="20"/>
@@ -239,7 +239,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[เลขที่เช็ค]]></text>
+				<text><![CDATA[เลขที่บัตรเครดิต]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="168" y="0" width="67" height="20"/>
@@ -328,7 +328,7 @@
 				<textElement>
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerName}.equals(null)?"":$F{customerCode} + " " + $F{customerName}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="409" y="5" width="74" height="20"/>
@@ -361,7 +361,7 @@
 				<textElement textAlignment="Center">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[($F{isPDPaid}!=null && ($F{isPDPaid}.equals('N') || $F{isPDPaid}.equals('Y')))?"\u0e02\u0e32\u0e22\u0e40\u0e0a\u0e37\u0e48\u0e2d":($F{paymentMethod}.equals("CS")?"\u0e40\u0e07\u0e34\u0e19\u0e2a\u0e14":"\u0e40\u0e0a\u0e47\u0e04")]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[($F{paymentMethod}.equals("CS")?"\u0e40\u0e07\u0e34\u0e19\u0e2a\u0e14":"\u0E1A\u0E31\u0E15\u0E23\u0E40\u0E04\u0E23\u0E14\u0E34\u0E15")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="111" y="5" width="58" height="20"/>
@@ -417,7 +417,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[รวมรายการรับชำระ   ]]></text>
+				<text><![CDATA[รวมรายการเงินสด   ]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="471" y="0" width="84" height="20"/>
@@ -441,7 +441,7 @@
 				<textElement textAlignment="Right">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_receipt_amount}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cash_amount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="473" y="42" width="82" height="20"/>
@@ -512,7 +512,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[รวมรายการขายเชื่อ  ]]></text>
+				<text><![CDATA[รวมรายการบัตรเครดิต  ]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="473" y="21" width="82" height="20"/>
@@ -523,7 +523,7 @@
 				<textElement textAlignment="Right">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_receipt_amount_pdpaid}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_creditcard_amount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

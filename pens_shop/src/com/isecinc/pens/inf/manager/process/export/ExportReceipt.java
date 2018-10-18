@@ -95,9 +95,8 @@ public class ExportReceipt {
             /** Get Column Detail Receipt **/
             TableBean orderDBean = new TableBean();
             orderDBean.setTableName("t_receipt_line");
-            List colOrderList = ExportHelper.initColumn(orderDBean);
+            List colReceiptLineList = ExportHelper.initColumn(orderDBean);
    
-         // Pasuwat Wang-arrayagul 
 			// Create Credit Note Line Sent To Oracle
             String sql ="	Select 		\n"+
             "	   'D'	AS	RECORD_TYPE	,	\n"+
@@ -113,21 +112,21 @@ public class ExportReceipt {
             "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
             "	    null as order_number, \n"+
             
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)  AS PAYMENT_METHOD ,\n"+
+            "	    t_receipt_by.PAYMENT_METHOD  AS PAYMENT_METHOD ,\n"+
             
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
             /******** new Requirement ************************************/
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
+            "       t_receipt_by.bank AS	BANK, \n"+	
             "       ''	AS	BANK_BRANCH, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_no)	AS	CHEQUE_NO, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.credit_card_type)	AS	CREDIT_CARD_TYPE ,	 \n"+
+            "       t_receipt_by.CREDIT_CARD_NO, \n"+	
+            "       t_receipt_by.CREDITCARD_EXPIRED as CREDIT_CARD_EXPIRE_DATE, \n"+	
+            "       t_receipt_by.CREDIT_CARD_TYPE ,	 \n"+
             /******** new Requirement ************************************/
             /** WIT Add 07/03/2011  **/
             "       '' AS ORDER_LINE_ID \n"+
             
-            "		FROM 		\n"+
+            "		FROM 	\n"+
             "		t_receipt_cn ,	\n"+
             "		t_receipt_match_cn, 	\n"+
             "		t_receipt_by,		\n"+
@@ -142,16 +141,16 @@ public class ExportReceipt {
             "       and t_credit_note.credit_note_id = t_receipt_cn.credit_note_id  \n"+
             "	    and t_receipt_cn.receipt_id ="+receiptId;
 			
-			logger.debug("SQL for Credit Note:"+sql);
+			logger.debug("SQL for Credit Note(CN):"+sql);
             
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){
 				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
+				for(i=0;i<colReceiptLineList.size();i++){
 					no++;
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
+					ColumnBean colBean = (ColumnBean)colReceiptLineList.get(i);
+					if(i==colReceiptLineList.size()-1){
 						lastAppen = "";
 					}else{
 						lastAppen = Constants.delimeterPipeStr;
@@ -182,30 +181,17 @@ public class ExportReceipt {
             "		t_receipt_line.DESCRIPTION	AS	DESCRIPTION	, 	\n"+
             "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
             "	    t_order.order_no as order_number, \n"+
-            
-		    /** if(PD_PAID ==Y){
-		     *   if(T_RECEIPT.ISPDPAID ==null){
-		     *      payment_method ='PD_CR'
-		     *   }
-		     *  }else{
-		     *    if(t_receipt_by.PAYMENT_METHOD=='AP'){ //Airpay = CS
-		     *       payment_method = 'CS'
-		     *    }else{
-		     *      payment_method =t_receipt_by.PAYMENT_METHOD
-		     *    }
-		     *  }
-		     * 
-		     * **/
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),IF(t_receipt_by.PAYMENT_METHOD='AP','CS',t_receipt_by.PAYMENT_METHOD))  AS PAYMENT_METHOD ,\n"+
+           
+            "	    t_receipt_by.PAYMENT_METHOD ,\n"+
             
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
             /******** new Requirement ************************************/
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
+            "       t_receipt_by.bank AS BANK, \n"+	
             "       ''	AS	BANK_BRANCH, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,IF(t_receipt_by.PAYMENT_METHOD='AP',null,t_receipt_by.cheque_no) )	AS	CHEQUE_NO, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
-            "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.credit_card_type)	AS	CREDIT_CARD_TYPE ,	 \n"+
+            "       t_receipt_by.CREDIT_CARD_NO, \n"+	
+            "       t_receipt_by.CREDITCARD_EXPIRED as CREDIT_CARD_EXPIRE_DATE, \n"+	
+            "       t_receipt_by.CREDIT_CARD_TYPE ,	 \n"+
             /******** new Requirement ************************************/
             /** WIT Add 07/03/2011  **/
             "       '' AS ORDER_LINE_ID \n"+
@@ -224,16 +210,15 @@ public class ExportReceipt {
             "       and t_receipt_line.order_id = t_order.order_id  \n"+
             "	    and t_receipt_line.receipt_id ="+receiptId;
 
-            logger.debug("SQL:"+sql);
-            
+            logger.debug("SQL Receipt:"+sql);
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){
 				totalRows++;
-				for(i=0;i<colOrderList.size();i++){
+				for(i=0;i<colReceiptLineList.size();i++){
 					no++;
-					ColumnBean colBean = (ColumnBean)colOrderList.get(i);
-					if(i==colOrderList.size()-1){
+					ColumnBean colBean = (ColumnBean)colReceiptLineList.get(i);
+					if(i==colReceiptLineList.size()-1){
 						lastAppen = "";
 					}else{
 						lastAppen = Constants.delimeterPipeStr;

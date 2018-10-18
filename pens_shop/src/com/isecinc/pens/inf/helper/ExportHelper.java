@@ -408,6 +408,19 @@ public class ExportHelper {
 				}
 			}
 			
+			/** Convert CreditExpireDate[10/21] to 01/10/2021 */
+			if(colBean.getColumnName().equalsIgnoreCase("CREDIT_CARD_EXPIRE_DATE")){ 
+				if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					//logger.debug("ColName:"+colBean.getColumnName()+":"+);
+					String[] creditExpireDate = Utils.isNull(rs.getString(colBean.getColumnName())).split("\\/");
+					if(creditExpireDate != null && creditExpireDate.length > 1){
+						return "01"+creditExpireDate[0]+creditExpireDate[1];
+					}
+				}else{
+					return "";
+				}
+			}
+			
 			/** Case Normal  **/
 			if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 				logger.debug("colBean.getColumnName():"+colBean.getColumnName());

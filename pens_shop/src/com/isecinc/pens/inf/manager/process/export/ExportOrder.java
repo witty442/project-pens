@@ -57,12 +57,7 @@ public class ExportOrder {
 				dataAppend.append(Constants.newLine);//new line
 				/** add Order Line Detail */
 				dataAppend.append(exportSalesOrderLine(conn,rs.getString("order_id"),sqlUpdateExportFlagList));
-				
-				/** add Order Payment Detail   Case DD Only */
-				if(User.DD.equalsIgnoreCase(userBean.getType())){
-				  dataAppend.append(exportSalesOrderPayment(conn,userBean,rs.getString("order_id")));
-				}
-				
+
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update t_order set exported ='Y' WHERE order_id = "+rs.getString("order_id"));
 				
@@ -124,14 +119,14 @@ public class ExportOrder {
 	            "	d.VAT_AMOUNT	AS	VAT_AMOUNT,	\n"+
 	            "   d.ORDER_LINE_ID AS ORDER_LINE_ID, \n"+
 	            "   d.ORG AS ORG , \n"+
-	            "   d.SUB_INV AS SUB_INV \n"+
+	            "   d.SUB_INV AS SUB_INV , \n"+
+	            "   d.selling_price \n"+
 	            "	FROM t_order_line d 	\n"+
 	            "	inner join t_order h	\n"+
 	            "	on d.ORDER_ID = h.ORDER_ID	\n"+
 	            "	left outer join ad_user a	\n"+
 	            "	on h.USER_ID = a.USER_ID	\n"+
-	            "   WHERE d.order_id ="+orderId+
-	            "   and d.promotion = 'N' \n";
+	            "   WHERE d.order_id ="+orderId;
   
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();

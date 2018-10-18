@@ -15,12 +15,15 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jasperreports.engine.type.LineDirectionEnum;
+
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.BeanParameter;
 import util.BundleUtil;
+import util.Constants;
 import util.ControlCode;
 import util.ConvertNullUtil;
 import util.DBCPConnectionProvider;
@@ -49,6 +52,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
@@ -75,7 +79,7 @@ import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
 public class OrderAction extends I_Action {
 
 	public Debug debug = new Debug(true);
-	public static String CUSTOMER_ID_MEYA_FIXED = "1";//Default Maya Customer
+	public static String CUSTOMER_ID_MEYA_FIXED = "2596587";//Default Maya Customer
 	
 	/**
 	 * Prepare without ID
@@ -119,6 +123,8 @@ public class OrderAction extends I_Action {
 			//PriceListID  Wait for MAYA 
 			orderForm.getOrder().setPriceListId(new MPriceList().getMayaPriceList().getId());
 
+            //creditCard Year Expire
+			request.getSession().setAttribute("CAREDITCARD_YEAR_EXPIRE_LIST", OrderUtils.getCreditcardYearExpireList());
 			// user
 			orderForm.getOrder().setSalesRepresent(user);
 
@@ -247,7 +253,9 @@ public class OrderAction extends I_Action {
 			//add Line Blank UOM (1 or 2)
 			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
 
-
+			//Calc TotalQty
+			orderForm.setTotalQty(new OrderProcess().sumTotalQty(orderForm.getLines()));
+			
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
@@ -285,7 +293,7 @@ public class OrderAction extends I_Action {
 			//Find Order by order_id
 			String id = Utils.isNull(request.getParameter("id"));
 			roundTrip = orderForm.getOrder().getRoundTrip();
-			//order = new MOrder().find(id);
+	
 			String whereCause =" where order_id = "+id;
 			order = new MOrder().findByWhereCond(whereCause);
 			
@@ -297,16 +305,14 @@ public class OrderAction extends I_Action {
 			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
 			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
 			orderForm.setLines(lines);
-			
+
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
 			
-			
-
 			//Filter Check Van Can Receipt Cheque Or Credit
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 
 			// Prepare order line to Edit
 			/** Promotion Process add add to Lines */
@@ -333,6 +339,7 @@ public class OrderAction extends I_Action {
             
 			//Split 2 Line
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request.getSession().getAttribute("memberVIP")));
+			
 			
 			//Merge to 1 Line show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
@@ -441,13 +448,30 @@ public class OrderAction extends I_Action {
 			
 			// remove promotion line
 			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			List<OrderLine> promotionSLine = new ArrayList<OrderLine>();
 			
+			/** debug **/
+			/*for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					logger.debug("*****Debug Line Special Input from screen***");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("*******************************************************");
+				}
+			}*/
 			// Set Display To Prepare Save Order Line (no promotion Lines)
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
             
+			/************************************************************************/
 			// Add Promotion Line only From orderFrom to promotionLine
 			for (OrderLine line : orderForm.getLines()) {
-				if (line.getPromotion().equalsIgnoreCase("Y")) {
+				//logger.debug("promotion:["+line.getPromotion()+"]");
+				if (line.getPromotion().equalsIgnoreCase("Y") ) {
 					promotionLine.add(line);
 				}
 			}
@@ -456,6 +480,49 @@ public class OrderAction extends I_Action {
 			for (OrderLine line : promotionLine) {
 				orderForm.getLines().remove(line);
 			}
+			
+			/*********************Promotion Specail****************************/
+			// Add Promotion Line(S) only From orderFrom to promotionLine
+			for (OrderLine line : orderForm.getLines()) {
+				//logger.debug("promotion:["+line.getPromotion()+"]");
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					/*logger.debug("*****Debug Line Special Before**********");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("*******************************************");*/
+					promotionSLine.add(line);
+				}
+			}
+		
+			//remove Promotion line(S) from orderFrom
+			for (OrderLine line : promotionSLine) {
+				orderForm.getLines().remove(line);
+			}
+			//Fill Line 1 to 2 Show on screen
+			promotionSLine =  orderProcess.fillLinesShowPromotion(promotionSLine);
+			//debug
+			/*for (OrderLine line : promotionSLine) {
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					logger.debug("*****Debug Line Special After fillLinesShowPromotion***");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("*******************************************************");
+				}
+			}*/
+			
+			//SumQtySameProduct
+			promotionSLine = orderProcess.sumQtyProductPromotionDuplicate(promotionSLine);
+			/*********************Promotion Specail****************************/
 			
 			//Recalculate lineAmount (qty*price) in Lines
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
@@ -479,22 +546,22 @@ public class OrderAction extends I_Action {
 			
 			//add Promotion to show
 			logger.info("fillLinesShow LINE Promotion");
-			List<OrderLine> promotionLines = null;
+			List<OrderLine> promotionLinesCalcNew = null;
 			
 			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
 			boolean exeOrderProcessfillLinesShowPromotion = ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion");
 			logger.info("CalcC4 OrderProcess fillLinesShowPromotion:"+exeOrderProcessfillLinesShowPromotion);
 			
 			if(exeOrderProcessfillLinesShowPromotion){
-				promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
+				promotionLinesCalcNew = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
 			}else{
-				  // default 1
-		        promotionLines = orderProcess.fillLinesShow(modProcess.getAddLines());
+				// default 1 old code
+				promotionLinesCalcNew = orderProcess.fillLinesShow(modProcess.getAddLines());
 			}
-			promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
+			promotionLinesCalcNew = orderProcess.sumQtyProductPromotionDuplicate(promotionLinesCalcNew);
 	
 			logger.info("Debug after promotion");
-			new OrderProcess().debug(promotionLines);
+			new OrderProcess().debug(promotionLinesCalcNew);
 			
 			//Sort by product
 			try{
@@ -503,15 +570,17 @@ public class OrderAction extends I_Action {
 				        return c2.getProduct().getCode().compareTo(c2.getProduct().getCode()); // use your logic
 				    }
 				};
-				Collections.sort(promotionLines, comparator); 
+				Collections.sort(promotionLinesCalcNew, comparator); 
 				logger.info("Debug after Sort Promotion");
-				new OrderProcess().debug(promotionLines);
+				new OrderProcess().debug(promotionLinesCalcNew);
 			}catch(Exception e){
 				logger.error(e.getMessage()+":Sort Error",e);
 			}
 			
-			//add promotion line
-			odLines.addAll(promotionLines);
+			//add promotion line(Y)
+			odLines.addAll(promotionLinesCalcNew);
+			//add Promotion Line(S)
+			odLines.addAll(promotionSLine);
 			
 			//set to OrderLines Show
 			orderForm.setLines(odLines);
@@ -526,17 +595,6 @@ public class OrderAction extends I_Action {
 			
 			// Re-Calculate TotalAmount,vatAmount,netAmount
 			orderForm.setOrder(new MOrder().reCalculateHeadAmount(orderForm.getOrder(), orderForm.getLines()));
-			
-			//Validate Case Credit don't have product in different group
-			if(User.TT.equals(userActive.getType()) ){
-				String productInvalid = new MOrder().validateProductIngroup(conn, orderForm.getLines());
-				if(productInvalid.length() >0){
-					productInvalid = productInvalid.substring(0,productInvalid.length()-1);
-					
-					request.setAttribute("Message","ไม่สามารถยันทึกข้อมูลได้     มีบางสินค้าที่ระบุ ต้องบันทึกแยก Order" );
-					request.setAttribute("do_not_save", "true");
-				}
-			}
 			
 			//Set Data to Session to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print", orderForm);
@@ -591,7 +649,7 @@ public class OrderAction extends I_Action {
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
 						.getSession().getAttribute("memberVIP")));
 			
-			//Merg to 1 Line to Show
+			//Merge to 1 Line to Show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			
 		} catch (Exception e) {
@@ -616,8 +674,8 @@ public class OrderAction extends I_Action {
 		String msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 		String org = "";
 		String subInv ="";
-		OrgRuleBean orgRuleBean;
-		User user = (User) request.getSession(true).getAttribute("user");
+		//User user = (User) request.getSession(true).getAttribute("user");
+		Customer customer = null;
 		try {
 			//clear Session Temp to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print",null);
@@ -628,7 +686,7 @@ public class OrderAction extends I_Action {
 			if (!isTokenValid(request)) {
 			
 				// VAN && TT
-				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
 				orderForm.setOrder(new Order());
 				orderForm.getOrder().setCustomerId(customer.getId());
 				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
@@ -639,6 +697,8 @@ public class OrderAction extends I_Action {
 					
 				orderForm.getLines().clear();
 				return "prepare";
+			}else{
+				customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
 			}
 
 			User userActive = (User) request.getSession(true).getAttribute("user");
@@ -677,18 +737,26 @@ public class OrderAction extends I_Action {
 
 			int i = 1;
 
-			if (!order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
-						.getSession().getAttribute("memberVIP")));
-			}
-			if (((String) request.getSession().getAttribute("memberVIP")).equalsIgnoreCase("Y")) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
-						.getSession().getAttribute("memberVIP")));
-			}
-
+		    /** Fill line to Save **/
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
+					.getSession().getAttribute("memberVIP")));
+	
 			for (OrderLine line : orderForm.getLines()) {
 				line.setLineNo(i++);
 				line.setPayment("N");
+				
+				/** Case promotion =S(special promotion) set line_amount =0,total_amount =0 */
+				//logger.debug("line promotion:"+Utils.isNull(line.getPromotion()));
+				/*if (line.getPromotion().equalsIgnoreCase("S") ) {
+					logger.debug("Debug Line Special Before Save**********");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+				}*/
 			}
 
 			// Sales Reps --current user who's create/edit record--
@@ -704,11 +772,18 @@ public class OrderAction extends I_Action {
 			double beforeSave_NetAmount = order.getNetAmount(); 
 	
 			//CASH
-			if("CS".equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){//CASH
+			if(Constants.PAYMT_CASH.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){//CASH
 				//CASH
 				order.setCreditCardType("");
 				order.setCreditCardNo("");
 				order.setCreditCardExpireDate("");
+			}else{
+				order.setCreditCardExpireDate(order.getCreditcardMonthExpire()+"/"+order.getCreditcardYearExpire());
+			}
+			//Case CustomerBillName is null use default customerName(Maya)
+			
+			if(Utils.isNull(order.getCustomerBillName()).equals("")){
+				order.setCustomerBillName(customer!=null?customer.getName():"");
 			}
 			// Save Order
 			if (!new MOrder().save(order, userActive.getId(), conn)) {
@@ -718,7 +793,7 @@ public class OrderAction extends I_Action {
 				return "prepare";
 			}
             
-			// Delete Promotion
+			// Delete Promotion =Y
 			new MOrderLine().deletePromotion(orderForm.getOrder().getId(), conn);
 
 			// Delete Line
@@ -755,6 +830,7 @@ public class OrderAction extends I_Action {
 			//Compare before Save
 			double afterSave_NetAmount = order.getNetAmount(); 
 			
+			logger.debug("beforeSave_NetAmount:"+beforeSave_NetAmount+",afterSave_NetAmount:"+afterSave_NetAmount);
 			//case Error netAmount before <> after save  resave
 			if(beforeSave_NetAmount != afterSave_NetAmount){
 			   logger.debug("ReSave Order netAmount error: beforeSave_NetAmount["+beforeSave_NetAmount+"]afterSave_NetAmount["+afterSave_NetAmount+"]");
@@ -773,7 +849,11 @@ public class OrderAction extends I_Action {
 			// Trx History --end--
 
 			/***** Save Receipt ******************************************/
-			logger.debug("CreateAutoReceipt ");
+			/** Check old receipt is exist and delete Case Edit Order */
+			int receiptIdExist  = new OrderProcess().deleteReceiptExistByOrderNo(conn, order.getOrderNo());
+			logger.debug("(0=NoExist)Delet Old Receipt receiptIdExist:"+receiptIdExist);
+			
+			logger.debug("CreateAutoReceipt NEW");
 			logger.debug("PaymentMethod:"+orderForm.getOrder().getPaymentMethod());
 
 			orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
@@ -825,12 +905,8 @@ public class OrderAction extends I_Action {
 			
 			//add Line Blank UOM (1 or 2)
 			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
-			
-			/********* WIT EDIT:20110804 :case not auto receipt cash  -> popup page AutoPay *****/
-			if(userActive.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
-				request.setAttribute("popup_autoreceipt", "true");
-			}
-			/**************************************************************/
+			//Calc TotalQty
+			orderForm.setTotalQty(new OrderProcess().sumTotalQty(orderForm.getLines()));
 			
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
@@ -988,10 +1064,10 @@ public class OrderAction extends I_Action {
 				// get Customer Info
 				Customer customer = new MCustomer().find(String.valueOf(customerId));
 				Order order = new Order();
-				order.setCustomerId(customerId);//Fix Meya all time
+				order.setCustomerId(customerId);//Fix Maya all time
 				order.setCustomerName(customer.getCode()+"-"+customer.getName());
 				order.setOrderDateFrom(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				order.setOrderDateTo(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				//order.setOrderDateTo(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				orderForm.setOrder(order);
 			}else{
 				request.getSession().removeAttribute("isAdd");
@@ -1019,40 +1095,33 @@ public class OrderAction extends I_Action {
 					whereCause += " AND DOC_STATUS = '" + order.getDocStatus() + "' \n";
 				}
 	
-				if ( !Utils.isNull(order.getOrderDateFrom()).equals("")) {
+				if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && !Utils.isNull(order.getOrderDateTo()).equals("")) {
 					whereCause += " AND ORDER_DATE >= '"
 							+ DateToolsUtil.convertToTimeStamp(order.getOrderDateFrom().trim()) + "' \n";
-				}
-				if (!Utils.isNull(order.getOrderDateTo()).equals("")) {
 					whereCause += " AND ORDER_DATE <= '"
 							+ DateToolsUtil.convertToTimeStamp(order.getOrderDateTo().trim()) + "' \n";
+				}else if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && Utils.isNull(order.getOrderDateTo()).equals("")) {
+					whereCause += " AND ORDER_DATE = '"
+							+ DateToolsUtil.convertToTimeStamp(order.getOrderDateFrom().trim()) + "' \n";
 				}
 	
 				whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' \n";
 				whereCause += " AND CUSTOMER_ID = " + order.getCustomerId() + " \n";
 				whereCause += " AND USER_ID = " + user.getId() +" \n";
-	            //customer bill info
-				if ( !Utils.isNull(order.getCustomerBillName()).equalsIgnoreCase("") 
-					|| !Utils.isNull(order.getAddressDesc()).equalsIgnoreCase("") 	
-					|| !Utils.isNull(order.getIdNo()).equalsIgnoreCase("") 	
-					|| !Utils.isNull(order.getPassportNo()).equalsIgnoreCase("") 	
-						 ) {
-				  whereCause += " AND CUSTOMER_BILL_ID IN ( \n";
-				  whereCause += " select customer_bill_id from m_customer_bill_info where 1=1 \n";
-				  if ( !Utils.isNull(order.getCustomerBillName()).equalsIgnoreCase("")){
-					  whereCause += " AND CUSTOMER_NAME LIKE '%"+Utils.isNull(order.getCustomerBillName())+"%' \n";
-				  }
-				  if ( !Utils.isNull(order.getAddressDesc()).equalsIgnoreCase("")){
+
+				 if ( !Utils.isNull(order.getCustomerBillName()).equalsIgnoreCase("")){
+					  whereCause += " AND CUSTOMER_BILL_NAME LIKE '%"+Utils.isNull(order.getCustomerBillName())+"%' \n";
+				 }
+				 if ( !Utils.isNull(order.getAddressDesc()).equalsIgnoreCase("")){
 					  whereCause += " AND ADDRESS_DESC LIKE '%"+Utils.isNull(order.getAddressDesc())+"%' \n";
-				  }
-				  if ( !Utils.isNull(order.getIdNo()).equalsIgnoreCase("")){
+				 }
+				 if ( !Utils.isNull(order.getIdNo()).equalsIgnoreCase("")){
 					  whereCause += " AND ID_NO ='"+Utils.isNull(order.getIdNo())+"' \n";
-				  }
-				  if ( !Utils.isNull(order.getPassportNo()).equalsIgnoreCase("")){
+				 }
+				 if ( !Utils.isNull(order.getPassportNo()).equalsIgnoreCase("")){
 					  whereCause += " AND PASSPORT_NO ='"+Utils.isNull(order.getPassportNo())+"' \n";
-				  }
-				   whereCause += ")";
-				}
+				 }
+
 				whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC ";
 				Order[] results = new MOrder().searchOpt(whereCause);
 	
@@ -1445,8 +1514,9 @@ public class OrderAction extends I_Action {
 		List<OrderLine> lines = null;
 		String fileName = "tax_invoice_summary_report";
 		try {
-			String fileType =  request.getParameter("fileType");
+			conn = DBConnection.getInstance().getConnection();
 			
+			String fileType =  request.getParameter("fileType");
 			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
 			String reportType = request.getParameter("reportType");
@@ -1467,11 +1537,20 @@ public class OrderAction extends I_Action {
 			if("CS".equals(order.getPaymentMethod())){
 				pReceiptByMsg = "เงินสด";	
 			}else{
-				String creditCardNo = Utils.isNull(order.getCreditCardNo());
-				creditCardNo = creditCardNo.length()==16?creditCardNo.substring(14,16):"";
-				pReceiptByMsg = "บัตรเครดิต xxxxxxx"+creditCardNo;
+				String creditCardNo = "";
+				if( !Utils.isNull(order.getCreditCardNo()).equals("")){
+				   creditCardNo = Utils.isNull(order.getCreditCardNo());
+				   creditCardNo = creditCardNo.substring(creditCardNo.length()-4,creditCardNo.length());
+				}
+				pReceiptByMsg = "บัตรเครดิต ****"+creditCardNo;
 			}
 
+			//Address Pens
+			//String addessPens ="662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120  โทร. 0-2294-7300 โทรสาร. 0-2294-7560 สำนักงานใหญ่";
+			String addressConfig = InitialReferences.getRef(conn,InitialReferences.ADDRESS_MAYA).get(0).getKey();
+			logger.debug("addressConfig:\n"+addressConfig);
+			parameterMap.put("p_address_pens", addressConfig);
+			
 			//original or copy report
 			//Cash
 			if("original".equalsIgnoreCase(reportType)){
@@ -1487,29 +1566,26 @@ public class OrderAction extends I_Action {
 				parameterMap.put("p_sign_name_1", "พนักงานขาย");
 				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า/ผู้ชำระเงิน");
 				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");
-			
-			//Credit
-			}else if("tax".equalsIgnoreCase(reportType)){ 
-				/*pReportTitle = "ใบส่งของ/ใบกำกับภาษี"; //พิมพ์ใบส่งของ/ใบกำกับภาษี
-				fileName = "tax_invoice_summary_new_report";
-				
-				parameterMap.put("p_sign_name_1", "พนักงานขาย");
-				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า");
-				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");*/
-			}else if("bill".equalsIgnoreCase(reportType)){ 
-				/*pReportTitle = "ใบเสร็จรับเงิน"; //พิมพ์ใบเสร็จรับเงิน
-				fileName = "tax_invoice_summary_report";*/
 			}
 
 			parameterMap.put("p_report_title", pReportTitle);
 			parameterMap.put("p_receiptNo", receiptNo.length() != 0 ? ReportHelper.convertOrderNoForReport(receiptNo) : ReportHelper.convertOrderNoForReport(order.getOrderNo()));
 			parameterMap.put("p_vatcode", order.getVatCode());
-			parameterMap.put("p_orderDate", order.getOrderDate());
+			
+			//Convert Order Date thai toChrist
+			Date createDateTemp = Utils.parse(order.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String createDateChrist = Utils.stringValue(createDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+			parameterMap.put("p_orderDate", createDateChrist);
+			
 			parameterMap.put("p_code", user.getCode());
 			parameterMap.put("p_name", user.getName());
 			parameterMap.put("p_taxNo", BeanParameter.getPensTaxNo());
 			parameterMap.put("p_receipt_by_msg", pReceiptByMsg);
-			parameterMap.put("p_create_date", order.getCreated());
+			
+			//Convert Thai to Christ date format
+			createDateTemp = Utils.parse(order.getCreated(), Utils.DD_MM_YYYY_HH_mm_WITH_SLASH,Utils.local_th);
+			createDateChrist = Utils.stringValue(createDateTemp, Utils.DD_MM_YYYY_HH_mm_WITH_SLASH);
+			parameterMap.put("p_create_date", createDateChrist);
 			
 			conn = DBConnection.getInstance().getConnection();
 			
@@ -1517,19 +1593,16 @@ public class OrderAction extends I_Action {
 			String cusTaxNoMsg = "";
 			
 			//"".equals(Utils.isNull(customer.getTaxNo()))?null:Utils.isNull(customer.getTaxNo())
-			if( !Utils.isNull(order.getIdNo()).equals("")){
-				cusTaxNoMsg ="เลขประจำตัวผู้เสียภาษี "+Utils.isNull(order.getIdNo()); 
+			if( !Utils.isNull(order.getIdNo()).equals("") && !Utils.isNull(order.getPassportNo()).equals("") ){
+				cusTaxNoMsg ="เลขบัตรประชาชน:"+Utils.isNull(order.getIdNo())+" Passport:"+Utils.isNull(order.getPassportNo()); 
 			}else{
-				//cusTaxNoMsg ="เลขประจำตัวผู้เสียภาษี "+BeanParameter.getPensTaxNo();
+				if( !Utils.isNull(order.getIdNo()).equals("")){
+					cusTaxNoMsg ="เลขบัตรประชาชน:"+Utils.isNull(order.getIdNo());
+				}else if( !Utils.isNull(order.getPassportNo()).equals("")){
+					cusTaxNoMsg ="Passport:"+Utils.isNull(order.getPassportNo()); 
+				}
 			}
 			
-			/*if(Utils.isNull(customer.getPrintHeadBranchDesc()).equals("Y")){
-				if(Utils.isNull(customer.getPrintType()).equals("H")){
-				     cusTaxNoMsg +="  สำนักงานใหญ่";
-				}else if(Utils.isNull(customer.getPrintType()).equals("B")){
-					 cusTaxNoMsg +=" สาขาที่  "+NumberToolsUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberToolsUtil.format_current_five_digit);
-				}
-			}*/
 			String addressDesc = Utils.isNull(order.getAddressDesc());
 			String custAddressArr1 = "";
 			String custAddressArr2 = "";
@@ -1596,19 +1669,17 @@ public class OrderAction extends I_Action {
 				taxInvoice.setSalePrice(line.getLineAmount());
 				taxInvoice.setPercentDiscount(0);
 				taxInvoice.setDiscount(line.getDiscount());
-				taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
+				
+				if("S".equalsIgnoreCase(line.getPromotion())){
+				  taxInvoice.setLineAmount(line.getLineAmount() + line.getDiscount());
+				}else{
+				   taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
+				}
 				// Summary
 				taxInvoice.setTotalAmount(line.getLineAmount() - line.getDiscount());
 				taxInvoice.setVatAmount(line.getVatAmount());
-				//taxInvoice.setNetAmount(line.getTotalAmount());
-							
-				
-				//BigDecimal totalAmount = new BigDecimal(taxInvoice.getTotalAmount());
-				//BigDecimal vatAmount = new BigDecimal(taxInvoice.getVatAmount());
-				//BigDecimal netAmount = totalAmount.add(vatAmount);
-				
+			
 				taxInvoice.setNetAmount(taxInvoice.getTotalAmount()+taxInvoice.getVatAmount());
-				//taxInvoice.setNetAmount(netAmount.doubleValue());
 
 				lstData.add(taxInvoice);
 				no++;

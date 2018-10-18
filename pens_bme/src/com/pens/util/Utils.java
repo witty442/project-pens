@@ -977,28 +977,28 @@ public class Utils {
 			columnCount = rsm.getColumnCount();
 			
 			//getColumnHeader 
-			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'>");
+			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'> \n");
 			 str.append("<tr>");  
 			 for(int i=1;i<=columnCount;i++){
 				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
-				    str.append("<th>");
+				    str.append("<th> \n");
 	            	str.append(rsm.getColumnName(i));
 	            	str.append("</th>");
 			   }
-			 str.append("</tr>"); 
+			 str.append("</tr> \n"); 
 			 
 			 //Gen Detail
 			 while(rs.next()){
-				 str.append("<tr>");  
+				 str.append("<tr> \n");  
 				 for(int i=1;i<=columnCount;i++){
 					    str.append("<td class='lineE'>");
 		            	str.append(isNull(rs.getString(rsm.getColumnName(i))));
 		            	str.append("</td>");
 				   }
-				 str.append("</tr>");  
+				 str.append("</tr> ");  
 			 }
 			
-			str.append("</table>");
+			str.append("</table> \n");
 			
 		}catch(Exception e){
 	      e.printStackTrace();

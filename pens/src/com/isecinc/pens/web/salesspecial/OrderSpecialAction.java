@@ -537,21 +537,64 @@ public class OrderSpecialAction extends I_Action {
 			
 			// remove promotion line
 			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			List<OrderLine> promotionSLine = new ArrayList<OrderLine>();
 			
 			// Set Display To Prepare Save Order Line (no promotion Lines)
-			orderForm.setLines(new OrderSpecialProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
+			orderForm.setLines(orderSpecialProcess.fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
             
-			// Add Promotion Line only From orderFrom to promotionLine
+			/******* Add Promotion Line(Y) only From orderFrom to promotionLine *********************/
 			for (OrderLine line : orderForm.getLines()) {
 				if (line.getPromotion().equalsIgnoreCase("Y")) {
 					promotionLine.add(line);
 				}
 			}
-			
 			//remove Promotion line from orderFrom
 			for (OrderLine line : promotionLine) {
 				orderForm.getLines().remove(line);
 			}
+			/*********************Promotion Specail**************************************************/
+			// Add Promotion Line(S) only From orderFrom to promotionLine
+			for (OrderLine line : orderForm.getLines()) {
+				//logger.debug("promotion:["+line.getPromotion()+"]");
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					/*logger.debug("*****Debug Line Special Before**********");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("*******************************************");*/
+					
+					promotionSLine.add(line);
+				}
+			}
+		
+			//remove Promotion line(S) from orderFrom
+			for (OrderLine line : promotionSLine) {
+				orderForm.getLines().remove(line);
+			}
+			//Fill Line 1 to 2 Show on screen
+			promotionSLine =  orderSpecialProcess.fillLinesShowPromotion(promotionSLine);
+			//debug
+			/*for (OrderLine line : promotionSLine) {
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					logger.debug("*****Debug Line Special After fillLinesShowPromotion***");
+					logger.debug("productCode:"+line.getProduct().getCode());
+					logger.debug("taxable:"+line.getTaxable());
+					logger.debug("qty:"+line.getQty()+","+line.getQty1());
+					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
+					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
+					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
+					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("*******************************************************");
+				}
+			}*/
+			
+			//SumQtySameProduct 'S'
+			promotionSLine = orderSpecialProcess.sumQtyProductPromotionDuplicate(promotionSLine);
+			/*********************Promotion Special****************************************************/
 			
 			//Recalculate lineAmount (qty*price) in Lines
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
@@ -611,6 +654,8 @@ public class OrderSpecialAction extends I_Action {
 			
 			//add promotion line
 			odLines.addAll(promotionLines);
+			//add promotion Special line
+			odLines.addAll(promotionSLine);
 			
 			//set to OrderLines Show
 			orderForm.setLines(odLines);
@@ -895,7 +940,33 @@ public class OrderSpecialAction extends I_Action {
 				//Wit Edit 15/05/2555 Obj:Case PlaceOfBilled
 				line.setOrg(org);
 				line.setSubInv(subInv);
-				
+			
+				/** Case promotion 
+				 * set line_amount =0 ,total_amount =0 (because case summary head no sum row promotion )
+				 * */
+				if (line.getPromotion().equalsIgnoreCase("S") ) {
+					line.setLineAmount(0);
+					line.setLineAmount1(0);
+					line.setLineAmount2(0);
+					line.setDiscount(0);
+					line.setDiscount1(0);
+					line.setDiscount2(0);
+					line.setTotalAmount1(0);
+					line.setTotalAmount2(0);
+					line.setTotalAmount(0);
+					
+					if (line.getPromotion().equalsIgnoreCase("S") ) {
+						logger.debug("*****Debug Line Special Before Save**************************");
+						logger.debug("productCode:"+line.getProduct().getCode());
+						logger.debug("taxable:"+line.getTaxable());
+						logger.debug("qty:"+line.getQty()+","+line.getQty1()+","+line.getQty2());
+						logger.debug("price:"+line.getPrice()+","+line.getPrice1()+","+line.getPrice2());
+						logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1()+","+line.getLineAmount2());
+						logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1()+","+line.getDiscount2());
+						logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1()+","+line.getTotalAmount2());
+						logger.debug("*******************************************************");
+					}
+				}
 				//Save Line to DB
 				new MOrderLine().save(line, userActive.getId(), conn);
 			}
@@ -1002,9 +1073,21 @@ public class OrderSpecialAction extends I_Action {
 				}
 			}
 			
-			/** WIT Edit 20110804 ****************************************/
             //set Merge to 1 Line to show
 			orderForm.setLines(new OrderSpecialProcess().fillLinesShow(orderForm.getLines()));
+			
+			/** Case Special promotion display Calc lineAmount(qty*price) and discount(-1*lineAmount) */
+			for (OrderLine line : orderForm.getLines()) {
+				if( Utils.isNull(line.getPromotion()).equalsIgnoreCase("S")){
+					line.setLineAmount1(line.getQty1()*line.getPrice1());
+					line.setLineAmount2(line.getQty2()*line.getPrice2());
+					line.setLineAmount(line.getLineAmount1()+line.getLineAmount2());
+					
+					line.setDiscount1((-1)*line.getLineAmount1());
+					line.setDiscount2((-1)*line.getLineAmount2());
+					line.setDiscount(line.getDiscount1()+line.getDiscount2());
+				}
+			}
 			
 			// re org case line_no duplicate
 			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
@@ -1205,7 +1288,7 @@ public class OrderSpecialAction extends I_Action {
 			whereCause += " AND USER_ID = " + user.getId();
 
 			whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC ";
-			Order[] results = new MOrder().search(whereCause);
+			Order[] results = new MOrder().searchOpt(whereCause);
 
 			// results = fillLinesShow(results);
 			if(results != null)

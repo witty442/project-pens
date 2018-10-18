@@ -116,7 +116,7 @@ public class OrderAllAction extends I_Action {
 					 request.getSession().removeAttribute("totalPage"); 
 					 
 					 //init store type
-					 STORE_TYPE_MAP = OrderAllDAO.initStoreTypeMap(Constants.STORE_TYPE_7CATALOG_CODE);
+					 STORE_TYPE_MAP = OrderAllDAO.initStoreTypeMap(Constants.STORE_TYPE_PENSHOP_CODE);
 					 
 					 Order order = new Order();
 					 //Old OrderDate set to next billDate
@@ -124,14 +124,14 @@ public class OrderAllAction extends I_Action {
 					 
 					 //new set to Current Date
 					 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					 order.setStoreType(Constants.STORE_TYPE_7CATALOG_CODE);
+					 order.setStoreType(Constants.STORE_TYPE_PENSHOP_CODE);
 					 summaryForm.setOrder(order);
 					 summaryForm.setPageName(pageName);
 					 
 					 ImportDAO importDAO = new ImportDAO();
 					 conn = DBConnection.getInstance().getConnection();
 					 
-					 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"",Constants.STORE_TYPE_7CATALOG_CODE);
+					 List<References> storeTypeList = importDAO.getStoreTypeList(conn,"",Constants.STORE_TYPE_PENSHOP_CODE);
 					 request.getSession().setAttribute("storeTypeList",storeTypeList);
 					
 					 List<References> regionList = importDAO.getRegionList(conn);
@@ -223,7 +223,6 @@ public class OrderAllAction extends I_Action {
 		int pageNumber = 1;
 		List<StoreBean> storeList = null;
 		String action = "";
-	
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));

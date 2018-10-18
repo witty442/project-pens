@@ -45,7 +45,7 @@ public class OrderDocumentProcess extends DocumentSequenceProcess {
 		if (docSequence.getOrderType().equalsIgnoreCase("YY"))
 			docNo += String.format("%s", docSequence.getCurrentYear().substring(2));
 		 
-		docNo += String.format("%s", new DecimalFormat("00000").format(seq));
+		docNo += String.format("%s", new DecimalFormat("0000").format(seq));
 		return docNo;
 	}
 

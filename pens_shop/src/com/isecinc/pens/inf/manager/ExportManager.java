@@ -214,7 +214,7 @@ public class ExportManager {
 					dao.insertMonitorItemDetail(connMonitor, modelDetailItem);
 				}
 				
-				/** Update Exported  Flag  ********/
+				/** ADD Update Exported  Flag  ********/
 				if(tableBean.getSqlUpdateExportFlagList() != null &&  tableBean.getSqlUpdateExportFlagList().size() > 0){
 					sqlUpdateExportFlagList.addAll(tableBean.getSqlUpdateExportFlagList());
 				}
@@ -224,7 +224,7 @@ public class ExportManager {
 			logger.info("Step Upload ALL File To FTP Server");
 			ftpManager.uploadAllFileToFTP(userLogin,initConfigMap, "");
 			
-			/** Update Exported  Flag  ********/
+			/** ADD Update Exported  Flag  ********/
 			if(sqlUpdateExportFlagList != null &&  sqlUpdateExportFlagList.size() > 0){
 				logger.debug("***** -Start  Update Exported=Y  Flag ALL TABLE*************");
 			    int updateRecord = exProcess.updateExportFlag(conn, userRequest,sqlUpdateExportFlagList);

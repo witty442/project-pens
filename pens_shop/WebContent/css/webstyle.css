@@ -399,7 +399,7 @@ TABLE.resultByManual TD {
 	cursor:pointer;
 	color:#3a8a9e;
 	font-family:arial;
-	font-size:16px;
+	font-size:20px;
 	font-weight:bold;
 	padding:2px 12px;
 	text-decoration:none;
@@ -423,7 +423,7 @@ TABLE.resultByManual TD {
 	cursor:pointer;
 	color:#3a8a9e;
 	font-family:arial;
-	font-size:16px;
+	font-size:20px;
 	font-weight:bold;
 	padding:2px 12px;
 	text-decoration:none;
@@ -464,7 +464,7 @@ TABLE.resultByManual TD {
 	cursor:pointer;
 	color:#ffffff;
 	font-family:Arial;
-	font-size:16px;
+	font-size:20px;
 	padding:6px 10px;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #283966;
@@ -503,7 +503,7 @@ TABLE.resultByManual TD {
 	cursor:pointer;
 	color:#3a8a9e;
 	font-family:arial;
-	font-size:16px;
+	font-size:20px;
 	font-weight:bold;
 	padding:2px 5px;
 	text-decoration:none;
@@ -542,7 +542,7 @@ TABLE.resultByManual TD {
 	cursor:pointer;
 	color:#3a8a9e;
 	font-family:arial;
-	font-size:16px;
+	font-size:20px;
 	font-weight:bold;
 	padding:2px 12px;
 	text-decoration:none;
@@ -668,6 +668,14 @@ SELECT.moveOrder.pdCode{
 	border-color: #BEBEBE;
 	color: #000000;
 	font-weight: bold;
+}
+.disableBoldBigBlueText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: 	#0040ff;
+	font-weight: bold;
+	font-size: 18px;
 }
 .disableBoldNumber {
 	background-color: #DCDCDC;

@@ -161,9 +161,15 @@
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandOShopping');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
 					      <span><bean:message bundle="sysprop" key="ImportBMEOShopping"/></span></a>
 				        </li>
-				        <li>
+				        <!--  despricate -->
+				         <%-- <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhand7Catalog');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
 					      <span><bean:message bundle="sysprop" key="ImportBME7Catalog"/></span></a>
+				        </li> --%>
+				        <!-- Use table 7-catalog=pens shop -->
+				        <li>
+					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandPensShop');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
+					      <span><bean:message bundle="sysprop" key="ImportBMEPensShop"/></span></a>
 				        </li>
 				        <li>
 					      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=onhandTVDirect');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
@@ -927,6 +933,12 @@
 		     <li>
 	            <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_BARCODE_MASTER_FROM_EXCEL%>');">
 	            <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_BARCODE_MASTER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
+	        </li> 
+	     <%} %>
+	     <%if ("canapos".equalsIgnoreCase(user.getUserName())){%>
+		     <li>
+	            <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/jojoAction.do?do=prepare&pageAction=new');">
+	            <span><%no++;out.print(no);%>.Jojo Report</span></a>
 	        </li> 
 	     <%} %>
 		</ul>

@@ -100,6 +100,7 @@ System.out.println("debugMode:"+debugMode);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -130,7 +131,7 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrderSpecial.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/addProductSalesOrder.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrderProductSpecial.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
@@ -139,85 +140,6 @@ table#productList tbody td.number{text-align:right;}
 
 //clear cache
 $.ajaxSetup({cache: false});
-
-function openProductCategory(){
-	  // CAll AJAX PAGE
-	  loadProductCat(0);
-	  
-	  //lockscreen
-	  lockScreen();
-	  
-	   $(document).ready(function() {
-		 // event.preventDefault();
-	     $("#brand-dialog").dialog("open");	    
-	  }); 
-}
-
-var currPage = 0;
-function loadProductCat(page){
-	currPage = page;
-	var custId = document.getElementById("order.customerId").value;
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productCatQuery.jsp",
-			data : "pageId=" +page+"&custId="+custId,
-			async: false,
-			success: function(getData){
-				var htmlText = jQuery.trim(getData);
-				
-				//alert(htmlText);
-				document.getElementById('brand-dialog').innerHTML = htmlText;
-			}
-		}).responseText;
-	});
-}
-
-function loadProducts(brandCode){
-	var orderDate = document.getElementById("orderDate").value;
-	var pricelistId = document.getElementById("order.priceListId").value;
-	var custId = document.getElementById("order.customerId").value;
-	
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
-			data : "brandCode=" +brandCode+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
-			async: false,
-			success: function(getData){
-				var htmlText = jQuery.trim(getData);
-				document.getElementById('selectProduct').innerHTML = htmlText;
-			}
-		}).responseText;
-	});
-	
-	$(document).ready(function() {
-	    $("#selectProduct").dialog("open");
-	});
-}
-
-function loadProductsByBrand(brandCode){
-	//alert("brandCode:"+brandCode.value);
-	if(brandCode.value != ""){
-		var orderDate = document.getElementById("orderDate").value;
-		var pricelistId = document.getElementById("order.priceListId").value;
-		var custId = document.getElementById("order.customerId").value;
-		
-		$(function(){
-			var getData = $.ajax({
-				url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
-				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
-				async: false,
-				success: function(getData){
-					var htmlText = jQuery.trim(getData);
-					document.getElementById('selectProduct').innerHTML = htmlText;
-				}
-			}).responseText;
-		});
-		
-		$(document).ready(function() {
-		    $("#selectProduct").dialog("open");
-		});
-	}
-}
 
 function loadMe(){
 	calculatePrice();	
@@ -248,22 +170,99 @@ $.ui.dialog.prototype._makeDraggable = function() {
     });
 };
 
+/************* Add Product***************************************************/
+ /*param:promotion :'N'(normal) or 'S'(special)
+ */
+var promotion_all = "N";//default
+function openProductCategory(inputPromotion){
+	  // CAll AJAX PAGE
+	  loadProductCat(0);
+	  
+	  //set promotion by user input
+	  promotion_all =inputPromotion;
+	  
+	  //lockscreen
+	  lockScreen();
+	  
+	   $(document).ready(function() {
+		 // event.preventDefault();
+	     $("#brand-dialog").dialog("open");	    
+	  }); 
+}
+var currPage = 0;
+function loadProductCat(page){
+	currPage = page;
+	var custId = document.getElementById("order.customerId").value;
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productCatQuery.jsp",
+			data : "pageId=" +page+"&custId="+custId,
+			async: false,
+			success: function(getData){
+				var htmlText = jQuery.trim(getData);
+				
+				//alert(htmlText);
+				document.getElementById('brand-dialog').innerHTML = htmlText;
+			}
+		}).responseText;
+	});
+}
+function loadProducts(brandCode){
+	var orderDate = document.getElementById("orderDate").value;
+	var pricelistId = document.getElementById("order.priceListId").value;
+	var custId = document.getElementById("order.customerId").value;
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
+			data : "brandCode=" +brandCode+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+			async: false,
+			success: function(getData){
+				var htmlText = jQuery.trim(getData);
+				document.getElementById('selectProduct').innerHTML = htmlText;
+			}
+		}).responseText;
+	});
+	
+	$(document).ready(function() {
+	    $("#selectProduct").dialog("open");
+	});
+}
+function loadProductsByBrand(brandCode){
+	//alert("brandCode:"+brandCode.value);
+	if(brandCode.value != ""){
+		var orderDate = document.getElementById("orderDate").value;
+		var pricelistId = document.getElementById("order.priceListId").value;
+		var custId = document.getElementById("order.customerId").value;
+		
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
+				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+				async: false,
+				success: function(getData){
+					var htmlText = jQuery.trim(getData);
+					document.getElementById('selectProduct').innerHTML = htmlText;
+				}
+			}).responseText;
+		});
+		
+		$(document).ready(function() {
+		    $("#selectProduct").dialog("open");
+		});
+	}
+}
 function brandDialogClose(){
 	$('#brand-dialog').dialog("close"); 
 	unlockScreen();
 }
-
 function productDialogClose(){
 	$('#selectProduct').dialog("close"); 	
 	unlockScreen();
 }
-
 $(function(){
 	var screen_height= $(window).height();
 	var screen_width = $(window).width();
-	
 	//alert(screen.height+":"+screen.width);
-
 	    $('#brand-dialog').dialog({
 						autoOpen: false,
 						modal:true,
@@ -359,11 +358,7 @@ function addProductToSalesOrder(){
 	var products = [];
 	products = eval(data);
 	//alert(products);
-	//alert(products.length);
-	//alert(products[0].taxable);
-	
 	//Load data from screen to product screen
-	
 	if(products != null){
 		for(var i=0; i < products.length ; i++){
 			//var p = new Object();
@@ -372,17 +367,13 @@ function addProductToSalesOrder(){
 			product.product = products[i].productCode;
 	//		alert(products[i].productName);
 			product.productLabel = decodeURIComponent(escapeParameter(products[i].productName));
-			//alert(products[i].productName);
-			
 			product.uom1 = products[i].uom1;
 			product.uom2 = products[i].uom2;
 			product.uomLabel1 = products[i].uom1;
 			product.uomLabel2 = products[i].uom2;
 			product.price1 = products[i].price1;
 			product.price2 = products[i].price2;
-			
 			//alert(products[i].qty1);
-			
 			product.qty1 = products[i].qty1;
 			product.qty2 = products[i].qty2;
 			
@@ -402,7 +393,7 @@ function addProductToSalesOrder(){
 			product.row = "";
 			
 			product.taxable = products[i].taxable;
-			product.isPromotionSpecial = products[i].isPromotionSpecial;
+			product.promotion= promotion_all;//by user select button
 			
 			addProduct('${pageContext.request.contextPath}', product);
 		}
@@ -636,29 +627,31 @@ function validateVanCreditLimit(){
 									<%-- &nbsp;&nbsp;
 									<input type="button" class="newPosBtn" value="เพิ่มสินค้ารายตัว" onclick="open_product('${pageContext.request.contextPath}');"/> --%>
 									&nbsp;&nbsp; 
-									<input type="button" class="newPosBtn" value="เลือกสินค้าตามแบรนด์" onclick="openProductCategory();" />
-
+									<input type="button" class="newPosBtn" value="เลือกสินค้าตามแบรนด์" 
+									   onclick="openProductCategory('N');" />
+                                    &nbsp;&nbsp;
+                                    <input type="button" class="newPosOrderSpecialBtn" value="เลือกสินค้าตามแบรนด์(แถมพิเศษ)" 
+									    onclick="openProductCategory('S');" />
 								</div>
 								
-								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
-										<th class="order">ลำดับ</th>
-										<th class="checkBox">
+										<th class="td_text_center" width="5%">ลำดับ</th>
+										<th class="td_text_center" width="5%">
 										   <input type="checkbox" name="chkAll"
 											onclick="checkSelect(this,document.getElementsByName('lineids'));" />
 										</th>
-										<th class="name">ชื่อสินค้า</th>
-										<th>หน่วยนับ</th>
-										<th>จำนวน</th>
-										<th class="costprice">ราคาต่อหน่วย</th>
-										<th>ยอดรวม</th>
-										<th class="costprice">ส่วนลด</th>
-										<th class="costprice">ยอดรวมหลังหักส่วนลด</th>
-										<th>วันที่ส่งสินค้า</th>							
-										<th>วันที่ต้องการสินค้า</th>
-										<th class="status">ภาษี</th>
-										<th class="status">โปรโมชั่น</th>
-										<th class="status">โปรโมชั่น(แถมพิเศษ)</th>
+										<th class="td_text_center" width="15%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="5%">หน่วยนับ</th>
+										<th class="td_text_center" width="5%">จำนวน</th>
+										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
+										<th class="td_text_center" width="10%">ยอดรวม</th>
+										<th class="td_text_center" width="10%">ส่วนลด</th>
+										<th class="td_text_center" width="10%">ยอดรวมหลังหักส่วนลด</th>
+										<th class="td_text_center" width="5%">วันที่ส่งสินค้า</th>							
+										<th class="td_text_center" width="5%">วันที่ต้องการสินค้า</th>
+										<th class="td_text_center" width="3%">ภาษี</th>
+										<th class="td_text_center" width="3%">โปรโมชั่น</th>
 									</tr>
 									<c:forEach var="lines1" items="${orderSpecialForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -670,11 +663,11 @@ function validateVanCreditLimit(){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td>${rows1.index + 1}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${rows1.index + 1}</td>
+										<td class="td_text_center" width="5%">
 										  <input type="checkbox" name="lineids" value="${lines1.id}"/>
 										</td>
-										<td align="left">
+										<td class="td_text_center" width="15%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
 											<input type='hidden' name='lines.row' value='${lines1.lineNo}'>
@@ -717,9 +710,9 @@ function validateVanCreditLimit(){
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
-											<input type='hidden' name='lines.isPromotionSpecial' value='${lines1.isPromotionSpecial}'>
+											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
-										<td align="center">
+										<td class="td_text_right" width="5%">
 											<c:choose>
 												<c:when test="<%=orderSpecialForm.getOrder().getOrderType().equals(User.DD) %>">
 													${lines1.uom.code}&nbsp;${lines1.uom1.code}
@@ -729,8 +722,7 @@ function validateVanCreditLimit(){
 												</c:otherwise>
 											</c:choose>
 										</td>
-										<td align="right">
-											
+										<td class="td_text_right" width="5%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -750,8 +742,7 @@ function validateVanCreditLimit(){
 											</c:choose>
 										
 										</td>
-										<td align="right">
-											
+										<td class="td_text_right" width="10%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
@@ -763,38 +754,30 @@ function validateVanCreditLimit(){
 											</c:choose>											
 										
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/>
 										</td>
-									
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
 									
-										<td align="center">${lines1.shippingDate}</td>
-										<td align="center">${lines1.requestDate}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${lines1.shippingDate}</td>
+										<td class="td_text_center" width="5%">${lines1.requestDate}</td>
+										<td class="td_text_center" width="3%">
 											<c:if test="${lines1.taxable=='Y'}">
 												   <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">								
 											</c:if>
 										</td>
-										<td align="center">
-												<c:if test="${lines1.promotion=='N'}">
-											         <%if(debugMode==true) {%>
-													   <%-- <a href="#" onclick="open_product('${pageContext.request.contextPath}',${rows1.index+1});">
-													   <img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>  --%>
-													 <%} %>
-												</c:if>
-										</td>
-										<td align="center">
+										<td  class="td_text_center" width="3%">
+											${lines1.promotion}
 										</td>
 									</tr>
 									</c:forEach>
 								</table>
-								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+								<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
 										<td align="left" class="footer">&nbsp;
 											<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
@@ -936,7 +919,6 @@ function validateVanCreditLimit(){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported" value="N"/>
 						<html:hidden property="order.isCash" value="N"/>
-					    <html:hidden property="order.isPromotionSpecial" value="Y"/>
 							
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						

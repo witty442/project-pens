@@ -26,8 +26,7 @@ if(request.getParameter("key")!=null){
 List<ProductC4> pos = new ProductC4Process().getAllItem((User)session.getAttribute("user"),customerId);
 pageContext.setAttribute("pos",pos,PageContext.PAGE_SCOPE);
 
-
-
+System.out.println("ProductC4 pos size:"+pos.size());
 %>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 
@@ -64,13 +63,7 @@ body {
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	    	<jsp:include page="/jsp/menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
@@ -93,9 +86,6 @@ body {
 						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr>
 								<th width="250px;"><bean:message key="Product.Name" bundle="sysele"/></th>
-								<!-- 
-								<th class="costprice"><bean:message key="PricePerUnit" bundle="sysele"/></th>
-								 -->
 								<th class="costprice"><bean:message key="PricePerPack" bundle="sysele"/></th>
 								<th class="status"><bean:message key="Contain" bundle="sysele"/></th>
 								<th><bean:message key="Promotion" bundle="sysele"/></th>
@@ -118,11 +108,7 @@ body {
 							<c:if test="${results.descriptionSize==1}">
 							<tr class="<c:out value='${tabclass}'/>">
 								<td align="left" width="250px;" rowspan="${results.descriptionSize}">${results.product.code} ${results.product.name}</td>
-								<!-- 
-								<td align="right" class="costprice">
-									<fmt:formatNumber pattern="#,##0.00" value="${results.subUnitPrice}"/>
-								</td>
-								 -->
+								
 								<td align="right" class="costprice" rowspan="${results.descriptionSize}">
 									<fmt:formatNumber pattern="#,##0.00" value="${results.baseUnitPrice}"/>
 								</td>

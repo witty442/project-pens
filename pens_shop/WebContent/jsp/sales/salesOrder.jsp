@@ -76,7 +76,20 @@ table#productList thead{background:#FFE4CA;}
 .qtyInput{width:50px; height:26px;text-align:right;}
 table#productList tbody td{vertical-align:top;padding-left:2px;padding-right:4px;}
 table#productList tbody td.number{text-align:right;}
+.h1{
+ font-size: 20px;
+ font-weight: bold;
+}
+.bigRadio{ width: 1.5em; height: 1.5em; }
 
+.sale_normal{
+  background-color: #00ff40;
+  font-weight: bold;
+}
+.sale_special{
+  background-color: #f2f20d	;
+  font-weight: bold;
+}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
@@ -89,6 +102,7 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.scannerdetection.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 
 <script type="text/javascript">
 //clear cach
@@ -98,12 +112,19 @@ onkeydown = function(e){
 	//alert(e.keyCode+":"+e.type);
 	//F1 =112
 	//F2 =113
+	//F3 =114
+	//F4 =115
 	//Enter =13
+	//Spacebar =32
 	  if(e.keyCode == 113){//F2
 	     // e.preventDefault();
 	     //your saving code
+	     setProductType('N')//default sale normal
 	     document.getElementById("barcode").focus();
-	  }else if(e.keyCode == 13){//Enter
+	  }else if(e.keyCode == 115){//F4
+		  setProductType('S')//default sale normal
+		  document.getElementById("barcode").focus();
+	  }else if(e.keyCode == 32){//Spacebar
 		 // presave();
 	  }
 }
@@ -136,6 +157,25 @@ function presave() {
 function loadMe(){
 	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 	calculatePrice();
+	
+	setProductType('N')//default sale normal
+}
+
+function setProductType(curProductType){
+	if(curProductType =='N'){//normal
+		document.getElementById("sale_normal").className='sale_normal';
+		document.getElementById("sale_special").className='';
+		
+		var value = 'N';
+		$("input[name=productType][value=" + value + "]").attr('checked', 'checked');
+	}else{
+		//special
+		document.getElementById("sale_normal").className='';
+		document.getElementById("sale_special").className='sale_special';
+		
+		var value = 'S';
+		$("input[name=productType][value=" + value + "]").attr('checked', 'checked');
+	}
 }
 
 /** Get Product By Barcode **/
@@ -158,6 +198,8 @@ function getProductKeypressByBarcodeModel(path,barcode){
 	var custId = document.getElementById("order.customerId").value;
 	var inputQty = document.getElementById("inputQty").value;
 	var barcodeObj = document.getElementById("barcode");
+	var productType = $('input[name=productType]:checked').val();//promotion
+	//alert("productType:"+productType);
 	
 	var result = '';
     var getData = $.ajax({
@@ -177,6 +219,8 @@ function getProductKeypressByBarcodeModel(path,barcode){
 		barcodeObj.value ="";
 		barcodeObj.focus();
 	}else{
+		setProductType('N')//default sale normal
+		
 		barcodeObj.value ="";
 		barcodeObj.focus();
 		//get Product Info By Old method
@@ -219,6 +263,7 @@ function getProductKeypressByBarcodeModel(path,barcode){
 				product.row = "";
 				
 				product.taxable = products[i].taxable;
+				product.promotion = productType;
 				
 				addProduct('${pageContext.request.contextPath}', product);
 				
@@ -279,21 +324,12 @@ onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/bu
 style="height: 100%;">
 <div id="div_body">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-   	<tr>
-		 <td colspan="3"><jsp:include page="../headerNew.jsp"/></td> 
-	</tr> 
   	<tr id="framerow">
   		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	    		<jsp:include page="../menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
@@ -315,20 +351,10 @@ style="height: 100%;">
 						<jsp:include page="../error.jsp"/>
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
-								<td align="left">
-								   <a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');">  
-									 <input type="button" value="ลบรายการ" class="newPosBtnLong">
-								   </a>
-								</td>
-								<td align="right"></td>
-								<td align="left" colspan="2"></td>
-							    <td align="left">  </td>
-							</tr>
-							<tr>
 								<td colspan="5" align="center">
 								<!-- **** Table Product **** -->
-								<div id="divTableProduct" style="width: 100%; height:300px; overflow-y: scroll;">
-								<table id="tblProduct" align="left" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+								<div id="divTableProductHead" style="width: 100%; height:50px; overflow-y: scroll;">
+								<table id="tblProductHead" align="left" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
 										<th class="td_text_center" width="5%">ลำดับ</th>
 										<th class="td_text_center" width="5%">
@@ -345,6 +371,11 @@ style="height: 100%;">
 										<th class="td_text_center" width="5%">ภาษี</th>
 										<th class="td_text_center" width="5%">โปรโมชั่น</th>
 									</tr>
+								</table>
+								</div>
+								<div id="divTableProduct" style="width: 100%; height:380px; overflow-y: scroll;">
+								<table id="tblProduct" align="left" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+									
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
 										<c:when test="${rows1.index %2 == 0}">
@@ -401,6 +432,8 @@ style="height: 100%;">
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
+											
+											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
 										<td class="td_text_center" width="10%">
 											<c:choose>
@@ -445,20 +478,27 @@ style="height: 100%;">
 										
 										</td>
 										<td class="td_text_right" width="10%">
+										    <!-- ยอดรวม -->
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
 										</td>
 										<td class="td_text_right" width="10%">
-											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/>
+										    <!-- ส่วนลด -->
+											<%-- <fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/> --%>
 										</td>
 										<td class="td_text_right" width="10%">
+										    <!-- ยอดรวม หลังหักส่วนลด -->
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
 										<td  class="td_text_center" width="5%">
+										   <!-- Taxable -->
 											<c:if test="${lines1.taxable=='Y'}">
 												   <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">								
 											</c:if>
 										</td>
-										<td  class="td_text_center" width="5%"></td>
+										<td  class="td_text_center" width="5%">
+										  <!-- Promotion -->
+										  ${lines1.promotion}
+										</td>
 									</tr>
 									</c:forEach>
 								</table>
@@ -471,11 +511,16 @@ style="height: 100%;">
 							   <table id="tblProductSummary" align="left" border="0" cellpadding="3" 
 							   cellspacing="1" width="100%" bgcolor="#D3D3D3">
 							      <tr>
-									<td class="td_text_right" width="40%" colspan="5"><b>รวมจำนวน</b></td>
+							        <td width="10%">
+							           <a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');">  
+									     <input type="button" value="ลบรายการ" class="newPosBtnLong">
+								       </a>
+							        </td>
+									<td class="td_text_right" width="30%" colspan="4"><span class="h1">รวมจำนวน</span></td>
 									<td  class="td_text_right" width="10%">
 									   <!-- <input type="text" name="totalQty" id="totalQty" size="10" 
 									   class="disableBoldNumber"> -->
-									  <b> <span id="totalQty"></span></b>
+									  <b> <span id="totalQty" class="h1"></span></b>
 									</td>
 									<td class="td_text_right" width="10%"></td>
 									<td class="td_text_right" width="10%"></td>
@@ -488,11 +533,12 @@ style="height: 100%;">
 							</td></tr>
 							<tr>
 							   <td valign="top"></td>
-								<td valign="top">
+								<td valign="top"  colspan="2">
 								    <table align="left" border="0" cellpadding="3" cellspacing="1">
 								    <tr>
 								      <td align="center"><b>สแกนบาร์โค๊ด</b></td>
 								      <td align="center"><b>จำนวน</b></td>
+								      <td align="center"></td>
 								    </tr>
 									<tr>
 										<td align="center" nowrap valign="top">&nbsp;
@@ -510,46 +556,72 @@ style="height: 100%;">
 											  onkeydown="return inputNum(event);"/> 
 											 <input type="button" value="+"onclick ="addInputQty(1)" class="newNegBtn"/>
 										</td>
+										<td align="center" nowrap valign="bottom">
+										    <input type="radio" class="bigRadio" name="productType" id="productType" value="N" checked onchange="setProductType('N')">
+										    <span id="sale_normal" class="sale_normal"> <b>ขายปกติ(F2) </b></span>
+										    <input type="radio" class="bigRadio" name="productType" id="productType" value="S" onchange="setProductType('S')">
+										    <span id="sale_special"> <b>แถมพิเศษ(F4)</b></span>
+										</td>
 									 </tr>
+									  <tr>
+									     <td colspan="3" align="right"><hr/> </td>
+									  </tr>
+									  <tr>
+									   <td colspan="3" align="right">
+									     <input type="button" value="คำนวณโปรโมชั่น" tabindex="-1" onclick="return presave('${pageContext.request.contextPath}');" class="newPosBtnLong">
+									    &nbsp;&nbsp;&nbsp;
+									     <input type="button" value="ยกเลิก" tabindex="-1" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+									   </td>
+									 </tr> 
 								   </table>
 								</td>
-								<td align="left" colspan="2">
-								  <table align="left" border="0" cellpadding="3" cellspacing="1">
+								<td align="left">
+								   <%-- <table align="left" border="0" cellpadding="3" cellspacing="1">
+								   <tr>
+									   <td colspan="2" align="center">
+									   
+									   </td>
+									 </tr>
 									 <tr>
 									   <td colspan="2" align="center">
 									    <input type="button" value="คำนวณโปรโมชั่น" tabindex="-1" onclick="return presave('${pageContext.request.contextPath}');" class="newPosBtnLong">
 									    <input type="button" value="ยกเลิก" tabindex="-1" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
 									   </td>
 									 </tr>
-								   </table>
+								   </table>  --%>
 								</td>
 								<td align="left" valign="top">
 								  <table align="left" border="0" cellpadding="3" cellspacing="1">
 									    <tr>
 									      <td align="right"><b>ยอดรวมก่อนภาษี</b></td>
 									      <td align="left">
-									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;" tabindex="-1"/>
+									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
 										     <html:hidden property="order.totalAmount"/>
 									      </td>
 									    </tr>
 									    <tr>
 									       <td align="right"><b>ภาษี</b></td>
 									       <td align="left">
-									         <input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;" tabindex="-1"/>
+									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
 									         <html:hidden property="order.vatAmount"/>
 									        </td>
 									    </tr>
 									    <tr>
 									       <td align="right"><b>ยอดรวมที่ไม่เสียภาษี</b></td>
 									       <td align="left">
-									           <input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;" tabindex="-1"/>
-									           <html:hidden property="order.totalAmountNonVat"/>
+									           <input type="text" id="tempTotalAmountNonVat" size="22"
+									           name="tempTotalAmountNonVat" readonly="readonly" 
+									           class="disableBoldText" style="text-align: right;" 
+									           tabindex="-1"/>
+									           <html:hidden property="order.totalAmountNonVat" />
 									       </td>
 									    </tr>
 									    <tr>
-									       <td align="right"><b>ยอดสุทธิ</b></td>
+									       <td align="right"><b><font size ="3">ยอดสุทธิ</font></b></td>
 									       <td align="left">
-									          <input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;" tabindex="-1"/>
+									          <input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" 
+									          class="disableBoldBigBlueText" 
+									          style="text-align: right;" tabindex="-1" size="15"/>
 									           <html:hidden property="order.netAmount"/>
 									       </td>
 									    </tr>
@@ -587,9 +659,17 @@ style="height: 100%;">
 						<html:hidden property="receiptCreditFlag"/>
 					    <html:hidden property="custCreditLimit"/>
 					    
+					    <html:hidden property="order.customerBillName"/>
+					    <html:hidden property="order.addressDesc"/>
+					    <html:hidden property="order.idNo"/>
+					    <html:hidden property="order.passportNo"/>
+					    
+					    <html:hidden property="order.paymentMethod"/>
 					    <html:hidden property="order.creditCardType"/>
 					    <html:hidden property="order.creditCardNo"/>
 					    <html:hidden property="order.creditCardExpireDate"/>
+                        <html:hidden property="order.creditcardMonthExpire"/>
+					    <html:hidden property="order.creditcardYearExpire"/>
 					    
 					    <html:hidden property="order.priceListId" styleId="order.priceListId"/>
 						<html:hidden property="order.vatCode" value="7"/>
@@ -611,24 +691,26 @@ style="height: 100%;">
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>
-				<tr style="height: 9px;">
+				 <tr style="height: 9px;">
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_4.gif"/></td>
 		            <td background="${pageContext.request.contextPath}/images2/boxcont1_7.gif"></td>
 		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_3.gif"/></td>
+		        </tr>
     		</table>
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
-    <tr>
+     <tr>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
    			<jsp:include page="../contentbottom.jsp"/>
         </td>
         <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
+   
      <tr>
-    	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
-  	</tr>
+    	 <td colspan="3"><jsp:include page="../footer.jsp"/></td> 
+  	</tr> 
 </table>
 </div>
 </body>

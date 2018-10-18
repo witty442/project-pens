@@ -237,6 +237,7 @@ function sumQtyInRow(row){
 				<jsp:param name="function" value="OrderOShopping"/>
 			</jsp:include>
 		 <% }else if("7CATALOG".equalsIgnoreCase(pageName)){%>
+		 <!-- =PensShop -->
 			<jsp:include page="../program.jsp">
 				<jsp:param name="function" value="Order7Catalog"/>
 			</jsp:include>

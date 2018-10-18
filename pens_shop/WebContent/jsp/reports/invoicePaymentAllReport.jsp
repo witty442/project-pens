@@ -1,3 +1,5 @@
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -5,9 +7,11 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:useBean id="performanceReportForm" class="com.isecinc.pens.web.report.performance.PerformanceReportForm" scope="request" />
+<jsp:useBean id="invoicePaymentAllReportForm" class="com.isecinc.pens.web.report.invoicepayment_all.InvoicePaymentAllReportForm" scope="request" />
 <%
-
+if( Utils.isNull(invoicePaymentAllReportForm.getInvoicePaymentAllReport().getReceiptDate()).equals("")){
+	invoicePaymentAllReportForm.getInvoicePaymentAllReport().setReceiptDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+}
 %>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -72,13 +76,7 @@ function clearForm(path){
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	    	<jsp:include page="/jsp/menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import util.Constants;
 import util.DateToolsUtil;
 import util.ReportHelper;
 
@@ -35,44 +36,20 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 		List<PerformanceReport> pos = new ArrayList<PerformanceReport>();
 		PerformanceReport p = null;
 		StringBuilder sql = new StringBuilder();
-
+		String creditcard ="";
 		try {
 			sql.delete(0, sql.length());
 			sql.append("\n SELECT A.* ");
-			sql.append("\n,CASE WHEN A.airpay_no IS NULL THEN A.CASH_AMOUNT ELSE 0 END AS CASH_AMOUNT_N");
-			sql.append("\n,CASE WHEN A.airpay_no IS NULL THEN A.VAT_CASH ELSE 0 END AS VAT_CASH_N ");
-			
-			sql.append("\n,CASE WHEN A.airpay_no <> '' THEN A.CASH_AMOUNT ELSE 0 END AS AIRPAY_AMOUNT_N");
-			sql.append("\n,CASE WHEN A.airpay_no <> '' THEN A.VAT_CASH ELSE 0 END AS AIRPAY_CASH_N ");
 			sql.append("\n FROM(");
-			
 			sql.append("\n  SELECT @rownum:=@rownum+1 as no , od.ORDER_DATE, us.CODE, us.NAME, od.ORDER_NO, ");
 			sql.append("\n  (SELECT SUM(DISCOUNT) FROM t_order_line ,(SELECT @rownum:=0) r ");
 			sql.append("\n  WHERE t_order_line.ORDER_ID = od.ORDER_ID AND t_order_line.ISCANCEL ='N' ) AS DISCOUNT, ");
-			sql.append("\n  CASE od.ISCASH WHEN 'Y' THEN od.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT, ");
-			sql.append("\n  CASE od.ISCASH WHEN 'N' THEN  od.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT, ");
-			sql.append("\n  CASE od.ISCASH WHEN 'Y' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_CASH, ");
-			sql.append("\n  CASE od.ISCASH WHEN 'N' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_RECEIPT, ");
-			sql.append("\n  od.VAT_AMOUNT, od.NET_AMOUNT, cus.CODE AS CUSTOMER_CODE, cus.NAME AS CUSTOMER_NAME ");
-			
-			sql.append("\n ,( select min(t_receipt_by.cheque_no) ");
-			sql.append("\n    from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
-			sql.append("\n    where od.order_id = t_receipt_line.order_id ");
-			sql.append("\n    and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
-			sql.append("\n    and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
-			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='CH' ");
-			sql.append("\n  ) as cheque_no ");
-			
-			sql.append("\n ,( select min(t_receipt_by.cheque_no) ");
-			sql.append("\n    from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
-			sql.append("\n    where od.order_id = t_receipt_line.order_id ");
-			sql.append("\n    and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
-			sql.append("\n    and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
-			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='AP' ");
-			sql.append("\n  ) as airpay_no ");
-			
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN od.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT, ");
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN  od.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT, ");
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_CASH, ");
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_RECEIPT, ");
+			sql.append("\n  od.VAT_AMOUNT, od.NET_AMOUNT, cus.CODE AS CUSTOMER_CODE, od.customer_bill_name ");
+			sql.append("\n  ,od.credit_card_no ");
 			sql.append("\n  ,od.doc_status as status ");
 			sql.append("\n  FROM t_order od ");
 			sql.append("\n  INNER JOIN ad_user us ON od.USER_ID = us.USER_ID ");
@@ -99,23 +76,20 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setName(rst.getString("NAME"));
 				p.setOrderNo(ReportHelper.convertOrderNoForReport(rst.getString("ORDER_NO")));
 				p.setDiscount(rst.getDouble("DISCOUNT"));
-				p.setCashAmount(rst.getDouble("CASH_AMOUNT_N"));
-				p.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));
+				p.setCashAmount(rst.getDouble("CASH_AMOUNT"));
+				p.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));//=creditCardAmt
 				p.setVatAmount(rst.getDouble("VAT_AMOUNT"));
 				p.setNetAmount(rst.getDouble("NET_AMOUNT"));
 				p.setCustomerCode(rst.getString("CUSTOMER_CODE"));
-				p.setCustomerName(rst.getString("CUSTOMER_NAME"));
-				p.setVatCash(rst.getDouble("VAT_CASH_N"));
-				p.setVatReceipt(rst.getDouble("VAT_RECEIPT"));
+				p.setCustomerName(rst.getString("CUSTOMER_BILL_NAME"));
+				p.setVatCash(rst.getDouble("VAT_CASH"));
+				p.setVatReceipt(rst.getDouble("VAT_RECEIPT"));//=creditCardAmt
 				
-				p.setAirpayAmount(rst.getDouble("AIRPAY_AMOUNT_N"));
-				
-				if( !Utils.isNull(rst.getString("cheque_no")).equals("")){
-                   p.setChequeNo(rst.getString("cheque_no"));
-				}else{
-				   p.setChequeNo(rst.getString("airpay_no"));
+				if( !Utils.isNull(rst.getString("credit_card_no")).equals("")){
+				   creditcard = rst.getString("credit_card_no");
+                   p.setCreditCardNo("**"+creditcard.substring(creditcard.length()-4,creditcard.length()));
 				}
-                p.setAirpayNo(rst.getString("airpay_no"));
+               // p.setAirpayNo(rst.getString("airpay_no"));
                 p.setStatus(rst.getString("status"));
 				pos.add(p);
 			}
@@ -160,8 +134,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  AND m_sales_target_new.TARGET_TO <= '" + DateToolsUtil.convertToTimeStamp(t.getOrderDate())
 					+ "' ");
 			sql.append("\n  AND ad_user.USER_ID = us.USER_ID ) AS TARGET_QTY, ");
-			sql.append("\n  SUM(CASE od.ISCASH WHEN 'Y' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_CASH_AMT, ");
-			sql.append("\n  SUM(CASE od.ISCASH WHEN 'N' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_RECEIPT_AMT ");
+			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_CASH_AMT, ");
+			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_RECEIPT_AMT ");
 
 			sql.append("\n  FROM t_order od  INNER JOIN ad_user us ON od.USER_ID = us.USER_ID ");
 			sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
@@ -188,8 +162,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			// Get cash amount & receipt amount.
 			sql.delete(0, sql.length());
 			sql.append("\n  SELECT ");
-			sql.append("\n  CASE t_order.ISCASH WHEN 'Y' THEN t_order.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT, ");
-			sql.append("\n  CASE t_order.ISCASH WHEN 'N' THEN t_order.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT ");
+			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN t_order.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT, ");
+			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN t_order.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT ");
 			sql.append("\n  FROM t_order ");
 			sql.append("\n  WHERE t_order.USER_ID = " + user.getId());
 			sql.append("\n  AND t_order.DOC_STATUS = 'SV' ");
@@ -258,43 +232,6 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setAllTargetAmount(allTargetAmount);
 			} else {
 				p.setAllTargetAmount(new Double("0"));
-			}
-			
-			/** Get Total Amount Airpay **/
-			sql.delete(0, sql.length());
-			sql.append("\n SELECT SUM(M.AIRPAY_AMOUNT) as AIRPAY_AMOUNT, SUM(M.AIRPAY_CASH) as AIRPAY_CASH ");
-			sql.append("\n FROM(");
-			sql.append("\n   SELECT ");
-			sql.append("\n 	 CASE WHEN A.airpay_no <> '' THEN A.CASH_AMOUNT ELSE 0 END AS AIRPAY_AMOUNT");
-			sql.append("\n 	,CASE WHEN A.airpay_no <> '' THEN A.VAT_CASH ELSE 0 END AS AIRPAY_CASH ");
-			sql.append("\n	 FROM(");
-			sql.append("\n  	SELECT ");
-			sql.append("\n  	CASE od.ISCASH WHEN 'Y' THEN od.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT ");
-			sql.append("\n  	,CASE od.ISCASH WHEN 'Y' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_CASH ");
-			sql.append("\n 		,( select min(t_receipt_by.cheque_no) ");
-			sql.append("\n    	from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
-			sql.append("\n    	where od.order_id = t_receipt_line.order_id ");
-			sql.append("\n    	and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
-			sql.append("\n    	and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    	and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
-			sql.append("\n    	and t_receipt_by.PAYMENT_METHOD ='AP' ");
-			sql.append("\n  	) as airpay_no ");
-			sql.append("\n  	FROM t_order od ");
-			sql.append("\n  	INNER JOIN ad_user us ON od.USER_ID = us.USER_ID ");
-			sql.append("\n  	INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
-			sql.append("\n  	WHERE cus.CUSTOMER_TYPE = 'CV' ");
-			sql.append("\n  	AND od.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(startDate) + "' ");
-			sql.append("\n  	AND od.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getOrderDate()) + "' ");
-			sql.append("\n  	AND od.ORDER_TYPE = '" + user.getOrderType().getKey() + "' ");
-			sql.append("\n  	AND us.USER_ID = " + user.getId());
-			sql.append("\n 	) A ");
-			sql.append("\n ) M ");
-			
-			logger.debug("sum Total Airpay Amount :"+sql.toString());
-			rst = stmt.executeQuery(sql.toString());
-			
-			if (rst.next()) {
-				p.setAllAirpayAmount(rst.getDouble("AIRPAY_AMOUNT"));
 			}
 			
 		} catch (Exception e) {

@@ -743,20 +743,9 @@ public class ReportUtilServlet extends HttpServlet {
 					|| "tax_invoice_summary_new_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)){
 				try{
-					//Select Printer Small Is online
-					/*if(ControlCode.canExecuteMethod("PrinterUtils", "selectPrinterSmallIsOnlineCheckOnline")){
-						printerInvoiceName = PrinterUtils.selectPrinterSmallIsOnlineCheckOnline();
-						if(Utils.isNull(printerInvoiceName).equals("")){
-							//throw new Exception("ERROR Cannot Find Printer Small");
-							
-							//default printer name
-							logger.info("No Found Printer is online use default printer(ZDesigner MZ 320) ");
-							printerInvoiceName="ZDesigner MZ 320";
-						}
-					}else{*/
-						//select from 3 printerName no check online
-					    printerInvoiceName = PrinterUtils.selectPrinterSmall();
-					//}
+					//select from 3 printerName no check online
+					printerInvoiceName = PrinterUtils.selectPrinterSmall();
+					
 					logger.info("Selected PrinterName:"+printerInvoiceName);
 							
 					PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();

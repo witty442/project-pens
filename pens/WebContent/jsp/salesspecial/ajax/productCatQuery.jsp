@@ -34,22 +34,22 @@ try{
 		basket = new Basket();	
 	}
 	
-	if(StringUtils.isEmpty(pageId_param))
+	if(StringUtils.isEmpty(pageId_param)){
 		pageId_param = "0";
-	
+	}
 	pageId = Integer.valueOf(pageId_param);
 	
 	MProductCategory mProductCat = new MProductCategory();
-	 productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
+	productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
 	
-	 no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
-	 no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
-	 no_of_total_display = no_of_column * no_of_rows;
+	no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
+	no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
+	no_of_total_display = no_of_column * no_of_rows;
 	
-	 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
+	totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
 	
 	// totalPage = totalRecord/(no_of_column * no_of_rows);
-	   totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
+	totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
 	   
 	//List All Brand
 	List<References> brandAllList = mProductCat.lookUpBrandAllListNew(user);

@@ -30,6 +30,8 @@ String isAdd = request.getSession(true).getAttribute("isAdd") != null ? (String)
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>" /></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -56,21 +58,12 @@ body {
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-  	<tr>
-		<td colspan="3"><jsp:include page="../header.jsp"/></td>
-	</tr>
   	<tr id="framerow">
   		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	    	<jsp:include page="../menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../program.jsp">
@@ -196,22 +189,19 @@ body {
 							<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;
 							<bean:message key="RecordsFound" bundle="sysprop" /> &nbsp;
 							<span class="searchResult">${orderForm.criteria.searchResult}</span>&nbsp;<bean:message key="Records" bundle="sysprop" /></div>
-							<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+							<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 								<tr>
-									<th class="order"><bean:message key="No" bundle="sysprop" /></th>
-									<th class="code"><bean:message key="DocumentNo" bundle="sysele" /></th>
-									<th class="code"><bean:message key="TransactionDate" bundle="sysele" /></th>
-									<th class="costprice"><bean:message key="TotalAmount" bundle="sysele" /></th>
-									<th class="status"><bean:message key="Exported" bundle="sysele"/></th>
-									<th class="status"><bean:message key="Interfaces" bundle="sysele"/></th>
-								<%-- 	<th class="status"><bean:message key="Order.Paid" bundle="sysele"/></th>
-									<th class="code"><bean:message key="Order.No"  bundle="sysele"/></th>
-									<th class="code"><bean:message key="Bill.No"  bundle="sysele"/></th> --%>
-									<th class="code">ชื่อลูกค้าออกบิล</th>
-									<th class="status"><bean:message key="Status" bundle="sysele" /></th>
-									<th class="status"><bean:message key="Order.Search.CreditNote" bundle="sysprop" /></th>
-									<th class="status">ทำรายการ</th>
-									<th class="status"><bean:message key="View" bundle="sysprop" /></th>
+									<th class="td_text_center" width="5%"><bean:message key="No" bundle="sysprop" /></th>
+									<th class="td_text_center" width="10%"><bean:message key="DocumentNo" bundle="sysele" /></th>
+									<th class="td_text_center" width="20%">ชื่อลูกค้าออกบิล</th>
+									<th class="td_text_center" width="10%"><bean:message key="TransactionDate" bundle="sysele" /></th>
+									<th class="td_text_center" width="10%"><bean:message key="TotalAmount" bundle="sysele" /></th>
+									<th class="td_text_center" width="5%"><bean:message key="Exported" bundle="sysele"/></th>
+									<th class="td_text_center" width="5%"><bean:message key="Interfaces" bundle="sysele"/></th>
+									
+									<th class="td_text_center" width="10%"><bean:message key="Status" bundle="sysele" /></th>
+								    <th class="td_text_center">ทำรายการ</th>
+									<th class="td_text_center" width="10%"><bean:message key="View" bundle="sysprop" /></th>
 								</tr>
 							<c:forEach var="results" items="${orderForm.results}" varStatus="rows">
 								<c:choose>
@@ -223,59 +213,32 @@ body {
 									</c:otherwise>
 								</c:choose>
 								<tr class="<c:out value='${tabclass}'/>">
-									<td width="36px;"><c:out value='${rows.index+1}' /></td>
-									<td align="center" width="88px;">${results.orderNo}</td>
-									<td align="center" width="88px;">${results.orderDate}</td>
-									<td align="right" width="62px;"><fmt:formatNumber pattern="#,#00.00"
+									<td ><c:out value='${rows.index+1}' /></td>
+									<td >${results.orderNo}</td>
+									<td >${results.customerBillName}</td>
+									<td >${results.orderDate}</td>
+									<td ><fmt:formatNumber pattern="#,#00.00"
 										value="${results.netAmount}"></fmt:formatNumber></td>
-									<td align="center" width="52px;">
+									<td >
 										<c:if test="${results.exported=='Y'}">
 											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 										</c:if>
 									</td>
-									<td align="center" width="52px;">
+									<td>
 										<c:if test="${results.interfaces=='Y'}">
 											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 										</c:if>
 									</td>
-									<%--<td align="center" width="50px;">
-									 	<c:if test="${results.payment=='Y'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-										</c:if>
-									</td>
-									<td align="center" width="88px;">${results.salesOrderNo}</td>
-									<td align="center" width="75px;">${results.arInvoiceNo}</td> --%>
-									<td align="left" width="50px;">${results.customerBillName}</td>
-									<td align="center" width="50px;">${results.docStatusLabel}</td>
-									<td align="center">
-										<c:if test="${results.hasCreditNote}">
-											<a href="#" onclick="javascript:creditNoteList('${pageContext.request.contextPath}','${results.arInvoiceNo}');">
-											<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
-										</c:if>
-									</td>
-									
-									<!-- OLD CODE  -->
-									<td align="center" width="52px;">
+									<td >${results.docStatusLabel}</td>
+									<td >
 										<c:if test="${results.exported=='N'}">
 											<c:if test="${results.docStatus=='SV'}">
-												<c:if test="${results.payment=='N'}">
-													<a href="#" onclick="javascript:prepareEditOrder('${pageContext.request.contextPath}','edit','${results.id}');">
-												    <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
-												</c:if>
+												<a href="#" onclick="javascript:prepareEditOrder('${pageContext.request.contextPath}','edit','${results.id}');">
+												<img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
 											</c:if>
 										</c:if>
-										<%if(role.equals(User.VAN)){ %>
-											<c:if test="${results.exported=='Y'}">
-												<c:if test="${results.docStatus=='SV'}">
-													<c:if test="${results.payment=='N'}">
-														<a href="#" onclick="javascript:prepareEditReceipt('${pageContext.request.contextPath}','edit','${results.id}');">
-													      <img border=0 src="${pageContext.request.contextPath}/icons/process.gif" title="รายการนี้ยังไม่ทำรายการรับเงิน"></a>						   
-													</c:if>
-												</c:if>
-											</c:if>
-									    <% } %>
 									</td>
-									<td align="center">
+									<td>
 										<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
 										<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
 									</td>
@@ -314,13 +277,13 @@ body {
     	</td>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
     </tr>
-    <tr>
+     <tr>
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
    			<jsp:include page="../contentbottom.jsp"/>
         </td>
         <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
+    </tr> 
     <tr>
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>

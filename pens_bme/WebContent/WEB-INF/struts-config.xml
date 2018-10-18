@@ -115,6 +115,7 @@
 		<form-bean name="autoCNHISHERForm" type="com.isecinc.pens.web.autocn.hisher.AutoCNHISHERForm" />
 		<form-bean name="autoSubBigCForm" type="com.isecinc.pens.web.autosub.AutoSubBigCForm" />
 		<form-bean name="toolManageForm" type="com.isecinc.pens.web.toolmanage.ToolManageForm" />
+		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -705,6 +706,9 @@
 			<forward name="search" path="/jsp/toolmanage/toolManageSearch.jsp" />
 			<forward name="detail" path="/jsp/toolmanage/toolManage.jsp" />
 			<forward name="report" path="/jsp/toolmanage/toolManageReport.jsp" />
+		</action>
+		<action name="jojoForm" path="/jsp/jojoAction" parameter="do" scope="session" type="com.isecinc.pens.web.jojo.JojoAction">
+			<forward name="search" path="/jsp/jojo/jojo.jsp" />
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

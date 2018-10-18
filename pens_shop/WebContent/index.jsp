@@ -32,6 +32,8 @@ body {
 }
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+
 <script type="text/javascript">
 function gologin(e){
 	if(e == null || (e != null && e.keyCode == 13)){

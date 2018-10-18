@@ -37,9 +37,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 		int i =0;
 		List<InvoiceDetailReport> pos = new ArrayList<InvoiceDetailReport>();
 		List<OrderLine> orderLines = new ArrayList<OrderLine>();
-
 		try {
-			
 			String p_productCodeFrom = t.getProductCodeFrom();
 			String p_productCodeTo = t.getProductCodeTo();
 			
@@ -194,8 +192,10 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 		List<OrderLine> pos = new ArrayList<OrderLine>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			sql.delete(0, sql.length());
-			sql.append("\n  SELECT l.* ,h.doc_status as status,h.order_no,h.order_date,m.name as customer_name ,m.code as customer_code from t_order h,t_order_line l,m_customer m ,m_product pd ");
+			sql.append("\n  SELECT l.* ,h.doc_status as status,h.order_no,h.order_date"
+					+ ",h.customer_bill_name as customer_name "
+					+ ",h.customer_bill_name as customer_code "
+					+ "from t_order h,t_order_line l,m_customer m ,m_product pd ");
 			sql.append("\n  where h.order_id = l.order_id  ");
 			sql.append("\n  and h.customer_id = m.customer_id ");
 			sql.append("\n  and pd.product_id = l.product_id ");

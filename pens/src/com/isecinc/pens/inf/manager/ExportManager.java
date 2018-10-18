@@ -2,9 +2,11 @@ package com.isecinc.pens.inf.manager;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,6 +76,7 @@ public class ExportManager {
 		String fileSize = "0 bytes";
 		int statusTaskAll = Constants.STATUS_SUCCESS;
 		FTPManager ftpManager = null;
+		List<String> sqlUpdateExportFlagList = new ArrayList<String>();
 		try{
 			//initial FTP Manager
 			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
@@ -391,17 +394,23 @@ public class ExportManager {
 					dao.insertMonitorItemDetail(connMonitor, modelDetailItem);
 				}
 				
-				/** Update Exported  Flag  ********/
+				/** ADD Update Exported  Flag  ********/
 				if(tableBean.getSqlUpdateExportFlagList() != null &&  tableBean.getSqlUpdateExportFlagList().size() > 0){
-					logger.debug("***** -Start Update Interfaces "+tableBean.getTableName()+" Flag *************");
-				    int updateRecord = exProcess.updateExportFlag(conn, userRequest,tableBean);
-				    logger.debug("***** -Result Update Interfaces "+tableBean.getTableName()+"  Flag "+updateRecord+" *************");
+					sqlUpdateExportFlagList.addAll(tableBean.getSqlUpdateExportFlagList());
 				}
+				
 				isExc = true;
 			}//for
 			
 			logger.info("Step Upload ALL File To FTP Server");
 			ftpManager.uploadAllFileToFTP(userLogin,initConfigMap, "");
+			
+			/** Update Exported  Flag  ********/
+			if(sqlUpdateExportFlagList != null &&  sqlUpdateExportFlagList.size() > 0){
+				logger.debug("***** -Start  Update Exported=Y  Flag ALL TABLE*************");
+			    int updateRecord = exProcess.updateExportFlag(conn, userRequest,sqlUpdateExportFlagList);
+			    logger.debug("***** -Result Update Exported=Y  Flag ALL TABLE TotalRec:"+updateRecord+" *************");
+			}
 			
 			logger.info("Step Success Transaction Commit");
 			conn.commit();

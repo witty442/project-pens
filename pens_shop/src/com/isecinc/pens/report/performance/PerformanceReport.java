@@ -33,7 +33,8 @@ public class PerformanceReport implements Serializable {
 	private String chequeNo;
 	private String status;
 	private String airpayNo;
-
+	private String creditCardNo;
+	
 	/** For sum all start month to date selected. **/
 	private double allDiscount;
 	private double allNetAmount;
@@ -47,6 +48,14 @@ public class PerformanceReport implements Serializable {
 	private double allAirpayAmount;
 	
 	
+	public String getCreditCardNo() {
+		return creditCardNo;
+	}
+
+	public void setCreditCardNo(String creditCardNo) {
+		this.creditCardNo = creditCardNo;
+	}
+
 	public double getAllAirpayAmount() {
 		return allAirpayAmount;
 	}

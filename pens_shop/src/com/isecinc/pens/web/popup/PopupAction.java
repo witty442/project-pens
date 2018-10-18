@@ -120,13 +120,16 @@ public class PopupAction extends I_Action {
 				//For Stock
 				 results = PopupDAO.searchItemBarcodeList(popupForm);
 			}
-			 if(results != null && results.size() >0){
-				 request.getSession().setAttribute("DATA_LIST", results);
-			 }else{
-				 request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
-			 }
-			 //mark flag serch
-			 request.getSession().setAttribute("search_submit", "search");
+		    logger.debug("results.size():"+results.size());
+		    
+			if(results != null && results.size() >0){
+				request.getSession().setAttribute("DATA_LIST", results);
+			}else{
+				request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
+			}
+			
+			//mark flag serch
+			request.getSession().setAttribute("search_submit", "search");
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

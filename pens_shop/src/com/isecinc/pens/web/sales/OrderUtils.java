@@ -3,6 +3,10 @@ package com.isecinc.pens.web.sales;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -20,6 +24,17 @@ public class OrderUtils {
 	public static void mian(String[] a){
 		
 	}
+	public static List<References> getCreditcardYearExpireList(){
+		List<References> list =new ArrayList<References>();
+		Calendar c = Calendar.getInstance(Locale.US);
+		list.add(new References(c.get(Calendar.YEAR)+"", c.get(Calendar.YEAR)+""));
+		for(int i=0;i<=19;i++){
+			c.add(Calendar.YEAR, 1);
+			list.add(new References(c.get(Calendar.YEAR)+"", c.get(Calendar.YEAR)+""));
+		}
+		return list;
+	}
+	
 	public static boolean canSaveCreditVan(Connection conn,User user,int customerId){
 		if(ControlCode.canExecuteMethod("OrderUtils", "canSaveCreditVan")){
 		   return canSaveCreditVanModel(conn, user, customerId);

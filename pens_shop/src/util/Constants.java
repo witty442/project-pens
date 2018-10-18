@@ -19,4 +19,7 @@ public class Constants {
 	// DOC_STATUS THAI
 	public static final String DOC_STATUS_SV_MSG ="\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01";
 	public static final String DOC_STATUS_VO_MSG = "\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01";
+	
+	public static final String PAYMT_CASH = "CS";
+	public static final String PAYMT_CREDITCARD = "CR";
 }

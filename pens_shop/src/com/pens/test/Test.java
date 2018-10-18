@@ -4,12 +4,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Test {
+import org.apache.log4j.Logger;
 
+import com.isecinc.pens.inf.helper.Utils;
+
+public class Test {
+	public static Logger logger = Logger.getLogger("PENS");
+	public static void main(String[] args) {
+		try{
+		logger.debug("order.getCreated():"+"17/10/2561 14:22");
+		Date createDateTemp = Utils.parse("17/10/2561 14:22", Utils.DD_MM_YYYY_HH_mm_WITH_SLASH,Utils.local_th);
+		logger.debug("createDateTemp:"+createDateTemp);
+		String createDateChrist = Utils.stringValue(createDateTemp, Utils.DD_MM_YYYY_HH_mm_WITH_SLASH);
+		logger.debug("createDateChrist:"+createDateChrist);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main_1(String[] args) {
 		// TODO Auto-generated method stub
 		/*SimpleDateFormat df = new SimpleDateFormat("yyyyMM", Locale.US);
 		String today = df.format(new Date());

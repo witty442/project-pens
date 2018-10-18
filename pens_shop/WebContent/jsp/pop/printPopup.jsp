@@ -101,7 +101,7 @@ function loadMe(_path){
   }else{ 
        if(Utils.isNull(msg).equals("")){
 %>
-         setTimeout(function(){window.close();},20000);
+         setTimeout(function(){window.close();},5000);
 <%  
        } 
      }

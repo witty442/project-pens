@@ -105,6 +105,12 @@ public class Order extends I_PO implements Serializable {
 		setCreditCardType(Utils.isNull(rst.getString("credit_card_type")));
 		setCreditCardNo(Utils.isNull(rst.getString("credit_card_no")));
 		setCreditCardExpireDate(Utils.isNull(rst.getString("credit_card_expire_date")));
+		//for show in screen
+		if( !Utils.isNull(getCreditCardExpireDate()).equals("")){
+			String temp = Utils.isNull(getCreditCardExpireDate());
+			setCreditcardMonthExpire(temp.substring(0,2));
+			setCreditcardYearExpire(temp.substring(3,7));
+		}
 		
 		//Get Customer bill info
 		setCustomerBillName(Utils.isNull(rst.getString("customer_bill_name")));
@@ -278,7 +284,26 @@ public class Order extends I_PO implements Serializable {
 	private String addressDesc;
 	private String idNo;
 	private String passportNo;
-    
+	private String creditcardMonthExpire;
+	private String creditcardYearExpire;
+	
+	
+	public String getCreditcardMonthExpire() {
+		return creditcardMonthExpire;
+	}
+
+	public void setCreditcardMonthExpire(String creditcardMonthExpire) {
+		this.creditcardMonthExpire = creditcardMonthExpire;
+	}
+
+	public String getCreditcardYearExpire() {
+		return creditcardYearExpire;
+	}
+
+	public void setCreditcardYearExpire(String creditcardYearExpire) {
+		this.creditcardYearExpire = creditcardYearExpire;
+	}
+
 	public String getCreditCardType() {
 		return creditCardType;
 	}

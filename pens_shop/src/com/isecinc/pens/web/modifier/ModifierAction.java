@@ -87,6 +87,7 @@ public class ModifierAction extends I_Action {
 
 			whereCause += " Order by modifier_id desc ";
 
+			logger.debug("whereCause:"+whereCause);
 			Modifier[] results = new MModifier().search(whereCause);
 			modifierForm.setResults(results);
 

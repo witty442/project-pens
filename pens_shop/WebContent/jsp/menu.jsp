@@ -8,29 +8,34 @@
 <%
 String role = ((User)session.getAttribute("user")).getType();
 User user = (User)session.getAttribute("user");
+int no = 0;
+int subNo = 0;
 %>
 
 <ul id="nav">
-	<li><a  href="javascript: void(0)" class="parent"><bean:message key="HomeMenu" bundle="sysprop"/></a>
+	<li><a  href="javascript: void(0)" class="parent"><%no=0; %><font size="3"><bean:message key="HomeMenu" bundle="sysprop"/></font></a>
 		<ul>
-			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/profile.do?id=<%=((User)session.getAttribute("user")).getId() %>';"><span><bean:message key="Profile" bundle="sysprop"/></span></a>
+			<li> 
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/profile.do?id=<%=((User)session.getAttribute("user")).getId() %>';">
+				<span>
+				   <font size="2"><%no++;out.print(no);%>.<bean:message key="Profile" bundle="sysprop"/></font>
+				</span></a>
+			   
 			</li>
 			<%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-           	<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/user.do';"><span><bean:message key="User" bundle="sysprop"/></span></a>
+           	<li> 
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/user.do';">
+				<span><font size="2"><%no++;out.print(no);%>.<bean:message key="User" bundle="sysprop"/></font></span></a>
 			</li>
 			<%} %>
-            <%if(role.equalsIgnoreCase(User.ADMIN)||role.equalsIgnoreCase(User.DD)){ %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/sysconfig.do';"><span><bean:message key="SystemConf" bundle="sysprop"/></span></a>
+            <li> 
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/docseq.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="DocumentSeq" bundle="sysprop"/></font></span></a>
             </li>
-            <%} %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/docseq.do';"><span><bean:message key="DocumentSeq" bundle="sysprop"/></span></a>
-            </li>
-           <li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
+           <li> 
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do?do=prepare';">
+				<span><font size="2"><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/> </font></span></a>
+			  
 			</li>
           <%--   <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salestargetnew.do';"><span><bean:message key="SalesTarget" bundle="sysprop"/></span></a>
@@ -38,29 +43,26 @@ User user = (User)session.getAttribute("user");
             
 		</ul>
 	</li>
-	<!-- WIT Edit :04/08/2554 -->
-	<%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-       <li>
-          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/customer.do';"><span><bean:message key="Customer" bundle="sysprop"/></span>
-          </a>
-       </li>
-     <%} %>
-            
-    <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
-    <li><a  href="javascript: void(0)" class="parent"><bean:message key="MasterData" bundle="sysprop"/></a>
+
+    <%if(!role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
+    <li><a  href="javascript: void(0)" class="parent"><font size="3"><bean:message key="MasterData" bundle="sysprop"/></font></a>
         <ul>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product.do';"><span><bean:message key="Product" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="Product" bundle="sysprop"/></font></span></a>
             </li>
            	<li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pricelist.do';"><span><bean:message key="PriceList" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pricelist.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="PriceList" bundle="sysprop"/></font></span></a>
             </li>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/modifier.do';"><span><bean:message key="Promotion" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/modifier.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="Promotion" bundle="sysprop"/></font></span></a>
             </li>
              <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product/productC4.jsp';"><span><bean:message key="ProductC4" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product/productC4.jsp';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="ProductC4" bundle="sysprop"/></font></span></a>
             </li>
             <%} %>
         </ul>
@@ -68,43 +70,50 @@ User user = (User)session.getAttribute("user");
     <%} %>
     <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
        <%if(!role.equalsIgnoreCase(User.DD)){ %>
-         <li><div 
-            onclick="window.location='${pageContext.request.contextPath}/jsp/saleOrderAction.do?do=prepare&action=add'">
-           <bean:message key="SalesOrder" bundle="sysprop"/>
-         </div>
-         </li>
-         
          <li>
-               <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/saleOrderAction.do?do=search&action=new'">
-                    <bean:message key="SalesOrderSearch" bundle="sysprop"/>
-               </a>
-          </li>
+            <div 
+            onclick="window.location='${pageContext.request.contextPath}/jsp/saleOrderAction.do?do=prepare&action=add'">
+              <font size="3"><bean:message key="SalesOrder" bundle="sysprop"/></font>
+            </div>
+         </li>
+         <li>
+              <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/saleOrderAction.do?do=search&action=new'">
+                 <font size="3"><bean:message key="SalesOrderSearch" bundle="sysprop"/></font>
+             </a>
+         </li>
       <%} %>
     <%} %>
 
-    <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
-    <li><a  href="javascript: void(0)" class="parent"><bean:message key="Reports" bundle="sysprop"/></a>
+    <%if(!role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
+    <li><a  href="javascript: void(0)" class="parent"><font size="3"><bean:message key="Reports" bundle="sysprop"/></font></a>
     	<ul>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';"><span><bean:message key="InvoiceDetailReport" bundle="sysprop"/></span></a>
-            </li>
-    		<%-- <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/performanceReport.do';"><span><bean:message key="PerformanceReport" bundle="sysprop"/></span></a>
-            </li> --%>
             <li> 
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentNewReport.do';"><span><bean:message key="ReceiptReport" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="InvoiceDetailReport" bundle="sysprop"/></font></span></a>
+            </li>
+    		 <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/performanceReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="PerformanceReport" bundle="sysprop"/></font></span></a>
+            </li> 
+            <li> 
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentNewReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="ReceiptReport" bundle="sysprop"/></font></span></a>
             </li>
              <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/cancelDetailReport.do';"><span><bean:message key="CancelDetailReport" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/cancelDetailReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="CancelDetailReport" bundle="sysprop"/></font></span></a>
             </li>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';"><span><bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></font></span></a>
             </li>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/detailedSalesReport.do';"><span><bean:message key="DetailedSalesReport" bundle="sysprop"/></span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/detailedSalesReport.do';">
+            	<span><font size="2"><%no++;out.print(no);%>.<bean:message key="DetailedSalesReport" bundle="sysprop"/></font></span></a>
             </li>
             <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span>รายงานการขาย By Item</span></a>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';">
+            	<span><font size="2"><%no++;out.print(no);%>.รายงานการขาย By Item</font></span></a>
             </li>
             
         	<%-- <li>
@@ -115,17 +124,17 @@ User user = (User)session.getAttribute("user");
     </li>
     <%} %>
    
-    <li class="parent"><a  href="javascript: void(0)" class="parent"><bean:message key="Interfaces" bundle="sysprop"/></a>
+   <%no=0; %>
+    <li class="parent"><a  href="javascript: void(0)" class="parent"><font size="3"><bean:message key="Interfaces" bundle="sysprop"/></font></a>
    		<ul>
            	<li>
-           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';"><span><bean:message key="Interfaces" bundle="sysprop"/></span></a>
+           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare';">
+           		<span><font size="2"><%no++;out.print(no);%>.<bean:message key="Interfaces" bundle="sysprop"/></font></span></a>
            	</li>
           	<li>
-           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/monitorInterfacesAction.do?do=prepare';"><span><bean:message key="MonitorInterfaces" bundle="sysprop"/></span></a>
+           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/monitorInterfacesAction.do?do=prepare';">
+           		<span><font size="2"><%no++;out.print(no);%>.<bean:message key="MonitorInterfaces" bundle="sysprop"/></font></span></a>
            	</li>
-           <%-- 	<li>
-           		<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manualUpdateAddressAction.do?do=prepare';"><span><bean:message key="ManualUpdateAddress" bundle="sysprop"/></span></a>
-           	</li> --%>
        </ul>
     </li>
    

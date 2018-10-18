@@ -332,7 +332,6 @@ function stampPrint(){
 										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
 										<th>¿“…’</th>
 										<th><bean:message key="Promotion" bundle="sysele"/></th>
-                                        <th>‚ª√‚¡™—Ëπ(·∂¡æ‘‡»…)</th>
 									</tr>
 									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -412,12 +411,6 @@ function stampPrint(){
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:if>
 										</td>
-										<td align="center">
-											<c:if test="${lines1.isPromotionSpecial=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
-										</td>
-										
 									</tr>
 									</c:forEach>
 								</table>
@@ -576,7 +569,6 @@ function stampPrint(){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported"/>
 						<html:hidden property="order.isCash"/>
-						<html:hidden property="order.isPromotionSpecial"/>
 						
 						<!--  Can Receipt Credit (VAN)-->
 						<html:hidden property="receiptCreditFlag"/>

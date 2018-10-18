@@ -50,7 +50,7 @@ public class MOrder extends I_Model<Order> {
 			"PAYMENT_METHOD", "SHIPPING_DAY", "SHIPPING_TIME", "TOTAL_AMOUNT", "VAT_AMOUNT", "NET_AMOUNT",
 			"INTERFACES", "PAYMENT", "SALES_ORDER_NO", "AR_INVOICE_NO", "USER_ID", "DOC_STATUS", "CREATED_BY",
 			"UPDATED_BY", "ISCASH", "ORDER_TIME", "REMARK", "CALL_BEFORE_SEND","ORA_BILL_ADDRESS_ID"
-			,"ORA_SHIP_ADDRESS_ID","org","PO_NUMBER","TOTAL_AMOUNT_NON_VAT","VAN_PAYMENT_METHOD","IS_PROMOTION_SPECIAL"};
+			,"ORA_SHIP_ADDRESS_ID","org","PO_NUMBER","TOTAL_AMOUNT_NON_VAT","VAN_PAYMENT_METHOD"};
 
 	/**
 	 * Find
@@ -116,6 +116,100 @@ public class MOrder extends I_Model<Order> {
 		return array;
 	}
 
+	public Order[] searchOpt(String whereCause) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		List<Order> pos = new ArrayList<Order>();
+		Order o = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			String sql ="\n select o.*"
+					  + "\n ,(select count(*) from t_order_line l "
+					  + "\n where l.order_id = o.order_id and l.promotion ='S') as promotion_s_count"
+					  + "\n from t_order o where 1=1 \n"+whereCause ;
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				o = new Order();
+				o.setId(rst.getInt("ORDER_ID"));
+				o.setOrderNo(rst.getString("ORDER_NO"));
+				o.setOrderDate(DateToolsUtil.convertToString(rst.getTimestamp("ORDER_DATE")));
+				o.setOrderTime(rst.getString("ORDER_TIME"));
+				o.setOrderType(rst.getString("ORDER_TYPE").trim());
+				o.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				o.setCustomerName(rst.getString("CUSTOMER_NAME").trim());
+				o.setBillAddressId(rst.getInt("BILL_ADDRESS_ID"));
+				o.setShipAddressId(rst.getInt("SHIP_ADDRESS_ID"));
+				o.setPriceListId(rst.getInt("PRICELIST_ID"));
+				o.setPaymentTerm(rst.getString("PAYMENT_TERM").trim());
+				o.setVatCode(rst.getString("VAT_CODE").trim());
+				o.setVatRate(rst.getDouble("VAT_RATE"));
+				o.setPaymentMethod(rst.getString("PAYMENT_METHOD").trim());
+				o.setShippingDay(ConvertNullUtil.convertToString(rst.getString("SHIPPING_DAY")).trim());
+				o.setShippingTime(ConvertNullUtil.convertToString(rst.getString("SHIPPING_TIME")).trim());
+				o.setTotalAmount(rst.getDouble("TOTAL_AMOUNT"));
+				o.setTotalAmountNonVat(rst.getDouble("TOTAL_AMOUNT_NON_VAT"));
+				o.setVatAmount(rst.getDouble("VAT_AMOUNT"));
+				o.setNetAmount(rst.getDouble("NET_AMOUNT"));
+				o.setInterfaces(rst.getString("INTERFACES").trim());
+				o.setPayment(rst.getString("PAYMENT").trim());
+				o.setSalesOrderNo(ConvertNullUtil.convertToString(rst.getString("SALES_ORDER_NO")).trim());
+				o.setArInvoiceNo(ConvertNullUtil.convertToString(rst.getString("AR_INVOICE_NO")).trim());
+				o.setSalesRepresent(new MUser().find(rst.getString("USER_ID")));
+				o.setDocStatus(rst.getString("DOC_STATUS").trim());
+				o.setCreated(DateToolsUtil.convertFromTimestamp(rst.getTimestamp("CREATED")));
+				o.setExported(rst.getString("EXPORTED"));
+				o.setIsCash(rst.getString("ISCASH"));
+				o.setRemark(ConvertNullUtil.convertToString(rst.getString("remark")).trim());
+				o.setCallBeforeSend(rst.getString("CALL_BEFORE_SEND"));
+				// set display
+				o.setDisplayLabel();
+				
+				//wit 20110804
+				o.setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD").trim()))?true:false);
+				
+				// Add Oracle Reference Address ID
+				o.setOraBillAddressID(rst.getInt("ORA_BILL_ADDRESS_ID"));
+				o.setOraShipAddressID(rst.getInt("ORA_SHIP_ADDRESS_ID"));
+				
+				//Wit Edit 15/05/2012
+				o.setOrg(rst.getString("org"));
+				if( !"".equals(ConvertNullUtil.convertToString(o.getOrg()))){
+					o.setPlaceOfBilled(new MOrgRule().getOrgRule(o.getOrg()).getName());
+				}
+				//System.out.println("print_datetime_pick:"+rst.getBigDecimal("print_datetime_pick"));
+				//System.out.println("print_datetime_rcp:"+rst.getBigDecimal("print_datetime_rcp"));
+				
+				o.setPrintDateTimePick(Utils.stringValueSpecial2(rst.getLong("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+				o.setPrintCountPick(rst.getInt("print_count_pick"));
+				
+				o.setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+				o.setPrintCountRcp(rst.getInt("print_count_rcp"));
+				
+				o.setPoNumber(Utils.isNull(rst.getString("po_number")));
+				o.setVanPaymentMethod(Utils.isNull(rst.getString("van_payment_method")));
+				
+				//Case found special promotion
+				if(rst.getInt("promotion_s_count") >0){
+					o.setPromotionSP(true);
+				}
+				pos.add(o);
+			}
+			Order[] array = new Order[pos.size()];
+			array = pos.toArray(array);
+			return array;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+	}
 	/**
 	 * Save
 	 * 
@@ -166,8 +260,7 @@ public class MOrder extends I_Model<Order> {
 				order.getOrg(),
 				order.getPoNumber(),
 				order.getTotalAmountNonVat(),
-				ConvertNullUtil.convertToString(order.getVanPaymentMethod()),
-				Utils.isNull(order.getIsPromotionSpecial()).equals("")?"N":Utils.isNull(order.getIsPromotionSpecial()).equals("")
+				ConvertNullUtil.convertToString(order.getVanPaymentMethod())
 				};
 		if (super.save(TABLE_NAME, columns, values, order.getId(), conn)) {
 			order.setId(id);

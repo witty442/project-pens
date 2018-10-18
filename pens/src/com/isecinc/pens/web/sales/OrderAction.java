@@ -1212,7 +1212,7 @@ public class OrderAction extends I_Action {
 			whereCause += " AND USER_ID = " + user.getId();
 
 			whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC ";
-			Order[] results = new MOrder().search(whereCause);
+			Order[] results = new MOrder().searchOpt(whereCause);
 
 			// results = fillLinesShow(results);
 			if(results != null)

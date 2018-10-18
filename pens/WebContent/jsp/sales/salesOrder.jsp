@@ -35,7 +35,10 @@ String today = sdf.format(new Date());
 //wit edit 29/07/2554   Case VanSales shippingDate = requestDate
 Calendar cld = Calendar.getInstance();
 if( !"VAN".equals(user.getType()) ){
-   cld.add(Calendar.DAY_OF_MONTH,3); // +3 Day
+  // cld.add(Calendar.DAY_OF_MONTH,3); // +3 Day
+  
+  //wit edit 04/09/2561
+  cld.add(Calendar.DAY_OF_MONTH,2); // +2 Day
 }
 
 String reqDate = new SimpleDateFormat("dd/MM/yyyy",new Locale("th","TH")).format(cld.getTime());

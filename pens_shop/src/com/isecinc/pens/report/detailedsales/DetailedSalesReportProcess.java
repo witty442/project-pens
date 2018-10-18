@@ -8,10 +8,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import util.Constants;
 import util.DateToolsUtil;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 
 /**
  * Detailed Sales Report
@@ -38,12 +40,11 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 		try {
 			sql.delete(0, sql.length());
 			
-			// Aneak.t 21/01/2011
+			// Witty 21/01/2018
 			sql.append("\n SELECT t.* FROM ( ");
-			sql.append("\n SELECT o.ORDER_DATE, o.ORDER_NO, c.NAME, c.NAME2, o.IsCash , ");
+			sql.append("\n SELECT o.ORDER_DATE, o.ORDER_NO, o.customer_bill_name as NAME, c.NAME2, o.IsCash , ");
 			sql.append("\n SUM(o.NET_AMOUNT) AS NET_AMOUNT, ");
-			sql.append("\n o.PAYMENT, o.INTERFACES, o.EXPORTED, o.DOC_STATUS, ");
-			sql.append("\n IF(o.ISCASH ='Y',null,(SELECT distinct rh.ISPDPAID FROM T_RECEIPT rh , T_RECEIPT_LINE rl WHERE rh.RECEIPT_ID = rl.RECEIPT_ID AND rl.ORDER_ID = o.ORDER_ID )) as ISPDPAID ");
+			sql.append("\n o.PAYMENT, o.INTERFACES, o.EXPORTED, o.DOC_STATUS,O.payment_method ");
 			sql.append("\n FROM t_order o ");
 			sql.append("\n LEFT JOIN m_customer c ON o.CUSTOMER_ID = c.CUSTOMER_ID ");
 			sql.append("\n WHERE c.CUSTOMER_TYPE = 'CV' ");
@@ -52,9 +53,11 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 			sql.append("\n AND o.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
 			sql.append("\n AND o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "' ");
 			
-			if(!StringUtils.isEmpty(t.getOrderType()))
-				sql.append("\n AND o.IsCash = '"+t.getOrderType()+"' ");
-			
+			if( Utils.isNull(t.getOrderType()).equals(Constants.PAYMT_CASH)){
+				sql.append("\n AND o.payment_method = '"+Constants.PAYMT_CASH+"' ");
+			}else if( Utils.isNull(t.getOrderType()).equals(Constants.PAYMT_CREDITCARD)){
+				sql.append("\n AND o.payment_method = '"+Constants.PAYMT_CREDITCARD+"' ");
+			}
 			//Aneak.t 21/01/2011
 			sql.append("\n GROUP BY o.ORDER_NO ");
 			
@@ -74,8 +77,7 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 			}
 			
 			sql.append(") t ");
-			if(!StringUtils.isEmpty(t.getPdPaid()))
-				sql.append("\n WHERE t.ISPDPAID = '"+t.getPdPaid()+"' ");
+		
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
@@ -88,14 +90,15 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 				detailedSales.setOrderDate(DateToolsUtil.convertToString(rs.getTimestamp("ORDER_DATE")));
 				detailedSales.setOrderNo(rs.getString("ORDER_NO"));
 				detailedSales.setName(rs.getString("NAME"));
-				detailedSales.setName2(rs.getString("NAME2"));
+				detailedSales.setName2("");
 				detailedSales.setTotalAmount(rs.getDouble("NET_AMOUNT"));
 				detailedSales.setPayment(rs.getString("PAYMENT"));
 				detailedSales.setInterfaces(rs.getString("INTERFACES"));
 				detailedSales.setExported(rs.getString("EXPORTED"));
 				detailedSales.setDocStatus(rs.getString("DOC_STATUS"));
 				detailedSales.setIsCash(rs.getString("IsCash"));
-				detailedSales.setIsPDPaid(rs.getString("IsPDPaid"));
+				detailedSales.setPaymentMethod(rs.getString("payment_method"));
+				//detailedSales.setIsPDPaid(rs.getString("IsPDPaid"));
 				
 				lstData.add(detailedSales);
 			}

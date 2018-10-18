@@ -111,74 +111,7 @@ public class ExportSQL {
         return sql;
 	}
 	
-	/**
-	 * 
-	 * @param tableBean
-	 * @param userBean
-	 * @return
-	 * @throws Exception
-	 * 
-	 * H export =Y   and L   need_export ='Y' and exported ='N' ->one record
-	 */
-	public  static String genSqlOrderCaseUserTypeDD(TableBean tableBean,User userBean) throws Exception{
-		
-		String str = ""+
-		"SELECT * FROM ( \n"+
-		/** Case1 Export Order Normal  H -Exported =N  ,D need_export ='Y' ,exported ='N' **/
-		"	select 	h.order_id,			\n"+
-		"	h.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
-		"	h.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
-		"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
-		"	m.NAME	AS	CUSTOMER_NAME ,		\n"+
-		"	h.NET_AMOUNT	AS	NET_AMOUNT		\n"+
-		"	FROM t_order h ,m_customer m	\n"+
-		"	where h.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
-		"   and  m.user_id = "+userBean.getId()+" \n"+
-		"   and  h.DOC_STATUS = 'SV' \n"+
-		"   and  h.EXPORTED  = 'N'  \n"+
-		"   and  h.order_id in " +
-		"       ( \n"+  /** Check on line is Exported ='N' */
-		"          select distinct h.order_id	 \n"+
-		"          FROM t_order h ,t_order_line l,m_customer m	 \n"+
-		"          where h.CUSTOMER_ID = m.CUSTOMER_ID	 \n"+
-		"          and h.order_id = l.order_id \n"+
-		"          and m.user_id = "+userBean.getId()+" \n"+
-		"          and h.DOC_STATUS = 'SV'  \n"+
-		"          and h.EXPORTED  = 'N'  \n"+
-		"          and l.need_export ='Y' \n"+
-		"          and l.exported ='N' \n"+
-		"       ) \n"+
-		"   UNION  \n"+
-		
-		/** Case2 Export Order Line  H = Y , D = need_export = Y ,exported =N **/
-		
-		"	select 	h.order_id,			\n"+
-		"	h.ORDER_NO	AS	ORDER_NUMBER  	,	\n"+
-		"	h.ORDER_TYPE 	AS	ORDER_TYPE 	,	\n"+
-		"	m.CODE	AS	CUSTOMER_NUMBER	,	\n"+
-		"	m.NAME	AS	CUSTOMER_NAME ,		\n"+
-		"	h.NET_AMOUNT	AS	NET_AMOUNT		\n"+
-		"	FROM t_order h ,m_customer m	\n"+
-		"	where h.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
-		"   and  m.user_id = "+userBean.getId()+" \n"+
-		"   and  h.DOC_STATUS = 'SV' \n"+
-		"   and  h.EXPORTED  = 'Y'  \n"+
-		"   and  h.order_id in " +
-		"       ( \n"+  /** Check on line is Exported ='N' */
-		"          select distinct h.order_id	 \n"+
-		"          FROM t_order h ,t_order_line l,m_customer m	 \n"+
-		"          where h.CUSTOMER_ID = m.CUSTOMER_ID	 \n"+
-		"          and h.order_id = l.order_id \n"+
-		"          and m.user_id = "+userBean.getId()+" \n"+
-		"          and h.DOC_STATUS = 'SV'  \n"+
-		"          and h.EXPORTED  = 'Y'  \n"+
-		"          and l.need_export ='Y' \n"+
-		"          and l.exported ='N' \n"+
-		"       ) \n"+
-		
-		"  )A ORDER BY A.ORDER_NUMBER \n";
-		return str;
-	}
+	
 	
 	/** 
 	 * genSqlCountCaseReceiptLockBoxPayment
@@ -245,7 +178,7 @@ public class ExportSQL {
 		"		t_order.PAYMENT_METHOD,	\n"+
 		"		''	AS	BANK,	\n"+
 		"		t_order.CREDIT_CARD_NO,	\n"+
-		"		t_order.CREDIT_CARD_EXPIRE_DATE,	\n"+
+		"		t_order.CREDIT_CARD_EXPIRE_DATE ,	\n"+
 		"		t_order.CREDIT_CARD_TYPE,	\n"+
 	
 		"		t_receipt.description	AS	DESCRIPTION,\n"+

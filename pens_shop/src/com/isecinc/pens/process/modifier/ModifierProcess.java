@@ -269,6 +269,12 @@ public class ModifierProcess {
 			// ITEM CATEGORY MODIFIER
 			stmt = conn.createStatement();
 			logger.debug("Item Category Modifier..");
+			/*logger.debug("BeanParameter.getModifierItemCategory():"+BeanParameter.getModifierItemCategory());
+			logger.debug("productCode:"+product.getCode());
+			logger.debug("productCategoryId:"+String.valueOf(product.getProductCategory()
+					.getId()));
+			logger.debug("product.getId():"+product.getId());*/
+			
 			sql = createSQL(BeanParameter.getModifierItemCategory(), String.valueOf(product.getProductCategory()
 					.getId()), product.getId(), "", "", user);
 			rst = stmt.executeQuery(sql);
@@ -799,6 +805,8 @@ public class ModifierProcess {
 					// PERCENT
 					for (OrderLine line : useLines) {
 						discount = line.getLineAmount() * promoLine.getValues() / 100;
+						//logger.info("line.getLineAmount():"+line.getLineAmount());
+						//logger.info("promoLine.getValues():"+promoLine.getValues());
 						if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
 						if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
 					
@@ -1248,21 +1256,26 @@ public class ModifierProcess {
 					+ levelType + "' and isactive = 'Y' ) \r\n";
 
 		// join order qualifier
-		sql += "  and a.modifier_id IN (\r\n";
-		sql += " select modifier_id from m_qualifier \r\n";
-		sql += " where operator = '=' \r\n";
-		sql += "   and isexclude = 'N' \r\n";
-		sql += "   and isactive = 'Y' \r\n";
-		sql += "   and QUALIFIER_CONTEXT = '" + BeanParameter.getQualifierContext() + "' \r\n";
-		sql += "   and qualifier_type = '" + BeanParameter.getQualifierType() + "' \r\n";
-		if (user.getType().equalsIgnoreCase(User.VAN))
-			sql += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' \r\n";
+		sql += " and a.modifier_id IN (\r\n";
+		sql += "  select modifier_id from m_qualifier \r\n";
+		sql += "  where operator = '=' \r\n";
+		sql += "    and isexclude = 'N' \r\n";
+		sql += "    and isactive = 'Y' \r\n";
+		sql += "    and QUALIFIER_CONTEXT = '" + BeanParameter.getQualifierContext() + "' \r\n";
+		sql += "    and qualifier_type = '" + BeanParameter.getQualifierType() + "' \r\n";
+		
+		if (user.getType().equalsIgnoreCase(User.VAN)){
+			sql += "    and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' \r\n";
+			logger.debug("Van QualifierValue:"+BeanParameter.getQualifierVAN());
+		}
+		
+		if (user.getType().equalsIgnoreCase(User.DD)){
+			sql += "    and QUALIFIER_VALUE = '" + BeanParameter.getQualifierDD() + "' \r\n";
+		}
 
-		if (user.getType().equalsIgnoreCase(User.DD))
-			sql += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierDD() + "' \r\n";
-
-		if (user.getType().equalsIgnoreCase(User.TT))
-			sql += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierTT() + "' \r\n";
+		if (user.getType().equalsIgnoreCase(User.TT)){
+			sql += "    and QUALIFIER_VALUE = '" + BeanParameter.getQualifierTT() + "' \r\n";
+		}
 
 		sql += ")\r\n";
 
@@ -1270,27 +1283,28 @@ public class ModifierProcess {
 		if (terriory.length() > 0) {
 
 			// in territory
-			sql += "  and (a.MODIFIER_LINE_ID IN (\r\n";
-			sql += "select MODIFIER_LINE_ID \r\n";
-			sql += "from m_qualifier \r\n";
-			sql += "where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
-			sql += "  and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
-			sql += "  and OPERATOR = '=' \r\n";
-			sql += "  and ISEXCLUDE = 'N' \r\n";
-			sql += "  and ISACTIVE = 'Y' \r\n";
-			sql += "  and QUALIFIER_VALUE = '" + territoryName + "' \r\n";
-			sql += ") \r\n";
+			sql += " and (a.MODIFIER_LINE_ID IN \r\n";
+			sql += "  ( select MODIFIER_LINE_ID \r\n";
+			sql += "   from m_qualifier \r\n";
+			sql += "   where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
+			sql += "   and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
+			sql += "   and OPERATOR = '=' \r\n";
+			sql += "   and ISEXCLUDE = 'N' \r\n";
+			sql += "   and ISACTIVE = 'Y' \r\n";
+			sql += "   and QUALIFIER_VALUE = '" + territoryName + "' \r\n";
+			sql += "  ) \r\n";
 
 			// no qualifier
-			sql += "  or a.MODIFIER_LINE_ID NOT IN (\r\n";
-			sql += "select MODIFIER_LINE_ID \r\n";
-			sql += "from m_qualifier \r\n";
-			sql += "where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
-			sql += "  and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
-			sql += "  and OPERATOR = '=' \r\n";
-			sql += "  and ISEXCLUDE = 'N' \r\n";
-			sql += "  and ISACTIVE = 'Y' \r\n";
-			sql += ")) \r\n";
+			sql += "  or a.MODIFIER_LINE_ID NOT IN \r\n";
+			sql += "  ( select MODIFIER_LINE_ID \r\n";
+			sql += "   from m_qualifier \r\n";
+			sql += "   where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
+			sql += "   and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
+			sql += "   and OPERATOR = '=' \r\n";
+			sql += "   and ISEXCLUDE = 'N' \r\n";
+			sql += "   and ISACTIVE = 'Y' \r\n";
+			sql += "  ) \r\n";
+			sql += " ) \r\n";
 		}
 
 		// exclude
@@ -1304,9 +1318,12 @@ public class ModifierProcess {
 			sql += "	) \r\n";
 		}
 		
+		//logger.debug("sql:"+sql);
 		return sql;
 	}
 
+	
+	
 	/**
 	 * Get Add Lines
 	 * 

@@ -155,10 +155,11 @@ public class MSummary {
 			StringBuilder sql = new StringBuilder();
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT  distinct h.order_date, pd.product_id,pd.code,pd.name from t_order h,t_order_line l,m_product pd ");
-				sql.append("\n  where h.order_id = l.order_id  ");
-				sql.append("\n  and h.doc_status ='SV' ");
-				sql.append("\n  and pd.product_id = l.product_id ");
+				sql.append("\n  SELECT  distinct h.order_date, pd.product_id,pd.code,pd.name \n"
+						+ " from t_order h,t_order_line l,m_product pd \n");
+				sql.append("\n  where h.order_id = l.order_id  \n");
+				sql.append("\n  and h.doc_status ='SV' \n");
+				sql.append("\n  and pd.product_id = l.product_id \n");
 
 				if( !Utils.isNull(c.getProductCodeFrom()).equals("")
 						&& !Utils.isNull(c.getProductCodeFrom()).equals("")){
@@ -166,11 +167,14 @@ public class MSummary {
 					sql.append(" and pd.code <='"+c.getProductCodeTo()+"' \n");
 				}
 				
-				  if( !Utils.isNull(c.getOrderDateFrom()).equals("")
+			   if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
 					sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 					sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				}else  if( !Utils.isNull(c.getOrderDateFrom()).equals("")
+						&&	Utils.isNull(c.getOrderDateTo()).equals("")	){
+					sql.append(" and h.order_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				  sql.append("\n  and h.user_id ="+user.getId());
 				
@@ -184,7 +188,7 @@ public class MSummary {
 				
 				while (rst.next()) {
 					Summary item = new Summary();
-					item.setOrderDate(Utils.format(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH));
+					item.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					item.setProductCode(rst.getString("code"));
 					item.setProductName(rst.getString("name"));
 					
@@ -311,7 +315,7 @@ public class MSummary {
 				if(!"".equals(orderDate))
 				  sql.append(" and h.order_date = str_to_date('"+orderDate+"','%d/%m/%Y') \n");
 			    sql.append(" and l.product_id ="+productId+" \n");
-			    sql.append(" and l.promotion = 'Y' \n");
+			    sql.append(" and l.promotion IN( 'Y','S') \n");
 			    sql.append(" and l.ISCANCEL='N' ");
 			    sql.append(" and h.user_id ="+user.getId());
 			    

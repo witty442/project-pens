@@ -88,6 +88,7 @@ if(request.getAttribute("do_not_save") != null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <style type="text/css">
@@ -110,7 +111,7 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrderSpecial.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/addProductSalesOrderSpecial.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrderProductSpecial.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
@@ -122,346 +123,6 @@ function loadMe(){
 	  alert("<%=request.getAttribute("Message")%>");
 	<%} %>
 }
-
-/******************************* Add Product *******************************************************/
-//clear cache
-$.ajaxSetup({cache: false});
-
-function openProductCategory(){
-	  // CAll AJAX PAGE
-	  loadProductCat(0);
-	  
-	  //lockscreen
-	  lockScreen();
-	  
-	   $(document).ready(function() {
-		 // event.preventDefault();
-	     $("#brand-dialog").dialog("open");	    
-	  }); 
-}
-
-var currPage = 0;
-function loadProductCat(page){
-	currPage = page;
-	var custId = document.getElementById("order.customerId").value;
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productCatQuery.jsp",
-			data : "pageId=" +page+"&custId="+custId,
-			async: false,
-			success: function(getData){
-				var htmlText = jQuery.trim(getData);
-				
-				//alert(htmlText);
-				document.getElementById('brand-dialog').innerHTML = htmlText;
-			}
-		}).responseText;
-	});
-}
-
-function loadProducts(brandCode){
-	var orderDate = document.getElementById("orderDate").value;
-	var pricelistId = document.getElementById("order.priceListId").value;
-	var custId = document.getElementById("order.customerId").value;
-	
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
-			data : "brandCode=" +brandCode+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
-			async: false,
-			success: function(getData){
-				var htmlText = jQuery.trim(getData);
-				document.getElementById('selectProduct').innerHTML = htmlText;
-			}
-		}).responseText;
-	});
-	
-	$(document).ready(function() {
-	    $("#selectProduct").dialog("open");
-	});
-}
-
-function loadProductsByBrand(brandCode){
-	//alert("brandCode:"+brandCode.value);
-	if(brandCode.value != ""){
-		var orderDate = document.getElementById("orderDate").value;
-		var pricelistId = document.getElementById("order.priceListId").value;
-		var custId = document.getElementById("order.customerId").value;
-		
-		$(function(){
-			var getData = $.ajax({
-				url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/productByBrand.jsp",
-				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
-				async: false,
-				success: function(getData){
-					var htmlText = jQuery.trim(getData);
-					document.getElementById('selectProduct').innerHTML = htmlText;
-				}
-			}).responseText;
-		});
-		
-		$(document).ready(function() {
-		    $("#selectProduct").dialog("open");
-		});
-	}
-}
-
-function lockScreen() {
-	$('#div_body').hide();
-	
-	 /*  $.blockUI({ 
-		overlayCSS: { backgroundColor: '#00f' },
-	    message: ''
-	});   */
-	  
-	 // disable_scroll();
-}
-
-function unlockScreen() {
-	// $.unblockUI({backgroundColor: '#00f' }); 
-	 //enable_scroll();
-	$('#div_body').show();
-}
-
-//set Cannot Dragg
-$.ui.dialog.prototype._makeDraggable = function() { 
-    this.uiDialog.draggable({
-        containment: true
-    });
-};
-
-function brandDialogClose(){
-	$('#brand-dialog').dialog("close"); 
-	unlockScreen();
-}
-
-function productDialogClose(){
-	$('#selectProduct').dialog("close"); 	
-	unlockScreen();
-}
-
-$(function(){
-	var screen_height= $(window).height();
-	var screen_width = $(window).width();
-	
-	//alert(screen.height+":"+screen.width);
-
-	    $('#brand-dialog').dialog({
-						autoOpen: false,
-						modal:true,
-						width: screen_width-10,
-						height:screen_height-20,
-						title:"เลือกกลุ่มสินค้า",
-						position:'center',
-						resizable: false,
-						dialogClass: 'brandDialog',
-						buttons: {
-							 "OK.":  function() { addProductToSalesOrder(); } , 
-							"Cancel.": 
-								function() { 
-								   $(this).dialog("close"); 
-								   unlockScreen();
-							     } 
-							}
-					});
-	    
-	   var btns = " <div align='center'>"
-	               +" <input onclick='addProductToSalesOrder()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
-		           +" <input onclick='brandDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
-	               +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-	               +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
-	    
-	    $(".brandDialog").children(".ui-dialog-titlebar").append(btns);
-
-    
-	  $('#selectProduct').dialog({
-			autoOpen: false,
-			width: screen_width-10,
-			height:screen_height-20,
-			modal:true,
-			resizable: false,
-			dialogClass: 'productDialog',
-			position:'fixed',
-			title:"กำหนดรายการสินค้าที่ต้องการ",
-			buttons: {
-				"OK.": function() {  addProductToBasket(); }, 
-				"Cancel.": function() { 
-					$(this).dialog("close");
-				}
-			}
-		});
-			
-	  var btns = " <div align='center'>"
-          +" <input onclick='addProductToBasket()' class ='newPosBtn' type='button' name='ok' value='           OK.           ' />"
-          +" <input onclick='productDialogClose()' class ='newPosBtn' type='button' name='ok' value='        Cancel.        ' />"
-          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-          +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>";
-
-      $(".productDialog").children(".ui-dialog-titlebar").append(btns);
-      
-      //error-dailog_message
-	    $('#error-dialog').dialog({
-						autoOpen: false,
-						modal:true,
-						width: 300,
-						height:80,
-						title:"Error Message",
-						position:'center',
-						resizable: false,
-						dialogClass: 'brandDialog',
-						buttons: {"ปิด.": 
-								function() { 
-								   $(this).dialog("close"); 
-								   unlockScreen();
-							     } 
-							}
-					});
-});
-
-function addProductToSalesOrder(){
-	//alert("addProductToSalesOrder!");
-	
-	unlockScreen();
-	
-	var data = '';
-	var custId = document.getElementById("order.customerId").value;
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/addProductToSO.jsp",
-			contentType: "application/json; charset=utf-8",
-			data : "custId=" +custId,
-			async: false,
-			success: function(getData){
-				data = jQuery.trim(getData);
-				//alert(data);
-			}
-		}).responseText;
-	});
-
-	var products = [];
-	products = eval(data);
-	//alert(products);
-	//alert(products.length);
-	//alert(products[0].taxable);
-	
-	//Load data from screen to product screen
-	
-	if(products != null){
-		for(var i=0; i < products.length ; i++){
-			//var p = new Object();
-			var product = new Object();
-			product.productId = products[i].productId;
-			product.product = products[i].productCode;
-	//		alert(products[i].productName);
-			product.productLabel = decodeURIComponent(escapeParameter(products[i].productName));
-			//alert(products[i].productName);
-			
-			product.uom1 = products[i].uom1;
-			product.uom2 = products[i].uom2;
-			product.uomLabel1 = products[i].uom1;
-			product.uomLabel2 = products[i].uom2;
-			product.price1 = 0;//products[i].price1;
-			product.price2 = 0;//products[i].price2;
-			
-			//alert(products[i].qty1);
-			
-			product.qty1 = products[i].qty1;
-			product.qty2 = products[i].qty2;
-			
-			product.amount1 = 0;//products[i].amount1;
-			product.amount2 = 0;//products[i].amount2;
-			product.disc1 = 0;
-			product.disc2 = 0;
-			product.total1 = products[i].amount1;
-			product.total2 = products[i].amount2;
-	
-			product.vat1 = "";
-			product.vat2 = "";
-			
-			product.ship = "<%=reqDate%>";
-			product.req = "<%=today%>";
-			product.id = "";
-			product.row = "";
-			
-			product.taxable = products[i].taxable;
-			
-			addProduct('${pageContext.request.contextPath}', product);
-		}
-	}
-	
-	$(document).ready(function() {
-	    $("#brand-dialog").dialog("close");
-	});
-}
-
-function addProductToBasket(){
-	//alert("addProductToBasket");
-	
-	var productIds = document.getElementsByName("productId");
-	var productNames = document.getElementsByName("productName");
-	var productCodes = document.getElementsByName("productCode");
-	var uom1s = document.getElementsByName("uom1");
-	var uom2s = document.getElementsByName("uom2");
-	var qty1s = document.getElementsByName("qty1");
-	var qty2s = document.getElementsByName("qty2");
-	var price1s = document.getElementsByName("price1");
-	var price2s = document.getElementsByName("price2");
-	var lineAmts = document.getElementsByName("totalLineAmt");
-	var custId = document.getElementById("order.customerId").value;
-	var taxables = document.getElementsByName("taxable");
-	
-	var categoryCode = document.getElementById("categoryCode").value;
-	var selected = false;
-
-	for(var i =0;i < lineAmts.length; i++){
-		if(!selected && Number(lineAmts[i].value) > 0 )
-			selected = true;
-		
-		$(function(){
-			var getData = $.ajax({
-				url: "${pageContext.request.contextPath}/jsp/salesspecial/ajax/addProductToBasket.jsp",
-				data : "custId=" +custId
-					  +"&pId="+productIds[i].value
-					  +"&pCode="+productCodes[i].value 
-					  +"&pName="+escapeParameter(productNames[i].value)
-					  +"&uom1="+uom1s[i].value
-					  +"&uom2="+uom2s[i].value
-					  +"&price1="+price1s[i].value
-					  +"&price2="+price2s[i].value
-					  +"&qty1="+qty1s[i].value
-					  +"&qty2="+qty2s[i].value
-					  +"&lineAmt="+lineAmts[i].value
-					  +"&taxable="+taxables[i].value,
-				async: false,
-				success: function(getData){
-					var status = jQuery.trim(getData);
-					if(status != "")
-						alert(status);
-				}
-			}).responseText;
-			
-		});
-	}
-
-	// Set Background 
-	if(selected){
-		$("#"+categoryCode).css('background-color', '#FFFF99');
-	}
-	else{
-		$("#"+categoryCode).css('background-color', '');
-	}
-
-	$(document).ready(function() {
-	    $("#selectProduct").dialog("close");
-	}); 	
-}
-
-function escapeParameter(param){
-	return param.replace("%","%25");
-}
-
-/******************************* Add Product *******************************************************/
-
 
 function printListOrderProductReport(path,userType){
 	var customerId = document.getElementsByName("order.customerId");
@@ -663,29 +324,22 @@ $(function(){
 							<tr>
 								<td colspan="4" align="center">
 								<div align="left">
-									<%-- &nbsp;&nbsp;
-									<input type="button" class="newPosBtn" value="เพิ่มสินค้ารายตัว" onclick="open_product('${pageContext.request.contextPath}');"/> --%>
-									&nbsp;&nbsp; 
-									<input type="button" class="newPosOrderSpecialBtn" value="เลือกสินค้าตามแบรนด์(แถมพิเศษ)" 
-									onclick="openProductCategory();" />
-
 								</div>
-								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
-										<th class="order">ลำดับ</th>
-										<th class="checkBox"></th>
-										<th class="name">ชื่อสินค้า</th>
-										<th>หน่วยนับ</th>
-										<th>จำนวน</th>
-										<th class="costprice">ราคาต่อหน่วย</th>
-										<th>ยอดรวม</th>
-										<th class="costprice">ส่วนลด</th>
-										<th class="costprice">ยอดรวมหลังหักส่วนลด</th>
-										<th>วันที่ส่งสินค้า</th>							
-										<th>วันที่ต้องการสินค้า</th>
-										<th class="status">ภาษี</th>
-										<th class="status">โปรโมชั่น</th>
-										<th class="status">โปรโมชั่น(แถมพิเศษ)</th>
+										<th class="td_text_center" width="5%">ลำดับ</th>
+										<th class="td_text_center" width="5%"></th>
+										<th class="td_text_center" width="15%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="5%">หน่วยนับ</th>
+										<th class="td_text_center" width="5%">จำนวน</th>
+										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
+										<th class="td_text_center" width="10%">ยอดรวม</th>
+										<th class="td_text_center" width="10%">ส่วนลด</th>
+										<th class="td_text_center" width="10%">ยอดรวมหลังหักส่วนลด</th>
+										<th class="td_text_center" width="5%">วันที่ส่งสินค้า</th>							
+										<th class="td_text_center" width="5%">วันที่ต้องการสินค้า</th>
+										<th class="td_text_center" width="3%">ภาษี</th>
+										<th class="td_text_center" width="3%">โปรโมชั่น</th>
 									</tr>
 									<c:forEach var="lines1" items="${orderSpecialForm.lines}" varStatus="rows1">
 									<c:choose>
@@ -697,11 +351,11 @@ $(function(){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td>${rows1.index + 1}</td>
-										<td style="display: none;">${lines1.lineNo}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${rows1.index + 1}</td>
+										<%-- <td style="display: none;">${lines1.lineNo}</td> --%>
+										<td class="td_text_center" width="5%">
 										   <c:choose>
-											<c:when test="${lines1.isPromotionSpecial=='Y'}">
+											<c:when test="${lines1.promotion=='S'}">
 										       <input type="checkbox" name="lineids" value="${lines1.id}" />
 										     </c:when>
 										     <c:otherwise>
@@ -709,7 +363,7 @@ $(function(){
 										     </c:otherwise>
 										    </c:choose>
 										</td>
-										<td align="left">
+										<td class="td_text" width="15%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
 											<input type='hidden' name='lines.row' value='${lines1.lineNo}'>
@@ -752,13 +406,12 @@ $(function(){
 											<input type='hidden' name='lines.lineno' value='${lines1.lineNo}'>
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
-											<input type='hidden' name='lines.isPromotionSpecial' value='${lines1.isPromotionSpecial}'>
+											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
-										<td align="center">
+										<td class="td_text_right" width="5%">
 									        ${lines1.fullUom}
 										</td>
-										<td align="right">
-											
+										<td class="td_text_right" width="5%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
 													<c:choose>
@@ -779,7 +432,7 @@ $(function(){
 											</c:choose>
 											
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
@@ -792,39 +445,30 @@ $(function(){
 											</c:choose>											
 										
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/>
 										</td>
-										<td align="right">
+										<td class="td_text_right" width="10%">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
 
-										<td align="center">${lines1.shippingDate}</td>
-										<td align="center">${lines1.requestDate}</td>
-										<td align="center">
+										<td class="td_text_center" width="5%">${lines1.shippingDate}</td>
+										<td class="td_text_center" width="5%">${lines1.requestDate}</td>
+										<td class="td_text_center" width="3%">
 											<c:if test="${lines1.taxable=='Y'}">
 												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 											</c:if>
 										</td>
-										<td align="center">
-											<c:if test="${lines1.promotion=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
-										</td>
-										<td align="center">
-											<c:if test="${lines1.isPromotionSpecial=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
+										<td class="td_text_center" width="3%">
+										   ${lines1.promotion}
 										</td>
 									</tr>
-									
 									</c:forEach>
-									
 								</table>
-								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+								<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
 										<td align="left" class="footer">&nbsp;
 											<a href="#" onclick="javascript:deleteProduct('${pageContext.request.contextPath}','<%=user.getType() %>');"> 
@@ -986,7 +630,6 @@ $(function(){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported"/>
 						<html:hidden property="order.isCash"/>
-						<html:hidden property="order.isPromotionSpecial"/>
 						
 						<html:hidden property="order.printDateTimePick"/>
 						<html:hidden property="order.printCountPick"/>
@@ -1026,6 +669,4 @@ $(function(){
 </table>
 </body>
 </html>
-<div id="brand-dialog"></div>
-<div id="selectProduct" >No Product To Display!</div>
 <div id="error-dialog"><div id="error-dialog-message" style="color:red;"></div></div>

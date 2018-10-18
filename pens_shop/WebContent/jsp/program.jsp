@@ -29,7 +29,7 @@ if(code.equals("null")) code = SystemProperties.getCaption(SystemProperties.CREA
 	<tr>
  		<td width="5%" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
    		<td width="85%" style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
-   			<strong><%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %></strong>
+   			<font size="3"><strong><%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %></strong></font>
    		</td>
    		<td width="10%" align="right" nowrap>
    		   <div id="time" style="font-weight: bold"> </div>

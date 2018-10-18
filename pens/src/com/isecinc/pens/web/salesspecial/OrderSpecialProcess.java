@@ -195,6 +195,7 @@ public class OrderSpecialProcess {
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
+						line.setSellingPrice(odLine.getSellingPrice());
 						
 						newLines.add(line);
 					}
@@ -221,6 +222,7 @@ public class OrderSpecialProcess {
 						line.setTripNo(odLine.getTripNo());
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
+						line.setSellingPrice(odLine.getSellingPrice());
 						newLines.add(line);
 					}
 				i++;
@@ -531,7 +533,8 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 				line.setCustomerCode(chkLine.getCustomerCode());
 				line.setOrderDate(chkLine.getOrderDate());
 				line.setStatus(chkLine.getStatus());
-
+				line.setTaxable(chkLine.getTaxable());
+				
 				newLinesList.add(line);
 				firstAdd = false;
 				prvIndex = 0;
@@ -612,6 +615,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setCustomerCode(chkLine.getCustomerCode());
 					line.setOrderDate(chkLine.getOrderDate());
 					line.setStatus(chkLine.getStatus());
+					line.setTaxable(chkLine.getTaxable());
 					
 					//set prev Qty 
 					newLinesList.set(prvIndex, line);
@@ -673,6 +677,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setCustomerCode(chkLine.getCustomerCode());
 					line.setOrderDate(chkLine.getOrderDate());
 					line.setStatus(chkLine.getStatus());
+					line.setTaxable(chkLine.getTaxable());
 					
 					newLinesList.add(line);
 					prvIndex++;

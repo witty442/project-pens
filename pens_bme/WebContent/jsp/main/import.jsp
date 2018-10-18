@@ -186,7 +186,17 @@ function importExcel(path,noCheckError){
 				return false;
 			}
 		}
-		<%}else if("onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))) {%>
+    <%}else if("onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))) {%>
+		if(form.dataFile.value == '' || extension != "txt"){
+			alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			return true;
+		}else{
+			if( startFileName !='sevencat'){
+				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย  SEVENCAT เท่านั้น");
+				return false;
+			}
+		}
+	<%}else if("onhandPensShop".equalsIgnoreCase(request.getParameter("page"))) {%>
 		if(form.dataFile.value == '' || extension != "txt"){
 			alert("กรุณาเลือกไฟล์นามสกุล .txt");
 			return true;
@@ -412,6 +422,10 @@ function getCustName(custCode,fieldName,storeType){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportBME7Catalog"/>
 				</jsp:include>
+			<%}else if("onhandPensShop".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="ImportBMEPensShop"/>
+				</jsp:include>
 			<%}else if("LoadStockInitLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="LoadStockInitLotus"/>
@@ -573,6 +587,7 @@ function getCustName(custCode,fieldName,storeType){
 								    		|| "onhandFriday".equalsIgnoreCase(request.getParameter("page"))
 								    		|| "onhandOShopping".equalsIgnoreCase(request.getParameter("page"))
 								    		|| "onhand7Catalog".equalsIgnoreCase(request.getParameter("page"))
+								    		|| "onhandPensShop".equalsIgnoreCase(request.getParameter("page"))
 								    		|| "onhandTVDirect".equalsIgnoreCase(request.getParameter("page"))
 								    		) {%>
 								       <input type="button" value="ยืนยัน Upload รวมข้อมูลที่ ERROR" class="newPosBtnLong" onclick="javascript:importExcel('${pageContext.request.contextPath}','NO_CHECK_ERROR')">
@@ -606,14 +621,13 @@ function getCustName(custCode,fieldName,storeType){
 						 <c:if test="${importForm.page == 'reconcile'}">
 						   <jsp:include page="subimports/reconcileSub.jsp" />  
 						 </c:if> 
-						 
+						
 						
 						<c:choose>
 					    <c:when test="${importForm.page == 'king'}">
 					       <jsp:include page="subimports/importKingTranSub.jsp" /> 
 					    </c:when>
-					    <c:when test="${importForm.page == 'wait'}">
-					       
+					    <c:when test="${importForm.page == 'wait'}"> 
 					    </c:when>
 					    <c:otherwise>
 					        <!--  ALL OLD IMPORT -->

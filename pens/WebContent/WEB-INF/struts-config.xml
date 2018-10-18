@@ -369,7 +369,6 @@
 		<action name="orderSpecialForm" path="/jsp/saleOrderSpecial" forward="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
 		<action name="orderSpecialForm" path="/jsp/saleOrderSpecialAction" parameter="do"
 			scope="request" type="com.isecinc.pens.web.salesspecial.OrderSpecialAction">
-			<forward name="search" path="/jsp/salesspecial/salesSpecialOrderSearch.jsp" />
 			<forward name="prepare" path="/jsp/salesspecial/salesSpecialOrder.jsp" />
 			<forward name="prepareEditOrder" path="/jsp/salesspecial/salesSpecialOrder.jsp" />
 			<forward name="prepareEditReceipt" path="/jsp/salesspecial/salesSpecialOrderView.jsp" />

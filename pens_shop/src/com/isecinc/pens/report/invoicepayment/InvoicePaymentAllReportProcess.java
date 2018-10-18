@@ -36,32 +36,19 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 		List<InvoicePaymentAllReport> pos = new ArrayList<InvoicePaymentAllReport>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			
-			sql.delete(0, sql.length());
 			sql.append("\n  select * from( ");
 			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
 			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
-			sql.append("\n  cus.CODE AS CUSTOMER_CODE,rcby.WRITE_OFF, ");
-			sql.append("\n  rcby.BANK, rcby.CHEQUE_NO, rcby.CHEQUE_DATE, rc.doc_status,");
+			sql.append("\n  rcby.WRITE_OFF, ");
+			sql.append("\n  (select o.customer_bill_name from t_order o where o.order_id = rcl.order_id ) as customer_bill_name, ");
+			sql.append("\n  rcby.BANK, rcby.credit_card_no, rcby.CHEQUE_DATE, rc.doc_status,");
 			sql.append("\n  rc.ISPDPAID , ");
 			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
 			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
-			/*sql.append("\n  (SELECT SUM(rcby.RECEIPT_AMOUNT) FROM t_receipt ");
-			sql.append("\n    INNER JOIN t_receipt_line ON t_receipt_line.RECEIPT_ID = t_receipt.RECEIPT_ID ");
-			sql.append("\n    INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n    WHERE rcby.PAYMENT_METHOD = 'CS' ");
-			// Wit Edit 18/05/2011
-			sql.append("\n    AND t_receipt.user_id = "+user.getId());
-			sql.append("\n    AND t_receipt.RECEIPT_DATE = rc.RECEIPT_DATE ");
-			sql.append("\n    AND t_receipt.DOC_STATUS = rc.DOC_STATUS ");
-			sql.append("\n    AND t_receipt_line.ORDER_ID =  rcl.ORDER_ID ");
-			sql.append("\n  ) AS CASH_WRITEOFF FROM t_receipt rc ");*/
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			//sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
 			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
 			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
 			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
@@ -69,40 +56,24 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			//sql.append("\n  AND rcby.WRITE_OFF = 'N'` ");
 			// today receipt, today order
 			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n    SELECT order_id FROM t_order od  ");
-			sql.append("\n    WHERE 1=1 )");
-			// order doc_status may be not equals receipt 
-			//sql.append("\n  AND od.DOC_STATUS = rc.DOC_STATUS ");
-			//sql.append("\n    AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( SELECT order_id FROM t_order od )");
 			// Wit Edit 18/05/2011
 			sql.append("\n  AND rc.user_id = "+user.getId());
-			sql.append("\n    AND rcby.PAYMENT_METHOD = 'CS'");
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CS'");
 			// Art Edit 14/09/2011
-			sql.append("\n    union all");
+			sql.append("\n  union all");
 			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
 			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
-			sql.append("\n  cus.CODE AS CUSTOMER_CODE,rcby.WRITE_OFF, ");
-			sql.append("\n  rcby.BANK, rcby.CHEQUE_NO, rcby.CHEQUE_DATE, rc.doc_status,");
+			sql.append("\n  rcby.WRITE_OFF, ");
+			sql.append("\n  (select o.customer_bill_name from t_order o where o.order_id = rcl.order_id ) as customer_bill_name, ");
+			sql.append("\n  rcby.BANK, rcby.credit_card_no, rcby.CHEQUE_DATE, rc.doc_status,");
 			sql.append("\n  rc.ISPDPAID , ");
 			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
 			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
-			/*sql.append("\n  (SELECT SUM(rcby.RECEIPT_AMOUNT) FROM t_receipt ");
-			sql.append("\n    INNER JOIN t_receipt_line ON t_receipt_line.RECEIPT_ID = t_receipt.RECEIPT_ID ");
-			sql.append("\n    INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n    WHERE rcby.PAYMENT_METHOD = 'CS' ");
-			// Wit Edit 18/05/2011
-			sql.append("\n    AND t_receipt.user_id = "+user.getId());
-			sql.append("\n    AND t_receipt.RECEIPT_DATE = rc.RECEIPT_DATE ");
-			sql.append("\n    AND t_receipt.DOC_STATUS = rc.DOC_STATUS ");
-			sql.append("\n    AND t_receipt_line.ORDER_ID =  rcl.ORDER_ID ");
-			sql.append("\n  ) AS CASH_WRITEOFF " +*/
 			sql.append("\n	FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			//sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
 			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
 			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
 			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
@@ -110,16 +81,12 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			//sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			// today receipt, today order
 			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n    SELECT order_id FROM t_order od  ");
-			sql.append("\n    WHERE 1=1 )");
-			// order doc_status may be not equals receipt 
-			//sql.append("\n  AND od.DOC_STATUS = rc.DOC_STATUS ");
-			//sql.append("\n    AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
+			sql.append("\n  AND rcl.ORDER_ID IN (SELECT order_id FROM t_order od  )");
 			// Wit Edit 18/05/2011
 			sql.append("\n  AND rc.user_id = "+user.getId());
-			sql.append("\n    AND rcby.PAYMENT_METHOD = 'CH') b");
-			sql.append("\n    order by b.RECEIPT_NO asc,b.PAYMENT_METHOD desc  ");
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CR' ");
+			sql.append("\n  ) b");
+			sql.append("\n  order by b.RECEIPT_NO asc,b.PAYMENT_METHOD desc  ");
 			
 			logger.debug("sql:"+sql.toString());
 			stmt = conn.createStatement();
@@ -134,20 +101,20 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 				inv.setName(rst.getString("NAME"));
 				inv.setWriteOff(rst.getString("WRITE_OFF"));
 				//inv.setCustomerName(rst.getString("CUSTOMER_NAME"));
-				inv.setCustomerCode(rst.getString("CUSTOMER_CODE"));
+				//inv.setCustomerCode(rst.getString("CUSTOMER_CODE"));
 				
 				if(!tempReceiptNo.equalsIgnoreCase(rst.getString("RECEIPT_NO"))){
 					inv.setReceiptNo(rst.getString("RECEIPT_NO"));
-					inv.setCustomerName(rst.getString("CUSTOMER_NAME"));
+					inv.setCustomerName(rst.getString("CUSTOMER_BILL_NAME"));
 					inv.setReceiptDate(DateToolsUtil.convertToString(rst.getDate("RECEIPT_DATE")));
 					inv.setId(i++);
 					tempReceiptNo = rst.getString("RECEIPT_NO");
 				}
 				
 				//inv.setBank(rst.getString("BANK"));
-				inv.setChequeNo(ConvertNullUtil.convertToString(rst.getString("CHEQUE_NO")));
+				inv.setChequeNo(ConvertNullUtil.convertToString(rst.getString("credit_card_no")));
 				if (!inv.getChequeNo().equals("")) {
-					//inv.setChequeDate(DateToolsUtil.convertToString(rst.getDate("CHEQUE_DATE")));
+					inv.setChequeNo(inv.getChequeNo().substring(inv.getChequeNo().length()-4,inv.getChequeNo().length()));
 				}
 				
 				inv.setPaymentMethod(rst.getString("PAYMENT_METHOD"));

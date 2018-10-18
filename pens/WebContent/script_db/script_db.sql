@@ -50,6 +50,6 @@ CREATE TABLE pens.t_temp_import_trans_err (
 	created timestamp NOT NULL,
 	doc_status varchar(5)
 );
-/** 09/2561 **/
-alter table t_order add is_promotion_special char(1);
-alter table t_order_line add is_promotion_special char(1);
+/** 11/2561 **/
+alter table t_order_line add selling_price decimal(15,5);
+alter table t_order_line add line_amount_special decimal(15,5);

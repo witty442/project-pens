@@ -47,76 +47,6 @@ function openCancelOrderPopup(path,orderNo,id,payment){
 	window.open(path + "/jsp/pop/cancelOrderPopup.jsp?id="+id+"&orderNo="+orderNo+"&payment="+payment, "Edit Shipping Date.", "width=400,height=260,location=No,resizable=No");
 }
 
-function put_new_shipdate(new_ship_date, start_row){
-	var diff_day = eval(document.getElementsByName('order.roundTrip')[0].value);
-	var round=''; 
-	var day;
-	
-	//alert('new_ship_date--->'+new_ship_date);
-	var d = new Date();
-	
-	var year = new_ship_date.split('/')[2];
-	var month = new_ship_date.split('/')[1];
-	var date = new_ship_date.split('/')[0];
-	
-	//d.setFullYear(2011, 11-1, 09);
-	d.setFullYear(year-543, month-1, date);
-	//alert('d--->'+d);
-	//alert('d--->'+d.getDay);
-	
-	var shippingDay = document.getElementsByName('order.shippingDay')[0].value;
-	//alert('shippingDay--->'+shippingDay);
-	
-	if(shippingDay ==  'Mon'){
-		day = 1;
-	}else if(shippingDay ==  'Tue'){
-		day = 2;
-	}else if(shippingDay ==  'Wed'){
-		day = 3;
-	}else if(shippingDay ==  'Thu'){
-		day = 4;
-	}else if(shippingDay ==  'Fri'){
-		day = 5;
-	}else if(shippingDay ==  'Sat'){
-		day = 6;
-	}else{
-		day = 0;
-	}
-	
-	//alert('day--->'+day);
-	//alert('getDay--->'+d.getDay());
-	if(d.getDay() != day){
-		alert('วันจัดส่งไม่ถูกต้องกับที่กำหนด');
-		return false;
-	}
-	
-	var tbl = document.getElementById('tblProduct');
-	var i;
-	for(i=eval(start_row);i<tbl.rows.length;i++){
-		if(i==1){round=i+"";}
-		if(round!=jQuery.trim(tbl.rows[i].cells[9].innerHTML)){
-			new_ship_date = newDayAdd(new_ship_date, calWeekByRoundtrip(diff_day));
-			
-		}
-		tbl.rows[i].cells[10].innerHTML=new_ship_date;
-		tbl.rows[i].cells[11].innerHTML = new_ship_date;
-		document.getElementsByName('lines.ship')[i-1].value=new_ship_date;
-		document.getElementsByName('lines.req')[i-1].value=new_ship_date;
-		round=jQuery.trim(tbl.rows[i].cells[9].innerHTML);
-	}
-}
-
-function calWeekByRoundtrip(diff_day){
-	//alert('diff_day1--->'+diff_day);
-	var week = diff_day / 7;
-	week = (Math.floor(week));
-	//alert('week--->'+week);
-	var diff_day = week * 7;
-	//alert('diff_day2--->'+diff_day);
-	
-    return diff_day;
-}
-
 function newDayAdd(inputDate, addDay){
 	var newDay = inputDate.split('/')[1] +'/'+ inputDate.split('/')[0]+'/'+ inputDate.split('/')[2];
     var d = new Date(newDay);  
@@ -144,12 +74,6 @@ function gotoReport(path, role){
 	window.open(path + "/jsp/pop/nextVisitPopup.jsp?rand="+rand+"&role="+role, "Print Receipt/Tax Invoice", "width="+w+",height="+h+", top="+top+", left="+left+",location=0,resizable=0");
 }
 
-function presave(path) {
-	if(!createProductList()){return false;}
-	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=preSave";
-	document.orderForm.submit();
-	return true;
-}
 
 function backadd(path) {
 	if(!createProductList()){return false;}
@@ -169,9 +93,10 @@ function save(path,role) {
 			creditCardNo.focus();
 			return false;
 		}
-		if(creditCardExpireDate.value != "" && creditCardExpireDate.value.length < 5){
+		if(creditcardMonthExpire.value == "" || creditcardYearExpire.value == ""){
 			alert("กรูณาระบุ วันที่หมดอายุ บัตรเครดิตให้ถูกต้อง");
-			creditCardExpireDate.focus();
+			if(creditcardMonthExpire.value == "" )creditcardMonthExpire.focus();
+			if(creditcardYearExpire.value == "" )creditcardYearExpire.focus();
 			return false;
 		}
 	}
@@ -190,7 +115,7 @@ function search(path){
 }
 
 function clearForm(path){
-	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=clearForm";
+	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=search&action=new";
 	document.orderForm.submit();
 	return true;
 }

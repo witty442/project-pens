@@ -1,3 +1,4 @@
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
@@ -13,6 +14,7 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/field_size.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 
 <style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -64,6 +66,22 @@ function searchPopup(path) {
 function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
 	document.getElementsByName("descs")[0].value = 'ALL,';
+}
+function selectOneRadio(){
+	var chRadio = document.getElementsByName("chCheck");
+	var pageName ='<%=pageName%>';
+	var code = document.getElementsByName("code_temp");
+	var desc = document.getElementsByName("desc");
+
+	for(var i=0;i<chRadio.length;i++){
+        if(chRadio[i].checked){
+        	//alert(i+":"+code[i+1].value);
+           // window.opener.setStoreMainValue(code[i].value,desc[i].value ,types);
+            window.opener.setDataPopupValue(code[i].value,desc[i].value,pageName);
+        	window.close();
+            break;
+        }
+	}
 }
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
@@ -165,6 +183,7 @@ function saveSelectedInPage(no){
 			}
 		}).responseText;
 	});
+	
 }
 
 function chekCodeDupInCodesAll(codeCheck){
@@ -271,7 +290,7 @@ window.onload = function(){
 		<%if("true".equalsIgnoreCase(mutiple)){ %>
 			<input type="button" name="ok" value=" Â×¹ÂÑ¹ " onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
 		<%}else{ %>
-		    <input type="button" name="ok" value=" Â×¹ÂÑ¹ " onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
+		    <input type="button" name="ok" value=" Â×¹ÂÑ¹ " onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
 		<%} %>
 			<input type="button" name="close" value="»Ô´Ë¹éÒ¨Í¹Õé" onclick="javascript:window.close();" style="width:100px;"  class="newPosBtnLong" />
 			&nbsp;
@@ -280,7 +299,11 @@ window.onload = function(){
 	</tr>
 </table>
 <!-- RESULT -->
-<%if(session.getAttribute("DATA_LIST") != null){ %>
+<%
+//out.println("pageName["+pageName+"]DATA_LIST:"+(session.getAttribute("DATA_LIST")));
+if(session.getAttribute("DATA_LIST") != null){ 
+ //out.println("pageName["+pageName+"]DATA_LIST SIZE:"+((List)session.getAttribute("DATA_LIST")).size());
+%>
 
 	<%if("ItemBarcode".equalsIgnoreCase(pageName) ){ %>
 	     <jsp:include page="popup_sub/ItemBarcodeResult.jsp?mutiple=<%=mutiple %>" /> 

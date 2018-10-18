@@ -274,9 +274,9 @@ function clearForm(path){
 
 function backsearch(path,customerId) {
 	if (document.getElementsByName("criteria.searchKey")[0].value != '') {
-		document.orderSpecialForm.action = path + "/jsp/saleOrderSpecialAction.do?do=search";
+		document.orderSpecialForm.action = path + "/jsp/saleOrderAction.do?do=search";
 	} else {
-		document.orderSpecialForm.action = path + "/jsp/saleOrderSpecialAction.do?do=prepare&customerId="+customerId;
+		document.orderSpecialForm.action = path + "/jsp/saleOrderAction.do?do=prepare&customerId="+customerId;
 	}
 	document.orderSpecialForm.submit();
 	return true;

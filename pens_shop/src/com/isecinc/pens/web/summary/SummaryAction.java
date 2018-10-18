@@ -14,6 +14,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.ExcelHeader;
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Summary;
@@ -137,6 +139,8 @@ public class SummaryAction extends I_Action {
 			//Header
 			isTotal = form.getSummary().getType().equals("TOTAL")?true:false;
 			
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
@@ -178,9 +182,7 @@ public class SummaryAction extends I_Action {
 				  h.append("<td>ชื่อสินค้า</td> \n");
 				  
 				  h.append("<td colspan='2'>จำนวนขาย</td> \n");
-				  
 				  h.append("<td colspan='2'>จำนวนของแถม</td> \n");
-				  
 				  h.append("<td colspan='2'>หน่วย</td> \n");
 
 				h.append("</tr> \n");
@@ -189,16 +191,16 @@ public class SummaryAction extends I_Action {
 					Summary s = (Summary)list.get(i);
 					h.append("<tr> \n");
 					if(!isTotal){
-					   h.append("<td>"+s.getOrderDate()+"</td> \n");
+					   h.append("<td class='text'>"+s.getOrderDate()+"</td> \n");
 					}
-					  h.append("<td>"+s.getProductCode()+"</td> \n");
-					  h.append("<td>"+s.getProductName()+"</td> \n");
+					  h.append("<td class='text'>"+s.getProductCode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getProductName()+"</td> \n");
 					  
 					  if( !Utils.isNull(s.getQty()).equals("")){
 						  String s1 = s.getQty().substring(0,s.getQty().indexOf("/"));
 						  String s2 = s.getQty().substring(s.getQty().indexOf("/")+1);
-						  h.append("<td>&nbsp;"+s1+"</td> \n");
-						  h.append("<td>&nbsp;"+s2+"</td> \n");
+						  h.append("<td class='num'>"+s1+"</td> \n");
+						  h.append("<td class='num'>"+s2+"</td> \n");
 					  }else{
 						  h.append("<td>&nbsp;</td> \n");
 						  h.append("<td>&nbsp;</td> \n");
@@ -207,8 +209,8 @@ public class SummaryAction extends I_Action {
 					  if( !Utils.isNull(s.getQtyPromotion()).equals("")){
 						  String s1 = s.getQtyPromotion().substring(0,s.getQtyPromotion().indexOf("/"));
 						  String s2 = s.getQtyPromotion().substring(s.getQtyPromotion().indexOf("/")+1);
-						  h.append("<td>&nbsp;"+s1+"</td> \n");
-						  h.append("<td>&nbsp;"+s2+"</td> \n");
+						  h.append("<td class='num'>"+s1+"</td> \n");
+						  h.append("<td class='num'>"+s2+"</td> \n");
 					  }else{
 						  h.append("<td>&nbsp;</td> \n");
 						  h.append("<td>&nbsp;</td> \n");
@@ -217,8 +219,8 @@ public class SummaryAction extends I_Action {
 					  if( !Utils.isNull(s.getFullUOM()).equals("")){
 						  String s1 = s.getFullUOM().substring(0,s.getFullUOM().indexOf("/"));
 						  String s2 = s.getFullUOM().substring(s.getFullUOM().indexOf("/")+1);
-						  h.append("<td>&nbsp;"+s1+"</td> \n");
-						  h.append("<td>&nbsp;"+s2+"</td> \n");
+						  h.append("<td class='num'>"+s1+"</td> \n");
+						  h.append("<td class='num'>"+s2+"</td> \n");
 					  }else{
 						  h.append("<td>&nbsp;</td> \n");
 						  h.append("<td>&nbsp;</td> \n");

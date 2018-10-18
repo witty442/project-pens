@@ -16,7 +16,13 @@ function prepareEditOrder(path,type,id){
 	document.orderForm.submit();
 	return true;
 }
-
+function prepareEditOrderSP(path,type,id){
+	if(id!=null){
+	  document.orderForm.action = path + "/jsp/saleOrderSpecialAction.do?do=prepareEditOrder&id=" + id;
+	}
+	document.orderForm.submit();
+	return true;
+}
 function prepareEditReceipt(path,type,id){
 	if(id!=null){
 	  document.orderForm.action = path + "/jsp/saleOrderAction.do?do=prepareEditReceipt&id=" + id;

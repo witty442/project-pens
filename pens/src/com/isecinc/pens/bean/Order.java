@@ -100,14 +100,12 @@ public class Order extends I_PO implements Serializable {
 		
 		setPoNumber(Utils.isNull(rst.getString("po_number")));
 		setVanPaymentMethod(Utils.isNull(rst.getString("van_payment_method")));
-		//09/2561 wit edit
-		setIsPromotionSpecial(Utils.isNull(rst.getString("is_promotion_special")).equals("")?"N":Utils.isNull(rst.getString("is_promotion_special")));
 	}
 
 	/**
 	 * Set display
 	 */
-	protected void setDisplayLabel() throws Exception {
+	public void setDisplayLabel() throws Exception {
 		for (References r : InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS)) {
 			if (r.getKey().equalsIgnoreCase(getDocStatus())) {
 				setDocStatusLabel(r.getName());
@@ -259,16 +257,17 @@ public class Order extends I_PO implements Serializable {
 	private int printCountRcp;
 	private String poNumber;
 	private String vanPaymentMethod;
-    private String isPromotionSpecial;
+    private boolean promotionSP;
 	
-	
-	public String getIsPromotionSpecial() {
-		return isPromotionSpecial;
+   
+	public boolean isPromotionSP() {
+		return promotionSP;
 	}
 
-	public void setIsPromotionSpecial(String isPromotionSpecial) {
-		this.isPromotionSpecial = isPromotionSpecial;
+	public void setPromotionSP(boolean promotionSP) {
+		this.promotionSP = promotionSP;
 	}
+
 	public String getVanPaymentMethod() {
 		return vanPaymentMethod;
 	}

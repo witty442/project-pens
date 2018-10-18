@@ -1,6 +1,8 @@
 package com.isecinc.pens.init;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -56,6 +58,7 @@ public class InitialReferences extends I_Initial {
 	public static final String VAN_DATE_FIX = "VanDateFix";
 	public static final String TRANSFER_BANK = "TransferBank";
 	public static final String ProdShowFileSize = "ProdShowFileSize";
+	public static final String ADDRESS_MAYA = "ADDRESS_MAYA";
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
@@ -67,7 +70,7 @@ public class InitialReferences extends I_Initial {
 	public void init(Connection conn) {
 		try {
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' \n");
+			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' AND IS_LOAD ='Y' \n");
 			
 			//*** WIT Edit 29/07/2554 : not Show BBL InternalBank  *******************************//
 			sql.append(" AND REFERENCE_ID NOT IN(  \n");
@@ -141,5 +144,38 @@ public class InitialReferences extends I_Initial {
 			e.printStackTrace();
 		}
 		return re;
+	}
+	
+	public static List<References> getRef(Connection conn,String code) {
+		List<References> refList = new ArrayList<References>();
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		StringBuffer sql = new StringBuffer();
+		try {
+			sql.append("SELECT * FROM pens_shop.c_reference WHERE ISACTIVE = 'Y' AND CODE ='"+code+"' \n");
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				logger.debug("add");
+				References r = new References(rs);
+				refList.add(r);
+			}
+			logger.debug("refList size:"+refList.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}finally{
+			try{
+				if(ps != null){
+					ps.close();
+				}
+				if(rs != null){
+					rs.close();
+				}
+			}catch(Exception ee){}
+		}
+		return refList;
 	}
 }

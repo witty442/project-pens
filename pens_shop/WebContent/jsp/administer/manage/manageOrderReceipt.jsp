@@ -1,3 +1,5 @@
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -5,15 +7,19 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<% 
 
-%>
 <jsp:useBean id="manageOrderReceiptForm" class="com.isecinc.pens.web.admin.ManageOrderReceiptForm" scope="request" />
 <%@page import="com.isecinc.pens.SystemProperties"%>
-
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.text.DecimalFormat"%>
-<%@page import="com.isecinc.pens.bean.Receipt"%><html>
+<%@page import="com.isecinc.pens.bean.Receipt"%>
+<%
+  System.out.println("documentDate:"+manageOrderReceiptForm.getDocumentDate());
+if(Utils.isNull(manageOrderReceiptForm.getDocumentDate()).equals("")){
+	manageOrderReceiptForm.setDocumentDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+}
+%>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
@@ -76,13 +82,7 @@ function cancelRR(id){
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
     		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../../menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
+	         <jsp:include page="../../menu_header.jsp"/>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 	      	<jsp:include page="../../program.jsp">
@@ -162,7 +162,7 @@ function cancelRR(id){
 								<td><%=i++ %></td>
 								<td align="left"><%=o.getOrderNo()%></td>
 								<td><%=o.getOrderDate()%></td>
-								<td align="left"><%=o.getCustomerName()%></td>
+								<td align="left"><%=o.getCustomerBillName()%></td>
 								<td align="right"><%=new DecimalFormat("#,##0.00").format(o.getNetAmount())%></td>
 								<td align="center">
 									<a href="javascript:cancelOM('<%=o.getId() %>');">

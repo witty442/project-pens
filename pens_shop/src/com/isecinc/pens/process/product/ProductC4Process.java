@@ -48,9 +48,11 @@ public class ProductC4Process {
 		Customer customer = null;
 		if (custmerId.length() > 0) customer = new MCustomer().find(custmerId);
 		try {
-			String whereCause = "  and isactive = 'Y' order by code, name ";
+			String whereCause = "  and isactive = 'Y' "
+					+ "and code in(select product_code from m_barcode )"
+					+ "order by code, name ";
 			Product[] ps = new MProduct().search(whereCause);
-			PriceList pl = new MPriceList().getCurrentPriceList(user.getOrderType().getKey());
+			PriceList pl = new MPriceList().getMayaPriceList();
 			List<ProductPrice> pps;
 			MProductPrice mProductPrice = new MProductPrice();
 			ProductC4 c4;

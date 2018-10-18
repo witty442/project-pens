@@ -36,7 +36,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	private String[] columns = { COLUMN_ID, "LINE_NO", "ORDER_ID", "PRODUCT_ID", "UOM_ID", "PRICE", "QTY",
 			"LINE_AMOUNT", "DISCOUNT", "TOTAL_AMOUNT", "REQUEST_DATE", "SHIPPING_DATE", "PROMOTION", "CREATED_BY",
 			"UPDATED_BY", "PAYMENT", "VAT_AMOUNT", "TRIP_NO", "PROMOTION_FROM", "ISCANCEL", "NEED_EXPORT", "EXPORTED",
-			"INTERFACES","CALL_BEFORE_SEND","org","sub_inv","taxable" };
+			"INTERFACES","CALL_BEFORE_SEND","org","sub_inv","taxable" ,"selling_price" };
 
 	/**
 	 * Find
@@ -93,7 +93,8 @@ public class MOrderLine extends I_Model<OrderLine> {
 				line.getExported() != null ? line.getExported() : "N",
 				line.getInterfaces() != null ? line.getInterfaces() : "N" ,
 				line.getCallBeforeSend() != null ? line.getCallBeforeSend() : "N",
-				line.getOrg(),line.getSubInv(),Utils.isNull(line.getTaxable()) 
+				line.getOrg(),line.getSubInv(),Utils.isNull(line.getTaxable()) ,
+				line.getSellingPrice()
 			  };
 		if (super.save(TABLE_NAME, columns, values, line.getId(), conn)) {
 			line.setId(id);

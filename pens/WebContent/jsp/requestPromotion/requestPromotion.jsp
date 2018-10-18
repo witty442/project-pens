@@ -657,9 +657,9 @@ function calPrice(fieldName){
 										  <input type="button" value="Gen File" class="newPosBtnLong" onclick="printRequestPromotion('${pageContext.request.contextPath}');">
 							      </c:if>
                              
-                                  <c:if test="${requestPromotionForm.requestPromotion.canEdit =='true'}">
+                                  <%-- <c:if test="${requestPromotionForm.requestPromotion.canEdit =='true'}"> --%>
 										<input type="button" value="บันทึกรายการ" class="newPosBtnLong" onclick="return save('${pageContext.request.contextPath}');">	
-								   </c:if>	
+								   <%-- </c:if>	 --%>
 							
 								<%if(session.getAttribute("shutcut_customerId") != null){ %>  
 								  
