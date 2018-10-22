@@ -485,7 +485,6 @@ public class BarcodeAction extends I_Action {
 		ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 		Connection conn = null;
 		try {
-	
 			String fileType = SystemElements.PDF;//request.getParameter("fileType");
 			logger.debug("fileType:"+fileType);
 			
@@ -494,7 +493,7 @@ public class BarcodeAction extends I_Action {
 				//Head
 				parameterMap.put("p_boxno", h.getBoxNo());
 				parameterMap.put("p_jobname", h.getJobId()+"-"+h.getName());
-				parameterMap.put("p_remark", Utils.isNull(h.getRemark()));
+				parameterMap.put("p_remark", "หมายเหตุ :"+Utils.isNull(h.getRemark()));
 	
 				//Gen Report
 				String fileName = "boxno_pdf_report";

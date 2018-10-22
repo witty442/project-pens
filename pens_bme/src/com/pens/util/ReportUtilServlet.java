@@ -375,51 +375,6 @@ public class ReportUtilServlet extends HttpServlet {
 		}
 	}
 
-	/**
-	 * sample fileName = "C1_report"; Run report to pdf file without list data.
-	 */
-	@SuppressWarnings("unchecked")
-	public void runReportPDF(HttpServletRequest request, HttpServletResponse response, Connection conn,
-			String fileJasper, HashMap parameterMap, String fileName) {
-
-		String jrxmlFileName = fileJasper + ".jrxml";
-		String jasperFileName = fileJasper + ".jasper";
-
-		try {
-			JasperCompileManager.compileReportToFile(jrxmlFileName, jasperFileName);
-			JasperPrint jprint = (JasperPrint) JasperFillManager.fillReport(jasperFileName, parameterMap, conn);
-
-			HashMap fontMap = new HashMap();
-			FontKey key = new FontKey("Angsana New", false, false);
-			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
-			fontMap.put(key, font);
-
-			FontKey key2 = new FontKey("Angsana New", true, false);
-			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			fontMap.put(key2, font2);
-
-			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
-			JRPdfExporter exporter = new JRPdfExporter();
-			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jprint);
-			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, rtfOutput);
-			exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, fileName);
-			//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
-			exporter.exportReport();
-
-			byte[] bytes = null;
-			bytes = rtfOutput.toByteArray();
-			response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-			response.setContentType("application/pdf");
-			response.setContentLength(bytes.length);
-			ServletOutputStream servletOutputStream = response.getOutputStream();
-			servletOutputStream.write(bytes, 0, bytes.length);
-			servletOutputStream.flush();
-			servletOutputStream.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	@SuppressWarnings( { "unchecked" })
 	private void runReportListToPDF(HttpServletRequest request, HttpServletResponse response, Connection conn,
@@ -428,13 +383,7 @@ public class ReportUtilServlet extends HttpServlet {
 
 		File rptFile = null;
 		fileName = fileName + ".pdf";
-
 		try {
-			//Wit Edit
-		    ServletContext context = request.getSession().getServletContext();
-            String fontPath = context.getRealPath("/reports/fonts/");//
-            logger.debug("fontPath:"+fontPath);
-            
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = createDataSource(lstData);
 
@@ -446,10 +395,11 @@ public class ReportUtilServlet extends HttpServlet {
 			FontKey key = new FontKey("Angsana New", false, false);
 			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
 			fontMap.put(key, font);
-
+	
 			FontKey key2 = new FontKey("Angsana New", true, false);
 			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
 			fontMap.put(key2, font2);
+		
 			
 			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
 			JRPdfExporter exporter = new JRPdfExporter();

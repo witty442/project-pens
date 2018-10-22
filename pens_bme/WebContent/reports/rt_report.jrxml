@@ -126,7 +126,7 @@
 			<textField>
 				<reportElement x="88" y="0" width="53" height="12"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="10" isUnderline="false"/>
+					<font fontName="Angsana New" size="10" isBold="false" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{docNo}]]></textFieldExpression>
 			</textField>

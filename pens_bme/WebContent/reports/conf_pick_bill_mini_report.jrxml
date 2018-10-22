@@ -104,7 +104,7 @@
 			<textField isBlankWhenNull="false">
 				<reportElement x="0" y="120" width="366" height="15"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="false"/>
+					<font fontName="Angsana New" size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["รายละเอียดดังนี้"]]></textFieldExpression>
 			</textField>
@@ -143,7 +143,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="11"/>
+					<font fontName="Angsana New" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{materialMaster}]]></textFieldExpression>
 			</textField>
@@ -157,7 +157,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="11"/>
+					<font fontName="Angsana New" size="11" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[">>"]]></textFieldExpression>
 			</textField>

@@ -306,11 +306,11 @@ public class BarcodeDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n select i.* ,j.name  from PENSBI.PENSBME_PICK_BARCODE i INNER JOIN  \n");
+			sql.append("\n select i.* ,j.name  from PENSBI.PENSBME_PICK_BARCODE i INNER JOIN  ");
 			sql.append("\n ( ");
 			sql.append("\n    select distinct job_id,name from PENSBME_PICK_JOB ");
 			sql.append("\n ) j on i.job_id = j.job_id");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n where 1=1  ");
 			//sql.append("\n and i.status in('"+PickConstants.BARCODE_ITEM_STATUS_CLOSE+"','"+PickConstants.BARCODE_ITEM_STATUS_OPEN+"')");
 			
 			if( !Utils.isNull(o.getBoxNo()).equals("")){
@@ -323,9 +323,7 @@ public class BarcodeDAO extends PickConstants{
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
-		  
 			   h = new Barcode();
 			   h.setNo(r);
 			   h.setJobId(rst.getString("job_id"));
@@ -336,14 +334,12 @@ public class BarcodeDAO extends PickConstants{
 			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
 			   h.setStatus(Utils.isNull(rst.getString("status"))); 
 			   h.setStatusDesc(JobDAO.getStatusDesc(Utils.isNull(rst.getString("status")))); 
-			  
 			   r++;
 			}//while
 
 			if(h != null){
 				h.setItems(searchItemReport(conn,h));
 			}
-			
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -587,8 +583,8 @@ public class BarcodeDAO extends PickConstants{
         List<Barcode> items = new ArrayList<Barcode>();
 		try {
 
-			sql.append("\n select substr(i.group_code,1,6) as group_code,count(*) as qty from PENSBI.PENSBME_PICK_BARCODE_ITEM i   \n");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n select substr(i.group_code,1,6) as group_code,count(*) as qty from PENSBI.PENSBME_PICK_BARCODE_ITEM i ");
+			sql.append("\n where 1=1   ");
 			sql.append("\n and i.status in('"+PickConstants.STATUS_CLOSE+"','"+PickConstants.STATUS_OPEN+"')");
 			
 			if( !Utils.isNull(o.getJobId()).equals("")){
