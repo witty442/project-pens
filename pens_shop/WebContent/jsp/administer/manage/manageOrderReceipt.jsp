@@ -1,18 +1,18 @@
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="java.util.Date"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-<jsp:useBean id="manageOrderReceiptForm" class="com.isecinc.pens.web.admin.ManageOrderReceiptForm" scope="request" />
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.text.DecimalFormat"%>
 <%@page import="com.isecinc.pens.bean.Receipt"%>
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<jsp:useBean id="manageOrderReceiptForm" class="com.isecinc.pens.web.admin.ManageOrderReceiptForm" scope="request" />
+
 <%
   System.out.println("documentDate:"+manageOrderReceiptForm.getDocumentDate());
 if(Utils.isNull(manageOrderReceiptForm.getDocumentDate()).equals("")){
@@ -59,10 +59,19 @@ function clearForm(){
 	window.location = '${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';
 }
 
-function cancelOM(id){
-	if(!confirm('การยกเลิกรายการขาย จะยกเลิกรายการรับชำระของรายการขายนี้ด้วย\r\nท่านแน่ใจหรือไม่?')){return false;}
-	document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=save&type=OM&id='+id;
-	document.manageOrderReceiptForm.submit();
+function cancelOrder(id){
+	var cancelReason = prompt("การยกเลิกรายการขาย จะยกเลิกรายการรับชำระของรายการขายนี้ด้วย\r\nท่านแน่ใจหรือไม่? กรุณาระบุเหตุผลการยกเลิก", "");
+	//alert(cancelReason);
+    if (cancelReason == null || cancelReason =='') {
+    	alert("กรุณาระบุเหตุผลการยกเลิก");
+    	return false;
+    }else{
+       document.getElementById("cancelReason").value = cancelReason;
+       
+	  //if(!confirm('การยกเลิกรายการขาย จะยกเลิกรายการรับชำระของรายการขายนี้ด้วย\r\nท่านแน่ใจหรือไม่?')){return false;}
+	  document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=save&type=OM&id='+id;
+	  document.manageOrderReceiptForm.submit();
+   }
 }
 
 function cancelRR(id){
@@ -165,7 +174,7 @@ function cancelRR(id){
 								<td align="left"><%=o.getCustomerBillName()%></td>
 								<td align="right"><%=new DecimalFormat("#,##0.00").format(o.getNetAmount())%></td>
 								<td align="center">
-									<a href="javascript:cancelOM('<%=o.getId() %>');">
+									<a href="javascript:cancelOrder('<%=o.getId() %>');">
 									<img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
 								</td>
 							</tr>
@@ -220,6 +229,7 @@ function cancelRR(id){
 						<%} %>
 						<%} %>
 						<br>
+						cancelReason:<input type="text" name="cancelReason" id="cancelReason"/>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>

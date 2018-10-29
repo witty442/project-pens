@@ -55,7 +55,7 @@ int pageNumber = 1;
 	@import "${pageContext.request.contextPath}/css/demo_page.css";
 	@import "${pageContext.request.contextPath}/css/demo_table.css";
 </style>
-<script type="text/javascript" language="javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="${pageContext.request.contextPath}/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" language="javascript" src="${pageContext.request.contextPath}/js/jquery.dataTables.js"></script>
 <script type="text/javascript" language="javascript" src="${pageContext.request.contextPath}/js/ColVis.min.js"></script>
 <script type="text/javascript" language="javascript" src="${pageContext.request.contextPath}/js/FixedColumns.js"></script>

@@ -1,17 +1,12 @@
 eclipse.preferences.version=1
-encoding//WebContent/js/billPlan.js=TIS-620
 encoding//WebContent/js/customer.js=TIS-620
 encoding//WebContent/js/customerTransaction.js=TIS-620
 encoding//WebContent/js/customerVisit.js=TIS-620
 encoding//WebContent/js/input.js=TIS-620
 encoding//WebContent/js/interfaces.js=TIS-620
 encoding//WebContent/js/monitor_interfaces.js=TIS-620
-encoding//WebContent/js/moveOrder.js=TIS-620
-encoding//WebContent/js/moveOrderSummary.js=TIS-620
 encoding//WebContent/js/pdreceipt.js=TIS-620
 encoding//WebContent/js/receipt.js=TIS-620
-encoding//WebContent/js/requestPromotion.js=TIS-620
-encoding//WebContent/js/requisitionProduct.js=TIS-620
 encoding//WebContent/js/salesOrder.js=TIS-620
 encoding//WebContent/js/salestarget.js=TIS-620
 encoding//WebContent/js/stock.js=TIS-620

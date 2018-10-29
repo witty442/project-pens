@@ -181,7 +181,9 @@ ul,li {
 UL {
 	width: 99%;
 }
-
+.disableCheckbox{
+  opacity:0.5;
+}
 .disableText {
 	background-color: #DCDCDC;
 	border: 1px solid;

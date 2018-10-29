@@ -12,7 +12,9 @@ public class MayaBean implements  Serializable{
 	 */
 	private static final long serialVersionUID = 4179679304223069016L;
 	//Criteria
+	private String custGroup;
 	private String type;
+	private String asOfDate;
 	private String startDate;
 	private String endDate;
 	private String groupCodeFrom;
@@ -39,6 +41,19 @@ public class MayaBean implements  Serializable{
     private List<MayaBean> itemsList;
     private MayaBean summary;
 
+    
+	public String getCustGroup() {
+		return custGroup;
+	}
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+	public String getAsOfDate() {
+		return asOfDate;
+	}
+	public void setAsOfDate(String asOfDate) {
+		this.asOfDate = asOfDate;
+	}
 	public String getType() {
 		return type;
 	}

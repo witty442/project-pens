@@ -157,8 +157,7 @@ function clearForm(path){
                           <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
 				      </c:when> 
 				      <c:otherwise>
-				         <!-- ALL SUB Report By old code -->
-				        <%--  <jsp:include page="subreports/subReportAll.jsp" />  --%>
+				         <!-- Nothing -->
 				      </c:otherwise>
 				   </c:choose>
                     

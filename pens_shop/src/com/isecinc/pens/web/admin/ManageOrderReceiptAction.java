@@ -101,14 +101,20 @@ public class ManageOrderReceiptAction extends I_Action {
 				conn.setAutoCommit(false);
 				String type = request.getParameter("type");
 				String id = request.getParameter("id");
+				String cancelReason = request.getParameter("cancelReason");
 				if (type != null && id != null) {
 					if (type.equalsIgnoreCase("OM")) {
 						// cancel order
 						Order order = new MOrder().find(id);
 						order.setDocStatus(Order.DOC_VOID);
-						new MOrder().save(order, user.getId(), conn);
+						//new MOrder().save(order, user.getId(), conn);
+						// cancel order
+						String sql = "update t_order set doc_status = 'VO' ,cancel_reason='"+cancelReason+"' where order_id = " + id + "";
+						stmt = conn.createStatement();
+						stmt.execute(sql);
+						
 						// cancel receipt @ order
-						String sql = "update t_receipt set doc_status = 'VO' where receipt_id in (";
+						sql = "update t_receipt set doc_status = 'VO' where receipt_id in (";
 						sql += "select receipt_id from t_receipt_line where order_id = " + id + ")";
 						stmt = conn.createStatement();
 						stmt.execute(sql);

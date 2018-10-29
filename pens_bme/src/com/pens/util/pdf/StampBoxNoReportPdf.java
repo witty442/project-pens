@@ -75,7 +75,7 @@ public class StampBoxNoReportPdf {
       page = 0;
       page++;
 	    try {
-	    	String absPath = BeanParameter.getReportPath()+"fonts/";
+	    	String absPath ="fonts/";// BeanParameter.getReportPath()+"fonts/";
 	    	logger.debug("absPath:"+absPath);
 	    	//Create BaseFont
 	    	//bf1 = BaseFont.createFont(absPath+"ANGSAUB.TTF", BaseFont.IDENTITY_H,BaseFont.EMBEDDED);

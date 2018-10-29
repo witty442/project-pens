@@ -11,6 +11,8 @@ import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MProductCategory;
 
 /**
@@ -147,24 +149,45 @@ public class InitialReferences extends I_Initial {
 	}
 	
 	public static List<References> getRef(Connection conn,String code) {
+		return getRefModel(conn, code, "");
+	}
+	public static List<References> getRef(Connection conn,String code,String orderBy) {
+		return getRefModel(conn, code, orderBy);
+	}
+	public static List<References> getRef(String code,String orderBy) {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getRefModel(conn, code, orderBy);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+		return null;
+	}
+	public static List<References> getRefModel(Connection conn,String code,String orderBy) {
 		List<References> refList = new ArrayList<References>();
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		StringBuffer sql = new StringBuffer();
 		try {
 			sql.append("SELECT * FROM pens_shop.c_reference WHERE ISACTIVE = 'Y' AND CODE ='"+code+"' \n");
+			if( !Utils.isNull(orderBy).equals("")){
+				sql.append("ORDER BY "+orderBy +" \n");
+			}
 			logger.debug("sql:"+sql.toString());
-			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			while(rs.next()){
-				logger.debug("add");
 				References r = new References(rs);
 				refList.add(r);
 			}
-			logger.debug("refList size:"+refList.size());
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.toString());
 		}finally{
 			try{

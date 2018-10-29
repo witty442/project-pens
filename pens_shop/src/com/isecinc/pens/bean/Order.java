@@ -117,6 +117,7 @@ public class Order extends I_PO implements Serializable {
 		setAddressDesc(Utils.isNull(rst.getString("address_desc")));
         setIdNo(Utils.isNull(rst.getString("id_no")));
         setPassportNo(Utils.isNull(rst.getString("passport_no")));
+        setCancelReason(Utils.isNull(rst.getString("cancel_reason")));
 	}
 
 	/**
@@ -286,8 +287,35 @@ public class Order extends I_PO implements Serializable {
 	private String passportNo;
 	private String creditcardMonthExpire;
 	private String creditcardYearExpire;
+	private String cancelReason;
+	private String tempCustAmount;
+	private String tempChangeAmount;
 	
 	
+	public String getTempCustAmount() {
+		return tempCustAmount;
+	}
+
+	public void setTempCustAmount(String tempCustAmount) {
+		this.tempCustAmount = tempCustAmount;
+	}
+
+	public String getTempChangeAmount() {
+		return tempChangeAmount;
+	}
+
+	public void setTempChangeAmount(String tempChangeAmount) {
+		this.tempChangeAmount = tempChangeAmount;
+	}
+
+	public String getCancelReason() {
+		return cancelReason;
+	}
+
+	public void setCancelReason(String cancelReason) {
+		this.cancelReason = cancelReason;
+	}
+
 	public String getCreditcardMonthExpire() {
 		return creditcardMonthExpire;
 	}

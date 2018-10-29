@@ -200,7 +200,7 @@ public class MayaSaleOutAction {
 			sql.append("\n ) MP ");
 			sql.append("\n WHERE M.ORDER_NUMBER = D.ORDER_NUMBER ");
 			sql.append("\n AND D.product_id = MP.product_id ");
-			
+			sql.append("\n AND M.DOC_STATUS ='SV' ");
 			if( !Utils.isNull(f.getBean().getStartDate()).equals("") && !Utils.isNull(f.getBean().getEndDate()).equals("") ){
 				dateTemp = Utils.parse(f.getBean().getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
@@ -218,6 +218,8 @@ public class MayaSaleOutAction {
 			sql.append("\n GROUP BY M.ORDER_DATE ,M.ORDER_NUMBER");
 			sql.append("\n ,MP.PENS_ITEM,MP.MATERIAL_MASTER,MP.BARCODE");
 			sql.append("\n ,D.PROMOTION ,D.PRICE ");
+			
+			sql.append("\n ORDER BY M.ORDER_DATE ,M.ORDER_NUMBER ASC");
 			
 			logger.debug("sql:"+sql);
 		} catch (Exception e) {

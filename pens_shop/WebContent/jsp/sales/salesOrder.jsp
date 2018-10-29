@@ -154,6 +154,7 @@ function presave() {
 	document.orderForm.submit();
 	return true;
 }
+
 function loadMe(){
 	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
 	calculatePrice();
@@ -594,35 +595,29 @@ style="height: 100%;">
 								  <table align="left" border="0" cellpadding="3" cellspacing="1">
 									    <tr>
 									      <td align="right"><b>ยอดรวมก่อนภาษี</b></td>
-									      <td align="left">
-									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
+									      <td align="right">
+									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="21" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
 										     <html:hidden property="order.totalAmount"/>
 									      </td>
 									    </tr>
 									    <tr>
 									       <td align="right"><b>ภาษี</b></td>
-									       <td align="left">
-									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
+									       <td align="right">
+									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="21" readonly="readonly" class="disableBoldText" style="text-align: right;" tabindex="-1"/>
 									         <html:hidden property="order.vatAmount"/>
 									        </td>
 									    </tr>
 									    <tr>
-									       <td align="right"><b>ยอดรวมที่ไม่เสียภาษี</b></td>
-									       <td align="left">
-									           <input type="text" id="tempTotalAmountNonVat" size="22"
-									           name="tempTotalAmountNonVat" readonly="readonly" 
-									           class="disableBoldText" style="text-align: right;" 
-									           tabindex="-1"/>
-									           <html:hidden property="order.totalAmountNonVat" />
-									       </td>
-									    </tr>
-									    <tr>
 									       <td align="right"><b><font size ="3">ยอดสุทธิ</font></b></td>
-									       <td align="left">
+									       <td align="right">
 									          <input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" 
 									          class="disableBoldBigBlueText" 
-									          style="text-align: right;" tabindex="-1" size="15"/>
+									          style="text-align: right;" tabindex="-1" size="17"/>
 									           <html:hidden property="order.netAmount"/>
+									           
+									           <!-- calc vat -->
+									           <input type="hidden" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat"/>
+									           <html:hidden property="order.totalAmountNonVat" />
 									       </td>
 									    </tr>
 								   </table>

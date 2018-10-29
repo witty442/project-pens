@@ -34,7 +34,7 @@ public class Database {
 		PreparedStatement pstmt = null;
 		ResultSet rst = null;
 		try {
-			logger.debug(sql);
+			//logger.debug(sql);
 			Constructor<?> constructor = classes.getDeclaredConstructor(new Class[] { ResultSet.class });
 			pstmt = conn.prepareStatement(sql);
 			int i = 1;

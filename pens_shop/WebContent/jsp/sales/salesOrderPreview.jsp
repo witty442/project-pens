@@ -30,7 +30,6 @@ if(action == null){
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
-
 %>
 <html>
 <head>
@@ -46,6 +45,7 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
  font-size: 20px;
  font-weight: bold;
 }
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <!-- Calendar -->
@@ -58,7 +58,7 @@ pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrderProduct.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
-
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">
 function loadMe(){
 	calculatePrice();	
@@ -71,6 +71,8 @@ function loadMe(){
 	<%if( !Utils.isNull(orderForm.getOrder().getPaymentMethod()).equals("")){%>
 	  document.getElementById("paymentMethod").value ="<%=orderForm.getOrder().getPaymentMethod()%>";
 	  changePaymentMethod(document.getElementById("paymentMethod"));
+	<%}else{%>
+	   changePaymentMethod(document.getElementById("paymentMethod"));
 	<%}%>
 }
 
@@ -111,6 +113,53 @@ function changePaymentMethod(paymentMethod){
 		document.getElementById("div_credit_2").style.display = "block";
 		document.getElementById("div_credit_3").style.display = "block";
 		document.getElementById("div_credit_4").style.display = "block";
+	}
+}
+/** Calc Change Amount onkeypress**/
+function calcChangeAmount(e,custAmountObj){
+    //alert(e.keyCode);
+	if(e != null && e.keyCode == 13){
+		//validate input is number 2 digit
+		if( !isNum2DigitValue(custAmountObj.value)){
+			alert("กรุณากรอก จำนวนเงินเป็นตัวเลขเท่านั้น");
+			custAmountObj.value ="";
+			custAmountObj.focus();
+			return false;
+		}
+		
+		calcChangeAmountModel(custAmountObj);
+	}
+}
+
+/** Calc Change Amount onchange**/
+function calcChangeAmountOnchange(custAmountObj){
+	//validate input is number 2 digit
+	if( !isNum2DigitValue(custAmountObj.value)){
+		alert("กรุณากรอก จำนวนเงินเป็นตัวเลขเท่านั้น");
+		custAmountObj.value ="";
+		custAmountObj.focus();
+		return false;
+	}
+	
+	calcChangeAmountModel(custAmountObj);
+}
+function calcChangeAmountModel(custAmountObj){
+    //alert(e.keyCode);
+	if(custAmountObj.value != ""){
+	  var netAmount = convetTxtObjToFloat(document.getElementById("tempNetAmount"));
+	  //alert("netAmount["+document.getElementById("tempNetAmount").value+"]:"+netAmount+",custAmount:"+custAmountObj.value);
+      if(Number(custAmountObj.value)< netAmount){
+    	  alert("จำนวนเงินจากลูกค้า น้อยกว่า ยอดสุทธิ กรุณาใส่จำนวนเงินใหม่");
+    	  document.getElementById("tempChangeAmount").value = "";
+    	  custAmountObj.focus();
+      }else{
+	     var changeAmoutResult = Number(custAmountObj.value)-netAmount;
+	     document.getElementById("tempChangeAmount").value =  addCommas(Number(changeAmoutResult).toFixed(2));
+	     custAmountObj.value =Number(custAmountObj.value).toFixed(2);
+      }
+	}else{
+		alert("กรุณาระบุจำนวนเงิน ");
+		custAmountObj.focus();
 	}
 }
 </script>
@@ -165,28 +214,28 @@ function changePaymentMethod(paymentMethod){
 							<tr>
 								<td align="right">&nbsp;&nbsp;ชื่อ-นามสกุล<font color="red"></font></td>
 								<td align="left" colspan="3">
-									<html:text property="order.customerBillName" size="40" styleClass="\" autoComplete=\"off"/>		
+									<html:text property="order.customerBillName" size="40" styleClass="\" autoComplete=\"off" tabindex="1"/>		
 								</td>
 							</tr>
 							<tr>
 								<td align="right">ที่อยู่<font color="red"></font></td>
 								<td align="left" colspan="3">
-									<html:text property="order.addressDesc" size="80"  styleClass="\" autoComplete=\"off" />
+									<html:text property="order.addressDesc" size="80"  styleClass="\" autoComplete=\"off" tabindex="2" />
 								</td>
 							</tr>
 							<tr>
 								<td align="right">บัตรประชาชน<font color="red"></font></td>
 								<td align="left" colspan="2">
 									<html:text property="order.idNo" size="20" maxlength="13" 
-									onkeydown="return inputNum(event);" styleClass="\" autoComplete=\"off" />
+									onkeydown="return inputNum(event);" styleClass="\" autoComplete=\"off"  tabindex="3"/>
 									&nbsp;&nbsp;&nbsp;&nbsp;
 									Passport No &nbsp;
-									<html:text property="order.passportNo" size="20" styleClass="\" autoComplete=\"off" />
+									<html:text property="order.passportNo" size="20" styleClass="\" autoComplete=\"off"  tabindex="4"/>
 								    &nbsp;&nbsp;&nbsp;&nbsp;  
 							</td> 
 							 <td align="left">   
 								         อัตราภาษี &nbsp;
-									<html:text property="order.vatCode" value="7" readonly="true" size="2" styleClass="disableText"/>
+									<html:text property="order.vatCode" value="7" readonly="true" size="2" styleClass="disableText"  tabindex="-1"/>
 									
 									<html:hidden property="order.priceListId" styleId="order.priceListId"/>
 									<html:hidden property="order.paymentTerm"/>
@@ -199,8 +248,8 @@ function changePaymentMethod(paymentMethod){
 								<div id="divTableProductHead" style="width: 100%; height:50px; overflow-y: scroll;">
 								<table id="tblProductHead" align="left" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>
-										<th class="td_text_center" width="9%">ลำดับ</th>
-										<th class="td_text_center" width="1%"></th>
+										<th class="td_text_center" width="4%">ลำดับ</th>
+										<th class="td_text_center" width="5%"><input type="checkbox" disabled name="chk_temp" class="disableCheckbox"/></th>
 										<th class="td_text_center" width="20%">ชื่อสินค้า</th>
 										<th class="td_text_center" width="10%">หน่วยนับ</th>
 										<th class="td_text_center" width="10%">จำนวน</th>
@@ -226,8 +275,8 @@ function changePaymentMethod(paymentMethod){
 										</c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
-										<td class="td_text_center" width="9%">${lines1.lineNo}</td>
-										<td class="td_text_center" width="1%"></td>
+										<td class="td_text_center" width="4%">${lines1.lineNo}</td>
+										<td class="td_text_center" width="5%"><input type="checkbox" disabled name="chk_temp" class="disableCheckbox"/></td>
 										<td class="td_text" width="20%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
@@ -379,6 +428,7 @@ function changePaymentMethod(paymentMethod){
 									            </html:select> 
 									           <html:text property="order.creditCardNo" styleId="creditCardNo"  styleClass="\" autoComplete=\"off"
 									           size="30" maxlength="16" onkeydown="return inputNum(event);"/>
+									           <font color="red">*</font>
 									         </span>
 									      </td>
 									      <td align="left" nowrap>
@@ -404,6 +454,7 @@ function changePaymentMethod(paymentMethod){
 					 				            <html:select property="order.creditcardYearExpire" styleId="creditcardYearExpire">
 										            <html:options collection="CAREDITCARD_YEAR_EXPIRE_LIST" property="key" labelProperty="name"/>
 									            </html:select> 
+									            <font color="red">*</font>
 									        </span>
 									      </td>
 									    </tr>
@@ -427,30 +478,53 @@ function changePaymentMethod(paymentMethod){
 								   <table align="left" border="0" cellpadding="3" cellspacing="1">
 									    <tr>
 									      <td align="right" nowrap><b>ยอดรวมก่อนภาษี</b></td>
-									      <td align="left">
-									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
+									      <td align="right">
+									        <input type="text" id="tempTotalAmount" name="tempTotalAmount" size="21" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
 										     <html:hidden property="order.totalAmount"/>
 									      </td>
 									    </tr>
 									    <tr>
 									       <td align="right" nowrap><b>ภาษี</b></td>
-									       <td align="left">
-									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="22" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
+									       <td align="right">
+									         <input type="text" id="tempVatAmount" name="tempVatAmount" size="21" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
 									         <html:hidden property="order.vatAmount"/>
 									       </td>
 									    </tr>
 									    <tr>
-									       <td align="right" nowrap><b>ยอดรวมที่ไม่เสียภาษี</b></td>
-									       <td align="left">
-									           <input type="text" id="tempTotalAmountNonVat" size="22" name="tempTotalAmountNonVat" readonly="readonly" class="disableBoldText" style="text-align: right;"/>
-									           <html:hidden property="order.totalAmountNonVat"/>
+									       <td align="right" nowrap><b><font size ="3">ยอดสุทธิ</font></b></td>
+									       <td align="right">
+									          <input type="text" id="tempNetAmount" name="tempNetAmount" size="17" readonly="readonly" class="disableBoldBigBlueText" style="text-align: right;"/>
+									           <html:hidden property="order.netAmount"/>
+									           
+									            <!-- calc vat -->
+									           <input type="hidden" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat"/>
+									           <html:hidden property="order.totalAmountNonVat" />
 									       </td>
 									    </tr>
 									    <tr>
-									       <td align="right" nowrap><b><font size ="3">ยอดสุทธิ</font></b></td>
-									       <td align="left">
-									          <input type="text" id="tempNetAmount" name="tempNetAmount" size="15" readonly="readonly" class="disableBoldBigBlueText" style="text-align: right;"/>
-									           <html:hidden property="order.netAmount"/>
+								          <td colspan="3" ><hr></td>
+								        </tr>
+									     <tr>
+									       <td align="right" nowrap style="color:#00e600;"><b><font size ="4">รับเงินจากลูกค้า</font></b></td>
+									       <td align="right">
+									         <!--  <input type="text" id="tempCustAmount" name="tempCustAmount" size="13" 
+									           class="enableBoldBigGreenText" style="text-align: right;"
+                                               onkeypress="calcChangeAmount(event,this)" /> -->
+                                               
+                                               <html:text property="order.tempCustAmount" size="14" styleId="tempCustAmount"
+                                                onkeypress="calcChangeAmount(event,this)"
+                                                onchange="calcChangeAmountOnchange(this)"
+                                                styleClass="enableBoldBigGreenNumber \" autoComplete=\"off"  tabindex="8"/>
+									       </td>
+									    </tr>
+									    <tr>
+									       <td align="right" nowrap style="color:#ff471a;"><b><font size ="4">เงินทอน</font></b></td>
+									       <td align="right">
+									          <!-- <input type="text" id="tempChangeAmount" name="tempChangeAmount" size="13" 
+									          readonly="readonly" class="disableBoldBigRedText" style="text-align: right;"/> -->
+									          
+									           <html:text property="order.tempChangeAmount" size="14" styleId="tempChangeAmount"
+                                               styleClass="disableBoldBigRedNumber" readonly="true" tabindex="-1"/>
 									       </td>
 									    </tr>
 								   </table> 

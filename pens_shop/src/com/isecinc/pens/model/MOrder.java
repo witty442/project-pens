@@ -300,12 +300,8 @@ public class MOrder extends I_Model<Order> {
 				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
 				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
 				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				if("S".equalsIgnoreCase(l.getPromotion())){
-					/** Line Discount Special is negative only **/
-				   totalAmountDec = totalAmountDec.add(lineAmount.add(lineDiscount) );
-				}else{
-				   totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-				}
+				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+				
 				//Non Vat
 				
 				if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
@@ -430,12 +426,8 @@ public class MOrder extends I_Model<Order> {
 					//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
 					lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
 					lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-					if("N".equalsIgnoreCase(l.getPromotion())){
-					   totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-					}else if("S".equalsIgnoreCase(l.getPromotion())){
-					  //In Special Line Discount is negative allway
-					  totalAmountDec = totalAmountDec.add(lineAmount.add(lineDiscount) );
-					}
+				    totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
+					
 					//Non Vat
 					if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
 						totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
@@ -532,15 +524,9 @@ public class MOrder extends I_Model<Order> {
 		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
 		for (OrderLine l : lines) {
 			//recalc LineAmount
+			l.setLineAmount(l.getPrice()*l.getQty());
+			l.setTotalAmount(l.getLineAmount()-l.getDiscount());
 			
-			if( !Utils.isNull(l.getPromotion()).equalsIgnoreCase("S")){
-				l.setLineAmount(l.getPrice()*l.getQty());
-				l.setTotalAmount(l.getLineAmount()-l.getDiscount());
-			}else{
-				//Case Special (S) no set amount (l.getDiscount() is negative only )*/
-				l.setLineAmount(l.getPrice()*l.getQty());
-				l.setTotalAmount(l.getLineAmount()+l.getDiscount());
-			}
 			logger.info("recal :product["+l.getProduct().getCode()+"]qty["+l.getQty()+"]price["+l.getPrice()+"]LineAmount["+l.getLineAmount()+"]Disc["+l.getDiscount()+"]total["+l.getTotalAmount()+"]");
 			newRecallines.add(l);
 			

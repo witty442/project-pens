@@ -46,25 +46,7 @@ function cancelOrder(path){
 function openCancelOrderPopup(path,orderNo,id,payment){
 	window.open(path + "/jsp/pop/cancelOrderPopup.jsp?id="+id+"&orderNo="+orderNo+"&payment="+payment, "Edit Shipping Date.", "width=400,height=260,location=No,resizable=No");
 }
-
-function newDayAdd(inputDate, addDay){
-	var newDay = inputDate.split('/')[1] +'/'+ inputDate.split('/')[0]+'/'+ inputDate.split('/')[2];
-    var d = new Date(newDay);  
-    d.setDate(d.getDate()+addDay);  
-    mkMonth=d.getMonth()+1;  
-    mkMonth=new String(mkMonth);  
-    if(mkMonth.length==1){  
-        mkMonth="0"+mkMonth;  
-    }  
-    mkDay=d.getDate();  
-    mkDay=new String(mkDay);  
-    if(mkDay.length==1){  
-        mkDay="0"+mkDay;  
-    }     
-    mkYear=d.getFullYear();  
-    return mkDay+"/"+mkMonth+"/"+mkYear;      
-}  
-
+ 
 function gotoReport(path, role){
 	var rand = Math.floor(Math.random()*11);
 	var w = 700;
@@ -88,17 +70,29 @@ function save(path,role) {
 	if("CR" ==paymentMethod.value){
 		var creditCardNo = document.getElementById('creditCardNo');
 		var creditCardExpireDate = document.getElementById('creditCardExpireDate');
-		if(creditCardNo.value != "" && creditCardNo.value.length <16){
-			alert("กรูณาระบุ รหัสบัตรเครดิตให้ถูกต้อง");
+		if(creditCardNo.value == ""){
+			alert("กรุณาระบุ รหัสบัตรเครดิต");
 			creditCardNo.focus();
 			return false;
+		}else{
+			if(creditCardNo.value != "" && creditCardNo.value.length < 16){
+				alert("กรุณาระบุ รหัสบัตรเครดิตให้ถูกต้อง");
+				creditCardNo.focus();
+				return false;
+			}
 		}
 		if(creditcardMonthExpire.value == "" || creditcardYearExpire.value == ""){
-			alert("กรูณาระบุ วันที่หมดอายุ บัตรเครดิตให้ถูกต้อง");
+			alert("กรุณาระบุ วันที่หมดอายุ บัตรเครดิตให้ถูกต้อง");
 			if(creditcardMonthExpire.value == "" )creditcardMonthExpire.focus();
 			if(creditcardYearExpire.value == "" )creditcardYearExpire.focus();
 			return false;
 		}
+	}
+	
+	//validate net_amount > 0
+	if( Number(document.getElementsByName("order.netAmount")[0].value)<=0){
+		alert("ไม่สามารถบันทึกข้อมูลได้ เนื่องจาก ยอดสุทธิเท่ากับศูนย์");
+		return false;
 	}
 	
 	if(!createProductList()){return false;}

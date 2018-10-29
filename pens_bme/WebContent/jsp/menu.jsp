@@ -286,17 +286,17 @@
 <%} %>
 
 <!-- Maya Menu-->
-<%if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN,User.WACOAL,User.PICK}) ){ no=0;%>
-	<%--  <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
+<% if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN,User.WACOAL,User.PICK}) ){ no=0;%>
+   <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
 		<ul> 
 		    <li>
 	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/mayaAction.do?do=prepare&pageAction=new&pageName=<%=MayaAction.P_MAYA_SALEOUT%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
 	        </li>
-			<li>
+			 <li>
 	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/mayaAction.do?do=prepare&pageAction=new&pageName=<%=MayaAction.P_MAYA_STOCK_ONHAND%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
-	        </li>
+	        </li> 
 		</ul>
-	</li>  --%>
+	</li>  
 <%} %>
 
 <!-- -------------------------------------------------------------------Report ------------------------------------------------------------------------------------------------------- -->
