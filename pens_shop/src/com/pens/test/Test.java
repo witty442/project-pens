@@ -1,22 +1,24 @@
 package com.pens.test;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.math.BigDecimal;
 
 import org.apache.log4j.Logger;
-
-import com.isecinc.pens.inf.helper.Utils;
 
 public class Test {
 	public static Logger logger = Logger.getLogger("PENS");
 	public static void main(String[] args) {
 		try{
-		logger.debug("order.getCreated():"+"17/10/2561 14:22");
-		Date createDateTemp = Utils.parse("17/10/2561 14:22", Utils.DD_MM_YYYY_HH_mm_WITH_SLASH,Utils.local_th);
-		logger.debug("createDateTemp:"+createDateTemp);
-		String createDateChrist = Utils.stringValue(createDateTemp, Utils.DD_MM_YYYY_HH_mm_WITH_SLASH);
-		logger.debug("createDateChrist:"+createDateChrist);
+		  BigDecimal priceIncludeVat = new BigDecimal(690.86);
+		 // priceIncludeVat = priceIncludeVat.setScale(2,BigDecimal.ROUND_HALF_UP);
+		  System.out.println("before priceIncludeVat:"+priceIncludeVat);
+		  
+		  BigDecimal priceExcludeVat = new BigDecimal("0");
+		  priceExcludeVat = priceIncludeVat.divide(new BigDecimal(1.07),BigDecimal.ROUND_HALF_UP);
+		  priceExcludeVat = priceExcludeVat.setScale(2,BigDecimal.ROUND_HALF_UP);
+		  System.out.println("before priceExcludeVat:"+priceExcludeVat);
+		  
+		  //vat = vat.setScale(0, BigDecimal.ROUND_UP);
+		 // System.out.println("after vat:"+vat);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

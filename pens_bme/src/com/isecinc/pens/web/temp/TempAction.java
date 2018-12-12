@@ -44,9 +44,6 @@ public class TempAction extends I_Action {
 
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
-	
-	
-	
 	/**
 	 * Prepare without ID
 	 */

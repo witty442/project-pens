@@ -9,8 +9,11 @@ import com.isecinc.core.web.I_Form;
 
 public class PromotionForm extends I_Form {
 
-	private static final long serialVersionUID = 8932109820314224488L;
-    private List<PromotionBean> results = new ArrayList<PromotionBean>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6955280771824755263L;
+	private List<PromotionBean> results = new ArrayList<PromotionBean>();
     private List<PromotionBean> resultsSearch = new ArrayList<PromotionBean>();
     private String pageName;
     private PromotionBean bean ;

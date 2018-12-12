@@ -104,6 +104,10 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.scannerdetection.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 
+<!-- Test new version jquery -->
+<!-- <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+ -->
 <script type="text/javascript">
 //clear cach
 $.ajaxSetup({cache: false});
@@ -362,8 +366,8 @@ style="height: 100%;">
 										   <input type="checkbox" name="chkAll"
 											onclick="checkSelect(this,document.getElementsByName('lineids'));" />
 										</th>
-										<th class="td_text_center" width="20%">ชื่อสินค้า</th>
-										<th class="td_text_center" width="10%">หน่วยนับ</th>
+										<th class="td_text_center" width="25%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="5%">หน่วยนับ</th>
 										<th class="td_text_center" width="10%">จำนวน</th>
 										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
 										<th class="td_text_center" width="10%">ยอดรวม</th>
@@ -390,7 +394,7 @@ style="height: 100%;">
 										<td  class="td_text_center" width="5%">${rows1.index + 1}</td>
 										<td  class="td_text_center" width="5%"><input type="checkbox" name="lineids" value="${lines1.id}" /></td>
 										
-										<td class="td_text" width="20%">
+										<td class="td_text" width="25%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
 											<input type='hidden' name='lines.row' value='${lines1.lineNo}'>
@@ -436,7 +440,7 @@ style="height: 100%;">
 											
 											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="5%">
 											<c:choose>
 												<c:when test="<%=orderForm.getOrder().getOrderType().equals(User.DD) %>">
 													${lines1.uom.code}&nbsp;${lines1.uom1.code}

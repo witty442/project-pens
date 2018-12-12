@@ -258,4 +258,95 @@ public class LocationInitial extends LocationControlPage {
 		}
 	}
 	
+	public  void initSessionTrip(HttpServletRequest requestWeb) {
+		References r = null;
+		HttpSession session = requestWeb.getSession(true);
+		Connection conn = null;
+		int i = 0;
+		try{
+			logger.debug("Initail Session ");
+			conn = DBConnection.getInstance().getConnectionApps();
+
+			//CUST_CAT_NO_LIST
+			//add Blank Row
+			List<PopupBean> dataList = new ArrayList<PopupBean>();
+			PopupBean item = new PopupBean();
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
+			//dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("S");
+			item.setCustCatDesc("Credit Sales");
+			dataList.add(item);
+			
+			item = new PopupBean();
+			item.setCustCatNo("C");
+			item.setCustCatDesc("Van Sales");
+			dataList.add(item);
+			
+			session.setAttribute("CUST_CAT_LIST",dataList);
+			/********************************************************/
+			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn);
+			dataList.addAll(salesChannelList_s);
+			session.setAttribute("SALES_CHANNEL_LIST",dataList);
+			
+			/********************************************************/
+			//SALESREP_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			dataList.addAll(salesrepList_s);
+			session.setAttribute("SALESREP_LIST",dataList);
+			
+			/********************************************************/
+			//PROVINCE_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setProvince("");
+			item.setProvinceName("");
+			dataList.add(item);
+			
+			List<PopupBean> tempList = searchProvinceList(conn,"");
+			dataList.addAll(tempList);
+			session.setAttribute("PROVINCE_LIST",dataList);
+            /********************************************************/
+			//init tripList
+			session.setAttribute("tripDayList", initTripList());
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			 	DBConnection.getInstance().closeConn(conn, null, null);
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+	}
+	
+	public static List<References> initTripList(){
+		List<References> dataList = new ArrayList<References>();
+		dataList.add(new References("", ""));
+		for(int i=1;i<= 23;i++){
+			dataList.add(new References(i+"", i+""));
+		}
+		dataList.add(new References(98+"", 98+""));
+		return dataList;
+	}
 }

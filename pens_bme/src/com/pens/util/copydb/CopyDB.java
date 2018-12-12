@@ -26,6 +26,7 @@ public class CopyDB {
 
 			//Copy From Production to Test
 			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE","");
+			
 		   // processProductionToUAT("pensbi","PENSBME_ONHAND_BME_LOCKED","");
 		   // processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING","");
 			//processProductionToUAT("pensbi","PENSBME_ONHAND_BME","");
@@ -36,7 +37,7 @@ public class CopyDB {
 			//processProductionToUAT("pensbi","pensbme_stock_issue"," where issue_req_no ='T61040029' ");
 			//processProductionToUAT("pensbi","pensbme_stock_issue_item"," where issue_req_no ='T61040029' ");
 			
-			processProductionToUAT("pensbi","C_CONSTANTS ","");
+			//processProductionToUAT("pensbi","C_CONSTANTS ","");
 			
 			/***********************************************************************/
 			//copy Test to product

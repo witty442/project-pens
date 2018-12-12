@@ -8,6 +8,16 @@ function prepare(path,type,id){
 	document.orderForm.submit();
 	return true;
 }
+/** Link Sales Order Special **/
+function prepareSP(path,type,id){
+	if(id!=null){
+		document.orderForm.action = path + "/jsp/saleOrderSpecialAction.do?do=prepare&id=" + id+"&action="+type;
+	}else{
+		document.orderForm.action = path + "/jsp/saleOrderSpecialAction.do?do=prepare"+"&action="+type;
+	}
+	document.orderForm.submit();
+	return true;
+}
 
 function prepareEditOrder(path,type,id){
 	if(id!=null){

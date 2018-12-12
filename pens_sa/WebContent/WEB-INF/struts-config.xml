@@ -136,6 +136,8 @@
 			<forward name="spider" path="/jsp/location/locationSearch.jsp" />
 			<forward name="monitorSpider" path="/jsp/location/monitorSpiderSearch.jsp" />
 			<forward name="monitorSpiderDetail" path="/jsp/location/monitorSpiderDetail.jsp" />
+			<forward name="tripSearch" path="/jsp/location/tripSearch.jsp" />
+			<forward name="tripDetail" path="/jsp/location/tripDetail.jsp" />
 		</action>
 	</action-mappings>
  

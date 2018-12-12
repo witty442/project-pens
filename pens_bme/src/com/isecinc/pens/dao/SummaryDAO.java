@@ -1095,18 +1095,15 @@ public class SummaryDAO {
 			StringBuilder sql = new StringBuilder();
 			try {
 				sql.delete(0, sql.length());
-				sql.append("  SELECT distinct trunc(max(Count_stk_date)) as Count_stk_date from PENSBME_MTT_INIT_STK \n");
+				sql.append("  SELECT distinct trunc(max(Count_stk_date)) as Count_stk_date from PENSBI.PENSBME_MTT_INIT_STK \n");
 				sql.append("  where 1=1 and Cust_no ='"+custNo+"' \n");
-				
 				logger.debug("sql:"+sql);
-			
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()) {
 			       initDate = rst.getDate("Count_stk_date");
 					
-				}//while
-
+				}//if
 			} catch (Exception e) {
 				throw e;
 			} finally {

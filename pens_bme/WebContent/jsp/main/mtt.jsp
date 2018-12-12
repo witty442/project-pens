@@ -240,7 +240,7 @@ function addRow(){
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
 	  //  " onchange='getProductModel(this,"+lineId+")' "+
 	    " />  </td>"+
-	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='30' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='data_groupCode'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
 	    "<td class='data_pensItem'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='20' /></td>"+
 	    

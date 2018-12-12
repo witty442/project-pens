@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.maya.sub;
+package com.isecinc.pens.web.shop.sub;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,8 +25,8 @@ import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
-import com.isecinc.pens.web.maya.MayaBean;
-import com.isecinc.pens.web.maya.MayaForm;
+import com.isecinc.pens.web.shop.ShopBean;
+import com.isecinc.pens.web.shop.ShopForm;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
@@ -36,10 +36,10 @@ import com.pens.util.excel.ExcelHeader;
 public class MayaStockOnhandAction {
  private static Logger logger = Logger.getLogger("PENS");
 	
- public static MayaForm search(HttpServletRequest request, MayaForm f,User user) throws Exception{
+ public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
 	   Statement stmt = null;
 		ResultSet rst = null;
-		List<MayaBean> pos = new ArrayList<MayaBean>();
+		List<ShopBean> pos = new ArrayList<ShopBean>();
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
 		try {
@@ -52,24 +52,19 @@ public class MayaStockOnhandAction {
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				MayaBean item = new MayaBean();
-				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				item.setOrderNo(Utils.isNull(rst.getString("ORDER_NUMBER")));
+				ShopBean item = new ShopBean();
+				item.setGroupCode(Utils.isNull(rst.getString("group_type")));
 				item.setPensItem(Utils.isNull(rst.getString("pens_item")));
 				item.setBarcode(rst.getString("barcode"));
 				item.setStyle(rst.getString("material_master"));
-				item.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit));
-				item.setUnitPrice(Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit));
-				item.setLineAmount(Utils.decimalFormat(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
-				item.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
-				item.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
-				item.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+		
+				item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("INIT_SALE_QTY"),Utils.format_current_2_disgit));
+				item.setTransInQty(Utils.decimalFormat(rst.getDouble("TRANS_IN_QTY"),Utils.format_current_2_disgit));
+				item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("SALE_OUT_QTY"),Utils.format_current_2_disgit));
+				item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("SALE_RETURN_QTY"),Utils.format_current_2_disgit));
+				item.setAdjustQty("0");//wait for spec
+				item.setOnhandQty(Utils.decimalFormat(rst.getDouble("ONHAND_QTY"),Utils.format_current_2_disgit));
 				
-				if("S".equalsIgnoreCase(Utils.isNull(rst.getString("promotion")))){
-				  item.setFreeItem("YES");
-				}else{
-				  item.setFreeItem("");
-				}
 				pos.add(item);
 			}//while
 
@@ -93,61 +88,57 @@ public class MayaStockOnhandAction {
 		return f;
     }
  
- public static StringBuffer exportToExcel(HttpServletRequest request, MayaForm form,User user,List<MayaBean> list){
+ public static StringBuffer exportToExcel(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
 		StringBuffer h = new StringBuffer("");
-		String colspan ="12";
+		String colspan ="10";
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
-			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
+			/*if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
 				colspan ="11";
-			}
+			}*/
 			//Header
 			h.append("<table border='1'> \n");
 			h.append(" <tr> \n");
-			h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ MAYA Shop</td> \n");
+			h.append("  <td align='left' colspan='"+colspan+"'><b>รายงาน Stock Onhand at MAYA</b></td> \n");
 			h.append(" </tr> \n");
 			h.append(" <tr> \n");
-			h.append("  <td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getBean().getStartDate()+"-"+form.getBean().getEndDate()+"</td> \n");
+			h.append("  <td align='left' colspan='"+colspan+"' ><b>วันที่ขาย (As Of Date):"+form.getBean().getAsOfDate()+"</b></td> \n");
 			h.append(" </tr> \n");
 			h.append("</table> \n");
 
 			if(list != null){
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");
-				  h.append("<th>Sales Date</th> \n");
-				  h.append("<th>Order No</th> \n");
+				  h.append("<th>Group</th> \n");
 				  h.append("<th>Pens Item</th> \n");
+				  h.append("<th>Material Master</th> \n");
 				  h.append("<th>Barcode</th> \n");
-				  h.append("<th>Style</th> \n");
-				  h.append("<th>Qty </th> \n");
-				  h.append("<th>Free Item</th> \n");
-				  h.append("<th>Unit Price</th> \n");
-				  h.append("<th>Line Amount</th> \n");
-				  h.append("<th>Discount</th> \n");
-				  h.append("<th>Vat Amount</th> \n");
-				  h.append("<th>Total Line Amount</th> \n");
+				  h.append("<th>Initial Stock</th> \n");
+				  h.append("<th>Trans In Qty</th> \n");
+				  h.append("<th>Sale Out Qty</th> \n");
+				  h.append("<th>Return Qty</th> \n");
+				  h.append("<th>Adjust Qty</th> \n");
+				  h.append("<th>Onhand Qty</th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
-					MayaBean s = (MayaBean)list.get(i);
+					ShopBean s = (ShopBean)list.get(i);
 					h.append("<tr> \n");
-					  h.append("<td class='text'>"+s.getOrderDate()+"</td> \n");
-					  h.append("<td class='text'>"+s.getOrderNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getGroupCode()+"</td> \n");
 					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
-					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
 					  h.append("<td class='text'>"+s.getStyle()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getQty()+"</td> \n");
-					  h.append("<td class='text'>"+s.getFreeItem()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getUnitPrice()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getLineAmount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getDiscount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getVatAmount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getTotalAmount()+"</td> \n");
+					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getInitSaleQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getTransInQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getAdjustQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getOnhandQty()+"</td> \n");
 					h.append("</tr>");
 				}
 				/** Summary **/
-				MayaBean s = (MayaBean)request.getSession().getAttribute("summary");
+				ShopBean s = (ShopBean)request.getSession().getAttribute("summary");
 				h.append("<tr> \n");
 				 
 				 /* if("PensItem".equalsIgnoreCase(form.getSummaryType())){
@@ -178,10 +169,10 @@ public class MayaStockOnhandAction {
 		return h;
 	}
  
- public static StringBuilder genSQL(Connection conn,MayaForm f,Date initDate) throws Exception{
+ public static StringBuilder genSQL(Connection conn,ShopForm f,Date initDate) throws Exception{
 		StringBuilder sql = new StringBuilder();
 		String storeType ="SHOP";
-		MayaBean c = f.getBean();//Get Criteria
+		ShopBean c = f.getBean();//Get Criteria
 		try {
 			//prepare parameter
 			String christSalesDateStr ="";
@@ -197,16 +188,16 @@ public class MayaStockOnhandAction {
 			sql.append("\n SELECT A.* FROM(");
 			sql.append("\n SELECT M.*");
 			sql.append("\n , NVL(INIT_MTT.INIT_SALE_QTY,0) AS INIT_SALE_QTY");
-			sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");
+			sql.append("\n , NVL(TRANS_IN.TRANS_IN_QTY,0) AS TRANS_IN_QTY");
 			sql.append("\n , NVL(SALE_OUT.SALE_OUT_QTY,0) AS SALE_OUT_QTY");
 			sql.append("\n , NVL(SALE_RETURN.SALE_RETURN_QTY,0) AS SALE_RETURN_QTY");
-			sql.append("\n , (NVL(INIT_MTT.INIT_SALE_QTY,0) + NVL(SALE_IN.SALE_IN_QTY,0)) - (NVL(SALE_OUT.SALE_OUT_QTY,0)+NVL(SALE_RETURN.SALE_RETURN_QTY,0)) ONHAND_QTY");
+			sql.append("\n , (NVL(INIT_MTT.INIT_SALE_QTY,0) + NVL(TRANS_IN.TRANS_IN_QTY,0)) - (NVL(SALE_OUT.SALE_OUT_QTY,0)+NVL(SALE_RETURN.SALE_RETURN_QTY,0)) ONHAND_QTY");
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
 			       /** INIT MTT */
 					sql.append("\n SELECT DISTINCT");
-				    sql.append("\n L.GROUP_CODE as group_type ,L.MATERIAL_MASTER ,L.BARCODE ");
+				    sql.append("\n L.GROUP_CODE as group_type,L.PENS_ITEM,L.MATERIAL_MASTER ,L.BARCODE ");
 					sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
@@ -240,7 +231,7 @@ public class MayaStockOnhandAction {
 					sql.append("\n L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
 					sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 					sql.append("\n ,(" );
-					sql.append("\n   SELECT,MP.PENS_VALUE as PENS_ITEM ");
+					sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
@@ -271,10 +262,11 @@ public class MayaStockOnhandAction {
 					sql.append("\n UNION ALL");
 					/** ORDER ORACLE(SALEOUT) */
 					sql.append("\n SELECT DISTINCT");
-					sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
+					sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
 					sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 					sql.append("\n ,(" );
 					sql.append("\n   SELECT I.inventory_item_id as product_id");
+					sql.append("\n   ,MP.pens_desc2 as group_code ");
 					sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
@@ -310,9 +302,10 @@ public class MayaStockOnhandAction {
 					/** Return **/
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n D.GROUP_CODE as group_type,D.PENS_ITEM ,D.MATERIAL_MASTER,D.BARCODE ");
-					sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J L,PENSBI.PENSBME_PICK_BARCODE L,PENSBI.PENSBME_PICK_BARCODE_ITEM D");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J,PENSBI.PENSBME_PICK_BARCODE L,PENSBI.PENSBME_PICK_BARCODE_ITEM D");
 					sql.append("\n WHERE J.JOB_ID = L.JOB_ID ");
-					sql.append("\n AND L.ISSUE_REQ_NO = D.ISSUE_REQ_NO ");
+					sql.append("\n AND L.BOX_NO = D.BOX_NO ");
+					sql.append("\n AND L.JOB_ID = D.JOB_ID ");
 					sql.append("\n AND J.STATUS ='"+PickConstants.STATUS_CLOSE+"'");
 					sql.append("\n AND L.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
 					sql.append("\n AND D.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
@@ -321,9 +314,9 @@ public class MayaStockOnhandAction {
 					
 					if(initDate != null){
 						 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-						 sql.append("\n AND L.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}else{
-						 sql.append("\n AND L.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}
 					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
 						sql.append("\n AND D.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
@@ -341,12 +334,12 @@ public class MayaStockOnhandAction {
         sql.append("\n )M ");
         sql.append("\n LEFT OUTER JOIN(	 ");
 	       /**** INIT MTT STOCK *****************/
-   		    sql.append("\n SELECT L.GROUP_CODE as group_type ,L.MATERIAL_MASTER ,L.BARCODE");
+   		    sql.append("\n SELECT L.GROUP_CODE as group_type ,L.pens_item ,L.MATERIAL_MASTER ,L.BARCODE");
 			sql.append("\n ,SUM(QTY) AS INIT_SALE_QTY ");
-			sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+			sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 			sql.append("\n ,( ");
 			sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-			sql.append("\n   PENSBME_MST_REFERENCE M ");
+			sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 			sql.append("\n   WHERE M.reference_code ='Store' ");
 			//Filter By StoreType
 			sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
@@ -370,7 +363,7 @@ public class MayaStockOnhandAction {
 				sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 				sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 			}
-			sql.append("\n  GROUP BY L.GROUP_CODE as group_type ,L.MATERIAL_MASTER ,L.BARCODE");
+			sql.append("\n  GROUP BY L.GROUP_CODE,L.pens_item,L.MATERIAL_MASTER ,L.BARCODE");
 			sql.append("\n )INIT_MTT ");
 			sql.append("\n ON M.pens_item = INIT_MTT.pens_item ");	 
 			sql.append("\n AND M.group_type = INIT_MTT.group_type ");		
@@ -382,7 +375,7 @@ public class MayaStockOnhandAction {
 	        sql.append("\n ,NVL(SUM(L.QTY),0) AS TRANS_IN_QTY ");
 	        sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 			sql.append("\n ,(" );
-			sql.append("\n   SELECT,MP.PENS_VALUE as PENS_ITEM ");
+			sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
@@ -393,10 +386,10 @@ public class MayaStockOnhandAction {
 			//Filter By StoreType
 			sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.store_code"));
 			if(initDate != null){
-				 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-				 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND L.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 			}else{
-				 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 			}
 			if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
 				sql.append("\n AND L.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
@@ -410,7 +403,7 @@ public class MayaStockOnhandAction {
 				sql.append("\n AND L.ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 				sql.append("\n AND L.ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 			}
-			sql.append("\n  GROUP BY L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
+			sql.append("\n  GROUP BY L.GROUP_CODE,L.ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
 			sql.append("\n )TRANS_IN ");
 			sql.append("\n ON  M.pens_item = TRANS_IN.pens_item ");	 
 			sql.append("\n AND M.group_type = TRANS_IN.group_type ");
@@ -418,11 +411,12 @@ public class MayaStockOnhandAction {
 			sql.append("\n LEFT OUTER JOIN( ");
 			 /******** SALE_OUT *****************/
 				sql.append("\n SELECT");
-				sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
-				sql.append("\n ,NVL(SUM(D.ORDERED_QUANTITY)) as SALE_OUT_QTY");
+				sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
+				sql.append("\n ,NVL(SUM(D.ORDERED_QUANTITY),0) as SALE_OUT_QTY");
 				sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 				sql.append("\n ,(" );
 				sql.append("\n   SELECT I.inventory_item_id as product_id");
+				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
 				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
@@ -453,17 +447,19 @@ public class MayaStockOnhandAction {
 					sql.append("\n AND MP.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND MP.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
+				sql.append("\n  GROUP BY MP.GROUP_CODE,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE");
 			sql.append("\n )SALE_OUT ");
-			sql.append("\n ON  M.customer_code = SALE_IN.customer_code and M.pens_item = SALE_IN.pens_item ");
-			sql.append("\n AND M.group_type  = SALE_IN.group_type ");
+			sql.append("\n ON M.pens_item = SALE_OUT.pens_item ");
+			sql.append("\n AND M.group_type  = SALE_OUT.group_type ");
 			sql.append("\n LEFT OUTER JOIN ( ");
 			 /******** SALE_RETURN *****************/
 				sql.append("\n SELECT ");
 				sql.append("\n D.GROUP_CODE as group_type,D.PENS_ITEM ,D.MATERIAL_MASTER,D.BARCODE ");
 				sql.append("\n ,COUNT(*) as SALE_RETURN_QTY ");
-				sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J L,PENSBI.PENSBME_PICK_BARCODE L,PENSBI.PENSBME_PICK_BARCODE_ITEM D");
+				sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J,PENSBI.PENSBME_PICK_BARCODE L,PENSBI.PENSBME_PICK_BARCODE_ITEM D");
 				sql.append("\n WHERE J.JOB_ID = L.JOB_ID ");
-				sql.append("\n AND L.ISSUE_REQ_NO = D.ISSUE_REQ_NO ");
+				sql.append("\n AND L.BOX_NO = D.BOX_NO ");
+				sql.append("\n AND L.JOB_ID = D.JOB_ID ");
 				sql.append("\n AND J.STATUS ='"+PickConstants.STATUS_CLOSE+"'");
 				sql.append("\n AND L.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
 				sql.append("\n AND D.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
@@ -472,9 +468,9 @@ public class MayaStockOnhandAction {
 				
 				if(initDate != null){
 					 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-					 sql.append("\n AND L.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}else{
-					 sql.append("\n AND L.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
 					sql.append("\n AND D.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
@@ -488,7 +484,7 @@ public class MayaStockOnhandAction {
 					sql.append("\n AND D.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND D.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
-			   sql.append("\n GROUP BY D.GROUP_CODE as group_type,D.PENS_ITEM ,D.MATERIAL_MASTER,D.BARCODE" );
+			   sql.append("\n GROUP BY D.GROUP_CODE,D.PENS_ITEM ,D.MATERIAL_MASTER,D.BARCODE" );
 			sql.append("\n )SALE_RETURN ");
 			sql.append("\n  ON M.pens_item = SALE_RETURN.pens_item ");
 			sql.append("\n  AND M.group_type   = SALE_RETURN.group_type");

@@ -53,6 +53,9 @@ public class Utils {
 	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
 	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	public static final String YY_MM = "yyMM";
+	public static final String YYYY_MM = "yyyyMM";
+	public static final String MMM_YYYY = "MMM yyyy";
+	public static final String MMMM_YYYY = "MMMM yyyy";
 	
 	public static final Locale local_th = new Locale("th","TH");
 	public static final String format_num_no_disgit = "#";

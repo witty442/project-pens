@@ -51,15 +51,25 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		cal.setTime(DateToolsUtil.convertStringToDate(reportForm.getInvoicePaymentReport().getReceiptDate()));
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
 		reportForm.getInvoicePaymentReport().setEndDate(DateToolsUtil.convertToString(cal.getTime()));
-
+		
+		parameterMap.put("salesCode",user.getUserName());
+		parameterMap.put("salesName",user.getName());
+		
 		/***** Current Day select *****************************************************************************/
 		InvoicePaymentReport dataReport = process.searchReport(reportForm.getInvoicePaymentReport(), user, conn);
 		List<InvoicePaymentReport> lstReport = dataReport.getItemsList();
 		parameterMap.put("curCashAmt", dataReport.getTotalCashAmt());
 		parameterMap.put("curCreditCardAmt", dataReport.getTotalCreditCardAmt());
+		parameterMap.put("curAliAmt", dataReport.getTotalAliAmt());
+		parameterMap.put("curWeAmt", dataReport.getTotalWeAmt());
 		
 		parameterMap.put("curCashCnt", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 1));//currentCashCnt
 		parameterMap.put("curCreditCardCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 2));//curCreditcasrCnt
+		parameterMap.put("curAliCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 6));//curAliCnt
+		parameterMap.put("curWeCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 7));//curWechatCnt
+		
+		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
+		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
 		
 		//sum cancel amt today =receiptDate
 		double[] curCancelCash = process.sumCurCancelCashAmt(reportForm.getInvoicePaymentReport(), user, conn);
@@ -72,9 +82,15 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("cashAmtBefore", value2[0]);
 		double creditSalesAmtBefore = process.sumCreditCardAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("creditCardAmtBefore",creditSalesAmtBefore);
+		double aliAmtBefore = process.sumAliAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
+		parameterMap.put("aliAmtBefore",aliAmtBefore);
+		double weAmtBefore = process.sumWeAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
+		parameterMap.put("weAmtBefore",weAmtBefore);
 		
 		parameterMap.put("cashCntBefore", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 3));
 		parameterMap.put("creditCardCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 4));
+		parameterMap.put("aliCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 9));
+		parameterMap.put("weCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 10));
 		/*******************************************************************************************************/		
 		
 		parameterMap.put("reportPath", BeanParameter.getReportPath());

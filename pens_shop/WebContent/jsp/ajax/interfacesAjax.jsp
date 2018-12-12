@@ -23,7 +23,7 @@ try{
 	}else{
 		s ="Success";
 	}
-	//System.out.println("Check Status DateTime["+(new Date())+"]TransId["+id+"]Status["+s+"]statisId["+status+"]");
+	System.out.println("***Check Status Date["+(new Date())+"]TransId["+id+"]Status["+status+"]Msg["+s+"]***");
 }catch(Exception e){
 	e.printStackTrace();
 }finally{

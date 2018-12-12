@@ -16,6 +16,7 @@ import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
+import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
@@ -37,6 +38,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 		int i =0;
 		List<InvoiceDetailReport> pos = new ArrayList<InvoiceDetailReport>();
 		List<OrderLine> orderLines = new ArrayList<OrderLine>();
+		MOrderLine mOrderLine = new MOrderLine();
 		try {
 			String p_productCodeFrom = t.getProductCodeFrom();
 			String p_productCodeTo = t.getProductCodeTo();
@@ -113,7 +115,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					item.setOrderVATAmt(order.getVatAmount());
 					item.setOrderAmtIncludeVAT(order.getNetAmount());
 					item.setInvoiceNo(Utils.isNull(order.getArInvoiceNo()));
-					
+				    
 					/** Check is Header by Order_id **/
 					if( !String.valueOf(orderLine.getOrderId()).equals(orderIdTem)){
 						item.setIsHeader("true");

@@ -1,5 +1,6 @@
 package com.isecinc.pens.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -45,7 +46,14 @@ public class ProductBarcodeDAO {
 			    	productCatalog.setProductName(itemProd.getProductName());
 			    	productCatalog.setUom1(itemProd.getUom1());
 			    	productCatalog.setUom2(itemProd.getUom2());
-			    	productCatalog.setPrice1(itemProd.getPrice1());
+			    	//productCatalog.setPrice1(itemProd.getPrice1());
+			    	//New Edit 20/11/2018 (price*vat 7%)
+			    	if(itemProd.getPrice1()==0){
+			    	   productCatalog.setPrice1(0);
+			    	}else{
+			    	   //calc price include vat 
+			    	   productCatalog.setPrice1(calePriceIncludeVat(itemProd.getPrice1()));
+			    	}
 			    	productCatalog.setPrice2(0);
 			    	productCatalog.setTaxable(itemProd.getTaxable());
 			    	productCatalog.setQty1(Integer.parseInt(inputQty));//get  from screen input
@@ -160,5 +168,28 @@ public class ProductBarcodeDAO {
 			} finally {
 			}
 			return catalog;
+		}
+		
+		
+		
+		private static double calePriceIncludeVat(double price1) throws Exception{
+			try{
+				logger.debug("Price:"+price1);
+				BigDecimal priceBig = new BigDecimal(price1);
+		    	BigDecimal vatBig = new BigDecimal(0.07);
+		    	vatBig = priceBig.multiply(vatBig).setScale(2,BigDecimal.ROUND_HALF_UP);
+		    	logger.debug("vatBig:"+vatBig);
+		    	
+		    	BigDecimal priceIncludeVat = priceBig.add(vatBig).setScale(2,BigDecimal.ROUND_HALF_UP);
+		    	logger.debug("before priceIncludeVat:"+priceIncludeVat.doubleValue());
+		    	
+		    	priceIncludeVat= priceIncludeVat.setScale(0,BigDecimal.ROUND_HALF_UP);
+		    	logger.debug("result priceIncludeVat:"+priceIncludeVat.doubleValue());
+		    	
+		    	return priceIncludeVat.doubleValue();
+			}catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			}
 		}
 }

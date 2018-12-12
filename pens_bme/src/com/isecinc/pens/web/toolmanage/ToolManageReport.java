@@ -33,6 +33,7 @@ public class ToolManageReport {
 	    	if("ExportToExcel".equalsIgnoreCase(action)){
 	    		 tableStyle ="border='1'";
 	    	}
+	    	logger.debug("CountStkDate:"+bean.getCountStkDate());
 	    	//Get Item List
 	    	List<ToolManageBean> itemList = searchItemList(conn, bean);
 	    	//Get Store  List
@@ -68,6 +69,7 @@ public class ToolManageReport {
 				   h.append("<th  class='colum_head' width='20%'>กลุ่มร้านค้า/อุปกรณ์</th> \n");
 				}else{
 				   h.append("<th  class='colum_head' width='20%'>ร้านค้า/อุปกรณ์</th> \n");
+				   h.append("<th  class='colum_head' width='5%'>วันที่นับสต๊อกล่าสุด</th> \n");
 				}
 				
 				//Gen Header By Item
@@ -91,6 +93,7 @@ public class ToolManageReport {
 					   h.append("<td class='text' align='left' width='15%'>"+store.getCustGroup()+"-"+store.getCustGroupName()+"</td> \n");
 					}else{
 					   h.append("<td class='text' align='left' width='15%'>"+store.getStoreCode()+"-"+store.getStoreName()+"</td> \n");
+					   h.append("<td class='text' align='left' width='5%'>"+Utils.stringValue(store.getCountStkDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
 					}
 					//Loop Item
 					for(int c=0;c<itemList.size();c++){
@@ -102,18 +105,18 @@ public class ToolManageReport {
 						}
 						data = dataMap.get(key);
 						if(data != null){
-						   logger.debug("get key:"+key+",QTY["+data.getQty()+"]");
+						   //logger.debug("get key:"+key+",QTY["+data.getQty()+"]");
 					       h.append("<td align='right' class='num' width='"+columnWidthPercent+"%'>"+data.getQty()+"</td> \n");
 						}else{
-						   logger.debug("get key:"+key+",QTY[0]");
+						  // logger.debug("get key:"+key+",QTY[0]");
 						   h.append("<td  align='right' class='num' width='"+columnWidthPercent+"%'>0</td> \n");
 						}
 						//Sum by Item
 						if(sumItemMap.get(item.getItem()) != null){
 							int prevQty = sumItemMap.get(item.getItem());
 							int newQty = data!=null?Utils.convertStrToInt(data.getQty()):0;
-							logger.debug("prevQty:"+prevQty);
-							logger.debug("newQty:"+newQty);
+							//logger.debug("prevQty:"+prevQty);
+							//logger.debug("newQty:"+newQty);
 							sumItemMap.put(item.getItem(), (prevQty+newQty));
 						}else{
 							sumItemMap.put(item.getItem(), data!=null?Utils.convertStrToInt(data.getQty()):0);
@@ -124,7 +127,7 @@ public class ToolManageReport {
 				}//for Loop Store
 				//Summary
 				 h.append("<tr> \n");
-				 h.append("<td  align='right'><b>รวม</b></td> \n");
+				 h.append("<td  align='right' colspan='2'><b>รวม</b></td> \n");
 				 for(int i=0;i<itemList.size();i++){
 					ToolManageBean s = (ToolManageBean)itemList.get(i);
 				    h.append("<td align='right'><b>"+(Utils.decimalFormat(sumItemMap.get(s.getItem()),Utils.format_current_no_disgit))+"</b></th> \n");
@@ -237,7 +240,7 @@ public class ToolManageReport {
 		return items;
 	}
 	
-	public static List<ToolManageBean> searchStoreList(Connection conn,ToolManageBean bean) throws Exception {
+	public static List<ToolManageBean> searchStoreList(Connection conn,ToolManageBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -253,7 +256,41 @@ public class ToolManageReport {
             sql.append("\n  from PENSBME_ITEM_INOUT H ,PENSBME_ITEM_INOUT_DETAIL D");
 		    sql.append("\n  where H.doc_no = D.doc_no");
 		    //Where Condition
-		    sql.append(genWhereSearchList(bean));
+		    sql.append(genWhereSearchList(o));
+		    sql.append("\n  union ");
+		    sql.append("\n  select distinct H.store_code ,to_number(REPLACE(H.store_code,'-', '')) as store_code_int");
+		    sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
+		    sql.append("\n  where M.reference_code = 'Store' and M.pens_value = trim(H.store_code)) as STORE_NAME ");
+		    sql.append("\n  , H.Count_stk_date ");
+		    sql.append("\n  from PENSBME_INITIAL_ITEM H");
+		    sql.append("\n  where 1=1");
+		    //not in transaction
+		    sql.append("\n  and H.store_code not in(");
+		    sql.append("\n    select distinct H.store_code ");
+            sql.append("\n    from PENSBME_ITEM_INOUT H ,PENSBME_ITEM_INOUT_DETAIL D");
+		    sql.append("\n    where H.doc_no = D.doc_no");
+		    //Where Condition
+		    sql.append(genWhereSearchList(o));
+		    sql.append("\n   )");
+			/*Date countStkDate = null;
+			if( !Utils.isNull(o.getCountStkDate()).equals("")){
+				countStkDate = Utils.parse(Utils.isNull(o.getCountStkDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			}*/
+			/*if(countStkDate != null){
+				 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				 sql.append("\n AND H.Count_stk_date > to_date('"+countStkDate+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND H.Count_stk_date <= to_date('"+asOfDate+"','dd/mm/yyyy')  ");
+			}else{
+				 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			     sql.append("\n and H.Count_stk_date <= to_date('"+Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			}*/
+
+		    if( !Utils.isNull(o.getCustGroup()).equals("")){
+		       sql.append("\n and H.store_code LIKE '"+Utils.isNull(o.getCustGroup())+"%' ");
+		    }
+		    if( !Utils.isNull(o.getStoreCode()).equals("")){
+		       sql.append("\n and H.store_code = '"+Utils.isNull(o.getStoreCode())+"' ");
+		    }
 		    sql.append("\n )A ");
             sql.append("\n order by A.store_code_int asc");
 			logger.debug("sql:"+sql);
@@ -321,7 +358,7 @@ public class ToolManageReport {
 			for(int i=0;i<storeList.size();i++){
 				ToolManageBean storeBean = storeList.get(i);
 				storeBean.setReportType(bean.getReportType());
-				storeBean.setCountStkDate(bean.getCountStkDate());
+				//storeBean.setCountStkDate(bean.getCountStkDate());
 				storeBean.setDocDate(bean.getDocDate());
 				storeBean.setItemFrom(bean.getItemFrom());
 				storeBean.setItemTo(bean.getItemTo());
@@ -348,7 +385,7 @@ public class ToolManageReport {
 					if(dataCustGroupMap.get(newKey) !=null){
 						//old+cur
 						oldBean = dataCustGroupMap.get(newKey);
-						oldBean.setQty(""+(Utils.convertToInt(oldBean.getQty())+Utils.convertToInt(currBean.getQty())));
+						oldBean.setQty(""+(Utils.convertCurrentcyToInt(oldBean.getQty())+Utils.convertCurrentcyToInt(currBean.getQty())));
 						
 						dataCustGroupMap.put(newKey, oldBean);
 					}else{
@@ -371,10 +408,8 @@ public class ToolManageReport {
 		String key  ="";
 		Date countStkDate = null;
 		try {
-			logger.debug("countStkDate:"+Utils.isNull(bean.getCountStkDate()));
-			if( !Utils.isNull(bean.getCountStkDate()).equals("")){
-				countStkDate = Utils.parse(Utils.isNull(bean.getCountStkDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			}
+			logger.debug("countStkDate:"+bean.getCountStkDate());
+			countStkDate = bean.getCountStkDate();//Utils.parse(Utils.isNull(bean.getCountStkDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n select M.cust_group,M.store_code,M.item ");
 			sql.append("\n ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
@@ -477,15 +512,11 @@ public class ToolManageReport {
 	
 	public static StringBuffer genWhereSearchList(ToolManageBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
-		 
-		Date countStkDate = null;
-		if( !Utils.isNull(o.getCountStkDate()).equals("")){
-			countStkDate = Utils.parse(Utils.isNull(o.getCountStkDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-		}
-		if(countStkDate != null){
+
+		if(o.getCountStkDate() != null){
 			 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			 sql.append("\n AND H.doc_date > to_date('"+countStkDate+"','dd/mm/yyyy')  ");
-			 sql.append("\n AND H.doc_date <= to_date('"+asOfDate+"','dd/mm/yyyy')  ");
+			 sql.append("\n AND H.doc_date > to_date('"+Utils.stringValue(o.getCountStkDate(), Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
+			 sql.append("\n AND H.doc_date <= to_date('"+Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
 		}else{
 			 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 		     sql.append("\n and H.doc_date <= to_date('"+Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");

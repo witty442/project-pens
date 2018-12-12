@@ -2,12 +2,9 @@ package com.isecinc.pens.web.location;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
-import util.Utils;
-
-public class LocationBean implements Serializable{
+public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	private static final long serialVersionUID = -4104083172800233911L;
 	
 	private String typeSearch;
@@ -24,6 +21,7 @@ public class LocationBean implements Serializable{
 	private String customerType;
 	private String custCatNo;
 	private String salesChannelNo;
+	private String salesrepId;
 	private String salesrepCode;
 	private String salesrepName;
 	private String dispAllStore;
@@ -45,11 +43,123 @@ public class LocationBean implements Serializable{
 	private String custLat;
 	private String custLng;
 	
+	//Trip
+	private String tripDay;
+	private String tripDay2;
+	private String tripDay3;
+	
+	private String tripDayDB;
+	private String tripDayDB2;
+	private String tripDayDB3;
+	
+	private int totalRec;
+	private String createUser;
+	private String status;
+	
+	private long custAccountId;
+	private long partySiteId;
+	
 	//option
 	private String startDate;
 	private String endDate;
 
 	
+	public String getSalesrepId() {
+		return salesrepId;
+	}
+
+	public void setSalesrepId(String salesrepId) {
+		this.salesrepId = salesrepId;
+	}
+
+	public String getTripDayDB() {
+		return tripDayDB;
+	}
+
+	public void setTripDayDB(String tripDayDB) {
+		this.tripDayDB = tripDayDB;
+	}
+
+	public String getTripDayDB2() {
+		return tripDayDB2;
+	}
+
+	public void setTripDayDB2(String tripDayDB2) {
+		this.tripDayDB2 = tripDayDB2;
+	}
+
+	public String getTripDayDB3() {
+		return tripDayDB3;
+	}
+
+	public void setTripDayDB3(String tripDayDB3) {
+		this.tripDayDB3 = tripDayDB3;
+	}
+
+	public long getCustAccountId() {
+		return custAccountId;
+	}
+
+	public void setCustAccountId(long custAccountId) {
+		this.custAccountId = custAccountId;
+	}
+
+	public long getPartySiteId() {
+		return partySiteId;
+	}
+
+	public void setPartySiteId(long partySiteId) {
+		this.partySiteId = partySiteId;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getCreateUser() {
+		return createUser;
+	}
+
+	public void setCreateUser(String createUser) {
+		this.createUser = createUser;
+	}
+
+	public String getTripDay2() {
+		return tripDay2;
+	}
+
+	public void setTripDay2(String tripDay2) {
+		this.tripDay2 = tripDay2;
+	}
+
+	public String getTripDay3() {
+		return tripDay3;
+	}
+
+	public void setTripDay3(String tripDay3) {
+		this.tripDay3 = tripDay3;
+	}
+
+	public int getTotalRec() {
+		return totalRec;
+	}
+
+	public void setTotalRec(int totalRec) {
+		this.totalRec = totalRec;
+	}
+
+	public String getTripDay() {
+		return tripDay;
+	}
+
+	public void setTripDay(String tripDay) {
+		this.tripDay = tripDay;
+	}
+
 	public String getStartDate() {
 		return startDate;
 	}
@@ -330,6 +440,17 @@ public class LocationBean implements Serializable{
 	public void setSalesrepCode(String salesrepCode) {
 		this.salesrepCode = salesrepCode;
 	}
-  
+	 @Override
+	 public int compareTo(LocationBean o) {
+	     return Comparators.TRIP_ASC.compare(this, o);
+	  }
+	 public static class Comparators {
+			public static Comparator<LocationBean> TRIP_ASC = new Comparator<LocationBean>() {
+		        @Override
+		        public int compare(LocationBean o1, LocationBean o2) {
+		            return Integer.parseInt(o1.getTripDay())-(Integer.parseInt(o2.getTripDay()));
+		        }
+		    };
+		 }
    
 }

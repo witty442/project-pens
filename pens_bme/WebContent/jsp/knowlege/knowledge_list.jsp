@@ -12,7 +12,7 @@
    <font size="3"> <b>Knowledge Sample </b></font>
    </td></tr>
   <tr><td>
-     <a href="${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new">การแบ่ง Page Sample(Request Job เพื่อทำ Auto-CN(LOTUS)</a>
+     <a href="${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&action=newsearch&pageName=ShopPromotion">การแบ่ง Page Sample(Master C4 for Shop)</a>
   </td></tr>
   <tr><td>
      <a href="${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new">add row,delete row table Sample(Request Job เพื่อทำ Auto-CN(LOTUS)</a>
@@ -31,7 +31,18 @@
       <a href="${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=ImportOrderToOracleFromExcel">
       Batch Task Sample(Load Order Excel to ORACLE)</a>
    </td></tr>
-  
+    <tr><td>
+       Struts autoComplete=off Text Field->
+      <b>" html:text property="order.creditCardExpireDate" styleClass="disableText \" autoComplete=\"off"/> "</b>
+    </td></tr>	
+    <tr><td>
+      <a href="${pageContext.request.contextPath}/jsp/adjustStockSAAction.do?do=prepare2&action=new">
+      Validate Data Table (Javascript>)</a>
+   </td></tr>
+    <tr><td>
+      <a href="${pageContext.request.contextPath}/jsp/jobAction.do?do=prepare2&action=new">
+     Call Ajax (Javascript>)</a>
+   </td></tr>
   </table>
 </body>
 </html>

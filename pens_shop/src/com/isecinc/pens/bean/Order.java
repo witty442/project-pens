@@ -156,7 +156,6 @@ public class Order extends I_PO implements Serializable {
 	/** Bill Address */
 	private int billAddressId;
 
-	/** Ship Address */
 	private int shipAddressId;
 
 	/** Price List */
@@ -269,6 +268,7 @@ public class Order extends I_PO implements Serializable {
 	private String creditCardNo;
 	private String creditCardExpireDate;
 	
+	
 	//Display Optional no DB
 	private String placeOfBilled;
 	private String org;
@@ -291,7 +291,7 @@ public class Order extends I_PO implements Serializable {
 	private String tempCustAmount;
 	private String tempChangeAmount;
 	
-	
+
 	public String getTempCustAmount() {
 		return tempCustAmount;
 	}

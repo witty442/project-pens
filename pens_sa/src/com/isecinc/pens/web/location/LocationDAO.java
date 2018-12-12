@@ -35,6 +35,7 @@ public class LocationDAO {
 				sql.append("\n ,l.latitude ,l.longitude   ");
 				sql.append("\n ,( cs.trip1 || decode(cs.trip2, null,null ,','||cs.trip2) || decode(cs.trip3, null,null ,','||cs.trip3))as trip");
 				sql.append("\n ,s.code as salesrep_code, s.salesrep_name ,cs.customer_class_code");
+				
 				sql.append("\n from xxpens_om_trip_cust_loc l ,  ");
 				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
@@ -277,6 +278,9 @@ public class LocationDAO {
 				sql.append("\n ,M.trip , M.salesrep_code ,M.salesrep_name ,M.customer_class_code ");
 				/** Checkin_loc Info **/
 				sql.append("\n ,T.latitude ,T.longitude ,T.flag ,T.order_number,T.checkin_date");
+				/** check sales vs order_number */
+				//sql.append("\n ,( CASE WHEN M.salesrep_code like 'V%' THEN '3' || SUBSTR(M.salesrep_code,2,5) ");
+				//sql.append("\n         ELSE '2' || SUBSTR(M.salesrep_code,2,5) END) as sales_code_check");
 				sql.append("\n FROM( ");//T
 				/********* Customer have Trip **************************************************************/
 				sql.append("\n   select distinct c.account_number as customer_code ,c.party_name as customer_desc ");
@@ -344,6 +348,9 @@ public class LocationDAO {
 				sql.append("\n   and l.cust_account_id = c.cust_account_id  ");
 				sql.append("\n 	 and l.salesrep_id = cs.primary_salesrep_id ");
 				sql.append("\n   and l.latitude is not null and l.longitude is not null ");
+				
+				//new join 
+				sql.append("\n and tc.sales_code = s.code ");
 				/********************************************************************************/
 				//where Cond
 				sql.append(genWhereCond(conn, c,"  "));
@@ -377,7 +384,8 @@ public class LocationDAO {
 				sql.append("\n   and cs.code = s.code ");
 				sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n   and cs.cust_account_id =  c.cust_account_id  ");
-				
+				//new join 
+				sql.append("\n and tc.sales_code = s.code ");
 				/********************************************************************************/
 				sql.append(genWhereCond(conn, c,""));
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
@@ -395,6 +403,8 @@ public class LocationDAO {
 				sql.append("\n  ) T ON M.customer_code =T.customer_code");
 				
 				sql.append("\n )A  WHERE 1=1");
+				//sql.append("\n AND ( substr(A.order_number,1,4) = A.sales_code_check ");
+				//sql.append("\n         or A.order_number is null ) ");
 				if(!"".equalsIgnoreCase(Utils.isNull(c.getDispAllNoOrder())) ) {
 					if(!"".equalsIgnoreCase(Utils.isNull(c.getDispAllVisit())) 
 						&& !"".equalsIgnoreCase(Utils.isNull(c.getDispAllOrder())) ){

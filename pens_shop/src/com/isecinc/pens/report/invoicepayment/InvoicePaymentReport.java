@@ -48,9 +48,23 @@ public class InvoicePaymentReport implements Serializable{
 	private List<InvoicePaymentReport> itemsList;
 	private double totalCreditCardAmt;
 	private double totalCashAmt;
+	private double totalAliAmt;
+	private double totalWeAmt;
 	
 	
 	
+	public double getTotalAliAmt() {
+		return totalAliAmt;
+	}
+	public void setTotalAliAmt(double totalAliAmt) {
+		this.totalAliAmt = totalAliAmt;
+	}
+	public double getTotalWeAmt() {
+		return totalWeAmt;
+	}
+	public void setTotalWeAmt(double totalWeAmt) {
+		this.totalWeAmt = totalWeAmt;
+	}
 	public double getTotalCreditCardAmt() {
 		return totalCreditCardAmt;
 	}

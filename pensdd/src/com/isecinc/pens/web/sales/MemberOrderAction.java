@@ -996,12 +996,52 @@ public class MemberOrderAction extends OrderAction {
 
 			lstLines.addAll(new MOrder().saveNewLineAuto(order, user, conn));
 			
+			//search new
+            lstLines = new MOrderLine().lookUp(conn,order.getId());
+			
+			// re-save calc amount order
+			double tamount = 0;
+			double vamount = 0;
+			double namount = 0;
+			for (OrderLine l : lstLines) {
+				logger.debug("lineNo:"+l.getLineNo()+",promotion1["+l.getPromotion1()+"]iscancel["+l.getIscancel()+"]");
+				if(!"Y".equals(l.getPromotion1()) && !"Y".equals(l.getIscancel())){
+					//tamount += l.getLineAmount();
+					//vamount += l.getVatAmount();
+					namount += l.getTotalAmount();
+				}
+			}
+			logger.debug("Test namount:"+namount);
+			
+			// Calculate Back From Net Amount
+			tamount = (namount * 100/107);
+			vamount = namount - tamount;
+			
+			order.setTotalAmount(tamount);
+			order.setVatAmount(vamount);
+			order.setNetAmount(namount);
+
+			new MOrder().save(order, user.getId(), conn);
+			
+			//commit Transaction
 			conn.commit();
 
 			//request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
-		
+		    
+			//search again
+			order = new MOrder().find(String.valueOf(orderForm.getOrder().getId()));
+			Order[] orders = new Order[1];
+			orders[0] = order;
+			
+			//calc summaryNeedBill;
+			order = new MOrder().setSummaryNeedBill(orders)[0];
+			
 			orderForm.setLines(lstLines);
-
+			orderForm.setOrder(order);
+			
+			logger.debug("Test NetAmount:"+orderForm.getOrder().getNetAmount());
+			logger.debug("Test needBillAmount:"+orderForm.getOrder().getTotalNeedBill());
+			
 			saveToken(request);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

@@ -324,6 +324,7 @@ $(function(){
 							<tr>
 								<td colspan="4" align="center">
 								<div align="left">
+								  N(สินค้าปกติ)&nbsp;&nbsp;&nbsp; Y(สินค้าแถมปกติ)&nbsp;&nbsp;&nbsp; S(สินค้าแถมพิเศษ)
 								</div>
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 									<tr>

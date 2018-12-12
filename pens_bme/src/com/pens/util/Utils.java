@@ -65,9 +65,10 @@ public class Utils {
 	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
 	private static String NUMBER_FORMAT ="#,##0";
 	      
-	public static void mainX(String[] args){
+	public static void main(String[] args){
 	    try{	
-	    	
+	    	String input ="020068";
+	    	System.out.println(new Double(input));
 	        
 	    }catch(Exception e){
 	        e.printStackTrace();
@@ -653,6 +654,17 @@ public class Utils {
 		}
 		return Integer.parseInt(str);
 	}
+	
+	public static int convertCurrentcyToInt(String str) throws Exception{
+		int output = 0;
+		if(str == null || Utils.isNull(str).equals("")){
+			return 0;
+		}
+		output =(new Double(str.replaceAll(",", ""))).intValue();
+		logger.debug("input:"+str+",output:"+output);
+		return output;
+	}
+	
 	public static double convertToDouble(String str) throws Exception{
 		if(str == null){
 			return 0;
@@ -661,7 +673,7 @@ public class Utils {
 	}
 	
 	public static long convertToLong(String str) throws Exception{
-		if(str == null){
+		if(str == null || isNull(str).equals("")){
 			return 0;
 		}
 		return Long.parseLong(str);

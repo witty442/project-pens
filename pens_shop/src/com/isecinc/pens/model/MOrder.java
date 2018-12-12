@@ -70,6 +70,29 @@ public class MOrder extends I_Model<Order> {
 	public Order find(Connection conn,String id) throws Exception {
 		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Order.class);
 	}
+	public Order findOpt(Connection conn ,String id) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Order p = null;
+		try{
+			String sql ="\n select * from t_order where id="+id ;
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				p = new Order(rst);
+			}
+			return p;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
+	
 	public Order findByWhereCond(String whereSql) throws Exception {
 		Connection conn = null;
 		try{
@@ -277,66 +300,14 @@ public class MOrder extends I_Model<Order> {
 		    Order orderUpdate = find(orderId);
 		    List<OrderLine> orderLines = new MOrderLine().lookUp(conn,orderUpdate.getId());
 		    //recalculate Head Amount
-		    return reCalculateHeadAmount(orderUpdate,orderLines);
+		    return reCalculateHeadAmountModel(orderUpdate,orderLines);
 	    }catch(Exception e){
 	    	throw e;
 	    }
 	}
-
-	public Order reCalculateHeadAmount(Order order, List<OrderLine> lines) {
-		BigDecimal totalAmountDec = new BigDecimal("0");
-		BigDecimal totalAmountNonVatDec = new BigDecimal("0");
-		BigDecimal totalAmountTemp = new BigDecimal("0");
-		BigDecimal lineAmount = new BigDecimal("0");
-		BigDecimal lineDiscount = new BigDecimal("0");
-		
-		BigDecimal VatCodeDec = new BigDecimal("7");
-		BigDecimal VatDec = new BigDecimal(0);
-		BigDecimal NetDec = new BigDecimal(0);
-		DecimalFormat df = new DecimalFormat("###0.00");
-		try{
-			//get OrderLine 
-			for (OrderLine l : lines) {
-				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
-				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-				
-				//Non Vat
-				
-				if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
-					totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
-				}
-			}
-
-			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			logger.debug("totalAmountDec:"+totalAmountDec);
-			logger.debug("totalAmountNonVatDec:"+totalAmountNonVatDec);
-			
-			//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
-			totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
-			totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			logger.debug("Result totalAmountTemp:"+totalAmountTemp);
-			
-			VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
-			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			//recalc vatAmount
-			VatDec = NetDec.subtract(totalAmountDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
-			order.setTotalAmountNonVat(new Double(df.format(totalAmountNonVatDec.doubleValue())));
-			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
-			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
-			
-		}catch(Exception e){
-		   logger.debug(e.getMessage(),e);
-		}finally{
-			
-		}
-		return order;
+	
+	public Order reCalculateHeadAmount(Order order,List<OrderLine> orderLines) {
+		return reCalculateHeadAmountModel(order, orderLines);
 	}
 	
 	public Order reCalculateHeadAmountCaseImport(Connection conn,String orderId) throws Exception{
@@ -344,16 +315,27 @@ public class MOrder extends I_Model<Order> {
 		    Order orderUpdate = find(orderId);
 		    List<OrderLine> orderLines = new MOrderLine().lookUp(conn,orderUpdate.getId());
 		    //recalculate Head Amount
-		    return reCalculateHeadAmountCaseImport(conn,orderUpdate,orderLines);
+		    return reCalculateHeadAmountModel(orderUpdate,orderLines);
 	    }catch(Exception e){
 	    	throw e;
 	    }
 	}
-
-	public Order reCalculateHeadAmountCaseImport(Connection conn,Order order, List<OrderLine> lines) {
-		BigDecimal totalAmountDec = new BigDecimal("0");
-		BigDecimal totalAmountNonVatDec = new BigDecimal("0");
-		BigDecimal totalAmountTemp = new BigDecimal("0");
+	
+	//Recalc Net Amount From DB After save DB
+	public Order reCalculateHeadAmountDB(Connection conn, Order order) {
+		try{
+			//get OrderLine 
+			List<OrderLine> orderlines = new MOrderLine().lookUp(conn,order.getId());
+			order = reCalculateHeadAmountModel(order,orderlines);
+		}catch(Exception e){
+		   logger.debug(e.getMessage(),e);
+		}
+		return order;
+	}
+	
+	public Order reCalculateHeadAmountModel(Order order, List<OrderLine> orderlines) {
+		BigDecimal totalAmountDecIncludeVat = new BigDecimal("0");
+		BigDecimal totalAmountDecExcludeVat = new BigDecimal("0");
 		BigDecimal lineAmount = new BigDecimal("0");
 		BigDecimal lineDiscount = new BigDecimal("0");
 		
@@ -363,38 +345,27 @@ public class MOrder extends I_Model<Order> {
 		DecimalFormat df = new DecimalFormat("###0.00");
 		try{
 			//get OrderLine 
-			for (OrderLine l : lines) {
+			for (OrderLine l : orderlines) {
 				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
 				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
 				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-				//Non Vat
-				//get Product is taxable
-				Product product = new MProduct().find(conn,String.valueOf(l.getProduct().getId()));
-				if( !Utils.isNull(product.getTaxable()).equalsIgnoreCase("Y")){
-					totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
-				}
+				totalAmountDecIncludeVat = totalAmountDecIncludeVat.add(lineAmount.subtract(lineDiscount) );
 			}
-
-			totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
+			logger.debug("totalAmountDecIncludeVat:"+totalAmountDecIncludeVat);
 			
-			logger.debug("totalAmountDec:"+totalAmountDec);
-			logger.debug("totalAmountNonVatDec:"+totalAmountNonVatDec);
+			//netDec = totalAmountDec(include vat)
+			NetDec = totalAmountDecIncludeVat.setScale(2,BigDecimal.ROUND_HALF_UP);
+			//calc netDec/1.07
+			totalAmountDecExcludeVat = NetDec.divide(new BigDecimal(1.07)).setScale(2,BigDecimal.ROUND_HALF_UP);
+			//vat = netAmount-totalAmoutnExludeVat
+			VatDec = NetDec.subtract(totalAmountDecExcludeVat).setScale(2,BigDecimal.ROUND_HALF_UP);
 			
-			//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
-			totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
-			totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
+			logger.debug("NetDec:"+NetDec);
+			logger.debug("VatDec:"+VatDec);
+			logger.debug("totalAmountDecExcludeVat:"+totalAmountDecExcludeVat);
 			
-			logger.debug("Result totalAmountTemp:"+totalAmountTemp);
-			
-			VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
-			NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			//recalc vatAmount
-			VatDec = NetDec.subtract(totalAmountDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
-			order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
-			order.setTotalAmountNonVat(new Double(df.format(totalAmountNonVatDec.doubleValue())));
+			order.setTotalAmount(new Double(df.format(totalAmountDecExcludeVat.doubleValue())));
+			order.setTotalAmountNonVat(0);
 			order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
 			order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
 			
@@ -405,58 +376,6 @@ public class MOrder extends I_Model<Order> {
 		}
 		return order;
 	}
-	
-	//Recalc Net Amount From DB After save DB
-		public Order reCalculateHeadAmountDB(Connection conn, Order order) {
-			BigDecimal totalAmountDec = new BigDecimal("0");
-			BigDecimal totalAmountNonVatDec = new BigDecimal("0");
-			BigDecimal totalAmountTemp = new BigDecimal("0");
-			BigDecimal lineAmount = new BigDecimal("0");
-			BigDecimal lineDiscount = new BigDecimal("0");
-			
-			BigDecimal VatCodeDec = new BigDecimal("7");
-			BigDecimal VatDec = new BigDecimal(0);
-			BigDecimal NetDec = new BigDecimal(0);
-			try{
-				//get OrderLine 
-				List<OrderLine> newlines = new MOrderLine().lookUp(conn,order.getId());
-				DecimalFormat df = new DecimalFormat("###0.00");
-				
-				for (OrderLine l : newlines) {
-					//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
-					lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-					lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				    totalAmountDec = totalAmountDec.add(lineAmount.subtract(lineDiscount) );
-					
-					//Non Vat
-					if( !Utils.isNull(l.getTaxable()).equalsIgnoreCase("Y")){
-						totalAmountNonVatDec = totalAmountNonVatDec.add(lineAmount.subtract(lineDiscount) );
-					}
-				}
-
-				totalAmountDec = totalAmountDec.setScale(2,BigDecimal.ROUND_HALF_UP);
-				
-				//Case some line is non vat (totalAmount-totaAmountNonVat) for calc vat only
-				totalAmountTemp = totalAmountDec.subtract(totalAmountNonVatDec);
-				totalAmountTemp = totalAmountTemp.setScale(2,BigDecimal.ROUND_HALF_UP);
-				
-				VatDec = (VatCodeDec.multiply(totalAmountTemp)).divide(new BigDecimal("100")).setScale(2,BigDecimal.ROUND_HALF_UP);
-				NetDec = totalAmountDec.add(VatDec).setScale(2,BigDecimal.ROUND_HALF_UP);
-				
-				//recalc vatAmount
-				VatDec = NetDec.subtract(totalAmountDec);
-				
-				order.setTotalAmount(new Double(df.format(totalAmountDec.doubleValue())));
-				order.setVatAmount(new Double(df.format(VatDec.doubleValue())));
-				order.setNetAmount(new Double(df.format(NetDec.doubleValue())));
-				
-			}catch(Exception e){
-			   logger.debug(e.getMessage(),e);
-			}finally{
-				
-			}
-			return order;
-		}
 	
 	public String validateProductIngroup(Connection conn,List<OrderLine> lines) throws Exception {
 		String productCodeInvalid ="";

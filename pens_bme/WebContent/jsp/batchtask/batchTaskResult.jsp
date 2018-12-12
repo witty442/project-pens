@@ -67,6 +67,8 @@
   <jsp:include page="sub/ImportBarcodeMasterFromExcel_sub.jsp"></jsp:include>
 <%}else if("ImportOrderToOracleFromExcel".equalsIgnoreCase(pageName)){ %>
   <jsp:include page="sub/ImportOrderToOracleFromExcel_sub.jsp"></jsp:include>
+<%}else{ %>
+ <jsp:include page="sub/AllResultBatchTask_sub.jsp"></jsp:include>
 <%} %>
 
  

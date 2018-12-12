@@ -771,8 +771,10 @@ public class OrderAction extends I_Action {
 			//For compare after save 
 			double beforeSave_NetAmount = order.getNetAmount(); 
 	
-			//CASH
-			if(Constants.PAYMT_CASH.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){//CASH
+			//CASH ,ALI,WECHAT
+			if(Constants.PAYMT_CASH.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))
+				|| Constants.PAYMT_ALI.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))
+				|| Constants.PAYMT_WE.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){//CASH
 				//CASH
 				order.setCreditCardType("");
 				order.setCreditCardNo("");
@@ -858,7 +860,8 @@ public class OrderAction extends I_Action {
 
 			orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
 			orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
-			orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+			String bankCode = InitialReferences.getRefByKey(InitialReferences.PAYMENT_METHOD_BANK,orderForm.getOrder().getPaymentMethod(),"").get(0).getKey();
+			orderForm.getAutoReceipt().setInternalBank(bankCode);//KBANK
 			orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
 			 
 			/** Set ReceiptBy Manual **/
@@ -1536,6 +1539,10 @@ public class OrderAction extends I_Action {
 	
 			if("CS".equals(order.getPaymentMethod())){
 				pReceiptByMsg = "‡ß‘π ¥";	
+			}else if("ALI".equals(order.getPaymentMethod())){
+				pReceiptByMsg = "AliPay";	
+			}else if("WE".equals(order.getPaymentMethod())){
+				pReceiptByMsg = "WeChat";	
 			}else{
 				String creditCardNo = "";
 				if( !Utils.isNull(order.getCreditCardNo()).equals("")){
@@ -1706,7 +1713,7 @@ public class OrderAction extends I_Action {
 			logger.info("Report Name:"+fileName);
 			
 			String fileJasper = BeanParameter.getReportPath() + fileName;
-           
+  
 			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
 			
 			//reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);

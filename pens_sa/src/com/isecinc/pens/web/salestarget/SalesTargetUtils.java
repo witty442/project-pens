@@ -172,6 +172,17 @@ public class SalesTargetUtils {
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
 			monthYearList.add(item);
 			
+			
+		/*	//Fortest 
+			//Prev Month
+			item = new PopupBean();
+			cal.add(Calendar.MONTH, -5);//Current-5
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			*/
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

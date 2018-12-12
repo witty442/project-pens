@@ -120,8 +120,7 @@ public class RequestPromotionAction extends I_Action {
 			m.setUserId(String.valueOf(user.getId()));
 			
 			List<RequestPromotion> RequestPromotionList = mDAO.searchReqPromotionList(m,user,false);
-			
-			
+	
 			mForm.setResults(RequestPromotionList);
 			mForm.setRequestPromotion(m);
 			
@@ -379,7 +378,6 @@ public class RequestPromotionAction extends I_Action {
 				lstData = p.getPromotionLineList();
 				
 				reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData,fileNameExport);
-				
 				
 			}else{
 				request.setAttribute("Message","Data not found");

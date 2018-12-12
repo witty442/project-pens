@@ -30,6 +30,8 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.bean.ImageFileBean;
@@ -355,6 +357,63 @@ public class FTPManager {
 		}
 	}
 
+	public void verifyFileInFTPServer(User userBean,LinkedHashMap<String,TableBean> controlTableMap,String path) throws Exception{
+		try {		
+			Set s = controlTableMap.keySet();
+			Iterator it = s.iterator();
+			while(it.hasNext()) {
+				String fileControlName = (String) it.next();
+				TableBean tableBean = (TableBean) controlTableMap.get(fileControlName);
+				logger.debug("export image fileControlName:"+fileControlName); 
+				
+				compareFileLocalVsServer(tableBean);	
+			
+			}//for		
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			
+		}	
+	}
+	public String  compareFileLocalVsServer(TableBean tableBean) throws Exception{
+		FTPClient ftp = null;
+		String dataStreamStr = "";
+		try {			
+			ftp = new FTPClient();
+			ftp.connect(server);
+			//ftp.enterLocalPassiveMode();
+			//ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			//ftp.setFileType(FTPClient.);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			logger.debug("pathGetFileFull:"+tableBean.getExportPath());
+            logger.debug("fileName:"+tableBean.getFileFtpNameFull()+"fileSize:");
+					
+            ftp.sendCommand("SIZE", tableBean.getExportPath()+"\\"+tableBean.getFileFtpNameFull());
+			String reply = ftp.getReplyString();
+		    logger.debug("Reply Server file SIZE: " + reply);
+	
+			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
+			
+			return dataStreamStr;
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
 	
 	/**
 	 * getFTPFileByName
@@ -362,8 +421,7 @@ public class FTPManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public String  getDownloadFTPFileByName(String pathFullName) throws Exception
-	{
+	public String  getDownloadFTPFileByName(String pathFullName) throws Exception{
 		FTPClient ftp = null;
 		String dataStreamStr = "";
 		try {			
@@ -856,50 +914,6 @@ public class FTPManager {
 		}	
 	}
 	
-	//TEST METHOD
-	public void uploadAllFileToFTP_OPT2_TEST(LinkedHashMap<String,TableBean> controlTableMap,String path) throws Exception{
-		try {		
-			Set s = controlTableMap.keySet();
-			Iterator it = s.iterator();
-			while(it.hasNext()) {
-				String tableName = (String) it.next();
-				TableBean tableBean = (TableBean) controlTableMap.get(tableName);
-				
-				if(tableBean.getFileExportList() != null && tableBean.getFileExportList().size() > 0){
-					
-	                for(int f=0;f<tableBean.getFileExportList().size();f++){
-	                	TableBean fileExportBean =(TableBean)tableBean.getFileExportList().get(f);
-	                	//Upload by step by one file
-	                	try{
-	                		logger.info("Step 1 upload NORMALMODE");
-	                		uploadAllFileToFTP_BY_FILE(path,fileExportBean);
-	                	}catch(Exception e){
-	                		logger.debug("Step 2 Try ftp upload use passivemode");
-	                		 uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE(path,fileExportBean);
-	                	}
-	                }//for
-	                
-	            }else if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-	            	//Upload by step by one file
-	            	try{
-	            		logger.info("Step 1 upload NORMALMODE ");
-	            		uploadAllFileToFTP_BY_FILE(path,tableBean);
-		            }catch(Exception e){
-	            		logger.debug("Step 2 Try ftp upload use passivemode");
-	            		uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE(path,tableBean);
-	            	}
-				}else{
-					// Data not Found
-					logger.info("Data not found");
-				}
-			}//for		
-		} catch (Exception e) {
-			throw new FTPException(e.getMessage());
-		} finally {
-			
-		}	
-	}
-	
 	/**
 	 * Main Method upload file to FTP 
 	 * @param controlTableMap
@@ -969,14 +983,24 @@ public class FTPManager {
 			
 		}	
 	}
-
-	/** Process Work on Window 8(tablet not work V107(tablet) **/
 	private void uploadAllFileToFTP_BY_FILE(String path,TableBean tableBean) throws Exception{
+		if(ControlCode.canExecuteMethod("FTPManager", "uploadAllFileToFTP_BY_FILE_NEW")){
+			//NEW Code
+			//No Complete command ftp
+			 uploadAllFileToFTP_BY_FILE_NEW(path,tableBean);
+		}else{
+			//OLD Code
+			 uploadAllFileToFTP_BY_FILE_OLD(path,tableBean);
+	    }
+	}
+	
+	/** Process Work on Window 8(tablet not work V107(tablet) **/
+	private void uploadAllFileToFTP_BY_FILE_OLD(String path,TableBean tableBean) throws Exception{
 		FTPClient ftp = null;
 		String reply = "";
 		Writer w = null;
 		OutputStream out = null;
-		logger.info("uploadAllFileToFTP_OPT2_BY_FILE");
+		logger.info("uploadAllFileToFTP_BY_FILE_OLD");
 		try {		
 			ftp = new FTPClient();
 			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
@@ -1076,7 +1100,107 @@ public class FTPManager {
 		}	
 	}
 	
+	/** Process Work on Window 10 **/
+	private void uploadAllFileToFTP_BY_FILE_NEW(String path,TableBean tableBean) throws Exception{
+		FTPClient ftp = null;
+		String reply = "";
+		Writer w = null;
+		OutputStream out = null;
+		logger.info("uploadAllFileToFTP_OPT2_BY_FILE_NEW");
+		try {		
+			ftp = new FTPClient();
+			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
+			ftp.connect(server);
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			
+			//ftp.setConnectTimeout(10000);
+			logger.info("connection timeout:"+ftp.getConnectTimeout());
+			
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			 
+			 if(tableBean.getDataStrExport() != null 
+					&& !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
+					if("".equalsIgnoreCase(path)){
+					   path = tableBean.getExportPath();
+					}
+					logger.info("Write To Path:"+path);
+					
+					ftp.changeWorkingDirectory(path);
+					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
 
+					logger.info("Write fileName:"+tableBean.getTableName()+":"+tableBean.getFileFtpNameFull());
+					out = ftp.storeFileStream(tableBean.getFileFtpNameFull());
+				    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    
+				    /** new Code ******************************************************/
+				    logger.info("Start Write OutputStreamWriter data:");
+				    w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
+				    w.write(tableBean.getDataStrExport().toString());
+				    w.flush();
+				    w.close();
+				    
+				    logger.info("End Write OutputStreamWriter data:");
+				    
+				    out.flush();
+				    out.close();
+					/******************************************************************/
+			         
+				   /* //Test Write File Local
+				    String fileTemp = "D:/temp/"+tableBean.getFileFtpNameFull();
+				    logger.info("Write File To Temp Test:"+fileTemp);
+				    FileUtil.writeFile(fileTemp, tableBean.getDataStrExport().toString());*/
+				    /******************************************************************/
+				    
+				    /** Close Command FTP **/
+				    try{
+					    logger.info(" Start completePendingCommand ");
+						boolean completed = ftp.completePendingCommand();
+						String ftpResponse = ftp.getReplyString();
+						logger.info("ftpResponse["+ftpResponse+"]");
+					    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    }catch(Exception e){
+				        logger.error(e.getMessage(),e);
+				    }
+				    
+				    //SITE CHMOD 777 201011101437-SALESREP.txt
+				    /** Set Permission File ***/
+				    try{
+					    logger.info(" Start CHMOD 777 ");
+					    ftp.sendSiteCommand("CHMOD 777 "+tableBean.getFileFtpNameFull());
+					    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
+				    }catch(Exception e){
+				    	logger.error(e.getMessage(),e);	
+				    }
+				}else{
+					// Data not Found
+					logger.info("Data not found");
+				}
+	
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+
+			if(ftp != null && ftp.isConnected()) {
+				try{
+					ftp.logout();
+					ftp.disconnect();
+					//logger.info("ftp disconnect : "+ftp.getReplyString());
+					ftp = null;
+				}catch(Exception e){
+					logger.error(e.getMessage(),e);
+				}
+			}
+		}	
+	}
+	
 	private void uploadImageAllFileToFTP(User user,TableBean tableBean) throws Exception{
 		FTPClient ftp = null;
 		String replyMsg = "";
@@ -1345,213 +1469,6 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 		}
 	}
 
-
-	private void uploadCustomerLocationAllFileToFTP_OPT2_BY_FILE(User userBean,TableBean tableBean,StringBuffer dataExportSt) throws Exception{
-		FTPClient ftp = null;
-		String reply = "";
-		Writer w = null;
-		OutputStream out = null;
-		logger.info("uploadCustomerLocationAllFileToFTP_OPT2_BY_FILE");
-		String path  ="";
-		String fileNameFull = "";
-		try {		
-			ftp = new FTPClient();
-			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
-			ftp.connect(server);
-			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			
-			//ftp.setConnectTimeout(connectTimeout);
-			path = EnvProperties.getInstance().getProperty("path.master.sales.out");//path.master.customer.out");
-			fileNameFull = ExportHelper.genFileName(tableBean,userBean);
-			logger.info("connection timeout:"+ftp.getConnectTimeout());
-			
-			if(!ftp.login(userFtp, passwordFtp)){
-				throw new FTPException("FTP Username or password invalid! ");
-			}
-			 
-			 if(dataExportSt != null && !Utils.isNull(dataExportSt.toString()).equals("")){
-					if("".equalsIgnoreCase(path)){
-					  // path = tableBean.getExportPath();
-					}
-					logger.info("Write To Path:"+path);
-					
-					ftp.changeWorkingDirectory(path);
-					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
-
-					out = ftp.storeFileStream(fileNameFull);
-				    
-				    /** new Code ******************************************************/
-				    logger.info("Start Write OutputStreamWriter data:");
-				    w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
-				    w.write(dataExportSt.toString());
-				    w.flush();
-				    w.close();
-				    
-				    logger.info("End Write OutputStreamWriter data:");
-				    
-				    out.flush();
-				    out.close();
-					/******************************************************************/
-			         
-				    /** Close Command FTP **/
-				    try{
-					    logger.info(" Start completePendingCommand ");
-						boolean completed = ftp.completePendingCommand();
-						String ftpResponse = ftp.getReplyString();
-						logger.info("ftpResponse["+ftpResponse+"]");
-					    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-				    }catch(Exception e){
-				        logger.error(e.getMessage(),e);
-				    }
-				    
-				    //SITE CHMOD 777 201011101437-SALESREP.txt
-				    /** Set Permission File ***/
-				    try{
-					    logger.info(" Start CHMOD 777 ");
-					    ftp.sendSiteCommand("CHMOD 777 "+fileNameFull);
-					    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-				    }catch(Exception e){
-				    	logger.error(e.getMessage(),e);	
-				    }
-				}else{
-					// Data not Found
-					logger.info("Data not found");
-				}
-	
-		} catch (SocketException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (UnknownHostException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (IOException e) {
-			throw new FTPException(e.getLocalizedMessage());
-		} catch (Exception e) {
-			throw new FTPException(e.getMessage());
-		} finally {
-			if(w != null){
-				//w.close();
-			}
-			if(out != null){
-			  // out.close();
-			}
-			if(ftp != null && ftp.isConnected()) {
-				try{
-					ftp.logout();
-					ftp.disconnect();
-					//logger.info("ftp disconnect : "+ftp.getReplyString());
-					ftp = null;
-				}catch(Exception e){
-					logger.error(e.getMessage(),e);
-				}
-			}
-		}	
-	}
-	
-	//Case normal can upload :use it
-	private void uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE(String path,TableBean tableBean) throws Exception{
-		FTPClient ftp = null;
-		String reply = "";
-		Writer w = null;
-		OutputStream out = null;
-		logger.info("uploadAllFileToFTP_OPT2_BY_FILE_BY_PASSIVEMODE");
-		try {		
-			ftp = new FTPClient();
-			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
-			ftp.connect(server);
-			//Passive mode ?secure mode
-			ftp.enterLocalPassiveMode(); //for window7  not work in window 8
-			
-			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-
-			logger.info("connection timeout:"+ftp.getConnectTimeout());
-			
-			if(!ftp.login(userFtp, passwordFtp)){
-				throw new FTPException("FTP Username or password invalid! ");
-			}
-			 
-			 if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-					if("".equalsIgnoreCase(path)){
-					   path = tableBean.getExportPath();
-					}
-					logger.info("Write To Path:"+path);
-					
-					ftp.changeWorkingDirectory(path);
-					logger.info("Write To Path FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
-
-					logger.info("Write fileName:"+tableBean.getTableName());
-					out = ftp.storeFileStream(tableBean.getFileFtpNameFull());
-				    logger.info("Write fileName FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-				    
-				    /** new Code ******************************************************/
-				    logger.info("Start Write OutputStreamWriter data:");
-				    w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
-				    w.write(tableBean.getDataStrExport().toString());
-				    w.flush();
-				    w.close();
-				    
-				    logger.info("End Write OutputStreamWriter data:");
-				    
-				    out.flush();
-				    out.close();
-					/******************************************************************/
-			         
-				    //Test Write File Local
-				    String fileTemp = "D:/temp/"+tableBean.getFileFtpNameFull();
-				    logger.info("Write File To Temp Test:"+fileTemp);
-				    FileUtil.writeFile(fileTemp, tableBean.getDataStrExport().toString());
-				    /******************************************************************/
-				    
-				    /** Close Command FTP **/
-				    try{
-					    logger.info(" Start completePendingCommand ");
-						boolean completed = ftp.completePendingCommand();
-						String ftpResponse = ftp.getReplyString();
-						logger.info("ftpResponse["+ftpResponse+"]");
-					    logger.info(" End completePendingCommand completed["+completed+"]FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-				    }catch(Exception e){
-				        logger.error(e.getMessage(),e);
-				    }
-				    
-				    //SITE CHMOD 777 201011101437-SALESREP.txt
-				    /** Set Permission File ***/
-				    try{
-					    logger.info(" Start CHMOD 777 ");
-					    ftp.sendSiteCommand("CHMOD 777 "+tableBean.getFileFtpNameFull());
-					    logger.info("End CHMOD 777 FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-				    }catch(Exception e){
-				    	logger.error(e.getMessage(),e);	
-				    }
-				}else{
-					// Data not Found
-					logger.info("Data not found");
-				}
-	
-		} catch (SocketException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (UnknownHostException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (IOException e) {
-			throw new FTPException(e.getLocalizedMessage());
-		} catch (Exception e) {
-			throw new FTPException(e.getMessage());
-		} finally {
-			if(w != null){
-				//w.close();
-			}
-			if(out != null){
-			  // out.close();
-			}
-			if(ftp != null && ftp.isConnected()) {
-				try{
-					ftp.logout();
-					ftp.disconnect();
-					//logger.info("ftp disconnect : "+ftp.getReplyString());
-					ftp = null;
-				}catch(Exception e){
-					logger.error(e.getMessage(),e);
-				}
-			}
-		}	
-	}
 	
 	/**
 	 * 
@@ -1692,105 +1609,6 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 			throw new FTPException(e.getMessage());
 		} finally {
 			if(ftp != null && ftp.isConnected()) {
-				ftp.disconnect();
-				//logger.info("ftp disconnect : "+ftp.getReplyString());
-				ftp = null;
-			}
-		}	
-	}
-	
-	/**
-	 * writeFileToFTP
-	 * @param controlTableMap
-	 * @throws Exception
-	 * ExportManager Call
-	 */
-	public String uploadFileToFTPXX(TableBean tableBean,String path,String encoding) throws Exception{
-		String ftpResponse = "";
-		FTPClient ftp = null;
-		String fileSize = "0";
-		try {		
-			ftp = new FTPClient();
-			if(encoding !=null){
-			   ftp.setControlEncoding(encoding);
-			}
-			ftp.connect(server);
-			//ftp.enterLocalActiveMode();
-			ftp.enterLocalPassiveMode();
-			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			//ftp.setFileTransferMode(FTPClient.ASCII_FILE_TYPE);
-
-			if(!ftp.login(userFtp, passwordFtp)){
-				throw new FTPException("FTP Username or password invalid! ");
-			}
-			 
-			if(tableBean.getDataStrExport() != null && !Utils.isNull(tableBean.getDataStrExport().toString()).equals("")){
-
-				if("".equalsIgnoreCase(path)){
-				   path = tableBean.getExportPath();
-				}
-				logger.debug("Write To Path:"+path);
-				
-				ftp.changeWorkingDirectory(path);
-				ftpResponse = ftp.getReplyString();
-				logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse); 
-					
-				logger.debug("Write fileName:"+tableBean.getTableName());
-				OutputStream out = ftp.storeFileStream(tableBean.getFileFtpNameFull());
-				//logger.debug("out:"+out);
-				ftpResponse = ftp.getReplyString();
-			    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
-			    
-			/*	out.write(tableBean.getDataStrExport().toString().getBytes());
-				out.flush();
-				out.close(); */
-				
-				/** new Code ******************************************************/
-				//FileOutputStream fos = new FileOutputStream("out.txt");
-			    Writer w = new BufferedWriter(new OutputStreamWriter(out,Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620)); 
-			    w.write(tableBean.getDataStrExport().toString());
-			    w.flush();
-			    w.close();
-				/******************************************************************/
-		
-				ftp.completePendingCommand();
-				ftpResponse = ftp.getReplyString();
-			    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
-			    
-			    //SITE CHMOD 777 201011101437-SALESREP.txt
-			    /** Set Permission File ***/
-			    ftp.sendSiteCommand("CHMOD 777 "+tableBean.getFileFtpNameFull());
-			    ftpResponse = ftp.getReplyString();
-			    logger.debug("FTP sendSiteCommand Response "+ftp.getControlEncoding()+" :"+ftpResponse);
-			    
-			    String pathName = path+tableBean.getFileFtpNameFull();
-			    logger.debug("tutiya ftp pathName:"+pathName);
-			    FTPFile[] files = ftp.listFiles(pathName);
-			    if(files !=null && files.length >0){
-			        FTPFile fileBean = (FTPFile)files[0];
-			        logger.debug("file Length:"+files.length);
-			        fileSize = FileUtils.byteCountToDisplaySize(fileBean.getSize());
-			    }
-			}else{
-				// Data not Found
-				logger.debug("Data not found");
-			}
-			ftp.logout();
-		    
-        	ftpResponse = ftp.getReplyString();
-		    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
-		    
-		    return fileSize;
-		} catch (SocketException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (UnknownHostException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (IOException e) {
-			throw new FTPException(e.getLocalizedMessage());
-		} catch (Exception e) {
-			throw new FTPException(e.getMessage());
-		} finally {
-			if(ftp != null) {
 				ftp.disconnect();
 				//logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
@@ -2341,160 +2159,6 @@ public void uploadImageByFileName(String ftpFilePath,String localFile) throws Ex
 			   fis.close();fis = null;
 			}
 		}	
-	}
-	
-	public void uploadBackUpDBZipFileToFTP_BK1(User user,String ftpParentPath,String fileName,String localFile) throws Exception{
-		FTPClient ftp = null;
-		File file = null;
-	    InputStream fis = null;
-		//int CON_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(20); // fail if can't connect within 20 seconds
-       // int LIVE_TIMEOUT = (int) TimeUnit.MINUTES.toMillis(5); // allow up to 5 minutes for data transfers
-		try {		
-			ftp = new FTPClient();
-			ftp.setControlEncoding(Constants.FTP_EXPORT_TO_ORACLE_ENCODING_TIS_620);
-			ftp.connect(server);
-			//ftp.enterRemotePassiveMode();
-			//ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
-			//ftp.setBufferSize(1024);
-			//ftp.mode(FTPClient.COMPRESSED_TRANSFER_MODE);
-	        
-			if(!ftp.login(userFtp, passwordFtp)){
-				throw new FTPException("FTP Username or password invalid! ");
-			}
-			
-			////////////////////////////////////////////
-			logger.debug("Parent path:"+ftpParentPath);
-			
-			String userTypePath = user.getType()+"/"+user.getUserName()+"/";
-			
-			/** Check Path BY User is created    /parentpath/VAN/CC401/  **/
-			ftp.changeWorkingDirectory(ftpParentPath+userTypePath);
-			logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString()); 
-			
-		    if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())){
-		    	logger.debug("not fount path :"+ftpParentPath+userTypePath);
-				// Folder not create 
-		    	ftp.changeWorkingDirectory(ftpParentPath+user.getType()+"/");
-		
-		    	logger.debug("Path:"+ftpParentPath+user.getType()+"/"+":"+ftp.getReplyString()); 
-		    	ftp.makeDirectory(ftpParentPath+userTypePath);
-		    	logger.debug("makeDirectory :"+ftp.getReplyString()); 
-		    	
-		    	ftp.changeWorkingDirectory(ftpParentPath+userTypePath);
-			}
-
-		    /** new Code ******************************************************/
-            
-		    fis = new FileInputStream(localFile);
-		    boolean uploadOk = ftp.storeFile(fileName, fis);
-		    logger.debug("upload ftp status :"+uploadOk);
-            if (!uploadOk){
-               logger.debug("upload ftp Error :"+uploadOk);
-            }
-            
-            /********************************************************************/
-            //Upload file  
-            /*fis = new FileInputStream(localFile);  
-            OutputStream  out = ftp.storeFileStream(fileName);  
-            byte buf[] = new byte[8192];  
-            while (fis.read(buf) != -1) {  
-            	out.write(buf);  
-            }  
-            fis.close();  
-            out.close();  */
-            
-            /*********************************************************************/
-	
-		  /*  fis =  new FileInputStream(localFile);
-			OutputStream out = ftp.storeFileStream(fileName);
-			
-			byte[] b = new byte[4096];
-			while (fis.read(b) != -1) {
-				out.write(b);
-			}
-			out.flush();
-			out.close();
-			fis.close();
-			
-            logger.debug("store xx " +ftpParentPath+userTypePath+fileName + " complete");
-            */
-			/******************************************************************/
- 
-		    /** Close Command FTP **/
-			ftp.completePendingCommand();
-		    logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyString());
-		     
-		} catch (SocketException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (UnknownHostException e) {
-			throw new FTPException("Could not connect to FTP server");
-		} catch (IOException e) {
-			throw new FTPException(e.getLocalizedMessage());
-		} catch (Exception e) {
-			throw new FTPException(e.getMessage());
-		} finally {
-			if(ftp != null && ftp.isConnected()) {
-				ftp.disconnect();
-				//logger.info("ftp disconnect : "+ftp.getReplyString());
-				ftp = null;
-			}
-			if(file != null){
-				file = null;
-			}
-			 IOUtils.closeQuietly(fis);
-			if(fis != null){
-			   fis.close();fis = null;
-			}
-			
-		}	
-	}
-	
-	/**
-	 * 
-	 * @param user
-	 * @param ftpFilePath
-	 * @param localFile
-	 * @throws Exception
-	 * Upload Zip To FTP Server
-	 */
-	public void uploadBackUpDBZipFileToFTP_BK2(User user,String ftpFilePath,String localFile) throws Exception{
-		
-		DataOutputStream dos = null;
-		sun.net.TelnetOutputStream tos = null;
-		FileInputStream fos = null;
-		sun.net.ftp.FtpClient ftp = null;
-		try{
-			ftp = new sun.net.ftp.FtpClient(server, 21);
-		    ftp.login(userFtp, passwordFtp);
-		    ftp.binary();
-		    
-		    fos = new FileInputStream(localFile);
-		    tos = ftp.put(ftpFilePath);
-		    dos = new DataOutputStream(tos);
-		    
-		    byte[] buffer = new byte[1024 * 1024];
-		    for (int length; (length = fos.read(buffer)) > 0;) {
-		        dos.write(buffer, 0, length);
-		    }
-		    tos.flush();
-		    dos.flush();
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}finally{
-			if(ftp != null){
-				ftp.closeServer();
-				ftp = null;
-			}
-			if(tos != null){
-				tos.close();
-			}
-			if(fos != null){
-				fos.close();
-			}
-			if(dos != null){
-				dos.close();
-			}
-		}
 	}
 	
 public void uploadBackUpDBZipFileToFTP(String rootFtpPath, String ftpFilePath,String localFile) throws Exception{

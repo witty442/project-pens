@@ -102,7 +102,7 @@ public class OrderValidate {
 				orderErrorBean.setStoreErrorList(storeList);
 			}//if storeList != null
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}finally{
 			try{
 			  if(conn != null){

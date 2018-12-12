@@ -24,9 +24,13 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.MTTBeanDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.isecinc.pens.web.shop.ShopBean;
+import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.BundleUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
@@ -51,14 +55,24 @@ public class MTTAction extends I_Action {
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
-				aForm.setResultsSearch(null);
+				aForm.setResults(null);
+				aForm.setSummary(null);
+				
 				MTTBean ad = new MTTBean();
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				
 				aForm.setBean(ad);
+				
+				//init session CustGroupList
+				List<PopupForm> billTypeList = new ArrayList();
+				PopupForm ref = new PopupForm("",""); 
+				billTypeList.add(ref);
+				billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
+				request.getSession().setAttribute("custGroupList",billTypeList);
+				
 			}else if("back".equals(action)){
-				aForm.setBean(MTTBeanDAO.searchHead(aForm.getBeanCriteria()));
-				aForm.setResultsSearch(aForm.getBean().getItems());
+				aForm.setBean(aForm.getBeanCriteria());//prev criteria
+				search2(mapping, aForm, request, response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -68,31 +82,141 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("search2");
-		MTTForm aForm = (MTTForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			MTTBean b = aForm.getBean();
-			aForm.setBean(MTTBeanDAO.searchHead(aForm.getBean()));
-			aForm.setResultsSearch(aForm.getBean().getItems());
-			
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+	 public static ActionForward search2(ActionMapping mapping,ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+			logger.debug("search2");
+			MTTForm aForm = (MTTForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			String msg = "";
+			int currPage = 1;
+			boolean allRec = false;
+			Connection conn = null;
+			try {
+				String action = Utils.isNull(request.getParameter("action"));
+				logger.debug("action:"+action);
+				
+				conn = DBConnection.getInstance().getConnection();
+				if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+					//case  back
+					if("back".equalsIgnoreCase(action)){
+						aForm.setBean(aForm.getBeanCriteria());
+					}
+					//default currPage = 1
+					aForm.setCurrPage(currPage);
+					
+					//get Total Record
+					aForm.setTotalRecord(MTTBeanDAO.searchHeadTotalRecList(conn,aForm.getBean()));
+					//calc TotalPage
+					aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > aForm.getTotalRecord()){
+					   endRec = aForm.getTotalRecord();
+				    }
+				    aForm.setStartRec(startRec);
+				    aForm.setEndRec(endRec);
+				    
+					//get Items Show by Page Size
+					List<MTTBean> items = MTTBeanDAO.searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize);
+					aForm.setResults(items);
+					
+					if(items.size() <=0){
+					   request.setAttribute("Message", "ไม่พบข้อมูล");
+					   aForm.setResults(null);
+					}else{
+						//currPage ==totalPage ->get Summary
+						if(currPage==aForm.getTotalPage()){
+						   aForm.setSummary(MTTBeanDAO.searchHeadTotalSummary(conn, aForm.getBean()));
+						}
+					}
+				}else{
+					// Goto from Page
+					currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+					logger.debug("currPage:"+currPage);
+					
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > aForm.getTotalRecord()){
+					   endRec = aForm.getTotalRecord();
+				    }
+				    aForm.setStartRec(startRec);
+				    aForm.setEndRec(endRec);
+				    
+					//get Items Show by Page Size
+					List<MTTBean> items = MTTBeanDAO.searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize);
+					aForm.setResults(items);
+					
+					//currPage ==totalPage ->get Summary
+					if(currPage==aForm.getTotalPage()){
+					   aForm.setSummary(MTTBeanDAO.searchHeadTotalSummary(conn, aForm.getBean()));
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+						+ e.getMessage());
+				throw e;
+			}finally{
+				if(conn != null){
+					conn.close();
+				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return mapping.findForward("search2");
+			return mapping.findForward("search2");
 	}
 	
+	 /**
+		 * Prepare without ID
+		 */
+		protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
+				throws Exception {
+			String forward = "prepare";
+			MTTForm aForm = (MTTForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			try {
+				//save old criteria
+				aForm.setBeanCriteria(aForm.getBean());
+				
+	            String saleDate = Utils.isNull(request.getParameter("sale_date"));
+	            String docNo = Utils.isNull(request.getParameter("docNo"));
+	            String mode = Utils.isNull(request.getParameter("mode"));
+	            
+				if( !"".equals(docNo)){
+					logger.debug("prepare edit docNo:"+docNo);
+					MTTBean c = new MTTBean();
+					c.setDocNo(docNo);
+					
+					MTTBean bean = MTTBeanDAO.searchHead(c).getItems().get(0);
+					
+					//search item
+					MTTBean items = MTTBeanDAO.searchItem( c);
+					aForm.setResults(items.getItems());
+					
+					aForm.setBean(bean);
+					aForm.setMode(mode);//Mode Edit
+				}else{
+					
+					logger.debug("prepare new docNo");
+					aForm.setResults(new ArrayList<MTTBean>());
+					MTTBean ad = new MTTBean();
+					ad.setCanEdit(true);
+					ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					aForm.setBean(ad);
+					
+					aForm.setMode(mode);//Mode Add new
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				request.setAttribute("Message", "err:"+ e.getMessage());
+				throw e;
+			}finally{
+				
+			}
+			return forward;
+		}
+
+		
 	public ActionForward prepareReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareReport");
 		MTTForm aForm = (MTTForm) form;
@@ -174,47 +298,55 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("report");
 	}
 	
-	private StringBuffer genExportReport(HttpServletRequest request,MTTForm form,User user){
+	private StringBuffer genExportReport(HttpServletRequest request,MTTForm form,User user) throws Exception{
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
 		String colSpan = "15";
+		Connection conn = null;
+		int totalQty = 0;
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			//Header
 			h.append("<table border='1'> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลขาย Sale-Out</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getBean().getSaleDateFrom()+"  ถึงวันที่ขาย:"+form.getBean().getSaleDateTo()+"</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' >กลุ่มร้านค้า:"+form.getBean().getCustGroup()+"&nbsp;"+Utils.isNull(form.getBean().getCustGroupName())+"</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' >รหัสร้านค้า:"+form.getBean().getStoreCode()+"&nbsp;"+Utils.isNull(form.getBean().getStoreName())+"</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' >Group Code:"+form.getBean().getGroupCode()+"</td> \n");
 			h.append("</tr> \n");
 			
-			h.append("<tr> \n");
+			h.append("<tr class='colum_head'> \n");
 			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ Scan:"+form.getBean().getCreateDateFrom()+"  ถึงวันที่ Scan:"+form.getBean().getCreateDateTo()+"</td> \n");
 			h.append("</tr> \n");
 			
-			
 			h.append("</table> \n");
+			
+			if((form.getResults() != null && form.getResults().size()==0) || form.getResults() == null){
+				//search new
+				conn = DBConnection.getInstance().getConnection();
+				List<MTTBean> items = MTTBeanDAO.searchHeadList(conn,form.getBean(),true,0,pageSize);
+				form.setResults(items);
+			}
 
-			if(form.getResultsSearch() != null){
-			    List<MTTBean> list = (List<MTTBean>)form.getResultsSearch();
+			if(form.getResults() != null){
+			    List<MTTBean> list = (List<MTTBean>)form.getResults();
 				h.append("<table border='1'> \n");
-				h.append("<tr> \n");
+				h.append("<tr class='colum_head'> \n");
 				  h.append("<td>No.</td> \n");
 				  h.append("<td>SaleDate</td> \n");
 				  h.append("<td>วันที่ Scan</td> \n");
@@ -250,11 +382,36 @@ public class MTTAction extends I_Action {
 					  h.append("<td class='num'>"+s.getRetailPriceBF()+"</td> \n");
 					  h.append("<td>"+s.getRemark()+"</td> \n");
 					h.append("</tr>");
+					
+					//add summary
+					totalQty += s.getQty();
 				}
+				//Add Summary
+				h.append("<tr> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td class='colum_head'>Total</td> \n");
+				  h.append("<td class='num_currency_bold'>"+totalQty+"</td> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				h.append("</tr>");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
+		}finally{
+			if(conn !=null){
+				conn.close();
+			}
 		}
 		return h;
 	}
@@ -263,7 +420,8 @@ public class MTTAction extends I_Action {
 		logger.debug("clear2");
 		MTTForm aForm = (MTTForm) form;
 		try {
-			aForm.setResultsSearch(null);
+			aForm.setResults(null);
+			aForm.setSummary(null);
 			aForm.setBean(new MTTBean());
 			
 			MTTBean ad = new MTTBean();
@@ -278,57 +436,7 @@ public class MTTAction extends I_Action {
 		return mapping.findForward("clear2");
 	}
 	
-	/**
-	 * Prepare without ID
-	 */
-	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String forward = "prepare";
-		MTTForm aForm = (MTTForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		try {
-			//save old criteria
-			aForm.setBeanCriteria(aForm.getBean());
-			
-            String saleDate = Utils.isNull(request.getParameter("sale_date"));
-            String docNo = Utils.isNull(request.getParameter("docNo"));
-            String mode = Utils.isNull(request.getParameter("mode"));
-            
-			if( !"".equals(docNo)){
-				logger.debug("prepare edit docNo:"+docNo);
-				MTTBean c = new MTTBean();
-				c.setDocNo(docNo);
-				
-				MTTBean bean = MTTBeanDAO.searchHead(c).getItems().get(0);
-				
-				//search item
-				MTTBean items = MTTBeanDAO.searchItem( c);
-				aForm.setResults(items.getItems());
-				
-				aForm.setBean(bean);
-				aForm.setMode(mode);//Mode Edit
-			}else{
-				
-				logger.debug("prepare new docNo");
-				aForm.setResults(new ArrayList<MTTBean>());
-				MTTBean ad = new MTTBean();
-				ad.setCanEdit(true);
-				ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				aForm.setBean(ad);
-				
-				aForm.setMode(mode);//Mode Add new
-				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return forward;
-	}
-
+	
 	/**
 	 * Prepare with ID
 	 */

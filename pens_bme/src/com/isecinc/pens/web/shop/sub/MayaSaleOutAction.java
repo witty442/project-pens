@@ -1,53 +1,46 @@
-package com.isecinc.pens.web.maya.sub;
+package com.isecinc.pens.web.shop.sub;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Master;
-import com.isecinc.pens.bean.OnhandSummary;
-import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.dao.StoreDAO;
-import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
-import com.isecinc.pens.web.maya.MayaBean;
-import com.isecinc.pens.web.maya.MayaForm;
-import com.isecinc.pens.web.summary.SummaryForm;
-import com.pens.util.FileUtil;
+import com.isecinc.pens.web.shop.ShopBean;
+import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
 public class MayaSaleOutAction {
  private static Logger logger = Logger.getLogger("PENS");
 	
- public static MayaForm search(HttpServletRequest request, MayaForm f,User user) throws Exception{
+ public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
 	   Statement stmt = null;
 		ResultSet rst = null;
-		List<MayaBean> pos = new ArrayList<MayaBean>();
+		List<ShopBean> pos = new ArrayList<ShopBean>();
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
+		double totalQty = 0;
+		double totalLineAmount = 0;
+		double totalDiscount = 0;
+		double totalVatAmount = 0;
+		double totalAmountInVat = 0;
+		double totalAmountExVat = 0;
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			sql = genSQL(conn,f);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				MayaBean item = new MayaBean();
+				ShopBean item = new ShopBean();
 				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setOrderNo(Utils.isNull(rst.getString("ORDER_NUMBER")));
 				item.setPensItem(Utils.isNull(rst.getString("pens_item")));
@@ -58,7 +51,9 @@ public class MayaSaleOutAction {
 				item.setLineAmount(Utils.decimalFormat(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
 				item.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
 				item.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
+				//TotalAmount (incVat)
 				item.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+				item.setTotalAmountExVat(Utils.decimalFormat(rst.getDouble("total_amount_ex_vat"),Utils.format_current_2_disgit));
 				
 				if("S".equalsIgnoreCase(Utils.isNull(rst.getString("promotion")))){
 				  item.setFreeItem("YES");
@@ -66,11 +61,29 @@ public class MayaSaleOutAction {
 				  item.setFreeItem("");
 				}
 				pos.add(item);
+				
+				//summary
+				totalQty +=rst.getDouble("qty");
+				totalLineAmount += rst.getDouble("line_amount");
+				totalDiscount += rst.getDouble("discount");
+				totalVatAmount += rst.getDouble("vat_amount");
+				totalAmountInVat += rst.getDouble("total_amount");
+				totalAmountExVat += rst.getDouble("total_amount_ex_vat");
 			}//while
-
+		
 			if(pos != null && pos.size() >0){
 				f.setResults(pos);
-				//request.getSession().setAttribute("summary" ,item);
+				
+				//add summary
+				ShopBean summary = new ShopBean();
+				summary.setQty(Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
+				summary.setLineAmount(Utils.decimalFormat(totalLineAmount,Utils.format_current_2_disgit));
+				summary.setDiscount(Utils.decimalFormat(totalDiscount,Utils.format_current_2_disgit));
+				summary.setVatAmount(Utils.decimalFormat(totalVatAmount,Utils.format_current_2_disgit));
+				summary.setTotalAmount(Utils.decimalFormat(totalAmountInVat,Utils.format_current_2_disgit));
+				summary.setTotalAmountExVat(Utils.decimalFormat(totalAmountExVat,Utils.format_current_2_disgit));
+				
+				request.getSession().setAttribute("summary" ,summary);
 			}else{
 				f.setResults(null);
 				request.getSession().setAttribute("summary" ,null);
@@ -88,9 +101,9 @@ public class MayaSaleOutAction {
 		return f;
     }
  
- public static StringBuffer exportToExcel(HttpServletRequest request, MayaForm form,User user,List<MayaBean> list){
+ public static StringBuffer exportToExcel(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
 		StringBuffer h = new StringBuffer("");
-		String colspan ="12";
+		String colspan ="13";
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
@@ -121,11 +134,12 @@ public class MayaSaleOutAction {
 				  h.append("<th>Line Amount</th> \n");
 				  h.append("<th>Discount</th> \n");
 				  h.append("<th>Vat Amount</th> \n");
-				  h.append("<th>Total Line Amount</th> \n");
+				  h.append("<th>Total Line Amount(In. Vat)</th> \n");
+				  h.append("<th>Total Line Amount(Ex. Vat)</th> \n");
 				h.append("</tr> \n");
 				
 				for(int i=0;i<list.size();i++){
-					MayaBean s = (MayaBean)list.get(i);
+					ShopBean s = (ShopBean)list.get(i);
 					h.append("<tr> \n");
 					  h.append("<td class='text'>"+s.getOrderDate()+"</td> \n");
 					  h.append("<td class='text'>"+s.getOrderNo()+"</td> \n");
@@ -134,37 +148,32 @@ public class MayaSaleOutAction {
 					  h.append("<td class='text'>"+s.getStyle()+"</td> \n");
 					  h.append("<td class='num_currency'>"+s.getQty()+"</td> \n");
 					  h.append("<td class='text'>"+s.getFreeItem()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getUnitPrice()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getLineAmount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getDiscount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getVatAmount()+"</td> \n");
-					  h.append("<td class='num_currency'>"+s.getTotalAmount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getUnitPrice()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getLineAmount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getDiscount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getVatAmount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalAmount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalAmountExVat()+"</td> \n");
 					h.append("</tr>");
 				}
-				/** Summary **/
-				MayaBean s = (MayaBean)request.getSession().getAttribute("summary");
-				h.append("<tr> \n");
-				 
-				 /* if("PensItem".equalsIgnoreCase(form.getSummaryType())){
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }else{
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
-				  h.append("<td></td> \n");
-				  h.append("<td class='currency_bold'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
-				h.append("</tr>");*/
 				
+				/** Summary **/
+				ShopBean s = (ShopBean)request.getSession().getAttribute("summary");
+				h.append("<tr> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;<b>รวม</b></td> \n");
+					h.append("<td class='num_currency_bold'>"+s.getQty()+"</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td class='currency_bold'>"+s.getLineAmount()+"</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td class='currency_bold'>"+s.getTotalAmount()+"</td> \n");
+					h.append("<td class='currency_bold'>"+s.getTotalAmountExVat()+"</td> \n");
+				h.append("</tr>");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){
@@ -173,8 +182,7 @@ public class MayaSaleOutAction {
 		return h;
 	}
  
- 
- public static StringBuilder genSQL(Connection conn,MayaForm f) throws Exception{
+ public static StringBuilder genSQL(Connection conn,ShopForm f) throws Exception{
 		StringBuilder sql = new StringBuilder();
 		Date dateTemp = null;
 		String dateStr ="";
@@ -187,7 +195,7 @@ public class MayaSaleOutAction {
 			sql.append("\n ,SUM(D.DISCOUNT) AS DISCOUNT");
 			sql.append("\n ,SUM(D.VAT_AMOUNT) AS VAT_AMOUNT");
 			sql.append("\n ,SUM(D.TOTAL_AMOUNT) AS TOTAL_AMOUNT");
-			
+			sql.append("\n ,NVL((SUM(D.TOTAL_AMOUNT)-SUM(D.VAT_AMOUNT)),0)  AS TOTAL_AMOUNT_EX_VAT ");
 			sql.append("\n FROM XXPENS_OM_SHOP_ORDER_MST M,XXPENS_OM_SHOP_ORDER_DT D ");
 			sql.append("\n ,(" );
 			sql.append("\n   SELECT I.inventory_item_id as product_id");

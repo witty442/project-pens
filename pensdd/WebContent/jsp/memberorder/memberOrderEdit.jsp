@@ -45,9 +45,7 @@ List<String> cannotEditTrips = new ArrayList<String>();
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <style type="text/css">
-<!--
-
--->
+.text_right { float:right }
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->
@@ -523,6 +521,17 @@ function saveNewLineAuto(){
 		</td>
 	</tr>
 	<tr>
+		<td align="right"><span id="netAmtLabel" style="display: none;"><bean:message key="Net" bundle="sysele"/></span>
+		 ยอดรวมแผนการจัดส่ง
+		&nbsp;&nbsp;</td>
+		<td align="left">
+			<!--  <input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;display:none;"/>  -->
+			<input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" 
+			 style="text-align: right;" value="<fmt:formatNumber type="number" pattern="#,###,##0.00" value="${orderForm.order.netAmount}" />" />
+			<html:hidden property="order.netAmount"/>
+		</td>
+	</tr>
+	<tr>
 		<td align="right">
 			<span id="taxLabel" style="display: none;">
 			<bean:message key="Tax" bundle="sysele"/>
@@ -534,13 +543,7 @@ function saveNewLineAuto(){
 			<html:hidden property="order.vatAmount"/>
 		</td>
 	</tr>
-	<tr>
-		<td align="right"><span id="netAmtLabel" style="display: none;"><bean:message key="Net" bundle="sysele"/></span>&nbsp;&nbsp;</td>
-		<td align="left">
-			<input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;display:none;"/>
-			<html:hidden property="order.netAmount"/>
-		</td>
-	</tr>
+	
 	<tr>
 		<td colspan="4"><hr/></td>
 	</tr>

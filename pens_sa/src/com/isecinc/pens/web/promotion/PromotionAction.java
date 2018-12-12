@@ -253,10 +253,6 @@ public class PromotionAction extends I_Action {
 			ServletContext context = request.getSession().getServletContext();
 			List<RequestPromotionLine> lstData = null;
 	
-			//String fileName = "rt_report";
-			//String fileJasper = BeanParameter.getReportPath() + fileName;
-			//reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, bean.getItems());
-			
 			String fileName = "request_promotion_report";
             String fileJasper =  BeanParameter.getReportPath() + fileName;
 			
@@ -315,8 +311,7 @@ public class PromotionAction extends I_Action {
 					parameterMap.put("costDetail5",Utils.isNull(costTableMap.get("5")!=null?costTableMap.get("5").getCostDetail():""));
 					parameterMap.put("costAmount5",costTableMap.get("5")!=null?costTableMap.get("5").getCostAmount():null);
 						
-				 }
-				
+				}
 				
 				String fileNameExport = p.getRequestNo()+"_"+Utils.isNull(p.getPrintDate())+".pdf";
 				//Set Lines

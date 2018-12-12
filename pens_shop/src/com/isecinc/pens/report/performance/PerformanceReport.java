@@ -24,12 +24,16 @@ public class PerformanceReport implements Serializable {
 	private double netAmount;
 	private double cashAmount;
 	private double receiptAmount;
+	private double aliAmount;
+	private double weAmount;
 	private double airpayAmount;
 	private double vatAmount;
 	private String customerCode;
 	private String customerName;
 	private double vatCash;
 	private double vatReceipt;
+	private double vatAli;
+	private double vatWe;
 	private String chequeNo;
 	private String status;
 	private String airpayNo;
@@ -46,8 +50,76 @@ public class PerformanceReport implements Serializable {
 	private double allVatReceiptAmount;
 	private double totalCancelAmountToday;
 	private double allAirpayAmount;
+	private double allAliAmount;
+	private double allWeAmount;
+	private double allVatAliAmount;
+	private double allVatWeAmount;
 	
 	
+	public double getVatAli() {
+		return vatAli;
+	}
+
+	public void setVatAli(double vatAli) {
+		this.vatAli = vatAli;
+	}
+
+	public double getVatWe() {
+		return vatWe;
+	}
+
+	public void setVatWe(double vatWe) {
+		this.vatWe = vatWe;
+	}
+
+	public double getAliAmount() {
+		return aliAmount;
+	}
+
+	public void setAliAmount(double aliAmount) {
+		this.aliAmount = aliAmount;
+	}
+
+	public double getWeAmount() {
+		return weAmount;
+	}
+
+	public void setWeAmount(double weAmount) {
+		this.weAmount = weAmount;
+	}
+
+	public double getAllVatAliAmount() {
+		return allVatAliAmount;
+	}
+
+	public void setAllVatAliAmount(double allVatAliAmount) {
+		this.allVatAliAmount = allVatAliAmount;
+	}
+
+	public double getAllVatWeAmount() {
+		return allVatWeAmount;
+	}
+
+	public void setAllVatWeAmount(double allVatWeAmount) {
+		this.allVatWeAmount = allVatWeAmount;
+	}
+
+	public double getAllAliAmount() {
+		return allAliAmount;
+	}
+
+	public void setAllAliAmount(double allAliAmount) {
+		this.allAliAmount = allAliAmount;
+	}
+
+	public double getAllWeAmount() {
+		return allWeAmount;
+	}
+
+	public void setAllWeAmount(double allWeAmount) {
+		this.allWeAmount = allWeAmount;
+	}
+
 	public String getCreditCardNo() {
 		return creditCardNo;
 	}

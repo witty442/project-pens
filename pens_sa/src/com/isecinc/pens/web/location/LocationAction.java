@@ -15,18 +15,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.CConstants;
+import util.DBConnection;
 import util.Utils;
 
-import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.CConstantsBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.stock.StockBean;
-import com.isecinc.pens.web.stock.StockConstants;
-import com.isecinc.pens.web.stock.StockForm;
-import com.isecinc.pens.web.stock.StockReport;
 
 /**
  * Summary Action
@@ -139,6 +133,24 @@ public class LocationAction extends I_Action {
 					/** Clear Session Detail Page */
 					request.getSession().removeAttribute("RESULTS_DETAIL");
 				 }
+			}else if("trip".equalsIgnoreCase(pageName)){
+				logger.debug("action:"+Utils.isNull(request.getParameter("action")));
+				if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
+					/** Init Data ***/
+				    LocationInitial.getInstance().initSessionTrip(request);
+				    
+				    LocationBean bean =new LocationBean();
+				    bean.setCustCatNo("C");//VanSale
+				    //fortest
+				    bean.setSalesrepCode("100033105");
+				    
+				    aForm.setBean(bean);
+				    aForm.setPageName(pageName);
+				    aForm.setResults(null);
+				    forwardPage="tripSearch";
+				 }else{
+					forwardPage="tripSearch";
+				 }
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -244,6 +256,14 @@ public class LocationAction extends I_Action {
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
 				
+			}else if("trip".equalsIgnoreCase(aForm.getPageName())){
+				forwardPage ="tripSearch";
+				 String action = Utils.isNull(request.getParameter("action"));
+				 if("back".equalsIgnoreCase(action)){
+					 aForm.setBean(aForm.getBeanCriteria());
+				 }
+				 
+				 aForm = TripAction.search(aForm,request,response);
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

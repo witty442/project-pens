@@ -38,7 +38,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
-	public BatchTaskInfo getBatchTaskInit(String taskName) throws Exception{
+	public BatchTaskInfo getBatchTaskInit_BK(String taskName) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 	    BatchTaskInfo taskInfo = new BatchTaskInfo();
@@ -46,7 +46,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		try{
 			conn  = DBConnection.getInstance().getConnection();
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select param ,button_name from BATCHTASK_INIT where program_name='"+taskName+"' \n");
+			sql.append(" select param ,button_name from PENSBI.BATCHTASK_INIT where program_name='"+taskName+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    
@@ -77,7 +77,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO monitor(" +
+			String sql = "INSERT INTO PENSBI.monitor(" +
 			" transaction_id," +
 			" monitor_id," +
 			" name ," +
@@ -134,7 +134,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO monitor_item(" +
+			String sql = "INSERT INTO PENSBI.monitor_item(" +
 			" id,"+
 			" monitor_id ,"+
 			" source ," +
@@ -201,7 +201,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		try {
 			logger.debug("*** insertMonitorItemDetail **********");
 			
-			String sql = "INSERT INTO monitor_item_detail(" +
+			String sql = "INSERT INTO PENSBI.monitor_item_detail(" +
 			" MONITOR_ITEM_ID," +
 			" customer_code ," +
 			" customer_name ," +
@@ -311,7 +311,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		BigDecimal monitorId = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select max(monitor_id) as monitor_id from monitor \n");
+			sql.append(" select max(monitor_id) as monitor_id from PENSBI.monitor \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    
@@ -348,8 +348,8 @@ public class BatchTaskDAO extends InterfaceUtils{
 		String status = "";
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select channel as batch_task_status from monitor \n");
-			sql.append("where MONITOR_ID = (select min(monitor_id) from monitor where transaction_id ="+id+") \n");
+			sql.append(" select channel as batch_task_status from PENSBI.monitor \n");
+			sql.append("where MONITOR_ID = (select min(monitor_id) from PENSBI.monitor where transaction_id ="+id+") \n");
 			
 		    logger.info("SQL:"+sql.toString());
 		    
@@ -377,7 +377,7 @@ public class BatchTaskDAO extends InterfaceUtils{
     	PreparedStatement ps = null;
     	try {
             conn = DBConnection.getInstance().getConnection();
-	       	String sql = "UPDATE c_monitor SET  transaction_id = 0";
+	       	String sql = "UPDATE PENSBI.c_monitor SET  transaction_id = 0";
 			ps = conn.prepareStatement(sql);
             ps.executeUpdate();
             
@@ -426,7 +426,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		Connection conn = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from c_monitor where action ='"+action+"' \n");
+			sql.append(" select * from PENSBI.c_monitor where action ='"+action+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -464,7 +464,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 	public void updateControlStatusMonitor(Connection conn,BigDecimal transactionId,BigDecimal monitorId,String status) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE monitor SET  channel = ? WHERE MONITOR_ID = ? and transaction_id = ?";
+			String sql = "UPDATE PENSBI.monitor SET  channel = ? WHERE MONITOR_ID = ? and transaction_id = ?";
 			
 			logger.debug("SQL:"+sql);
 			int index = 0;
@@ -485,8 +485,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 	}
 	
 	
-	
-	
+
 	public  String findMonitorStatusBK(Connection conn,String id,String transaction_count) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -561,7 +560,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		MonitorBean  m = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor where 1=1  and monitor_id ="+monitorId+"\n");
+			sql.append(" select * from PENSBI.monitor where 1=1  and monitor_id ="+monitorId+"\n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -886,7 +885,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *   \n");
-			sql.append(" from monitor_item  \n");
+			sql.append(" from PENSBI.monitor_item  \n");
 			sql.append(" where 1=1 \n");
 			sql.append(" and monitor_id ="+mc.getMonitorId() +"\n");
 
@@ -906,6 +905,9 @@ public class BatchTaskDAO extends InterfaceUtils{
 				item.setFailCount(rs.getInt("fail_count"));
 				item.setErrorCode(rs.getString("error_code"));
 				item.setErrorMsg(rs.getString("error_msg"));
+				
+				//ColumnHeadList
+				item.setColumnHeadStrArr(findMonitorItemColumnHeadResultList(conn,item.getId()));
 				
 			    //SuccessList
 				item.setSuccessList(findMonitorItemResultList(conn,item.getId(),"SUCCESS"));
@@ -939,7 +941,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor_item.* \n");
-			sql.append(" from monitor_item where 1=1 \n");
+			sql.append(" from PENSBI.monitor_item where 1=1 \n");
 			sql.append(" and id ="+id +"\n");
 
 		    logger.debug("SQL:"+sql.toString());
@@ -1062,7 +1064,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		int row = 0;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor_item_result where 1=1 \n");
+			sql.append(" select * from PENSBI.monitor_item_result where 1=1 \n");
 			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
 			sql.append(" and status ='"+statusDesc+"' \n");
 			sql.append(" order by no asc ");
@@ -1094,6 +1096,35 @@ public class BatchTaskDAO extends InterfaceUtils{
 		return resultItemList;
 	} 
 	
+	public String findMonitorItemColumnHeadResultList(Connection conn ,BigDecimal monitorIItemId) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String columnHeadTable = "";
+		int row = 0;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select * from PENSBI.MONITOR_ITEM_COLUMN_RESULT where 1=1 \n");
+			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
+		    logger.debug("SQL:"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				columnHeadTable = Utils.isNull(rs.getString("COLUMN_HEAD"));
+			}
+			
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return columnHeadTable;
+	} 
 	public  List<MonitorItemResultBean> findMonitorItemResultListByTypeMessage(Connection conn,BigDecimal monitorIItemId,String typeMessage) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -1101,7 +1132,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		int row = 0;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor_item_result where 1=1 \n");
+			sql.append(" select * from PENSBI.monitor_item_result where 1=1 \n");
 			sql.append(" and monitor_item_id ="+monitorIItemId +"\n");
 			sql.append(" and monitor_item_id in(select id from monitor_item where id ="+monitorIItemId+" )");
 			sql.append(" and message like'"+typeMessage+"%' \n");
@@ -1143,7 +1174,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		List<MonitorItemDetailBean> itemList = new ArrayList<MonitorItemDetailBean> ();
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor_item_detail where 1=1  and monitor_item_id ="+monitorItemId+"\n");
+			sql.append(" select * from PENSBI.monitor_item_detail where 1=1  and monitor_item_id ="+monitorItemId+"\n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -1189,7 +1220,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "UPDATE monitor SET " +
+			String sql = "UPDATE PENSBI.monitor SET " +
 			" status = ? ,file_count =? ,error_code = ? ,error_msg =?"+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
@@ -1225,7 +1256,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "UPDATE monitor SET " +
+			String sql = "UPDATE PENSBI.monitor SET " +
 			" status = ? ,channel = ? ,file_count =? ,error_code = ? ,error_msg =?"+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
@@ -1260,7 +1291,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 	public MonitorItemBean updateMonitorItem(Connection conn,MonitorItemBean model) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE monitor_item SET " +
+			String sql = "UPDATE PENSBI.monitor_item SET " +
 			"  status = ? ,error_msg = ? ,success_count =? ,fail_count=?"+
 			" WHERE ID = ?";
 			
@@ -1302,8 +1333,8 @@ public class BatchTaskDAO extends InterfaceUtils{
 		PreparedStatement ps = null;
 		PreparedStatement ps2 = null;
 		try {
-			String sql = "UPDATE monitor SET  status = "+Constants.STATUS_REGEN+"  WHERE  transaction_id ="+model.getTransactionId();
-			String sql2 = "UPDATE monitor_item SET  status = "+Constants.STATUS_REGEN+"    WHERE monitor_id in(select monitor_id from monitor where  transaction_id ="+model.getTransactionId()+")";
+			String sql = "UPDATE PENSBI.monitor SET  status = "+Constants.STATUS_REGEN+"  WHERE  transaction_id ="+model.getTransactionId();
+			String sql2 = "UPDATE PENSBI.monitor_item SET  status = "+Constants.STATUS_REGEN+"  WHERE monitor_id in(select monitor_id from monitor where  transaction_id ="+model.getTransactionId()+")";
 			
 			logger.debug("SQL:"+sql);
 			logger.debug("SQL2:"+sql2);

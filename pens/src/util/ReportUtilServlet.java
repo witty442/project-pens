@@ -609,13 +609,12 @@ public class ReportUtilServlet extends HttpServlet {
 
 		File rptFile = null;
 		fileName = fileName + ".pdf";
-
 		try {
 			fileNameExport = Utils.isNull(fileNameExport).equals("")?fileName:fileNameExport;
 			
 			//Wit Edit
 		    ServletContext context = request.getSession().getServletContext();
-            String fontPath = "fonts/";//context.getRealPath("/reports/fonts/");//
+            String fontPath = context.getRealPath("/reports/fonts/");//
             logger.debug("fontPath:"+fontPath);
             
 			rptFile = new File(fileJasper + ".jasper");
@@ -627,11 +626,11 @@ public class ReportUtilServlet extends HttpServlet {
 			// Set font for pdf.
 			HashMap fontMap = new HashMap();
 			FontKey key = new FontKey("Angsana New", false, false);
-			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
+			PdfFont font = new PdfFont("fonts/ANGSAU.TTF", BaseFont.IDENTITY_H, true);
 			fontMap.put(key, font);
 
 			FontKey key2 = new FontKey("Angsana New", true, false);
-			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
+			PdfFont font2 = new PdfFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
 			fontMap.put(key2, font2);
 
 			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();

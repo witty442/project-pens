@@ -30,6 +30,8 @@ if(action == null){
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
+List<References> creditCardType = InitialReferences.getReferenes().get(InitialReferences.CREDITCARD_TYPE);
+pageContext.setAttribute("creditCardType",creditCardType,PageContext.PAGE_SCOPE);
 %>
 <html>
 <head>
@@ -103,7 +105,7 @@ function stampPrint(){
 	printDateTimePick.value = currentDateStr;
 }
 function changePaymentMethod(paymentMethod){
-	if("CS" ==paymentMethod.value ){
+	if("CS" ==paymentMethod.value || "ALI" ==paymentMethod.value || "WE" ==paymentMethod.value){
 		document.getElementById("div_credit_1").style.display = "none";
 		document.getElementById("div_credit_2").style.display = "none";
 		document.getElementById("div_credit_3").style.display = "none";
@@ -250,8 +252,8 @@ function calcChangeAmountModel(custAmountObj){
 									<tr>
 										<th class="td_text_center" width="4%">ลำดับ</th>
 										<th class="td_text_center" width="5%"><input type="checkbox" disabled name="chk_temp" class="disableCheckbox"/></th>
-										<th class="td_text_center" width="20%">ชื่อสินค้า</th>
-										<th class="td_text_center" width="10%">หน่วยนับ</th>
+										<th class="td_text_center" width="25%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="5%">หน่วยนับ</th>
 										<th class="td_text_center" width="10%">จำนวน</th>
 										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
 										<th class="td_text_center" width="10%">ยอดรวม</th>
@@ -277,7 +279,7 @@ function calcChangeAmountModel(custAmountObj){
 									<tr class="${tabclass}">
 										<td class="td_text_center" width="4%">${lines1.lineNo}</td>
 										<td class="td_text_center" width="5%"><input type="checkbox" disabled name="chk_temp" class="disableCheckbox"/></td>
-										<td class="td_text" width="20%">
+										<td class="td_text" width="25%">
 											${lines1.product.code}&nbsp;${lines1.product.name}
 											<input type="hidden" name='lines.id' value='${lines1.id}'>
 											<input type='hidden' name='lines.row' value='${lines1.lineNo}'>
@@ -322,7 +324,7 @@ function calcChangeAmountModel(custAmountObj){
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
 											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 										</td>
-										<td class="td_text_center" width="10%">${lines1.fullUom}</td>
+										<td class="td_text_center" width="5%">${lines1.fullUom}</td>
 										<td class="td_text_right" width="10%">
 											<c:choose>
 												<c:when test="${lines1.promotion=='Y'}">
@@ -423,8 +425,7 @@ function calcChangeAmountModel(custAmountObj){
 									      <td align="left" nowrap>
 									         <span id="div_credit_3" style="display:none">
 									            <html:select property="order.creditCardType" >
-										           <html:option value="VISA">VISA</html:option>
-										           <html:option value="MASTER">MASTER</html:option>
+										            <html:options collection="creditCardType" property="key" labelProperty="name"/>
 									            </html:select> 
 									           <html:text property="order.creditCardNo" styleId="creditCardNo"  styleClass="\" autoComplete=\"off"
 									           size="30" maxlength="16" onkeydown="return inputNum(event);"/>

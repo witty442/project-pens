@@ -52,6 +52,11 @@
 	           onclick="window.location='${pageContext.request.contextPath}/jsp/locationAction.do?do=prepare&pageName=monitorSpider&action=new';">
 	          <span>2.<bean:message key="MonitorSpider" bundle="sysprop"/></span></a>
 	       </li>  
+	        <li>
+	          <a href="#" class="parent" 
+	           onclick="window.location='${pageContext.request.contextPath}/jsp/locationAction.do?do=prepare&pageName=trip&action=new';">
+	          <span>3.<bean:message key="Trip" bundle="sysprop"/></span></a>
+	       </li>  
 		</ul>
 	</li> 
 	<%}%>

@@ -44,9 +44,9 @@ public class MoveOrderReportProcess extends I_ReportProcess<MoveOrderReport> {
 			sql.append("\n h.move_order_type,h.status,h.exported,h.USER_ID");
 			sql.append("\n  ,(select p.pd_desc from m_pd p where p.pd_code = h.pd_code and p.sales_code ='"+user.getUserName()+"') as pd_desc ");
 			sql.append("\n  ,(select p.name from ad_user p where p.user_name = h.sales_code) as sales_desc ");
-			sql.append("\n  ,(select sum(qty1) from t_move_order_line p where p.request_number = h.request_number group by p.request_number) as qty1 ");
-			sql.append("\n  ,(select sum(qty2) from t_move_order_line p where p.request_number = h.request_number group by p.request_number) as qty2 ");
-			sql.append("\n  ,(select sum(total_amount) from t_move_order_line p where p.request_number = h.request_number group by p.request_number) as total_amount");
+			sql.append("\n  ,(select sum(qty1) from t_move_order_line p where p.status='SV' and p.request_number = h.request_number group by p.request_number) as qty1 ");
+			sql.append("\n  ,(select sum(qty2) from t_move_order_line p where p.status='SV' and  p.request_number = h.request_number group by p.request_number) as qty2 ");
+			sql.append("\n  ,(select sum(total_amount) from t_move_order_line p where p.status='SV' and  p.request_number = h.request_number group by p.request_number) as total_amount");
 			sql.append("\n  from t_move_order h ");
 			sql.append("\n  where 1=1");
 			

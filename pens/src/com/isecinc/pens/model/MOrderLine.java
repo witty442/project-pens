@@ -166,6 +166,25 @@ public class MOrderLine extends I_Model<OrderLine> {
 			throw e;
 		}
 	}
+	
+	//Y and S
+	public boolean deletePromotionAll(int orderId, Connection conn) throws Exception {
+		List<OrderLine> pos = new ArrayList<OrderLine>();
+		String deleteId = "";
+		try {
+			String whereCause = " AND ORDER_ID = " + orderId + " AND PROMOTION IN('Y','S') ORDER BY LINE_NO ";
+			pos = super.search(TABLE_NAME, COLUMN_ID, whereCause, OrderLine.class);
+			for (OrderLine l : pos)
+				deleteId += "," + l.getId();
+			if (deleteId.length() > 0) {
+				deleteId = deleteId.substring(1);
+				return super.delete(TABLE_NAME, COLUMN_ID, deleteId, conn);
+			}
+			return true;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
 	/**
 	 * Delete All Lines

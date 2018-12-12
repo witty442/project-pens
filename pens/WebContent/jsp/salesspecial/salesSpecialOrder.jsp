@@ -632,6 +632,7 @@ function validateVanCreditLimit(){
                                     &nbsp;&nbsp;
                                     <input type="button" class="newPosOrderSpecialBtn" value="เลือกสินค้าตามแบรนด์(แถมพิเศษ)" 
 									    onclick="openProductCategory('S');" />
+									 N(สินค้าปกติ)&nbsp;&nbsp;&nbsp; Y(สินค้าแถมปกติ)&nbsp;&nbsp;&nbsp; S(สินค้าแถมพิเศษ)
 								</div>
 								
 								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">

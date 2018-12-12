@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
@@ -79,7 +81,7 @@ public class ExportManager {
 		List<String> sqlUpdateExportFlagList = new ArrayList<String>();
 		try{
 			//initial FTP Manager
-			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));	
 			
 			/** Connection Monitor */
 			connMonitor = DBConnection.getInstance().getConnection();
@@ -224,6 +226,10 @@ public class ExportManager {
 			logger.info("Step Upload ALL File To FTP Server");
 			ftpManager.uploadAllFileToFTP(userLogin,initConfigMap, "");
 			
+			/*if(ControlCode.canExecuteMethod("FTPManager", "verifyFileInFTPServer")){
+				ftpManager.verifyFileInFTPServer(userLogin,initConfigMap, "");
+			}*/
+			
 			/** ADD Update Exported  Flag  ********/
 			if(sqlUpdateExportFlagList != null &&  sqlUpdateExportFlagList.size() > 0){
 				logger.debug("***** -Start  Update Exported=Y  Flag ALL TABLE*************");
@@ -248,7 +254,8 @@ public class ExportManager {
 			   conn.rollback();
 			   
 			   logger.debug("Error:Step delete file in FTP Case Rollback ");
-			   ftpManager.deleteAllFileInFTPCaseRollback(initConfigMap, "");
+			   ftpManager.deleteAllFileInFTPCaseRollback(initConfigMap, ""); 
+			   
 			}
 			/** End process ***/
 			logger.debug("-Update Monitor to Fail ");

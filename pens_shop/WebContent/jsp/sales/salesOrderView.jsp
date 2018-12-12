@@ -36,6 +36,9 @@ pageContext.setAttribute("vatcodes",vatcodes,PageContext.PAGE_SCOPE);
 List<References> paymentMethod = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 pageContext.setAttribute("paymentMethod",paymentMethod,PageContext.PAGE_SCOPE);
 
+List<References> creditCardType = InitialReferences.getReferenes().get(InitialReferences.CREDITCARD_TYPE);
+pageContext.setAttribute("creditCardType",creditCardType,PageContext.PAGE_SCOPE);
+
 %>
 <html>
 <head>
@@ -184,7 +187,7 @@ function stampPrint(){
 	});
 }
 function changePaymentMethod(paymentMethod){
-	if("CS" ==paymentMethod.value ){
+	if("CS" ==paymentMethod.value || "ALI" ==paymentMethod.value || "WE" ==paymentMethod.value){
 		document.getElementById("div_credit_1").style.display = "none";
 		document.getElementById("div_credit_2").style.display = "none";
 		document.getElementById("div_credit_3").style.display = "none";
@@ -286,8 +289,8 @@ function changePaymentMethod(paymentMethod){
 								<table id="tblProductHead" align="left" border="0" cellpadding="1" cellspacing="1" class="tableSearch">
 									<tr>
 										<th class="td_text_center" width="10%">ลำดับ</th>
-										<th class="td_text_center" width="20%">ชื่อสินค้า</th>
-										<th class="td_text_center" width="10%">หน่วยนับ</th>
+										<th class="td_text_center" width="25%">ชื่อสินค้า</th>
+										<th class="td_text_center" width="5%">หน่วยนับ</th>
 										<th class="td_text_center" width="10%">จำนวน</th>
 										<th class="td_text_center" width="10%">ราคาต่อหน่วย</th>
 										<th class="td_text_center" width="10%">ยอดรวม</th>
@@ -311,8 +314,8 @@ function changePaymentMethod(paymentMethod){
 									</c:choose>
 									<tr class="${tabclass}">
 										<td class="td_text_center" width="10%">${rows1.index + 1}</td>
-										<td class="td_text" width="20%">${lines1.product.code} ${lines1.product.name}</td>
-										<td class="td_text_center" width="10%">
+										<td class="td_text" width="25%">${lines1.product.code} ${lines1.product.name}</td>
+										<td class="td_text_center" width="5%">
 											${lines1.fullUom}
 										</td>
 										<td class="td_text_right" width="10%">
@@ -411,6 +414,10 @@ function changePaymentMethod(paymentMethod){
 									        <html:hidden property="order.paymentMethod" styleId="paymentMethod"/>
 									         <%if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("CS")) {%>
 									              <input type="text"  value="เงินสด" class="disableBoldText" readonly size="10"/>
+									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("ALI")) {%>
+									              <input type="text"  value="AliPay" class="disableBoldText" readonly size="10"/>
+									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("WE")) {%>
+									             <input type="text"  value="WeChat" class="disableBoldText" readonly size="10"/>
 									         <%}else{ %>
 									              <input type="text"  value="บัตรเครดิต" class="disableBoldText" readonly size="10"/>
 									         <%} %>
@@ -418,9 +425,8 @@ function changePaymentMethod(paymentMethod){
 									      </td>
 									      <td align="left" nowrap>
 									         <span id="div_credit_3" style="display:none">
-									            <html:select property="order.creditCardType" disabled="true">
-										           <html:option value="VISA">VISA</html:option>
-										           <html:option value="MASTER">MASTER</html:option>
+									            <html:select property="order.creditCardType" disabled="true" styleClass="normalText">
+										           <html:options collection="creditCardType" property="key" labelProperty="name"/>
 									            </html:select> 
 									           <html:text property="order.creditCardNo" styleId="creditCardNo"
 									           readonly="true" styleClass="disableText" size="30"/>

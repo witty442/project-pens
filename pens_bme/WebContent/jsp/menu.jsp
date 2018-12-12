@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.web.maya.MayaAction"%>
+<%@page import="com.isecinc.pens.web.shop.ShopAction"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
@@ -249,7 +249,10 @@
 			      </li>
 		       </ul>
 		  </li>
-		  
+		    <li>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_SWITCHITEM_TO_ORL_FROM_EXCEL%>');">
+	          <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_SWITCHITEM_TO_ORL_FROM_EXCEL%>" bundle="sysprop"/></span></a>
+	        </li> 
 		</ul>
 	</li>
 <%} %>
@@ -281,22 +284,29 @@
 	        <li>
 			   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=ReportStockWacoalLotus');"><span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="ReportStockWacoalLotus"/></span></a>
 			</li>
+			 
 		</ul>
 	</li>
 <%} %>
 
 <!-- Maya Menu-->
 <% if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN,User.WACOAL,User.PICK}) ){ no=0;%>
-   <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
+    <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
 		<ul> 
 		    <li>
-	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/mayaAction.do?do=prepare&pageAction=new&pageName=<%=MayaAction.P_MAYA_SALEOUT%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
 	        </li>
 			 <li>
-	           <a href="#" onclick="javascript:link(false,'${pageContext.request.contextPath}/jsp/mayaAction.do?do=prepare&pageAction=new&pageName=<%=MayaAction.P_MAYA_STOCK_ONHAND%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_STOCK_ONHAND%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
 	        </li> 
+	         <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
+	        </li>  
+	        <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
+	        </li>
 		</ul>
-	</li>  
+	</li>   
 <%} %>
 
 <!-- -------------------------------------------------------------------Report ------------------------------------------------------------------------------------------------------- -->
@@ -468,6 +478,10 @@
 				 <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');">
 				 <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
 			 </li> 
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareReportOrder&action=new');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>
@@ -956,6 +970,12 @@
 	            <span><%no++;out.print(no);%>.Jojo Report</span></a>
 	        </li> 
 	     <%} %>
+	     <%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+	         <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ITEMBARCODE_CROSSREF_TO_ORL_FR_EXCEL%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ITEMBARCODE_CROSSREF_TO_ORL_FR_EXCEL%>" bundle="sysprop"/></span></a>
+	        </li>
+	      <%} %>
 		</ul>
 	</li> 
 <%} %>

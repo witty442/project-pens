@@ -562,13 +562,10 @@ public class ReportUtilServlet extends HttpServlet {
 
 		File rptFile = null;
 		fileName = fileName + ".pdf";
-
 		try {
 			//Wit Edit
 		    ServletContext context = request.getSession().getServletContext();
-            String fontPath = context.getRealPath("/reports/fonts/");//
-            logger.debug("fontPath:"+fontPath);
-            
+         
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = createDataSource(lstData);
 

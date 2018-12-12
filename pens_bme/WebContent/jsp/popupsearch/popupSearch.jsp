@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.popupsearch.PopupSearchHelper"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -28,29 +29,17 @@
     String currentPage = "1";
     String hideAll = Utils.isNull(request.getParameter("hideAll"));
     String multipleCheck = Utils.isNull(request.getParameter("multipleCheck"));
+    String fieldName = Utils.isNull(request.getParameter("fieldName"));
     String titleSearch = "";
     String codeSearchTxtName = "";
 	String descSearchTxtName = "";
 	
-    /** Criteria Name **/
-    if("StoreCodeBME".equalsIgnoreCase(pageName)){
-    	titleSearch = "ร้านค้า";
-    	codeSearchTxtName = "รหัสร้านค้า";
-    	descSearchTxtName = "ชื่อร้านค้า";
-    }else if("FIND_GroupCode_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
-    	titleSearch = "Group In Style Mapping";
-    	codeSearchTxtName = "Group Code";
-    	descSearchTxtName = "";
-    }else if("FIND_StyleNo_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
-    	titleSearch = "Article In Style Mapping";
-    	codeSearchTxtName = "Article";
-    	descSearchTxtName = "";
-    }else if("FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){
-    	titleSearch = "PensItem In Style Mapping";
-    	codeSearchTxtName = "Pens Item";
-    	descSearchTxtName = "";
-    }
-    
+	//SetDescription
+	PopupSearchHelper criName = PopupSearchHelper.setDescription(pageName); 
+	titleSearch = criName.getTitleSearch();
+	codeSearchTxtName = criName.getCodeSearchTxtName();
+	descSearchTxtName = criName.getDescSearchTxtName();
+	
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
     String descs = Utils.isNull(session.getAttribute("descs"));
@@ -85,7 +74,11 @@ function selectOneRadio(){
 	for(var i=0;i<chRadio.length;i++){
         if(chRadio[i].checked){
         	//alert(i+":"+code[i+1].value);
-            window.opener.setDataPopupValue(code[i].value,desc[i].value ,pageName);
+        	<%if("".equals(fieldName)){%>
+              window.opener.setDataPopupValue(code[i].value,desc[i].value ,pageName);
+            <%}else{%>
+              window.opener.setDataPopupValue(code[i].value,desc[i].value ,pageName,'<%=fieldName%>');
+            <%}%>
         	window.close();
             break;
         }
@@ -261,6 +254,7 @@ window.onload = function(){
 <html:form action="/jsp/popupSearchAction">
 
 <input type="hidden" name=pageName value ="<%=pageName%>" />
+<input type="hidden" name=fieldName value ="<%=fieldName%>" />
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
@@ -302,10 +296,17 @@ window.onload = function(){
 <%if(session.getAttribute("DATA_LIST") != null){ %>
    <%if("StoreCodeBME".equalsIgnoreCase(pageName)){ %>
         <jsp:include page="popup_sub/storeCodeResult.jsp" /> 
+        
    <%}else if("FIND_GroupCode_IN_StyleMappingLotus".equalsIgnoreCase(pageName)
 		  || "FIND_StyleNo_IN_StyleMappingLotus".equalsIgnoreCase(pageName)
 		  || "FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(pageName)){ %>
         <jsp:include page="popup_sub/FIND_StyleMappingLotus_Result.jsp" /> 
+        
+  <%}else if("FIND_Style".equalsIgnoreCase(pageName)
+		  || "FIND_PensItem".equalsIgnoreCase(pageName)){ %>
+        <jsp:include page="popup_sub/FIND_MSTRef_Result.jsp" /> 
+  <%}else if("FIND_GroupCode".equalsIgnoreCase(pageName)){ %>
+        <jsp:include page="popup_sub/FIND_GroupCodeMSTRef_Result.jsp" /> 
  
    <%}else if(session.getAttribute("search_submit") != null){ %>
         <font size="2" color="red">ไม่พบข้อมูล</font>

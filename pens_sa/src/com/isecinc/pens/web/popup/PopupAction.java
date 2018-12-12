@@ -151,6 +151,7 @@ public class PopupAction extends I_Action {
 			}else if("CustomerLocation".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock
 				 results = PopupDAO.searchCustomerLocationList(popupForm);
+				 
 			}
 			
 			 if(results != null && results.size() >0){

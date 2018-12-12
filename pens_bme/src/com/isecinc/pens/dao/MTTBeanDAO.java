@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.web.mtt.MTTAction;
+import com.isecinc.pens.web.shop.ShopBean;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 public class MTTBeanDAO{
@@ -26,6 +28,163 @@ public class MTTBeanDAO{
 	public static String STATUS_NEW ="N";
 	public static String STATUS_CANCEL ="AB";
 	
+	public static int searchHeadTotalRecList(Connection conn,MTTBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		int totalRec = 0;
+		try {
+			sql.append("\n select count(*) as c  from (");
+			sql.append("\n   select doc_no,sale_date ,cust_group,cust_no,barcode," );
+			sql.append("\n   MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date");
+			sql.append("\n   ,status,count(*) as qty");
+			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1 ");
+			sql.append("\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  ");
+			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  ");
+			sql.append("\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name ");
+			sql.append("\n   from PENSBME_SALES_OUT S");
+		    sql.append("\n   where 1=1 ");
+		    //Where Condition
+		    sql.append("   "+genWhereSearchHeadList(o).toString());
+			sql.append("\n    group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
+            sql.append("\n   )A ");
+         
+			logger.debug("sql:"+sql);
+
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+				totalRec = rst.getInt("c");
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	public static MTTBean searchHeadTotalSummary(Connection conn,MTTBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		MTTBean h = null;
+		try {
+			sql.append("\n  select count(*) as qty");;
+			sql.append("\n  from PENSBME_SALES_OUT S");
+		    sql.append("\n  where 1=1 ");
+		    //Where Condition
+		    sql.append("   "+genWhereSearchHeadList(o).toString());
+			logger.debug("sql:"+sql);
+
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()) {
+				h = new MTTBean();
+	            h.setQty(rst.getInt("qty"));
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return h;
+	}
+	public static List<MTTBean> searchHeadList(Connection conn,MTTBean o,boolean allRec ,int currPage,int pageSize) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		MTTBean h = null;
+		List<MTTBean> items = new ArrayList<MTTBean>();
+		int r = 1;
+		int c = 1;
+		int totalQty = 0;
+		try {
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n   select doc_no,sale_date ,cust_group,cust_no,barcode," );
+			sql.append("\n   MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date");
+			sql.append("\n   ,status,count(*) as qty");
+			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1 ");
+			sql.append("\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  ");
+			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  ");
+			sql.append("\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name ");
+			sql.append("\n   from PENSBME_SALES_OUT S");
+		    sql.append("\n   where 1=1 ");
+		    //Where Condition
+		    sql.append("   "+genWhereSearchHeadList(o).toString());
+			sql.append("\n    group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
+			sql.append("\n    order by doc_no desc,GROUP_CODE desc ");
+            sql.append("\n   )A ");
+         
+     	    // get record start to end 
+            if( !allRec){
+     	     sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+     	    sql.append("\n )M  ");
+		    if( !allRec){
+			  sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+		    }
+			logger.debug("sql:"+sql);
+			
+			//strart no by currPage
+			r = Utils.calcStartNoInPage(currPage, MTTAction.pageSize);
+
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   h = new MTTBean();
+			   h.setNo(r);
+			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
+			   h.setCustGroup(rst.getString("cust_group"));
+			   h.setCustGroupName(rst.getString("cust_group_name"));
+			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
+			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+			   h.setRemark(Utils.isNull(rst.getString("remark")));
+			   
+               h.setBarcode(Utils.isNull(rst.getString("barcode")));
+               h.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));
+               h.setGroupCode(Utils.isNull(rst.getString("GROUP_CODE")));
+               h.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+               h.setRetailPriceBF(Utils.isNull(rst.getString("RETAIL_PRICE_BF")));
+               h.setQty(rst.getInt("qty"));
+               
+               h.setStatus(Utils.isNull(rst.getString("status")));
+               if("AB".equalsIgnoreCase(h.getStatus())){
+            	   h.setStatusDesc("CANCEL");
+            	   h.setBarcodeStyle("disableText");
+   				   h.setCanCancel(false);
+				   h.setCanEdit(false);
+               }else{
+            	   h.setStatusDesc("NEW");
+            	   h.setBarcodeStyle("");  
+            	   h.setCanCancel(true);
+				   h.setCanEdit(true);
+               }
+               totalQty += h.getQty();
+           
+			   items.add(h);
+			   r++;
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
+	//OLD Method 
 	public static MTTBean searchHead(MTTBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -150,6 +309,52 @@ public class MTTBeanDAO{
 			} catch (Exception e) {}
 		}
 		return o;
+	}
+	public static StringBuffer genWhereSearchHeadList(MTTBean o) throws Exception{
+		StringBuffer sql = new StringBuffer("");
+		sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
+		
+		if( !Utils.isNull(o.getDocNo()).equals("")){
+			sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
+		}
+		if( !Utils.isNull(o.getCustGroup()).equals("")){
+			sql.append("\n and cust_group = '"+Utils.isNull(o.getCustGroup())+"'  ");
+		}
+		if( !Utils.isNull(o.getStoreCode()).equals("")){
+			sql.append("\n and cust_no = '"+Utils.isNull(o.getStoreCode())+"'  ");
+		}
+		if( !Utils.isNull(o.getGroupCode()).equals("")){
+			sql.append("\n and group_code = '"+Utils.isNull(o.getGroupCode())+"'  ");
+		}
+		
+		if( !Utils.isNull(o.getSaleDateFrom()).equals("")){
+			Date fDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getSaleDateTo()).equals("")){
+			Date tDate  = Utils.parse(o.getSaleDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+
+			sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getCreateDateFrom()).equals("")){
+			Date fDate  = Utils.parse(o.getCreateDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n and trunc(CREATE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+		}
+		
+		if( !Utils.isNull(o.getCreateDateTo()).equals("")){
+			Date tDate  = Utils.parse(o.getCreateDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+
+			sql.append("\n and trunc(CREATE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+		}
+		return sql;
 	}
 	
 	public static MTTBean searchScanReport(MTTBean o ) throws Exception {

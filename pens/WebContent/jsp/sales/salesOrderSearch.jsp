@@ -258,8 +258,16 @@ body {
 									    <% } %>
 									</td>
 									<td align="center">
-										<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
-										<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
+								     <c:choose>
+										<c:when test="${results.promotionSP == true}">
+			                              	<a href="#" onclick="javascript:prepareSP('${pageContext.request.contextPath}','view','${results.id}');">
+									         <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
+										</c:when>
+										<c:otherwise>
+										     <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
+									         <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
+										</c:otherwise>
+									    </c:choose>
 									</td>
 								</tr>
 							</c:forEach>

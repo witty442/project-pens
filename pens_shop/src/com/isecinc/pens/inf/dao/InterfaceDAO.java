@@ -36,13 +36,6 @@ import com.isecinc.pens.inf.helper.Utils;
 public class InterfaceDAO {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
 	
 	 /** c_monitor **/
     public void updateControlMonitor(BigDecimal transactionId,String type) {
@@ -52,14 +45,14 @@ public class InterfaceDAO {
            conn = DBConnection.getInstance().getConnection();
            dao.updateControlMonitor(conn,transactionId,type);
         } catch (Exception e) {
-        	e.printStackTrace();
+        	logger.error(e.getMessage(),e);
         }finally{
         	try{
 	        	if(conn != null){
 	        		conn.close();conn=null;
 	        	}
-        	}catch(Exception e){
-        		e.printStackTrace();
+        	}catch(Exception ee){
+        		logger.error(ee.getMessage(),ee);
         	}
         }
     }
@@ -516,9 +509,7 @@ public class InterfaceDAO {
 				ps.setString(++index,type);
 				ps.setBigDecimal(++index, transactionId);
 				ps.executeUpdate();
-				
 			}
-		
 		} catch (Exception ex) {
 			throw ex;
 		} finally {

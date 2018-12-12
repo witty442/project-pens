@@ -804,8 +804,6 @@ public class MMoveOrder {
 				  m.setCanEdit(true);
 			  }
 			  
-			  
-
 			}//while
 			//Find Lines
 			totalAmount = 0;

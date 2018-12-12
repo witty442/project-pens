@@ -191,6 +191,8 @@
 		<form-bean name="stockForm" type="com.isecinc.pens.web.stock.StockForm" />
 		<form-bean name="clearInvoiceForm" type="com.isecinc.pens.web.clearinvoice.ClearInvoiceForm" />
 		<form-bean name="prodShowForm" type="com.isecinc.pens.web.prodshow.ProdShowForm" />
+		<form-bean name="creditPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditPaidReportForm" />
+		<form-bean name="creditNoPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -439,7 +441,22 @@
 			<forward name="report" path="/jsp/reports/creditControlReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/creditControlReport.jsp" />
 		</action>
-
+		
+		 <!-- Credit Paid REPORT -->
+		<action name="creditPaidReportForm" path="/jsp/creditPaidReport"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.creditpaid.CreditPaidReportAction">
+			<forward name="report" path="/jsp/reports/creditPaidReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/creditPaidReport.jsp" />
+		</action>
+        <!-- Credit No Paid REPORT -->
+		<action name="creditNoPaidReportForm" path="/jsp/creditNoPaidReport"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportAction">
+			<forward name="report" path="/jsp/reports/creditNoPaidReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/creditNoPaidReport.jsp" />
+		</action>
+		
 		<!-- PERFORMANCE REPORT -->
 		<action name="performanceReportForm" path="/jsp/performanceReport"
 			forward="/jsp/reports/performanceReport.jsp" />
@@ -650,7 +667,7 @@
 			type="com.isecinc.pens.web.report.moveorder.MoveOrderReportAction">
 			<forward name="report" path="/jsp/reports/moveOrderReport.jsp" />
 		</action>
-		
+
 		<action name="salesTargetSummaryForm" path="/jsp/salesTargetSummary"
 			forward="/jsp/reports/salesTargetSummary.jsp"  >
 			<forward name="report" path="/jsp/reports/salesTargetSummary.jsp" />

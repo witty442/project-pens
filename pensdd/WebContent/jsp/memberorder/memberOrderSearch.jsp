@@ -112,6 +112,7 @@ body {
 									<th class="code"><bean:message key="TransactionDate" bundle="sysele" /></th>
 									<th><bean:message key="Member" bundle="sysele"/></th>
 									<th class="costprice"><bean:message key="TotalAmount" bundle="sysele" /></th>
+									<th class="costprice">ยอดรวมแผนการจัดส่ง</th>
 									<th class="status"><bean:message key="Exported" bundle="sysele"/></th>
 									<th class="status"><bean:message key="Interfaces" bundle="sysele"/></th>
 									<th class="status"><bean:message key="Order.Paid" bundle="sysele"/></th>
@@ -132,8 +133,14 @@ body {
 									<td align="center">${results.orderNo}</td>
 									<td align="center">${results.orderDate}</td>
 									<td align="left">${results.customerName}</td>
-									<td align="right"><fmt:formatNumber pattern="#,#00.00"
-										value="${results.totalNeedBill}"></fmt:formatNumber></td>
+									<td align="right">
+									   <fmt:formatNumber pattern="#,#00.00"
+										value="${results.totalNeedBill}"></fmt:formatNumber>
+									</td>
+									<td align="right">
+									   <fmt:formatNumber pattern="#,#00.00"
+										value="${results.netAmount}"></fmt:formatNumber>
+									</td>
 									<td align="center">
 										<c:if test="${results.exported=='Y'}">
 											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">

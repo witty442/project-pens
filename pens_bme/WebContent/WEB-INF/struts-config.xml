@@ -116,7 +116,7 @@
 		<form-bean name="autoSubBigCForm" type="com.isecinc.pens.web.autosub.AutoSubBigCForm" />
 		<form-bean name="toolManageForm" type="com.isecinc.pens.web.toolmanage.ToolManageForm" />
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
-		<form-bean name="mayaForm" type="com.isecinc.pens.web.maya.MayaForm" />
+		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -712,8 +712,10 @@
 			<forward name="search" path="/jsp/jojo/jojo.jsp" />
 		</action>
 		<!-- Maya -->
-		<action name="mayaForm" path="/jsp/mayaAction" parameter="do" scope="session" type="com.isecinc.pens.web.maya.MayaAction" >
-			<forward name="search" path="/jsp/maya/maya.jsp" />
+		<action name="shopForm" path="/jsp/shopAction" parameter="do" scope="session" type="com.isecinc.pens.web.shop.ShopAction" >
+			<forward name="search" path="/jsp/shop/shop.jsp" />
+			<forward name="searchPromotion" path="/jsp/shop/shopPromotionSearch.jsp" />
+			<forward name="detailPromotion" path="/jsp/shop/shopPromotion.jsp" />
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

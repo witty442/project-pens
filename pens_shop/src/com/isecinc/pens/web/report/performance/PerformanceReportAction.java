@@ -45,11 +45,19 @@ public class PerformanceReportAction extends I_ReportAction<PerformanceReport> {
 				parameterMap.put("total_amount", p.getAllCashAmount());
 				parameterMap.put("total_ap_amount", p.getAllAirpayAmount());
 				parameterMap.put("total_receipt", p.getAllReceiptAmount());
+				
+				parameterMap.put("total_ali", p.getAllAliAmount());
+				parameterMap.put("total_we", p.getAllWeAmount());
+				
 				parameterMap.put("total_vat", p.getAllVatAmount());
 				parameterMap.put("total_net", p.getAllNetAmount());
 				parameterMap.put("target_amount", p.getAllTargetAmount());
 				parameterMap.put("total_vat_cash", p.getAllVatCashAmount());
 				parameterMap.put("total_vat_receipt", p.getAllVatReceiptAmount());
+				
+				parameterMap.put("total_vat_ali", p.getAllVatAliAmount());
+				parameterMap.put("total_vat_we", p.getAllVatWeAmount());
+				
 				parameterMap.put("total_cancel_amount", p.getTotalCancelAmountToday());
 				
 			}

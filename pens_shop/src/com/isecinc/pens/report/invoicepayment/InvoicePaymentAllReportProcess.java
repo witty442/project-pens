@@ -37,6 +37,7 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 		StringBuilder sql = new StringBuilder();
 		try {
 			sql.append("\n  select * from( ");
+			//CASH
 			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
 			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
 			sql.append("\n  rcby.WRITE_OFF, ");
@@ -57,11 +58,62 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			// today receipt, today order
 			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rcl.ORDER_ID IN ( SELECT order_id FROM t_order od )");
-			// Wit Edit 18/05/2011
 			sql.append("\n  AND rc.user_id = "+user.getId());
 			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CS'");
-			// Art Edit 14/09/2011
+			
 			sql.append("\n  union all");
+			//ALIPAY
+			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
+			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
+			sql.append("\n  rcby.WRITE_OFF, ");
+			sql.append("\n  (select o.customer_bill_name from t_order o where o.order_id = rcl.order_id ) as customer_bill_name, ");
+			sql.append("\n  rcby.BANK, rcby.credit_card_no, rcby.CHEQUE_DATE, rc.doc_status,");
+			sql.append("\n  rc.ISPDPAID , ");
+			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
+			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n  WHERE 1=1");
+			//sql.append("\n  AND rcby.WRITE_OFF = 'N'` ");
+			// today receipt, today order
+			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( SELECT order_id FROM t_order od )");
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'ALI'");
+			
+			sql.append("\n  union all");
+			//WECHAT
+			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
+			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
+			sql.append("\n  rcby.WRITE_OFF, ");
+			sql.append("\n  (select o.customer_bill_name from t_order o where o.order_id = rcl.order_id ) as customer_bill_name, ");
+			sql.append("\n  rcby.BANK, rcby.credit_card_no, rcby.CHEQUE_DATE, rc.doc_status,");
+			sql.append("\n  rc.ISPDPAID , ");
+			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
+			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n  WHERE 1=1");
+			//sql.append("\n  AND rcby.WRITE_OFF = 'N'` ");
+			// today receipt, today order
+			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( SELECT order_id FROM t_order od )");
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'WE'");
+			
+			sql.append("\n  union all");
+			
+			//Creditcard
 			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
 			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
 			sql.append("\n  rcby.WRITE_OFF, ");
@@ -82,7 +134,6 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			// today receipt, today order
 			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rcl.ORDER_ID IN (SELECT order_id FROM t_order od  )");
-			// Wit Edit 18/05/2011
 			sql.append("\n  AND rc.user_id = "+user.getId());
 			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CR' ");
 			sql.append("\n  ) b");
@@ -119,11 +170,19 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 				
 				inv.setPaymentMethod(rst.getString("PAYMENT_METHOD"));
 				inv.setReceiptAmount(rst.getDouble("RECEIPT_AMT"));
-				
 				inv.setStatus(rst.getString("doc_status"));
-				
 				inv.setIsPDPaid(rst.getString("ISPDPAID"));
-				
+				//display PaymentMethodDes
+				if("CS".equalsIgnoreCase(inv.getPaymentMethod())){
+					inv.setPaymentMethodDesc("เงินสด");
+				}else if("CR".equalsIgnoreCase(inv.getPaymentMethod())){
+					inv.setPaymentMethodDesc("บัตรเครดิต");
+				}else if("ALI".equalsIgnoreCase(inv.getPaymentMethod())){
+					inv.setPaymentMethodDesc("AliPay");				
+				}else if("WE".equalsIgnoreCase(inv.getPaymentMethod())){
+					inv.setPaymentMethodDesc("WeChat");
+				}
+
 				pos.add(inv);
 			}
 		} catch (Exception e) {

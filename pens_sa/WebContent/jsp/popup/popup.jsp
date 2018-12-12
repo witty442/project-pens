@@ -41,7 +41,7 @@
     	descSearchTxtName = "Brand Name";
     }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
       || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
-      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)){
+      || "CustomerCreditPromotion".equalsIgnoreCase(pageName) ){
     	headName = "ร้านค้า("+pageName+")";
     	codeSearchTxtName = "Customer Code";
     	descSearchTxtName = "Customer Name";
@@ -249,6 +249,7 @@ window.onload = function(){
 <input type="hidden" name="currentPage"  value ="<%=currentPage%>" />
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
+<input type="hidden" name="hideAll" value ="<%=hideAll%>" />
 
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px" class="txt1">

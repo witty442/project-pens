@@ -176,6 +176,15 @@ function rejectRow(path,id,lineId,rowId){
 		document.getElementById("span_reject_action_"+rowId).innerHTML = "";
 	}
 }
+function updateStatusManual(path,status){
+	var form = document.salesTargetForm;
+	if(confirm("ยืนยันแก้ไขสถานะ เป็น "+status)){
+		form.action = path + "/jsp/salesTargetAction.do?do=updateStatusManual&status="+status;
+		form.submit();
+		return true;
+	}
+	return false;
+}
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -454,6 +463,7 @@ function rejectRow(path,id,lineId,rowId){
 										<a href="javascript:backForm('${pageContext.request.contextPath}')">
 										  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
 										</a>
+										
 									</td>
 									<td align="left" width="10%">
 									    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -472,6 +482,23 @@ function rejectRow(path,id,lineId,rowId){
 									</td>
 								</tr>
 						</table>
+						<div align="center">
+						   <%if("GOD".equalsIgnoreCase(user.getUserName())){ %>
+								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Open')">
+									 <input type="button" value="อัพสถานะไปเป็น Open(GOD)" class="newPosBtn">
+								</a>
+								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Post')">
+									 <input type="button" value="อัพสถานะไปเป็น Post(GOD)" class="newPosBtn">
+								</a>
+								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Accept')">
+									 <input type="button" value="อัพสถานะไปเป็น Accept(GOD)" class="newPosBtn">
+								</a>
+								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Finish')">
+									 <input type="button" value="อัพสถานะไปเป็น Finish(GOD)" class="newPosBtn">
+								</a>
+								
+							<%} %>
+						</div>
 					</div>
 				</c:if>
 					<!-- ************************Result ***************************************************-->

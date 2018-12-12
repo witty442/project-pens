@@ -981,5 +981,38 @@ public class SalesTargetDAO {
 				}
 			}
 		}
+	 
+	 public static void updateStatusHeadByManual(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("updateStatusHeadByManual(admin) status["+o.getStatus()+"]");
+			int  c = 1;
+			try{
+				StringBuffer sql = new StringBuffer("");
+				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE 1=1  \n" );
+				sql.append(" and M.salesrep_code = '"+o.getSalesrepCode()+"' \n" );
+				sql.append(" and M.customer_code = '"+o.getCustomerCode()+"' \n" );
+				sql.append(" and M.brand = '"+o.getBrand()+"' \n" );
+				sql.append(" and M.target_month = '"+o.getTargetMonth()+"' \n" );
+				sql.append(" and M.target_quarter = '"+o.getTargetQuarter()+"' \n" );
+				sql.append(" and M.target_year = '"+o.getTargetYear()+"' \n" );
+
+		        logger.debug("sql:"+sql.toString());
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				
+				ps.executeUpdate();
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
 		
 }

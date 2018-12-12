@@ -39,8 +39,8 @@ function addProduct(path,objValue){
 		}else if(objValue.promotion=="S"){
 		    //Special discount = (-1)*qty*price
 			//if sum only promotion =S
-			disc1 = (-1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(qty1,5)));
-			disc2 = (-1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(qty2,5)));
+			disc1 = (1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(qty1,5)));
+			disc2 = (1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(qty2,5)));
 			
 			//alert("row["+index+"]:AddProduct_1:disc1:"+disc1);
 			//console.log("row["+objValue.row+"]:AddProduct_1:disc1:"+disc1);
@@ -216,8 +216,8 @@ function setValueToProduct(path, objValue){
 	}else if(objValue.promotion=="S"){
 	   //Special (-1)*(qty*price)
 	   //if sum only promotion =S
-	   disc1 = (-1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(objValue.qty1,5)));
-	   disc2 = (-1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(objValue.qty2,5)));
+	   disc1 = (1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(objValue.qty1,5)));
+	   disc2 = (1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(objValue.qty2,5)));
 			
 	   inputLabel+="<input type='hidden' name='lines.disc1' value='"+disc1+"'>";
 	   inputLabel+="<input type='hidden' name='lines.disc2' value='"+disc2+"'>";
@@ -272,10 +272,9 @@ function setValueToProduct(path, objValue){
 	}else 	if(objValue.promotion=="Y"){//Normal promotion
 	   tbl.rows[objValue.row].cells[c++].innerHTML= 0;//discount
 	}else if(objValue.promotion=="S"){
-	    //Special (-1)*
 		//if sum only promotion =S
-	    disc1 = (-1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(objValue.qty1,5)));
-		disc2 = (-1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(objValue.qty2,5)));
+	    disc1 = (1)*(Number(toFixed(objValue.price1,5))*Number(toFixed(objValue.qty1,5)));
+		disc2 = (1)*(Number(toFixed(objValue.price2,5))*Number(toFixed(objValue.qty2,5)));
 		
 		//alert("2:disc1:"+disc1);
 	    tbl.rows[objValue.row].cells[c++].innerHTML= addCommas((eval(disc1)).toFixed(5));//discount
@@ -479,10 +478,10 @@ function calculatePrice(){
 			   totalAmtSubDis1 = 0;
 			   totalAmtSubDis2 = 0;
 			}else if(promotion[i].value =='S'){
-			  /** discount Line(special is negeative only ) **/
+			  /** discount Line(special) **/
 			   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
-			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) + Number(toFixed(discs1[i].value,5));
-			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) + Number(toFixed(discs2[i].value,5));
+			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
+			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
 			}
 			
 			vatLine1 = (Number(v)*Number(totalAmtSubDis1))/100;
@@ -512,12 +511,7 @@ function calculatePrice(){
 			}else if(promotion[i].value =='Y'){
 				sellingPrice[i].value = 0;
 			}else if(promotion[i].value =='S'){
-				var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-				var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-				var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-				var sellingPriceT = linePriceT+(lineDiscT/lineQtyT);
-				//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-				sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
+				sellingPrice[i].value = 0;
 			}
 			/********************************************************************************************/
 			
@@ -564,10 +558,10 @@ function calculatePrice(){
 			   totalAmtSubDis1 = 0;
 			   totalAmtSubDis2 = 0;
 			}else if(promotion[i].value =='S'){
-			  /** discount Line(special is negeative only ) **/
+			  /** discount Line(special) **/
 			   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
-			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) + Number(toFixed(discs1[i].value,5));
-			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) + Number(toFixed(discs2[i].value,5));
+			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
+			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
 			}
 			
 			vatLine1 = 0;
@@ -596,12 +590,7 @@ function calculatePrice(){
 			}else if(promotion[i].value =='Y'){
 				sellingPrice[i].value = 0;
 			}else if(promotion[i].value =='S'){
-				var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-				var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-				var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-				var sellingPriceT = linePriceT+(lineDiscT/lineQtyT);
-				//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-				sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
+				sellingPrice[i].value = 0;
 			}
 			
 			sumTNonVat+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);

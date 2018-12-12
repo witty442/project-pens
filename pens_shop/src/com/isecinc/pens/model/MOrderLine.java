@@ -12,6 +12,7 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
@@ -408,5 +409,49 @@ public class MOrderLine extends I_Model<OrderLine> {
 		sql += "  ) \r\n";
 
 		return sql;
+	}
+	public double findTotalLineAmount(Connection conn ,String id) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		double totalDiscountAmount = 0;
+		try{
+			String sql ="\n select sum(line_amount) as c from t_order_line where id="+id +" and iscancel <> 'Y' ";
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				totalDiscountAmount = rst.getDouble("c");
+			}
+			return totalDiscountAmount;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
+	public double findTotalDiscountAmount(Connection conn ,String id) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		double totalDiscountAmount = 0;
+		try{
+			String sql ="\n select sum(discount_amount) as c from t_order_line where id="+id +" and iscancel <> 'Y' ";
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				totalDiscountAmount = rst.getDouble("c");
+			}
+			return totalDiscountAmount;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
 	}
 }

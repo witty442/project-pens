@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.maya;
+package com.isecinc.pens.web.shop;
 
 import java.util.List;
 
@@ -19,15 +19,15 @@ import com.isecinc.pens.bean.TransactionSummary;
  * @version $Id: ReceiptForm.java,v 1.0 26/10/2010 00:00:00 atiz.b Exp $
  * 
  */
-public class MayaForm extends I_Form {
+public class ShopForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
 
     private String page;
     private String summaryType;
-    private MayaBean bean;
-    private MayaBean beanCriteria;
-	private List<MayaBean> results;
+    private ShopBean bean;
+    private ShopBean beanCriteria;
+	private List<ShopBean> results;
 
 	public String getPage() {
 		return page;
@@ -42,22 +42,22 @@ public class MayaForm extends I_Form {
 	public void setSummaryType(String summaryType) {
 		this.summaryType = summaryType;
 	}
-	public MayaBean getBean() {
+	public ShopBean getBean() {
 		return bean;
 	}
-	public void setBean(MayaBean bean) {
+	public void setBean(ShopBean bean) {
 		this.bean = bean;
 	}
-	public MayaBean getBeanCriteria() {
+	public ShopBean getBeanCriteria() {
 		return beanCriteria;
 	}
-	public void setBeanCriteria(MayaBean beanCriteria) {
+	public void setBeanCriteria(ShopBean beanCriteria) {
 		this.beanCriteria = beanCriteria;
 	}
-	public List<MayaBean> getResults() {
+	public List<ShopBean> getResults() {
 		return results;
 	}
-	public void setResults(List<MayaBean> results) {
+	public void setResults(List<ShopBean> results) {
 		this.results = results;
 	}
 	@Override

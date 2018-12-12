@@ -28,13 +28,12 @@ public class PromotionDAO {
 			sql.append("\n select count(*) as c FROM(");
 			sql.append("\n  SELECT S.* FROM (");
 			sql.append("\n    select substr(H.request_no,2,1) as region ,H.request_date ,H.request_no ");
-			sql.append("\n    ,substr(D.product_code,1,3) as brand ,H.salesrep_id,H.customer_number,D.product_code");
+			sql.append("\n    ,H.salesrep_id,H.customer_number");
 			sql.append("\n    ,substr(H.request_no,1,4) as sales_code");
+			sql.append("\n    ,H.product_category as brand");
 			sql.append("\n    from xxpens_om_req_promotion_mst H");
-			sql.append("\n    ,xxpens_om_req_promotion_dt1 D"); 
 			sql.append("\n    ,xxpens_ar_customer_all_v C");
-			sql.append("\n    WHERE H.request_no =D.request_no");
-			sql.append("\n    AND C.account_number = H.customer_number");
+			sql.append("\n    WHERE C.account_number = H.customer_number");
 			sql.append("\n  )S WHERE 1=1");
 			 //GenWhereSQL
 			sql.append(" "+genWhereCondSql(conn,o));
@@ -76,19 +75,24 @@ public class PromotionDAO {
 			sql.append("\n  ,(select B.salesrep_desc from PENSBI.XXPENS_BI_MST_SALESREP B ");
 			sql.append("\n    where B.salesrep_code=substr(H.request_no,1,4)) as salesrep_full_name ");
 			sql.append("\n  ,H.customer_number ,C.party_name ,H.product_type,H.request_date");
-			sql.append("\n  ,H.request_no, substr(REGEXP_REPLACE(D.product_code,'[^0-9]+',''),1,3) as brand");
+			sql.append("\n  ,H.request_no");
+			
+			//sql.append("\n  , substr(REGEXP_REPLACE(D.product_code,'[^0-9]+',''),1,3) as brand");
+			//sql.append("\n  ,(select B.brand_desc from PENSBI.XXPENS_BI_MST_BRAND B ");
+			//sql.append("\n    where B.brand_no =substr(REGEXP_REPLACE(D.product_code,'[^0-9]+',''),1,3) )as brand_name ");
+			
+			sql.append("\n  , H.product_category as brand");
 			sql.append("\n  ,(select B.brand_desc from PENSBI.XXPENS_BI_MST_BRAND B ");
-			sql.append("\n    where B.brand_no =substr(REGEXP_REPLACE(D.product_code,'[^0-9]+',''),1,3) )as brand_name ");
+			sql.append("\n    where B.brand_no = H.product_category ) as brand_name ");
+			
 			sql.append("\n  FROM xxpens_om_req_promotion_mst H");
-			sql.append("\n  ,xxpens_om_req_promotion_dt1 D"); 
 			sql.append("\n  ,xxpens_ar_customer_all_v C");
-			sql.append("\n  WHERE H.request_no =D.request_no");
-			sql.append("\n  AND C.account_number = H.customer_number");
+			sql.append("\n  WHERE C.account_number = H.customer_number");
 			sql.append("\n )S WHERE 1=1");
 			 //GenWhereSQL
 			sql.append(" "+genWhereCondSql(conn,o));
 		
-			sql.append("\n    ORDER BY S.region ,S.sales_code,S.customer_number asc ");
+			sql.append("\n    ORDER BY S.sales_code,S.request_date,S.request_no asc ");
 			sql.append("\n   )A ");
         	// get record start to end 
             if( !allRec){
@@ -194,17 +198,14 @@ public class PromotionDAO {
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
-			
 			while (rst.next()) {
 			  no++;
 			  RequestPromotion m = new RequestPromotion();
 			  m.setNo(no+"");
 			  m.setRequestNo(rst.getString("request_no"));
 			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  
 			  m.setProductCatagory(Utils.isNull(rst.getString("product_category")));
 			  m.setProductCatagoryDesc(Utils.isNull(rst.getString("product_catagory_name")));
-			  
 			  m.setProductType(Utils.isNull(rst.getString("product_type")));
 			  m.setProductTypeDesc(getProductTypeDesc(Utils.isNull(rst.getString("product_type"))));
 			  m.setName(Utils.isNull(rst.getString("request_name")));
@@ -212,7 +213,6 @@ public class PromotionDAO {
 			  m.setCustomerCode(Utils.isNull(rst.getString("customer_number")));
 			  m.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			  m.setUserId(Utils.isNull(rst.getString("salesrep_id")));
-			  
 			  m.setPromotionStartDate(Utils.stringValue(rst.getDate("promotion_start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  m.setPromotionEndDate(Utils.stringValue(rst.getDate("promotion_end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  m.setRemark(Utils.isNull(rst.getString("remark")));
@@ -278,7 +278,20 @@ public class PromotionDAO {
 						  
 						  m.getPromotionLineList().add(newCostLine);
 					  }//for
-				  }//if
+				  }else if(m.getPromotionLineList() ==null || (m.getPromotionLineList() != null & m.getPromotionLineList().size()==0)){
+					  int diffRow = 7;
+					  int lastLineNo = 0;
+					  for(int r=0;r<diffRow;r++){
+						  lastLineNo++;
+						  RequestPromotionLine newCostLine = new RequestPromotionLine();
+						  newCostLine.setLineNo(lastLineNo);
+						  newCostLine.setProductCode("");
+						  newCostLine.setProductName(" \n");
+						  newCostLine.setNewCtn(null);
+						  
+						  m.getPromotionLineList().add(newCostLine);
+					  }//for
+				  }
 			  }//if get Item
 			  list.add(m);
 			}//while
@@ -312,10 +325,8 @@ public class PromotionDAO {
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-
 				while (rst.next()) {
 				    line = new RequestPromotionLine();
-				 
 				    line.setLineNo(rst.getInt("line_number"));
 					line.setProductCode(rst.getString("product_code"));
 					line.setNewCtn(rst.getBigDecimal("new_ctn"));

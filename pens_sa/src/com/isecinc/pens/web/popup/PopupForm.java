@@ -27,8 +27,8 @@ public class PopupForm extends ActionForm implements Serializable{
 
     private String code;
     private String desc;
+   
     private Map<String, String> criteriaMap;
-    
     
 	public Map<String, String> getCriteriaMap() {
 		return criteriaMap;

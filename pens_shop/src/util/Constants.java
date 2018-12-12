@@ -22,4 +22,6 @@ public class Constants {
 	
 	public static final String PAYMT_CASH = "CS";
 	public static final String PAYMT_CREDITCARD = "CR";
+	public static final String PAYMT_ALI = "ALI";
+	public static final String PAYMT_WE = "WE";
 }

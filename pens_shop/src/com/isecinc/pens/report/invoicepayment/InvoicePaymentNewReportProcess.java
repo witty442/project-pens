@@ -37,7 +37,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 	/**
 	 * Search for invoice payment report
 	 */
-	public List<InvoicePaymentReport> searchReport(InvoicePaymentReport t, User user, Connection conn, int type)
+	public List<InvoicePaymentReport> searchReport1(InvoicePaymentReport t, User user, Connection conn, int type)
 			throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -155,122 +155,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		return pos;
 	}
 
-	public List<InvoicePaymentReport> sumPostAmt(InvoicePaymentReport t, User user, Connection conn, int type)throws Exception {
-	Statement stmt = null;
-	ResultSet rst = null;
-	List<InvoicePaymentReport> pos = new ArrayList<InvoicePaymentReport>();
-	InvoicePaymentReport inv = null;
-	StringBuilder sql = new StringBuilder();
-	try {
-		sql.delete(0, sql.length());
-		sql.append("\n  SELECT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
-		sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
-		sql.append("\n  cus.CODE AS CUSTOMER_CODE, od.ORDER_NO, od.ORDER_DATE, ");
-		sql.append("\n  rcby.BANK, rcby.CHEQUE_NO, rcby.CHEQUE_DATE, ");
-		sql.append("\n  (rcby.RECEIPT_AMOUNT) AS CHEQUE_AMT, ");
-		sql.append("\n  (SELECT SUM(rcby.RECEIPT_AMOUNT) FROM t_receipt ");
-		sql.append("\n  INNER JOIN t_receipt_line ON t_receipt_line.RECEIPT_ID = t_receipt.RECEIPT_ID ");
-		sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-		sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-		sql.append("\n  WHERE rcby.PAYMENT_METHOD = 'CS' ");
-		// Wit Edit 18/05/2011
-		sql.append("\n  AND t_receipt.user_id = "+user.getId());
-		switch (type) {
-		case 1: {
-			sql.append("\n  AND rcby.WRITE_OFF = 'Y' ");
-		}
-			break;
-		default:
-			break;
-		}
-		sql.append("\n  AND t_receipt.RECEIPT_DATE = rc.RECEIPT_DATE ");
-		sql.append("\n  AND t_receipt.DOC_STATUS = rc.DOC_STATUS ");
-		sql.append("\n  AND t_receipt_line.ORDER_ID =  rcl.ORDER_ID ");
-		sql.append("\n  ) AS CASH_WRITEOFF FROM t_receipt rc ");
-		sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
-		sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
-		sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-		sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-		sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
-		sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
-		sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
-		sql.append("\n  WHERE rcby.PAYMENT_METHOD IN('CH','CS')");
-		sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 	
-		switch (type) {
-		case 1: {
-			// today receipt, today order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n  SELECT order_id FROM t_order od  ");
-			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
-			sql.append("\n  AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
-		}
-			break;
-		case 2: {
-			// today receipt, post order
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n  SELECT order_id FROM t_order od  ");
-			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS  ");
-			sql.append("\n  AND od.ORDER_DATE <> rc.RECEIPT_DATE) ");
-		}
-			break;
-		case 3: {
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
-			sql.append("\n  AND IF(rc.ISPDPAID IS NULL OR rc.ISPDPAID ='',rc.receipt_date,rc.PDPAID_DATE) <= DATE('" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "') ");
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n  SELECT order_id FROM t_order od  ");
-			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS ) ");
-		}
-			break;
-		default:
-			break;
-		}
-		sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
-		// Wit Edit 18/05/2011
-		sql.append("\n  AND rc.user_id = "+user.getId());
-		
-		logger.debug("sql:"+sql.toString());
-		stmt = conn.createStatement();
-		rst = stmt.executeQuery(sql.toString());
-		int i = 1;
-		while (rst.next()) {
-			inv = new InvoicePaymentReport();
-	
-			inv.setId(i++);
-			inv.setInvName(rst.getString("INV_NAME"));
-			inv.setDescription(rst.getString("DESCRIPTION"));
-			inv.setReceiptDate(DateToolsUtil.convertToString(rst.getDate("RECEIPT_DATE")));
-			inv.setCode(rst.getString("CODE"));
-			inv.setName(rst.getString("NAME"));
-			inv.setCustomerName(rst.getString("CUSTOMER_NAME"));
-			inv.setCustomerCode(rst.getString("CUSTOMER_CODE"));
-			inv.setOrderNo(rst.getString("ORDER_NO"));
-			inv.setOrderDate(DateToolsUtil.convertToString(rst.getDate("ORDER_DATE")));
-			inv.setBank(rst.getString("BANK"));
-			inv.setChequeNo(rst.getString("CHEQUE_NO"));
-			if (!inv.getChequeNo().equals("")) {
-				inv.setChequeDate(DateToolsUtil.convertToString(rst.getDate("CHEQUE_DATE")));
-			}
-			inv.setChequeAmt(rst.getDouble("CHEQUE_AMT"));
-			inv.setCashWriteOff(rst.getDouble("CASH_WRITEOFF"));
-			inv.setReceiptAmount(inv.getChequeAmt() + inv.getCashWriteOff());
-			if (type == 1) inv.setIsCurrent("Y");
-			else inv.setIsCurrent("N");
-			pos.add(inv);
-		}
-	} catch (Exception e) {
-		throw e;
-	} finally {
-		try {
-			rst.close();
-			stmt.close();
-		} catch (Exception e2) {}
-	}
-	
-	return pos;
-	}
 	public int countReport(InvoicePaymentReport t, User user, Connection conn, int type)throws Exception {
 	Statement stmt = null;
 	ResultSet rst = null;
@@ -286,7 +171,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
 		sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
 		sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
-		sql.append("\n  WHERE rcby.PAYMENT_METHOD IN('CS','CR')");
+		sql.append("\n  WHERE rcby.PAYMENT_METHOD IN('CS','CR','ALI','WE')");
 		sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 	
 		switch (type) {
@@ -335,6 +220,44 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n  SELECT order_id FROM t_order od  ");
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS ) ");
+		}
+			break;
+		case 6: {
+			// today Alipay Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='ALI'");
+			sql.append("\n  AND rc.receipt_date = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
+		}
+			break;
+		case 7: {
+			// today WeChat Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='WE'");
+			sql.append("\n  AND rc.receipt_date = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
+		}
+			break;
+		case 9: {
+			// Before ALi Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='ALI'");
+			sql.append("\n  AND rc.RECEIPT_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE < '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
+		}
+		   break;
+		case 10: {
+			// Before WeChat Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='WE'");
+			sql.append("\n  AND rc.RECEIPT_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE < '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
 		}
 			break;
 		default:
@@ -649,6 +572,8 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		InvoicePaymentReport dataReport = new InvoicePaymentReport();
 		double totalCashAmt = 0;
 		double totalCreditcardAmt = 0;
+		double totalAliAmt = 0;
+		double totalWeAmt = 0;
 		try{
 		StringBuffer reportSql = new StringBuffer(); 
 		reportSql.append("\n SELECT M. * FROM( " );
@@ -722,6 +647,14 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			   inv.setPaymentTerm("CASH");
 			   iscash = true;
 			   totalCashAmt += rset.getDouble("receipt_amount");
+			}else if("ALI".equalsIgnoreCase(inv.getPaymentMethod())){
+			   inv.setPaymentTerm("ALI");
+			   iscash = true;
+			   totalAliAmt += rset.getDouble("receipt_amount");
+			}else if("WE".equalsIgnoreCase(inv.getPaymentMethod())){
+			   inv.setPaymentTerm("WE");
+			   iscash = true;
+			   totalWeAmt += rset.getDouble("receipt_amount");
 			}else{
 			   inv.setPaymentTerm("CREDIT");//creditCard
 			   inv.setCreditCardAmt(rset.getDouble("receipt_amount"));
@@ -749,6 +682,8 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		 resultL.addAll(paymentL);
 		 dataReport.setTotalCashAmt(totalCashAmt);
 		 dataReport.setTotalCreditCardAmt(totalCreditcardAmt);
+		 dataReport.setTotalAliAmt(totalAliAmt);
+		 dataReport.setTotalWeAmt(totalWeAmt);
 	     dataReport.setItemsList(resultL);
 		 return dataReport;
 	  }catch(Exception e){
@@ -770,6 +705,90 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('CR') ");
+			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
+			sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
+			sql.append("\n  WHERE t_order.DOC_STATUS = 'SV' )");
+			// Wit Edit 18/05/2011
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			
+			logger.debug("sql:"+sql.toString());
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				creditSalesAmt = rst.getDouble("CASH_AMOUNT");
+			}
+
+			//value[0] = cashReceipt;
+			//value[1] = receiptCnt;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return creditSalesAmt;
+	}
+	public double sumAliAmtBefore(InvoicePaymentReport t, User user,Connection conn) throws Exception 
+	{
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double creditSalesAmt = 0d;
+		try {
+			sql.delete(0, sql.length());
+			sql.append("\n  SELECT SUM(rcby.RECEIPT_AMOUNT) AS CASH_AMOUNT ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('ALI') ");
+			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
+			sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
+			sql.append("\n  WHERE t_order.DOC_STATUS = 'SV' )");
+			// Wit Edit 18/05/2011
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			
+			logger.debug("sql:"+sql.toString());
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				creditSalesAmt = rst.getDouble("CASH_AMOUNT");
+			}
+
+			//value[0] = cashReceipt;
+			//value[1] = receiptCnt;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return creditSalesAmt;
+	}
+	public double sumWeAmtBefore(InvoicePaymentReport t, User user,Connection conn) throws Exception 
+	{
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double creditSalesAmt = 0d;
+		try {
+			sql.delete(0, sql.length());
+			sql.append("\n  SELECT SUM(rcby.RECEIPT_AMOUNT) AS CASH_AMOUNT ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('WE') ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
 			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");

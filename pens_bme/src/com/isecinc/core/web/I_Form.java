@@ -53,6 +53,7 @@ public abstract class I_Form extends ActionForm {
 	// start paginator
 	private String resultScreen;
 	private String pageObjKey;
+	@Deprecated
 	private String currentPage;
 	private String orderBy;
 	private String txtDorA;

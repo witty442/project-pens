@@ -97,10 +97,10 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 			//logger.debug("RealPath:"+request.getRealPath(""));
 			
 			/** Connection Monitor */
-			connMonitor = DBConnection.getInstance().getConnection();
+			connMonitor = DBConnection.getInstance().getConnectionApps();
 
 			/** Set Transaction no Auto Commit **/
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			conn.setAutoCommit(false);
 		
 			/**debug TimeUse **/
@@ -206,7 +206,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 			if (dataFile != null) {
 				//XXPENS_OM_FM_ORDER_MST
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" INSERT INTO XXPENS_OM_EXCEL_ORDER_MST( \n");
+				sql.append(" INSERT INTO APPS.XXPENS_OM_EXCEL_ORDER_MST( \n");
 				sql.append(" order_number, ordered_date, account_number,  \n");
 				sql.append(" ship_to_location ,cust_po_number, Salesrep_number, Subinventory, \n");
 				sql.append(" order_type, TRANSPORTER, INT_FLAG, \n");
@@ -216,7 +216,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 				
 				//XXPENS_OM_FM_ORDER_DT
 				sql = new StringBuffer("");
-				sql.append(" INSERT INTO XXPENS_OM_EXCEL_ORDER_DT( \n");//5
+				sql.append(" INSERT INTO APPS.XXPENS_OM_EXCEL_ORDER_DT( \n");//5
 				sql.append(" HEADER_ID, LINE_ID, ITEM_NO, QTY ,CREATION_DATE) VALUES( ?,?,?,?,?) \n");
 				psD = conn.prepareStatement(sql.toString());
 
@@ -281,18 +281,29 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 						   logger.debug("ordered_date Str:"+orderedDateStr);
 						}else if(colNo==2){
 						   //account_number
-						   account_number = Utils.isNull(cellValue);
+						   if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+							  //logger.debug("account_number : is Number:"+cellValue);
+							   account_number = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
+							}else{
+							   //logger.debug("account_number : No Number:"+cellValue);
+								account_number = Utils.isNull(cellValue);
+							}
+						   logger.debug("result account_number:"+account_number);
 						}else if(colNo==3){
 						    //ship_to_location
 							ship_to_location = Utils.convertDoubleToStrNoDigit(cellValue);
 						}else if(colNo==4){
 						   //cust_po_number
 							if(Utils.isNumeric(Utils.isNull(cellValue))){
+							 //  logger.debug("cust_po_number : is Number:"+cellValue);
 							   cust_po_number = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
 							}else{
+							   //logger.debug("cust_po_number : No Number:"+cellValue);
 							   cust_po_number = Utils.isNull(cellValue);
 							}
-							logger.debug("cust_po_number:"+cust_po_number);
+							
+							//cust_po_number = Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
+							logger.debug("result cust_po_number:"+cust_po_number);
 						}else if(colNo==5){
 						  //item_no
 						   item_no = Utils.convertDoubleToStrNoDigit(cellValue);
@@ -371,11 +382,11 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 						 errorMsg =" Order number และ Order date  เคยมีประวัติการ Load ไปแล้ว<br/>";
 					 }
 					 //validate customer_number must exist in master_reference
-					 if( !isCustomerNumberExist(conn, account_number)){
+					 /*if( !isCustomerNumberExist(conn, account_number)){
 						 importError = true;
 						 importAllError = true;
 						 errorMsg +=", ไม่พบ Customer code ใน Master Table<br/>";
-					 }
+					 }*/
 					 //validate ship_to_location must exist in master_reference
 					 if( !isShipToLocationExist(conn, ship_to_location)){
 						 importError = true;
@@ -461,7 +472,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 		StringBuilder sql = new StringBuilder();
 		boolean isExist = false;
 		try {
-			sql.append("\n SELECT count(*) as c FROM XXPENS_OM_EXCEL_ORDER_MST ");
+			sql.append("\n SELECT count(*) as c FROM APPS.XXPENS_OM_EXCEL_ORDER_MST ");
 			sql.append("\n WHERE file_name ='"+fileName+"'");
 			logger.debug("sql:"+sql);
 			
@@ -489,7 +500,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 		StringBuilder sql = new StringBuilder();
 		boolean isExist = false;
 		try {
-			sql.append("\n SELECT count(*) as c FROM XXPENS_OM_EXCEL_ORDER_MST ");
+			sql.append("\n SELECT count(*) as c FROM APPS.XXPENS_OM_EXCEL_ORDER_MST ");
 			sql.append("\n WHERE order_number ='"+orderNumber+"'");
 			sql.append("\n and Ordered_date =to_date('"+orderDate+"','dd/mm/yyyy')");
 			logger.debug("sql:"+sql);

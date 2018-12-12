@@ -28,6 +28,7 @@ public class InvoicePaymentAllReport implements Serializable {
 	private double vatReceipt;
 	private String chequeNo;
 	private String paymentMethod;
+	private String paymentMethodDesc;
 	private String status;
 	private String isPDPaid;
 	
@@ -44,6 +45,12 @@ public class InvoicePaymentAllReport implements Serializable {
 	private double allVatReceiptAmount;
 	
 	
+	public String getPaymentMethodDesc() {
+		return paymentMethodDesc;
+	}
+	public void setPaymentMethodDesc(String paymentMethodDesc) {
+		this.paymentMethodDesc = paymentMethodDesc;
+	}
 	public String getStatus() {
 		return status;
 	}

@@ -27,7 +27,7 @@ import com.isecinc.pens.inf.manager.FTPManager;
 
 public class RunScriptDBAction {
 	protected static  Logger logger = Logger.getLogger("PENS");
-	private static String schema ="pens";
+	private static String schema ="pens_shop";
 	private static String table_control ="c_control_run_script_db";
     private static String path_script_db = "/script_db/";
     private static String STATUS_RUN_SUCCESS ="success";
@@ -449,7 +449,8 @@ public class RunScriptDBAction {
 			sql.append("  WHERE table_schema = '"+schema+"' \n");
 			sql.append("  and engine ='InnoDB' \n");
 			sql.append("  and table_name ='"+table_control+"' \n");
-		
+		    logger.debug("sql:"+sql.toString());
+		    
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			

@@ -8,10 +8,30 @@ import org.apache.log4j.Logger;
 
 public class BatchTask {
 	public static Logger logger = Logger.getLogger("PENS");
+	
+	public static void insertMonitorItemColumnHeadTableResult(Connection conn,BigDecimal monitorItemId,String columnHead) throws Exception {
+		PreparedStatement ps = null;
+		try {
+			String sql = "INSERT INTO PENSBI.MONITOR_ITEM_COLUMN_RESULT(MONITOR_ITEM_ID, COLUMN_HEAD)VALUES(?,?) ";
+			logger.info("SQL:"+sql);
+			int index = 0;
+			ps = conn.prepareStatement(sql);
+			ps.setBigDecimal(++index, monitorItemId);
+			ps.setString(++index,columnHead);
+			int r = ps.executeUpdate();
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+	}
+	
 	public static void insertMonitorItemResult(Connection conn,BigDecimal monitorItemId,int no,String status,String msg) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO MONITOR_ITEM_RESULT(MONITOR_ITEM_ID, STATUS, MESSAGE,NO)VALUES(?,?,?,?) ";
+			String sql = "INSERT INTO PENSBI.MONITOR_ITEM_RESULT(MONITOR_ITEM_ID, STATUS, MESSAGE,NO)VALUES(?,?,?,?) ";
 			logger.info("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);

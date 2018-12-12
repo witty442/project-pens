@@ -55,7 +55,6 @@ public class MTTBean implements Serializable{
 	private boolean canEdit = false;
 	private boolean canCancel = false;
 	
-	
 	public String getCreateDate() {
 		return createDate;
 	}

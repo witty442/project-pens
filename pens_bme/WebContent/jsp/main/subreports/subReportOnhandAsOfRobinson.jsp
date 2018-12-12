@@ -1,73 +1,139 @@
-on</tags>
-          <tags>persp.actionSet:org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo</tags>
-          <tags>persp.actionSet:org.eclipse.ui.externaltools.ExternalToolsSet</tags>
-          <tags>persp.actionSet:org.eclipse.ui.actionSet.keyBindings</tags>
-          <tags>persp.actionSet:org.eclipse.ui.actionSet.openFiles</tags>
-          <tags>persp.viewSC:org.eclipse.jdt.ui.PackageExplorer</tags>
-          <tags>persp.viewSC:org.eclipse.team.ui.GenericHistoryView</tags>
-          <tags>persp.viewSC:org.eclipse.team.sync.views.SynchronizeView</tags>
-          <tags>persp.viewSC:org.eclipse.egit.ui.StagingView</tags>
-          <tags>persp.viewSC:org.eclipse.egit.ui.ReflogView</tags>
-          <tags>persp.actionSet:org.eclipse.egit.ui.navigation</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_9XbfjcLOEeiXuYIstn5Mdg" selectedElement="_9XbfjsLOEeiXuYIstn5Mdg" horizontal="true">
-            <children xsi:type="basic:PartSashContainer" xmi:id="_9XbfjsLOEeiXuYIstn5Mdg" containerData="3960" selectedElement="_9Xbfj8LOEeiXuYIstn5Mdg">
-              <children xsi:type="basic:PartStack" xmi:id="_9Xbfj8LOEeiXuYIstn5Mdg" elementId="org.eclipse.egit.ui.RepositoriesViewMStack" containerData="7000" selectedElement="_9XbfkMLOEeiXuYIstn5Mdg">
-                <tags>newtablook</tags>
-                <tags>MinimizedByZoom</tags>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbfkMLOEeiXuYIstn5Mdg" elementId="org.eclipse.egit.ui.RepositoriesView" ref="_9XbhkMLOEeiXuYIstn5Mdg"/>
-              </children>
-              <children xsi:type="basic:PartStack" xmi:id="_9XbfkcLOEeiXuYIstn5Mdg" elementId="org.eclipse.jdt.ui.PackageExplorerMStack" toBeRendered="false" containerData="3000">
-                <tags>newtablook</tags>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbfksLOEeiXuYIstn5Mdg" elementId="org.eclipse.jdt.ui.PackageExplorer" toBeRendered="false" ref="_9XbhlcLOEeiXuYIstn5Mdg"/>
-              </children>
-            </children>
-            <children xsi:type="basic:PartSashContainer" xmi:id="_9Xbfk8LOEeiXuYIstn5Mdg" containerData="6040" selectedElement="_9XbflMLOEeiXuYIstn5Mdg">
-              <children xsi:type="advanced:Placeholder" xmi:id="_9XbflMLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.editorss" containerData="5000" ref="_9XbgwsLOEeiXuYIstn5Mdg">
-                <tags>Maximized</tags>
-              </children>
-              <children xsi:type="basic:PartStack" xmi:id="_9XbflcLOEeiXuYIstn5Mdg" elementId="bottom" visible="false" containerData="5000" selectedElement="_9XbflsLOEeiXuYIstn5Mdg">
-                <tags>newtablook</tags>
-                <tags>Minimized</tags>
-                <tags>MinimizedByZoom</tags>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbflsLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.views.PropertySheet" ref="_9XbhEsLOEeiXuYIstn5Mdg"/>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9Xbfl8LOEeiXuYIstn5Mdg" elementId="org.eclipse.team.ui.GenericHistoryView" ref="_9XbhhsLOEeiXuYIstn5Mdg"/>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbfmMLOEeiXuYIstn5Mdg" elementId="org.eclipse.team.sync.views.SynchronizeView" ref="_9XbhicLOEeiXuYIstn5Mdg"/>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbfmcLOEeiXuYIstn5Mdg" elementId="org.eclipse.egit.ui.StagingView" ref="_9Xbhk8LOEeiXuYIstn5Mdg"/>
-                <children xsi:type="advanced:Placeholder" xmi:id="_9XbfmsLOEeiXuYIstn5Mdg" elementId="org.eclipse.egit.ui.ReflogView" ref="_9XbhlMLOEeiXuYIstn5Mdg"/>
-              </children>
-            </children>
-          </children>
-        </children>
-      </children>
-      <children xsi:type="basic:PartStack" xmi:id="_9Xbfm8LOEeiXuYIstn5Mdg" elementId="stickyFolderRight" toBeRendered="false" containerData="2500">
-        <children xsi:type="advanced:Placeholder" xmi:id="_9XbfnMLOEeiXuYIstn5Mdg" elementId="org.eclipse.help.ui.HelpView" toBeRendered="false" ref="_9Xbgv8LOEeiXuYIstn5Mdg"/>
-        <children xsi:type="advanced:Placeholder" xmi:id="_9XbfncLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.internal.introview" toBeRendered="false" ref="_9XbgwMLOEeiXuYIstn5Mdg"/>
-        <children xsi:type="advanced:Placeholder" xmi:id="_9XbfnsLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.cheatsheets.views.CheatSheetView" toBeRendered="false" ref="_9XbgwcLOEeiXuYIstn5Mdg"/>
-      </children>
-    </children>
-    <sharedElements xsi:type="basic:Part" xmi:id="_9Xbgv8LOEeiXuYIstn5Mdg" elementId="org.eclipse.help.ui.HelpView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Help" iconURI="platform:/plugin/org.eclipse.help.ui/icons/view16/help_view.gif" closeable="true">
-      <tags>View</tags>
-      <tags>categoryTag:Help</tags>
-    </sharedElements>
-    <sharedElements xsi:type="basic:Part" xmi:id="_9XbgwMLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.internal.introview" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Welcome" iconURI="platform:/plugin/org.eclipse.ui/icons/full/eview16/defaultview_misc.png" closeable="true">
-      <tags>View</tags>
-      <tags>categoryTag:General</tags>
-    </sharedElements>
-    <sharedElements xsi:type="basic:Part" xmi:id="_9XbgwcLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.cheatsheets.views.CheatSheetView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Cheat Sheets" iconURI="platform:/plugin/org.eclipse.ui.cheatsheets/icons/view16/cheatsheet_view.gif" closeable="true">
-      <tags>View</tags>
-      <tags>categoryTag:Help</tags>
-    </sharedElements>
-    <sharedElements xsi:type="advanced:Area" xmi:id="_9XbgwsLOEeiXuYIstn5Mdg" elementId="org.eclipse.ui.editorss" selectedElement="_9Xbgw8LOEeiXuYIstn5Mdg">
-      <children xsi:type="basic:PartSashContainer" xmi:id="_9Xbgw8LOEeiXuYIstn5Mdg" selectedElement="_9XbgxMLOEeiXuYIstn5Mdg" horizontal="true">
-        <children xsi:type="basic:PartStack" xmi:id="_9XbgxMLOEeiXuYIstn5Mdg" elementId="PartStack@13f4ebd" containerData="5000">
-          <children xsi:type="advanced:Placeholder" xmi:id="_9XbgxcLOEeiXuYIstn5Mdg" elementId="Drag Placerholder" toBeRendered="false"/>
-          <children xsi:type="advanced:Placeholder" xmi:id="_9XbgxsLOEeiXuYIstn5Mdg" elementId="Drag Placerholder" toBeRendered="false"/>
-          <children xsi:type="advanced:Placeholder" xmi:id="_9Xbgx8LOEeiXuYIstn5Mdg" elementId="Drag Placerholder" toBeRendered="false"/>
-        </children>
-        <children xsi:type="basic:PartStack" xmi:id="_9XbgyMLOEeiXuYIstn5Mdg" elementId="org.eclipse.e4.primaryDataStack" toBeRendered="false" containerData="5000">
-          <tags>newtablook</tags>
-          <tags>org.eclipse.e4.primaryDataStack</tags>
-          <tags>EditorStack</tags>
-          <children xsi:type="advanced:Placeholder" xmi:id="_9XbgycLOEeiXuYIstn5Mdg" elementId="Drag Placerholder" toBeRendered="false"/>
-          <children xsi:type="advanced:Placeholder" xmi:id="_9XbgysLOEeiXuYIstn5Mdg" elementId="Drag Placerholder" toBeRendered="false"/>
-    
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.*"%>
+<%@page import="com.isecinc.pens.bean.OnhandSummary"%>
+<%@page import="com.isecinc.pens.dao.ImportDAO"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
+
+<jsp:useBean id="summaryForm" class="com.isecinc.pens.web.summary.SummaryForm" scope="session" />
+<%
+  //get d-xxx-d parameter d-49489-p=16
+  String queryStr= request.getQueryString();
+if(queryStr.indexOf("d-") != -1){
+	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+	System.out.println("queryStr:"+queryStr);
+}
+
+  String currentPage = Utils.isNull(request.getParameter(queryStr));
+  String totalPage = "";
+  System.out.println("currentPage:"+currentPage);
+  List<OnhandSummary> dataList = summaryForm.getResults();
+  if(dataList != null && dataList.size() >0){
+    totalPage = String.valueOf((dataList.size()/ 50)+1);
+  } 
+%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<style type="text/css">
+<!--
+body {
+	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
+	/**background-repeat: repeat;**/
+}
+.style1 {color: #004a80}
+-->
+</style>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+
+<!-- Calendar -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<script>
+	function gotoPage(path,pageNumber){
+		var form = document.reqPickStockForm;
+	   // form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber+"&prevPageNumber="+form.pageNumber.value+"&totalQtyCurPage="+document.getElementsByName("totalQtyCurPage")[0].value;
+		form.action = path + "/jsp/reqPickStockAction.do?do=search&pageNumber="+pageNumber;
+		
+	    form.submit();
+	    return true;
+	}
+</script>
+                    
+</head>
+     <c:if test="${summaryForm.page == 'onhandAsOfRobinson'}">
+		<c:if test="${summaryForm.results != null}">
+		<c:if test="${summaryForm.summaryType == 'PensItem' || summaryForm.summaryType ==null}">
+		<br/>
+			<display:table style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
+			    
+			    <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
+			    <display:column  title="PensItem" property="pensItem"  sortable="false" class="lotus_pensItem"/>
+			    
+			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
+			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	   
+			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
+			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>			
+			   
+			   <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+				<display:footer>
+			      <tr class="text_blod">
+			          <td colspan="5" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			      </tr>
+			    </display:footer>
+		       <%} %>	
+			</display:table>
+			</c:if>
+			
+			<c:if test="${summaryForm.summaryType == 'GroupCode'}">
+		    <br/>
+			<display:table  style="width:100%;" id="item" name="sessionScope.summaryForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+			    requestURI="#" sort="list" pagesize="50">	
+			    
+			   <display:column  title="รหัสร้านค้า(Bme)" property="storeCode"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="CustNo(Oracle)" property="custNo"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="ชื่อร้านค้า" property="storeName"  sortable="false" class="lotus_storeCode"/>
+			    <display:column  title="Group" property="group"  sortable="false" class="lotus_group"/>	
+			  
+			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
+			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
+			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
+			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
+			    
+			    <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
+				<display:footer>
+			      <tr class="text_blod">
+			          <td colspan="4" align="right"><b>รวม</b></td>
+			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
+			      </tr>
+			    </display:footer>
+		       <%} %>	
+			</display:table>
+			</c:if>
+	   </c:if>
+ </c:if>	 
+
+</body>
+</html>

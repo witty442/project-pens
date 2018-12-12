@@ -17,7 +17,15 @@ public class MonitorItemResultBean implements Serializable{
    private   BigDecimal monitorItemId;
    private   String status ;
    private   String msg ;
+   private String columnHeadTable;
    
+   
+public String getColumnHeadTable() {
+	return columnHeadTable;
+}
+public void setColumnHeadTable(String columnHeadTable) {
+	this.columnHeadTable = columnHeadTable;
+}
 public int getRow() {
 	return row;
 }

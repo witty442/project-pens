@@ -121,7 +121,12 @@ public class PopupSearchAction extends I_Action {
 				|| "FIND_PensItem_IN_StyleMappingLotus".equalsIgnoreCase(popupForm.getPageName()) ){
 				
 				results = PopupSearchDAO.searchStyleMappingLotusList(popupForm);
-			}
+			}else if("FIND_GroupCode".equalsIgnoreCase(popupForm.getPageName()) 
+					|| "FIND_PensItem".equalsIgnoreCase(popupForm.getPageName()) 
+					|| "FIND_STYLE".equalsIgnoreCase(popupForm.getPageName()) ){
+					
+					results = PopupSearchDAO.searchMstReference(popupForm);
+				}
 			
 			 if(results != null && results.size() >0){
 				 request.getSession().setAttribute("DATA_LIST", results);

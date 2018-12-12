@@ -18,7 +18,15 @@ public class MTTForm extends I_Form {
     private String mode;
     private MTTBean bean ;
     private MTTBean beanCriteria ;
+    private MTTBean summary ;
     
+    
+	public MTTBean getSummary() {
+		return summary;
+	}
+	public void setSummary(MTTBean summary) {
+		this.summary = summary;
+	}
 	public String getMode() {
 		return mode;
 	}

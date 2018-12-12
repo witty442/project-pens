@@ -199,7 +199,6 @@ public class OrderLine extends I_PO implements Serializable {
 
 	private double sellingPrice;
 	
-	
 	public double getSellingPrice() {
 		return sellingPrice;
 	}

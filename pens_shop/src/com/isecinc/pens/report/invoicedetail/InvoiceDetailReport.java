@@ -54,6 +54,16 @@ public class InvoiceDetailReport implements Serializable {
     
     private String productCodeFrom;
     private String productCodeTo;
+    private double totalDiscountAmt;
+	
+    
+	public double getTotalDiscountAmt() {
+		return totalDiscountAmt;
+	}
+
+	public void setTotalDiscountAmt(double totalDiscountAmt) {
+		this.totalDiscountAmt = totalDiscountAmt;
+	}
 
     
 	public String getOrderDateStr() {

@@ -16,11 +16,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="interfacesForm" class="com.isecinc.pens.web.interfaces.InterfacesForm" scope="request" />
-<%-- <jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" /> --%>
 <%
 User user = (User) session.getAttribute("user");
 String role = ((User)session.getAttribute("user")).getType();
-
 
 List<References> importList = ImportHelper.readConfigTableImport();
 pageContext.setAttribute("importList",importList,PageContext.PAGE_SCOPE);
@@ -383,7 +381,7 @@ body {
 							</tr>
 							<tr>
 								<td align="center" width ="100%">
-								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong" style="width: 180px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
+								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong" style="width: 210px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
 								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								    &nbsp;&nbsp;&nbsp;
 								    <a href ="javascript:openPopup('${pageContext.request.contextPath}')" 

@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.bean.MTTBean"%>
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
@@ -19,21 +21,7 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="mttForm" class="com.isecinc.pens.web.mtt.MTTForm" scope="session" />
-
-<%
-//if(session.getAttribute("custGroupList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(GeneralDAO.searchCustGroup( new PopupForm()));
-	
-	session.setAttribute("custGroupList",billTypeList);
-//}
-%>
 
 <html>
 <head>
@@ -41,40 +29,17 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
-<style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
+<style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('saleDateTo'));
@@ -102,11 +67,26 @@ function search(path){
 	    && $('#groupCode').val()=="" && $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
 		alert("กรุณากรอก ข้อมูลค้นหาอย่างน้อย 1 รายการ");
 		return false;
+	}else{
+		if($('#custGroup').val()!=""){
+			 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
+				&& $('#storeCode').val()==""&& $('#groupCode').val()=="" 
+				&& $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
+			alert("ท่านเลือกกล่มร้านค้า  กรุณาเลือกข้อมูลค้นหาเพิ่มอีกอย่างน้อย 1 รายการ เนื่องจากข้อมูลที่จะแสดงมีมากเกินไป");
+			return false;
+		   }//if
+		}//if
 	}
 	
 	form.action = path + "/jsp/mttAction.do?do=search2&action=newsearch";
 	form.submit();
 	return true;
+}
+function gotoPage(path,currPage){
+	var form = document.mttForm;
+	form.action = path + "/jsp/mttAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
 }
 
 function openEdit(path,docNo){
@@ -139,28 +119,10 @@ function openPopupCustomer(path,types,storeType){
 }
 
 function setStoreMainValue(code,desc,storeNo,subInv,types){
-
 	var form = document.mttForm;
 	//alert(form);
 	form.storeCode.value = code;
 	form.storeName.value = desc;
-	
-	if(storeNo=='' || subInv==''){
-		if(storeNo==''){
-			alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
-		}
-		if(subInv==''){
-			alert("ไม่พบข้อมูล Sub Inventory  ไม่สามารถทำงานต่อได้");
-		}
-		form.storeCode.value = '';
-		form.storeName.value = "";
-		form.storeNo.value = "";
-		form.subInv.value = "";
-	}else{
-	   form.storeNo.value = storeNo;
-	   form.subInv.value = subInv;
-	}
-	
 } 
 
 function getCustNameKeypress(e,custCode,fieldName){
@@ -170,15 +132,12 @@ function getCustNameKeypress(e,custCode,fieldName){
 			if("storeCode" == fieldName){
 				form.storeCode.value = '';
 				form.storeName.value = "";
-				form.storeNo.value = "";
-				form.subInv.value = "";
 			}
 		}else{
-		  getCustName(custCode,fieldName);
+		   getCustName(custCode,fieldName);
 		}
 	}
 }
-
 function getCustName(custCode,fieldName){
 	var returnString = "";
 	var form = document.mttForm;
@@ -209,16 +168,13 @@ function getCustName(custCode,fieldName){
 					form.storeName.value = "";
 					
 				}
-				
 			}else{
 				alert("ไม่พบข้อมูล");
 				form.storeCode.focus();
 				form.storeCode.value ="";
 				form.storeName.value = "";
-				
 			}
 		}
-	
 }
 function resetStore(){
 	var form = document.mttForm;
@@ -227,7 +183,6 @@ function resetStore(){
 	if(storeGrouptext != ''){
 		form.storeCode.value = "";
 		form.storeName.value = "";
-	
 	}
 }
 </script>
@@ -276,9 +231,9 @@ function resetStore(){
 						       <tr>
                                     <td> Sale Date From</td>
 									<td>					
-									   <html:text property="bean.saleDateFrom" styleId="saleDateFrom" size="20"/>
+									   <html:text property="bean.saleDateFrom" styleId="saleDateFrom" size="20" readonly="true"/>
 									   Sale Date To   				
-									   <html:text property="bean.saleDateTo" styleId="saleDateTo" size="20"/>
+									   <html:text property="bean.saleDateTo" styleId="saleDateTo" size="20" readonly="true"/>
 									</td>
 								</tr>
 								<tr>
@@ -287,7 +242,6 @@ function resetStore(){
 										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>
-									   
 									</td>
 								</tr>
 								<tr>
@@ -329,6 +283,9 @@ function resetStore(){
 										<a href="javascript:openEdit('${pageContext.request.contextPath}','','add')">
 										  <input type="button" value="   เพิ่มรายการใหม่   " class="newPosBtnLong">
 										</a>	
+										<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
+						                   <input type="button" value="  Export  " class="newPosBtnLong"> 
+						                </a>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -337,8 +294,14 @@ function resetStore(){
 							</table>
 					  </div>
 
-            <c:if test="${mttForm.resultsSearch != null}">
-                  	
+            <c:if test="${mttForm.results != null}">
+                  	 <jsp:include page="../pageing.jsp">
+				       <jsp:param name="totalPage" value="<%=mttForm.getTotalPage() %>"/>
+				       <jsp:param name="totalRecord" value="<%=mttForm.getTotalRecord() %>"/>
+				       <jsp:param name="currPage" value="<%=mttForm.getCurrPage() %>"/>
+				       <jsp:param name="startRec" value="<%=mttForm.getStartRec() %>"/>
+				       <jsp:param name="endRec" value="<%=mttForm.getEndRec() %>"/>
+			         </jsp:include>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 						           <th >Action</th>	
@@ -358,7 +321,7 @@ function resetStore(){
 									<th >ราคาปลีกก่อน Vat</th>	
 									<th >Remark</th>					
 							   </tr>
-							<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">
+							<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
 								<c:choose>
 									<c:when test="${rows.index %2 == 0}">
 										<c:set var="tabclass" value="lineO"/>
@@ -419,37 +382,33 @@ function resetStore(){
 										</td>
 									</tr>
 							  </c:forEach>
-							  
-							  <tr class="">
-							       <td class=""></td> 
-								   <td class=""></td> 
-								   <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-								   <td class="hilight_text" align="right">
-									  <B> Total </B>
-									</td>
-									<td class="hilight_text" align="center">
-									 <B>  ${mttForm.bean.totalQty}</B>
-									</td>
-									<td class=""></td>
-									
-							</tr>
+							  <%if(mttForm.getCurrPage()==mttForm.getTotalPage()) {
+							      MTTBean summary = mttForm.getSummary();
+							  %>
+								  <tr class="">
+								       <td class=""></td> 
+									   <td class=""></td> 
+									   <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+								       <td class=""></td>
+									   <td class="hilight_text" align="right">
+										  <B> Total </B>
+										</td>
+										<td class="hilight_text" align="right">
+										 <B> <%=summary.getQty() %></B>
+										</td>
+										<td class=""></td>
+								</tr>
+							<%} %>
 					</table>
-					
-					<div align="center">
-						<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
-						   <input type="button" value="    Export      " class="newPosBtnLong"> 
-						</a>
-					</div>	
-									
+							
 				</c:if>
 					<!-- ************************Result ***************************************************-->
 					

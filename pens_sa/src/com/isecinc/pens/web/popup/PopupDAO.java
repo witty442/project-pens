@@ -469,6 +469,7 @@ public class PopupDAO {
 		return pos;
 	}
 	 
+	 
 	 public static List<PopupForm> searchItemStockList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

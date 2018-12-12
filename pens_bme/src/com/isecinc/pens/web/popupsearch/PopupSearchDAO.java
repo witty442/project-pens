@@ -125,5 +125,93 @@ public class PopupSearchDAO {
 			}
 			return pos;
 		}
-	
+/**
+ * 	
+ * @param c
+ * @param typeSearch :GroupCode:PensItem:Style
+ * @return
+ * @throws Exception
+ */
+	 public static List<PopupSearchForm> searchMstReference(PopupSearchForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupSearchForm> pos = new ArrayList<PopupSearchForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				//Exp :MAYA
+				String groupStoreName = Utils.isNull(c.getCriteriaMap().get("groupStoreName"));
+
+				if("FIND_GroupCode".equalsIgnoreCase(c.getPageName())){
+					sql.append("\n SELECT distinct pens_desc2 FROM PENSBI.PENSBME_MST_REFERENCE M WHERE 1=1");
+					sql.append("\n and M.reference_code ='LotusItem' ");
+					if( !Utils.isNull(groupStoreName).equals("")){
+						 sql.append("\n and M.pens_desc6 ='"+groupStoreName+"' ");
+					}
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				      sql.append("\n and M.pens_desc2 ='"+c.getCodeSearch()+"' ");
+					}
+					sql.append("\n  ORDER BY M.pens_desc2 asc ");
+				}else if("FIND_PensItem".equalsIgnoreCase(c.getPageName())){
+					sql.append("\n SELECT * FROM PENSBI.PENSBME_MST_REFERENCE M WHERE 1=1");
+					sql.append("\n and M.reference_code ='LotusItem' ");
+					if( !Utils.isNull(groupStoreName).equals("")){
+						 sql.append("\n and M.pens_desc6 ='"+groupStoreName+"' ");
+					}
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				      sql.append("\n and M.pens_value ='"+c.getCodeSearch()+"' ");
+					}
+					sql.append("\n  ORDER BY M.pens_value asc ");
+				}else if("FIND_Style".equalsIgnoreCase(c.getPageName())){
+					sql.append("\n SELECT * FROM PENSBI.PENSBME_MST_REFERENCE M WHERE 1=1");
+					sql.append("\n and M.reference_code ='LotusItem' ");
+					if( !Utils.isNull(groupStoreName).equals("")){
+						 sql.append("\n and M.pens_desc6 ='"+groupStoreName+"' ");
+					}
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				      sql.append("\n and M.interface_value ='"+c.getCodeSearch()+"' ");
+					}
+					sql.append("\n  ORDER BY M.pens_value asc ");
+				}
+				
+			
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupSearchForm item = new PopupSearchForm();
+					no++;
+					item.setNo(no);
+					if("FIND_GroupCode".equalsIgnoreCase(c.getPageName()) ){
+					   item.setCode(rst.getString("pens_desc2"));
+					   item.setGroupCode(rst.getString("pens_desc2"));
+					}else if("FIND_PensItem".equalsIgnoreCase(c.getPageName()) ){
+					   item.setGroupCode(rst.getString("pens_desc2"));
+					   item.setStyleNo(rst.getString("interface_value"));
+					   item.setPensItem(rst.getString("pens_value"));
+					   item.setCode(rst.getString("pens_value"));
+					}else if("FIND_Style".equalsIgnoreCase(c.getPageName()) ){
+					   item.setCode(rst.getString("interface_value"));
+						item.setGroupCode(rst.getString("pens_desc2"));
+						item.setStyleNo(rst.getString("interface_value"));
+						item.setPensItem(rst.getString("pens_value"));
+					}
+					
+				
+					pos.add(item);
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 }

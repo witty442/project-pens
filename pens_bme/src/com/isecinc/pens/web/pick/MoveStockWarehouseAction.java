@@ -45,7 +45,7 @@ public class MoveStockWarehouseAction extends I_Action {
 				List<References> wareHouseList = new ArrayList<References>();
 				References ref1 = new References("","");
 				wareHouseList.add(ref1);
-				wareHouseList.addAll(JobDAO.getWareHouseList("'W2','W3','W4','W5'"));
+				wareHouseList.addAll(JobDAO.getWareHouseList("'W2','W3','W4','W5','W6','W7'"));
 				request.getSession().setAttribute("wareHouseList",wareHouseList);
 				
 			}else{

@@ -365,6 +365,37 @@ public class SalesTargetAction extends I_Action {
 		return mapping.findForward("detail");
 	}
 	
+	public ActionForward updateStatusManual(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("updateStatusManual set status to:"+Utils.isNull(request.getParameter("status")));
+		Connection conn = null;
+		SalesTargetForm aForm = (SalesTargetForm) form;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			SalesTargetBean h = aForm.getBean();
+			//Update status head
+			h.setStatus(Utils.isNull(request.getParameter("status")));
+			h.setUpdateUser("GOD");
+			SalesTargetDAO.updateStatusHeadByManual(conn, h);
+
+			request.setAttribute("Message","อัพเดตข้อมูล Status to:"+Utils.isNull(request.getParameter("status"))+" เรียบร้อยแล้ว");
+			
+			conn.commit();
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("detail");
+	}
+	
 	public ActionForward postToSales(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("postToSales By Marketing");
 		Connection conn = null;

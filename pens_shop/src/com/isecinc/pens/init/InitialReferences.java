@@ -61,7 +61,8 @@ public class InitialReferences extends I_Initial {
 	public static final String TRANSFER_BANK = "TransferBank";
 	public static final String ProdShowFileSize = "ProdShowFileSize";
 	public static final String ADDRESS_MAYA = "ADDRESS_MAYA";
-	
+	public static final String PAYMENT_METHOD_BANK = "PaymentMethodBANK";
+	public static final String CREDITCARD_TYPE = "CreditCardType";
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
 	public void init() {}
@@ -177,6 +178,59 @@ public class InitialReferences extends I_Initial {
 		StringBuffer sql = new StringBuffer();
 		try {
 			sql.append("SELECT * FROM pens_shop.c_reference WHERE ISACTIVE = 'Y' AND CODE ='"+code+"' \n");
+			if( !Utils.isNull(orderBy).equals("")){
+				sql.append("ORDER BY "+orderBy +" \n");
+			}
+			logger.debug("sql:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				References r = new References(rs);
+				refList.add(r);
+			}
+		} catch (Exception e) {
+			logger.error(e.toString());
+		}finally{
+			try{
+				if(ps != null){
+					ps.close();
+				}
+				if(rs != null){
+					rs.close();
+				}
+			}catch(Exception ee){}
+		}
+		return refList;
+	}
+	public static List<References> getRefBykey(Connection conn,String code,String key) {
+		return getRefByKeyModel(conn, code,key, "");
+	}
+	public static List<References> getRefByKey(Connection conn,String code,String key,String orderBy) {
+		return getRefByKeyModel(conn, code,key, orderBy);
+	}
+	public static List<References> getRefByKey(String code,String key,String orderBy) {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getRefByKeyModel(conn, code,key, orderBy);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+		return null;
+	}
+	public static List<References> getRefByKeyModel(Connection conn,String code,String key,String orderBy) {
+		List<References> refList = new ArrayList<References>();
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		StringBuffer sql = new StringBuffer();
+		try {
+			sql.append("SELECT * FROM pens_shop.c_reference WHERE ISACTIVE = 'Y' AND CODE ='"+code+"' and name ='"+key+"'\n");
 			if( !Utils.isNull(orderBy).equals("")){
 				sql.append("ORDER BY "+orderBy +" \n");
 			}

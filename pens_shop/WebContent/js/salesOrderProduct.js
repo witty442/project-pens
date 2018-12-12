@@ -97,8 +97,8 @@ function addProduct2(path,objValue){
         var tds = '<tr class='+className+'>';
         tds += '<td class="td_text_center" width="5%"></td>';//1
         tds += '<td class="td_text_center" width="5%"></td>';//2
-        tds += '<td class="td_text" width="20%"></td>';//3
-        tds += '<td class="td_text_center" width="10%"></td>';//4
+        tds += '<td class="td_text" width="25%"></td>';//3
+        tds += '<td class="td_text_center" width="5%"></td>';//4
         tds += '<td class="td_text_right" width="10%"></td>';//5
         tds += '<td class="td_text_right" width="10%"></td>';//6
         tds += '<td class="td_text_right" width="10%"></td>';//7
@@ -405,7 +405,6 @@ function calculatePrice(){
 	var totalAmtInVat=0,stotalAmtInVat1=0,totalAmtInVat2=0;
 	
 	var sumT=0;
-	var sumTNonVat=0;
 	var sumVat=0;
 	var sumTot = 0;
 	var totalQty = 0;
@@ -416,214 +415,107 @@ function calculatePrice(){
 		totalAmtSubDis=0;
 		vatLine=0;
 		totalAmtInVat=0;
-		
-		//Sum Only promotion ='' 
-		//alert("calc promotion:"+promotion[i].value);
-		//if(promotion[i].value =='N'){//Normal product
-			//Case product have Tax
-			if(taxables[i].value=='Y'){
-				//alert(discs[i].value);
-				if(amounts[i]){
-					discs[i].value = Number(toFixed(discs[i].value,5)).toFixed(5);
-					amounts[i].value = Number(toFixed(amounts[i].value,5)).toFixed(5);
-					totalAmtSubDis = Number(toFixed(amounts[i].value,5)) - Number(toFixed(discs[i].value,5));
-				}
-				
-				vatLine = (Number(v)*Number(totalAmtSubDis))/100;
-				totalAmtInVat = Number(totalAmtSubDis)+Number(vatLine);
-				
-				if(amounts[i]){
-					afdiscs[i].value = Number(toFixed(totalAmtSubDis,5)).toFixed(2);
-					vats[i].value=Number(toFixed(vatLine,2)).toFixed(2);
-					totals[i].value = Number(toFixed(totalAmtInVat,5)).toFixed(2);
-				}
-				
-				//alert("bf amount1["+amounts1[i].value+"]af amounts1["+Number(toFixed(amounts1[i].value,5)).toFixed(5)+"] ::: bf amount2["+amounts2[i].value+"]af amounts2["+Number(toFixed(amounts2[i].value,5)).toFixed(5)+"]");
-				
-				amounts1[i].value = Number(toFixed(amounts1[i].value,5)).toFixed(5);
-				amounts2[i].value = Number(toFixed(amounts2[i].value,5)).toFixed(5);
-				
-				//alert("calc:"+discs1[i].value+":"+discs2[i].value);
-				discs1[i].value = Number(toFixed(discs1[i].value,5)).toFixed(5);
-				discs2[i].value = Number(toFixed(discs2[i].value,5)).toFixed(5);
-				
-				/** calc TotalAmount **/
-				if(promotion[i].value =='N'){
-				   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
-				   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
-				}else if(promotion[i].value =='S'){
-				  /** discount Line(special is negeative only ) **/
-				   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
-				   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
-				   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
-				}
-				vatLine1 = (Number(v)*Number(totalAmtSubDis1))/100;
-				vatLine2 = (Number(v)*Number(totalAmtSubDis2))/100;
-				
-				totalAmtInVat1 = Number(totalAmtSubDis1)+ Number(vatLine1);
-				totalAmtInVat2 = Number(totalAmtSubDis2)+ Number(vatLine2);
-				
-				afdiscs1[i].value = Number(toFixed(totalAmtSubDis1,5)).toFixed(2);
-				afdiscs2[i].value = Number(toFixed(totalAmtSubDis2,5)).toFixed(2);
-				
-				vats1[i].value = Number(toFixed(vatLine1,2)).toFixed(2);
-				vats2[i].value = Number(toFixed(vatLine2,2)).toFixed(2);
-				
-				totals1[i].value = Number(toFixed(totalAmtInVat1,5)).toFixed(2);
-				totals2[i].value = Number(toFixed(totalAmtInVat2,5)).toFixed(2);
-				
-				/********************************************************************************************/
-				/** sellingPrice = price-(Disc/qty)*/
-				if(promotion[i].value =='N'){
-					var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-					var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-					var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-					var sellingPriceT = linePriceT-(lineDiscT/lineQtyT);
-					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-					sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
-				}else{
-					//var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-					//var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-					//var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-					//var sellingPriceT = linePriceT+(lineDiscT/lineQtyT);
-					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-					sellingPrice[i].value = 0;//Number(toFixed(sellingPriceT,5)).toFixed(2);
-				}
-				/********************************************************************************************/
-				sumT+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);
-				//alert("afdiscs1["+afdiscs1[i].value+"],afdiscs2["+afdiscs2[i].value+"] -->sumT["+sumT+"]");
-				
-				sumVat+=Number(vats1[i].value) +  Number(vats2[i].value);
-				sumTot+=Number(totals1[i].value) + Number(totals2[i].value);
-				
-				//display in table
-				total_ex_disc = totalAmtSubDis1 + totalAmtSubDis2;
-				//after discount >> netAmount
-				tbl.rows[i].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(5));
+
+		//Case product have Tax
+		if(taxables[i].value=='Y'){
+			//alert(discs[i].value);
+			if(amounts[i]){
+				discs[i].value = Number(toFixed(discs[i].value,5)).toFixed(5);
+				amounts[i].value = Number(toFixed(amounts[i].value,5)).toFixed(5);
+				totalAmtSubDis = Number(toFixed(amounts[i].value,5)) - Number(toFixed(discs[i].value,5));
+			}
+			
+			vatLine = (Number(v)*Number(totalAmtSubDis))/100;
+			totalAmtInVat = Number(totalAmtSubDis)+Number(vatLine);
+			
+			if(amounts[i]){
+				afdiscs[i].value = Number(toFixed(totalAmtSubDis,5)).toFixed(2);
+				vats[i].value=Number(toFixed(vatLine,2)).toFixed(2);
+				totals[i].value = Number(toFixed(totalAmtInVat,5)).toFixed(2);
+			}
+			
+			//alert("bf amount1["+amounts1[i].value+"]af amounts1["+Number(toFixed(amounts1[i].value,5)).toFixed(5)+"] ::: bf amount2["+amounts2[i].value+"]af amounts2["+Number(toFixed(amounts2[i].value,5)).toFixed(5)+"]");
+			
+			amounts1[i].value = Number(toFixed(amounts1[i].value,5)).toFixed(5);
+			amounts2[i].value = Number(toFixed(amounts2[i].value,5)).toFixed(5);
+			
+			//alert("calc:"+discs1[i].value+":"+discs2[i].value);
+			discs1[i].value = Number(toFixed(discs1[i].value,5)).toFixed(5);
+			discs2[i].value = Number(toFixed(discs2[i].value,5)).toFixed(5);
+			
+			/** calc TotalAmount **/
+			if(promotion[i].value =='N'){
+			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
+			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
+			}else if(promotion[i].value =='S'){
+			  /** discount Line(special ) **/
+			   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
+			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
+			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
+			}
+			vatLine1 = (Number(v)*Number(totalAmtSubDis1))/100;
+			vatLine2 = (Number(v)*Number(totalAmtSubDis2))/100;
+			
+			totalAmtInVat1 = Number(totalAmtSubDis1)+ Number(vatLine1);
+			totalAmtInVat2 = Number(totalAmtSubDis2)+ Number(vatLine2);
+			
+			afdiscs1[i].value = Number(toFixed(totalAmtSubDis1,5)).toFixed(2);
+			afdiscs2[i].value = Number(toFixed(totalAmtSubDis2,5)).toFixed(2);
+			
+			vats1[i].value = Number(toFixed(vatLine1,2)).toFixed(2);
+			vats2[i].value = Number(toFixed(vatLine2,2)).toFixed(2);
+			
+			totals1[i].value = Number(toFixed(totalAmtInVat1,5)).toFixed(2);
+			totals2[i].value = Number(toFixed(totalAmtInVat2,5)).toFixed(2);
+			
+			/********************************************************************************************/
+			/** sellingPrice = price-(Disc/qty)*/
+			if(promotion[i].value =='N'){
+				var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
+				var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
+				var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
+				var sellingPriceT = linePriceT-(lineDiscT/lineQtyT);
+				//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
+				sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
 			}else{
-				
-				//Case Product is no tax
-				if(amounts[i]){
-					discs[i].value = Number(toFixed(discs[i].value,5)).toFixed(5);
-					amounts[i].value = Number(toFixed(amounts[i].value,5)).toFixed(5);
-					totalAmtSubDis = Number(toFixed(amounts[i].value,5)) - Number(toFixed(discs[i].value,5));
-				}
-				
-				vatLine = 0;
-				totalAmtInVat = Number(totalAmtSubDis)+Number(vatLine);
-				
-				if(amounts[i]){
-					afdiscs[i].value = Number(toFixed(totalAmtSubDis,5)).toFixed(2);
-					vats[i].value=Number(toFixed(vatLine,2)).toFixed(2);
-					totals[i].value = Number(toFixed(totalAmtInVat,5)).toFixed(2);
-				}
-				
-				//alert("bf amount1["+amounts1[i].value+"]af amounts1["+Number(toFixed(amounts1[i].value,5)).toFixed(5)+"] ::: bf amount2["+amounts2[i].value+"]af amounts2["+Number(toFixed(amounts2[i].value,5)).toFixed(5)+"]");
-				
-				amounts1[i].value = Number(toFixed(amounts1[i].value,5)).toFixed(5);
-				amounts2[i].value = Number(toFixed(amounts2[i].value,5)).toFixed(5);
-				
-				discs1[i].value = Number(toFixed(discs1[i].value,5)).toFixed(5);
-				discs2[i].value = Number(toFixed(discs2[i].value,5)).toFixed(5);
-				
-				if(promotion[i].value =='N'){
-				   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
-				   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
-				}else if(promotion[i].value =='S'){
-				  /** discount Line(special is negeative only ) **/
-				   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
-				   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
-				   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
-				}
-				
-				vatLine1 = 0;
-				vatLine2 = 0;
-				
-				totalAmtInVat1 = Number(totalAmtSubDis1)+ Number(vatLine1);
-				totalAmtInVat2 = Number(totalAmtSubDis2)+ Number(vatLine2);
-				
-				afdiscs1[i].value = Number(toFixed(totalAmtSubDis1,5)).toFixed(2);
-				afdiscs2[i].value = Number(toFixed(totalAmtSubDis2,5)).toFixed(2);
-				
-				vats1[i].value = Number(toFixed(vatLine1,2)).toFixed(2);
-				vats2[i].value = Number(toFixed(vatLine2,2)).toFixed(2);
-				
-				totals1[i].value = Number(toFixed(totalAmtInVat1,5)).toFixed(2);
-				totals2[i].value = Number(toFixed(totalAmtInVat2,5)).toFixed(2);
-				
-				/** sellingPrice = price-(Disc/qty)*/
-				if(promotion[i].value =='N'){
-					var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-					var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-					var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-					var sellingPriceT = linePriceT-(lineDiscT/lineQtyT);
-					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-					sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
-				}else{
-					//var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-					//var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-					//var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-					//var sellingPriceT = linePriceT+(lineDiscT/lineQtyT);
-					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-					sellingPrice[i].value = 0;//Number(toFixed(sellingPriceT,5)).toFixed(2);
-				}
-				
-				sumTNonVat+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);
-				//alert("afdiscs1["+afdiscs1[i].value+"],afdiscs2["+afdiscs2[i].value+"] -->sumT["+sumT+"]");
-				
-				sumVat+=Number(vats1[i].value) +  Number(vats2[i].value);
-				sumTot+=Number(totals1[i].value) + Number(totals2[i].value);
-				
-				//display in table
-				total_ex_disc = totalAmtSubDis1 + totalAmtSubDis2;
-				//after discount >> netAmount
-				tbl.rows[i].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(5));
-				
-			}//if check taxable
-		//}
+				sellingPrice[i].value = 0;
+			}
+			/********************************************************************************************/
+			sumT+= Number(afdiscs1[i].value) + Number(afdiscs2[i].value);
+			//alert("afdiscs1["+afdiscs1[i].value+"],afdiscs2["+afdiscs2[i].value+"] -->sumT["+sumT+"]");
+			
+			sumVat+=Number(vats1[i].value) +  Number(vats2[i].value);
+			sumTot+=Number(totals1[i].value) + Number(totals2[i].value);
+			
+			//display in table
+			total_ex_disc = totalAmtSubDis1 + totalAmtSubDis2;
+			//after discount >> netAmount
+			tbl.rows[i].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(5));
+		}
 			
 		//sum totalQty =qty1+qty2
 		totalQty += Number(qty1[i].value);
 	}//for
 	
 	//alert(sumT);
-	//WIT Edit :08/06/2011  Cale Vat by total_amount of Header 
-	
-	//total_amount- total_discount  excluded vat
-	//alert("sumT["+sumT+"]");
-	
-	var totalAmount = toFixed(Number(sumT)+Number(sumTNonVat),2);
-	document.getElementsByName("order.totalAmount")[0].value = totalAmount;
-	
-	var totalAmountHaveVat = toFixed(Number(sumT),2);
-	document.getElementById("tempTotalAmount").value = addCommas(Number(totalAmountHaveVat).toFixed(2));
-	
-	//Total Amount Non Vat
-	var totalAmountNonVat = toFixed(Number(sumTNonVat),2);
-	document.getElementsByName("order.totalAmountNonVat")[0].value = totalAmountNonVat;
-	document.getElementById("tempTotalAmountNonVat").value = addCommas(Number(totalAmountNonVat).toFixed(2));
-	
-	//total_vat_amount
-	var sumVatAmount = toFixed((Number(v)*Number(sumT))/100,2); 
-	
-	//alert("sumT["+sumT+"]sumTNonVat["+sumTNonVat+"]sumVatAmount["+sumVatAmount+"]");
-	
-	//sumTotalAmount+sumTotalAmountNonvat+totalVatAmount
-	var totalNetAmount = toFixed(Number(sumT)+Number(sumVatAmount)+Number(sumTNonVat),2) ;
+
+    //totalAmount include vat
+	var totalNetAmount = toFixed(Number(sumT),2);
 	document.getElementsByName("order.netAmount")[0].value = totalNetAmount;
 	document.getElementById("tempNetAmount").value = addCommas(Number(totalNetAmount).toFixed(2));
+
+	//calc totalAmount Exclude vat = totalNetAmount*1.07 
+	var totalAmount = Math.round((Number(totalNetAmount) / Number(1.07))*100)/100;
+	totalAmount = toFixed(totalAmount,2);
+	document.getElementsByName("order.totalAmount")[0].value = totalAmount;
+	document.getElementById("tempTotalAmount").value = addCommas(Number(totalAmount).toFixed(2));
 	
-	//recalc TotalVatAmount
-	var sumVatAmount = Number(totalNetAmount).toFixed(2) - Number(totalAmount).toFixed(2);
+	//calc sumVatAmount from totalNetAmount
+	var sumVatAmount = toFixed((Number(totalNetAmount)-Number(totalAmount)),2); 
 	document.getElementsByName("order.vatAmount")[0].value = sumVatAmount;
-	//Case sumVat =0 display "-"
-	if(sumVatAmount ==0){
-	   document.getElementById("tempVatAmount").value = "-";
-	}else{
-	   document.getElementById("tempVatAmount").value = addCommas(Number(sumVatAmount).toFixed(2));
-	}
-	//show totalQty
-	//sum totalQty =qty1+qty2
-	 document.getElementById("totalQty").innerText = addCommas(Number(totalQty));
+	document.getElementById("tempVatAmount").value = addCommas(Number(sumVatAmount).toFixed(2));
 	
+	/******************************************************************************/
+	//sum totalQty =qty1+qty2
+	document.getElementById("totalQty").innerText = addCommas(Number(totalQty));
 }

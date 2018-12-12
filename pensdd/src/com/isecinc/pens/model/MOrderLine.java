@@ -133,6 +133,16 @@ public class MOrderLine extends I_Model<OrderLine> {
 		}
 		return pos;
 	}
+	public List<OrderLine> lookUp(Connection conn,int orderId) {
+		List<OrderLine> pos = new ArrayList<OrderLine>();
+		try {
+			String whereCause = " AND ORDER_ID = " + orderId + " AND ISCANCEL='N' ORDER BY TRIP_NO, LINE_NO ";
+			pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, OrderLine.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pos;
+	}
 	
 	/**
 	 * Check duplicate in tripNo 

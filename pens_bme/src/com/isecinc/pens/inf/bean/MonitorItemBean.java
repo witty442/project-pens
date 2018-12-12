@@ -41,9 +41,15 @@ public class MonitorItemBean implements Serializable{
    private List<MonitorItemResultBean> failList;
    private List<MonitorItemResultBean> salesInList;
    private List<MonitorItemResultBean> returnList;
+   private String columnHeadStrArr;
    
-   
-   
+
+public String getColumnHeadStrArr() {
+	return columnHeadStrArr;
+}
+public void setColumnHeadStrArr(String columnHeadStrArr) {
+	this.columnHeadStrArr = columnHeadStrArr;
+}
 public List<MonitorItemResultBean> getSalesInList() {
 	return salesInList;
 }

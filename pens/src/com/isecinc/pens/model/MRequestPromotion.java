@@ -709,7 +709,20 @@ public class MRequestPromotion {
 							  newCostLine.setNewCtn(null);
 							  
 							  m.getPromotionLineList().add(newCostLine);
-						  }
+						  }//for
+					  }else if(m.getPromotionLineList() ==null || (m.getPromotionLineList() != null & m.getPromotionLineList().size()==0)){
+						  int diffRow = 7;
+						  int lastLineNo = 0;
+						  for(int r=0;r<diffRow;r++){
+							  lastLineNo++;
+							  RequestPromotionLine newCostLine = new RequestPromotionLine();
+							  newCostLine.setLineNo(lastLineNo);
+							  newCostLine.setProductCode("");
+							  newCostLine.setProductName(" \n");
+							  newCostLine.setNewCtn(null);
+							  
+							  m.getPromotionLineList().add(newCostLine);
+						  }//for
 					  }
 				  }
 					  
