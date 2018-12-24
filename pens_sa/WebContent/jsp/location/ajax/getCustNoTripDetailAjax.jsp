@@ -8,13 +8,15 @@
 <%@page import="java.util.ArrayList"%>
 <%
 String customerCode = Utils.isNull(request.getParameter("customerCode"));
+String salesrepId =  Utils.isNull(request.getParameter("salesrepId"));
 String returnMsg = "";
 try{
-	System.out.println("getCustTripDetailAjax customerCode:"+customerCode);
+	System.out.println("getCustNoTripDetailAjax customerCode:"+customerCode+",salesrepId:"+salesrepId);
 	if( !Utils.isNull(customerCode).equals("")){
 		LocationBean o = new LocationBean();
 		o.setCustomerCode(customerCode);
-		LocationBean bean = TripAction.searchCustomerTripDetail(o);
+		o.setSalesrepId(salesrepId);
+		LocationBean bean = TripAction.searchCustomerNoTripDetail(o);
 		if(bean != null){
 			returnMsg = bean.getCustomerName()+"|"+bean.getTripDay()+"|"+bean.getTripDay2()+"|"+bean.getTripDay3();
 		}

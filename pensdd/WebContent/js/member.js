@@ -145,7 +145,16 @@ function clearForm(path){
 	document.memberForm.submit();
 	return true;
 }
-
+function copyMember(path){
+	if(document.getElementById('custCodeCopy').value ==""){
+		alert("กรุณาระบุ รหัสลูกค้าที่ต้องการ Copy");
+		document.getElementById('custCodeCopy').focus();
+		return false;
+    }
+	document.memberForm.action = path + "/jsp/memberAction.do?do=copyMember&custCodeCopy="+document.getElementById('custCodeCopy').value;
+	document.memberForm.submit();
+	return true;
+}
 /** ADDRESS **/
 function open_address(path, rowNo, type){
 	if(rowNo==null)
