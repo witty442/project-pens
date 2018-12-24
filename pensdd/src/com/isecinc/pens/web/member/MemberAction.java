@@ -29,6 +29,7 @@ import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ResultBean;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.init.InitialSystemConfig;
@@ -39,6 +40,7 @@ import com.isecinc.pens.model.MMemberProduct;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MTrxHistory;
+import com.isecinc.pens.process.document.MemberDocumentProcess;
 
 /**
  * Member Action Class
@@ -289,6 +291,131 @@ public class MemberAction extends I_Action {
 
 		return "view";
 	}
+	//Copy member by code
+	public ActionForward copyMember(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		MemberForm memberForm = (MemberForm) form;
+		Connection conn = null;
+		Member member = null;
+
+		try {
+			User userActive = (User) request.getSession().getAttribute("user");
+
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			// Begin Transaction
+			conn.setAutoCommit(false);
+            
+			//Search member by 
+			String custCodeCopy = Utils.isNull(request.getParameter("custCodeCopy"));
+			
+			member = new MMember().find(custCodeCopy);
+			if (member == null) {
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+			}
+
+			member.setCustomerType(userActive.getCustomerType().getKey());
+			memberForm.setAddresses(new MAddress().lookUp(member.getId()));
+			memberForm.setContacts(new MContact().lookUp(member.getId()));
+			memberForm.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
+			if (member.getBirthDay() != null && !member.getBirthDay().equals("")) {
+				int curYear = Integer.parseInt(new SimpleDateFormat("yyyy", new Locale("th", "TH")).format(new Date()));
+				int birthYear = Integer.parseInt(member.getBirthDay().split("/")[2]);
+				member.setAge(String.valueOf(curYear - birthYear));
+			}
+			// check expire date.
+			String expireDate = this.getExpireDate(member.getId());
+			if (!"".equals(expireDate)) member.setExpiredDate(expireDate);
+
+			memberForm.setMember(member);
+			// get back search key
+			if (memberForm.getCriteria().getSearchKey() == null) {
+				if (request.getSession(true).getAttribute("CMSearchKey") != null) {
+					memberForm.getCriteria()
+							.setSearchKey((String) request.getSession(true).getAttribute("CMSearchKey"));
+				}
+			} else {
+				request.getSession(true).removeAttribute("CMSearchKey");
+			}
+
+			//////////////////////////////////////////////////////////////////////
+			//insert new member
+			member = memberForm.getMember();
+			//Gen New Code 90XXXX
+			member.setCode(new MemberDocumentProcess().getNextDocumentNoCaseCopyMember(member.getCode()));
+			  
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			// Begin Transaction
+			conn.setAutoCommit(false);
+
+			// Save Member
+			member.setCustomerType(userActive.getCustomerType().getKey());
+
+			// Calculate expired date.
+			Calendar cal = Calendar.getInstance();
+			int month = 0;
+			month = Integer.parseInt(memberForm.getMember().getMemberType());
+
+			// Calculate Expire Date at 1st Save
+			/*if (memberForm.getMember().getId() == 0 || memberForm.getMember().getExpiredDate().length() == 0) {
+				cal.setTime(DateToolsUtil.convertStringToDate(memberForm.getMember().getRegisterDate()));
+				cal.add(Calendar.MONTH, month);
+				member.setExpiredDate(DateToolsUtil.convertToString(cal.getTime()));
+				new MMember().setMemberAgeLevel(member);
+			}
+*/
+			logger.debug("creditName:"+member.getCardName());
+			// Save Member
+			if (!new MMember().save(member, userActive.getCode(), userActive.getId(), conn)) {
+				// return with duplicate Document no
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
+				conn.rollback();
+				return mapping.findForward("view");
+			}
+
+			// Save Address
+			for (Address address : memberForm.getAddresses()) {
+				address.setCustomerId(member.getId());
+				new MAddress().save(address, userActive.getId(), conn);
+			}
+
+			// Save Contact
+			for (Contact contact : memberForm.getContacts()) {
+				contact.setCustomerId(member.getId());
+				new MContact().save(contact, userActive.getId(), conn);
+			}
+
+			// Save Product
+			for (MemberProduct memberProduct : memberForm.getMemberProducts()) {
+				memberProduct.setCustomerId(member.getId());
+				new MMemberProduct().save(memberProduct, userActive.getId(), conn);
+			}
+
+			// Commit Transaction
+			conn.commit();
+
+			memberForm.setMember(member);
+
+			/******************************************************************/
+			// Commit Transaction
+			conn.commit();
+
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+		} catch (Exception e) {
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {}
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				conn.setAutoCommit(true);
+				conn.close();
+			} catch (Exception e2) {}
+		}
+
+		return mapping.findForward("view");
+	}
+
 
 	/**
 	 * Cancel Member

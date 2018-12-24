@@ -169,8 +169,8 @@ public class MayaSaleOutAction {
 					h.append("<td>&nbsp;</td> \n");
 					h.append("<td>&nbsp;</td> \n");
 					h.append("<td class='currency_bold'>"+s.getLineAmount()+"</td> \n");
-					h.append("<td>&nbsp;</td> \n");
-					h.append("<td>&nbsp;</td> \n");
+					h.append("<td class='currency_bold'>"+s.getDiscount()+"</td> \n");
+					h.append("<td class='currency_bold'>"+s.getVatAmount()+"</td> \n");
 					h.append("<td class='currency_bold'>"+s.getTotalAmount()+"</td> \n");
 					h.append("<td class='currency_bold'>"+s.getTotalAmountExVat()+"</td> \n");
 				h.append("</tr>");
@@ -195,7 +195,7 @@ public class MayaSaleOutAction {
 			sql.append("\n ,SUM(D.DISCOUNT) AS DISCOUNT");
 			sql.append("\n ,SUM(D.VAT_AMOUNT) AS VAT_AMOUNT");
 			sql.append("\n ,SUM(D.TOTAL_AMOUNT) AS TOTAL_AMOUNT");
-			sql.append("\n ,NVL((SUM(D.TOTAL_AMOUNT)-SUM(D.VAT_AMOUNT)),0)  AS TOTAL_AMOUNT_EX_VAT ");
+			sql.append("\n ,NVL(SUM(D.TOTAL_AMOUNT)/1.07,0)  AS TOTAL_AMOUNT_EX_VAT ");
 			sql.append("\n FROM XXPENS_OM_SHOP_ORDER_MST M,XXPENS_OM_SHOP_ORDER_DT D ");
 			sql.append("\n ,(" );
 			sql.append("\n   SELECT I.inventory_item_id as product_id");

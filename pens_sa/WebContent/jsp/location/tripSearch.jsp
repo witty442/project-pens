@@ -30,7 +30,15 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <style type="text/css">
+fieldset { border:1px solid black }
 
+legend {
+  padding: 0.2em 0.5em;
+  border:1px solid green;
+  color:green;
+  font-size:90%;
+  text-align:left;
+  }
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -94,6 +102,11 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 	    }else{
 	       param +="&salesrepId="+salesrepId;	
 	    }
+	   if(form.salesrepCode.value ==""){
+		   alert("กรุณาระบุพนักงานขาย ก่อน เพิ่มข้อมูล");
+		   form.salesrepCode.focus();
+		   return false;
+	   } 
 	    
 	var url = path + "/jsp/location/tripDetail.jsp?"+param;
 	PopupCenter(url,"Manage Cust Trip",800,700);
@@ -161,7 +174,7 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
 								    </html:select>
 									</td>
-									<td width="10%" align="right">Trip/จุด</td>
+									<td width="10%" align="right"><b>Trip/จุด</b></td>
 								    <td width="20%" align="left"> <html:text property="bean.tripDay"  styleId="tripDay" size="8"/></td>
 								    </tr>
 								   </table>
@@ -210,11 +223,18 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body"  width="100%">
 						<tr>
 							<td align="center" width="80%">
-								<input type="button" value="ค้นหา" class="newPosBtnLong" onclick="search('${pageContext.request.contextPath}','')">
+								<input type="button" value="ค้นหา" class="newPosBtnLong" 
+								onclick="search('${pageContext.request.contextPath}','')">
+								 &nbsp;&nbsp;
 								<input type="button" value="เพิ่มรายการใหม่" class="newPosBtnLong" 
 								onclick="viewTripDetail('${pageContext.request.contextPath}','','<%=Utils.isNull(request.getParameter("currPage"))%>','')"> 
+								 &nbsp;&nbsp;
+								 <input type="button" value=" Export " class="newPosBtnLong" 
+								 onclick="exportReport('${pageContext.request.contextPath}')">
+								 &nbsp;&nbsp;
 								<input type="button" value="Clear" class="newPosBtnLong" onclick="clearForm('${pageContext.request.contextPath}')">
 							 <!--  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>จุด 99 (ยังไม่มีการ เซต trip/จุด)</b> -->
+							
 							</td>
 						</tr>
 					</table>					

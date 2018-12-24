@@ -43,6 +43,9 @@
       <a href="${pageContext.request.contextPath}/jsp/jobAction.do?do=prepare2&action=new">
      Call Ajax (Javascript>)</a>
    </td></tr>
+    <tr><td>
+             การ Export to Excel ปัญหาภาษาไทย  add tag <.. meta charset='utf-8'..>
+   </td></tr>
   </table>
 </body>
 </html>

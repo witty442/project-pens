@@ -150,6 +150,8 @@ public class Member extends I_PO implements Serializable {
 		
 		//Edit 10/12/2557
 		setOldPriceFlag(rst.getString("OLD_PRICE_FLAG"));
+		
+		setTotalOrderQty(rst.getInt("total_order_qty"));
 	}
 
 	/**
@@ -226,8 +228,27 @@ public class Member extends I_PO implements Serializable {
 	private String isFreeOfChart;
 	private int paymentType;
 	private String oldPriceFlag;
+    private int totalOrderQty;
+    
+    private String custCodeCopy;
+    
+    
+	public String getCustCodeCopy() {
+		return custCodeCopy;
+	}
 
-	
+	public void setCustCodeCopy(String custCodeCopy) {
+		this.custCodeCopy = custCodeCopy;
+	}
+
+	public int getTotalOrderQty() {
+		return totalOrderQty;
+	}
+
+	public void setTotalOrderQty(int totalOrderQty) {
+		this.totalOrderQty = totalOrderQty;
+	}
+
 	public String getOldPriceFlag() {
 		return oldPriceFlag;
 	}

@@ -43,3 +43,16 @@ function compareDate(date1,date2){
 		 return -1;
 	 }
 }
+/**
+ * 
+ * @param date1(thaiDate) 01/11/2561
+ * @param date2(thaiDate) 30/11/2561
+ * Return : true in same month,false no same month
+ */
+function dateFromToInSameMonth(date1,date2){
+	 date1 = thaiDateToEngDate(date1);
+	 date2 = thaiDateToEngDate(date2);
+	 if(date1.getMonth() != date2.getMonth()) return false;
+	 return true;
+}
+

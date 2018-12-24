@@ -142,7 +142,7 @@ public class LocationAction extends I_Action {
 				    LocationBean bean =new LocationBean();
 				    bean.setCustCatNo("C");//VanSale
 				    //fortest
-				    bean.setSalesrepCode("100033105");
+				    //bean.setSalesrepCode("100033105");
 				    
 				    aForm.setBean(bean);
 				    aForm.setPageName(pageName);
@@ -313,6 +313,21 @@ public class LocationAction extends I_Action {
 				}else{
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
+			    			
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(resultHtmlTable.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+			    
+			}else if("trip".equalsIgnoreCase(aForm.getPageName())){
+				resultHtmlTable = TripAction.exportToExcel(aForm.getBean());
 			    			
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");

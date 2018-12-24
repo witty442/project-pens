@@ -29,15 +29,15 @@ String action = Utils.isNull(request.getParameter("action"));
 String customerCode = "";
 String errorMsg = "";
 String message = "";
-String currTrip = "1";//defualt 1
-if(Utils.isNull(request.getParameter("currTrip")).equals("")){
+String currTrip = "";
+/* if(Utils.isNull(request.getParameter("currTrip")).equals("")){
 	if(session.getAttribute("tripPageList") != null){
 		List<LocationBean> tripPageList =(List)session.getAttribute("tripPageList");
 		currTrip = tripPageList.size()>=1?tripPageList.get(0).getTripDay():"1";
 	}
 }else{
 	currTrip = Utils.isNull(request.getParameter("currTrip"));
-}
+} */
 	
 String custCatNo = Utils.isNull(request.getParameter("custCatNo"));
 String salesChannelNo = Utils.isNull(request.getParameter("salesChannelNo"));
@@ -142,6 +142,7 @@ try {
 		   SalesrepBean salesBean = SalesrepDAO.getSalesrepBeanById(conn, salesrepId);
 		   if(salesBean != null){
 			   bean.setSalesrepCode(salesBean.getCode());
+			   bean.setSalesrepName(salesBean.getSalesrepFullName());
 		   }
 		}else{
 		   //Edit
@@ -200,6 +201,16 @@ function save(path){
 	<%}else{%>
 	   document.getElementsByName("action")[0].value ="saveEdit";
 	<%}%>
+	//validate trip
+	if(document.getElementsByName("tripDay")[0].value =="" 
+		&& document.getElementsByName("tripDay2")[0].value =="" 
+		&& document.getElementsByName("tripDay3")[0].value =="" 
+		){
+		alert("กรุณาระบุข้อมูล Trip/จุด  อย่างน้อย 1 จุด");
+		document.getElementsByName("tripDay")[0].focus();
+		return false;
+	}
+	
     var form = document.tempLocationForm;
 	form.submit();
 	return true; 
@@ -219,7 +230,7 @@ function openPopup(path,pageName){
 }
 function setDataPopupValue(code,desc,pageName){
 	var form = document.tempLocationForm;
-	if("CustomerLocation" == pageName){
+	if("CustomerLocNoTrip" == pageName){
 		form.customerCode.value = code;
 		form.customerName.value = desc;
 		//get trip detail
@@ -250,8 +261,8 @@ function getCustName(custCode){
 	var returnString = "";
 	var form = document.tempLocationForm;
 		var getData = $.ajax({
-				url: "${pageContext.request.contextPath}/jsp/location/ajax/getCustTripDetailAjax.jsp",
-				data : "customerCode=" + custCode.value,
+				url: "${pageContext.request.contextPath}/jsp/location/ajax/getCustNoTripDetailAjax.jsp",
+				data : "customerCode=" + custCode.value+"&salesrepId="+form.salesrepId.value,
 				async: false,
 				cache: false,
 				success: function(getData){
@@ -260,12 +271,12 @@ function getCustName(custCode){
 			}).responseText;
 		
 		if(returnString !=''){
-			alert("พบข้อมูลร้านนี้มีการ บันทึก trip/จุด ไว้แล้ว ");
+			//alert("พบข้อมูลร้านนี้มีการ บันทึก trip/จุด ไว้แล้ว ");
 			var retArr = returnString.split("|");
 			form.customerName.value = retArr[0];
-			form.tripDay.value = retArr[1];
+			/* form.tripDay.value = retArr[1];
 			form.tripDay2.value = retArr[2];
-			form.tripDay3.value = retArr[3];
+			form.tripDay3.value = retArr[3]; */
 		}else{
 			alert("ไม่พบข้อมูล");
 			form.customerCode.focus();
@@ -294,7 +305,7 @@ function closeForm(){
     <input type="hidden" name="district" id="district" value ="<%=district %>"/>
     <input type="hidden" name="salesrepId" id="salesrepId" value ="<%=salesrepId %>"/>
     
-   <table width="80%" border="0" align="center" cellpadding="5" cellspacing="5">
+   <table width="80%" border="1" align="center" cellpadding="5" cellspacing="5">
       
      <tr class="txt_style" >
   	     <td width="60%" colspan ="5" align="left" nowrap> 
@@ -312,13 +323,14 @@ function closeForm(){
   	     <%if( !"".equals(customerCode)){ %>
   	        <font size="3"><b>แก้ไข ข้อมูล Trip/จุด ของร้านค้า </b></font>
   	     <%}else{ %>
-  	        <font size="3"><b>เพิ่มข้อมูล Trip/จุด  ของร้านค้า</b></font>
+  	        <font size="3"><b>เพิ่มข้อมูล Trip/จุด  ของร้านค้าใหม่ (ที่ยังไม่มี Trip)</b></font>
   	     <%} %>
   	     </td> 
      </tr>
      <tr class="txt_style" >
   	 <td  width="60%" colspan ="5" align="left" nowrap><b>รหัสพนักงาน</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  	        <input type="text" name="salesRepCode" value="<%=bean.getSalesrepCode() %>" class="disableText" readonly="true" size="20"/>
+  	        <input type="text" name="salesRepCode" value="<%=bean.getSalesrepCode() %>" class="disableText" readonly="true" size="10"/>
+  	        <input type="text" name="salesRepName" value="<%=bean.getSalesrepName() %>" class="disableText" readonly="true" size="40"/>
      </td>
     </tr>
 	<tr class="txt_style" >
@@ -327,9 +339,9 @@ function closeForm(){
   	        <input type="text" name="customerCode" value="<%=bean.getCustomerCode() %>" class="disableText" readonly="true" size="20"/>
         <%}else{ %>
              <input type="text" name="customerCode" value="" size="20" onkeypress="getCustNameKeypress(event,this)"/>
-             <input type="button" name="x0" class="btnSmallLong" value="ตรวจสอบข้อมูล Trip เดิม" onclick="getCustNameClick()"/> 
-                
-             <input type="button" name="x1" class="btnSmallLong" value="ค้นหาร้านค้า" onclick="openPopup('${pageContext.request.contextPath}','CustomerLocation')"/>   
+             <!-- <input type="button" name="x0" class="btnSmallLong" value="ตรวจสอบข้อมูล Trip เดิม" onclick="getCustNameClick()"/> 
+              -->   
+             <input type="button" name="x1" class="btnSmallLong" value="ค้นหาร้านค้า" onclick="openPopup('${pageContext.request.contextPath}','CustomerLocNoTrip')"/>   
         <%} %>
      </td>
     </tr>

@@ -5,13 +5,15 @@ function clearForm(path){
 }
 
 function exportReport(path){
-  var foundChkMonth = false;
-  if(foundChkMonth){
-     document.locationForm.action = path + "/jsp/locationAction.do?do=exportReport";
-     document.locationForm.submit();
-     return true;
-  }
-  return false;
+	var salesrepCode = document.getElementById("salesrepCode");
+	 if(salesrepCode.value ==""){
+		 alert("กรุณาระบุ พนักงานขาย ");
+		 salesrepCode.focus();
+		 return false;
+	 }
+    document.locationForm.action = path + "/jsp/locationAction.do?do=exportReport";
+    document.locationForm.submit();
+    return true;
 }
 
 function loadSalesrepCodeList(path){

@@ -1,3 +1,4 @@
+<%@page import="util.SessionIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620"
 	pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -76,7 +77,7 @@ body {
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/member.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/member.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" language="javascript">
 function loadMe(){
@@ -183,9 +184,16 @@ function paymentMethodChanged(paymentMethod,clearValue){
 						<jsp:include page="../error.jsp"/>
 							<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 								<tr>
-									<td width="25%" colspan="2"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
+									<td width="25%" colspan="2" align="right">Copy จากสมาชิกเลขที่ </td>
+									<td width="20%"><html:text property="member.custCodeCopy"size="10" styleId="custCodeCopy"/>
+									   <a href="#" onclick="copyMember('${pageContext.request.contextPath}');">
+									     <input type="button" value="Copy" class="newPosBtn">
+									   </a>
+									</td>
+									
+									<td width="20%" align="left">
+									   
+									   </td>
 									<td></td>
 								</tr>
 								<tr>
@@ -539,11 +547,9 @@ function paymentMethodChanged(paymentMethod,clearValue){
 											<html:option value="3">&nbsp;</html:option>
 											<html:option value="1">เก็บครั้งแรกทั้งหมด</html:option>
 											<html:option value="2">เก็บรายครั้ง</html:option>
-											
-											
 										</html:select>	
 									</td>
-									<td></td>
+									<td>จำนวนขวดรวม ในการจัดส่ง &nbsp; <html:text property="member.totalOrderQty" size="5" onkeydown="return inputNum(event);"/></td>
 									<td align="left">
 										<html:checkbox property="member.isFreeOfChart" styleId="isvip" value="Y" /><bean:message key="Member.FreeOfChart" bundle="sysele" />
 									</td>

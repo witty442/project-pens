@@ -152,6 +152,10 @@ public class PopupAction extends I_Action {
 				//For Stock
 				 results = PopupDAO.searchCustomerLocationList(popupForm);
 				 
+			}else if("CustomerLocNoTrip".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For Edit Trip
+				 results = PopupDAO.searchCustomerLocNoTripList(popupForm);
+				 
 			}
 			
 			 if(results != null && results.size() >0){

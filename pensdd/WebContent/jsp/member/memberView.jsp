@@ -441,10 +441,9 @@ function loadMe(){
 											<html:option value="1">เก็บครั้งแรกทั้งหมด</html:option>
 											<html:option value="2">เก็บรายครั้ง</html:option>
 											
-											
 										</html:select>	
 									</td>
-									<td></td>
+									<td>จำนวนขวดรวม ในการจัดส่ง &nbsp; <html:text property="member.totalOrderQty" styleClass="disableText" readonly="true" size="5" onkeydown="return inputNum(event);"/></td>
 									<td align="left">
 										<html:checkbox property="member.isFreeOfChart" disabled="true" styleId="isvip" value="Y" /><bean:message key="Member.FreeOfChart" bundle="sysele" />
 									</td>

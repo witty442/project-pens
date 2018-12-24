@@ -37,6 +37,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -77,6 +78,14 @@ function search(path){
 		   }//if
 		}//if
 	}
+	 //validate date from to in same month
+	 if( $('#saleDateFrom').val() !="" && $('#saleDateTo').val() !=""){
+		 if(!dateFromToInSameMonth($('#saleDateFrom').val(),$('#saleDateTo').val())){
+			 alert("กรุณาเลือกวันที่ ในช่วงเดือนเดียวกันเท่านั้น")
+			 $('#saleDateTo').focus();
+			 return false;
+		 }
+	 }
 	
 	form.action = path + "/jsp/mttAction.do?do=search2&action=newsearch";
 	form.submit();

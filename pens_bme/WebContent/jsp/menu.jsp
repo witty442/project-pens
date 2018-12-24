@@ -443,7 +443,10 @@
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=bmeTrans');">
 				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMETransaction"/></span></a>
 			</li>
-			
+			<li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/pickReportAction.do?do=prepareReport&action=new');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="PickReport"/></span></a>
+			</li>
 		</ul>
 	</li>
 <%} %>
@@ -755,7 +758,7 @@
 				<span><u><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="pickStockGroupComplete"/>(temp)</u></span></a>
 			</li>
 			 <!-- **** Despricate *** -->
-			 
+
 		</ul>
 	<%}else if ( Utils.userInRole(user,new String[]{User.SALE}) ){ no=0;%>
 	        <li>
@@ -782,6 +785,7 @@
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');">
 				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
 			</li>
+			 
 	    </ul>  
 	<%} %>
 	</li>

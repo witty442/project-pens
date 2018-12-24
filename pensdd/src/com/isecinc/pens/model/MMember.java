@@ -47,7 +47,8 @@ public class MMember extends I_Model<Member> {
 			"PRODUCT_CATEGORY_ID", "ORDER_AMOUNT_PERIOD", "SHIPPING_DATE", "SHIPPING_TIME", "ISACTIVE", "CREATED_BY",
 			"UPDATED_BY", "ROUND_TRIP", "RECOMMENDED_TYPE", "RECOMMENDED_ID", "EXPIRED_DATE", "AGE_MONTH",
 			"PARTY_TYPE", "DELIVERY_GROUP", "EXPORTED", "INTERFACES", "ISVIP", "SHIPPING_TIME_TO",
-			"CREDITCARD_EXPIRED", "OCCUPATION", "FREE_OF_CHART","PAYMENT_TYPE","CARD_NO","CARD_BANK","CARD_NAME","OLD_PRICE_FLAG"};
+			"CREDITCARD_EXPIRED", "OCCUPATION", "FREE_OF_CHART","PAYMENT_TYPE","CARD_NO","CARD_BANK"
+			,"CARD_NAME","OLD_PRICE_FLAG","TOTAL_ORDER_QTY"};
 
 	/**
 	 * Find
@@ -330,9 +331,10 @@ public class MMember extends I_Model<Member> {
 		int id = 0;
 		if (member.getId() == 0) {
 			id = SequenceProcess.getNextValue(TABLE_NAME);
-			// String prefix = new DecimalFormat("00").format(Integer.parseInt(member.getTerritory()));
 			String prefix = "";
-			member.setCode(new MemberDocumentProcess().getNextDocumentNo(userCode, prefix, activeUserID, conn));
+			if( Utils.isNull(member.getCode()).equals("")){
+			   member.setCode(new MemberDocumentProcess().getNextDocumentNo(userCode, prefix, activeUserID, conn));
+			}
 		} else {
 			id = member.getId();
 		}
@@ -372,7 +374,8 @@ public class MMember extends I_Model<Member> {
 				member.getCreditCardNo(),
 				member.getCreditCardBank(),
 				member.getCardName(),
-				Utils.isNull(member.getOldPriceFlag())
+				Utils.isNull(member.getOldPriceFlag()),
+				member.getTotalOrderQty()
 				};
 			
 

@@ -102,14 +102,12 @@
 		
 		<form-bean name="SAsearchValuePopupForm" type="com.isecinc.pens.web.salesanalyst.SASearchValuePopupForm" />
 		<form-bean name="lockItemOrderForm" type="com.isecinc.pens.web.lockitem.LockItemOrderForm" />
-		
 		<!-- Schedule -->
 		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
 		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
 		
 		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
 		<form-bean name="popupSearchForm" type="com.isecinc.pens.web.popupsearch.PopupSearchForm" />
-		
 		<form-bean name="autoCNForm" type="com.isecinc.pens.web.autocn.AutoCNForm" />
 		<form-bean name="genVanScriptForm" type="com.isecinc.pens.web.other.GenVanScriptForm" />
 		<form-bean name="autoCNHISHERForm" type="com.isecinc.pens.web.autocn.hisher.AutoCNHISHERForm" />
@@ -117,6 +115,7 @@
 		<form-bean name="toolManageForm" type="com.isecinc.pens.web.toolmanage.ToolManageForm" />
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
+		<form-bean name="pickReportForm" type="com.isecinc.pens.web.pick.PickReportForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -568,6 +567,9 @@
 			
 			<forward name="report" path="/jsp/main/mttReport.jsp" />
 			<forward name="scanReport" path="/jsp/main/scanReport.jsp" />
+		</action>
+		<action name="pickReportForm" path="/jsp/pickReportAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickReportAction">
+			<forward name="search" path="/jsp/pick/pickReport.jsp" />
 		</action>
 		
 		<action name="mcForm" path="/jsp/mcAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCAction">

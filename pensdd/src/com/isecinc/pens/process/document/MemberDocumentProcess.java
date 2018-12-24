@@ -43,6 +43,21 @@ public class MemberDocumentProcess extends DocumentSequenceProcess {
 		return docNo;
 	}
 
+	//input 305-> 90305
+	public String getNextDocumentNoCaseCopyMember(String oldMemberCode)
+			throws Exception {
+		String docNo ="";
+		if(oldMemberCode.length()==1){
+			docNo = "9000"+oldMemberCode;
+		}else if(oldMemberCode.length()==2){
+		   docNo = "900"+oldMemberCode;
+		}else if(oldMemberCode.length()==3){
+		   docNo = "90"+oldMemberCode;
+		}else if(oldMemberCode.length()==4){
+		   docNo = "9"+oldMemberCode;
+		}
+		return docNo;
+	}
 	/**
 	 * Test
 	 * 

@@ -90,6 +90,7 @@ public class Customer extends I_PO implements Serializable {
 		// Order Amount
 		setOrderAmount(new MOrder().lookUpByCustomer(getId()));
 
+		setTotalOrderQty(rst.getInt("total_order_qty"));
 		// set display label
 		setDisplayLabel();
 
@@ -220,7 +221,18 @@ public class Customer extends I_PO implements Serializable {
     
 	private String oldPriceFlag;
 	
+	/** TOTAL Order Qty */
+	private double totalOrderQty;
 	
+	
+	public double getTotalOrderQty() {
+		return totalOrderQty;
+	}
+
+	public void setTotalOrderQty(double totalOrderQty) {
+		this.totalOrderQty = totalOrderQty;
+	}
+
 	public String getOldPriceFlag() {
 		return oldPriceFlag;
 	}

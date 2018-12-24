@@ -142,7 +142,7 @@ public class PickStockGroupDAO extends PickConstants{
 			   for(int i=0;i<h.getItems().size();i++){
 				  PickStock l = (PickStock)h.getItems().get(i);
 				   l.setIssueReqNo(h.getIssueReqNo());
-				   l.setCreateUser(h.getCreateUser());
+				   l.setCreateUser(h.getUpdateUser());
 				   l.setUpdateUser(h.getUpdateUser());
 				   l.setIssueReqStatus(h.getIssueReqStatus());
 				   
@@ -298,6 +298,9 @@ public class PickStockGroupDAO extends PickConstants{
 				   
 				   h.setCreateUser(o.getCreateUser());
 				   h.setUpdateUser(o.getUpdateUser());
+				   
+				   //edit new 
+				   h.setIssueReqStatus(o.getIssueReqStatus());
 				   
 				   //save pick_stock_line
 				   savePickStockLineModel(conn, h);

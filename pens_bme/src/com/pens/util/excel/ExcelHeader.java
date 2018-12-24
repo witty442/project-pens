@@ -44,5 +44,7 @@ public class ExcelHeader {
 		
 		EXCEL_HEADER.append("</style> \n");
 		
+		//set support thai unicode 
+		EXCEL_HEADER.append("<meta charset='utf-8'>");
 	}
 }

@@ -41,7 +41,7 @@
     	descSearchTxtName = "Brand Name";
     }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
       || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
-      || "CustomerCreditPromotion".equalsIgnoreCase(pageName) ){
+      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName) ){
     	headName = "ร้านค้า("+pageName+")";
     	codeSearchTxtName = "Customer Code";
     	descSearchTxtName = "Customer Name";
@@ -285,7 +285,7 @@ window.onload = function(){
      <jsp:include page="popup_sub/BrandResult.jsp" /> 
 <%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
 		|| "CustomerLocation".equalsIgnoreCase(pageName) || "CustomerVanProdShow".equalsIgnoreCase(pageName)
-		|| "CustomerCreditPromotion".equalsIgnoreCase(pageName)
+		|| "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName)
 		){ 
 %>
      <jsp:include page="popup_sub/CustomerResult.jsp" /> 

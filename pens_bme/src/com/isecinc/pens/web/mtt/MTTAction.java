@@ -336,15 +336,12 @@ public class MTTAction extends I_Action {
 			
 			h.append("</table> \n");
 			
-			if((form.getResults() != null && form.getResults().size()==0) || form.getResults() == null){
-				//search new
-				conn = DBConnection.getInstance().getConnection();
-				List<MTTBean> items = MTTBeanDAO.searchHeadList(conn,form.getBean(),true,0,pageSize);
-				form.setResults(items);
-			}
+			
+			//search new
+			conn = DBConnection.getInstance().getConnection();
+			List<MTTBean> items = MTTBeanDAO.searchHeadList(conn,form.getBean(),true,0,pageSize);
 
-			if(form.getResults() != null){
-			    List<MTTBean> list = (List<MTTBean>)form.getResults();
+			if(items != null){
 				h.append("<table border='1'> \n");
 				h.append("<tr class='colum_head'> \n");
 				  h.append("<td>No.</td> \n");
@@ -363,10 +360,10 @@ public class MTTAction extends I_Action {
 				  h.append("<td>ราคาขายปลีกก่อน VAT</td> \n");
 				  h.append("<td>Remark</td> \n");
 				h.append("</tr> \n");
-				for(int i=0;i<list.size();i++){
-					MTTBean s = (MTTBean)list.get(i);
+				for(int i=0;i<items.size();i++){
+					MTTBean s = (MTTBean)items.get(i);
 					h.append("<tr> \n");
-					  h.append("<td>"+s.getNo()+"</td> \n");
+					  h.append("<td>"+(i+1)+"</td> \n");
 					  h.append("<td>"+s.getSaleDate()+"</td> \n");
 					  h.append("<td>"+s.getCreateDate()+"</td> \n");
 					  h.append("<td>"+s.getDocNo()+"</td> \n");
