@@ -3,7 +3,9 @@ package com.isecinc.pens.dao.constants;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -24,6 +26,7 @@ public class ControlConstantsDB {
 	public static String JOB_CUTT_DATE_BIGC_REF_CODE = "JOB_CUTT_DATE_BIGC";
 	public static String W2_CK_STK_INITDATE_CODE = "W2_CK_STK_INITDATE";
 	
+	public static String NS_CUTSOMER_SUB_TYPE = "NISSIN_CUST_SUB_TYPE";
 	
 	public static String getValueByConCode(String conType,String conCode) throws Exception {
 		Statement stmt = null;
@@ -57,6 +60,41 @@ public class ControlConstantsDB {
 			} catch (Exception e) {}
 		}
 		return value;
+	}
+	
+	public static List<ConstantBean> getCondList(String conType) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<ConstantBean> condList = new ArrayList<ConstantBean>();
+		ConstantBean bean = null;
+		Connection conn = null;
+		try {
+			sql.append("\n select * FROM PENSBI.PENSBME_C_CONTROL WHERE con_type = '"+conType+"' and isactive ='Y'");
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnectionApps();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				bean = new ConstantBean();
+				bean.setConType(Utils.isNull(rst.getString("con_type")));
+				bean.setConCode(Utils.isNull(rst.getString("con_code")));
+				bean.setConValue(Utils.isNull(rst.getString("con_value")));
+				bean.setConDesc(Utils.isNull(rst.getString("con_desc")));
+				bean.setConDisp(Utils.isNull(rst.getString("con_value_disp")));
+				condList.add(bean);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			    conn.close();
+			} catch (Exception e) {}
+		}
+		return condList;
 	}
 	
 	 public static BMEControlBean calcMonthEndOnhandDateLotusAsOf(Connection conn,String storeCode,String asOfdate) throws Exception {

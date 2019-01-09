@@ -508,7 +508,7 @@ public class PopupDAO {
 				
 				sql.append("\n and cs.trip1 is null and cs.trip2 is null and cs.trip3 is null ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and c.customer_code ='"+c.getCodeSearch()+"' ");
+					sql.append("\n and c.customer_code LIKE '%"+c.getCodeSearch()+"%' ");
 				}
 				if( !Utils.isNull(c.getDescSearch()).equals("")){
 					sql.append("\n and c.customer_desc LIKE '%"+c.getDescSearch()+"%' ");

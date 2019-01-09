@@ -41,7 +41,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 	}
 	
 	public UOMConversion getCurrentConversionNotIn(int productId, String uomId) throws Exception {
-		logger.debug("Find UOM conversion on Product : " + productId + " : " + uomId);
+		//logger.debug("Find UOM conversion on Product : " + productId + " : " + uomId);
 		String whereCause = "";
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id <> '" + uomId + "' ";

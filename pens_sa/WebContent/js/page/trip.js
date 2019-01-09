@@ -4,18 +4,6 @@ function clearForm(path){
     document.locationForm.submit();
 }
 
-function exportReport(path){
-	var salesrepCode = document.getElementById("salesrepCode");
-	 if(salesrepCode.value ==""){
-		 alert("กรุณาระบุ พนักงานขาย ");
-		 salesrepCode.focus();
-		 return false;
-	 }
-    document.locationForm.action = path + "/jsp/locationAction.do?do=exportReport";
-    document.locationForm.submit();
-    return true;
-}
-
 function loadSalesrepCodeList(path){
 	var cboDistrict = document.getElementsByName('bean.salesrepCode')[0];
 	var param  ="salesChannelNo=" + document.getElementsByName('bean.salesChannelNo')[0].value;

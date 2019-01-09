@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -26,6 +28,8 @@ List<OrderLine> lines = orderForm.getLines();
 orderForm.getOrder().getPriceListId();
 List<String> trips = new ArrayList<String>(); 
 List<String> cannotEditTrips = new ArrayList<String>();
+
+System.out.println("lines size:"+lines.size());
 %>
 
 <%@page import="java.util.List"%>
@@ -41,11 +45,16 @@ List<String> cannotEditTrips = new ArrayList<String>();
 <%@page import="com.isecinc.pens.model.MProductPrice"%><html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<title>XX<bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
 <style type="text/css">
 .text_right { float:right }
+
+.lineW {
+	background-color: #b8b894;
+}
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->
@@ -230,7 +239,21 @@ function saveNewLineAuto(){
 	document.orderForm.submit();
 	return true;
 }
-
+function closePageAction(){
+	//check totalOrderQty in page
+	var totalOrderQty = $('#totalOrderQty').val();
+	var totalQtyInPage = 0;
+	<%for(OrderLine ll : lines){ %>
+	   var qtyTemp = document.getElementById("qty_<%=ll.getId()%>").value;
+	   totalQtyInPage += parseFloat(qtyTemp);
+	<%}%>
+	
+	//alert("totalOrderQty:"+totalOrderQty+",totalQtyInPage:"+totalQtyInPage);
+	if(totalOrderQty != totalQtyInPage){
+		alert("จำนวนขวดรวม ("+totalQtyInPage+") ในหน้านี้ ไม่เท่ากับจำนวนขวดรวมที่กำหนดไว้ ("+totalOrderQty+")");
+	}
+	setTimeout("window.close()",2000);
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -246,8 +269,12 @@ function saveNewLineAuto(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
 		<td width="25%"></td>
-		<td width="20%"></td>
-		<td width="15%"></td>
+		<td width="20%" align="center">
+		  <input type="button" value="ปิดหน้าจอนี้" id="closePageBtn" onclick="closePageAction();" class="closeSpecialBtn">
+		</td>
+		<td width="15%">
+		 
+		</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -292,6 +319,7 @@ function saveNewLineAuto(){
 		<td colspan="4">
 			<jsp:include page="memberNewProduct.jsp"></jsp:include>
 			<input type="button" value="เพิ่มรายการใหม่อัตโนมัติ" id="addNewGroupBtn" onclick="saveNewLineAuto();">
+		
 		</td>
 	</tr>
 	<tr>
@@ -340,8 +368,12 @@ function saveNewLineAuto(){
 				int no = 0;
 				int tripNoCount = 1;
 				int lastTripNo = 0;
-
-				// Open Loop Order Line Detail
+				
+				Date requestDate = null;
+                Date currentDate = Utils.parse(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH), Utils.DD_MM_YYYY_WITH_SLASH);
+				System.out.println("currentDate:"+currentDate);
+				
+                // Open Loop Order Line Detail
 				for(OrderLine l : lines){ 
 					if(ot!=l.getTripNo()){ 
 						ot=l.getTripNo(); 
@@ -356,17 +388,26 @@ function saveNewLineAuto(){
 					//lastTripNo
 					lastTripNo = l.getTripNo();
 					
-					if(no%2==0){
-						if("Y".equals(l.getPromotion1())){
-						   classLine ="lineP";
-						}else{
-						   classLine ="lineE";
-						}
+					//check l.getRequestDate() < currentDate display line blue
+					requestDate = null;
+					if( !Utils.isNull(l.getRequestDate()).equals("")){
+					   requestDate = Utils.parse(l.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					}
+					if(requestDate != null && requestDate.before(currentDate) && !requestDate.equals(currentDate)){
+						  classLine ="lineW";
 					}else{
-						if("Y".equals(l.getPromotion1())){
-						  classLine = "lineP";
+						if(no%2==0){
+							if("Y".equals(l.getPromotion1())){
+							   classLine ="lineP";
+							}else{
+							   classLine ="lineE";
+							}
 						}else{
-						  classLine = "lineO";
+							if("Y".equals(l.getPromotion1())){
+							  classLine = "lineP";
+							}else{
+							  classLine = "lineO";
+							}
 						}
 					}
 					
@@ -389,8 +430,6 @@ function saveNewLineAuto(){
 						if(isShipment)
 							cannotEditTrips.add(""+l.getId());
 					}
-					
-					
 			%>
 			
 			<tr class="<%=classLine%>">
@@ -587,7 +626,14 @@ function saveNewLineAuto(){
 			</html:select>
 		</td>
 	</tr>
+	<tr>
+		<td colspan="4" align="center">
+		    &nbsp;&nbsp;&nbsp;
+			<input type="button" value="ปิดหน้าจอนี้" id="closePageBtn" onclick="closePageAction();" class="closeSpecialBtn">
+		</td>
+	</tr>
 </table>
+
 <br>
 <!--  -->
 <html:hidden property="order.priceListId" styleId="pricelistId"/>
@@ -604,6 +650,8 @@ function saveNewLineAuto(){
 <html:hidden property="newReqDate" styleId="newReqDate"/>
 <html:hidden property="editTripNo" styleId="editTripNo"/>
 <html:hidden property="editLineId" styleId="editLineId"/>
+<html:hidden property="order.totalOrderQty" styleId="totalOrderQty"/>
+
 <input type="hidden" name="memberVIP" value="${memberVIP}"/>
 <input type="hidden" name="lastTripNo" id="lastTripNo" value="<%=lastTripNo%>"/>
 <input type="hidden" name="tripNoCount" id="tripNoCount" value="<%=tripNoCount%>"/>

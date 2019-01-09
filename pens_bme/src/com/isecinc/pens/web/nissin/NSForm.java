@@ -15,12 +15,19 @@ public class NSForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
     private List<NSBean> results = new ArrayList<NSBean>();
-    private List<NSBean> resultsSearch = new ArrayList<NSBean>();
-
+    private NSBean summary ;
+    
     private String mode;
     private NSBean bean ;
     private NSBean beanCriteria ;
     
+    
+	public NSBean getSummary() {
+		return summary;
+	}
+	public void setSummary(NSBean summary) {
+		this.summary = summary;
+	}
 	public String getMode() {
 		return mode;
 	}
@@ -32,12 +39,6 @@ public class NSForm extends I_Form {
 	}
 	public void setResults(List<NSBean> results) {
 		this.results = results;
-	}
-	public List<NSBean> getResultsSearch() {
-		return resultsSearch;
-	}
-	public void setResultsSearch(List<NSBean> resultsSearch) {
-		this.resultsSearch = resultsSearch;
 	}
 	
 	public NSBean getBean() {

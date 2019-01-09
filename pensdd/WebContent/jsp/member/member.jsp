@@ -185,9 +185,13 @@ function paymentMethodChanged(paymentMethod,clearValue){
 							<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 								<tr>
 									<td width="25%" colspan="2" align="right">Copy จากสมาชิกเลขที่ </td>
-									<td width="20%"><html:text property="member.custCodeCopy"size="10" styleId="custCodeCopy"/>
+									<td width="20%" nowrap><html:text property="member.memberCodeCopy" size="10" 
+									styleId="memberCodeCopy"  styleClass="\" autoComplete=\"off" />
 									   <a href="#" onclick="copyMember('${pageContext.request.contextPath}');">
 									     <input type="button" value="Copy" class="newPosBtn">
+									   </a>
+									   <a href="#" onclick="viewMember('${pageContext.request.contextPath}');">
+									     <input type="button" value="Member Info" class="newPosBtn">
 									   </a>
 									</td>
 									

@@ -83,6 +83,8 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		int month = c.get(Calendar.MONTH)+1;
 		int year = c.get(Calendar.YEAR);
 		
+		logger.debug("month:"+month);
+		
 		StringBuffer whereClause = new StringBuffer();
 		whereClause.append(" AND User_ID = "+user.getId());
 		whereClause.append(" AND MONTH(TARGET_FROM) = "+month);
@@ -121,7 +123,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 				//Test 
 				//result.setTargetQty(stn.getBaseQty()+"/"+stn.getSubQty());
 				
-				logger.debug("Qty1:"+stn.getBaseQty()+",qty2:"+stn.getSubQty());
+				//logger.debug("Qty1:"+stn.getBaseQty()+",qty2:"+stn.getSubQty());
 				
 				result.setSalesQty(setQtyStr(stn.getProduct().getId()+"", stn.getBaseQty(), stn.getSubQty()) );
 				
@@ -133,7 +135,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			}
 		}
 		
-		// Include Order that don't have 
+		// Include Order that don't have Sales target
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT pd.product_id,pd.code as ProductCode , pd.Name as ProductName ,uom.UOM_ID , uom.Name as UOM_NAME \n")
 			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,IF(odl.promotion ='N',odl.Qty,0),0)) as BaseQty \n")
@@ -153,7 +155,8 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			
 			//.append("AND od.ar_invoice_no is not null \n")
 			.append("AND odl.Product_ID NOT IN \n")
-			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn WHERE stn.User_ID = ? AND month(stn.Target_From) = ?) \n");
+			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn "
+					+ "WHERE stn.User_ID = ? AND month(stn.Target_From) = ? AND year(stn.Target_From) ="+year+" ) \n");
 
 			if(p_productCodeFrom != null && p_productCodeFrom.length() >0)
 				sql.append(" AND pd.Code >= ? \n");
@@ -247,24 +250,24 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 	 }
 	 
 	 private double[] calcCTNQty(String productId,int qty1,int qty2,UOMConversion  uc2) throws Exception{
-		    logger.debug("CalcCTN QTY productId["+productId+"]");
+		    //logger.debug("CalcCTN QTY productId["+productId+"]");
 		    String ctnUomId = "CTN";
 			double[] priQty = new double[2];
 			UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(Integer.parseInt(productId),ctnUomId);
 		    
 		    if( uc2 != null){
-		        logger.debug("qty2["+qty2+"]( rate1["+uc1.getConversionRate()+"]/rate2["+uc2.getConversionRate()+"])");
+		       // logger.debug("qty2["+qty2+"]( rate1["+uc1.getConversionRate()+"]/rate2["+uc2.getConversionRate()+"])");
 		        
 		        if(uc2.getConversionRate() > 0){
 		        	double qty2Temp = qty2 / (uc1.getConversionRate()/uc2.getConversionRate()) ;
-		        	logger.debug("result divide["+qty2Temp+"]");
+		        	//logger.debug("result divide["+qty2Temp+"]");
 		        
 					double pcsQty = new Double(qty2Temp).intValue();
 		        	priQty[0] = qty1  +pcsQty;
 		        	
 		        	//‡»…
 		        	double qty2Temp2 = qty2 % (uc1.getConversionRate()/uc2.getConversionRate()) ;
-		        	logger.debug("result mod["+qty2Temp2+"]");
+		        	//logger.debug("result mod["+qty2Temp2+"]");
 					priQty[1] = qty2Temp2;
 					
 		        }else{

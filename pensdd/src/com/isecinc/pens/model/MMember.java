@@ -452,7 +452,8 @@ public class MMember extends I_Model<Member> {
 				member.getCreditCardNo(),
 				member.getCreditCardBank(),
 				member.getCardName(),
-				Utils.isNull(member.getOldPriceFlag())
+				Utils.isNull(member.getOldPriceFlag()),
+				member.getTotalOrderQty()
 				};
 		
 		
@@ -484,6 +485,10 @@ public class MMember extends I_Model<Member> {
 		// }
 		int ageMonth = member.getAgeMonth();
 		ageMonth += month;
+		
+		logger.debug("xx month:"+month);
+		logger.debug("xx ageMonth:"+ageMonth);
+		
 		if (ageMonth >= 0 && ageMonth <= 3) {
 			level = "R";
 		}

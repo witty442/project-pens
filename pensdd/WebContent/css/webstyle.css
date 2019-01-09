@@ -305,6 +305,15 @@ TABLE.result2 TD {
 	height: 25px;
 }
 
+.closeSpecialBtn {
+	font-weight: bold;
+	background-color: #B2DFEE;
+	color: #68838B;
+	height: 50px;
+	width: 210px;
+	font-size: 35px;
+}
+
 .newPosBtnLong {
 	font-weight: bold;
 	/**background-color: #1E90FF;**/

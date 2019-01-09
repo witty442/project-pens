@@ -46,6 +46,7 @@ legend {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/trip.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -84,6 +85,17 @@ function search(path,currPage){
 	form.submit();
 	return true;
 }
+function exportReport(path){
+	var salesrepCode = document.getElementById("salesrepCode");
+	 if(salesrepCode.value ==""){
+		 alert("กรุณาระบุ พนักงานขาย ");
+		 salesrepCode.focus();
+		 return false;
+	 }
+    document.locationForm.action = path + "/jsp/locationAction.do?do=exportReport";
+    document.locationForm.submit();
+    return true;
+}
 function gotoPage(path,currPage){
 	var form = document.locationForm;
 	form.action = path + "/jsp/locationAction.do?do=search&pageName=<%=request.getParameter("pageName")%>&currPage="+currPage;
@@ -111,6 +123,54 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 	var url = path + "/jsp/location/tripDetail.jsp?"+param;
 	PopupCenter(url,"Manage Cust Trip",800,700);
 	return true;
+}
+function validateTripDay(tripDayObj){
+	if(tripDayObj.value != ""){
+		//validate is number
+		if( !isNumPositive(tripDayObj)){
+			return false;
+		}
+		//validate x>0 and x<23
+		if(tripDayObj.value > 23 && tripDayObj.value != 98){
+			alert("ไม่สามารถระบุ จุดได้มากกว่าวันที่ 23");
+			tripDayObj.focus();
+			tripDayObj.value ="";
+			return false;
+		}
+		if(tripDayObj.value <= 0){
+			alert("ไม่สามารถระบุ จุดเป็น 0 ");
+			tripDayObj.focus();
+			tripDayObj.value ="";
+			return false;
+		}
+	}
+	return true;
+}
+function saveTripByCustAjax(index,customerCode){
+	var returnString = "";
+	var tripDay = document.getElementsByName("tripDay")[index];
+	var tripDay2 = document.getElementsByName("tripDay2")[index];
+	var tripDay3 = document.getElementsByName("tripDay3")[index];
+	
+	var param  ="&tripDay="+tripDay.value;
+	    param +="&tripDay2="+tripDay2.value;
+	    param +="&tripDay3="+tripDay3.value;
+	    
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/location/ajax/saveTripByCustAjax.jsp",
+			data : "customerCode=" + customerCode +param,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	
+	if(returnString =='บันทึกข้อมูลเรียบร้อย'){
+		alert(returnString);
+	}else{
+		alert(returnString +"\n"+"กรุณา กดบันทึกข้อมูล อีกครั้ง");
+	}
 }
 </script>
 </head>
@@ -175,7 +235,8 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 								    </html:select>
 									</td>
 									<td width="10%" align="right"><b>Trip/จุด</b></td>
-								    <td width="20%" align="left"> <html:text property="bean.tripDay"  styleId="tripDay" size="8"/></td>
+								    <td width="20%" align="left"> <html:text property="bean.tripDay"  styleId="tripDay" size="8"  
+								    styleClass="\" autoComplete=\"off"/></td>
 								    </tr>
 								   </table>
 								   </fieldset>
@@ -199,16 +260,10 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
                                      </td> 
 									<td width="10%" align="right" nowrap> <b>รหัสร้านค้า</b> </td>
 									<td width="15%" align="left"  nowrap>
-								       <html:text property="bean.customerCode"  styleId="customerCode" size="15"/>
+								       <html:text property="bean.customerCode"  styleId="customerCode" size="15" styleClass="\" autoComplete=\"off"/>
 									   <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerLocation')"/>   
 									</td>
 									<td width="25%" align="right" nowrap> 
-									<%--  <b>ประเภทร้านค้า</b>&nbsp;
-										     <html:select property="bean.customerType" styleId="customerType" styleClass="txt_style">
-									            <html:option value="">ร้านค้าทั้งหมด</html:option>
-									            <html:option value="P">ร้านโชห่วย</html:option>
-									            <html:option value="B">ร้านธงฟ้า</html:option>
-								            </html:select> --%>
 									</td>
 								    <td width="12%" align="left"></td>
 								    </tr>
@@ -223,16 +278,16 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body"  width="100%">
 						<tr>
 							<td align="center" width="80%">
-								<input type="button" value="ค้นหา" class="newPosBtnLong" 
+								<input type="button" value="  ค้นหา  " class="newPosBtnLong" 
 								onclick="search('${pageContext.request.contextPath}','')">
-								 &nbsp;&nbsp;
+								 &nbsp;
 								<input type="button" value="เพิ่มรายการใหม่" class="newPosBtnLong" 
 								onclick="viewTripDetail('${pageContext.request.contextPath}','','<%=Utils.isNull(request.getParameter("currPage"))%>','')"> 
-								 &nbsp;&nbsp;
+								 &nbsp;
 								 <input type="button" value=" Export " class="newPosBtnLong" 
 								 onclick="exportReport('${pageContext.request.contextPath}')">
-								 &nbsp;&nbsp;
-								<input type="button" value="Clear" class="newPosBtnLong" onclick="clearForm('${pageContext.request.contextPath}')">
+								 &nbsp;
+								<input type="button" value="  Clear  " class="newPosBtnLong" onclick="clearForm('${pageContext.request.contextPath}')">
 							 <!--  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>จุด 99 (ยังไม่มีการ เซต trip/จุด)</b> -->
 							
 							</td>
@@ -262,7 +317,11 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 			            <th>หมายเลขลูกค้า</th>
 						<th>ชื่อ</th>
 						<th>ที่อยู่</th>
-						<th>Action</th>
+						<!-- <th>Action</th> -->
+						<th>จุด 1</th>
+						<th>จุด 2</th>
+						<th>จุด 3</th>
+						<th>บันทึกการแก้ไข</th>
 					</tr>
 					<% 
 					String tabclass ="lineE";
@@ -274,13 +333,30 @@ function viewTripDetail(path,customerCode,currTrip,salesrepId){
 						}
 						%>
 							<tr class="<%=tabclass%>">
-							    <td class="td_text_center" width="5%"><%=(n+1)%></td>
-								<td class="td_text" width="10%"><%=mc.getCustomerCode()%></td>
-								<td class="td_text" width="15%"><%=mc.getCustomerName()%></td>
-								<td class="td_text" width="20%"><%=mc.getAddress()%></td>
-								<td class="td_text_center" width="10%">
+							    <td class="td_text_center" width="4%"><%=(n+1)%></td>
+								<td class="td_text" width="8%"><%=mc.getCustomerCode()%></td>
+								<td class="td_text" width="10%"><%=mc.getCustomerName()%></td>
+								<td class="td_text" width="25%"><%=mc.getAddress()%></td>
+								<%-- <td class="td_text_center" width="10%">
 							     <a  href="javascript:viewTripDetail('${pageContext.request.contextPath}','<%=mc.getCustomerCode()%>','','<%=mc.getSalesrepCode()%>')">แก้ไข/ดู</a>
+								</td> --%>
+								<td class="td_text_center" width="5%">
+								   <input type="text" name="tripDay" value="<%=mc.getTripDay()%>" 
+								    onblur="validateTripDay(this)" size ="3" class="enableNumber" autocomplete="off"/>
 								</td>
+								<td class="td_text_center" width="5%">
+								   <input type="text" name="tripDay2" value="<%=mc.getTripDay2()%>" 
+								    onblur="validateTripDay(this)" size ="3" class="enableNumber"  autocomplete="off"/>
+								</td>
+								<td class="td_text_center" width="5%">
+								   <input type="text" name="tripDay3" value="<%=mc.getTripDay3()%>" 
+								    onblur="validateTripDay(this)" size ="3" class="enableNumber"  autocomplete="off"/>
+								</td>
+							    <td class="td_text_center" width="8%">
+							       <b>
+							        <a href="javascript:saveTripByCustAjax(<%=n %>,'<%=mc.getCustomerCode()%>')">บันทึก</a>
+							      </b>
+								</td> 
 							</tr>
 					    <%} %>
 					</table>

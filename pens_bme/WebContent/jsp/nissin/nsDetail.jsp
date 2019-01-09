@@ -48,36 +48,6 @@ System.out.println("Bean:"+bean.getChannelId());
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-
-.day {
-  width: 14%;
-}
-.holiday {
-  width: 14%;
-  background-color: #F78181;
-}
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -232,20 +202,16 @@ function loadProvince(){
 									</td>
 								</tr>
 							<tr>
-                                    <td align="right"> 
-                                      ID
-                                    </td>
-									<td align="left">
-									   <html:text property="bean.orderId" styleClass="disableText" styleId="orderId"/>
-									</td>
+                                <td align="right">ID</td>
+								<td align="left">
+								   <html:text property="bean.orderId" styleClass="disableText" styleId="orderId"/>
+								</td>
 								</tr>
 						     <tr>
-                                    <td align="right"> Date
-                                      
-                                    </td>
+                                    <td align="right"> Date </td>
 									<td align="left"><html:text property="bean.orderDate" styleClass="disableText" readonly="true" styleId="orderDate"/>
 									
-									    Type <font color="red">*</font>
+									    Catagory <font color="red">*</font>
 										 <html:select property="bean.customerType" styleId="customerType" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
@@ -255,10 +221,15 @@ function loadProvince(){
 								    Region <font color="red">*</font>
 										  <html:select property="bean.channelId" styleId="channelId" onchange="loadProvince();">
 											<html:options collection="channelList" property="code" labelProperty="desc"/>
-									    </html:select>
+									     </html:select>
 									    
 									    Province <font color="red">*</font>
 									      <html:select property="bean.provinceId" styleId="provinceId" >
+									    </html:select> 
+									    &nbsp;&nbsp;
+									     Type <font color="red"></font>
+									      <html:select property="bean.customerSubType" styleId="customerSubType" >
+									        <html:options collection="customerSubTypeList" property="conValue" labelProperty="conDisp"/>
 									    </html:select> 
 									</td>
 								</tr>
@@ -266,34 +237,34 @@ function loadProvince(){
                                     <td  align="right"> Customer Name<font color="red">*</font>
 									</td>
 									<td align="left">
-									    <html:text property="bean.customerName" styleClass="" styleId="customerName"  size="150" maxlength="200"></html:text>
+									    <html:text property="bean.customerName" styleClass="\" autoComplete=\"off" styleId="customerName"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td align="right"> Address Line1 
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine1" styleClass="" styleId="addressLine1"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine1" styleClass="\" autoComplete=\"off" styleId="addressLine1"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Address Line2  
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine2" styleClass="" styleId="addressLine2"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine2" styleClass="\" autoComplete=\"off" styleId="addressLine2"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Phone Number<font color="red">*</font>
 									</td>
 									<td align="left">
-									  <html:text property="bean.phone" styleClass="" styleId="phone" size="20"></html:text>
+									  <html:text property="bean.phone" styleClass="\" autoComplete=\"off" styleId="phone" size="20"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Remark1 </td>
 									<td align="left">
-									   <html:text property="bean.remark" styleClass="" styleId="remark" size="150" maxlength="200"></html:text>
+									   <html:text property="bean.remark" styleClass="\" autoComplete=\"off" styleId="remark" size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								

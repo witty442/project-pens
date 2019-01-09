@@ -230,15 +230,15 @@ public class Member extends I_PO implements Serializable {
 	private String oldPriceFlag;
     private int totalOrderQty;
     
-    private String custCodeCopy;
+    private String memberCodeCopy;
     
     
-	public String getCustCodeCopy() {
-		return custCodeCopy;
+	public String getMemberCodeCopy() {
+		return memberCodeCopy;
 	}
 
-	public void setCustCodeCopy(String custCodeCopy) {
-		this.custCodeCopy = custCodeCopy;
+	public void setMemberCodeCopy(String memberCodeCopy) {
+		this.memberCodeCopy = memberCodeCopy;
 	}
 
 	public int getTotalOrderQty() {

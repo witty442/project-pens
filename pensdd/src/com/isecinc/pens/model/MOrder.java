@@ -57,7 +57,52 @@ public class MOrder extends I_Model<Order> {
 	public Order find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Order.class);
 	}
+	public Order findOpt(String id) throws Exception {
+		Connection conn = null;
+		try{
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			return findOpt(conn, id);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+	}
+	public Order findOpt(Connection conn,String id) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Order o = null;
+		String sql = "";
+		boolean valid = true;
+		try{
+			sql  = "select o.* \n";
+			sql += ",(select total_order_qty from m_customer m where m.customer_id = o.customer_id) as total_order_qty \n";
+			sql += " from t_order o where order_id = "+id +" \n";
+			logger.debug("sql :"+sql);
+			
+			ps = conn.prepareStatement(sql);
+		    rs = ps.executeQuery();
+		    while(rs.next()){
+		    	o = new Order(rs);
+		    	o.setTotalOrderQty(rs.getInt("total_order_qty"));
 
+		    	//validate qty in order_line by trip) vs totalOrderQty= 
+		    	o.setValidQty(validateQty(conn, rs.getInt("total_order_qty"), o.getId()));
+		    }
+		    return o;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(rs != null){
+				rs.close();rs=null;
+			}
+		}
+	}
 	/**
 	 * Search
 	 * 
@@ -73,6 +118,58 @@ public class MOrder extends I_Model<Order> {
 		Order[] array = new Order[pos.size()];
 		array = pos.toArray(array);
 		return array;
+	}
+	
+	public Order[] searchOpt(String whereCause) throws Exception {
+		Connection conn = null;
+		try{
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			return searchOpt(conn, whereCause);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+	}
+	public Order[] searchOpt(Connection conn,String whereCause) throws Exception {
+		List<Order> pos = new ArrayList<Order>();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Order o = null;
+		String sql = "";
+		try{
+			sql  = "select o.* \n";
+			sql += ",(select total_order_qty from m_customer m where m.customer_id = o.customer_id) as total_order_qty \n";
+			sql += " from t_order o where 1=1 \n"+whereCause;
+			
+			logger.debug("sql :"+sql);
+			
+			ps = conn.prepareStatement(sql);
+		    rs = ps.executeQuery();
+		    while(rs.next()){
+		    	o = new Order(rs);
+		    	o.setTotalOrderQty(rs.getInt("total_order_qty"));
+		    	
+		    	//validate qty in order_line by trip) vs totalOrderQty= 
+		    	o.setValidQty(validateQty(conn, rs.getInt("total_order_qty"), o.getId()));
+		    	
+		    	pos.add(o);
+		    }
+			Order[] array = new Order[pos.size()];
+			array = pos.toArray(array);
+			return array;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(rs != null){
+				rs.close();rs=null;
+			}
+		}
 	}
 
 	/**
@@ -503,7 +600,38 @@ public class MOrder extends I_Model<Order> {
 		Order[] ret = new Order[orderL.size()];
 		return orderL.toArray(ret);
 	}
-
+	
+	//validate input qty by trip vs total_order_qty(m_customer)
+	public String validateQty(Connection conn,int totalOrderQty ,int orderId) throws Exception  {
+		PreparedStatement ppstmt = null;
+		ResultSet rset =  null;
+		String valid = "Y";
+		String sql = "SELECT trip_no ,sum(coalesce(qty,0)) as qty FROM t_order_line \n"
+				+ " WHERE order_id = "+orderId+"  and iscancel <> 'Y' \n";
+		try {
+			   ppstmt = conn.prepareStatement(sql);
+			   rset =  ppstmt.executeQuery();
+			   if(rset.next()){
+					if(rset.getInt("qty") != totalOrderQty){
+						valid = "N";
+					}
+				}
+				return valid;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				if(ppstmt != null){
+					ppstmt.close();
+					ppstmt = null;
+				}
+				if(rset != null){
+					rset.close();
+					rset = null;
+				}
+			} catch (Exception e2) {}
+		}
+	}
 	public List<OrderLine> saveNewLineAuto(Order orders,User user,Connection conn) throws Exception  {
 		PreparedStatement ppstmt = null;
 		ResultSet rs = null;

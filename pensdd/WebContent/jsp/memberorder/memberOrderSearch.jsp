@@ -82,11 +82,15 @@ body {
 							<tr>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="order.orderNo" styleId="orderNo" size="20" maxlength="20" tabindex="1" onkeypress="nextKeypress(event)"/>
+									<html:text property="order.orderNo" styleId="orderNo" size="20" 
+									 styleClass="\" autoComplete=\"off" 
+									 maxlength="20" tabindex="1" onkeypress="nextKeypress(event)"/>
 								</td>
 								<td align="right"><bean:message key="Member.Code" bundle="sysele" /></td>
 								<td align="left">
-									<html:text property="order.memberCode" styleId="memberCode" size="20" maxlength="20" tabindex="2" onkeypress="searchKeypress(event,'${pageContext.request.contextPath}')"/>
+									<html:text property="order.memberCode" styleId="memberCode" size="20" 
+									maxlength="20" tabindex="2"  styleClass="\" autoComplete=\"off" 
+									onkeypress="searchKeypress(event,'${pageContext.request.contextPath}')"/>
 								</td>
 							</tr>
 						</table>
@@ -117,6 +121,7 @@ body {
 									<th class="status"><bean:message key="Interfaces" bundle="sysele"/></th>
 									<th class="status"><bean:message key="Order.Paid" bundle="sysele"/></th>
 									<th class="status"><bean:message key="Status" bundle="sysele" /></th>
+									<!-- <th class="status">ʶҹе�Ǩ�ͺ�ӹǹ�Ǵ</th> -->
 									<th class="status"><bean:message key="Edit" bundle="sysprop" /></th>
 								</tr>	
 							<c:forEach var="results" items="${orderForm.results}" varStatus="rows">
@@ -157,6 +162,14 @@ body {
 										</c:if>
 									</td>
 									<td align="center">${results.docStatusLabel}</td>
+									<%-- <td align="center">
+										<c:if test="${results.validQty=='Y'}">
+										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+										</c:if>
+										<c:if test="${results.validQty=='N'}">
+										<img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif">
+										</c:if>
+									</td> --%>
 									<td align="center">
 										<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','${results.id}');">
 										<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>

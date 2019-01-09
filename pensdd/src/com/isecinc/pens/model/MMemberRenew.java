@@ -7,6 +7,7 @@ import java.util.List;
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.MemberRenew;
 import com.isecinc.pens.process.SequenceProcess;
 
@@ -39,7 +40,14 @@ public class MMemberRenew extends I_Model<MemberRenew> {
 	public MemberRenew find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, MemberRenew.class);
 	}
-
+	
+	public MemberRenew findByIdLastRenew(String customerId) throws Exception {
+		String whereCause = "";
+		whereCause += " AND customer_id = " + customerId + " \n order by expired_date desc";
+		MemberRenew[] pos = search(whereCause);
+		if (pos != null) return pos[0];
+		return null;
+	}
 	/**
 	 * Search
 	 * 

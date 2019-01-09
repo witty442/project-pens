@@ -226,8 +226,26 @@ public class Order extends I_PO implements Serializable {
 	
 	private List<OrderLine> orderLineList;
 	private String oldPriceFlag;
+	private String validQty;
+	private int totalOrderQty;
 	
 	
+	public int getTotalOrderQty() {
+		return totalOrderQty;
+	}
+
+	public void setTotalOrderQty(int totalOrderQty) {
+		this.totalOrderQty = totalOrderQty;
+	}
+
+	public String getValidQty() {
+		return validQty;
+	}
+
+	public void setValidQty(String validQty) {
+		this.validQty = validQty;
+	}
+
 	public String getOldPriceFlag() {
 		return oldPriceFlag;
 	}

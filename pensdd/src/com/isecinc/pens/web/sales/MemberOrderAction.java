@@ -59,16 +59,18 @@ public class MemberOrderAction extends OrderAction {
 			OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
 			orderForm.setCriteria(criteria);
 			String whereCause = "";
-			whereCause += "  and order_type = '" + user.getOrderType().getKey() + "' ";
-			whereCause += "  and doc_status = 'SV' ";
+			whereCause += "  and order_type = '" + user.getOrderType().getKey() + "' \n";
+			whereCause += "  and doc_status = 'SV' \n";
 			if (orderForm.getOrder().getOrderNo().trim().length() > 0)
-				whereCause += "  and order_no like '" + orderForm.getOrder().getOrderNo().trim() + "%' ";
+				whereCause += "  and order_no like '" + orderForm.getOrder().getOrderNo().trim() + "%' \n";
 			if (orderForm.getOrder().getMemberCode().trim().length() > 0)
 				whereCause += "  and customer_id in (select customer_id from m_customer where code = '"
-						+ orderForm.getOrder().getMemberCode().trim() + "') ";
+						+ orderForm.getOrder().getMemberCode().trim() + "') \n";
+			
+			whereCause  += " order by ORDER_DATE desc \n";
 			
 			MOrder orderService = new MOrder();
-			Order[] ords = orderService.search(whereCause);
+			Order[] ords = orderService.searchOpt(whereCause);
 
 			if (ords != null) {
 				ords = orderService.setSummaryNeedBill(ords);
@@ -79,6 +81,7 @@ public class MemberOrderAction extends OrderAction {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 		}
@@ -103,7 +106,7 @@ public class MemberOrderAction extends OrderAction {
 			MOrder orderService = new MOrder();
 			MCustomer customerService = new MCustomer();
 			
-			Order order = orderService.find(id);
+			Order order = orderService.findOpt(id);
 			Order[] orders = new Order[1];
 			orders[0]=order;
 			order = orderService.setSummaryNeedBill(orders)[0];

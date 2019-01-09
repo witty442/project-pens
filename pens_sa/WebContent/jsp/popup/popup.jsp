@@ -42,7 +42,13 @@
     }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
       || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
       || "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName) ){
-    	headName = "ร้านค้า("+pageName+")";
+    	
+    	if("CustomerLocNoTrip".equalsIgnoreCase(pageName)){
+    	  headName = "<span title='"+pageName+"'>ร้านค้า(ที่ยังไม่การกำหนด จุด/Trip)</span>";
+    	}else{
+    	  headName = "<span title='"+pageName+"'>ร้านค้า("+pageName+")</span>";
+    	}
+    	
     	codeSearchTxtName = "Customer Code";
     	descSearchTxtName = "Customer Name";
     }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
@@ -258,13 +264,13 @@ window.onload = function(){
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b><%=codeSearchTxtName %></b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
+		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
 		<input type="button" name="search"  class="newPosBtnLong"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td nowrap><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
+		<td ><html:text property="descSearch"  size="60" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
 	</tr>
 </table>
 

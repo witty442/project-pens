@@ -25,8 +25,13 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.NSBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.NSDAO;
+import com.isecinc.pens.dao.constants.ConstantBean;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.popup.PopupForm;
+import com.isecinc.pens.web.shop.ShopBean;
+import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
 import com.pens.util.ReportUtilServlet;
@@ -54,17 +59,30 @@ public class NSAction extends I_Action {
 			String page = Utils.isNull(request.getParameter("page"));
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
-				aForm.setResultsSearch(null);
+				aForm.setResults(null);
 				NSBean ad = new NSBean();
 				ad.setNoPicRcv("true");
 				ad.setCreateUser(user.getUserName());
-				
 				aForm.setBean(ad);
+				
+				//prepare session
+				List<PopupForm> billTypeList = new ArrayList<PopupForm>();
+				PopupForm ref = new PopupForm("",""); 
+				billTypeList.add(ref);
+				billTypeList.addAll(NSDAO.searchChannelList(new PopupForm(),""));
+				request.getSession().setAttribute("channelList",billTypeList);
+				
+				//customerSubType
+				List<ConstantBean> customerSubTypeList = new ArrayList<ConstantBean>();
+				ConstantBean blank = new ConstantBean("","","",""); 
+				customerSubTypeList.add(blank);
+				customerSubTypeList.addAll(ControlConstantsDB.getCondList(ControlConstantsDB.NS_CUTSOMER_SUB_TYPE));
+				request.getSession().setAttribute("customerSubTypeList",customerSubTypeList);
+				
 			}else if("back".equals(action)){
 				NSBean cri  = aForm.getBeanCriteria();
-				//cri.setDocNo("");
-				aForm.setBean(NSDAO.searchHead(cri,false,page));
-				aForm.setResultsSearch(aForm.getBean().getItems());
+				aForm.setBean(cri);
+				search(mapping, aForm, request, response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,43 +92,95 @@ public class NSAction extends I_Action {
 		return mapping.findForward("search");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("search2");
-		NSForm aForm = (NSForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-		    String action = Utils.isNull(request.getParameter("action"));
-		    if( "newsearch".equalsIgnoreCase(action)){
+	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+			logger.debug("searchPromotion");
+			NSForm aForm = (NSForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			String msg = "";
+			int currPage = 1;
+			boolean allRec = false;
+			Connection conn = null;
+			try {
+				String action = Utils.isNull(request.getParameter("action"));
+				logger.debug("action:"+action);
 				String page = Utils.isNull(request.getParameter("page"));
 				
-				aForm.setBean(NSDAO.searchHead(aForm.getBean(),false,page));
-				
-				aForm.setResultsSearch(aForm.getBean().getItems());
-	
-				if(aForm.getResultsSearch().size() <=0){
-				   request.setAttribute("Message", "ไม่พบข้อมูล");
-				   aForm.setResultsSearch(null);
+				conn = DBConnection.getInstance().getConnection();
+				if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+					//case  back
+					if("back".equalsIgnoreCase(action)){
+						aForm.setBean(aForm.getBeanCriteria());
+					}
+					//default currPage = 1
+					aForm.setCurrPage(currPage);
+					
+					//get Total Record
+					aForm.setTotalRecord(NSDAO.searchHeadTotalRecList(conn,aForm.getBean()));
+					//calc TotalPage
+					aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > aForm.getTotalRecord()){
+					   endRec = aForm.getTotalRecord();
+				    }
+				    aForm.setStartRec(startRec);
+				    aForm.setEndRec(endRec);
+				    
+					//get Items Show by Page Size
+					List<NSBean> items = NSDAO.searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,page);
+					aForm.setResults(items);
+					
+					if(items.size() <=0){
+					   request.setAttribute("Message", "ไม่พบข้อมูล");
+					   aForm.setResults(null);
+					}else{
+						if(aForm.getTotalPage()==aForm.getCurrPage()){
+							aForm.setSummary(NSDAO.searchHeadSummary(conn, aForm.getBean()));
+						}
+					}
+					
+				}else{
+					// Goto from Page
+					currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+					logger.debug("currPage:"+currPage);
+					
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > aForm.getTotalRecord()){
+					   endRec = aForm.getTotalRecord();
+				    }
+				    aForm.setStartRec(startRec);
+				    aForm.setEndRec(endRec);
+				    
+					//get Items Show by Page Size
+					List<NSBean> items = NSDAO.searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,page);
+					aForm.setResults(items);
+					
+					if(aForm.getTotalPage()==aForm.getCurrPage()){
+						aForm.setSummary(NSDAO.searchHeadSummary(conn, aForm.getBean()));
+					}
 				}
-		    }
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
+			} catch (Exception e) {
+				e.printStackTrace();
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+						+ e.getMessage());
+				throw e;
+			}finally{
+				if(conn != null){
+					conn.close();
+				}
+			}
+			return "search";
 		}
-		return mapping.findForward("search");
-	}
-	
-
+	 
 	public ActionForward clear2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear2");
 		NSForm aForm = (NSForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			aForm.setResultsSearch(null);
+			aForm.setResults(null);
 			aForm.setBean(new NSBean());
 			
 			NSBean ad = new NSBean();
@@ -142,10 +212,9 @@ public class NSAction extends I_Action {
 			logger.debug("prepare edit docNo:"+orderId +",mode:"+mode);
 		
 			NSBean c = new NSBean();
-			
 			if( !Utils.isNull(orderId).equals("")){
 			   c.setOrderId(orderId);
-			   NSBean bean = NSDAO.searchHead(c,true,page).getItems().get(0);
+			   NSBean bean = NSDAO.searchNissinOrder(c,page);
 			   bean.setMode(mode);
 			   
 			   aForm.setBean(bean);
@@ -186,31 +255,7 @@ public class NSAction extends I_Action {
 		return "detail";
 	}
 
-	/**
-	 * Search
-	 */
-	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		NSForm orderForm = (NSForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			NSBean aS = null;//AdjustStockDAO.search(orderForm.getAdjustStock());
-			//orderForm.setResults(aS.getItems());
-
-			orderForm.setBean(aS);
-			
-			request.setAttribute("Message", msg);
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return "search";
-	}
-
+	
 	/**
 	 * Save
 	 */
@@ -237,10 +282,7 @@ public class NSAction extends I_Action {
 			}
 			
 			//Search Again
-			NSBean result = NSDAO.searchHead(conn,h,true,page);
-			logger.debug("Size:"+result.getItems());
-			
-			NSBean bean = result.getItems().get(0);
+			NSBean bean =NSDAO.searchNissinOrder(conn,h,page);
 		
 		    aForm.setBean(bean);
 			
@@ -282,7 +324,7 @@ public class NSAction extends I_Action {
 			NSDAO.updateStatusRTNControl(conn, h);
 			
 			//Search Again
-			NSBean bean = NSDAO.searchHead(conn,h,true,page).getItems().get(0);
+			NSBean bean = NSDAO.searchNissinOrder(conn,h,page);
 		    aForm.setBean(bean);
 			
 			conn.commit();
@@ -321,7 +363,7 @@ public class NSAction extends I_Action {
 			//Search Again
 			NSBean cri = new NSBean();
 			cri.setOrderId(h.getOrderId());
-			NSBean bean = NSDAO.searchHead(conn,cri,true,page).getItems().get(0);
+			NSBean bean =  NSDAO.searchNissinOrder(conn,cri,page);//NSDAO.searchHead(conn,cri,true,page).getItems().get(0);
 		    aForm.setBean(bean);
 			
 			conn.commit();
@@ -376,7 +418,7 @@ public class NSAction extends I_Action {
 			NSBean c = new NSBean();
 			c.setOrderId(orderId);
 			if( !Utils.isNull(orderId).equals("")){
-			  NSBean bean = NSDAO.searchHead(c,true,page).getItems().get(0);
+			  NSBean bean = NSDAO.searchNissinOrder(c,page);;//NSDAO.searchHead(c,true,page).getItems().get(0);
 			 
 			  aForm.setBean(bean);
 			}
@@ -420,7 +462,7 @@ public class NSAction extends I_Action {
 			NSDAO.updateNissinOrderByPens(conn, h);
 			
 			//Search Again
-			NSBean bean = NSDAO.searchHead(conn,h,true,page).getItems().get(0);
+			NSBean bean =NSDAO.searchNissinOrder(conn,h,page);;// NSDAO.searchHead(conn,h,true,page).getItems().get(0);
 			
 		    aForm.setBean(bean);
 			
@@ -466,7 +508,7 @@ public class NSAction extends I_Action {
 			logger.debug("fileType:"+fileType);
 			
 			conn = DBConnection.getInstance().getConnection();
-			NSBean bean = NSDAO.searchHead(conn,repoNSForm.getBean(),true,page);
+			NSBean bean = NSDAO.searchNissinOrder(conn,repoNSForm.getBean(),page);//NSDAO.searchHead(conn,repoNSForm.getBean(),true,page);
 		   
 			if(bean != null && bean.getItems() != null && bean.getItems().size() >0){
 				//Gen Report
@@ -497,14 +539,15 @@ public class NSAction extends I_Action {
 			HttpServletResponse response) {
 		
 		logger.debug("exportToExcel: ");
+		Connection conn = null;
 		NSForm repoNSForm = (NSForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		Connection conn = null;
 		StringBuffer h = new StringBuffer("");
 		int colSpan = 6;
 		try {
+			conn = DBConnection.getInstance().getConnection();
 			//logger.debug("ReqPickStock:"+h);
-			List<NSBean> resultList = repoNSForm.getResultsSearch();
+			List<NSBean> resultList = NSDAO.searchHeadList(conn, repoNSForm.getBean(), true, 0, 0,"");
 				
 			if(resultList != null && resultList.size()>0){
 					
@@ -529,7 +572,8 @@ public class NSAction extends I_Action {
 					h.append("<th>Cup72 (CTN)</th>\n");
 					h.append("<th>Cup72 (CUP)</th>\n");
 					h.append("<th>BAG (CTN)</th>\n");
-					h.append("<th>BAG (BAG)</th>\n");
+					h.append("<th>BAG (PAC 6)</th>\n");
+					h.append("<th>BAG (PAC 10)</th>\n");
 					h.append("<th>Pooh72 (CTN)</th>\n");
 					h.append("<th>Pooh72 (CUP)</th>\n");
 					
@@ -538,35 +582,51 @@ public class NSAction extends I_Action {
 			h.append("</tr> \n");
 
 			  for(int n=0;n<resultList.size();n++){
-				NSBean mc = (NSBean)resultList.get(n);
+				   NSBean mc = (NSBean)resultList.get(n);
 					h.append("<tr> \n");
 					h.append("<td>"+mc.getOrderId() +"</td>");
-					h.append("<td>"+mc.getStatusDesc()+"</td>"); 
+					h.append("<td class='text'>"+mc.getStatusDesc()+"</td>"); 
 					h.append("<td>"+mc.getOrderDate() +"</td>");
-					h.append("<td>"+mc.getCustomerType()+"</td>");
-					h.append("<td>"+mc.getCustomerCode()+"</td>");
-				    h.append("<td>"+mc.getCustomerName()+"</td>");
-				    h.append("<td>"+mc.getChannelName()+"</td>");
-				    h.append("<td>"+mc.getProvinceName()+"</td>");
-				    h.append("<td>"+mc.getAddressLine1() +"</td>");
-				    h.append("<td>"+mc.getAddressLine2()+"</td>");
-					h.append("<td>"+mc.getPhone()+"</td>");
-					h.append("<td>"+mc.getInvoiceNo()+"</td>");
+					h.append("<td class='text'>"+mc.getCustomerType()+"</td>");
+					h.append("<td class='text'>"+mc.getCustomerCode()+"</td>");
+				    h.append("<td class='text'>"+mc.getCustomerName()+"</td>");
+				    h.append("<td class='text'>"+mc.getChannelName()+"</td>");
+				    h.append("<td class='text'>"+mc.getProvinceName()+"</td>");
+				    h.append("<td class='text'>"+mc.getAddressLine1() +"</td>");
+				    h.append("<td class='text'>"+mc.getAddressLine2()+"</td>");
+					h.append("<td class='text'>"+mc.getPhone()+"</td>");
+					h.append("<td class='text'>"+mc.getInvoiceNo()+"</td>");
 					h.append("<td>"+mc.getInvoiceDate()+"</td>");
 					h.append("<td>"+mc.getSaleCode()+"</td>");
 					h.append("<td>"+mc.getCupQty()+"</td>");
 					h.append("<td>"+mc.getCupNQty()+"</td>");
 					h.append("<td>"+mc.getPacQty()+"</td>");
 					h.append("<td>"+mc.getPacNQty()+"</td>");
+					h.append("<td>"+mc.getPac10Qty()+"</td>");
 					h.append("<td>"+mc.getPoohQty()+"</td>"); 
 					h.append("<td>"+mc.getPoohNQty()+"</td>"); 
 					
-					h.append("<td>"+mc.getRemark()+"</td>"); 
-					h.append("<td>"+mc.getPendingReason()+"</td>"); 
+					h.append("<td class='text'>"+mc.getRemark()+"</td>"); 
+					h.append("<td class='text'>"+mc.getPendingReason()+"</td>"); 
 				    h.append("</tr>");
 				}
-				
-			  h.append("</table>");
+			
+			    //Get Summary
+			    NSBean summary = NSDAO.searchHeadSummary(conn, repoNSForm.getBean());
+			    if(summary !=null){
+			    	h.append("<tr>");
+			    	h.append("<td class='colum_head' colspan='15'>Total</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getCupQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getCupNQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPacQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPacNQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPac10Qty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPoohQty()+"</td>"); 
+					h.append("<td class='num_currency_bold'>"+summary.getPoohNQty()+"</td>"); 
+					h.append("<td colspan='2'></td>"); 
+				    h.append("</tr>");
+			    }
+			    h.append("</table>");
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 				response.setContentType("application/vnd.ms-excel");

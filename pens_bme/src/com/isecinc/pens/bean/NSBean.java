@@ -25,6 +25,7 @@ public class NSBean implements Serializable{
 	
 	private String customerCode;
 	private String customerType;
+	private String customerSubType;
 	private String customerName;
 	private String addressLine1;
 	private String addressLine2;
@@ -41,7 +42,8 @@ public class NSBean implements Serializable{
 	private String poohQty;
 	
 	private String cupNQty;
-	private String pacNQty;
+	private String pacNQty;//equals pac 6
+	private String pac10Qty;
 	private String poohNQty;
 	
 	private String status;
@@ -58,6 +60,22 @@ public class NSBean implements Serializable{
     private NSBean summary;
 	
     
+	public String getPac10Qty() {
+		return pac10Qty;
+	}
+
+	public void setPac10Qty(String pac10Qty) {
+		this.pac10Qty = pac10Qty;
+	}
+
+	public String getCustomerSubType() {
+		return customerSubType;
+	}
+
+	public void setCustomerSubType(String customerSubType) {
+		this.customerSubType = customerSubType;
+	}
+
 	public NSBean getSummary() {
 		return summary;
 	}

@@ -128,6 +128,12 @@ function save(path) {
 			//return;
 		//}
 	
+	if(document.getElementsByName('member.totalOrderQty')[0].value <= 0 ){
+		alert('กรุณาระบุจำนวนขวดรวม');
+		document.getElementsByName('member.totalOrderQty')[0].focus();
+		return false;
+	} 
+	
 	if(!createAddressList()){return false;}
 	if(!createContactList()){return false;}
 	
@@ -146,15 +152,30 @@ function clearForm(path){
 	return true;
 }
 function copyMember(path){
-	if(document.getElementById('custCodeCopy').value ==""){
-		alert("กรุณาระบุ รหัสลูกค้าที่ต้องการ Copy");
-		document.getElementById('custCodeCopy').focus();
+	if(confirm("ยืนยัน Copy ข้อมูลสมาชิก")){
+		if(document.getElementById('memberCodeCopy').value ==""){
+			alert("กรุณาระบุ รหัสลูกค้าที่ต้องการ Copy");
+			document.getElementById('memberCodeCopy').focus();
+			return false;
+	    }
+		document.memberForm.action = path + "/jsp/memberAction.do?do=copyMember&memberCodeCopy="+document.getElementById('memberCodeCopy').value;
+		document.memberForm.submit();
+		return true;
+	}
+	return false;
+}
+
+function viewMember(path){
+	if(document.getElementById('memberCodeCopy').value ==""){
+		alert("กรุณาระบุ รหัสลูกค้าที่ต้องการ ดูข้อมูล");
+		document.getElementById('memberCodeCopy').focus();
 		return false;
     }
-	document.memberForm.action = path + "/jsp/memberAction.do?do=copyMember&custCodeCopy="+document.getElementById('custCodeCopy').value;
+	document.memberForm.action = path + "/jsp/memberAction.do?do=viewMember&memberCodeCopy="+document.getElementById('memberCodeCopy').value;
 	document.memberForm.submit();
 	return true;
 }
+
 /** ADDRESS **/
 function open_address(path, rowNo, type){
 	if(rowNo==null)

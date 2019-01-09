@@ -1,13 +1,12 @@
+<%@page import="com.isecinc.pens.web.rt.RTConstant"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Date"%>
 <%@page import="com.isecinc.pens.web.nissin.NSAction"%>
 <%@page import="com.isecinc.pens.web.nissin.NSConstant"%>
 <%@page import="com.isecinc.pens.dao.NSDAO"%>
-<%@page import="com.isecinc.pens.web.rt.RTConstant"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.bean.NSBean"%>
-<%@page import="com.isecinc.pens.bean.PayBean"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -17,7 +16,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -27,13 +25,8 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
-
 <%
-String dateSession = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
 int pageNumber = 1;
 
 String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
@@ -45,18 +38,11 @@ System.out.println("screenHeight:"+screenHeight);
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRole().getKey();
 
-if(session.getAttribute("channelList") == null){
-	List<PopupForm> billTypeList = new ArrayList();
-	PopupForm ref = new PopupForm("",""); 
-	billTypeList.add(ref);
-	billTypeList.addAll(NSDAO.searchChannelList(new PopupForm(),""));
-	session.setAttribute("channelList",billTypeList);
-}
-
 %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<meta charset='utf-8'>
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 
@@ -68,27 +54,7 @@ if(session.getAttribute("channelList") == null){
 <%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css" /> --%>
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
 
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 #scroll {
     width:<%=screenWidth%>px;
     height:<%=screenHeight%>px;
@@ -122,12 +88,16 @@ function clearForm(path){
 
 function search(path){
 	var form = document.nsForm;
-	
-	form.action = path + "/jsp/nsAction.do?do=search2&action=newsearch";
+	form.action = path + "/jsp/nsAction.do?do=search&action=newsearch";
 	form.submit();
 	return true;
 }
-
+function gotoPage(path,currPage){
+	var form = document.nsForm;
+	form.action = path + "/jsp/nsAction.do?do=search&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function printReport(path){
 	var form = document.nsForm;
 	
@@ -166,17 +136,6 @@ function openPensEdit(path,orderId){
 	form.action = path + "/jsp/nsAction.do?do=preparePens&mode=edit"+param;
 	form.submit();
 	return true; 
-}
-
-function gotoPage(path,pageNumber){
-	var form = document.nsForm;
-	
-	//if(confirm("ข้อมูลในหน้านี้ จะถูกบันทึก กรุณากดปุ่มเพื่อยืนยันการบันทึก และไปหน้าถัดไป ")){
-		form.action = path + "/jsp/nsAction.do?do=search2&pageNumber="+pageNumber;
-		form.submit();
-		return true;
-	//}
-	//return false;
 }
 </script>
 
@@ -229,9 +188,9 @@ function gotoPage(path,pageNumber){
 								<tr>
                                     <td align="right"> ID&nbsp; </td>
                                     <td align="left">  
-                                        <html:text property="bean.orderId" styleClass="" styleId="orderId"></html:text>
+                                        <html:text property="bean.orderId" styleClass="\" autoComplete=\"off" styleId="orderId"></html:text>
                                     </td>
-									<td nowrap>	&nbsp;Type&nbsp;
+									<td nowrap>	&nbsp;Catagory&nbsp;
 										 <html:select property="bean.customerType" styleId="customerType" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
@@ -251,16 +210,21 @@ function gotoPage(path,pageNumber){
 										  <html:select property="bean.channelId" styleId="channelId">
 											<html:options collection="channelList" property="code" labelProperty="desc"/>
 									    </html:select>
+									    &nbsp;
+									     Type <font color="red"></font>
+									      <html:select property="bean.customerSubType" styleId="customerSubType" >
+									        <html:options collection="customerSubTypeList" property="conValue" labelProperty="conDisp"/>
+									    </html:select> 
 									</td>
 								</tr>
 								<tr>
                                     <td align="right"> From Date&nbsp; </td>
                                     <td>
-                                        <html:text property="bean.orderDateFrom" styleClass="" styleId="orderDateFrom"></html:text>
+                                        <html:text property="bean.orderDateFrom" readonly="true" styleClass="" styleId="orderDateFrom"></html:text>
                                     </td>
 									<td>&nbsp;To Date&nbsp;
 										  <font color="red"></font>
-                                        <html:text property="bean.orderDateTo" styleClass="" styleId="orderDateTo"></html:text>
+                                        <html:text property="bean.orderDateTo" readonly ="true" styleClass="" styleId="orderDateTo"></html:text>
 									</td>
 								</tr>
 						   </table>
@@ -289,183 +253,138 @@ function gotoPage(path,pageNumber){
 							</table>
 					  </div>
 
-            <c:if test="${nsForm.resultsSearch != null}">
-                  <% 
-							
-						String tabclass ="lineE";
-						List<NSBean> resultList = nsForm.getResultsSearch();
-						
-						//calc Page number
-						String action = Utils.isNull(request.getParameter("action"));
-	                    if( !"newsearch".equalsIgnoreCase(action)){
-						     pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
-	                    }
-	                    
-						int totalPage = Utils.calcTotalPage(resultList.size(), NSAction.pageSize);
-						int totalRow = resultList.size();
-						int start = ((pageNumber-1)*NSAction.pageSize);
-						int end = (pageNumber * NSAction.pageSize);
-						 if(end > totalRow){
-							   end = totalRow;
-						 }
-				  %>
-					   <div align="left">
-						   <span class="pagebanner">รายการทั้งหมด  <%=totalRow %> รายการ, แสดงรายการที่  <%=(start+1) %> ถึง  <%=end %>.</span>
-						   
-						   <span class="pagelinks">
-							หน้าที่ 
-							 <% 
-								 for(int r=0;r<totalPage;r++){
-									 if(pageNumber ==(r+1)){
-								 %>
-				 				   <font size="3"><b><%=(r+1) %></b></font>
-								 <%}else{ %>
-								    <font size="2" ><b>
-								      <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-								      </b>
-								    </font>
-							 <% }} %>				
-							</span>
-					  </div>
-            
-                  <!-- 	<div id ="scroll" > -->
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
-						       <tr>
-						            <!-- <th >No</th> -->
-						            <th >Action</th>
-						            <th >Status</th>
-						            <th >ID</th>
-									<th >Date</th>
-									<th >Type</th>
-									<th >Customer Code</th>
-									<th >Customer Name</th>
-									<th >Region</th>
-									<th >Province</th>
-									<th >Address Line1</th>
-									<th >Address Line2</th>
-									<th >Phone Number</th>
-									<th >Invoice No</th>
-									<th >Invoice Date</th>
-									<th >Sale Code</th>
-									<th >Cup72 (CTN)</th>
-									<th >Cup72 (CUP)</th>
-									<th >BAG (CTN)</th>
-									<th >BAG (BAG)</th>
-									<th >Pooh72 (CTN)</th>
-									<th >Pooh72 (CUP)</th>
-									<th >Remark1</th>
-									<th >Pending Reason</th>
-							   </tr>
-							
+            <c:if test="${nsForm.results != null}">
+					   <jsp:include page="../pageing.jsp">
+				       <jsp:param name="totalPage" value="<%=nsForm.getTotalPage() %>"/>
+				       <jsp:param name="totalRecord" value="<%=nsForm.getTotalRecord() %>"/>
+				       <jsp:param name="currPage" value="<%=nsForm.getCurrPage() %>"/>
+				       <jsp:param name="startRec" value="<%=nsForm.getStartRec() %>"/>
+				       <jsp:param name="endRec" value="<%=nsForm.getEndRec() %>"/>
+			         </jsp:include>
+				<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
+				       <tr>
+				            <th >Action</th>
+				            <th >Status</th>
+				            <th >ID</th>
+							<th >Date</th>
+							<th >Type</th>
+							<th >Customer Code</th>
+							<th >Customer Name</th>
+							<th >Region</th>
+							<th >Province</th>
+							<th >Address Line1</th>
+							<th >Address Line2</th>
+							<th >Phone Number</th>
+							<th >Invoice No</th>
+							<th >Invoice Date</th>
+							<th >Sale Code</th>
+							<th >Cup72 (CTN)</th>
+							<th >Cup72 (CUP)</th>
+							<th >BAG (CTN)</th>
+							<th >BAG (PAC 6)</th>
+							<th >BAG (PAC 10)</th>
+							<th >Pooh72 (CTN)</th>
+							<th >Pooh72 (CUP)</th>
+							<th >Remark1</th>
+							<th >Pending Reason</th>
+					   </tr>
+					
 					<% 
 					int no = 1;
-					System.out.println("start:"+start);
-					System.out.println("end:"+end);
-					
-							for(int n=start; n<end; n++){
-								NSBean mc = (NSBean)resultList.get(n);
-								if(n%2==0){
-									tabclass="lineO";
-								}
-								no = n+1;
+					String tabclass ="lineE";
+					List<NSBean> resultList = nsForm.getResults();
+					for(int n=0;n<resultList.size();n++){
+						NSBean mc = (NSBean)resultList.get(n);
+						if(n%2==0){
+							tabclass="lineO";
+						}
+						no = n+1;
+						%>
+							<tr class="<%=tabclass%>">
+							<%-- <td class="td_text_center" width="5%"><%=no %></td> --%>
+							<td class="td_text_center" width="5%">
+								<%if ( Utils.isNull(request.getParameter("page")).equalsIgnoreCase("pens") ){%>
+								     <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
+										    <% if(mc.getStatus().equals(NSConstant.STATUS_OPEN)	){%>
+											 <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+											            Edit
+											 </a>
+											 <%}else{ %>
+											   <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+											             View
+											   </a>
+									        <% } %>
+								      <%}else {%>
+									           <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+											             View
+											   </a>
+								       <% } %>
+							    
+								<%}else{ 
+									  if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){
+									    if(mc.getStatus().equals(RTConstant.STATUS_OPEN)){
+							       %>
+										 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+										            Edit
+										 </a>
+										 <%}else{ %>
+										   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+										             View
+										   </a>
+							    <%        } 
+									}else{
 								%>
-									<tr class="<%=tabclass%>">
-									<%-- <td class="td_text_center" width="5%"><%=no %></td> --%>
-									<td class="td_text_center" width="5%">
-										<%if ( Utils.isNull(request.getParameter("page")).equalsIgnoreCase("pens") ){%>
-										     <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
-												    <% if(mc.getStatus().equals(NSConstant.STATUS_OPEN)	){%>
-													 <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-													            Edit
-													 </a>
-													 <%}else{ %>
-													   <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-													             View
-													   </a>
-											        <% } %>
-										      <%}else {%>
-											           <a href="javascript:openPensEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-													             View
-													   </a>
-										       <% } %>
-									    
-										<%}else{ 
-											  if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){
-											    if(mc.getStatus().equals(RTConstant.STATUS_OPEN)){
-									       %>
-												 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-												            Edit
-												 </a>
-												 <%}else{ %>
-												   <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-												             View
-												   </a>
-									    <%        } 
-											}else{
-										%>
-											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
-												       View
-										     </a>
-												
-										<%	}
-									      }
-									     %>
-										</td>
-										<td class="td_text_center" width="3%" nowrap><%=mc.getStatusDesc()%></td>
-										<td class="td_text_center" width="4%" nowrap><%=mc.getOrderId()%></td>
-										<td class="td_text_center" width="4%" nowrap ><%=mc.getOrderDate()%></td>
-										<td class="td_text_center" width="4%" nowrap><%=mc.getCustomerType()%></td>
-										<td class="td_text" width="5%" ><%=mc.getCustomerCode()%></td>
-									    <td class="td_text" width="5%" ><%=mc.getCustomerName() %></td>
-									    <td class="td_text" width="5%" ><%=mc.getChannelName() %></td>
-									    <td class="td_text" width="5%" ><%=mc.getProvinceName() %></td>
-									    <td class="td_text" width="7%" ><%=mc.getAddressLine1()%></td>
-									    <td class="td_text" width="7%" ><%=mc.getAddressLine2()%></td>
-										<td class="td_text" width="5%" nowrap><%=mc.getPhone()%></td>
-										<td class="td_text" width="5%" nowrap><%=mc.getInvoiceNo()%></td>
-										<td class="td_text" width="5%" nowrap><%=mc.getInvoiceDate()%></td>
-										<td class="td_text" width="5%" nowrap><%=mc.getSaleCode()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getCupQty()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getCupNQty()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getPacQty()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getPacNQty()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getPoohQty()%></td>
-										<td class="td_text_center" width="4%"><%=mc.getPoohNQty()%></td>
-										<td class="td_text" width="15%" ><%=mc.getRemark()%></td> 
-										<td class="td_text" width="5%"><%=mc.getPendingReason()%></td> 
-										<!-- 65 -->
-									</tr>
-							<%} %>
-							
-							<%if(totalPage==pageNumber){ 
-								NSBean s =  nsForm.getBean().getSummary();
-							%>
-							<tr class='hilight_text'>
-							<!--         <td class="td_text_center" width="3%" nowrap></td>
-									<td class="td_text_center" width="5%" nowrap></td>
-									<td class="td_text_center" width="5%" nowrap ></td>
-									<td class="td_text_center" width="4%" nowrap></td>
-									<td class="td_text" width="5%" ></td>
-								    <td class="td_text" width="5%" ></td>
-								    <td class="td_text" width="5%" ></td>
-								    <td class="td_text" width="5%" ></td>
-								    <td class="td_text" width="8%" ></td>
-								    <td class="td_text" width="8%" ></td>
-									<td class="td_text" width="5%" nowrap></td>
-									<td class="td_text" width="5%" nowrap></td>
-									<td class="td_text" width="5%" nowrap></td>
-									<td class="td_text" width="5%" nowrap></td> -->
-									<td class="td_text_right"  colspan="15" align="right">Total</td>
-									<td class="td_text_center" width="4%"><%=s.getCupQty()%></td>
-									<td class="td_text_center" width="4%"><%=s.getCupNQty()%></td>
-									<td class="td_text_center" width="4%"><%=s.getPacQty()%></td>
-									<td class="td_text_center" width="4%"><%=s.getPacNQty()%></td>
-									<td class="td_text_center" width="4%"><%=s.getPoohQty()%></td>
-									<td class="td_text_center" width="4%"><%=s.getPoohNQty()%></td>
-									<td class="td_text" width="15%" nowrap></td> 
-									<td class="td_text" width="5%" nowarp></td> 
+									 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getOrderId()%>')">
+										       View
+								     </a>
+										
+								<%	}
+							      }
+							     %>
+								</td>
+								<td class="td_text_center" width="3%" nowrap><%=mc.getStatusDesc()%></td>
+								<td class="td_text_center" width="4%" nowrap><%=mc.getOrderId()%></td>
+								<td class="td_text_center" width="4%" nowrap ><%=mc.getOrderDate()%></td>
+								<td class="td_text_center" width="4%" nowrap><%=mc.getCustomerType()%></td>
+								<td class="td_text" width="5%" ><%=mc.getCustomerCode()%></td>
+							    <td class="td_text" width="5%" ><%=mc.getCustomerName() %></td>
+							    <td class="td_text" width="5%" ><%=mc.getChannelName() %></td>
+							    <td class="td_text" width="5%" ><%=mc.getProvinceName() %></td>
+							    <td class="td_text" width="7%" ><%=mc.getAddressLine1()%></td>
+							    <td class="td_text" width="7%" ><%=mc.getAddressLine2()%></td>
+								<td class="td_text" width="5%" nowrap><%=mc.getPhone()%></td>
+								<td class="td_text" width="5%" nowrap><%=mc.getInvoiceNo()%></td>
+								<td class="td_text" width="5%" nowrap><%=mc.getInvoiceDate()%></td>
+								<td class="td_text" width="5%" nowrap><%=mc.getSaleCode()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getCupQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getCupNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPacQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPacNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPac10Qty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPoohQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPoohNQty()%></td>
+								<td class="td_text" width="15%" ><%=mc.getRemark()%></td> 
+								<td class="td_text" width="5%"><%=mc.getPendingReason()%></td> 
+								<!-- 65 -->
 							</tr>
-							 <%} %>
+						<%} %>
+						
+						<%if(nsForm.getTotalPage()==nsForm.getCurrPage()){ 
+							NSBean s =  nsForm.getSummary();
+						%>
+						<tr class='hilight_text'>
+							<td class="td_text_right"  colspan="15" align="right">Total</td>
+							<td class="td_text_center" width="4%"><%=s.getCupQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getCupNQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPacQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPacNQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPac10Qty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPoohQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPoohNQty()%></td>
+							<td class="td_text" width="15%" nowrap></td> 
+							<td class="td_text" width="5%" nowrap></td> 
+						</tr>
+						<%} %>
 					</table>
 					<!-- </div> -->
 				</c:if>
@@ -473,8 +392,7 @@ function gotoPage(path,pageNumber){
 		<!-- ************************Result ***************************************************-->	
 					<!-- hidden field -->
 					<input type="hidden" name="page" value="<%=request.getParameter("page") %>"/>
-					<input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
-					
+				
 					</html:form>
 					<!-- BODY -->
 					</td>

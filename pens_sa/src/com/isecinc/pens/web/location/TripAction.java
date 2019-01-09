@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 
 import util.DBConnection;
 import util.ExcelHeader;
+import util.MonitorTime;
 import util.Utils;
 
 import com.isecinc.core.bean.Messages;
@@ -57,9 +58,11 @@ public class TripAction {
 				
 				//get Total Record
 				//Trip Day 1 - 23 +98
+				MonitorTime monitor = new MonitorTime("searchTripList");
 				List<LocationBean> tripPageList = searchTripList(conn, aForm.getBean());
 				request.getSession().setAttribute("tripPageList", tripPageList);
-			    
+				monitor.debugUsedTime();
+				
 			    // Get Trip Case Search By Customer
 			    if(tripPageList != null && tripPageList.size() >0){
 			    	for(int i=0;i<tripPageList.size();i++){
@@ -94,8 +97,10 @@ public class TripAction {
 			    	currPage = Utils.convertStrToInt(request.getParameter("currPage"));
 			    	aForm.setCurrPage(currPage);
 			    }
+			    monitor = new MonitorTime("searchHeadList");
 				List<LocationBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPageSqlIn);
 				aForm.setResults(items);
+				monitor.debugUsedTime();
 				
 				if(items.size() <=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -118,9 +123,11 @@ public class TripAction {
 				//get Items Show by Page Size
 			    allRec = false;
 			    String currPageSqlIn = "'"+currPage+"'";
+			    MonitorTime monitor = new MonitorTime("searchHeadList");
 				List<LocationBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPageSqlIn);
 				aForm.setResults(items);
 				
+				monitor.debugUsedTime();
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -135,6 +142,16 @@ public class TripAction {
 		return aForm;
 	}
  
+ public static List<LocationBean> searchTripList_bk(Connection conn,LocationBean o) throws Exception {
+	 List<LocationBean> list = new ArrayList<LocationBean>();
+	 for(int i=0;i<23;i++){
+		 LocationBean bean = new LocationBean();
+		 bean.setTripDay((i+1)+"");
+		 list.add(bean);
+	 }
+	 return list;
+ }
+ 
  public static List<LocationBean> searchTripList(Connection conn,LocationBean o) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -143,21 +160,29 @@ public class TripAction {
 		LocationBean c = new LocationBean();
 		StringBuffer sql = new StringBuffer("");
 		try{
-
 			sql.append("\n   SELECT distinct cs.trip1,trip2,trip3");
-			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
+			sql.append("\n   FROM ");
+			sql.append("\n   ( select cs.trip1,cs.trip2,cs.trip3 ");
+			sql.append("\n   ,cs. cust_account_id ,cs.primary_salesrep_id,cs.address ");
+			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
+			sql.append("\n   where 1=1 ");
+			sql.append("\n   and (   (cs.trip1 >=1 and cs.trip1 <=23) ");
+			sql.append("\n        or (cs.trip2 >=1 and cs.trip2 <=23) ");
+			sql.append("\n        or (cs.trip3 >=1 and cs.trip3 <=23) ) ");
+			sql.append("\n   )cs ");	
 			sql.append("\n   ,xxpens_ar_customer_all_v c");
 			sql.append("\n   ,xxpens_salesreps_v s");
 			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
 			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
 			sql.append("   "+genWhereCondSql(conn, "", o));
+			
 			if( !Utils.isNull(o.getTripDay()).equals("")){
-				sql.append("\n   and (cs.trip1 in("+o.getTripDay()+")  ");
-				sql.append("\n        or cs.trip2 in("+o.getTripDay()+") ");
-				sql.append("\n        or cs.trip3 in("+o.getTripDay()+" ))");
+				sql.append("\n   and (cs.trip1 ="+o.getTripDay()+"  ");
+				sql.append("\n        or cs.trip2 ="+o.getTripDay()+" ");
+				sql.append("\n        or cs.trip3 ="+o.getTripDay()+" )");
 			}
 			
-			sql.append("\n   order by trip1,trip2,trip3 asc" );
+			//sql.append("\n   order by trip1,trip2,trip3 asc" );
 			
 			logger.debug("sql:"+sql);
 			
@@ -230,27 +255,31 @@ public class TripAction {
 		List<LocationBean> items = new ArrayList<LocationBean>();
 		try {
 			sql.append("\n   SELECT ");
-			sql.append("\n   c.account_number ,c.party_name ,cs.address,s.salesrep_id");
-			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
+			sql.append("\n   c.account_number ,c.party_name ");
+			sql.append("\n   ,cs.address,s.salesrep_id ,cs.trip1,cs.trip2,cs.trip3");
+			sql.append("\n   FROM ");
+			sql.append("\n   ( select cs.trip1,cs.trip2,cs.trip3 ");
+			sql.append("\n   ,cs. cust_account_id ,cs.primary_salesrep_id,cs.address ");
+			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
+			sql.append("\n   where 1=1 ");
+			sql.append("\n   and (   (cs.trip1 >=1 and cs.trip1 <=23) ");
+			sql.append("\n        or (cs.trip2 >=1 and cs.trip2 <=23) ");
+			sql.append("\n        or (cs.trip3 >=1 and cs.trip3 <=23) ) ");
+			sql.append("\n   )cs ");	
 			sql.append("\n   ,xxpens_ar_customer_all_v c");
 			sql.append("\n   ,xxpens_salesreps_v s");
 			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
 			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
-			//case No set trip currPage =99
-			if("'99'".equals(tripBySearchSqlIn)){
-				sql.append("\n   and (cs.trip1 is null  ");
-				sql.append("\n        and cs.trip2 is null ");
-				sql.append("\n        and cs.trip3 is null )");
-			}else{
-				sql.append("\n   and (cs.trip1 in("+tripBySearchSqlIn+")  ");
-				sql.append("\n        or cs.trip2 in("+tripBySearchSqlIn+") ");
-				sql.append("\n        or cs.trip3 in("+tripBySearchSqlIn+" ))");
+			if( !"".equals(tripBySearchSqlIn)){
+				sql.append("\n   and (   cs.trip1 ="+tripBySearchSqlIn+" ");
+				sql.append("\n        or cs.trip2 ="+tripBySearchSqlIn+" ");
+				sql.append("\n        or cs.trip3 ="+tripBySearchSqlIn+" )");
 			}
 			sql.append("   "+genWhereCondSql(conn, "", o));
 			if( !Utils.isNull(o.getTripDay()).equals("")){
-				sql.append("\n   and (cs.trip1 in("+o.getTripDay()+")  ");
-				sql.append("\n        or cs.trip2 in("+o.getTripDay()+") ");
-				sql.append("\n        or cs.trip3 in("+o.getTripDay()+" ))");
+				sql.append("\n   and (   cs.trip1 ="+o.getTripDay()+"  ");
+				sql.append("\n        or cs.trip2 ="+o.getTripDay()+" ");
+				sql.append("\n        or cs.trip3 ="+o.getTripDay()+" )");
 			}
 			
 			sql.append("\n order by  c.account_number asc ");
@@ -265,6 +294,9 @@ public class TripAction {
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("salesrep_id")));
+			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
+			   h.setTripDay2(Utils.isNull(rst.getString("trip2")));
+			   h.setTripDay3(Utils.isNull(rst.getString("trip3")));
 			   items.add(h);
 			}//while
 		} catch (Exception e) {
@@ -283,6 +315,7 @@ public class TripAction {
 		StringBuilder sql = new StringBuilder();
 		LocationBean h = null;
 		List<LocationBean> items = new ArrayList<LocationBean>();
+		Map<String,String> chkDupCustCodeMap = new HashMap<String,String>();
 		try {
 			sql.append("\n SELECT A.* FROM( ");
 			sql.append("\n   SELECT to_number(cs.trip1) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
@@ -295,7 +328,7 @@ public class TripAction {
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and cs.trip1 ="+o.getTripDay()+" ");
 			}
-			sql.append("\n UNION ALL ");
+			sql.append("\n UNION ");
 			
 			sql.append("\n   SELECT to_number(cs.trip2) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
@@ -307,7 +340,7 @@ public class TripAction {
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and cs.trip2 ="+o.getTripDay()+" ");
 			}
-			sql.append("\n UNION ALL ");
+			sql.append("\n UNION ");
 			
 			sql.append("\n   SELECT to_number(cs.trip3) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
@@ -333,7 +366,11 @@ public class TripAction {
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("salesrep_id")));
-			   items.add(h);
+			   
+			   if(chkDupCustCodeMap.get(h.getCustomerCode()) ==null){
+			     items.add(h);
+			   }
+			   chkDupCustCodeMap.put(h.getCustomerCode(), h.getCustomerCode());
 			}//while
 		} catch (Exception e) {
 			throw e;
@@ -341,6 +378,7 @@ public class TripAction {
 			try {
 				rst.close();
 				ps.close();
+				chkDupCustCodeMap.clear();
 			} catch (Exception e) {}
 		}
 		return items;
@@ -506,6 +544,11 @@ public class TripAction {
 	 String province = "";
 	 String district = "";
 	 try {
+		 //filter only have trip
+		/* sql.append("\n   and (   (cs.trip1 >=1 and cs.trip1 <=23) ");
+		 sql.append("\n        or (cs.trip2 >=1 and cs.trip2 <=23)");
+		 sql.append("\n        or (cs.trip3 >=1 and cs.trip3 <=23) )");*/
+			
 		if( !Utils.isNull(c.getProvince()).equals("")){
 			province = LocationControlPage.getProvinceName(conn, Utils.isNull(c.getProvince()));
 		}
@@ -625,6 +668,7 @@ public class TripAction {
 public static void updateCustTripMasterProc(Connection conn,LocationBean o) throws Exception{
 	PreparedStatement ps = null;
 	logger.debug("updateCustTripMasterProc cust_account_id["+o.getCustAccountId()+"]");
+	logger.debug("trip1:"+o.getTripDay()+",trip2:"+o.getTripDay2()+",trip3:"+o.getTripDay3());
 	int  c = 1;
 	try{
 		StringBuffer sql = new StringBuffer("");
@@ -640,9 +684,21 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 		
 		ps.setLong(c++,o.getCustAccountId());
 		ps.setLong(c++,o.getPartySiteId());
-		ps.setString(c++,Utils.isNull(o.getTripDay()));
-		ps.setString(c++,Utils.isNull(o.getTripDay2()));
-		ps.setString(c++,Utils.isNull(o.getTripDay3()));
+		if( !Utils.isNull(o.getTripDay()).equals("")){
+		   ps.setString(c++,Utils.isNull(o.getTripDay()));
+		}else{
+		   ps.setNull(c++, java.sql.Types.NULL);
+		}
+		if( !Utils.isNull(o.getTripDay2()).equals("")){
+		   ps.setString(c++,Utils.isNull(o.getTripDay2()));
+		}else{
+		   ps.setNull(c++, java.sql.Types.NULL);
+		}
+		if( !Utils.isNull(o.getTripDay3()).equals("")){
+		   ps.setString(c++,Utils.isNull(o.getTripDay3()));
+		}else{
+		   ps.setNull(c++, java.sql.Types.NULL);
+		}
 		ps.executeUpdate();
 		
 	}catch(Exception e){
@@ -663,7 +719,9 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 			conn = DBConnection.getInstance().getConnectionApps();
 			List<LocationBean> itemsList = searchExportReportList(conn,bean);
 			
-			SalesrepBean salesrepBean = SalesrepDAO.getSalesrepBeanById(conn, bean.getSalesrepId());
+			logger.debug("salesrepCode:"+bean.getSalesrepCode());
+			
+			SalesrepBean salesrepBean = SalesrepDAO.getSalesrepBeanById(conn, bean.getSalesrepCode());
 			
 			h.append(ExcelHeader.EXCEL_HEADER);
 			//Header

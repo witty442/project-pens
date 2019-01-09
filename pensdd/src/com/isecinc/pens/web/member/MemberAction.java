@@ -24,6 +24,7 @@ import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Contact;
 import com.isecinc.pens.bean.Member;
 import com.isecinc.pens.bean.MemberProduct;
+import com.isecinc.pens.bean.MemberRenew;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ResultBean;
@@ -37,6 +38,7 @@ import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MContact;
 import com.isecinc.pens.model.MMember;
 import com.isecinc.pens.model.MMemberProduct;
+import com.isecinc.pens.model.MMemberRenew;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MTrxHistory;
@@ -215,7 +217,7 @@ public class MemberAction extends I_Action {
 				new MMember().setMemberAgeLevel(member);
 			}
 
-			logger.debug("creditName:"+member.getCardName());
+			logger.debug("creditName:"+member.getCardName()+",MEMBERlEVEL:"+member.getMemberLevel());
 			// Save Member
 			if (!new MMember().save(member, userActive.getCode(), userActive.getId(), conn)) {
 				// return with duplicate Document no
@@ -297,7 +299,8 @@ public class MemberAction extends I_Action {
 		MemberForm memberForm = (MemberForm) form;
 		Connection conn = null;
 		Member member = null;
-
+		String customerIdSource = "";
+        logger.debug("copyMember");
 		try {
 			User userActive = (User) request.getSession().getAttribute("user");
 
@@ -306,63 +309,40 @@ public class MemberAction extends I_Action {
 			conn.setAutoCommit(false);
             
 			//Search member by 
-			String custCodeCopy = Utils.isNull(request.getParameter("custCodeCopy"));
-			
-			member = new MMember().find(custCodeCopy);
+			String memberCodeCopy = Utils.isNull(request.getParameter("memberCodeCopy"));
+			logger.debug("memberCodeCopy:"+memberCodeCopy);
+			member = new MMember().findByCode(memberCodeCopy);
 			if (member == null) {
-				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+				request.setAttribute("Message","ไม่พบข้อมูล รหัสสมาชิกที่ต้องการ Copy");
+				return mapping.findForward("prepare");
+			}else{
+				Member memberCopyExist = new MMember().findByCode(new MemberDocumentProcess().getNextDocumentNoCaseCopyMember(member.getCode()));
+			    if(memberCopyExist != null){
+			    	request.setAttribute("Message","รหัสสมาชิก ถูก Copy ข้อมูลไปแล้ว");
+					return mapping.findForward("prepare");
+			    }
 			}
-
-			member.setCustomerType(userActive.getCustomerType().getKey());
+			customerIdSource = ""+member.getId();
+            logger.debug("memberId:"+member.getId());
+            
 			memberForm.setAddresses(new MAddress().lookUp(member.getId()));
 			memberForm.setContacts(new MContact().lookUp(member.getId()));
 			memberForm.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
-			if (member.getBirthDay() != null && !member.getBirthDay().equals("")) {
-				int curYear = Integer.parseInt(new SimpleDateFormat("yyyy", new Locale("th", "TH")).format(new Date()));
-				int birthYear = Integer.parseInt(member.getBirthDay().split("/")[2]);
-				member.setAge(String.valueOf(curYear - birthYear));
-			}
+			
 			// check expire date.
 			String expireDate = this.getExpireDate(member.getId());
 			if (!"".equals(expireDate)) member.setExpiredDate(expireDate);
 
-			memberForm.setMember(member);
-			// get back search key
-			if (memberForm.getCriteria().getSearchKey() == null) {
-				if (request.getSession(true).getAttribute("CMSearchKey") != null) {
-					memberForm.getCriteria()
-							.setSearchKey((String) request.getSession(true).getAttribute("CMSearchKey"));
-				}
-			} else {
-				request.getSession(true).removeAttribute("CMSearchKey");
-			}
-
-			//////////////////////////////////////////////////////////////////////
+			/************* Insert ***************************************************************/
 			//insert new member
-			member = memberForm.getMember();
+			member.setId(0);
 			//Gen New Code 90XXXX
 			member.setCode(new MemberDocumentProcess().getNextDocumentNoCaseCopyMember(member.getCode()));
-			  
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			// Begin Transaction
-			conn.setAutoCommit(false);
+		    logger.debug("new memberCode:"+member.getCode());
 
 			// Save Member
 			member.setCustomerType(userActive.getCustomerType().getKey());
 
-			// Calculate expired date.
-			Calendar cal = Calendar.getInstance();
-			int month = 0;
-			month = Integer.parseInt(memberForm.getMember().getMemberType());
-
-			// Calculate Expire Date at 1st Save
-			/*if (memberForm.getMember().getId() == 0 || memberForm.getMember().getExpiredDate().length() == 0) {
-				cal.setTime(DateToolsUtil.convertStringToDate(memberForm.getMember().getRegisterDate()));
-				cal.add(Calendar.MONTH, month);
-				member.setExpiredDate(DateToolsUtil.convertToString(cal.getTime()));
-				new MMember().setMemberAgeLevel(member);
-			}
-*/
 			logger.debug("creditName:"+member.getCardName());
 			// Save Member
 			if (!new MMember().save(member, userActive.getCode(), userActive.getId(), conn)) {
@@ -372,35 +352,49 @@ public class MemberAction extends I_Action {
 				return mapping.findForward("view");
 			}
 
-			// Save Address
+			logger.debug("member new customerId:"+member.getId());
+			
+			// Copy Address
 			for (Address address : memberForm.getAddresses()) {
 				address.setCustomerId(member.getId());
+				address.setId(0);
 				new MAddress().save(address, userActive.getId(), conn);
 			}
 
-			// Save Contact
+			// Copy Contact
 			for (Contact contact : memberForm.getContacts()) {
 				contact.setCustomerId(member.getId());
+				contact.setId(0);
 				new MContact().save(contact, userActive.getId(), conn);
 			}
 
-			// Save Product
+			// Copy Product
 			for (MemberProduct memberProduct : memberForm.getMemberProducts()) {
 				memberProduct.setCustomerId(member.getId());
+				memberProduct.setId(0);
 				new MMemberProduct().save(memberProduct, userActive.getId(), conn);
 			}
 
+			//Copy member Renew
+			//Search Source member Renew Last Update
+			MemberRenew memberRenew = new MMemberRenew().findByIdLastRenew(customerIdSource);
+			if(memberRenew != null){
+			   memberRenew.setId(0);
+			   memberRenew.setRenewedDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//curretnDate
+			   Member m = new Member();
+			   m.setId(member.getId());
+			   memberRenew.setMember(m);
+			   
+			   new MMemberRenew().save(memberRenew, userActive.getCode(), userActive.getId(), conn);
+			}
 			// Commit Transaction
 			conn.commit();
 
 			memberForm.setMember(member);
-
-			/******************************************************************/
-			// Commit Transaction
-			conn.commit();
-
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+			
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
 			try {
 				conn.rollback();
 			} catch (SQLException e1) {}
@@ -412,10 +406,77 @@ public class MemberAction extends I_Action {
 				conn.close();
 			} catch (Exception e2) {}
 		}
-
 		return mapping.findForward("view");
 	}
+	
+	
+	public ActionForward viewMember(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		MemberForm memberForm = (MemberForm) form;
+		Connection conn = null;
+		Member member = null;
+        logger.debug("viewMember");
+		try {
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			//Search member by 
+			String memberCodeCopy = Utils.isNull(request.getParameter("memberCodeCopy"));
+			logger.debug("memberCodeCopy:"+memberCodeCopy);
+			member = new MMember().findByCode(memberCodeCopy);
+			if (member == null) {
+				request.setAttribute("Message","ไม่พบข้อมูล รหัสสมาชิกที่ต้องการ Copy");
+				return mapping.findForward("prepare");
+			}
+            logger.debug("memberId:"+member.getId());
+            
+			memberForm.setAddresses(new MAddress().lookUp(member.getId()));
+			memberForm.setContacts(new MContact().lookUp(member.getId()));
+			memberForm.setMemberProducts(new MMemberProduct().lookUp(member.getId()));
+			
+			// check expire date.
+			String expireDate = this.getExpireDate(member.getId());
+			if (!"".equals(expireDate)) member.setExpiredDate(expireDate);
 
+			//reset value for new insert
+			member.setCode("");
+			member.setId(0);
+			member.setAgeMonth(0);
+			if(memberForm.getAddresses() != null && memberForm.getAddresses().size()>0){
+				for(int i=0;i<memberForm.getAddresses().size();i++){
+					Address add = memberForm.getAddresses().get(i);
+					add.setCustomerId(0);
+					add.setId(0);
+					memberForm.getAddresses().set(i, add);
+				}
+			}
+			if(memberForm.getContacts() != null && memberForm.getContacts().size()>0){
+				for(int i=0;i<memberForm.getContacts().size();i++){
+					Contact add = memberForm.getContacts().get(i);
+					add.setCustomerId(0);
+					add.setId(0);
+					memberForm.getContacts().set(i, add);
+				}
+			}
+			if(memberForm.getMemberProducts() != null && memberForm.getMemberProducts().size()>0){
+				for(int i=0;i<memberForm.getMemberProducts().size();i++){
+					MemberProduct add = memberForm.getMemberProducts().get(i);
+					add.setCustomerId(0);
+					add.setId(0);
+					memberForm.getMemberProducts().set(i, add);
+				}
+			}
+			memberForm.setMember(member);
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message",InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()+ e.getMessage());
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("prepare");
+	}
 
 	/**
 	 * Cancel Member

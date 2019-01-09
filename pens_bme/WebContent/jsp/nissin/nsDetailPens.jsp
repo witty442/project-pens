@@ -42,28 +42,6 @@ String role = user.getRole().getKey();
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-
 fieldset
 {
     border: 1px solid #ddd;
@@ -73,8 +51,6 @@ fieldset
     margin: 0 5px;
     height: 180px;
 }
-
-
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
@@ -244,7 +220,7 @@ function cancelAction(path){
                                     <td align="right"> Date
                                     </td>
 									<td align="left"><html:text property="bean.orderDate" styleClass="disableText" styleId="orderDate"></html:text>
-									    Type
+									    Catagory
 										 <html:select property="bean.customerType" styleId="customerType" disabled="true" >
 										    <html:option value=""></html:option>
 											<html:option value="School">School</html:option>
@@ -259,27 +235,33 @@ function cancelAction(path){
 									    Province 
 									      <html:select property="bean.provinceId" styleId="provinceId" disabled="true">
 									    </html:select> 
+									    
+									     &nbsp;&nbsp;
+									     Type <font color="red"></font>
+									      <html:select property="bean.customerSubType" styleId="customerSubType" disabled="true">
+									        <html:options collection="customerSubTypeList" property="conValue" labelProperty="conDisp"/>
+									    </html:select> 
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Customer name <font color="red">*</font>
 									</td>
 									<td align="left">
-									    <html:text property="bean.customerName" styleClass="normalText" styleId="customerName"  size="150" maxlength="200"></html:text>
+									    <html:text property="bean.customerName" styleClass="normalText\" autoComplete=\"off" styleId="customerName"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td align="right"> Address Line1 
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine1" styleClass="normalText" styleId="addressLine1"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine1" styleClass="normalText\" autoComplete=\"off" styleId="addressLine1"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
                                     <td  align="right"> Address Line2  
 									</td>
 									<td align="left">
-									  <html:text property="bean.addressLine2" styleClass="normalText" styleId="addressLine2"  size="150" maxlength="200"></html:text>
+									  <html:text property="bean.addressLine2" styleClass="normalText\" autoComplete=\"off" styleId="addressLine2"  size="150" maxlength="200"></html:text>
 									</td>
 								</tr>
 								<tr>
@@ -317,40 +299,42 @@ function cancelAction(path){
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" >
 		                                         <tr><td>
 				                                       Customer Code<font color="red">*</font>  
-													   <html:text property="bean.customerCode" styleClass="" styleId="customerCode" size="20" readonly="" ></html:text>
+													   <html:text property="bean.customerCode" styleClass="\" autoComplete=\"off" styleId="customerCode" size="20" readonly="" ></html:text>
 													   Sale Code <font color="red">*</font> 
-													    <html:text property="bean.saleCode" styleClass="" styleId="saleCode" size="20" ></html:text>
+													    <html:text property="bean.saleCode" styleClass="\" autoComplete=\"off" styleId="saleCode" size="20" ></html:text>
 												 </td></tr>
 												 <tr><td>
 												   
 												   Invoice Date<font color="red">*</font> 
 												   <html:text property="bean.invoiceDate" styleClass="" styleId="invoiceDate" size="20" readonly="true" ></html:text>
 												   Invoice No
-												   <html:text property="bean.invoiceNo" styleClass="" styleId="invoiceNo" size="30" maxlength="30"></html:text>
+												   <html:text property="bean.invoiceNo" styleClass="\" autoComplete=\"off" styleId="invoiceNo" size="30" maxlength="30"></html:text>
 												    </td></tr>
 											   </table>
 											   
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
 			                                    <tr>
 			                                      <th colspan="2">CUP 72</th>
-			                                      <th colspan="2">BAG</th>
+			                                      <th colspan="3">BAG</th>
 			                                      <th colspan="2">POOH 72</th>
 			                                    </tr>
 			                                    <tr>
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
 			                                      <th>CTN</th>
-			                                      <th>BAG</th>
+			                                      <th>BAG 6</th>
+			                                      <th>BAG 10</th>
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
 			                                    </tr>
 			                                    <tr>
-			                                       <td><html:text property="bean.cupQty" styleClass="" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.cupNQty" styleClass="" styleId="cupNQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.pacQty" styleClass="" styleId="pacQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.pacNQty" styleClass="" styleId="pacNQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.poohQty" styleClass="" styleId="poohQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.poohNQty" styleClass="" styleId="poohNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.cupQty" styleClass="\" autoComplete=\"off" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.cupNQty" styleClass="\" autoComplete=\"off" styleId="cupNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.pacQty" styleClass="\" autoComplete=\"off" styleId="pacQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.pacNQty" styleClass="\" autoComplete=\"off" styleId="pacNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.pac10Qty" styleClass="\" autoComplete=\"off" styleId="pac10Qty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.poohQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td><html:text property="bean.poohNQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="10" onkeydown="return inputNum(event);"/> </td>
 			                                    </tr>
 		                                      </table>
 		                                    </fieldset>

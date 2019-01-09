@@ -61,7 +61,7 @@ public class ImportBillICC extends InterfaceUtils{
 		MonitorTime monitorTime = null;
 		Map<String, String> batchParamMap = new HashMap<String, String>();
 		try{
-			/** prepare Paramenter **/
+			/** prepare Parameter **/
 			batchParamMap = m.getBatchParamMap();
 			patheImport = env.getProperty("path.icc.hisher.import.dlyr");
 			

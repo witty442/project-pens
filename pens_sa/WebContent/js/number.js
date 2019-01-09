@@ -33,7 +33,7 @@ function isNumPositive(obj){
 		return false;
 	}else{
 		if(v < 0){
-			alert('ใม่สามารถกรอก ตัวเลขติดลบได้');
+			alert('ไม่สามารถกรอก ตัวเลขติดลบได้');
 			obj.value = "";
 			obj.focus();
 			return false;

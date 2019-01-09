@@ -165,8 +165,10 @@ public class LocationControlPage {
 				 bean = new PopupBean();
 				 bean.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
 				 bean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
-				 
-				 pos.add(bean);
+				
+				 if(Utils.isNull(bean.getSalesrepCode()).length() >=4){
+				   pos.add(bean);
+				 }
 			}//while
 			
 		}catch(Exception e){
