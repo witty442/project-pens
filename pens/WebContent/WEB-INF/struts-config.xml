@@ -78,6 +78,14 @@
 		<form-bean name="performanceReportForm"
 			type="com.isecinc.pens.web.report.performance.PerformanceReportForm" />
 			
+		<!-- PERFORMANCE REPORT SUB REPORT-->
+		<form-bean name="performanceReportFormSubReport"
+			type="com.isecinc.pens.web.report.performance_subreport.PerformanceReportFormSubReport" />
+			
+	    <!-- Bank Transfer Report -->
+		<form-bean name="bankTransferReportForm"
+			type="com.isecinc.pens.web.report.transfer.BankTransferReportForm" />
+			
 		<!-- INVOICE PAYMENT REPORT -->
 		<form-bean name="invoicePaymentReportForm"
 			type="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm" />
@@ -193,6 +201,7 @@
 		<form-bean name="prodShowForm" type="com.isecinc.pens.web.prodshow.ProdShowForm" />
 		<form-bean name="creditPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditPaidReportForm" />
 		<form-bean name="creditNoPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportForm" />
+		<form-bean name="transferForm" type="com.isecinc.pens.web.transfer.TransferForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -457,6 +466,13 @@
 			<forward name="clearform" path="/jsp/reports/creditNoPaidReport.jsp" />
 		</action>
 		
+		 <!-- Performance REPORT SubReport-->
+		<action name="performanceReportFormSubReport" path="/jsp/performanceReportSubReport"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.performance_subreport.PerformanceReportActionSubReport">
+			<forward name="report" path="/jsp/reports/performanceReportSubReport.jsp" />
+		</action>
+		
 		<!-- PERFORMANCE REPORT -->
 		<action name="performanceReportForm" path="/jsp/performanceReport"
 			forward="/jsp/reports/performanceReport.jsp" />
@@ -466,7 +482,16 @@
 			<forward name="report" path="/jsp/reports/performanceReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/performanceReport.jsp" />
 		</action>
-
+		
+       <!-- BANK TRANSFER REPORT -->
+		<action name="bankTransferReportForm" path="/jsp/bankTransferReport"
+			forward="/jsp/reports/bankTransferReport.jsp" />
+		<action name="bankTransferReportForm" path="/jsp/bankTransferReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.transfer.BankTransferReportAction">
+			<forward name="report" path="/jsp/reports/bankTransferReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/bankTransferReport.jsp" />
+		</action>
 		<!-- INVOICE PAYMENT REPORT -->
 		<action name="invoicePaymentReportForm" path="/jsp/invoicePaymentReport"
 			forward="/jsp/reports/invoicePaymentReport.jsp" />
@@ -733,6 +758,10 @@
 			<forward name="popupPrint" path="/jsp/stock/stock.jsp" />
 		</action>
 		
+		<action name="transferForm" path="/jsp/transferAction" parameter="do" scope="session" type="com.isecinc.pens.web.transfer.TransferAction" >
+		    <forward name="search" path="/jsp/transfer/transferSearch.jsp" />
+			 <forward name="detail" path="/jsp/transfer/transfer.jsp"/>
+		</action>
 			<!-- MoveOrder -->
 		<action name="requestPromotionForm" path="/jsp/requestPromotionAction" parameter="do" scope="request" type="com.isecinc.pens.web.reqPromotion.RequestPromotionAction" >
 			<forward name="prepare" path="/jsp/requestPromotion/requestPromotionSearch.jsp" />

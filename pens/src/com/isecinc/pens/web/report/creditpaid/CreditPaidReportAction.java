@@ -111,6 +111,7 @@ public CreditPaidReport getDataCreditPaid_HavePDReportProcess(CreditPaidReport t
 			sql.append("\n  ,o.doc_status   ");
 			sql.append("\n  ,r.pdpaid_date  ");
 			sql.append("\n  ,r.PAYMENT_METHOD2 ");
+			sql.append("\n  ,(select cheque_date from t_pd_receipt_his h where h.order_no = o.order_no) as cheque_date");
 			sql.append("\n  ,SUM(o.NET_AMOUNT)  AS RECEIPT_AMOUNT ");
 			sql.append("\n   from t_order o, m_customer cus  ");
 			sql.append("\n   ,( ");
@@ -159,6 +160,11 @@ public CreditPaidReport getDataCreditPaid_HavePDReportProcess(CreditPaidReport t
 				}else if("CH".equals(Utils.isNull(rs.getString("PAYMENT_METHOD2")))){
 				   detailedSales.setPaymentMethod("àªç¤");
 				}
+				if(rs.getTimestamp("cheque_date") != null){
+				   detailedSales.setChequeDate(DateToolsUtil.convertToString(rs.getTimestamp("cheque_date")));
+				}else{
+				   detailedSales.setChequeDate("");
+				}
 				
 				totalOrderAmt += detailedSales.getOrderAmount();
 				
@@ -197,6 +203,7 @@ public CreditPaidReport getDataCreditPaid_NoPDReportProcess(CreditPaidReport t, 
 		sql.append("\n  ,'SV' as doc_status   ");
 		sql.append("\n  ,o.pdpaid_date  ");
 		sql.append("\n  ,o.PD_PAYMENTMETHOD ");
+		sql.append("\n  ,(select cheque_date from t_pd_receipt_his h where h.order_no = o.order_no) as cheque_date");
 		sql.append("\n  ,SUM(o.RECEIPT_AMOUNT)  AS RECEIPT_AMOUNT ");
 		sql.append("\n   from t_receipt_pdpaid_no o, m_customer cus  ");
 		sql.append("\n   where 1=1 ");
@@ -231,7 +238,11 @@ public CreditPaidReport getDataCreditPaid_NoPDReportProcess(CreditPaidReport t, 
 			}else if("CH".equals(Utils.isNull(rs.getString("PD_PAYMENTMETHOD")))){
 			   detailedSales.setPaymentMethod("àªç¤");
 			}
-			
+			if(rs.getTimestamp("cheque_date") != null){
+			   detailedSales.setChequeDate(DateToolsUtil.convertToString(rs.getTimestamp("cheque_date")));
+			}else{
+			   detailedSales.setChequeDate("");
+			}
 			totalOrderAmt += detailedSales.getOrderAmount();
 			
 			lstData.add(detailedSales);

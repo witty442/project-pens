@@ -160,9 +160,9 @@ function openConfirm(path,documentNo,issueReqStatus){
                                       Issue request Date 
                                      </td>
 									<td>	
-									<html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />		
+									<html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" styleClass="\" autoComplete=\"off" />		
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;			
-									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
+									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" styleClass="\" autoComplete=\"off" />	  
 									</td>
 								</tr>
 								 <tr>
@@ -174,13 +174,13 @@ function openConfirm(path,documentNo,issueReqStatus){
 											<html:options collection="statusIssueReqList" property="key" labelProperty="name"/>
 									  </html:select>	
 									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;				
-									 ผู้เบิก <html:text property="bean.requestor" styleId="requestor" size="20" />	  
+									 ผู้เบิก <html:text property="bean.requestor" styleId="requestor" size="20"  styleClass="\" autoComplete=\"off"/>	  
 									</td>
 								</tr>
 								<tr>
                                     <td> หมายเหตุ </td>
                                     <td>
-						               <html:text property="bean.remark" styleId="remark" size="50" />
+						               <html:text property="bean.remark" styleId="remark" size="50"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 						   </table>

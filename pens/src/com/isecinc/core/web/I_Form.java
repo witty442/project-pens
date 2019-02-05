@@ -25,6 +25,63 @@ public abstract class I_Form extends ActionForm {
 
 	/** Status for Change */
 	private String status;
+	
+   //Wit Edit 19/09/2017 pageing
+	private int currPage;
+	private int totalPage;
+	private int totalRecord;
+	private int startRec;
+	private int endRec;
+	private int pageSize;
+	
+	
+	public int getCurrPage() {
+		return currPage;
+	}
+
+	public void setCurrPage(int currPage) {
+		this.currPage = currPage;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+
+	public int getTotalRecord() {
+		return totalRecord;
+	}
+
+	public void setTotalRecord(int totalRecord) {
+		this.totalRecord = totalRecord;
+	}
+
+	public int getStartRec() {
+		return startRec;
+	}
+
+	public void setStartRec(int startRec) {
+		this.startRec = startRec;
+	}
+
+	public int getEndRec() {
+		return endRec;
+	}
+
+	public void setEndRec(int endRec) {
+		this.endRec = endRec;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
 
 	public String[] getIds() {
 		return ids;

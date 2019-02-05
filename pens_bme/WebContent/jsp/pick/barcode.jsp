@@ -534,7 +534,7 @@ function getProductModelByMat(matObj,lineId){
                                       <c:when test="${barcodeForm.mode == 'add'}">
 									     <td >
 								             <html:text property="job.jobId" styleId="jobId" size="20" 
-						                               onkeypress="getJobNameKeypress(event,this)"/> 
+						                               onkeypress="getJobNameKeypress(event,this)"  styleClass="\" autoComplete=\"off"/> 
 						                      <font color="red">*</font>
 						                     <input type="button" name="x1" value="..." onclick="openJobPopup('${pageContext.request.contextPath}')"/>
 										 </td>
@@ -575,7 +575,7 @@ function getProductModelByMat(matObj,lineId){
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
 									  <c:if test="${barcodeForm.job.canEdit == true}">  
-						                  <html:text property="job.remark" styleId="remark" size="90" />
+						                  <html:text property="job.remark" styleId="remark" size="90"  styleClass="\" autoComplete=\"off"/>
 						              </c:if>
 						               <c:if test="${barcodeForm.job.canEdit == false}">  
 						                  <html:text property="job.remark" styleId="remark" size="90" readonly="true" styleClass="disableText"/>
@@ -587,7 +587,7 @@ function getProductModelByMat(matObj,lineId){
 								              &nbsp; GR NO(His&Her) 
 								              <c:choose>
 		                                         <c:when test="${barcodeForm.job.canEditGrNo == true}">
-		                                             <html:text property="job.grNo" styleId="grNo" size="20" />
+		                                             <html:text property="job.grNo" styleId="grNo" size="20"  styleClass="\" autoComplete=\"off"/>
 		                                         </c:when>
 		                                         <c:otherwise>   
 		                                             <html:text property="job.grNo" styleId="grNo" size="20" readonly="true" styleClass="disableText" />
@@ -598,7 +598,7 @@ function getProductModelByMat(matObj,lineId){
                                       }else{
                                       %>
                                          &nbsp; GR NO(His&Her) 
-                                         <html:text property="job.grNo" styleId="grNo" size="20" />
+                                         <html:text property="job.grNo" styleId="grNo" size="20"  styleClass="\" autoComplete=\"off"/>
                                       <%} %>
 									</td>
 								</tr>	

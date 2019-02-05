@@ -249,7 +249,8 @@ public class ExportSQL {
 					"   t.PD_PAYMENTMETHOD, \n"+
 					"   t.PDPAID_DATE, \n"+
 					"   t.CREATED, \n"+
-					"   t.CREATED_BY \n"+
+					"   t.CREATED_BY, \n"+
+					"   t.CHEQUE_DATE \n"+
 				"	from t_pd_receipt_his t \n"+
 				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n";
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_prod_show")){
@@ -281,6 +282,26 @@ public class ExportSQL {
 				"	from t_req_promotion t \n"+
 				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
 				"   and status ='SV' ";
+			}else if(tableBean.getTableName().equalsIgnoreCase("t_bank_transfer")){
+				str ="select \n"+
+					"  'H' AS RECORD_TYPE, \n"+
+					"	t.TRANSFER_TYPE  , \n"+
+					"	t.TRANSFER_BANK ,\n"+
+					"	t.TRANSFER_DATE , \n"+
+					"	t.TRANSFER_TIME , \n"+
+					"   t.AMOUNT,\n"+
+					"   t.CHEQUE_NO, \n"+
+					"   t.CHEQUE_DATE, \n"+
+					"   t.CREATED, \n"+
+					"   t.CREATED_BY, \n"+
+					"   t.CREATE_DATE, \n"+
+					"   t.UPDATED_BY, \n"+
+					"   t.UPDATED, \n"+
+					"   t.USER_ID, \n"+
+					"   t.line_id , \n"+
+					"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME \n"+
+				"	from t_bank_transfer t \n"+
+				"   where ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n";
 			}
 			return str;
 		}catch(Exception e){
@@ -479,7 +500,9 @@ public class ExportSQL {
 		"      and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
 		"	   and m_customer.user_id = "+userBean.getId() +" \n"+
 		"      and  t_receipt.DOC_STATUS = 'SV' \n"+
-		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL OR TRIM(t_receipt.EXPORTED) ='')     \n";
+		"      and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL OR TRIM(t_receipt.EXPORTED) ='')     \n"+
+		//Add new issue  Case van No export if internal_bank is null 16/01/2019
+		"      and t_receipt.INTERNAL_BANK is not null and t_receipt.INTERNAL_BANK <> '' \n";
         return sql;
 	}
 	

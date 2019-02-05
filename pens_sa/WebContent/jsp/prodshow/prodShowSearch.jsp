@@ -16,14 +16,8 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="prodShowForm" class="com.isecinc.pens.web.prodshow.ProdShowForm" scope="session" />
-
 <%
-//for test clear session
-//SIdUtils.getInstance().clearInstance();
-		
-User user = (User) request.getSession().getAttribute("user");
-String role = user.getRoleSalesTarget();
-
+String pageName = Utils.isNull(request.getParameter("pageName")); 
 %>
 <html>
 <head>
@@ -88,6 +82,10 @@ String role = user.getRoleSalesTarget();
 					 	    <!-- ************************Result *************-->
 					 	    <jsp:include page="result/prodShowResult.jsp" />  
 					 	</div>
+					 	
+					 	<!-- INPUT HIDDEN -->
+					 	<input type="hidden" name="pageName" value="<%=pageName %>"/>
+					 	
 					</html:form>
 					<!-- BODY -->
 					</td>

@@ -301,7 +301,6 @@ public class OrderAction extends I_Action {
 			//add Line Blank UOM (1 or 2)
 			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
 
-
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
 			orderForm.setAutoReceipt(new Receipt());
@@ -941,7 +940,15 @@ public class OrderAction extends I_Action {
 				 
 				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
 				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
-				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+				 
+				 logger.debug("PDPAID ="+user.isPDPaid());
+				 //case PDPAID =Y use default bank 002
+				 if(user.isPDPaid()){
+				    orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+			     }else{
+			    	//PD_PAID =N use internal_bank from t_bank_transfer (not found no export t_receipt)
+			    	orderForm.getAutoReceipt().setInternalBank("");
+			     }
 				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
 				 
 				 /** Set ReceiptBy Manual **/
@@ -997,8 +1004,14 @@ public class OrderAction extends I_Action {
 				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
 				 receiptByList.add(receiptBy);
 				 //process auto receipt 
-				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
-				
+				 
+				 //Case Money_to_pens ='Y'  set exported='Z' no export
+				 if("Y".equalsIgnoreCase(user.getMoneyToPens())){
+				     new OrderProcess().createAutoReceipt_PDPAID_MONEYTOPENS(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
+				 }else{
+					 //Case Money_to_pens ='N'  set exported ='N' export normal
+					 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn); 
+				 }
 				 //set msg 
 				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
 				

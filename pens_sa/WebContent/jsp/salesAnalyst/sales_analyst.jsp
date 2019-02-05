@@ -514,9 +514,7 @@ function showSearchValuePopup(path,currCondNo){
 		//alert(param);
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
-	//	window.open(encodeURI(url),"",
-				   //"menubar=no,resizable=no,titlebar=no,location=no,toolbar=no,scrollbars=yes,status=no,menubar=no,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
-	      PopupCenterFullHeight(encodeURI(url),"","700");
+	    PopupCenterFullHeight(encodeURI(url),"","700");
 	}
 }
 

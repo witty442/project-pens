@@ -18,6 +18,7 @@
 	<field name="pdDate" class="java.lang.String"/>
 	<field name="paymentMethod" class="java.lang.String"/>
 	<field name="status" class="java.lang.String"/>
+	<field name="chequeDate" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -107,7 +108,7 @@
 				<text><![CDATA[ลำดับ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="497" y="0" width="58" height="20"/>
+				<reportElement x="441" y="0" width="58" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -133,7 +134,7 @@
 				<text><![CDATA[เลขที่รายการขาย]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="178" y="0" width="159" height="20"/>
+				<reportElement x="169" y="0" width="140" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -146,7 +147,7 @@
 				<text><![CDATA[ร้านค้า]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="413" y="0" width="80" height="20"/>
+				<reportElement x="390" y="0" width="51" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -156,10 +157,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[วันที่ส่งเงินเชื่อให้ PD]]></text>
+				<text><![CDATA[วันที่เก็บงิน]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="111" y="0" width="67" height="20"/>
+				<reportElement x="111" y="0" width="58" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -172,7 +173,7 @@
 				<text><![CDATA[วันที่ทำรายการ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="337" y="0" width="76" height="20"/>
+				<reportElement x="309" y="0" width="81" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -183,6 +184,19 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<text><![CDATA[จำนวนเงิน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="499" y="0" width="56" height="20"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[วันที่หน้าเช็ค]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -213,7 +227,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{orderNo}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="337" y="5" width="76" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="309" y="5" width="81" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -224,7 +238,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{orderAmount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="179" y="5" width="159" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="169" y="5" width="140" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -235,7 +249,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerName}.equals(null)?"":$F{customerCode} + " " + $F{customerName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="419" y="5" width="78" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="390" y="5" width="51" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -246,7 +260,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{pdDate}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="111" y="5" width="67" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="111" y="5" width="58" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -257,7 +271,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{orderDate}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="497" y="5" width="58" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="441" y="5" width="58" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -266,6 +280,17 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{paymentMethod}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="497" y="5" width="58" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{chequeDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -300,7 +325,7 @@
 	<summary>
 		<band height="160">
 			<staticText>
-				<reportElement x="0" y="0" width="337" height="20"/>
+				<reportElement x="0" y="0" width="309" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -313,7 +338,7 @@
 				<text><![CDATA[ยอดรวมเงินเชื่อที่เก็บได้    ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="413" y="0" width="142" height="20"/>
+				<reportElement x="390" y="0" width="165" height="20"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -326,7 +351,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="337" y="0" width="76" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="309" y="0" width="81" height="20"/>
 				<box>
 					<pen lineWidth="1.0" lineStyle="Dashed"/>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>

@@ -18,6 +18,7 @@ import com.isecinc.pens.inf.bean.ImageFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExportHelper;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
@@ -925,6 +926,59 @@ public class ExportProcess {
 		}
 	}
 
+	public   TableBean exportBankTransfer(Connection conn,TableBean tableBean,User userBean) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer dataAppend = new StringBuffer("");
+		 String lastAppen = Constants.delimeterPipeStr;
+        int countTrans = 0;
+        int i=0;
+        List<String> sqlUpdateExportFlagList = new ArrayList<String>(); 
+		try{
+			ps = conn.prepareStatement(tableBean.getPrepareSqlSelect());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				//Add Order Header
+				for(i=0;i<tableBean.getColumnBeanList().size();i++){
+					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
+					if(i==tableBean.getColumnBeanList().size()-1){
+						lastAppen = "";
+					}else{
+						lastAppen = Constants.delimeterPipeStr;
+					}
+					if(colBean.getColumnName().equalsIgnoreCase("RECORD_TYPE")){
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs));
+					}else{
+						dataAppend.append(ExportHelper.covertToFormatExport(colBean,rs)).append(lastAppen);
+					}	
+				}//for
+				
+				/** Add New Line **/
+				dataAppend.append(Constants.newLine);//new line
+				
+				/** Set Data For Update ExportFlag **/
+				sqlUpdateExportFlagList.add("update t_bank_transfer set exported = 'Y' WHERE line_id ="+rs.getInt("line_id")+"");
+				
+			}//while	
+		
+			tableBean.setExportCount(countTrans);
+			tableBean.setDataStrExport(dataAppend);
+			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
+		
+			return tableBean;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps= null;
+			}
+			if(rs != null){
+				rs.close();rs= null;
+			}
+		}
+	}
+	
+	
 	/**
 	 * exportMoveOrder
 	 * @param conn
@@ -969,7 +1023,6 @@ public class ExportProcess {
 				dataAppend.append(Constants.newLine);//new line
 				/** add Order Line Detail */
 				dataAppend.append(exportMoveOrderLine(conn,rs.getString("request_number"),sqlUpdateExportFlagList));
-				
 				
 				/** Set Data For Update InterfacesFlag **/
 				sqlUpdateExportFlagList.add("update t_move_order set exported ='Y' WHERE request_number = '"+rs.getString("request_number")+"'");
@@ -1055,7 +1108,6 @@ public class ExportProcess {
 			tableBean.setDataStrExport(dataAppend);
 			tableBean.setSqlUpdateExportFlagList(sqlUpdateExportFlagList);
 		    tableBean.setImageFileList(imageFileListAll);
-		    
 
 			return tableBean;
 		}catch(Exception e){

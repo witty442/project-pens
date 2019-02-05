@@ -355,7 +355,8 @@ $(function() {
 								<%if( role.equalsIgnoreCase(User.VAN)){ %>
 								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
 								<%}else{ %>
-								   <th class="cust_actionEditCust" >เปิดบิลพิเศษ</th>
+								  <!--  <th class="cust_actionEditCust" >เปิดบิลพิเศษ</th> -->
+								  <th class="cust_actionEditCust" >ตั้งกองโชว์</th>
 								<%} %>
 								<th class="cust_actionView">แสดง</th>
 								<th class="cust_actionEdit">ทำรายการ</th>
@@ -410,7 +411,7 @@ $(function() {
 									 <c:if test="${item.isActive=='Y'}">
 									    <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
 									       <%-- <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/> --%>
-									       จัดรายการ
+									     <b>  จัดรายการ</b>
 									    </a>
 									    </c:if>
 									</td>
@@ -446,11 +447,18 @@ $(function() {
 									</c:if>
 								</td> --%>
 								<!-- Order Special -->
+								<%-- <td class="cust_actionEditCust">
+									 <c:if test="${item.isActive=='Y'}">
+								       <a href="#" onclick="toCreateNewOrderSpecial('${pageContext.request.contextPath}','add',${item.id})">
+							            <img src="${pageContext.request.contextPath}/images2/b_order_special.png" width="32" height="32" border="0" class="newPicBtn">
+							          </a>  
+							        </c:if>
+								</td> --%>
 								<td class="cust_actionEditCust">
 									 <c:if test="${item.isActive=='Y'}">
-								      <a href="#" onclick="toCreateNewOrderSpecial('${pageContext.request.contextPath}','add',${item.id})">
-							            <img src="${pageContext.request.contextPath}/images2/b_order_special.png" width="32" height="32" border="0" class="newPicBtn">
-							          </a> 
+								       <a href="#" onclick="manageProdShowTT('${pageContext.request.contextPath}','${item.code}');">
+							                <b>  ตั้งกองโชว์</b>
+							          </a>  
 							        </c:if>
 								</td>
 							<%} %>
@@ -473,7 +481,7 @@ $(function() {
 						
 								    <c:if test="${item.imageFileName != ''}">
 										<a href="#" onclick="return showImage('${pageContext.request.contextPath}','${item.id}','${item.imageFileName}');">
-											แสดงรูปภาพ 
+											<b>แสดงรูปภาพ </b>
 										 </a>
 									 </c:if>
 							    </td>

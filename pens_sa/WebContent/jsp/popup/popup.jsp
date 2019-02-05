@@ -35,7 +35,7 @@
 	
     /** Criteria Name **/
     if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
-       || "BrandProdShow".equalsIgnoreCase(pageName)	){
+       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	){
     	headName = "แบรนด์("+pageName+")";
     	codeSearchTxtName = "Brand";
     	descSearchTxtName = "Brand Name";
@@ -52,10 +52,14 @@
     	codeSearchTxtName = "Customer Code";
     	descSearchTxtName = "Customer Name";
     }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
-    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)	){
+    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)|| "ItemStockVan".equalsIgnoreCase(pageName)  	){
     	headName = "รหัสสินค้า("+pageName+")";
     	codeSearchTxtName = "รหัสสินค้า";
     	descSearchTxtName = "ชื่อสินค้า";
+    }else  if("PDStockVan".equalsIgnoreCase(pageName)){
+	 	headName = "PD/หน่วยรถ("+pageName+")";
+	 	codeSearchTxtName = "PD/หน่วยรถ";
+	 	descSearchTxtName = "ชื่อ PD/หน่วยรถ";
     }
     
     /** Store Select MutilCode in each Page **/
@@ -287,7 +291,7 @@ window.onload = function(){
 <!-- RESULT -->
 <%if(session.getAttribute("DATA_LIST") != null){ %>
 <%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
-	|| "BrandProdShow".equalsIgnoreCase(pageName)){ %>
+	|| "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/BrandResult.jsp" /> 
 <%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
 		|| "CustomerLocation".equalsIgnoreCase(pageName) || "CustomerVanProdShow".equalsIgnoreCase(pageName)
@@ -295,8 +299,13 @@ window.onload = function(){
 		){ 
 %>
      <jsp:include page="popup_sub/CustomerResult.jsp" /> 
-<%}else if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName) ){ %>
+<%}else if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName) 
+		 || "ItemStockVan".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="popup_sub/ItemResult.jsp" /> 
+     
+<%}else if("PDStockVan".equalsIgnoreCase(pageName) ){ %>
+     <jsp:include page="popup_sub/pdStockVanResult.jsp" /> 
+     
 <%}}else if(session.getAttribute("search_submit") != null){ %>
  <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>

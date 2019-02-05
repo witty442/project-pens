@@ -125,10 +125,10 @@ function openEdit(path,requestNo,returnNo,mode){
 						       <tr>
                                     <td> Request Date</td>
 									<td>					
-										 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
+										 <html:text property="bean.requestDate" styleId="requestDate" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20"/>
+									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td>					
 										Status   
@@ -140,13 +140,13 @@ function openEdit(path,requestNo,returnNo,mode){
 								<tr>
                                     <td> Return Date</td>
 									<td>					
-										 <html:text property="bean.returnDate" styleId="returnDate" size="20"/>
+										 <html:text property="bean.returnDate" styleId="returnDate" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    Return No <html:text property="bean.returnNo" styleId="returnNo" size="20"/>
+									    Return No <html:text property="bean.returnNo" styleId="returnNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td>
-									    CN NO <html:text property="bean.cnNo" styleId="cnNo" size="15"/>
+									    CN NO <html:text property="bean.cnNo" styleId="cnNo" size="15" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>	
 						   </table>

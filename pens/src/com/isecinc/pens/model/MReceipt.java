@@ -272,8 +272,9 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		}
 		return true;
 	}
-
-	public boolean updateReceiptFromPDReceipt(Receipt receipt, int activeUserID, Connection conn) throws Exception {
+	
+	/** Case PD_PAID = Y and pay by credit  set exported ='Z'  no export to Oracle*/
+	public boolean saveWOCheckDup_PDPAID(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receipt.getId() == 0) {
 			id = SequenceProcess.getNextValue(TABLE_NAME);
@@ -294,9 +295,42 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
 				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
+				receipt.getIsPDPaid() , DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())) 
+			  , receipt.getPdPaymentMethod(),"Z"};
+		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
+			receipt.setId(id);
+		}
+		return true;
+	}
+	public boolean updateReceiptFromPDReceipt(Receipt receipt, int activeUserID, Connection conn) throws Exception {
+		int id = 0;
+		if (receipt.getId() == 0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME);
+			String prefix = "";
+			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
+				receipt.setReceiptNo("R"
+						+ new ReceiptDocumentProcess().getNextDocumentNo(receipt.getSalesRepresent().getCode(), prefix,
+								activeUserID, conn));
+		} else {
+			id = receipt.getId();
+		}
+		 String[] columnsM = { COLUMN_ID, "RECEIPT_NO", "RECEIPT_DATE", "ORDER_TYPE", "CUSTOMER_ID", "CUSTOMER_NAME",
+					"PAYMENT_METHOD", "BANK", "CHEQUE_NO", "CHEQUE_DATE", "RECEIPT_AMOUNT", "INTERFACES", "DOC_STATUS",
+					"USER_ID", "CREATED_BY", "UPDATED_BY", "CREDIT_CARD_TYPE", "DESCRIPTION", "PREPAID", "APPLY_AMOUNT",
+					"INTERNAL_BANK" ,"ISPDPAID","PDPAID_DATE","PD_PAYMENTMETHOD","EXPORTED"};
+		 
+		Object[] values = { id, ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim(),
+				DateToolsUtil.convertToTimeStamp(receipt.getReceiptDate()),
+				ConvertNullUtil.convertToString(receipt.getOrderType()).trim(), receipt.getCustomerId(),
+				ConvertNullUtil.convertToString(receipt.getCustomerName()).trim(), null, null,
+				Utils.parseCheckNull(receipt.getChequeDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th) , null,
+				receipt.getReceiptAmount(), receipt.getInterfaces(), receipt.getDocStatus(),
+				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
+				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
+				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
 				receipt.getIsPDPaid() , DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())) ,
 			    receipt.getPdPaymentMethod(),Utils.isNull(receipt.getExported())};
-		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
+		if (super.save(TABLE_NAME, columnsM, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}
 		return true;
@@ -307,8 +341,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		try {
 			String sql = "\n INSERT INTO t_receipt_pdpaid_no ";
 	               sql +="\n ( ORDER_NO,ORDER_DATE,CUSTOMER_ID,RECEIPT_AMOUNT, PDPAID_DATE, ";
-	               sql +="\n PD_PAYMENTMETHOD, CREATED, CREATED_BY) ";
-	               sql +="\n VALUES(?,?,?,?,?,?,?,?)";
+	               sql +="\n PD_PAYMENTMETHOD, CREATED, CREATED_BY,CHEQUE_DATE) ";
+	               sql +="\n VALUES(?,?,?,?,?,?,?,?,?)";
 	               
 			logger.debug("SQL:"+sql);
 			
@@ -327,7 +361,11 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			ps.setString(++index, r.getPdPaymentMethod());
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setInt(++index, user.getId());
-			
+			if( !Utils.isNull(r.getChequeDate()).equals("")){
+			   ps.setDate(++index, new java.sql.Date(Utils.parse(r.getChequeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			}else{
+			   ps.setDate(++index, null);
+			}
 			return ps.executeUpdate();
 		} catch (Exception ex) {
 			throw ex;
@@ -343,8 +381,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		try {
 			String sql = "\n INSERT INTO t_pd_receipt_his ";
 	               sql +="\n ( ORDER_NO,ORDER_DATE,CUSTOMER_ID,RECEIPT_AMOUNT, PDPAID_DATE, ";
-	               sql +="\n PD_PAYMENTMETHOD, CREATED, CREATED_BY,EXPORTED) ";
-	               sql +="\n VALUES(?,?,?,?,?,?,?,?,?)";
+	               sql +="\n PD_PAYMENTMETHOD, CREATED, CREATED_BY,EXPORTED,CHEQUE_DATE) ";
+	               sql +="\n VALUES(?,?,?,?,?,?,?,?,?,?)";
 	               
 			logger.debug("SQL:"+sql);
 			logger.debug("insert orderNo:"+r.getReceiptNo());
@@ -365,7 +403,11 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setInt(++index, user.getId());
 			ps.setString(++index, "N");
-			
+			if( !Utils.isNull(r.getChequeDate()).equals("")){
+			   ps.setDate(++index, new java.sql.Date(Utils.parse(r.getChequeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			}else{
+			   ps.setDate(++index, null);
+			}
 			return ps.executeUpdate();
 		} catch (Exception ex) {
 			throw ex;

@@ -54,6 +54,14 @@ public class ExternalProcess {
 		     GenerateAutoReceiptVan.genAutoReceiptCash(userLogin);
 		     logger.info("--- 2.End Run genAutoReceiptCash ---");
 		 }
+		 
+		//Case Van PDPAID ='N' AND MONEY_TO_PENS ='Y  
+		//update bank(last transfer cash) in t_receipt_by and payment_method ='CS' (CASH) ONLY
+		if(    "VAN".equalsIgnoreCase(userLogin.getType()) 
+			&& "N".equalsIgnoreCase(userLogin.getPdPaid())){
+			
+			UpdateBankReceiptCaseVANProcess.process(userLogin);//t_receipt
+		}
 	}
 	
 	public void processExportAfter(HttpServletRequest request,User userLogin){

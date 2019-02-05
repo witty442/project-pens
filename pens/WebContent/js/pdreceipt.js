@@ -15,9 +15,19 @@ function defaultDate(paymentMethod,row,currDate){
 		if(document.getElementsByName("pdReceiptDate")[eval(row-1)].value == null || document.getElementsByName("pdReceiptDate")[eval(row-1)].value.length ==0){
 			document.getElementsByName("pdReceiptDate")[eval(row-1)].value=currDate;
 		}
-	}
-	else
+		//Case Cheque enable chequeDate
+		//alert(paymentMethod.value+",row["+row+"]");
+		if(paymentMethod.value =='CH'){
+			document.getElementsByName("chequeDate")[eval(row-1)].disabled=false;
+		}else{
+			document.getElementsByName("chequeDate")[eval(row-1)].disabled=true;
+			document.getElementsByName("chequeDate")[eval(row-1)].value='';
+		}
+	}else{
 		document.getElementsByName("pdReceiptDate")[eval(row-1)].value='';
+    }
+	
+	
 }
 
 function save(path){
@@ -27,11 +37,13 @@ function save(path){
 	var p_receiptId = "ids=";
 	var p_paymentMethods ="pms=";
 	var p_pdPaidDate ="pdates=";
+	var p_chequeDate ="pchequeDates=";
 	
 	var receiptIds = document.getElementsByName("receiptId");
 	var paymentMethods = document.getElementsByName("pd.paymentMethod");
 	var paidDates = document.getElementsByName("pdReceiptDate");
-
+	var chequeDates = document.getElementsByName("chequeDate");
+	
 	var isFirst = true;
 	var noValueSelect = true;
 	for(var i=0;i<paymentMethods.length;i++){
@@ -41,19 +53,27 @@ function save(path){
 				paidDates[i].focus();
 				return false;
 			}
+			if(paymentMethods[i].value == 'CH'){
+				if(chequeDates[i].value == null || trim(chequeDates[i].value).length == 0 ){
+					alert("กรุณาระบุ วันที่หน้าเช็ค");
+					chequeDates[i].focus();
+					return false;
+				}
+			}
 			
 			if(isFirst){
 				p_receiptId = p_receiptId+receiptIds[i].value;
 				p_paymentMethods = p_paymentMethods+paymentMethods[i].value;
 				p_pdPaidDate = p_pdPaidDate+paidDates[i].value;
+				p_chequeDate = p_chequeDate+chequeDates[i].value;
 				
 				isFirst = false;
 				noValueSelect = false;
-			}
-			else{
+			}else{
 				p_receiptId = p_receiptId+","+receiptIds[i].value;
 				p_paymentMethods = p_paymentMethods+","+paymentMethods[i].value;
 				p_pdPaidDate = p_pdPaidDate+","+paidDates[i].value;
+				p_chequeDate = p_chequeDate+","+chequeDates[i].value;
 			}
 		}
 		else{
@@ -70,7 +90,7 @@ function save(path){
 		return false;
 	}
 	
-	document.pdReceiptForm.action = path + "/jsp/pdReceipt.do?do=save&"+p_receiptId+"&"+p_paymentMethods+"&"+p_pdPaidDate;
+	document.pdReceiptForm.action = path + "/jsp/pdReceipt.do?do=save&"+p_receiptId+"&"+p_paymentMethods+"&"+p_pdPaidDate+"&"+p_chequeDate;
 	document.pdReceiptForm.submit();
 	return true;
 }

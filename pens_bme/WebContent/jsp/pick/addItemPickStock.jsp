@@ -220,12 +220,12 @@ function currencyToNum(str){
 								<td class="data_materialMaster"><%=o.getMaterialMaster()%></td>
 								<td class="data_barcode"><%=o.getBarcode() %></td>
 								<td class="data_onhandQty">
-								    <input tabindex="-1" type="text" name="onhandQty" value ="<%=o.getOnhandQty()%>" size="20" class="disableNumber"/>
+								    <input tabindex="-1" type="text" name="onhandQty" value ="<%=o.getOnhandQty()%>" size="20" class="disableNumber" />
 								</td>
 								<td class="data_qty">
 									  <input tabindex="1" type="text" name="qty" value ="<%=Utils.isNull(o.getQty()) %>" size="20"  class="enableNumber"
 									   onkeypress="chkQtyKeypress(this,event,<%=i%>)"
-					                   onblur="validateQty(this,<%=i%>)"
+					                   onblur="validateQty(this,<%=i%>)" autocomplete="off"
 									  />
 								</td>
 						</tr>

@@ -263,30 +263,30 @@ function loadSummaryTypeListW2(status){
 						       <tr>
                                     <td> PensItem From</td>
 									<td>					
-										 <html:text property="bean.pensItemFrom" styleId="pensItemFrom" size="20"/>
+										 <html:text property="bean.pensItemFrom" styleId="pensItemFrom" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    PensItem To    <html:text property="bean.pensItemTo" styleId="pensItemTo" size="20"/>   
+									    PensItem To    <html:text property="bean.pensItemTo" styleId="pensItemTo" size="20" styleClass="\" autoComplete=\"off"/>   
 									</td>
 									<td></td>
 								</tr>
 								 <tr>
                                     <td> Group Code From</td>
 									<td>					
-										 <html:text property="bean.groupCodeFrom" styleId="GroupCodeFrom" size="20"/>
+										 <html:text property="bean.groupCodeFrom" styleId="GroupCodeFrom" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    Group Code To  <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20"/>	   
+									    Group Code To  <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20" styleClass="\" autoComplete=\"off"/>	   
 									</td>
 									<td></td>
 								</tr>
 								<tr>
                                     <td> จากเลขที่กล่อง</td>
 									<td>					
-										 <html:text property="bean.boxNoFrom" styleId="GroupCodeFrom" size="20"/>
+										 <html:text property="bean.boxNoFrom" styleId="GroupCodeFrom" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    ถึงเลขที่กล่อง    <html:text property="bean.boxNoTo" styleId="GroupCodeTo" size="20"/>	 
+									    ถึงเลขที่กล่อง    <html:text property="bean.boxNoTo" styleId="GroupCodeTo" size="20" styleClass="\" autoComplete=\"off"/>	 
 									</td>
 									<td></td>
 								</tr>
@@ -295,7 +295,7 @@ function loadSummaryTypeListW2(status){
 									<td colspan="3">
 						                <html:text property="bean.jobId" styleId="jobId" size="20" 
 						                  onkeypress="getJobNameKeypress(event,this)"
-						                  />					    
+						                   styleClass="\" autoComplete=\"off"/>					    
 									     <input type="button" name="x1" value="..." onclick="openJobPopup('${pageContext.request.contextPath}')"/>
 									    <html:text property="bean.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
 									</td>

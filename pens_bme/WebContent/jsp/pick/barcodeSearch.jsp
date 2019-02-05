@@ -215,7 +215,7 @@ function getJobNameModel(code){
 										 <html:text property="job.transactionDate" styleId="transactionDate" size="20"/>
 									</td>
 									<td> 
-									           เลขที่กล่อง <html:text property="job.boxNo" styleId="boxNo" size="20"/>
+									           เลขที่กล่อง <html:text property="job.boxNo" styleId="boxNo" size="20"  styleClass="\" autoComplete=\"off"/>
 									           สถานะ   
 										<html:select property="job.status" styleId="status">
 											<html:options collection="barcodeStatusList" property="key" labelProperty="name"/>
@@ -229,7 +229,7 @@ function getJobNameModel(code){
                                     <td>รับคืนจาก </td>
 									<td colspan="2">
 						                <html:text property="job.jobId" styleId="jobId" size="20" 
-						                  onkeypress="getJobNameKeypress(event,this)"
+						                  onkeypress="getJobNameKeypress(event,this)"  styleClass="\" autoComplete=\"off"
 						                  />					    
 									     <input type="button" name="x1" value="..." onclick="openJobPopup('${pageContext.request.contextPath}')"/>
 									    <html:text property="job.name" styleId="name" readonly="true" styleClass="disableText" size="50"/>
@@ -256,9 +256,9 @@ function getJobNameModel(code){
 								<tr>
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
-						               <html:text property="job.remark" styleId="remark" size="80" />
+						               <html:text property="job.remark" styleId="remark" size="80"  styleClass="\" autoComplete=\"off"/>
 						              Scan By User
-						               <html:text property="job.createUser" styleId="createUser" size="20" />
+						               <html:text property="job.createUser" styleId="createUser" size="20"  styleClass="\" autoComplete=\"off"/>
 						               &nbsp;&nbsp;
 						               <html:checkbox property="job.includeCancel">&nbsp; แสดงรายการที่ยกเลิกด้วย</html:checkbox>
 									</td>

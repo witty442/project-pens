@@ -44,7 +44,8 @@ public class ProdShowAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action")); 
-		
+			String pageName = Utils.isNull(request.getParameter("pageName")); 
+			
 			if("new".equals(action)){
 				//init connection
 				conn = DBConnection.getInstance().getConnectionApps();
@@ -54,11 +55,11 @@ public class ProdShowAction extends I_Action {
 				ProdShowBean bean = new ProdShowBean();
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
 				bean.setPeriodType("month");
-				bean.setCustCatNo("V");
+				bean.setCustCatNo("VAN".equalsIgnoreCase(pageName)?"V":"S");
 				aForm.setBean(bean);
 				
 				//prepare Session List
-				prepareSearchData(request, conn, user);
+				prepareSearchData(request, conn, user,pageName);
 				
 			}else if("back".equals(action)){
 				//clear session 
@@ -81,11 +82,10 @@ public class ProdShowAction extends I_Action {
 		return mapping.findForward("search");
 	}
 	
-	public  void prepareSearchData(HttpServletRequest request,Connection conn,User user){
+	public  void prepareSearchData(HttpServletRequest request,Connection conn,User user,String pageName){
 		try{
 			//init monthYearList
 			request.getSession().setAttribute("PERIOD_LIST", ProdShowUtils.initPeriod(conn));
-			
 			
 			//SALES_CHANNEL_LIST
 			//add Blank Row
@@ -100,11 +100,16 @@ public class ProdShowAction extends I_Action {
 			request.getSession().setAttribute("SALES_CHANNEL_LIST",salesChannelList);
 			
 			//Cust Cat No List
-			//add Blank Row
 			List<PopupBean> custCatNoList = new ArrayList<PopupBean>();
-			item = new PopupBean();
-			item.setCustCatNo("V");
-			item.setCustCatDesc("VAN SALES");
+			if("VAN".equalsIgnoreCase(pageName)){
+				item = new PopupBean();
+				item.setCustCatNo("V");
+				item.setCustCatDesc("VAN SALES");
+			}else{
+				item = new PopupBean();
+				item.setCustCatNo("S");
+				item.setCustCatDesc("CREDIT SALES");
+			}
 			custCatNoList.add(item);
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 			

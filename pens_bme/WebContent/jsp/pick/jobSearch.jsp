@@ -228,9 +228,9 @@ function gotoPage(path,currPage){
 								<tr>
                                     <td align="right" nowrap width="5%"  class="criteria_style"> Job Id</td>
 									<td width="35%" nowrap  colspan="3"  class="criteria_style">
-						               <html:text property="job.jobId" styleId="jobId" size="10" />
+						               <html:text property="job.jobId" styleId="jobId" size="10" styleClass="\" autoComplete=\"off" />
 						                Job Name
-						                 <html:text property="job.name" styleId="name" size="40" />
+						                 <html:text property="job.name" styleId="name" size="40"  styleClass="\" autoComplete=\"off"/>
 									    &nbsp;&nbsp;&nbsp;&nbsp;Job Status &nbsp;
 						               <html:select property="job.status">
 											<html:options collection="jobStatusList" property="key" labelProperty="name"/>
@@ -243,9 +243,9 @@ function gotoPage(path,currPage){
 								<tr>
                                     <td nowrap width="5%"  class="criteria_style"> เอกสารอ้างอิง</td>
 									 <td  nowrap  width="35%" colspan="3"  class="criteria_style"> 
-									 <html:text property="job.refDoc" styleId="refDoc" size="40" />
+									 <html:text property="job.refDoc" styleId="refDoc" size="40" styleClass="\" autoComplete=\"off"/>
 									 RTN No
-									  <html:text property="job.rtnNo" styleId="rtnNo" size="15" />
+									  <html:text property="job.rtnNo" styleId="rtnNo" size="15" styleClass="\" autoComplete=\"off"/>
 									  &nbsp;&nbsp;&nbsp;
 									  <html:checkbox property="job.dispAutoCN">&nbsp;แสดงรายที่ Auto CN/Sub Transfer แล้ว</html:checkbox>
 									</td>

@@ -97,7 +97,11 @@ public class OrderAction extends I_Action {
 				 ImportDAO importDAO = new ImportDAO();
 				 conn = DBConnection.getInstance().getConnection();
 				 
-				 String notInCustCode = Constants.STORE_TYPE_FRIDAY_CODE+"," +Constants.STORE_TYPE_OSHOPPING_CODE+"," +Constants.STORE_TYPE_7CATALOG_CODE+"," +Constants.STORE_TYPE_TVD_CODE;
+				 String notInCustCode  = Constants.STORE_TYPE_FRIDAY_CODE+",";
+						notInCustCode += Constants.STORE_TYPE_OSHOPPING_CODE+"," ;
+						notInCustCode += Constants.STORE_TYPE_7CATALOG_CODE+"," ;
+						notInCustCode += Constants.STORE_TYPE_PENSHOP_CODE+"," ;
+						notInCustCode += Constants.STORE_TYPE_TVD_CODE;
 				 List<References> storeTypeList = importDAO.getStoreTypeList(conn,notInCustCode);
 			     request.getSession().setAttribute("storeTypeList",storeTypeList);
 			     

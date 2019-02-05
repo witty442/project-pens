@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +26,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.process.document.ProdShowDocumentProcess;
 
 
 public class ProdShowServlet  extends HttpServlet{
@@ -70,6 +69,7 @@ public class ProdShowServlet  extends HttpServlet{
 		User user = (User) request.getSession().getAttribute("user");
 		EnvProperties env = EnvProperties.getInstance();
 		try {
+			
 	        List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
 	        logger.debug("items size:"+items.size());
 	        for (FileItem item : items) {
@@ -169,12 +169,21 @@ public class ProdShowServlet  extends HttpServlet{
 	        	logger.debug("row["+i+"]pic3:"+itemD.getInputFileNamePic3()+"dbPic3:"+itemD.getInputFileNameDBPic3());
 	        }*/
 	        
-	        String imageLocalProdShowPath = env.getProperty("path.image.prodshow.local");//"D:/SalesApp/Images-prodshow/";
+	        //"D:/SalesApp/Images-prodshow/";
+	        String imageLocalProdShowPath = env.getProperty("path.image.prodshow.local");
 			//create Dir case no exist
 			FileUtil.createDir(imageLocalProdShowPath);
 			
 	        conn = DBConnection.getInstance().getConnection();
 	        conn.setAutoCommit(false);
+	        
+	        //Case Credit Sale OrderNo =generate by runninga
+	        if(user.getType().equalsIgnoreCase(User.TT)){
+	        	//case new doc gen
+	        	if(Utils.isNull(headBean.getOrderNo()).equals("")){
+	              headBean.setOrderNo(new ProdShowDocumentProcess().getNextDocumentNo(new Date(),user.getCode(),user.getId(), conn));
+	            }
+	        }
 	        //save prodShow
 	        headBean.setCreatedBy(user.getId()+"");
 	        headBean.setUpdatedBy(user.getId()+"");
@@ -302,6 +311,12 @@ public class ProdShowServlet  extends HttpServlet{
 		        	}//if
 		        }//for
 	        }//if
+	        
+	        //test rollback
+	        /*if(true){
+	        	throw new Exception("Error make");
+	        }*/
+	        
 	        conn.commit();
 	        request.getSession().setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 	        
@@ -319,6 +334,14 @@ public class ProdShowServlet  extends HttpServlet{
 	    	try{
 	    	  conn.rollback();
 	    	  deleteFileCaseRollBack(itemList);
+	    	  
+	    	  //set for display error
+	    	  request.getSession().setAttribute("ERROR_Message", "ไม่สามารถบันทึกข้อมูลได้");
+	    	  request.getSession().setAttribute("customerCode", headBean.getCustomerCode());
+	    	  headBean.setMode("edit");
+	    	  headBean.setCanSave(true);
+	    	  request.getSession().setAttribute("prodShowBean", headBean);
+	    	  response.sendRedirect(request.getContextPath()+"/jsp/prodshow/prodShow.jsp");
 	    	}catch(Exception ee){}
 	    }finally{
 	    	try{

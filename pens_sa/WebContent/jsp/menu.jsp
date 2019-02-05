@@ -38,8 +38,21 @@
 	       </li> --%>
 		</ul>
 	</li> 
+
+<%if ( UserUtils.userInRoleStockVan(user,new String[]{User.ADMIN,User.STOCKVAN}) ){ %>
+	<li><a href="javascript: void(0)" class="parent"><span>Inventory</span></a>
+		<ul>
+			<li>
+               <a href="#" class="parent" 
+               onclick="window.location='${pageContext.request.contextPath}/jsp/stockVanAction.do?do=prepareSearch&action=new&pageName=StockVan';">
+               <span><%no++;out.print(no);%>.<bean:message key="StockVan" bundle="sysprop"/></span>
+               </a>
+             </li>
+		</ul>
+	</li> 
+<%}%>
 	
-	<%if ( UserUtils.userInRoleSpider(user,new String[]{User.ADMIN,User.SPIDER}) ){ %>
+<%if ( UserUtils.userInRoleSpider(user,new String[]{User.ADMIN,User.SPIDER}) ){ %>
 	<li><a href="javascript: void(0)" class="parent"><span>PENS Spider</span></a>
 		<ul>
 			 <li>
@@ -59,7 +72,7 @@
 	       </li>  
 		</ul>
 	</li> 
-	<%}%>
+<%}%>
 	
 <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
 	no=0;
@@ -107,23 +120,34 @@
 		 </ul>
 	</li>
 <%} %>
-<%if ( UserUtils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR}) ){ 
+<%if (   UserUtils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR}) 
+	  || UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW})) { 
 	no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent" ><span>Credit Sales</span></a>
 		<ul>
-	        <li>
-               <a href="#" class="parent" 
-               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_CREDIT%>&action=new';">
-               <span><%no++;out.print(no);%>.<bean:message key="ReportStockCredit" bundle="sysprop"/></span>
-               </a>
-             </li> 
-              <li>
-               <a href="#" class="parent" 
-               onclick="window.location='${pageContext.request.contextPath}/jsp/promotionAction.do?do=prepareSearch&action=new';">
-               <span><%no++;out.print(no);%>.<bean:message key="Promotion" bundle="sysprop"/></span>
-               </a>
-             </li> 
+		    <%if ( UserUtils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR})){ %>
+		        <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_CREDIT%>&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="ReportStockCredit" bundle="sysprop"/></span>
+	               </a>
+	             </li> 
+	              <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/promotionAction.do?do=prepareSearch&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="Promotion" bundle="sysprop"/></span>
+	               </a>
+	             </li> 
+            <%} %>
+             <%if ( UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
+		        <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/prodShowAction.do?do=prepareSearch&action=new&pageName=CREDIT';">
+	               <span><%no++;out.print(no);%>.<bean:message key="ProdShow" bundle="sysprop"/></span>
+	               </a>
+	             </li>
+            <%} %> 
 		</ul>
 	</li>  
 <%}%>
@@ -136,7 +160,7 @@
 		 <%if ( UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
 	        <li>
                <a href="#" class="parent" 
-               onclick="window.location='${pageContext.request.contextPath}/jsp/prodShowAction.do?do=prepareSearch&action=new';">
+               onclick="window.location='${pageContext.request.contextPath}/jsp/prodShowAction.do?do=prepareSearch&action=new&pageName=VAN';">
                <span><%no++;out.print(no);%>.<bean:message key="ProdShow" bundle="sysprop"/></span>
                </a>
              </li>

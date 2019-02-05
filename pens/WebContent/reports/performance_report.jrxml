@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="performance_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="1.5"/> 
+	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="74"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="order_date" class="java.lang.String"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="total_discount" class="java.lang.Double"/>
@@ -20,6 +20,9 @@
 	<parameter name="total_record_item" class="java.lang.Integer"/>
 	<parameter name="total_cancel_amount" class="java.lang.Double"/>
 	<parameter name="total_record_cancel" class="java.lang.Integer"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\Work_ISEC\\workspace_git\\project-pens\\pens\\WebContent\\reports\\"]]></defaultValueExpression>
+	</parameter>
 	<field name="no" class="java.lang.Integer"/>
 	<field name="id" class="java.lang.Integer"/>
 	<field name="code" class="java.lang.String"/>
@@ -504,7 +507,7 @@
 		<band/>
 	</lastPageFooter>
 	<summary>
-		<band height="265" splitType="Stretch">
+		<band height="250" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="64" width="114" height="20"/>
 				<box>
@@ -952,7 +955,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="2" y="155" width="165" height="77"/>
+				<reportElement x="2" y="140" width="165" height="77"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -968,7 +971,7 @@
 ____/____/____]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="330" y="155" width="165" height="77"/>
+				<reportElement x="330" y="140" width="165" height="77"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -984,7 +987,7 @@ ____/____/____]]></text>
 ____/____/____]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="413" y="232" width="142" height="20"/>
+				<reportElement x="413" y="217" width="142" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="12"/>
 				</textElement>
@@ -1081,21 +1084,21 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_cancel_amount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd-MM-yyyy HH:mm:ss">
-				<reportElement x="45" y="232" width="142" height="20"/>
+				<reportElement x="45" y="217" width="142" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="12"/>
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="2" y="232" width="43" height="20"/>
+				<reportElement x="2" y="217" width="43" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="12"/>
 				</textElement>
 				<text><![CDATA[พิมพ์วันที่ : ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="165" y="155" width="165" height="77"/>
+				<reportElement x="165" y="140" width="165" height="77"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>

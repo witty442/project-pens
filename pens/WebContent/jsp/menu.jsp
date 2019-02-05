@@ -69,12 +69,14 @@ int subNo = 0;
 			<%} %>
 		
 			<li>
-			<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="PD" bundle="sysprop"/></span></a>
+			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="ManageCreditReceipt" bundle="sysprop"/></span></a>
 			</li>
-
-			<li>
+           <li>
+			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transferAction.do?do=prepareSearch&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Transfer" bundle="sysprop"/></span></a>
+			</li>
+			<%-- <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"><span><%no++;out.print(no);%>.ปรับปรุงโปรแกรม SalesApp</span></a>
-			</li>
+			</li> --%>
 			<%if( !role.equalsIgnoreCase(User.ADMIN)){ %>
            	<%-- <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/clearInvoiceAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="ClearInvoice" bundle="sysprop"/></span></a>
@@ -126,18 +128,23 @@ int subNo = 0;
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesHistoryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InterfaceHistoryReport" bundle="sysprop"/></span></a>
             </li>
             <%if(!role.equalsIgnoreCase(User.DD)){ %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transactionSummaryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="TransactionSummaryReport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoiceDetailReport" bundle="sysprop"/></span></a>
-            </li>
+	            <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transactionSummaryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="TransactionSummaryReport" bundle="sysprop"/></span></a>
+	            </li>
+	            <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoiceDetailReport" bundle="sysprop"/></span></a>
+	            </li>
             <%} %>
 
     		<%if(role.equalsIgnoreCase(User.VAN)){ %>
-    		<li>
+    		<%-- <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/performanceReport.do';"><span><%no++;out.print(no);%>.<bean:message key="PerformanceReport" bundle="sysprop"/></span></a>
-            </li>
+            </li> --%>
+            	<!-- New Version Report Performance (with sub report)-->
+			<li>
+	           <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/performanceReportSubReport.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="PerformanceReport" bundle="sysprop"/></span></a>
+	        </li>
+	            
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentNewReport.do';"><span><%no++;out.print(no);%>.<bean:message key="ReceiptReport" bundle="sysprop"/></span></a>
             </li>
@@ -179,6 +186,9 @@ int subNo = 0;
 	             <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/creditNoPaidReport.do?do=prepareReport&action=new';"><span><%no++;out.print(no);%>.<bean:message key="CreditNoPaidReport" bundle="sysprop"/></span></a>
 	            </li>
+	            <%-- <li>
+	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/bankTransferReport.do';"><span><%no++;out.print(no);%>.<bean:message key="BankTransferReport" bundle="sysprop"/></span></a>
+	         	</li> --%>
            <%} %>
            <%if(role.equalsIgnoreCase(User.TT)){ %>
                 <li>

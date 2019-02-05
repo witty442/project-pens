@@ -183,7 +183,7 @@ function save(path){
 								<tr>
                                     <td> ข้อมูลการติดต่อ</td>
 									<td colspan="3">
-									   <html:text property="bean.remark" styleId="remark" size="80" />
+									   <html:text property="bean.remark" styleId="remark" size="80"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>	
 								

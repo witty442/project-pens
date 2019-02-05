@@ -62,6 +62,7 @@ String desc = session.getAttribute("desc_session")!=null?(String)session.getAttr
  if(SAInitial.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
 	 isMultiSelect = true;
  } 
+ System.out.println("isMultiSelect:"+isMultiSelect);
  
  pageContext.setAttribute("isMultiSelect", isMultiSelect, PageContext.PAGE_SCOPE);
  

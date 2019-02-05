@@ -600,7 +600,8 @@ function currencyToNum(str){
 										 <c:choose>
 										 <c:when test="${reqPickStockForm.mode == 'save'}">
 											    <c:if test="${reqPickStockForm.bean.disableCustGroup == false}">
-										           <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+										           <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')"
+										            onkeypress="getCustNameKeypress(event,this,'storeCode')"  styleClass="\" autoComplete=\"off"/>-
 										           <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 										        </c:if>
 										        <c:if test="${reqPickStockForm.bean.disableCustGroup == true}">
@@ -623,12 +624,12 @@ function currencyToNum(str){
 								<tr>
 							     	<td nowrap> ผู้เบิก  <font color="red">*</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							     	&nbsp;&nbsp;&nbsp;&nbsp;
-									  <html:text property="bean.requestor" styleId="requestor" size="20" />
+									  <html:text property="bean.requestor" styleId="requestor" size="20"  styleClass="\" autoComplete=\"off"/>
 									</td>
 									 <td nowrap colspan="2">วันที่รับของ <font color="red">*</font> 
-								      <html:text property="bean.needDate" styleId="needDate" size="20"  readonly="true" styleClass=""/>
+								      <html:text property="bean.needDate" styleId="needDate" size="20"  readonly="true"  styleClass="\" autoComplete=\"off"/>
 								              หมายเหตุ  
-                                      <html:text property="bean.remark" styleId="remark" size="60" />
+                                      <html:text property="bean.remark" styleId="remark" size="60"  styleClass="\" autoComplete=\"off"/>
                                      </td>
 								</tr>	
 						   </table>
@@ -665,7 +666,7 @@ function currencyToNum(str){
 					   
 					<div align="left">
 					   <span class="pagebanner">รายการทั้งหมด  <%=totalRow %> รายการ, แสดงรายการที่  <%=start %> ถึง  <%=end %>.</span>
-					   <span class="pagelinks">ระบุ Group Code ที่ต้องการ  <html:text property="bean.groupCode" styleId="groupCode" size="10" />
+					   <span class="pagelinks">ระบุ Group Code ที่ต้องการ  <html:text property="bean.groupCode" styleId="groupCode" size="10" styleClass="\" autoComplete=\"off" />
 					        <c:if test="${reqPickStockForm.bean.canEdit == true}">
 								<a href="javascript:searchFilter('${pageContext.request.contextPath}')">
 									<input type="button" value="แสดงข้อมูล" class="newPosBtnLong"> 

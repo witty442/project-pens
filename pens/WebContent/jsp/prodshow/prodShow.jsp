@@ -30,9 +30,13 @@ User user = (User) request.getSession().getAttribute("user");
 
 String action = Utils.isNull(request.getParameter("action"));
 String orderNo = Utils.isNull(request.getParameter("orderNo"));
+String customerCode = Utils.isNull(request.getParameter("customerCode"));
+String fromPage = Utils.isNull(request.getParameter("fromPage"));
 
 System.out.println("action:"+action);
 System.out.println("orderNo:"+orderNo);
+System.out.println("customerCode:"+customerCode);
+System.out.println("fromPage:"+fromPage);
 
 //Get NaxFileSizeUpload Config
 String maxFileSizeUpload = "";
@@ -42,28 +46,79 @@ if( refFileSize != null){
    System.out.println("maxFileSizeUpload(kb) :"+maxFileSizeUpload);
 }
 try{
-	
+
 if("new".equalsIgnoreCase(action)){
 	 session.setAttribute("Message", "");
+	 session.setAttribute("ERROR_Message", "");
+	 
+	 //init connection
 	 conn  = DBConnection.getInstance().getConnection();
 	 
-	 Order order = new MOrder().findByWhereCond(conn,"where order_no='"+orderNo+"'");
-	 if(order!= null){
-		 prodShowBean = new ProdShowBean();
-		 prodShowBean.setOrderNo(orderNo);
-		 prodShowBean.setOrderId(order.getId());
+	//Case By Van Sales
+	if(user.getType().equalsIgnoreCase(User.VAN)){
+		 Order order = new MOrder().findByWhereCond(conn,"where order_no='"+orderNo+"'");
+		 if(order!= null){
+			 prodShowBean = new ProdShowBean();
+			 prodShowBean.setOrderNo(orderNo);
+			 prodShowBean.setOrderId(order.getId());
+			 
+			 //get Customer Detail
+			 Customer cus = new MCustomer().findByWhereCond(conn, " where customer_id ="+order.getCustomerId());
+			 if(cus != null){
+				 prodShowBean.setCustomerCode(cus.getCode());
+				 prodShowBean.setCustomerName(cus.getName());
+			 }
+			 //get ProdShow Data
+			ProdShowBean prodShowBeanDB = ProdShowDAO.searchProdShow(conn,prodShowBean.getOrderNo(), true);
+			 if(prodShowBeanDB !=null && !prodShowBeanDB.getDocDate().equals("")){
+				 System.out.println("ProdShowDB orderNo:"+prodShowBeanDB.getOrderNo()+",Exist");
+				 //set from db to show
+				 prodShowBean.setDocDate(prodShowBeanDB.getDocDate());
+				 prodShowBean.setRemark(prodShowBeanDB.getRemark());
+				 prodShowBean.setExport(prodShowBeanDB.getExport());
+				 //set Item
+				 prodShowBean.setItems(prodShowBeanDB.getItems());
+				 System.out.println("Items Size:"+prodShowBean.getItems().size());
+			    if("Y".equalsIgnoreCase(prodShowBeanDB.getExport())){
+			    	prodShowBean.setMode("view");
+			    	prodShowBean.setCanSave(false);
+			    }else{
+			    	prodShowBean.setCanSave(true);
+			    	prodShowBean.setMode("edit");
+			    }
+			 }else{
+				 prodShowBean.setCanSave(true);
+				 prodShowBean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 prodShowBean.setMode("add"); 
+			 }
+		  }
+	}else if(user.getType().equalsIgnoreCase(User.TT)){
+		//Case By Credit Sales  OrderNo ->gen by running
+		
+		//Case Add new orderNo is null
+		 if("".equalsIgnoreCase(orderNo)){
+			 prodShowBean = new ProdShowBean();
+			 prodShowBean.setOrderNo("");
+			 prodShowBean.setOrderId(0);
+		 }else{
+			 //case Edit
+			 prodShowBean = new ProdShowBean();
+			 prodShowBean.setOrderNo(orderNo);
+			 prodShowBean.setOrderId(0);
+		 }
 		 
 		 //get Customer Detail
-		 Customer cus = new MCustomer().findByWhereCond(conn, " where customer_id ="+order.getCustomerId());
+		 Customer cus = new MCustomer().findByWhereCond(conn, " where code ='"+customerCode+"'");
 		 if(cus != null){
 			 prodShowBean.setCustomerCode(cus.getCode());
 			 prodShowBean.setCustomerName(cus.getName());
 		 }
-		 //get ProdShow Data
-		ProdShowBean prodShowBeanDB = ProdShowDAO.searchProdShow(conn,prodShowBean.getOrderNo(), true);
+		 //get ProdShow Data 
+		ProdShowBean prodShowBeanDB = ProdShowDAO.searchProdShow(conn,prodShowBean.getOrderNo(),true);
 		 if(prodShowBeanDB !=null && !prodShowBeanDB.getDocDate().equals("")){
 			 System.out.println("ProdShowDB orderNo:"+prodShowBeanDB.getOrderNo()+",Exist");
 			 //set from db to show
+			 prodShowBean.setOrderNo(prodShowBeanDB.getOrderNo());
 			 prodShowBean.setDocDate(prodShowBeanDB.getDocDate());
 			 prodShowBean.setRemark(prodShowBeanDB.getRemark());
 			 prodShowBean.setExport(prodShowBeanDB.getExport());
@@ -82,8 +137,8 @@ if("new".equalsIgnoreCase(action)){
 			 prodShowBean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 prodShowBean.setMode("add"); 
 		 }
-	 }
-		
+		 
+	}
 	//List All Brand
 	brandList = new MProductCategory().lookUpBrandAllListNew(user);
 	List<References> brandAllList = new ArrayList<References>();
@@ -96,10 +151,20 @@ if("new".equalsIgnoreCase(action)){
 	System.out.println("session prodShowBean:"+session.getAttribute("prodShowBean"));
     prodShowBean  = (ProdShowBean)session.getAttribute("prodShowBean");
     System.out.println(" prodShowBean:"+session.getAttribute("prodShowBean"));
+    if(session.getAttribute("ERROR_Message") != null){
+    	 //init connection
+   	    conn  = DBConnection.getInstance().getConnection();
+    	//Get custName
+	   	 Customer cus = new MCustomer().findByWhereCond(conn, " where code ='"+Utils.isNull(session.getAttribute("customerCode"))+"'");
+		 if(cus != null){
+			 prodShowBean.setCustomerCode(cus.getCode());
+			 prodShowBean.setCustomerName(cus.getName());
+		 }
+    }
 }
 
 brandList = (List<References>)request.getSession().getAttribute("brandList");
-//System.out.println("bean:"+prodShowBean.getOrderNo());
+System.out.println("brandList:"+brandList);
 
 %>
 <html>
@@ -182,11 +247,16 @@ function validateTableData(){
 	return true;
 }
 function prepare(path,type,id){
-	if(id!=null){
-		document.prodShowForm.action = path + "/jsp/saleOrderAction.do?do=prepare&id=" + id+"&action="+type;
-	}else{
-		document.prodShowForm.action = path + "/jsp/saleOrderAction.do?do=prepare"+"&action="+type;
-	}
+	<%if(user.getType().equals(User.TT)){%>
+	    var customerCode = document.getElementById("customerCode"); 
+	    document.prodShowForm.action = path + "/jsp/prodshow/prodShowSearch.jsp?customerCode="+customerCode.value;
+	<%}else{%>
+		if(id!=null){
+			document.prodShowForm.action = path + "/jsp/saleOrderAction.do?do=prepare&id=" + id+"&action="+type;
+		}else{
+			document.prodShowForm.action = path + "/jsp/saleOrderAction.do?do=prepare"+"&action="+type;
+		}
+	<%}%>
 	document.prodShowForm.submit();
 	return true;
 }
@@ -368,7 +438,6 @@ function setBrandName(brandObj,rowId){
 	//alert(index);
 	document.getElementsByName("statusRow")[index].value ='CANCEL';
 }
- 
  function checkDupItem(brandNew,curRowId){
 	var brand = document.getElementsByName("brand");
 	var statusRow = document.getElementsByName("statusRow");
@@ -379,7 +448,6 @@ function setBrandName(brandObj,rowId){
 	}
 	return false;
  } 
- 
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -423,6 +491,7 @@ function setBrandName(brandObj,rowId){
                           <% String modeMsg = "";
                           System.out.println("Message:"+request.getAttribute("Message"));
                           String message  = Utils.isNull(session.getAttribute("Message"));
+                          String errorMessage  = Utils.isNull(session.getAttribute("ERROR_Message"));
 						        /* if(prodShowBean.getMode().equalsIgnoreCase("add")){
 						        	modeMsg = "เพิ่ม";
 						        }else if(prodShowBean.getMode().equalsIgnoreCase("edit")){
@@ -432,7 +501,8 @@ function setBrandName(brandObj,rowId){
 						        } */
 						    %>
 						    <div align="center">
-						     <font size="2" color="blue"> <%=message %></font>
+						       <font size="2" color="blue"> <%=message %></font>
+						       <font size="2" color="red"> <%=errorMessage %></font>
 						    </div>
 					 	    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						      <tr>	 
@@ -470,7 +540,8 @@ function setBrandName(brandObj,rowId){
                                     <td align="right">หมายเหตุ<font color="red"></font></td>
 									<td colspan="2">	
 									 <!--   <html:text property="bean.remark" styleId="remark" size="60" /> -->
-									    <input type="text" name="remark" Id="remark" size="60"/>
+									    <input type="text" name="remark" Id="remark" size="60" 
+									    value="<%=Utils.isNull(prodShowBean.getRemark())%>" autocomplete="off"/>
 									</td>
 								</tr>
 						   </table> 
@@ -498,6 +569,7 @@ function setBrandName(brandObj,rowId){
 							String selected = "";
 							String tabclass ="lineE";
 							List<ProdShowBean> resultItemList = prodShowBean!=null? prodShowBean.getItems():null; 
+							System.out.println("resultItemList:"+resultItemList);
 							
 							// Check disble text by view or verify
 							boolean readonly = true;
@@ -599,6 +671,7 @@ function setBrandName(brandObj,rowId){
                </div>
                
 					<!-- hidden field -->
+					<input type="hidden" name="fromPage" value="<%=fromPage%>"/>
 					</form>
 					<!-- BODY -->
 					</td>

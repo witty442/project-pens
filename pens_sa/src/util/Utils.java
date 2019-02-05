@@ -111,6 +111,13 @@ public class Utils {
 		return new Double(str).doubleValue();
 	}
 	
+	public static String convertStrDoubleToStr(String str,String format){
+		if(isNull(str).equals("")){
+			return "";
+		}
+		str = str.replaceAll(",", "");
+		return  decimalFormat(new Double(str).doubleValue(),format);
+	}
 	
 	public static boolean statusInCheck(String status,String[] statusCheckArr){
 		boolean r = false;

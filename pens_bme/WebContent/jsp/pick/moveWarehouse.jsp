@@ -437,7 +437,7 @@ function checkOpenDate(){
 								<tr>
                                     <td align="right"> หมายเหตุ</td>
 									<td colspan="3">
-										<html:text property="bean.remark" styleId="remark" size="80" />
+										<html:text property="bean.remark" styleId="remark" size="80" styleClass="\" autoComplete=\"off" />
 						              
 									</td>
 								</tr>	

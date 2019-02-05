@@ -123,7 +123,7 @@ public class ProdShowDAO {
 		StringBuffer sql = new StringBuffer("");
 
 		if( !Utils.isNull(o.getCustCatNo()).equals("")){
-			sql.append("\n and H.order_number Like 'V%'");
+			sql.append("\n and H.order_number Like '"+Utils.isNull(o.getCustCatNo())+"%'");
 		}
 		if( !Utils.isNull(o.getSalesChannelNo()).equals("")){
 			sql.append("\n and substr(H.order_number,2,1) = '"+Utils.isNull(o.getSalesChannelNo())+"'");

@@ -124,6 +124,9 @@ public class PopupAction extends I_Action {
 			}else if("BrandProdShow".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchBrandProdShowList(popupForm);
 				 
+			}else if("BrandStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchBrandList(popupForm);
+				 
 			}else if("Customer".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalesTarget
 				 results = PopupDAO.searchCustomerList(popupForm);
@@ -156,6 +159,11 @@ public class PopupAction extends I_Action {
 				//For Edit Trip
 				 results = PopupDAO.searchCustomerLocNoTripList(popupForm);
 				 
+			}else if("PDStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchPDStockVanList(popupForm); 
+				 
+			}else if("ItemStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchItemStockVanList(popupForm); 
 			}
 			
 			 if(results != null && results.size() >0){

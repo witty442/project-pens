@@ -249,7 +249,7 @@ function resetStore(){
 						       <tr>
                                     <td> Issue Request No</td>
 									<td>					
-										 <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20"/>
+										 <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20"  styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
 									           สถานะ   
@@ -280,7 +280,8 @@ function resetStore(){
                                                                                                                                             รหัสร้านค้า    
                                     </td>
 									<td colspan="2">
-									   <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									   <html:text property="bean.storeCode" styleId="storeCode" size="20" onblur="getCustName(this,'storeCode')" 
+									   onkeypress="getCustNameKeypress(event,this,'storeCode')"  styleClass="\" autoComplete=\"off"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="40"/>
 									   

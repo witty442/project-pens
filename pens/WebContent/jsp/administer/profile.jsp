@@ -154,6 +154,12 @@ function changeRoles(val){
 								<td align="left">
 									<html:text property="user.idCardNo" size="30" readonly="true" styleClass="disableText"/>
 								</td>
+								<% if(isVAN) {%>
+									<td align="right">ส่งเงินให้ Pens&nbsp;&nbsp;</td>
+									<td align="left">									
+										<input type="checkbox" <c:if test="${user.moneyToPens=='Y'}">checked</c:if> name="user.moneyToPens" value="Y">
+									</td>
+								<% } %>
 							</tr>
 							<tr>
 								<td align="right"><bean:message key="User.Role"  bundle="sysele"/>&nbsp;&nbsp;</td>

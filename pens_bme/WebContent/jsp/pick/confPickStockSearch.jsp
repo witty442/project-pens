@@ -269,7 +269,7 @@ function isSelectOne(){
                                       Issue request Date 
                                      </td>
                                      <td colspan="3">
-                                     <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" />
+                                     <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20"  styleClass="\" autoComplete=\"off"/>
 									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
 									
                                       Issue request status
@@ -293,7 +293,8 @@ function isSelectOne(){
 									<td >รหัสร้านค้า
 									</td>
 									<td align="left" colspan="2"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" 
+									  onkeypress="getCustNameKeypress(event,this,'storeCode')"  styleClass="\" autoComplete=\"off"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
 									
@@ -305,7 +306,7 @@ function isSelectOne(){
 								<tr>
                                     <td> Status Date  </td>		
 								    <td colspan="2">
-								      <html:text property="bean.statusDate" styleId="statusDate" size="20" />	  
+								      <html:text property="bean.statusDate" styleId="statusDate" size="20"  styleClass="\" autoComplete=\"off"/>	  
 						            Warehouse
 									      <html:select property="bean.wareHouse" styleId="wareHouse" >
 											<html:options collection="wareHouseList2" property="key" labelProperty="name"/>

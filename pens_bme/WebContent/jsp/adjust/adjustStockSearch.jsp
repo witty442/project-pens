@@ -168,14 +168,14 @@ function getStoreNameModel(storeCode){
 						       <tr>
                                     <td> Transaction Date </td>
 									<td>						
-										  <html:text property="adjustStock.transactionDate" styleId="transactionDate" size="20" />
+										  <html:text property="adjustStock.transactionDate" styleId="transactionDate" size="20"  styleClass=" \" autoComplete=\"off" />
 									</td>
 								</tr>
 								 <tr>
                                     <td> รหัสร้านค้า</td>
 									<td >
 						                 <html:text property="adjustStock.storeCode" styleId="storeCode" size="20" 
-						                  onkeypress="getStoreNameKeypress(event,this)"
+						                  onkeypress="getStoreNameKeypress(event,this)"  styleClass=" \" autoComplete=\"off"
 						                  />					    
 									     <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','all')"/>
 									    <html:text property="adjustStock.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="40"/>
@@ -184,7 +184,7 @@ function getStoreNameModel(storeCode){
 								<tr>
                                     <td> Document No</td>
 									<td >
-						               <html:text property="adjustStock.documentNo" styleId="documentNo" size="20" />
+						               <html:text property="adjustStock.documentNo" styleId="documentNo" size="20"   styleClass=" \" autoComplete=\"off"/>
 									</td>
 								</tr>	
 						   </table>

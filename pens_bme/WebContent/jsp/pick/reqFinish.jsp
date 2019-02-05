@@ -232,7 +232,7 @@ function sumTotal(chkObj){
 									<td colspan="3">
 									<c:choose>
 											<c:when test="${reqFinishForm.bean.canEdit == true}">
-												 <html:text property="bean.remark" styleId="remark" size="80" />
+												 <html:text property="bean.remark" styleId="remark" size="80"  styleClass="\" autoComplete=\"off"/>
 											</c:when>
 											<c:otherwise>
 												 <html:text property="bean.remark" styleId="remark" size="80" styleClass="disableText" readonly="true"/>

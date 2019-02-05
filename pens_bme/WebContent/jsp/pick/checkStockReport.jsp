@@ -133,9 +133,9 @@ function exportExcel(path){
 								</tr>
 								<tr>
                                     <td> รุ่น&nbsp;</td>
-									<td><html:text property="bean.style" styleId="style" size="20"/></td>
+									<td><html:text property="bean.style" styleId="style" size="20" styleClass="\" autoComplete=\"off"/></td>
 									<td> &nbsp;
-									    สีไซร์    <html:text property="bean.materialMaster" styleId="materialMaster" size="20"/>	 
+									    สีไซร์    <html:text property="bean.materialMaster" styleId="materialMaster" size="20" styleClass="\" autoComplete=\"off"/>	 
 									</td>
 									<td></td>
 								</tr>

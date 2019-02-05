@@ -277,10 +277,10 @@ function addRow(path){
 	var rowData ="<tr class='"+className+"'  onmouseover='getRowIndex(this)'> "+
 	    "<td class='td_text_center' width='10%'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
 	    "<td class='td_text_center' width='20%'> <input type='text' name='barcode' size='30'  "+
-	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
+	    " onkeypress='getProductKeypress(event,this,"+lineId+")' autocomplete='off' "+
 	
 	    " />  </td>"+
-	    "<td class='td_text_center' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25'  onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='td_text_center' width='20%'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")' autocomplete='off' /></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' />"+ 
 	    "  <input type='hidden' tabindex ='-1' id='status' name='status' value='' /></td>"+
@@ -741,7 +741,7 @@ function getProductModelByMat(matObj,lineId){
                                       <c:when test="${scanCheckForm.mode == 'add'}">
 										     <td >
 									             <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" 
-							                               onkeypress="getIssueKeypress(event,this)"/> 
+							                               onkeypress="getIssueKeypress(event,this)"  styleClass="\" autoComplete=\"off"/> 
 							                      <font color="red">*</font>
 							                     <input type="button" name="x1" value="..." onclick="openIssuePopup('${pageContext.request.contextPath}','<%=mode%>')"/>
 											 </td>

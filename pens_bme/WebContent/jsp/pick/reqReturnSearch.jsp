@@ -123,10 +123,10 @@ function openEdit(path,requestDate,requestNo,mode){
 						       <tr>
                                     <td> Request Date</td>
 									<td>					
-										 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
+										 <html:text property="bean.requestDate" styleId="requestDate" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
-									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20"/>
+									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td>					
 										สถานะ   
@@ -138,7 +138,7 @@ function openEdit(path,requestDate,requestNo,mode){
 								<tr>
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
-						               <html:text property="bean.remark" styleId="remark" size="80" />
+						               <html:text property="bean.remark" styleId="remark" size="80" styleClass="\" autoComplete=\"off" />
 									</td>
 								</tr>	
 						   </table>

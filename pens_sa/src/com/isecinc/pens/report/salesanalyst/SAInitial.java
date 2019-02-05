@@ -87,6 +87,7 @@ public class SAInitial {
 		MULTI_SELECTION_LIST.add("Organization_id");
 		MULTI_SELECTION_LIST.add("Order_type_id");
 		MULTI_SELECTION_LIST.add("SUBBRAND");
+		MULTI_SELECTION_LIST.add("Division");
 		
 		/** Column Of ORDER **/
 		COLUMN_ORDER_MAP.put("ORDERED","ORDERED");

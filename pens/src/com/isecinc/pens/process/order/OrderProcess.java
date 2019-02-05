@@ -1018,5 +1018,138 @@ public void debug(List<OrderLine> lines) throws Exception {
 		// Trx History --end--
 		return true;
 	}
+	
+	public boolean createAutoReceipt_PDPAID_MONEYTOPENS(Receipt receipt, Order order, List<OrderLine> lines, List<ReceiptBy> bys,
+			String creditCardExpired, User user, Connection conn) throws Exception {
+
+		MReceipt mReceipt = new MReceipt();
+
+		// Generate Receipt Header
+		
+		// Check Set Receipt Date Before Default for Key In Delay Case
+		if(receipt.getReceiptDate() == null || receipt.getReceiptDate().trim().length()==0)
+			receipt.setReceiptDate(DateToolsUtil.convertToString(new Date()));// Current Date
+		
+		// Order Type
+		receipt.setOrderType(order.getOrderType());
+		// Customer
+		receipt.setCustomerId(order.getCustomerId());
+		receipt.setCustomerName(order.getCustomerName());
+		// Receipt Amount
+		receipt.setReceiptAmount(0);
+		// Sales Reps --current user who's create record--
+		receipt.setSalesRepresent(user);
+		// Status
+		receipt.setInterfaces("N");
+		receipt.setDocStatus(Receipt.DOC_SAVE);
+		// Prepaid Flag
+		receipt.setPrepaid("Y");
+
+		// Apply
+		receipt.setApplyAmount(0);
+
+		// desc
+		receipt.setDescription("Generate from Order " + order.getOrderNo());
+
+		mReceipt.saveWOCheckDup_PDPAID(receipt, user.getId(), conn);
+
+		// re-calculate receipt & apply
+		double receiptAmount = 0;
+		double applyAmount = 0;
+		for (ReceiptBy by : bys) {
+			receiptAmount += by.getReceiptAmount();
+			applyAmount += Double.parseDouble(by.getAllPaid());
+		}
+
+		// Receipt Amount
+		receipt.setReceiptAmount(receiptAmount);
+		// Apply
+		receipt.setApplyAmount(applyAmount);
+
+		// re-save
+		mReceipt.saveWOCheckDup_PDPAID(receipt, user.getId(), conn);
+
+		// Generate Line (one Line)
+		ReceiptLine rLine = new ReceiptLine();
+		// Status
+		rLine.setLineNo(1);
+		rLine.setReceiptId(receipt.getId());
+		rLine.setOrder(order);
+		// Order No
+		rLine.setArInvoiceNo("");
+		rLine.setSalesOrderNo("");
+		// desc
+		rLine.setDescription("Generate from Order " + order.getOrderNo());
+		// Amount
+		rLine.setInvoiceAmount(order.getNetAmount());
+		rLine.setCreditAmount(order.getNetAmount());
+		rLine.setPaidAmount(applyAmount);
+		rLine.setRemainAmount(order.getNetAmount() - applyAmount);
+
+		new MReceiptLine().save(rLine, user.getId(), conn);
+
+		// Generate Receipt By
+		MReceiptBy mReceiptBy = new MReceiptBy();
+		receiptAmount = 0;
+		double paidAmount = 0;
+		double remainAmount = 0;
+
+		MReceiptMatch mReceiptMatch = new MReceiptMatch();
+		ReceiptMatch match;
+		for (ReceiptBy by : bys) {
+			paidAmount = 0;
+			receiptAmount = by.getReceiptAmount();
+			paidAmount = Double.parseDouble(by.getAllPaid());
+			remainAmount = receiptAmount - paidAmount;
+			by.setPaidAmount(paidAmount);
+			by.setRemainAmount(remainAmount);
+			by.setReceiptId(receipt.getId());
+			if (by.getPaymentMethod().equalsIgnoreCase("CR")) {
+				by.setCreditcardExpired(creditCardExpired);
+			} else {
+				by.setCreditcardExpired("");
+			}
+			mReceiptBy.save(by, user.getId(), conn);
+
+			// apply match
+			match = new ReceiptMatch();
+			match.setReceiptLineId(rLine.getId());
+			match.setReceiptById(by.getId());
+			match.setReceiptId(receipt.getId());
+			match.setPaidAmount(Double.parseDouble(by.getAllPaid()));
+			mReceiptMatch.save(match, user.getId(), conn);
+		}
+
+		// re-save
+		for (OrderLine ol : lines) {
+			ol.setPayment("Y");
+			ol.setExported("N");
+			ol.setNeedExport("N");
+			ol.setInterfaces("N");
+			new MOrderLine().save(ol, user.getId(), conn);
+		}
+		// re-save
+		order.setPayment("Y");
+		
+		//edit 14/03/2561 Case Van no save receipt(credit)
+		/*no change is_cash in order */
+		/*if("N".equals(receipt.getIsPDPaid())){
+			order.setIsCash("N");
+		}else{
+			order.setIsCash("Y");
+		}*/
+		
+		new MOrder().save(order, user.getId(), conn);
+
+		// Trx History
+		TrxHistory trx = new TrxHistory();
+		trx.setTrxModule(TrxHistory.MOD_RECEIPT);
+		trx.setTrxType(TrxHistory.TYPE_INSERT);
+		trx.setRecordId(receipt.getId());
+		trx.setUser(user);
+		new MTrxHistory().save(trx, user.getId(), conn);
+		// Trx History --end--
+		return true;
+	}
 
 }

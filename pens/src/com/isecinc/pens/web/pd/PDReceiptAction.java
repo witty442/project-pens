@@ -20,6 +20,7 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MOrder;
@@ -101,18 +102,26 @@ public class PDReceiptAction extends I_Action {
 		String ids = request.getParameter("ids");
 		String pms = request.getParameter("pms");
 		String pdates = request.getParameter("pdates");
+		String chequedates = request.getParameter("pchequeDates");
 		Connection conn = null;
 		User user = (User)request.getSession().getAttribute("user");
 		MOrder mOrder = new MOrder();
 		MReceipt mReceipt = new MReceipt();
 		int idx = 0;
 		try{
+			logger.debug("ids:"+ids);
+			logger.debug("chequedates:"+chequedates);
+			
 			if(!StringUtils.isEmpty(ids)){
-		
+				logger.debug("PD_PAID:"+user.getPdPaid());
 				String[] pm = pms.split("[,]");
 				String[] pdate = pdates.split("[,]");
-				
-				conn = new DBCPConnectionProvider().getConnection(null);
+				String[] chequedate = null;
+				if( !Utils.isNull(chequedates).equals("")){
+					chequedate = chequedates.split("[,]");
+				}
+					
+				conn = DBConnection.getInstance().getConnection();
 				conn.setAutoCommit(false);
 				
 				//Case PD_PAID =N
@@ -128,7 +137,8 @@ public class PDReceiptAction extends I_Action {
 						receiptSave.setPdPaymentMethod(pm[idx]);
 						receiptSave.setPdPaidDate(pdate[idx]);
 						receiptSave.setIsPDPaid("Y");
-			
+						receiptSave.setChequeDate(chequedate != null?chequedate[idx]:"");
+						
 						//Save to DB
 						mReceipt.saveReceiptCasePDPaidNo(conn,receiptSave,user);
 						
@@ -145,7 +155,9 @@ public class PDReceiptAction extends I_Action {
 						receipt.setPdPaymentMethod(pm[idx]);
 						receipt.setPdPaidDate(pdate[idx]);
 						receipt.setIsPDPaid("Y");
-
+						//Edit 09/01/2562 add 
+						receipt.setChequeDate(chequedate != null?chequedate[idx]:"");
+						
 						//Save to DB
 						mReceipt.updateReceiptFromPDReceipt(receipt, user.getId(), conn);
 						
@@ -160,6 +172,7 @@ public class PDReceiptAction extends I_Action {
 						receiptSave.setReceiptAmount(order.getNetAmount());
 						receiptSave.setPdPaymentMethod(pm[idx]);
 						receiptSave.setPdPaidDate(pdate[idx]);
+						receiptSave.setChequeDate(chequedate != null?chequedate[idx]:"");
 						
 						//Save To DB
 						mReceipt.savePDReceiptHis(conn,receiptSave,user);
@@ -177,10 +190,15 @@ public class PDReceiptAction extends I_Action {
 			conn.rollback();
 			logger.error(e.getMessage(),e);
 		}finally{
-			conn.close();
+			try{
+			  conn.close();
+			}catch(Exception ee){
+				ee.printStackTrace();
+			}
 		}
 		return "prepare";
 	}
+	
 	public ActionForward clearForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		PDReceiptForm aForm = (PDReceiptForm) form;

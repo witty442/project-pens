@@ -29,14 +29,7 @@ public class LoginProcess {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			String sql = "SELECT A.USER_GROUP_ID ,  \n";
-			sql +="   A.CATEGORY, A.ORGANIZATION, A.START_DATE,  \n";
-			sql +="   A.END_DATE, A.NAME, A.SOURCE_NAME,  \n";
-			sql +="   A.ID_CARD_NO, A.USER_NAME, A.PASSWORD,  \n";
-			sql +="   A.CODE, A.UPDATED, A.UPDATED_BY,  \n";
-			sql +="   A.TERRITORY, A.USER_ID,ROLE_SALESTARGET ,ROLE_CR_STOCK ,ROLE_SPIDER ,  \n"; 
-			sql +="   A.ROLE_PRODSHOW ,A.ROLE_VANDOC \n";
-			sql +=" FROM c_user_info A WHERE 1=1 \n";
+			String sql = "SELECT A.* FROM c_user_info A WHERE 1=1 \n";
 			sql +=" AND(  ( START_DATE <= SYSDATE and END_DATE >= SYSDATE AND END_DATE IS NOT NULL) \n";
                    sql +="      OR  \n";
                    sql +="       (START_DATE <= SYSDATE  AND END_DATE IS NULL) \n";

@@ -105,6 +105,9 @@ public class Utils {
 			throw e;
 		}
 	}
+	public static int calcStartNoInPage(int currentPage,int maxPerPage){
+		return (((currentPage-1)*maxPerPage))+1;
+	}
 	
 	public static void stopTomcat(){
 	      String line;
@@ -513,7 +516,19 @@ public class Utils {
 		}
 		return dateStr;
 	}
-	
+	public static String stringValueNull(Date date, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date != null){
+			   dateStr = ft.format(date);
+			}else{
+			   dateStr = "";
+			}
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
 	public static String stringValueDefault(Date date, String format ,Locale locale,String defaultS) throws Exception {
 		String dateStr = null;		
 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);

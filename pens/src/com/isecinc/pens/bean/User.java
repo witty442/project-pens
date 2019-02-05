@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.jcraft.jsch.Logger;
 
@@ -71,6 +72,7 @@ public class User extends I_PO implements Serializable {
 		
 		// Add PD Paid for VAN Sales
 		setPdPaid(rst.getString("PD_PAID"));
+		setMoneyToPens(Utils.isNull(rst.getString("money_to_pens")));
 	}
 
 	/**
@@ -193,6 +195,17 @@ public class User extends I_PO implements Serializable {
 	
 	/** PD_PAID for VAN Sales **/
 	private String pdPaid;
+    /** moneyToPens */
+    private String moneyToPens;
+    
+    
+	public String getMoneyToPens() {
+		return moneyToPens;
+	}
+
+	public void setMoneyToPens(String moneyToPens) {
+		this.moneyToPens = moneyToPens;
+	}
 
 	public String getPdPaid() {
 		return pdPaid;

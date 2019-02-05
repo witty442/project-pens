@@ -12,7 +12,7 @@
    <font size="3"> <b>Knowledge Sample </b></font>
    </td></tr>
   <tr><td>
-     <a href="${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&action=newsearch&pageName=ShopPromotion">การแบ่ง Page Sample(Master C4 for Shop)</a>
+     <a href="${pageContext.request.contextPath}/jsp/mttAction.do?do=prepare2&action=new">การแบ่ง Page Sample(บันทึกและค้นหาข้อมูลขาย Sale-Out)</a>
   </td></tr>
   <tr><td>
      <a href="${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new">add row,delete row table Sample(Request Job เพื่อทำ Auto-CN(LOTUS)</a>
@@ -33,7 +33,7 @@
    </td></tr>
     <tr><td>
        Struts autoComplete=off Text Field->
-      <b>" html:text property="order.creditCardExpireDate" styleClass="disableText \" autoComplete=\"off"/> "</b>
+      <b>" html:text property="order.creditCardExpireDate" styleClass="disableText \" autoComplete=\"off"&nbsp;&nbsp; />"</b>
     </td></tr>	
     <tr><td>
       <a href="${pageContext.request.contextPath}/jsp/adjustStockSAAction.do?do=prepare2&action=new">
@@ -45,6 +45,9 @@
    </td></tr>
     <tr><td>
              การ Export to Excel ปัญหาภาษาไทย  add tag <.. meta charset='utf-8'..>
+   </td></tr>
+   <tr><td>
+             การ Import pic หลายรูปพร้อมกัน  ProdShowServlet path->   /pens/jsp/prodshow/prodshow.jsp
    </td></tr>
   </table>
 </body>

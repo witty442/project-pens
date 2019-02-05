@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import util.DateToolsUtil;
+
 import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
@@ -60,7 +62,42 @@ public class ProdShowDAO {
 			}
 			return bean;
 		}
-	 
+	 public static List<ProdShowBean> searchProdShowList(Connection conn,String customerCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			ProdShowBean bean = null;
+			StringBuilder sql = new StringBuilder();
+			List<ProdShowBean> itemList = new ArrayList<ProdShowBean>();
+			try {
+				sql.append("\n  SELECT M.* ");
+				sql.append("\n  ,(select name from m_customer c where c.code = M.customer_no) as customer_name ");
+				sql.append("\n  from t_prod_show M");
+				sql.append("\n  where 1=1 and customer_no = '"+customerCode+"'");
+				sql.append("\n  order by M.order_no desc");
+				
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					bean = new ProdShowBean();
+					bean.setOrderNo(Utils.isNull(rst.getString("order_no")));
+					bean.setCustomerCode(Utils.isNull(rst.getString("customer_no")));
+					bean.setCustomerName(Utils.isNull(rst.getString("customer_name")));
+					bean.setDocDate(Utils.stringValue(rst.getDate("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					bean.setRemark(Utils.isNull(rst.getString("remark")));
+					bean.setExport(Utils.isNull(rst.getString("exported")));
+					itemList.add(bean);
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return itemList;
+		}
 	 public static List<ProdShowBean> searchProdShowItems(Connection conn,String orderNo) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

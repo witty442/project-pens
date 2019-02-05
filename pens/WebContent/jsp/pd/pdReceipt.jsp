@@ -8,8 +8,15 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout"%>
-<jsp:useBean id="pdReceiptForm"
-	class="com.isecinc.pens.web.pd.PDReceiptForm" scope="request" />
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="util.DateToolsUtil"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
+
+<jsp:useBean id="pdReceiptForm" class="com.isecinc.pens.web.pd.PDReceiptForm" scope="request" />
 <%
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getType();
@@ -18,25 +25,13 @@ pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
 
 String today = DateToolsUtil.getCurrentDateTime("dd/MM/yyyy");
 %>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="util.DateToolsUtil"%>
-
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<title><bean:message bundle="sysprop"
-		key="<%=SystemProperties.PROJECT_NAME %>" />
-</title>
-<link rel="StyleSheet"
-	href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet"
-	href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>"
-	type="text/css" />
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>" /></title>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -50,25 +45,17 @@ body {
 }
 -->
 </style>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/pdreceipt.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/pdreceipt.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <!-- Calendar -->
-<link rel="stylesheet" type="text/css"
-	href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 	function loadMe() {
-		new Epoch('epoch_popup', 'th', document
-				.getElementById('receiptDateFrom'));
+		new Epoch('epoch_popup', 'th', document.getElementById('receiptDateFrom'));
 		new Epoch('epoch_popup', 'th', document.getElementById('receiptDateTo'));
 	}
 </script>
@@ -99,7 +86,7 @@ body {
 				
 				<!-- PROGRAM HEADER --> 
 				<jsp:include page="../program.jsp">
-					<jsp:param name="function" value="PD" />
+					<jsp:param name="function" value="ManageCreditReceipt" />
 					<jsp:param name="code" value="" />
 				</jsp:include> 
 				
@@ -180,26 +167,16 @@ body {
 										<bean:message key="Records" bundle="sysprop" />
 									</div>
 									<table align="center" border="0" cellpadding="3"
-										cellspacing="1" class="result" >
+										cellspacing="1" class="tableSearchNoWidth" width="100%" >
 										<tr>
-											<th class="order"><bean:message key="No"
-													bundle="sysprop" />
-											</th>
-											<th class="code"><bean:message key="Order.No" bundle="sysele" />
-											</th>
-											<th class="code"><bean:message key="Order.Date" bundle="sysele" />
-											</th>
-											<th class="code"><bean:message key="Trip.CustomerName" bundle="sysele" />
-											</th>
-											<th class="code"><bean:message key="Receipt.Amount"
-													bundle="sysele" />
-											</th>
-											<th class="code"><bean:message key="Profile.PaymentMethod"
-													bundle="sysele" />
-											</th>
-											<th class="code"><bean:message key="PDReceipt.Date"
-													bundle="sysele" />
-											</th>
+											<th><bean:message key="No" bundle="sysprop" /></th>
+											<th><bean:message key="Order.No" bundle="sysele" /></th>
+											<th><bean:message key="Order.Date" bundle="sysele" /></th>
+											<th><bean:message key="Trip.CustomerName" bundle="sysele" /></th>
+											<th><bean:message key="Receipt.Amount"bundle="sysele" /></th>
+											<th><bean:message key="Profile.PaymentMethod"bundle="sysele" /></th>
+											<th>วันที่เก็บเงิน </th>
+											<th>วันที่หน้าเช็ค </th>
 										</tr>
 										<c:forEach var="results" items="${pdReceiptForm.pdReceipts}"
 											varStatus="rows">
@@ -212,12 +189,12 @@ body {
 												</c:otherwise>
 											</c:choose>
 											<tr class="<c:out value='${tabclass}'/>">
-												<td><c:out value='${rows.index+1}'/></td>
-												<td>${results.receiptNo}</td>
-												<td>${results.receiptDate}</td>
-												<td align="left">${results.customerName}</td>
-												<td><fmt:formatNumber pattern="#,##0.00" value="${results.receiptAmount}"/></td>
-												<td>
+												<td class="td_text_center" width="5%"><c:out value='${rows.index+1}'/></td>
+												<td class="td_text_center" width="5%">${results.receiptNo}</td>
+												<td class="td_text_center" width="5%">${results.receiptDate}</td>
+												<td class="td_text" width="20%">${results.customerName}</td>
+												<td class="td_text_center" width="10%"><fmt:formatNumber pattern="#,##0.00" value="${results.receiptAmount}"/></td>
+												<td class="td_text_center" width="10%">
 													<input name="receiptId" type="hidden" value="${results.id}" />
 													<select name="pd.paymentMethod" onchange="defaultDate(this,'${rows.index+1}','<%=today%>')" >
 														<option value="">&nbsp;</option>
@@ -225,23 +202,27 @@ body {
 														<option value="CH"><bean:message key="PaymentMethod.Cheque" bundle="sysele" /></option>
 													</select>
 												</td>
-												<td>
-													<input type="text" name="pdReceiptDate" maxlength="10" size="15" value="" readonly="readonly" id="pdReceiptDate">
+												<td class="td_text_center" width="10%">
+													<input type="text" name="pdReceiptDate" maxlength="10" size="10"  readonly="readonly" id="pdReceiptDate">
+												</td>
+												<td class="td_text_center" width="10%">
+													<input type="text" name="chequeDate" maxlength="10" size="10" readonly="readonly" disabled="true" id="chequeDate">
 												</td>
 											</tr>
 										</c:forEach>
 									</table>
-									<table align="center" border="0" cellpadding="3"
-										cellspacing="1" class="result">
+									<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 										<tr>
 											<td align="left" class="footer">&nbsp;</td>
 										</tr>
 									</table>
 									<script>
 										var pdReceiptDate = document.getElementsByName("pdReceiptDate");
-
+										var chequeDate = document.getElementsByName("chequeDate");
+										
 										for(var i=0;i<pdReceiptDate.length ; i++){
 											new Epoch('epoch_popup', 'th', pdReceiptDate[i]);
+											new Epoch('epoch_popup', 'th', chequeDate[i]);
 										}
 									
 									</script>

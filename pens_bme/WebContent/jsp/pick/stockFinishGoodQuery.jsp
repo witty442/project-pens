@@ -130,25 +130,25 @@ function exportExcel(path){
 						       <tr>
                                     <td> PensItem From</td>
 									<td>					
-										 <html:text property="bean.pensItemFrom" styleId="pensItemFrom" size="20"/>
+										 <html:text property="bean.pensItemFrom" styleId="pensItemFrom" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
 									    PensItem To       
 									</td>
 									<td>					
-										<html:text property="bean.pensItemTo" styleId="pensItemTo" size="20"/>
+										<html:text property="bean.pensItemTo" styleId="pensItemTo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								 <tr>
                                     <td> Group Code From</td>
 									<td>					
-										 <html:text property="bean.groupCodeFrom" styleId="GroupCodeFrom" size="20"/>
+										 <html:text property="bean.groupCodeFrom" styleId="GroupCodeFrom" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
 									    Group Code To     
 									</td>
 									<td>					
-										 <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20"/>									
+										 <html:text property="bean.groupCodeTo" styleId="GroupCodeTo" size="20" styleClass="\" autoComplete=\"off"/>									
 									</td>
 								</tr>
 								<tr>

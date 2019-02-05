@@ -42,6 +42,11 @@ function loadMe(){
 	 sumTotalIssueQty();
 	 sumTotalReceiptQty();
 	 sumTotalDiffCost();
+	 
+	 //move cursor to last row
+	 var itemIssueDesc = document.getElementsByName("itemIssueDesc");
+	 //alert(itemIssueDesc.length);
+	 itemIssueDesc[itemIssueDesc.length-1].focus();
 }
 function clearForm(path){
 	var form = document.adjustStockForm;
@@ -562,7 +567,7 @@ function checkSelect(chk1,chk2){
 									<td >
 									  <c:if test="${adjustStockForm.mode=='add'}">
 						                 <html:text property="adjustStock.storeCode" styleId="storeCode" size="20" 
-						                  onkeypress="getStoreNameKeypress(event,this)"
+						                  onkeypress="getStoreNameKeypress(event,this)" styleClass=" \" autoComplete=\"off"
 						                  />
 									     <font color="red">*</font>-
 									     <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','all')"/>
@@ -597,10 +602,10 @@ function checkSelect(chk1,chk2){
                                     <td> Reference</td>
 									<td >
 									  <c:if test="${adjustStockForm.mode == 'edit'}">
-						                 <html:text property="adjustStock.ref" styleId="ref" size="30" />
+						                 <html:text property="adjustStock.ref" styleId="ref" size="30"  styleClass=" \" autoComplete=\"off"/>
 						              </c:if>
 						              <c:if test="${adjustStockForm.mode == 'add'}">
-						                 <html:text property="adjustStock.ref" styleId="ref" size="30" />
+						                 <html:text property="adjustStock.ref" styleId="ref" size="30"  styleClass=" \" autoComplete=\"off"/>
 						              </c:if>
 						              <c:if test="${adjustStockForm.mode != 'add'}">
 						               <c:if test="${adjustStockForm.mode != 'edit'}">
@@ -756,7 +761,12 @@ function checkSelect(chk1,chk2){
 									<td ><input type="text" name="totalDiffCost" class="disableNumber" size="10"/></td>
 							</tr>
 					</table>
-								
+				 <c:if test="${adjustStockForm.adjustStock.canEdit == true}">
+                        <div align="left">
+							<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>	
+							<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
+						</div>
+				  </c:if>  		
 								
 					<!-- BUTTON ACTION-->
 					<div align="center">

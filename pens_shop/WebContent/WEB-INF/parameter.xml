@@ -35,7 +35,7 @@
 		<context>ORDER</context>
 		<type>Order Type</type>
 		<!-- <van>Order-Van Sales</van> -->
-		<van>Order-Modern Trade-Shop</van>
+		<van>Order-Modern Trade-MAYA</van>
 		<tt>Order-Credit Sales</tt>
 		<dd>-</dd>
 	</qualifier>

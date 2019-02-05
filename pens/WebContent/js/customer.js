@@ -1,4 +1,13 @@
- function showImage(path,customerId){
+
+function manageProdShowTT(path,customerCode){
+	var param  = "&customerCode="+customerCode;
+	    param += "&fromPage=customerSearch";
+	document.customerForm.action = path + "/jsp/prodshow/prodShowSearch.jsp?action=new"+param;
+	document.customerForm.submit();
+	return true;
+}
+
+function showImage(path,customerId){
 	 var location= $("#imageFileName").val();
 		//alert(lat+","+lng);
 	 if(location != "" ){

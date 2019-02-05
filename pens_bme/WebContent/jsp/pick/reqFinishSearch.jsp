@@ -118,7 +118,7 @@ function gotoPage(path,currPage){
 										 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
 									</td>
 									<td> 
-									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20"/>
+									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td>					
 										
@@ -144,7 +144,7 @@ function gotoPage(path,currPage){
 								<tr>
                                     <td> หมายเหตุ</td>
 									<td colspan="3">
-						               <html:text property="bean.remark" styleId="remark" size="80" />
+						               <html:text property="bean.remark" styleId="remark" size="80"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>	
 						   </table>

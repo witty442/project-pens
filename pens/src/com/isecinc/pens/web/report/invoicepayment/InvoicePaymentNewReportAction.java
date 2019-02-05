@@ -60,23 +60,8 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		double[] valueCheque = process.sumChequeReceipt(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("chequeReceipt", valueCheque[0]);
 
-		/* Comment Out : 
-		// today Cheque
-		List<InvoicePaymentReport> lstCurrent = process.searchReport(reportForm.getInvoicePaymentReport(), user, conn,InvoicePaymentReportProcess.SERACH_CASH_SALES );
-		// Before
-		List<InvoicePaymentReport> lstBefore = process.searchReport(reportForm.getInvoicePaymentReport(), user, conn, InvoicePaymentReportProcess.SERACH_CREDIT_SALES);
-		// All
-		List<InvoicePaymentReport> lstReport = new ArrayList<InvoicePaymentReport>();
-		lstReport.addAll(lstCurrent);
-		lstReport.addAll(lstBefore);
-		*/
-		
+		// Data List
 		List<InvoicePaymentReport> lstReport = process.searchReport(reportForm.getInvoicePaymentReport(), user, conn);
-		
-		//Credit
-		//double[] valueCredit = process.sumChequeDayBeforeCaseCredit(reportForm.getInvoicePaymentReport(), user, conn);
-		//parameterMap.put("sumCreditCaseCashAmt", valueCredit[0]);
-		//parameterMap.put("sumCreditCaseChequeAmt", valueCredit[1]);
 		
 		// Sum Amt cash day before.
 		double[] value2 = process.sumCashDayBefore(reportForm.getInvoicePaymentReport(), user, conn);
@@ -88,6 +73,7 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("chequeDayBefore", valueChequeBefore[0]);
 		parameterMap.put("receiptCnt2", valueChequeBefore[1]);
 		
+		//Count Bill 
 		parameterMap.put("receiptCurrentCnt", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 1));//current
 		parameterMap.put("receiptDayBeforeCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 3));//ALL
 		
@@ -95,7 +81,8 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		double[] cancelReceipt = process.sumCancelReceiptAmount(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("cancelReceiptAmount",cancelReceipt[0]);
 		parameterMap.put("cancelReceiptCnt",new Double(cancelReceipt[1]).intValue());
-
+        
+		// receipt all before
 		double creditSalesAmtBefore = process.sumCreditSalesAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("creditSalesAmtBefore",creditSalesAmtBefore);
 				

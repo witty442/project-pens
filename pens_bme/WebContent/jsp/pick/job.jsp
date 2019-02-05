@@ -356,7 +356,7 @@ function resetStore(){
 									</td>
 									<td align="left"> 
 									 <c:if test="${jobForm.job.canEdit == true}">	
-									       <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									       <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')" styleClass="\" autoComplete=\"off"/>-
 									       <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  </c:if>
 									   <c:if test="${jobForm.job.canEdit == false}">	
@@ -387,7 +387,7 @@ function resetStore(){
                                     <td> Job Name <font color="red">*</font></td>
 									<td >
 									 <c:if test="${jobForm.job.canEdit == true}">
-						                 <html:text property="job.name" styleId="name" size="50" />
+						                 <html:text property="job.name" styleId="name" size="50"  styleClass="\" autoComplete=\"off"/>
 						             </c:if>
 						            <c:if test="${jobForm.job.canEdit == false}">
 						                 <html:text property="job.name" styleId="name" size="50" readonly="true" styleClass="disableText" />
@@ -414,19 +414,19 @@ function resetStore(){
 								<tr>
                                     <td> เอกสารอ้างอิง</td>
 									<td>				
-										  <html:text property="job.refDoc" styleId="refDoc" size="40" />
+										  <html:text property="job.refDoc" styleId="refDoc" size="40"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								<tr>
                                     <td> จำนวนตัว (ตาม RTN)</td>
 									<td>				
-										  <html:text property="job.rtnQty" styleId="rtnQty" size="15" onblur="isNum(this)"/>
+										  <html:text property="job.rtnQty" styleId="rtnQty" size="15" onblur="isNum(this)"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								<tr>
                                     <td> ยอดเงิน (ตาม RTN) </td>
 									<td>				
-										  <html:text property="job.rtnAmt" styleId="rtnAmt" size="15"  onblur="isNum2Digit(this)"/>
+										  <html:text property="job.rtnAmt" styleId="rtnAmt" size="15"  onblur="isNum2Digit(this)"  styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								<%if(jobForm.getMode().equals("edit") || jobForm.getMode().equals("view")){ %>
@@ -434,7 +434,7 @@ function resetStore(){
 	                                    <td> RTN No / GR No </td>
 										<td>	
 										<%if(jobForm.getMode().equals("edit")){ %>			
-											<html:text property="job.rtnNo" styleId="rtnNo" size="25" onblur="validRtnNoInJob(this)"/>
+											<html:text property="job.rtnNo" styleId="rtnNo" size="25" onblur="validRtnNoInJob(this)"  styleClass="\" autoComplete=\"off"/>
 									    <%}else{ %>
 									        <html:text property="job.rtnNo" styleId="rtnNo" size="90" readonly="true" styleClass="disableText"/>   
 									    <%} %>

@@ -186,7 +186,7 @@ public class OrderAllDAO {
 				
 			}else if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_7CATALOG";
-				storeType = Constants.STORE_TYPE_7CATALOG_CODE;
+				storeType = Constants.STORE_TYPE_PENSHOP_CODE;
 				storeTypeItemCode = Constants.STORE_TYPE_7CATALOG_ITEM;
 				
 			}else if("TVDIRECT".equalsIgnoreCase(Utils.isNull(pageName)) ){
@@ -287,7 +287,7 @@ public class OrderAllDAO {
 
 					}//for
 					
-					//RemainOmhandQty + lineQty display
+					//RemainOnhandQty + lineQty display
 					item.setOnhandQty((Utils.convertStrToInt(item.getOnhandQty())+lineQty)+"");
 					
 				}//if
@@ -1457,11 +1457,10 @@ public class OrderAllDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select order_no,bar_on_box,store_code,item,barcode,bill_type, qty from PENSBME_ORDER WHERE trunc(order_date) =? and store_type= ?  \n");
 			
-		    //logger.debug("SQL:"+sql.toString());
+		    logger.debug("SQL:"+sql.toString());
 		    
-		   /* logger.debug("orderDate["+orderDate+"]");
-		    logger.debug("storeCode["+storeCode+"]");
-		    logger.debug("item["+item+"]");*/
+		    logger.debug("orderDate["+orderDate+"]");
+		    logger.debug("storeType["+storeType+"]");
 		    
 			ps = conn.prepareStatement(sql.toString());
 			

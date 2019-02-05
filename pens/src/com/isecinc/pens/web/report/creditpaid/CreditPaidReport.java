@@ -32,8 +32,15 @@ public class CreditPaidReport implements Serializable{
 	private double totalOrderAmt;
 	
 	private List<CreditPaidReport> items;
+	private String chequeDate;
 	
 	
+	public String getChequeDate() {
+		return chequeDate;
+	}
+	public void setChequeDate(String chequeDate) {
+		this.chequeDate = chequeDate;
+	}
 	public double getTotalOrderAmt() {
 		return totalOrderAmt;
 	}

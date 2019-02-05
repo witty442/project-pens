@@ -122,7 +122,7 @@ function gotoPage(path,currPage){
 										 <html:text property="bean.requestDate" styleId="requestDate" size="20"/>
 									</td>
 									<td> 
-									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20"/>
+									    Request No <html:text property="bean.requestNo" styleId="requestNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td> 
 									    Confirm Date <html:text property="bean.confirmDate" styleId="confirmDate" size="20"/>

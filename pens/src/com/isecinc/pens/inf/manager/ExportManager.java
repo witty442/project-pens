@@ -289,8 +289,20 @@ public class ExportManager {
 						    }
 						    logger.info("--End Export t_pd_receipt_his--");
                 		}
+	            	}else if(tableBean.getTableName().equalsIgnoreCase("t_bank_transfer")){
+	            		if(User.VAN.equalsIgnoreCase(userRequest.getType())){
+	                		logger.info("--Start Export t_bank_transfer--");
+	                		
+	                		/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+							modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());
+							 /** Check Data Found Before Export **/
+						    if( modelDetailItem != null && modelDetailItem.length > 0){
+							   tableBean = exProcess.exportBankTransfer(connMonitor, tableBean, userRequest);
+						    }
+						    logger.info("--End Export t_bank_transfer--");
+	            		}
 					}
-					
+            	
 					// 2011/11/30 Create New Export File
 					// New Export File To Temp2
 					else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec")){
@@ -430,6 +442,7 @@ public class ExportManager {
 			   
 			   logger.debug("Error:Step delete file in FTP Case Rollback ");
 			   ftpManager.deleteAllFileInFTPCaseRollback(initConfigMap, "");
+			   
 			}
 			/** End process ***/
 			logger.debug("-Update Monitor to Fail ");

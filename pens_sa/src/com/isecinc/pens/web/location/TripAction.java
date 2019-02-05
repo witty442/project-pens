@@ -161,27 +161,14 @@ public class TripAction {
 		StringBuffer sql = new StringBuffer("");
 		try{
 			sql.append("\n   SELECT distinct cs.trip1,trip2,trip3");
-			sql.append("\n   FROM ");
-			sql.append("\n   ( select cs.trip1,cs.trip2,cs.trip3 ");
-			sql.append("\n   ,cs. cust_account_id ,cs.primary_salesrep_id,cs.address ");
 			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
 			sql.append("\n   where 1=1 ");
-			sql.append("\n   and (   (cs.trip1 >=1 and cs.trip1 <=23) ");
-			sql.append("\n        or (cs.trip2 >=1 and cs.trip2 <=23) ");
-			sql.append("\n        or (cs.trip3 >=1 and cs.trip3 <=23) ) ");
-			sql.append("\n   )cs ");	
-			sql.append("\n   ,xxpens_ar_customer_all_v c");
-			sql.append("\n   ,xxpens_salesreps_v s");
-			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
-			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
 			sql.append("   "+genWhereCondSql(conn, "", o));
-			
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and (cs.trip1 ="+o.getTripDay()+"  ");
 				sql.append("\n        or cs.trip2 ="+o.getTripDay()+" ");
 				sql.append("\n        or cs.trip3 ="+o.getTripDay()+" )");
 			}
-			
 			//sql.append("\n   order by trip1,trip2,trip3 asc" );
 			
 			logger.debug("sql:"+sql);
@@ -255,21 +242,10 @@ public class TripAction {
 		List<LocationBean> items = new ArrayList<LocationBean>();
 		try {
 			sql.append("\n   SELECT ");
-			sql.append("\n   c.account_number ,c.party_name ");
-			sql.append("\n   ,cs.address,s.salesrep_id ,cs.trip1,cs.trip2,cs.trip3");
-			sql.append("\n   FROM ");
-			sql.append("\n   ( select cs.trip1,cs.trip2,cs.trip3 ");
-			sql.append("\n   ,cs. cust_account_id ,cs.primary_salesrep_id,cs.address ");
+			sql.append("\n    cs.account_number ,cs.party_name ");
+			sql.append("\n   ,cs.address,cs.primary_salesrep_id ,cs.trip1,cs.trip2,cs.trip3");
 			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
 			sql.append("\n   where 1=1 ");
-			sql.append("\n   and (   (cs.trip1 >=1 and cs.trip1 <=23) ");
-			sql.append("\n        or (cs.trip2 >=1 and cs.trip2 <=23) ");
-			sql.append("\n        or (cs.trip3 >=1 and cs.trip3 <=23) ) ");
-			sql.append("\n   )cs ");	
-			sql.append("\n   ,xxpens_ar_customer_all_v c");
-			sql.append("\n   ,xxpens_salesreps_v s");
-			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
-			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
 			if( !"".equals(tripBySearchSqlIn)){
 				sql.append("\n   and (   cs.trip1 ="+tripBySearchSqlIn+" ");
 				sql.append("\n        or cs.trip2 ="+tripBySearchSqlIn+" ");
@@ -277,13 +253,11 @@ public class TripAction {
 			}
 			sql.append("   "+genWhereCondSql(conn, "", o));
 			if( !Utils.isNull(o.getTripDay()).equals("")){
-				sql.append("\n   and (   cs.trip1 ="+o.getTripDay()+"  ");
+				sql.append("\n   and (   cs.trip1 ="+o.getTripDay()+" ");
 				sql.append("\n        or cs.trip2 ="+o.getTripDay()+" ");
 				sql.append("\n        or cs.trip3 ="+o.getTripDay()+" )");
 			}
-			
-			sql.append("\n order by  c.account_number asc ");
-			
+			sql.append("\n order by  cs.account_number asc ");
 			logger.debug("sql :"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -293,7 +267,7 @@ public class TripAction {
 			   h.setCustomerCode(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
-			   h.setSalesrepCode(Utils.isNull(rst.getString("salesrep_id")));
+			   h.setSalesrepCode(Utils.isNull(rst.getString("primary_salesrep_id")));
 			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
 			   h.setTripDay2(Utils.isNull(rst.getString("trip2")));
 			   h.setTripDay3(Utils.isNull(rst.getString("trip3")));
@@ -403,16 +377,14 @@ public class TripAction {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		LocationBean h = null;
+		SalesrepBean salesrepBean = null;
 		try {
 			sql.append("\n   SELECT ");
-			sql.append("\n   c.account_number ,c.party_name ,cs.address,s.salesrep_id,cs.trip1,cs.trip2,cs.trip3");
-			sql.append("\n   ,cs.party_site_id,cs.cust_account_id ,s.code,s.salesrep_full_name");
+			sql.append("\n   cs.account_number ,cs.party_name ,cs.address,cs.primary_salesrep_id,cs.trip1,cs.trip2,cs.trip3");
+			sql.append("\n   ,cs.party_site_id,cs.cust_account_id ,cs.code");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
-			sql.append("\n   ,xxpens_ar_customer_all_v c");
-			sql.append("\n   ,xxpens_salesreps_v s");
-			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
-			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
-			sql.append("\n   and c.account_number ='"+o.getCustomerCode()+"'");	
+			sql.append("\n   WHERE 1=1");
+			sql.append("\n   and cs.account_number ='"+o.getCustomerCode()+"'");	
 			logger.debug("sql:\n"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
@@ -421,9 +393,13 @@ public class TripAction {
 			   h.setCustomerCode(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
-			   h.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
+			   h.setSalesrepId(Utils.isNull(rst.getString("primary_salesrep_id")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("code")));
-			   h.setSalesrepName(Utils.isNull(rst.getString("salesrep_full_name")));
+			  
+			   //Get Salesrep name
+			   salesrepBean = SalesrepDAO.getSalesrepBeanById(conn, h.getSalesrepId());
+			   h.setSalesrepName(Utils.isNull(salesrepBean.getSalesrepFullName()));
+			   
 			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
 			   h.setTripDay2(Utils.isNull(rst.getString("trip2")));
 			   h.setTripDay3(Utils.isNull(rst.getString("trip3")));
@@ -463,16 +439,14 @@ public class TripAction {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		LocationBean h = null;
+		SalesrepBean salesrepBean =null;
 		try {
 			sql.append("\n   SELECT ");
-			sql.append("\n   c.account_number ,c.party_name ,cs.address,s.salesrep_id,cs.trip1,cs.trip2,cs.trip3");
-			sql.append("\n   ,cs.party_site_id,cs.cust_account_id ,s.code,s.salesrep_full_name");
+			sql.append("\n   cs.account_number ,cs.party_name ,cs.address,cs.primary_salesrep_id,cs.trip1,cs.trip2,cs.trip3");
+			sql.append("\n   ,cs.party_site_id, cs.cust_account_id ,cs.code");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
-			sql.append("\n   ,xxpens_ar_customer_all_v c");
-			sql.append("\n   ,xxpens_salesreps_v s");
-			sql.append("\n   WHERE cs.cust_account_id = c.cust_account_id ");
-			sql.append("\n   and cs.primary_salesrep_id = s.salesrep_id ");
-			sql.append("\n   and c.account_number ='"+o.getCustomerCode()+"'");	
+			sql.append("\n   WHERE 1=1");
+			sql.append("\n   and cs.account_number ='"+o.getCustomerCode()+"'");	
 			sql.append("\n   and cs.primary_salesrep_id ="+o.getSalesrepId()+"");	
 			sql.append("\n   and cs.trip1 is null and cs.trip2 is null and cs.trip3 is null ");
 			logger.debug("sql:\n"+sql.toString());
@@ -483,9 +457,13 @@ public class TripAction {
 			   h.setCustomerCode(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
-			   h.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
+			   h.setSalesrepId(Utils.isNull(rst.getString("primary_salesrep_id")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("code")));
-			   h.setSalesrepName(Utils.isNull(rst.getString("salesrep_full_name")));
+			   
+			   //Get Salesrep name
+			   salesrepBean = SalesrepDAO.getSalesrepBeanById(conn, h.getSalesrepId());
+			   h.setSalesrepName(Utils.isNull(salesrepBean.getSalesrepFullName()));
+			   
 			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
 			   h.setTripDay2(Utils.isNull(rst.getString("trip2")));
 			   h.setTripDay3(Utils.isNull(rst.getString("trip3")));
@@ -556,16 +534,16 @@ public class TripAction {
 			district = LocationControlPage.getDistrictName(conn, Utils.isNull(c.getDistrict()));
 		}
 		if( !Utils.isNull(c.getCustomerCode()).equals("")){
-			sql.append("\n and c"+schema_name+".account_number ='"+c.getCustomerCode()+"' ");
+			sql.append("\n and cs"+schema_name+".account_number ='"+c.getCustomerCode()+"' ");
 		}
 		if( !Utils.isNull(c.getCustomerName()).equals("")){
-			sql.append("\n and c"+schema_name+".party_name LIKE '%"+c.getCustomerName()+"%' ");
+			sql.append("\n and cs"+schema_name+".party_name LIKE '%"+c.getCustomerName()+"%' ");
 		}
 		if( !Utils.isNull(c.getCustCatNo()).equals("")){
-			sql.append("\n and s"+schema_name+".sales_channel = '"+Utils.isNull(c.getCustCatNo())+"' ");
+			sql.append("\n and cs"+schema_name+".sales_channel = '"+Utils.isNull(c.getCustCatNo())+"' ");
 		}
 		if( !Utils.isNull(c.getSalesChannelNo()).equals("")){
-			sql.append("\n and s"+schema_name+".region = '"+Utils.isNull(c.getSalesChannelNo())+"' ");
+			sql.append("\n and cs"+schema_name+".region = '"+Utils.isNull(c.getSalesChannelNo())+"' ");
 		}
 		if( !Utils.isNull(c.getSalesrepCode()).equals("")){
 			sql.append("\n and cs"+schema_name+".primary_salesrep_id = "+Utils.isNull(c.getSalesrepCode())+"");
