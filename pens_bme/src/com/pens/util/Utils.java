@@ -777,7 +777,7 @@ public class Utils {
 		if (str ==null || isNull(str).equals("")){
 			return new Double(0);
 		}
-		//logger.debug("str:"+str);
+		logger.debug("str:"+str);
 		return ((Double)str);
 	}
 	

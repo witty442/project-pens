@@ -1,0 +1,985 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="stock_return_subreport1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="587" leftMargin="3" rightMargin="5" topMargin="5" bottomMargin="5">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="127"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="pens_logo_fit" class="java.lang.String"/>
+	<parameter name="request_date" class="java.lang.String"/>
+	<parameter name="request_number" class="java.lang.String"/>
+	<parameter name="description" class="java.lang.String"/>
+	<parameter name="customer_code" class="java.lang.String"/>
+	<parameter name="customer_name" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="address2" class="java.lang.String"/>
+	<parameter name="sales_code" class="java.lang.String"/>
+	<parameter name="sales_name" class="java.lang.String"/>
+	<parameter name="userPrint" class="java.lang.String"/>
+	<parameter name="totalAllAmount" class="java.lang.String"/>
+	<parameter name="totalAllVatAmount" class="java.lang.String"/>
+	<parameter name="totalAllNonVatAmount" class="java.lang.String"/>
+	<field name="no" class="java.lang.Integer"/>
+	<field name="arInvoiceNo" class="java.lang.String"/>
+	<field name="productCode" class="java.lang.String"/>
+	<field name="productName" class="java.lang.String"/>
+	<field name="uom1Qty" class="java.lang.String"/>
+	<field name="uom2Qty" class="java.lang.String"/>
+	<field name="uom2" class="java.lang.String"/>
+	<field name="uom1Pac" class="java.lang.String"/>
+	<field name="discount" class="java.lang.String"/>
+	<field name="totalAmount" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="132" splitType="Stretch">
+			<staticText>
+				<reportElement x="165" y="0" width="258" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ใบอนุมัติให้คืนคลัง PENS รอทำลาย]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="469" y="45" width="45" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" วันที่ : "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="398" y="92" width="62" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<text><![CDATA[รหัสพนักงานขาย:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="268" y="25" width="99" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["(สำหรับบริหารขาย)"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="462" y="92" width="125" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sales_code}+": " + $P{sales_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="503" y="0" width="47" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[หน้า]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="563" y="0" width="9" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<textField evaluationTime="Page">
+				<reportElement x="550" y="0" width="13" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="572" y="0" width="13" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="445" y="25" width="69" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" เลขที่เอกสาร : "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="248" y="92" width="25" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<text><![CDATA[ที่อยู่:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="277" y="92" width="121" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="92" width="43" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<text><![CDATA[รหัสร้านค้า:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="45" y="92" width="40" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{customer_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="86" y="92" width="40" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<text><![CDATA[ชื่อร้านค้า:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="127" y="92" width="119" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{customer_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="36" width="266" height="56"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true" pdfEncoding="Identity-H"/>
+				</textElement>
+				<text><![CDATA[บริษัท เพนส์ มาร์เก็ตติ้ง แอนด์ ดิสทริบิวชั่น จำกัด
+662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
+เลขประจำตัวผู้เสียภาษี 0105553086671   ]]></text>
+			</staticText>
+			<image scaleImage="FillFrame">
+				<reportElement x="2" y="0" width="72" height="36"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{pens_logo_fit}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="519" y="25" width="66" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{request_number}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="519" y="45" width="65" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{request_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="277" y="112" width="121" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{address2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="59" splitType="Stretch">
+			<staticText>
+				<reportElement x="116" y="1" width="123" height="58"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ชื่อสินค้า]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="334" y="41" width="45" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ต่อหีบ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="1" width="140" height="20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สำหรับพนักงานขาย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="75" y="1" width="41" height="58"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รหัสสินค้า]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="21" width="95" height="20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สินค้าแจ้งคืน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="269" y="41" width="30" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เศษ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="334" y="21" width="45" height="20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[การบรรจุ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="299" y="41" width="35" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[หน่วย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="239" y="41" width="30" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เต็ม]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="1" width="16" height="58"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="1" width="57" height="58"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เลขที่บิล]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="41" width="30" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เต็ม]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="41" width="30" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[หน่วย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="21" width="90" height="20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวนคืนจริง]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="409" y="41" width="30" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เศษ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="379" y="1" width="90" height="20"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[สำหรับพนักงานคลังสินค้า]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="1" width="116" height="40"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวนเงิน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="41" width="52" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ส่วนลด(ต่อหีบ)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="521" y="41" width="64" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รวม]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="2" y="0" width="16" height="22"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="18" y="0" width="57" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{arInvoiceNo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="75" y="0" width="41" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{productCode}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="116" y="0" width="123" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{productName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="239" y="0" width="30" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uom1Qty}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="269" y="0" width="30" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uom2Qty}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="299" y="0" width="35" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uom2}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="334" y="0" width="45" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uom1Pac}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="379" y="0" width="30" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="409" y="0" width="30" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="521" y="0" width="59" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalAmount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="469" y="0" width="47" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="516" y="0" width="5" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="580" y="0" width="5" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="439" y="0" width="30" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uom2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band/>
+	</lastPageFooter>
+	<summary>
+		<band height="210" splitType="Stretch">
+			<textField>
+				<reportElement x="443" y="185" width="142" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{userPrint}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="43" y="185" width="142" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="185" width="43" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<text><![CDATA[พิมพ์วันที่ : ]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="521" y="44" width="59" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAllAmount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="521" y="22" width="59" height="22"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAllVatAmount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="521" y="0" width="59" height="22"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAllNonVatAmount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="445" y="2" width="69" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รวม]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="445" y="22" width="69" height="22"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[VAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="445" y="46" width="69" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ผลรวม]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="2" width="113" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[หมายเหตุในการส่งคืนสินค้า]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="18" y="22" width="394" height="44"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{description}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="106" width="115" height="51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+วันที่ ____/____/____]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="88" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ขนส่ง/ผู้แทน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="157" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ให้ขนส่งเซนต์ชื่อ ประทับตรงขนส่งด้วย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="106" width="115" height="51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+วันที่ ____/____/____]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="88" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ผู้ตรวจสอบ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="157" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ซุปเปอร์ไวเซอร์/ผู้จัดการแผนก]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="106" width="115" height="51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+วันที่ ____/____/____]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="88" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ผู้อนุมัติ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="157" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ผู้จัดการส่วน/ฝ่าย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="106" width="115" height="51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+วันที่ ____/____/____]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="88" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ตรวจสอบรายการ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="157" width="115" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[เจ้าหน้าที่การตลาด]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="106" width="125" height="51"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+วันที่ ____/____/____]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="88" width="125" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ตรวจสอบ/อนุมัติ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="157" width="125" height="18"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ผจก.ฝ่ายบริหารการขาย]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="5" height="22"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="22" width="5" height="22"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="44" width="5" height="22"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

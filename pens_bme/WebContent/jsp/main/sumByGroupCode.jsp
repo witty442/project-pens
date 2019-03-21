@@ -24,12 +24,12 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-
 <jsp:useBean id="sumGroupCodeForm" class="com.isecinc.pens.web.summary.groupCode.SummaryForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "sumGroupCodeForm");
+
 ImportDAO importDAO = new ImportDAO();
 //if(session.getAttribute("storeTypeList") == null){
    List<PopupForm> storeTypeList = GeneralDAO.searchCustGroupInSaleOutPage(new PopupForm());

@@ -33,8 +33,27 @@ public class PickReportBean implements Serializable{
 	private String dispType;
     //option for filter select
 	private String issueReqNoArr;
+	private String pensItemFrom;
+	private String pensItemTo;
 	
 	
+	
+	public String getPensItemFrom() {
+		return pensItemFrom;
+	}
+
+	public void setPensItemFrom(String pensItemFrom) {
+		this.pensItemFrom = pensItemFrom;
+	}
+
+	public String getPensItemTo() {
+		return pensItemTo;
+	}
+
+	public void setPensItemTo(String pensItemTo) {
+		this.pensItemTo = pensItemTo;
+	}
+
 	public String getIssueReqNoArr() {
 		return issueReqNoArr;
 	}

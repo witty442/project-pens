@@ -44,6 +44,7 @@ public class AdminConsoleAction extends I_Action {
 		return "process";
 	}
 
+	
 	/**
 	 * Search
 	 */
@@ -197,10 +198,12 @@ public class AdminConsoleAction extends I_Action {
 				Connection conn = null;
 				  try {   
 					  conn = DBConnection.getInstance().getConnection();
-					  
-				      resultBKDB =RunScriptDBAction.runScriptDBUpdateAll(request, conn);
-				      adForm.setResultAddDB(resultBKDB);
-				      
+					  String scriptDBName = Utils.isNull(request.getParameter("scriptDBName"));
+					  logger.debug("scriptDBName:"+scriptDBName);
+					  if( !scriptDBName.equals("")){
+				         resultBKDB =RunScriptDBAction.runScriptDBByName(request, conn,scriptDBName);
+				         adForm.setResultAddDB(resultBKDB);
+					  }
 				  } catch(Exception e) {
 				     e.printStackTrace();
 				  }finally{

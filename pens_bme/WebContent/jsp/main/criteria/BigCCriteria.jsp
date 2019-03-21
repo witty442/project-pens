@@ -14,12 +14,12 @@ String hideAll = "";
 		 <tr>
 		  <td width="30%"></td>
 			<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
-			ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
+			ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo" readonly="true"/></td>
 		</tr>
 		<tr>
 		 <td width="30%"></td>
-			<td align="left">รหัสร้านค้า
-			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<td align="left" nowrap>รหัสร้านค้า 
+			    &nbsp;&nbsp;&nbsp;&nbsp;
 			    <html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
 			    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','bigc')"/>
 			    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>

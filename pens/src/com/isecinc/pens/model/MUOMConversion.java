@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.sql.Connection;
 import java.util.List;
 
 import com.isecinc.core.model.I_Model;
@@ -29,6 +30,24 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 		whereCause += "  and uom_id = '" + uomId + "' ";
 		whereCause += "  and (disable_date is null or date_format(disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
 		List<UOMConversion> pos = super.search(TABLE_NAME, "", whereCause, UOMConversion.class);
+		if (pos != null) {
+			if (pos.size() > 0) {
+				return pos.get(0);
+			} else {
+				return new UOMConversion();
+			}
+		} else {
+			return new UOMConversion();
+		}
+	}
+	
+	public UOMConversion getCurrentConversion(Connection conn,int productId, String uomId) throws Exception {
+		//logger.debug("Find UOM conversion on Product : " + productId + " : " + uomId);
+		String whereCause = "";
+		whereCause += "  and product_id = " + productId;
+		whereCause += "  and uom_id = '" + uomId + "' ";
+		whereCause += "  and (disable_date is null or date_format(disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
+		List<UOMConversion> pos = super.search(conn,TABLE_NAME, "", whereCause, UOMConversion.class);
 		if (pos != null) {
 			if (pos.size() > 0) {
 				return pos.get(0);

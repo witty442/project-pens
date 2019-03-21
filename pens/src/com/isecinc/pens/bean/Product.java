@@ -80,11 +80,58 @@ public class Product extends I_PO implements Serializable {
 	private String conversionRate;
 	private String taxable;
 	
+	//optional
+	private String uom1Pac;
+	private String uom2Pac;
+	private String uom1Price;
+	private String uom1ConvRate;
+	private String uom2ConvRate;
+	
 	/** Product Price **/
 	private ProductPrice[] productPrices = null;
 
 	
-    
+   
+	public String getUom1ConvRate() {
+		return uom1ConvRate;
+	}
+
+	public void setUom1ConvRate(String uom1ConvRate) {
+		this.uom1ConvRate = uom1ConvRate;
+	}
+
+	public String getUom2ConvRate() {
+		return uom2ConvRate;
+	}
+
+	public void setUom2ConvRate(String uom2ConvRate) {
+		this.uom2ConvRate = uom2ConvRate;
+	}
+
+	public String getUom1Price() {
+		return uom1Price;
+	}
+
+	public void setUom1Price(String uom1Price) {
+		this.uom1Price = uom1Price;
+	}
+
+	public String getUom1Pac() {
+		return uom1Pac;
+	}
+
+	public void setUom1Pac(String uom1Pac) {
+		this.uom1Pac = uom1Pac;
+	}
+
+	public String getUom2Pac() {
+		return uom2Pac;
+	}
+
+	public void setUom2Pac(String uom2Pac) {
+		this.uom2Pac = uom2Pac;
+	}
+
 	public String getTaxable() {
 		return taxable;
 	}

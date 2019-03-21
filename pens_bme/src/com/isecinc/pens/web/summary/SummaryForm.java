@@ -59,9 +59,16 @@ public class SummaryForm extends I_Form {
     private String summaryType;
     private String endDate;
     private String endSaleDate;
+    
+    private StringBuffer dataHTML;
 	
     
-    
+	public StringBuffer getDataHTML() {
+		return dataHTML;
+	}
+	public void setDataHTML(StringBuffer dataHTML) {
+		this.dataHTML = dataHTML;
+	}
 	public List<TransactionSummary> getResultsTrans() {
 		return resultsTrans;
 	}
@@ -281,10 +288,16 @@ public class SummaryForm extends I_Form {
 		return criteria.getDiffStockSummary();
 	}
 
+	public void setBean(OnhandSummary summary) {
+		criteria.setBean(summary);
+	}
+	public OnhandSummary getBean() {
+		return criteria.getBean();
+	}
+
 	public void setDiffStockSummary(DiffStockSummary summary) {
 		criteria.setDiffStockSummary(summary);
 	}
-	
 	@Override
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		// reset properties

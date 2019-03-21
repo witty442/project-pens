@@ -38,6 +38,7 @@
 		<form-bean name="moveOrderForm" type="com.isecinc.pens.web.moveorder.MoveOrderForm" />
 		<form-bean name="promotionForm" type="com.isecinc.pens.web.promotion.PromotionForm" />
 		<form-bean name="stockVanForm" type="com.isecinc.pens.web.stockvan.StockVanForm" />
+		<form-bean name="stockMCForm" type="com.isecinc.pens.web.stockmc.StockMCForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -50,6 +51,7 @@
 			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
+              <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new" redirect="true" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
 		
@@ -123,6 +125,10 @@
 		</action>
 		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction">
 			<forward name="search" path="/jsp/prodshow/prodShowSearch.jsp" />
+		</action>
+		<action name="stockMCForm" path="/jsp/stockMCAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockmc.StockMCAction">
+			<forward name="search" path="/jsp/stockMC/stockMCSearch.jsp" />
+			<forward name="detail" path="/jsp/stockMC/stockMC.jsp" />
 		</action>
 		<action name="stockVanForm" path="/jsp/stockVanAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockvan.StockVanAction">
 			<forward name="search" path="/jsp/stockvan/stockVanSearch.jsp" />

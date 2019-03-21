@@ -23,10 +23,12 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="mttForm" class="com.isecinc.pens.web.mtt.MTTForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "mttForm");
+
 MTTBean bean = ((MTTForm)session.getAttribute("mttForm")).getBean();
 
 if(session.getAttribute("custGroupList") == null){
@@ -331,7 +333,7 @@ function setGroupMainValue(code,desc,types){
 							</table>
 					  </div>
 
-            <c:if test="${mttForm.resultsSearch != null}">
+            <c:if test="${mttForm.results != null}">
                   <c:if test="${mttForm.bean.dispType == 'barcode'}">
 							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							       <tr>
@@ -345,7 +347,7 @@ function setGroupMainValue(code,desc,types){
 									<th >Barcode</th>
 									<th >QTY</th>			
 								   </tr>
-								<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">
+								<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
 									<c:choose>
 										<c:when test="${rows.index %2 == 0}">
 											<c:set var="tabclass" value="lineO"/>
@@ -397,7 +399,7 @@ function setGroupMainValue(code,desc,types){
 								<th >Pens Item</th>
 								<th >QTY</th>		
 							   </tr>
-								<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">
+								<c:forEach var="results" items="${mttForm.results}" varStatus="rows">
 									<c:choose>
 										<c:when test="${rows.index %2 == 0}">
 											<c:set var="tabclass" value="lineO"/>

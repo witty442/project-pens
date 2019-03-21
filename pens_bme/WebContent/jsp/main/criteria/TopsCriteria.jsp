@@ -19,7 +19,7 @@ String hideAll = "";
 			<td align="left">รหัสร้านค้า
 			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			    <html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
-			    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','tops')"/>
+			    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','tops')"/>
 			    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
 			</td>
 		</tr>

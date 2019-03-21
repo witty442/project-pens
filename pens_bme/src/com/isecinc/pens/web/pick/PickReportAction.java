@@ -109,7 +109,10 @@ public class PickReportAction extends I_Action {
 					aForm.setCurrPage(currPage);
 					
 					//get Total Record
-					aForm.setTotalRecord(PickReportDAO.searchHeadTotalRecList(conn,aForm.getBean()));
+					String issueReqNoAll = PickReportDAO.searchHeadTotalRecList(conn,aForm.getBean());
+					String[] issueReqNoArr = issueReqNoAll.split("\\,");
+					aForm.setTotalRecord(issueReqNoArr.length);
+					aForm.setIssueReqNoAll(issueReqNoAll);
 					//calc TotalPage
 					aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
 					//calc startRec endRec
@@ -203,8 +206,17 @@ public class PickReportAction extends I_Action {
 			response.setContentType("application/vnd.ms-excel");
 			
 			String reportType = Utils.isNull(request.getParameter("reportType"));
+			String chkAll = Utils.isNull(request.getParameter("chkAll"));
+			logger.debug("chkAll:"+chkAll);
+			
 			//get select checkbox issueReqNo filter export 
-			String issueReqNoAll = Utils.isNull(request.getParameter("codes"));
+			String issueReqNoAll = "";
+			if( !Utils.isNull(chkAll).equals("")){
+			   issueReqNoAll =  aForm.getIssueReqNoAll();
+			}else{
+			   issueReqNoAll =  Utils.isNull(request.getParameter("codes"));
+			}
+			
 			logger.debug("issueReqNoAll:"+issueReqNoAll);
 			if(issueReqNoAll.length()>0){
 				issueReqNoAll = issueReqNoAll.substring(0,issueReqNoAll.length()-1);

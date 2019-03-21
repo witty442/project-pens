@@ -8,7 +8,7 @@ String custId = request.getParameter("custId");
 String productId = request.getParameter("pId");
 String productCode = request.getParameter("pCode");
 String productName = request.getParameter("pName");
-System.out.println(productName);
+//System.out.println(productName);
 
 String uom1 = request.getParameter("uom1");
 String uom2 = request.getParameter("uom2");

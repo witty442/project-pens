@@ -30,23 +30,25 @@ public class PickReportDAO{
 	public static String STATUS_NEW ="N";
 	public static String STATUS_CANCEL ="AB";
 	
-	public static int searchHeadTotalRecList(Connection conn,PickReportBean o) throws Exception {
+	public static String searchHeadTotalRecList(Connection conn,PickReportBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		int totalRec = 0;
+		String issueReqNo = "";
 		try {
-			sql.append("\n select count(*) as c  from (");
-			sql.append("\n   select S.issue_req_no");
-			sql.append("\n   from PENSBI.PENSBME_PICK_STOCK S");
-		    sql.append("\n   where 1=1 ");
+			sql.append("\n select issue_req_no from (");
+			sql.append("\n   select distinct S.issue_req_no");
+			sql.append("\n   from PENSBI.PENSBME_PICK_STOCK S ,PENSBI.PENSBME_PICK_STOCK_I D");
+		    sql.append("\n   where S.issue_req_no= D.issue_req_no");
 		    //Where Condition
 		    sql.append("\n   and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' \n");
 		    sql.append("   "+genWhereSearchHeadList(o,"PENSBME_PICK_STOCK").toString());
+		   
+		    
 			sql.append("\n   UNION ALL ");
-			sql.append("\n   select S.issue_req_no");
-			sql.append("\n   from PENSBI.PENSBME_STOCK_ISSUE S");
-		    sql.append("\n   where 1=1 ");
+			sql.append("\n   select distinct S.issue_req_no");
+			sql.append("\n   from PENSBI.PENSBME_STOCK_ISSUE S ,PENSBI.PENSBME_STOCK_ISSUE_ITEM D");
+		    sql.append("\n   where S.issue_req_no= D.issue_req_no ");
 		    //Where Condition
 		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"' \n");
 		    sql.append("   "+genWhereSearchHeadList(o,"PENSBME_STOCK_ISSUE").toString());
@@ -57,8 +59,9 @@ public class PickReportDAO{
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			while(rst.next()) {
-				totalRec = rst.getInt("c");
+				issueReqNo += rst.getString("issue_req_no")+",";
 			}//while
+			logger.debug("issueReqNo:"+issueReqNo);
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -67,7 +70,7 @@ public class PickReportDAO{
 				ps.close();
 			} catch (Exception e) {}
 		}
-		return totalRec;
+		return issueReqNo;
 	}
 	public static PickReportBean searchHeadTotalSummary(Connection conn,PickReportBean o) throws Exception {
 		PreparedStatement ps = null;
@@ -111,35 +114,35 @@ public class PickReportDAO{
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
 			sql.append("\n select AA.* FROM (");
-			sql.append("\n   select S.store_code,S.issue_req_no ,confirm_issue_date as issue_date,S.remark ,S.pick_user as requestor");
+			sql.append("\n   select distinct S.store_code,S.issue_req_no ,confirm_issue_date as issue_date,S.remark ,S.pick_user as requestor");
 			sql.append("\n   ,(select pens_desc FROM PENSBI.PENSBME_MST_REFERENCE M WHERE M.reference_code = 'Store' ");
 			sql.append("\n     and M.pens_value = S.STORE_CODE) as store_name  ");
 			sql.append("\n   ,(select count(*)  FROM PENSBI.PENSBME_PICK_STOCK_I M WHERE M.issue_req_no = S.issue_req_no ");
 			sql.append("\n     and M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"' ) as issue_qty ");
-			sql.append("\n   from PENSBI.PENSBME_PICK_STOCK S");
-		    sql.append("\n   where 1=1 ");
+			sql.append("\n   from PENSBI.PENSBME_PICK_STOCK S  ,PENSBI.PENSBME_PICK_STOCK_I D");
+		    sql.append("\n   where  S.issue_req_no = D.issue_req_no");
 		    //Where Condition
 		    sql.append("\n   and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("   "+genWhereSearchHeadList(o,"PENSBME_PICK_STOCK").toString());
 		    
 		    sql.append("\n   UNION ALL");
 		    
-		    sql.append("\n   select S.CUSTOMER_NO as store_code,S.issue_req_no ,S.status_date as issue_date,S.remark ,S.requestor");
+		    sql.append("\n   select distinct S.CUSTOMER_NO as store_code,S.issue_req_no ,S.status_date as issue_date,S.remark ,S.requestor");
 			sql.append("\n   ,(select pens_desc FROM PENSBI.PENSBME_MST_REFERENCE M WHERE M.reference_code = 'Store'");
 			sql.append("\n     and M.pens_value = S.CUSTOMER_NO) as store_name  ");
 			sql.append("\n   ,(select nvl(sum(issue_qty),0)  FROM PENSBI.PENSBME_STOCK_ISSUE_ITEM M WHERE ");
 			sql.append("\n     M.issue_req_no = S.issue_req_no and M.status ='"+PickConstants.STATUS_ISSUED+"'");
 			sql.append("\n     group by M.issue_req_no ) as issue_qty ");
-			sql.append("\n   from PENSBI.PENSBME_STOCK_ISSUE S");
-		    sql.append("\n   where 1=1 ");
+			sql.append("\n   from PENSBI.PENSBME_STOCK_ISSUE S ,PENSBI.PENSBME_STOCK_ISSUE_ITEM D");
+		    sql.append("\n   where S.issue_req_no = D.issue_req_no ");
 		    //Where Condition
 		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"'");
 		    sql.append("   "+genWhereSearchHeadList(o,"PENSBME_STOCK_ISSUE").toString());
 		    sql.append("\n    )AA ");
-		    sql.append("\n    order by AA.issue_req_no desc ,AA.issue_date desc");
+		    sql.append("\n    order by AA.issue_date desc,AA.issue_req_no desc ,to_number(REPLACE(AA.store_code, '-')) desc");
             sql.append("\n   )A ");
          
-     	    // get record start to end 
+     	    // get record start to end  
             if( !allRec){
      	     sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
             } 
@@ -336,16 +339,16 @@ public class PickReportDAO{
 		StringBuffer sql = new StringBuffer("");
 		
 		if( !Utils.isNull(o.getIssueReqNoArr()).equals("")){
-			sql.append("\n and issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+			sql.append("\n and S. in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
 		}
 		if( !Utils.isNull(o.getCustGroup()).equals("")){
-			sql.append("\n and cust_group ='"+o.getCustGroup()+"'");
+			sql.append("\n and S.cust_group ='"+o.getCustGroup()+"'");
 		}
 		if( !Utils.isNull(o.getStoreCode()).equals("")){
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
-			   sql.append("\n and store_code ='"+o.getStoreCode()+"'");
+			   sql.append("\n and S.store_code ='"+o.getStoreCode()+"'");
 			}else{
-			  sql.append("\n and customer_no ='"+o.getStoreCode()+"'");
+			  sql.append("\n and S.customer_no ='"+o.getStoreCode()+"'");
 			}
 		}
 		if( !Utils.isNull(o.getIssueReqDateFrom()).equals("")){
@@ -353,9 +356,9 @@ public class PickReportDAO{
 			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
 			
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
-			   sql.append("\n and trunc(CONFIRM_ISSUE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 			}else{
-			  sql.append("\n and trunc(STATUS_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			  sql.append("\n and trunc(S.STATUS_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 			}
 		}
 		
@@ -364,11 +367,31 @@ public class PickReportDAO{
 			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
 
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
-			   sql.append("\n and trunc(CONFIRM_ISSUE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}else{
-			   sql.append("\n and trunc(STATUS_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			   sql.append("\n and trunc(S.STATUS_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
 		}
+		
+		if( !Utils.isNull(o.getIssueReqDateTo()).equals("")){
+			Date tDate  = Utils.parse(o.getIssueReqDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+
+			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
+			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			}else{
+			   sql.append("\n and trunc(S.STATUS_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			}
+		}
+		if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
+	    	 sql.append("\n and D.pens_item >='"+Utils.isNull(o.getPensItemFrom())+"'");
+	    	 sql.append("\n and D.pens_item <='"+Utils.isNull(o.getPensItemTo())+"'");
+	    }else if( !Utils.isNull(o.getPensItemFrom()).equals("") && Utils.isNull(o.getPensItemTo()).equals("")){
+	    	 sql.append("\n and D.pens_item ='"+Utils.isNull(o.getPensItemFrom())+"'");
+	    }
+		if( !Utils.isNull(o.getGroupCode()).equals("")){
+	    	 sql.append("\n and D.group_code LIKE '"+Utils.isNull(o.getGroupCode())+"%'");
+	    }
 	  return sql;
 	}
 	

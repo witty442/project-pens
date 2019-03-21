@@ -12,6 +12,9 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "salesAnalystReportForm");
+
 if(request.getParameter("action") != null){
     SAInitial.getInstance().initSession(request);
 }

@@ -53,9 +53,8 @@ System.out.println("currentPage:"+currentPage);
 	}
 </style>
 </head>
-     <c:if test="${summaryForm.page == 'BigC'}">
+     <c:if test="${summaryForm.page == 'BigC' || summaryForm.page == 'BigC_TEMP'}">
      <c:if test="${summaryForm.resultsTrans != null}">
-
 		<br/>
 			<div id ="scroll" >
 				<display:table style="width:100%;"  id="item" name="sessionScope.summaryForm.resultsTrans" defaultsort="0" defaultorder="descending"  class="resultDisp"

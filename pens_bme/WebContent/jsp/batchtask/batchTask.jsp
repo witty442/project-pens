@@ -19,6 +19,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="batchTaskForm" class="com.isecinc.pens.web.batchtask.BatchTaskForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "batchTaskForm");
+
 try{
 User user = (User) session.getAttribute("user");
 String pageName = Utils.isNull(request.getParameter("pageName"));
@@ -76,8 +79,10 @@ body {
    color: red;
 }
 </style>
- 
+
+<!-- OLD CODE -->
 <%out.println(taskInfo.getValidateScript()); %>
+<!-- NEW CODE GR FROM FILE -->
 
 <Script>
     function loadme(){
@@ -358,7 +363,7 @@ body {
                         <!-- Generate BUTTON By Task Config-->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						    <tr>
-								<td align="center" width ="100%"> &nbsp;</td>
+								<td align="center" width ="100%">&nbsp;</td>
 							</tr>
 							<tr>
 								<td align="center" width ="100%">
@@ -366,6 +371,12 @@ body {
 								       <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')">
 								      <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								</td>
+							</tr>
+							<tr>
+								<td align="center" width ="100%">&nbsp;</td>
+							</tr>
+							  <tr>
+								<td align="center" width ="100%"><b><%=Utils.isNull(taskInfo.getDescription()) %></b></td>
 							</tr>
 						</table>   
 							

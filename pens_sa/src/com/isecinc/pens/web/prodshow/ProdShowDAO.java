@@ -68,6 +68,7 @@ public class ProdShowDAO {
 			sql.append("\n ,H.order_number,D.brand");
 			sql.append("\n ,D.pic1,D.pic2,D.pic3");
 			sql.append("\n ,(select B.brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no=D.brand) as brand_name ");
+			sql.append("\n ,H.show_date ");
 			sql.append("\n FROM XXPENS_OM_PRODSHOW_MST H");
 			sql.append("\n ,XXPENS_OM_PRODSHOW_DT D"); 
 			sql.append("\n ,xxpens_ar_customer_all_v C");
@@ -104,7 +105,7 @@ public class ProdShowDAO {
 			   h.setPic1(Utils.isNull(rst.getString("pic1"))); 
 			   h.setPic2(Utils.isNull(rst.getString("pic2"))); 
 			   h.setPic3(Utils.isNull(rst.getString("pic3"))); 
-			   
+			   h.setShowDate(Utils.stringValueChkNull(rst.getDate("show_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   items.add(h);
 			}//while
 

@@ -26,9 +26,12 @@ public class StockVanBean implements Serializable{
 	private String productName;
 	private String dispType;
 	private String dispPlan;
+	private String dispPrice;
 	private String dispHaveQty;
 	private String pdQty;
+	private String pdPrice;
 	private String pdIntQty;
+	private String pdIntPrice;
 	private String createUser;
 	private String updateUser;
 	
@@ -36,6 +39,24 @@ public class StockVanBean implements Serializable{
 	private List<StockVanBean> rowColumnDataList;
 	
 	
+	public String getPdPrice() {
+		return pdPrice;
+	}
+	public void setPdPrice(String pdPrice) {
+		this.pdPrice = pdPrice;
+	}
+	public String getPdIntPrice() {
+		return pdIntPrice;
+	}
+	public void setPdIntPrice(String pdIntPrice) {
+		this.pdIntPrice = pdIntPrice;
+	}
+	public String getDispPrice() {
+		return dispPrice;
+	}
+	public void setDispPrice(String dispPrice) {
+		this.dispPrice = dispPrice;
+	}
 	public String getDispHaveQty() {
 		return dispHaveQty;
 	}

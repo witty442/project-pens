@@ -176,6 +176,22 @@
 		</ul>
 	</li>  
 <%}%>
+<%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ 
+	  no=0;
+%>
+	<li><a href="javascript: void(0)" class="parent" ><span>MC</span></a>
+		<ul>
+		 <%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ %>
+	        <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMC';">
+               <span><%no++;out.print(no);%>.<bean:message key="StockMC" bundle="sysprop"/></span>
+               </a>
+             </li> 
+          <%} %> 
+		</ul>
+	</li>  
+<%}%>
 
 <li>
    <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	

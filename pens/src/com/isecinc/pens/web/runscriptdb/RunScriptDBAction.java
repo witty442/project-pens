@@ -431,6 +431,53 @@ public class RunScriptDBAction {
 		return r;
 	}
 	
+	public static String runScriptDBByName(HttpServletRequest sc ,Connection conn,String scriptDBName){
+		String r = "";
+		String path = "";
+		try{
+			path = sc.getRealPath(path_script_db);
+			r +="\n *** Start runScriptDBByName by["+scriptDBName+"]***";
+			
+			if("script_db_all_backup".equalsIgnoreCase(scriptDBName)){
+			
+				//Read script from /script_db/script_db_all_backup.sql
+				String pathScriptDB = path+"/script_db_all_backup.sql";
+				logger.debug("read path:"+pathScriptDB);
+				String dataFile = FileUtil.readFile(pathScriptDB, "TIS-620");
+				
+				//Read script from /script_db/script_db_last_year.sql
+				 pathScriptDB = path+"/script_db_last_year.sql";
+				logger.debug("read path:"+pathScriptDB);
+				 dataFile += FileUtil.readFile(pathScriptDB, "TIS-620");
+				
+				//Read Current Version
+				pathScriptDB = path+"/script_db.sql";
+				logger.debug("read path:"+pathScriptDB);
+				dataFile += FileUtil.readFile(pathScriptDB, "TIS-620");
+				
+				//logger.info("Data File:"+dataFile);
+				
+			   //run script split by ";"
+				r += excUpdate(conn,dataFile);
+				r +="\n *** End runScriptDBUpdaterAll ***";
+			}else{
+				String pathScriptDB = path+"/"+scriptDBName+".sql";
+				logger.debug("read path:"+pathScriptDB);
+				String dataFile = FileUtil.readFile(pathScriptDB, "TIS-620");
+				
+				 //run script split by ";"
+				r += excUpdate(conn,dataFile);
+				r +="\n *** End runScriptDBUpdaterAll ***";
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			
+		}
+		return r;
+	}
+	
 	/**
 	 * 
 	 * @param conn

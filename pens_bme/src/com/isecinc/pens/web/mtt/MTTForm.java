@@ -13,7 +13,6 @@ public class MTTForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
     private List<MTTBean> results = new ArrayList<MTTBean>();
-    private List<MTTBean> resultsSearch = new ArrayList<MTTBean>();
 
     private String mode;
     private MTTBean bean ;
@@ -38,12 +37,6 @@ public class MTTForm extends I_Form {
 	}
 	public void setResults(List<MTTBean> results) {
 		this.results = results;
-	}
-	public List<MTTBean> getResultsSearch() {
-		return resultsSearch;
-	}
-	public void setResultsSearch(List<MTTBean> resultsSearch) {
-		this.resultsSearch = resultsSearch;
 	}
 	public MTTBean getBean() {
 		return bean;

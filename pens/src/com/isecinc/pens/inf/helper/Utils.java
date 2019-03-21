@@ -21,9 +21,11 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -31,6 +33,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.xml.JRXmlWriter;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -63,7 +66,8 @@ public class Utils {
 	public static final String format_current_2_disgit = "#,##0.00";
     public static final String format_current_5_digit = "#,##0.00000";
 	public static final String format_current_6_digit = "#,##0.000000";
-	
+	public static final String format_digit_only = ".#0000";
+	  
 	//20081223   09 42 34.572
 	//2008-12-23 09:42:34.572000
 
@@ -78,6 +82,17 @@ public class Utils {
 	    }
 	}
 	
+ public static String converToTextSqlIn(String value){
+		
+		List<String> valuesText = new ArrayList<String>() ;
+		String[] values = value.split("[,]");
+		
+		for(String text : values){
+			valuesText.add("'"+text+"'");
+		}
+		
+		return StringUtils.join(valuesText, ","); 
+	}
    public static boolean isInternetConnect(String urlTest){
         boolean r = true;
         try{
@@ -643,13 +658,22 @@ public class Utils {
 		return Integer.parseInt(str);
 	}
 	
-	public static String convertDoubleToStrDefault(double d,String defaultStr) {
+	//NODIGIT
+	public static String convertDoubleToStrDefaultNoDigit(double d,String defaultStr) {
 		//logger.debug("d["+d+"]");
 		if (d ==0 || 0.0==d){
 			return defaultStr;
 		}
 		return decimalFormat(d,format_current_no_disgit);
 	}
+	public static String convertDoubleToStr(double d,String format) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 || 0.0==d){
+			return "";
+		}
+		return decimalFormat(d,format);
+	}
+	
 	public static String convertIntToStrDefault(int d,String defaultStr) {
 		//logger.debug("d["+d+"]");
 		if (d ==0 ){

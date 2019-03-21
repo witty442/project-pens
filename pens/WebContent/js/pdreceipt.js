@@ -18,10 +18,16 @@ function defaultDate(paymentMethod,row,currDate){
 		//Case Cheque enable chequeDate
 		//alert(paymentMethod.value+",row["+row+"]");
 		if(paymentMethod.value =='CH'){
-			document.getElementsByName("chequeDate")[eval(row-1)].disabled=false;
+			//show
+			//alert(document.getElementById("div_chequeDate_"+row));
+			
+			document.getElementById("div_chequeDate_"+row).style.display="block";
+			var chequeDate = document.getElementsByName("chequeDate")[eval(row-1)];
+			new Epoch('epoch_popup', 'th', chequeDate);
 		}else{
-			document.getElementsByName("chequeDate")[eval(row-1)].disabled=true;
+			//hide
 			document.getElementsByName("chequeDate")[eval(row-1)].value='';
+			document.getElementById("div_chequeDate_"+row).style.display="none";
 		}
 	}else{
 		document.getElementsByName("pdReceiptDate")[eval(row-1)].value='';

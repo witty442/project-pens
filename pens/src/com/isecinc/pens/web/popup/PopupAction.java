@@ -52,6 +52,15 @@ public class PopupAction extends I_Action {
 				 request.getSession().setAttribute("keys", null);
 				 request.getSession().setAttribute("descs", null);
 				 forward = "searchInvoice";
+			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE_STOCK_RETURN".equalsIgnoreCase(request.getParameter("page"))){
+				 request.setAttribute("INVOICE_LIST", null);
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+				 forward = "searchInvoiceStockReturn";
 			 }
 			
 		} catch (Exception e) {
@@ -114,6 +123,26 @@ public class PopupAction extends I_Action {
 					 request.setAttribute("Message", "ไม่พบข่อมูล");
 				 }
 				 forward = "searchInvoice";
+				 
+			}else if("INVOICE_STOCK_RETURN".equalsIgnoreCase(request.getParameter("page"))){
+				String productCode = Utils.isNull(request.getParameter("productCode"));
+				String userId = Utils.isNull(request.getParameter("userId"));
+				String customerCode = Utils.isNull(request.getParameter("customerCode"));
+				String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
+				
+				popupForm.setCustomerCode(customerCode);
+				popupForm.setUserId(userId);
+				popupForm.setProductCode(productCode);
+				popupForm.setRequestNumber(requestNumber);
+				
+				 List<PopupForm> results = PopupDAO.searchInvoiceStockReturn(popupForm,"",user);
+				 
+				 if(results != null && results.size() >0){
+					 request.setAttribute("INVOICE_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+				 forward = "searchInvoiceStockReturn";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

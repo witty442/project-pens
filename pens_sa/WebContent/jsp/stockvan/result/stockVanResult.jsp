@@ -1,15 +1,30 @@
-<%@page import="java.util.Map"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="com.isecinc.pens.web.stockvan.StockVanBean"%>
-<%@page import="java.util.List"%>
-<%@page import="util.Utils"%>
+
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<jsp:useBean id="stockVanForm" class="com.isecinc.pens.web.stockvan.StockVanForm" scope="session" />
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%
+String screenWidth = "";
+if(session.getAttribute("screenWidth") != null){ 
+	screenWidth = (String)session.getAttribute("screenWidth");
+}
+System.out.println("screenWidth:"+screenWidth);
+%>
+<style type="text/css">
+ #scroll {
+<%if(!"0".equals(screenWidth)){%>
+    width:<%=screenWidth%>px; 
+
+	border:1px solid #000;
+	overflow:auto;
+	white-space:nowrap;
+	box-shadow:0 0 25px #000;
+<%}%>
+</style>
 
 <%
-  if(request.getSession().getAttribute("RESULT_DATA") != null){
-	  out.print(((StringBuffer)request.getSession().getAttribute("RESULT_DATA")).toString());
+  if(request.getAttribute("RESULT_DATA") != null){
+	  out.print("<div id ='scroll'>");
+	  out.print(((StringBuffer)request.getAttribute("RESULT_DATA")).toString());
+	  out.print("</div>");
   }
 %>
+
 	

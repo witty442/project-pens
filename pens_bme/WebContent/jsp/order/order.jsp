@@ -19,6 +19,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderForm");
+
 List<StoreBean> storeList = null;
 if(session.getAttribute("storeList") != null){
 	storeList = (List<StoreBean>)session.getAttribute("storeList");

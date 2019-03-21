@@ -26,7 +26,7 @@ import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.Utils;
 
-/** Like  KingPower = Duty-free **/
+
 public class ReportOnhandAsOfRobinsonAction {
 	private static Logger logger = Logger.getLogger("PENS");
 	

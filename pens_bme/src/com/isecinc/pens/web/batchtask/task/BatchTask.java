@@ -12,6 +12,7 @@ public class BatchTask {
 	public static void insertMonitorItemColumnHeadTableResult(Connection conn,BigDecimal monitorItemId,String columnHead) throws Exception {
 		PreparedStatement ps = null;
 		try {
+			logger.debug("insertMonitorItemResult mnitor_item_id:"+monitorItemId);
 			String sql = "INSERT INTO PENSBI.MONITOR_ITEM_COLUMN_RESULT(MONITOR_ITEM_ID, COLUMN_HEAD)VALUES(?,?) ";
 			logger.info("SQL:"+sql);
 			int index = 0;
@@ -31,8 +32,9 @@ public class BatchTask {
 	public static void insertMonitorItemResult(Connection conn,BigDecimal monitorItemId,int no,String status,String msg) throws Exception {
 		PreparedStatement ps = null;
 		try {
+			logger.debug("insertMonitorItemResult mnitor_item_id:"+monitorItemId);
 			String sql = "INSERT INTO PENSBI.MONITOR_ITEM_RESULT(MONITOR_ITEM_ID, STATUS, MESSAGE,NO)VALUES(?,?,?,?) ";
-			logger.info("SQL:"+sql);
+			//logger.info("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			ps.setBigDecimal(++index, monitorItemId);

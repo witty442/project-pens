@@ -60,8 +60,8 @@ public class AppversionVerify {
 		return app;
 	}
 	
-	public void initAppVersion(){
-		logger.info("initAppVersion");
+	public static void initAppVersion(){
+		logger.info("initAppVersion By LoginAction");
 		Connection conn = null;
 		try{
 		   conn = DBConnection.getInstance().getConnection();
@@ -231,7 +231,7 @@ public class AppversionVerify {
 	            URL url = new URL(initPathFileDropbox);
 	            url.openConnection();
 	            InputStream inStream = url.openStream();
-	            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(inStream,"TIS-620"));
 	            String line = null;
 	            String[] lineArr = null;
 	            try {
@@ -314,6 +314,8 @@ public class AppversionVerify {
 		
 			//** Download Software for Tablet sales **/
 			new DownloadWorker(user).start();
+			
+			
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

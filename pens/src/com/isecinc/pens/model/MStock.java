@@ -671,13 +671,13 @@ public class MStock {
 				  m.setFullUom(uom1+"/"+uom2);
 				  m.setConversionRate(new MProduct().getConversionRate(Utils.convertStrToInt(m.getInventoryItemId()),uom1,uom2));
 				  
-				  m.setQty(Utils.convertDoubleToStrDefault(rst.getInt("qty"),""));
-				  m.setQty2(Utils.convertDoubleToStrDefault(rst.getInt("qty2"),""));
-				  m.setQty3(Utils.convertDoubleToStrDefault(rst.getInt("qty3"),""));
+				  m.setQty(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("qty"),""));
+				  m.setQty2(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("qty2"),""));
+				  m.setQty3(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("qty3"),""));
 				  
-				  m.setSub(Utils.convertDoubleToStrDefault(rst.getInt("sub"),""));
-				  m.setSub2(Utils.convertDoubleToStrDefault(rst.getInt("sub2"),""));
-				  m.setSub3(Utils.convertDoubleToStrDefault(rst.getInt("sub3"),""));
+				  m.setSub(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("sub"),""));
+				  m.setSub2(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("sub2"),""));
+				  m.setSub3(Utils.convertDoubleToStrDefaultNoDigit(rst.getInt("sub3"),""));
 				  
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel("Y".equals(m.getStatus())?"ใช้งาน":"ยกเลิก");
@@ -867,7 +867,7 @@ public class MStock {
 				  m = new StockLine();
 				  m.setRequestNumber(rst.getString("request_number"));
 				  m.setLineId(rst.getInt("line_number"));
-				  m.setQty(Utils.convertDoubleToStrDefault(rst.getDouble("qty"),""));
+				  m.setQty(Utils.convertDoubleToStrDefaultNoDigit(rst.getDouble("qty"),""));
 				}//while
 				
 			} catch (Exception e) {

@@ -26,6 +26,10 @@
     <url-pattern>/jsp/*</url-pattern>
   </filter-mapping>
   
+  <listener>
+    <listener-class>com.isecinc.pens.web.login.HttpSessionVerifier</listener-class>
+  </listener>
+  
   <!--  Quarzt Case Deploy Batch Task -->
   <!-- <context-param>
     <param-name>quartz:config-file</param-name>

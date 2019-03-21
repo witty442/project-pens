@@ -495,10 +495,10 @@ public class ImportDAO {
 			if(rs.next()){
 				m = new Master();
 				m.setReferenceCode(rs.getString("reference_code"));
-				m.setPensValue(rs.getString("pens_value"));
+				m.setPensValue(rs.getString("pens_value"));//storeCode(pens)
 				m.setPensDesc(rs.getString("pens_desc"));
-				m.setInterfaceDesc(rs.getString("interface_desc"));
-				m.setInterfaceValue(rs.getString("interface_value"));
+				m.setInterfaceDesc(rs.getString("pens_desc"));	//StoreName
+				m.setInterfaceValue(rs.getString("interface_value"));//StoreNo
 				m.setPensDesc2(rs.getString("pens_desc2"));
 			}
 		

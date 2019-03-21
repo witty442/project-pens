@@ -8,4 +8,6 @@ public class BatchTaskConstants {
  public static String IMPORT_ORDER_TO_ORACLE_FROM_EXCEL = "ImportOrderToOracleFromExcel";
  public static String IMPORT_SWITCHITEM_TO_ORL_FROM_EXCEL = "ImportSwitchItemToOracleFromExcel";
  public static String IMPORT_ITEMBARCODE_CROSSREF_TO_ORL_FR_EXCEL = "ImportItemBarcodeCrossRefToOracleFromExcel";
+ public static String IMPORT_SALES_OUT_BIGC_FROM_TEXT = "ImportSalesOutBigCFromText";
+ public static String IMPORT_ITEM_GP_ROBIN_FROM_EXCEL = "ImportItemGPRobinsonFromExcel";
 }

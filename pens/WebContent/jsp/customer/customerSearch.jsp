@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker"%>
+<%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="util.GoogleMapJavaScriptAPI"%>
@@ -23,6 +25,12 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="customerForm" class="com.isecinc.pens.web.customer.CustomerForm" scope="request" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "customerForm");
+
+//Start init Appversion Verify
+new AppversionVerifyWorker().start();
+
 String role = ((User)session.getAttribute("user")).getType();
 
 List<District> districtsAll = new ArrayList<District>();

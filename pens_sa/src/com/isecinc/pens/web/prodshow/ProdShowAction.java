@@ -298,7 +298,8 @@ public class ProdShowAction extends I_Action {
 	 h.append("<th>พนักงานขาย</th>\n");
 	 h.append("<th>รหัสร้านค้า</th>\n");
 	 h.append("<th>ชื่อร้านค้า</th>\n");
-	 h.append("<th>เลขที่ Order ตั้งกอง</th>\n");
+	 h.append("<th>เลขที่ ตั้งกอง</th>\n");
+	 h.append("<th>วันที่ทำรายการ</th>\n");
 	 h.append("<th>แบรนด์</th>\n");
 	 h.append("<th>รูปที่ 1</th>\n");
 	 h.append("<th>รูปที่ 2</th>\n");
@@ -314,6 +315,7 @@ public class ProdShowAction extends I_Action {
 		 h.append("<td class='text'> "+p.getCustomerCode()+"</td>\n");
 		 h.append("<td class='text'> "+p.getCustomerName()+"</td>\n");
 		 h.append("<td class='text'> "+p.getOrderNo()+"</td>\n");
+		 h.append("<td class='text'> "+p.getShowDate()+"</td>\n");
 		 h.append("<td class='text'> "+p.getBrand()+"-"+p.getBrandName()+"</td>\n");
 		 h.append("<td class='text'> "+p.getPic1()+"</td>\n");
 		 h.append("<td class='text'> "+p.getPic2()+"</td>\n");

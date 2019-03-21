@@ -202,6 +202,7 @@
 		<form-bean name="creditPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditPaidReportForm" />
 		<form-bean name="creditNoPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportForm" />
 		<form-bean name="transferForm" type="com.isecinc.pens.web.transfer.TransferForm" />
+		<form-bean name="stockReturnForm" type="com.isecinc.pens.web.stockreturn.StockReturnForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -216,11 +217,13 @@
 			<forward name="prepare2" path="/jsp/pop/searchCustomerPopupOne.jsp" />
 			<forward name="clear2" path="/jsp/pop/searchCustomerPopupOne.jsp" />
 			
+			<forward name="prepare3" path="/jsp/pop/searchCustomerAndAddressPopupOne.jsp" />
 		</action>
 		
 		<action name="popupForm" path="/jsp/popupAction" parameter="do" scope="session" type="com.isecinc.pens.web.popup.PopupAction" >
 			<forward name="searchBrand" path="/jsp/pop/searchBrandPopup.jsp" />
 			<forward name="searchInvoice" path="/jsp/pop/searchInvoicePopup.jsp" />
+			<forward name="searchInvoiceStockReturn" path="/jsp/pop/searchInvoiceStockReturnPopup.jsp" />
 		</action>
 		
 		<!-- LOGIN -->
@@ -756,6 +759,13 @@
 			<forward name="edit" path="/jsp/stock/stock.jsp"/>
 			<forward name="preview" path="/jsp/stock/stock.jsp" />
 			<forward name="popupPrint" path="/jsp/stock/stock.jsp" />
+		</action>
+		
+		<action name="stockReturnForm" path="/jsp/stockReturnAction" parameter="do" scope="request" type="com.isecinc.pens.web.stockreturn.StockReturnAction" >
+			<forward name="search" path="/jsp/stockReturn/stockReturnSearch.jsp" />
+			<forward name="stockReport" path="/jsp/stockReturn/stockReturnReport.jsp" />
+			<forward name="detail" path="/jsp/stockReturn/stockReturn.jsp"/>
+			<forward name="printPopup" path="/jsp/stockReturn/printStockReturnPopup.jsp"/>
 		</action>
 		
 		<action name="transferForm" path="/jsp/transferAction" parameter="do" scope="session" type="com.isecinc.pens.web.transfer.TransferAction" >

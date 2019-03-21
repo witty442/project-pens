@@ -19,6 +19,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="pickReportForm" class="com.isecinc.pens.web.pick.PickReportForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "pickReportForm");
+
 String codes = Utils.isNull(session.getAttribute("pick_report_codes"));
 %>
 <html>
@@ -59,11 +62,17 @@ function exportExcel(path,reportType){
 		alert("กรุณากรอก กลุ่มร้านค้า");
 		$('#custGroup').focus();
 		return false;
-	 }
+	}
 	//validate start end date is same month
 	if( $('#issueReqDateFrom').val() !="" && $('#issueReqDateTo').val() !=""){
-		 if(!dateFromToInSameMonth($('#issueReqDateFrom').val(),$('#issueReqDateTo').val())){
-			 alert("กรุณาเลือกวันที่ ในช่วงเดือนเดียวกันเท่านั้น")
+		 if(!dateFromToInSameYear($('#issueReqDateFrom').val(),$('#issueReqDateTo').val())){
+			 alert("กรุณาเลือกวันที่ ในช่วงปีเดียวกันเท่านั้น");
+			 $('#issueReqDateTo').focus();
+			 return false;
+		 }
+	 }else{
+		 if( $('#issueReqDateFrom').val() =="" && $('#issueReqDateTo').val() ==""){
+			 alert("กรุณาระบุวันที่");
 			 $('#issueReqDateTo').focus();
 			 return false;
 		 }
@@ -80,7 +89,6 @@ function exportExcel(path,reportType){
 	form.submit();
 	return true;
 }
-
 function search(path){
 	var form = document.pickReportForm;
 	 if( $('#custGroup').val()=="" ){
@@ -90,25 +98,27 @@ function search(path){
 	 }
 	//validate start end date is same month
 	if( $('#issueReqDateFrom').val() !="" && $('#issueReqDateTo').val() !=""){
-		 if(!dateFromToInSameMonth($('#issueReqDateFrom').val(),$('#issueReqDateTo').val())){
-			 alert("กรุณาเลือกวันที่ ในช่วงเดือนเดียวกันเท่านั้น")
+		 if(!dateFromToInSameYear($('#issueReqDateFrom').val(),$('#issueReqDateTo').val())){
+			 alert("กรุณาเลือกวันที่ ในช่วงปีเดียวกันเท่านั้น");
 			 $('#issueReqDateTo').focus();
 			 return false;
 		 }
-	 }
+	 }else if( $('#issueReqDateFrom').val() =="" && $('#issueReqDateTo').val() ==""){
+		 alert("กรุณาเลือกวันที่ ");
+		 $('#issueReqDateFrom').focus();
+		 return false;
+	 } 
 	
 	form.action = path + "/jsp/pickReportAction.do?do=searchReport&action=newsearch";
 	form.submit();
 	return true;
 }
-
 function gotoPage(path,currPage){
 	var form = document.pickReportForm;
 	form.action = path + "/jsp/pickReportAction.do?do=searchReport&currPage="+currPage;
     form.submit();
     return true;
 }
-
 function openPopupCustomer(path,types,storeType){
 	var form = document.pickReportForm;
 	var storeGroup = form.custGroup.value;
@@ -122,14 +132,12 @@ function openPopupCustomer(path,types,storeType){
 			  // "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 	PopupCenterFullHeight(url,"",600);
 }
-
 function setStoreMainValue(code,desc,storeNo,subInv,types){
 	var form = document.pickReportForm;
 	//alert(form);
 	form.storeCode.value = code;
 	form.storeName.value = desc;
 } 
-
 function getCustNameKeypress(e,custCode,fieldName){
 	var form = document.pickReportForm;
 	if(e != null && e.keyCode == 13){
@@ -188,18 +196,28 @@ function resetStore(){
 		form.storeName.value = "";
 	}
 }
+function checkAll(chkAllObj){
+	var chk = document.getElementsByName("chCheck");
+	for(i=0;i<chk.length;i++){
+		chk[i].checked = chkAllObj.checked;
+	}
+	if(chkAllObj.checked){
+		document.getElementsByName("codes")[0].value ="all";
+	}else{
+		document.getElementsByName("codes")[0].value ="";
+	}
+}
+
 /* set Chechbox Page **/
 function saveSelectedInPage(no){
 	//alert(no);
 	var chk = document.getElementsByName("chCheck");
 	var currentPage = document.getElementsByName("currentPage")[0].value;
 	var code = document.getElementsByName("code_temp");
-
 	var retCode = '';
 	var codesAllNew = "";
 
 	//alert("no:"+no);
-	
 	if(no > <%=PickReportAction.pageSize%>){
 	   no = no - ( (currentPage-1) *<%=PickReportAction.pageSize%>);
 	}
@@ -227,7 +245,6 @@ function saveSelectedInPage(no){
 		
 	    removeUnSelected(retCode);
     }
-	
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/pick/ajax/setValueSelected.jsp",
@@ -239,7 +256,6 @@ function saveSelectedInPage(no){
 		}).responseText;
 	});
 }
-
 function chekCodeDupInCodesAll(codeCheck){
 	var codesAll = document.getElementsByName("codes")[0].value;
 	var codesAllArray = codesAll.split(",");
@@ -252,7 +268,6 @@ function chekCodeDupInCodesAll(codeCheck){
 	}//for
 	return found;
 }
-
 function removeUnSelected(codeCheck){
 	var codesAll = document.getElementsByName("codes")[0].value;
 	var codesAllArray = codesAll.split(",");
@@ -262,20 +277,16 @@ function removeUnSelected(codeCheck){
    		   codesAllNew += codesAllArray[i] +",";
    		}//if
 	}//for
-	
 	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
 	document.getElementsByName("codes")[0].value =  codesAllNew;
 }
-
 function setChkInPage(){
 	var chk = document.getElementsByName("chCheck");
 	var code = document.getElementsByName("code_temp");
 	//alert("Code Size:"+code.length);
-	
 	var codes = document.getElementsByName("codes")[0].value;
 	var codesChk = codes.split(",");
 	//alert("codes:"+codes);
-	
 	if(codesChk != ''){
 		for(var i=0;i<chk.length;i++){
 			for(var c=0;c<codesChk.length;c++){
@@ -287,9 +298,40 @@ function setChkInPage(){
 		}//for 1
   }//if
 }
-
+function openPopupProduct(path,types){
+	var form = document.pickReportForm;
+	var storeType ="";
+	if("020058"==form.custGroup.value){
+		storeType ='tops';
+	}
+	var param = "&types="+types+"&storeType="+storeType;
+	url = path + "/jsp/searchProductPopupAction.do?do=prepare&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
+function setProductMainValue(code,desc,types){
+	var form = document.pickReportForm;
+	//alert(form);
+	if("from" == types){
+		form.pensItemFrom.value = code;
+	}else{
+		form.pensItemTo.value = code;
+	}
+} 
+function openPopupGroup(path,selectOne){
+	var form = document.pickReportForm;
+	var storeType ="";
+	if("020058"==form.custGroup.value){
+		storeType ='tops';
+	}
+    var param = "&selectOne="+selectOne+"&storeType="+storeType;
+	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
+function setGroupMainValue(code,desc,types){
+	var form = document.pickReportForm;
+	form.groupCode.value = code;
+}
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -335,7 +377,7 @@ function setChkInPage(){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 						      
 								<tr>
-                                    <td> กลุ่มร้านค้า <font color="red">*</font> </td>
+                                    <td align="right">กลุ่มร้านค้า <font color="red">*</font> </td>
 									<td>		
 										 <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
@@ -343,7 +385,7 @@ function setChkInPage(){
 									</td>
 								</tr>
 								<tr>
-									<td >รหัสร้านค้า
+									<td  align="right">รหัสร้านค้า
 									</td>
 									<td align="left"> 
 									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
@@ -355,15 +397,36 @@ function setChkInPage(){
 									</td>
 								</tr>
 								 <tr>
-                                    <td> From Issue Request Date</td>
+                                    <td align="right"> From Issue Request Date<font color="red">*</font></td>
 									<td>					
 									   <html:text property="bean.issueReqDateFrom" styleId="issueReqDateFrom" size="20" readonly="true"/>
-									   To Issue Request Date   				
+									   To    				
 									   <html:text property="bean.issueReqDateTo" styleId="issueReqDateTo" size="20" readonly="true"/>
 									</td>
 								</tr>
+								 <tr>
+								 <td align="right">
+								    Pens Item From
+								 </td>
+								 <td>
+								  <html:text property="bean.pensItemFrom" styleId="pensItemFrom" styleClass="\" autoComplete=\"off"/>
+							      <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>   
+								 - 
+								  &nbsp;&nbsp; <html:text property="bean.pensItemTo" styleId="pensItemTo" styleClass="\" autoComplete=\"off"/>
+							      <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
+								</td>
+							</tr>
+							<tr>
+								 <td align="right">
+								   Group Code
+								 </td>
+								 <td>
+								    <html:text property="bean.groupCode" styleId="groupCode" styleClass="\" autoComplete=\"off"/>
+								    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}','selectOne')"/>
+								</td>
+							</tr> 
 								<tr>
-                                    <td> Status</td>
+                                    <td align="right"> Status</td>
 									<td><html:text property="bean.status" styleId="status" readonly="true" styleClass="disableText"/></td>
 								</tr>
 						   </table>
@@ -402,7 +465,7 @@ function setChkInPage(){
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
-									<th >Select</th>
+									<th > <input type ="checkbox" name="chkAll" id="chkAll" onclick="checkAll(this)" /></th>
 									<th >Store Code</th>
 									<th >Store Name</th>
 									<th >Issue Req No</th>

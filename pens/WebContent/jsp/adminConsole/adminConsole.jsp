@@ -216,7 +216,7 @@ function addSlqToeSQL(sqlUtils){
 	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
 	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Dup Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
-	<INPUT TYPE="button" class="tab_style" id ="id_add_db" name ="tab_add_db"  VALUE="Add New DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_add_db')">
+	<INPUT TYPE="button" class="tab_style" id ="id_add_db" name ="tab_add_db"  VALUE="Update Script DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_add_db')">
 	
     <div id="div_msg" style="display:none"> 
 		    <br/><br/>
@@ -305,10 +305,18 @@ function addSlqToeSQL(sqlUtils){
 	  </div>
       <div id="div_add_db" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 		  <BR>
-		  <span class="h1_style">Add New Script DB </span> :
-		   <INPUT class="button2_style" TYPE="button" name ="B_AddNewDB"  
-		   VALUE="Submit" onclick="submitBT('<%=request.getContextPath()%>');">
+		  <span class="h1_style">Update Script DB </span> 
+		    &nbsp;<b>เลือก Script DB ที่ต้องการ Run:</b>
+		     <select id="scriptDBName" name="scriptDBName">
+				  <option value="script_db">Script DB Last Version</option>
+				  <option value="script_db_last_year">Script DB Last Year</option>
+				  <option value="script_db_all_backup">Script DB ALL</option>
+			</select>
+			&nbsp;&nbsp;
+			 <INPUT class="button2_style" TYPE="button" name ="B_AddNewDB"  
+		      VALUE="Submit" onclick="submitBT('<%=request.getContextPath()%>');">
 		  <BR>
+		  
 		   <html:textarea property="resultAddDB" style=" width :100%;" rows="40"/>
 		  <br>
 	  </div>

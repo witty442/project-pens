@@ -125,7 +125,11 @@ function clearForm(path, type) {
 	document.interfacesForm.submit();
 	return true;
 }
-
+function clearControlForm(path, type) {
+	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=clearControl&type="+type;
+	document.interfacesForm.submit();
+	return true;
+}
 function save(path){
 	
 	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=save";

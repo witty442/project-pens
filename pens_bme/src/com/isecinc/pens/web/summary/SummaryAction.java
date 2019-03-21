@@ -26,8 +26,9 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.summary.process.GenerateMonthEndLotus;
+import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.isecinc.pens.web.summary.report.OpenBillRobinsonReportAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfRobinsonAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorBigCAction;
@@ -60,7 +61,7 @@ public class SummaryAction extends I_Action {
 				 request.getSession().setAttribute("resultsTrans", null);
 				 request.getSession().setAttribute("summaryTrans",null);
 				 request.getSession().setAttribute("HeadSummary",null);
-				 
+				 summaryForm.setDataHTML(null);
 				 summaryForm.setEndDate("");
 				 summaryForm.setEndSaleDate("");
 				 summaryForm.setResults(null);
@@ -96,9 +97,12 @@ public class SummaryAction extends I_Action {
 					 oh.setDispHaveQty("true");
 					 summaryForm.setOnhandSummary(oh);
 				 }
-				
+				 
+				 //for test 
+				 OnhandSummary bean = new OnhandSummary();
+				 bean.setAsOfDate("01/02/2562");
+				 summaryForm.setBean(bean);
 			 }
-			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -255,6 +259,7 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
+					
 				/**  Onhand as of robinson OLD Version **/
 				}else if("onhandAsOf_Robinson".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//set for display by page
@@ -282,9 +287,16 @@ public class SummaryAction extends I_Action {
 						summaryForm.setResults(null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}
-			   /** Onhand as of robinson new version**/
+			    /** Onhand as of robinson new version**/
 				}else if("onhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					summaryForm = ReportOnhandAsOfRobinsonAction.process(request,user, summaryForm);
+					
+				}else if("openBillRobinsonReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					summaryForm.setDataHTML(null);
+					summaryForm = OpenBillRobinsonReportAction.process(request,user, summaryForm,"html");
+					 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
+						 request.setAttribute("Message", "ไม่พบข่อมูล");
+					 }
 					
 				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
@@ -573,6 +585,27 @@ public class SummaryAction extends I_Action {
 						request.getSession().setAttribute("summaryTrans", null);
 						request.setAttribute("Message", "ไม่พบข่อมูล");
 					}	
+				}else if("bigc_temp".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					request.getSession().setAttribute("summary" ,null);
+					summaryForm.setPage(Utils.isNull(request.getParameter("page")));
+					
+					List<TransactionSummary> results = null;
+					TransactionSummary re = new SummaryDAO().search(summaryForm.getTransactionSummary(),user,"bigc_temp");
+					results = re.getItemsList();
+					if (results != null  && results.size() >0) {
+						request.getSession().setAttribute("summaryTrans", re.getSummary());
+						summaryForm.setResultsTrans(results);
+						//logger.debug("results:"+summaryForm.getBigcSummaryResults());
+						
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", summaryForm.getTransactionSummary().getPensCustCodeFrom());
+						if(m != null)
+						  summaryForm.getTransactionSummary().setPensCustNameFrom(m.getPensDesc());
+					} else {
+						summaryForm.setResultsTrans(null);
+						request.getSession().setAttribute("summaryTrans", null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}	
 				}else if("tops".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					request.getSession().setAttribute("summary" ,null);
 					summaryForm.setPage(Utils.isNull(request.getParameter("page")));
@@ -684,9 +717,6 @@ public class SummaryAction extends I_Action {
 					summaryForm = ReportOnhandSizeColorBigCAction.process(request,user, summaryForm);
 				
 				/** Duty-free */
-				}else if("onhandAsOfKing".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-					summaryForm = ReportOnhandAsOfKingAction.process(request,user, summaryForm);
-
 				}else if("onhandAsOfKing".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					summaryForm = ReportOnhandAsOfKingAction.process(request,user, summaryForm);
 					
@@ -927,7 +957,15 @@ public class SummaryAction extends I_Action {
 			}else if("bigc".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				fileName ="ReportSalesDetailBmeBigC.xls";
 				if(summaryForm.getResultsTrans() != null && summaryForm.getResultsTrans().size() > 0){
-					htmlTable = export.genBigCHTML(request,summaryForm,user);	
+					htmlTable = export.genBigCHTML(request,summaryForm,user,"");	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if("bigc_temp".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				fileName ="ReportSalesDetailBmeBigC_TEMP.xls";
+				if(summaryForm.getResultsTrans() != null && summaryForm.getResultsTrans().size() > 0){
+					htmlTable = export.genBigCHTML(request,summaryForm,user,"(รายวัน-TEMP)");	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -985,6 +1023,15 @@ public class SummaryAction extends I_Action {
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
 				}
+			}else if("openBillRobinsonReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				 summaryForm.setDataHTML(null);
+				 summaryForm = OpenBillRobinsonReportAction.process(request,user, summaryForm,"EXCEL");
+				 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
+					summaryForm.setOnhandSummaryMTTDetailResults(null);
+					request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }else{
+				    htmlTable = summaryForm.getDataHTML();
+				 }
 			}
 			
 	        //logger.debug("fileName:"+fileName);

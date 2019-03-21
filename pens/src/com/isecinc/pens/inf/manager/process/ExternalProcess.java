@@ -5,12 +5,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import util.AppversionVerify;
+import util.ControlCode;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
 import com.isecinc.pens.inf.manager.batchwork.DownloadSalesAppWorker;
 import com.isecinc.pens.inf.manager.batchwork.UploadDatabaseBackupWorker;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
+import com.pens.utils.manual.cleardb.ClearDupDB;
 
 public class ExternalProcess {
 
@@ -37,6 +39,15 @@ public class ExternalProcess {
 		  logger.info("--- 2.Start Run processAfterImport ---");
 		  AppversionVerify.processAfterImport(userLogin);
 		  logger.info("--- 2.End Run processAfterImport ---");
+		  
+		  //Clear cust address dup Case Van Type
+		  if(User.VAN.equals(userLogin.getType())){
+			  if(ControlCode.canExecuteMethod("ClearDupDB", "clearDupCustDB")){
+				  logger.info("--- 3.Start Run clearDupCustDB processAfterImport ---");
+				  ClearDupDB.clearDupCustDB();
+				  logger.info("--- 3.End Run clearDupCustDB processAfterImport ---");
+			  }
+		  }
 	}
 
 	/******* export *********************************************/

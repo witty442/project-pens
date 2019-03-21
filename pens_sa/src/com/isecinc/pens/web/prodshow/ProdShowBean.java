@@ -34,11 +34,18 @@ public class ProdShowBean implements Serializable{
 	
 	private long lineNumber;
 	private String orderNo;
+	private String showDate;
 	private String pic1;
 	private String pic2;
 	private String pic3;
 	
 	
+	public String getShowDate() {
+		return showDate;
+	}
+	public void setShowDate(String showDate) {
+		this.showDate = showDate;
+	}
 	public String getSalesrepName() {
 		return salesrepName;
 	}

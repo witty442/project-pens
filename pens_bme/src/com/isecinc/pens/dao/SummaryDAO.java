@@ -251,6 +251,9 @@ public class SummaryDAO {
 	    		}else if("bigc".equalsIgnoreCase(type)){
 	    		   summaryList = searchBigC(c,conn,user);	
 	    		   re.setItemsList(summaryList);
+	    		}else if("bigc_temp".equalsIgnoreCase(type)){
+		    	   summaryList = searchBigC_TEMP(c,conn,user);	
+		    	   re.setItemsList(summaryList);
 	    		}else if("tops".equalsIgnoreCase(type)){
 		    	   summaryList = searchTops(c,conn,user);	
 		    	   re.setItemsList(summaryList);
@@ -602,8 +605,15 @@ public class SummaryDAO {
 			}
 			return pos;
 		}
-	  
-	  public List<TransactionSummary> searchTops(TransactionSummary c,Connection conn,User user) throws Exception {
+	  /**
+	   * 
+	   * @param c
+	   * @param conn
+	   * @param user
+	   * @return
+	   * @throws Exception
+	   */
+	  public List<TransactionSummary> searchBigC_TEMP(TransactionSummary c,Connection conn,User user) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			List<TransactionSummary> pos = new ArrayList<TransactionSummary>();
@@ -613,11 +623,98 @@ public class SummaryDAO {
 			Date salesDateToParam = null;
 			try {
 				sql.delete(0, sql.length());
+				sql.append("\n  SELECT * from PENSBME_SALES_FROM_BIGC_TEMP");
+				sql.append("\n  where 1=1  ");
+				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
+					salesDateFlag = true;
+					
+					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					
+					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					
+					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
+					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
+				}
+				
+				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("")){
+					sql.append(" and pens_cust_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") \n");
+				}
+				
+				if(!Utils.isNull(c.getFileName()).equals("")){
+					sql.append(" and file_name LIKE '%"+c.getFileName()+"%' \n");
+				}
+				
+				sql.append("\n  ORDER BY sales_date ,pens_cust_code,style_no asc \n");
+				
+				logger.debug("sql:"+sql);
+				
+				ps = conn.prepareStatement(sql.toString());
+				logger.debug("salesDateFromParam:"+salesDateFromParam);
+				logger.debug("salesDateToParam:"+salesDateToParam);
+				
+				if(salesDateFlag){
+					//ps.setDate(1, new java.sql.Date(salesDateFromParam.getTime()));
+					//ps.setDate(2, new java.sql.Date(salesDateToParam.getTime()));
+				}
+				rst = ps.executeQuery(sql.toString());
+				
+				while (rst.next()) {
+					TransactionSummary item = new TransactionSummary();
+					item.setVendor(rst.getString("VENDOR"));
+					item.setName(rst.getString("NAME"));
+					item.setBarcode(rst.getString("BARCODE"));
+					item.setStoreNo(rst.getString("STORE_NO"));
+					item.setStoreName(rst.getString("STORE_NAME"));
+					item.setStyleNo(rst.getString("STYLE_NO"));
+					item.setDescription(rst.getString("DESCRIPTION"));
+					
+					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setQty(Utils.decimalFormat(rst.getDouble("QTY"),Utils.format_current_2_disgit));
+					item.setGpPercent(Utils.decimalFormat(rst.getDouble("GP_PERCENT"),Utils.format_current_2_disgit));
+					item.setTotalWholePriceBF(Utils.decimalFormat(rst.getDouble("TOTAL_WHOLE_PRICE_BF"),Utils.format_current_2_disgit));
+				
+					item.setPensItem(rst.getString("PENS_ITEM"));
+					item.setPensCustCode(rst.getString("PENS_CUST_CODE"));
+					item.setPensCustDesc(rst.getString("PENS_CUST_DESC"));
+					item.setPensGroup(rst.getString("PENS_GROUP"));
+					item.setPensGroupType(rst.getString("PENS_GROUP_TYPE"));
+					item.setSalesYear(rst.getString("SALES_YEAR"));
+					item.setSalesMonth(rst.getString("SALES_MONTH"));
+					item.setFileName(rst.getString("File_name"));
+
+					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateUser(rst.getString("create_user"));
+					//Whole_Price_BF NUMBER(11,2),
+					//Retail_Price_BF NUMBER(11,2),
+					item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"),Utils.format_current_2_disgit));
+					item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"),Utils.format_current_2_disgit));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	  public List<TransactionSummary> searchTops(TransactionSummary c,Connection conn,User user) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			List<TransactionSummary> pos = new ArrayList<TransactionSummary>();
+			StringBuilder sql = new StringBuilder();
+			boolean salesDateFlag = false;
+			Date salesDateFromParam = null;
+			Date salesDateToParam = null;
+			try {
 				sql.append("\n  SELECT * from PENSBME_SALES_FROM_TOPS");
 				sql.append("\n  where 1=1  ");
-			
-				
-
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					

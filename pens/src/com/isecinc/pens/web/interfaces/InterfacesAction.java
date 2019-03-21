@@ -357,6 +357,23 @@ public class InterfacesAction extends I_Action {
 	}
 	
 	/**
+	 * Export To Txt
+	 */
+	public ActionForward clearControl(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearControl");
+		try {
+		    String sql = "delete from monitor; delete from monitor_item;delete from monitor_item_detail;";
+		    String log = Utils.excUpdate(sql);
+		    logger.debug("log:"+log);
+			request.setAttribute("Message","Clear Control Import Export Success กรุณา ดึงข้อมูล หรือ Export ใหม่ ");
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("success");
+	}
+	/**
 	 * 
 	 * @param mapping
 	 * @param form

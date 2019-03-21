@@ -24,6 +24,9 @@
 <jsp:useBean id="orderAllForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderAllForm");
+
 String pageName = Utils.isNull(request.getParameter("pageName"));
 
 ImportDAO importDAO = new ImportDAO();

@@ -79,6 +79,9 @@ public class BatchTaskAction extends I_Action {
 				batchTaskForm.setMonitorItemList(null);
 				//Get BatchTask INIT
 				BatchTaskInfo taskInfo = new BatchTaskInfo();
+				//getDescription 
+				taskInfo.setDescription(getDescriptionByTaskname(pageName));
+				//get Parameter by TaskName
 				String[] paramAll = getParamByTaskname(pageName).split("\\$");
 				
 				//Button Name
@@ -159,6 +162,7 @@ public class BatchTaskAction extends I_Action {
 		BatchTaskDAO dao = new BatchTaskDAO();
 		String pageName = "";
 		try {
+			
 			String timeInUse =batchTaskForm.getMonitorBean().getTimeInUse();
 			pageName = Utils.isNull(request.getParameter("pageName"));
 			logger.info("TimeInUse:"+timeInUse);
@@ -177,6 +181,7 @@ public class BatchTaskAction extends I_Action {
 				batchTaskForm.setMonitorItem(monitorItemBean);
 			} else {
 				request.setAttribute("Message", "Data not found");
+				batchTaskForm.setResults(null);
 			}
 				
 			batchTaskForm.getMonitorBean().setTimeInUse(timeInUse);
@@ -220,6 +225,26 @@ public class BatchTaskAction extends I_Action {
    		   Class noparams[] = {};
    		
    		   Method method = cls.getDeclaredMethod("getParam", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (String)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
+	
+	private String getDescriptionByTaskname(String taskName){
+		String param = "";
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("getDecsription", noparams);
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;

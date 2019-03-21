@@ -224,7 +224,7 @@ public class MTTAction extends I_Action {
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
-				aForm.setResultsSearch(null);
+				aForm.setResults(null);
 				MTTBean ad = new MTTBean();
 				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				request.getSession().setAttribute("summary",null);
@@ -245,16 +245,16 @@ public class MTTAction extends I_Action {
 		String msg = "";
 		try {
 			aForm.setBean(MTTBeanDAO.searchHead(aForm.getBean()));
-			aForm.setResultsSearch(aForm.getBean().getItems());
+			aForm.setResults(aForm.getBean().getItems());
 			
 			//set summary
 			MTTBean summary = new MTTBean();
 			summary.setTotalQty(aForm.getBean().getTotalQty());
 			request.getSession().setAttribute("summary", summary);
 			
-			if(aForm.getResultsSearch().size() <=0){
+			if(aForm.getResults().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			   aForm.setResults(null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -670,11 +670,10 @@ public class MTTAction extends I_Action {
 	public ActionForward prepareScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareScanReport");
 		MTTForm aForm = (MTTForm) form;
-		User user = (User) request.getSession().getAttribute("user");
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			if("new".equals(action)){
-				aForm.setResultsSearch(null);
+				aForm.setResults(null);
 				MTTBean ad = new MTTBean();	
 				aForm.setBean(ad);
 			}
@@ -687,18 +686,15 @@ public class MTTAction extends I_Action {
 	}
 	
 	public ActionForward searchScanReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("searchReport");
+		logger.debug("searchScanReport");
 		MTTForm aForm = (MTTForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
 		try {
-			MTTBean b = aForm.getBean();
 			aForm.setBean(MTTBeanDAO.searchScanReport(aForm.getBean()));
-			aForm.setResultsSearch(aForm.getBean().getItems());
+			aForm.setResults(aForm.getBean().getItems());
 			
-			if(aForm.getResultsSearch().size() <=0){
+			if(aForm.getResults().size() <=0){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
+			   aForm.setResults(null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -789,8 +785,8 @@ public class MTTAction extends I_Action {
 			
 			h.append("</table> \n");
 
-			if(form.getResultsSearch() != null){
-			    List<MTTBean> list = (List<MTTBean>)form.getResultsSearch();
+			if(form.getResults() != null){
+			    List<MTTBean> list = (List<MTTBean>)form.getResults();
 			    
 				h.append("<table border='1'> \n");
 				h.append("<tr> \n");

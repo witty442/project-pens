@@ -52,6 +52,7 @@ public class StockVanForm extends I_Form {
 		if(getBean()!=null){
 			this.getBean().setDispPlan("");
 			this.getBean().setDispHaveQty("");
+			this.getBean().setDispPrice("");
 		}
 	}
     

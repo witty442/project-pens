@@ -1,27 +1,57 @@
 @charset "utf-8";
 /* CSS Document */
-
+ 
 #nav {
 	margin: 0;
 	padding: 7px 6px 0;
 	background: #7d7d7d url(../images2/gradient.png) repeat-x 0 -110px;
 	line-height: 100%;
 
-	border-radius: 2em;
-	-webkit-border-radius: 2em;
-	-moz-border-radius: 2em;
+	border-radius: 1em;
+	-webkit-border-radius: 1em;
+	-moz-border-radius: 1em;
 
 	-webkit-box-shadow: 0 1px 3px rgba(0,0,0, .4);
 	-moz-box-shadow: 0 1px 3px rgba(0,0,0, .4);
 }
 #nav li {
-	margin: 0 5px;
+	margin: 0 0;
 	padding: 0 0 8px;
 	float: left;
 	position: relative;
 	list-style: none;
 }
 
+/* main level link */
+#nav div {
+	font-weight: bold;
+	color: #e7e5e5;
+	text-decoration: none;
+	display: block;
+	padding:  8px 20px;
+	margin: 0;
+
+	-webkit-border-radius: 1.6em;
+	-moz-border-radius: 1.6em;
+	
+	text-shadow: 0 1px 1px rgba(0,0,0, .3);
+}
+#nav div:hover {
+	background: #000;
+	color: #fff;
+}
+/* main level link hover */
+#nav .current div, #nav li:hover > div {
+	 background: #666 url(../images2/gradient.png) repeat-x 0 -40px;
+	color: #444;
+	border-top: solid 1px #f8f8f8;
+
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0, .2);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0, .2);
+	box-shadow: 0 1px 1px rgba(0,0,0, .2);
+
+	text-shadow: 0 1px 0 rgba(255,255,255, 1);
+}
 
 /* main level link */
 #nav a {
@@ -29,7 +59,7 @@
 	color: #e7e5e5;
 	text-decoration: none;
 	display: block;
-	padding:  8px 20px;
+	padding:  8px 14px;
 	margin: 0;
 
 	-webkit-border-radius: 1.6em;
@@ -85,7 +115,7 @@
 
 	margin: 0;
 	padding: 0;
-	width: 185px;
+	width: 250px;
 	position: absolute;
 	top: 35px;
 	left: 0;
@@ -113,7 +143,7 @@
 
 /* level 3+ list */
 #nav ul ul {
-	left: 181px;
+	left: 250px;
 	top: -3px;
 }
 

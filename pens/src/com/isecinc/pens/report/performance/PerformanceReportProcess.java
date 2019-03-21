@@ -172,7 +172,7 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  AND od.DOC_STATUS = 'SV' ");
 			sql.append("\n  AND us.USER_ID = " + user.getId());
 			sql.append("\n  ORDER BY od.ORDER_ID ");
-
+            logger.debug("sql :"+sql.toString());
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {

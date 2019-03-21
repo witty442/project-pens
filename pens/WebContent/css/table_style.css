@@ -52,11 +52,28 @@ TABLE.tableSearchNoWidth TD {
 }
 .td_text_center{
 	align:center;
-	
 }
 .td_text_right{
 	text-align:right;
 }
 .td_number{
 	text-align:right;
+}
+.normalTextInput {
+	background-color: #FFFFFF;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
+.errorTextInput {
+	background-color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+}
+.errorNumberInput {
+	background-color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
 }

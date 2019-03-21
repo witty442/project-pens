@@ -390,8 +390,10 @@ body {
 							<tr>
 								<td align="center" width ="100%">
 								    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong" style="width: 180px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')" title="<%=com.isecinc.pens.inf.helper.ConvertUtils.genEnvStr() %>"> 
-								    &nbsp;&nbsp;&nbsp;<input type="button" value="Clear" class="newPosBtnLong" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								    &nbsp;&nbsp;&nbsp;
+								    <input type="button" value="Clear" class="newPosBtnLong" style="width: 160px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+								    &nbsp;&nbsp;&nbsp;
+								   
 								    <a href ="javascript:openPopup('${pageContext.request.contextPath}')" 
 								    title="ตรวจสอบ FTP Connection"><b>?</b>
 								    </a>
@@ -566,7 +568,9 @@ body {
 					</c:if>
 						<br><br>
 						<!-- BODY -->
-						<div align="center">
+						<div align="left">
+						    <input type="button" value="Clear(ControlImporExport)" class="newPosBtnLong" style="width: 250px;" onClick="javascript:clearControlForm('${pageContext.request.contextPath}','admin')">
+						   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						    Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"></html:text> Seconds
 						</div>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>

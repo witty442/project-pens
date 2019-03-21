@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Master;
+import com.isecinc.pens.bean.MasterItemBean;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.dao.constants.Constants;
@@ -1604,6 +1605,37 @@ public class GeneralDAO {
 				} catch (Exception e) {}
 			}
 			return pensItem;
+		}
+	 
+	 public static MasterItemBean getMasterItemByPensItem(Connection conn,String pensItem) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			MasterItemBean master = null;
+			try {
+				sql.append("\n select pens_value FROM ");
+				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n and reference_code ='LotusItem' ");
+				sql.append("\n and pens_value = '"+pensItem+"' \n");
+				
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					master = new MasterItemBean();
+					master.setPensItem(Utils.isNull(rst.getString("pens_value")));
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return master;
 		}
 	 
 	 public static List<References> getProductTypeListInterfaceICC() throws Exception {

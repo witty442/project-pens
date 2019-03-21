@@ -251,13 +251,17 @@ public class StockVanDAO {
 			sql.append("\n select M.product_code,M.product_name");
 			sql.append("\n ,M.subinventory_code");
 			sql.append("\n ,PD.pd_qty");
+			sql.append("\n ,(NVL(PD.pd_qty,0) * NVL(M.unit_price,0)) as pd_price");
 			sql.append("\n ,PD_INT.pd_int_qty");
+			sql.append("\n ,(NVL(PD_INT.pd_int_qty,0) * NVL(M.unit_price,0)) as pd_int_price");
 			sql.append("\n FROM (");
 			sql.append("\n /** MASTER **/ ");
 			sql.append("\n  SELECT distinct pd.inventory_item_id ");
 			sql.append("\n  ,p.segment1 as product_code ");
 			sql.append("\n  ,p.description as product_name ");
 			sql.append("\n  ,pd.subinventory_code ");
+			sql.append("\n  ,(select unit_price from apps.xxpens_om_price_list_cs_v pr ");
+			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
 			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
@@ -276,6 +280,8 @@ public class StockVanDAO {
 			sql.append("\n  ,p.segment1 as product_code ");
 			sql.append("\n  ,p.description as product_name ");
 			sql.append("\n  ,pd_int.to_subinventory as subinventory_code ");
+			sql.append("\n  ,(select unit_price from apps.xxpens_om_price_list_cs_v pr ");
+			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
 			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
@@ -348,8 +354,10 @@ public class StockVanDAO {
 					   m.setProductCode(Utils.isNull(rs.getString("product_code")));
 					   
 					   double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;
-					   
 					   m.setPdQty(Utils.decimalFormat(pd_qty,Utils.format_current_2_disgit));
+					   
+					   double pd_price = (double) Math.round(rs.getDouble("pd_price") * 100) / 100;
+					   m.setPdPrice(Utils.decimalFormat(pd_price,Utils.format_current_2_disgit));
 					   //key
 					   keyMap = m.getPdCode()+"_"+m.getProductCode();
 					}else{
@@ -359,10 +367,15 @@ public class StockVanDAO {
 						m.setProductCode(Utils.isNull(rs.getString("product_code")));
 						
 						double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;
+						double pd_price = (double) Math.round(rs.getDouble("pd_price") * 100) / 100;
 						double pd_int_qty = (double) Math.round(rs.getDouble("pd_int_qty") * 100) / 100;
+						double pd_int_price = (double) Math.round(rs.getDouble("pd_int_price") * 100) / 100;
 						
 						m.setPdQty(Utils.decimalFormat(pd_qty,Utils.format_current_2_disgit));
+						m.setPdPrice(Utils.decimalFormat(pd_price,Utils.format_current_2_disgit));
 						m.setPdIntQty(Utils.decimalFormat(pd_int_qty,Utils.format_current_2_disgit));
+						m.setPdIntPrice(Utils.decimalFormat(pd_int_price,Utils.format_current_2_disgit));
+						
 						//key 
 						keyMap = m.getPdCode()+"_"+m.getProductCode();
 					}
@@ -374,8 +387,11 @@ public class StockVanDAO {
 						m.setPdCode(Utils.isNull(rs.getString("subinventory_code")));
 						
 						double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;
-						
 						m.setPdQty(Utils.decimalFormat(pd_qty,Utils.format_current_2_disgit));
+						
+						double pd_price = (double) Math.round(rs.getDouble("pd_price") * 100) / 100;
+						m.setPdPrice(Utils.decimalFormat(pd_price,Utils.format_current_2_disgit));
+						
 					    //key 
 						keyMap = m.getProductCode()+"_"+m.getPdCode();
 					}else{
@@ -385,10 +401,14 @@ public class StockVanDAO {
 						m.setPdCode(Utils.isNull(rs.getString("subinventory_code")));
 						
 						double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;
+						double pd_price = (double) Math.round(rs.getDouble("pd_price") * 100) / 100;
 						double pd_int_qty = (double) Math.round(rs.getDouble("pd_int_qty") * 100) / 100;
+						double pd_int_price = (double) Math.round(rs.getDouble("pd_int_price") * 100) / 100;
 						
 						m.setPdQty(Utils.decimalFormat(pd_qty,Utils.format_current_2_disgit));
+						m.setPdPrice(Utils.decimalFormat(pd_price,Utils.format_current_2_disgit));
 						m.setPdIntQty(Utils.decimalFormat(pd_int_qty,Utils.format_current_2_disgit));
+						m.setPdIntPrice(Utils.decimalFormat(pd_int_price,Utils.format_current_2_disgit));
 					    
 					    //key
 					    keyMap = m.getProductCode()+"_"+m.getPdCode();
@@ -421,13 +441,13 @@ public class StockVanDAO {
 			sql.append("\n and subinv.subinventory Like '"+Utils.isNull(o.getPdType())+"%'");
 		}
 		if( !Utils.isNull(o.getPdCode()).equals("")){
-			sql.append("\n and subinv.subinventory = '"+Utils.isNull(o.getPdCode())+"'");
+			sql.append("\n and subinv.subinventory in("+Utils.converToTextSqlIn(o.getPdCode())+")");
 		}
 		if( !Utils.isNull(o.getBrand()).equals("")){
-			sql.append("\n and P.brand = '"+Utils.isNull(o.getBrand())+"'");
+			sql.append("\n and P.brand in("+Utils.converToTextSqlIn(o.getBrand())+")");
 		}
 		if( !Utils.isNull(o.getProductCode()).equals("")){
-			sql.append("\n and P.segment1 = '"+Utils.isNull(o.getProductCode()+"'"));
+			sql.append("\n and P.segment1 in("+Utils.converToTextSqlIn(o.getProductCode())+")");
 		}
 		return sql;
 	}

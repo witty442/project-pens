@@ -17,17 +17,18 @@ if(batchTaskForm.getMonitorItem() != null){
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
 %>
 
-	<%if(failList != null && failList.size() >0){%>
+	<%if(failList != null && failList.size() >0){
+		//Gen Column Head Table
+	  if( !Utils.isNull(columnHeadStrArr).equals("")){
+		String[] columnHeadArr = columnHeadStrArr.split("\\|");
+	%>
 	<p></p>
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-	  <th colspan="15"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   ${batchTaskForm.monitorItem.failCount} Row </font></th>
+	  <th colspan="<%=columnHeadArr.length%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   ${batchTaskForm.monitorItem.failCount} Row </font></th>
 	</tr>
 	<tr>
 		<% 
-		//Gen Column Head Table
-		if( !Utils.isNull(columnHeadStrArr).equals("")){
-			String[] columnHeadArr = columnHeadStrArr.split("\\|");
 			for(int c=0;c<columnHeadArr.length;c++){
 		%>
 		  <th width="5%"><%=columnHeadArr[c]%></th>
@@ -65,17 +66,19 @@ if(batchTaskForm.getMonitorItem() != null){
 	</table>
   <%} %>
 
-<% if(successList != null && successList.size() >0){ %> 
+<% if(successList != null && successList.size() >0){ 
+	//Gen Column Head Table
+    if( !Utils.isNull(columnHeadStrArr).equals("")){
+	   String[] columnHeadArr = columnHeadStrArr.split("\\|");
+%> 
     <p></p>
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-	  <th colspan="15">จำนวน Row ที่สามารถ Import ได้   ${batchTaskForm.monitorItem.successCount} Row </th>
+	  <th colspan="<%=columnHeadArr.length%>">จำนวน Row ที่สามารถ Import ได้   ${batchTaskForm.monitorItem.successCount} Row </th>
 	</tr>
 	<tr>
 		<% 
-		//Gen Column Head Table
-		if( !Utils.isNull(columnHeadStrArr).equals("")){
-			String[] columnHeadArr = columnHeadStrArr.split("\\|");
+		
 			for(int c=0;c<columnHeadArr.length;c++){
 		%>
 		  <th width="5%"><%=columnHeadArr[c]%></th>

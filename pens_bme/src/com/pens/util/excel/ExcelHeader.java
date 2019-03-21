@@ -33,6 +33,11 @@ public class ExcelHeader {
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
 		
+		EXCEL_HEADER.append(" .row_hilight{ \n");
+		EXCEL_HEADER.append("   background-color: #909090; \n");
+		EXCEL_HEADER.append("   font-weight: bold; \n");
+		EXCEL_HEADER.append(" } \n");
+		
 		EXCEL_HEADER.append(" .currency{ \n");
 		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
 		EXCEL_HEADER.append(" } \n");

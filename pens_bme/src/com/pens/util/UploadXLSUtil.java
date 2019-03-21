@@ -83,7 +83,7 @@ public class UploadXLSUtil {
 					}
 					break;
 				case Cell.CELL_TYPE_NUMERIC:
-					logger.debug("column(" + colNo + "): CELL_TYPE_NUMERIC, value: " + cell.getNumericCellValue());
+					//logger.debug("column(" + colNo + "): CELL_TYPE_NUMERIC, value: " + cell.getNumericCellValue());
 					
 					value = cell.getNumericCellValue();
 					// date value
@@ -93,7 +93,7 @@ public class UploadXLSUtil {
 					break;
 				default:
 					RichTextString text = cell.getRichStringCellValue();
-					logger.debug("column(" + colNo + "): CELL_TYPE_STRING, value: " + text.getString());
+					//logger.debug("column(" + colNo + "): CELL_TYPE_STRING, value: " + text.getString());
 					value = text.getString();
 					break;
 				}

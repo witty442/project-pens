@@ -49,16 +49,21 @@ public class ClearDupDB {
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
-			
 			 while(rs.next()){
 				 toatlCustomer++;
+				 
+				 //delete all exception last created 
+				 deleteAddressDupByPurposeCaseOrderByCreateDateDesc(conn,"B",rs.getString("customer_id"));
+				 deleteAddressDupByPurposeCaseOrderByCreateDateDesc(conn,"S",rs.getString("customer_id"));
+				 
+				 
 				// Delete by ref id asc
-				 deleteAddressDupByPurposeCaseOrderByRefID(conn,"B",rs.getString("customer_id"));
-				 deleteAddressDupByPurposeCaseOrderByRefID(conn,"S",rs.getString("customer_id"));
+				// deleteAddressDupByPurposeCaseOrderByRefID(conn,"B",rs.getString("customer_id"));
+				// deleteAddressDupByPurposeCaseOrderByRefID(conn,"S",rs.getString("customer_id"));
 				 
 				 // Delete by update desc
-				 deleteAddressDupByPurposeCaseOrderByUpdated(conn,"B",rs.getString("customer_id"));
-				 deleteAddressDupByPurposeCaseOrderByUpdated(conn,"S",rs.getString("customer_id"));
+				 //deleteAddressDupByPurposeCaseOrderByUpdated(conn,"B",rs.getString("customer_id"));
+				 //deleteAddressDupByPurposeCaseOrderByUpdated(conn,"S",rs.getString("customer_id")); 
 			 }
 			 
 			msgHead.append("*** Total Customer Duplicate :["+toatlCustomer +"] ***************\n");
@@ -85,6 +90,44 @@ public class ClearDupDB {
 		return msgHead;
 	}
 	
+	public static StringBuffer deleteAddressDupByPurposeCaseOrderByCreateDateDesc(Connection conn ,String purpose,String customerId){
+
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		int count = 0;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			sql = new StringBuffer("");
+			sql.append(" select * from m_address where customer_id="+customerId+" and purpose ='"+purpose+"' order by created desc");
+			
+			logger.debug("sql p:"+sql.toString());
+			
+            ps = conn.prepareStatement(sql.toString());
+            rs = ps.executeQuery();
+            while(rs.next()){
+            	count++;
+            	if(count>1){
+            		//delete row
+            		rec++;
+            		excUpdate(conn,"delete from m_address where customer_id="+customerId+" and purpose='"+purpose+"' and address_id ="+rs.getInt("address_id"));
+            	}
+            }
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+			   if(ps != null){
+				   ps.close();ps=null;
+			   }
+			   if(rs != null){
+				   rs.close();rs =null;
+			   }
+			}catch(Exception e){}
+		}
+		return msg;
+	}
+
 	public static StringBuffer deleteAddressDupByPurposeCaseOrderByRefID(Connection conn ,String purpose,String customerId){
 
 		PreparedStatement ps =null;

@@ -58,8 +58,23 @@ public class Order implements Serializable{
 	private String size;
     private String color;
 	private int rowExcel;
+	//criteria
+	private String pensItemFrom;
+	private String pensItemTo;
+	
 
-
+	public String getPensItemFrom() {
+		return pensItemFrom;
+	}
+	public void setPensItemFrom(String pensItemFrom) {
+		this.pensItemFrom = pensItemFrom;
+	}
+	public String getPensItemTo() {
+		return pensItemTo;
+	}
+	public void setPensItemTo(String pensItemTo) {
+		this.pensItemTo = pensItemTo;
+	}
 	public String getInvoiceNo() {
 		return invoiceNo;
 	}

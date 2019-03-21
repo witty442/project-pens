@@ -56,3 +56,15 @@ function dateFromToInSameMonth(date1,date2){
 	 return true;
 }
 
+/**
+ * 
+ * @param date1(thaiDate) 01/11/2561
+ * @param date2(thaiDate) 30/11/2561
+ * Return : true in same year,false no same year
+ */
+function dateFromToInSameYear(date1,date2){
+	 date1 = thaiDateToEngDate(date1);
+	 date2 = thaiDateToEngDate(date2);
+	 if(date1.getYear() != date2.getYear()) return false;
+	 return true;
+}

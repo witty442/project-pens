@@ -246,9 +246,16 @@ int subNo = 0;
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareCustomer&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Stock" bundle="sysprop"/> </span></a>
             </li>
+             <%if(role.equalsIgnoreCase(User.TT)){ %>
+              <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockReturnAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/> </span></a>
+              </li>
+             <%} %>
          </ul>
       </li>
     
+
+    <!-- TEST -->
 	 <%if(role.equalsIgnoreCase(User.VAN)){ no=0;%>
 	     <li><a  href="javascript: void(0)" class="parent">รายการ เบิก/คืน</a>
 		     <ul>

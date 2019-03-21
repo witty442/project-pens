@@ -82,6 +82,7 @@ public class OrderAction extends I_Action {
 				 request.getSession().removeAttribute("totalPage");
 				 request.getSession().removeAttribute("totalPage"); 
 				 request.getSession().removeAttribute("ORDER_ERROR");
+				 request.getSession().removeAttribute("canOrderMap");
 				 
 				 //init store type
 				 STORE_TYPE_MAP = new OrderDAO().initStoreTypeMap();

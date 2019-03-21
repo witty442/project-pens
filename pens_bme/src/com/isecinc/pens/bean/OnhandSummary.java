@@ -3,6 +3,7 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
 
 	/**
@@ -68,8 +69,58 @@ public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
     
     private List<OnhandSummary> itemsList;
     private OnhandSummary summary;
+    private String orderLotNo;
+    private String wholePriceVat;
+    private String totalSaleAmount;
+    private String gp;
+    private List<OnhandSummary> subList;
+    private double totalQtyByCust = 0;
+	private double totalAmountByCust = 0;
+	
     
-   
+	public double getTotalQtyByCust() {
+		return totalQtyByCust;
+	}
+	public void setTotalQtyByCust(double totalQtyByCust) {
+		this.totalQtyByCust = totalQtyByCust;
+	}
+	public double getTotalAmountByCust() {
+		return totalAmountByCust;
+	}
+	public void setTotalAmountByCust(double totalAmountByCust) {
+		this.totalAmountByCust = totalAmountByCust;
+	}
+	public List<OnhandSummary> getSubList() {
+		return subList;
+	}
+	public void setSubList(List<OnhandSummary> subList) {
+		this.subList = subList;
+	}
+	public String getGp() {
+		return gp;
+	}
+	public void setGp(String gp) {
+		this.gp = gp;
+	}
+	public String getOrderLotNo() {
+		return orderLotNo;
+	}
+	public void setOrderLotNo(String orderLotNo) {
+		this.orderLotNo = orderLotNo;
+	}
+	public String getWholePriceVat() {
+		return wholePriceVat;
+	}
+	public void setWholePriceVat(String wholePriceVat) {
+		this.wholePriceVat = wholePriceVat;
+	}
+	
+	public String getTotalSaleAmount() {
+		return totalSaleAmount;
+	}
+	public void setTotalSaleAmount(String totalSaleAmount) {
+		this.totalSaleAmount = totalSaleAmount;
+	}
 	public String getStoreNo() {
 		return storeNo;
 	}

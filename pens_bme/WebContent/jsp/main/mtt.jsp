@@ -18,6 +18,9 @@
 <jsp:useBean id="mttForm" class="com.isecinc.pens.web.mtt.MTTForm" scope="session" />
 
 <%
+ /*clear session form other page */
+ SessionUtils.clearSessionUnusedForm(request, "mttForm");
+
  String mode = mttForm.getMode();
 %>
 

@@ -5,6 +5,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620">
 <title>Knowledge</title>
+<script type="text/javascript">
+ function showDiv(id){
+	 //alert(id);
+	 document.getElementById(id).style.display = "block";
+ }
+</script>
 </head>
 <body>
 <table align="center" border="1" cellspacing="3" width="100%">
@@ -32,22 +38,43 @@
       Batch Task Sample(Load Order Excel to ORACLE)</a>
    </td></tr>
     <tr><td>
-       Struts autoComplete=off Text Field->
-      <b>" html:text property="order.creditCardExpireDate" styleClass="disableText \" autoComplete=\"off"&nbsp;&nbsp; />"</b>
+      <b> Struts autoComplete=off Text Field-> </b>
+     <textarea rows="3" cols="200">
+        <html_X:text property="order.creditCardExpireDate" styleClass="disableText \" autoComplete=\"off"/>
+     </textarea>
     </td></tr>	
     <tr><td>
       <a href="${pageContext.request.contextPath}/jsp/adjustStockSAAction.do?do=prepare2&action=new">
-      Validate Data Table (Javascript>)</a>
+      <b>Validate Data Table (Javascript>)</b></a>
    </td></tr>
     <tr><td>
       <a href="${pageContext.request.contextPath}/jsp/jobAction.do?do=prepare2&action=new">
-     Call Ajax (Javascript>)</a>
+      <b> Call Ajax (Javascript>)</b></a>
    </td></tr>
     <tr><td>
-             การ Export to Excel ปัญหาภาษาไทย  add tag <.. meta charset='utf-8'..>
+           <b>  การ Export to Excel ปัญหาภาษาไทย  add tag <.. meta charset='utf-8'..></b>
    </td></tr>
    <tr><td>
-             การ Import pic หลายรูปพร้อมกัน  ProdShowServlet path->   /pens/jsp/prodshow/prodshow.jsp
+        <b>การ Import pic หลายรูปพร้อมกัน  ProdShowServlet path->   /pens/jsp/prodshow/prodshow.jsp</b>
+   </td></tr>
+   <tr><td>
+        <b> Calendar Popup (support thai Calendar) <a href="javascript:showDiv('div_Calendar');">Show Detail</a></b>
+         <div style="display: none;" id="div_Calendar">
+              <textarea rows="15" cols="200">
+         <!-- Calendar -->
+			<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
+			<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
+		    
+		    //$('#expireDate1_1').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+		    </textarea>
+		</div>	 
    </td></tr>
   </table>
 </body>

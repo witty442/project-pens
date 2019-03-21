@@ -32,12 +32,65 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String subInv;
 	
 	private String customerCode;
+	private String customerId;
 	private String productCode;
 	private String page;
 	private String userId;
 	private String stringDate;
+	private String address;
+	private String requestNumber;
+	private String priAllQty;
+	private String priQty;
+	private String subQty;
 	
-	
+	public String getPriAllQty() {
+		return priAllQty;
+	}
+
+	public void setPriAllQty(String priAllQty) {
+		this.priAllQty = priAllQty;
+	}
+
+	public String getPriQty() {
+		return priQty;
+	}
+
+	public void setPriQty(String priQty) {
+		this.priQty = priQty;
+	}
+
+	public String getSubQty() {
+		return subQty;
+	}
+
+	public void setSubQty(String subQty) {
+		this.subQty = subQty;
+	}
+
+	public String getRequestNumber() {
+		return requestNumber;
+	}
+
+	public void setRequestNumber(String requestNumber) {
+		this.requestNumber = requestNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public String getStringDate() {
 		return stringDate;
 	}

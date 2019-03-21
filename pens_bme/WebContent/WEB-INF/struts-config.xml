@@ -116,6 +116,7 @@
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
 		<form-bean name="pickReportForm" type="com.isecinc.pens.web.pick.PickReportForm" />
+	
 	</form-beans>
 	
 	<global-forwards>
@@ -168,7 +169,8 @@
 			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
 		</action>
 		
-		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
+		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" 
+		   scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
            <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
         </action>
         
@@ -719,6 +721,7 @@
 			<forward name="searchPromotion" path="/jsp/shop/shopPromotionSearch.jsp" />
 			<forward name="detailPromotion" path="/jsp/shop/shopPromotion.jsp" />
 		</action>
+		
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />
 	<message-resources key="sysele" parameter="SystemElements_th" />

@@ -166,7 +166,7 @@ public class CopyDB {
 			
 			logger.debug("configList size:"+configList.size());
 			while(rsSelect.next()){
-		        logger.debug("found data");
+		       // logger.debug("found data");
 				for(i = 0;i<configList.size();i++){
 					DBBackUpConfig config = (DBBackUpConfig)configList.get(i);
 					
@@ -195,7 +195,7 @@ public class CopyDB {
 				if(values != null && values.length() >0){
 					values = values.substring(0,values.length()-1);
 					sqlInsert = "insert into "+schema+"."+tableName+"("+columns+") values ("+values+")";
-					logger.debug("sqlInsert:"+sqlInsert);
+					//logger.debug("sqlInsert:"+sqlInsert);
 					//insert to DB Dest
 					int update =Utils.excUpdateOneSql(connDest, sqlInsert);
 					

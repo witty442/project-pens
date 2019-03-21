@@ -381,12 +381,23 @@ public class OrderDAO {
 				sql.append(" and order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 				sql.append(" and order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
 				
-			}else{
+			}else if( !Utils.isNull(o.getSalesDateFrom()).equals("")){
 				Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
 				sql.append(" and order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 				
 			}
+			if( !Utils.isNull(o.getPensItemFrom()).equals("") 
+					&& !Utils.isNull(o.getPensItemTo()).equals("") ){
+				sql.append(" and h.item >= '"+Utils.isNull(o.getPensItemFrom())+"'  \n");
+				sql.append(" and h.item <= '"+Utils.isNull(o.getPensItemTo())+"' \n");
+			}else if( !Utils.isNull(o.getPensItemFrom()).equals("")) {	
+				sql.append(" and h.item = '"+Utils.isNull(o.getPensItemFrom())+"'  \n");
+			}
+			if( !Utils.isNull(o.getGroupCode()).equals("")){
+				sql.append(" and h.group_code LIKE '"+Utils.isNull(o.getGroupCode())+"%'  \n");
+			}
+			
 			if( !Utils.isNull(o.getCustGroup()).equals("")){
 				sql.append(" and store_type = '"+Utils.isNull(o.getCustGroup())+"'  \n");
 			}
@@ -596,11 +607,21 @@ public class OrderDAO {
 					sql.append(" and h.order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 					sql.append(" and h.order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
 						
-				}else{
+				}else if( !Utils.isNull(o.getSalesDateFrom()).equals("") ){
 					Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
 					sql.append(" and h.order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 					
+				}
+				if( !Utils.isNull(o.getPensItemFrom()).equals("") 
+						&& !Utils.isNull(o.getPensItemTo()).equals("") ){
+					sql.append(" and h.item >= '"+Utils.isNull(o.getPensItemFrom())+"'  \n");
+					sql.append(" and h.item <= '"+Utils.isNull(o.getPensItemTo())+"' \n");
+				}else if( !Utils.isNull(o.getPensItemFrom()).equals("")) {	
+					sql.append(" and h.item = '"+Utils.isNull(o.getPensItemFrom())+"'  \n");
+				}
+				if( !Utils.isNull(o.getGroupCode()).equals("")){
+					sql.append(" and h.group_code LIKE '"+Utils.isNull(o.getGroupCode())+"%'  \n");
 				}
 				if( !Utils.isNull(o.getCustGroup()).equals("")){
 					sql.append(" and h.store_type = '"+Utils.isNull(o.getCustGroup())+"'  \n");

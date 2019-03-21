@@ -69,6 +69,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 			// for logoff link
 			// do when logoff is not null
 			session.removeAttribute("user");// remove user from session
+			session.invalidate();
 			RequestDispatcher rd = config.getServletContext().getRequestDispatcher("/index.jsp");
 			rd.forward(req, res);
 		} else if (session.getAttribute("user") != null) {

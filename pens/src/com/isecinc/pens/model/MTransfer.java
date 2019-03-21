@@ -39,6 +39,11 @@ public class MTransfer {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
+			//delete line id (user check box delete)
+			if( !Utils.isNull(head.getLineIdDelete()).equals("")){
+			   boolean result = deleteTransfer(conn, head.getLineIdDelete());
+			}
+			
 			if(head.getItems() != null && head.getItems().size() > 0){
 				// Process normal
 				for(int i =0;i< head.getItems().size();i++){
@@ -66,6 +71,29 @@ public class MTransfer {
 		return head;
 	}
 	
+	private boolean deleteTransfer(Connection conn ,String lineIdDelete) throws Exception {
+		boolean result = false;
+		PreparedStatement ps = null;
+		try {
+			
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" delete from t_bank_transfer where line_id in("+Utils.converToTextSqlIn(lineIdDelete)+") \n");
+			logger.debug("SQL:"+sql);
+
+			ps = conn.prepareStatement(sql.toString());
+			int ch = ps.executeUpdate();
+			result = ch>0?true:false;
+			
+			logger.debug("delete record:"+ch);
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+		return result;
+	}
 	private TransferBean updateTransfer(Connection conn ,TransferBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -112,7 +140,6 @@ public class MTransfer {
 		}
 		return model;
 	}
-	
 	
 	private TransferBean insertTransfer(Connection conn ,TransferBean model) throws Exception {
 		boolean result = false;

@@ -184,10 +184,12 @@
 		          	       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');">
 		          	       <span>3.1 <bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
 		               </li>
+		               <!-- OLD FORMAT IMPORT -->
 		                <li>
 						   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=bigc&action=new');">3.2 
 						   <span><bean:message bundle="sysprop" key="ImportBMEFromBigC"/></span></a>
-						</li>
+						</li> 
+						 
 						 <li>
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=king&action=new');">3.3 
 							<span><bean:message bundle="sysprop" key="ImportBMEFromKing"/></span></a>
@@ -196,6 +198,11 @@
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=tops&action=new');">3.4 
 							<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
 						</li>
+						<!-- NEW FORMAT IMPORT BIGC 11/03/2562-->
+		                  <li>
+					          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_SALES_OUT_BIGC_FROM_TEXT%>');">
+					          3.5 <span><bean:message key="<%=BatchTaskConstants.IMPORT_SALES_OUT_BIGC_FROM_TEXT%>" bundle="sysprop"/></span></a>
+					      </li> 
 			       </ul>
 			    </li>
 	           
@@ -367,6 +374,9 @@
 				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%>  <bean:message bundle="sysprop" key="SummaryBMEFromBigC"/></span></a>
 			       </li>
 			       <li>
+				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=BigC_TEMP');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%>  <bean:message bundle="sysprop" key="SummaryBMEFromBigCTemp"/></span></a>
+			       </li>
+			       <li>
 				      <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="SummaryBMESizeColorBigC"/></span></a>
 			        </li> 
 			        <li>
@@ -408,10 +418,14 @@
 				     <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="onhandAsOf_Robinson"/>(NEW)</span></a>
 			       </li> 
 			    <!-- OLD Version -->
-					<li>
+					<%-- <li>
 				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandAsOf_Robinson');">
 				     <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="onhandAsOf_Robinson"/>(OLD)</span></a>
-			       </li>  
+			       </li>   --%>
+			       <li>
+				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=openBillRobinsonReport');">
+				     <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="openBillRobinsonReport"/></span></a>
+			       </li>
 			   </ul>	    
 		    </li> 
 			<li>
@@ -941,7 +955,7 @@
 	</li> 
 <%} %>
 
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){ no=0;%>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER,User.SALE}) ){ no=0;%>
   	<li><a href="javascript: void(0)" class="parent"><span>Master Data</span></a>
 		<ul>
 		<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HISHER}) ){ %>
@@ -978,6 +992,12 @@
 	         <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ITEMBARCODE_CROSSREF_TO_ORL_FR_EXCEL%>');">
 	           <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ITEMBARCODE_CROSSREF_TO_ORL_FR_EXCEL%>" bundle="sysprop"/></span></a>
+	        </li>
+	      <%} %>
+	       <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){%>
+	         <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ITEM_GP_ROBIN_FROM_EXCEL%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ITEM_GP_ROBIN_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
 	      <%} %>
 		</ul>

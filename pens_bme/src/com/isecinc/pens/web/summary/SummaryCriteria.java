@@ -16,12 +16,21 @@ import com.isecinc.pens.bean.TransactionSummary;
 public class SummaryCriteria extends I_Criteria {
 
 	private static final long serialVersionUID = -189773759780203365L;
-
+	private OnhandSummary bean = new OnhandSummary();
 	private OnhandSummary onhandSummary = new OnhandSummary();
 	private TransactionSummary transactionSummary = new TransactionSummary();
 	private PhysicalSummary physicalSummary = new PhysicalSummary();
     private DiffStockSummary diffStockSummary = new DiffStockSummary();
 	
+    
+	public OnhandSummary getBean() {
+		return bean;
+	}
+
+	public void setBean(OnhandSummary bean) {
+		this.bean = bean;
+	}
+
 	public OnhandSummary getOnhandSummary() {
 		return onhandSummary;
 	}

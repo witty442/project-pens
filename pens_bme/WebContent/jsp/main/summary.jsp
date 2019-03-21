@@ -23,6 +23,9 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <%
+   /*clear session form other page */
+   SessionUtils.clearSessionUnusedForm(request, "summaryForm");
+
 	String storeType ="";
 	User user = (User)session.getAttribute("user");
 	String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
@@ -43,7 +46,8 @@ function loadMe(){
 	<%if("lotus".equalsIgnoreCase(request.getParameter("page")) || "sumByGroupCode".equalsIgnoreCase(request.getParameter("page"))  ) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
-	<%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))) {%>
+	<%}else if("bigc".equalsIgnoreCase(request.getParameter("page")) 
+			|| "bigc_temp".equalsIgnoreCase(request.getParameter("page")) ) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
 	    new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
     <%}else if("tops".equalsIgnoreCase(request.getParameter("page"))) {%>
@@ -56,6 +60,8 @@ function loadMe(){
         new Epoch('epoch_popup', 'th', document.getElementById('countDateFrom'));
         new Epoch('epoch_popup', 'th', document.getElementById('countDateTo'));
     <%} else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
+        new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
+    <%} else if("openBillRobinsonReport".equalsIgnoreCase(request.getParameter("page"))) {%>
         new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
 	<%}else if("onhandLotusPeriod".equalsIgnoreCase(request.getParameter("page"))) {%>
 	    new Epoch('epoch_popup', 'th', document.getElementById('asOfDateFrom'));
@@ -107,7 +113,8 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
 		   return false;
 	   }
-   <%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))) {%>
+   <%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))
+             || "bigc_temp".equalsIgnoreCase(request.getParameter("page")) ) {%>
 	   var salesDateFrom = form.salesDateFrom.value;
 	   var salesDateTo = form.salesDateTo.value;
 	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
@@ -161,7 +168,14 @@ function search(path){
 		   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
 		   return false;
 	   }
-	   
+    <%}else if("openBillRobinsonReport".equalsIgnoreCase(request.getParameter("page"))) {%>
+	   var asOfDateFrom = form.asOfDate.value;
+	  
+	   if(asOfDateFrom ==""){
+		   alert("กรุณากรอกข้อมูล วันที่เปิด Order โรงงาน/ วันที่ Issue จาก PC");
+		   return false;
+	   }
+	      
    <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 		   || "monthEndLotus".equalsIgnoreCase(request.getParameter("page"))
 		   || "onhandTops".equalsIgnoreCase(request.getParameter("page"))
@@ -438,6 +452,10 @@ function clearForm(path){
 			   <jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEFromBigC"/>
 				</jsp:include>
+			<%}else if("bigc_temp".equalsIgnoreCase(request.getParameter("page"))){ %>
+			   <jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEFromBigCTemp"/>
+				</jsp:include>
 			<%}else if("tops".equalsIgnoreCase(request.getParameter("page"))){ %>
 			   <jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMEFromTops"/>
@@ -491,6 +509,10 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="onhandAsOf_Robinson"/>
 				</jsp:include>
+		    <%}else if("openBillRobinsonReport".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="openBillRobinsonReport"/>
+				</jsp:include>
 			<%}else{ %>
 				<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="<%=pageName %>"/>
@@ -520,7 +542,8 @@ function clearForm(path){
 						   <jsp:include page="criteria/LotusCriteria.jsp" /> 
 						<%}else if("sumByGroupCode".equalsIgnoreCase(request.getParameter("page"))) {%>
 						    <jsp:include page="criteria/SumByGroupCodeCriteria.jsp" /> 
-						<%}else if("bigc".equalsIgnoreCase(request.getParameter("page"))) {%>
+						<%}else if("bigc".equalsIgnoreCase(request.getParameter("page")) 
+								|| "bigc_temp".equalsIgnoreCase(request.getParameter("page")) ) {%>
 						   <jsp:include page="criteria/BigCCriteria.jsp" /> 
 						<%}else if("tops".equalsIgnoreCase(request.getParameter("page")) ) {%>
 						      <jsp:include page="criteria/TopsCriteria.jsp" /> 
@@ -530,6 +553,8 @@ function clearForm(path){
 						     <jsp:include page="criteria/PhysicalCriteria.jsp" /> 
 						<%}else if("diff_stock".equalsIgnoreCase(request.getParameter("page"))) {%>
 						     <jsp:include page="criteria/DiffStockCriteria.jsp" /> 
+				        <%}else if("openBillRobinsonReport".equalsIgnoreCase(request.getParameter("page"))) {%>
+						     <jsp:include page="criteria/openBillRobinsonReportCriteria.jsp" /> 
 						<%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
 						     <jsp:include page="criteria/OnhandCriteria.jsp" /> 
 						<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
@@ -798,6 +823,9 @@ function clearForm(path){
 	                   <c:when test="${summaryForm.page == 'BigC'}">
 	                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
 	                   </c:when>
+	                     <c:when test="${summaryForm.page == 'BigC_TEMP'}">
+	                        <jsp:include page="subreports/subReportSalesBigC.jsp" /> 
+	                   </c:when>
 	                   <c:when test="${summaryForm.page == 'tops'}">
 	                        <jsp:include page="subreports/subReportSalesTops.jsp" /> 
 	                   </c:when>
@@ -806,6 +834,9 @@ function clearForm(path){
 	                   </c:when>
 	                   <c:when test="${summaryForm.page == 'onhandBigC'}">
 	                         <jsp:include page="subreports/subReportOnhandAsOf_BigC.jsp" /> 
+	                   </c:when>
+	                    <c:when test="${summaryForm.page == 'openBillRobinsonReport'}">
+	                         <jsp:include page="subreports/subOpenBillRobinsonReport.jsp" /> 
 	                   </c:when>
 				      <c:otherwise>
 				         <!-- ALL SUB Report By old code -->

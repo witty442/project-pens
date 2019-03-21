@@ -21,6 +21,9 @@
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderForm");
+
 ImportDAO importDAO = new ImportDAO();
 if(session.getAttribute("storeTypeList") == null){
    List<References> storeTypeList = importDAO.getStoreTypeList();

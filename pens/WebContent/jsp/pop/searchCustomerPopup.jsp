@@ -16,6 +16,7 @@
 <head>
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/field_size.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 .style1 {color: #004a80}

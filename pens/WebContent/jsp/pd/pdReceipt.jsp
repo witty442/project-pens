@@ -1,6 +1,5 @@
 <%@page import="util.SessionGen"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620"
-	pageEncoding="TIS-620"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
@@ -75,6 +74,7 @@ body {
 				background="${pageContext.request.contextPath}/images2/content01.png"
 				valign="top">
 				<div style="height: 60px;">
+				
 					<!-- MENU -->
 					<table width="100%" border="0" align="center" cellpadding="0"
 						cellspacing="0" class="txt1">
@@ -82,6 +82,7 @@ body {
 							<td width="100%"><jsp:include page="../menu.jsp" /></td>
 						</tr>
 					</table>
+					
 				</div> 
 				
 				<!-- PROGRAM HEADER --> 
@@ -206,7 +207,9 @@ body {
 													<input type="text" name="pdReceiptDate" maxlength="10" size="10"  readonly="readonly" id="pdReceiptDate">
 												</td>
 												<td class="td_text_center" width="10%">
-													<input type="text" name="chequeDate" maxlength="10" size="10" readonly="readonly" disabled="true" id="chequeDate">
+												    <div id="div_chequeDate_${rows.index+1}" style="display:none">
+													  <input type="text" name="chequeDate" maxlength="10" size="10" id="chequeDate" readonly="readonly">
+													</div>
 												</td>
 											</tr>
 										</c:forEach>

@@ -24,6 +24,9 @@
 <jsp:useBean id="orderFridayForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderFridayForm");
+
 ImportDAO importDAO = new ImportDAO();
 
 if(session.getAttribute("billTypeList") == null){

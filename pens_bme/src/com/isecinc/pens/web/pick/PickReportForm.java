@@ -20,8 +20,16 @@ public class PickReportForm extends I_Form {
     private PickReportBean bean ;
     private PickReportBean beanCriteria ;
     private PickReportBean summary ;
+    private String issueReqNoAll;
     
     
+    
+	public String getIssueReqNoAll() {
+		return issueReqNoAll;
+	}
+	public void setIssueReqNoAll(String issueReqNoAll) {
+		this.issueReqNoAll = issueReqNoAll;
+	}
 	public PickReportBean getSummary() {
 		return summary;
 	}

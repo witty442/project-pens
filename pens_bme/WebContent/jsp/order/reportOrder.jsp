@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.web.order.OrderAction"%>
@@ -25,54 +26,37 @@
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.order.OrderForm" scope="session" />
 
 <%
-//if(session.getAttribute("custGroupList") == null){
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderForm");
+
+if(session.getAttribute("custGroupList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
 	billTypeList.add(ref);
 	billTypeList.addAll(GeneralDAO.searchCustGroupByCustomer(new PopupForm()));
 	
 	session.setAttribute("custGroupList",billTypeList);
-//}
+}
 
 int start = 0;
 int end = 0;
 int pageNumber = 1;
 %>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -234,7 +218,6 @@ function getCustName(custCode,fieldName){
 		}
 	}
 }
-
 function resetStore(){
 	var form = document.orderForm;
 	var storeGrouptext = $("#custGroup option:selected").text();
@@ -246,11 +229,42 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
-
+function openPopupProduct(path,types){
+	var form = document.orderForm;
+	var storeType ="";
+	if("020058"==form.custGroup.value){
+		storeType ='tops';
+	}
+	var param = "&types="+types+"&storeType="+storeType;
+	url = path + "/jsp/searchProductPopupAction.do?do=prepare&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
+function setProductMainValue(code,desc,types){
+	var form = document.orderForm;
+	//alert(form);
+	if("from" == types){
+		form.pensItemFrom.value = code;
+	}else{
+		form.pensItemTo.value = code;
+	}
+} 
+function openPopupGroup(path,selectOne){
+	var form = document.orderForm;
+	var storeType ="";
+	if("020058"==form.custGroup.value){
+		storeType ='tops';
+	}
+    var param = "&selectOne="+selectOne+"&storeType="+storeType;
+	url = path + "/jsp/searchGroupPopupAction.do?do=prepare&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
+function setGroupMainValue(code,desc,types){
+	var form = document.orderForm;
+	form.groupCode.value = code;
+}
 </script>
 </head>
-
-				
+	
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
@@ -315,9 +329,30 @@ function resetStore(){
 								    วันที่ Order <font color="red">*</font>
 								 </td>
 								 <td>
-								  <html:text property="order.salesDateFrom" styleId="salesDateFrom" size="20" />
+								  <html:text property="order.salesDateFrom" styleId="salesDateFrom" size="20" readonly="true"/>
 								 - 
-								  <html:text property="order.salesDateTo" styleId="salesDateTo" size="20" />
+								  <html:text property="order.salesDateTo" styleId="salesDateTo" size="20" readonly="true" />
+								</td>
+							</tr>
+							<tr>
+								 <td align="right">
+								    Pens Item From
+								 </td>
+								 <td>
+								  <html:text property="order.pensItemFrom" styleId="pensItemFrom" styleClass="\" autoComplete=\"off"/>
+							      <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>   
+								 - 
+								  &nbsp;&nbsp; <html:text property="order.pensItemTo" styleId="pensItemTo" styleClass="\" autoComplete=\"off"/>
+							      <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
+								</td>
+							</tr>
+							<tr>
+								 <td align="right">
+								   Group Code
+								 </td>
+								 <td>
+								    <html:text property="order.groupCode" styleId="groupCode" styleClass="\" autoComplete=\"off"/>
+								    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}','selectOne')"/>
 								</td>
 							</tr>
 							<tr>
@@ -325,10 +360,10 @@ function resetStore(){
 								   Invoice No<font color="red"></font>
 								</td>
 								<td >
-								  <html:text property="order.invoiceNo" styleId="invoiceNo" size="20" />
+								  <html:text property="order.invoiceNo" styleId="invoiceNo" size="20" styleClass="\" autoComplete=\"off"/>
 								 &nbsp;&nbsp; 
 								 Order lot no 
-								  <html:text property="order.orderLotNo" styleId="orderLotNo" size="20" />
+								  <html:text property="order.orderLotNo" styleId="orderLotNo" size="20" styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>
 					   </table>

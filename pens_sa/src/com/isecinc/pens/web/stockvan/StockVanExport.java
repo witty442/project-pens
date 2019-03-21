@@ -22,15 +22,20 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
    String td_number = "td_number";
    String td_number_bold = "td_number_bold";
    try{
+	   /** Case Export to Excel **/
 	   if("EXCEL".equalsIgnoreCase(typeExport)){
 		   out.append(ExcelHeader.EXCEL_HEADER);//excel style
 		   
 		   td_text_center = "text";
 		   td_text = "text";
-		   td_number = "num_currency";
-		   td_number_bold = "num_currency_bold";
+		   td_number = "currency";
+		   td_number_bold = "currency_bold";
 	   }
+	   String dispType = Utils.isNull(stockVanForm.getBean().getDispType());
 	   boolean dispHaveQty = !Utils.isNull(stockVanForm.getBean().getDispHaveQty()).equals("")?true:false;
+	   boolean dispPlan = !Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")?true:false;
+	   boolean dispPrice = !Utils.isNull(stockVanForm.getBean().getDispPrice()).equals("")?true:false;
+	   
 	   if(stockVanForm.getResultsSearch() != null && stockVanForm.getResultsSearch().size()>0){
 	   	
 	   /** For summary column **/
@@ -48,15 +53,17 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   int column_2 = 10;
 	   int width = 5;
 	   int totalColumn = columnList.size();
-	   if( !Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){
-	   	totalColumn  =totalColumn*2;//display column plan 
+	   if( dispPlan==true ){
+	   	    totalColumn  =totalColumn*2;//display column plan 
 	   }
-
+	   if( dispPlan==true && dispPrice==true  ){
+		   	totalColumn  =totalColumn*4;//display column plan 
+	   }
 	   //85% remain to calc
 	   if(85%totalColumn==0){
-	   	width = 85/totalColumn;
+	   	    width = 85/totalColumn;
 	   }else{
-	   	width = 85/totalColumn;
+	     	width = 85/totalColumn;
 	   }
 	   if(totalColumn >8){
 	       if(width>5){
@@ -65,217 +72,522 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	       	width = 5;
 	       }
 	   }else{
-	   	tableWidth = 65;
-	   	column_1 = 5;
-	   	column_2 = 10;
-	   	width = 5;
+	   	  tableWidth = 65;
+	   	  column_1 = 5;
+	   	  column_2 = 10;
+	   	  width = 5;
 	   }
 
 	   /***********************Validate Sum Qty Column,Row <>0***********************************/
 	   List<StockVanBean> resultList = stockVanForm.getResultsSearch();
-	   for(int n=0;n<resultList.size();n++){
-	   	StockVanBean rowItem = (StockVanBean)resultList.get(n);
-	      //for by column
-	      if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
-	          	for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
-	          		StockVanBean columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
-	          		
-	          		//1 Row by pd  ,column product
-	          		if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")){
-	          			//no display plan
-	          			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	                         //Summary by column (product_code)
-	                         if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
-	                         	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
-	                         	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                         	 //logger.debug("sumPdQty:"+sumPdQty);
-	                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                         	
-	                         	 //add to summary Map
-	                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
-	                         }else{
-	                         	 sumBean = new StockVanBean();
-	                         	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                         	// logger.debug("sumPdQty:"+sumPdQty);
-	                         	 //add to summary Map
-	                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
-	                         }
-	          			}else{
-	          				 //Summary by column (product_code)
-	                        if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
-	                          	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
-	                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
-	                          	 //add to summary Map
-	                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);	
-	                         }else{
-	                          	 sumBean = new StockVanBean();
-	                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
-	                          	
-	                          	 //add to summary Map
-	                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);            
-	                         }//if
-	          			}//if
-	          		}else{
-	          			// Row by product  ,column pd
-	          			//no display plan
-	          			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	          				//Summary by column (pd_code)
-	                          if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
-	                          	sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
-	                          	double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	
-	                          	//add to summary Map
-	                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
-	                          }else{
-	                          	sumBean = new StockVanBean();
-	                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	
-	                          	//add to summary Map
-	                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
-	                          }
-	          			}else{	
-	          				//Summary by column (product_code)
-	                          if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
-	                          	 sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
-	                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
-	                          	
-	                          	 //add to summary Map
-	                          	 summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
-	                          }else{
-	                          	 sumBean = new StockVanBean();
-	                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
-	                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
-	                          	
-	                          	 //add to summary Map
-	                          	 summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
-	                          }//if
-	          			}//fi
-	          		}//if
-	            }//for 2
-	        }//if    		 
-	   }//for row
-
+	   /************* Summary by Column *********************************************************/
+	   if(true){
+		   for(int n=0;n<resultList.size();n++){
+		   	  StockVanBean rowItem = (StockVanBean)resultList.get(n);
+		      //for by column
+		      if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
+		          	for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
+		          		StockVanBean columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
+		          		
+		          		//1 Row by pd  ,column product
+		          		if( dispType.equals("1")){
+		          		    // 1.1) no plan,no price test=pass
+		          			if(dispPlan==false && dispPrice==false){
+		          			    //Summary by column (product_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
+		                         	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
+		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                         	 //logger.debug("sumPdQty:"+sumPdQty);
+		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                         	 //add to summary Map
+		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
+		                         }else{
+		                         	 sumBean = new StockVanBean();
+		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                         	 
+		                         	 // logger.debug("sumPdQty:"+sumPdQty);
+		                         	 //add to summary Map
+		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
+		                         }
+		          			// 1.2) display plan,no price test=pass
+		          			}else if( dispPlan==true && dispPrice==false){ 
+		          				//Summary by column (product_code)
+		                        if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
+		                          	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
+		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	
+		                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	 //add to summary Map
+		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);	
+		                         }else{
+		                          	 sumBean = new StockVanBean();
+		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                        	 
+		                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	
+		                          	 //add to summary Map
+		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);            
+		                         }//if
+		          			// 1.3) no plan ,display price  test=
+		          			}else if(dispPlan==false && dispPrice==true){ 
+		          			    //Summary by column (product_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
+		                         	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
+		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                         	 double sumPdPrice = Utils.convertStrToDouble2Digit(sumBean.getPdPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                         	 //logger.debug("sumPdQty:"+sumPdQty);
+		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                         	 sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                         	
+		                         	 //add to summary Map
+		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
+		                         }else{
+		                         	 sumBean = new StockVanBean();
+		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                         	 double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                         	 sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                         	 
+		                         	 // logger.debug("sumPdQty:"+sumPdQty);
+		                         	 //add to summary Map
+		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
+		                         }
+		          			// 1.4) display plan ,display price  test=
+		          			}else if( dispPlan==true && dispPrice==true){
+		          			   //Summary by column (product_code)
+		                        if(summaryByColumnMap.get(columnDataBean.getProductCode()) != null){
+		                          	 sumBean = summaryByColumnMap.get(columnDataBean.getProductCode());
+		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	 double sumPdPrice = Utils.convertStrToDouble2Digit(sumBean.getPdPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	 double sumPdIntPrice = Utils.convertStrToDouble2Digit(sumBean.getPdIntPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		                          	
+		                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	 sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	 sumBean.setPdIntPrice(String.valueOf(sumPdIntPrice));//add summary
+		                          	 //add to summary Map
+		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);	
+		                         }else{
+		                          	 sumBean = new StockVanBean();
+		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	 double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	 double sumPdIntPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		                        	 
+		                          	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	 sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	 sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	 sumBean.setPdIntPrice(String.valueOf(sumPdIntPrice));//add summary
+		                          	
+		                          	 //add to summary Map
+		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);            
+		                         }//if
+		          			}
+		          		}else{
+		          			//2). Row by product  ,column pd
+		          		    // 2.1) no plan,no price test=pass
+		          			if(dispPlan==false && dispPrice==false){
+		          			     //Summary by column (pd_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
+		                          	sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }else{
+		                          	sumBean = new StockVanBean();
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }
+		          			// 2.2) display plan,no price test=pass
+		          			}else if( dispPlan==true && dispPrice==false){ 
+		          			    //Summary by column (pd_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
+		                          	sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                        	double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }else{
+		                          	sumBean = new StockVanBean();
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }
+		          			// 2.3) no plan ,display price  test=
+		          			 }else if(dispPlan==false && dispPrice==true){ 
+		          				//Summary by column (pd_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
+		                          	sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                        	double sumPdPrice = Utils.convertStrToDouble2Digit(sumBean.getPdPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }else{
+		                          	sumBean = new StockVanBean();
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }
+		          			// 2.4) display plan ,display price  test=
+		          			}else if( dispPlan==true && dispPrice==true){
+		          			    //Summary by column (pd_code)
+		                         if(summaryByColumnMap.get(columnDataBean.getPdCode()) != null){
+		                          	sumBean = summaryByColumnMap.get(columnDataBean.getPdCode());
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(sumBean.getPdQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                        	double sumPdPrice = Utils.convertStrToDouble2Digit(sumBean.getPdPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                        	double sumPdIntQty = Utils.convertStrToDouble2Digit(sumBean.getPdIntQty())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                        	double sumPdIntPrice = Utils.convertStrToDouble2Digit(sumBean.getPdIntPrice())+Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	sumBean.setPdIntPrice(String.valueOf(sumPdIntPrice));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }else{
+		                          	sumBean = new StockVanBean();
+		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		                          	double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		                          	double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		                          	double sumPdIntPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
+		                          	sumBean.setPdPrice(String.valueOf(sumPdPrice));//add summary
+		                          	sumBean.setPdIntQty(String.valueOf(sumPdIntQty));//add summary
+		                          	sumBean.setPdIntPrice(String.valueOf(sumPdIntPrice));//add summary
+		                          	//add to summary Map
+		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
+		                         }
+		          			}//if 
+		          		}//if
+		            }//for 2
+		        }//if    		 
+		   }//for row
+	   }
 	   /*********************** Head Table ******************************************************/
-	     headTableHtml.append("<table id='tblProduct' align='center' border='1' width='"+tableWidth+"%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'>");
-	     headTableHtml.append("<tr> ");
+	     headTableHtml.append("<table id='tblProduct' align='center' border='1' width='"+tableWidth+"%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+	     headTableHtml.append("<tr> \n");
 	          if(columnList != null && columnList.size()>0){ 
 	           //1 row by pd ,column by product
-	           if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")){	
-	   			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	   				headTableHtml.append("<th>PD/ﾋｹ霽ﾂﾃｶ</th>");
-	   				headTableHtml.append("<th>ｪﾗ靉 PD</th>");
-	   			    
-	   				//<!-- no display plan -->
+	           if(dispType.equals("1")){	
+	        	 //  1.1)no display plan ,price
+	   			 if( dispPlan==false && dispPrice==false){ 
+	   				headTableHtml.append("<th>PD/ﾋｹ霽ﾂﾃｶ</th> \n");
+	   				headTableHtml.append("<th>ｪﾗ靉 PD</th>\n");
+	   				
              	    for(int k=0;k<columnList.size();k++){
                       StockVanBean s = (StockVanBean)columnList.get(k);
                       //check qty <> 0 to show
                       if(dispHaveQty){
                          if(Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty())  != 0){
-                            headTableHtml.append("<th>"+s.getProductCode()+"</th>");
+                            headTableHtml.append("<th>"+s.getProductCode()+"</th> \n");
                          }
                       }else{
-                    	 headTableHtml.append("<th>"+s.getProductCode()+"</th>");
+                    	 headTableHtml.append("<th>"+s.getProductCode()+"</th> \n");
                       }
                    }//for 
-	   			}else{ 
-	   				headTableHtml.append("<th rowspan='2'>PD/ﾋｹ霽ﾂﾃｶ</th>");
-	   				headTableHtml.append("<th rowspan='2'>ｪﾗ靉 PD</th>");
-	   			    
-	   			   // <!-- display plan -->
-	   			     for(int k=0;k<columnList.size();k++){
+	   			   // 1.2)display plan ,no price
+	   			  }else if( dispPlan==true && dispPrice==false){ 
+	   				  headTableHtml.append("<th rowspan='2'>PD/ﾋｹ霽ﾂﾃｶ</th> \n");
+	   				  headTableHtml.append("<th rowspan='2'>ｪﾗ靉 PD</th> \n");
+	   			      for(int k=0;k<columnList.size();k++){
                           StockVanBean s = (StockVanBean)columnList.get(k);
                           //check qty <> 0 to show
                           if(dispHaveQty){
 	                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
 	                       	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
 	                               
-	                       	   headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th>");
+	                       	   headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th> \n");
 	                          }
                           }else{
-                        	  headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th>");
+                        	  headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th> \n");
                           }
-                       }//for 
-	   			} 
+                        }//for 
+	   			    //  1.3).no plan ,display price   
+	   				}else if( dispPlan ==false && dispPrice==true){ 
+	   					  headTableHtml.append("<th rowspan='2'>PD/ﾋｹ霽ﾂﾃｶ</th> \n");
+		   				  headTableHtml.append("<th rowspan='2'>ｪﾗ靉 PD</th> \n");
+		   			      for(int k=0;k<columnList.size();k++){
+	                          StockVanBean s = (StockVanBean)columnList.get(k);
+	                          //check qty <> 0 to show
+	                          if(dispHaveQty){
+		                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+		                       	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+		                               
+		                       	   headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th> \n");
+		                          }
+	                          }else{
+	                        	  headTableHtml.append("<th colspan='2'>"+s.getProductCode()+"</th> \n");
+	                          }
+	                        }//for 
+	   				//  1.4).Display plan ,display price 
+	   				}else if( dispPlan==true && dispPrice==true){ 
+		   				  headTableHtml.append("<th rowspan='3'>PD/ﾋｹ霽ﾂﾃｶ</th> \n");
+		   				  headTableHtml.append("<th rowspan='3'>ｪﾗ靉 PD</th> \n");
+		   			      for(int k=0;k<columnList.size();k++){
+	                         StockVanBean s = (StockVanBean)columnList.get(k);
+	                         //check qty <> 0 to show
+	                         if(dispHaveQty){
+		                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+		                       	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+		                               
+		                       	   headTableHtml.append("<th colspan='4'>"+s.getProductCode()+"</th> \n");
+		                          }
+	                         }else{
+	                       	     headTableHtml.append("<th colspan='4'>"+s.getProductCode()+"</th> \n");
+	                         }
+	                      }//for 
+	   				} 
 	   		}else{ 
-	   			//2 row by product,column by pd
-	   		   headTableHtml.append("<th>ﾃﾋﾑﾊﾊﾔｹ､鰓</th>");
-	   		   headTableHtml.append("<th>ｪﾗ靉ﾊﾔｹ､鰓</th>");
-	   			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	   				//<!-- no display plan -->
-             	    for(int k=0;k<columnList.size();k++){
-                      StockVanBean s = (StockVanBean)columnList.get(k);
-                      //check qty <> 0 to show
-                      if(dispHaveQty){
-	                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty())  != 0){
-	                         headTableHtml.append("<th>"+s.getPdCode()+"</th>");
-	                      }
-                      }else{
-                    	  headTableHtml.append("<th>"+s.getPdCode()+"</th>");
-                      }
-                   }//for 
-	   			}else{
-	   			    //<!--  display plan -->
-	   				for(int k=0;k<columnList.size();k++){
-                      StockVanBean s = (StockVanBean)columnList.get(k);
-                      //check qty <> 0 to show
-                      if(dispHaveQty){
-	                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
-	                   	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
-	                         headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+	   		   //Case 2 row by product,column by pd
+		   		// 2.1) no plan,no price test=pass
+		   		if(dispPlan==false && dispPrice==false){
+		   			 headTableHtml.append("<th>ﾃﾋﾑﾊﾊﾔｹ､鰓</th> \n");
+		   		     headTableHtml.append("<th>ｪﾗ靉ﾊﾔｹ､鰓</th> \n");
+			   		 for(int k=0;k<columnList.size();k++){
+	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     //check qty <> 0 to show
+	                     if(dispHaveQty){
+		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty())  != 0){
+		                         headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+		                      }
+	                     }else{
+	                   	     headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+	                     }
+	                  }//for 
+		   		// 2.2) display plan,no price test=pass
+		   		}else if( dispPlan==true && dispPrice==false){ 
+		   			 headTableHtml.append("<th>ﾃﾋﾑﾊﾊﾔｹ､鰓</th> \n");
+		   		     headTableHtml.append("<th>ｪﾗ靉ﾊﾔｹ､鰓</th> \n");
+		   			 for(int k=0;k<columnList.size();k++){
+	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     //check qty <> 0 to show
+	                     if(dispHaveQty){
+	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
+	      	                   	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
+	                    		  headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+	 	                          headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ﾃﾐﾋﾇ靨ｧｷﾒｧ</th>");
+		                      }
+	                     }else{
+	                    	 headTableHtml.append("<th>"+s.getPdCode()+"</th>");
 	                         headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ﾃﾐﾋﾇ靨ｧｷﾒｧ</th>");
-	                      }
-                      }else{
-                    	  headTableHtml.append("<th>"+s.getPdCode()+"</th>");
-	                      headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ﾃﾐﾋﾇ靨ｧｷﾒｧ</th>");
-                      }
-                   }//for 
-	   			} 
+	                     }
+	                  }//for 
+		   		// 2.3) no plan ,display price  test=
+		   		}else if(dispPlan==false && dispPrice==true){ 
+		   			 headTableHtml.append("<th rowspan='2'>ﾃﾋﾑﾊﾊﾔｹ､鰓</th> \n");
+		   		     headTableHtml.append("<th rowspan='2'>ｪﾗ靉ﾊﾔｹ､鰓</th> \n");
+			   		 for(int k=0;k<columnList.size();k++){
+	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     //check qty <> 0 to show
+	                     if(dispHaveQty){
+	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0 ){
+	                    		  headTableHtml.append("<th colspan='2'>"+s.getPdCode()+"</th>");
+		                      }
+	                     }else{
+	                    	 headTableHtml.append("<th colspan='2'>"+s.getPdCode()+"</th>");
+	                     }
+	                  }//for 
+		   		// 2.4) display plan ,display price  test=
+		   		}else if( dispPlan==true && dispPrice==true){
+		   			 headTableHtml.append("<th rowspan='3'>ﾃﾋﾑﾊﾊﾔｹ､鰓</th> \n");
+		   		     headTableHtml.append("<th rowspan='3'>ｪﾗ靉ﾊﾔｹ､鰓</th> \n");
+		   		 	 for(int k=0;k<columnList.size();k++){
+	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     //check qty <> 0 to show
+	                     if(dispHaveQty){
+	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0 
+	                    	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
+	                    		  headTableHtml.append("<th colspan='4'>"+s.getPdCode()+"</th>");
+		                      }
+	                     }else{
+	                    	 headTableHtml.append("<th colspan='4'>"+s.getPdCode()+"</th>");
+	                     }
+	                  }//for 
+		   		}//if
 	   		}//if 2 
-	          }//if 1
+	      }//if 1
 	     
-	     out.append("</tr>");
-	   	   
+	     headTableHtml.append("</tr>");
+	   	/**** Show Row ,colspan  head Table *******************************************************/   
 	    //Case 1,and display plan  
-	    if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")
-	   	  && !Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("") ){
-	   	   headTableHtml.append("<tr>");
-	   	  for(int k=0;k<columnList.size();k++){
-              StockVanBean s = (StockVanBean)columnList.get(k);
-              if(dispHaveQty){
-                  if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
-               	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
-			           headTableHtml.append("<th>羯 PD</th>");
-			           headTableHtml.append("<th>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th>");
-                  }
-              }else{
-            	  headTableHtml.append("<th>羯 PD</th>");
-		          headTableHtml.append("<th>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th>");
-              }
-	   	  }//for
-	   	  headTableHtml.append("</tr>");
-	    } 
+	    if(dispType.equals("1")){
+	    	 //  1.1)no display plan ,price
+   			if( dispPlan==false && dispPrice==false){ 
+
+	    	//  1.2) display plan ,no price 
+   			}else if( dispPlan==true && dispPrice==false){ 
+		   	      headTableHtml.append("<tr>");
+		   	      for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+				           headTableHtml.append("<th>羯 PD</th> \n");
+				           headTableHtml.append("<th>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	                   }
+	                }else{
+	            	  headTableHtml.append("<th>羯 PD</th> \n");
+			          headTableHtml.append("<th>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n"); 
+		   // 1.3).no plan ,display price   test =
+		   }else if( dispPlan==false && dispPrice==true){ 
+			     headTableHtml.append("<tr>");
+		   	     for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	                   }
+	                }else{
+	            	  headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			          headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+		   // 1.4).Display plan ,display price 
+		   }else if( dispPlan==true && dispPrice==true){ 
+			     //***** Row head 2 *************************************************/
+			      headTableHtml.append("<tr>");
+		   	      for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+				           headTableHtml.append("<th colspan='2'>羯 PD</th> \n");
+				           headTableHtml.append("<th colspan='2'>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	                   }
+	                }else{
+	            	   headTableHtml.append("<th colspan='2'>羯 PD</th> \n");
+			           headTableHtml.append("<th colspan='2'>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+		   	     //***** Row head 3 *************************************************/
+			   	 headTableHtml.append("<tr>");
+		   	     for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	                   }
+	                }else{
+	            	   headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+			           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+	       }//if
+	    }else{
+	    	//Case 2,row product ,pd column
+	    	// 2.1) no plan,no price test=pass
+	    	if(dispPlan==false && dispPrice==false){
+
+	    	// 2.2) display plan,no price test=pass
+	    	}else if( dispPlan==true && dispPrice==false){ 
+
+	    	// 2.3) no plan ,display price  test=
+	    	}else if(dispPlan==false && dispPrice==true){ 
+	    		  headTableHtml.append("<tr>");
+	    		  logger.debug("Case 2.3 columnSize:"+columnList.size());
+		   	      for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
+	                	   logger.debug("add -->:dispHaveQty");
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	                   }
+	                }else{
+	                	 logger.debug("add -->:");
+	            	  headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			          headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+	    	// 2.4) display plan ,display price  test=
+	    	}else if( dispPlan==true && dispPrice==true){
+	    		 //***** Row head 2 *************************************************/
+			     headTableHtml.append("<tr>");
+		   	      for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
+	                	   logger.debug("add row2 dispHaveQty");
+				           headTableHtml.append("<th colspan='2'>羯 PD</th> \n");
+				           headTableHtml.append("<th colspan='2'>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	                   }
+	                }else{
+	                	  logger.debug("add row2");
+	            	   headTableHtml.append("<th colspan='2'>羯 PD</th> \n");
+			           headTableHtml.append("<th colspan='2'>ﾃﾐﾋﾇ靨ｧｷﾒｧ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+		   	     //***** Row head 3 *************************************************/
+			   	 headTableHtml.append("<tr>");
+		   	     for(int k=0;k<columnList.size();k++){
+	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                if(dispHaveQty){
+	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
+	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
+	                	   logger.debug("add dispHaveQty");
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+				           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+				           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	                   }
+	                }else{
+	                   logger.debug("add ");
+	            	   headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+			           headTableHtml.append("<th>ﾊｵ�ﾍ｡</th> \n");
+			           headTableHtml.append("<th>ﾂﾍｴ爰ﾔｹ</th> \n");
+	               }
+		   	     }//for
+		   	     headTableHtml.append("</tr> \n");
+	    	}//if
+	    }//if
 	    out.append(headTableHtml.toString());
 	    /*********************** Head Table ******************************************************/
 	      
 	     /********************* Row Detail *******************************************************/
 	   	String tabclass ="";
+	   	StockVanBean rowItem = null;
+	   	StockVanBean columnDataBean = null;
 	   	for(int n=0;n<resultList.size();n++){
 	   		rowTableHtml = new StringBuffer("");
-	   		StockVanBean rowItem = (StockVanBean)resultList.get(n);
+	   		rowItem = (StockVanBean)resultList.get(n);
 	   		if(n%2==0){ 
 	   			tabclass="lineO";
 	   		}else{
@@ -283,176 +595,323 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   		}
 	   	
 	   		rowTableHtml.append("<tr class="+tabclass+">");
-	   		 	//1 Row by pd  ,column product
-	   		    if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")){
-	   		       rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getPdCode()+"</td>");
-	   		       rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getPdDesc()+"</td>");
+	   		 	//1) Row by pd  ,column product
+	   		    if(dispType.equals("1")){
+	   		       rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getPdCode()+"</td> \n");
+	   		       rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getPdDesc()+"</td> \n");
 	   			}else{ 
-	   			   //<!--  Row by product  ,column pd--> 
-	   			   rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getProductCode()+"</td>");
-	   			   rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getProductName()+"</td>");
+	   			 //<!--2)  Row by product  ,column pd--> 
+	   			   rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getProductCode()+"</td> \n");
+	   			   rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getProductName()+"</td> \n");
 	   			} 
 	   			 //<!--  For By Column Select List-->
-	   		       // System.out.println("getRowColumnDataList Size:"+rowItem.getRowColumnDataList() .size());
-	   		      
 	   		        if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
 	   		        	for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
-	   		        		StockVanBean columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
+	   		        		columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
 	   		        		
-	   		        		//1 Row by pd  ,column product
-	   		        		if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")){
-	   		        			//no display plan
-	   		        			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
+	   		        		//1) Row by pd  ,column product
+	   		        		if(dispType.equals("1")){
+	   		        			// 1.1) no plan,no price test=pass
+	   		        			if(dispPlan==false && dispPrice==false){ 
 	   		        				//check qty <> 0 to show
 	   		        			    if(dispHaveQty){
 		   	                            if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdQty()) != 0){
-		   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
+		   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
 		   		        				   //for check all column in row qty <>0
 		   		                           totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		   	                             }
 	   		        			    }else{
-	   		        			    	rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
+	   		        			    	rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
 		   		        				//for check all column in row qty <>0
 		   		                        totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 	   		        			    }
-	   		        			}else{
-	   		        				// display plan
-	   		        				//check qty <> 0 to show
-	   		        				if(dispHaveQty){
-		                                  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdQty()) != 0
-		                       	          || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdIntQty()) != 0 ){
-		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
-		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdIntQty()+"</td>");
+		   	                      // 1.2) display plan,no price test=pass
+	   		        			  }else if( dispPlan==true && dispPrice==false){ 
+	   		        				   //check qty <> 0 to show
+		   		        				if(dispHaveQty){
+			                                  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdQty()) != 0
+			                       	          || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdIntQty()) != 0 ){
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td> \n");
+			   		        				
+			   		        				    //for check all column in row qty <>0
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+			                                  }
+		   		        				}else{
+		   		        					rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td> \n");
 		   		        				
 		   		        				    //for check all column in row qty <>0
 		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-		                                  }
-	   		        				}else{
-	   		        					rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
-	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdIntQty()+"</td>");
-	   		        				
-	   		        				    //for check all column in row qty <>0
-	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	   		        				}
-	   		        			}//if
+		   		        				}
+					              // 1.3) no plan ,display price  test=
+	   		   		        	  }else if(dispPlan==false && dispPrice==true){ 
+	   		   		        	      //check qty <> 0 to show
+		   		        				if(dispHaveQty){
+			                                  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdQty()) != 0
+			                       	          || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdIntQty()) != 0 ){
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td> \n");
+			   		        				
+			   		        				    //for check all column in row qty <>0
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+			                                  }
+		   		        				}else{
+		   		        					rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td> \n");
+		   		        				
+		   		        				    //for check all column in row qty <>0
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		   		        				}	
+						          // 1.4) Display plan ,display price  test=
+	   		   		        	  }else if( dispPlan==true && dispPrice==true){ 
+		   		        				if(dispHaveQty){ //check qty <> 0 to show
+			                                  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdQty()) != 0
+			                       	          || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getProductCode()).getPdIntQty()) != 0 ){
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td> \n");
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td> \n");
+			   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntPrice())+"</td> \n");
+			   		        				    
+			   		        				    //for check all column in row qty <>0
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+			   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+			                                  }
+		   		        				}else{
+		   		        					rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td> \n");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td> \n");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td> \n");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntPrice())+"</td> \n");
+		   		        				   
+		   		        				    //for check all column in row qty <>0
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		   		        				}		
+	   		   		        	  }//if
 	   		        		}else{
-	   		        			// Row by product  ,column pd
-	   		        			//no display plan
-	   		        			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	   		        				//check qty <> 0 to show
-	   		        				if(dispHaveQty){
+	   		        			// 2)Row by product  ,column pd
+	   		        		   // 2.1) no plan,no price test=pass
+	   		        			if(dispPlan==false && dispPrice==false){
+		   		        			if(dispHaveQty){//check qty <> 0 to show
 		   	                            if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdQty()) != 0){
-		   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
+		   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
 		   		        				   //for check all column in row qty <>0
 		   		                           totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		   	                            }
-	   		        				}else{
-	   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
+		   		        			}else{
+	   		        				   rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
 	   		        				   //for check all column in row qty <>0
 	   		                           totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	   		        				}
-	   		        			}else{
-	   		        				// display plan
-	   		        			   //check qty <> 0 to show
+		   		        			}
+	   		        			// 2.2) display plan,no price test=pass
+	   		        			}else if( dispPlan==true && dispPrice==false){ 
+	   		        				  if(dispHaveQty){
+		   		        				  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdQty()) != 0
+		                       	           || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdIntQty()) != 0 ){
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td>");
+		   		        				   
+		   		        				   //for check all column in row qty <>0
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		   		        				  }
+		   		        				}else{
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td>");
+		   		        				   
+		   		        				   //for check all column in row qty <>0
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		   		        				}
+	   		        			// 2.3) no plan ,display price  test=
+	   		        			}else if(dispPlan==false && dispPrice==true){ 
 	   		        				if(dispHaveQty){
-	   		        				  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdQty()) != 0
-	                       	           || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdIntQty()) != 0 ){
-	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
-	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdIntQty()+"</td>");
-	   		        				   
-	   		        				   //for check all column in row qty <>0
-	   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	   		        				  }
+		   		        				  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdQty()) != 0){
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td>");
+		   		        				   
+		   		        				   //for check all column in row qty <>0
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   		        				  }
+		   		        				}else{
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td>");
+		   		        				   
+		   		        				   //for check all column in row qty <>0
+		   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   		        				}
+	   		        			// 2.4) display plan ,display price  test=
+	   		        			}else if( dispPlan==true && dispPrice==true){
+	   		        				if(dispHaveQty){ //check qty <> 0 to show
+		                                  if( Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdQty()) != 0
+		                       	          || Utils.convertStrToDouble(summaryByColumnMap.get(columnDataBean.getPdCode()).getPdIntQty()) != 0 ){
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td>");
+		   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntPrice())+"</td>");
+		   		        				    
+		   		        				    //for check all column in row qty <>0
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+		   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+		                                  }
 	   		        				}else{
-	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdQty()+"</td>");
-	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+columnDataBean.getPdIntQty()+"</td>");
+	   		        					rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdQty())+"</td>");
+	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdPrice())+"</td>");
+	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntQty())+"</td>");
+	   		        				    rowTableHtml.append("<td class='"+td_number+"' width='"+width+"%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getPdIntPrice())+"</td>");
 	   		        				   
-	   		        				   //for check all column in row qty <>0
-	   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
-	   		                        	totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
-	   		        				}
-	   		        			}//fi
-	   		        		}//if
-	   		             }//for 2
-	   		           }//if  
+	   		        				    //for check all column in row qty <>0
+	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
+	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
+	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
+	   	                        	    totalRowQty +=Utils.convertStrToDouble2Digit(columnDataBean.getPdIntPrice());
+	   		        				}//if		
+ 		   		        	   }//if in case 2
+	   		        	 }//if case 2
+	   		        }//if
+	   		 }//for 2
 	   		         
-	   		       // <!--  For By Column List-->
-	   		       rowTableHtml.append("</tr>"); 
+	   		 // <!--  For By Column List-->
+	   		 rowTableHtml.append("</tr>"); 
 	   		          
 	   		// System.out.println("totalRowQty["+totalRowQty+"]");
 	   		 /**Show Row is sum Row Qty != 0 **/
-	   		 if(totalRowQty != 0){
-	   			 out.append(rowTableHtml.toString());
+	   		 if(dispHaveQty){
+		   		 if(totalRowQty != 0){
+		   			 out.append(rowTableHtml.toString());
+		   		 }
+	   		 }else{
+	   			out.append(rowTableHtml.toString()); 
 	   		 }
 	   		 totalRowQty=0;         		 
 	   	}//for row
 	   	
-	   	//<!-- ***** Summary ***** -->
+	  /**************** Summary ***************************************************************/
 	   	out.append("<tr class='row_hilight'>"); 
-	   	out.append("<td width='"+(column_1+column_2)+"%' colspan='2' align='right'>ﾂﾍｴﾃﾇﾁ</td>");
+	   	out.append("<td width='"+(column_1+column_2)+"%' colspan='2' align='right'>ﾂﾍｴﾃﾇﾁ</td> \n");
 	   	if(columnList != null && columnList.size() >0){
 	        for(int k=0;k<columnList.size();k++){
 	              StockVanBean s = (StockVanBean)columnList.get(k);
 	              //1 Row by pd  ,column product
-	          		if( Utils.isNull(stockVanForm.getBean().getDispType()).equals("1")){
-	          			//no display plan
-		          		 if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-		          		   sumBean = summaryByColumnMap.get(s.getProductCode());
-		          		   //check qty <> 0 to show
-		          		   if(dispHaveQty){
+	          		if(dispType.equals("1")){
+	          		   // 1.1) no plan,no price test=pass
+	          			if(dispPlan==false && dispPrice==false){
+	          			   sumBean = summaryByColumnMap.get(s.getProductCode());
+		          		   if(dispHaveQty){ //check qty <> 0 to show
 		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
-		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
+		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 		                      }
 		          		   }else{
-		          			 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>"); 
+		          			   logger.debug("producCode["+s.getProductCode()+"]sumBean.getPdQty():"+sumBean.getPdQty());
+		          			   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n"); 
 		          		   }
-		          		 
-	          			 }else{
-	          				//display plan
-	          				sumBean = summaryByColumnMap.get(s.getProductCode());
-	          			   //check qty <> 0 to show
-	          			   if(dispHaveQty){
-		                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
-		                       || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0){
-		          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-		          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td>");
-		                       }
-		                   }else{
-		                	   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-	          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td>");  
-		                   }
+	          			// 1.2) display plan,no price test=pass
+	          			}else if( dispPlan==true && dispPrice==false){ 
+	          			   sumBean = summaryByColumnMap.get(s.getProductCode());
+		          		   if(dispHaveQty){ //check qty <> 0 to show
+		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
+		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+		                      }
+		          		   }else{
+		          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n"); 
+		          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n"); 
+		          		   }
+	          			// 1.3) no plan ,display price  test=
+	          			 }else if(dispPlan==false && dispPrice==true){ 
+	          				   sumBean = summaryByColumnMap.get(s.getProductCode());
+			          		   if(dispHaveQty){ //check qty <> 0 to show
+			                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			                      }
+			          		   }else{
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n"); 
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n"); 
+			          		   }
+	          			// 1.4) Display plan ,display price  test=
+	          			}else if( dispPlan==true && dispPrice==true){
+	          				   sumBean = summaryByColumnMap.get(s.getProductCode());
+			          		   if(dispHaveQty){ //check qty <> 0 to show
+			                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
+			                    		|| Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0  ){
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			                      }
+			          		   }else{
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n"); 
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          		   }
 	          			}
 	          		}else{
-	          			// Row by product  ,column pd
-	          			// no display plan
-	          			if( Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")){ 
-	          				sumBean = summaryByColumnMap.get(s.getPdCode());
-	          			    //check qty <> 0 to show
-	          				if(dispHaveQty){
-	                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
-	          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-	                          }
-	          				}else{
-	          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-	          				}
-	          			}else{
-	          			   // display plan
-	          				sumBean = summaryByColumnMap.get(s.getPdCode());
-	          			   //check qty <> 0 to show
-	          			   if(dispHaveQty){
-		                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
-		                        || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0){
-		          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-		          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td>");
-		                       }
-	          			   }else{
-	          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td>");
-	          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td>");
-	          			   }
-	          			}//if
+	          			//2) Row by product  ,column pd
+	          		   // 2.1) no plan,no price test=pass
+	          			if(dispPlan==false && dispPrice==false){
+	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
+	          				 if(dispHaveQty){//check qty <> 0 to show
+	                           if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
+	          				      out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+	                           }
+	          				 }else{
+	          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+	          				 }
+	          			// 2.2) display plan,no price test=pass
+	          			}else if( dispPlan==true && dispPrice==false){ 
+	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
+	          				 if(dispHaveQty){
+			                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
+			                        || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0){
+			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+			                       }
+		          			  }else{
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          			  }
+	          			// 2.3) no plan ,display price  test=
+	          			}else if(dispPlan==false && dispPrice==true){ 
+	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
+	          				 if(dispHaveQty){
+			                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
+			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			                       }
+		          			  }else{
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+		          			  }
+	          			// 2.4) display plan ,display price  test=
+	          			}else if( dispPlan==true && dispPrice==true){
+	          				   sumBean = summaryByColumnMap.get(s.getPdCode());
+			          		   if(dispHaveQty){ //check qty <> 0 to show
+			                      if(   Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
+			                    	 || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0){
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			                      }
+			          		   }else{
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n"); 
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          			  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
+		          				  out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntPrice(),Utils.format_current_2_disgit)+"</td> \n");
+			          		   }
+	          			}
 	          		}//if
 	           }//for 
 	   	//<!-- ***** Summary ***** -->

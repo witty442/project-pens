@@ -37,7 +37,8 @@
 						<th >พนักงานขาย</th>
 						<th >รหัสค้า</th>
 						<th >ชื่อร้านค้า</th>
-						<th >เลขที่ Order ตั้งกอง</th>
+						<th >เลขที่ตั้งกอง</th>
+						<th >วันที่ทำรายการ</th>
 						<th> แบรนด์</th>
 						<th> รูปที่ 1</th>
 						<th> รูปที่ 2</th>
@@ -67,6 +68,9 @@
 							<td class="td_text" width="12%"> <%=item.getCustomerName() %></td>
 							<td class="td_text_center" width="9%">
 								 <%=item.getOrderNo() %>
+							</td>
+							<td class="td_text_center" width="5%">
+								 <%=item.getShowDate() %>
 							</td>
 							<td class="td_text" width="11%">
 								 <%=item.getBrand()+"-"+item.getBrandName()%>

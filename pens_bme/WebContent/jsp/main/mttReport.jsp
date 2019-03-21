@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
@@ -21,10 +22,12 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="mttForm" class="com.isecinc.pens.web.mtt.MTTForm" scope="session" />
 
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "mttForm");
+
 if(session.getAttribute("custGroupList") == null){
 	List<PopupForm> billTypeList = new ArrayList();
 	PopupForm ref = new PopupForm("",""); 
@@ -40,37 +43,16 @@ if(session.getAttribute("custGroupList") == null){
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <link href="${pageContext.request.contextPath}/css/extremecomponents.css" rel="stylesheet" type="text/css" />
-<style type="text/css">
-span.pagebanner{ 
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
 
-span.pagelinks{
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -90,12 +72,30 @@ function clearForm(path){
 
 function search(path){
 	var form = document.mttForm;
-	if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
-		&& $('#custGroup').val()=="" && $('#storeCode').val()==""
-	    && $('#groupCode').val()=="" && $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
-		alert("กรุณากรอก ข้อมูลค้นหาอย่างน้อย 1 รายการ");
-		return false;
-	}
+	 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
+			&& $('#custGroup').val()=="" && $('#storeCode').val()==""
+		    && $('#groupCode').val()=="" && $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
+			alert("กรุณากรอก ข้อมูลค้นหาอย่างน้อย 1 รายการ");
+			return false;
+		}else{
+			if($('#custGroup').val()!=""){
+				 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
+					&& $('#storeCode').val()==""&& $('#groupCode').val()=="" 
+					&& $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
+				alert("ท่านเลือกกล่มร้านค้า  กรุณาเลือกข้อมูลค้นหาเพิ่มอีกอย่างน้อย 1 รายการ เนื่องจากข้อมูลที่จะแสดงมีมากเกินไป");
+				return false;
+			   }//if
+			}//if
+		}
+		 //validate date from to in same month
+		 if( $('#saleDateFrom').val() !="" && $('#saleDateTo').val() !=""){
+			 if(!dateFromToInSameMonth($('#saleDateFrom').val(),$('#saleDateTo').val())){
+				 alert("กรุณาเลือกวันที่ ในช่วงเดือนเดียวกันเท่านั้น")
+				 $('#saleDateTo').focus();
+				 return false;
+			 }
+		 }
+		
 	form.action = path + "/jsp/mttAction.do?do=searchReport&action=newsearch";
 	form.submit();
 	return true;
@@ -257,9 +257,9 @@ function resetStore(){
 						       <tr>
                                     <td> Sale Date From</td>
 									<td>					
-									   <html:text property="bean.saleDateFrom" styleId="saleDateFrom" size="20"/>
+									   <html:text property="bean.saleDateFrom" styleId="saleDateFrom" size="20" readonly="true"/>
 									   Sale Date To   				
-									   <html:text property="bean.saleDateTo" styleId="saleDateTo" size="20"/>
+									   <html:text property="bean.saleDateTo" styleId="saleDateTo" size="20" readonly="true"/>
 									</td>
 								</tr>
 								<tr>
@@ -314,105 +314,9 @@ function resetStore(){
 								</tr>
 							</table>
 					  </div>
-               <jsp:include page="subreports/subMttReport.jsp" />
-   
-<%--             <c:if test="${mttForm.resultsSearch != null}">
-                  	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
-						       <tr>
-						       
-									<th >No</th>
-									<th >วันที่ขาย</th>
-									<th >วันที่ Scan</th>
-									<th >Doc No</th>
-									<th >กลุ่ม</th>
-									<th >รหัสกลุ่ม</th>
-									<th >รหัสร้านค้า</th>
-									<th >ชื่อร้านค้า</th>
-									<th >Barcode</th>
-									<th >Group Code</th>
-									<th >Material Master</th>
-									<th >Pens Item</th>
-									<th >จำนวนชิ้นที่ขาย</th>		
-									<th >ราคาปลีกก่อน Vat</th>	
-									<th >Remark</th>					
-							   </tr>
-							<c:forEach var="results" items="${mttForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-									<tr class="<c:out value='${tabclass}'/>">
-									
-										<td class="td_text_center" width="5%">${results.no}</td>
-										<td class="td_text_center" width="5%">${results.saleDate}
-										   <input type="hidden" name ="saleDate" id ="saleDate" value="${results.saleDate}" class="disableText" size="10">
-										</td>
-										<td class="td_text_center" width="5%">${results.createDate}</td>
-										<td class="td_text_center" width="7%">${results.docNo}
-										   <input type="hidden" name ="docNo" id ="docNo" value="${results.docNo}" class="disableText" size="15">
-										</td>
-										<td class="td_text_center" width="5%">${results.custGroup}
-										   <input type="hidden" name ="custGroup" id ="custGroup"  value="${results.custGroup}" class="disableText" size="20">
-										</td>
-										<td class="td_text_center" width="5%">${results.custGroupName}</td>
-										<td class="td_text_center" width="7%">${results.storeCode}
-										   <input type="hidden" name ="storeCode" id ="storeCode"  value="${results.storeCode}" class="disableText" size="15">
-										</td>
-										<td class="td_text" width="10%">${results.storeName}</td>
-										<td class="td_text_center" width="8%">${results.barcode}
-										   <input type="hidden" name ="barcode" id ="barcode"  value="${results.barcode}" class="disableText" size="15">
-										</td>
-										<td class="td_text_center" width="7%">${results.groupCode}
-										   <input type="hidden" name ="groupCode" id ="groupCode"  value="${results.groupCode}" class="disableText" size="10">
-										</td>
-										<td class="td_text"  width="8%">${results.materialMaster}
-										   <input type="hidden" name ="materialMaster" id ="materialMaster"  value="${results.materialMaster}" class="disableText" size="15">
-										</td>
-										<td class="td_text" width="8%">${results.pensItem}
-										   <input type="hidden" name ="pensItem" id ="pensItem"  value="${results.pensItem}" class="disableText" size="10">
-										</td>
-										<td class="td_text_right"  width="5%">
-										    ${results.qty}
-										</td>
-										<td class="td_number"  width="10%">
-										    ${results.retailPriceBF}
-										</td>
-										<td class="td_text"  width="5%">
-										    ${results.remark}
-										</td>
-									</tr>
-							  </c:forEach>
-							  
-							  <tr class="">
-							       <td class=""></td> 
-								   <td class=""></td> 
-								   <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							       <td class=""></td>
-							      
-								   <td class="hilight_text" align="right">
-									  <B> Total </B>
-									</td>
-									<td class="hilight_text" align="center">
-									 <B>  ${mttForm.bean.totalQty}</B>
-									</td>
-									<td class=""></td>
-									
-							</tr>
-					</table> --%>
-					
-				<%-- </c:if> --%>
+					  
+                    <jsp:include page="subreports/subMttReport.jsp" />
+  
 					<!-- ************************Result ***************************************************-->
 					
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>

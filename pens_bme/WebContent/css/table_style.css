@@ -64,7 +64,11 @@ TABLE.tableSearchNoWidth TD {
 	height: 30px;
 	font-weight: bold;
 }
-
+ .row_hilight{
+   background-color: #909090;
+   font-weight: bold; 
+ } 
+ 
 .td_text{
 	text-align: left;
 

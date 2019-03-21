@@ -270,6 +270,7 @@ public class TransferAction extends I_Action {
 		TransferBean item = null;
 		int i=0;
 		List<TransferBean> items = new ArrayList<TransferBean>();
+		String lineIdDelete = "";
 		Connection conn = null;
 		try {
 			logger.debug("save-->");
@@ -324,14 +325,17 @@ public class TransferAction extends I_Action {
 				   }
 				   
 				   items.add(item);
+				}else if (Utils.isNull(keyDatas[i]).equals("CANCEL")) {
+					lineIdDelete += lineId[i]+",";
 				}
 			}
 			m.setItems(items);
+			m.setLineIdDelete(lineIdDelete);
 			
 			mDAO.save(user,m);
 	
 			List<TransferBean> itemSearchList = mDAO.searchTransferList(conn,m,true,0,0);
-			if(itemSearchList != null){
+			if(itemSearchList != null && itemSearchList.size() >0){
 				m = itemSearchList.get(0);//for check action control
 			}
 			stockForm.setLines(itemSearchList);

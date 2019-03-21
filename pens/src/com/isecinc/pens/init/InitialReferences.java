@@ -57,6 +57,7 @@ public class InitialReferences extends I_Initial {
 	public static final String TRANSFER_BANK = "TransferBank";
 	public static final String ProdShowFileSize = "ProdShowFileSize";
 	public static final String TRANSFER_BANK_VAN = "TransferBankVAN";
+	public static final String BACKDATE_INVOICE_STOCKRETURN = "backDateInvStkReturn"; 
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 

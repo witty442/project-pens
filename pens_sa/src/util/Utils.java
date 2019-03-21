@@ -91,6 +91,8 @@ public class Utils {
 	public static double convertStrToDouble(String str){
 		if(isNull(str).equals("")){
 			return 0;
+		}else{
+			//logger.debug("doubleStr:"+str);
 		}
 		str = str.replaceAll(",", "");
 		return new Double(str).doubleValue();
@@ -306,6 +308,19 @@ public class Utils {
 		return str.trim();
 	}
 	
+	public static String isNullDoubleStrToZero(String doubleStr) {
+		if (doubleStr ==null || isNull(doubleStr).equals("")){
+			return "0.00";
+		}
+		return doubleStr;
+	}
+	public static String isNullDoubleStrToBlank(String doubleStr) {
+		if (doubleStr ==null || isNull(doubleStr).equals("")
+			|| isNull(doubleStr).equals("0") || isNull(doubleStr).equals("0.00")){
+			return "";
+		}
+		return doubleStr;
+	}
 	public static String isNull(Object str) {
 		if (str ==null){
 			return "";

@@ -14,6 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import util.DBConnection;
 import util.SIdUtils;
+import util.UserUtils;
 import util.Utils;
 
 import com.isecinc.pens.bean.User;
@@ -80,6 +81,11 @@ public class LoginAction extends DispatchAction {
 			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat
+			
+			/** Role MC_ENTRY redirect page to StockMCAction**/
+			/*if(UserUtils.userInRoleMCCheckForwardPage(user, new String[]{User.MC_ENTRY})){
+				forwordStr = "pass_mcentry";
+			}*/
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

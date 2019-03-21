@@ -25,11 +25,11 @@ public class BatchTaskForm extends I_Form {
 	 */
 	private static final long serialVersionUID = 4077513527723148160L;
 
-	private InterfaceBean bean =null;
-	private MonitorBean monitorBean = null;
+	private InterfaceBean bean =new InterfaceBean();
+	private MonitorBean monitorBean = new MonitorBean();
 	private List<MonitorItemBean> monitorItemList;
-	private MonitorItemBean monitorItem;
-	private BatchTaskInfo taskInfo;
+	private MonitorItemBean monitorItem = new MonitorItemBean();
+	private BatchTaskInfo taskInfo = new BatchTaskInfo();
 	private FormFile dataFormFile;
 	private MonitorBean[] results = null;
 	

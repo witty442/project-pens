@@ -2130,7 +2130,7 @@ public class SummaryExport {
 		return h;
 	}
 	
-	public StringBuffer genBigCHTML(HttpServletRequest request,SummaryForm form,User user){
+	public StringBuffer genBigCHTML(HttpServletRequest request,SummaryForm form,User user,String reportType){
 		StringBuffer h = new StringBuffer("");
 		String colSpan="34";
 		try{
@@ -2141,7 +2141,7 @@ public class SummaryExport {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลรายละเอียดขาย B'ME จาก BIGC</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลรายละเอียดขาย B'ME จาก BIGC "+reportType+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");

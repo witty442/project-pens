@@ -13,8 +13,8 @@ String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
 
 String totalPage = "";
 String currentPage = "";
-if(mttForm.getResultsSearch() != null){ 
-	 totalPage = String.valueOf(Utils.calcTotalPage(mttForm.getResultsSearch().size(),50));
+if(mttForm.getResults() != null){ 
+	 totalPage = String.valueOf(Utils.calcTotalPage(mttForm.getResults().size(),50));
 	 
 	String queryStr= request.getQueryString();
 	if(queryStr.indexOf("d-") != -1){
@@ -52,11 +52,11 @@ System.out.println("currentPage:"+currentPage);
 	}
 </style>
 </head>
-     <c:if test="${mttForm.resultsSearch != null}">
+     <c:if test="${mttForm.results != null}">
     							
 		<br/>
 		<div id ="scroll" >
-			<display:table style="width:100%;" id="item" name="sessionScope.mttForm.resultsSearch"
+			<display:table style="width:100%;" id="item" name="sessionScope.mttForm.results"
 			 defaultsort="0" defaultorder="descending" class="resultDisp"
 			 requestURI="#" sort="list" pagesize="50">	
 			 

@@ -42,8 +42,15 @@ public class TransferBean implements Serializable{
 	private boolean canEdit = false;
 	private String message = "";
 	private List<TransferBean> items;
+	private String lineIdDelete;
 	
 	
+	public String getLineIdDelete() {
+		return lineIdDelete;
+	}
+	public void setLineIdDelete(String lineIdDelete) {
+		this.lineIdDelete = lineIdDelete;
+	}
 	public String getNo() {
 		return no;
 	}

@@ -59,7 +59,7 @@ public class MMoveOrder {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
-			//Genearte MoveOrderNo
+			//Generate MoveOrderNo
 			String requestNumber  ="";
 			BigDecimal createdLong = Utils.getCurrentTimestampLong();
 			BigDecimal updatedLong = Utils.getCurrentTimestampLong();
