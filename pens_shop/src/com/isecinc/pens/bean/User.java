@@ -10,6 +10,7 @@ import java.util.List;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
+import com.isecinc.pens.model.MConfig;
 import com.jcraft.jsch.Logger;
 
 /**
@@ -71,6 +72,9 @@ public class User extends I_PO implements Serializable {
 		
 		// Add PD Paid for VAN Sales
 		setPdPaid(rst.getString("PD_PAID"));
+		
+		//Get C_config By User_id
+		setConfig(new MConfig().getConfig(getId()));
 	}
 
 	/**
@@ -193,6 +197,17 @@ public class User extends I_PO implements Serializable {
 	
 	/** PD_PAID for VAN Sales **/
 	private String pdPaid;
+
+	private ConfigBean config;
+	
+	
+	public ConfigBean getConfig() {
+		return config;
+	}
+
+	public void setConfig(ConfigBean config) {
+		this.config = config;
+	}
 
 	public String getPdPaid() {
 		return pdPaid;

@@ -1,6 +1,7 @@
 package com.isecinc.pens.report.salesanalyst.helper;
 
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -18,7 +19,52 @@ public class SAGenCondition {
 	
 	protected static  Logger logger = Logger.getLogger("PENS");
 	SAUtils reportU = new SAUtils();
-	
+	public static void main(String[] a){
+		try{
+			genWhereCondSQLCaseByYEAR("INVOICE","'2017','2015'");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	 public static String genWhereCondSQLCaseByYEAR(String typeColumn,String allYear){
+	    	String sql = "";
+	    	logger.debug("allYear:"+allYear);
+	    	if(allYear.indexOf(",") != -1){
+		    	String[] yearAllArr = allYear.split("\\,");
+		    	//sort year asc
+		    	if(yearAllArr.length >0){
+		    	  int[] yearAllArrInt = new int[yearAllArr.length-1];
+		          for(int i=0;i<yearAllArr.length-1;i++){
+		        	  yearAllArrInt[i] = Utils.convertStrToInt(yearAllArr[i].replaceAll("'", ""));
+		          }
+		          Arrays.sort(yearAllArrInt);
+		          
+		         /* for (int i = 0; i < yearAllArrInt.length; i++) {
+		        	   System.out.println(yearAllArrInt[i]);
+		        	 };
+		        	 */
+		        	 
+		        	if("INVOICE".equalsIgnoreCase(typeColumn)){
+		 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t AND INVOICE_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
+		 	    	}else{
+		 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t AND ORDERED_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
+		 	    	}
+		    	}
+	    	}else{
+	    		allYear = allYear.replaceAll("'", "");
+	    		if("INVOICE".equalsIgnoreCase(typeColumn)){
+	 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t AND INVOICE_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    	}else{
+	 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t AND ORDERED_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    	}
+	    	}
+	    	return sql;
+	   }
+	 
     public static String genGroupBySQL(String groupBy){
     	String groupBySQl = groupBy;
     	if("SUBBRAND".equalsIgnoreCase(groupBy)){
@@ -224,7 +270,10 @@ public class SAGenCondition {
 				
 			}else if("SUBBRAND".equalsIgnoreCase(condType)){
 				sql = "(select max(M.subbrand_desc) as desc_ from XXPENS_BI_MST_SUBBRAND M WHERE M.INVENTORY_ITEM_ID = S.INVENTORY_ITEM_ID )";	
-				
+			
+			}else if("SALES_ZONE".equalsIgnoreCase(condType)){
+				sql = "(select max(M.ZONE_NAME) as desc_ from XXPENS_BI_MST_SALES_ZONE M WHERE M.ZONE = S.SALES_ZONE )";	
+			
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "(select M.Invoice_Date as desc_ from XXPENS_BI_MST_INVOICE_DATE M WHERE M.INVOICE_DATE = S.INVOICE_DATE)";
 			
@@ -310,6 +359,9 @@ public class SAGenCondition {
 				
 			}else if("SUBBRAND".equalsIgnoreCase(condType)){
 				sql = "(select max(M.subbrand_no) as desc_ from XXPENS_BI_MST_SUBBRAND M WHERE M.INVENTORY_ITEM_ID = S.INVENTORY_ITEM_ID)";	
+			
+			}else if("SALES_ZONE".equalsIgnoreCase(condType)){
+				sql = "(select max(M.ZONE) as desc_ from XXPENS_BI_MST_SALES_ZONE M WHERE M.ZONE = S.SALES_ZONE )";	
 			
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "(select M.Invoice_Date as desc_ from XXPENS_BI_MST_INVOICE_DATE M WHERE M.INVOICE_DATE = S.INVOICE_DATE)";
@@ -408,7 +460,8 @@ public class SAGenCondition {
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				sql.append(""+" AND sales_order_year||sales_order_quarter = '"+colGroupName+"' \n");
 			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(""+" AND sales_order_year = '"+colGroupName+"' \n");
+				//sql.append(""+" AND sales_order_year = '"+colGroupName+"' \n");
+				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",colGroupName));
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo() , Utils.DD_MM_YYYY_WITH_SLASH);
 				sql.append(""+"AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
@@ -432,7 +485,8 @@ public class SAGenCondition {
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				sql.append(""+" AND invoice_year||invoice_quarter = '"+colGroupName+"' \n");
 			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(""+" AND invoice_year = '"+colGroupName+"' \n");
+				//sql.append(""+" AND invoice_year = '"+colGroupName+"' \n");
+				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",colGroupName));
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
 				sql.append(""+" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");

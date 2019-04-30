@@ -47,6 +47,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String expireDate;
 	private String requestDate;
 	//total
+	private String salesZone;
 	
 	//Control Access Button
 
@@ -65,6 +66,14 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     
     
     
+	public String getSalesZone() {
+		return salesZone;
+	}
+
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
+
 	public String getTypeSearch() {
 		return typeSearch;
 	}

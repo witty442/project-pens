@@ -62,7 +62,7 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 	public String getParam(){
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
 	}
-	public String getDecsription(){
+	public String getDescription(){
 		String desc = "ใช้ File นามสกุล .txt ที่ Load มาจาก EDI Web ใหม่ มาทำการ Upload <br/>";
 		       desc +="(เป็นข้อมูลใช้เช็คยอดขายรายวัน ไม่ได้นำไปใช้ออกรายงานสต๊อกใดๆ) <br/>";
 		return desc;

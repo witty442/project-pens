@@ -382,6 +382,9 @@
 			        <li>
 				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigCSP');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%>  <bean:message bundle="sysprop" key="SummaryBMEOnhandBigCSP"/></span></a>
 			        </li> 
+			         <li>
+				    <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandBigCOracle');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%>  <bean:message bundle="sysprop" key="SummaryBMEOnhandBigCAtOracle"/></span></a>
+			        </li>
 			   </ul>	    
 		    </li> 
 		
@@ -407,9 +410,9 @@
 				<a href="#" onclick="window.location='<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=diff_stock';"><span><bean:message bundle="sysprop" key="SummaryBMEDiffStock"/></span></a>
 			</li> --%>
 		
-			<%-- <li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAction.do?do=prepare&action=new');"><span>6.<bean:message bundle="sysprop" key="Report"/></span></a>
-			</li> --%>
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAction.do?do=prepare&action=new');"><span>TEMP.<bean:message bundle="sysprop" key="Report"/></span></a>
+			</li> 
 			 <li><a class="parent" ><span><%no++;out.print(no);%>.รายงาน Robinson</span></a>
 			 <%subNo=0; %>
 			    <ul>

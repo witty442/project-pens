@@ -7,12 +7,14 @@
 <%
 String salesChannelNo = Utils.isNull(request.getParameter("salesChannelNo"));
 String custCatNo = Utils.isNull(request.getParameter("custCatNo"));
+String salesZone = Utils.isNull(request.getParameter("salesZone"));
 System.out.println("salesChannelNo:"+salesChannelNo);
 System.out.println("custCatNo:"+custCatNo);
+System.out.println("salesZone:"+salesZone);
 List<PopupBean> dataList= null;
 try{
 	//if( !Utils.isNull(salesChannelNo).equals("")){
-		dataList = StockControlPage.searchSalesrepListAll(salesChannelNo,custCatNo);
+		dataList = StockControlPage.searchSalesrepListAll(salesChannelNo,custCatNo,salesZone); 
 	//}
 if(dataList != null){
 	if(dataList.size()>1){

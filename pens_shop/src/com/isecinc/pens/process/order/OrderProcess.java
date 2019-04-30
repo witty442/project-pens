@@ -196,6 +196,7 @@ public class OrderProcess {
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
 						line.setSellingPrice(odLine.getSellingPrice());
+						line.setModifierLineId(odLine.getModifierLineId());
 						
 						newLines.add(line);
 					}
@@ -223,6 +224,7 @@ public class OrderProcess {
 						line.setFullUom(odLine.getFullUom());
 						line.setTaxable(odLine.getTaxable());
 						line.setSellingPrice(odLine.getSellingPrice());
+						line.setModifierLineId(odLine.getModifierLineId());
 						
 						newLines.add(line);
 					}
@@ -281,6 +283,7 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 					line.setDiscount(chkLine.getDiscount());
 					line.setTotalAmount(chkLine.getTotalAmount());
 					line.setSellingPrice(chkLine.getSellingPrice());
+					line.setModifierLineId(chkLine.getModifierLineId());
 					
 					if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 						line.setVatAmount1(chkLine.getVatAmount());
@@ -366,6 +369,7 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 						line.setDiscount(chkLine.getDiscount() + newLinesList.get(prvIndex).getDiscount());
 						line.setTotalAmount(chkLine.getTotalAmount() + newLinesList.get(prvIndex).getTotalAmount());
 						line.setSellingPrice(chkLine.getSellingPrice() + newLinesList.get(prvIndex).getSellingPrice());
+						line.setModifierLineId(chkLine.getModifierLineId());
 						
 						// Set value to previous
 						line.setUom1(newLinesList.get(prvIndex).getUom1());
@@ -415,6 +419,7 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 						line.setDiscount(chkLine.getDiscount());
 						line.setTotalAmount(chkLine.getTotalAmount());
 						line.setSellingPrice(chkLine.getSellingPrice());
+						line.setModifierLineId(chkLine.getModifierLineId());
 						
 						if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 							line.setVatAmount1(chkLine.getVatAmount());

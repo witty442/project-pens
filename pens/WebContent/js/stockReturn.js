@@ -240,7 +240,7 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 			uom2[rowId-1].value = '';
 			uom1Pac[rowId-1].value = '';
 			uom2Pac[rowId-1].value = '';
-			uom1Price[rowId-1].value = '';
+			//uom1Price[rowId-1].value = '';
 			discount[rowId-1].value = '';
 			totalAmount[rowId-1].value = '';
 			uom1ConvRate[rowId-1].value = '';
@@ -316,7 +316,7 @@ function getProductModel(itemCodeObj,rowId){
 			uom2[rowId-1].value = '';
 			uom1Pac[rowId-1].value = '';
 			uom2Pac[rowId-1].value = '';
-			uom1Price[rowId-1].value = '';
+			//uom1Price[rowId-1].value = '';
 			discount[rowId-1].value = '';
 			totalAmount[rowId-1].value = '';
 			uom1ConvRate[rowId-1].value = '';
@@ -332,7 +332,7 @@ function getProductModel(itemCodeObj,rowId){
 			uom2[rowId-1].value = s[2];
 			uom1Pac[rowId-1].value = s[3];
 			uom2Pac[rowId-1].value = s[4];
-			uom1Price[rowId-1].value = s[5];
+			//uom1Price[rowId-1].value = s[5];
 			uom1ConvRate[rowId-1].value = s[6];
 			uom2ConvRate[rowId-1].value = s[7];
 		}
@@ -597,16 +597,19 @@ function openPopupInvoiceModel(path,index,userId){
 	}
 }
 
-function setInvoiceValue(code,priAllQty,priQty,subQty,index){
+function setInvoiceValue(code,priAllQty,priQty,subQty,uom1Price,index){
 	var arInvoiceNo = document.getElementsByName("arInvoiceNo")[index-1];
 	var remainPriAllQty = document.getElementsByName("remainPriAllQty")[index-1];
 	var remainPriQty = document.getElementsByName("remainPriQty")[index-1];
 	var remainSubQty = document.getElementsByName("remainSubQty")[index-1];
+	var uom1PriceObj = document.getElementsByName("uom1Price")[index-1];
+	
 	if(code != ''){
 	  arInvoiceNo.value = code;
 	  remainPriAllQty.value = priAllQty;
 	  remainPriQty.value = priQty;
 	  remainSubQty.value = subQty;
+	  uom1PriceObj.value = uom1Price;
 	  
 	  if(checkItemDuplicate(index)){
 		 arInvoiceNo.className ="errorTextInput";
@@ -615,6 +618,7 @@ function setInvoiceValue(code,priAllQty,priQty,subQty,index){
 		 remainPriAllQty.value = '';
 		 remainPriQty.value = '';
 		 remainSubQty.value = '';
+		 uom1PriceObj.value = '';
 	  }else{
 		  arInvoiceNo.className ="normalTextInput";
 	  }
@@ -623,6 +627,7 @@ function setInvoiceValue(code,priAllQty,priQty,subQty,index){
 	   remainPriAllQty.value = '';
 	   remainPriQty.value = '';
 	   remainSubQty.value = '';
+	   uom1PriceObj.value ='';
 	}
 } 
 function checkItemDuplicate(curRowIdChk){

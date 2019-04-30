@@ -24,7 +24,7 @@ public class CopyDB {
 			//String tableName ="PENSBME_MST_REFERENCE";
 			//String where =" where id =1";
 
-			//Copy From Production to Test
+			/*****************copy  product to test********************/
 			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE","");
 			
 		   // processProductionToUAT("pensbi","PENSBME_ONHAND_BME_LOCKED","");
@@ -38,8 +38,10 @@ public class CopyDB {
 			//processProductionToUAT("pensbi","pensbme_stock_issue_item"," where issue_req_no ='T61040029' ");
 			
 			//processProductionToUAT("pensbi","C_CONSTANTS ","");
+			//processProductionToUAT("pensbi","C_USER_INFO","");
+			//processProductionToUAT("pensbi","XXPENS_BI_MST_SALES_ZONE","");
 			
-			/***********************************************************************/
+			/*****************copy Test to product********************/
 			//copy Test to product
 			//processUATToProduction("pensbi","PENSBME_ONHAND_BME_LOCKED_FRI","");
 			//processUATToProductionUserApps("apps","XXPENS_OM_TRIP_TONGFA_BAK","");
@@ -180,6 +182,12 @@ public class CopyDB {
 						   values +="'"+replaceSingleQuote(Utils.isNull(rsSelect.getString(config.getField())))+"',";
 						}
 					}else if(config.getType().toLowerCase().startsWith(("date"))){
+						if(rsSelect.getDate(config.getField()) != null){
+						   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
+						}else{
+						   values += "NULL,";
+						}
+					}else if(config.getType().toLowerCase().startsWith(("timstamp"))){
 						if(rsSelect.getDate(config.getField()) != null){
 						   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 						}else{

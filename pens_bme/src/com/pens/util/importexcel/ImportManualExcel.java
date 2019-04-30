@@ -28,10 +28,13 @@ public class ImportManualExcel {
 	public static void main(String[] args) {
 		try{
 			
-			//importExcel("ORACLE","UAT","d://temp//ImportManualExcel/ข้อมูลตั้งต้น ของแต่ละห้าง.xlsx",7);
-			//importExcel("ORACLE","PRODUCTION","d://temp//ImportManualExcel/ข้อมูลตั้งต้น ของแต่ละห้าง.xlsx",7);
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/ข้อมูลตั้งต้น ของแต่ละห้าง.xlsx",7);
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ข้อมูลตั้งต้น ของแต่ละห้าง.xlsx",7);
 			
-			//importExcel("MYSQL","UAT","d://temp//ImportManualExcel/data_stock_return.xls",5);
+			//importExcel("MYSQL","UAT","d://dev_temp//temp//ImportManualExcel/data_stock_return.xls",5);
+		
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
+			importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

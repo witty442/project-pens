@@ -17,6 +17,8 @@
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="pickStockForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "pickStockForm");
 %>
 <html>
 <head>
@@ -74,8 +76,8 @@ function cancel(path){
 function confirmAction(path){
 	var form = document.pickStockForm;
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
-		/**Control Save Lock Screen **/
-		startControlSaveLockScreen();
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
 		
 		 form.action = path + "/jsp/pickStockAction.do?do=confirmAllBox";
 		 form.submit();
@@ -90,13 +92,12 @@ function cancelIssueAction(path){
 		/**Control Save Lock Screen **/
 		startControlSaveLockScreen();
 		
-		 form.action = path + "/jsp/pickStockAction.do?do=cancelIssueAllBoxAction";
-		 form.submit();
-		 return true;
+		form.action = path + "/jsp/pickStockAction.do?do=cancelIssueAllBoxAction";
+		form.submit();
+		return true;
 	}
 	return false;
 }
-
 function search(path){
 	var form = document.pickStockForm;
 	var transactionDate =$('#transactionDate').val();
@@ -327,6 +328,13 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
+
+function printStampBoxNoReport(path){
+	var form = document.pickStockForm;
+	form.action = path + "/jsp/pickStockAction.do?do=printStampBoxNoReport";
+	form.submit();
+	return true;
+}
 </script>
 
 </head>		
@@ -532,7 +540,10 @@ function resetStore(){
 											   <input type="button" value="    ยกเลิก     " disabled class="disablePosBtnLong"> 
 											<!--  </a>   -->
 										 </c:if>
-										 
+										   <a href="javascript:printStampBoxNoReport('${pageContext.request.contextPath}')">
+											  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
+											</a> 
+											
 										  <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">
 											 <a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 											   <input type="button" value="    Export     " class="newPosBtnLong"> 

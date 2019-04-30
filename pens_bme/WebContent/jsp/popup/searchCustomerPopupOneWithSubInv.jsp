@@ -9,32 +9,13 @@
 <%@taglib uri="/WEB-INF/displaytag-11.tld" prefix="display"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-
 <html>
 <head>
 <title></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
 <style type="text/css">
-input[type=checkbox]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
-
-input[type=radio]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
@@ -67,8 +48,10 @@ function selectOneRadio(){
 	for(var i=0;i<chRadio.length;i++){
         if(chRadio[i].checked){
         	//alert(i+":"+storeNo[i+1].value);
-        	<% if(methodName.equals("pickStockGroup")){ %>
+        	<% if(methodName.equals("pickStockGroup") ){ %>
         	   window.opener.setStoreMainValuePickStockGroup(code[i].value,desc[i].value,storeNo[i].value,subInv[i].value ,types);
+        	<%} else if(methodName.equals("onhandBigCOracle") ){ %>
+         	   window.opener.setStoreMainValueOnhandBigCOracle(code[i].value,desc[i].value,subInv[i].value ,types);
         	<%}else{ %>
                window.opener.setStoreMainValue(code[i].value,desc[i].value,storeNo[i].value,subInv[i].value ,types);
             <%}%>
@@ -101,6 +84,12 @@ function selectOneRadio(){
 		<td width="20%" ><b>รายละเอียด</b></td>
 		<td width="90%" ><html:text property="descSearch"  size="60" style="height:20px"/></td>
 	</tr>
+	<%if(methodName.equals("onhandBigCOracle") ){ %>
+		<tr height="21px" class="txt1">
+		<td width="20%" ><b>Sub Inv</b></td>
+		<td width="90%" ><html:text property="subInvSearch"  size="10" style="height:20px"/></td>
+	</tr>
+	<%} %>
 </table>
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >

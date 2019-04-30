@@ -480,6 +480,12 @@ public class LocationDAO {
 			sql.append("\n"+blank+"   and cs.amphur = '"+district+"' ");
 		   }
 		}
+		if( !Utils.isNull(c.getSalesZone()).equals("")){
+		    sql.append("\n  and cs.primary_salesrep_id in(");
+		    sql.append("\n    select salesrep_id from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+		    sql.append("\n    where zone = "+Utils.isNull(c.getSalesZone()) );
+		    sql.append("\n  )");
+		}
 		return sql;
 	 }
 }

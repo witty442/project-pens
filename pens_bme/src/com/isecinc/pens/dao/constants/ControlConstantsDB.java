@@ -27,6 +27,7 @@ public class ControlConstantsDB {
 	public static String W2_CK_STK_INITDATE_CODE = "W2_CK_STK_INITDATE";
 	
 	public static String NS_CUTSOMER_SUB_TYPE = "NISSIN_CUST_SUB_TYPE";
+	public static String MAY_REPORT_TYPE = "MAYA_REPORT";
 	
 	public static String getValueByConCode(String conType,String conCode) throws Exception {
 		Statement stmt = null;

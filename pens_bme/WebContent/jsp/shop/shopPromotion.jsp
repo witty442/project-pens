@@ -93,6 +93,7 @@ function validateDataTable(){
 	}
 	
 	var keyData = document.getElementsByName("keyData");
+	var modifierLineId = document.getElementsByName("modifierLineId");
 	var subPromoName = document.getElementsByName("subPromoName");
 	var startPromtionQty = document.getElementsByName("startPromtionQty");
 	var endPromtionQty = document.getElementsByName("endPromtionQty");
@@ -108,6 +109,10 @@ function validateDataTable(){
 		}
 		//alert(itemIssue[i].value );
 	    if(keyData[i].value != 'CANCEL' && subPromoName[i].value !=""){
+	    	if(modifierLineId[i].value =="" ){
+				 rows[i+1].className ='lineError';
+				 pass = false;
+			}
 			if(startPromtionQty[i].value =="" ){
 				 rows[i+1].className ='lineError';
 				 pass = false;
@@ -157,10 +162,14 @@ function addRowAction(){
 	    "  <font color='red'></font> "+
 	    "</td>"+
 	    "<td class='td_text_center' width='10%'> "+
+	    "  <input type='text' name='modifierLineId' id='modifierLineId' value='' size='15' autoComplete=off /> "+
+	    "  <font color='red'>*</font> "+
+	    "</td>"+
+	    "<td class='td_text_center' width='5%'> "+
 	    "  <input type='text' name='startPromtionQty' id='startPromtionQty' autoComplete=off  value='' size='15' class='enableNumber' onblur='isNum(this);'/> "+
 	    "  <font color='red'></font> "+
 	    "</td>"+
-	    "<td class='td_text_center' width='10%'> "+
+	    "<td class='td_text_center' width='5%'> "+
 	    "  <input type='text' name='endPromtionQty' id='endPromtionQty'  autoComplete=off  value='' size='15' class='enableNumber' onblur='isNum(this);'/> "+
 	    "  <font color='red'></font> "+
 	    "</td>"+
@@ -226,7 +235,7 @@ function removeRowByIndex(path,drow,index){
     	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
     	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
     		<div style="height: 60px;">
-    		<!-- MENU -->
+    		<!-- MENU --> 
 	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 				<tr>
 			        <td width="100%">
@@ -287,6 +296,7 @@ function removeRowByIndex(path,drow,index){
 					        <tr>
 					            <th></th>
 								<th>ชื่อ Promotion ย่อย</th>
+								<th>Modifier Line Id</th>
 								<th>จำนวนชิ้นเริ่มต้น</th>
 								<th>จำนวนชิ้นสิ้นสุด</th>
 								<th>เปอร์เซ็นส่วนลด </th>
@@ -313,11 +323,15 @@ function removeRowByIndex(path,drow,index){
 									  <input type="text" name="subPromoName" id="subPromoName" size="40" value="<%=mc.getSubPromoName()%>" autoComplete=off />
 									  <font color="red"></font>
 									</td>
-									<td class="td_text_center" width="10%">
+									 <td class="td_text_center" width="10%">	
+									  <input type="text" name="modifierLineId" id="modifierLineId" size="15" value="<%=mc.getModifierLineId()%>" autoComplete=off />
+									  <font color="red">*</font>
+									</td>
+									<td class="td_text_center" width="5%">
 									  <input type="text" name="startPromtionQty" onkeydown="return inputNum(event)"  id="startPromtionQty" autoComplete=off  class='enableNumber' size="15" value="<%=mc.getStartPromtionQty()%>"/>
 									  <font color="red"></font>
 									</td>
-								    <td class="td_text_center" width="10%"> 
+								    <td class="td_text_center" width="5%"> 
 								      <input type="text" name="endPromtionQty" onkeypress="isNum(this)"  id="endPromtionQty" autoComplete=off  class='enableNumber' size="15" value="<%=mc.getEndPromtionQty()%>"/>
 								     <font color="red"></font>
 								     </td>

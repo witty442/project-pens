@@ -3,7 +3,7 @@
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String" />
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
 	<parameter name="subDataList" class="java.util.List"/>
 	<parameter name="parameter_subreport" class="java.util.Map"/>
 	<parameter name="found_data_subreport" class="java.lang.String"/>

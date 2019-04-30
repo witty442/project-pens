@@ -369,7 +369,8 @@ public class PopupDAO {
 					PopupForm item = new PopupForm();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
-					//item.setDesc(Utils.isNull(rst.getString("qty")));
+					item.setPrice(getOrderItemPriceByArInvoiceNo(conn, c, backDate, user, Utils.isNull(rst.getString("ar_invoice_no"))));
+					
 					//calc priQty
 					stockBean = calcStockReturnPriQtyByArInvoice(conn,c.getRequestNumber(), Utils.isNull(rst.getString("ar_invoice_no")),backDate,c,user );
 					if(stockBean != null){
@@ -377,8 +378,12 @@ public class PopupDAO {
 					   item.setPriAllQty(Utils.decimalFormat(stockBean.getPriAllQty(),Utils.format_current_5_digit));
 					   item.setPriQty(Utils.decimalFormat(stockBean.getPriQty(),Utils.format_current_5_digit));
 					   item.setSubQty(Utils.decimalFormat(stockBean.getSubQty(),Utils.format_current_5_digit));
+					   
+					   if(stockBean.getPriAllQty() > 0.00){
+					      pos.add(item);
+					   }
 					}
-					pos.add(item);
+					
 				}//while
 
 			} catch (Exception e) {
@@ -391,6 +396,43 @@ public class PopupDAO {
 				} catch (Exception e) {}
 			}
 			return pos;
+		}
+	 public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupForm c,String backDate,User user,String arInvoiceNo) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String price ="";
+			try {
+				sql.append("\n select distinct l.price" );
+				sql.append("\n from t_order h ,t_order_line l ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				sql.append("\n and h.doc_status <> 'VO' ");
+				sql.append("\n and l.promotion <> 'Y' ");
+				sql.append("\n and h.order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+			    sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					price = Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit);
+	
+				}//if
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return price;
 		}
 	 
 	 public static StockBeanUtils calcStockReturnPriQtyByArInvoice(Connection conn,String curRequestNumber

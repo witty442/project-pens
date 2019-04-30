@@ -4,10 +4,12 @@ import java.util.Calendar;
 import java.util.List;
 
 
+
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.PriceList;
+import com.isecinc.pens.bean.User;
 
 /**
  * MPriceList Class
@@ -77,7 +79,26 @@ public class MPriceList extends I_Model<PriceList> {
 		}
 	}
 	
-	public PriceList getMayaPriceList() throws Exception {
+	public PriceList getMayaPriceList(User user) throws Exception {
+		String whereCause = "and isactive = 'Y' and pricelist_id ="+user.getConfig().getPricelistId();
+		//whereCause += "  and name = 'MAYA Pricelist' ";
+		logger.info("xx:"+whereCause);
+		PriceList[] pls = search(whereCause);
+		if (pls != null) {
+			if (pls.length > 0) {
+				for (PriceList pl : pls) {
+					if (DateToolsUtil.checkStartEnd(pl.getEffectiveDate(), pl.getEffectiveToDate())) return pl;
+				}
+				return new PriceList();
+			} else {
+				return new PriceList();
+			}
+		} else {
+			return new PriceList();
+		}
+	}
+	
+	public PriceList getMayaPriceList_BK() throws Exception {
 		String whereCause = "and isactive = 'Y' ";
 		//whereCause += "  and name = 'MAYA Pricelist' ";
 		logger.info("xx:"+whereCause);

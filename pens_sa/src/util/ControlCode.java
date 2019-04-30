@@ -16,7 +16,7 @@ public class ControlCode {
 		PreparedStatement ps = null;
 		String sql = "select isactive from c_control_code where class_name='"+className+"' and method_name='"+methodName+"'";
 		try{
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
 			ps =conn.prepareStatement(sql);
@@ -28,7 +28,7 @@ public class ControlCode {
 					canExecute = false;
 				}
 			}
-			logger.info("class_name["+className+"]method_name["+methodName+"]canExecute["+canExecute+"]");
+			//logger.info("class_name["+className+"]method_name["+methodName+"]canExecute["+canExecute+"]");
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{

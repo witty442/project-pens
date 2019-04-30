@@ -675,14 +675,20 @@ public class ModifierProcess {
 							if (modifierAttr.getValueTo() != 0) {
 								if (line.getQty() <= modifierAttr.getValueTo()) {
 									discount = line.getQty() * modifierLine.getValues();
-									if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
-									if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
+									if (line.getBestDiscount() == 0){
+										line.setBestDiscount(discount);
+									}
+									if (line.getBestDiscount() < discount){
+										line.setBestDiscount(discount);
+									}
 								}
 							} else {
 								discount = line.getQty() * modifierLine.getValues();
 								if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
 								if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
 							}
+							logger.info("Use modifier_line_id["+modifierLine.getId()+"]");
+							line.setModifierLineId(modifierLine.getId());
 							logger.info("LineProduct["+line.getProduct().getCode()+"] BreakType[Point] method[AMT] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
 						}//if
 					}//for
@@ -695,14 +701,24 @@ public class ModifierProcess {
 							if (modifierAttr.getValueTo() != 0) {
 								if (line.getQty() <= modifierAttr.getValueTo()) {
 									discount = line.getLineAmount() * modifierLine.getValues() / 100;
-									if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
-									if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
+									if (line.getBestDiscount() == 0){
+										line.setBestDiscount(discount);
+									}
+									if (line.getBestDiscount() < discount){
+										line.setBestDiscount(discount);
+									}
 								}
 							} else {
 								discount = line.getLineAmount() * modifierLine.getValues() / 100;
-								if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
-								if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
+								if (line.getBestDiscount() == 0){
+									line.setBestDiscount(discount);
+								}
+								if (line.getBestDiscount() < discount){
+									line.setBestDiscount(discount);
+								}
 							}
+							logger.info("Use modifier_line_id["+modifierLine.getId()+"]");
+							line.setModifierLineId(modifierLine.getId());
 							if(isDebug){
 							  logger.info("LineProduct["+line.getProduct().getCode()+"] BreakType[point] Method[AMT Percent] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
 							}
@@ -726,9 +742,14 @@ public class ModifierProcess {
 					discount *= modifierLine.getValues();
 					for (OrderLine line : useLines) {
 						lineDiscount = discount * line.getQty() / sumQty;
-						if (line.getBestDiscount() == 0) line.setBestDiscount(lineDiscount);
-						if (line.getBestDiscount() < lineDiscount) line.setBestDiscount(lineDiscount);
-						
+						if (line.getBestDiscount() == 0){
+							line.setBestDiscount(lineDiscount);
+						}
+						if (line.getBestDiscount() < lineDiscount){
+							line.setBestDiscount(lineDiscount);
+						}
+						logger.info("Use modifier_line_id["+modifierLine.getId()+"]");
+						line.setModifierLineId(modifierLine.getId());
 						if(isDebug){
 						  logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
 						}
@@ -769,10 +790,12 @@ public class ModifierProcess {
 		//logger.info("Relate Lines..(m_line_from -> m_line_to)" + modifierLine.getRelatedModifier().size());
 		
 		// get relate line
+		int i=0;
 		for (ModifierLine mrline : modifierLine.getRelatedModifier()) {
+			i++;
 			if(isDebug){
-			  logger.info("Relate MLines["+mrline.getId()+"]: " + mrline);
-			  logger.info("Qty["+sumQty+"] to Get Discount.. mLineTo.Attr.ValueFrom" + mrline.getAttr().getValueFrom() + " to "+ mrline.getAttr().getValueTo());
+			  logger.info("["+i+"]Relate MLines["+mrline.getId()+"]: " + mrline);
+			  logger.info("["+i+"]Qty["+sumQty+"] to Get Discount.. mLineTo.Attr.ValueFrom[" + mrline.getAttr().getValueFrom() + "] to ["+ mrline.getAttr().getValueTo()+"]");
 			}
 			
 			if (sumQty >= mrline.getAttr().getValueFrom() && sumQty <= mrline.getAttr().getValueTo()) {
@@ -794,8 +817,14 @@ public class ModifierProcess {
 					// AMT
 					for (OrderLine line : useLines) {
 						discount = line.getQty() * promoLine.getValues();
-						if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
-						if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
+						if (line.getBestDiscount() == 0){
+							line.setBestDiscount(discount);
+						}
+						if (line.getBestDiscount() < discount){
+							line.setBestDiscount(discount);
+						}
+						logger.info("Use modifier_line_id["+promoLine.getId()+"]");
+						line.setModifierLineId(promoLine.getId());
 						
 						if(isDebug){
 						  logger.info("BreakType[Point] Method[AMT] :BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
@@ -807,11 +836,16 @@ public class ModifierProcess {
 						discount = line.getLineAmount() * promoLine.getValues() / 100;
 						//logger.info("line.getLineAmount():"+line.getLineAmount());
 						//logger.info("promoLine.getValues():"+promoLine.getValues());
-						if (line.getBestDiscount() == 0) line.setBestDiscount(discount);
-						if (line.getBestDiscount() < discount) line.setBestDiscount(discount);
-					
+						if (line.getBestDiscount() == 0){
+							line.setBestDiscount(discount);
+						}
+						if (line.getBestDiscount() < discount){
+							line.setBestDiscount(discount);
+						}
+						logger.info("Use modifier_line_id["+promoLine.getId()+"]");
+						line.setModifierLineId(promoLine.getId());
 						if(isDebug){
-						  logger.info("BreakType[Point] Method[AMT Percent]:BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
+						  logger.info("BreakType[Point] Method[Percent]:BestDiscount["+line.getBestDiscount()+"] result discount["+discount+"]");
 						}
 					}
 				}
@@ -828,9 +862,14 @@ public class ModifierProcess {
 					discount *= modifierLine.getValues();
 					for (OrderLine line : useLines) {
 						lineDiscount = discount * line.getQty() / sumQty;
-						if (line.getBestDiscount() == 0) line.setBestDiscount(lineDiscount);
-						if (line.getBestDiscount() < lineDiscount) line.setBestDiscount(lineDiscount);
-						
+						if (line.getBestDiscount() == 0){
+							line.setBestDiscount(lineDiscount);
+						}
+						if (line.getBestDiscount() < lineDiscount){
+							line.setBestDiscount(lineDiscount);
+						}
+						logger.info("Use modifier_line_id["+promoLine.getId()+"]");
+						line.setModifierLineId(promoLine.getId());
 						if(isDebug){
 						  logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
 						}

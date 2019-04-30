@@ -125,7 +125,7 @@ public class PopupAction extends I_Action {
 				 results = PopupDAO.searchBrandProdShowList(popupForm);
 				 
 			}else if("BrandStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
-				 results = PopupDAO.searchBrandList(popupForm);
+				 results = PopupDAO.searchBrandStockVanList(popupForm);
 				 
 			}else if("Customer".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalesTarget

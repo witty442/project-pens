@@ -355,8 +355,11 @@ public class MOrder extends I_Model<Order> {
 			
 			//netDec = totalAmountDec(include vat)
 			NetDec = totalAmountDecIncludeVat.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
 			//calc netDec/1.07
-			totalAmountDecExcludeVat = NetDec.divide(new BigDecimal(1.07)).setScale(2,BigDecimal.ROUND_HALF_UP);
+			totalAmountDecExcludeVat = NetDec.divide(new BigDecimal("1.07"),BigDecimal.ROUND_HALF_UP);
+			totalAmountDecExcludeVat = totalAmountDecExcludeVat.setScale(2,BigDecimal.ROUND_HALF_UP);
+			
 			//vat = netAmount-totalAmoutnExludeVat
 			VatDec = NetDec.subtract(totalAmountDecExcludeVat).setScale(2,BigDecimal.ROUND_HALF_UP);
 			

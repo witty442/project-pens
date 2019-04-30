@@ -139,6 +139,7 @@ function loadSalesrepCodeList(){
 	var cboDistrict = document.getElementsByName('bean.salesrepCode')[0];
 	var param  ="salesChannelNo=" + document.getElementsByName('bean.salesChannelNo')[0].value;
 	    param +="&custCatNo="+ document.getElementsByName('bean.custCatNo')[0].value;
+	    param +="&salesZone="+ document.getElementsByName('bean.salesZone')[0].value;
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/prodshow/ajax/genSalesrepCodeListAjax.jsp",
@@ -215,6 +216,11 @@ function openImage(path,fileName){
 						<html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				    </html:select>
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				       ภาคตามสายดูแล 
+				      <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList()">
+						<html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+				    </html:select>
+				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 				 พนักงานขาย 
 				     <html:select property="bean.salesrepCode" styleId="salesrepCode">
 						<html:options collection="SALESREP_LIST" property="salesrepCode" labelProperty="salesrepCode"/>

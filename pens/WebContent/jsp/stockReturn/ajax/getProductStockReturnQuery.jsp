@@ -14,7 +14,7 @@ boolean dup = false;
 String outputText = "";
 try{
 	if(productCode != null && productCode.length()>0){
-	   p = new MProduct().getStockReturnProduct(productCode,user);
+	   p = new MProduct().getStockReturnProduct(productCode,user); 
 	   if(p!= null){
 	      outputText = p.getId()+"|"+p.getName()+"|"+p.getUom2()+"|"+p.getUom1Pac()+"|"+p.getUom2Pac()+"|"+p.getUom1Price();
 	      outputText +="|"+p.getUom1ConvRate()+"|"+p.getUom2ConvRate();

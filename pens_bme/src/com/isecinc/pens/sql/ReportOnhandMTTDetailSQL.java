@@ -358,7 +358,7 @@ public class ReportOnhandMTTDetailSQL {
 			sql.append("\n ORDER BY A.group_type,A.MATERIAL_MASTER,A.BARCODE asc ");
 
 			if(logger.isDebugEnabled()){
-			   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+			   FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 			}
 		} catch (Exception e) {
 			throw e;

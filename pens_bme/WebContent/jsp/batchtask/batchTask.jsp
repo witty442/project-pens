@@ -33,6 +33,8 @@ if(taskInfo != null){
 	//paramMap = taskInfo.getParamMap();//old code
 	paramList = taskInfo.getParamList();
 	buttonName = taskInfo.getButtonName();
+	
+	System.out.println("Desc:"+taskInfo.getDescription());
 }
 %>
 <html>
@@ -374,7 +376,7 @@ body {
 							</tr>
 							<tr>
 								<td align="center" width ="100%">&nbsp;</td>
-							</tr>
+							</tr> 
 							  <tr>
 								<td align="center" width ="100%"><b><%=Utils.isNull(taskInfo.getDescription()) %></b></td>
 							</tr>

@@ -16,6 +16,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="pickStockGroupForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "pickStockGroupForm");
+
 String pageName = pickStockGroupForm.getBean().getPage();
 %>
 <html>
@@ -109,7 +112,12 @@ function confirmAction(path){
 	}
 	return false;
 }
-
+function printStampBoxNoReport(path){
+	var form = document.pickStockGroupForm;
+	form.action = path + "/jsp/pickStockGroupAction.do?do=printStampBoxNoReport";
+	form.submit();
+	return true;
+}
 function completeAction(path){
 	var form = document.pickStockGroupForm;
 	if(confirm("ยันยันการ Complete ข้อมูล")){
@@ -533,7 +541,7 @@ function isNum(obj){
 										<td colspan="2">
 							                <html:text property="bean.jobId" styleId="jobId" size="20" 
 							                  onkeypress="getJobNameKeypress(event,this)"
-							                  />					    
+							                  styleClass="\" autoComplete=\"off"/>					    
 										     <input type="button" name="x1" value="..." onclick="openJobPopup('${pageContext.request.contextPath}')"/>
 										    <html:text property="bean.jobName" styleId="jobName" readonly="true" styleClass="disableText" size="50"/>
 										</td>
@@ -541,17 +549,17 @@ function isNum(obj){
 									<tr>
 	                                    <td>จากเลขที่กล่อง</td>
 	                                     <td colspan="2">
-	                                       <html:text property="bean.boxNoFrom" styleId="boxNoFrom" size="20" />
+	                                       <html:text property="bean.boxNoFrom" styleId="boxNoFrom" size="20"  styleClass="\" autoComplete=\"off"/>
 	                                                                                                                                        ถึงเลขที่กล่อง
-	                                  	<html:text property="bean.boxNoTo" styleId="boxNoTo" size="20" />	  
+	                                  	<html:text property="bean.boxNoTo" styleId="boxNoTo" size="20"  styleClass="\" autoComplete=\"off"/>	  
 										</td>
 									</tr>
 									<tr>
 	                                    <td>Group Code From <font color="red">*</font></td>
 	                                     <td colspan="2">
-	                                       <html:text property="bean.groupCodeFrom" styleId="groupCodeFrom" size="20" />
+	                                       <html:text property="bean.groupCodeFrom" styleId="groupCodeFrom" size="20"  styleClass="\" autoComplete=\"off"/>
 	                                       Group Code To <font color="red">*</font>
-	                                  	<html:text property="bean.groupCodeTo" styleId="groupCodeTo" size="20" />	  
+	                                  	<html:text property="bean.groupCodeTo" styleId="groupCodeTo" size="20"  styleClass="\" autoComplete=\"off"/>	  
 										</td>
 									</tr>
 									<tr>
@@ -592,7 +600,7 @@ function isNum(obj){
                                       <td colspan="2">
                                         <html:text property="bean.issueReqStatusDesc" styleId="issueReqStatusDesc" size="20" readonly="true" styleClass="disableText"/>
                                      	 ผู้เบิก  
-									  <html:text property="bean.pickUser" styleId="pickUser" size="20" /><font color="red">*</font>	  
+									  <html:text property="bean.pickUser" styleId="pickUser" size="20"  styleClass="\" autoComplete=\"off"/><font color="red">*</font>	  
 									</td>
 								</tr>
 								<tr>
@@ -608,7 +616,8 @@ function isNum(obj){
 									<td >รหัสร้านค้า<font color="red">*</font>
 									</td>
 									<td align="left" colspan="2"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" 
+									  onkeypress="getCustNameKeypress(event,this,'storeCode')"  styleClass="\" autoComplete=\"off"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
@@ -623,19 +632,21 @@ function isNum(obj){
 								
 								<tr>
                                     <td > Confirm Issue Date</td>
-                                    <td>
+                                    <td colspan="2">
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20" readonly="true" styleClass="disableText"/>
+									&nbsp;&nbsp; Invoice No&nbsp;&nbsp; 
+									<html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
-									<td align="right">Invoice No</td>
-									<td> 
-									   <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
-									</td>
+									
 								</tr>
 								<tr>
                                     <td > หมายเหตุ </td>
                                     <td colspan="2"> 
-                                      <html:text property="bean.remark" styleId="remark" size="60" />
-                                      </td>
+                                      <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
+                                          &nbsp;&nbsp;    จำนวนกล่อง &nbsp;&nbsp; 
+                                      <html:text property="bean.totalBox" styleId="totalBox" size="10" 
+                                      styleClass="enableNumber\" autoComplete=\"off"  onkeypress="isNum(this)"/>
+                                    </td>
 								</tr>	
 						   </table>
 					    </div>
@@ -712,7 +723,7 @@ function isNum(obj){
 													    <input type="text" name="issueQty" value ="<%=o.getIssueQty()%>" size="20" 
 													     onkeypress="chkIssueQtyKeypress(this,event,<%=i%>)"
 								                         onchange="validateIssueQty(this,<%=i%>)" class="enableNumber"
-								                         tabindex="<%=tabindex%>"/> 
+								                         tabindex="<%=tabindex%>" autoComplete="off"/> 
 													</td>
 												</c:if>
 												
@@ -787,6 +798,10 @@ function isNum(obj){
 											 <!-- </a> -->  
 										 </c:if>
 										 
+										   <a href="javascript:printStampBoxNoReport('${pageContext.request.contextPath}')">
+											  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
+											</a> 
+											
 										  <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
 											 <a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 											   <input type="button" value="    Export     " class="newPosBtnLong"> 

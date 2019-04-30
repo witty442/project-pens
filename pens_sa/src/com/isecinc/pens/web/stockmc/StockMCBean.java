@@ -61,8 +61,15 @@ public class StockMCBean implements Serializable{
 	private String startDate;
 	//for delete lineIdArr
 	private String lineIdDeletes;
+    private String endDate;
+     
 	
-	
+	public String getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
 	public String getCustomerCode() {
 		return customerCode;
 	}

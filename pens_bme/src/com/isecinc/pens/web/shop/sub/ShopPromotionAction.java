@@ -89,6 +89,7 @@ public class ShopPromotionAction {
 			//get Parametervalues
 			String[] keyDatas = request.getParameterValues("keyData");
 			String[] subPromoId = request.getParameterValues("subPromoId");
+			String[] modifierLineId = request.getParameterValues("modifierLineId");
 			String[] subPromoName = request.getParameterValues("subPromoName");
 			String[] startPromtionQty = request.getParameterValues("startPromtionQty");
 			String[] endPromtionQty = request.getParameterValues("endPromtionQty");
@@ -103,6 +104,7 @@ public class ShopPromotionAction {
 					
 				   item = new ShopBean();
 				   item.setSubPromoId(Utils.convertToLong(subPromoId[i]));
+				   item.setModifierLineId(modifierLineId[i]);
 				   item.setSubPromoName(subPromoName[i]);
 				   item.setStartPromtionQty(startPromtionQty[i]);
 				   item.setEndPromtionQty(endPromtionQty[i]);
@@ -114,6 +116,7 @@ public class ShopPromotionAction {
 					
 				   item = new ShopBean();
 				   item.setSubPromoId(Utils.convertToLong(subPromoId[i]));
+				   item.setModifierLineId(modifierLineId[i]);
 				   item.setSubPromoName(subPromoName[i]);
 				   item.setStartPromtionQty(startPromtionQty[i]);
 				   item.setEndPromtionQty(endPromtionQty[i]);
@@ -334,6 +337,7 @@ public class ShopPromotionAction {
 			rst = ps.executeQuery();
 			while(rst.next()) {
 			   h = new ShopBean();
+			   h.setModifierLineId(Utils.isNull(rst.getString("modifier_line_id")));
 			   h.setSubPromoId(rst.getLong("sub_promo_id"));
 			   h.setSubPromoName(Utils.isNull(rst.getString("SUB_PROMO_NAME")));
 			   h.setStartPromtionQty(rst.getInt("START_PROMO_QTY")+"");
@@ -445,12 +449,13 @@ public class ShopPromotionAction {
 			StringBuffer sql = new StringBuffer("");
 			try{
 				sql.append("UPDATE PENSBI.M_C4_MST \n");
-				sql.append("SET START_DATE =?, END_DATE =?  ,UPDATE_DATE = ?, UPDATE_USER = ? \n");
+				sql.append("SET PROMO_NAME =? ,START_DATE =?, END_DATE =?  ,UPDATE_DATE = ?, UPDATE_USER = ? \n");
 				sql.append("WHERE PROMO_ID =? \n");
 				
 				//logger.debug("sql:"+sql.toString());
 				
 				ps = conn.prepareStatement(sql.toString());
+				ps.setString(c++, Utils.isNull(head.getPromoName()));
 				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())); 
 				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime()));
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
@@ -568,8 +573,8 @@ public class ShopPromotionAction {
 			try{
 				sql.append("INSERT INTO PENSBI.M_C4_DT \n");
 				sql.append("(PROMO_ID, SUB_PROMO_ID, SUB_PROMO_NAME \n");
-				sql.append(",START_PROMO_QTY , END_PROMO_QTY,DISCOUNT_PERCENT, CREATE_DATE, CREATE_USER) \n");
-				sql.append("VALUES(?,?,?,?,?,?,?,?) \n");
+				sql.append(",START_PROMO_QTY , END_PROMO_QTY,DISCOUNT_PERCENT, CREATE_DATE, CREATE_USER,MODIFIER_LINE_ID) \n");
+				sql.append("VALUES(?,?,?,?,?,?,?,?,?) \n");
 				
 				//logger.debug("sql:"+sql.toString());
 				
@@ -583,6 +588,7 @@ public class ShopPromotionAction {
 				ps.setDouble(c++, Utils.convertStrToDouble(item.getDiscountPercent())); 
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, head.getUserName());
+				ps.setInt(c++, Utils.convertStrToInt(item.getModifierLineId()));
 				
 				r =ps.executeUpdate();
 			}catch(Exception e){
@@ -602,8 +608,9 @@ public class ShopPromotionAction {
 			StringBuffer sql = new StringBuffer("");
 			try{
 				sql.append("UPDATE PENSBI.M_C4_DT \n");
-				sql.append("SET SUB_PROMO_NAME = ?,START_PROMO_QTY =? , END_PROMO_QTY =?"
-						+ ",DISCOUNT_PERCENT =? , UPDATE_DATE=?, UPDATE_USER= ? \n");
+				sql.append("SET SUB_PROMO_NAME = ?,START_PROMO_QTY =? , END_PROMO_QTY =?");
+				sql.append(",DISCOUNT_PERCENT =? , UPDATE_DATE=?, UPDATE_USER= ? \n");
+				sql.append(",MODIFIER_LINE_ID =? \n");
 				sql.append("WHERE PROMO_ID =? AND SUB_PROMO_ID = ? \n");
 				
 				//logger.debug("sql:"+sql.toString());
@@ -615,6 +622,7 @@ public class ShopPromotionAction {
 				ps.setDouble(c++, Utils.convertStrToDouble(item.getDiscountPercent())); 
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, head.getUserName());
+				ps.setInt(c++, Utils.convertStrToInt(item.getModifierLineId()));
 				ps.setLong(c++, head.getPromoId());
 				ps.setLong(c++, item.getSubPromoId());
 				

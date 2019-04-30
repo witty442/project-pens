@@ -244,7 +244,7 @@ public class BatchTaskAction extends I_Action {
    		  //no paramater
    		   Class noparams[] = {};
    		
-   		   Method method = cls.getDeclaredMethod("getDecsription", noparams);
+   		   Method method = cls.getDeclaredMethod("getDescription", noparams);
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;

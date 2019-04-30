@@ -326,11 +326,11 @@ public class PromotionUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo) throws Exception{
+	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnectionApps();
-			return searchSalesrepListAll(conn, salesChannelNo, custCatNo);
+			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone);
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -339,7 +339,7 @@ public class PromotionUtils {
 			} catch (Exception e) {}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo){
+	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -366,6 +366,13 @@ public class PromotionUtils {
 			if( !Utils.isNull(salesChannelNo).equals("")){
 				sql.append("\n  and s.region ='"+Utils.isNull(salesChannelNo)+"'");
 			}
+			if( !Utils.isNull(salesZone).equals("")){
+				sql.append("\n  and S.code in(");
+				sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+				sql.append("\n    where zone = "+Utils.isNull(salesZone) );
+				sql.append("\n  )");
+			}
+			
 			sql.append("\n  and length(S.code) >= 3");
 			sql.append("\n  and S.ISACTIVE ='Y'");
 			//Not in()
@@ -445,6 +452,40 @@ public class PromotionUtils {
 	 return pos;
 	}
 	
+	public static List<PopupBean> searchSalesZoneListModel(Connection conn){
+		List<PopupBean> pos = new ArrayList<PopupBean>();
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
+			sql.append("\n  where 1=1  ");
+			sql.append("\n  and zone in('0','1','2','3','4') ");
+			sql.append("\n  ORDER BY S.zone asc \n");
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no=0;
+			while (rst.next()) {
+				no++;
+				PopupBean item = new PopupBean();
+				item.setNo(no);
+				item.setSalesZone(Utils.isNull(rst.getString("zone")));
+				item.setSalesZoneDesc(Utils.isNull(rst.getString("zone_name")));
+				pos.add(item);
+			}//while
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return pos;
+	}
 	 public static List<PopupBean> searchBrand(PopupBean c,String operation) throws Exception{
 		 Connection conn = null;
 		 try{

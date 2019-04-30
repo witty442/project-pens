@@ -47,10 +47,20 @@ public class StockReturn {
 	
 	private boolean canEdit = false;
 	private boolean showSaveBtn = false;
+	private boolean showPrintBtn = false;
 	private boolean showCancelBtn = false;
 	
 	private List<StockReturnLine> lineList;
     private List<String> lineNoDeleteList;
+
+    
+	public boolean isShowPrintBtn() {
+		return showPrintBtn;
+	}
+
+	public void setShowPrintBtn(boolean showPrintBtn) {
+		this.showPrintBtn = showPrintBtn;
+	}
 
 	public String getBackDate() {
 		return backDate;

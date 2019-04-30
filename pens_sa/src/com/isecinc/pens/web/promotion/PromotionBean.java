@@ -38,8 +38,15 @@ public class PromotionBean implements Serializable{
 	private String requestDate;
 	private String productType;
 	private String productTypeDesc;
+	private String salesZone;
 	
 	
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
 	public String getProductTypeDesc() {
 		return productTypeDesc;
 	}

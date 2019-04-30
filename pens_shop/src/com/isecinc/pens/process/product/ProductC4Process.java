@@ -52,7 +52,7 @@ public class ProductC4Process {
 					+ "and code in(select product_code from m_barcode )"
 					+ "order by code, name ";
 			Product[] ps = new MProduct().search(whereCause);
-			PriceList pl = new MPriceList().getMayaPriceList();
+			PriceList pl = new MPriceList().getMayaPriceList(user);
 			List<ProductPrice> pps;
 			MProductPrice mProductPrice = new MProductPrice();
 			ProductC4 c4;

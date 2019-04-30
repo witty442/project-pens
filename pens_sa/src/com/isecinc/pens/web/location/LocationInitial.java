@@ -130,7 +130,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","");
 			dataList.addAll(salesrepList_s);
 			session.setAttribute("SALESREP_LIST",dataList);
 			
@@ -164,6 +164,17 @@ public class LocationInitial extends LocationControlPage {
 			tripTypeList.add(new References("NotEqualTrip"," แสดงข้อมูลร้านค้าไม่ตรงตามTrip "));
 			session.setAttribute("TRIP_TYPE_LIST", tripTypeList);
 			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -226,7 +237,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","");
 			dataList.addAll(salesrepList_s);
 			session.setAttribute("SALESREP_LIST",dataList);
 			
@@ -309,7 +320,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","");
 			dataList.addAll(salesrepList_s);
 			session.setAttribute("SALESREP_LIST",dataList);
 			

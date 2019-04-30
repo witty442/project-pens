@@ -38,8 +38,16 @@ public class ProdShowBean implements Serializable{
 	private String pic1;
 	private String pic2;
 	private String pic3;
+	private String salesZone;
 	
 	
+	
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
 	public String getShowDate() {
 		return showDate;
 	}

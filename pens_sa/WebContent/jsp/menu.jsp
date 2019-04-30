@@ -15,7 +15,7 @@
     String role = user.getRoleSalesTarget(); 
 %>
 <ul id="nav">
-<%if(user.getUserGroupId()==SAConstants.USER_GROUP_ID_ADMIN){%>
+<%if ( UserUtils.userInRole("",user,new String[]{User.ADMIN}) ){ %>
 	<li><a href="javascript: void(0)" class="parent" ><span><bean:message key="HomeMenu" bundle="sysprop"/></span></a>
 		<ul>
            	<li>
@@ -31,6 +31,7 @@
 		</ul>
 	</li>
 <%} %>
+<%if ( UserUtils.userInRole("ROLE_SA",user,new String[]{User.ADMIN,User.SA}) ){ %>
 	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
 		<ul>
 			<%-- <li>
@@ -38,8 +39,9 @@
 	       </li> --%>
 		</ul>
 	</li> 
+<%} %>
 
-<%if ( UserUtils.userInRoleStockVan(user,new String[]{User.ADMIN,User.STOCKVAN}) ){ %>
+<%if ( UserUtils.userInRole("ROLE_STOCK_VAN",user,new String[]{User.ADMIN,User.STOCKVAN}) ){ %>
 	<li><a href="javascript: void(0)" class="parent"><span>Inventory</span></a>
 		<ul>
 			<li>
@@ -52,7 +54,7 @@
 	</li> 
 <%}%>
 	
-<%if ( UserUtils.userInRoleSpider(user,new String[]{User.ADMIN,User.SPIDER}) ){ %>
+<%if ( UserUtils.userInRole("ROLE_SPIDER",user,new String[]{User.ADMIN,User.SPIDER}) ){ %>
 	<li><a href="javascript: void(0)" class="parent"><span>PENS Spider</span></a>
 		<ul>
 			 <li>
@@ -120,13 +122,13 @@
 		 </ul>
 	</li>
 <%} %>
-<%if (   UserUtils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR}) 
-	  || UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW})) { 
+<%if (   UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR}) 
+	  || UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW})) { 
 	no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent" ><span>Credit Sales</span></a>
 		<ul>
-		    <%if ( UserUtils.userInRoleCreditStock(user,new String[]{User.ADMIN, User.STOCKCR})){ %>
+		    <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR})){ %>
 		        <li>
 	               <a href="#" class="parent" 
 	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_CREDIT%>&action=new';">
@@ -140,7 +142,7 @@
 	               </a>
 	             </li> 
             <%} %>
-             <%if ( UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
+             <%if ( UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
 		        <li>
 	               <a href="#" class="parent" 
 	               onclick="window.location='${pageContext.request.contextPath}/jsp/prodShowAction.do?do=prepareSearch&action=new&pageName=CREDIT';">
@@ -151,13 +153,13 @@
 		</ul>
 	</li>  
 <%}%>
-<%if ( UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW}) 
-		|| UserUtils.userInRoleVanDoc(user,new String[]{User.ADMIN, User.VANDOC})){ 
+<%if (   UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW}) 
+	  || UserUtils.userInRole("ROLE_VANDOC",user,new String[]{User.ADMIN, User.VANDOC})){ 
 	  no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent" ><span>Van Sales</span></a>
 		<ul>
-		 <%if ( UserUtils.userInRoleProdShow(user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
+		 <%if ( UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
 	        <li>
                <a href="#" class="parent" 
                onclick="window.location='${pageContext.request.contextPath}/jsp/prodShowAction.do?do=prepareSearch&action=new&pageName=VAN';">
@@ -165,7 +167,7 @@
                </a>
              </li>
           <%} %> 
-           <%if ( UserUtils.userInRoleVanDoc(user,new String[]{User.ADMIN, User.VANDOC}) ){ %>
+           <%if ( UserUtils.userInRole("ROLE_VANDOC",user,new String[]{User.ADMIN, User.VANDOC}) ){ %>
                <li>
                 <a href="#" class="parent" 
                    onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderAction.do?do=prepareSearch&action=new';">
@@ -176,16 +178,24 @@
 		</ul>
 	</li>  
 <%}%>
-<%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ 
+<%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ 
 	  no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent" ><span>MC</span></a>
 		<ul>
-		 <%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ %>
+		 <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ %>
 	        <li>
                <a href="#" class="parent"  
                onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMC';">
                <span><%no++;out.print(no);%>.<bean:message key="StockMC" bundle="sysprop"/></span>
+               </a>
+             </li> 
+          <%} %> 
+          <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN,User.MT_QUERY}) ){ %>
+	        <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=MasterItemStockMC';">
+               <span><%no++;out.print(no);%>.<bean:message key="MasterItemStockMC" bundle="sysprop"/></span>
                </a>
              </li> 
           <%} %> 

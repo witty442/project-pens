@@ -103,20 +103,38 @@ public class PopupDAO {
 			try {
 				String brand = Utils.isNull(c.getCriteriaMap().get("brand"));
 				
-				sql.append("\n SELECT distinct M.segment1,M.description ");
+				sql.append("\n SELECT distinct A.segment1,A.description FROM(");
+				
+				sql.append("\n SELECT distinct p.segment1,p.description ");
 				sql.append("\n from apps.xxpens_inv_onhand_r00_v M");
 				sql.append("\n ,apps.xxpens_om_item_mst_v p");
 				sql.append("\n where M.inventory_item_id = p.inventory_item_id  ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and M.segment1 ='"+c.getCodeSearch()+"' ");
+					sql.append("\n and p.segment1 ='"+c.getCodeSearch()+"' ");
 				}
 				if( !Utils.isNull(c.getDescSearch()).equals("")){
-					sql.append("\n and B.description LIKE '%"+c.getDescSearch()+"%' ");
+					sql.append("\n and p.description LIKE '%"+c.getDescSearch()+"%' ");
 				}
 				if( !Utils.isNull(brand).equals("")){
 					sql.append("\n and p.brand in("+Utils.converToTextSqlIn(brand)+") ");
 				}
-				sql.append("\n  ORDER BY M.segment1 asc ");
+				sql.append("\n  UNION ALL");
+				
+				sql.append("\n SELECT distinct p.segment1,p.description ");
+				sql.append("\n from apps.xxpens_inv_intransit_r00_v M");
+				sql.append("\n ,apps.xxpens_om_item_mst_v p");
+				sql.append("\n where M.inventory_item_id = p.inventory_item_id  ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and p.segment1 ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and p.description LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				if( !Utils.isNull(brand).equals("")){
+					sql.append("\n and p.brand in("+Utils.converToTextSqlIn(brand)+") ");
+				}
+				sql.append("\n )A");
+				sql.append("\n  ORDER BY A.segment1 asc ");
 				
 				logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnection();
@@ -234,7 +252,69 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	 
+	 public static List<PopupForm> searchBrandStockVanList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.append("\n SELECT distinct A.brand_no,A.brand_desc FROM( ");
+				sql.append("\n SELECT distinct B.brand_no ,B.brand_desc ");
+				sql.append("\n from apps.xxpens_inv_onhand_r00_v pd ");
+				sql.append("\n ,apps.xxpens_om_item_mst_v P ");
+				sql.append("\n ,pensbi.XXPENS_BI_MST_BRAND B ");
+				sql.append("\n where pd.inventory_item_id = P.inventory_item_id ");
+				sql.append("\n and P.brand = B.brand_no ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and B.brand_no ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and B.brand_desc LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n UNION ALL");
+				
+				sql.append("\n SELECT distinct B.brand_no ,B.brand_desc ");
+				sql.append("\n from apps.xxpens_inv_intransit_r00_v pd_int ");
+				sql.append("\n ,apps.xxpens_om_item_mst_v P ");
+				sql.append("\n ,pensbi.XXPENS_BI_MST_BRAND B ");
+				sql.append("\n where pd_int.inventory_item_id = P.inventory_item_id ");
+				sql.append("\n and P.brand = B.brand_no ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and B.brand_no ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and B.brand_desc LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n )A ");
+				sql.append("\n  ORDER BY A.brand_no asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("brand_no"));
+					item.setDesc(rst.getString("brand_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 	 public static List<PopupForm> searchBrandProdShowList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

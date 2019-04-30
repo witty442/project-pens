@@ -172,6 +172,13 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 }
+.disableTextSmall {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	font-size: 10px;
+}
 .disableTextCenter {
 	background-color: #DCDCDC;
 	border: 1px solid;

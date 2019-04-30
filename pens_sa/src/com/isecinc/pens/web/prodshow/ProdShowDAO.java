@@ -138,6 +138,12 @@ public class ProdShowDAO {
 		if( !Utils.isNull(o.getCustomerCode()).equals("")){
 			sql.append("\n and H.customer_number = '"+Utils.isNull(o.getCustomerCode())+"'");
 		}
+		if( !Utils.isNull(o.getSalesZone()).equals("")){
+			sql.append("\n  and substr(H.order_number,1,4) in(");
+			sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+			sql.append("\n    where zone = "+Utils.isNull(o.getSalesZone()) );
+			sql.append("\n  )");
+		}
 		
 		if( !Utils.isNull(o.getStartDate()).equalsIgnoreCase("") && !Utils.isNull(o.getEndDate()).equalsIgnoreCase("")){
 			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

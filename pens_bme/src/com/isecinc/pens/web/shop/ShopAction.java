@@ -140,6 +140,7 @@ public class ShopAction extends I_Action {
 					 if("back".equalsIgnoreCase(action)){
 						 aForm.setBean(aForm.getBeanCriteria());
 					 }
+					 
 					 if("DETAIL".equalsIgnoreCase(aForm.getBean().getReportType())){
 					    aForm = ShopBillDetailAction.search(aForm,request,response);
 					 }else  if("SUMMARY".equalsIgnoreCase(aForm.getBean().getReportType())){

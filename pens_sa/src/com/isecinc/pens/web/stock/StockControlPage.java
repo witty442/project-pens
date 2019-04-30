@@ -83,6 +83,18 @@ public class StockControlPage {
 			dataList.addAll(salesChannelList_s);
 			request.getSession().setAttribute("SALES_CHANNEL_LIST",dataList);
 			
+			//SALESZONE_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesZoneList =searchSalesZoneListModel(conn);
+			dataList.addAll(salesZoneList);
+			request.getSession().setAttribute("SALES_ZONE_LIST",dataList);
+			
 			//SALESREP_LIST
 			//add Blank Row
 			dataList = new ArrayList<PopupBean>();
@@ -91,7 +103,7 @@ public class StockControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","");
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","");
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
 			
@@ -219,12 +231,45 @@ public class StockControlPage {
 		}
 	 return pos;
 	}
-	
-	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo) throws Exception{
+	public static List<PopupBean> searchSalesZoneListModel(Connection conn){
+		List<PopupBean> pos = new ArrayList<PopupBean>();
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
+			sql.append("\n  where 1=1  ");
+			sql.append("\n  and zone in('0','1','2','3','4') ");
+			sql.append("\n  ORDER BY S.zone asc \n");
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no=0;
+			while (rst.next()) {
+				no++;
+				PopupBean item = new PopupBean();
+				item.setNo(no);
+				item.setSalesZone(Utils.isNull(rst.getString("zone")));
+				item.setSalesZoneDesc(Utils.isNull(rst.getString("zone_name")));
+				pos.add(item);
+			}//while
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return pos;
+	}
+	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListAll(conn, salesChannelNo, custCatNo);
+			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone);
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -233,7 +278,7 @@ public class StockControlPage {
 			} catch (Exception e) {}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo){
+	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -258,6 +303,12 @@ public class StockControlPage {
 			}
 			if( !Utils.isNull(salesChannelNo).equals("")){
 				sql.append("\n  and substr(salesrep_code,2,1)='"+Utils.isNull(salesChannelNo)+"'");
+			}
+			if( !Utils.isNull(salesZone).equals("")){
+				sql.append("\n  and salesrep_code in(");
+				sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+				sql.append("\n    where zone = "+Utils.isNull(salesZone) );
+				sql.append("\n  )");
 			}
 			sql.append("\n  ORDER BY S.salesrep_code asc ");
 			

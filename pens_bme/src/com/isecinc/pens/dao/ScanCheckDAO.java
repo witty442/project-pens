@@ -866,7 +866,9 @@ public class ScanCheckDAO extends PickConstants{
 			sql.append("\n select M.* ,L.total_box FROM(");
 				sql.append("\n select h.issue_req_no ,i.box_no,h.customer_no");
 				sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
-				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.customer_no) as customer_NAME ");
+				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.customer_no) as customer_name ");
+				sql.append("\n  ,(select M.pens_desc3 from pensbi.PENSBME_MST_REFERENCE M ");
+				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.customer_no) as customer_address ");
 				sql.append("\n from PENSBME_SCAN_CHECKOUT h, PENSBME_SCAN_CHECKOUT_ITEM i ");
 				sql.append("\n where 1=1   ");
 				sql.append("\n and h.issue_req_no = i.issue_req_no  ");
@@ -902,6 +904,7 @@ public class ScanCheckDAO extends PickConstants{
 			   h.setBoxNo(Utils.isNull(rst.getString("box_no")));
 			   h.setStoreCode(Utils.isNull(rst.getString("customer_no")));
 			   h.setStoreName(Utils.isNull(rst.getString("customer_name")));
+			   h.setAddress(Utils.isNull(rst.getString("customer_address")));
 			   h.setWareHouse(o.getWareHouse());
 			   h.setTotalBox(rst.getInt("total_box"));
 			   items.add(h);

@@ -212,9 +212,8 @@ public class MayaStockOnhandAction {
 					if( !Utils.isNull(initDateStr).equals("")){
 						 sql.append("\n AND H.COUNT_STK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					}
-					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-						sql.append("\n AND L.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-						sql.append("\n AND L.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+						sql.append("\n AND L.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 					}
 					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 						sql.append("\n AND L.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -247,9 +246,8 @@ public class MayaStockOnhandAction {
 					}else{
 						 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}
-					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-						sql.append("\n AND L.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-						sql.append("\n AND L.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+						sql.append("\n AND L.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 					}
 					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 						sql.append("\n AND MP.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -284,9 +282,8 @@ public class MayaStockOnhandAction {
 					}else{
 						 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}
-					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-						sql.append("\n AND MP.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-						sql.append("\n AND MP.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+						sql.append("\n AND MP.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 					}
 					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 						sql.append("\n AND MP.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -318,9 +315,8 @@ public class MayaStockOnhandAction {
 					}else{
 						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}
-					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-						sql.append("\n AND D.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-						sql.append("\n AND D.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+						sql.append("\n AND D.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 					}
 					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 						sql.append("\n AND D.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -351,9 +347,8 @@ public class MayaStockOnhandAction {
 			if( !Utils.isNull(initDateStr).equals("")){
 				 sql.append("\n AND H.COUNT_STK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 			}
-			if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-				sql.append("\n AND L.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-				sql.append("\n AND L.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+			if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+				sql.append("\n AND L.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 			}
 			if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 				sql.append("\n AND L.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -391,9 +386,8 @@ public class MayaStockOnhandAction {
 			}else{
 				 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 			}
-			if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-				sql.append("\n AND L.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-				sql.append("\n AND L.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+			if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+				sql.append("\n AND L.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 			}
 			if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 				sql.append("\n AND MP.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -435,9 +429,8 @@ public class MayaStockOnhandAction {
 				}else{
 					 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
-				if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-					sql.append("\n AND MP.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-					sql.append("\n AND MP.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+				if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+					sql.append("\n AND MP.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 				}
 				if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 					sql.append("\n AND MP.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -472,9 +465,8 @@ public class MayaStockOnhandAction {
 				}else{
 					 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
-				if( !Utils.isNull(c.getGroupCodeFrom()).equals("") && !Utils.isNull(c.getGroupCodeTo()).equals("")){
-					sql.append("\n AND D.GROUP_CODE >='"+Utils.isNull(c.getGroupCodeFrom())+"' ");
-					sql.append("\n AND D.GROUP_CODE <='"+Utils.isNull(c.getGroupCodeTo())+"' ");
+				if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
+					sql.append("\n AND D.GROUP_CODE LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
 				}
 				if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
 					sql.append("\n AND D.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
@@ -496,7 +488,7 @@ public class MayaStockOnhandAction {
 			
 			//debug write sql to file
 			if(logger.isDebugEnabled()){
-			   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+			   FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 			}
 		} catch (Exception e) {
 			throw e;

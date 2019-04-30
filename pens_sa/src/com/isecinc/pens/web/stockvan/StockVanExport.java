@@ -47,6 +47,9 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   StringBuffer rowTableHtml = new StringBuffer("");
 
 	   List<StockVanBean> columnList = (List<StockVanBean>)request.getSession().getAttribute("COLUMN_LIST");
+	   if(columnList ==null || (columnList !=null && columnList.size()==0)){
+		   return new StringBuffer("");
+	   }
 	   /** Calculate width **/
 	   int tableWidth =100;
 	   int column_1 = 5;

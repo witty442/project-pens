@@ -338,6 +338,12 @@ public class InterfaceDAO {
 					   item.setCode(rs.getString("request_no"));
 					   item.setType(type);
 					   item.setAmount(0); 
+				   }else if(type.equalsIgnoreCase("t_stock_return")){
+					   item.setCustomerCode("");
+					   item.setCustomerName("");
+					   item.setCode(rs.getString("request_number"));
+					   item.setType(type);
+					   item.setAmount(0); 
 				   }
 				   itemList.add(item);
 				}

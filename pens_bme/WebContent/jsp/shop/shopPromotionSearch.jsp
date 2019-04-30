@@ -189,9 +189,9 @@ function openAdd(path){
 								}
 								%>
 									<tr class="<%=tabclass%>">
-										<td class="td_text_center" width="8%"><%=mc.getPromoName()%></td>
-										<td class="td_text_center" width="8%"><%=mc.getStartDate()%></td>
-									    <td class="td_text_center" width="8%"><%=mc.getEndDate()%></td>
+										<td class="td_text" width="10%"><%=mc.getPromoName()%></td>
+										<td class="td_text_center" width="5%"><%=mc.getStartDate()%></td>
+									    <td class="td_text_center" width="5%"><%=mc.getEndDate()%></td>
 										<td class="td_text_center" width="10%">
 										<%if(mc.isCanEdit()){ %>
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getPromoId()%>','edit')">

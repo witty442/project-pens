@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.shop.ShopBean;
@@ -118,7 +119,18 @@ public class ShopBillDetailAction {
 		int no=1;
 		Date dateTemp = null;
 		String dateStr ="";
+		boolean newVersion = false;
 		try {
+			//Date > 201904 = newVersion
+			Date dateCheck = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			int YYYYMM = Utils.convertStrToInt(Utils.stringValue(dateCheck, Utils.YYYYMM));
+			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
+			logger.debug("YYYYMM:"+YYYYMM);
+			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
+			if(YYYYMM > YYYYNN_DATECUT_OFF){
+				newVersion = true;
+			}
+			
 			if(getTotalRec){
 			  sql.append("\n SELECT count(*) as c FROM(");	
 			}
@@ -144,13 +156,18 @@ public class ShopBillDetailAction {
 			sql.append("\n   ,( ((P.discount_percent/100)*a.price) * A.qty) discount_amt");
 			sql.append("\n   FROM(");
 			sql.append("\n     SELECT ");
-			sql.append("\n     H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n      H.order_date,MP.MATERIAL_MASTER");
 			sql.append("\n     ,MP.pens_item,MP.inventory_item_id");
-			sql.append("\n     ,D.price,nvl(D.discount_percent ,0) as discount_percent");
+			sql.append("\n     ,D.price");
+			if(newVersion){
+			   sql.append("\n      ,D.list_line_id");
+			}else{
+			   sql.append("\n      ,nvl(D.discount_percent ,0) as discount_percent ");
+			}
 			sql.append("\n     ,sum(ordered_quantity) as qty");
 			sql.append("\n     FROM APPS.XXPENS_OM_SHOP_ORDER_MST H");
 			sql.append("\n     ,APPS.XXPENS_OM_SHOP_ORDER_DT D");
-			sql.append("\n     ,( ");
+			sql.append("\n     ,(  ");
 			sql.append("\n       SELECT I.inventory_item_id ,MP.pens_desc2 as group_code");
 			sql.append("\n      ,MP.PENS_VALUE as PENS_ITEM,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n      ,MP.INTERFACE_DESC as BARCODE ");
@@ -178,22 +195,34 @@ public class ShopBillDetailAction {
 				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
-			sql.append("\n        group by H.order_date,MP.MATERIAL_MASTER,MP.pens_item,MP.inventory_item_id ,D.price,nvl(D.discount_percent ,0)");
+			sql.append("\n     group by H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n     ,MP.pens_item,MP.inventory_item_id ,D.price ");
+			if(newVersion){
+				sql.append("\n        ,D.list_line_id");
+			}else{
+				sql.append("\n        ,nvl(D.discount_percent ,0) ");
+			}
 			sql.append("\n  )A");
 			sql.append("\n  LEFT OUTER JOIN");
 			sql.append("\n  (");
 			sql.append("\n     SELECT M.start_date,M.end_date");
 			sql.append("\n     ,M.promo_name,D.sub_promo_name");
 			sql.append("\n     ,D.start_promo_qty ,D.end_promo_qty,D.DISCOUNT_PERCENT");
+			sql.append("\n     ,D.modifier_line_id");
 			sql.append("\n     from PENSBI.M_C4_MST M,PENSBI.M_C4_DT D ");
 			sql.append("\n     where M.promo_id = D.promo_id");
 			sql.append("\n  )P");
 			sql.append("\n  ON A.order_date between P.start_date and P.end_date");
-			sql.append("\n  and A.discount_percent = P.discount_percent ");
+			if(!newVersion){
+			  // OLD CODE 
+			  sql.append("\n  and A.discount_percent = P.discount_percent ");
+			}else{
+			  //NEW CODE WIT EDIT:18/04/2019
+			  sql.append("\n  and A.list_line_id = P.modifier_line_id ");
+			}
 			sql.append("\n )AA");
 			sql.append("\n WHERE AA.retail_sell_amt > 0 ");
 			sql.append("\n order by AA.promo_name,AA.sub_promo_name,AA.MATERIAL_MASTER,AA.pens_item");
-			////////////////////////////
             sql.append("\n   )A ");
          
      	    // get record start to end 

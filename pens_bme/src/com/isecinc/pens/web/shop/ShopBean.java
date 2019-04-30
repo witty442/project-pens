@@ -70,8 +70,15 @@ public class ShopBean implements  Serializable{
     //control 
     private boolean canEdit;
     private String reportType;
+    private String modifierLineId;
     
     
+	public String getModifierLineId() {
+		return modifierLineId;
+	}
+	public void setModifierLineId(String modifierLineId) {
+		this.modifierLineId = modifierLineId;
+	}
 	public String getTotalAmountExVat() {
 		return totalAmountExVat;
 	}

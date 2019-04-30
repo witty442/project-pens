@@ -8,6 +8,7 @@ function loadSalesrepCodeList(path){
 	var cboDistrict = document.getElementsByName('bean.salesrepCode')[0];
 	var param  ="salesChannelNo=" + document.getElementsByName('bean.salesChannelNo')[0].value;
 	    param +="&custCatNo="+ document.getElementsByName('bean.custCatNo')[0].value;
+	    param +="&salesZone="+ document.getElementsByName('bean.salesZone')[0].value;
 	$(function(){
 		var getData = $.ajax({
 			url: path+"/jsp/location/ajax/genSalesrepCodeListAjax.jsp",

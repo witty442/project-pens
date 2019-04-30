@@ -16,7 +16,7 @@ String storeType = Utils.isNull(request.getParameter("storeType"));
 String outputText = "";
 try{
 
-	System.out.println("custCode:"+custCode+",storeGroup:"+storeGroup);
+	System.out.println("custCode:"+custCode+",storeGroup:"+storeGroup+",storeType:"+storeType);
 	
 	if( !"".equals(Utils.isNull(custCode)) ){
 		//condCode = new String(condCode.getBytes("ISO8859_1"), "UTF-8");

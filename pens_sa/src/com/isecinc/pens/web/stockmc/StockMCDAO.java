@@ -220,6 +220,80 @@ public class StockMCDAO {
 		return items;
 	}
 	
+	public static List<StockMCBean> searchStockMCReport(Connection conn,String idSelected) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		StockMCBean h = null;
+		List<StockMCBean> items = new ArrayList<StockMCBean>();
+		int no =0;
+		try {
+			sql.append("\n select H.stock_date,H.customer_code,H.store_code,H.mc_name,H.create_user ");
+			sql.append("\n ,(select M.customer_name from pensbi.mc_cust M ");
+			sql.append("\n   where M.customer_code = H.customer_code ) as customer_name");
+			sql.append("\n ,D.* ,(select max(M.description) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
+			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
+			sql.append("\n WHERE H.id = D.id ");
+			sql.append("\n AND D.id in( "+Utils.converToTextSqlIn(idSelected)+")");
+			sql.append("\n ORDER BY H.stock_date,H.customer_code,H.store_code , D.line_id asc");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   no++;
+			   h = new StockMCBean();
+			   h.setStockDate(Utils.stringValueChkNull(rst.getDate("stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
+			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
+			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
+			   h.setCreateUser(Utils.isNull(rst.getString("create_user")));
+			   h.setMcName(rst.getString("mc_name"));  
+			   
+			   h.setId(rst.getInt("id"));
+			   h.setNo(no);
+			   h.setLineId(rst.getInt("line_id"));
+			   h.setProductCode(Utils.isNull(rst.getString("product_code")));
+			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
+			   h.setProductName(Utils.isNull(rst.getString("description")));
+			   h.setProductPackSize(Utils.isNull(rst.getString("PRODUCT_PACKSIZE")));
+			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
+			   h.setRetailPriceBF(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit)));
+			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
+			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
+			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
+			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
+			   h.setUom(Utils.isNull(rst.getString("uom")));
+			   //1
+			   h.setFrontendQty1(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_1"), Utils.format_current_no_disgit)));
+			   h.setUom1(Utils.isNull(rst.getString("uom_1")));
+			   h.setExpireDate1(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   //2
+			   h.setFrontendQty2(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_2"), Utils.format_current_no_disgit)));
+			   h.setUom2(Utils.isNull(rst.getString("uom_2")));
+			   h.setExpireDate2(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   //3
+			   h.setFrontendQty3(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_3"), Utils.format_current_no_disgit)));
+			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
+			   h.setExpireDate3(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			
+			   items.add(h);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
 	public static StringBuffer genWhereCondSql(Connection conn,StockMCBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		if( o.getId() != 0){

@@ -99,6 +99,18 @@ public class StockVanAction extends I_Action {
 			List<PopupBean> salesChannelList_s = StockVanUtils.searchSalesChannelListModel(conn, user);
 			salesChannelList.addAll(salesChannelList_s);
 			request.getSession().setAttribute("SALES_CHANNEL_LIST",salesChannelList);
+			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+
+			List<PopupBean> salesZoneList_s = StockVanUtils.searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -128,7 +140,7 @@ public class StockVanAction extends I_Action {
 				List<StockVanBean> items = StockVanDAO.searchStockVanList(conn,aForm.getBean(),columnList);
 				aForm.setResultsSearch(items);
 				
-				if(items.size() <=0){
+				if(items.size() <=0 || columnList.size()<=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				   request.getSession().setAttribute("RESULT_DATA",null);
 				   aForm.setResultsSearch(null);

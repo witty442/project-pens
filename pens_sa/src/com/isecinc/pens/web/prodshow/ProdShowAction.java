@@ -25,6 +25,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.promotion.PromotionUtils;
 
 /**
  * Summary Action
@@ -122,9 +123,21 @@ public class ProdShowAction extends I_Action {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = ProdShowUtils.searchSalesrepListAll(conn,"","C");
+			List<PopupBean> salesrepList_s = ProdShowUtils.searchSalesrepListAll(conn,"","C","");
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
+			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+			
+			List<PopupBean> salesZoneList_s = ProdShowUtils.searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

@@ -1,0 +1,11 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+RECORD_TYPE,N,0,CHAR,,N           
+REQUEST_NUMBER  ,N,1,CHAR,,N
+CUSTOMER_CODE,N,2,CHAR,,N
+REQUEST_DATE,N,3,DATE,,N
+DESCRIPTION,N,4,CHAR,,N
+total_nonvat_amount,N,5,CHAR,,N
+total_vat_amount,N,6,CHAR,,N
+total_amount,N,7,CHAR,,N
+salesrep_id,N,8,CHAR,,N
+file_name,N,9,CHAR,,N

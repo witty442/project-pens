@@ -41,6 +41,21 @@ TABLE.tableSearchNoWidth TD {
 	font-size: 13px;
 }
 
+.tableSearchNoWidthNoOverflow {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+}
+
+TABLE.tableSearchNoWidthNoOverflow TH {
+	background-color: #03A4B6;
+	text-align: center;
+}
+
+TABLE.tableSearchNoWidthNoOverflow TD {
+	color: #000000;
+	font-size: 13px;
+}
 .table_hilight {
 	background-color: #909090;
 	text-align: center;
@@ -79,7 +94,13 @@ table.tableSearch td.td_text_right {
   text-align: right;
   align:right;
 }
-
+.number_small{
+  text-align:right;
+  font-size: 10px;
+}
+.text_small{
+  font-size: 10px;
+}
 .td_number{
 	text-align:right;
 }

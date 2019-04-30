@@ -47,14 +47,13 @@ function setDataPopupValue(code,desc,pageName,fieldName){
 	<td align="left" width="10%"></td>
   </tr>
    <tr>
-	<td align="right" width="10%"> From Group</td>
+	<td align="right" width="10%"> Group</td>
 	<td align="left" width="6%">
 	<html:text property="bean.groupCodeFrom" styleId="groupCodeFrom" size="15" maxlength="6"/>
 	 <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','FIND_GroupCode','groupCodeFrom','false')"/>   
 	</td>
-	<td align="right" width="6%"> To Group</td>
-	<td align="left" width="10%"><html:text property="bean.groupCodeTo" styleId="groupCodeTo" size="15"  maxlength="6"/>
-	 <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','FIND_GroupCode','groupCodeTo','false')"/>   
+	<td align="right" width="6%"> </td>
+	<td align="left" width="10%">   
 	</td>
   </tr>
   <tr>

@@ -60,27 +60,27 @@ public class PickConstants extends Constants{
 	public static String SUB_PICK_TYPE_PART_BOX ="PBOX";
 	
 	public static String getStoreGroupName(String storeGroup){
-		if(storeGroup.equals(STORE_TYPE_LOTUS_CODE)){
+		if(storeGroup.equalsIgnoreCase(STORE_TYPE_LOTUS_CODE)){
 			return "LOTUS";
-		}else 	if(storeGroup.equals(STORE_TYPE_BIGC_CODE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_BIGC_CODE)){
 			return "BIGC";
-		}else 	if(storeGroup.equals(STORE_TYPE_TOPS_CODE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_TOPS_CODE)){
 			return "TOPS";		
-		}else 	if(storeGroup.equals(STORE_TYPE_FRIDAY_CODE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_FRIDAY_CODE)){
 			return "FRIDAY";
-		}else 	if(storeGroup.equals(STORE_TYPE_TVD_CODE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_TVD_CODE)){
 			return "TV-DIRECT";
-		}else 	if(storeGroup.equals(STORE_TYPE_MTT_CODE_1)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_MTT_CODE_1)){
 			return "MTT";
-		}else 	if(storeGroup.equals(STORE_TYPE_KING_POWER)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_KING_POWER)){
 			return "KING Power";
-		}else 	if(storeGroup.equals(STORE_TYPE_HISHER_CODE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_HISHER_CODE)){
 			return "HIS-HER";
-		}else 	if(storeGroup.equals(STORE_TYPE_PENS)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_PENS)){
 			return "กลุ่มภายใน PENS";
-		}else 	if(storeGroup.equals(STORE_TYPE_GRAND_SALE)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_GRAND_SALE)){
 			return "Grand Sale";
-		}else 	if(storeGroup.equals(STORE_TYPE_WIENNA)){
+		}else 	if(storeGroup.equalsIgnoreCase(STORE_TYPE_WIENNA)){
 			return "Wienna - เวียนนา";
 		}
 		return "";

@@ -36,6 +36,9 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 	public String getParam(){
 		return "AS_OF_DATE|วันที่เปิด Order Big-C จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
 	}
+	public String getDescription(){
+		return "";
+	}
 	public String getValidateScript(){
 		String script ="";
 		

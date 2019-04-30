@@ -438,12 +438,12 @@ function loadDataFromMain(){
 	<tr>
 		<td align="left">
 			<c:if test="${isMultiSelect}" >
-				<input type="button" name="ok" value=" OK " class="newPosBtnLong"  onclick="selectMultiple()" style="width:80px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectMultiple()" style="width:80px;"/>
 			</c:if>
 			<c:if test="${!isMultiSelect}" >
-				<input type="button" name="ok" value=" OK " class="newPosBtnLong"  onclick="selectOneRadio()" style="width:80px;"/>
+				<input type="button" name="ok" value=" OK " class="newPosBtn1"  onclick="selectOneRadio()" style="width:80px;"/>
 			</c:if>
-			<input type="button" name="close" value="Close" class="newPosBtnLong"  onclick="javascript:window.close();" style="width:80px;"/>
+			<input type="button" name="close" value="Close" class="newPosBtn1"  onclick="javascript:window.close();" style="width:80px;"/>
 		</td>
 	</tr>
 </table>

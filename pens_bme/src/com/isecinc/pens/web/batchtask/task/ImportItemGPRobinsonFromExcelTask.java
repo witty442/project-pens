@@ -66,7 +66,7 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
 	}
 	public String getDescription(){
-		return "Import File Excel";
+		return "Import File From Excel";
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -178,6 +178,7 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 
 	public static MonitorItemBean runProcess(Connection connMonitor ,Connection conn,MonitorBean monitorModel ,MonitorItemBean monitorItemBean) {
 		UploadXLSUtil xslUtils = new UploadXLSUtil();
+	    PreparedStatement psDel = null;
 	    PreparedStatement ps = null;
 	    int successCount = 0;
 	    int failCount = 0;
@@ -203,7 +204,11 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 			logger.debug("dataFile:"+dataFile);
 			if (dataFile != null) {
 				
-				//xxpens_inv_vanmisc_temp
+				sql = new StringBuffer("");
+				sql.append("DELETE FROM PENSBI.PENSBME_ITEMBY_GP ");
+				psDel = conn.prepareStatement(sql.toString());
+				psDel.execute();
+			
 				sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_ITEMBY_GP( \n");
 				sql.append(" PENS_ITEM, GROUP_CODE, WHOLE_PRICE_VAT,GP,CREATE_DATE,CREATE_USER,FILE_NAME) \n");
@@ -292,7 +297,7 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 					if(pensItemMAP.get(pensItem) == null){
 						pensItemMAP.put(pensItem, pensItem);
 						//validate in db is exist
-						if(isPensItemExist(connMonitor, pensItem)){
+						if(isPensItemExist(conn, pensItem)){
 							importError = true;
 							importAllError =true;
 							errorMsg +="Pens Item ซ้ำ (DB Exist)";
@@ -356,6 +361,9 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 			logger.error(e.getMessage(),e);
 		} finally {
 			try {
+			  if(psDel != null){
+		    	 psDel.close();psDel=null;
+		      }
 		      if(ps != null){
 		    	 ps.close();ps=null;
 		      }

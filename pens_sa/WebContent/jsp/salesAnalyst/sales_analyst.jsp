@@ -902,7 +902,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
          txtArea1.document.write(tab_text);
          txtArea1.document.close();
          txtArea1.focus(); 
-         sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
+         sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Submit.xls");
      }else{                 //other browser not tested on IE 11
          sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
      }
@@ -1113,7 +1113,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                   =
 		                                </td>
 		                                <td align="left">
-											 <html:text property="salesBean.condCode1" styleId="condCode1" style="width:100px;" onkeyup="loadValue(event, 1,true);" onchange="set_display_value1(event, 1);"/>&nbsp;   
+											 <html:text property="salesBean.condCode1" styleId="condCode1" style="width:100px;" onkeyup="loadValue(event, 1,true);"
+											  onchange="set_display_value1(event, 1);" styleClass="\" autoComplete=\"off"/>&nbsp;   
 											 <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','1');">
 									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" width="20px" height="20px"/>
 									        </a>
@@ -1135,7 +1136,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                   =
 		                                </td>
 		                                <td align="left">
-											 <html:text property="salesBean.condCode2" styleId="condCode2" style="width:100px;" onkeyup="loadValue(event, 2,true);" onchange="set_display_value2(event, 2);"/>&nbsp;
+											 <html:text property="salesBean.condCode2" styleId="condCode2" style="width:100px;" onkeyup="loadValue(event, 2,true);" 
+											 onchange="set_display_value2(event, 2);" styleClass="\" autoComplete=\"off"/>&nbsp;
 											 <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','2');">
 									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
@@ -1158,7 +1160,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                   =
 		                                </td>
 		                                <td align="left">
-											 <html:text property="salesBean.condCode3" styleId="condCode3" style="width:100px;" onkeyup="loadValue(event, 3,true);" onchange="set_display_value3(event, 3);"/>&nbsp;
+											 <html:text property="salesBean.condCode3" styleId="condCode3" style="width:100px;" onkeyup="loadValue(event, 3,true);" 
+											 onchange="set_display_value3(event, 3);" styleClass="\" autoComplete=\"off"/>&nbsp;
 											  <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','3');">
 									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
@@ -1181,7 +1184,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 		                                   =
 		                                </td>
 		                                <td align="left" >
-                                             <html:text property="salesBean.condCode4" styleId="condCode4" style="width:100px;" onkeyup="loadValue(event, 4,true);" onchange="set_display_value4(event, 4);"/>&nbsp;
+                                             <html:text property="salesBean.condCode4" styleId="condCode4" style="width:100px;" onkeyup="loadValue(event, 4,true);"
+                                              onchange="set_display_value4(event, 4);" styleClass="\" autoComplete=\"off"/>&nbsp;
 											  <a href="javascript:showSearchValuePopup('${pageContext.request.contextPath}','4');">
 									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"  width="20px" height="20px"/>
 									        </a>
@@ -1194,7 +1198,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 								        </td>
 		                              </tr>
 		                              
-		                              <tr nowarp="nowarp" >
+		                              <tr>
 		                                <%-- <td align="left" width="20%"></td>
 		                                <td align="center" width="5%"></td>
 		                                <td align="left" width="75%"><html:radio property="salesBean.includePos" value="Y" />รวม Pos

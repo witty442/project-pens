@@ -47,12 +47,13 @@ function selectOneRadio(){
 	var priAllQty = document.getElementsByName("priAllQty");
 	var priQty = document.getElementsByName("priQty");
 	var subQty = document.getElementsByName("subQty");
+	var price = document.getElementsByName("price");
 	
 	for(var i=0;i<chRadio.length;i++){
         if(chRadio[i].checked){
         	//alert(i+":"+code[i+1].value);
         	//window.close();
-            window.opener.setInvoiceValue(code[i].value,priAllQty[i].value,priQty[i].value,subQty[i].value,<%=index%>);
+            window.opener.setInvoiceValue(code[i].value,priAllQty[i].value,priQty[i].value,subQty[i].value,price[i].value,<%=index%>);
         	setTimeout("window.close()",400);
             break;
         }
@@ -107,6 +108,7 @@ function selectOneRadio(){
 		<input type ="hidden" name="priAllQty" id="priAllQty" value="<bean:write name="item" property="priAllQty"/>" />
 		<input type ="hidden" name="priQty" id="priQty" value="<bean:write name="item" property="priQty"/>" />
 		<input type ="hidden" name="subQty" id="subQty" value="<bean:write name="item" property="subQty"/>" />
+		<input type ="hidden" name="price" id="price" value="<bean:write name="item" property="price"/>" />
 	 </display:column>
     											    
     <display:column  title="Invoice No" property="code"   sortable="false" class="code"/>

@@ -56,7 +56,6 @@ if(session.getAttribute("custGroupList") == null){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('issueReqDate'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('confirmIssueDate'));
@@ -67,7 +66,6 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function search(path){
 	var form = document.pickStockForm;
 	var issueReqDate =$('#issueReqDate').val();
@@ -86,42 +84,36 @@ function gotoPage(path,currPage){
     form.submit();
     return true;
 }
-
 function openEdit(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepare&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
 	form.submit();
 	return true;
 }
-
 function openEditAllBox(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepareAllBox&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
 	form.submit();
 	return true;
 }
-
 function openEditAllPartBox(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepareAllPartBox&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
 	form.submit();
 	return true;
 }
-
 function openConfirm(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepare&process=confirm&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
 	form.submit();
 	return true;
 }
-
 function openConfirmAllBox(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepareAllBox&process=confirm&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;
 	form.submit();
 	return true;
 }
-
 function openConfirmAllPartBox(path,documentNo,issueReqStatus){
 	var form = document.pickStockForm;
 	form.action = path + "/jsp/pickStockAction.do?do=prepareAllPartBox&process=confirm&issueReqNo="+documentNo+"&issueReqStatus="+issueReqStatus;

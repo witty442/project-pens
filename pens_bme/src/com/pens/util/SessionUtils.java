@@ -26,7 +26,7 @@ public class SessionUtils {
 	    	  String mySessionVarName = (String)mySession.nextElement();
 	    	  if(mySessionVarName.indexOf("Form") != -1 && !mySessionVarName.equals(curSessionFormName)){
 	    		  session.removeAttribute(mySessionVarName);
-	    	      System.out.println("Remove AttrSessionName="+mySessionVarName);
+	    	      logger.info("Remove AttrSessionName="+mySessionVarName);
 	    	  }
     	  }
       }catch(Exception e){

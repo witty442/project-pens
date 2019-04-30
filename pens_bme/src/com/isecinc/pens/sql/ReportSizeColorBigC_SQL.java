@@ -504,7 +504,7 @@ public class ReportSizeColorBigC_SQL {
 			
 			//debug write sql to file
 			if(logger.isDebugEnabled()){
-			   FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+			   FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 			}
 			//logger.debug("sql:"+sql);
 

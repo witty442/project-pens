@@ -76,6 +76,10 @@
 		    </textarea>
 		</div>	 
    </td></tr>
+   <tr><td>
+   Jquery Calendar  ,Jquery fix head table
+   http://localhost:8080/pens_sa/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMC
+   </td></tr>
   </table>
 </body>
 </html>

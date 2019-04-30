@@ -1,4 +1,4 @@
-
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.bean.Barcode"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.dao.SummaryDAO"%>
@@ -7,11 +7,10 @@
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="com.pens.util.*"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>
 <%
-	String itemCode = Utils.isNull((String) request.getParameter("itemCode"));
+String itemCode = Utils.isNull((String) request.getParameter("itemCode"));
 String storeCode = Utils.isNull((String) request.getParameter("storeCode"));
 String matCode = Utils.isNull((String) request.getParameter("matCode"));
 

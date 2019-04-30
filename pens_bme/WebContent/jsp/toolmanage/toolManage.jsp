@@ -14,7 +14,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="toolManageForm" class="com.isecinc.pens.web.toolmanage.ToolManageForm" scope="session" /> 
 
-<%
+<% 
 User user = (User) request.getSession().getAttribute("user");
 List<ToolManageBean> itemList = (List<ToolManageBean>)request.getSession().getAttribute("itemList");
 %>

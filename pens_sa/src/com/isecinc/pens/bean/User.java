@@ -41,6 +41,7 @@ public class User extends I_PO implements Serializable {
 	public static final String STOCKVAN = "STOCKVAN";
 	public static final String MC_ENTRY = "MC_ENTRY";
 	public static final String MT_QUERY = "MT_QUERY"; 
+	public static final String SA = "SA"; //salesAnalysis
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -96,6 +97,7 @@ public class User extends I_PO implements Serializable {
 		setRoleVanDoc(convertToString(rst.getString("ROLE_VANDOC")));
 		setRoleStockVan(convertToString(rst.getString("ROLE_STOCK_VAN")));
 		setRoleMC(convertToString(rst.getString("ROLE_MC")));
+		setRoleSA(convertToString(rst.getString("ROLE_SA")));
 		
 		System.out.println("setRoleMC:"+getRoleMC()+";"+convertToString(rst.getString("ROLE_MC")));
 		// set display label
@@ -205,8 +207,17 @@ public class User extends I_PO implements Serializable {
     private String roleVanDoc;
     private String roleStockVan;
     private String roleMC;
+    private String roleSA;
     
     
+	public String getRoleSA() {
+		return roleSA;
+	}
+
+	public void setRoleSA(String roleSA) {
+		this.roleSA = roleSA;
+	}
+
 	public String getRoleMC() {
 		return roleMC;
 	}

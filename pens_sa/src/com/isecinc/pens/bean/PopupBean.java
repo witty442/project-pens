@@ -34,7 +34,22 @@ public class PopupBean implements Serializable{
 	private String district;
 	private String districtName;
 	
+	private String salesZone;
+	private String salesZoneDesc;
 	
+	
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
+	public String getSalesZoneDesc() {
+		return salesZoneDesc;
+	}
+	public void setSalesZoneDesc(String salesZoneDesc) {
+		this.salesZoneDesc = salesZoneDesc;
+	}
 	public String getProvince() {
 		return province;
 	}

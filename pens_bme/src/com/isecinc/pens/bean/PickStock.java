@@ -25,6 +25,7 @@ public class PickStock implements Serializable{
 	private String pickTypeDesc;
 	private String remark;
 	private int totalQty;
+	private String totalBox;
 	private int totalIssueQty;
 	private String storeCode;
 	private String storeName;
@@ -91,6 +92,12 @@ public class PickStock implements Serializable{
 	private String issueReqNoTo;
 	
 	
+	public String getTotalBox() {
+		return totalBox;
+	}
+	public void setTotalBox(String totalBox) {
+		this.totalBox = totalBox;
+	}
 	public String getBarcode() {
 		return barcode;
 	}

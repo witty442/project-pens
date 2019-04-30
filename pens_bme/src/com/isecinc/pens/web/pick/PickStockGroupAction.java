@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.pick;
 
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
@@ -15,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -31,6 +33,8 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
+import com.pens.util.pdf.StampBoxNoPickAllBoxReportPdf;
+import com.pens.util.pdf.StampBoxNoPickByGroupReportPdf;
 
 /**
  * Summary Action
@@ -776,6 +780,32 @@ public class PickStockGroupAction extends I_Action {
 			}
 		}
 		return mapping.findForward("prepareByGroup");
+	}
+	public ActionForward printStampBoxNoReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		PickStockForm reportForm = (PickStockForm) form;
+		try {
+			reportForm.getBean().setBoxNo("");
+			InputStream in= StampBoxNoPickByGroupReportPdf.generate(request,reportForm.getBean());// 
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename=stamp_box_no.pdf");
+			response.setContentType("application/vnd.ms-excel");
+			
+			IOUtils.copy(in,out);
+
+		    out.flush();
+		    out.close();
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", e.getMessage());
+		} finally {
+			try {
+			
+			} catch (Exception e2) {}
+		}
+		// return null;
+		return null;
 	}
 	public ActionForward exportBarcodeToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("exportBarcodeToExcel");

@@ -32,6 +32,7 @@ import com.isecinc.pens.inf.manager.process.ExportProcess;
 import com.isecinc.pens.inf.manager.process.export.ExportOrder;
 import com.isecinc.pens.inf.manager.process.export.ExportReceipt;
 import com.isecinc.pens.inf.manager.process.export.ExportReqPromotion;
+import com.isecinc.pens.inf.manager.process.export.ExportStockReturn;
 import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
 
 /**
@@ -301,11 +302,9 @@ public class ExportManager {
 						    }
 						    logger.info("--End Export t_bank_transfer--");
 	            		}
-					}
-            	
 					// 2011/11/30 Create New Export File
 					// New Export File To Temp2
-					else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec")){
+	               }else if(tableBean.getTableName().equalsIgnoreCase("t_order_rec")){
 						logger.info("--Start Export t_order_rec--");
 						
 						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
@@ -316,6 +315,22 @@ public class ExportManager {
 						}
 						
 						logger.info("--End Export t_order_rec--");
+				  
+					//Export to db temp oracle 
+	               }else if(tableBean.getTableName().equalsIgnoreCase("t_stock_return")){
+						logger.info("--Start Export t_stock_return--");
+						
+						//get sql prepare select 
+						tableBean.setPrepareSqlSelect(ExportStockReturn.getSqlPrepareSelect(tableBean,userLogin));
+						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
+						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
+					    /** Check Data Found Before Export **/
+						if(modelDetailItem != null && modelDetailItem.length > 0){
+							//Export to db temp oracle 
+						   tableBean = new ExportStockReturn().exportStockReturn(conn,tableBean,userRequest);	
+						}
+						
+						logger.info("--End Export t_stock_return--");	
 					/** Case Export Order Line Only User Role DD **/
 					}else{
 						logger.info("--Start Export "+tableBean.getTableName()+"--");

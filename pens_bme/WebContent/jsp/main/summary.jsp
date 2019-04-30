@@ -253,11 +253,16 @@ function search(path){
 	      if(location ==""){ 
 		    alert("กรุณาเลือกข้อมูล Location");
 		    return false;
-	      } 
+	      }     
 	 <% }%>
-	
-	form.action = path + "/jsp/summaryAction.do?do=search&page=<%=request.getParameter("page")%>";
-	form.submit();
+	 
+	 /** new search in page criteria */
+	 <%if( !"onhandBigCOracle".equalsIgnoreCase(request.getParameter("page"))) { %>
+		form.action = path + "/jsp/summaryAction.do?do=search&page=<%=request.getParameter("page")%>";
+		form.submit();
+	 <%}else{%>
+	     return searchInPage(path);
+	 <%}%>
 	return true;
 }
 
@@ -488,6 +493,10 @@ function clearForm(path){
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="SummaryBMESizeColorBigC"/>
 				</jsp:include>
+		   <%}else if("onhandBigCOracle".equalsIgnoreCase(request.getParameter("page"))) {%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="SummaryBMEOnhandBigCAtOracle"/>
+				</jsp:include>
 		
 		    <%}else if("sizeColorLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
 		      	<jsp:include page="../program.jsp">
@@ -557,6 +566,8 @@ function clearForm(path){
 						     <jsp:include page="criteria/openBillRobinsonReportCriteria.jsp" /> 
 						<%}else if("onhand".equalsIgnoreCase(request.getParameter("page"))) {%>
 						     <jsp:include page="criteria/OnhandCriteria.jsp" /> 
+						 <%}else if("onhandBigCOracle".equalsIgnoreCase(request.getParameter("page"))) {%>
+						     <jsp:include page="criteria/OnhandBigCOracleCriteria.jsp" /> 
 						<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigC".equalsIgnoreCase(request.getParameter("page"))
 								|| "onhandBigCSP".equalsIgnoreCase(request.getParameter("page"))
@@ -837,6 +848,9 @@ function clearForm(path){
 	                   </c:when>
 	                    <c:when test="${summaryForm.page == 'openBillRobinsonReport'}">
 	                         <jsp:include page="subreports/subOpenBillRobinsonReport.jsp" /> 
+	                   </c:when>
+	                   <c:when test="${summaryForm.page == 'onhandBigCOracle'}">
+	                         <jsp:include page="subreports/subReportOnhandBigCOracle.jsp" /> 
 	                   </c:when>
 				      <c:otherwise>
 				         <!-- ALL SUB Report By old code -->

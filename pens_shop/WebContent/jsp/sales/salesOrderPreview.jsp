@@ -323,6 +323,7 @@ function calcChangeAmountModel(custAmountObj){
 											<input type='hidden' name='lines.tripno' value='${lines1.tripNo}'>
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
 											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
+											<input type='hidden' name='lines.modifierLineId' value='${lines1.modifierLineId}'>
 										</td>
 										<td class="td_text_center" width="5%">${lines1.fullUom}</td>
 										<td class="td_text_right" width="10%">

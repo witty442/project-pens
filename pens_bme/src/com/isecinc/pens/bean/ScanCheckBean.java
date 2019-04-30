@@ -39,7 +39,7 @@ public class ScanCheckBean implements Serializable{
 	private String barcodeStyle;
 	private String requestor;
 	private int totalBox;
-	
+	private String address;
 
 	//optional
 	private boolean canEdit = false;
@@ -47,6 +47,12 @@ public class ScanCheckBean implements Serializable{
 	private boolean canPrint = false;
 	
 	
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	public boolean isCanPrint() {
 		return canPrint;
 	}

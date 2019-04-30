@@ -68,6 +68,7 @@ public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
     private String storeNo;
     
     private List<OnhandSummary> itemsList;
+    private List<OnhandSummary> errorList;
     private OnhandSummary summary;
     private String orderLotNo;
     private String wholePriceVat;
@@ -78,6 +79,12 @@ public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
 	private double totalAmountByCust = 0;
 	
     
+	public List<OnhandSummary> getErrorList() {
+		return errorList;
+	}
+	public void setErrorList(List<OnhandSummary> errorList) {
+		this.errorList = errorList;
+	}
 	public double getTotalQtyByCust() {
 		return totalQtyByCust;
 	}

@@ -72,9 +72,10 @@ public class InitialReferences extends I_Initial {
 			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' and is_load ='Y' \n");
 			
 			//*** WIT Edit 29/07/2554 : not Show BBL InternalBank  *******************************//
-			sql.append(" AND REFERENCE_ID NOT IN(  \n");
+			/*sql.append(" AND REFERENCE_ID NOT IN(  \n");
 			sql.append("	SELECT REFERENCE_ID FROM c_reference WHERE  CODE = 'InternalBank'  and VALUE = '001'   \n");
-			sql.append(" )  \n");
+			sql.append(" )  \n");*/
+			/*** WIT EDIT 03/04/2562 show all internalBank ***/
 			//*************************************************************************************//
 			
 			List<References> refList = Database.query(sql.toString(), null, References.class, conn);

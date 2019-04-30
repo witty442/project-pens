@@ -582,7 +582,7 @@ public class ToolManageDAO extends PickConstants{
 			List<ToolManageBean> itemList = new ArrayList<ToolManageBean>();
 			try {
 				sql.append("\n select * FROM PENSBI.PENSBME_ITEM_MASTER M ");
-	            sql.append("\n where 1=1 ");
+	            sql.append("\n where 1=1 order by item");
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

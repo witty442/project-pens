@@ -1034,6 +1034,8 @@ public class PickStockGroupDAO extends PickConstants{
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
 			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no"))); 
 			   
+			   h.setTotalBox(Utils.isNull(rst.getString("total_box"))); 
+			   
 			   if(rst.getDate("confirm_issue_date") != null){
 				   String dateStr = Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				   h.setConfirmIssueDate(dateStr);
@@ -2069,8 +2071,8 @@ public class PickStockGroupDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_PICK_STOCK \n");
 			sql.append(" (ISSUE_REQ_NO, ISSUE_REQ_DATE, ISSUE_REQ_STATUS, PICK_USER,REMARK ," +
-					"CREATE_DATE,CREATE_USER,PICK_TYPE,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,SUB_PICK_TYPE)  \n");
-		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?) \n");
+					"CREATE_DATE,CREATE_USER,PICK_TYPE,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,SUB_PICK_TYPE,TOTAL_BOX)  \n");
+		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -2090,7 +2092,7 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setString(c++, o.getStoreNo());
 			ps.setString(c++, o.getSubInv());
 			ps.setString(c++, Utils.isNull(o.getSubPickType()));
-			
+			ps.setInt(c++, Utils.convertToInt(o.getTotalBox()));
 			ps.executeUpdate();
 			
 		}catch(Exception e){
@@ -2189,7 +2191,7 @@ public class PickStockGroupDAO extends PickConstants{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
-			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_REQ_QTY = ? \n");
+			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_REQ_QTY = ? ,TOTAL_BOX =? \n");
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				sql.append(" ,confirm_issue_date =? \n ");
 			}
@@ -2204,6 +2206,7 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
 			ps.setInt(c++, o.getTotalQty());
+			ps.setInt(c++, Utils.convertToInt(o.getTotalBox()));
 			
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				Date confrimDate = Utils.parse( o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

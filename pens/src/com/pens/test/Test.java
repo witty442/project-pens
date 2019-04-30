@@ -11,9 +11,9 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMM", Locale.US);
-		String today = df.format(new Date());
-	    System.out.println("today:"+today);
+	    if(0.0000099 >0.00){
+	      System.out.println("today:");
+	    }
 	}
 
 }

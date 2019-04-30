@@ -118,9 +118,21 @@ public class MoveOrderAction extends I_Action {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = MoveOrderUtils.searchSalesrepListAll(conn,"","C");
+			List<PopupBean> salesrepList_s = MoveOrderUtils.searchSalesrepListAll(conn,"","C","");
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
+			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+
+			List<PopupBean> salesZoneList_s = MoveOrderUtils.searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

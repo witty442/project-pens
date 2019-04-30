@@ -31,6 +31,7 @@ import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.web.summary.report.OpenBillRobinsonReportAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfRobinsonAction;
+import com.isecinc.pens.web.summary.report.ReportOnhandBigCOracleAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorBigCAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorLotusAction;
@@ -99,9 +100,9 @@ public class SummaryAction extends I_Action {
 				 }
 				 
 				 //for test 
-				 OnhandSummary bean = new OnhandSummary();
+				/* OnhandSummary bean = new OnhandSummary();
 				 bean.setAsOfDate("01/02/2562");
-				 summaryForm.setBean(bean);
+				 summaryForm.setBean(bean);*/
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -293,11 +294,18 @@ public class SummaryAction extends I_Action {
 					
 				}else if("openBillRobinsonReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					summaryForm.setDataHTML(null);
+					summaryForm.getBean().setErrorList(null);
 					summaryForm = OpenBillRobinsonReportAction.process(request,user, summaryForm,"html");
-					 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
-						 request.setAttribute("Message", "ไม่พบข่อมูล");
+					//validate error
+					if(summaryForm.getBean().getErrorList() != null && summaryForm.getBean().getErrorList().size() >0){
+						 //gen Error Item display
+						 request.setAttribute("Message", "ข้อมูลไม่ถูกต้อง ไม่พบข้อมูล Pens Item ใน MASTER TABLE PENSBME_ITEMBY_GP");
+						 summaryForm.setDataHTML(OpenBillRobinsonReportAction.genErrorListTable(summaryForm.getBean().getErrorList()));
+					 }else{
+						 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
+							 request.setAttribute("Message", "ไม่พบข้อมูล");
+						 }
 					 }
-					
 				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
 					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -722,6 +730,9 @@ public class SummaryAction extends I_Action {
 					
 				}else if("sizeColorKing".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					summaryForm = ReportOnhandSizeColorKingAction.process(request,user, summaryForm);
+					
+				}else if("onhandBigCOracle".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+					summaryForm = ReportOnhandBigCOracleAction.process(request,user, summaryForm);
 				}
 				
 				// set param on screen
@@ -825,6 +836,7 @@ public class SummaryAction extends I_Action {
 			/** Onhand **/
 			if("onhand".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				fileName ="ReportStockonhandBme.xls";
+				logger.debug("summaryForm.getOnhandSummaryResults().size():"+summaryForm.getOnhandSummaryResults().size() );
 				if(summaryForm.getOnhandSummaryResults() != null && summaryForm.getOnhandSummaryResults().size() > 0){
 					htmlTable = export.genOnhandHTML(request,summaryForm,user);	
 				}else{
@@ -1016,21 +1028,39 @@ public class SummaryAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if("sizeColorLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-				fileName="Report Stock on-hand at LOTUS Size-Color(Init New Stock)_"+Utils.isNull(summaryForm.getSummaryType())+".xls";
+				fileName="Report Stock onhand at LOTUS Size-Color(Init New Stock)_"+Utils.isNull(summaryForm.getSummaryType())+".xls";
 				if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
 					htmlTable = export.genLotusSizeColorHTML(request,summaryForm,user);	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
 				}
+			}else if("onhandBigCOracle".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
+				fileName="Report Stock onhand BigC at Oracle.xls";
+				if(summaryForm.getResults() != null && summaryForm.getResults().size() > 0){
+					htmlTable = ReportOnhandBigCOracleAction.genExcel(request,summaryForm);
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
 			}else if("openBillRobinsonReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				 summaryForm.setDataHTML(null);
+				 summaryForm.getBean().setErrorList(null);
 				 summaryForm = OpenBillRobinsonReportAction.process(request,user, summaryForm,"EXCEL");
-				 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
-					summaryForm.setOnhandSummaryMTTDetailResults(null);
-					request.setAttribute("Message", "ไม่พบข่อมูล");
+				
+				 //validate error
+				 if(summaryForm.getBean().getErrorList() != null && summaryForm.getBean().getErrorList().size() >0){
+					 logger.debug("Export error");
+					 //gen Error Item display
+					 request.setAttribute("Message", "ข้อมูลไม่ถูกต้อง ไม่พบข้อมูล Pens Item ใน MASTER TABLE PENSBME_ITEMBY_GP");
+					 summaryForm.setDataHTML(OpenBillRobinsonReportAction.genErrorListTable(summaryForm.getBean().getErrorList()));
 				 }else{
-				    htmlTable = summaryForm.getDataHTML();
+					// logger.debug("data HTML:"+summaryForm.getDataHTML()+":"+summaryForm.getDataHTML().toString().length());
+					 if(summaryForm.getDataHTML()==null ||(summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()==0)){
+						 request.setAttribute("Message", "ไม่พบข้อมูล");
+					 }else{
+						  htmlTable = summaryForm.getDataHTML();
+					 }
 				 }
 			}
 			
@@ -1038,18 +1068,21 @@ public class SummaryAction extends I_Action {
 	        //fileName = Utils.toUnicodeChar(fileName);
 	        //logger.debug("fileName:"+fileName);
 	        //"data.xls";
-			java.io.OutputStream out = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
-			response.setContentType("application/vnd.ms-excel");
-			
-			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
-			w.write(htmlTable.toString());
-		    w.flush();
-		    w.close();
-
-		    out.flush();
-		    out.close();
-
+			if( (summaryForm.getDataHTML() != null && summaryForm.getDataHTML().toString().length()>0)
+				|| (htmlTable != null && htmlTable.length() > 0)){
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(htmlTable.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    
+			    out.close();
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());

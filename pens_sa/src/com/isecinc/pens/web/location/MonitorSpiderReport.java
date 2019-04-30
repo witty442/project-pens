@@ -736,6 +736,12 @@ public class MonitorSpiderReport {
 			if( !Utils.isNull(district).equals("")){
 				sql.append("\n and cs"+schema_name+".amphur = '"+district+"' ");
 			}
+			if( !Utils.isNull(c.getSalesZone()).equals("")){
+			    sql.append("\n  and cs"+schema_name+".primary_salesrep_id in(");
+			    sql.append("\n    select salesrep_id from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+			    sql.append("\n    where zone = "+Utils.isNull(c.getSalesZone()) );
+			    sql.append("\n  )");
+			}
 			
 			if( !Utils.isNull(c.getCustomerType()).equals("")){
 				if( Utils.isNull(c.getCustomerType()).equals("P")){

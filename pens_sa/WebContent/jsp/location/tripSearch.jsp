@@ -221,21 +221,26 @@ function saveTripByCustAjax(index,customerCode){
 								       <html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
 							           </html:select>
 							           </td>
-								     <td width="10%" align="right"  nowrap><b>ภาคการขาย</b> </td>
-								     <td width="10%" align="left">
+								     <td width="10%" align="right" nowrap><b>ภาคการขาย</b> </td>
+								     <td width="30%" align="left" nowrap>
 								      <html:select property="bean.salesChannelNo" styleId="salesChannelNo" 
 								      onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
 						                <html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				                      </html:select>
+				                       &nbsp;&nbsp;          
+										<b>ภาคตามสายดูแล </b>
+									  <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+									    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+									  </html:select>
                                      </td> 
 									<td width="10%" align="right" nowrap> <b>พนักงานขาย <font color="red">*</font></b> </td>
-									<td width="20%" align="left">
+									<td width="10%" align="left">
 									<html:select property="bean.salesrepCode" styleId="salesrepCode" >
 										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
 								    </html:select>
 									</td>
 									<td width="10%" align="right"><b>Trip/จุด</b></td>
-								    <td width="20%" align="left"> <html:text property="bean.tripDay"  styleId="tripDay" size="8"  
+								    <td width="10%" align="left"> <html:text property="bean.tripDay"  styleId="tripDay" size="8"  
 								    styleClass="\" autoComplete=\"off"/></td>
 								    </tr>
 								   </table>

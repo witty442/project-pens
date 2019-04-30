@@ -533,7 +533,7 @@ public class ScanCheckAction extends I_Action {
 			reportForm.getBean().setBoxNo("");
 			InputStream in= StampBoxNoReportPdf.generate(request,reportForm.getBean());// 
 			java.io.OutputStream out = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment; filename=data.pdf");
+			response.setHeader("Content-Disposition", "attachment; filename=stamp_box_no.pdf");
 			response.setContentType("application/vnd.ms-excel");
 			
 			IOUtils.copy(in,out);

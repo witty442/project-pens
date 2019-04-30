@@ -84,6 +84,13 @@ public class StockReport {
 			if( !Utils.isNull(o.getCustCatNo()).equals("")){
 				sql.append("\n and M.sales_channel_name = '"+Utils.isNull(o.getCustCatNo())+"'");
 			}
+			 //SalesZone
+			if( !Utils.isNull(o.getSalesZone()).equals("")){
+				sql.append("\n and M.sales_code in(" );
+				sql.append("\n  SELECT SALESREP_CODE FROM PENSBI.XXPENS_BI_MST_SALES_ZONE ");
+				sql.append("\n  where zone ='"+Utils.isNull(o.getSalesZone())+"'");
+				sql.append("\n ) ");
+			}
 			//Region
 			if( !Utils.isNull(o.getSalesChannelNo()).equals("")){
 				sql.append("\n and M.region = '"+Utils.isNull(o.getSalesChannelNo())+"'");

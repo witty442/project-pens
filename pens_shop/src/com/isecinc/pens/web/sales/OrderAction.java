@@ -79,8 +79,6 @@ import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
 public class OrderAction extends I_Action {
 
 	public Debug debug = new Debug(true);
-	public static String CUSTOMER_ID_MEYA_FIXED = "2596587";//Default Maya Customer
-	
 	/**
 	 * Prepare without ID
 	 */
@@ -100,9 +98,12 @@ public class OrderAction extends I_Action {
 			logger.debug("debug.isDebugEnable():"+debug.isDebugEnable());
 			request.getSession().setAttribute("debug_mode", debug.isDebugEnable());
 			User user = (User) request.getSession(true).getAttribute("user");
-
-			customerId = Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
-				
+           
+			//get default customerId from c_config
+			customerId = user.getConfig().getCustomerId();
+			logger.debug("customerId config:"+customerId);
+			logger.debug("pricelistId config:"+user.getConfig().getPricelistId());
+			
 			OrderCriteria criteria = new OrderCriteria();
 			//criteria.setSearchKey(searchKey)
 			orderForm.setCriteria(criteria);
@@ -121,7 +122,7 @@ public class OrderAction extends I_Action {
 			orderForm.getOrder().setOrderTime(new SimpleDateFormat("HH:mm", new Locale("th", "TH")).format(new Date()));
 
 			//PriceListID  Wait for MAYA 
-			orderForm.getOrder().setPriceListId(new MPriceList().getMayaPriceList().getId());
+			orderForm.getOrder().setPriceListId(user.getConfig().getPricelistId());// new MPriceList().getMayaPriceList().getId());
 
             //creditCard Year Expire
 			request.getSession().setAttribute("CAREDITCARD_YEAR_EXPIRE_LIST", OrderUtils.getCreditcardYearExpireList());
@@ -757,7 +758,7 @@ public class OrderAction extends I_Action {
 					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
 					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
 				}*/
-			}
+			}//for
 
 			// Sales Reps --current user who's create/edit record--
 			order.setSalesRepresent(userActive);
@@ -818,6 +819,8 @@ public class OrderAction extends I_Action {
 				//Wit Edit 15/05/2555 Obj:Case PlaceOfBilled
 				line.setOrg(org);
 				line.setSubInv(subInv);
+				
+				logger.debug("modifier_line_id["+line.getModifierLineId()+"]");
 				
 				//Save Line to DB
 				new MOrderLine().save(line, userActive.getId(), conn);
@@ -1055,10 +1058,17 @@ public class OrderAction extends I_Action {
 		OrderForm orderForm = (OrderForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String action = Utils.isNull(request.getParameter("action"));
+		int customerId = 0;
 		try {
 			logger.debug("action:"+action);
 			if( "new".equalsIgnoreCase(action)){
-				int customerId = Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
+				//get from m_customer by user_id
+				Customer custByUserId = new MCustomer().findByWhereCond(" where user_id = "+user.getId());// Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
+				if(custByUserId != null){
+				   customerId = custByUserId.getId();
+				}else{
+					throw new Exception("Cannot found Customer Default");
+				}
 				
 				OrderCriteria criteria = new OrderCriteria();
 				//criteria.setSearchKey(searchKey)

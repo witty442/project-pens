@@ -513,8 +513,9 @@ public class MProduct extends I_Model<Product>{
 			    catalog.setUom2Pac(conversionRate);
 			    catalog.setUom2ConvRate(uc2.getConversionRate()+"");
 			    
-			    //ctn price
-			    catalog.setUom1Price(Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit));
+			    //ctn price from t_order_line
+			   // catalog.setUom1Price(Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit));
+			    
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

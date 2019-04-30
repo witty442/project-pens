@@ -82,10 +82,10 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat
 			
-			/** Role MC_ENTRY redirect page to StockMCAction**/
-			/*if(UserUtils.userInRoleMCCheckForwardPage(user, new String[]{User.MC_ENTRY})){
-				forwordStr = "pass_mcentry";
-			}*/
+			/** Role SA ,Admin --<**/
+			if( !UserUtils.userInRole("ROLE_SA",user, new String[]{User.ADMIN,User.SA})){
+				forwordStr = "pass_salestarget";
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

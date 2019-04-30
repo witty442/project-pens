@@ -24,18 +24,48 @@ public class StockVanDAO {
 		try {
 			//Case 1  แนวตั้ง : PD/หน่วยรถ    แนวนอน :  รหัสสินค้า  
 			if("1".equals(o.getDispType())){
-				sql.append("\n  SELECT distinct p.segment1 as column_code from ");
-				sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-				sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
-				sql.append("\n ,apps.xxpens_salesreps_v s");
-				sql.append("\n ,apps.xxpens_om_item_mst_v p");
-				sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-				sql.append("\n  AND subinv.user_id = s.user_id");
-				sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
-				 //GenWhereSQL
-				sql.append(" "+genWhereCondSql(conn,o));
-				sql.append("\n  ORDER BY p.segment1 ");
-				
+				//no display pd intransit
+				if( Utils.isNull(o.getDispPlan()).equals("")){
+					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
+					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
+					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_salesreps_v s");
+					sql.append("\n ,apps.xxpens_om_item_mst_v p");
+					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
+					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
+					 //GenWhereSQL
+					sql.append(" "+genWhereCondSql(conn,o));
+					sql.append("\n  ORDER BY p.segment1 ");
+				}else{
+					sql.append("\n SELECT distinct p.column_code FROM (");
+					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
+					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
+					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_salesreps_v s");
+					sql.append("\n ,apps.xxpens_om_item_mst_v p");
+					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
+					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
+					 //GenWhereSQL
+					sql.append(" "+genWhereCondSql(conn,o));
+					
+					sql.append("\n  UNION ALL");
+					
+					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
+					sql.append("\n  apps.xxpens_inv_intransit_r00_v pd");
+					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_salesreps_v s");
+					sql.append("\n ,apps.xxpens_om_item_mst_v p");
+					sql.append("\n  WHERE pd.to_subinventory = subinv.subinventory");
+					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
+					 //GenWhereSQL
+					sql.append(" "+genWhereCondSql(conn,o));
+					sql.append("\n ) p ");
+					
+					sql.append("\n  ORDER BY p.column_code ");
+				}
 			//Case 2  แนวตั้ง : รหัสสินค้า      แนวนอน :    PD/หน่วยรถ
 			}else if("2".equals(o.getDispType())){
 				//no display pd intransit
@@ -448,6 +478,12 @@ public class StockVanDAO {
 		}
 		if( !Utils.isNull(o.getProductCode()).equals("")){
 			sql.append("\n and P.segment1 in("+Utils.converToTextSqlIn(o.getProductCode())+")");
+		}
+		if( !Utils.isNull(o.getSalesZone()).equals("")){
+		    sql.append("\n  and S.code in(");
+		    sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+		    sql.append("\n    where zone = "+Utils.isNull(o.getSalesZone()) );
+		    sql.append("\n  )");
 		}
 		return sql;
 	}

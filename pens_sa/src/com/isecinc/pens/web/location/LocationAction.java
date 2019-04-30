@@ -86,7 +86,7 @@ public class LocationAction extends I_Action {
 				    LocationBean bean = new LocationBean();
 				    //default check display
 				    bean.setCustCatNo("C");//VanSale
-				    bean.setDispAllNoOrder("true");
+				    bean.setDispAllNoOrder("true"); 
 				    bean.setDispAllOrder("true");
 				    bean.setDispAllVisit("true");
 				    //for test 

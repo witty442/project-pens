@@ -210,6 +210,7 @@ function setValueToProduct(path, objValue){
 	inputLabel+="<input type='hidden' name='lines.tripno' value='1'>";
 	inputLabel+="<input type='hidden' name='lines.taxable' value='"+objValue.taxable+"'>";              
 	inputLabel+="<input type='hidden' name='lines.sellingPrice' value='0'>";
+	inputLabel+="<input type='hidden' name='lines.modifierLineId' value='0'>";
 	
 	var checkBoxLabel='<input type="checkbox" name="lineids" value="0"/>';
 	
@@ -302,6 +303,7 @@ function createProductList(){
 	var vats1=document.getElementsByName('lines.vat1');
 	var vats2=document.getElementsByName('lines.vat2');
 	var sellingPrice=document.getElementsByName('lines.sellingPrice');
+	var modifierLineId=document.getElementsByName('lines.modifierLineId');
 	
 	var ships=document.getElementsByName('lines.ship');
 	var reqs=document.getElementsByName('lines.req');
@@ -343,6 +345,7 @@ function createProductList(){
 		inputLabel+="<input type='text' name='lines["+i+"].totalAmount1' value='"+totals1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].totalAmount2' value='"+totals2[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].sellingPrice' value='"+sellingPrice[i].value+"'>";
+		inputLabel+="<input type='text' name='lines["+i+"].modifierLineId' value='"+modifierLineId[i].value+"'>";
 		
 		inputLabel+="<input type='text' name='lines["+i+"].shippingDate' value='"+ships[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].requestDate' value='"+reqs[i].value+"'>";

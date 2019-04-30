@@ -140,6 +140,11 @@ function setDataPopupValue(code,desc,pageName){
 				<html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 		    </html:select>
 		    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		    ภาคตามสายดูแล 
+			<html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList()">
+			    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+			</html:select>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 		    ประเภท <font color="red">*</font>
 		  <html:select property="bean.pdType" styleId="pdType">
 		        <html:option value=""> </html:option>

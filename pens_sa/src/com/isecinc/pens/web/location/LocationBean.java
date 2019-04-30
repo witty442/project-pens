@@ -62,8 +62,17 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	//option
 	private String startDate;
 	private String endDate;
+	private String salesZone;
 
 	
+	public String getSalesZone() {
+		return salesZone;
+	}
+
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
+
 	public String getSalesrepId() {
 		return salesrepId;
 	}

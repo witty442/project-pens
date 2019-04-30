@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.stockmc.StockMCAction"%>
 <%@page import="util.UserUtils"%>
 <%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
@@ -21,6 +22,8 @@
 SessionUtils.clearSessionUnusedForm(request, "stockMCForm");
 User user = (User)session.getAttribute("user");
 String pageName = Utils.isNull(request.getParameter("pageName")); 
+
+String codes = Utils.isNull(session.getAttribute("stock_mc_codes"));
 %>
 <html>
 <head>
@@ -50,7 +53,7 @@ function loadMe(){
 }
 function clearForm(path){
 	var form = document.stockMCForm;
-	var pageName = "";//document.getElementsByName("pageName")[0].value;
+	var pageName = document.getElementsByName("pageName")[0].value;
 	form.action = path + "/jsp/stockMCAction.do?do=prepareSearch&action=back&pageName="+pageName;
 	form.submit();
 	return true;
@@ -71,7 +74,8 @@ function openEdit(path,action,id){
 	var form = document.stockMCForm;
     var param = "&id="+id;
         param +="&action="+action;
-	
+        param +="&pageName="+document.getElementsByName("pageName")[0].value;
+        
 	form.action = path + "/jsp/stockMCAction.do?do=viewDetail"+param;
 	form.submit();
 	return true;
@@ -79,6 +83,11 @@ function openEdit(path,action,id){
 
 function exportToExcel(path){
 	var form = document.stockMCForm;
+	var codes = document.getElementsByName("codes")[0].value;
+	if(codes == ''){
+		alert("กรุณาระบุ รายการที่ต้องการ Export ก่อน");
+		return false;
+	}
 	form.action = path + "/jsp/stockMCAction.do?do=exportToExcel&action=newsearch";
 	form.submit();
 	return true;
@@ -89,8 +98,77 @@ function gotoPage(path,currPage){
     form.submit();
     return true;
 }
+/* set Chechbox Page **/
+function saveSelectedInPage(no){
+	//alert(no);
+	var chk = document.getElementsByName("chCheck");
+	var currentPage = document.getElementsByName("currentPage")[0].value;
+	var code = document.getElementsByName("code_temp");
+	var retCode = '';
+	var codesAllNew = "";
 
-
+	//alert("no:"+no);
+	if(no > <%=StockMCAction.pageSize%>){
+	   no = no - ( (currentPage-1) *<%=StockMCAction.pageSize%>);
+	}
+	//alert("no["+no+"]checked:"+chk[no].checked);
+    if(chk[no].checked){
+    	//Add 
+        retCode = code[no].value;
+		
+		//alert("code["+no+"]="+retCode);
+	    codesAllNew = document.getElementsByName("codes")[0].value;
+		
+	    var found = chekCodeDupInCodesAll(retCode);
+	    if(found == false){
+	  	   codesAllNew += retCode +",";
+	    }
+	    document.getElementsByName("codes")[0].value =  codesAllNew;
+	    //alert(no+":found["+found+"] codes["+document.getElementsByName("codes")[0].value+"]");
+    }else{
+    	//remove
+    	retCode = code[no].value;
+		
+		//alert(retCode);
+	    codesAllNew = document.getElementsByName("codes")[0].value;
+		
+	    removeUnSelected(retCode);
+    }
+	$(function(){
+		var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/stockMC/ajax/saveValueSelected.jsp",
+			data : "codes=" + encodeURIComponent(document.getElementsByName("codes")[0].value),
+			//async: false,
+			cache: true,
+			success: function(){
+			}
+		}).responseText;
+	});
+}
+function chekCodeDupInCodesAll(codeCheck){
+	var codesAll = document.getElementsByName("codes")[0].value;
+	var codesAllArray = codesAll.split(",");
+	var found = false;;
+	for(var i=0;i < codesAllArray.length; i++){
+   		if(codesAllArray[i] == codeCheck){
+   			found = true;
+   			break;
+   		}//if
+	}//for
+	return found;
+}
+function removeUnSelected(codeCheck){
+	var codesAll = document.getElementsByName("codes")[0].value;
+	var codesAllArray = codesAll.split(",");
+	var codesAllNew  = "";
+	for(var i=0;i < codesAllArray.length; i++){
+   		if(codesAllArray[i] != codeCheck){
+   		   codesAllNew += codesAllArray[i] +",";
+   		}//if
+	}//for
+	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
+	document.getElementsByName("codes")[0].value =  codesAllNew;
+}
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
@@ -162,11 +240,14 @@ function gotoPage(path,currPage){
 									<%-- <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 									  <input type="button" value="  Export   " class="newPosBtnLong"> 
 									</a> --%>
-									<%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
+									<%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
 										<a href="javascript:openEdit('${pageContext.request.contextPath}','add','')">
 										  <input type="button" value=" เพิ่มรายการใหม่  " class="newPosBtnLong"> 
 										</a>
 									<%}%>
+									<a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
+									  <input type="button" value="Export To Excel" class="newPosBtnLong">
+									</a>
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 									  <input type="button" value="   Clear   " class="newPosBtnLong">
 									</a>						
@@ -201,6 +282,7 @@ function gotoPage(path,currPage){
 								</div>
 									<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
 									       <tr>
+									            <th >Selected</th>
 												<th >No</th>
 												<th >วันที่ตรวจนับสต๊อก</th>
 												<th >ห้าง</th>
@@ -222,6 +304,10 @@ function gotoPage(path,currPage){
 											}
 											%>
 												<tr class="<%=tabclass%>">
+												    <td class="td_text_center" width="2%">
+												     <input type ="checkbox" name="chCheck" id="chCheck" onclick="saveSelectedInPage(<%=n%>)"  />
+												      <input type ="hidden" name="code_temp" value="<%=item.getId() %>" />
+													</td>
 													<td class="td_text_center" width="2%"><%=no %></td>
 													<td class="td_text_center" width="5%">
 													   <%=item.getStockDate() %>
@@ -240,7 +326,7 @@ function gotoPage(path,currPage){
 														 <%=item.getMcName() %>
 													</td>
 													<td class="td_text_center" width="4%">
-														 <%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
+														 <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
 															   <a href="javascript:openEdit('${pageContext.request.contextPath}','edit', '<%=item.getId()%>')">
 															      แก้ไข
 															  </a>
@@ -260,6 +346,8 @@ function gotoPage(path,currPage){
 					 	<!-- INPUT HIDDEN -->
 					 	<input type="hidden" name="pageName" value="<%=pageName %>"/>
 					 	<input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
+					 	<input type="hidden" name="currentPage"  value ="<%=stockMCForm.getCurrPage()%>" />
+                        <input type="hidden" name="codes" value ="<%=codes%>" />
 					</html:form>
 					<!-- BODY -->
 					</td>

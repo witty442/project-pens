@@ -30,7 +30,7 @@ import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 
 /**
   WITTY
-  SalesAnalystReportAction
+  SAReportAction
  * 
  */
 public class SAReportAction extends I_Action {

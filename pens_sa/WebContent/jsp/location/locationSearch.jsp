@@ -232,14 +232,18 @@ function loadMe(path){
 						                <html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				                      </html:select>
                                      </td> 
+                                    <td width="10%" align="right"nowrap><b>ภาคตามสายดูแล</b></td>
+								    <td width="20%" align="left">
+								    <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+									    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+									</html:select>
+                                     </td>
 									<td width="10%" align="right" nowrap> <b>พนักงานขาย</b> </td>
 									<td width="20%" align="left">
 									<html:select property="bean.salesrepCode" styleId="salesrepCode" >
 										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
 								    </html:select>
 									</td>
-									<td width="10%" align="right"></td>
-								    <td width="20%" align="left"></td>
 								    </tr>
 								   </table>
 								   </fieldset>

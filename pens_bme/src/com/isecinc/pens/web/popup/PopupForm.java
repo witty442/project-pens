@@ -24,6 +24,7 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String codeSearch;
 	private String matCodeSearch;
 	private String descSearch;
+	private String subInvSearch;
 	private String storeType;
 	private String code;
 	private String desc;
@@ -60,6 +61,14 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String branchId;
 	private String branchName;
 	
+
+	public String getSubInvSearch() {
+		return subInvSearch;
+	}
+
+	public void setSubInvSearch(String subInvSearch) {
+		this.subInvSearch = subInvSearch;
+	}
 
 	public String getBranchId() {
 		return branchId;

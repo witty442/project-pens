@@ -25,6 +25,7 @@ import util.Utils;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
@@ -88,6 +89,7 @@ public class SAInitial {
 		MULTI_SELECTION_LIST.add("Order_type_id");
 		MULTI_SELECTION_LIST.add("SUBBRAND");
 		MULTI_SELECTION_LIST.add("Division");
+		MULTI_SELECTION_LIST.add("SALES_ZONE");
 		
 		/** Column Of ORDER **/
 		COLUMN_ORDER_MAP.put("ORDERED","ORDERED");
@@ -503,7 +505,8 @@ public class SAInitial {
 					sql.append("\t"+" AND sales_order_year||sales_order_quarter IN("+all+") \n");
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}else if(TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-					sql.append("\t"+" AND sales_order_year IN("+all+") \n");
+					//sql.append("\t"+" AND sales_order_year IN("+all+") \n");
+					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",all));
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {
@@ -546,7 +549,8 @@ public class SAInitial {
 					sql.append("\t"+" AND invoice_year||invoice_quarter IN("+all+") \n");
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}else if(TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
-					sql.append("\t"+" AND invoice_year IN("+all+") \n");
+					//sql.append("\t"+" AND invoice_year IN("+all+") \n");
+					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",all));
 					sql.append("\t"+" GROUP BY "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {
@@ -654,7 +658,10 @@ public class SAInitial {
 			sql.append("ORDER BY COALESCE("+order_by_name2+","+whenNullValue+") "+order_type+" \n"); // modify by tutiya
 		}
 		
-		logger.debug("*************** Generate SQL ******************** \n"+sql.toString()+"\n*****************************************************\n");
+		//logger.debug("*************** Generate SQL ******************** \n"+sql.toString()+"\n*****************************************************\n");
+		if(logger.isDebugEnabled()){
+			FileUtil.writeFile("d://dev_temp/temp/sql.sql", sql.toString(),"TIS-620");
+		}
 		return sql;
 	}
 	
@@ -966,7 +973,33 @@ public class SAInitial {
 						no++;
 						returnList.add(new DisplayBean(no,rs.getString("subbrand_no"),rs.getString("subbrand_no"),rs.getString("subbrand_desc")));
 					}
+			//SALES ZONE
+			 }else if("SALES_ZONE".equalsIgnoreCase(condType)){
+				 sql = "select distinct ZONE,ZONE_NAME  from XXPENS_BI_MST_SALES_ZONE where ZONE is not null \n";
 					
+					if(!Utils.isNull(code).equals("")){
+						if(code.indexOf(",") > -1){
+							sql += " and ZONE in ("+SAUtils.converToText("SALES_ZONE", code) +") \n";
+						}
+						else{
+							sql += " and ZONE like '"+code+"%' \n";
+						}
+					}
+					if(!Utils.isNull(desc).equals("")){
+						sql += " and ZONE_NAME LIKE '%"+desc+"%' \n";
+					}
+					
+					/** filter by user **/
+					sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "SALES_ZONE","");
+					
+					sql += "order by ZONE \n";
+					
+					ps = conn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					while(rs.next()){
+						no++;
+						returnList.add(new DisplayBean(no,rs.getString("ZONE"),rs.getString("ZONE"),rs.getString("ZONE_NAME")));
+					}
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "select invoice_date from XXPENS_BI_MST_INVOICE_DATE where invoice_date is not null ";
 				if(!Utils.isNull(code).equals("")){
@@ -1410,7 +1443,7 @@ public class SAInitial {
 						
 						//ประเภทขาย Customer_Category   + ภาคตามพนักงานขายย Sales_Channel ==>  พนักงานขายย Salesrep_id
 						if (filterBean.getCondType1().equalsIgnoreCase("Customer_Category") && filterBean.getCondType2().equalsIgnoreCase("Sales_Channel")){
-							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc "+
+							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc \n"+
 							" from XXPENS_BI_MST_SALESREP u, xxpens_bi_sales_analysis_v t1 \n"+
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.Customer_Category in ("+SAUtils.converToText("Customer_Category", filterBean.getCondCode1()) + ")  \n"+
@@ -1423,7 +1456,7 @@ public class SAInitial {
 							
 							//ดิวิชั่น   Division           + ภาคตามพนักงานขาย Sales_Channel  ==>  พนักงานขาย Salesrep_id	
 						}else if (filterBean.getCondType1().equalsIgnoreCase("Division") && filterBean.getCondType2().equalsIgnoreCase("Sales_Channel")){
-							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc "+
+							sql = "select distinct u.salesrep_id,u.salesrep_code,u.salesrep_desc \n"+
 							" from XXPENS_BI_MST_SALESREP u, xxpens_bi_sales_analysis_v t1 \n"+
 							" where u.salesrep_code is not null and t1.salesrep_id = u.salesrep_id \n"+ 
 							" and t1.division in ("+SAUtils.converToText("Division", filterBean.getCondCode1()) + ") \n"+
@@ -1707,7 +1740,33 @@ public class SAInitial {
 						no++;
 						returnList.add(new DisplayBean(no,rs.getString("subbrand_no"),rs.getString("subbrand_no"),rs.getString("subbrand_desc")));
 					}
-					
+					//SALES ZONE
+				 }else if("SALES_ZONE".equalsIgnoreCase(condType)){
+					 sql = "select distinct ZONE,ZONE_NAME  from XXPENS_BI_MST_SALES_ZONE where ZONE is not null \n";
+						
+						if(!Utils.isNull(code).equals("")){
+							if(code.indexOf(",") > -1){
+								sql += " and ZONE in ("+SAUtils.converToText("SALES_ZONE", code) +") \n";
+							}
+							else{
+								sql += " and ZONE like '"+code+"%' \n";
+							}
+						}
+						if(!Utils.isNull(desc).equals("")){
+							sql += " and ZONE_NAME LIKE '%"+desc+"%' \n";
+						}
+						
+						/** filter by user **/
+						sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "SALES_ZONE","");
+						
+						sql += "order by ZONE \n";
+						
+						ps = conn.prepareStatement(sql);
+						rs = ps.executeQuery();
+						while(rs.next()){
+							no++;
+							returnList.add(new DisplayBean(no,rs.getString("ZONE"),rs.getString("ZONE"),rs.getString("ZONE_NAME")));
+						}
 				}else if("Invoice_Date".equalsIgnoreCase(condType)){
 					sql = "select invoice_date from XXPENS_BI_MST_INVOICE_DATE where invoice_date is not null ";
 					if(!Utils.isNull(code).equals("")){

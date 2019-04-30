@@ -34,7 +34,8 @@ import com.pens.util.excel.ExcelHeader;
 public class OpenBillRobinsonReportAction {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static SummaryForm process(HttpServletRequest request,User user,SummaryForm summaryForm,String typeExport) throws Exception{
+
+public static SummaryForm process(HttpServletRequest request,User user,SummaryForm summaryForm,String typeExport) throws Exception{
 	Connection conn = null;
 	OnhandSummary cri = summaryForm.getBean();
 	Statement stmt = null;
@@ -48,45 +49,53 @@ public class OpenBillRobinsonReportAction {
 	StringBuffer h = new StringBuffer("");
 	String orderLotNoAll = "";
 	boolean genGrandTotal = false;
+	 String text_center = "td_text_center";
+	 String text = "td_text";
+	 String number = "td_number";
+	 String number_bold = "td_number_bold";
+	 String currency = "td_number";
+	 String currency_bold = "td_number_bold";
+	 String border ="0";
 	try{
-		 String text_center = "td_text_center";
-		 String text = "td_text";
-		 String number = "td_number";
-		 String number_bold = "td_number_bold";
-		 String currency = "td_number";
-		 String currency_bold = "td_number_bold";
-		 String border ="0";
-		 /** Case Export to Excel **/
-		 logger.debug("typeExport:"+typeExport);
-		 if("EXCEL".equalsIgnoreCase(typeExport)){
-		    h.append(ExcelHeader.EXCEL_HEADER);//excel style
-		  
-		    //Gen Header report
-		    h.append("<table id='tblProductHead' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
-			h.append("<tr> \n");
-			h.append("<td colspan='9' align='center'><font size='3'><b>ใบแจ้งเปิดบิล ของโรบินสัน</b> </font></td> \n");
-			h.append("</tr> \n");
-			h.append("<tr> \n");
-			h.append("<td colspan='9'><b>วันที่เปิด Order โรงงาน / วันที่ Issue จาก PIC  :  "+cri.getAsOfDate()+"</b></td> \n");
-			h.append("</tr> \n");
-			h.append("</table> \n");
-			
-			border ="1";
-		    text_center = "text";
-		    text = "text";
-		    number = "currency";
-		    number_bold = "currency_bold";
-		    currency = "currency";
-		    currency_bold = "currency_bold";
-		 }
-		 
 		//set Page Name
 		summaryForm.setPage("openBillRobinsonReport");
 		//Init Connection
 		conn = DBConnection.getInstance().getConnection();
 		
 		OnhandSummary bean = searchOpenBillRobinsonAll(conn, cri, user);
-	
+		//validate Error 
+		if(bean != null && bean.getErrorList() != null && bean.getErrorList().size() >0){
+			bean.setAsOfDate(cri.getAsOfDate());
+			summaryForm.setBean(bean);
+			return summaryForm;
+		}else{
+			 /** Case Export to Excel **/
+			 logger.debug("typeExport:"+typeExport);
+			 if(bean.getItemsList() != null && bean.getItemsList().size() >0){
+				 if("EXCEL".equalsIgnoreCase(typeExport)){
+				    h.append(ExcelHeader.EXCEL_HEADER);//excel style
+				  
+				    //Gen Header report
+				    h.append("<table id='tblProductHead' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+					h.append("<tr> \n");
+					h.append("<td colspan='9' align='center'><font size='3'><b>ใบแจ้งเปิดบิล ของโรบินสัน</b> </font></td> \n");
+					h.append("</tr> \n");
+					h.append("<tr> \n");
+					h.append("<td colspan='9'><b>วันที่เปิด Order โรงงาน / วันที่ Issue จาก PIC  :  "+cri.getAsOfDate()+"</b></td> \n");
+					h.append("</tr> \n");
+					h.append("</table> \n");
+					
+					border ="1";
+				    text_center = "text";
+				    text = "text";
+				    number = "num";
+				    number_bold = "num_bold";
+				    currency = "currency";
+				    currency_bold = "currency_bold";
+				 }
+			 }
+		}
+		
 		if(bean.getItemsList() != null && bean.getItemsList().size() >0){
 			h.append("<table id='tblProduct' align='center' border='"+border+"' width='100%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
 			h.append("<tr> \n");
@@ -230,46 +239,52 @@ public class OpenBillRobinsonReportAction {
 			List<OnhandSummary> mainList = new ArrayList<OnhandSummary>();
 			List<OnhandSummary> subList = new ArrayList<OnhandSummary>();
 			StringBuilder sql = new StringBuilder();
+			List<OnhandSummary> errorList = new ArrayList<OnhandSummary>();
+			Map<String, String> pensItemErrorMap = new HashMap<String, String>();
 			//key storeCode+orderLotNo+gp
 			String keyMain = "";
 			Map<String, List<OnhandSummary>> mainGroupMap = new HashMap<String, List<OnhandSummary>>();
 			OnhandSummary bean = new OnhandSummary();
 			try {
 				sql.append("SELECT A.* ");
+				sql.append(",(select max(interface_value) from pensbi.pensbme_mst_reference M \n");
+				sql.append("  where reference_code ='Store' \n");
+				sql.append("  and M.pens_value = A.store_code) as store_code_oracle \n");
 				sql.append(",(select max(M.pens_desc) from pensbi.pensbme_mst_reference M \n");
 				sql.append("   where M.reference_code ='Store' and M.pens_value=A.store_code) as store_name \n");
 				sql.append("FROM ( \n");
 				
 				//PENSBME ORDER
-				sql.append(" select O.store_code,O.order_lot_no,O.group_code,\n");
+				sql.append(" select O.store_code,O.order_lot_no,O.group_code,O.item as m_pens_item,\n");
 				sql.append(" GP.gp,GP.pens_item,GP.whole_price_vat ,nvl(sum(O.qty),0) as qty \n");
-				sql.append(" FROM \n");
-				sql.append(" PENSBI.pensbme_order O ,\n");
-				sql.append(" PENSBI.PENSBME_ITEMBY_GP GP\n");
-				sql.append(" WHERE O.item = GP.pens_item \n");
+				sql.append(" FROM PENSBI.pensbme_order O  \n");
+				sql.append(" LEFT OUTER JOIN PENSBI.PENSBME_ITEMBY_GP GP \n");
+				sql.append(" ON O.item = GP.pens_item \n");
+				sql.append(" WHERE 1=1 \n");
 				//robinson only
-				//sql.append(" and O.store_type = '100002' \n");
-				
-				/*if( !Utils.isNull(cri.getAsOfDate()).equals("")){
+				sql.append(" and O.store_type = '100002' \n");
+				if( !Utils.isNull(cri.getAsOfDate()).equals("")){
 					Date dateObj = Utils.parse(cri.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					sql.append(" and O.order_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
-				}*/
-				//for test
-				sql.append("and O.order_date = to_date('13/02/2019','dd/mm/yyyy') \n");
-				sql.append("and O.store_code ='020047-71' \n");
+				}
 				
-				sql.append(" Group by O.store_code,O.order_lot_no,O.group_code \n");
+				//for test 2 orderLotNo 
+				/*sql.append("and O.order_date = to_date('13/02/2019','dd/mm/yyyy') \n");
+				sql.append("and O.store_code ='020047-71' \n");*/
+				
+				sql.append(" Group by O.store_code,O.order_lot_no,O.group_code,O.item \n");
 				sql.append("         ,GP.gp,GP.pens_item,GP.whole_price_vat \n");
 				
 				sql.append(" UNION ALL \n");
 				
 				//PENSBME_PICK_STOCK
-				sql.append(" select H.store_code,H.issue_req_no as order_lot_no,O.group_code,\n");
+				sql.append(" select H.store_code,H.issue_req_no as order_lot_no,O.group_code,O.pens_item as m_pens_item,\n");
 				sql.append(" GP.gp,GP.pens_item,GP.whole_price_vat ,nvl(count(*),0) as qty \n");
 				sql.append(" FROM PENSBI.PENSBME_PICK_STOCK H,\n");
-				sql.append(" PENSBI.PENSBME_PICK_STOCK_I O ,\n");
-				sql.append(" PENSBI.PENSBME_ITEMBY_GP GP\n");
-				sql.append(" WHERE O.pens_item = GP.pens_item \n");
+				sql.append(" PENSBI.PENSBME_PICK_STOCK_I O \n");
+				sql.append(" LEFT OUTER JOIN PENSBI.PENSBME_ITEMBY_GP GP \n");
+				sql.append("  ON O.pens_item = GP.pens_item \n");
+				sql.append(" WHERE 1=1 \n");
 				sql.append(" AND O.issue_req_no = H.issue_req_no \n");
 				sql.append(" AND H.issue_req_status ='I' \n");
 				//robinson only
@@ -279,19 +294,19 @@ public class OpenBillRobinsonReportAction {
 					sql.append(" and H.confirm_issue_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
 				}
 				
-				sql.append(" Group by H.store_code,H.issue_req_no,O.group_code \n");
+				sql.append(" Group by H.store_code,H.issue_req_no,O.group_code,O.pens_item  \n");
 				sql.append("         ,GP.gp,GP.pens_item,GP.whole_price_vat \n");
 				
                 sql.append(" UNION ALL \n");
 				
 				//PENSBME_STOCK_ISSUE
-				sql.append(" select H.customer_no as store_code,H.issue_req_no as order_lot_no,O.group_code,\n");
+				sql.append(" select H.customer_no as store_code,H.issue_req_no as order_lot_no,O.group_code,O.pens_item as m_pens_item,\n");
 				sql.append(" GP.gp,GP.pens_item,GP.whole_price_vat ,nvl(sum(O.issue_qty),0) as qty \n");
 				sql.append(" FROM PENSBI.PENSBME_STOCK_ISSUE H,\n");
-				sql.append(" PENSBI.PENSBME_STOCK_ISSUE_ITEM O ,\n");
-				sql.append(" PENSBI.PENSBME_ITEMBY_GP GP\n");
-				sql.append(" WHERE O.pens_item = GP.pens_item \n");
-				sql.append(" AND O.issue_req_no = H.issue_req_no \n");
+				sql.append(" PENSBI.PENSBME_STOCK_ISSUE_ITEM O \n");
+				sql.append(" LEFT OUTER JOIN PENSBI.PENSBME_ITEMBY_GP GP\n");
+				sql.append(" ON O.pens_item = GP.pens_item \n");
+				sql.append(" WHERE  O.issue_req_no = H.issue_req_no \n");
 				sql.append(" AND H.status ='I' \n");
 				//robinson only
 				sql.append(" and H.cust_group = '100002' \n");
@@ -300,7 +315,7 @@ public class OpenBillRobinsonReportAction {
 					sql.append(" and H.status_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
 				}
 				
-				sql.append(" Group by H.customer_no,H.issue_req_no,O.group_code \n");
+				sql.append(" Group by H.customer_no,H.issue_req_no,O.group_code,O.pens_item \n");
 				sql.append("         ,GP.gp,GP.pens_item,GP.whole_price_vat \n");
 				
 				sql.append(")A \n");
@@ -313,7 +328,7 @@ public class OpenBillRobinsonReportAction {
 				rst = stmt.executeQuery(sql.toString());
 				while (rst.next()) {
 					OnhandSummary item = new OnhandSummary();
-					item.setStoreCode(Utils.isNull(rst.getString("store_code")));
+					item.setStoreCode(Utils.isNull(rst.getString("store_code_oracle")));
 					item.setStoreName(Utils.isNull(rst.getString("store_name")));
 					item.setGp(Utils.isNull(rst.getString("gp")));
 					
@@ -351,8 +366,19 @@ public class OpenBillRobinsonReportAction {
 						//count by group (custCode,gp)
 						mainIndexList++;
 					}
+					
+					//check error
+					if(Utils.isNull(rst.getString("pens_item")).equals("")){
+						if(pensItemErrorMap.get(Utils.isNull(rst.getString("m_pens_item"))) ==null){
+						item.setPensItem(Utils.isNull(rst.getString("m_pens_item")));
+						   errorList.add(item);
+						}
+						pensItemErrorMap.put(Utils.isNull(rst.getString("m_pens_item")),Utils.isNull(rst.getString("m_pens_item")));
+					}
+					
 				}//while
 				bean.setItemsList(mainList);
+				bean.setErrorList(errorList);
 			} catch (Exception e) {
 				throw e;
 			} finally {
@@ -364,6 +390,35 @@ public class OpenBillRobinsonReportAction {
 			return bean;
 	    }
 	
+	public static StringBuffer genErrorListTable(List<OnhandSummary> errorList) throws Exception{
+		StringBuffer h = new StringBuffer();
+		try{
+			 //Gen Header report
+			if(errorList != null && errorList.size() >0){
+			    h.append("<table id='tblProductHead' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth' width='50%'> \n");
+			    h.append("<tr> \n");
+			    //h.append(" <td align='center' ><b>ไม่พบข้อมูล Pens Item ใน MASTER TABLE PENSBME_ITEMBY_GP</b> </td>");
+			    h.append(" <th align='center'>OrderLotNo/RequestNo</th>");
+			    h.append(" <th align='center'>GroupCode</th>");
+			    h.append(" <th align='center'>Pens Item</th>");
+			    h.append("</tr> \n");
+			   
+			    for(int i=0;i<errorList.size();i++){
+					OnhandSummary s = errorList.get(i);
+					h.append("<tr> \n");
+					h.append(" <td align='center'>"+s.getOrderLotNo()+"</td> \n");
+					h.append(" <td align='center'>"+s.getGroup()+"</td> \n");
+					h.append(" <td align='center'>"+s.getPensItem()+"</td> \n");
+				    h.append("</tr> \n");
+				}
+			    
+				h.append("</table> \n");
+			}
+			return h;
+		}catch(Exception e){
+			throw e;
+		}
+	}
 	private static String getOrderLotNoFromList(List<OnhandSummary> subList) throws Exception{
 		String orderLotNoAll = "";
 		Map<String, String> orderLotNoDup = new HashMap<String, String>();

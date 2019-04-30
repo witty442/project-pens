@@ -59,7 +59,9 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 	public String getParam(){
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
 	}
-	
+	public String getDescription(){
+		return "Import File From Excel";
+	}
 	public String getValidateScript(){
 		String script ="";
 		script +="<script>";

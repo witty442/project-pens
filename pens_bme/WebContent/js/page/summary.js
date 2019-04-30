@@ -5,6 +5,14 @@ function openPopupCustomer(path,types,storeType){
 	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare2&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
 }
+function openPopupCustomerWithSubInv(path,types,storeType,methodName){
+    var param = "&types="+types;
+        param += "&storeType="+storeType;
+        param += "&methodName="+methodName;
+        
+	url = path + "/jsp/searchCustomerPopupAction.do?do=prepare3&action=new"+param;
+	PopupCenterFullHeight(url,"",600);
+}
 
 function openPopupCustomerAll(path,types,storeType,hideAll){
     var param = "&types="+types;
@@ -112,7 +120,61 @@ function getCustName(path,custCode,fieldName,storeType){
 		}
 	}
 }
-
+function getCustNameWithSubInvKeypress(path,e,custCode,storeType,fieldName){
+	var form = document.summaryForm;
+	if(e != null && e.keyCode == 13){
+		if(custCode.value ==''){
+			if("pensCustNameFrom" == fieldName){
+				form.pensCustNameFrom.value = '';
+			}
+			if("pensCustNameTo" ==fieldName){
+				form.pensCustNameTo.value = '';
+			}
+		}else{
+			getCustNameWithSubInv(path,custCode,fieldName,storeType);
+		}
+	}
+}
+function getCustNameWithSubInv(path,custCode,fieldName,storeType){
+	var returnString = "";
+	var form = document.summaryForm;
+	var getData = $.ajax({
+			url: path+"/jsp/ajax/getCustNameWithSubInvAjax.jsp",
+			data : "custCode=" + custCode.value+"&storeType="+storeType,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	
+	if("pensCustNameFrom" == fieldName){
+		if(returnString != ''){
+		   var reArr = returnString.split("|");
+		   form.pensCustNameFrom.value = reArr[0];
+		   form.subInv.value = reArr[2];
+		}else{
+			custCode.value ='';
+			form.pensCustNameFrom.value ='';
+			form.subInv.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
+	}
+	if("pensCustNameTo" ==fieldName){
+		if(returnString != ''){
+			var reArr = returnString.split("|");
+			form.pensCustNameTo.value = reArr[0];
+			form.subInv.value = reArr[2];
+		}else{
+			custCode.value ='';
+			form.pensCustNameTo.value ='';
+			form.subInv.value ='';
+			custCode.focus();
+			alert("ไม่พบข้อมูล");
+		}
+	}
+}
 function getBranchNameKeypress(path,e,custCode,fieldName,storeType){
 	var form = document.summaryForm;
 	if(e != null && e.keyCode == 13){

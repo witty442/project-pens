@@ -161,8 +161,8 @@ function gotoReportXXXX(path, reportType,requestNumber){
 										<td align="left" colspan="3" width="80%" nowrap>
 										  <html:text property="bean.requestDate" size="8" readonly="true" styleClass="disableText"/>
 										   &nbsp;&nbsp;&nbsp;&nbsp; 
-										     พนักงานขาย  :<input type="text" value="<%=user.getCode()%>" size="10"/>
-										     <input type="text" value="<%=user.getName()%>" size="20"/>
+										     พนักงานขาย  :<input type="text" value="<%=user.getCode()%>" size="5" readonly class="disableText"/>
+										     <input type="text" value="<%=user.getName()%>" size="20" readonly class="disableText"/>
 										   &nbsp;&nbsp;&nbsp;&nbsp;  
 										     เลขที่เอกสาร   <html:text property="bean.requestNumber" styleId="requestNumber" size="20" readonly="true" styleClass="disableText"/>
                                           &nbsp;&nbsp;                                                       
@@ -378,11 +378,11 @@ function gotoReportXXXX(path, reportType,requestNumber){
 									</a>	
 								   </c:if>	
 								</c:if>		
-								
-								<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','1','${stockReturnForm.bean.requestNumber}');">
-								    <input type="button" value="พิมพ์รายงาน"  class="newPosBtnLong">
-							    </a> 
-								  
+								<c:if test="${stockReturnForm.bean.showPrintBtn =='true'}">
+									<a href="#" onclick="gotoReport('${pageContext.request.contextPath}','1','${stockReturnForm.bean.requestNumber}');">
+									    <input type="button" value="พิมพ์รายงาน"  class="newPosBtnLong">
+								    </a> 
+								 </c:if>
 								<a href="#" onclick="backsearch('${pageContext.request.contextPath}');">
 									  <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong">
 								    </a>

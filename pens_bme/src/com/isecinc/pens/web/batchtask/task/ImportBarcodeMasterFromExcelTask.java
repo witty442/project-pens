@@ -46,7 +46,9 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 	public String getParam(){
 		return "dataType|ระบุประเภทกลุ่ม Barcode|LIST||VALID,dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
 	}
-
+	public String getDescription(){
+		return "Import File Excel";
+	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
 		

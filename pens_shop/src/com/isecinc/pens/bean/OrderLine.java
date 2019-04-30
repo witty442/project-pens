@@ -196,6 +196,16 @@ public class OrderLine extends I_PO implements Serializable {
 	
 	private String cancelDate;
 	private String taxable;
+	private int modifierLineId;
+	
+	
+	public int getModifierLineId() {
+		return modifierLineId;
+	}
+
+	public void setModifierLineId(int modifierLineId) {
+		this.modifierLineId = modifierLineId;
+	}
 
 	private double sellingPrice;
 	

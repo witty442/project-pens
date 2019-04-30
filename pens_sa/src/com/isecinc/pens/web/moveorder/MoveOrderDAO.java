@@ -145,6 +145,13 @@ public class MoveOrderDAO {
 		if( !Utils.isNull(o.getSalesrepCode()).equals("")){
 			sql.append("\n and H.sales_code = '"+Utils.isNull(o.getSalesrepCode())+"'");
 		}
+
+		if( !Utils.isNull(o.getSalesZone()).equals("")){
+		sql.append("\n  and H.sales_code in(");
+		sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
+		sql.append("\n    where zone = "+Utils.isNull(o.getSalesZone()) );
+		sql.append("\n  )");
+		}
 		if( !Utils.isNull(o.getStartDate()).equalsIgnoreCase("") && !Utils.isNull(o.getEndDate()).equalsIgnoreCase("")){
 			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);

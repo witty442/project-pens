@@ -34,11 +34,18 @@ public class StockVanBean implements Serializable{
 	private String pdIntPrice;
 	private String createUser;
 	private String updateUser;
+	private String salesZone;
 	
 	//option for display
 	private List<StockVanBean> rowColumnDataList;
 	
 	
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
 	public String getPdPrice() {
 		return pdPrice;
 	}

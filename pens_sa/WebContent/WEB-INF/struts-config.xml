@@ -51,7 +51,7 @@
 			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
-              <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new" redirect="true" /> 
+             <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new" redirect="true" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
 		
@@ -129,6 +129,8 @@
 		<action name="stockMCForm" path="/jsp/stockMCAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockmc.StockMCAction">
 			<forward name="search" path="/jsp/stockMC/stockMCSearch.jsp" />
 			<forward name="detail" path="/jsp/stockMC/stockMC.jsp" />
+			<forward name="searchMasterItem" path="/jsp/stockMC/stockMCMasterItemSearch.jsp" />
+			<forward name="detailMasterItem" path="/jsp/stockMC/stockMCMasterItem.jsp" />
 		</action>
 		<action name="stockVanForm" path="/jsp/stockVanAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockvan.StockVanAction">
 			<forward name="search" path="/jsp/stockvan/stockVanSearch.jsp" />

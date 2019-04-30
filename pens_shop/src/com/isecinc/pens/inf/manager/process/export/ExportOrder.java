@@ -122,7 +122,8 @@ public class ExportOrder {
 	            "   d.ORDER_LINE_ID AS ORDER_LINE_ID, \n"+
 	            "   d.ORG AS ORG , \n"+
 	            "   d.SUB_INV AS SUB_INV , \n"+
-	            "   d.selling_price \n"+
+	            "   d.selling_price , \n"+
+	            "   d.MODIFIER_LINE_ID \n"+
 	            "	FROM t_order_line d 	\n"+
 	            "	inner join t_order h	\n"+
 	            "	on d.ORDER_ID = h.ORDER_ID	\n"+

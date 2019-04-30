@@ -946,7 +946,7 @@ public class OrderAction extends I_Action {
 				 if(user.isPDPaid()){
 				    orderForm.getAutoReceipt().setInternalBank("002");//SCB-ÊÒ¢ÒÊÒ¸Ø»ÃÐ´ÔÉ°ì 068-2-81805-7
 			     }else{
-			    	//PD_PAID =N use internal_bank from t_bank_transfer (not found no export t_receipt)
+			    	//PD_PAID =N use internal_bank from t_bank_transfer (internal_bank not found ->no export t_receipt)
 			    	orderForm.getAutoReceipt().setInternalBank("");
 			     }
 				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());

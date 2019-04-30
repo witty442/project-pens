@@ -971,11 +971,12 @@ public class SummaryDAO {
 			try {
 				conn = DBConnection.getInstance().getConnection();
 				
-				sql.append("\n  SELECT M.* , \n");
-				sql.append("\n  (select max(M1.interface_desc) from pensbi.PENSBME_MST_REFERENCE M1 ");
-				sql.append("\n   where M1.reference_code = 'SubInv' and M1.pens_value =M.pens_value) as sub_inv ");
-				sql.append("\n  from PENSBME_MST_REFERENCE M");
-				sql.append("\n  where 1=1 and reference_code ='Store' ");
+				sql.append("SELECT A.* FROM (\n");
+				sql.append("  SELECT M.* , \n");
+				sql.append("  (select max(M1.interface_desc) from pensbi.PENSBME_MST_REFERENCE M1 \n");
+				sql.append("   where M1.reference_code = 'SubInv' and M1.pens_value =M.pens_value) as sub_inv \n");
+				sql.append("  from PENSBME_MST_REFERENCE M \n");
+				sql.append("  where 1=1 and reference_code ='Store' \n");
 			
 				if("equals".equals(operation)){
 					if( !Utils.isNull(c.getCodeSearch()).equals("")){
@@ -1028,9 +1029,14 @@ public class SummaryDAO {
 						sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_ROBINSON_CODE+"%' \n");
 					}
 				}
-				sql.append("\n  and pens_desc4 ='N' \n");
-				sql.append("\n  ORDER BY pens_value asc \n");
-				
+				sql.append("  and pens_desc4 ='N' \n");
+				sql.append("  ORDER BY pens_value asc \n");
+				sql.append(" )A WHERE 1=1 \n");
+				//sub_inv
+				if( !Utils.isNull(c.getSubInvSearch()).equals("")){
+					sql.append(" and A.sub_inv ='"+c.getSubInvSearch()+"' \n");
+				}
+			
 				logger.debug(" sql:"+sql);
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

@@ -82,7 +82,7 @@ public class SAGenerate {
 				    debug.debug("DateStr:"+salesBean.getDay());
 				    debug.debug("Date:"+Utils.parseToBudishDate(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
 				    //debug.debug("Sql:"+sql.toString());
-				    FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+				    FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 				    
 				   rs = ps.executeQuery();
 				    
@@ -111,7 +111,7 @@ public class SAGenerate {
 				
 				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
-					FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
 				    
@@ -138,7 +138,7 @@ public class SAGenerate {
 				configBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
-					FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
 				    
@@ -162,7 +162,7 @@ public class SAGenerate {
 				configBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
 				if( !Utils.isNull(sql.toString()).equals("")){
-					FileUtil.writeFile("d:/temp/sql.sql", sql.toString());
+					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
 				    

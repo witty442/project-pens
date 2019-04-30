@@ -319,7 +319,7 @@ public class StockReturnAction extends I_Action {
 			 StockReturn m = prepareUpdateStockReturn(user, stockForm);
 			 
 			 m = new MStockReturn().searchStockReturn(m,user);
-
+             m.setShowPrintBtn(true);
 			 stockForm.setBean(m);
 			 //Set Lines
 			 stockForm.setLines(m.getLineList());
@@ -507,6 +507,7 @@ public class StockReturnAction extends I_Action {
 			}
 			
 			m = mDAO.searchStockReturn(m,user);
+			m.setShowPrintBtn(true);
 			stockForm.setBean(m);
 			stockForm.setLines(m.getLineList());
 			
@@ -597,10 +598,13 @@ public class StockReturnAction extends I_Action {
         	  
             if("1".equalsIgnoreCase(Utils.isNull(request.getParameter("reportType")))){
             	parameterMap.put("subReportName","สำหรับบริหารขาย");
+            	//parameterMap.put("subReportName2","(ต้นฉบับ)");
+            	
             	fileNameExport = "StockRe_"+f.getBean().getRequestNumber()+".pdf";
             	
             }else{
             	parameterMap.put("subReportName","สำหรับคลังสินค้า");
+            	//parameterMap.put("subReportName2","(สำเนา)");
             	fileNameExport = "StockRe_"+f.getBean().getRequestNumber()+".pdf";
             }
             //get head detail

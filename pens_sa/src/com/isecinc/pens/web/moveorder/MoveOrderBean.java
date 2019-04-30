@@ -43,8 +43,15 @@ public class MoveOrderBean implements Serializable{
 	private String dispHaveReason;
 	private String dispCheckMoveDay;
 	private List<MoveOrderBean> items;
+	private String salesZone;
 	
 	
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
 	public String getDispCheckMoveDay() {
 		return dispCheckMoveDay;
 	}
