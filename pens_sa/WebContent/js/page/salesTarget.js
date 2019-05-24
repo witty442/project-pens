@@ -230,26 +230,26 @@ function addRow(setFocus){
 	    "   onkeypress='getProductKeypress(event,this,"+rowId+")' "+
 	    "   onkeydown='getProductKeydown(event,this,"+rowId+")' "+
 	    "   onchange='checkProductOnblur(event,this,"+rowId+")' " +
-	    "   tabindex ="+tabIndex+
+	    "   autoComplete='off'  tabindex ="+tabIndex+
 	    " />  </td>"+
 	    "<td class='td_text_center'  width='19%'> "+
 	    " <input type='text' tabindex ='-1' name='itemName' size='35' readonly class='disableText' />" +
 	    " <input type='hidden' tabindex ='-1' name='itemId' id='itemId'/>"+
 	    "</td>"+
-	    "<td class='td_text_center' width='7%'> <input type='text' tabindex ='-1' name='orderAmt12Month' id='orderAmt12Month' readonly class='disableNumber' size='8' /></td>"+
-	    "<td class='td_text_center' width='7%'> <input type='text' tabindex ='-1' name='orderAmt3Month' id='orderAmt3Month' readonly class='disableNumber' size='8' /></td>"+
-	    "<td class='td_text_center' width='7%'> <input type='text' tabindex ='-1' name='price' id='price' readonly class='disableNumber' size='8' /></td>";
+	    "<td class='td_number' width='7%'> <input type='text' tabindex ='-1' name='orderAmt12Month' id='orderAmt12Month' readonly class='disableNumber' size='8' /></td>"+
+	    "<td class='td_number' width='7%'> <input type='text' tabindex ='-1' name='orderAmt3Month' id='orderAmt3Month' readonly class='disableNumber' size='8' /></td>"+
+	    "<td class='td_number' width='7%'> <input type='text' tabindex ='-1' name='price' id='price' readonly class='disableNumber' size='8' /></td>";
 	  	   
 	    tabIndex++;
-	    rowData +="<td class='td_text_center' width='9%'> "+
+	    rowData +="<td class='td_number' width='9%'> "+
 	    "  <input type='text' name='targetQty' id='targetQty' size='10' class='enableNumber' "+
 	    "   onblur='isNumPositive(this);calcTargetAmount(this,"+rowId+")'  tabindex ="+tabIndex+""+
-	    "   onkeypress='nextRowKeypress(event,"+rowId+")'"+
+	    "   onkeypress='nextRowKeypress(event,"+rowId+")'  autoComplete='off' "+
 	    " />  </td>"+
 	    
-	    "<td class='td_text_center' width='9%'><input type='text' tabindex ='-1' name='targetAmount' id='targetAmount' readonly class='disableNumber' size='10'/></td>"+
+	    "<td class='td_number' width='9%'><input type='text' tabindex ='-1' name='targetAmount' id='targetAmount' readonly class='disableNumber' size='10'/></td>"+
 	    "<td class='td_text_center' width='6%'><input type='text' tabindex ='-1' name='status' id='status' value='Open' readonly class='disableTextCenter' size='6'/></td>"+
-	    "<td class='td_text_center' width='15%'><input type='text' tabindex ='-1' name='remark' id='remark'  class='normalText' size='20'/></td>"+
+	    "<td class='td_text_center' width='15%'><input type='text' tabindex ='-1' name='remark' id='remark'  class='normalText' size='20'  autoComplete='off' /></td>"+
 	    "<td class='td_text_center' width='11%'><input type='text' tabindex ='-1' name='rejectReason' id='rejectReason' readonly class='disableText' size='18'/></td>"+
 	    "</tr>";
 

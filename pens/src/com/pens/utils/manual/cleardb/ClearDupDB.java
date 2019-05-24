@@ -100,7 +100,7 @@ public class ClearDupDB {
 			sql = new StringBuffer("");
 			sql.append(" select * from m_address where customer_id="+customerId+" and purpose ='"+purpose+"' order by created desc");
 			
-			logger.debug("sql p:"+sql.toString());
+			//logger.debug("sql p:"+sql.toString());
 			
             ps = conn.prepareStatement(sql.toString());
             rs = ps.executeQuery();

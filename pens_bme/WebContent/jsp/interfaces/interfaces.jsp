@@ -605,10 +605,23 @@ body {
 						        </tr>
 						       <tr>
 							    <td align="right" width="40%">ระบุวันที่ icc สรุปบิล (Bill Date)<font color="red">*</font></td>
-							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20"/></td>
+							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20" readonly="true"/>
+							     
+							    </td>
 						      </tr>
 							</table>
 							
+							<div id="divInfo" style="display: none" align="center">
+							   <table >
+							   <tr><td><b>** Process Info (Export Order 2 File to ICC By FTP path:AOSVAT)</b></td></tr>
+							   <tr><td><b>1.tax_0503.500 ,2.itm_0503.500</b></td></tr>
+							   <tr><td><b>TABLE PENSBME_ICC_HEAD ,PENSBME_ICC_DLYR</b></td></tr>
+							   <tr><td><b>ReExport update flag sql: </b></td> </tr>
+							   <tr>
+							     <td><b>update PENSBME_ICC_HEAD set interface_icc ='N' where bill_date = '03052562' </b></td>
+							   </tr>
+							   </table>
+							</div>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						   <tr>
@@ -775,8 +788,9 @@ body {
 							<!-- Status:  --><html:hidden property="monitorBean.status"  styleClass="disableText"/>
 							<table class="test">
 							<tr>
-							    <td align="left" width="50%">
+							    <td align="center" width="50%">
 								  <b> Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"  styleClass="disableText"/> Seconds</b>
+								  &nbsp;&nbsp; <a href="javascript:showDivInfo()">Process Info</a>
 								</td>
 								<td align="right"  width="50%">
 								   <b>
@@ -827,5 +841,10 @@ body {
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+<script>
+function showDivInfo(){
+	document.getElementById("divInfo").style.display = "block";
+}
+</script>
 </body>
 </html>

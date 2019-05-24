@@ -348,10 +348,17 @@ public class SalesTargetUtils {
 		StringBuilder sql = new StringBuilder();
 		try{
 			sql.append("\n  SELECT M.INVENTORY_ITEM_ID ,M.INVENTORY_ITEM_CODE ,M.INVENTORY_ITEM_DESC" );
-			sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " +
+			
+			/** old **/
+			/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " +
 					"where P.product_id =M.INVENTORY_ITEM_ID " +
 					"and P.primary_uom_code ='Y' " +
-					"and P.pricelist_id ="+priceListId+") as price");
+					"and P.pricelist_id ="+priceListId+") as price");*/
+			
+			sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " +
+					"where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " +
+					"and P.list_header_id ="+priceListId+") as price");
+			
 		//	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,12)) as amt_12 ");
 	    //	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,3)) as amt_3 ");
 			sql.append("\n  ,P.SUM3 as amt_3  ");
@@ -582,6 +589,7 @@ public class SalesTargetUtils {
 			conn.close();
 		 }
 	}
+	
 	public static String getPriceListId(Connection conn,String salesChannelNo,String custCatNo){
 		String value = "";
 		Statement stmt = null;
@@ -749,11 +757,11 @@ public class SalesTargetUtils {
 	  return salesChannelDesc;
 	}
 	
-	public static List<PopupBean> searchCustCatNoList(String salesChannelNo) throws Exception{
+	public static List<PopupBean> searchCustCatNoMTList(String salesChannelNo) throws Exception{
 		 Connection conn = null;
 		 try{
 			 conn = DBConnection.getInstance().getConnection();
-			 return searchCustCatNoListModel(conn,salesChannelNo);
+			 return searchCustCatNoMTListModel(conn,salesChannelNo);
 		 }catch(Exception e){
 			 throw e;
 		 }finally{
@@ -761,19 +769,21 @@ public class SalesTargetUtils {
 		 }
 	  }
 	 
-	public static List<PopupBean> searchCustCatNoListModel(Connection conn,String salesChannelNo){
+	public static List<PopupBean> searchCustCatNoMTListModel(Connection conn,String salesChannelNo){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.delete(0, sql.length());
 			sql.append("\n  SELECT distinct M.cust_cat_no,C.cust_cat_desc from XXPENS_BI_MST_CUST_CAT_MAP M ,XXPENS_BI_MST_CUST_CAT C  ");
 			sql.append("\n  where 1=1 AND M.cust_cat_no = C.cust_cat_no ");
 			if( !Utils.isNull(salesChannelNo).equals("")){
 			  sql.append("\n  and m.sales_channel_no ='"+salesChannelNo+"'");
 			}
-			sql.append("\n  ORDER BY M.cust_cat_no asc \n");
+			//Not show Credit and VanSale
+			//sql.append("\n and M.cust_cat_no not in('ORDER - CREDIT SALES','ORDER - VAN SALES')");
+			
+			sql.append("\n ORDER BY M.cust_cat_no asc \n");
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
@@ -787,7 +797,6 @@ public class SalesTargetUtils {
 				item.setCustCatDesc(Utils.isNull(rst.getString("cust_cat_desc")));
 				pos.add(item);
 			}//while
-			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		} finally {
@@ -877,18 +886,18 @@ public class SalesTargetUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListAll() throws Exception{
+	public static List<PopupBean> searchSalesrepMTListAll() throws Exception{
 		 Connection conn = null;
 		 try{
 			 conn = DBConnection.getInstance().getConnection();
-			 return searchSalesrepListAll(conn);
+			 return searchSalesrepMTListAll(conn);
 		 }catch(Exception e){
 			 throw e;
 		 }finally{
 			conn.close();
 		 }
 	  }
-	public static List<PopupBean> searchSalesrepListAll(Connection conn){
+	public static List<PopupBean> searchSalesrepMTListAll(Connection conn){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1166,4 +1175,5 @@ public class SalesTargetUtils {
 			}
 			return pos;
 		}
+	 
 }

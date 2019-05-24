@@ -69,7 +69,8 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 
 <!-- Sticky Header Table -->
 <%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap.min.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
- --%><link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery.stickytable.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ --%>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery.stickytable.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.stickytable.js"></script> 
 
 

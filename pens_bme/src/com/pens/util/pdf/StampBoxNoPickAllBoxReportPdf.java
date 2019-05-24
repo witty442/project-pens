@@ -97,7 +97,7 @@ public class StampBoxNoPickAllBoxReportPdf {
 	    	bf2 = BaseFont.createFont(absPath+"BROWA.TTF", BaseFont.IDENTITY_H,BaseFont.EMBEDDED);
 	    	
 	    	mainBigFont = new Font(bfMainBigFont, 30);
-	    	mainFont = new Font(bf1, 20);
+	    	mainFont = new Font(bf1, 30);
 	    	subFont = new Font(bf2, 18);
 	    	 
 	    	conn = DBConnection.getInstance().getConnection();
@@ -122,6 +122,7 @@ public class StampBoxNoPickAllBoxReportPdf {
 	    		 //show 4 group per page
 	    		 if(no%4==0){
 	    	         document.newPage();
+	    	         no=0;
 	    	     }
 	    	     
 	    	 }//for
@@ -144,7 +145,7 @@ public class StampBoxNoPickAllBoxReportPdf {
 	    // We add one empty line
 	    addEmptyLine(preface, 1);
 	    // Lets write a big header
-	    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"           เลขที่กล่อง          : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
+	    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"      เลขที่กล่อง      : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
 	    preface.add(new Paragraph("ร้านค้า   : "+item.getStoreCode()+" - "+item.getStoreName(), mainBigFont));
 	    preface.add(new Paragraph("ที่อยู่   : "+item.getAddress(), subFont));
 	   //add to doc

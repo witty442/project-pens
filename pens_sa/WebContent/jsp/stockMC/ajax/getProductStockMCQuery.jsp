@@ -21,7 +21,7 @@ try{
 		if(p!= null){
 			outputText  = p.getProductCode()+"|";
 			outputText += p.getProductName()+"|"+p.getProductPackSize()+"|";
-			outputText +=p.getProductExpireDate()+"|"+p.getRetailPriceBF()+"|";
+			outputText += /*p.getProductExpireDate()*/""+"|"+p.getRetailPriceBF()+"|";
 			outputText +=p.getBarcode()+"|"+p.getExpireDate1();
 		}
 		System.out.println("outputText:"+outputText);

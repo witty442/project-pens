@@ -544,9 +544,9 @@ function calPrice(fieldName){
 										newAmount =  NumberToolsUtil.decimalFormat(c.getNewAmount(), NumberToolsUtil.format_current_2_disgit); 
 										
 										stockCtn = NumberToolsUtil.decimalFormat(c.getStockCtn(), NumberToolsUtil.format_current_no_disgit); 
-										stockQty = NumberToolsUtil.decimalFormat(c.getStockQty(), NumberToolsUtil.format_current_no_disgit); 
+										stockQty = NumberToolsUtil.decimalFormat(c.getStockQty(), NumberToolsUtil.format_current_2_disgit); 
 										borrowCtn = NumberToolsUtil.decimalFormat(c.getBorrowCtn(), NumberToolsUtil.format_current_no_disgit); 
-										borrowQty = NumberToolsUtil.decimalFormat(c.getBorrowQty(), NumberToolsUtil.format_current_no_disgit); 
+										borrowQty = NumberToolsUtil.decimalFormat(c.getBorrowQty(), NumberToolsUtil.format_current_2_disgit); 
 									
 										borrowAmount =  NumberToolsUtil.decimalFormat(c.getBorrowAmount(), NumberToolsUtil.format_current_2_disgit);
 										invoiceNo = Utils.isNull(c.getInvoiceNo()); 
@@ -594,7 +594,7 @@ function calPrice(fieldName){
 										<td nowrap><input type="text"
 											tabindex="<% tabIndex++; out.print(tabIndex);%>"
 											value="<%=stockQty%>" name="stockQty" size="8"
-											onkeydown="return inputNum(event);"
+											onkeydown="return isNum0to9andpoint(this,event);"
 											onblur="calPrice('stockQty');" class="numberText" /></td>
 										<td nowrap><input type="text"
 											tabindex="<% tabIndex++; out.print(tabIndex);%>"
@@ -604,7 +604,7 @@ function calPrice(fieldName){
 										<td nowrap><input type="text"
 											tabindex="<% tabIndex++; out.print(tabIndex);%>"
 											value="<%=borrowQty%>" name="borrowQty" size="8"
-											onkeydown="return inputNum(event);"
+											onkeydown="return isNum0to9andpoint(this,event);"
 											onblur="calPrice('borrowQty');" class="numberText" /></td>
 										<td nowrap><input type="text"
 											tabindex="<% tabIndex++; out.print(tabIndex);%>"

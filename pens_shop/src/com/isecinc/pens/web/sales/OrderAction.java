@@ -937,11 +937,6 @@ public class OrderAction extends I_Action {
 		return "view";
 	}
 
-	 public static CustomerBillInfo getDefautCustomerBillInfo(){
-		 CustomerBillInfo bean = new CustomerBillInfo();
-		 bean.setCustomerName("ลูกค้าทั่วไป");
-		 return bean;
-	 }
 	/**
 	 * Create Auto Receipt
 	 * 

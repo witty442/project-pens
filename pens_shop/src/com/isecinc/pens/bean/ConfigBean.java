@@ -6,9 +6,24 @@ public class ConfigBean implements Serializable{
   
 	private int userId;
 	private String customerCode;
+	private String customerName;
 	private int customerId;
 	private int pricelistId;
+	private String qualifier;
 	
+	
+	public String getCustomerName() {
+		return customerName;
+	}
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+	public String getQualifier() {
+		return qualifier;
+	}
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
+	}
 	public String getCustomerCode() {
 		return customerCode;
 	}

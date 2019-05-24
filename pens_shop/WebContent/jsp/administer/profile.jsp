@@ -175,7 +175,30 @@ function changeRoles(val){
 									<html:password property="user.confirmPassword" readonly="true" styleClass="disableText" size="20" maxlength="10"/>
 								</td>
 							</tr>
-							<tr id="subInvs">
+							<tr>
+								<td colspan="4" align="center"><b>Application Config</b></td>
+							</tr>
+							<tr>
+							    <td align="right">รหัสร้านค้า&nbsp;&nbsp;</td>
+								<td align="left">
+									<html:text property="user.config.customerCode" readonly="true" styleClass="disableText" size="20"/>
+								</td>
+								<td align="right">ชื่อร้านค้า&nbsp;&nbsp;</td>
+								<td align="left">
+									<html:text property="user.config.customerName" readonly="true" styleClass="disableText" size="50"/>
+								</td>
+							</tr>
+							<tr>
+							    <td align="right">PricelistID&nbsp;&nbsp;</td>
+								<td align="left">
+									<html:text property="user.config.pricelistId" readonly="true" styleClass="disableText" size="20"/>
+								</td>
+								<td align="right">Qualifier&nbsp;&nbsp;</td>
+								<td align="left">
+									<html:text property="user.config.qualifier" readonly="true" styleClass="disableText" size="50"/>
+								</td>
+							</tr>
+							<%-- <tr id="subInvs">
 								<c:if test="${userForm.pdList!=null}">
 								<td align="right" valign="top"><bean:message key="User.SubInv"  bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td colspan="2" align="left">
@@ -201,7 +224,7 @@ function changeRoles(val){
 									</table>
 								</td>
 								</c:if>
-							</tr> 
+							</tr>  --%>
 							<%-- <tr id="subInvs">
 								<c:if test="${userForm.subInventories!=null}">
 								<td align="right" valign="top"><bean:message key="User.SubInv"  bundle="sysele"/>&nbsp;&nbsp;</td>

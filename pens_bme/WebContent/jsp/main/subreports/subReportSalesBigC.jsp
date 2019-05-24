@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.bean.TransactionSummary"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
@@ -15,6 +16,13 @@
 <%
 String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
 String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
+
+//hide column case Role WACOAl
+User user = (User)session.getAttribute("user");
+boolean isRoleWacoal = false;
+if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){
+	isRoleWacoal = true;
+}
 
 String totalPage = "";
 String currentPage = "";
@@ -69,9 +77,13 @@ System.out.println("currentPage:"+currentPage);
 							    <display:column  title="DESCRIPTION" property="description"  sortable="false"  class="td_text" style="width:5%"/>	
 							    
 							    <display:column  title="QTY" property="qty"  sortable="false"  class="td_text" style="width:5%"/>
+							    <%if( !isRoleWacoal) {%>
 							    <display:column  title="Whole Price BF" property="wholePriceBF"  sortable="false"  class="td_text" style="width:5%"/>	
+							    <%} %>
 							    <display:column  title="Retail Price BF" property="retailPriceBF"  sortable="false"  class="td_text" style="width:5%"/>	
+							    <%if( !isRoleWacoal) {%>
 							    <display:column  title="TOTAL Whole Price BF" property="totalWholePriceBF"  sortable="false"  class="td_text" style="width:5%"/>	
+							    <%} %>
 							    <display:column  title="Pens Group" property="pensGroup"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Pens Item" property="pensItem"  sortable="false"  class="td_text" style="width:5%"/>	
@@ -80,8 +92,9 @@ System.out.println("currentPage:"+currentPage);
 							    <display:column  title="file Name" property="fileName"  sortable="false"  class="td_text" style="width:5%"/>	
 							    <display:column  title="Vendor" property="vendor"  sortable="false" class="td_text" style="width:5%"/>
 							    <display:column  title="Name" property="name" sortable="false" class="td_text" style="width:5%;white-space:nowrap"/>	
-
+                                <%if( !isRoleWacoal) {%>
 							    <display:column  title="GP Percent" property="gpPercent"  sortable="false" class="td_text" style="width:5%"/>	
+							    <%} %>
 							    <display:column  title="Create date" property="createDate"  sortable="false" class="td_text" style="width:5%"/>	
 							    <display:column  title="Create by" property="createUser"  sortable="false" class="td_text" style="width:5%"/>	
 							    

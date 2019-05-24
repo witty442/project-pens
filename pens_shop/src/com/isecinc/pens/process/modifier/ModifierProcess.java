@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import util.BeanParameter;
@@ -28,6 +29,7 @@ import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Qualifier;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MModifier;
 import com.isecinc.pens.model.MModifierAttr;
@@ -1304,8 +1306,13 @@ public class ModifierProcess {
 		sql += "    and qualifier_type = '" + BeanParameter.getQualifierType() + "' \r\n";
 		
 		if (user.getType().equalsIgnoreCase(User.VAN)){
-			sql += "    and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' \r\n";
-			logger.debug("Van QualifierValue:"+BeanParameter.getQualifierVAN());
+			//OLD Get from param.xml
+			//sql += "    and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' \r\n";
+			//logger.debug("Van QualifierValue:"+BeanParameter.getQualifierVAN());
+			
+			//NEW 05/2019 get from c_config
+			sql += "    and QUALIFIER_VALUE = '" + user.getConfig().getQualifier() + "' \r\n";
+			logger.debug("Van QualifierValue:"+ user.getConfig().getQualifier());
 		}
 		
 		if (user.getType().equalsIgnoreCase(User.DD)){
@@ -1319,10 +1326,14 @@ public class ModifierProcess {
 		sql += ")\r\n";
 
 		// join customer qualifier
+		
+		//logger.debug("terriory:"+terriory+",territoryName:"+territoryName);
+		//FileUtil.writeFile(FileUtil.dev_temp_path+"test.txt", territoryName,"TIS-620");
+		
 		if (terriory.length() > 0) {
 
 			// in territory
-			sql += " and (a.MODIFIER_LINE_ID IN \r\n";
+			sql += " and (a.MODIFIER_LINE_ID IN  \r\n";
 			sql += "  ( select MODIFIER_LINE_ID \r\n";
 			sql += "   from m_qualifier \r\n";
 			sql += "   where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
@@ -1330,7 +1341,8 @@ public class ModifierProcess {
 			sql += "   and OPERATOR = '=' \r\n";
 			sql += "   and ISEXCLUDE = 'N' \r\n";
 			sql += "   and ISACTIVE = 'Y' \r\n";
-			sql += "   and QUALIFIER_VALUE = '" + territoryName + "' \r\n";
+			//sql += "   and QUALIFIER_VALUE = '" + territoryName + "' \r\n";
+			sql += "   and QUALIFIER_VALUE = '" + user.getConfig().getQualifier() + "' \r\n";
 			sql += "  ) \r\n";
 
 			// no qualifier

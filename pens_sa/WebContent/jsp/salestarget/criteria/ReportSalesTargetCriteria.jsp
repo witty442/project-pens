@@ -193,7 +193,12 @@ function exportToExcel(path){
 						<html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				    </html:select>
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				    ประเภทขาย 
+				         ภาคตามการดูแล
+				    <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+					    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+					 </html:select>
+					 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				         ประเภทขาย 
 				     <html:select property="bean.custCatNo" styleId="custCatNo" onchange="loadSalesrepCodeList()">
 						<html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
 				    </html:select>
@@ -208,11 +213,11 @@ function exportToExcel(path){
 			<tr>
                 <td> แบรนด์ </td>
 				<td colspan="3">
-				   <html:text property="bean.brand" styleId="brand" size="20"/>
+				   <html:text property="bean.brand" styleId="brand" size="20" styleClass="\" autoComplete=\"off" />
 				    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','Brand')"/>   
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				    รหัสร้านค้า
-				    <html:text property="bean.customerCode" styleId="customerCode" size="20"/>
+				    <html:text property="bean.customerCode" styleId="customerCode" size="20" styleClass="\" autoComplete=\"off" />
 				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','Customer')"/>   
 				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				   สถานะ &nbsp;

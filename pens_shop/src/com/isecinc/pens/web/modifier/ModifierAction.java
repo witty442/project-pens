@@ -74,15 +74,16 @@ public class ModifierAction extends I_Action {
 			whereCause += "   and isactive = 'Y' ";
 			whereCause += "   and QUALIFIER_CONTEXT = '" + BeanParameter.getQualifierContext() + "' ";
 			whereCause += "   and qualifier_type = '" + BeanParameter.getQualifierType() + "' ";
-			if (user.getType().equalsIgnoreCase(User.VAN))
-				whereCause += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' ";
-
-			if (user.getType().equalsIgnoreCase(User.DD))
+			if (user.getType().equalsIgnoreCase(User.VAN)){
+				//whereCause += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierVAN() + "' ";
+				whereCause += "   and QUALIFIER_VALUE = '" + user.getConfig().getQualifier() + "' ";
+			
+		    }else if (user.getType().equalsIgnoreCase(User.DD)){
 				whereCause += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierDD() + "' ";
 
-			if (user.getType().equalsIgnoreCase(User.TT))
+		    }else if (user.getType().equalsIgnoreCase(User.TT)){
 				whereCause += "   and QUALIFIER_VALUE = '" + BeanParameter.getQualifierTT() + "' ";
-
+	        }
 			whereCause += ")";
 
 			whereCause += " Order by modifier_id desc ";

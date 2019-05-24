@@ -49,6 +49,9 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 	public String getDescription(){
 		return "Import File Excel";
 	}
+	public String getDevInfo(){
+		return "";
+	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
 		

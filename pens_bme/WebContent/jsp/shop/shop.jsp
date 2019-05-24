@@ -101,6 +101,10 @@ function clearForm(path){
 						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
 						<%}else if(ShopAction.P_SHOP_BILL_DETAIL.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						     <jsp:include page="criteria/shopBillCriteria.jsp" /> 
+						<%}if(ShopAction.P_TM_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" /> 
+						<%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
 						<%} %>
 				     <!-- ************* CRITERIA ********************************************************* -->
 					<br>
@@ -131,8 +135,11 @@ function clearForm(path){
 						  <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
 					<%}else if(ShopAction.P_SHOP_BILL_DETAIL.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						  <jsp:include page="subreports/subShopBillDetail.jsp" /> 
-					<%} %>
-                    
+					<%}else if(ShopAction.P_TM_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						  <jsp:include page="subreports/subMayaSaleOut.jsp" /> 
+                    <%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						  <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
+                    <%} %>
                     <!-- ****** RESULT ***************************************************************** -->
 
 					<!-- hidden field -->

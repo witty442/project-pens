@@ -4,36 +4,26 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Master;
-import com.isecinc.pens.bean.OnhandSummary;
-import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
-import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
-public class MayaStockOnhandAction {
+public class ShopStockOnhandAction {
  private static Logger logger = Logger.getLogger("PENS");
 	
  public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
@@ -205,10 +195,11 @@ public class MayaStockOnhandAction {
 					sql.append("\n   where M.reference_code ='Store' ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
+					sql.append("\n   AND M.pens_value ='"+f.getBean().getCustGroup()+"' ");
 			        sql.append("\n  ) M ");
 					sql.append("\n WHERE H.cust_no = L.cust_no  ");
 					sql.append("\n AND M.customer_code = H.cust_no  ");
-					sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
+					sql.append("\n AND H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
 					if( !Utils.isNull(initDateStr).equals("")){
 						 sql.append("\n AND H.COUNT_STK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					}
@@ -240,6 +231,7 @@ public class MayaStockOnhandAction {
 					sql.append("\n AND L.BARCODE = MP.BARCODE ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.store_code"));
+					sql.append("\n AND L.store_code ='"+f.getBean().getCustGroup()+"' ");
 					if(initDate != null){
 						 sql.append("\n AND L.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -276,6 +268,7 @@ public class MayaStockOnhandAction {
 					sql.append("\n AND D.product_id = MP.product_id ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
+					sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
 					if(initDate != null){
 						 sql.append("\n AND L.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -308,7 +301,7 @@ public class MayaStockOnhandAction {
 					sql.append("\n AND D.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "J.STORE_CODE"));
-					
+					sql.append("\n AND J.STORE_CODE ='"+f.getBean().getCustGroup()+"' ");
 					if(initDate != null){
 						 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -339,6 +332,7 @@ public class MayaStockOnhandAction {
 			sql.append("\n   WHERE M.reference_code ='Store' ");
 			//Filter By StoreType
 			sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
+			sql.append("\n   AND M.pens_value ='"+f.getBean().getCustGroup()+"' ");
 	        sql.append("\n  ) M ");
 			sql.append("\n WHERE 1=1 ");
 			sql.append("\n and H.cust_no = L.cust_no  ");
@@ -380,6 +374,7 @@ public class MayaStockOnhandAction {
 			sql.append("\n AND L.BARCODE = MP.BARCODE ");
 			//Filter By StoreType
 			sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.store_code"));
+			sql.append("\n AND L.store_code ='"+f.getBean().getCustGroup()+"' ");
 			if(initDate != null){
 				 sql.append("\n AND L.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 				 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -422,7 +417,7 @@ public class MayaStockOnhandAction {
 				sql.append("\n AND D.product_id = MP.product_id ");
 				//Filter By StoreType
 				sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
-				
+				sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
 				if(initDate != null){
 					 sql.append("\n AND L.order_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND L.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -458,7 +453,7 @@ public class MayaStockOnhandAction {
 				sql.append("\n AND D.STATUS <> '"+PickConstants.STATUS_CANCEL+"'");
 				//Filter By StoreType
 				sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "J.STORE_CODE"));
-				
+				sql.append("\n AND J.STORE_CODE ='"+f.getBean().getCustGroup()+"' ");
 				if(initDate != null){
 					 sql.append("\n AND J.close_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND J.close_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");

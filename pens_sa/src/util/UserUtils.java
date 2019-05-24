@@ -56,6 +56,10 @@ public class UserUtils {
 	
 	public static boolean userInRoleSalesTarget(User user,String[] roles){
 		boolean r = false;
+		/** case Admin All Pass **/
+		if(user.getUserName().equalsIgnoreCase("admin")){
+			return true;
+		}
 		for(int i=0;i<roles.length;i++){
 			String roleCheck = roles[i].toLowerCase().trim();
 			String userRoleTemp = user.getRoleSalesTarget().toLowerCase().trim();

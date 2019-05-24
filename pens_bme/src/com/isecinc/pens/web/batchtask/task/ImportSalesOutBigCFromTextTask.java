@@ -67,6 +67,9 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 		       desc +="(เป็นข้อมูลใช้เช็คยอดขายรายวัน ไม่ได้นำไปใช้ออกรายงานสต๊อกใดๆ) <br/>";
 		return desc;
 	}
+	public String getDevInfo(){
+		return "";
+	}
 	public String getValidateScript(){
 		String script ="";
 		script +="<script>";

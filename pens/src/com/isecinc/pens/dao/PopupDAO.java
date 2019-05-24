@@ -335,6 +335,8 @@ public class PopupDAO {
 				sql.append("\n where h.order_id = l.order_id ");
 				sql.append("\n and h.ar_invoice_no is not null ");
 				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and l.promotion <> 'Y' ");
+				sql.append("\n and l.iscancel <> 'Y' ");
 				sql.append("\n and h.user_id = " +c.getUserId());
 				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
 				sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");

@@ -50,6 +50,10 @@ public class ProductC4Process {
 		try {
 			String whereCause = "  and isactive = 'Y' "
 					+ "and code in(select product_code from m_barcode )"
+					+ "and product_id in("
+					+ "  select product_id from m_product_price "
+					+ "  where pricelist_id ="+user.getConfig().getPricelistId()
+					+" )"
 					+ "order by code, name ";
 			Product[] ps = new MProduct().search(whereCause);
 			PriceList pl = new MPriceList().getMayaPriceList(user);

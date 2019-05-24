@@ -7,4 +7,5 @@ public interface BatchTaskInterface {
   public String getDescription();
   public String getValidateScript();
   public MonitorBean run(MonitorBean model);
+  public String getDevInfo();
 }

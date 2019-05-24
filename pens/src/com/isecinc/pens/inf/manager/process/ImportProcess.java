@@ -3,12 +3,19 @@ package com.isecinc.pens.inf.manager.process;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 
+
+
+
+
+import util.ControlCode;
+import util.DateToolsUtil;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -55,20 +62,46 @@ public class ImportProcess {
 	    	 //Debug Time
 	    	  monitorTime = new MonitorTime("Split Line To DB>>importToDB table:"+tableBean.getTableName());
 	    	  
+	    	  logger.debug("ImportToDB");
+	    	  dataTextLineArr = ftpFileBean.getDataLineText();
+	    	  
 	    	  /*Case Table Have Pre Function **/
 	    	  if( !"N".equalsIgnoreCase(tableBean.getPreFunction())){
 	    		  
 	    		  //MonitorTime monitorTime1 = new MonitorTime("Start PreFunction.process");
 	    		  
 	    		  logger.info("**** Script "+tableBean.getTableName()+" Pre Function name:"+tableBean.getPreFunction());
-	    		  String[] errors = PreFunction.process(conn, tableBean,userBean);
-	    		  
+	    		 
+	    		  // Case SalesTarget File is Next Month no delete currentMonth 
+	    		  if("m_sales_target_new".equalsIgnoreCase(tableBean.getTableName())){
+	    			  try{
+	    				  if(ControlCode.canExecuteMethod("ImportProcess", "checkSalesTargetSameMonthYear")){
+		    				 // logger.debug("dataTextLineArr[0]:"+dataTextLineArr[0]);
+		    				  String[] lineArrTemp = dataTextLineArr[0].split(Constants.delimeterPipe);
+			    		      Date targetDate = Utils.parse(lineArrTemp[1],Utils.DD_MM_YYYY_WITHOUT_SLASH);
+			    		      //logger.debug("targetDate:"+lineArrTemp[1]);
+			    		      //logger.debug("targetDate2:"+targetDate);
+			    		      Date currentDate = Utils.getCurrentDate();
+			    		      boolean inSameMonthYear = DateToolsUtil.compareDateInSameMonthYear(targetDate, currentDate);
+			    		      logger.info("inSameMonthYear SalesTarget:"+inSameMonthYear);
+			    		      if(inSameMonthYear){
+			    		    	logger.info("delete old SalesTarget By CurrentDate");
+			    		        String[] errors = PreFunction.process(conn, tableBean,userBean);
+			    		      }
+	    				  }else{
+	    					  String[] errors = PreFunction.process(conn, tableBean,userBean);
+	    				  }
+	    			  }catch(Exception ee){
+	    				  ee.printStackTrace();
+	    				  String[] errors = PreFunction.process(conn, tableBean,userBean);
+	    			  }
+	    		  }else{
+	    		     String[] errors = PreFunction.process(conn, tableBean,userBean);
+	    		  }
 	    		  //Debug Time
 	 			   monitorTime.debugUsedTime();
 	    	  }
-	    	  
-	    	  logger.debug("ImportToDB");
-	    	  dataTextLineArr = ftpFileBean.getDataLineText();
+	    
 			  // init prepareStatment
 			  logger.debug("sqlInsert:"+tableBean.getPrepareSqlIns());
 			  logger.debug("sqlUpd:"+tableBean.getPrepareSqlUpd());

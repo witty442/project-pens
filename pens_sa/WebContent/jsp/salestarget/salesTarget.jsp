@@ -1,4 +1,3 @@
-
 <%@page import="util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
@@ -19,7 +18,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
 //for test
@@ -48,6 +46,12 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 	pageNameTemp = "ReportSalesTarget";
 }else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "ReportSalesTargetAll";
+}else if(SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "MKT_SalesTarget_TT";
+}else if(SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "TTSUPER_SalesTarget";
+}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "TTMGR_SalesTarget";
 }
 //System.out.println("pageNameTemp:"+pageNameTemp);
 
@@ -62,18 +66,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css">
-/* Change Autocomplete styles in Chrome*/
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus
-input:-webkit-autofill, 
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover
-textarea:-webkit-autofill:focus,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {
-} 
+ 
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -280,7 +273,7 @@ function updateStatusManual(path,status){
 						   </table>
 					  </div>
 					  
-                    <c:if test="${salesTargetForm.results != null}">
+                     <c:if test="${salesTargetForm.results != null}">
                        <c:if test="${salesTargetForm.bean.canSet == true}">
 	                        <div align="left">
 								<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>
@@ -346,16 +339,16 @@ function updateStatusManual(path,status){
 									   <input type="hidden" name="itemId" id="itemId" value ="${results.itemId}"/>
 									   <input type="text" name="itemName" id="itemName" value ="${results.itemName}" size="35" readonly class="disableText"/>
 									</td>
-									<td class="td_text_center" width="7%">
+									<td class="td_number" width="7%">
 									  <input type="text" name="orderAmt12Month" id="orderAmt12Month" value ="${results.orderAmt12Month}" size="8" readonly class="disableNumber"/>
 									</td>
-									<td class="td_text_center" width="7%">
+									<td class="td_number" width="7%">
 									  <input type="text" name="orderAmt3Month"  id="orderAmt3Month" value ="${results.orderAmt3Month}" size="8" readonly class="disableNumber"/>
 									</td>
-									<td class="td_text_center" width="7%">
+									<td class="td_number" width="7%">
 									  <input type="text" name="price" id="price" value ="${results.price}" size="8" readonly class="disableNumber"/>
 									</td>
-									<td class="td_text_center" width="9%">
+									<td class="td_number" width="9%">
 									  <c:set var="tabIndex" value="${tabIndex + 1}" />
 									  <input type="text" name="targetQty" id="targetQty" value ="${results.targetQty}" size="10"
 										    onblur="isNumPositive(this);calcTargetAmount(this,${results.rowId})"
@@ -364,7 +357,7 @@ function updateStatusManual(path,status){
 										    onkeypress="nextRowKeypress(event,${results.rowId})"
 										  />
 									</td>
-									<td class="td_text_center" width="9%">
+									<td class="td_number" width="9%">
 									  <input type="text" name="targetAmount" id="targetAmount" value ="${results.targetAmount}" size="10" readonly class="disableNumber"/>
 									</td>
 									<td class="td_text_center" width="6%">
@@ -402,18 +395,18 @@ function updateStatusManual(path,status){
 						    <td class="" align="right" colspan="4" width="29%">
 							  <B> Total</B>
 							</td>
-							<td class="td_text_center" width="7%">
+							<td class="td_number" width="7%">
 							 <B>  <input type="text" name="totalOrderAmt12Month" value ="${salesTargetForm.bean.totalOrderAmt12Month}" size="7" readonly class="disableNumberBold"/></B>
 							</td>
-							<td class="td_text_center" width="7%">
+							<td class="td_number" width="7%">
 							 <B>  <input type="text" name="totalOrderAmt3Month" value ="${salesTargetForm.bean.totalOrderAmt3Month}" size="7" readonly class="disableNumberBold"/></B>
 							</td>
 								<td class="td_text_center" align="right" width="7%"></td>
-							<td class="td_text_center" width="9%">
+							<td class="td_number" width="9%">
 							 <B>  <input type="text" name="totalTargetQty" value ="${salesTargetForm.bean.totalTargetQty}" size="7" readonly class="disableNumberBold"/></B>
 							</td>
-							<td class="td_text_center" width="9%">
-							 <B>  <input type="text" name="totalTargetAmount" value ="${salesTargetForm.bean.totalTargetAmount}" size="7" readonly class="disableNumberBold"/></B>
+							<td class="td_number" width="9%">
+							 <B>  <input type="text" name="totalTargetAmount" value ="${salesTargetForm.bean.totalTargetAmount}" size="9" readonly class="disableNumberBold"/></B>
 							</td>
 							 <c:if test="${salesTargetForm.bean.canReject == false}">
 						       <td class="" width="32%" colspan="3">&nbsp;</td>

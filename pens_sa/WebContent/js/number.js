@@ -11,6 +11,17 @@ function convetTxtObjToFloat(obj){
 	 }
   }
 
+function convertNumberStrToFloat(numberStr){
+	 // alert(obj.value);
+	try{
+	  if(numberStr==''){
+		  return 0;
+	  }
+	 return parseFloat(numberStr.replace(/\,/g,''));
+	}catch(err) {
+		 alert(err.message);
+	}
+}
 function isNum(obj){
   if(obj.value != ""){
 	if(isNaN(obj.value)){

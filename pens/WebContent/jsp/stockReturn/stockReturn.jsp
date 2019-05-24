@@ -72,6 +72,10 @@ function backsearch(path) {
 	document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=prepare"+"&action=back";//stockSearch
 	document.stockReturnForm.submit();
 }
+function clearForm(path) {
+	document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=createNewStock";//stockSearch
+	document.stockReturnForm.submit();
+}
 function openPopupInvoice(index){
 	openPopupInvoiceModel('${pageContext.request.contextPath}',index,<%=user.getId()%>);
 }
@@ -181,7 +185,7 @@ function gotoReportXXXX(path, reportType,requestNumber){
 										      onkeypress="getCustNameKeypress(event,this)" styleClass="\" autoComplete=\"off"
 										      onblur="getCustNameOnblur(event,this)"/>
 										      
-										      <input type="button" name="bt1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
+										      <input type="button" id="btFindCust" name="btFindCust" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}')"/>
 										    
 											<html:text property="bean.customerName" styleId="customerName"  size="50" readonly="true" styleClass="disableText"/>
 											<html:hidden property="bean.customerId" styleId="customerId" />
@@ -383,6 +387,10 @@ function gotoReportXXXX(path, reportType,requestNumber){
 									    <input type="button" value="พิมพ์รายงาน"  class="newPosBtnLong">
 								    </a> 
 								 </c:if>
+								 <a href="#" onclick="clearForm('${pageContext.request.contextPath}');">
+									  <input type="button" value="  Clear  "  class="newPosBtnLong">
+								    </a>
+								
 								<a href="#" onclick="backsearch('${pageContext.request.contextPath}');">
 									  <input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong">
 								    </a>

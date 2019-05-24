@@ -45,6 +45,7 @@ public class Utils {
 	private static String CURRENCY_FORMAT ="#,##0.00";
 	private static String NUMBER_FORMAT ="#,##0";
 	
+	public static final String format_number_no_digit = "###0";
 	public static final String format_current_no_disgit = "#,##0";
 	public static final String format_current_2_disgit = "#,##0.00";
     public static final String format_current_5_digit = "#,##0.00000";

@@ -512,8 +512,15 @@ function setStoreMainValue(code,desc,address,customerId){
 	$("#customerName").val(desc);
 	$("#customerAddress").val(address);
 	$("#customerId").val(customerId);
+	
+	disableFindCustomer();
 } 
-
+/** hide find customer **/
+function disableFindCustomer(){
+	$("#customerCode").attr('readonly', true);
+	document.getElementById('customerCode').className='disableText';
+	document.getElementById('btFindCust').style.visibility = 'hidden';
+}
 function getCustNameKeypress(e,custCode){
 	var form = document.stockReturnForm;
 	if(e != null && e.keyCode == 13){
@@ -523,7 +530,7 @@ function getCustNameKeypress(e,custCode){
 			$("#customerAddress").val('');
 			$("#customerId").val('');
 		}else{
-		  getCustName(custCode);
+		   getCustName(custCode);
 		}
 	}
 }
@@ -562,6 +569,8 @@ function getCustName(custCode){
 			$("#customerName").val(retArr[0]);
 			$("#customerAddress").val(retArr[1]);
 			$("#customerId").val(retArr[2]);
+			
+			disableFindCustomer();
 		}else{
 			alert("ไม่พบข้อมูล");
 			$("#customerCode").val('');

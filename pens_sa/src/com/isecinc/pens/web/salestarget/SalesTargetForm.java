@@ -13,9 +13,9 @@ public class SalesTargetForm extends I_Form {
     private List<SalesTargetBean> results = new ArrayList<SalesTargetBean>();
     
     private String pageName;
+    private String subPageName;
     private SalesTargetBean bean ;
-    private SalesTargetBean beanCriteria ;
-    
+  
 	public List<SalesTargetBean> getResults() {
 		return results;
 	}
@@ -23,6 +23,12 @@ public class SalesTargetForm extends I_Form {
 		this.results = results;
 	}
 	
+	public String getSubPageName() {
+		return subPageName;
+	}
+	public void setSubPageName(String subPageName) {
+		this.subPageName = subPageName;
+	}
 	public String getPageName() {
 		return pageName;
 	}
@@ -35,12 +41,7 @@ public class SalesTargetForm extends I_Form {
 	public void setBean(SalesTargetBean bean) {
 		this.bean = bean;
 	}
-	public SalesTargetBean getBeanCriteria() {
-		return beanCriteria;
-	}
-	public void setBeanCriteria(SalesTargetBean beanCriteria) {
-		this.beanCriteria = beanCriteria;
-	}
+	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 
 		

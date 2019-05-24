@@ -169,7 +169,7 @@ function loadItem(path){
 								 <html:text property="bean.storeCode" styleId="storeCode" size="30" styleClass="\" autoComplete=\"off"/>
 								
 								  &nbsp;&nbsp; 
-								   <%if ( UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
+								   <%if (true){// UserUtils.userInRoleMC(user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
 									   <c:if test="${stockMCForm.bean.canEdit ==true}">
 										<a href="#" onclick="return save('${pageContext.request.contextPath}');">
 										  <input type="button" value="บันทึกรายการ" class="newPosBtnLong">

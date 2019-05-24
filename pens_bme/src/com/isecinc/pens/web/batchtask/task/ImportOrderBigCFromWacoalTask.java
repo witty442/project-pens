@@ -37,7 +37,10 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 		return "AS_OF_DATE|วันที่เปิด Order Big-C จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
 	}
 	public String getDescription(){
-		return "";
+		return " ";
+	}
+	public String getDevInfo(){
+		return "Import Order(PENSBME_ORDER) Bigc To Oracle (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
 	}
 	public String getValidateScript(){
 		String script ="";

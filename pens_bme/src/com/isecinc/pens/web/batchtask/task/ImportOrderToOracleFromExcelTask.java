@@ -65,6 +65,9 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 	public String getDescription(){
 		return "Import File From Excel";
 	}
+	public String getDevInfo(){
+		return "";
+	}
 	public String getValidateScript(){
 		String script ="";
 		script +="<script>";

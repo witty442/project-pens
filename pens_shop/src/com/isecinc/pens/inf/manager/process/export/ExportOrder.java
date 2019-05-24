@@ -108,7 +108,9 @@ public class ExportOrder {
 	            "	d.QTY	AS	QTY,	\n"+
 	           // "	d.PRICE	AS	PRICE,	\n"+//priveIncludeVat
 	           //   priceExcludeVat new edit 11/2561(wit)
-	           "	(select p.price from m_product_price p where d.product_id =p.product_id and p.isactive ='Y') AS	price,	\n"+
+	            "	(select p.price from m_product_price p ,c_config c "+
+	            "   where d.product_id = p.product_id and p.pricelist_id = c.pricelist_id \n"+
+	            "   and p.isactive ='Y' ) AS	price,	\n"+
 	            "	d.LINE_AMOUNT	AS	LINE_AMOUNT, \n"+
 	            "	d.DISCOUNT	AS	DISCOUNT,	\n"+
 	            "	d.TOTAL_AMOUNT	AS	TOTAL_AMOUNT, \n"+

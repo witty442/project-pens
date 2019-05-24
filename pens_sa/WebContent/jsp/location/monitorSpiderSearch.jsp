@@ -1,3 +1,4 @@
+<%@page import="util.SessionUtils"%>
 <%@page import="util.CConstants"%>
 <%@page import="com.isecinc.pens.bean.CConstantsBean"%>
 <%@page import="java.util.Map"%>
@@ -19,6 +20,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "locationForm");
+
 String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 
 	screenWidth = (String)session.getAttribute("screenWidth");
@@ -185,14 +189,18 @@ function viewDetail(detailType,salesrepId,tripDate){
 						                <html:options collection="SALES_CHANNEL_LIST" property="salesChannelNo" labelProperty="salesChannelDesc"/>
 				                      </html:select>
                                      </td> 
-									<td width="10%" align="right" nowrap> <b>พนักงานขาย</b> </td>
+									<td width="10%" align="right" nowrap><b>ภาคตามสายดูแล</b>  </td>
 									<td width="20%" align="left">
-									<html:select property="bean.salesrepCode" styleId="salesrepCode" >
-										<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
-								    </html:select>
+									   <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+									    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+									   </html:select>
 									</td>
-									<td width="10%" align="right"></td>
-								    <td width="20%" align="left"></td>
+									<td width="10%" align="right"><b>พนักงานขาย</b></td>
+								    <td width="20%" align="left">
+									    <html:select property="bean.salesrepCode" styleId="salesrepCode" >
+											<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
+									    </html:select>
+								    </td>
 								    </tr>
 								   </table>
 								   </fieldset>

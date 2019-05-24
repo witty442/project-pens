@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="request_promotion_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="5" bottomMargin="20">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="560"/>
 	<parameter name="requestDate" class="java.lang.String"/>
 	<parameter name="requestNo" class="java.lang.String"/>
 	<parameter name="printDate" class="java.lang.String"/>
@@ -693,7 +693,7 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{productCode}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern=" #,##0" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="410" y="0" width="43" height="23"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -766,7 +766,7 @@
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{stockCtn}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern=" #,##0" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="320" y="0" width="43" height="23"/>
 				<box>
 					<topPen lineWidth="1.0"/>
@@ -981,7 +981,7 @@
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sum_stockCtn}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern=" #,##0" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="320" y="0" width="43" height="20"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
@@ -1003,7 +1003,7 @@
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sum_borrowCtn}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern=" #,##0" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern=" #,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="410" y="0" width="43" height="20"/>
 				<box>
 					<leftPen lineWidth="1.0"/>

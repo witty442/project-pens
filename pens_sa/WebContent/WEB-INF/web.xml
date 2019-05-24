@@ -73,9 +73,27 @@
   </welcome-file-list>
   
   <jsp-config>
-	  <taglib>
+	 <taglib>
         <taglib-uri>http://displaytag.sourceforge.net/</taglib-uri>
         <taglib-location>/WEB-INF/displaytag-11.tld</taglib-location>
     </taglib>
+    <taglib>
+	     <taglib-uri>
+		    http://struts.apache.org/tags-bean
+	     </taglib-uri>
+	     <taglib-location>
+		     /WEB-INF/struts-bean.tld
+	     </taglib-location>
+     </taglib>
+     <taglib>
+	     <taglib-uri>
+		    http://struts.apache.org/tags-html
+	     </taglib-uri>
+	     <taglib-location>
+		    /WEB-INF/struts-html.tld
+	     </taglib-location>
+	  </taglib>
   </jsp-config>
+  
+  
 </web-app>

@@ -7,3 +7,6 @@ CREATE TABLE pens_shop.c_config (
 	pricelist_id int not null,
 	PRIMARY KEY (user_id)
 );
+
+/** 05-2562 **/
+alter table c_config add qualifier varchar(60);

@@ -320,6 +320,19 @@ public class Utils {
 		}
 		return d;
 	}
+	public static String getCurrentDateYYYYMM(){
+		String d = "";
+		Calendar c = Calendar.getInstance(Locale.US);
+		logger.debug("currentYear:"+String.valueOf(c.get(Calendar.YEAR)));
+		try{
+			d   = String.valueOf(c.get(Calendar.YEAR)).length()==1?"0"+String.valueOf(c.get(Calendar.YEAR)+543):String.valueOf(c.get(Calendar.YEAR)+543);
+			d  += String.valueOf(c.get(Calendar.MONTH)).length()==1?"0"+String.valueOf(c.get(Calendar.MONTH)+1):String.valueOf(c.get(Calendar.MONTH)+1);
+			
+		}catch(Exception e){
+			
+		}
+		return d;
+	}
 	
 	public static void reconveryReport(String[] args){
 	    try{	       

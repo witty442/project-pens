@@ -13,13 +13,14 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
-public class MayaSaleOutAction {
+public class ShopSaleOutAction {
  private static Logger logger = Logger.getLogger("PENS");
 	
  public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
@@ -113,7 +114,11 @@ public class MayaSaleOutAction {
 			//Header
 			h.append("<table border='1'> \n");
 			h.append(" <tr> \n");
-			h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ MAYA Shop</td> \n");
+			if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_PENSHOP_CODE)){
+			  h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ MAYA Shop</td> \n");
+			}else if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_TERMINAL_CODE)){
+			  h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Terminal Shop</td> \n");
+			}
 			h.append(" </tr> \n");
 			h.append(" <tr> \n");
 			h.append("  <td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getBean().getStartDate()+"-"+form.getBean().getEndDate()+"</td> \n");
@@ -203,12 +208,15 @@ public class MayaSaleOutAction {
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,XXPENS_OM_ITEM_MST_V I");
-			sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+			sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+			sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21') ");
 			sql.append("\n   AND MP.pens_value =I.segment1 ");
 			sql.append("\n ) MP ");
 			sql.append("\n WHERE M.ORDER_NUMBER = D.ORDER_NUMBER ");
 			sql.append("\n AND D.product_id = MP.product_id ");
 			sql.append("\n AND M.DOC_STATUS ='SV' ");
+			sql.append("\n AND M.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
+			
 			if( !Utils.isNull(f.getBean().getStartDate()).equals("") && !Utils.isNull(f.getBean().getEndDate()).equals("") ){
 				dateTemp = Utils.parse(f.getBean().getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);

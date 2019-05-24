@@ -46,7 +46,7 @@ public class SalesTargetControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoMTListModel(conn, ""));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -74,7 +74,7 @@ public class SalesTargetControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoMTListModel(conn, ""));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 			
 			//init monthYearList
@@ -118,7 +118,7 @@ public class SalesTargetControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetUtils.searchCustCatNoMTListModel(conn, ""));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 					
 			//init monthYearList
@@ -135,7 +135,17 @@ public class SalesTargetControlPage {
 			logger.error(e.getMessage(),e);
 		}
 	}
-	public static void prepareSearchReportSalesTarget(HttpServletRequest request,Connection conn,User user,String pageName){
+	public static void prepareSearchReportSalesTarget(HttpServletRequest request,Connection conn,User user
+			,String pageName,String subPagName){
+		logger.debug("subPagName:"+subPagName);
+		if("TT".equalsIgnoreCase(subPagName)){
+			SalesTargetTTControlPage.prepareSearchReportSalesTargetTT(request, conn, user, pageName);
+		}else{
+			prepareSearchReportSalesTargetMT(request, conn, user, pageName);
+		}
+	}
+	public static void prepareSearchReportSalesTargetMT(HttpServletRequest request,Connection conn,User user
+			,String pageName){
 		PopupBean item = null;
 		List<PopupBean> dataList = null;
 		try{
@@ -166,7 +176,7 @@ public class SalesTargetControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			dataList.add(item);
-			dataList.addAll(SalesTargetUtils.searchCustCatNoListModel(conn, ""));
+			dataList.addAll(SalesTargetUtils.searchCustCatNoMTListModel(conn, ""));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",dataList);
 			
 			//SALES_CHANNEL_LIST
@@ -180,18 +190,6 @@ public class SalesTargetControlPage {
 			List<PopupBean> salesChannelList_s = SalesTargetUtils.searchSalesChannelListModel(conn, user);
 			dataList.addAll(salesChannelList_s);
 			request.getSession().setAttribute("SALES_CHANNEL_LIST",dataList);
-			
-			//CUST_CAT_LIST
-			//add Blank Row
-			dataList = new ArrayList<PopupBean>();
-			item = new PopupBean();
-			item.setSalesChannelNo("");
-			item.setSalesChannelDesc("");
-			dataList.add(item);
-			
-			List<PopupBean> custCatList_s = SalesTargetUtils.searchCustCatNoListModel(conn, "");
-			dataList.addAll(custCatList_s);
-			request.getSession().setAttribute("CUST_CAT_LIST",dataList);
 		
 			//SALESREP_LIST
 			//add Blank Row
@@ -201,7 +199,7 @@ public class SalesTargetControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = SalesTargetUtils.searchSalesrepListAll(conn);
+			List<PopupBean> salesrepList_s = SalesTargetUtils.searchSalesrepMTListAll(conn);
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
 			
@@ -216,6 +214,17 @@ public class SalesTargetControlPage {
 			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_OPEN));
 			request.getSession().setAttribute("STATUS_LIST",dataList);
 			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+			
+			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
+			salesZoneList.addAll(salesZoneList_s);
+			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -240,16 +249,6 @@ public class SalesTargetControlPage {
 			dataList.add(new PopupBean("reportType","Detail","Detail"));
 			request.getSession().setAttribute("DISP_TYPE_LIST",dataList);
 			
-			//Cust Cat No List
-			//add Blank Row
-			dataList = new ArrayList<PopupBean>();
-			item = new PopupBean();
-			item.setCustCatNo("");
-			item.setCustCatDesc("");
-			dataList.add(item);
-			dataList.addAll(SalesTargetUtils.searchCustCatNoListModel(conn, ""));
-			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",dataList);
-			
 			//SALES_CHANNEL_LIST
 			//add Blank Row
 			dataList = new ArrayList<PopupBean>();
@@ -270,7 +269,7 @@ public class SalesTargetControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> custCatList_s = SalesTargetUtils.searchCustCatNoListModel(conn, "");
+			List<PopupBean> custCatList_s = SalesTargetUtils.searchCustCatNoMTListModel(conn, "");
 			dataList.addAll(custCatList_s);
 			request.getSession().setAttribute("CUST_CAT_LIST",dataList);
 		
@@ -375,6 +374,8 @@ public class SalesTargetControlPage {
 		}
 		return forward;
 	}
+	
+	
 	/**
 	 * prepareDetailMT
 	 * @param form
@@ -507,6 +508,32 @@ public class SalesTargetControlPage {
 			cri.setStartDate(bean.getStartDate());
 			cri.setEndDate(bean.getEndDate());
 			cri.setSalesChannelNo(bean.getSalesChannelNo());
+		}else if(SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){
+			cri.setPeriod(bean.getPeriod());
+			cri.setPeriodDesc(bean.getPeriodDesc());
+			cri.setBrand(bean.getBrand());
+			cri.setBrandName(bean.getBrandName());
+			cri.setSalesZone(bean.getSalesZone());
+			cri.setCustCatNo(bean.getCustCatNo());
+			cri.setStartDate(bean.getStartDate());
+			cri.setEndDate(bean.getEndDate());
+		}else if(SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){
+			cri.setPeriod(bean.getPeriod());
+			cri.setPeriodDesc(bean.getPeriodDesc());
+			cri.setBrand(bean.getBrand());
+			cri.setBrandName(bean.getBrandName());
+			cri.setSalesZone(bean.getSalesZone());
+			cri.setCustCatNo(bean.getCustCatNo());
+			cri.setStartDate(bean.getStartDate());
+			cri.setEndDate(bean.getEndDate());
+		}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){
+			cri.setPeriod(bean.getPeriod());
+			cri.setPeriodDesc(bean.getPeriodDesc());
+			cri.setSalesZone(bean.getSalesZone());
+			cri.setCustCatNo(bean.getCustCatNo());
+			cri.setCustCatNo(bean.getCustCatNo());
+			cri.setStartDate(bean.getStartDate());
+			cri.setEndDate(bean.getEndDate());
 		}
 		return cri;
 	}

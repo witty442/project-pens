@@ -10,10 +10,9 @@ public class Test {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-	    if(0.0000099 >0.00){
-	      System.out.println("today:");
-	    }
+		String date ="10052019";
+	    System.out.println(date.substring(2,4));
+	    System.out.println(date.substring(4,8));
 	}
 
 }

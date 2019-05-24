@@ -91,7 +91,7 @@ public class StampBoxNoReportPdf {
 	    	bf2 = BaseFont.createFont(absPath+"BROWA.TTF", BaseFont.IDENTITY_H,BaseFont.EMBEDDED);
 	    	
 	    	mainBigFont = new Font(bfMainBigFont, 30);
-	    	mainFont = new Font(bf1, 20);
+	    	mainFont = new Font(bf1, 30);
 	    	subFont = new Font(bf2, 18);
 	    	 
 	    	conn = DBConnection.getInstance().getConnection();
@@ -132,23 +132,26 @@ public class StampBoxNoReportPdf {
 	    
 	      if(groupCodeList != null && groupCodeList.size() >0){
 	    	  
-	    	  lineNumber +=8 ;//add head line
+	    	  lineNumber +=14 ;//add head line
 	    	  //Calc new page
 	    	  lineNumber += (groupCodeList.size()/maxGroupCountInRow)+1; 
-	    	  logger.debug("page["+page+"]boxno["+item.getBoxNo()+"]lineNumber["+lineNumber+"]");
+	    	 
 		      // Start a new page
 		      if(lineNumber >= maxRowInPage){
 		    	  page++;
-		    	  logger.debug("new page["+page+"]:boxNo["+item.getBoxNo()+"]");
+		    	  logger.debug("new page["+page+"]boxno["+item.getBoxNo()+"]lineNumber["+lineNumber+"]");
+		    	 // logger.debug("new page["+page+"]:boxNo["+item.getBoxNo()+"]");
 		          document.newPage();
 		          lineNumber = 0;
+		      }else{
+		    	  logger.debug("page["+page+"]boxno["+item.getBoxNo()+"]lineNumber["+lineNumber+"]");
 		      }
 		      
 		    Paragraph preface = new Paragraph();
 		    // We add one empty line
 		    addEmptyLine(preface, 1);
 		    // Lets write a big header
-		    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"           เลขที่กล่อง          : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
+		    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"    เลขที่กล่อง    : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
 		    preface.add(new Paragraph("ร้านค้า   : "+item.getStoreCode()+" - "+item.getStoreName(), mainBigFont));
 		    preface.add(new Paragraph("ที่อยู่   : "+item.getAddress(), subFont));
 		    preface.add(new Paragraph("ยอดรวม   "+r.getTotalQty()+"  ชิ้น", mainFont));

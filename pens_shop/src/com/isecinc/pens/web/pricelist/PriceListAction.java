@@ -87,10 +87,15 @@ public class PriceListAction extends I_Action {
 					&& !pricelistForm.getPriceList().getIsActive().equals("")) {
 				whereCause += " AND ISACTIVE = '" + pricelistForm.getPriceList().getIsActive() + "' ";
 			}
-			whereCause += " AND PRICE_LIST_TYPE = '" + user.getOrderType().getKey() + "' ";
-
+			//whereCause += " AND PRICE_LIST_TYPE = '" + user.getOrderType().getKey() + "' ";
+			
+			//Get from app config
+			whereCause += " AND PRICELIST_ID = " + user.getConfig().getPricelistId() + " ";
+			
 			whereCause += " ORDER BY NAME ";
 
+			logger.debug("whereClasue: \n"+whereCause);
+			
 			PriceList[] results = new MPriceList().search(whereCause);
 			pricelistForm.setResults(results);
 			if (results != null) {

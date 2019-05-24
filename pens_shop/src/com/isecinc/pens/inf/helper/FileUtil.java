@@ -35,7 +35,8 @@ import org.apache.log4j.Logger;
  */
 public class FileUtil {
 	public static Logger logger = Logger.getLogger("PENS");
-
+    public static String dev_temp_path ="D:\\dev_temp\\logs\\";
+    
 	public static void main(String[] s){
 		
 	}

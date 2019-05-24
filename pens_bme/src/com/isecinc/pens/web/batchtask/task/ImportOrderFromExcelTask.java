@@ -62,6 +62,9 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 	public String getDescription(){
 		return "Import File From Excel";
 	}
+	public String getDevInfo(){
+		return "";
+	}
 	public String getValidateScript(){
 		String script ="";
 		script +="<script>";

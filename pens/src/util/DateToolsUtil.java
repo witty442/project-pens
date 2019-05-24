@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.inf.helper.Utils;
 
 public class DateToolsUtil {
 
@@ -420,5 +421,31 @@ public class DateToolsUtil {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		return c;
+	}
+	/**
+	 * 
+	 * @param date1
+	 * @param date2
+	 * @return date1 > date2 return 1;
+	 *         date1 = date2 return 0;
+	 *         date1 < date2 return -1;
+	 */
+	public static int compareDate(Date date1,Date date2){
+		if(date1.after(date2)){
+			return 1;
+		}else if(date1.equals(date2)){
+			return 1;
+		}else{
+			return -1;
+		}
+	}
+	
+	public static boolean compareDateInSameMonthYear(Date date1,Date date2) throws Exception{
+		int YYYYMM1 =  Integer.parseInt(Utils.stringValue(date1, Utils.YYYY_MM));
+		int YYYYMM2 =  Integer.parseInt(Utils.stringValue(date2, Utils.YYYY_MM));
+		if(YYYYMM1 != YYYYMM2){
+			return false;
+		}
+		return true;
 	}
 }

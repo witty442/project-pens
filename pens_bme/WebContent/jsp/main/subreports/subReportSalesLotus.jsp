@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.bean.TransactionSummary"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
@@ -15,6 +16,13 @@
 <%
 String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
 String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
+
+//hide column case Role WACOAl
+User user = (User)session.getAttribute("user");
+boolean isRoleWacoal = false;
+if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){
+	isRoleWacoal = true;
+}
 
 String totalPage = "";
 String currentPage = "";
@@ -74,7 +82,9 @@ System.out.println("currentPage:"+currentPage);
 					    <display:column  title="DESCRIPTION" property="description"  sortable="false"  class="td_text" style="width:5%"/>	
 					    
 					    <display:column  title="QTY" property="qty"  sortable="false"  class="td_text" style="width:5%"/>
+					    <%if( !isRoleWacoal) {%>
 					    <display:column  title="Pens Group" property="pensGroup"  sortable="false"  class="td_text" style="width:5%"/>	
+					    <%} %>
 					    <display:column  title="Pens Group Type" property="pensGroupType"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="Sales Year" property="salesYear"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="Sales Month" property="salesMonth"  sortable="false"  class="td_text" style="width:5%"/>			
@@ -87,11 +97,13 @@ System.out.println("currentPage:"+currentPage);
 					    <display:column  title="Size Type" property="sizeType"  sortable="false"  class="td_text" style="width:5%"/>	
 					    			
 					    <display:column  title="SIZE" property="sizes"  sortable="false"  class="td_text" style="width:5%"/>	
+					    <%if( !isRoleWacoal) {%>
 					    <display:column  title="GROSS SALES" property="grossSales"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="RETURN AMT" property="returnAmt"  sortable="false"  class="td_text" style="width:5%"/>			
+					    <%} %>
 					    <display:column  title="NET SALES INCL VAT" property="netSalesInclVat"  sortable="false"  class="td_text" style="width:5%"/>	
+					   <%if( !isRoleWacoal) {%>
 					    <display:column  title="VAT AMT" property="vatAmt"  sortable="false"  class="td_text" style="width:5%"/>		
-	
 					    <display:column  title="NET SALES EXC VAT" property="netSalesExcVat"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="GP AMOUNT" property="gpAmount"  sortable="false"  class="td_text" style="width:5%"/>			
 					    <display:column  title="VAT ON GP AMOUNT" property="vatOnGpAmount"  sortable="false"  class="td_text" style="width:5%"/>	
@@ -100,6 +112,7 @@ System.out.println("currentPage:"+currentPage);
 					    <display:column  title="AP AMOUNT" property="apAmount"  sortable="false" class="td_text" style="width:5%"/>	
 					    <display:column  title="TOTAL VAT AMT" property="totalVatAmt"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="AP AMOUNT INCL VAT" property="apAmountInclVat"  sortable="false"  class="td_text" style="width:5%"/>			
+					    <%} %>
 					    <display:column  title="Create date" property="createDate"  sortable="false"  class="td_text" style="width:5%"/>	
 					    <display:column  title="Create by" property="createUser"  sortable="false"  class="td_text" style="width:5%"/>	<!-- 33 -->
 					    
@@ -114,7 +127,9 @@ System.out.println("currentPage:"+currentPage);
 						      <td width="5%">&nbsp;</td>
 						      <td width="5%"><b>Total</b></td>
 						      <td class="td_number_bold" width="10%"><span id="totalQty"></span> </td>
+						     <%if( !isRoleWacoal) {%>
 						      <td width="10%">&nbsp;</td>
+						     <%} %>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
@@ -126,6 +141,12 @@ System.out.println("currentPage:"+currentPage);
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
+							  <%if( !isRoleWacoal) {%>
+							  <td width="10%">&nbsp;</td>
+							  <td width="10%">&nbsp;</td>
+							  <%} %>
+							  <td width="10%">&nbsp;</td>
+							  <%if( !isRoleWacoal) {%>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
@@ -134,9 +155,7 @@ System.out.println("currentPage:"+currentPage);
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
-							  <td width="10%">&nbsp;</td>
+							  <%} %>
 							  <td width="10%">&nbsp;</td>
 							  <td width="10%">&nbsp;</td>
 						    </tr>

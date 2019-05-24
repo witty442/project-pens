@@ -28,13 +28,13 @@ public class SalesTargetReport {
 		COLUMNNAME_MAP.put("INVENTORY_ITEM_CODE", "SKU");
 	}
 	
-	public static StringBuffer searchReport(SalesTargetBean o,boolean excel){
-		return searchReportModel(o, excel);
+	public static StringBuffer searchReport(SalesTargetBean o,boolean excel,String subPageName){
+		return searchReportModel(o, excel,subPageName);
 	}
-    public static StringBuffer searchReport(SalesTargetBean o){
-		return searchReportModel(o, false);
+    public static StringBuffer searchReport(SalesTargetBean o,String subPageName){
+		return searchReportModel(o, false,subPageName);
 	}
-	public static StringBuffer searchReportModel(SalesTargetBean o,boolean excel){
+	public static StringBuffer searchReportModel(SalesTargetBean o,boolean excel,String subPageName){
 		SalesTargetBean s = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -56,12 +56,25 @@ public class SalesTargetReport {
 			columnNameArr = o.getReportType().split("\\,");
 			
 			sql.append("\n  SELECT "+genSelectColumnName(columnNameArr));
-			sql.append("\n  NVL(SUM(D.TARGET_QTY),0) as TARGET_QTY " );
-			sql.append("\n ,NVL(SUM(D.TARGET_AMOUNT),0) as TARGET_AMOUNT ");
-			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP M  ");
-			sql.append("\n  ,XXPENS_BI_SALES_TARGET_TEMP_L D ");
-			sql.append("\n  WHERE 1=1 ");
-			sql.append("\n  AND M.ID=D.ID ");
+			sql.append("\n  NVL(SUM(M.TARGET_QTY),0) as TARGET_QTY " );
+			sql.append("\n ,NVL(SUM(M.TARGET_AMOUNT),0) as TARGET_AMOUNT ");
+			sql.append("\n  FROM(");
+			sql.append("\n    SELECT M.STATUS,M.sales_channel, M.CUSTOMER_CATEGORY ");
+			sql.append("\n    , M.target_month,M.target_quarter,M.target_year ");
+			sql.append("\n    , M.salesrep_code,M.brand ,customer_code");
+			sql.append("\n    , (select zone from  PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n       where Z.salesrep_id =M.salesrep_id ) as SALES_ZONE ");
+			sql.append("\n    ,D.INVENTORY_ITEM_CODE ,D.TARGET_QTY ,D.TARGET_AMOUNT");
+			sql.append("\n    FROM PENSBI.XXPENS_BI_SALES_TARGET_TEMP M  ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L D ");
+			sql.append("\n    WHERE M.ID= D.ID ");
+			sql.append("\n )M ");
+			sql.append("\n WHERE 1=1 ");
+			//subPageName TT show only van and credit
+			if("TT".equalsIgnoreCase(subPageName)){
+				sql.append("\n AND M.CUSTOMER_CATEGORY IN('ORDER - VAN SALES','ORDER - CREDIT SALES') ");
+			}
+			
 			//old Code
 			//sql.append("\n  AND M.STATUS ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getStatus()), " and M.STATUS ="));
@@ -71,6 +84,7 @@ public class SalesTargetReport {
 			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getTargetQuarter()), " and M.target_quarter ="));
 			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getTargetYear()), " and M.target_year ="));
 			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getSalesrepCode()), " and M.salesrep_code ="));
+			sql.append(SQLHelper.genStrCondChkNull(Utils.isNull(o.getSalesZone()), " and M.sales_zone ="));
 			sql.append(SQLHelper.genStrArrCondChkNull(Utils.isNull(o.getBrand()), " and M.brand in "));
 			sql.append(SQLHelper.genStrArrCondChkNull(Utils.isNull(o.getCustomerCode()), " and M.customer_code in"));
 			
@@ -89,6 +103,7 @@ public class SalesTargetReport {
 				 html.append(genHeadTable(excel,columnNameArr));
 			  }
 			  for(int i=0;i<columnNameArr.length;i++){
+				  logger.debug("columnName:"+columnNameArr[i]);
 				  ROWVALUE_MAP.put(columnNameArr[i], rst.getString(columnNameArr[i]) );
 				  
 				  ROWDESC_MAP.put(columnNameArr[i]+"_NAME", rst.getString(columnNameArr[i]+"_NAME") );
@@ -339,22 +354,25 @@ public class SalesTargetReport {
 		for(int i=0;i<columnNameArr.length;i++){
 		  if("Brand".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.brand ,";
-			  sql +="\n (select x.brand_desc from XXPENS_BI_MST_BRAND X WHERE X.brand_no = M.brand) as BRAND_NAME ,";
+			  sql +="\n (select x.brand_desc from PENSBI.XXPENS_BI_MST_BRAND X WHERE X.brand_no = M.brand) as BRAND_NAME ,";
 		  }else  if("CUSTOMER_CATEGORY".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.CUSTOMER_CATEGORY ,";
-			  sql +="\n (select x.cust_cat_desc from XXPENS_BI_MST_CUST_CAT X WHERE X.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_NAME ,";
+			  sql +="\n (select x.cust_cat_desc from PENSBI.XXPENS_BI_MST_CUST_CAT X WHERE X.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_NAME ,";
 		  }else if("SALES_CHANNEL".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.SALES_CHANNEL ,";
-			  sql +="\n (select x.SALES_CHANNEL_DESC from XXPENS_BI_MST_SALES_CHANNEL X WHERE X.SALES_CHANNEL_NO = M.SALES_CHANNEL) as SALES_CHANNEL_NAME ,";
+			  sql +="\n (select x.SALES_CHANNEL_DESC from PENSBI.XXPENS_BI_MST_SALES_CHANNEL X WHERE X.SALES_CHANNEL_NO = M.SALES_CHANNEL) as SALES_CHANNEL_NAME ,";
 		  }else if("SALESREP_CODE".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.SALESREP_CODE ,";
-			  sql +="\n (select x.SALESREP_DESC from XXPENS_BI_MST_SALESREP X WHERE X.SALESREP_CODE = M.SALESREP_CODE) as SALESREP_CODE_NAME ,";
+			  sql +="\n (select x.SALESREP_DESC from PENSBI.XXPENS_BI_MST_SALESREP X WHERE X.SALESREP_CODE = M.SALESREP_CODE) as SALESREP_CODE_NAME ,";
 		  }else if("CUSTOMER_CODE".equalsIgnoreCase(columnNameArr[i])){
 			  sql +="\n M.CUSTOMER_CODE  ,";
-			  sql +="\n (select x.customer_desc from XXPENS_BI_MST_CUSTOMER X WHERE X.CUSTOMER_CODE = M.CUSTOMER_CODE) as CUSTOMER_CODE_NAME ,";
+			  sql +="\n (select x.customer_desc from PENSBI.XXPENS_BI_MST_CUSTOMER X WHERE X.CUSTOMER_CODE = M.CUSTOMER_CODE) as CUSTOMER_CODE_NAME ,";
 		  }else if("INVENTORY_ITEM_CODE".equalsIgnoreCase(columnNameArr[i])){
-			  sql +="\n D.INVENTORY_ITEM_CODE ,";
-			  sql +="\n (select x.INVENTORY_ITEM_DESC from XXPENS_BI_MST_ITEM X WHERE X.INVENTORY_ITEM_CODE = D.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_CODE_NAME ,";
+			  sql +="\n M.INVENTORY_ITEM_CODE ,";
+			  sql +="\n (select x.INVENTORY_ITEM_DESC from PENSBI.XXPENS_BI_MST_ITEM X WHERE X.INVENTORY_ITEM_CODE = M.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_CODE_NAME ,";
+		  }else if("SALES_ZONE".equalsIgnoreCase(columnNameArr[i])){
+			  sql +="\n M.SALES_ZONE ,";
+			  sql +="\n (select max(x.ZONE_NAME) from PENSBI.XXPENS_BI_MST_SALES_ZONE X WHERE X.ZONE = M.SALES_ZONE) as SALES_ZONE_NAME ,";
 		  }//if
 		}//for
 	  return sql;

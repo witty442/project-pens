@@ -294,6 +294,10 @@ public class MonitorSpiderReport {
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
 				sql.append("\n  and cs.cust_account_id =  c.cust_account_id ");
+				sql.append("\n  and s.salesrep_full_name not like '%ยกเลิก%'");
+				sql.append("\n  and s.region in(0,1,2,3,4) ");
+				sql.append("\n  and s.sales_channel in('C','S') ");
+				sql.append("\n  and s.isactive ='Y' ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -317,6 +321,10 @@ public class MonitorSpiderReport {
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
 				sql.append("\n  and cs.cust_account_id =  c.cust_account_id ");
+				sql.append("\n  and s.salesrep_full_name not like '%ยกเลิก%'");
+				sql.append("\n  and s.region in(0,1,2,3,4) ");
+				sql.append("\n  and s.sales_channel in('C','S') ");
+				sql.append("\n  and s.isactive ='Y' ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -340,6 +348,10 @@ public class MonitorSpiderReport {
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
 				sql.append("\n  and cs.cust_account_id =  c.cust_account_id ");
+				sql.append("\n  and s.salesrep_full_name not like '%ยกเลิก%'");
+				sql.append("\n  and s.region in(0,1,2,3,4) ");
+				sql.append("\n  and s.sales_channel in('C','S') ");
+				sql.append("\n  and s.isactive ='Y' ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -363,6 +375,10 @@ public class MonitorSpiderReport {
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
 				sql.append("\n  and cs.cust_account_id =  c.cust_account_id ");
+				sql.append("\n  and s.salesrep_full_name not like '%ยกเลิก%'");
+				sql.append("\n  and s.region in(0,1,2,3,4) ");
+				sql.append("\n  and s.sales_channel in('C','S') ");
+				sql.append("\n  and s.isactive ='Y' ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				sql.append("\n   )M ");
@@ -994,7 +1010,8 @@ public class MonitorSpiderReport {
 			 sql.append("\n and trunc(tc_sub.checkin_date) = to_date('"+c.getDay()+"','dd/mm/yyyy')"); 
 		
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
-			
+			 sql.append("\n order by tc_sub.checkin_date");
+			 		
 			 logger.debug("sql:"+sql.toString());
 			 
 			 ps = conn.prepareStatement(sql.toString());

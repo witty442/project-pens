@@ -1755,7 +1755,16 @@ public class SummaryExport {
 	public StringBuffer genLotusHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		TransactionSummary sum = new TransactionSummary();
+		//hide column case Role WACOAl
+		boolean isRoleWacoal = false;
+		if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){
+			isRoleWacoal = true;
+		}
+		String colSpan="33";
 		try{
+			if(isRoleWacoal){
+				colSpan="22";
+			}
 			if(request.getSession().getAttribute("summaryTrans") != null){
 				sum = (TransactionSummary) request.getSession().getAttribute("summaryTrans");
 			}
@@ -1764,19 +1773,19 @@ public class SummaryExport {
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33'>รายงานข้อมูลรายละเอียดขาย B'ME จาก LOTUS</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"'>รายงานข้อมูลรายละเอียดขาย B'ME จาก LOTUS</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >จากวันที่ขาย:"+form.getTransactionSummary().getSalesDateFrom()+"  ถึง วันที่ขาย:"+form.getTransactionSummary().getSalesDateTo()+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากวันที่ขาย:"+form.getTransactionSummary().getSalesDateFrom()+"  ถึง วันที่ขาย:"+form.getTransactionSummary().getSalesDateTo()+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >จากรหัสร้านค้า:"+Utils.isNull(form.getTransactionSummary().getPensCustCodeFrom())+"  ถึงรหัสร้านค้า:"+Utils.isNull(form.getTransactionSummary().getPensCustCodeTo())+"</td> \n");
+			h.append("<td align='left' colspan='"+colSpan+"' >จากรหัสร้านค้า:"+Utils.isNull(form.getTransactionSummary().getPensCustCodeFrom())+"  ถึงรหัสร้านค้า:"+Utils.isNull(form.getTransactionSummary().getPensCustCodeTo())+"</td> \n");
 			h.append("</tr> \n");
 
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='33' >File Name:"+form.getTransactionSummary().getFileName()+"</td>\n");
+			h.append("<td align='left' colspan='"+colSpan+"' >File Name:"+form.getTransactionSummary().getFileName()+"</td>\n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -1795,7 +1804,9 @@ public class SummaryExport {
 					h.append("<th>STYLE NO</th>  \n");
 					h.append("<th>DESCRIPTION</th> \n");
 					h.append("<th>QTY</th> \n");
+					if( !isRoleWacoal) {
 					h.append("<th>Pens Group</th>\n");
+					}
 					h.append("<th>Pens Group Type</th> \n");
 					h.append("<th>Sales Year</th>\n");
 					h.append("<th>Sales Month</th>  \n");
@@ -1807,9 +1818,12 @@ public class SummaryExport {
 					h.append("<th>COL</th> \n");
 					h.append("<th>Size Type</th> \n");
 					h.append("<th>SIZE</th> \n");
+					if( !isRoleWacoal) {
 					h.append("<th>GROSS SALES</th> \n");
 					h.append("<th>RETURN AMT</th>\n");
+					}
 					h.append("<th>NET SALES INCL VAT</th> \n");
+					if( !isRoleWacoal) {
 					h.append("<th>VAT AMT</th> \n");
 					h.append("<th>NET SALES EXC VAT</th> \n");
 					h.append("<th>GP AMOUNT</th>  \n");
@@ -1818,6 +1832,7 @@ public class SummaryExport {
 					h.append("<th>AP AMOUNT</th> \n");
 					h.append("<th>TOTAL VAT AMT</th> \n");
 					h.append("<th>AP AMOUNT INCL VAT</th> \n");
+					}
 					h.append("<th>Create date</th>  \n");
 					h.append("<th>Create by</th>\n");
 				h.append("</tr> \n");
@@ -1834,7 +1849,9 @@ public class SummaryExport {
 						h.append("<td>"+Utils.isNull(s.getStyleNo())+"</td>  \n");
 						h.append("<td>"+Utils.isNull(s.getDescription())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getQty())+"</td> \n");
+						if( !isRoleWacoal) {
 						h.append("<td>"+Utils.isNull(s.getPensGroup())+"</td>\n");
+						}
 						h.append("<td>"+Utils.isNull(s.getPensGroupType())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getSalesYear())+"</td>\n");
 						h.append("<td>"+Utils.isNull(s.getSalesMonth())+"</td>  \n");
@@ -1846,9 +1863,12 @@ public class SummaryExport {
 						h.append("<td>"+Utils.isNull(s.getCol())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getSizeType())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getSizes())+"</td> \n");
+						if( !isRoleWacoal) {
 						h.append("<td>"+Utils.isNull(s.getGrossSales())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getReturnAmt())+"</td>\n");
+						}
 						h.append("<td>"+Utils.isNull(s.getNetSalesInclVat())+"</td> \n");
+						if( !isRoleWacoal) {
 						h.append("<td>"+Utils.isNull(s.getVatAmt())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getNetSalesExcVat())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getGpAmount())+"</td>  \n");
@@ -1857,6 +1877,7 @@ public class SummaryExport {
 						h.append("<td>"+Utils.isNull(s.getApAmount())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getTotalVatAmt())+"</td> \n");
 						h.append("<td>"+Utils.isNull(s.getApAmountInclVat())+"</td> \n");
+						}
 						h.append("<td>"+Utils.isNull(s.getCreateDate())+"</td>  \n");
 						h.append("<td>"+Utils.isNull(s.getCreateUser())+"</td>\n");
 					h.append("</tr>");
@@ -1870,6 +1891,9 @@ public class SummaryExport {
 				h.append("<td></td>  \n");
 				h.append("<td>Total</td> \n");
 				h.append("<td class='num_bold'>"+sum.getQty()+"</td> \n");
+				if( !isRoleWacoal) {
+				h.append("<td></td>  \n");
+				}
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
@@ -1882,6 +1906,12 @@ public class SummaryExport {
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
+				if( !isRoleWacoal) {
+				h.append("<td></td>  \n");
+				h.append("<td></td>  \n");
+				}
+				h.append("<td></td>  \n");
+				if( !isRoleWacoal) {
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
@@ -1889,13 +1919,10 @@ public class SummaryExport {
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
+			    }
 				h.append("<td></td>  \n");
 				h.append("<td></td>  \n");
-				h.append("<td></td>  \n");
-				h.append("<td></td>  \n");
-				h.append("<td></td>  \n");
-				h.append("<td></td>  \n");
-			h.append("</tr>");
+			    h.append("</tr>");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){
@@ -2132,8 +2159,15 @@ public class SummaryExport {
 	
 	public StringBuffer genBigCHTML(HttpServletRequest request,SummaryForm form,User user,String reportType){
 		StringBuffer h = new StringBuffer("");
-		String colSpan="34";
+		boolean isRoleWacoal = false;
+		if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){
+			isRoleWacoal = true;
+		}
+		String colSpan="22";
 		try{
+			if(isRoleWacoal){
+				colSpan="19";
+			}
 			//css Excel
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
@@ -2172,9 +2206,13 @@ public class SummaryExport {
 					h.append("<th>STYLE NO</th>  \n");
 					h.append("<th>DESCRIPTION</th> \n");
 					h.append("<th>QTY</th> \n");
+					if( !isRoleWacoal) {
 					h.append("<th>WHOLE PRICE BF</th> \n");
+					}
 					h.append("<th>Retail PRICE BF</th> \n");
+					if( !isRoleWacoal) {
 					h.append("<th>TOTAL WHOLE PRICE BF</th> \n");
+					}
 					h.append("<th>Pens Group</th>\n");
 					h.append("<th>Pens Group Type</th> \n");
 					h.append("<th>Pens Item</th> \n");
@@ -2183,8 +2221,9 @@ public class SummaryExport {
 					h.append("<th>file Name</th>\n");
 					h.append("<th>Vendor</th> \n");
 					h.append("<th>Name</th>\n");
-					
+					if( !isRoleWacoal) {
 					h.append("<th>GP PERCENT</th>  \n");
+					}
 					h.append("<th>Create date</th>  \n");
 					h.append("<th>Create by</th>\n");
 				h.append("</tr> \n");
@@ -2201,10 +2240,13 @@ public class SummaryExport {
 						h.append("<td class='text'>"+Utils.isNull(s.getStyleNo())+"</td>  \n");
 						h.append("<td class='text'>"+Utils.isNull(s.getDescription())+"</td> \n");
 						h.append("<td class='currency'>"+Utils.isNull(s.getQty())+"</td> \n");
+						if( !isRoleWacoal) {
 						h.append("<td class='currency'>"+Utils.isNull(s.getWholePriceBF())+"</td> \n");
+						}
 						h.append("<td class='currency'>"+Utils.isNull(s.getRetailPriceBF())+"</td> \n");
+						if( !isRoleWacoal) {
 						h.append("<td class='currency'>"+Utils.isNull(s.getTotalWholePriceBF())+"</td> \n");
-
+						}
 						h.append("<td class='text'>"+Utils.isNull(s.getPensGroup())+"</td>\n");
 						h.append("<td class='text'>"+Utils.isNull(s.getPensGroupType())+"</td> \n");
 						h.append("<td class='text'>"+Utils.isNull(s.getPensItem())+"</td> \n");
@@ -2213,9 +2255,9 @@ public class SummaryExport {
 						h.append("<td class='text'>"+Utils.isNull(s.getFileName())+"</td>\n");
 						h.append("<td class='text'>"+Utils.isNull(s.getVendor())+"</td> \n");
 						h.append("<td class='text'>"+Utils.isNull(s.getName())+"</td>\n");
-					
+						if( !isRoleWacoal) {
 						h.append("<td class='currency'>"+Utils.isNull(s.getGpPercent())+"</td> \n");
-						
+						}
 						h.append("<td class='text'>"+Utils.isNull(s.getCreateDate())+"</td>  \n");
 						h.append("<td class='text'>"+Utils.isNull(s.getCreateUser())+"</td>\n");
 					h.append("</tr>");

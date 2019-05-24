@@ -189,6 +189,28 @@ function save(path){
 	return false;
 }
 
+function saveTotalBox(path){
+	var form = document.pickStockGroupForm;
+	var issueReqNo =$('#issueReqNo').val();
+	var totalBox =$('#totalBox').val();
+	if(totalBox ==''){
+		$('#totalBox').focus();
+		alert("กรุณาระบุจำนวนกล่อง");
+		return false;
+	}
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/pick/ajax/saveTotalBoxPickStockGroupAjax.jsp",
+		data : "issueReqNo=" + issueReqNo+"&totalBox="+totalBox,
+		async: false,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
+	
+	setTimeout("alert(returnString)",1500);
+}
+
 function checkAll(chkObj){
 	var chk = document.getElementsByName("linechk");
 	for(var i=0;i<chk.length;i++){
@@ -643,9 +665,16 @@ function isNum(obj){
                                     <td > หมายเหตุ </td>
                                     <td colspan="2"> 
                                       <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
+                                       
+                                       <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
                                           &nbsp;&nbsp;    จำนวนกล่อง &nbsp;&nbsp; 
-                                      <html:text property="bean.totalBox" styleId="totalBox" size="10" 
-                                      styleClass="enableNumber\" autoComplete=\"off"  onkeypress="isNum(this)"/>
+                                          <html:text property="bean.totalBox" styleId="totalBox" size="10" 
+                                           styleClass="enableNumber\" autoComplete=\"off"  onkeypress="isNum(this)"/>
+                                     
+											<a href="javascript:saveTotalBox('${pageContext.request.contextPath}')">
+												<input type="button" value="บันทึกจำนวนกล่อง" class="newPosBtnLong"> 
+											</a>
+										</c:if>
                                     </td>
 								</tr>	
 						   </table>
@@ -798,10 +827,11 @@ function isNum(obj){
 											 <!-- </a> -->  
 										 </c:if>
 										 
-										   <a href="javascript:printStampBoxNoReport('${pageContext.request.contextPath}')">
-											  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
-											</a> 
-											
+										   <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
+											   <a href="javascript:printStampBoxNoReport('${pageContext.request.contextPath}')">
+												  <input type="button" value="พิมพ์ไปปะหน้ากล่อง" class="newPosBtnLong">
+												</a> 
+											</c:if>
 										  <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
 											 <a href="javascript:exportExcel('${pageContext.request.contextPath}')">
 											   <input type="button" value="    Export     " class="newPosBtnLong"> 

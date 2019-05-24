@@ -34,7 +34,7 @@ public class StampBoxNoPickByGroupReportPdf {
 	
  
   private static Font mainBigFont =new Font(Font.FontFamily.TIMES_ROMAN, 30,Font.BOLD);
-  private static Font mainFont =new Font(Font.FontFamily.TIMES_ROMAN, 18,Font.BOLD);
+  private static Font mainFont =new Font(Font.FontFamily.TIMES_ROMAN, 26,Font.BOLD);
   private static Font subFont =new Font(Font.FontFamily.TIMES_ROMAN, 16,Font.BOLD);
   protected static Logger logger = Logger.getLogger("PENS");
   private static int page = 0;
@@ -97,7 +97,7 @@ public class StampBoxNoPickByGroupReportPdf {
 	    	bf2 = BaseFont.createFont(absPath+"BROWA.TTF", BaseFont.IDENTITY_H,BaseFont.EMBEDDED);
 	    	
 	    	mainBigFont = new Font(bfMainBigFont, 30);
-	    	mainFont = new Font(bf1, 20);
+	    	mainFont = new Font(bf1, 30);
 	    	subFont = new Font(bf2, 18);
 	    	 
 	    	conn = DBConnection.getInstance().getConnection();
@@ -109,21 +109,22 @@ public class StampBoxNoPickByGroupReportPdf {
 	        addMetaData(document,"StampBoxNoPickAll");
 	      
 	       //Get BoxNo List
-	       java.util.List<ScanCheckBean> boxNoList = getBoxNoList(conn, bean);
+	       ScanCheckBean pickStockBean = getPickStockGroup(conn, bean);
+	       int noTemp =0;
 	       int no =0;
-	       if(boxNoList != null && boxNoList.size() >0){
-	    	  for(i=0;i<boxNoList.size();i++){
+	       if(pickStockBean != null ){
+	    	  for(i=0;i<pickStockBean.getTotalBox();i++){
 	    		  no++;
-	    		 ScanCheckBean item = boxNoList.get(i);
-	    		
+	    		  noTemp++;
 	    		 //add box no to doc
-	    		 addMainContent(conn,document,item);
+	    		 pickStockBean.setBoxNo(no+"");
+	    		 addMainContent(conn,document,pickStockBean);
 	    		 
 	    		 //show 4 group per page
-	    		 if(no%4==0){
+	    		 if(noTemp%4==0){
 	    	         document.newPage();
+	    	         noTemp=0;
 	    	     }
-	    	     
 	    	 }//for
 	       }
 	       document.close();
@@ -144,7 +145,7 @@ public class StampBoxNoPickByGroupReportPdf {
 	    // We add one empty line
 	    addEmptyLine(preface, 1);
 	    // Lets write a big header
-	    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"           เลขที่กล่อง          : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
+	    preface.add(new Paragraph("Issue Req No : "+item.getIssueReqNo()+"      เลขที่กล่อง    : "+item.getBoxNo()+"/"+item.getTotalBox(), mainFont));
 	    preface.add(new Paragraph("ร้านค้า   : "+item.getStoreCode()+" - "+item.getStoreName(), mainBigFont));
 	    preface.add(new Paragraph("ที่อยู่   : "+item.getAddress(), subFont));
 	   //add to doc
@@ -177,42 +178,27 @@ public class StampBoxNoPickByGroupReportPdf {
 	    return preface;
  }
 
-  public static List<ScanCheckBean> getBoxNoList(Connection conn,PickStock o ) throws Exception {
+  public static ScanCheckBean getPickStockGroup(Connection conn,PickStock o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		ScanCheckBean h = null;
-		List<ScanCheckBean> items = new ArrayList<ScanCheckBean>();
 		int no=0;
 		try {
-			sql.append("\n select M.* ,L.total_box FROM(");
-				sql.append("\n select h.issue_req_no ,h.store_code,i.box_no ");
-				sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
-				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.store_code) as customer_name ");
-				sql.append("\n  ,(select M.pens_desc3 from pensbi.PENSBME_MST_REFERENCE M ");
-				sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.store_code) as customer_address ");
-				sql.append("\n from PENSBI.PENSBME_PICK_STOCK h, PENSBI.PENSBME_PICK_STOCK_I i ");
-				sql.append("\n where 1=1   ");
-				sql.append("\n and h.issue_req_no = i.issue_req_no  ");
-		        sql.append("\n and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
-				sql.append("\n  group by h.issue_req_no ,h.store_code,i.box_no ");
-			
-			sql.append("\n )M LEFT OUTER JOIN  ");
-		    sql.append("\n (");
-			    sql.append("\n select issue_req_no ,count(*) as total_box FROM(");
-				sql.append("\n  select  distinct i.issue_req_no, i.box_no ");
-				sql.append("\n  from PENSBI.PENSBME_PICK_STOCK h, PENSBI.PENSBME_PICK_STOCK_I i ");
-				sql.append("\n  where 1=1   ");
-				sql.append("\n  and h.issue_req_no = i.issue_req_no  ");
-				sql.append("\n  and i.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
-			sql.append("\n     ) group by issue_req_no ");
-			sql.append("\n) L ON  M.issue_req_no = L.issue_req_no");
-			sql.append("\n  order by M.store_code asc  ");
+			sql.append("\n select h.issue_req_no ,h.store_code,h.total_box ");
+			sql.append("\n  ,(select M.pens_desc from pensbi.PENSBME_MST_REFERENCE M ");
+			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.store_code) as customer_name ");
+			sql.append("\n  ,(select M.pens_desc3 from pensbi.PENSBME_MST_REFERENCE M ");
+			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = h.store_code) as customer_address ");
+			sql.append("\n from PENSBI.PENSBME_PICK_STOCK h ");
+			sql.append("\n where 1=1   ");
+	        sql.append("\n and h.issue_req_no = '"+Utils.isNull(o.getIssueReqNo())+"'");
+	        
 			logger.debug("sql:"+sql);
-			
+
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-			while(rst.next()) {
+			if(rst.next()) {
 			   no++;
 			   h = new ScanCheckBean();
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
@@ -221,7 +207,7 @@ public class StampBoxNoPickByGroupReportPdf {
 			   h.setStoreName(Utils.isNull(rst.getString("customer_name")));
 			   h.setAddress(Utils.isNull(rst.getString("customer_address")));
 			   h.setTotalBox(rst.getInt("total_box"));
-			   items.add(h);
+			   
 			}//while
 		} catch (Exception e) {
 			throw e;
@@ -231,7 +217,7 @@ public class StampBoxNoPickByGroupReportPdf {
 				ps.close();
 			} catch (Exception e) {}
 		}
-		return items;
+		return h;
 	}
   // iText allows to add metadata to the PDF which can be viewed in your Adobe
   // Reader

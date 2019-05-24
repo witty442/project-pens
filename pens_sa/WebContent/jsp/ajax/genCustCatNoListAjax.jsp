@@ -10,7 +10,7 @@ String salesChannelNo = (String)request.getParameter("salesChannelNo");
 List<PopupBean> dataList= null;
 try{
 	if( !Utils.isNull(salesChannelNo).equals("")){
-		dataList = SalesTargetUtils.searchCustCatNoList(salesChannelNo);
+		dataList = SalesTargetUtils.searchCustCatNoMTList(salesChannelNo);
 		
 	}
 }catch(Exception e){

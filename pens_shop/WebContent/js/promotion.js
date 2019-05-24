@@ -4,7 +4,6 @@ function prepare(path,id){
 	return true;
 }
 
-
 function search(path){
 	if(!datedifference(document.getElementById('startDate'),document.getElementById('endDate'))){return false;}
 	
@@ -36,12 +35,18 @@ function view(path, id){
 }
 
 function showDetail(path,type,id){
-	if(type=='DIS')
-		window.open(path + "/jsp/pricePromotion/promotion_discount.jsp?lineId="+id, "Discount", "width=300,height=200,location=No,resizable=No");
-	else if (type=='PBH')
-		window.open(path + "/jsp/pricePromotion/promotion_pricebreak.jsp?lineId="+id, "Pricebreak", "width=500,height=400,location=No,resizable=No");
-	else if (type=='PRG')
-		window.open(path + "/jsp/pricePromotion/promotion_promotionalgood.jsp?lineId="+id, "PromotionalGood", "width=500,height=300,location=No,resizable=No");
-	else
-		;
+	var url = "";
+	if(type=='DIS'){
+		//window.open(path + "/jsp/pricePromotion/promotion_discount.jsp?lineId="+id, "Discount", "width=300,height=200,location=No,resizable=No");
+		url = path + "/jsp/pricePromotion/promotion_discount.jsp?lineId="+id;
+		PopupCenterFullHeight(url,"Discount",500);
+	}else if (type=='PBH'){
+		//window.open(path + "/jsp/pricePromotion/promotion_pricebreak.jsp?lineId="+id, "Pricebreak", "width=500,height=400,location=No,resizable=No");
+		url = path + "/jsp/pricePromotion/promotion_pricebreak.jsp?lineId="+id;
+		PopupCenterFullHeight(url,"Pricebreak",500);
+	}else if (type=='PRG'){
+		//window.open(path + "/jsp/pricePromotion/promotion_promotionalgood.jsp?lineId="+id, "PromotionalGood", "width=500,height=300,location=No,resizable=No");
+		url = path + "/jsp/pricePromotion/promotion_promotionalgood.jsp?lineId="+id;
+		PopupCenterFullHeight(url,"PromotionalGood",500);
+	}
 }

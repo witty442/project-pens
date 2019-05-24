@@ -29,9 +29,11 @@ public final class EnvProperties extends Properties{
 	private static final int START_VAR_PATTERN_CHAR_COUNT = 2;
 	private static final int END_VAR_PATTERN_CHAR_COUNT = 1;
 	private static final Pattern pat = Pattern.compile(VAR_PATTERN);
-	private static final String propName ="inf-config/inf-env.properties";
+	private static final String propNameControl ="inf-config/control-env.txt";
+	private static  String propName = "";
     
 	private EnvProperties() throws IOException {
+		//logger.debug("reload");
 		reload();
 	}
 
@@ -72,7 +74,9 @@ public final class EnvProperties extends Properties{
 	 */
 	public static synchronized EnvProperties getInstance() {
 		try {
+			//logger.debug("Instance EnvProperties :"+_instance);
 			if(_instance == null){
+				//logger.debug("new Instance EnvProperties");
 				_instance = new EnvProperties();
 			}
 		}catch(IOException e) {
@@ -90,6 +94,13 @@ public final class EnvProperties extends Properties{
 		InputStream is = null;
 		try{
 			ClassLoader cl = FileUtil.class.getClassLoader();
+			
+			/*# -------control-env.txt Config For Load Properties UAT OR Product --------------------------#*/
+			InputStream fis = cl.getResourceAsStream(propNameControl);
+		    String productType = FileUtil.readControlEnvFile(fis);
+		    propName = "inf-config/"+productType.toLowerCase()+"-inf-env.properties";
+		    
+			logger.info("load peroperties file name:"+propName);
 		    is = cl.getResourceAsStream(propName);
 		    
 			load(is);
@@ -97,12 +108,16 @@ public final class EnvProperties extends Properties{
 			fillUpVariable();
 		}catch (IOException e){
 			logger.error(e.getMessage(),e);
+			e.printStackTrace();
 			throw e;
+		}catch(Exception ee){
+			logger.error(ee.getMessage(),ee);
+			ee.printStackTrace();
 		}
 	}
-	  
+	
 	public static void main(String[] argv) {
-		String value= EnvProperties.getInstance().getProperty("DB2.SCHEMA");
+		String value= EnvProperties.getInstance().getProperty("product.type");
 		System.out.println(value);
 		//logger.debug(value);
 	}

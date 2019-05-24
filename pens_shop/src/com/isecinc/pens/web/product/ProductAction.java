@@ -96,7 +96,8 @@ public class ProductAction extends I_Action {
 			whereCause += " select distinct(pp.product_id) ";
 			whereCause += " from m_product_price pp , m_pricelist pl ";
 			whereCause += " where pp.pricelist_id = pl.pricelist_id ";
-			whereCause += " and pl.price_list_type = '" + user.getOrderType().getKey() + "' ";
+			//whereCause += " and pl.price_list_type = '" + user.getOrderType().getKey() + "' ";
+			whereCause += " and pl.pricelist_id = " + user.getConfig().getPricelistId() + " ";
 			whereCause += " and pp.isactive = 'Y' ";
 			whereCause += ") ";
 
@@ -143,8 +144,8 @@ public class ProductAction extends I_Action {
 			User user = (User) request.getSession().getAttribute("user");
 			product = new MProduct().find(productId);
 			String sql = "SELECT * FROM " + MProductPrice.TABLE_NAME + " WHERE PRODUCT_ID = " + productId;
-			sql += " AND pricelist_id in (select pricelist_id from m_pricelist where price_list_type = '"
-					+ user.getOrderType().getKey() + "') ";
+			sql += " AND pricelist_id in (select pricelist_id from m_pricelist where pricelist_id = '"
+					+ user.getConfig().getPricelistId() + "') ";
 			pos = Database.query(sql, null, ProductPrice.class, conn);
 			productPrices = new ProductPrice[pos.size()];
 			productPrices = pos.toArray(productPrices);

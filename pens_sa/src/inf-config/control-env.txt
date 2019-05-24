@@ -1,0 +1,3 @@
+# ----------Config Type UAT OR PRODUCTION for load properties-----------------------------------#
+#PRODUCTION
+UAT

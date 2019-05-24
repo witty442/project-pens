@@ -208,6 +208,14 @@ UL {
 	color: #000000;
 	text-align: right;
 }
+.errorBoldNumber {
+	background-color: red;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: right;
+	font-weight: bold;
+}
 .enableNumberBold {
 	border: 1px solid;
 	border-color: #BEBEBE;
@@ -229,6 +237,31 @@ UL {
 	color: #000000;
 	text-align: right;
 	font-weight: bold;
+}
+.disableNumberBlue {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	color: #4d4dff;
+	text-align: right;
+	font-weight: bold;
+	font-size: 14px;
+}
+.disableNumberBoldBlue {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	color: #4d4dff;
+	text-align: right;
+	font-weight: bold;
+	font-size: 16px;
+}
+.disableNumberBoldRed {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #ff3333;
+	text-align: right;
+	font-weight: bold;
+	font-size: 16px;
 }
 .recordfound {
 	text-align: left;

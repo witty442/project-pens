@@ -1,4 +1,5 @@
 
+<%@page import="util.SessionUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -18,6 +19,9 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "locationForm");
+
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
 //String path = request.getP
 java.util.List yearList = null;

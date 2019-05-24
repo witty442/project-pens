@@ -24,6 +24,8 @@ pageContext.setAttribute("linesRelate",line.getRelatedModifier(),PageContext.PAG
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+
 </head>
 <body topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <br>
@@ -34,11 +36,12 @@ pageContext.setAttribute("linesRelate",line.getRelatedModifier(),PageContext.PAG
 	</tr>
 </table>
 <br/>
-<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth">
 	<tr>
-		<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-		<th class="costprice"><bean:message key="Modifier.ValFrom" bundle="sysele"/></th>
-		<th class="costprice"><bean:message key="Modifier.ValTo" bundle="sysele"/></th>
+		<th class="td_text_center"><bean:message key="No" bundle="sysprop"/></th>
+		<th class="td_text_center" width="10%">Modifier Line Id</th>
+		<th class="td_text_center"><bean:message key="Modifier.ValFrom" bundle="sysele"/></th>
+		<th class="td_text_center"><bean:message key="Modifier.ValTo" bundle="sysele"/></th>
 		<th><bean:message key="Modifier.AppMethod" bundle="sysele"/></th>
 		<th class="costprice"><bean:message key="Modifier.Vals" bundle="sysele"/></th>
 	</tr>
@@ -52,19 +55,20 @@ pageContext.setAttribute("linesRelate",line.getRelatedModifier(),PageContext.PAG
 			</c:otherwise>
 		</c:choose>
 		<tr class="<c:out value='${tabclass}'/>">
-			<td align="center"><c:out value='${rows.index + 1}'/></td>
-			<td align="right"><fmt:formatNumber pattern="#,##0.00" value="${results.attr.valueFrom}"/></td>
-			<td align="right">
+			<td  class="td_text_center" width="10%"><c:out value='${rows.index + 1}'/></td>
+			<td  class="td_text_center" width="10%">${results.id}</td>
+			<td  class="td_number" width="10%"><fmt:formatNumber pattern="#,##0.00" value="${results.attr.valueFrom}"/></td>
+			<td  class="td_number" width="10%">
 				<c:if test="${results.attr.valueTo<999999}">
 					<fmt:formatNumber pattern="#,##0.00" value="${results.attr.valueTo}"/>
 				</c:if>
 			</td>
-			<td align="center">${results.applicationMethod}</td>
-			<td align="right"><fmt:formatNumber pattern="#,##0.00" value="${results.values}"/></td>
+			<td  class="td_text_center" width="10%">${results.applicationMethod}</td>
+			<td  class="td_number" width="10%"><fmt:formatNumber pattern="#,##0.00" value="${results.values}"/></td>
 		</tr>
 	</c:forEach>	
 	<tr>
-		<td align="left" colspan="5" class="footer">&nbsp;</td>
+		<td align="left" colspan="6" class="footer">&nbsp;</td>
 	</tr>
 </table>
 <br>

@@ -24,13 +24,14 @@ public class SessionUtils {
     	  Enumeration mySession = session.getAttributeNames();
     	  while (mySession.hasMoreElements()) {
 	    	  String mySessionVarName = (String)mySession.nextElement();
+	    	 // logger.debug("Session Attr Name:"+mySessionVarName);
 	    	  if(mySessionVarName.indexOf("Form") != -1 && !mySessionVarName.equals(curSessionFormName)){
 	    		  session.removeAttribute(mySessionVarName);
-	    	      System.out.println("Remove AttrSessionName="+mySessionVarName);
+	    	      //logger.info("Remove Attr SessionName="+mySessionVarName);
 	    	  }
     	  }
       }catch(Exception e){
-    	  e.printStackTrace();
+    	 logger.error(e.getMessage(),e);
       }
 	    
 	}

@@ -229,7 +229,7 @@ function cancelRR(id){
 						<%} %>
 						<%} %>
 						<br>
-						cancelReason:<input type="text" name="cancelReason" id="cancelReason"/>
+						<input type="hidden" name="cancelReason" id="cancelReason"/>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>

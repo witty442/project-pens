@@ -649,7 +649,8 @@ public class Utils {
 	}
 	
 	public static int convertToInt(String str) throws Exception{
-		if(str == null){
+		logger.debug("xx:"+str);
+		if(str == null || Utils.isNull(str).equals("")){
 			return 0;
 		}
 		return Integer.parseInt(str);

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.PickStock;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.pens.util.Utils;
@@ -2181,6 +2182,38 @@ public class PickStockGroupDAO extends PickConstants{
 		}finally{
 			if(ps != null){
 				ps.close();ps=null;
+			}
+		}
+	}
+	public static void updateTotalBox(String issueReqNo,String totalBox,User user) throws Exception{
+		Connection conn = null;
+		PreparedStatement ps = null;
+		logger.debug("updateHeadModel");
+		try{
+			conn = DBConnection.getInstance().getConnectionApps();
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
+			sql.append(" SET UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_BOX =? \n");
+		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
+			
+			ps = conn.prepareStatement(sql.toString());
+			int c =1;
+			
+			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+			ps.setString(c++, user.getUserName());
+			ps.setInt(c++, Utils.convertToInt(totalBox));
+			ps.setString(c++, issueReqNo);
+			
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(conn != null){
+			  conn.close();conn=null;
 			}
 		}
 	}

@@ -43,14 +43,31 @@ public class SalesTargetAction extends I_Action {
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		String pageName ="";
+		String subPageName = "";//Exp TT
 		try {
 			String action = Utils.isNull(request.getParameter("action")); 
 			pageName = Utils.isNull(request.getParameter("pageName"));
+			subPageName = Utils.isNull(request.getParameter("subPageName"));
+			aForm.setPageName(pageName);
+			aForm.setSubPageName(subPageName);
 			if("new".equals(action)){
-				pageName = Utils.isNull(request.getParameter("pageName"));
+				
+				//clear session
+				request.getSession().setAttribute("criteria_",null);
 				request.getSession().setAttribute("RESULTS",null);
+				request.getSession().setAttribute("productMKTList",null);
+				request.getSession().setAttribute("salesrepList",null);
+				request.getSession().setAttribute("dataMap",null);
+				request.getSession().setAttribute("PERIOD_LIST",null);
+				request.getSession().setAttribute("REPORT_TYPE_LIST",null);
+				request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",null);
+				request.getSession().setAttribute("SALES_CHANNEL_LIST",null);
+				request.getSession().setAttribute("SALESREP_LIST",null);
+				request.getSession().setAttribute("STATUS_LIST",null);
+				request.getSession().setAttribute("SALES_ZONE_LIST",null);
+				
 				SalesTargetBean sales = new SalesTargetBean();
-				logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
+				logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]subPageName["+subPageName+"]");
 				
 				//init Connection
 				conn = DBConnection.getInstance().getConnection();
@@ -68,37 +85,85 @@ public class SalesTargetAction extends I_Action {
 					}
 					
 				}else if (SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName) ){
+					sales = new SalesTargetBean();
 					SalesTargetControlPage.prepareSearchMTMGR(request, conn, user,pageName);
 					
 				}else if (SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName) ){
-					SalesTargetControlPage.prepareSearchReportSalesTarget(request, conn, user,pageName);
+					sales = new SalesTargetBean();
+					SalesTargetControlPage.prepareSearchReportSalesTarget(request, conn, user,pageName,subPageName);
+					
 				}else if (SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL.equalsIgnoreCase(pageName) ){
+					sales = new SalesTargetBean();
 					SalesTargetControlPage.prepareSearchReportSalesTargetAll(request, conn, user,pageName);
+				
+					/**************** TT ******************************/
+				}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){
+					sales = new SalesTargetBean();
+					SalesTargetTTControlPage.prepareSearchMKT_TT(request, conn, user,pageName);
+					
+					//for test
+					sales.setBrand("501");
+				}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){
+					sales = new SalesTargetBean();
+					SalesTargetTTControlPage.prepareSearchTTSUPER(request, conn, user,pageName);
+			
+				}else if (SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){
+					sales = new SalesTargetBean();
+					SalesTargetTTControlPage.prepareSearchTTMGR(request, conn, user,pageName);
+					
 				}
 				
+				//set bean session
 				aForm.setBean(sales);
+				logger.debug("bean:"+aForm.getBean());
 			}else if("back".equals(action)){
 				pageName = aForm.getPageName();
-				logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
-				//Search By MKT
-				if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
-				    SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMKT(aForm.getBeanCriteria(),user,pageName);
-				    aForm.setBean(salesReuslt);
-				    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMKT(request,aForm.getBean(),user));
-				   
-				}else if (SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){
-					SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMT(aForm.getBeanCriteria(),user,pageName);
-				    aForm.setBean(salesReuslt);
-				    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMT(request,aForm.getBean(),user));
-				    
-				}else if (SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){
-					SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMT(aForm.getBeanCriteria(),user,pageName);
-				    aForm.setBean(salesReuslt);
-				    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTMGR(request,aForm.getBean(),user));
-				}
+				logger.debug("action["+action+"]User["+user.getUserName()+"]pageName["+pageName+"]");
+				SalesTargetBean criteria_ = (SalesTargetBean)request.getSession().getAttribute("criteria_");
+				
+				//for case error back to main search
+				if(criteria_ !=null){
+					logger.debug("Back CustCatNo:"+criteria_.getCustCatNo());
+					
+					//save criteria back action
+					request.getSession().setAttribute("criteria_",SalesTargetControlPage.convertToCriteriaBean(pageName,criteria_));
+					
+					//Search By MKT
+					if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
+					    SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMKT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMKT(request,aForm.getBean(),user));
+					   
+					}else if (SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){
+						SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMT(request,aForm.getBean(),user));
+					    
+					}else if (SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){
+						SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTMGR(request,aForm.getBean(),user));
+					
+					}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){
+						SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByMKT_TT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByMKT_TT(request,aForm.getBean(),user));
+					
+					}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){
+						SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTSUPER_TT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTSUPER(request,aForm.getBean(),user));
+					
+					}else if (SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){
+						SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTMGR_TT(criteria_,user,pageName);
+					    aForm.setBean(salesReuslt);
+					    request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTMGR(request,aForm.getBean(),user));
+					}
+				}//if
 			}
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
+		    logger.error(e.getMessage(),e);
+			//request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
 			throw e;
 		}finally{
 			if(conn != null){
@@ -116,8 +181,9 @@ public class SalesTargetAction extends I_Action {
 		String pageName = aForm.getPageName();
 		try {
 			logger.debug("search Head :pageName["+pageName+"]");
-			//save old criteria
-			aForm.setBeanCriteria(SalesTargetControlPage.convertToCriteriaBean(pageName,aForm.getBean()));
+	
+			//save criteria search head
+			request.getSession().setAttribute("criteria_",SalesTargetControlPage.convertToCriteriaBean(pageName,aForm.getBean()));
 			
 			//Search By Role MKT(Marketing)
 			if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
@@ -135,7 +201,7 @@ public class SalesTargetAction extends I_Action {
 			     request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMT(request,aForm.getBean(),user));
 			     foundData = true;
 			  }
-			  //Search By Role Manager MT(sales)
+			  //Search By Role Manager MTMGR(sales)
 			}else if (SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){
 			   SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMT(aForm.getBean(),user,pageName);
 			   aForm.setBean(salesReuslt);
@@ -145,7 +211,7 @@ public class SalesTargetAction extends I_Action {
 			  }
 			  //Search Report
 			}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){
-				 StringBuffer resultHtmlTable = SalesTargetReport.searchReport(aForm.getBean());
+				 StringBuffer resultHtmlTable = SalesTargetReport.searchReport(aForm.getBean(),aForm.getSubPageName());
 				 if(resultHtmlTable != null){
 					  request.getSession().setAttribute("RESULTS",resultHtmlTable);
 					  foundData = true;
@@ -157,6 +223,31 @@ public class SalesTargetAction extends I_Action {
 					  request.getSession().setAttribute("RESULTS",resultHtmlTable);
 					  foundData = true;
 				 }
+			//Search By MKT_TT
+			}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){
+			   SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByMKT_TT(aForm.getBean(),user,pageName);
+			   aForm.setBean(salesReuslt);
+			   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+				  request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByMKT_TT(request,aForm.getBean(),user));
+				  foundData = true;
+			   }
+			 //Search By TTSUPER
+			}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){
+				   SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTSUPER_TT(aForm.getBean(),user,pageName);
+				   aForm.setBean(salesReuslt);
+				   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+					  request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTSUPER(request,aForm.getBean(),user));
+					  foundData = true;
+				   }
+			 //Search By TTMGR
+			}else if (SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){
+				   SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTMGR_TT(aForm.getBean(),user,pageName);
+				   logger.debug("canFinish:"+salesReuslt.isCanFinish());
+				   aForm.setBean(salesReuslt);
+				   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+					  request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTMGR(request,aForm.getBean(),user));
+					  foundData = true;
+				   }
 			}
 			
 			if(foundData==false){
@@ -180,96 +271,52 @@ public class SalesTargetAction extends I_Action {
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		User user = (User) request.getSession().getAttribute("user");
+		String forward ="detail";
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		String pageName = aForm.getPageName();
 		//Search By MKT
 		if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName) ){
 		   return SalesTargetControlPage.prepareDetailMKT(form, request, response);
+		   
 		}else if (SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName) ){
 		   return SalesTargetControlPage.prepareDetailMT(form, request, response);
+		   
 		}else if (SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){
 		   return SalesTargetControlPage.prepareDetailMTMGR(form, request, response);
+		
+	    /*************** TT ************************************************/
+		}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName) ){
+		   return SalesTargetTTControlPage.prepareDetailMKT_TT(form, request, response);
+		   
+		}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName) ){
+			return SalesTargetTTControlPage.prepareDetailTTSUPER_TT(form, request, response);
+			
+		}else if (SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName) ){
+			return SalesTargetTTControlPage.prepareDetailTTMGR_TT(form, request, response);
 		}
-		return "detail";
+		return forward;
 	}
 
 	/**
 	 * Save
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Connection conn = null;
+		
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
 		try {
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
-			SalesTargetBean h = aForm.getBean();
-			h.setStatus(SalesTargetConstants.STATUS_OPEN);
-			h.setCreateUser(user.getUserName());
-			h.setUpdateUser(user.getUserName());
-			
-			List<SalesTargetBean> itemList = new ArrayList<SalesTargetBean>();
-			//Set Item
-			String[] lineId = request.getParameterValues("lineId");
-			String[] itemCode = request.getParameterValues("itemCode");
-			String[] itemId = request.getParameterValues("itemId");
-			String[] targetQty = request.getParameterValues("targetQty");
-			String[] targetAmount = request.getParameterValues("targetAmount");
-			String[] price = request.getParameterValues("price");
-			String[] orderAmt12Month = request.getParameterValues("orderAmt12Month");
-			String[] orderAmt3Month = request.getParameterValues("orderAmt3Month");
-			String[] remark = request.getParameterValues("remark");
-			String[] rejectReason = request.getParameterValues("rejectReason");
-			String[] status = request.getParameterValues("status");
-			
-			logger.debug("itemCode:"+itemCode.length);
-			
-			//add value to Results
-			if(itemCode != null && itemCode.length > 0){
-				for(int i=0;i<itemCode.length;i++){
-					if( !Utils.isNull(itemCode[i]).equals("") && !Utils.isNull(price[i]).equals("")){
-						 SalesTargetBean l = new SalesTargetBean();
-						 logger.debug("itemCode["+Utils.isNull(itemCode[i])+"]lineId:"+lineId[i]);
-						 
-						 l.setLineId(Utils.convertStrToLong(lineId[i],0));
-						 l.setItemCode(Utils.isNull(itemCode[i]));
-						 l.setItemId(Utils.isNull(itemId[i]));
-						 l.setTargetQty(Utils.isNull(targetQty[i]));
-						 l.setTargetAmount(Utils.isNull(targetAmount[i]));
-						 l.setPrice(Utils.isNull(price[i]));
-						 l.setOrderAmt12Month(Utils.isNull(orderAmt12Month[i]));
-						 l.setOrderAmt3Month(Utils.isNull(orderAmt3Month[i]));
-						 l.setRemark(Utils.isNull(remark[i]));
-						 l.setRejectReason(Utils.isNull(rejectReason[i]));
-						 l.setStatus(Utils.isNull(status[i]));
-						
-						 l.setCreateUser(user.getUserName());
-						 l.setUpdateUser(user.getUserName());
-						 itemList.add(l);
-					}//if
-				}//for
-			}//if
-			//set items list
-			h.setItems(itemList);
-			//save
-			SalesTargetDAO.save(h,user);
-			
-			//commit
-			conn.commit();
-
-			//search
-			boolean getItems = true;
-			h = SalesTargetDAO.searchSalesTarget(conn, h,getItems, user,aForm.getPageName());
-			//get PriceListId
-			h.setPriceListId(SalesTargetUtils.getPriceListId(conn, h.getSalesChannelNo(), h.getCustCatNo()));
-			
-			aForm.setBean(h);
-			aForm.setResults(h.getItems());
-			
-			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetMTAction().save(aForm, request, response);
+				
+			}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().saveTTByMKT(aForm, request, response);
+				
+			}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().saveTTSUPER(aForm, request, response);
+			}
 		} catch (Exception e) {
-			conn.rollback();
+			
             e.printStackTrace();
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			try {
@@ -278,37 +325,21 @@ public class SalesTargetAction extends I_Action {
 			return "detail";
 		} finally {
 			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
+				
 			} catch (Exception e2) {}
 		}
 		return "detail";
 	}
 	public ActionForward copyFromLastMonth(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("copyFromLastMonth By MKT");
+		logger.debug("copyFromLastMonth ");
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String pageName = aForm.getPageName();
 		try {
-			SalesTargetBean bean = aForm.getBean();
-			bean.setCreateUser(user.getUserName());
-			bean.setUpdateUser(user.getUserName());
-			
-			String errorCode = SalesTargetCopy.copyFromLastMonth(user, bean,aForm.getPageName());
-			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
-				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
-			}else if(errorCode.equalsIgnoreCase("DATA_PREV_NOT_FOUND")){
-				request.setAttribute("Message","ไม่พบข้อมูลเดือนที่แล้ว");
-			}else{
-			   request.setAttribute("Message","Copy ข้อมูลเรียบร้อยแล้ว");
-			   
-			   //Search Data
-			   SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMKT(aForm.getBean(),user,pageName);
-			   aForm.setBean(salesReuslt);
-			   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() > 0){
-				  request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMKT(request,aForm.getBean(),user));
-			   }
+			if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName) ){
+				 new SalesTargetMTAction().copyFromLastMonth(mapping, aForm, request, response);
+			}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName) ){
+				 new SalesTargetTTAction().copyFromLastMonthTTByMKT(mapping, aForm, request, response);
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -401,30 +432,14 @@ public class SalesTargetAction extends I_Action {
 		Connection conn = null;
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
 		try {
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
-			SalesTargetBean h = aForm.getBean();
-			h.setStatus(SalesTargetConstants.STATUS_POST);
-			h.setUpdateUser(user.getUserName());
-			
-			//update status POST
-			SalesTargetDAO.updateStatusHeadByMKT(conn, h);
-			SalesTargetDAO.updateStatusItemByMKTByID(conn, h);
-			
-			request.setAttribute("Message","Post To Sales เรียบร้อยแล้ว");
-			
-			conn.commit();
-			
-			//search
-			boolean getItems = true;
-			h = SalesTargetDAO.searchSalesTarget(conn, h,getItems, user,aForm.getPageName());
-			
-			aForm.setBean(h);
-			aForm.setResults(h.getItems());
+			if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetMTAction().postToSales(mapping, aForm, request, response);
+			}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().postToSalesTT(mapping, aForm, request, response);
+			}
 		} catch (Exception e) {
-			conn.rollback();
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		} finally {
@@ -438,91 +453,44 @@ public class SalesTargetAction extends I_Action {
 	}
 	
 	public ActionForward salesAcceptToSalesManager(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("salesAcceptToSalesManager By MT(Sales)");
-		Connection conn = null;
+		logger.debug("salesAcceptToSalesManager By MT(Sales) Or TTSUPER");
+
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
 		try {
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
-			SalesTargetBean h = aForm.getBean();
-			h.setStatus(SalesTargetConstants.STATUS_ACCEPT);
-			h.setUpdateUser(user.getUserName());
-			
-			//update status POST
-			SalesTargetDAO.updateStatusHeadByMKT(conn, h);
-			SalesTargetDAO.updateStatusItemByMKTByID(conn, h);
-			
-			request.setAttribute("Message","ได้ทำการ Accept เป้าหมายขาย เรียบร้อยแล้ว");
-			
-			conn.commit();
-			
-			//search
-			boolean getItems = true;
-			h = SalesTargetDAO.searchSalesTarget(conn, h,getItems, user,aForm.getPageName());
-			
-			aForm.setBean(h);
-			aForm.setResults(h.getItems());
+			if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().salesAcceptToSalesManagerTT(mapping, aForm, request, response);		
+			}else{ //PAGE_SALES
+				//MTSAles
+				return new SalesTargetMTAction().salesAcceptToSalesManager(mapping, aForm, request, response);
+			}
 		} catch (Exception e) {
-			conn.rollback();
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		} finally {
-			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
-			} catch (Exception e2) {}
+		
 		}
 		return mapping.findForward("detail");
 	}
 	
 	public ActionForward salesManagerFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("salesManagerFinish By MT Manager");
-		Connection conn = null;
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
 		try {
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			SalesTargetBean cri = new SalesTargetBean();
-			cri = aForm.getBean();
-			
-			String[] ids = request.getParameterValues("ids");
-			String[] status = request.getParameterValues("status");
-			
-			for(int i=0;i<ids.length;i++){
-				if( !SalesTargetConstants.STATUS_FINISH.equals(Utils.isNull(status[i]))){
-					SalesTargetBean h = new SalesTargetBean();
-					h.setId(Utils.convertStrToLong(ids[i], 0));
-					h.setStatus(SalesTargetConstants.STATUS_FINISH);
-					h.setUpdateUser(user.getUserName());
-					
-					//update status FINISH
-					SalesTargetDAO.updateStatusHeadByMKT(conn, h);
-					SalesTargetDAO.updateStatusItemByMKTByID(conn, h);
-				}
+			if (SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().salesManagerFinishByTTMGR_TT(mapping, aForm, request, response);		
+			}else{ //PAGE_MTMGR
+				return new SalesTargetMTAction().salesManagerFinish(mapping, aForm, request, response);
 			}
-			request.setAttribute("Message","ได้ทำการ อนุมัติเป้าหมายขาย เรียบร้อยแล้ว");
-			
-			conn.commit();
-			
-			//search head
-			cri = SalesTargetDAO.searchTargetHeadByMT(cri,user,aForm.getPageName());
-			aForm.setBean(cri);
-		    //gen Results
-			request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTMGR(request,aForm.getBean(),user));
-			
 		} catch (Exception e) {
-			conn.rollback();
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		} finally {
 			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
+				
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward("search");
@@ -541,7 +509,7 @@ public class SalesTargetAction extends I_Action {
 		try {
 			 //Search Report
 			 if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){
-				  resultHtmlTable = SalesTargetReport.searchReport(aForm.getBean(),excel);
+				  resultHtmlTable = SalesTargetReport.searchReport(aForm.getBean(),excel,aForm.getSubPageName());
 				 if(resultHtmlTable != null){
 					  foundData = true;
 				 }

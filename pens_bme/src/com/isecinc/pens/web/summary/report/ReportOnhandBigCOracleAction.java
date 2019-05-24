@@ -96,6 +96,11 @@ public class ReportOnhandBigCOracleAction {
 		sql.append("    ,interface_desc as subinventory_code \n" );
 		sql.append("    from PENSBI.PENSBME_MST_REFERENCE ");
 		sql.append("    where reference_code = 'SubInv' \n");
+		sql.append("    and pens_value in( \n");
+		sql.append("      SELECT pens_value from PENSBI.PENSBME_MST_REFERENCE \n");
+		sql.append("      where reference_code = 'Store' \n");
+		sql.append("      and pens_desc4 ='N' \n");
+		sql.append("    ) \n");
 		sql.append(" ) MST \n");
 		sql.append(" ,( \n");
 		sql.append("    SELECT inventory_item_id \n" );

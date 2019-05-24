@@ -81,6 +81,9 @@ public class BatchTaskAction extends I_Action {
 				BatchTaskInfo taskInfo = new BatchTaskInfo();
 				//getDescription 
 				taskInfo.setDescription(getDescriptionByTaskname(pageName));
+				//getDevInfo
+				taskInfo.setDevInfo(getDevInfoByTaskname(pageName));
+				
 				//get Parameter by TaskName
 				String[] paramAll = getParamByTaskname(pageName).split("\\$");
 				
@@ -245,6 +248,26 @@ public class BatchTaskAction extends I_Action {
    		   Class noparams[] = {};
    		
    		   Method method = cls.getDeclaredMethod("getDescription", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (String)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
+	
+	private String getDevInfoByTaskname(String taskName){
+		String param = "";
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("getDevInfo", noparams);
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;

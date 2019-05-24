@@ -1,0 +1,5 @@
+
+pens_bme/src/inf-config/production-inf-env.properties
+pens_bme/src/inf-config/uat-inf-env.properties
+pens_sa/src/inf-config/production-inf-env.properties
+pens_sa/src/inf-config/uat-inf-env.properties

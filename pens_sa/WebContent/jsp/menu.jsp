@@ -76,18 +76,20 @@
 	</li> 
 <%}%>
 	
-<%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){
+<%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR,User.TTSUPER,User.TTMGR}) ){
 	no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent"><span>Sale Target</span></a>
 		<ul>
-	        <li><a class="parent"><span>1.เป้าหมายของ MT</span></a>
+		 <!-- ****************************************************************************** -->
+		 <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR}) ){ %>
+	         <li><a class="parent"><span><% subNo=0;no++;out.print(no); %>.เป้าหมายของ MT</span></a>
 			       <ul>
 			       <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MKT}) ){ %>
 					     <li>
 		                    <a href="#" class="parent" 
 		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MKT%>&action=new';">
-		                      <span>1.1 <bean:message key="MKT_SalesTarget" bundle="sysprop"/></span>
+		                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="MKT_SalesTarget" bundle="sysprop"/></span>
 		                    </a>
 		                 </li>
 	                 <%}%>
@@ -95,25 +97,63 @@
 		                  <li>
 		                    <a href="#" class="parent" 
 		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_SALES%>&action=new';">
-		                    <span>1.2 <bean:message key="MT_SalesTarget" bundle="sysprop"/></span>
+		                    <span><%subNo++;out.print(no+"."+subNo+" "); %> <bean:message key="MT_SalesTarget" bundle="sysprop"/></span>
 		                    </a>
 		                 </li> 
 	                 <%}%>
 	                  <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MTMGR}) ){ %>
 		                <li>
 		                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MTMGR%>&action=new';">
-		                      <span>1.3 <bean:message key="MTMGR_SalesTarget" bundle="sysprop"/></span>
+		                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="MTMGR_SalesTarget" bundle="sysprop"/></span>
 		                    </a>
 		                 </li>
 	                 <%} %>
+					   <li>
+							<a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET%>&action=new';"> 
+				                <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="ReportSalesTargetMT" bundle="sysprop"/></span>
+				            </a> 
+			           </li> 
 			       </ul>
-			   </li>
-			   
-			   <li>
-					<a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET%>&action=new';"> 
-		                <span>2.<bean:message key="ReportSalesTarget" bundle="sysprop"/></span>
-		            </a> 
-	           </li> 
+	             </li>
+	       <%} %>
+	            
+		 <!-- ********************** TT **************************************** -->
+		  <%if (UserUtils.userInRoleSalesTarget(user,new String[]{User.MKT,User.TTMGR,User.TTSUPER}) ){ %>
+	         <li><a class="parent"><span><% subNo=0;no++;out.print(no); %>.เป้าหมายของ TT</span></a>
+			       <ul>
+			       <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MKT}) ){ %>
+					     <li>
+		                    <a href="#" class="parent" 
+		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MKT_TT%>&action=new';">
+		                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="MKT_SalesTarget_TT" bundle="sysprop"/></span>
+		                    </a>
+		                 </li>
+	                 <%}%>
+	                  <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.TTSUPER}) ){ %>
+		                  <li>
+		                    <a href="#" class="parent" 
+		                    onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_TTSUPER%>&action=new';">
+		                    <span><%subNo++;out.print(no+"."+subNo+" "); %> <bean:message key="TTSUPER_SalesTarget" bundle="sysprop"/></span>
+		                    </a>
+		                 </li> 
+	                 <%}%>
+	                  <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.TTMGR}) ){ %>
+		                  <li>
+		                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_TTMGR%>&action=new';">
+		                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="TTMGR_SalesTarget" bundle="sysprop"/></span>
+		                    </a>
+		                 </li> 
+	                 <%} %>
+					   <%-- <li>
+							<a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&subPageName=TT&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET%>&action=new';"> 
+				                <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="ReportSalesTargetTT" bundle="sysprop"/></span>
+				            </a> 
+			           </li>  --%>
+			       </ul>
+	             </li>
+	          <%} %>
+	          <!-- ****************************************************************************** -->
+			  
 	            <li>
 					 <%--  <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL%>&action=new';">
 		                  <span>3 <bean:message key="ReportSalesTargetAll" bundle="sysprop"/></span>

@@ -258,6 +258,18 @@ public class LocationInitial extends LocationControlPage {
 			//get constants config all by ref_code
 			Map<String, CConstantsBean> constantsMap = CConstants.getConstantsList(conn, CConstants.SPIDER_REF_CODE);
 			session.setAttribute("CONSTANTS_MAP",constantsMap);
+			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
@@ -339,6 +351,18 @@ public class LocationInitial extends LocationControlPage {
             /********************************************************/
 			//init tripList
 			session.setAttribute("tripDayList", initTripList());
+			
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			salesZoneList.add(item);
+
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			salesZoneList.addAll(salesZoneList_s);
+			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

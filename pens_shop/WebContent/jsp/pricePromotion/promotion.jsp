@@ -18,6 +18,7 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -29,11 +30,11 @@ body {
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script language = "javascript" src = "${pageContext.request.contextPath}/js/javascript.js"></script>
-<script language = "javascript" src = "${pageContext.request.contextPath}/js/promotion.js"></script>
+<script language = "javascript" src = "${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script language = "javascript" src = "${pageContext.request.contextPath}/js/promotion.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
-function loadMe()
-{
+function loadMe(){
 	
 }
 </script>

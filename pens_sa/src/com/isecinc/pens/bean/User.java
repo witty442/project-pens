@@ -42,6 +42,10 @@ public class User extends I_PO implements Serializable {
 	public static final String MC_ENTRY = "MC_ENTRY";
 	public static final String MT_QUERY = "MT_QUERY"; 
 	public static final String SA = "SA"; //salesAnalysis
+	
+	public static final String TTSUPER = "TTSUPER";//Supper
+	public static final String TTMGR = "TTMGR";//ManagerSale
+	
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**

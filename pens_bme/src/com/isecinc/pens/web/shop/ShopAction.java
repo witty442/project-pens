@@ -23,11 +23,12 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.autocn.AutoCNForm;
-import com.isecinc.pens.web.shop.sub.MayaSaleOutAction;
-import com.isecinc.pens.web.shop.sub.MayaStockOnhandAction;
+import com.isecinc.pens.web.shop.sub.ShopSaleOutAction;
+import com.isecinc.pens.web.shop.sub.ShopStockOnhandAction;
 import com.isecinc.pens.web.shop.sub.ShopBillDetailAction;
 import com.isecinc.pens.web.shop.sub.ShopBillSummaryAction;
 import com.isecinc.pens.web.shop.sub.ShopPromotionAction;
+import com.isecinc.pens.web.shop.sub.TerminalStockOnhandAction;
 import com.pens.util.Utils;
 
 /**
@@ -41,9 +42,11 @@ public class ShopAction extends I_Action {
 	/** Constants  */
 	final public static String P_MAYA_SALEOUT = "MayaSaleOut";
 	final public static String P_MAYA_STOCK_ONHAND = "MayaStockOnhand";
-	final public static String P_SHOP_PROM = "ShopPromotion";
+	final public static String P_SHOP_PROM = "ShopPromotion";//MasterC4
 	final public static String P_SHOP_BILL_DETAIL = "ShopBillDetail";
 	
+	final public static String P_TM_SALEOUT = "TMSaleOut";
+	final public static String P_TM_STOCK_ONHAND = "TMStockOnhand";
 	/**
 	 * Prepare without ID
 	 */
@@ -59,11 +62,21 @@ public class ShopAction extends I_Action {
 			 if("new".equalsIgnoreCase(pageAction)){
 				 if(P_MAYA_SALEOUT.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
 					 bean.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					 bean.setEndDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
+					 
+				 }else if(P_TM_SALEOUT.equalsIgnoreCase(pageName)){
+					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);
+					 bean.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setEndDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(pageName)){
+					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);
 				 }else if(P_SHOP_PROM.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 forward = "searchPromotion"; 
@@ -120,11 +133,17 @@ public class ShopAction extends I_Action {
 				
 			}else{
 				 if(P_MAYA_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-					 aForm = MayaSaleOutAction.search(request, aForm,user);
+					 aForm = ShopSaleOutAction.search(request, aForm,user);
 					 
+				 }else if(P_TM_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					aForm = ShopSaleOutAction.search(request, aForm,user);
+					
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-					 aForm = MayaStockOnhandAction.search(request, aForm,user);
-				 
+					 aForm = ShopStockOnhandAction.search(request, aForm,user);
+					 
+				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 aForm = TerminalStockOnhandAction.search(request, aForm,user);
+					 
 				 }else if(P_SHOP_PROM.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){  
 					 String action = Utils.isNull(request.getParameter("action"));
 					 if("back".equalsIgnoreCase(action)){
@@ -191,7 +210,7 @@ public class ShopAction extends I_Action {
 			 if(P_MAYA_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				fileName="Report Sale MAYA Shop.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = MayaSaleOutAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopSaleOutAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -199,7 +218,7 @@ public class ShopAction extends I_Action {
 			}else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				fileName="Report Sale MAYA StockOnhand.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = MayaStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -212,6 +231,22 @@ public class ShopAction extends I_Action {
 					 }else  if("SUMMARY".equalsIgnoreCase(aForm.getBean().getReportType())){
 						 htmlTable = ShopBillSummaryAction.exportToExcel(request,aForm,user);	
 					 }
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if(P_TM_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale TERMINAL Shop.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = ShopSaleOutAction.exportToExcel(request,aForm,user,aForm.getResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale TERMINAL StockOnhand.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = TerminalStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");

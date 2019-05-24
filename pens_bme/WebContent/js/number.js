@@ -10,7 +10,17 @@ function convetTxtObjToFloat(obj){
 		 alert(err.message);
 	 }
   }
-
+function convertNumberStrToFloat(numberStr){
+	 // alert(obj.value);
+	try{
+	  if(numberStr==''){
+		  return 0;
+	  }
+	 return parseFloat(numberStr.replace(/\,/g,''));
+	}catch(err) {
+		 alert(err.message);
+	}
+}
 function isNum(obj){
   if(obj.value != ""){
 	  //remove comma

@@ -25,8 +25,11 @@ public class SalesTargetBean implements Serializable{
 	private String brandName;
 	private String salesChannelNo;
 	private String salesChannelName;
+	private String salesZone;
+	private String salesZoneDesc;
 	private String division;
 	private String custCatNo;
+	private String custCatDesc;
 	private String customerId;
 	private String customerGroup;
 	private String customerCode;
@@ -43,6 +46,7 @@ public class SalesTargetBean implements Serializable{
 	private String lineStatusStyle ="disableTextCenter";
 	private String salesrepId;
 	private String salesrepCode;
+	private String salesrepName;
 	private String orderAmt12Month;
 	private String orderAmt3Month ;
 	private String itemCode;
@@ -51,6 +55,8 @@ public class SalesTargetBean implements Serializable{
 	private String price;
 	private String targetQty;
 	private String targetAmount;
+	private String salesTargetQty;
+	private String salesTargetAmount;
 	private String status;
 	private String remark;
 	private String rejectReason;
@@ -58,6 +64,8 @@ public class SalesTargetBean implements Serializable{
 	//total
 	private String totalTargetQty;
 	private String totalTargetAmount;
+	private String totalSalesTargetQty;
+	private String totalSalesTargetAmount;
 	private String totalOrderAmt12Month;
 	private String totalOrderAmt3Month ;
 	
@@ -78,6 +86,54 @@ public class SalesTargetBean implements Serializable{
 	private List<SalesTargetBean> itemsList;
 	
 	
+	public String getTotalSalesTargetQty() {
+		return totalSalesTargetQty;
+	}
+	public void setTotalSalesTargetQty(String totalSalesTargetQty) {
+		this.totalSalesTargetQty = totalSalesTargetQty;
+	}
+	public String getTotalSalesTargetAmount() {
+		return totalSalesTargetAmount;
+	}
+	public void setTotalSalesTargetAmount(String totalSalesTargetAmount) {
+		this.totalSalesTargetAmount = totalSalesTargetAmount;
+	}
+	public String getSalesTargetQty() {
+		return salesTargetQty;
+	}
+	public void setSalesTargetQty(String salesTargetQty) {
+		this.salesTargetQty = salesTargetQty;
+	}
+	public String getSalesTargetAmount() {
+		return salesTargetAmount;
+	}
+	public void setSalesTargetAmount(String salesTargetAmount) {
+		this.salesTargetAmount = salesTargetAmount;
+	}
+	public String getSalesrepName() {
+		return salesrepName;
+	}
+	public void setSalesrepName(String salesrepName) {
+		this.salesrepName = salesrepName;
+	}
+	public String getCustCatDesc() {
+		return custCatDesc;
+	}
+	public void setCustCatDesc(String custCatDesc) {
+		this.custCatDesc = custCatDesc;
+	}
+	public String getSalesZone() {
+		return salesZone;
+	}
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
+	public String getSalesZoneDesc() {
+		return salesZoneDesc;
+	}
+	public void setSalesZoneDesc(String salesZoneDesc) {
+		this.salesZoneDesc = salesZoneDesc;
+	}
 	public String getTotalOrderAmt12Month() {
 		return totalOrderAmt12Month;
 	}

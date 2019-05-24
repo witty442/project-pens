@@ -17,10 +17,17 @@ private static final long serialVersionUID = 1L;
     private String paramValid;
     private String validateScript;
     private String description;
+    private String devInfo;
 	private Map<String, BatchTaskInfo> paramMap;
 	private List<BatchTaskInfo> paramList;
 	
 	
+	public String getDevInfo() {
+		return devInfo;
+	}
+	public void setDevInfo(String devInfo) {
+		this.devInfo = devInfo;
+	}
 	public String getDescription() {
 		return description;
 	}

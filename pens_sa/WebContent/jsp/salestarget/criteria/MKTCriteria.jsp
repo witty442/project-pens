@@ -219,7 +219,7 @@ function loadCustCatNoList(){
 				<td colspan="2">
 	                <html:text property="bean.brand" styleId="brand" size="20" 
 	                  onkeypress="getBrandNameKeypress(event,this)"
-	                  />	
+	                  styleClass="\" autoComplete=\"off" />	
 				    <html:text property="bean.brandName" styleId="brandName" readonly="true" styleClass="disableText" size="50"/>
 				</td>  
 			</tr>	

@@ -73,7 +73,38 @@ public class FileUtil {
 	       throw e;
 	    }
 	}
-	
+	public static String readControlEnvFile(InputStream fis) throws Exception {
+	    BufferedInputStream bis = null;
+	    DataInputStream dis = null;
+        String str ="";
+        String lineStr ="";
+	    try {
+		      // Here BufferedInputStream is added for fast reading.
+		      bis = new BufferedInputStream(fis);
+		      dis = new DataInputStream(bis);
+
+		      // dis.available() returns 0 if the file does not have more lines.
+		      while (dis.available() != 0) {
+		    	  lineStr = dis.readLine();
+		    	  //System.out.println("lineStr:"+lineStr);
+		    	  if( !lineStr.startsWith("#")){
+		            str  = lineStr;
+		      	    //System.out.println("xx str:"+str);
+		            break;
+		    	  }
+		      }
+	         // System.out.println("str:"+str);
+		      // dispose all the resources after using them.
+		      fis.close();
+		      bis.close();
+		      dis.close();
+	      return str;
+	    } catch (FileNotFoundException e) {
+	       throw e;
+	    } catch (IOException e) {
+	       throw e;
+	    }
+	}
 	
 	public static void writeFile(String fileName,String str) {
 		FileWriter fstream =null;

@@ -34,7 +34,10 @@ public class ImportManualExcel {
 			//importExcel("MYSQL","UAT","d://dev_temp//temp//ImportManualExcel/data_stock_return.xls",5);
 		
 			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
-			importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
+			
+			
+			importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/XXPENS_BI_MST_CUST_CAT_MAP_TT.xlsx",6);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

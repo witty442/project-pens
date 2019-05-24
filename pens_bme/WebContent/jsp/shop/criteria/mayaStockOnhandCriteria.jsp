@@ -35,7 +35,7 @@ function setDataPopupValue(code,desc,pageName,fieldName){
 </script>
 <table  border="0" cellpadding="3" cellspacing="0" width="50%">
 <tr>
-	<td align="right" width="10%">Maya Shop</td>
+	<td align="right" width="10%"> Shop</td>
 	<td align="left" width="6%"><html:text property="bean.custGroup" styleId="custGroup" styleClass="disableText" readonly="true" size="15"/></td>
 	<td align="right" width="6%"> </td>
 	<td align="left" width="10%"></td>

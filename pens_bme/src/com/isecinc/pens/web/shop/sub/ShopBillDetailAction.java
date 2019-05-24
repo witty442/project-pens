@@ -127,7 +127,7 @@ public class ShopBillDetailAction {
 			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
 			logger.debug("YYYYMM:"+YYYYMM);
 			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
-			if(YYYYMM > YYYYNN_DATECUT_OFF){
+			if(YYYYMM >= YYYYNN_DATECUT_OFF){
 				newVersion = true;
 			}
 			
@@ -212,8 +212,9 @@ public class ShopBillDetailAction {
 			sql.append("\n     from PENSBI.M_C4_MST M,PENSBI.M_C4_DT D ");
 			sql.append("\n     where M.promo_id = D.promo_id");
 			sql.append("\n  )P");
-			sql.append("\n  ON A.order_date between P.start_date and P.end_date");
+			sql.append("\n  ON 1=1");
 			if(!newVersion){
+			   sql.append("\n and A.order_date between P.start_date and P.end_date");
 			  // OLD CODE 
 			  sql.append("\n  and A.discount_percent = P.discount_percent ");
 			}else{

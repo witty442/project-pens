@@ -122,6 +122,9 @@
 		<action name="salesTargetForm" path="/jsp/salesTargetAction" parameter="do" scope="session" type="com.isecinc.pens.web.salestarget.SalesTargetAction">
 			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
 			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
+			<forward name="detailTTMKT" path="/jsp/salestarget/salesTargetTTMKT.jsp" />
+			<forward name="detailTTSUPER" path="/jsp/salestarget/salesTargetTTSUPER.jsp" />
+			<forward name="detailTTMGR" path="/jsp/salestarget/salesTargetTTMGR.jsp" />
 		</action>
 		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction">
 			<forward name="search" path="/jsp/prodshow/prodShowSearch.jsp" />

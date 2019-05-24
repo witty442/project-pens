@@ -22,10 +22,10 @@ public class MConfig {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			
-			String sql =" select c.* \n"
-					+ " ,( select m.customer_id from m_customer m where m.code = c.customer_code) as customer_id \n"
-					+ " from pens_shop.c_config c \n"
-					+ " where user_id="+userId +"\n";
+			String sql =" select c.* ,m.customer_id ,m.name \n"	
+					+ " from pens_shop.c_config c,m_customer m \n"
+					+ " where m.code = c.customer_code \n"
+					+ " and c.user_id="+userId +"\n";
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
@@ -33,8 +33,10 @@ public class MConfig {
 				p = new ConfigBean();
 				p.setUserId(userId);
 				p.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
+				p.setCustomerName(Utils.isNull(rst.getString("name")));
 				p.setCustomerId(rst.getInt("customer_id"));
 				p.setPricelistId(rst.getInt("pricelist_id"));
+				p.setQualifier(Utils.isNull(rst.getString("qualifier")));
 			}
 			return p;
 		}catch(Exception e){

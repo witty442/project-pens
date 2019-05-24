@@ -1,4 +1,5 @@
 
+<%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.location.LocationBean"%>
 <%@page import="com.isecinc.pens.web.location.LocationForm"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -20,6 +21,8 @@
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "locationForm");
 %>
 <html>
 <head>

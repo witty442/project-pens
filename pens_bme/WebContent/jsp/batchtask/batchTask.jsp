@@ -377,11 +377,20 @@ body {
 							<tr>
 								<td align="center" width ="100%">&nbsp;</td>
 							</tr> 
-							  <tr>
+							 <tr>
 								<td align="center" width ="100%"><b><%=Utils.isNull(taskInfo.getDescription()) %></b></td>
 							</tr>
+							 <tr>
+								<td align="center" width ="100%">
+								<%if(user.getUserName().equalsIgnoreCase("admin")){ %>
+								  <b><a href="javascript:showDivInfo()">Process Info</a></b>
+								<%} %>
+								</td>
+							</tr>
 						</table>   
-							
+						<div id="divInfo" style="display: none" align="center">
+					     	<%=Utils.isNull(taskInfo.getDevInfo()) %>
+						</div>
                         <!-- Batch Task Result--> 
 					    <jsp:include page="batchTaskResult.jsp"></jsp:include>
 					  
@@ -435,6 +444,11 @@ body {
   	</tr>
 </table>
 </body>
+<script>
+function showDivInfo(){
+	document.getElementById("divInfo").style.display = "block";
+}
+</script>
 <%}catch(Exception e){
 	e.printStackTrace();
 } %>
