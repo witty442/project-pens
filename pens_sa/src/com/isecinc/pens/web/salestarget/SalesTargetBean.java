@@ -60,6 +60,7 @@ public class SalesTargetBean implements Serializable{
 	private String status;
 	private String remark;
 	private String rejectReason;
+	private String totalAmountBrandBySale;
 
 	//total
 	private String totalTargetQty;
@@ -86,6 +87,12 @@ public class SalesTargetBean implements Serializable{
 	private List<SalesTargetBean> itemsList;
 	
 	
+	public String getTotalAmountBrandBySale() {
+		return totalAmountBrandBySale;
+	}
+	public void setTotalAmountBrandBySale(String totalAmountBrandBySale) {
+		this.totalAmountBrandBySale = totalAmountBrandBySale;
+	}
 	public String getTotalSalesTargetQty() {
 		return totalSalesTargetQty;
 	}

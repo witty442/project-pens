@@ -11,8 +11,8 @@
    /* for menu Count */
    int no = 0;
    int subNo = 0;	
-	User user = (User)session.getAttribute("user");
-    String role = user.getRoleSalesTarget(); 
+   User user = (User)session.getAttribute("user");
+   String role = user.getRoleSalesTarget(); 
 %>
 <ul id="nav">
 <%if ( UserUtils.userInRole("",user,new String[]{User.ADMIN}) ){ %>
@@ -144,16 +144,15 @@
 		                    </a>
 		                 </li> 
 	                 <%} %>
-					   <%-- <li>
+					   <li>
 							<a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&subPageName=TT&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET%>&action=new';"> 
 				                <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="ReportSalesTargetTT" bundle="sysprop"/></span>
 				            </a> 
-			           </li>  --%>
+			           </li>  
 			       </ul>
 	             </li>
 	          <%} %>
 	          <!-- ****************************************************************************** -->
-			  
 	            <li>
 					 <%--  <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL%>&action=new';">
 		                  <span>3 <bean:message key="ReportSalesTargetAll" bundle="sysprop"/></span>

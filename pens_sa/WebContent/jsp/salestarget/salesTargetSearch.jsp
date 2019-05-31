@@ -1,4 +1,3 @@
-
 <%@page import="util.SessionUtils"%>
 <%@page import="util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
@@ -32,10 +31,10 @@ String subPageName = Utils.isNull(request.getParameter("subPageName"));
 if(subPageName.equals("")){
 	subPageName = salesTargetForm.getSubPageName();
 }
-System.out.println("pageName:"+pageName);
+/* System.out.println("pageName:"+pageName);
 System.out.println("subPageName:"+subPageName);
 System.out.println("salesTargetForm Bean:"+salesTargetForm.getBean());
-
+ */
 String pageNameTemp = "";
 if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "MKT_SalesTarget";
@@ -62,7 +61,7 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 }else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "TTMGR_SalesTarget";
 }
-System.out.println("pageNameTemp:"+pageNameTemp);
+//System.out.println("pageNameTemp:"+pageNameTemp);
 %>
 <html>
 <head>
@@ -129,7 +128,11 @@ System.out.println("pageNameTemp:"+pageNameTemp);
 						    <%}else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MTMGRCriteria.jsp" /> 
 						    <%}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/ReportSalesTargetCriteria.jsp" />  
+						        <%if(!"TT".equals(subPageName)){ %>
+						           <jsp:include page="criteria/ReportSalesTargetCriteria.jsp" />  
+						        <%}else{ %>
+						           <jsp:include page="criteria/ReportSalesTargetTTCriteria.jsp" />  
+						        <%} %>
 						    <%}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/ReportSalesTargetAllCriteria.jsp" /> 
 						    <%}else if(SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){ %>
@@ -145,33 +148,16 @@ System.out.println("pageNameTemp:"+pageNameTemp);
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
 					  if(request.getSession().getAttribute("RESULTS") != null) {
-					    out.println(request.getSession().getAttribute("RESULTS"));
+					     out.println(request.getSession().getAttribute("RESULTS"));
 					  
 					  %>
-					<!-- ************************Result ***************************************************-->
-					  <%if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>
-						  <div align="center">
-							   <table  border="0" cellpadding="3" cellspacing="0" >
-								<tr>
-									<td align="center" >
-									      <c:if test="${salesTargetForm.bean.canFinish == true}">
-											<a href="javascript:salesManagerFinish('${pageContext.request.contextPath}')">
-											  <input type="button" value=" อนุมัติเป้าหมาย " class="newPosBtnLong">
-											</a>
-										 </c:if>
-										<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
-										  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
-										</a>
-									</td>	
-								 </tr>
-								</table>
-						    </div>
-					  <%}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){  %>
-						  <div align="center">
+						<!-- ************************Result ***************************************************-->
+						  <%if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>
+							  <div align="center">
 								   <table  border="0" cellpadding="3" cellspacing="0" >
 									<tr>
 										<td align="center" >
-										     <c:if test="${salesTargetForm.bean.canFinish == true}">
+										      <c:if test="${salesTargetForm.bean.canFinish == true}">
 												<a href="javascript:salesManagerFinish('${pageContext.request.contextPath}')">
 												  <input type="button" value=" อนุมัติเป้าหมาย " class="newPosBtnLong">
 												</a>
@@ -183,7 +169,24 @@ System.out.println("pageNameTemp:"+pageNameTemp);
 									 </tr>
 									</table>
 							    </div>
-					 <%} }%>
+						  <%}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){  %>
+							  <div align="center">
+								   <table  border="0" cellpadding="3" cellspacing="0" >
+									<tr>
+										<td align="center" >
+										     <c:if test="${salesTargetForm.bean.canFinish == true}">
+												<a href="javascript:salesManagerFinish('${pageContext.request.contextPath}')">
+												  <input type="button" value=" อนุมัติเป้าหมายรวมทุกแบรนด์ " class="newPosBtnLong">
+												</a>
+											 </c:if>
+											<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
+											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+											</a>
+										</td>	
+									 </tr>
+									</table>
+							    </div>
+					 <% } }%>
 					</html:form>
 					<!-- BODY -->
 					</td>

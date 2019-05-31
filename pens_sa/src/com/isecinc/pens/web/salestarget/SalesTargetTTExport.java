@@ -143,12 +143,12 @@ public class SalesTargetTTExport {
 		    	
 				h.append("<tr class='"+className+"'> \n");
 			    h.append("<td class='td_text_center' width='10%'>"+item.getCustCatDesc()+"</td> \n");
-			    h.append("<td class='td_text_center' width='10%'>"+item.getSalesZoneDesc()+"</td> \n");
-				h.append("<td class='td_text_center' width='10%'>"+item.getBrand()+"</td> \n");
-				h.append("<td class='td_text_center' width='10%'>"+item.getBrandName()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
-				h.append("<td class='td_text_center' width='10%'> \n");
+			    h.append("<td class='td_text_center' width='14%'>"+item.getSalesZoneDesc()+"</td> \n");
+				h.append("<td class='td_text_center' width='5%'>"+item.getBrand()+"</td> \n");
+				h.append("<td class='td_text_center' width='14%'>"+item.getBrandName()+"</td> \n");
+				h.append("<td class='td_number' width='7%'>"+item.getTargetQty()+"</td> \n");
+				h.append("<td class='td_number' width='7%'>"+item.getTargetAmount()+"</td> \n");
+				h.append("<td class='td_text_center' width='5%'> \n");
 				h.append(" <input type='text' readonly name='status' size='6' value="+item.getStatus()+" class='disableText'/> \n");
 				h.append("</td> \n");
 				
@@ -263,12 +263,14 @@ public class SalesTargetTTExport {
 			h.append("<table id='tblProduct' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
 			h.append("<tr> \n");
 			h.append("<th rowspan='2'>ประเภทขาย </th> \n");
+			h.append("<th rowspan='2' >ภาคตามการดูแล</th> \n");
 			h.append("<th rowspan='2' >แบรนด์</th> \n");
 			h.append("<th rowspan='2' >ชื่อแบรนด์</th> \n");
 			h.append("<th colspan='2'>ส่วน Marketing กำหนดเป้า</th> \n");
 			h.append("<th colspan='2' >ส่วนที่แผนกขายรับเป้า</th> \n");
 			h.append("<th rowspan='2' >สถานะ</th> \n");
 			h.append("<th rowspan='2' >รายละเอียด</th>	 \n");	
+			h.append("<th rowspan='2' >อนุมัติ</th>	 \n");	
 			h.append("<th rowspan='2' >ไม่อนุมัติ</th>	 \n");		
 			h.append("</tr> \n");
 			h.append("<tr> \n");
@@ -283,31 +285,51 @@ public class SalesTargetTTExport {
 		    	className = (i %2 == 0)?"lineE":"lineO";
 		    	
 				h.append("<tr class='"+className+"'> \n");
-			    h.append("<td class='td_text_center' width='10%'>"+item.getCustCatDesc()+"</td> \n");
-				h.append("<td class='td_text_center' width='10%'>"+item.getBrand()+"</td> \n");
-				h.append("<td class='td_text_center' width='10%'>"+item.getBrandName()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getSalesTargetQty()+"</td> \n");
-				h.append("<td class='td_number' width='10%'>"+item.getSalesTargetAmount()+"</td> \n");
+			    h.append("<td class='td_text_center' width='8%'>"+item.getCustCatDesc()+"</td> \n");
+			    h.append("<td class='td_text_center' nowrap width='14%'>"+item.getSalesZoneDesc()+"</td> \n");
+				h.append("<td class='td_text_center' width='5%'>"+item.getBrand()+"</td> \n");
+				h.append("<td class='td_text_center' width='15%'>"+item.getBrandName()+"</td> \n");
+				h.append("<td class='td_number' width='8%'>"+item.getTargetQty()+"</td> \n");
+				h.append("<td class='td_number' width='8%'>"+item.getTargetAmount()+"</td> \n");
+				h.append("<td class='td_number' width='8%'>"+item.getSalesTargetQty()+"</td> \n");
+				h.append("<td class='td_number' width='8%'>"+item.getSalesTargetAmount()+"</td> \n");
 				
-				h.append("<td class='td_text_center' width='10%'> \n");
+				h.append("<td class='td_text_center' width='5%'> \n");
 				h.append(" <input type='text' readonly class='disableText' size='5' name='status' value='"+item.getStatus()+"' /> \n");
 				h.append("</td> \n");
 				//View
-				h.append("<td class='td_text_center' width='10%'> \n");
+				h.append("<td class='td_text_center' width='8%'> \n");
 				action = "View";
-				
-				//function openEdit(path,salesZone,salesZoneDesc,custCatNo,custCatNoDesc,mode){
 				h.append(" <a href="+singleQuote+"javascript:openEdit('"+request.getContextPath()+"'  \n");
 				h.append("  ,'"+item.getSalesZone()+"','"+item.getBrand()+"' \n");
 				h.append("  ,'"+item.getCustCatNo()+"','"+action+"')"+singleQuote+" > \n");
 				h.append("   "+action);
 				h.append("</a> \n");
+				h.append("<input type='hidden' name ='custCatNo' value ='"+item.getCustCatNo()+"'/>\n");
+				h.append("<input type='hidden' name ='brand' value ='"+item.getBrand()+"'/>\n");
+				h.append("<input type='hidden' name ='zone' value ='"+item.getSalesZone()+"'/>\n");
 				h.append("</td> \n");
 				
-				//reject
-				h.append("<td class='td_text_center' width='10%'> \n");
+				/**** accept ***************************************/
+				h.append("<td class='td_text_center' width='5%'> \n");
+				action = item.isCanFinish()?"อนุมัติ":"";
+				
+				h.append("<div name='accept_div' >");
+				h.append(" <a href="+singleQuote+"javascript:acceptRow('"+request.getContextPath()+"'  \n");
+				h.append("  ,'"+item.getSalesZone()+"' \n");
+				h.append("  ,'"+item.getBrand()+"' ");
+				h.append("  ,'"+item.getCustCatNo() +"' \n");
+				h.append("  ,'"+item.getPeriod()+"' \n");	
+				h.append("  ,'"+item.getStartDate()+"' ");	
+				h.append("  ,'"+item.getRowId()+"' \n");	
+				h.append("  )"+singleQuote+" > \n");
+				h.append("   "+action);
+				h.append(" </a> \n");
+				h.append(" </div> \n");
+				h.append("</td> \n");
+				
+				/*** unaccept ******************************************/
+				h.append("<td class='td_text_center' width='5%'> \n");
 				action = item.isCanUnAccept()?"ไม่อนุมัติ":"";
 				
 				//path,salesZone,brand,custCatNo,period,startDate,rowId){
@@ -325,6 +347,7 @@ public class SalesTargetTTExport {
 				h.append(" </a> \n");
 				h.append(" </div> \n");
 				h.append("</td> \n");
+				
 				h.append("</tr> \n");
 				
 				//summary
@@ -339,6 +362,7 @@ public class SalesTargetTTExport {
 				}
 				if(itemNext==null || !itemNext.getCustCatNo().equalsIgnoreCase(item.getCustCatNo())){
 					h.append("<tr class='hilight_text'> \n");
+					h.append("<td class=''></td>  \n");
 					h.append("<td class=''></td>  \n");
 					h.append("<td class=''></td>  \n");
 					h.append("<td class='' align='right'> \n");
@@ -370,20 +394,21 @@ public class SalesTargetTTExport {
 			h.append("<tr class='hilight_text'> \n");
 			h.append("<td class=''></td>  \n");
 			h.append("<td class=''></td>  \n");
+			h.append("<td class=''></td>  \n");
 			h.append("<td class='' align='right'> \n");
-			h.append("  <font color='#000099' size='1'><B> ยอดรวมทั้งหมด </B></font> \n");
+			h.append("  <font color='#000099' size='2'><B> ยอดรวมทั้งหมด </B></font> \n");
 			h.append("</td> \n");
 			h.append("<td class='td_number_bold' align='right'> \n");
-			h.append("  <font color='#000099' size='1'><B>  "+o.getTotalTargetQty()+" </B></font>  \n");
+			h.append("  <font color='#000099' size='2'><B>  "+o.getTotalTargetQty()+" </B></font>  \n");
 			h.append("</td> \n");
 			h.append("<td class='td_number_bold' align='right'> \n");
-			h.append("  <font color='#000099' size='1'><B> "+o.getTotalTargetAmount()+"</B></font>  \n");
+			h.append("  <font color='#000099' size='2'><B> "+o.getTotalTargetAmount()+"</B></font>  \n");
 			h.append("</td> \n");
 			h.append("<td class='td_number_bold' align='right'> \n");
-			h.append("  <font color='#000099' size='1'><B>  "+o.getTotalSalesTargetQty()+" </B></font>  \n");
+			h.append("  <font color='#000099' size='2'><B>  "+o.getTotalSalesTargetQty()+" </B></font>  \n");
 			h.append("</td> \n");
 			h.append("<td class='td_number_bold' align='right'> \n");
-			h.append(" <font color='#000099' size='1'> <B> "+o.getTotalSalesTargetAmount()+"</B></font>  \n");
+			h.append(" <font color='#000099' size='2'> <B> "+o.getTotalSalesTargetAmount()+"</B></font>  \n");
 			h.append("</td> \n");
 			h.append("<td class=''></td> \n");
 			h.append("<td class=''></td> \n");

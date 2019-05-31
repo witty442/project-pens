@@ -72,6 +72,10 @@ public class ShopBillSummaryAction {
 				List<ShopBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,getTotalRec);
 				aForm.setResults(items);
 				
+				if(aForm.getCurrPage()==aForm.getTotalPage()){
+					//search summary
+					aForm.setSummary(searchSummary(conn, aForm.getBean()));
+				}
 				if(items.size() <=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				   aForm.setResults(null);
@@ -96,6 +100,10 @@ public class ShopBillSummaryAction {
 				List<ShopBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,getTotalRec);
 				aForm.setResults(items);
 				
+				if(aForm.getCurrPage()==aForm.getTotalPage()){
+					//search summary
+					aForm.setSummary(searchSummary(conn, aForm.getBean()));
+				}
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -139,10 +147,190 @@ public class ShopBillSummaryAction {
             /**************************************************************************/
 			sql.append("\n SELECT BB.sub_promo_name ");
 			sql.append("\n ,NVL(SUM(BB.QTY),0) AS QTY");
-			sql.append("\n ,NVL(SUM(BB.retail_sell_amt,0) as retail_sell_amt");
-			sql.append("\n ,NVL(SUM(BB.whole_sell_amt,0) as whole_sell_amt");
+			sql.append("\n ,NVL(SUM(BB.retail_sell_amt),0) as retail_sell_amt");
+			sql.append("\n ,NVL(SUM(BB.whole_sell_amt),0) as whole_sell_amt");
 			sql.append("\n ,BB.discount_percent ");
-			sql.append("\n ,NVL(SUM(BB.discount_amt,0) as discount_amt");
+			sql.append("\n ,NVL(SUM(BB.discount_amt),0) as discount_amt");
+			
+			sql.append("\n ,NVL(SUM(BB.sell_af_disc),0) as sell_af_disc");
+			sql.append("\n ,NVL(SUM(BB.wacoal_amt),0) as wacoal_amt");
+			sql.append("\n ,NVL(SUM(BB.pens_amt),0) as pens_amt");
+			sql.append("\n FROM( ");
+			sql.append("\n SELECT AA.*");
+			sql.append("\n ,(AA.retail_sell_amt-AA.discount_amt) as sell_af_disc");
+			sql.append("\n ,(AA.retail_sell_amt-AA.discount_amt-AA.whole_sell_amt) as wacoal_amt");
+			sql.append("\n ,((AA.retail_sell_amt-AA.discount_amt) *6/100) as pens_amt");
+			sql.append("\n FROM(");
+			sql.append("\n   SELECT ");
+			sql.append("\n   P.sub_promo_name,P.start_date,P.end_date");
+			sql.append("\n   ,P.start_promo_qty,P.end_promo_qty,P.discount_percent");
+			sql.append("\n   ,A.MATERIAL_MASTER,A.pens_item");
+			sql.append("\n   ,(A.price*A.qty) as retail_sell_amt");
+			sql.append("\n   ,(");
+			sql.append("\n     SELECT M.LIST_PRICE_PER_UNIT *A.qty");
+			sql.append("\n     FROM APPS.XXPENS_OM_ITEM_MST_V M");
+			sql.append("\n     where A.inventory_item_id = M.inventory_item_id");
+			sql.append("\n   ) as whole_sell_amt");
+			sql.append("\n   ,A.qty");
+			sql.append("\n   ,((P.discount_percent/100)*a.price) discount_amt");
+			sql.append("\n   FROM(");
+			sql.append("\n     SELECT ");
+			sql.append("\n     H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n     ,MP.pens_item,MP.inventory_item_id,D.price");
+			if(newVersion){
+			   sql.append("\n      ,D.list_line_id");
+			}else{
+			   sql.append("\n      ,nvl(D.discount_percent ,0) as discount_percent ");
+			}
+			sql.append("\n     ,sum(ordered_quantity) as qty");
+			
+			sql.append("\n     FROM APPS.XXPENS_OM_SHOP_ORDER_MST H");
+			sql.append("\n     ,APPS.XXPENS_OM_SHOP_ORDER_DT D");
+			sql.append("\n     ,( ");
+			sql.append("\n       SELECT I.inventory_item_id ,MP.pens_desc2 as group_code");
+			sql.append("\n      ,MP.PENS_VALUE as PENS_ITEM,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
+			sql.append("\n      ,MP.INTERFACE_DESC as BARCODE ");
+			sql.append("\n      FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+			sql.append("\n      where MP.reference_code ='7CItem' ");
+			sql.append("\n      AND MP.pens_value =I.segment1");
+			sql.append("\n     ) MP");
+			sql.append("\n     where H.order_number = D.order_number");
+			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
+			
+			if( !Utils.isNull(o.getGroupCode()).equals("")){
+				sql.append("\n    AND MP.MATERIAL_MASTER ='"+Utils.isNull(o.getGroupCode())+"'");
+			}
+			if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("") ){
+				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE >= to_date('"+dateStr+"','dd/mm/yyyy')");
+				
+				dateTemp = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE <= to_date('"+dateStr+"','dd/mm/yyyy')");
+				
+			}else if( !Utils.isNull(o.getStartDate()).equals("") && Utils.isNull(o.getEndDate()).equals("") ){
+				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
+			}
+			sql.append("\n        group by H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n        ,MP.pens_item,MP.inventory_item_id ,D.price");
+			if(newVersion){
+				sql.append("\n        ,D.list_line_id");
+			}else{
+				sql.append("\n        ,nvl(D.discount_percent ,0) ");
+			}
+			sql.append("\n  )A");
+			sql.append("\n  LEFT OUTER JOIN");
+			sql.append("\n  (");
+			sql.append("\n     SELECT D.modifier_line_id,M.start_date,M.end_date");
+			sql.append("\n     ,D.sub_promo_name ,D.start_promo_qty ,D.end_promo_qty");
+			sql.append("\n     ,D.DISCOUNT_PERCENT");
+			sql.append("\n     from PENSBI.M_C4_MST M,PENSBI.M_C4_DT D ");
+			sql.append("\n     where M.promo_id = D.promo_id");
+			sql.append("\n  )P");
+			sql.append("\n   ON A.order_date between P.start_date and P.end_date");
+			if(!newVersion){
+			   sql.append("\n   and A.discount_percent = P.discount_percent ");
+			}else{
+			   sql.append("\n   and A.list_line_id = P.modifier_line_id ");
+			}
+			sql.append("\n  )AA");
+			sql.append("\n  WHERE AA.retail_sell_amt > 0 ");
+			sql.append("\n )BB");
+			sql.append("\n group by BB.sub_promo_name ,bb.discount_percent ");
+			sql.append("\n order by BB.sub_promo_name");
+			/**************************************************************************/
+            sql.append("\n   )A ");
+         
+     	    // get record start to end 
+            if( !allRec){
+     	      sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+     	    sql.append("\n )M  ");
+		    if( !allRec){
+			  sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
+		    }
+		    if(getTotalRec){
+			   sql.append("\n ) ");	
+			}
+		    
+		    if( getTotalRec){
+				logger.debug("sql:"+sql);
+		    }
+		    if( !getTotalRec){
+			 // logger.debug("sql:"+sql);
+		      if(logger.isDebugEnabled()){
+			      FileUtil.writeFile("D://dev_temp//temp//sql.sql", sql.toString());
+		      }
+		    }
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(getTotalRec){
+				if(rst.next()){
+				  ShopBean s = new ShopBean(); 
+				  s.setTotalRec(rst.getInt("c"));
+				  items.add(s);
+				}
+			}else{
+				while(rst.next()) {
+				   h = new ShopBean();
+				   h.setPromoName(Utils.isNull(rst.getString("SUB_PROMO_NAME")));
+				   //h.setStartDate(Utils.stringValueNull(rst.getDate("start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  // h.setEndDate(Utils.stringValueNull(rst.getDate("end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 //  h.setStyle(Utils.isNull(rst.getString("MATERIAL_MASTER")));
+				 //  h.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+				   h.setQty(Utils.decimalFormat(rst.getInt("QTY"),Utils.format_current_no_disgit));
+				   h.setWholeSellAmt(Utils.decimalFormat(rst.getDouble("whole_sell_amt"),Utils.format_current_2_disgit));
+				   h.setRetailSellAmt(Utils.decimalFormat(rst.getDouble("retail_sell_amt"),Utils.format_current_2_disgit));
+				   
+				   h.setDiscountPercent(Utils.decimalFormat(rst.getDouble("discount_percent"),Utils.format_current_2_disgit));
+				   h.setDiscountAmt(Utils.decimalFormat(rst.getDouble("discount_amt"),Utils.format_current_2_disgit));
+				   
+				   h.setSellAfDisc(Utils.decimalFormat(rst.getDouble("sell_af_disc"),Utils.format_current_2_disgit));
+				   h.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"),Utils.format_current_2_disgit));
+				   h.setPensAmt(Utils.decimalFormat(rst.getDouble("pens_amt"),Utils.format_current_2_disgit));
+				   items.add(h);
+				   no++;
+				}//while
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+ public static ShopBean searchSummary(Connection conn,ShopBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ShopBean h = null;
+		Date dateTemp = null;
+		String dateStr ="";
+		boolean newVersion = false;
+		try {
+			//Date > 201904 = newVersion
+			Date dateCheck = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			int YYYYMM = Utils.convertStrToInt(Utils.stringValue(dateCheck, Utils.YYYYMM));
+			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
+			logger.debug("YYYYMM:"+YYYYMM);
+			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
+			if(YYYYMM > YYYYNN_DATECUT_OFF){
+				newVersion = true;
+			}
+
+			sql.append("\n SELECT NVL(SUM(M.QTY),0) as QTY FROM (");
+			sql.append("\n SELECT BB.sub_promo_name ");
+			sql.append("\n ,NVL(SUM(BB.QTY),0) AS QTY");
+			sql.append("\n ,NVL(SUM(BB.retail_sell_amt),0) as retail_sell_amt");
+			sql.append("\n ,NVL(SUM(BB.whole_sell_amt),0) as whole_sell_amt");
+			sql.append("\n ,BB.discount_percent ");
+			sql.append("\n ,NVL(SUM(BB.discount_amt),0) as discount_amt");
 			
 			sql.append("\n ,NVL(SUM(BB.sell_af_disc),0) as sell_af_disc");
 			sql.append("\n ,NVL(SUM(BB.wacoal_amt,0)) as wacoal_amt");
@@ -230,62 +418,16 @@ public class ShopBillSummaryAction {
 			}
 			sql.append("\n  )AA");
 			sql.append("\n  WHERE AA.retail_sell_amt > 0 ");
-			sql.append("\n )BB");
-			sql.append("\n order by BB.sub_promo_name");
+			sql.append("\n  )BB");
+			sql.append("\n ) M");
 			/**************************************************************************/
-            sql.append("\n   )A ");
-         
-     	    // get record start to end 
-            if( !allRec){
-     	      sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
-            } 
-     	    sql.append("\n )M  ");
-		    if( !allRec){
-			  sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
-		    }
-		    if(getTotalRec){
-			   sql.append("\n ) ");	
-			}
-		    
-		    if( getTotalRec){
-				logger.debug("sql:"+sql);
-		    }
-		    if( !getTotalRec){
-			 // logger.debug("sql:"+sql);
-		      if(logger.isDebugEnabled()){
-			      FileUtil.writeFile("D://dev_temp//temp//sql.sql", sql.toString());
-		      }
-		    }
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-			if(getTotalRec){
-				if(rst.next()){
-				  ShopBean s = new ShopBean(); 
-				  s.setTotalRec(rst.getInt("c"));
-				  items.add(s);
-				}
-			}else{
-				while(rst.next()) {
-				   h = new ShopBean();
-				   h.setPromoName(Utils.isNull(rst.getString("SUB_PROMO_NAME")));
-				   h.setStartDate(Utils.stringValueNull(rst.getDate("start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setEndDate(Utils.stringValueNull(rst.getDate("end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setStyle(Utils.isNull(rst.getString("MATERIAL_MASTER")));
-				   h.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
-				   h.setQty(Utils.decimalFormat(rst.getInt("QTY"),Utils.format_current_no_disgit));
-				   h.setWholeSellAmt(Utils.decimalFormat(rst.getDouble("whole_sell_amt"),Utils.format_current_2_disgit));
-				   h.setRetailSellAmt(Utils.decimalFormat(rst.getDouble("retail_sell_amt"),Utils.format_current_2_disgit));
-				   
-				   h.setDiscountPercent(Utils.decimalFormat(rst.getDouble("discount_percent"),Utils.format_current_2_disgit));
-				   h.setDiscountAmt(Utils.decimalFormat(rst.getDouble("discount_amt"),Utils.format_current_2_disgit));
-				   
-				   h.setSellAfDisc(Utils.decimalFormat(rst.getDouble("sell_af_disc"),Utils.format_current_2_disgit));
-				   h.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"),Utils.format_current_2_disgit));
-				   h.setPensAmt(Utils.decimalFormat(rst.getDouble("pens_amt"),Utils.format_current_2_disgit));
-				   items.add(h);
-				   no++;
-				}//while
-			}
+			if(rst.next()) {
+			   h = new ShopBean();
+			   h.setQty(Utils.decimalFormat(rst.getInt("QTY"),Utils.format_current_no_disgit));
+	
+			}//while
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -294,9 +436,9 @@ public class ShopBillSummaryAction {
 				ps.close();
 			} catch (Exception e) {}
 		}
-		return items;
+		return h;
 	}
- 
+
  public static StringBuffer genWheresearchList(ShopBean o){
 	 StringBuffer sql = new StringBuffer();
 	 if( !Utils.isNull(o.getPromoName()).equals("")){
@@ -370,28 +512,22 @@ public class ShopBillSummaryAction {
 					h.append("</tr>");
 				}
 				/** Summary **/
-				//ShopBean s = (ShopBean)request.getSession().getAttribute("summary");
-				//h.append("<tr> \n");
-				 
-				 /* if("PensItem".equalsIgnoreCase(form.getSummaryType())){
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }else{
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
-				  h.append("<td></td> \n");
-				  h.append("<td class='currency_bold'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
-				h.append("</tr>");*/
+				ShopBean s = form.getSummary();
+				h.append("<tr> \n");
+				  h.append("<td class='text'>"+Utils.isNull(s.getPromoName())+"</td> \n");
+				  h.append("<td class='text'>"+s.getStartDate()+"</td> \n");
+				  h.append("<td class='text'>"+s.getEndDate()+"</td> \n");
+				  h.append("<td class='text'>"+s.getStyle()+"</td> \n");
+				  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+				  h.append("<td class='num_currency'>"+s.getQty()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getRetailSellAmt()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getWholeSellAmt()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getDiscountPercent()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getDiscountAmt()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getSellAfDisc()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getWacoalAmt()+"</td> \n");
+				  h.append("<td class='currency'>"+s.getPensAmt()+"</td> \n");
+				h.append("</tr>");
 				
 				h.append("</table> \n");
 			}

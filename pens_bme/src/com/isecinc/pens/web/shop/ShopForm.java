@@ -28,6 +28,16 @@ public class ShopForm extends I_Form {
     private ShopBean bean;
     private ShopBean beanCriteria;
 	private List<ShopBean> results;
+	private ShopBean summary;
+	
+	
+	public ShopBean getSummary() {
+		return summary;
+	}
+
+	public void setSummary(ShopBean summary) {
+		this.summary = summary;
+	}
 
 	public String getPage() {
 		return page;

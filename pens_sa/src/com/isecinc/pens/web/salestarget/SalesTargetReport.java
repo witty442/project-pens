@@ -23,6 +23,7 @@ public class SalesTargetReport {
 		COLUMNNAME_MAP.put("BRAND", "แบรนด์");
 		COLUMNNAME_MAP.put("CUSTOMER_CATEGORY", "ประเภทขาย");
 		COLUMNNAME_MAP.put("SALES_CHANNEL", "ภาคการขาย");
+		COLUMNNAME_MAP.put("SALES_ZONE", "ภาคตามการดูแล");
 		COLUMNNAME_MAP.put("SALESREP_CODE", "พนักงานขาย");
 		COLUMNNAME_MAP.put("CUSTOMER_CODE", "ร้านค้า");
 		COLUMNNAME_MAP.put("INVENTORY_ITEM_CODE", "SKU");

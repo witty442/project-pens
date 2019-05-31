@@ -266,9 +266,7 @@ function sumTotalByAllCol(){
 	 	document.getElementById('total_price_all').value = total_price_all;
 	 	toCurrenyNoDigit(document.getElementById('total_price_all'));
    }
-   
 }
-
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -340,7 +338,6 @@ function sumTotalByAllCol(){
 									    <html:select property="bean.salesZone" styleId="salesZone"  disabled="true">
 											<html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
 									    </html:select> 
-									 
 									</td>
 								</tr>
 								<tr>
@@ -382,6 +379,7 @@ function sumTotalByAllCol(){
 									 value="<%=Utils.decimalFormat(totalCTNMKT, Utils.format_current_no_disgit) %>"/>
 								</td>
 								<td>&nbsp;</td>
+								<td>&nbsp;</td>
 							</tr>
 							<tr>
 								<td class="td_text_center"><font color='#4d4dff'><b>รวบบาท By MKT</b></font></td>
@@ -400,6 +398,7 @@ function sumTotalByAllCol(){
 									 value="<%=Utils.decimalFormat(totalAmountMKT, Utils.format_current_2_disgit) %>"/>
 								 </td>
 								<td>&nbsp;</td>
+								<td>&nbsp;</td>
 							</tr>
 						 <tr>
 							<th class="td_text_center"rowspan="2">พนักงานขาย</th>
@@ -415,8 +414,8 @@ function sumTotalByAllCol(){
 									
 							<th class="td_text_center" rowspan="2">ยอดรวมหีบ รายเซลส์</th>
 							<th class="td_text_center" rowspan="2">ยอดรวมบาท รายเซลส์</th>
+							<th class="td_text_center" rowspan="2">ยอดรวมรายเซลส์<br/> ของทุกแบรนด์</th>
 							</tr>
-							
 							<tr>
 							<%	
 							//Loop Product ระบุเป้า(หีบ)
@@ -455,12 +454,15 @@ function sumTotalByAllCol(){
 											}
 									%>
 									     <td class="td_number">
+									        <div class="tooltip">	
 									        <input type="text" size="5"  class="disableNumber" autoComplete="off"
 									           name="target_qty_<%=productBean.getItemCode() %>_<%=salesrep.getSalesrepCode()%>"
 									           id="target_qty_<%=col%>_<%=row%>"
 									           onblur="isNum(this);sumTotalByRow(this,'<%=col%>','<%=row%>')" 
-									           value="<%=targetQty%>" readonly  />
-									        
+									           value="<%=targetQty%>" readonly  
+									           />
+									        <span class="tooltiptext"><%=salesrep.getSalesrepCode()%></span>
+									        </div>
 									       <!--  ,amount:   --> 
 									        <input type="hidden" size="5"
 									          name="target_amount_<%=productBean.getItemCode() %>_<%=salesrep.getSalesrepCode()%>"
@@ -472,12 +474,12 @@ function sumTotalByAllCol(){
 									          id="price_<%=col%>_<%=row%>"
 									          value="<%=productBean.getPrice() %>" />
 									         
-									           <input type="hidden" size="1"
+									          <input type="hidden" size="1"
 									          name="id_<%=productBean.getItemCode() %>_<%=salesrep.getSalesrepCode()%>"
 									          id="id_<%=col%>_<%=row%>"
 									          value="<%=salesrep.getId()%>" />
 									         
-									           <input type="hidden" size="1"
+									          <input type="hidden" size="1"
 									          name="line_id_<%=productBean.getItemCode() %>_<%=salesrep.getSalesrepCode()%>"
 									          id="line_id_<%=col%>_<%=row%>"
 									          value="<%=lineId%>" />
@@ -497,6 +499,16 @@ function sumTotalByAllCol(){
                                          name="total_amount_by_sales_<%=row%>" 
                                          id="total_amount_by_sales_<%=row%>" 
                                          size="10" readonly/>
+									</td>
+									<td class="td_number">
+                                         <input type="text" class="disableNumberBlue" 
+                                         name="total_amount_by_sales_allbrand_<%=row%>" 
+                                         id="total_amount_by_sales_allbrand_<%=row%>" 
+                                         size="11" readonly value="<%=salesrep.getTotalAmountBrandBySale() %>"/>
+                                         <input type="hidden" 
+                                           name="total_amount_by_sales_allbrand_o_<%=row%>" 
+                                           id="total_amount_by_sales_allbrand_o_<%=row%>" 
+                                           value="<%=salesrep.getTotalAmountBrandBySale() %>"/>
 									</td>
 								</tr>
 							<%
@@ -519,6 +531,7 @@ function sumTotalByAllCol(){
 									<%  }  %>
 									<td class="td_number"></td>
 									<td class="td_number"></td>
+									<td class="td_number"></td>
 							 </tr>
 							 <tr>
 								<td class="td_text_right"><b>รวมหีบ Sales By SKU</b></td>
@@ -538,6 +551,7 @@ function sumTotalByAllCol(){
 									  <input type="text" class="disableNumberBoldBlue" 
 									    name="total_ctn_all" id="total_ctn_all"size="10" readonly/>
 									</td>
+									<td class="td_number"></td>
 									<td class="td_number"></td>
 							 </tr>
 							 <tr>
@@ -559,6 +573,7 @@ function sumTotalByAllCol(){
 									  <input type="text" class="disableNumberBoldBlue" 
 									    name="total_price_all" id="total_price_all"size="10" readonly/>
 									</td>
+									<td class="td_number"></td>
 									<td class="td_number"></td>
 							 </tr>
 							<!-- ***********Summary by Column ********************* -->

@@ -39,7 +39,6 @@ function disableF5(e) {
 //To re-enable f5
 $(document).unbind("keydown", disableF5);
 
-
 function clearForm(path){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;
@@ -92,6 +91,7 @@ function salesManagerFinish(path){
 	}
 	return false;
 }
+
 function checkCanFinish(){
 	var r= true;
 	var status = document.getElementsByName("status");
@@ -103,9 +103,9 @@ function checkCanFinish(){
 			 // alert(status[i].innerHTML);
 			  r = false;
 			  break;
-		  }
-	  }
-	}
+		  }//if
+	  }//if
+	}//for
 	return r;
 }
 function unacceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
@@ -132,16 +132,18 @@ function unacceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 		unacceptDiv.style.display = 'none'; 
 	}
 }
-function acceptRow(path,id,rowId){
-	var status = document.getElementsByName("statusSpan")[rowId-1];
+function acceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
+	var status = document.getElementsByName("status")[rowId-1];
 	var acceptDiv = document.getElementsByName("accept_div")[rowId-1];
 	//alert(unacceptDiv);
 	
 	var returnString = "";
-	var param = "id="+id;
+	var param  = "salesZone="+salesZone+"&brand="+brand;
+        param += "&custCatNo="+custCatNo+"&period="+period;
+        param += "&startDate="+startDate;
 	if(confirm("ยืนยัน อนุมัติ เป้าหมายรายการนี้")){
 		var getData = $.ajax({
-				url: path+"/jsp/ajax/salesManagerAcceptRowAjax.jsp",
+				url: path+"/jsp/ajax/salesManagerTTAcceptRowAjax.jsp",
 				data : encodeURI(param),
 				async: true,
 				cache: false,
@@ -150,7 +152,7 @@ function acceptRow(path,id,rowId){
 				}
 			}).responseText;
 		//set new status and hide unaccept Action
-		status.innerHTML ="Finish";
+		status.value ="Finish";
 		acceptDiv.style.display = 'none'; 
 	}
 }

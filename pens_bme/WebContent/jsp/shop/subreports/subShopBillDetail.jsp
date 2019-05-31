@@ -77,6 +77,28 @@ function gotoPage(path,currPage){
 						<td class="td_text_center" width="8%"><%=mc.getPensAmt()%></td>
 					</tr>
 			<%}%>
+			<!-- Summary -->
+			<%
+			if(shopForm.getCurrPage()==shopForm.getTotalPage()){
+			ShopBean mc = shopForm.getSummary();
+			%>
+			<tr class="hilight_text">
+						<td class="td_text_center" width="10%"></td>
+						<td class="td_text_center" width="10%"></td>
+						<td class="td_text_center" width="5%"></td>
+					    <td class="td_text_center" width="5%"></td>
+						<td class="td_text_center" width="7%"></td>
+						<td class="td_text_center" width="7%">รวม</td>
+						<td class="td_text_center" width="5%"><%=mc.getQty()%></td>
+						<td class="td_text_center" width="5%"></td>
+						<td class="td_text_center" width="5%"></td>
+						<td class="td_text_center" width="8%"></td>
+						<td class="td_text_center" width="8%"></td>
+						<td class="td_text_center" width="8%"></td>
+						<td class="td_text_center" width="8%"></td>
+						<td class="td_text_center" width="8%"></td>
+					</tr>
+		  <%} %>
 	</table>
 	<%}else{ %>
 	
@@ -128,6 +150,23 @@ function gotoPage(path,currPage){
 				e.printStackTrace();
 			}
 			%>
+			<!-- Summary -->
+			<%
+			if(shopForm.getCurrPage()==shopForm.getTotalPage()){
+			ShopBean mc = shopForm.getSummary();
+			%>
+			<tr class="hilight_text">
+			    <td class="td_text_center" width="10%">รวม</td>
+				<td class="td_text_center" width="7%"><%=mc.getQty()%></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+				<td class="td_text_center" width="8%"></td>
+			</tr>
+			<%} %>
 	</table>
 <%} %>
 </c:if>

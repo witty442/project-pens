@@ -46,6 +46,10 @@ public class SalesTargetTTDAO {
 			//update status REJECT IN TT Head and detail
 			SalesTargetTTDAO.updateStatusRejectByTTSUPER_TT(conn, h);
 			
+			//update status POST in TEMP
+			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
+			
 			conn.commit();
 			r = true;
 		} catch (Exception e) {
@@ -63,7 +67,7 @@ public class SalesTargetTTDAO {
 	
 	public static boolean salesManagerTTUnaccept(User user,String salesZone,String brand,
 			String custCatNo,String period,String startDate ) throws Exception {
-		logger.debug("Sales Manager Unaccept By Manager MT");
+		logger.debug("Sales Manager Unaccept By Manager TT");
 		Connection conn = null;
         boolean r = false;
 		try {
@@ -81,8 +85,8 @@ public class SalesTargetTTDAO {
 			h = convertCriteria(h);
 			
 			//update status Unaccept
-			SalesTargetTTDAO.updateStatusHead_TT(conn, h);
-			SalesTargetTTDAO.updateStatusItem_TT(conn, h);
+			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
 			
 			conn.commit();
 			r = true;
@@ -99,21 +103,28 @@ public class SalesTargetTTDAO {
 		return r;
 	}
 	
-	public static boolean salesManagerAccept(User user,long id)  throws Exception {
-		logger.debug("Sales Manager Accept By Manager MT");
+	public static boolean salesManagerAccept(User user,String salesZone,String brand,
+			String custCatNo,String period,String startDate )  throws Exception {
+		logger.debug("Sales Manager Accept By Manager TT");
 		Connection conn = null;
         boolean r = false;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			SalesTargetBean h = new SalesTargetBean();
-			h.setId(id);
+			h.setSalesZone(salesZone);
+			h.setBrand(brand);
+			h.setCustCatNo(custCatNo);
+			h.setPeriod(period);
+			h.setStartDate(startDate);
 			h.setStatus(SalesTargetConstants.STATUS_FINISH);
 			h.setUpdateUser(user.getUserName());
 			
+			h = convertCriteria(h);
+			
 			//update status Unaccept
-			SalesTargetTTDAO.updateStatusHead_TT(conn, h);
-			SalesTargetTTDAO.updateStatusItem_TT(conn, h);
+			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
 			
 			conn.commit();
 			r = true;
@@ -265,7 +276,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
 			sql.append("\n  ,(select nvl(sum(target_qty),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_qty ");
 			sql.append("\n  ,(select nvl(sum(target_amount),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_amount ");
-			sql.append("\n  , M.status ,M.reject_reason ");
+			sql.append("\n  , M.status as tt_status ,M.reject_reason ");
 			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and M.status <>'"+SalesTargetConstants.STATUS_OPEN+"'");
@@ -295,7 +306,7 @@ public class SalesTargetTTDAO {
 				sql.append("\n ) ");
 			}
 			
-			sql.append("\n ORDER BY M.CUSTOMER_CATEGORY,M.brand asc ");
+			sql.append("\n ORDER BY M.CUSTOMER_CATEGORY,M.zone,M.brand asc ");
 
 			logger.debug("sql:"+sql);
 			
@@ -313,11 +324,23 @@ public class SalesTargetTTDAO {
 			   h.setSalesZoneDesc(rst.getString("zone_name"));
 			   h.setBrand(rst.getString("brand"));  
 			   h.setBrandName(rst.getString("brand_name"));
-			   h.setStatus(Utils.isNull(rst.getString("status")));
+			   
+			  
 			   h.setRejectReason(Utils.isNull(rst.getString("reject_reason")));
 			   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit,""));
 			   h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
 			
+			   //get status from temp //more 1 status
+			   h.setPeriod(o.getPeriod());
+			   h.setTargetMonth(o.getTargetMonth());
+			   h.setTargetQuarter(o.getTargetQuarter());
+			   h.setTargetYear(o.getTargetYear());
+			   
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h));
+			   if( Utils.isNull(h.getStatus()).equals("") ){
+				  h.setStatus(Utils.isNull(rst.getString("tt_status")));
+			   }
+			   
 			   //get Total Qty
 			   totalTargetQty = totalTargetQty+ rst.getInt("TOTAL_TARGET_QTY");
 			   totalTargetAmount = totalTargetAmount+ rst.getDouble("TOTAL_TARGET_AMOUNT");
@@ -389,7 +412,6 @@ public class SalesTargetTTDAO {
 			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
 			sql.append("\n  ) as total_sales_target_amount ");
 			
-			sql.append("\n  , M.status ");
 			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and m.status <> '"+SalesTargetConstants.STATUS_OPEN+"'");
@@ -418,7 +440,7 @@ public class SalesTargetTTDAO {
 				sql.append("\n  where user_name = '"+user.getUserName()+"'");
 				sql.append("\n ) ");
 			}
-			sql.append("\n ORDER BY M.CUSTOMER_CATEGORY,M.brand asc ");
+			sql.append("\n ORDER BY M.CUSTOMER_CATEGORY,M.zone,M.brand asc ");
 
 			logger.debug("sql:"+sql);
 			
@@ -438,13 +460,18 @@ public class SalesTargetTTDAO {
 			   h.setSalesZoneDesc(rst.getString("zone_name"));
 			   h.setBrand(rst.getString("brand"));  
 			   h.setBrandName(rst.getString("brand_name"));
-			   h.setStatus(Utils.isNull(rst.getString("status"))); 
 			   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit,""));
 			   h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
 			
 			   h.setSalesTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_SALES_TARGET_QTY"), Utils.format_current_no_disgit,""));
 			   h.setSalesTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_SALES_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
 			
+			   //get status from temp //more 1 status
+			   h.setTargetMonth(o.getTargetMonth());
+			   h.setTargetQuarter(o.getTargetQuarter());
+			   h.setTargetYear(o.getTargetYear());
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h));
+			  
 			   //get Total Qty MKT
 			   totalTargetQty = totalTargetQty+ rst.getInt("TOTAL_TARGET_QTY");
 			   totalTargetAmount = totalTargetAmount+ rst.getDouble("TOTAL_TARGET_AMOUNT");
@@ -452,10 +479,12 @@ public class SalesTargetTTDAO {
 			   //Total By TTSUPER
 			   totalSalesTargetQty = totalSalesTargetQty+ rst.getInt("TOTAL_SALES_TARGET_QTY");
 			   totalSalesTargetAmount = totalSalesTargetAmount+ rst.getDouble("TOTAL_SALES_TARGET_AMOUNT");
+			  
 			   //set Access Action
 			   h = SalesTargetTTUtils.setAccess(h,user,pageName);
 			   logger.debug("canUnAccept:"+h.isCanUnAccept());
 			   logger.debug("canFinish:"+h.isCanFinish());
+			   
 			   items.add(h);
 			   
 			   
@@ -784,12 +813,13 @@ public class SalesTargetTTDAO {
 		return dataList;
 	}
 	
-	public static List<SalesTargetBean> searchSalesrepList(Connection conn,SalesTargetBean cri,User user,Map<String, String> rowMap) throws Exception {
+	public static List<SalesTargetBean> searchSalesrepListByTTSUPER(Connection conn,SalesTargetBean cri,User user,Map<String, String> rowMap) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<SalesTargetBean> dataList = new ArrayList<SalesTargetBean>();
 		SalesTargetBean h = null;
+		String totalAmountByBrand = "";
 		try {
 			cri = convertCriteria(cri);
 			
@@ -817,6 +847,7 @@ public class SalesTargetTTDAO {
 			rst = ps.executeQuery();
 
 			while(rst.next()) {
+			   totalAmountByBrand = "";
 			   h = new SalesTargetBean();
 			   h.setSalesrepId(rst.getString("salesrep_id"));
 			   h.setSalesrepCode(rst.getString("code"));
@@ -828,6 +859,95 @@ public class SalesTargetTTDAO {
 			   //logger.debug("salesrepCode["+h.getSalesrepCode()+"]id["++"]");
 			   if(rowMap.get(h.getSalesrepCode()) != null){
 				   h.setId(Utils.convertStrToLong(rowMap.get(h.getSalesrepCode()), 0));
+			   }
+			   //getTotalAmountBrandBySales
+			   h.setPeriod(cri.getPeriod());
+			   h.setTargetMonth(cri.getTargetMonth());
+			   h.setTargetQuarter(cri.getTargetQuarter());
+			   h.setTargetYear(cri.getTargetYear());
+			   h.setSalesZone(cri.getSalesZone());
+			   
+			   totalAmountByBrand =getTotalAmountBrandBySales(conn, h,cri.getBrand());
+			   h.setTotalAmountBrandBySale("");
+			   //logger.debug("totalAmountByBrand["+totalAmountByBrand+"]");
+			   if( !totalAmountByBrand.equals("0.00")){
+			      h.setTotalAmountBrandBySale(totalAmountByBrand);
+			   }
+			  // logger.debug("totalAmountByBrand["+h.getTotalAmountBrandBySale()+"]");
+			   dataList.add(h);
+			}//while
+			
+			if(h==null){
+				h = cri;
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return dataList;
+	}
+	public static List<SalesTargetBean> searchSalesrepListByTTMGR(Connection conn,SalesTargetBean cri,User user,Map<String, String> rowMap) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		List<SalesTargetBean> dataList = new ArrayList<SalesTargetBean>();
+		SalesTargetBean h = null;
+		String totalAmountByBrand = "";
+		try {
+			cri = convertCriteria(cri);
+			
+			sql.append("\n  select M.code,M.salesrep_full_name,M.salesrep_id ,M.region ");
+			sql.append("\n  ,( select max(cust_cat_desc) from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT S");
+			sql.append("\n    where S.cust_cat_no = '"+cri.getCustCatNo()+"') as cust_cat_desc");
+			sql.append("\n  from apps.xxpens_salesreps_v M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
+			sql.append("\n  where M.salesrep_id = Z.salesrep_id and M.isactive ='Y'");
+			sql.append("\n  and M.salesrep_full_name not like '%ยกเลิก%'");
+			
+			if( Utils.isNull(cri.getCustCatNo()).equalsIgnoreCase("ORDER - VAN SALES")){
+				sql.append("\n  and M.sales_channel = 'C'");
+			}else if( Utils.isNull(cri.getCustCatNo()).equalsIgnoreCase("ORDER - CREDIT SALES")){
+				sql.append("\n  and M.sales_channel = 'S'");
+			}
+			if(!Utils.isNull(cri.getSalesZone()).equals("")){
+				sql.append("\n  and Z.zone = '"+cri.getSalesZone()+"'");
+			}
+			
+			sql.append("\n  ORDER BY M.code ");
+
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+
+			while(rst.next()) {
+			   totalAmountByBrand = "";
+			   h = new SalesTargetBean();
+			   h.setSalesrepId(rst.getString("salesrep_id"));
+			   h.setSalesrepCode(rst.getString("code"));
+			   h.setSalesrepName(rst.getString("salesrep_full_name"));
+			   h.setSalesChannelNo(rst.getString("region"));
+			   h.setCustCatNo(cri.getCustCatNo());
+			   h.setCustCatDesc(rst.getString("cust_cat_desc"));
+			   
+			   //logger.debug("salesrepCode["+h.getSalesrepCode()+"]id["++"]");
+			   if(rowMap.get(h.getSalesrepCode()) != null){
+				   h.setId(Utils.convertStrToLong(rowMap.get(h.getSalesrepCode()), 0));
+			   }
+			   //getTotalAmountBrandBySales
+			   h.setPeriod(cri.getPeriod());
+			   h.setTargetMonth(cri.getTargetMonth());
+			   h.setTargetQuarter(cri.getTargetQuarter());
+			   h.setTargetYear(cri.getTargetYear());
+			   h.setSalesZone(cri.getSalesZone());
+			   
+			   totalAmountByBrand = getTotalAmountBrandBySales(conn, h,"");
+			   h.setTotalAmountBrandBySale("");
+			   if( !totalAmountByBrand.equals("0.00")){
+			      h.setTotalAmountBrandBySale(totalAmountByBrand);
 			   }
 			   dataList.add(h);
 			}//while
@@ -844,6 +964,46 @@ public class SalesTargetTTDAO {
 			} catch (Exception e) {}
 		}
 		return dataList;
+	}
+	public static  String getTotalAmountBrandBySales(Connection conn,SalesTargetBean cri,String notInBrand) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		String totalAmountBrandBySale = "";
+		try {
+			sql.append("\n  select NVL(SUM(D.TARGET_AMOUNT),0) as TARGET_AMOUNT");
+			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M");
+			sql.append("\n  ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L D");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
+			sql.append("\n  where M.salesrep_id= Z.salesrep_id ");
+			sql.append("\n  and M.id = D.id ");
+			sql.append("\n  and M.CUSTOMER_CATEGORY = '"+cri.getCustCatNo()+"'");
+			sql.append("\n  and M.salesrep_id = "+cri.getSalesrepId()+"");
+		    sql.append("\n  and Z.zone = '"+cri.getSalesZone()+"'");
+			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
+			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
+		    sql.append("\n  and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+		    
+		    if( !Utils.isNull(notInBrand).equals("")){
+			    sql.append("\n  and M.brand <> '"+notInBrand+"'");
+			}
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()) {
+			   totalAmountBrandBySale= Utils.decimalFormat(rst.getDouble("TARGET_AMOUNT"), Utils.format_current_2_disgit);
+			}//while
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return totalAmountBrandBySale;
 	}
 	
 	public static String getAllStatusInItem(Connection conn,long id,User user) throws Exception {
@@ -1127,6 +1287,48 @@ public class SalesTargetTTDAO {
 	 return maxLineId;
 	}
 	
+	public static String findStatusTEMPByTTSUPER(Connection conn,SalesTargetBean o){
+		String status = "";
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Map<String, String> mapStatus = new HashMap<String, String>();
+		try{
+			sql.append("\n SELECT STATUS from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M  ");
+			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n where 1=1  ");
+			sql.append("\n and m.salesrep_id = Z.salesrep_id  ");
+			sql.append("\n and M.period = '"+Utils.isNull(o.getPeriod())+"'");
+			sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+			sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+			sql.append("\n and Z.zone= '"+Utils.isNull(o.getSalesZone())+"'");
+			sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+			sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+			sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				if(mapStatus.get(rst.getString("STATUS")) ==null){
+				   status += rst.getString("STATUS")+"/";
+				}
+				mapStatus.put(rst.getString("STATUS"), rst.getString("STATUS"));
+			}//while
+			if(status.length()>0){
+				status = status.substring(0,status.length()-1);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return status;
+	}
+	
 	 public static void insertHeadByMKT_TT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			int c =1;
@@ -1166,34 +1368,16 @@ public class SalesTargetTTDAO {
 			}
 		}
 	 
-		public static void updateStatusHead_TT(Connection conn,SalesTargetBean o) throws Exception{
+		public static void updateStatusHead_TEMPByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("UpdateStatusHeadByMKT_TT ID["+o.getId()+"]status["+o.getStatus()+"]");
 			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
 			try{
 		        //convert Criteria
                 o = convertCriteria(o);
-
-				//XXPENS_BI_SALES_TARGET_TT
-				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TT M SET  \n");
-				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-				sql.append(" WHERE 1=1  \n" );
-				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
-				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
-				sql.append("\n and M.zone= '"+Utils.isNull(o.getSalesZone())+"'");
-				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
-				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
-				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
-				
-				ps = conn.prepareStatement(sql.toString());
-				ps.setString(c++, o.getStatus());
-				ps.setString(c++, o.getUpdateUser());
-				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
-				ps.executeUpdate();
-				
+                
 				//XXPENS_BI_SALES_TARGET_TEMP
-				c = 1;
 				sql = new StringBuffer("");
 				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET  \n");
 				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
@@ -1223,36 +1407,16 @@ public class SalesTargetTTDAO {
 			}
 		}
 		
-		public static void updateStatusItem_TT(Connection conn,SalesTargetBean o) throws Exception{
+		public static void updateStatusItem_TEMPByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("UpdateStatusItemByMKT ID["+o.getId()+"] status["+o.getStatus()+"]");
 			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
 			try{
-				//XXPENS_BI_SALES_TARGET_TT_L
-				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TT_L SET  \n");
-				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-				sql.append(" WHERE ID IN( \n" );
-				sql.append("  SELECT ID FROM  XXPENS_BI_SALES_TARGET_TT M \n");
-				sql.append("  WHERE 1=1  \n" );
-				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
-				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
-				sql.append("\n and M.zone= '"+Utils.isNull(o.getSalesZone())+"'");
-				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
-				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
-				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
-				
-				sql.append(" )  \n" );
-				
-				ps = conn.prepareStatement(sql.toString());
-					
-				ps.setString(c++, o.getStatus());
-				ps.setString(c++, o.getUpdateUser());
-				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
-				ps.executeUpdate();
-				
+				//convert Criteria
+                o = convertCriteria(o);
+                
 				//XXPENS_BI_SALES_TARGET_TEMP_L
-				c = 1;
 				sql = new StringBuffer("");
 				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP_L  SET  \n");
 				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
@@ -1269,6 +1433,152 @@ public class SalesTargetTTDAO {
 				sql.append("\n  and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
 				sql.append("\n  and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
 				sql.append(" )  \n" );
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.executeUpdate();
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static void updateStatusHead_TEMPByTTMGR(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("updateStatusHead_TEMPByTTMGR status["+o.getStatus()+"]");
+			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
+			try{
+				o = convertCriteria(o);
+				//XXPENS_BI_SALES_TARGET_TEMP
+			
+				sql = new StringBuffer("");
+				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE 1=1  \n" );
+			    sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				sql.append("\n and M.salesrep_id in( ");
+				sql.append("\n   select salesrep_id from PENSBI.XXPENS_BI_MST_SALES_ZONE");
+				sql.append("\n   where zone= '"+Utils.isNull(o.getSalesZone())+"'");
+				sql.append("\n )");
+				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+
+				ps = conn.prepareStatement(sql.toString());
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static void updateStatusItem_TEMPByTTMGR(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("updateStatusItem_TEMPByTTMGR status["+o.getStatus()+"]");
+			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
+			try{
+				//XXPENS_BI_SALES_TARGET_TEMP_L
+				sql = new StringBuffer("");
+				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP_L  SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE ID IN( \n" );
+				sql.append("    SELECT ID FROM  XXPENS_BI_SALES_TARGET_TEMP M \n");
+				sql.append("    WHERE 1=1  " );
+				sql.append("\n  and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				sql.append("\n  and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				sql.append("\n  and M.salesrep_id in( ");
+				sql.append("\n     select salesrep_id from PENSBI.XXPENS_BI_MST_SALES_ZONE");
+				sql.append("\n     where zone= '"+Utils.isNull(o.getSalesZone())+"'");
+				sql.append("\n   )");
+				sql.append("\n  and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				sql.append("\n  and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				sql.append("\n  and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+				sql.append(" )  \n" );
+				ps = conn.prepareStatement(sql.toString());
+					
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.executeUpdate();
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		
+		public static void updateStatusHead_TTByMKT(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("updateStatusHead_TTByMKT ID["+o.getId()+"]status["+o.getStatus()+"]");
+			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
+			try{
+		        //convert Criteria
+                o = convertCriteria(o);
+                
+				//XXPENS_BI_SALES_TARGET_TT
+				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TT M SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE 1=1  \n" );
+				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				sql.append("\n and M.zone= '"+Utils.isNull(o.getSalesZone())+"'");
+				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+				
+				ps = conn.prepareStatement(sql.toString());
+				ps.setString(c++, o.getStatus());
+				ps.setString(c++, o.getUpdateUser());
+				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.executeUpdate();
+				
+			}catch(Exception e){
+				throw e;
+			}finally{
+				if(ps != null){
+					ps.close();ps=null;
+				}
+			}
+		}
+		public static void updateStatusItem_TTByMKT(Connection conn,SalesTargetBean o) throws Exception{
+			PreparedStatement ps = null;
+			logger.debug("UpdateStatusItemByMKT ID["+o.getId()+"] status["+o.getStatus()+"]");
+			int  c = 1;
+			StringBuffer sql = new StringBuffer("");
+			try{
+				//XXPENS_BI_SALES_TARGET_TT_L
+				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TT_L SET  \n");
+				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
+				sql.append(" WHERE ID IN( \n" );
+				sql.append("  SELECT ID FROM  XXPENS_BI_SALES_TARGET_TT M \n");
+				sql.append("  WHERE 1=1  \n" );
+				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				sql.append("\n and M.zone= '"+Utils.isNull(o.getSalesZone())+"'");
+				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+				
+				sql.append(" )  \n" );
+				
 				ps = conn.prepareStatement(sql.toString());
 					
 				ps.setString(c++, o.getStatus());

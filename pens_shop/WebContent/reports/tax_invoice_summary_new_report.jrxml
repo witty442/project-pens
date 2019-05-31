@@ -56,7 +56,7 @@
 				<text><![CDATA[ลูกค้า:]]></text>
 			</staticText>
 			<textField pattern="">
-				<reportElement x="1" y="41" width="199" height="18"/>
+				<reportElement x="1" y="36" width="205" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="6" isBold="false"/>
 				</textElement>
@@ -84,7 +84,7 @@
 				<text><![CDATA[ที่อยู่:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="3" y="17" width="197" height="12"/>
+				<reportElement x="1" y="16" width="204" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="8" isBold="true"/>
 				</textElement>
@@ -98,7 +98,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{custAddress1}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="29" width="199" height="13"/>
+				<reportElement x="1" y="26" width="205" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="8" isBold="false"/>
 				</textElement>
@@ -172,7 +172,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[($P{p_receiptNo}!=null? "เลขที่ " + $P{p_receiptNo}:"")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="2" y="59" width="198" height="12"/>
+				<reportElement x="1" y="60" width="205" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="7" isBold="false"/>
 				</textElement>

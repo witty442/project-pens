@@ -37,7 +37,6 @@ function disableF5(e) {
 //To re-enable f5
 $(document).unbind("keydown", disableF5);
 
-
 function clearForm(path){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;

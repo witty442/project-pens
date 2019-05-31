@@ -363,9 +363,13 @@ public class SalesTargetTTUtils {
 			sql.append("\n  ,P.SUM12 as amt_12  ");
 			sql.append("\n  from XXPENS_BI_MST_ITEM M  ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
-			sql.append("\n   SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
-			sql.append("\n   WHERE PERIOD ='"+period+"'");
-			sql.append("\n   AND CUSTOMER_CATEGORY ='"+custCatNo+"'");
+			sql.append("\n   SELECT INVENTORY_ITEM_ID ,SUM(V.sum3) as SUM3,sum(V.SUM12) as SUM12 ");
+			sql.append("\n   FROM apps.XXPENS_BI_MST_SALES_AVG_V V ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n   WHERE V.PERIOD ='"+period+"'");
+			sql.append("\n   AND V.CUSTOMER_CATEGORY ='"+custCatNo+"'");
+			sql.append("\n   AND Z.ZONE ='"+salesZone+"'");
+			sql.append("\n   AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n   GROUP BY INVENTORY_ITEM_ID ");
 			sql.append("\n  ) P ON M.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  where M.INVENTORY_ITEM_CODE ='"+itemCode+"' ");
 			// 504 ,821 ,833 No check dup in page
@@ -803,11 +807,11 @@ public class SalesTargetTTUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchCustCatNoTTList(String salesZone) throws Exception{
+	public static List<PopupBean> searchCustCatNoTTList() throws Exception{
 		 Connection conn = null;
 		 try{
 			 conn = DBConnection.getInstance().getConnection();
-			 return searchCustCatNoTTListModel(conn,salesZone);
+			 return searchCustCatNoTTListModel(conn);
 		 }catch(Exception e){
 			 throw e;
 		 }finally{
@@ -815,19 +819,16 @@ public class SalesTargetTTUtils {
 		 }
 	  }
 	 
-	public static List<PopupBean> searchCustCatNoTTListModel(Connection conn,String salesZone){
+	public static List<PopupBean> searchCustCatNoTTListModel(Connection conn){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
 			sql.delete(0, sql.length());
-			sql.append("\n  SELECT distinct M.cust_cat_no,C.cust_cat_desc from XXPENS_BI_MST_CUST_CAT_MAP_TT M ,XXPENS_BI_MST_CUST_CAT C  ");
-			sql.append("\n  where 1=1 AND M.cust_cat_no = C.cust_cat_no ");
-			if( !Utils.isNull(salesZone).equals("")){
-			  sql.append("\n  and m.sales_zone ='"+salesZone+"'");
-			}
-			sql.append("\n  ORDER BY M.cust_cat_no asc \n");
+			sql.append("\n  SELECT distinct C.cust_cat_no,C.cust_cat_desc from PENSBI.XXPENS_BI_MST_CUST_CAT C  ");
+			sql.append("\n  where  C.cust_cat_no IN( 'ORDER - CREDIT SALES','ORDER - VAN SALES')");
+			sql.append("\n  ORDER BY C.cust_cat_no asc \n");
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
@@ -995,83 +996,7 @@ public class SalesTargetTTUtils {
 	}
 	
 	
-	public static SalesTargetBean searchSalesrepCodeByUserName(Connection conn,User user){
-		SalesTargetBean bean = null;
-		Statement stmt = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-	    boolean found = false;
-	    String salesrepCode = "";
-	    String salesrepId = "";
-		try{
-			sql.delete(0, sql.length());
-			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id from XXPENS_BI_MST_CUST_SALES M ,XXPENS_BI_MST_SALESREP S ");
-			sql.append("\n  where M.salesrep_code =S.salesrep_code ");
-			sql.append("\n and user_name ='"+user.getUserName()+"'");
-			
-			sql.append("\n  ORDER BY M.salesrep_code asc \n");
-			
-			logger.debug("sql:"+sql);
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			while (rst.next()) {
-				 found = true;
-				 salesrepCode +=Utils.isNull(rst.getString("salesrep_code"))+",";
-				 salesrepId +=Utils.isNull(rst.getString("salesrep_id"))+",";
-			}//while
-			if(found){
-				bean = new SalesTargetBean();
-				bean.setSalesrepCode(salesrepCode);
-				bean.setSalesrepId(salesrepId);
-			}
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		} finally {
-			try {
-				rst.close();
-				stmt.close();
-			} catch (Exception e) {}
-		}
-	 return bean;
-	}
 	
-	public static List<PopupBean> searchSalesrepListByUserName(Connection conn,User user){
-		PopupBean bean = null;
-		Statement stmt = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-		List<PopupBean> pos = new ArrayList<PopupBean>();
-		try{
-			sql.delete(0, sql.length());
-			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id from XXPENS_BI_MST_CUST_SALES M ,XXPENS_BI_MST_SALESREP S ");
-			sql.append("\n  where M.salesrep_code =S.salesrep_code ");
-			sql.append("\n and user_name ='"+user.getUserName()+"'");
-			sql.append("\n  ORDER BY M.salesrep_code asc \n");
-			
-			logger.debug("sql:"+sql);
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			while (rst.next()) {
-				 
-				 //salesrepCode +=Utils.isNull(rst.getString("salesrep_code"))+",";
-				 //salesrepId +=Utils.isNull(rst.getString("salesrep_id"))+",";
-				 bean = new PopupBean();
-				 bean.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
-				 bean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
-				 
-				 pos.add(bean);
-			}//while
-			
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		} finally {
-			try {
-				rst.close();
-				stmt.close();
-			} catch (Exception e) {}
-		}
-	 return pos;
-	}
 	
 	public static List<PopupBean> searchSalesrepListAll() throws Exception{
 		 Connection conn = null;
@@ -1120,11 +1045,11 @@ public class SalesTargetTTUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListByCustCatNo(String salesChannelNo,String custCatNo) throws Exception{
+	public static List<PopupBean> searchSalesrepListTT(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListByCustCatNo(conn,salesChannelNo,custCatNo);
+			return searchSalesrepListTT(conn,salesChannelNo,custCatNo,salesZone);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -1133,29 +1058,42 @@ public class SalesTargetTTUtils {
 			}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListByCustCatNo(Connection conn,String salesChannelNo,String custCatNo){
+	public static List<PopupBean> searchSalesrepListTT(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<PopupBean> pos = new ArrayList<PopupBean>();
-		try{
-			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id from XXPENS_BI_MST_CUST_SALES M ,XXPENS_BI_MST_SALESREP S ");
-			sql.append("\n  where M.salesrep_code =S.salesrep_code ");
-			sql.append("\n  and cust_cat_no ='"+custCatNo+"'");
-			if( !Utils.isNull(salesChannelNo).equals("")){
-				sql.append("\n  and sales_channel_no ='"+salesChannelNo+"'");
+		try{	
+			sql.append("\n  SELECT distinct S.code,S.salesrep_id ");
+			sql.append("\n  from apps.xxpens_salesreps_v S ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n  where Z.salesrep_id =S.salesrep_id ");
+			sql.append("\n  and S.region in('0','1','2','3','4')");
+			sql.append("\n  and S.isactive ='Y'");
+			sql.append("\n  and S.code not like 'SN%'");
+			sql.append("\n  and S.salesrep_full_name not like '%ยกเลิก%' ");
+			if( !Utils.isNull(custCatNo).equals("")){
+				if("ORDER - CREDIT SALES".equalsIgnoreCase(custCatNo)){
+			       sql.append("\n  and S.sales_channel_name ='Credit Sales'");
+				}else if("ORDER - VAN SALES".equalsIgnoreCase(custCatNo)){
+				   sql.append("\n  and S.sales_channel_name ='Van Sales'");
+				}
 			}
-			sql.append("\n  ORDER BY M.salesrep_code asc \n");		
+			if( !Utils.isNull(salesChannelNo).equals("")){
+				sql.append("\n  and S.region ='"+salesChannelNo+"'");
+			}
+			if( !Utils.isNull(salesZone).equals("")){
+				sql.append("\n  and Z.zone ='"+salesZone+"'");
+			}
+			sql.append("\n  ORDER BY S.code asc \n");		
 			logger.debug("sql:"+sql);
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				 
-				 //salesrepCode +=Utils.isNull(rst.getString("salesrep_code"))+",";
-				 //salesrepId +=Utils.isNull(rst.getString("salesrep_id"))+",";
 				 bean = new PopupBean();
-				 bean.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
+				 bean.setSalesrepCode(Utils.isNull(rst.getString("code")));
 				 bean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
 				 if(Utils.isNull(bean.getSalesrepCode()).length()>=4){
 				   pos.add(bean);

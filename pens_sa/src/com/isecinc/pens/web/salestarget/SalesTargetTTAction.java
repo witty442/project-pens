@@ -225,7 +225,7 @@ public class SalesTargetTTAction  {
 			Map<String, SalesTargetBean> dataMap = dataList.get(1);
 		
 			//Get SalesList
-		    salesrepList = SalesTargetTTDAO.searchSalesrepList(conn, aForm.getBean(), user,rowMap);
+		    salesrepList = SalesTargetTTDAO.searchSalesrepListByTTSUPER(conn, aForm.getBean(), user,rowMap);
 	
 			request.getSession().setAttribute("salesrepList", salesrepList);
 			request.getSession().setAttribute("dataMap", dataMap);
@@ -380,9 +380,13 @@ public class SalesTargetTTAction  {
 			h.setStatus(SalesTargetConstants.STATUS_POST);
 			h.setUpdateUser(user.getUserName());
 			
-			//update status POST
-			SalesTargetTTDAO.updateStatusHead_TT(conn, h);
-			SalesTargetTTDAO.updateStatusItem_TT(conn, h);
+			//update status POST in TT
+			SalesTargetTTDAO.updateStatusHead_TTByMKT(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TTByMKT(conn, h);
+			
+			//update status POST in TEMP
+			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
 			
 			request.setAttribute("Message","Post To Sales เรียบร้อยแล้ว");
 			
@@ -422,14 +426,14 @@ public class SalesTargetTTAction  {
 			h.setUpdateUser(user.getUserName());
 			
 			//update  (XXPENS_BI_SALES_TARGET_TEMP ,XXPENS_BI_SALES_TARGET_TT )  TABLE status POST to ACCEPT
-			SalesTargetTTDAO.updateStatusHead_TT(conn, h);
-			SalesTargetTTDAO.updateStatusItem_TT(conn, h);
+			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
+			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
 	
 			request.setAttribute("Message","ได้ทำการ Accept เป้าหมายขาย เรียบร้อยแล้ว");
 			conn.commit();
 			
 			//search again
-			List<SalesTargetBean> productMKTList =(List<SalesTargetBean>)request.getSession().getAttribute("productMKTList");
+			//List<SalesTargetBean> productMKTList =(List<SalesTargetBean>)request.getSession().getAttribute("productMKTList");
 			List<SalesTargetBean> salesrepList = (List<SalesTargetBean>)request.getSession().getAttribute("salesrepList");
 			
 			//Get target save By Sales(XXPENS_BI_SALES_TARGET_TEMP) to MAP
@@ -439,7 +443,7 @@ public class SalesTargetTTAction  {
 			Map<String, SalesTargetBean> dataMap = dataList.get(1);
 		
 			//Get SalesList
-		    salesrepList = SalesTargetTTDAO.searchSalesrepList(conn, aForm.getBean(), user,rowMap);
+		    salesrepList = SalesTargetTTDAO.searchSalesrepListByTTSUPER(conn, aForm.getBean(), user,rowMap);
 	
 			request.getSession().setAttribute("salesrepList", salesrepList);
 			request.getSession().setAttribute("dataMap", dataMap);
@@ -475,14 +479,26 @@ public class SalesTargetTTAction  {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			SalesTargetBean cri = new SalesTargetBean();
-			cri = aForm.getBean();
+			cri.setPeriod(aForm.getBean().getPeriod());
+			cri.setStartDate(aForm.getBean().getStartDate());
 			cri.setStatus(SalesTargetConstants.STATUS_FINISH);
 			cri.setUpdateUser(user.getUserName());
 			
-			//update status FINISH
-			SalesTargetTTDAO.updateStatusHead_TT(conn, cri);
-			SalesTargetTTDAO.updateStatusItem_TT(conn, cri);
+			//get parameter from input
+			String[] custCatNo = request.getParameterValues("custCatNo");
+			String[] brand = request.getParameterValues("brand");
+			String[] zone = request.getParameterValues("zone");
 			
+			for(int i =0;i<custCatNo.length;i++){
+				cri.setCustCatNo(custCatNo[i]);
+				cri.setBrand(brand[i]);
+				cri.setSalesZone(zone[i]);
+				//update status FINISH
+				//loop
+				SalesTargetTTDAO.updateStatusHead_TEMPByTTMGR(conn, cri);
+				SalesTargetTTDAO.updateStatusItem_TEMPByTTMGR(conn, cri);
+			
+			}
 			request.setAttribute("Message","ได้ทำการ อนุมัติเป้าหมายขาย เรียบร้อยแล้ว");
 			
 			conn.commit();

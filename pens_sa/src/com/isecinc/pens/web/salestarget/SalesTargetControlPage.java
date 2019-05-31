@@ -222,7 +222,7 @@ public class SalesTargetControlPage {
 			item.setSalesZoneDesc("");
 			salesZoneList.add(item);
 			
-			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
+			List<PopupBean> salesZoneList_s = SalesTargetUtils.searchSalesZoneMTListModel(conn, "");
 			salesZoneList.addAll(salesZoneList_s);
 			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){

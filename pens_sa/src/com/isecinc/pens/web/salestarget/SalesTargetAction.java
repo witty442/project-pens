@@ -5,10 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +24,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 
 /**
- * Summary Action
+ * SalesTargetAction
  * 
  * @author WITTY
  * 
@@ -102,7 +99,7 @@ public class SalesTargetAction extends I_Action {
 					SalesTargetTTControlPage.prepareSearchMKT_TT(request, conn, user,pageName);
 					
 					//for test
-					sales.setBrand("501");
+					//sales.setBrand("501");
 				}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){
 					sales = new SalesTargetBean();
 					SalesTargetTTControlPage.prepareSearchTTSUPER(request, conn, user,pageName);
@@ -313,6 +310,7 @@ public class SalesTargetAction extends I_Action {
 				return new SalesTargetTTAction().saveTTByMKT(aForm, request, response);
 				
 			}else if (SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName) ){
+				request.setAttribute("save_by_ttsuper", "save_by_ttsuper");
 				return new SalesTargetTTAction().saveTTSUPER(aForm, request, response);
 			}
 		} catch (Exception e) {

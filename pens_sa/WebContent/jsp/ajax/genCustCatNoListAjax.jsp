@@ -11,7 +11,6 @@ List<PopupBean> dataList= null;
 try{
 	if( !Utils.isNull(salesChannelNo).equals("")){
 		dataList = SalesTargetUtils.searchCustCatNoMTList(salesChannelNo);
-		
 	}
 }catch(Exception e){
 	e.printStackTrace();

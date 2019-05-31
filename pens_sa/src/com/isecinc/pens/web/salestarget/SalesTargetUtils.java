@@ -937,7 +937,7 @@ public class SalesTargetUtils {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListByCustCatNo(conn,salesChannelNo,custCatNo);
+			return searchSalesrepListByCustCatNo(conn,salesChannelNo,custCatNo,"");
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -946,27 +946,49 @@ public class SalesTargetUtils {
 			}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListByCustCatNo(Connection conn,String salesChannelNo,String custCatNo){
+	public static List<PopupBean> searchSalesrepListByCustCatNo(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return searchSalesrepListByCustCatNo(conn,salesChannelNo,custCatNo,salesZone);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+	}
+	public static List<PopupBean> searchSalesrepListByCustCatNo(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		try{
-			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id from XXPENS_BI_MST_CUST_SALES M ,XXPENS_BI_MST_SALESREP S ");
-			sql.append("\n  where M.salesrep_code =S.salesrep_code ");
-			sql.append("\n  and cust_cat_no ='"+custCatNo+"'");
+			sql.append("\n  SELECT distinct M.salesrep_code,S.salesrep_id ");
+			sql.append("\n  from PENSBI.XXPENS_BI_MST_CUST_SALES M");
+			sql.append("\n  ,apps.xxpens_salesreps_v S ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n  where M.salesrep_code =S.code ");
+			sql.append("\n  and S.salesrep_id =Z.salesrep_id ");
+			sql.append("\n  and S.isactive ='Y'");
+			sql.append("\n  and S.salesrep_full_name not like '%ยกเลิก%' ");
+			if( !Utils.isNull(custCatNo).equals("")){
+			  sql.append("\n  and M.cust_cat_no ='"+custCatNo+"'");
+			}
 			if( !Utils.isNull(salesChannelNo).equals("")){
-				sql.append("\n  and sales_channel_no ='"+salesChannelNo+"'");
+				sql.append("\n  and M.sales_channel_no ='"+salesChannelNo+"'");
+			}
+			if( !Utils.isNull(salesZone).equals("")){
+				sql.append("\n  and Z.zone ='"+salesZone+"'");
 			}
 			sql.append("\n  ORDER BY M.salesrep_code asc \n");		
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				 
-				 //salesrepCode +=Utils.isNull(rst.getString("salesrep_code"))+",";
-				 //salesrepId +=Utils.isNull(rst.getString("salesrep_id"))+",";
 				 bean = new PopupBean();
 				 bean.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
 				 bean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
@@ -1175,5 +1197,40 @@ public class SalesTargetUtils {
 			}
 			return pos;
 		}
-	 
+	  public static List<PopupBean> searchSalesZoneMTListModel(Connection conn,String salesZone){
+			List<PopupBean> pos = new ArrayList<PopupBean>();
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			try{
+				sql.append("\n  SELECT distinct M.zone,M.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE M   ");
+				sql.append("\n  where 1=1  ");
+				if( !Utils.isNull(salesZone).equals("")){
+				  sql.append("\n  and m.zone ='"+salesZone+"'");
+				}
+				sql.append("\n  ORDER BY M.zone asc \n");
+				
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupBean item = new PopupBean();
+					item.setNo(no);
+					item.setSalesZone(Utils.isNull(rst.getString("zone")));
+					item.setSalesZoneDesc(Utils.isNull(rst.getString("zone_name")));
+					pos.add(item);
+				}//while
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+		 return pos;
+		}
 }

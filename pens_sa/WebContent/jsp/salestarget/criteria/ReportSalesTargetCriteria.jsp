@@ -2,8 +2,13 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
 SalesTargetBean bean = ((SalesTargetForm)session.getAttribute("salesTargetForm")).getBean();
+String subPageName= Utils.isNull(request.getParameter("subPageName"));
+if("".equals(subPageName)){
+	subPageName = salesTargetForm.getSubPageName();
+}
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <script type="text/javascript">
@@ -118,6 +123,7 @@ function loadSalesrepCodeList(){
 	var cboDistrict = document.getElementsByName('bean.salesrepCode')[0];
 	var param  ="custCatNo=" + document.getElementsByName('bean.custCatNo')[0].value;
 	    param +="&salesChannelNo=" + document.getElementsByName('bean.salesChannelNo')[0].value;
+	    param +="&salesZone=" + document.getElementsByName('bean.salesZone')[0].value;
 	$(function(){
 		var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/genSalesrepCodeListAjax.jsp",
@@ -199,8 +205,8 @@ function exportToExcel(path){
 					 </html:select>
 					 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				         ประเภทขาย 
-				     <html:select property="bean.custCatNo" styleId="custCatNo" onchange="loadSalesrepCodeList()">
-						<html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
+				     <html:select property="bean.custCatNo" styleId="custCatNo" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+						<html:options collection="CUSTOMER_CATEGORY_LIST" property="custCatNo" labelProperty="custCatDesc"/>
 				    </html:select>
 				    &nbsp;&nbsp;&nbsp;&nbsp;
 				       พนักงานขาย 
@@ -216,10 +222,11 @@ function exportToExcel(path){
 				   <html:text property="bean.brand" styleId="brand" size="20" styleClass="\" autoComplete=\"off" />
 				    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','Brand')"/>   
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				    รหัสร้านค้า
-				    <html:text property="bean.customerCode" styleId="customerCode" size="20" styleClass="\" autoComplete=\"off" />
-				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','Customer')"/>   
-				  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					   รหัสร้านค้า
+					    <html:text property="bean.customerCode" styleId="customerCode" size="20" styleClass="\" autoComplete=\"off" />
+					     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','Customer')"/>   
+					  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				  
 				   สถานะ &nbsp;
 				   <html:select property="bean.status" styleId="status" >
 						<html:options collection="STATUS_LIST" property="status" labelProperty="status"/>

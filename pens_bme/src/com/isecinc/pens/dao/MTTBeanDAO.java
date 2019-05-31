@@ -875,31 +875,4 @@ public class MTTBeanDAO{
 			}
 		}
 
-		public static void deleteModel(Connection conn,MTTBean o) throws Exception{
-			PreparedStatement ps = null;
-			logger.debug("Update");
-			int  c = 1;
-			try{
-				StringBuffer sql = new StringBuffer("");
-				sql.append(" DELETE FROM PENSBI.PENSBME_PICK_BARCODE_ITEM  \n");
-				sql.append(" WHERE  \n" );
-				sql.append(" DOC_NO =? \n" );
-
-				ps = conn.prepareStatement(sql.toString());
-
-				ps.setString(c++, o.getDocNo());
-				
-				ps.executeUpdate();
-				
-			}catch(Exception e){
-				throw e;
-			}finally{
-				if(ps != null){
-					ps.close();ps=null;
-				}
-			}
-		}
-		
-		
-
 }

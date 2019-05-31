@@ -7,20 +7,27 @@
 <%
 String salesChannelNo = (String)request.getParameter("salesChannelNo");
 String custCatNo = (String)request.getParameter("custCatNo");
-//System.out.println("custCatNo:"+custCatNo);
-List<PopupBean> dataList= null;
+String salesZone = (String)request.getParameter("salesZone");
+System.out.println("salesChannelNo:"+salesChannelNo);
+System.out.println("custCatNo:"+custCatNo);
+System.out.println("salesZone:"+salesZone);
+List<PopupBean> dataList= null; 
 try{
-	if( !Utils.isNull(custCatNo).equals("")){
-		dataList = SalesTargetUtils.searchSalesrepListByCustCatNo(salesChannelNo,custCatNo);
+	if( !Utils.isNull(custCatNo).equals("") || !Utils.isNull(salesZone).equals("")){
+		dataList = SalesTargetUtils.searchSalesrepListByCustCatNo(salesChannelNo,custCatNo,salesZone);
+		
+		System.out.println("dataList:"+dataList.size());
 	}
 }catch(Exception e){ 
 	e.printStackTrace();
 }finally{
 }
-if(dataList != null && dataList.size()>1){
+if(dataList != null && dataList.size()>0){
 %>
+ <option value=""></option>
+   <%for(PopupBean u : dataList){ %>
+     <option value="<%=u.getSalesrepCode()%>"><%=u.getSalesrepCode()%></option>
+   <%}%>
+<%}else{%>
 <option value=""></option>
-<%} %>
-<%for(PopupBean u : dataList){ %>
-<option value="<%=u.getSalesrepCode()%>"><%=u.getSalesrepCode()%></option>
 <%}%>

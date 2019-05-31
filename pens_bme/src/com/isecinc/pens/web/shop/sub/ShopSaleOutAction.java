@@ -203,7 +203,7 @@ public class ShopSaleOutAction {
 			sql.append("\n ,NVL(SUM(D.TOTAL_AMOUNT)/1.07,0)  AS TOTAL_AMOUNT_EX_VAT ");
 			sql.append("\n FROM XXPENS_OM_SHOP_ORDER_MST M,XXPENS_OM_SHOP_ORDER_DT D ");
 			sql.append("\n ,(" );
-			sql.append("\n   SELECT I.inventory_item_id as product_id");
+			sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
 			sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");

@@ -71,6 +71,10 @@ public class ShopBillDetailAction {
 			    allRec = false;
 				List<ShopBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,getTotalRec);
 				aForm.setResults(items);
+				if(aForm.getCurrPage()==aForm.getTotalPage()){
+					//search summary
+					aForm.setSummary(searchSummary(conn, aForm.getBean()));
+				}
 				
 				if(items.size() <=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
@@ -96,6 +100,10 @@ public class ShopBillDetailAction {
 				List<ShopBean> items = searchHeadList(conn,aForm.getBean(),allRec,currPage,pageSize,getTotalRec);
 				aForm.setResults(items);
 				
+				if(aForm.getCurrPage()==aForm.getTotalPage()){
+					//search summary
+					aForm.setSummary(searchSummary(conn, aForm.getBean()));
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -289,6 +297,130 @@ public class ShopBillDetailAction {
 		return items;
 	}
  
+ public static ShopBean searchSummary(Connection conn,ShopBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		ShopBean h = null;
+		Date dateTemp = null;
+		String dateStr ="";
+		boolean newVersion = false;
+		try {
+			//Date > 201904 = newVersion
+			Date dateCheck = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			int YYYYMM = Utils.convertStrToInt(Utils.stringValue(dateCheck, Utils.YYYYMM));
+			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
+			logger.debug("YYYYMM:"+YYYYMM);
+			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
+			if(YYYYMM >= YYYYNN_DATECUT_OFF){
+				newVersion = true;
+			}
+			sql.append("\n SELECT NVl(SUM(M.QTY),0) as QTY FROM(");
+			sql.append("\n SELECT AA.*");
+			sql.append("\n ,(AA.retail_sell_amt-AA.discount_amt) as sell_af_disc");
+			sql.append("\n ,(AA.retail_sell_amt-AA.discount_amt-AA.whole_sell_amt) as wacoal_amt");
+			sql.append("\n ,((AA.retail_sell_amt-AA.discount_amt) *6/100) as pens_amt");
+			sql.append("\n FROM(");
+			sql.append("\n   SELECT ");
+			sql.append("\n   P.promo_name,P.sub_promo_name,P.start_date,P.end_date");
+			sql.append("\n   ,P.start_promo_qty,P.end_promo_qty,P.discount_percent");
+			sql.append("\n   ,A.MATERIAL_MASTER,A.pens_item");
+			sql.append("\n   ,(A.price*A.qty) as retail_sell_amt");
+			sql.append("\n   ,(");
+			sql.append("\n     SELECT M.LIST_PRICE_PER_UNIT *A.qty");
+			sql.append("\n     FROM APPS.XXPENS_OM_ITEM_MST_V M");
+			sql.append("\n     where A.inventory_item_id = M.inventory_item_id");
+			sql.append("\n   ) as whole_sell_amt");
+			sql.append("\n   ,A.qty");
+			sql.append("\n   ,( ((P.discount_percent/100)*a.price) * A.qty) discount_amt");
+			sql.append("\n   FROM(");
+			sql.append("\n     SELECT ");
+			sql.append("\n      H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n     ,MP.pens_item,MP.inventory_item_id");
+			sql.append("\n     ,D.price");
+			if(newVersion){
+			   sql.append("\n      ,D.list_line_id");
+			}else{
+			   sql.append("\n      ,nvl(D.discount_percent ,0) as discount_percent ");
+			}
+			sql.append("\n     ,sum(ordered_quantity) as qty");
+			sql.append("\n     FROM APPS.XXPENS_OM_SHOP_ORDER_MST H");
+			sql.append("\n     ,APPS.XXPENS_OM_SHOP_ORDER_DT D");
+			sql.append("\n     ,(  ");
+			sql.append("\n       SELECT I.inventory_item_id ,MP.pens_desc2 as group_code");
+			sql.append("\n      ,MP.PENS_VALUE as PENS_ITEM,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
+			sql.append("\n      ,MP.INTERFACE_DESC as BARCODE ");
+			sql.append("\n      FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+			sql.append("\n      where MP.reference_code ='7CItem' ");
+			sql.append("\n      AND MP.pens_value =I.segment1");
+			sql.append("\n     ) MP");
+			sql.append("\n     where H.order_number = D.order_number");
+			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
+			
+			if( !Utils.isNull(o.getGroupCode()).equals("")){
+				sql.append("\n    AND MP.MATERIAL_MASTER LIKE '"+Utils.isNull(o.getGroupCode())+"%'");
+			}
+			if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("") ){
+				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE >= to_date('"+dateStr+"','dd/mm/yyyy')");
+				
+				dateTemp = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE <= to_date('"+dateStr+"','dd/mm/yyyy')");
+				
+			}else if( !Utils.isNull(o.getStartDate()).equals("") && Utils.isNull(o.getEndDate()).equals("") ){
+				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
+			}
+			sql.append("\n     group by H.order_date,MP.MATERIAL_MASTER");
+			sql.append("\n     ,MP.pens_item,MP.inventory_item_id ,D.price ");
+			if(newVersion){
+				sql.append("\n        ,D.list_line_id");
+			}else{
+				sql.append("\n        ,nvl(D.discount_percent ,0) ");
+			}
+			sql.append("\n  )A");
+			sql.append("\n  LEFT OUTER JOIN");
+			sql.append("\n  (");
+			sql.append("\n     SELECT M.start_date,M.end_date");
+			sql.append("\n     ,M.promo_name,D.sub_promo_name");
+			sql.append("\n     ,D.start_promo_qty ,D.end_promo_qty,D.DISCOUNT_PERCENT");
+			sql.append("\n     ,D.modifier_line_id");
+			sql.append("\n     from PENSBI.M_C4_MST M,PENSBI.M_C4_DT D ");
+			sql.append("\n     where M.promo_id = D.promo_id");
+			sql.append("\n  )P");
+			sql.append("\n  ON 1=1");
+			if(!newVersion){
+			   sql.append("\n and A.order_date between P.start_date and P.end_date");
+			  // OLD CODE 
+			  sql.append("\n  and A.discount_percent = P.discount_percent ");
+			}else{
+			  //NEW CODE WIT EDIT:18/04/2019
+			  sql.append("\n  and A.list_line_id = P.modifier_line_id ");
+			}
+			sql.append("\n )AA");
+			sql.append("\n WHERE AA.retail_sell_amt > 0 ");
+			sql.append("\n )M");
+       
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			if(rst.next()) {
+			   h = new ShopBean();
+			   h.setQty(Utils.decimalFormat(rst.getInt("QTY"),Utils.format_current_no_disgit));
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return h;
+	}
+ 
  public static StringBuffer genWheresearchList(ShopBean o){
 	 StringBuffer sql = new StringBuffer();
 	 if( !Utils.isNull(o.getPromoName()).equals("")){
@@ -364,29 +496,23 @@ public class ShopBillDetailAction {
 					h.append("</tr>");
 				}
 				/** Summary **/
-				//ShopBean s = (ShopBean)request.getSession().getAttribute("summary");
-				//h.append("<tr> \n");
-				 
-				 /* if("PensItem".equalsIgnoreCase(form.getSummaryType())){
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }else{
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;</td> \n");
-					  h.append("<td>&nbsp;<b>รวม</b></td> \n");
-				  }
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleInQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleReturnQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getSaleOutQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getAdjustQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getStockShortQty()+bEnd+"</td> \n");
-				  h.append("<td class='num_currency_bold'>"+bStart+s.getOnhandQty()+bEnd+"</td> \n");
-				  h.append("<td></td> \n");
-				  h.append("<td class='currency_bold'>"+bStart+s.getOnhandAmt()+bEnd+"</td> \n");
-				h.append("</tr>");*/
-				
+				ShopBean s = form.getSummary();
+				h.append("<tr> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'></td> \n");
+				  h.append("<td class='text'><b>รวม</b></td> \n");
+				  h.append("<td class='num_currency'>"+s.getQty()+"</td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				  h.append("<td class='currency'></td> \n");
+				h.append("</tr>");
 				h.append("</table> \n");
 			}
 		}catch(Exception e){

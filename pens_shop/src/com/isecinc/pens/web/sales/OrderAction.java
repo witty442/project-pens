@@ -1623,9 +1623,11 @@ public class OrderAction extends I_Action {
 			//case AddressDesc >200
 			if(addressDesc.length()>=fixNewLineLen){
 				String temp = addressDesc.substring(fixNewLineLen-1,fixNewLineLen);
+				logger.debug("address:"+temp);
 				if("".equals(temp)){
 				   custAddressArr1 = addressDesc.substring(0,fixNewLineLen);
 				   custAddressArr2 = addressDesc.substring(fixNewLineLen+1,addressDesc.length());
+				   
 				}else{
 					//find blank position < fixNewLineLen
 					String addressTemp = addressDesc.substring(0,fixNewLineLen);

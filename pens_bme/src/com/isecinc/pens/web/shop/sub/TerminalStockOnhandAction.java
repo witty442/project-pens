@@ -221,7 +221,7 @@ public class TerminalStockOnhandAction {
 					sql.append("\n L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
 					sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 					sql.append("\n ,(" );
-					sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
+					sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
@@ -312,7 +312,7 @@ public class TerminalStockOnhandAction {
 					sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
 					sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 					sql.append("\n ,(" );
-					sql.append("\n   SELECT I.inventory_item_id as product_id");
+					sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
 					sql.append("\n   ,MP.pens_desc2 as group_code ");
 					sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
@@ -423,7 +423,7 @@ public class TerminalStockOnhandAction {
 	        sql.append("\n ,NVL(SUM(L.QTY),0) AS TRANS_IN_QTY ");
 	        sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 			sql.append("\n ,(" );
-			sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
+			sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
@@ -526,7 +526,7 @@ public class TerminalStockOnhandAction {
 				sql.append("\n ,NVL(SUM(D.ORDERED_QUANTITY),0) as SALE_OUT_QTY");
 				sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 				sql.append("\n ,(" );
-				sql.append("\n   SELECT I.inventory_item_id as product_id");
+				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
 				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");

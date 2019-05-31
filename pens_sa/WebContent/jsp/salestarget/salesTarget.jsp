@@ -291,7 +291,7 @@ function updateStatusManual(path,status){
 									<th>ชื่อสินค้า</th>
 									<th>ยอดขาย-คืน(เฉลี่ย 12 เดือน)</th>
 									<th>ยอดขาย-คืน(เฉลี่ย 3 เดือน)</th>
-									<th>ราคา Last Price</th>
+									<th>ราคา List Price</th>
 									<th>เป้าหมาย ขาย(หีบ)</th>
 									<th>เป้าหมาย ขาย(บาท)</th>	
 									<th>สถานะ</th>	

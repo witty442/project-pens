@@ -229,7 +229,7 @@ public class ShopAction extends I_Action {
 					 if("DETAIL".equalsIgnoreCase(aForm.getBean().getReportType())){
 						 htmlTable = ShopBillDetailAction.exportToExcel(request,aForm,user);	
 					 }else  if("SUMMARY".equalsIgnoreCase(aForm.getBean().getReportType())){
-						 htmlTable = ShopBillSummaryAction.exportToExcel(request,aForm,user);	
+						// htmlTable = ShopBillSummaryAction.exportToExcel(request,aForm,user);	
 					 }
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");

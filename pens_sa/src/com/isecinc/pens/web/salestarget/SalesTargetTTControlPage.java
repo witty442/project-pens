@@ -78,7 +78,7 @@ public class SalesTargetTTControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 			
 			//SALES_CHANNEL_LIST
@@ -120,7 +120,7 @@ public class SalesTargetTTControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 			
 		}catch(Exception e){
@@ -154,7 +154,7 @@ public class SalesTargetTTControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn, ""));
+			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn));
 			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
 			
 			//SALES_CHANNEL_LIST
@@ -298,7 +298,10 @@ public class SalesTargetTTControlPage {
 			
 			SalesTargetBean chkBean =SalesTargetTTDAO.searchSalesTargetTT(conn, sales, false, user, pageName);
 			//check status
-			if( chkBean != null && Utils.isNull(chkBean.getStatus()).equals(SalesTargetConstants.STATUS_POST)){
+			if( chkBean != null 
+				&& ( Utils.isNull(chkBean.getStatus()).equals(SalesTargetConstants.STATUS_POST)
+					|| Utils.isNull(chkBean.getStatus()).equals(SalesTargetConstants.STATUS_UN_ACCEPT)) 
+					) {
 			  sales.setCanSet(true);
 			  sales.setCanAccept(true);
 			}
@@ -317,7 +320,7 @@ public class SalesTargetTTControlPage {
 			   dataMap = dataList.get(1);
 			}
 			//Get SalesList
-			List<SalesTargetBean> salesrepList = SalesTargetTTDAO.searchSalesrepList(conn, sales, user,rowMap);
+			List<SalesTargetBean> salesrepList = SalesTargetTTDAO.searchSalesrepListByTTSUPER(conn, sales, user,rowMap);
 				
 			request.getSession().setAttribute("productMKTList", productMKTList);
 			request.getSession().setAttribute("salesrepList", salesrepList);
@@ -387,7 +390,7 @@ public class SalesTargetTTControlPage {
 			   dataMap = dataList.get(1);
 			}
 			//Get SalesList
-			List<SalesTargetBean> salesrepList = SalesTargetTTDAO.searchSalesrepList(conn, sales, user,rowMap);
+			List<SalesTargetBean> salesrepList = SalesTargetTTDAO.searchSalesrepListByTTMGR(conn, sales, user,rowMap);
 				
 			request.getSession().setAttribute("productMKTList", productMKTList);
 			request.getSession().setAttribute("salesrepList", salesrepList);
@@ -454,20 +457,20 @@ public class SalesTargetTTControlPage {
 			//add Blank Row
 			dataList = new ArrayList<PopupBean>();
 			item = new PopupBean();
-			item.setSalesChannelNo("");
-			item.setSalesChannelDesc("");
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
 			dataList.add(item);
 			
 			List<PopupBean> custCatList_s = SalesTargetTTUtils.searchCustCatNoTTListModel(conn,user, "");
 			dataList.addAll(custCatList_s);
-			request.getSession().setAttribute("CUST_CAT_LIST",dataList);
+			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",dataList);
 		
 			//SALESREP_LIST
 			//add Blank Row
 			dataList = new ArrayList<PopupBean>();
 			item = new PopupBean();
-			item.setSalesChannelNo("");
-			item.setSalesChannelDesc("");
+			item.setSalesrepCode("");
+			item.setSalesrepId("");
 			dataList.add(item);
 			
 			List<PopupBean> salesrepList_s = SalesTargetTTUtils.searchSalesrepTTListAll(conn,user);

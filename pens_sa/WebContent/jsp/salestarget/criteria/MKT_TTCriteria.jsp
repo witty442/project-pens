@@ -73,8 +73,8 @@ function disableF5(e) {
 $(document).unbind("keydown", disableF5);
 
 function copyMonthToMonth(path){
-	var url = path +"/jsp/salestarget/criteria/copyMonthToMonthPopup.jsp";
-	PopupCenter(url,"Copy Month To Month",500,300);
+	//var url = path +"/jsp/salestarget/criteria/copyMonthToMonthTTPopup.jsp";
+	//PopupCenter(url,"Copy Month To Month",500,300);
 }
 function clearForm(path){
 	var form = document.salesTargetForm;

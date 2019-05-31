@@ -17,6 +17,7 @@ import util.DateToolsUtil;
 
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentNewReportProcess;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReportProcess;
@@ -99,6 +100,38 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		setFileType(reportForm.getCriteria().getFileType());
 		setFileName("invoice_payment_new_report");  
 
+		logger.debug("curCashCnt:"+parameterMap.get("curCashCnt"));
+		logger.debug("curCreditCardCnt:"+parameterMap.get("curCreditCardCnt"));
+		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
+		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
+		
+		logger.debug("cashCntBefore:"+parameterMap.get("cashCntBefore"));
+		logger.debug("creditCardCntBefore:"+parameterMap.get("creditCardCntBefore"));
+		logger.debug("aliCntBefore:"+parameterMap.get("aliCntBefore"));
+		logger.debug("weCntBefore:"+parameterMap.get("weCntBefore"));
+       
+		double p_sum_all_cnt = (Integer)parameterMap.get("curCashCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("curCreditCardCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("curAliCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("curWeCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("cashCntBefore");
+		      p_sum_all_cnt += (Integer)parameterMap.get("creditCardCntBefore");
+		      p_sum_all_cnt += (Integer)parameterMap.get("aliCntBefore");
+		      p_sum_all_cnt += (Integer)parameterMap.get("weCntBefore");
+		
+
+      double p_sum_all_amt = (Double)parameterMap.get("curCashAmt");
+		      p_sum_all_amt += (Double)parameterMap.get("curCreditCardAmt");
+		      p_sum_all_amt += (Double)parameterMap.get("curAliAmt");
+		      p_sum_all_amt += (Double)parameterMap.get("curWeAmt");
+		      
+		      p_sum_all_amt += (Double)parameterMap.get("cashAmtBefore");
+		      p_sum_all_amt += (Double)parameterMap.get("creditCardAmtBefore");
+		      p_sum_all_amt += (Double)parameterMap.get("aliAmtBefore");
+		      p_sum_all_amt += (Double)parameterMap.get("weAmtBefore");
+		      
+		parameterMap.put("p_sum_all_cnt",p_sum_all_cnt);
+		parameterMap.put("p_sum_all_amt",p_sum_all_amt);
 		return lstReport;
 	}
 
