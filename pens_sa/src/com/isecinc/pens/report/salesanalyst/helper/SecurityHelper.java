@@ -35,6 +35,7 @@ public class SecurityHelper {
 		COLUMN_KEY_MAP.put("Sales_Channel", "ภาคตามพนักงานขาย"); //ภาคตามพนักงานขาย Area
 		COLUMN_KEY_MAP.put("Customer_Category","ประเภทขาย");//SaleType
 		COLUMN_KEY_MAP.put("Salesrep_id", "พนักงานขาย");	//SalesMan
+		COLUMN_KEY_MAP.put("SALES_ZONE", "ภาคตามสายดูแล");	//SalesZone
 		
 		
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Brand", "Brand_no");//Brand
@@ -89,7 +90,7 @@ public class SecurityHelper {
 			html +="<table border='0' align='left' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
-			String roles[] = new String[5];
+			String roles[] = new String[6];
 			int i=0;
 			while(rs.next()){
 				 roleColumnAccess = rs.getString("role_column_access");
@@ -370,7 +371,7 @@ public class SecurityHelper {
 			sql1 += " and a.user_name = '"+user.getUserName()+"'";
 			sql1 += " and rc.role_column_access = '"+condType+"'";
 			
-			//logger.debug("sql:"+sql1);
+			logger.debug("sql:"+sql1);
 			
 			ps = conn.prepareStatement(sql1);
 			rs = ps.executeQuery();	
@@ -399,6 +400,10 @@ public class SecurityHelper {
 				  sql = condValue;
 				}
 			}else if("Brand".equalsIgnoreCase(condType)){
+				if( !Utils.isNull(condValue).equals("")){
+				  sql = condValue;
+				}
+			}else if("SALES_ZONE".equalsIgnoreCase(condType)){
 				if( !Utils.isNull(condValue).equals("")){
 				  sql = condValue;
 				}

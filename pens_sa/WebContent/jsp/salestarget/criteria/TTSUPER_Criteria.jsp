@@ -4,7 +4,7 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 <%
@@ -50,17 +50,6 @@ function search(path){
 		alert("กรุณากรอก เดือน");
 		return false;
 	 } 
-	/*  if( $('#brand').val()==""){
-		alert("กรุณากรอก แบรนด์");
-		$('#brand').focus();
-		return false;
-	 }  */
-	/* 
-	 if( $('#custCatNo').val()==""){
-		 $('#custCatNo').focus();
-		alert("กรุณากรอก ประเภทขาย");
-		return false;
-	 }  */
 	form.action = path + "/jsp/salesTargetAction.do?do=searchHead&action=newsearch";
 	form.submit();
 	return true;
@@ -77,6 +66,8 @@ function openEdit(path,salesZone,brand,custCatNo,mode){
 }
 
 function rejectRow(path,salesZone,brand,custCatNo,period,rowId){
+	var div_msg = document.getElementById("div_msg");
+	
 	var rejectReason = document.getElementsByName("rejectReason")[rowId-1];
 	var status = document.getElementsByName("status")[rowId-1];
 	var period = document.getElementsByName("bean.period")[0].value;
@@ -88,6 +79,7 @@ function rejectRow(path,salesZone,brand,custCatNo,period,rowId){
 	var reasonPrompt = prompt("ระบุเหตุผลในการยกเลิก", "");
 	//alert(reasonPrompt);
 	if(reasonPrompt != null){
+	
 		rejectReason.value = reasonPrompt;
 		param +="&rejectReason="+reasonPrompt;
 		var getData = $.ajax({
@@ -103,6 +95,7 @@ function rejectRow(path,salesZone,brand,custCatNo,period,rowId){
 		status.value ="Reject";
 		//set hide action reject
 		document.getElementById("span_reject_action_"+rowId).innerHTML = "";
+		div_msg.style.display = 'block'; 
 	}
 }
 
@@ -146,12 +139,56 @@ function setPeriodDate(periodDesc){
 	form.startDate.value = periodDesc.value.split("|")[1];
 	form.endDate.value = periodDesc.value.split("|")[2]; 
 }
-
+function copyFromLastMonthByTTSUPER(path,e){
+	var form = document.salesTargetForm;
+	var pageName = document.getElementsByName("pageName")[0].value;
+	if( $('#periodDesc').val()==""){
+		alert("กรุณากรอก เดือน");
+		return false;
+	 } 
+	
+	if(confirm('ยืนยัน Copy From Last Month ทุกแบรนด์')){
+	  //To disable f5
+	  $(document).bind("keydown", disableF5);
+	
+	  /**Control Save Lock Screen **/
+	  startControlSaveLockScreen();
+	  
+	  form.action = path + "/jsp/salesTargetAction.do?do=copyFromLastMonth&action=new&pageName="+pageName;
+	  form.submit();
+	  return true;
+	}
+	return false;
+}
+function copyRowByBrand(path,salesZone,brand,custCatNo,period,rowId){
+	var form = document.salesTargetForm;
+	var pageName = document.getElementsByName("pageName")[0].value;
+	
+	var div_msg = document.getElementById("div_msg");
+	var period = document.getElementsByName("bean.period")[0].value;
+	var startDate = document.getElementsByName("bean.startDate")[0].value;
+	var returnString = "";
+	var param = "&custCatNo="+custCatNo+"&salesZone="+salesZone+"&brand="+brand;
+	    param += "&period="+period+"&startDate="+startDate
+	
+	if(confirm("ยืนยัน Copy แบรนด์นี้ จากเป้าเดือนที่แล้ว")){
+		  /**Control Save Lock Screen **/
+		  startControlSaveLockScreen();
+		  
+		  form.action = path + "/jsp/salesTargetAction.do?do=copyBrandFromLastMonth&action=new&pageName="+pageName+param;
+		  form.submit();
+	}
+}
 </script>
-<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+
  <!-- Progress Bar -->
- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
- <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+  <div id="div_msg" style="display:none">
+   <b><font size="2" color="red">บันทึกข้อมูลเรียบร้อยแล้ว</font></b>
+ </div>
+ 
+  <!-- Progress Bar -->
+<%--  <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+  <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
     <tr>
 		<td align="center" width ="100%">
 		   <div style="height:50px;align:center">
@@ -163,9 +200,7 @@ function setPeriodDate(periodDesc){
 		 </td>
    </tr>
   </table>   	      
-</div>
- <!-- Progress Bar -->
- 
+</div> --%> 
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
 	       <tr>
                 <td> เดือน <font color="red">*</font></td>
@@ -214,7 +249,18 @@ function setPeriodDate(periodDesc){
 					</a>
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
-					</a>		
+					</a>	
+					&nbsp;&nbsp;	
+					<!-- Copy From Last Month -->
+					 <a href="javascript:copyFromLastMonthByTTSUPER('${pageContext.request.contextPath}',event)">
+					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
+					</a> 
+		
+					<%if(UserUtils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
+					<%-- 	<a href="javascript:copyMonthToMonthyTTSUPER('${pageContext.request.contextPath}')">
+						  <input type="button" value="Copy  Month To Month" class="newPosBtnLong">
+						</a> 	 --%>	
+					<%} %>		
 				</td>
 			</tr>
 		</table>

@@ -15,6 +15,7 @@ import org.apache.tomcat.util.buf.C2BConverter;
 
 import util.DBConnection;
 import util.DateToolsUtil;
+import util.SQLHelper;
 import util.UserUtils;
 import util.Utils;
 
@@ -347,23 +348,24 @@ public class SalesTargetUtils {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n  SELECT M.INVENTORY_ITEM_ID ,M.INVENTORY_ITEM_CODE ,M.INVENTORY_ITEM_DESC" );
+			sql.append("\n  SELECT M.INVENTORY_ITEM_ID ,M.SEGMENT1 as INVENTORY_ITEM_CODE ,M.DESCRIPTION as INVENTORY_ITEM_DESC" );
 			
-			/** old **/
-			/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " +
-					"where P.product_id =M.INVENTORY_ITEM_ID " +
-					"and P.primary_uom_code ='Y' " +
-					"and P.pricelist_id ="+priceListId+") as price");*/
+			/** ORDER_BME**/
+			/*
+				sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " +
+						"where P.product_id =M.INVENTORY_ITEM_ID " +
+						"and P.primary_uom_code ='Y' " +
+						"and P.pricelist_id ="+priceListId+") as price");*/
 			
-			sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " +
-					"where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " +
-					"and P.list_header_id ="+priceListId+") as price");
+			sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n  where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " );
+			sql.append("\n  and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price");
 			
 		//	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,12)) as amt_12 ");
 	    //	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,3)) as amt_3 ");
 			sql.append("\n  ,P.SUM3 as amt_3  ");
 			sql.append("\n  ,P.SUM12 as amt_12  ");
-			sql.append("\n  from XXPENS_BI_MST_ITEM M  ");
+			sql.append("\n  from xxpens_om_item_mst_v M  ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
 			sql.append("\n   SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
 			sql.append("\n   WHERE PERIOD ='"+period+"'");
@@ -371,14 +373,14 @@ public class SalesTargetUtils {
 			sql.append("\n   AND SALESREP_ID ='"+salesrepId+"'");
 			sql.append("\n   AND CUSTOMER_ID ='"+customerId+"'");
 			sql.append("\n  ) P ON M.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
-			sql.append("\n  where M.INVENTORY_ITEM_CODE ='"+itemCode+"' ");
+			sql.append("\n  where M.SEGMENT1 ='"+itemCode+"' ");
 			// 504 ,821 ,833 No check dup in page
 			if( !brand.equalsIgnoreCase("504") 
 			   && !brand.equalsIgnoreCase("821") 
 			   && !brand.equalsIgnoreCase("833")
 			   && !brand.equalsIgnoreCase("505")
 			   ){
-			   sql.append("\n  AND M.INVENTORY_ITEM_CODE LIKE '"+brand+"%' ");
+			   sql.append("\n  AND M.SEGMENT1 LIKE '"+brand+"%' ");
 			}
 			
 			logger.debug("sql:"+sql);
@@ -596,10 +598,10 @@ public class SalesTargetUtils {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n  SELECT PRICE_LIST_ID from XXPENS_BI_MST_CUST_CAT_MAP M  ");
+			sql.append("\n  SELECT PRICE_LIST_ID from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP M  ");
 			sql.append("\n  where  SALES_CHANNEL_NO ='"+salesChannelNo+"'");
 			sql.append("\n  and  CUST_CAT_NO ='"+custCatNo+"' \n");
-			//logger.debug("sql:"+sql);
+			logger.debug("sql:"+sql);
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());

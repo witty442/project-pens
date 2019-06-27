@@ -105,6 +105,9 @@ function save(path){
 	sumTotalByAllCol(validTotalCol,showMsg);
 	
 	if(validateTotalCanSave()){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		form.action = path + "/jsp/salesTargetAction.do?do=save";
 		form.submit();
 		return true;
@@ -120,6 +123,9 @@ function salesAcceptToSalesManager(path){
 	
 	if(validateTotalCanAccept()){
 		if(confirm("ยืนยันรับเป้าแบรนด์รายเซลล์")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 			var form = document.salesTargetForm;
 			form.action = path + "/jsp/salesTargetAction.do?do=salesAcceptToSalesManager";
 			form.submit();
@@ -948,3 +954,6 @@ function sumTotalByCurCol(obj,curCol){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

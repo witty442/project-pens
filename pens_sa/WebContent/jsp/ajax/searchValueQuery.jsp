@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.report.salesanalyst.SAGenrateCondPopup"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.DisplayBean"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
@@ -21,7 +22,7 @@ try{
 	
 	if(condCode != null && !condCode.equals("")){
 		condCode = new String(condCode.getBytes("ISO8859_1"), "UTF-8");
-		lstData = SAInitial.getInstance().getConditionValueList(request,condType, condCode, "");
+		lstData = SAGenrateCondPopup.getConditionValueList(request,condType, condCode, "");
 		if(lstData != null && lstData.size() > 0){
 	if(isMultiCode){
 		for(int i = 0; i < lstData.size() ; i++){

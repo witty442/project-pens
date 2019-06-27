@@ -25,6 +25,7 @@ public class Order implements Serializable{
 	private String custGroup;
 	private String groupCode;
 	private String groupCodeDesc;
+	private String groupProductType;
 	private String item;
 	private String itemDesc;
 	private String itemDisp;
@@ -63,6 +64,13 @@ public class Order implements Serializable{
 	private String pensItemTo;
 	
 
+	
+	public String getGroupProductType() {
+		return groupProductType;
+	}
+	public void setGroupProductType(String groupProductType) {
+		this.groupProductType = groupProductType;
+	}
 	public String getPensItemFrom() {
 		return pensItemFrom;
 	}

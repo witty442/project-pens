@@ -1528,7 +1528,7 @@ public class SAInitial {
 					}
 	            }else if("SUBBRAND".equalsIgnoreCase(condType)){
 					
-	                sql = "select distinct subbrand_no,subbrand_desc  from XXPENS_BI_MST_SUBBRANDwhere subbrand_no is not null \n";
+	                sql = "select distinct subbrand_no,subbrand_desc  from XXPENS_BI_MST_SUBBRAND where subbrand_no is not null \n";
 					
 					if(!Utils.isNull(code).equals("")){
 						if(code.indexOf(",") > -1){

@@ -1521,6 +1521,7 @@ public class OrderAction extends I_Action {
 		Order order = null;
 		List<OrderLine> lines = null;
 		String fileName = "tax_invoice_summary_report";
+		String productNameShort = "";
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			
@@ -1675,7 +1676,10 @@ public class OrderAction extends I_Action {
 				}else{
 				  taxInvoice.setProductCode(no+")"+line.getProduct().getCode());	
 				}
-				taxInvoice.setProductName(line.getProduct().getName());
+				//show product 10 letter
+				productNameShort = Utils.isNull(line.getProduct().getName());
+				productNameShort = productNameShort.length()>10?productNameShort.substring(0,10):productNameShort;
+				taxInvoice.setProductName(productNameShort);
 				taxInvoice.setUomId(line.getProduct().getUom().getId());
 				taxInvoice.setMainQty(new Double(line.getQty1()).intValue());
 				taxInvoice.setSubQty(new Double(line.getQty2()).intValue());

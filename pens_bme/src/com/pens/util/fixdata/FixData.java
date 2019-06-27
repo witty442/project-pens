@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.Utils;
 
 public class FixData {
@@ -46,7 +46,7 @@ public class FixData {
 			
 			while(rs.next()){
 				
-				psUpdate.setString(1, NumberToolsUtil.convertSciToDecimal(rs.getString("code")));
+				psUpdate.setString(1, NumberUtil.convertSciToDecimal(rs.getString("code")));
 				psUpdate.setString(2, Utils.isNull(rs.getString("cust_no")));
 				psUpdate.setString(3, Utils.isNull(rs.getString("reference")));
 				psUpdate.setDate(4, rs.getDate("sale_date"));

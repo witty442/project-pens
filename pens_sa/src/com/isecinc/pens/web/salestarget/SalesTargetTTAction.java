@@ -155,7 +155,7 @@ public class SalesTargetTTAction  {
 	                    String targetAmount = Utils.isNull(request.getParameter(keyTargetAmount));
 	                   // logger.debug("keyTargetQty["+keyTargetQty+"],targetQty["+targetQty+"]");
 	                    
-	                    if( !Utils.isNull(targetQty).equals("")){
+	                    //if( !Utils.isNull(targetQty).equals("")){
 	                    	logger.debug("keyTargetQty["+keyTargetQty+"],targetQty["+targetQty+"]");
 	                    	
 	                    	checkFoundInsertQty = true;
@@ -181,7 +181,7 @@ public class SalesTargetTTAction  {
 							
 		                    //add product
 							productDataSaveListBySalesrep.add(l);
-	                    }
+	                    //}
 	        		}//for 2
 	        	    
 	        	    //header
@@ -264,7 +264,7 @@ public class SalesTargetTTAction  {
 			bean.setCreateUser(user.getUserName());
 			bean.setUpdateUser(user.getUserName());
 			
-			String errorCode = SalesTargetTTCopy.copyFromLastMonth(user, bean,aForm.getPageName());
+			String errorCode = SalesTargetTTCopy.copyFromLastMonthByMKT_TT(user, bean,aForm.getPageName());
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
 				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
 			}else if(errorCode.equalsIgnoreCase("DATA_PREV_NOT_FOUND")){
@@ -277,6 +277,85 @@ public class SalesTargetTTAction  {
 			   aForm.setBean(salesReuslt);
 			   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() > 0){
 				  request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMKT(request,aForm.getBean(),user));
+			   }
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} finally {
+			try {
+				
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("search");
+	}
+	
+	public ActionForward copyFromLastMonthByTTSUPER(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("copyFromLastMonthByTTSUPER FROM XXPENS_BI_SALES_TARGET_TEMP");
+		SalesTargetForm aForm = (SalesTargetForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
+		try {
+			SalesTargetBean bean = aForm.getBean();
+			bean.setCreateUser(user.getUserName());
+			bean.setUpdateUser(user.getUserName());
+			
+			String errorCode = SalesTargetTTSUPERCopy.copyFromLastMonthByTTSUPER(user, bean,aForm.getPageName());
+			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
+				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
+			}else if(errorCode.equalsIgnoreCase("DATA_MKT_NOT_POST_FOUND")){
+				request.setAttribute("Message","ไม่พบข้อมูล Maketing Post To Sales");
+			}else if(errorCode.equalsIgnoreCase("DATA_PREV_NOT_FOUND")){
+				request.setAttribute("Message","ไม่พบข้อมูลเดือนที่แล้ว");
+			}else{
+			    request.setAttribute("Message","Copy ข้อมูลเรียบร้อยแล้ว");
+			   
+			    //Search Data
+			    SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMKT(aForm.getBean(),user,pageName);
+			    aForm.setBean(salesReuslt);
+			    if(salesReuslt.getItems() != null && salesReuslt.getItems().size() > 0){
+				   request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMKT(request,aForm.getBean(),user));
+			    }
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} finally {
+			try {
+				
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("search");
+	}
+	public ActionForward copyBrandFromLastMonthByTTSUPER(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("copyBrandFromLastMonthByTTSUPER ");
+		SalesTargetForm aForm = (SalesTargetForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
+		try {
+			SalesTargetBean paramBean = new SalesTargetBean();
+			paramBean.setPeriod(Utils.isNull(request.getParameter("period")));
+			paramBean.setStartDate(Utils.isNull(request.getParameter("startDate")));
+			paramBean.setBrand(Utils.isNull(request.getParameter("brand")));
+			paramBean.setCustCatNo(Utils.isNull(request.getParameter("custCatNo")));
+			paramBean.setSalesZone(Utils.isNull(request.getParameter("salesZone")));
+			paramBean.setCreateUser(user.getUserName());
+			paramBean.setUpdateUser(user.getUserName());
+			
+			String errorCode = SalesTargetTTSUPERCopyByBrand.copyBrandFromLastMonthByTTSUPER(user, paramBean,aForm.getPageName());
+			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
+				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
+			}else if(errorCode.equalsIgnoreCase("DATA_MKT_NOT_POST_FOUND")){
+				request.setAttribute("Message","ไม่พบข้อมูล Maketing Post To Sales");
+			}else if(errorCode.equalsIgnoreCase("DATA_PREV_NOT_FOUND")){
+				request.setAttribute("Message","ไม่พบข้อมูลเดือนที่แล้ว");
+			}else{
+			    request.setAttribute("Message","Copy ข้อมูลเรียบร้อยแล้ว");
+			    
+			   //search
+			   SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTSUPER_TT(aForm.getBean(),user,pageName);
+			   if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+				    request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTSUPER(request,aForm.getBean(),user));
 			   }
 			}
 		} catch (Exception e) {
@@ -497,6 +576,9 @@ public class SalesTargetTTAction  {
 				//loop
 				SalesTargetTTDAO.updateStatusHead_TEMPByTTMGR(conn, cri);
 				SalesTargetTTDAO.updateStatusItem_TEMPByTTMGR(conn, cri);
+				
+				//TT for MKT
+				SalesTargetTTDAO.updateStatusHead_TTByMKT(conn, cri);
 			
 			}
 			request.setAttribute("Message","ได้ทำการ อนุมัติเป้าหมายขาย เรียบร้อยแล้ว");

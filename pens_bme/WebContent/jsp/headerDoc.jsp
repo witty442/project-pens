@@ -5,11 +5,12 @@
 	<tr height="137px;">
 		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/header_left.png" border="0"/>
 		</td>
-        <td width="523px;" background="${pageContext.request.contextPath}/images2/header01Doc.png">&nbsp;
+        <td width="523px;" background="${pageContext.request.contextPath}/images2/header01MC.png">&nbsp;
             <div class="userlabel">
-        	  ${user.name} / ${user.role.name}
-        	</div>
-        	
+                <img src="${pageContext.request.contextPath}/images2/pens_logo_small.png" border="0"/>
+                <br/><br/>
+        	    ${user.name} | ${user.userGroupName}<br/>
+        	</div> 
         </td>
         <td background="${pageContext.request.contextPath}/images2/header_bg.png">&nbsp; </td>
         <td width="523px;" background="${pageContext.request.contextPath}/images2/header02Doc.png" align="right" valign="top">

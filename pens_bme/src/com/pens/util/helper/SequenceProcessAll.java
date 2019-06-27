@@ -23,7 +23,20 @@ public class SequenceProcessAll {
 	private static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 
-	
+	public static Integer getNextValue(String sequenceType) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getNextValueModel(conn, sequenceType);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		
+	}
 	public static Integer getNextValue(Connection conn,String sequenceType) throws Exception {
 		return getNextValueModel(conn, sequenceType);
 	}

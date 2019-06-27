@@ -56,13 +56,9 @@ function copyFromLastMonth(path,e){
 	 } 
 	 
 	if(confirm('ยืนยัน Copy From Last Month')){
-	  //To disable f5
-	  $(document).bind("keydown", disableF5);
-	  $(function() {
-		///$("#dialog").dialog({ height: 200,width:650,modal:true });
-		  $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '25%', width: '60%' } }); 
-	   }); 
-	  
+	   /**Control Save Lock Screen **/
+	   startControlSaveLockScreen();
+		
 	  form.action = path + "/jsp/salesTargetAction.do?do=copyFromLastMonth&action=new&pageName="+pageName;
 	  form.submit();
 	  return true;
@@ -181,7 +177,7 @@ function loadCustCatNoList(){
 </script>
 
  <!-- Progress Bar -->
- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+<%--  <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
  <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
     <tr>
 		<td align="center" width ="100%">
@@ -194,7 +190,7 @@ function loadCustCatNoList(){
 		 </td>
    </tr>
   </table>   	      
-</div>
+</div> --%>
  <!-- Progress Bar -->
  
 <table align="center" border="0" cellpadding="3" cellspacing="0" >

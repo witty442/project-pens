@@ -33,6 +33,7 @@ import com.isecinc.pens.inf.manager.process.bean.LineImportTransBean;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction2;
 import com.isecinc.pens.model.MOrder;
+import com.isecinc.pens.model.MOrderLine;
 import com.pens.utils.LoggerUtils;
 
 public class UpdateSalesProcess {
@@ -350,7 +351,10 @@ public class UpdateSalesProcess {
 		    			  if( !Utils.isNull(orderId).equals("")){
 		    				 //Update Payment Flag
 			    		     updateOrderFlag(conn,orderId, userBean);
-			    		        
+			    		       
+			    		     /** 10/06/2019 Case Oracle cancel some line  mark line to iscancel ='Y' **/
+			    		     //new MOrderLine().updateOrderLineToCancelNoUpdateFlag(conn,orderId,9999);
+			    		     
 			    		     // Re-Calculate TotalAmount,TotalAmountNonVat,vatAmount,netAmount
 			    		     try{
 				    		    Order orderUpdate =  new MOrder().reCalculateHeadAmountCaseImport(conn,orderId);

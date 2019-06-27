@@ -476,6 +476,9 @@ function removeRow(path){
 		}else{
 			//rearrangNo
 			rearrangNo();
+			
+			//resum Total 
+			sumTotalAllRow();
 		}
 	}
 	return false;

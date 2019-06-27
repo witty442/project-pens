@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
+
 import util.DBConnection;
 import util.ExcelHeader;
 import util.SQLHelper;
@@ -29,13 +31,13 @@ public class SalesTargetReport {
 		COLUMNNAME_MAP.put("INVENTORY_ITEM_CODE", "SKU");
 	}
 	
-	public static StringBuffer searchReport(SalesTargetBean o,boolean excel,String subPageName){
-		return searchReportModel(o, excel,subPageName);
+	public static StringBuffer searchReport(User user,SalesTargetBean o,boolean excel,String subPageName){
+		return searchReportModel(user ,o, excel,subPageName);
 	}
-    public static StringBuffer searchReport(SalesTargetBean o,String subPageName){
-		return searchReportModel(o, false,subPageName);
+    public static StringBuffer searchReport(User user,SalesTargetBean o,String subPageName){
+		return searchReportModel(user,o, false,subPageName);
 	}
-	public static StringBuffer searchReportModel(SalesTargetBean o,boolean excel,String subPageName){
+	public static StringBuffer searchReportModel(User user,SalesTargetBean o,boolean excel,String subPageName){
 		SalesTargetBean s = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -71,10 +73,8 @@ public class SalesTargetReport {
 			sql.append("\n    WHERE M.ID= D.ID ");
 			sql.append("\n )M ");
 			sql.append("\n WHERE 1=1 ");
-			//subPageName TT show only van and credit
-			if("TT".equalsIgnoreCase(subPageName)){
-				sql.append("\n AND M.CUSTOMER_CATEGORY IN('ORDER - VAN SALES','ORDER - CREDIT SALES') ");
-			}
+			//NOT IN TT Target
+			sql.append("\n AND M.SALES_ZONE NOT IN(0,1,2,3,4)");
 			
 			//old Code
 			//sql.append("\n  AND M.STATUS ='"+SalesTargetConstants.STATUS_FINISH+"'");

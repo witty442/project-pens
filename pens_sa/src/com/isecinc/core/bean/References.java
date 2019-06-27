@@ -65,6 +65,16 @@ public class References implements Serializable {
 
 	/** NAME */
 	private String name;
+	private String index;
+
+	
+	public String getIndex() {
+		return index;
+	}
+
+	public void setIndex(String index) {
+		this.index = index;
+	}
 
 	public String getKey() {
 		return key;

@@ -215,7 +215,7 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION");
 					/** ORDER BME (TRANS_IN)*/
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
@@ -249,7 +249,7 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND L.ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION ");
 					/** ORDER ORACLE(SALEOUT) */
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
@@ -287,7 +287,7 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND MP.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 				
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION");
 					
 					/** Return **/
 					sql.append("\n SELECT DISTINCT");

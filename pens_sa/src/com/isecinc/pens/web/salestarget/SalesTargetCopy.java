@@ -204,10 +204,18 @@ public class SalesTargetCopy {
 			sql.append("\n  null as UPDATE_DATE, ");
 			sql.append("\n  p.SUM12, ");//AMT_AVG12
 			sql.append("\n  p.SUM3, ");//AMT_AVG3
-			sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
+			
+			//old version
+			/*sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 			sql.append("\n    where P.product_id =L.INVENTORY_ITEM_ID " );
 			sql.append("\n    and P.primary_uom_code ='Y' " );
 			sql.append("\n    and P.pricelist_id ="+priceListId+") as price ");//Price
+*/			
+			//new version 06/2019
+			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
+			sql.append("\n   and P.list_header_id ="+priceListId+") as price");
+			
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
 			sql.append("\n    SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");

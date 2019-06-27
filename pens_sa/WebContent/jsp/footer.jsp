@@ -9,7 +9,7 @@
         <td background="${pageContext.request.contextPath}/images2/footer01.png">
         	Application Version
 			
-			<a href ="javascript:window.open('<%=request.getContextPath()%>/jsp/adminConsole/adminConsole.jsp','','width=800px,height=600px')" title="Configuration">
+			<a href ="javascript:PopupCenterFull('<%=request.getContextPath()%>/jsp/adminConsole/adminConsole.jsp','')" title="Configuration">
 			  <font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
 			</a>
 			  Type:[<b><%=EnvProperties.getInstance().getProperty("product.type")%></b>]

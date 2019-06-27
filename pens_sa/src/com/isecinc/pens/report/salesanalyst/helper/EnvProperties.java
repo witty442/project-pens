@@ -28,7 +28,7 @@ public final class EnvProperties extends Properties{
 	private static final int START_VAR_PATTERN_CHAR_COUNT = 2;
 	private static final int END_VAR_PATTERN_CHAR_COUNT = 1;
 	private static final Pattern pat = Pattern.compile(VAR_PATTERN);
-	private static final String propNameControl ="inf-config/control-env.txt";
+	private static final String propNameControl ="inf-config/env.txt";
 	private static  String propName = "";
     
 	private EnvProperties() throws IOException {
@@ -97,7 +97,7 @@ public final class EnvProperties extends Properties{
 			/*# -------control-env.txt Config For Load Properties UAT OR Product --------------------------#*/
 			InputStream fis = cl.getResourceAsStream(propNameControl);
 		    String productType = FileUtil.readControlEnvFile(fis);
-		    propName = "inf-config/"+productType.toLowerCase()+"-inf-env.properties";
+		    propName = "inf-config/"+productType.toLowerCase()+"-env.properties";
 		    
 			logger.info("load peroperties file name:"+propName);
 		    is = cl.getResourceAsStream(propName);

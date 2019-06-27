@@ -78,6 +78,7 @@ public class SalesTargetBean implements Serializable{
 	private boolean canUnAccept = false;
 	private boolean canExport = false;
 	private boolean canFinish = false;
+	private boolean canCopy = false;
 	//optional
 	private String period;
 	private String periodDesc;
@@ -87,6 +88,12 @@ public class SalesTargetBean implements Serializable{
 	private List<SalesTargetBean> itemsList;
 	
 	
+	public boolean isCanCopy() {
+		return canCopy;
+	}
+	public void setCanCopy(boolean canCopy) {
+		this.canCopy = canCopy;
+	}
 	public String getTotalAmountBrandBySale() {
 		return totalAmountBrandBySale;
 	}

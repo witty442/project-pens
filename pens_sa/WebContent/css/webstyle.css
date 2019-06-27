@@ -153,6 +153,16 @@ UL {
 .errorText {
 	color: red;
 }
+.errorTextBold {
+	color: red;
+	font-weight: bold;
+}
+.errorInputText {
+	background-color: red;
+	color: #ffffff;
+	border: 1px solid;
+	border-color: #BEBEBE;
+}
 .errorDisableText {
 	background-color: #DCDCDC;
 	color: red;

@@ -629,7 +629,9 @@ function clearForm(path){
 						       <tr>
 									<td align="right"  nowrap>รหัสร้านค้า<font color="red">*</font>
 									  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>
+									   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" 
+									    size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"
+									    styleClass="\" autoComplete=\"off"/>
 									    &nbsp;
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>','<%=hideAll%>')"/>
 									</td>
@@ -666,18 +668,20 @@ function clearForm(path){
 								<%} %>
 								<tr>
 									<td align="right" width="30%"  nowrap>
-									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
+									     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom" 
+									     styleClass="\" autoComplete=\"off"/>
 									     &nbsp;
 									    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from','<%=storeType %>')"/>
 									</td>
 									<td align="left" width="30%"  nowrap>
-									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
+									     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo" 
+									     styleClass="\" autoComplete=\"off"/>
 									     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to','<%=storeType %>')"/>   
 									</td>
 								</tr>
 								<tr>
 									<td align="right" width="30%"  nowrap>Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-									    <html:text property="onhandSummary.group" styleId="group" />
+									    <html:text property="onhandSummary.group" styleId="group" styleClass="\" autoComplete=\"off"/>
 									    &nbsp;
 									    <% if( "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))
 									        || "onhandLotus".equalsIgnoreCase(request.getParameter("page")) 

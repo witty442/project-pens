@@ -12,7 +12,9 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
+import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.SequenceProcess;
@@ -427,5 +429,32 @@ public class MOrderLine extends I_Model<OrderLine> {
 		sql += "  ) \r\n";
 
 		return sql;
+	}
+	
+	/** 
+	 * updateOrderLineToCancelNoUpdateFlag
+	 * @param conn
+	 * @param orderId
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 * Description update t_order_line  update_flag <> 'Y'
+	 */
+	public int updateOrderLineToCancelNoUpdateFlag(Connection conn,String orderId,int userId) throws Exception {
+		PreparedStatement ps = null;
+		try {
+			String sql = "UPDATE "+TABLE_NAME+" SET  ISCANCEL ='Y' ,update_flag ='N', \n"
+					+ "remark ='Line is cancel from oracle' ,UPDATED_BY ="+userId+" ,UPDATED = CURRENT_TIMESTAMP \n "
+					+ "WHERE order_id = "+orderId+" and ( update_flag <> 'Y'  or update_flag is null) ";
+			logger.debug("SQL:"+sql);
+			ps = conn.prepareStatement(sql);
+			return ps.executeUpdate();
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
 	}
 }

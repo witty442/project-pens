@@ -537,7 +537,66 @@ public class Utils {
 		}
 		return str.toString();
   }
-	
+	public static String excQueryApps(String sql) {
+	    PreparedStatement ps =null;
+		ResultSet rs = null;
+        Connection conn = null;
+        ResultSetMetaData rsm = null;
+        int columnCount = 0;
+        StringBuffer str = new StringBuffer("");
+		try{
+			System.out.println("sql:"+sql);   
+			conn = DBConnection.getInstance().getConnectionApps();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			rsm = rs.getMetaData();
+			columnCount = rsm.getColumnCount();
+			
+			//getColumnHeader 
+			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'>");
+			 str.append("<tr>");  
+			 for(int i=1;i<=columnCount;i++){
+				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
+				    str.append("<th>");
+	            	str.append(rsm.getColumnName(i));
+	            	str.append("</th>");
+			   }
+			 str.append("</tr>"); 
+			 
+			 //Gen Detail
+			 while(rs.next()){
+				 str.append("<tr>");  
+				 for(int i=1;i<=columnCount;i++){
+					    str.append("<td class='lineE'>");
+		            	str.append(isNull(rs.getString(rsm.getColumnName(i))));
+		            	str.append("</td>");
+				   }
+				 str.append("</tr>");  
+			 }
+			
+			str.append("</table>");
+			
+		}catch(Exception e){
+	      e.printStackTrace();
+	      str.append("ERROR: \n"+e.getMessage());
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				if(rs != null){
+				   rs.close();rs = null;
+				}
+				
+				if(conn != null){
+					conn.close();
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return str.toString();
+  }
 	
 	public static String excUpdate(String sql) {
 	    PreparedStatement ps =null;

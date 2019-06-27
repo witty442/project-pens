@@ -746,3 +746,7 @@ function escapeParameter(param){
 </Script>
 <div id="brand-dialog">No Product Catalog To Display!</div>
 <div id="selectProduct">No Product To Display!</div>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

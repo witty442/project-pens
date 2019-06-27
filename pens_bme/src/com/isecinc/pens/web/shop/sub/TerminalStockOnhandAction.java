@@ -215,7 +215,7 @@ public class TerminalStockOnhandAction {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION ");
 					/** ORDER BME (TRANS_IN)*/
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
@@ -250,7 +250,7 @@ public class TerminalStockOnhandAction {
 						sql.append("\n AND L.ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
-					sql.append("\n UNION ALL  ");
+					sql.append("\n UNION ");
 					/** Pick Stock **/
 					sql.append("\n SELECT DISTINCT I.group_code as group_type,I.PENS_ITEM,I.material_master");
 					sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
@@ -277,7 +277,7 @@ public class TerminalStockOnhandAction {
 						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
-					sql.append("\n UNION ALL  ");
+					sql.append("\n UNION ");
 					/** Pick Stock Issue **/
 					sql.append("\n SELECT DISTINCT I.group_code as group_type,I.PENS_ITEM,I.material_master");
 					sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
@@ -305,7 +305,7 @@ public class TerminalStockOnhandAction {
 						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION");
 					
 					/** ORDER ORACLE(SALEOUT) */
 					sql.append("\n SELECT DISTINCT");
@@ -345,7 +345,7 @@ public class TerminalStockOnhandAction {
 						sql.append("\n AND MP.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 				
-					sql.append("\n UNION ALL");
+					sql.append("\n UNION");
 					
 					/** Return **/
 					sql.append("\n SELECT DISTINCT");
@@ -418,6 +418,8 @@ public class TerminalStockOnhandAction {
 		   sql.append("\n LEFT OUTER JOIN(	 ");
 		   
 		   /******** TRANS_IN *****************/
+		   sql.append("\n SELECT T.group_type,T.PENS_ITEM ,T.MATERIAL_MASTER,T.BARCODE");
+	        sql.append("\n ,NVL(SUM(T.TRANS_IN_QTY),0) AS TRANS_IN_QTY FROM(");
 		    /** ORDER **/
 		    sql.append("\n SELECT L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
 	        sql.append("\n ,NVL(SUM(L.QTY),0) AS TRANS_IN_QTY ");
@@ -454,7 +456,7 @@ public class TerminalStockOnhandAction {
 			}
 			sql.append("\n  GROUP BY L.GROUP_CODE,L.ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
 			
-			sql.append("\n  UNION ");
+			sql.append("\n  UNION ALL");
 			
 			/** Pick Stock **/
 			sql.append("\n SELECT I.group_code as group_type,I.PENS_ITEM,I.material_master");
@@ -485,7 +487,7 @@ public class TerminalStockOnhandAction {
 			}
 			sql.append("\n GROUP BY  I.group_code,I.PENS_ITEM,I.material_master");
 			
-			sql.append("\n UNION ");
+			sql.append("\n UNION ALL");
 			
 			/** Pick Stock Issue **/
 			sql.append("\n SELECT I.group_code as group_type,I.PENS_ITEM,I.material_master");
@@ -514,7 +516,8 @@ public class TerminalStockOnhandAction {
 				sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 				sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 			}
-			sql.append("\n GROUP BY  I.group_code,I.PENS_ITEM,I.material_master");
+			sql.append("\n    GROUP BY  I.group_code,I.PENS_ITEM,I.material_master");
+			sql.append("\n  )T GROUP BY T.group_type,T.PENS_ITEM ,T.MATERIAL_MASTER,T.BARCODE");
 			sql.append("\n )TRANS_IN ");
 			sql.append("\n ON  M.pens_item = TRANS_IN.pens_item ");	 
 			sql.append("\n AND M.group_type = TRANS_IN.group_type ");

@@ -427,6 +427,8 @@ public class ReportEndDateLotusSQL {
 				
 				//Get Max End Date By StoreCode and asOfdate
 				maxEndDate =  getMaxEndDateByStoreCode(conn,storeCode);
+				logger.debug("calcDueDate Lotus ReportEndDate");
+				logger.debug("asOfDate:"+asOfdate);
 				logger.debug("maxEndDate:"+maxEndDate);
 				
 				if ( !"".equals(Utils.isNull(maxEndDate))){
@@ -453,7 +455,9 @@ public class ReportEndDateLotusSQL {
 			StringBuilder sql = new StringBuilder();
 			String yearMonth = "";
 			try {
-				sql.append("\n select distinct max(ending_date) as ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 and store_code ='"+storeCode+"'");
+				sql.append("\n select distinct max(ending_date) as ending_date "
+						+ "FROM PENSBME_ENDDATE_STOCK "
+						+ "WHERE 1=1 and store_code ='"+storeCode+"'");
 			
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
@@ -472,8 +476,6 @@ public class ReportEndDateLotusSQL {
 			}
 			return yearMonth;
 		}
-	 
-
 	 
 	  public static String genWhereCondDate(BMEControlBean bean ,String symnoname){
 		  String whereSQL = "";

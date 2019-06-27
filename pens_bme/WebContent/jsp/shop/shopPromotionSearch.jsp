@@ -130,9 +130,10 @@ function openAdd(path){
 								<tr>
                                     <td align="right"> เริ่มต้น</td>
 									<td>
-						               <html:text property="bean.startDate" styleId="startDate" size="15" readonly="true" />
+									s
+						               <html:text property="bean.startDate" styleId="startDate" size="15" readonly="false" styleClass="\" autoComplete=\"off"/>
 						                                          สิ้นสุด
-						                <html:text property="bean.endDate" styleId="endDate" size="15" readonly="true"/>
+						                <html:text property="bean.endDate" styleId="endDate" size="15" readonly="false" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>	
 						   </table>

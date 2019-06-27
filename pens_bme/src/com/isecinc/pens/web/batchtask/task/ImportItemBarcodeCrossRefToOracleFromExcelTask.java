@@ -68,7 +68,7 @@ public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask im
 		return "Import File From Excel";
 	}
 	public String getDevInfo(){
-		return "";
+		return "{call xxpens_inv_item_cross_pkg.import_cust_item(150, 600)} <br/> , apps.XXPENS_OM_CUST_ITEM_TMP";
 	}
 	public String getValidateScript(){
 		String script ="";

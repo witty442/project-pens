@@ -322,6 +322,26 @@ function setItemName(itemObj,rowId){
 			}
 		}
 	}
+	function getCustNameOnblur(path,e,storeCode,fieldName){
+		var form = document.toolManageForm;
+		var storeType = form.custGroup.value;
+		if(form.storeCode.value !=''){
+			if(form.custGroup.value ==''){
+				alert("กรณาระบุ กลุ่มร้านค้า");
+				form.storeCode.value = '';
+				form.storeName.value = '';
+				form.custGroup.focus();
+				return false;
+			}
+			if(form.custGroup.value =='' && storeCode.value ==''){
+				if("storeName" == fieldName){
+					form.storeName.value = '';
+				}	
+			}else{
+			   getCustName(path,storeCode,fieldName,storeType);
+			}
+		}
+	}
 	function getCustName(path,storeCode,fieldName,storeType){
 		var returnString = "";
 		var form = document.toolManageForm;
@@ -344,6 +364,11 @@ function setItemName(itemObj,rowId){
 				alert("ไม่พบข้อมูล");
 			}
 		}
+	}
+	function resetStore(){
+		var form = document.toolManageForm;
+		form.storeCode.value = '';
+		form.storeName.value = '';
 	}
 </script>
 </head>		
@@ -431,13 +456,16 @@ function setItemName(itemObj,rowId){
 								<tr>
                                     <td align="right">  กลุ่มร้านค้า<font color="red">*</font>	</td>
 									<td>	
-									    <html:select property="bean.custGroup" styleId="custGroup">
+									    <html:select property="bean.custGroup" styleId="custGroup" onchange="resetStore()">
 											<html:options collection="custGroupList" property="pensValue" labelProperty="pensDesc"/>
 									    </html:select>	
 									</td>
 									<td>&nbsp;&nbsp;		
 									   รหัสร้านค้า<font color="red">*</font>
-                                       <html:text property="bean.storeCode" styleId="storeCode" size="15"  onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'storeName')"/>
+                                       <html:text property="bean.storeCode" styleId="storeCode" size="15" 
+                                         onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'storeName')"
+                                         onblur="getCustNameOnblur('${pageContext.request.contextPath}',event,this,'storeName')"
+                                        />
 								       <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','StoreCodeBME','true')"/>   
 									  <html:text property="bean.storeName" styleId="storeName" size="30"  styleClass="disableText" readonly="true"/>
 									</td>

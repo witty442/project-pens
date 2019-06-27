@@ -12,6 +12,7 @@ public class StoreBean implements Serializable{
 	private String barOnBox;
 	private String storeCode;
 	private String storeName;
+	private String storeEngName;
 	private String storeDisp;
 	private String storeDispShort;
 	private String item;
@@ -33,6 +34,12 @@ public class StoreBean implements Serializable{
 	private String storeCorner;
 	
 	
+	public String getStoreEngName() {
+		return storeEngName;
+	}
+	public void setStoreEngName(String storeEngName) {
+		this.storeEngName = storeEngName;
+	}
 	public String getMaterialMaster() {
 		return materialMaster;
 	}

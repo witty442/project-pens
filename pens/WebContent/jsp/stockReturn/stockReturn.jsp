@@ -67,6 +67,9 @@ function disableF5(e) {
 function loadMe(){
 	//alert("loadMe");
 	  addRow(true);	
+	  
+	//resum Total 
+	sumTotalAllRow();
 }
 function backsearch(path) {
 	document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=prepare"+"&action=back";//stockSearch

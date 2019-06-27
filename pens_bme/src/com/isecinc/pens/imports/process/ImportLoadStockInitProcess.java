@@ -149,7 +149,11 @@ public class ImportLoadStockInitProcess {
 				
 				/** validate StoreNo **/
 				 if("MTT".equalsIgnoreCase(importType)){
-					if( isStoreCodeCanImport(conn,"MTT",storeNo.substring(0,storeNo.indexOf("-")))==false ){
+					 String storeNoTemp = storeNo;
+					 if(storeNo.indexOf("-") != -1){
+					    storeNoTemp = storeNo.substring(0,storeNo.indexOf("-"));
+					 }
+					if( isStoreCodeCanImport(conn,"MTT",storeNoTemp)==false ){
 						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
 						return mapping.findForward("success");
 					}

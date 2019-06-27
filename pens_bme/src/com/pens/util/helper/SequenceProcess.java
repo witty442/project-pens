@@ -24,7 +24,20 @@ public class SequenceProcess {
 	private static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 
-	
+	public static Integer getNextValue(String sequenceType,String code,Date orderDateObj) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getNextValueModel(conn, sequenceType, code,orderDateObj);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		
+	}
 	public static Integer getNextValue(Connection conn,String sequenceType,String code,Date orderDateObj) throws Exception {
 		return getNextValueModel(conn, sequenceType, code,orderDateObj);
 	}
@@ -93,17 +106,19 @@ public class SequenceProcess {
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
 				nextValue = rst.getInt("seq");
-				
+				logger.debug("update PENSBME_C_SEQUENCE");
 				//update nextValue
 				stmt = conn.createStatement();
 				stmt.executeUpdate("UPDATE PENSBME_C_SEQUENCE SET SEQ ="+(nextValue+1)+" WHERE SEQUENCE_TYPE ='"+sequenceType+"' AND CODE ='"+code+"' AND MONTH='"+curMonth+"' AND YEAR='"+curYear+"'");
 			} else{
+				logger.debug("Insert PENSBME_C_SEQUENCE");
 				nextValue = 1;
 				//not found -> insert
 				stmt = conn.createStatement();
 				stmt.executeUpdate("INSERT INTO PENSBME_C_SEQUENCE(SEQUENCE_TYPE,MONTH,YEAR,CODE,SEQ)VALUES('"+sequenceType+"','"+curMonth+"','"+curYear+"','"+code+"',"+(nextValue+1)+")");
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
 		} finally {
 			try {

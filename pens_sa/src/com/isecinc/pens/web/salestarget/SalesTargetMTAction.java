@@ -384,7 +384,7 @@ public class SalesTargetMTAction  {
 		try {
 			 //Search Report
 			 if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){
-				  resultHtmlTable = SalesTargetReport.searchReport(aForm.getBean(),excel,"");
+				  resultHtmlTable = SalesTargetReport.searchReport(user,aForm.getBean(),excel,"");
 				 if(resultHtmlTable != null){
 					  foundData = true;
 				 }

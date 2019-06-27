@@ -19,4 +19,5 @@ public class SalesTargetConstants {
   public static final String PAGE_MKT_TT = "MKT_TT";
   public static final String PAGE_TTSUPER ="TTSUPER";
   public static final String PAGE_TTMGR = "TTMGR";
+  public static final String PAGE_TTADMIN = "TT_ADMIN";
 }

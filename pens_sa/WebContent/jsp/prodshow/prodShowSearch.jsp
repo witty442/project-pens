@@ -1,6 +1,6 @@
 
+<%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowBean"%>
-<%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
@@ -17,6 +17,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="prodShowForm" class="com.isecinc.pens.web.prodshow.ProdShowForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "prodShowForm");
+
 String pageName = Utils.isNull(request.getParameter("pageName")); 
 %>
 <html>

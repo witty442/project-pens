@@ -290,9 +290,13 @@ public class TripAction {
 		LocationBean h = null;
 		List<LocationBean> items = new ArrayList<LocationBean>();
 		Map<String,String> chkDupCustCodeMap = new HashMap<String,String>();
+		String tripDayAll = "";
 		try {
-			sql.append("\n SELECT A.* FROM( ");
+			sql.append("\n SELECT A.*");
+			sql.append("\n ,T2.trip_day2 ,T3.trip_day3 ");
+			sql.append("\n  FROM( ");
 			sql.append("\n   SELECT to_number(cs.trip1) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
+			sql.append("\n   ,cs.amphur,cs.province ");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
 			sql.append("\n   ,xxpens_ar_customer_all_v c");
 			sql.append("\n   ,xxpens_salesreps_v s");
@@ -302,9 +306,10 @@ public class TripAction {
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and cs.trip1 ="+o.getTripDay()+" ");
 			}
-			sql.append("\n UNION ");
-			
-			sql.append("\n   SELECT to_number(cs.trip2) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
+			sql.append("\n ) A LEFT OUTER JOIN  ");
+			sql.append("\n ( ");
+			sql.append("\n   SELECT to_number(cs.trip2) as trip_day2 ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
+			sql.append("\n   ,cs.amphur,cs.province ");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
 			sql.append("\n   ,xxpens_ar_customer_all_v c");
 			sql.append("\n   ,xxpens_salesreps_v s");
@@ -314,9 +319,11 @@ public class TripAction {
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and cs.trip2 ="+o.getTripDay()+" ");
 			}
-			sql.append("\n UNION ");
-			
-			sql.append("\n   SELECT to_number(cs.trip3) as trip_day ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
+			sql.append("\n ) T2 ON A.account_number = T2.account_number ");
+			sql.append("\n LEFT OUTER JOIN");
+			sql.append("\n ( ");
+			sql.append("\n   SELECT to_number(cs.trip3) as trip_day3 ,c.account_number ,c.party_name ,cs.address,s.salesrep_id");
+			sql.append("\n   ,cs.amphur,cs.province ");
 			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
 			sql.append("\n   ,xxpens_ar_customer_all_v c");
 			sql.append("\n   ,xxpens_salesreps_v s");
@@ -326,7 +333,8 @@ public class TripAction {
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and cs.trip3 ="+o.getTripDay()+" ");
 			}
-			sql.append("\n )A ");
+			sql.append("\n )T3 ON A.account_number = T3.account_number ");
+			
 			sql.append("\n order by  A.trip_day ,A.account_number asc ");
 			
 			logger.debug("sql :"+sql.toString());
@@ -335,12 +343,23 @@ public class TripAction {
 			rst = ps.executeQuery();
 			while(rst.next()) {
 			   h = new LocationBean();
-			   h.setTripDay(rst.getString("trip_day"));
+			   tripDayAll = "";
+			   if( !Utils.isNull(rst.getString("trip_day")).equals("")){
+				   tripDayAll = Utils.isNull(rst.getString("trip_day"));
+			   }
+			   if( !Utils.isNull(rst.getString("trip_day2")).equals("")){
+				   tripDayAll += ","+ Utils.isNull(rst.getString("trip_day2"));
+			   }
+			   if( !Utils.isNull(rst.getString("trip_day3")).equals("")){
+				   tripDayAll += ","+ Utils.isNull(rst.getString("trip_day3"));
+			   }
+			   h.setTripDay(tripDayAll);
 			   h.setCustomerCode(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("salesrep_id")));
-			   
+			   h.setDistrict(Utils.isNull(rst.getString("amphur")));
+			   h.setProvince(Utils.isNull(rst.getString("province")));
 			   if(chkDupCustCodeMap.get(h.getCustomerCode()) ==null){
 			     items.add(h);
 			   }
@@ -697,7 +716,7 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 
  public static StringBuffer exportToExcel(LocationBean bean) throws Exception{
 		StringBuffer h = new StringBuffer("");
-		String colspan ="4";
+		String colspan ="6";
 		Connection conn =null;
 		try{
 			//search all
@@ -727,6 +746,8 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 				  h.append("<th>หมายเลขลูกค้า</th> \n");
 				  h.append("<th>ชื่อ</th> \n");
 				  h.append("<th>ที่อยู่</th> \n");
+				  h.append("<th>อำเภอ</th> \n");
+				  h.append("<th>จังหวัด</th> \n");
 				h.append("</tr> \n");
 			
 				for(int i=0;i<itemsList.size();i++){
@@ -737,7 +758,8 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 					  h.append("<td class='text'>"+s.getCustomerCode()+"</td> \n");
 					  h.append("<td class='text'>"+s.getCustomerName()+"</td> \n");
 					  h.append("<td class='text'>"+s.getAddress()+"</td> \n");
-					  
+					  h.append("<td class='text'>"+s.getDistrict()+"</td> \n");
+					  h.append("<td class='text'>"+s.getProvince()+"</td> \n");
 					h.append("</tr>");
 				}
 				h.append("</table> \n");

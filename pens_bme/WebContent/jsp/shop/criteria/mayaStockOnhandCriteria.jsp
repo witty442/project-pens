@@ -2,9 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <script>
-function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
+function loadCalendar(){
+	//new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
+	 $('#asOfDate').calendarsPicker({calendar: $.calendars.instance('thai','th')});
 }
+function loadMe(){}
 function search(path){
 	var form = document.shopForm;
 	var asOfDate = form.asOfDate; 
@@ -42,7 +44,7 @@ function setDataPopupValue(code,desc,pageName,fieldName){
   </tr>
  <tr>
 	<td align="right" width="10%"> วันที่ขาย (As Of Date)<font color="red">*</font></td>
-	<td align="left" width="6%"><html:text property="bean.asOfDate" styleId="asOfDate" readonly="true" size="15"/></td>
+	<td align="left" width="6%"><html:text property="bean.asOfDate" styleId="asOfDate" readonly="false" size="15" styleClass="\" autoComplete=\"off"/></td>
 	<td align="right" width="6%"> </td>
 	<td align="left" width="10%"></td>
   </tr>

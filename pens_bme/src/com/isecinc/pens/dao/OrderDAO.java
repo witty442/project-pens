@@ -746,17 +746,17 @@ public class OrderDAO {
 					if(o.getCountOrderNoByStoreCode() > MAX_ORDER_SPLIT_ORDER_NO){
 						logger.debug("Case Order Item over maxSplitOrderNo ->Split order_no");
 						//update order by barcode
-						updateOrderLotNoByStoreBarcode(conn,user,orderDate,o.getStoreType(),o.getStoreCode(),o.getOrderNo());
+						updateOrderLotNoByStoreBarcode(conn,user,orderDate,o.getStoreType(),o.getStoreCode(),o.getOrderNo(),o.getGroupProductType());
 					}else{
 						logger.debug("Case StoreCode not over maxSplitOrderNo ->update order_lot_no = order_no;");
 						//update all storeNo,orderNo
-						String orderLotNo = OrderNoGenerate.genOrderNoSplit(conn, orderDate, "ALLBR");
-						String barOnBox = OrderNoGenerate.genBarOnBox(conn, orderDate);
+						String orderLotNo = OrderNoGenerate.genOrderNoSplit(orderDate, "ALLBR");
+						String barOnBox = OrderNoGenerate.genBarOnBox(orderDate);
 						
 						o.setOrderLotNo(orderLotNo);
 						o.setBarOnBox(barOnBox);
 						
-						updateOrderLotNoByStoreCode(conn, o);
+						updateOrderLotNoByStoreCodeGroupProductType(conn, o);
 					}
 				}
 			}
@@ -770,7 +770,9 @@ public class OrderDAO {
 	}
 	
 	
-	private void updateOrderLotNoByStoreBarcode(Connection conn,User user,Date orderDate,String storeType,String storeCode,String orderNo) throws Exception {
+	private void updateOrderLotNoByStoreBarcode(Connection conn,User user,
+			Date orderDate,String storeType,String storeCode
+			,String orderNo,String groupProductType) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -781,6 +783,7 @@ public class OrderDAO {
 		    logger.debug("storeType["+storeType+"]");
 		    logger.debug("storeCode["+storeCode+"]");
 		    logger.debug("orderNo["+orderNo+"]");
+		    logger.debug("groupProductType["+groupProductType+"]");
 		    logger.debug("****Param:********************");
 		    
 			sql.append(" select o.store_type, o.store_code,o.order_no , \n ");
@@ -791,6 +794,7 @@ public class OrderDAO {
 			sql.append("  and store_type = ?  \n ");
 			sql.append("  and store_code = ?  \n ");
 			sql.append("  and order_no = ?  \n ");
+			sql.append("  and substr(group_code,1,1) = '"+groupProductType+"'  \n ");
 			sql.append(" ORDER BY o.store_type,o.order_no,o.store_code,o.bill_type,o.barcode asc \n ");
 			
 			logger.debug("sql:"+sql);
@@ -816,8 +820,8 @@ public class OrderDAO {
 				
 				logger.debug("no["+no+"]MAX["+MAX_ORDER_SPLIT_ORDER_NO+"]");
 				if(no==1){
-				   orderLotNo = OrderNoGenerate.genOrderNoSplit(conn, orderDate, "ALLBR");
-				   barOnBox = OrderNoGenerate.genBarOnBox(conn, orderDate);
+				   orderLotNo = OrderNoGenerate.genOrderNoSplit(orderDate, "ALLBR");
+				   barOnBox = OrderNoGenerate.genBarOnBox(orderDate);
 
 				   logger.debug("gen orderLotNo["+orderLotNo+"]barOnBox["+barOnBox+"]");
 				}
@@ -933,13 +937,15 @@ public class OrderDAO {
 		StringBuilder sql = new StringBuilder();
 		List<Order> storeOrderList = new ArrayList<Order>();
 		try{
-			
 			sql.append(" select A.* from ( \n ");
-			sql.append("  select distinct o.store_type, o.store_code,o.order_no ,count(*) as count_order_no \n ");
-			sql.append("  from PENSBME_ORDER o \n ");
+			sql.append("  select distinct o.store_type, o.store_code,o.order_no ");
+			sql.append("  ,substr(group_code,1,1) as group_product_type \n ");
+			sql.append("  ,count(*) as count_order_no \n ");
+			sql.append("  from PENSBI.PENSBME_ORDER o \n ");
 			sql.append("  WHERE 1=1  \n ");
 			sql.append("  and trunc(order_date) = ?  \n ");
-			sql.append("  group by o.store_type,o.store_code,o.order_no  \n ");
+			sql.append("  group by o.store_type,o.store_code,o.order_no,substr(group_code,1,1)  \n ");
+			
 			sql.append(" )A order by A.store_type,A.order_no,A.store_code asc \n ");
 			
 			logger.debug("sql:"+sql);
@@ -953,6 +959,7 @@ public class OrderDAO {
 				o.setStoreType(rst.getString("store_type"));
 				o.setStoreCode(rst.getString("store_code"));
 				o.setOrderNo(rst.getString("order_no"));
+				o.setGroupProductType(rst.getString("group_product_type"));
 				o.setCountOrderNoByStoreCode(rst.getInt("count_order_no"));
 				
 				storeOrderList.add(o);
@@ -2223,14 +2230,14 @@ public class OrderDAO {
 		}
 	}
 	
-	public static void updateOrderLotNoByStoreCode(Connection conn,Order o) throws Exception{
+	public static void updateOrderLotNoByStoreCodeGroupProductType(Connection conn,Order o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("Update");
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_ORDER \n");
 			sql.append(" SET ORDER_LOT_NO =? ,BAR_ON_BOX = ?,UPDATE_USER =? ,UPDATE_DATE =?  \n" );
-			sql.append(" WHERE ORDER_NO =? AND STORE_CODE =? \n" );
+			sql.append(" WHERE ORDER_NO =? AND STORE_CODE =? AND SUBSTR(GROUP_CODE,1,1) ='"+o.getGroupProductType()+"'\n" );
 
 			ps = conn.prepareStatement(sql.toString());
 				

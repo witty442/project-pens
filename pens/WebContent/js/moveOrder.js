@@ -40,6 +40,9 @@ function cancelMoveOrder(path,moveOrderType){
 	if(confirm("ยืนยันการ ยกเลิกรายการ")){
 		var input= confirmInputReason();
 		if(input){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 			document.getElementsByName('moveOrder.description')[0].value = input;
 		    document.moveOrderForm.action = path + "/jsp/moveOrderAction.do?do=cancelMoveOrder";
 		    document.moveOrderForm.submit();
@@ -95,7 +98,8 @@ function save(path,moveOrderType){
 	
 	
 	if(!createProductList()){return false;}
-	
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	document.moveOrderForm.action = path + "/jsp/moveOrderAction.do?do=save";
 	document.moveOrderForm.submit();
 	return true;

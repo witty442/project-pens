@@ -149,6 +149,13 @@
 				                <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="ReportSalesTargetTT" bundle="sysprop"/></span>
 				            </a> 
 			           </li>  
+			             <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN}) ){ %>
+			                <%--   <li>
+			                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_TTADMIN%>&action=new';">
+			                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="TTADMIN_SalesTarget" bundle="sysprop"/></span>
+			                    </a>
+			                 </li>   --%>
+	                 <%} %>
 			       </ul>
 	             </li>
 	          <%} %>
@@ -212,6 +219,18 @@
                    onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderAction.do?do=prepareSearch&action=new';">
                  <span><%no++;out.print(no);%>.<bean:message key="MoveOrder" bundle="sysprop"/></span>
                 </a>
+              </li>   
+            <%} %>
+             <%if ( UserUtils.userInRole("ROLE_VANDOC",user,new String[]{User.ADMIN, User.VANDOC}) ){ %>
+               <li>
+                 <a href="#" class="parent" 
+                   onclick="window.location='${pageContext.request.contextPath}/jsp/billPlanAction.do?do=prepareSearch&action=new';">
+                 <span><%no++;out.print(no);%>.<bean:message key="BILLT_INCOMPLETE" bundle="sysprop"/></span>
+                </a>  
+               <%--   <a href="#" class="parent" 
+                   onclick="window.location='${pageContext.request.contextPath}/jsp/billPlan/billPlanSearch.jsp';">
+                 <span><%no++;out.print(no);%>.<bean:message key="BILLT_INCOMPLETE" bundle="sysprop"/></span>
+                </a> --%>
               </li>   
             <%} %>
 		</ul>

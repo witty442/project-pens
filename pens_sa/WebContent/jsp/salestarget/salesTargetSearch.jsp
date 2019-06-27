@@ -60,6 +60,8 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 	pageNameTemp = "TTSUPER_SalesTarget";
 }else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "TTMGR_SalesTarget";
+}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "TTADMIN_SalesTarget";
 }
 //System.out.println("pageNameTemp:"+pageNameTemp);
 %>
@@ -122,25 +124,27 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 						<jsp:include page="../error.jsp"/>
 						<div align="center">
 						   	<%if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/MKTCriteria.jsp" /> 
+						        <jsp:include page="criteria/MKTCriteria.jsp" flush="true"/> 
 						    <%}else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/MTCriteria.jsp" />  
+						        <jsp:include page="criteria/MTCriteria.jsp" flush="true" />  
 						    <%}else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/MTMGRCriteria.jsp" /> 
+						        <jsp:include page="criteria/MTMGRCriteria.jsp" flush="true" /> 
 						    <%}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){ %>
 						        <%if(!"TT".equals(subPageName)){ %>
-						           <jsp:include page="criteria/ReportSalesTargetCriteria.jsp" />  
+						           <jsp:include page="criteria/ReportSalesTargetCriteria.jsp" flush="true" />  
 						        <%}else{ %>
-						           <jsp:include page="criteria/ReportSalesTargetTTCriteria.jsp" />  
+						           <jsp:include page="criteria/ReportSalesTargetTTCriteria.jsp" flush="true" />  
 						        <%} %>
 						    <%}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET_ALL.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/ReportSalesTargetAllCriteria.jsp" /> 
+						        <jsp:include page="criteria/ReportSalesTargetAllCriteria.jsp" flush="true" /> 
 						    <%}else if(SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName)){ %>
-						       <jsp:include page="criteria/MKT_TTCriteria.jsp" />
+						        <jsp:include page="criteria/MKT_TTCriteria.jsp" flush="true" />
 						    <%}else if(SalesTargetConstants.PAGE_TTSUPER.equalsIgnoreCase(pageName)){ %>
-						       <jsp:include page="criteria/TTSUPER_Criteria.jsp" />   
+						        <jsp:include page="criteria/TTSUPER_Criteria.jsp" flush="true" />   
 						    <%}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/TTMGR_Criteria.jsp" />   
+						        <jsp:include page="criteria/TTMGR_Criteria.jsp" flush="true" />   
+						      <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/TTADMIN_Criteria.jsp" flush="true" />   
 						    <%} %>
 					    </div>
 					  
@@ -214,3 +218,6 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

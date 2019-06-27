@@ -45,19 +45,9 @@ function copyFromLastMonth(path,e){
 		return false;
 	 } 
 	 
-	 /* if( $('#custCatNo').val()==""){
-		 $('#custCatNo').focus();
-		alert("กรุณากรอก ประเภทขาย");
-		return false;
-	 }  */
-	 
 	if(confirm('ยืนยัน Copy From Last Month')){
-	  //To disable f5
-	  $(document).bind("keydown", disableF5);
-	  $(function() {
-		///$("#dialog").dialog({ height: 200,width:650,modal:true });
-		  $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '25%', width: '60%' } }); 
-	   }); 
+	  /**Control Save Lock Screen **/
+	  startControlSaveLockScreen();
 	  
 	  form.action = path + "/jsp/salesTargetAction.do?do=copyFromLastMonth&action=new&pageName="+pageName;
 	  form.submit();
@@ -66,16 +56,19 @@ function copyFromLastMonth(path,e){
 	return false;
 }
 
+function copyMonthToMonth(path){
+	var url = path +"/jsp/salestarget/criteria/copyMonthToMonthTTPopup.jsp";
+	PopupCenter(url,"Copy Month To Month",500,300);
+}
+
 function disableF5(e) {
 	if (e.which == 116) e.preventDefault(); 
 }
+
 //To re-enable f5
 $(document).unbind("keydown", disableF5);
 
-function copyMonthToMonth(path){
-	//var url = path +"/jsp/salestarget/criteria/copyMonthToMonthTTPopup.jsp";
-	//PopupCenter(url,"Copy Month To Month",500,300);
-}
+
 function clearForm(path){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;
@@ -171,7 +164,7 @@ function loadCustCatNoList(){
 </script>
 
  <!-- Progress Bar -->
- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+<%--  <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
  <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
     <tr>
 		<td align="center" width ="100%">
@@ -184,7 +177,7 @@ function loadCustCatNoList(){
 		 </td>
    </tr>
   </table>   	      
-</div>
+</div> --%>
  <!-- Progress Bar -->
  
 <table align="center" border="0" cellpadding="3" cellspacing="0" >

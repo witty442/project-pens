@@ -48,7 +48,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String requestDate;
 	//total
 	private String salesZone;
-	
+	private String salesZoneName;
 	//Control Access Button
 
 	//optional
@@ -63,9 +63,15 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private StringBuffer dataStrBuffer;
     private String columnNameSort;
     private String orderSortType;
-    
-    
-    
+
+	public String getSalesZoneName() {
+		return salesZoneName;
+	}
+
+	public void setSalesZoneName(String salesZoneName) {
+		this.salesZoneName = salesZoneName;
+	}
+
 	public String getSalesZone() {
 		return salesZone;
 	}
@@ -463,6 +469,19 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
 	                return o2.getSalesChannelName().compareTo(o1.getSalesChannelName());
+	            }
+	        };
+	        public static Comparator<StockBean> SALES_ZONE_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return o2.getSalesZone().compareTo(o1.getSalesZone());
+	            }
+	        };
+	        
+	        public static Comparator<StockBean> SALES_ZONE_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return o1.getSalesZone().compareTo(o2.getSalesZone());
 	            }
 	        };
 	        

@@ -524,7 +524,7 @@ public class OrderAction extends I_Action {
 	}
 
 	public ActionForward exportToTextAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("export ToText");
+		logger.debug("exportToTextAll");
 		OrderForm orderForm = (OrderForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		StringBuffer data = new StringBuffer("");

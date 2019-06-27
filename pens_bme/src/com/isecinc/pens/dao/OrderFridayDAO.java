@@ -302,8 +302,8 @@ public class OrderFridayDAO {
 					}else{
 						logger.debug("Case StoreCode not over maxSplitOrderNo ->update order_lot_no = order_no;");
 						//update all storeNo,orderNo
-						String orderLotNo = OrderNoGenerate.genOrderNoSplit(conn, orderDate, "ALLBR");
-						String barOnBox = OrderNoGenerate.genBarOnBox(conn, orderDate);
+						String orderLotNo = OrderNoGenerate.genOrderNoSplit( orderDate, "ALLBR");
+						String barOnBox = OrderNoGenerate.genBarOnBox( orderDate);
 						
 						o.setOrderLotNo(orderLotNo);
 						o.setBarOnBox(barOnBox);
@@ -366,8 +366,8 @@ public class OrderFridayDAO {
 				
 				logger.debug("no["+no+"]MAX["+MAX_ORDER_SPLIT_ORDER_NO+"]");
 				if(no==1){
-				   orderLotNo = OrderNoGenerate.genOrderNoSplit(conn, orderDate, "ALLBR");
-				   barOnBox = OrderNoGenerate.genBarOnBox(conn, orderDate);
+				   orderLotNo = OrderNoGenerate.genOrderNoSplit(orderDate, "ALLBR");
+				   barOnBox = OrderNoGenerate.genBarOnBox(orderDate);
 
 				   logger.debug("gen orderLotNo["+orderLotNo+"]barOnBox["+barOnBox+"]");
 				}

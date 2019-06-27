@@ -12,10 +12,12 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.log4j.Logger;
+
 import com.isecinc.pens.SystemElements;
 
 public class DateToolsUtil {
-
+	protected static  Logger logger = Logger.getLogger("PENS");
 	public static final String SHORT_TIME = "HH:mm";
 
 	public static final int DAY = 1;
@@ -186,6 +188,20 @@ public class DateToolsUtil {
 			break;
 		}
 		return monthOfNum;
+	}
+	
+	/** Return last day of month 
+	 * 
+	 * @param Date;
+	 * @return
+	 */
+	public static String getMaxDayOfMonth(Date date) {
+	   String maxDayOfMonth = "";
+	   Calendar cal = Calendar.getInstance();
+	   cal.setTime(date);
+	   logger.debug("InputDate:"+cal.getTime());
+	   maxDayOfMonth = String.valueOf(cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+	   return maxDayOfMonth;
 	}
 
 	/**

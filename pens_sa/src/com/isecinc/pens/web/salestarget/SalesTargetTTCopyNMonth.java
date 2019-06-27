@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import util.DBConnection;
 import util.Utils;
 
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
 
 public class SalesTargetTTCopyNMonth {
@@ -37,7 +38,7 @@ public class SalesTargetTTCopyNMonth {
 		}
 	}
 	
-	public static String copy(String fromPeriod,String fromStartDate,String toPeriod,String toStartDate){
+	public static String copy(String fromPeriod,String fromStartDate,String toPeriod,String toStartDate,User user){
 		String returnStr = "";
 		try{
 			logger.debug("** Start Copy From["+fromPeriod+"]TO["+toPeriod+"]**");
@@ -50,7 +51,7 @@ public class SalesTargetTTCopyNMonth {
 			destBean.setStartDate(Utils.isNull(toStartDate)); 
 			destBean.setPeriod(Utils.isNull(toPeriod));
 			
-			returnStr = copyFromNMonth(dateSource,destBean);
+			returnStr = copyFromNMonth(dateSource,destBean,user);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -58,7 +59,7 @@ public class SalesTargetTTCopyNMonth {
 		return returnStr;
 	}
 	
-	public static String copyFromNMonth(Date dateSource ,SalesTargetBean destBean)  throws Exception {
+	public static String copyFromNMonth(Date dateSource ,SalesTargetBean destBean,User user)  throws Exception {
 		logger.debug("copyFromNMonth FromDate["+dateSource+"]to DestDate["+destBean.getStartDate()+"]");
 		Connection conn = null;
         Calendar curCal = Calendar.getInstance();
@@ -77,7 +78,7 @@ public class SalesTargetTTCopyNMonth {
 			
 			//validate cur month data Exist (all status)
 			destBean = SalesTargetDAO.convertCriteria(destBean);
-			boolean curDataExist = salesTargetIsExist(conn,destBean,"");
+			boolean curDataExist = salesTargetTTIsExist(conn,destBean,"");
 			if(curDataExist ==true){
 				errorCode ="DATA_CUR_EXIST_EXCEPTION";
 				logger.debug("ErrorCode["+errorCode+"]");
@@ -96,13 +97,13 @@ public class SalesTargetTTCopyNMonth {
 				logger.info("Copy from Period["+sourceBean.getPeriod()+"] to ["+destBean.getPeriod()+"]");
 				
 				//validate prev month data is exist (Status=Finish)
-				boolean prevDataExist = salesTargetIsExist(conn,sourceBean,SalesTargetConstants.STATUS_FINISH);
+				boolean prevDataExist = salesTargetTTIsExist(conn,sourceBean,SalesTargetConstants.STATUS_FINISH);
 				
 				if(prevDataExist == false){
 					errorCode ="DATA_PREV_NOT_FOUND";
 				}else{
 					//insert data Loop By brand
-					insertDataByBrand(conn, sourceBean, destBean);
+					insertDataByBrand(conn, sourceBean, destBean,user);
 				}
 			}
 			
@@ -124,7 +125,7 @@ public class SalesTargetTTCopyNMonth {
 	}
 	
 	
-	public static boolean insertDataByBrand(Connection conn,SalesTargetBean sourceBean,SalesTargetBean destBean) throws Exception {
+	public static boolean insertDataByBrand(Connection conn,SalesTargetBean sourceBean,SalesTargetBean destBean,User user) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -135,9 +136,8 @@ public class SalesTargetTTCopyNMonth {
 		try {
 			sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 			
-			sql.append("\n select id ,customer_category ,salesrep_id ");
-			sql.append("\n ,customer_id ,sales_channel ");
-			sql.append("\n from XXPENS_BI_SALES_TARGET_TEMP M where 1=1 ");
+			sql.append("\n select id ,customer_category ,zone  ");
+			sql.append("\n from XXPENS_BI_SALES_TARGET_TT M where 1=1 ");
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
@@ -161,13 +161,11 @@ public class SalesTargetTTCopyNMonth {
 				
 				//set for get Avg Order
 				destBean.setCustCatNo(Utils.isNull(rst.getString("customer_category")));
-				destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
-				destBean.setCustomerId(Utils.isNull(rst.getString("customer_id")));
+				destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
 				
 				//find priceListId
-				priceListId = SalesTargetUtils.getPriceListId(conn,Utils.isNull(rst.getString("sales_channel")),Utils.isNull(rst.getString("customer_category")));
+				priceListId = SalesTargetTTUtils.getPriceListId(conn, Utils.isNull(rst.getString("zone")), Utils.isNull(rst.getString("customer_category")),user);
 				
-				//insert Line
 			    insertLine(conn, priceListId, destBean, rst.getBigDecimal("id"), idNew);
 			}//if
 		} catch (Exception e) {
@@ -190,30 +188,25 @@ public class SalesTargetTTCopyNMonth {
 			if(idNew.compareTo(new BigDecimal("0")) ==0){
 				idNew = new BigDecimal("1");
 			}
-			sql.append("\n  INSERT INTO XXPENS_BI_SALES_TARGET_TEMP ");
+			sql.append("\n  INSERT INTO PENSBI.XXPENS_BI_SALES_TARGET_TT ");
 			sql.append("\n  SELECT ");
 			sql.append("\n  "+idNew+" as ID, ");
-			sql.append("\n  CUSTOMER_ID, ");
-			sql.append("\n  CUSTOMER_GROUP, ");
-			sql.append("\n  CUSTOMER_CODE, ");
-			sql.append("\n  SALESREP_ID, ");
-			sql.append("\n  SALESREP_CODE, ");
+			sql.append("\n  '"+curBean.getPeriod()+"' as PERIOD, ");
 			sql.append("\n  '"+curBean.getTargetMonth()+"' as TARGET_MONTH, ");
 			sql.append("\n  '"+curBean.getTargetQuarter()+"' as TARGET_QUARTER, ");
 			sql.append("\n  '"+curBean.getTargetYear()+"' as TARGET_YEAR, ");
 			sql.append("\n  CUSTOMER_CATEGORY, ");
-			sql.append("\n  DIVISION, ");
-			sql.append("\n  SALES_CHANNEL, ");
+			sql.append("\n  ZONE, ");
 			sql.append("\n  BRAND, ");
 			sql.append("\n  BRAND_GROUP, ");
 			sql.append("\n  'Open' as STATUS, ");
+			sql.append("\n  '' as REJECT_REASON, ");
 			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
-			sql.append("\n  null as UPDATE_DATE, ");
-			sql.append("\n  '"+curBean.getPeriod()+"' as PERIOD ");
-			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP WHERE ID="+idCopy);
-		   // logger.debug("sql:"+sql);
+			sql.append("\n  null as UPDATE_DATE ");
+			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT WHERE ID="+idCopy);
+		    logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
 			ps.execute();
@@ -233,7 +226,7 @@ public class SalesTargetTTCopyNMonth {
 		StringBuilder sql = new StringBuilder();
 		boolean h = false;
 		try {
-			sql.append("\n  INSERT INTO XXPENS_BI_SALES_TARGET_TEMP_L");
+			sql.append("\n  INSERT INTO PENSBI.XXPENS_BI_SALES_TARGET_TT_L");
 			sql.append("\n  SELECT ");
 			sql.append("\n  "+idNew+" as ID, ");
 			sql.append("\n  LINE_ID, ");
@@ -250,20 +243,23 @@ public class SalesTargetTTCopyNMonth {
 			sql.append("\n  null as UPDATE_DATE, ");
 			sql.append("\n  p.SUM12, ");//AMT_AVG12
 			sql.append("\n  p.SUM3, ");//AMT_AVG3
-			sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
-			sql.append("\n    where P.product_id =L.INVENTORY_ITEM_ID " );
-			sql.append("\n    and P.primary_uom_code ='Y' " );
-			sql.append("\n    and P.pricelist_id ="+priceListId+") as price ");//Price
-			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
+			sql.append("\n  ( SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n    where P.INVENTORY_ITEM_ID =L.INVENTORY_ITEM_ID " );
+			sql.append("\n    and P.list_header_id ="+priceListId+") as price ");//Price
+			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT_L L ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
-			sql.append("\n    SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
-			sql.append("\n    WHERE PERIOD ='"+curBean.getPeriod()+"'");
-			sql.append("\n    AND CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
-			sql.append("\n    AND SALESREP_ID ='"+curBean.getSalesrepId()+"'");
-			sql.append("\n    AND CUSTOMER_ID ='"+curBean.getCustomerId()+"'");
+			
+			sql.append("\n   SELECT INVENTORY_ITEM_ID ,SUM(V.sum3) as SUM3,sum(V.SUM12) as SUM12 ");
+			sql.append("\n   FROM apps.XXPENS_BI_MST_SALES_AVG_V V ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n   WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
+			sql.append("\n   AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
+			sql.append("\n   AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n   AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n   GROUP BY INVENTORY_ITEM_ID ");
+			
 			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  WHERE L.ID="+idCopy);
-		   //logger.debug("sql:"+sql);
+		   logger.debug("sql:"+sql);
 		    
 			ps = conn.prepareStatement(sql.toString());
 			ps.execute();
@@ -278,7 +274,7 @@ public class SalesTargetTTCopyNMonth {
 		return h;
 	}
 	
-	public static boolean salesTargetIsExist(Connection conn,SalesTargetBean cri,String status) throws Exception {
+	public static boolean salesTargetTTIsExist(Connection conn,SalesTargetBean cri,String status) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -287,9 +283,9 @@ public class SalesTargetTTCopyNMonth {
 			cri = SalesTargetDAO.convertCriteria(cri);
 			sql.append("\n  select sum(item_count) as item_count from(");
 			sql.append("\n   select M.id ");
-			sql.append("\n   ,(select count(*) from XXPENS_BI_SALES_TARGET_TEMP L ");
+			sql.append("\n   ,(select count(*) from XXPENS_BI_SALES_TARGET_TT L ");
 			sql.append("\n     where L.id= M.id) as item_count");
-			sql.append("\n   from XXPENS_BI_SALES_TARGET_TEMP  M ");
+			sql.append("\n   from XXPENS_BI_SALES_TARGET_TT  M ");
 			sql.append("\n   where 1=1 ");
 			if( !Utils.isNull(status).equals("")){
 			  sql.append("\n   and M.status ='"+status+"'");

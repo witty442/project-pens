@@ -1,3 +1,7 @@
+function setDataChange(obj){
+	if(obj.value != "")
+	  document.getElementById('check_save_before_post').value="save_before_post";
+}
 
 function calcTargetAmount(targetQtyObj,rowId){
 	var targetAmount = document.getElementsByName("targetAmount")[rowId-1];
@@ -17,6 +21,7 @@ function clearTotal(){
 	document.getElementsByName("totalTargetQty")[0].value="";
 }
 function summaryTotal(){
+	
 	var totalOrderAmt12Month = 0;
 	var totalOrderAmt3Month =0;
 	var totalTargetAmount = 0;

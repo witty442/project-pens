@@ -15,7 +15,10 @@
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css?v=<%=SessionIdUtils.getInstance().getIdSession() %>">
 <style type="text/css">
-
+body {
+	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
+	background-repeat: repeat;
+}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">

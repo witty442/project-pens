@@ -46,6 +46,9 @@ public class CopyDB {
 			//processUATToProduction("pensbi","PENSBME_ONHAND_BME_LOCKED_FRI","");
 			//processUATToProductionUserApps("apps","XXPENS_OM_TRIP_TONGFA_BAK","");
 			
+			//processUATToProduction("PENSBI","PENSBME_PICK_JOB","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
+			//processUATToProduction("PENSBI","PENSBME_PICK_BARCODE","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
+			//processUATToProduction("PENSBI","PENSBME_PICK_BARCODE_ITEM","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -65,7 +68,7 @@ public class CopyDB {
 			logger.debug("Total Record Insert :"+countIns);
 			logger.debug("**End processProductionToUAT**");
 		}catch(Exception e){
-			e.printStackTrace();
+			e.printStackTrace(); 
 		}finally{
 			if(connSource != null){
 				connSource.close();
@@ -306,7 +309,7 @@ public class CopyDB {
 			String username = "pensbi";
 			String password = "pensbi";
 			
-			logger.debug("GetConnection Dest DB(UAT) :"+url+","+username+","+password);
+			logger.debug("GetConnection  DB(UAT) :"+url+","+username+","+password);
 			
 			Properties props = new Properties();
 			props.setProperty("user", username);
@@ -331,7 +334,7 @@ public class CopyDB {
 			String username = "apps";
 			String password = "apps";
 			
-			logger.debug("GetConnection Dest DB(UAT) :"+url+","+username+","+password);
+			logger.debug("GetConnection  DB(UAT) :"+url+","+username+","+password);
 			
 			Properties props = new Properties();
 			props.setProperty("user", username);

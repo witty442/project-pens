@@ -42,7 +42,7 @@ import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
 import com.pens.util.FileUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 
@@ -1837,7 +1837,7 @@ public class ImportProcess {
 						if(colNo==0){
 							String sciValue = String.valueOf((Double)xslUtils.getCellValue(colNo, cell));
 							logger.debug("sciVal:"+sciValue);
-							ps.setString(index++,NumberToolsUtil.convertSciToDecimal(sciValue));
+							ps.setString(index++,NumberUtil.convertSciToDecimal(sciValue));
 						}else if(colNo==1){
 						   //Desc
 							desc = Utils.isNull(cellValue);

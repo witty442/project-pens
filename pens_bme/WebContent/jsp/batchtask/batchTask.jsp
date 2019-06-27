@@ -1,4 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.batchtask.task.BatchTaskListBean"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Iterator"%>
@@ -8,7 +9,6 @@
 <%@page import="java.util.Date"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
-<%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -130,7 +130,6 @@ body {
 		document.batchTaskForm.submit();
 		return true;
 	}
-	
 	function clearForm(path, type) {
 		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName="+document.getElementById("pageName").value;
 		document.batchTaskForm.submit();
@@ -378,18 +377,46 @@ body {
 								<td align="center" width ="100%">&nbsp;</td>
 							</tr> 
 							 <tr>
-								<td align="center" width ="100%"><b><%=Utils.isNull(taskInfo.getDescription()) %></b></td>
+								<td align="center" width ="100%">
+								 <%if(user.getUserName().equalsIgnoreCase("admin")){ %>
+									  <table border="0"  width ="50%" cellpadding="3" cellspacing="1" bgcolor="#000000">
+									    <tr bgcolor="#FFFFFF">
+									      <td width="10%" align="center"><b>Process Name</b></td>
+									      <td width="40%" align="center"><b>Process Description</b></td>
+									    </tr>
+									    <tr bgcolor="#FFFFFF">
+									       <td> <%=pageName %></td>
+									       <td> <%=Utils.isNull(taskInfo.getDescription()) %></td>
+									    </tr>
+										 <tr bgcolor="#FFFFFF">
+										     <td> Table Ralate</td>
+										     <td> <%=Utils.isNull(taskInfo.getDevInfo()) %></td>
+										  </tr>
+									  </table>
+									<%}else{ %>
+									   <table border="0" width ="50%" cellpadding="3" cellspacing="1" bgcolor="#000000">
+									    <tr  bgcolor="#FFFFFF">
+									      <td width="10%" align="center"><b>Process Name</b></td>
+									      <td width="40%" align="center"><b>Process Description</b></td>
+									    </tr>
+									    <tr  bgcolor="#FFFFFF">
+									       <td> <%=pageName %></td>
+									       <td> <%=Utils.isNull(taskInfo.getDescription()) %></td>
+									    </tr>
+									  </table>
+									<%} %>
+								</td>
 							</tr>
 							 <tr>
 								<td align="center" width ="100%">
 								<%if(user.getUserName().equalsIgnoreCase("admin")){ %>
-								  <b><a href="javascript:showDivInfo()">Process Info</a></b>
+								<!--   <b><a href="javascript:showDivInfo()">Process Info</a></b> -->
 								<%} %>
 								</td>
 							</tr>
 						</table>   
 						<div id="divInfo" style="display: none" align="center">
-					     	<%=Utils.isNull(taskInfo.getDevInfo()) %>
+					     
 						</div>
                         <!-- Batch Task Result--> 
 					    <jsp:include page="batchTaskResult.jsp"></jsp:include>

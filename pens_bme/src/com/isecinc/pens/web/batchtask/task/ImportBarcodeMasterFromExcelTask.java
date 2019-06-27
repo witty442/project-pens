@@ -50,7 +50,7 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 		return "Import File Excel";
 	}
 	public String getDevInfo(){
-		return "";
+		return "PENSBI.PENSBME_MST_REFERENCE";
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();

@@ -1,8 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.isecinc.pens.web.salestarget.SalesTargetTTUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetTTCopyNMonth"%>
-<%@page import="com.isecinc.pens.web.salestarget.SalesTargetCopyNMonth"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="com.isecinc.pens.web.salestarget.SalesTargetUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="util.Utils"%>
@@ -19,7 +18,7 @@
 //Calc from current Time 
 int prevMonth = 4;
 int nextMonth = 4;
-List<PopupBean> periodList =SalesTargetUtils.initPeriodAllYear(prevMonth,nextMonth);
+List<PopupBean> periodList =SalesTargetTTUtils.initPeriodAllYear(prevMonth,nextMonth);
 %>
 
 <script type="text/javascript">
@@ -52,12 +51,11 @@ function copy(path,e){
 	if(confirm('ยืนยัน Copy From '+$('#fromPeriod').val() +" to "+$('#toPeriod').val())){
 		
 		 //To disable f5
-		   $(document).bind("keydown", disableF5);
-		  $(function() {
-			///$("#dialog").dialog({ height: 200,width:650,modal:true });
-			  $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '40%',height: '25%', width: '60%' } }); 
-		   });  
-		  
+		 $(document).bind("keydown", disableF5);
+
+		 /**Control Save Lock Screen **/
+		 startControlSaveLockScreen();
+		   
 	     var param  = "&fromPeriod="+$('#fromPeriod').val();
 	      param += "&fromStartDate="+$('#fromStartDate').val();
 	      param += "&toPeriod="+$('#toPeriod').val();
@@ -117,7 +115,7 @@ function setPeriodDate(periodDesc,type){
 <form name="form1" method="post">
 
  <!-- Progress Bar -->
- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+<%--  <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
  <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
     <tr>
 		<td align="center" width ="100%">
@@ -130,7 +128,7 @@ function setPeriodDate(periodDesc,type){
 		 </td>
    </tr>
   </table>   	      
-</div>
+</div> --%>
  <!-- Progress Bar -->
 
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
@@ -202,8 +200,9 @@ function setPeriodDate(periodDesc,type){
 		String toStartDate = Utils.isNull(request.getParameter("toStartDate"));
 		String msg = "Copy Success From Month["+fromPeriod+"] To Month["+toPeriod+"]";
 		String returnStr = "";
+		User user = (User) request.getSession().getAttribute("user");
 		try{
-			returnStr = SalesTargetTTCopyNMonth.copy(fromPeriod, fromStartDate, toPeriod, toStartDate);
+			returnStr = SalesTargetTTCopyNMonth.copy(fromPeriod, fromStartDate, toPeriod, toStartDate,user);
 			
       	  if("DATA_CUR_EXIST_EXCEPTION" ==returnStr){
       		  msg = "ข้อมูลเดือน "+toPeriod +" มีการ key ข้อมูลบางส่วนไปแล้ว";
@@ -222,3 +221,8 @@ function setPeriodDate(periodDesc,type){
 </form>
 </body>
 </html>
+
+   <!-- Control Save Lock Screen -->
+   <jsp:include page="../../controlSaveLockScreen.jsp"/>
+   <!-- Control Save Lock Screen -->
+		   

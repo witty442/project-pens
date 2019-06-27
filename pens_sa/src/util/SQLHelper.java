@@ -1,7 +1,10 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 public class SQLHelper {
@@ -59,5 +62,15 @@ public class SQLHelper {
 		String dateStr = Utils.stringValue(d, format);//en format
 		sql = "\n and "+schema +" to_date('"+dateStr+"','"+format+"')";
 		return sql;
+	}
+   public static String converToTextSqlIn(String value){
+		List<String> valuesText = new ArrayList<String>() ;
+		String[] values = value.split("[,]");
+		
+		for(String text : values){
+			valuesText.add("'"+text+"'");
+		}
+		
+		return StringUtils.join(valuesText, ","); 
 	}
 }

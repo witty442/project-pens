@@ -21,6 +21,7 @@ import org.apache.commons.lang.time.DateUtils;
 import util.DBConnection;
 import util.DateToolsUtil;
 import util.Debug;
+import util.NumberUtil;
 import util.Utils;
 
 import com.isecinc.pens.bean.User;
@@ -35,7 +36,7 @@ import com.sun.corba.se.spi.extension.ZeroPortPolicy;
  */
 public class SAGenerate {
    
-	protected static  Debug debug = new Debug(true,1);
+	public static  Debug debug = new Debug(true,Debug.level_1);
     public static SAUtils reportU = new SAUtils();
 	
 	
@@ -48,11 +49,11 @@ public class SAGenerate {
 	public static List<StringBuffer> genReport(Connection conn,String contextPath,User user,SABean salesBean) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String htmlCode = "";
 		List<ConfigBean> colGroupList = new ArrayList<ConfigBean>();
 		ConfigBean groupByBean = null;
 		String allCond = "";
 		List<StringBuffer> resultList = new ArrayList<StringBuffer>();
+		CriteriaBean criBean = new CriteriaBean();
 		try{
 			if(SAInitial.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				/** Set Group Display  **/
@@ -76,7 +77,7 @@ public class SAGenerate {
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 			   
 				
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    debug.debug("DateStr:"+salesBean.getDay());
@@ -90,23 +91,39 @@ public class SAGenerate {
 				
 			}else if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkMonth:"+salesBean.getChkMonth().length);
+				
+				String yearCri = "";
+				String monthCri = "";
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkMonth().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkMonth()[i]+"]");
 					
 					colGroupList.add(new ConfigBean(salesBean.getChkMonth()[i],salesBean.getChkMonth()[i],Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i]))));
-					allCond +="'"+salesBean.getChkMonth()[i]+"',";
+					if(i != salesBean.getChkMonth().length-1){
+					   allCond +="'"+salesBean.getChkMonth()[i]+"',";
+					}else{
+					   allCond +="'"+salesBean.getChkMonth()[i]+"'";
+					}
+					/*if(i != salesBean.getChkMonth().length-1){
+					   yearCri +="'"+(salesBean.getChkMonth()[i]).substring(0,4)+"',"; 
+					   monthCri +="'"+(salesBean.getChkMonth()[i]).substring(4,6)+"',"; 
+					}else{
+					   yearCri +="'"+(salesBean.getChkMonth()[i]).substring(0,4)+"'"; 
+					   monthCri +="'"+(salesBean.getChkMonth()[i]).substring(4,6)+"'"; 
+					}*/
+					
 				}
-				
+				criBean.setMonth(monthCri);
+				criBean.setYear(yearCri);
+				criBean.setAllCond(allCond);
 				if(colGroupList.size() > 0){
 					Collections.sort(colGroupList);
 				}
 				
-				allCond +="'0'";
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				debug.debug("sql Month:"+sql.toString());
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
@@ -120,21 +137,37 @@ public class SAGenerate {
 				
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkQuarter:"+salesBean.getChkQuarter().length);
+				String yearCri = "";
+				String quarterCri = "";
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkQuarter().length;i++){
-					debug.debug("name:["+i+"]value:["+salesBean.getChkQuarter()[i]+"]");
+					debug.debug("name:["+i+"]value:["+salesBean.getChkQuarter()[i]+"]",1);
 					colGroupList.add(new ConfigBean(salesBean.getChkQuarter()[i],salesBean.getChkQuarter()[i],Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i]))));
-					allCond +="'"+salesBean.getChkQuarter()[i]+"',";
+					if(i != salesBean.getChkQuarter().length-1){
+						allCond +="'"+salesBean.getChkQuarter()[i]+"',";
+					}else{
+						allCond +="'"+salesBean.getChkQuarter()[i]+"'";
+					}
+					
+					/*if(i != salesBean.getChkQuarter().length-1){
+					   yearCri +="'"+(salesBean.getChkQuarter()[i]).substring(0,4)+"',"; 
+					   quarterCri +="'"+(salesBean.getChkQuarter()[i]).substring(4,5)+"',"; 
+					}else{
+					   yearCri +="'"+(salesBean.getChkQuarter()[i]).substring(0,4)+"'"; 
+					   quarterCri +="'"+(salesBean.getChkQuarter()[i]).substring(4,5)+"'"; 
+					}*/
 				}
+				criBean.setQuarter(quarterCri);
+				criBean.setYear(yearCri);
+				criBean.setAllCond(allCond);
 				
 				if(colGroupList.size() > 0){
 					Collections.sort(colGroupList);
 				}
-				allCond +="'0'";
 				
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
@@ -150,14 +183,17 @@ public class SAGenerate {
 				for(int i=0;i<salesBean.getChkYear().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkYear()[i]+"]");
 					colGroupList.add(new ConfigBean(salesBean.getChkYear()[i],salesBean.getChkYear()[i],Utils.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i]))+"" ));
-					allCond +="'"+salesBean.getChkYear()[i]+"',";
-				
+					if(i != salesBean.getChkYear().length-1){
+					  allCond +="'"+salesBean.getChkYear()[i]+"',";
+					}else{
+					  allCond +="'"+salesBean.getChkYear()[i]+"'";
+					}
 				}
-				allCond +="'0'";
+				criBean.setYear(allCond);
 				
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    rs = ps.executeQuery();
@@ -196,6 +232,7 @@ public class SAGenerate {
 		List<ConfigBean> colGroupList = new ArrayList<ConfigBean>();
 		ConfigBean groupByBean = null;
 		String allCond = "";
+		CriteriaBean criBean = new CriteriaBean();
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			
@@ -206,7 +243,7 @@ public class SAGenerate {
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 			    
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,"");
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				htmlCode = sql.toString();
 			}else if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkMonth:"+salesBean.getChkMonth().length);
@@ -220,7 +257,7 @@ public class SAGenerate {
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
 				
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				htmlCode = sql.toString();
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkQuarter:"+salesBean.getChkQuarter().length);
@@ -235,7 +272,7 @@ public class SAGenerate {
 				
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				htmlCode = sql.toString();
 			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				debug.debug("chkYear:"+salesBean.getChkYear().length);
@@ -250,7 +287,7 @@ public class SAGenerate {
 				
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
-				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,allCond);
+				StringBuffer sql = SAInitial.getInstance().genMainSql(conn,user,salesBean,colGroupList,criBean);
 				htmlCode = sql.toString();
 			}
 		  return htmlCode;
@@ -364,31 +401,31 @@ public class SAGenerate {
 		}
 	}
 	
-   /**
-    * 
-    * @param contextPath
-    * @param groupByBean
-    * @param colGroupList
-    * @param colDispList
-    * @param rs
-    * @param summaryType
-    * @return
-    * @throws Exception
-    */
-	private static void genResultSetToJsonData(String contextPath,ConfigBean groupByBean,List colGroupList,List colDispList ,ResultSet rs,String summaryType) throws Exception{
-	
-	}
-	
 	private static StringBuffer genReportHtml(String contextPath,ConfigBean groupByBean,List colGroupList,List colDispList ,ResultSet rs,String summaryType) throws Exception{
-		
+		List<ConfigBean> rowCodeList = new ArrayList<ConfigBean>();
 		StringBuffer htmlStr = new StringBuffer("");
 		boolean found = false;
+		Map<String,BigDecimal> summaryRowMap = new HashMap<String,BigDecimal>();
+		Map<String,BigDecimal> summaryAllRowMap = new HashMap<String,BigDecimal>();
 		Map<String,BigDecimal> summaryColumnMap = new HashMap<String,BigDecimal>();
-		Map<String,BigDecimal> summaryPerMap1 = new HashMap<String,BigDecimal>();
-		Map<String,BigDecimal> summaryPercentMap1 = new HashMap<String,BigDecimal>();
+		Map<String,BigDecimal> summaryPerMap = new HashMap<String,BigDecimal>();
+		Map<String,BigDecimal> summaryPercentMap = new HashMap<String,BigDecimal>();
 		BigDecimal bigZero = new BigDecimal("0");
 		BigDecimal big100 = new BigDecimal("100");
-		
+		BigDecimal conPercent = null;
+		String colSumKey = "";
+		BigDecimal colSum = null;
+		String rowSumKey = "";
+		BigDecimal rowSum = null;
+		String conIDKey = "";
+		int i=0,gc=0,r=0,col=0;
+		BigDecimal value = null;
+		BigDecimal valueRowSummary = null;
+		BigDecimal valueColSummary = null;
+		String resultRowSumBean ="";
+		BigDecimal valueRowSum =null;
+		BigDecimal rowSumAll = null;
+		String keySumRowMap = "";
 		int totalRecord = 0;
 		int no =0;
 		int columnCount = 3; //default
@@ -396,6 +433,7 @@ public class SAGenerate {
 		
 		boolean isSummry = false;
 		if(SAInitial.SUMMARY_TYPE_SUM.equals(summaryType) 
+			|| SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType) 
 			|| SAInitial.SUMMARY_TYPE_AVG.equals(summaryType)
 			|| SAInitial.SUMMARY_TYPE_PERCENT.equals(summaryType)){
 			isSummry = true;
@@ -410,6 +448,8 @@ public class SAGenerate {
 		boolean isDebug = false;
 		boolean hideRowEnable = true;
 		boolean isFoundDataInRow = false;
+		ConfigBean colDispBean = null;
+		ConfigBean configGroupBean = null;
 		try{
 			debug.debug("colGroupList Size:"+colGroupList.size(),1);
 			
@@ -433,7 +473,7 @@ public class SAGenerate {
 			}
 			
 			htmlStr.append(" <th rowspan='2'>"+groupBy+"</th>  \n");
-			for(int i=0;i<colGroupList.size();i++){
+			for(i=0;i<colGroupList.size();i++){
 				ConfigBean configBean = (ConfigBean)colGroupList.get(i);
 				htmlStr.append("<th colspan='"+colDispList.size()+"'>"+configBean.getDispText()+"</th> \n");
 			}
@@ -448,50 +488,79 @@ public class SAGenerate {
 					
 					label = "เปอร์เซ็นต์  <br/> ("+colGroup2.getDispText()+" เทียบ "+colGroup1.getDispText()+")";
 				}
-				
-				htmlStr.append("<th colspan='"+colDispList.size()+"'>"+label+"</th> \n");
+				if(SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType)){
+					htmlStr.append("<th colspan='"+colDispList.size()+"'>"+label+"</th> \n");
+					htmlStr.append("<th colspan='"+colDispList.size()+"'>% Contribute</th> \n");
+				}else{
+				   htmlStr.append("<th colspan='"+colDispList.size()+"'>"+label+"</th> \n");
+				}
 			}
 			
 			htmlStr.append("</tr>\n");
 			
 			htmlStr.append("<tr> \n");
 			/** Display Column **/
-			for(int i=0;i<colGroupList.size();i++){
-				ConfigBean configGroupBean = (ConfigBean)colGroupList.get(i);
-				for(int d=0;d<colDispList.size();d++){
-					ConfigBean configBean = (ConfigBean)colDispList.get(d);
-					String columnOrder = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
-					debug.debug("ColumnOrder:"+columnOrder,1);
+			for(i=0;i<colGroupList.size();i++){
+				configGroupBean = (ConfigBean)colGroupList.get(i);
+				for( col=0;col<colDispList.size();col++){
+					colDispBean = (ConfigBean)colDispList.get(col);
+					String columnOrder = colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
+					debug.debug("ColumnOrder:"+columnOrder,0);
+					String sortIdKey = colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName()); 
 					
-					String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName()); 
-					
-				    htmlStr.append("<th nowrap>"+configBean.getDispText()+"&nbsp;&nbsp;");
-				    htmlStr.append(" <img style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_down.gif' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
-				    htmlStr.append(" &nbsp;&nbsp;");
-				    htmlStr.append(" <img style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_up.gif' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
-				    htmlStr.append("</th> \n");
-   				    
-				}
-			}
+					if(SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType)){
+						htmlStr.append("<th nowrap>"+colDispBean.getDispText()+"&nbsp;&nbsp;");
+					    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-asc.png' width='20px' height='20px' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
+					    htmlStr.append("  &nbsp;&nbsp;");
+					    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-desc.png' width='20px' height='20px' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
+					    htmlStr.append("</th> \n");
+					   
+					}else{
+						htmlStr.append("<th nowrap>"+colDispBean.getDispText()+"&nbsp;&nbsp;");
+					    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-asc.png' width='20px' height='20px' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
+					    htmlStr.append("  &nbsp;&nbsp;");
+					    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-desc.png' width='20px' height='20px' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
+					    htmlStr.append("</th> \n");
+					}
+				}//for 2
+			}//for 1
 			
 			//new Add Head
 			if(isSummry){
-				ConfigBean configGroupBean1 = (ConfigBean)colGroupList.get(0);
-				for(int d=0;d<colDispList.size();d++){
-					ConfigBean configBean = (ConfigBean)colDispList.get(d);
-					String columnOrder = configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName());
-					debug.debug("ColumnOrder:"+columnOrder,1);
+					ConfigBean configGroupBean1 = (ConfigBean)colGroupList.get(0);
+					for(col=0;col<colDispList.size();col++){
+						colDispBean = (ConfigBean)colDispList.get(col);
+						String columnOrder = colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName());
+						debug.debug("ColumnOrder:"+columnOrder,1);
+						
+						String sortIdKey = summaryType+"_"+colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
 					
-					String sortIdKey = summaryType+"_"+configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
+						htmlStr.append("<th>"+colDispBean.getDispText()+"&nbsp;&nbsp;");
+					    htmlStr.append(" <img  style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-asc.png' width='20px' height='20px' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
+					    htmlStr.append(" &nbsp;&nbsp;");
+					    htmlStr.append(" <img  style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-desc.png' width='20px' height='20px' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
+					    htmlStr.append("</th> \n");
+						
+					}//for 
+					
+					if(SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType)){
+						for(col=0;col<colDispList.size();col++){
+						    colDispBean = (ConfigBean)colDispList.get(col);
+							String columnOrder = colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName());
+							debug.debug("ColumnOrder:"+columnOrder,1);
 							
-				    htmlStr.append("<th>"+configBean.getDispText()+"&nbsp;&nbsp;");
-				    htmlStr.append(" <img  style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_down.gif' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
-				    htmlStr.append(" &nbsp;&nbsp;");
-				    htmlStr.append(" <img  style=\"cursor:pointer\" src='"+contextPath+"/icons/arrow_up.gif' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
-				    htmlStr.append("</th> \n");
-   				    
-				}
-			}
+							String sortIdKey = summaryType+"_"+colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
+							String debug =isDebug?"Con:":"";
+							
+							//%Contribute
+						    htmlStr.append("<th nowrap> "+debug+colDispBean.getDispText()+"&nbsp;&nbsp;");
+						    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-asc.png' width='20px' height='20px' href='#' class='link-sort asc' id='"+sortIdKey+"'/>");
+						    htmlStr.append("  &nbsp;&nbsp;");
+						    htmlStr.append("  <img style=\"cursor:pointer\" src='"+contextPath+"/icons/img_sort-desc.png' width='20px' height='20px' href='#' class='link-sort desc' id='"+sortIdKey+"'/>");
+						    htmlStr.append("</th> \n");
+						}//for
+					}//if
+			}//if
 			
 			htmlStr.append("</tr>  </thead> \n");
 			/**************** Header Table *********************************/
@@ -501,7 +570,9 @@ public class SAGenerate {
 			htmlStr.append("<tbody> \n");
 			
 			StringBuffer rowHtml = new StringBuffer("");
+			int rowNo=0;
 			while(rs.next()){
+				rowNo++;
 				found = true;
 				isFoundDataInRow = false;
 				StringBuffer rowNoHtml = new StringBuffer("");
@@ -524,22 +595,21 @@ public class SAGenerate {
 					rowHtml.append(" <td align='left'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
 				}
 				
-				
-				/** Calculation Summary By For Loop  ***/
-				Map<String,BigDecimal> summaryRowMap = new HashMap<String,BigDecimal>();
-				
-				for(int i=0;i<colGroupList.size();i++){
-					ConfigBean configGroupBean = (ConfigBean)colGroupList.get(i);
+				/** Calculation Summary All Row For Loop  ***/
+				summaryRowMap = new HashMap<String,BigDecimal>();
+				debug.debug("**** Start SummaryRowMap Row["+rowNo+"] ****");
+				for(gc=0;gc<colGroupList.size();gc++){
+					ConfigBean rowGroupBean = (ConfigBean)colGroupList.get(gc);
+					debug.debug("rowGroupBean.getName():"+rowGroupBean.getName());
+					//debug.debug("colDispList:"+colDispList.size());
 					
-					debug.debug("colDispList:"+colDispList.size());
-					BigDecimal value = null;
-					BigDecimal valueRowSummary = null;
-					BigDecimal valueColSummary = null;
+					value = null;
+					valueRowSummary = null;
+					valueColSummary = null;
 				
-					
-					for(int d=0;d<colDispList.size();d++){
-						ConfigBean configBean = (ConfigBean)colDispList.get(d);
-						String resultKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
+					for(col=0;col<colDispList.size();col++){
+						colDispBean = (ConfigBean)colDispList.get(col);
+						String resultKey = colDispBean.getName()+"_"+reportU.getShortColName(rowGroupBean.getName());
 						
 						debug.debug("resultKey:"+resultKey);
 						
@@ -568,7 +638,7 @@ public class SAGenerate {
 							summaryColumnMap.put(resultKey, valueColSummary);	
 						}
 		
-						String resultKey1 = configBean.getName();
+						String resultKey1 = colDispBean.getName();
 						/** Summary By Row **/
 						if(summaryRowMap.get(resultKey1) != null){
 							BigDecimal sumRowValueAdd = (BigDecimal)summaryRowMap.get(resultKey1);
@@ -579,40 +649,43 @@ public class SAGenerate {
 						}
 						
 						/** Summary 1 For case PER **/
-						if(summaryPerMap1.get(resultKey1) != null){
-							BigDecimal summaryValueAdd = (BigDecimal)summaryPerMap1.get(resultKey1);
+						if(summaryPerMap.get(resultKey1) != null){
+							BigDecimal summaryValueAdd = (BigDecimal)summaryPerMap.get(resultKey1);
 							summaryValueAdd = summaryValueAdd.add(valueRowSummary);
-							summaryPerMap1.put(resultKey1, summaryValueAdd);
+							summaryPerMap.put(resultKey1, summaryValueAdd);
 						}else{
-							summaryPerMap1.put(resultKey1, valueRowSummary);
+							summaryPerMap.put(resultKey1, valueRowSummary);
 						}			
 						
 						String debug =isDebug?"D:":"";
 						
-						String sortIdKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
+						String sortIdKey = colDispBean.getName()+"_"+reportU.getShortColName(rowGroupBean.getName());
 						
-					    rowHtml.append("<td align='right' class='sort_"+sortIdKey+"'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),value)+"</td> \n");
+					    rowHtml.append("<td align='right' class='sort_"+sortIdKey+"'>"+debug+Utils.convertDigitToDisplay(colDispBean.getDispText(),value)+"</td> \n");
 					
 					}// For 1
 				}//for 2
 				
-				
-				
 				if(isSummry){
 					/** Calculation Summary Case Percent **/
 					//new 2
-					for(int c=0;c<colDispList.size();c++){
-						ConfigBean configBean = (ConfigBean)colDispList.get(c);
+					for(col=0;col<colDispList.size();col++){
+					    colDispBean = (ConfigBean)colDispList.get(col);
 						
-						debug.debug("configBean Name["+c+"]:"+configBean.getName());
+						debug.debug("configBean Name["+col+"]:"+colDispBean.getName());
 						
-						String resultRowSumBean = configBean.getName();
-						BigDecimal valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
+						resultRowSumBean = colDispBean.getName();
+						valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
+						debug.debug("RSumXX["+colDispBean.getName()+"]value["+valueRowSum+"]");
 						boolean isPct = false;
+						
+						//set summary all row By SUM_ROW_CodeRow+colDispName
+						keySumRowMap = "SUM_ROW_"+rs.getString(groupByBean.getName()+"_CODE")+"_"+colDispBean.getName();
+						summaryAllRowMap.put(keySumRowMap, valueRowSum);
 						
 						if(resultRowSumBean.startsWith("PER")){
 							//Sum1
-							ConfigBean configBean1 = (ConfigBean)colDispList.get(c-2);
+							ConfigBean configBean1 = (ConfigBean)colDispList.get(col-2);
 							String resultKey1 = configBean1.getName();
 							BigDecimal summaryValue1 = new BigDecimal("0");
 							if(summaryRowMap != null && summaryRowMap.get(resultKey1) != null){
@@ -620,7 +693,7 @@ public class SAGenerate {
 							}
 							
 							//Sum2
-							ConfigBean configBean2 = (ConfigBean)colDispList.get(c-1);
+							ConfigBean configBean2 = (ConfigBean)colDispList.get(col-1);
 							String resultKey2 = configBean2.getName();
 							BigDecimal summaryValue2 = new BigDecimal("0");
 							if(summaryRowMap != null && summaryRowMap.get(resultKey2) != null){
@@ -635,19 +708,19 @@ public class SAGenerate {
 							}
 						}
 						
+						//Calc Percent
 						if(isPercent){
-
 							ConfigBean colGroup1 = (ConfigBean)colGroupList.get(colGroupList.size()-2);
 							ConfigBean colGroup2 = (ConfigBean)colGroupList.get(colGroupList.size()-1);
 							
-							ConfigBean configBeanP =  (ConfigBean)colDispList.get(c);
+							ConfigBean colDispBeanP =  (ConfigBean)colDispList.get(col);
 							
 							//Sum1
-							String resultKey1 = configBeanP.getName()+"_"+reportU.getShortColName(colGroup1.getName());
+							String resultKey1 = colDispBeanP.getName()+"_"+reportU.getShortColName(colGroup1.getName());
 							BigDecimal summaryValue1 = Utils.isNullToZero(rs.getBigDecimal(resultKey1));
 							
 							//Sum2
-							String resultKey2 = configBeanP.getName()+"_"+reportU.getShortColName(colGroup2.getName());
+							String resultKey2 = colDispBeanP.getName()+"_"+reportU.getShortColName(colGroup2.getName());
 							BigDecimal summaryValue2 = Utils.isNullToZero(rs.getBigDecimal(resultKey2));
 							
 							debug.debug("summaryValue1:"+summaryValue1,1);
@@ -659,8 +732,6 @@ public class SAGenerate {
 							}
 						}
 						
-						//
-						
 						if(SAInitial.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
 							valueRowSum = valueRowSum.divide(BigDecimal.valueOf(colGroupList.size()), 2, BigDecimal.ROUND_HALF_UP);
 						}
@@ -668,22 +739,37 @@ public class SAGenerate {
 						String debug = isDebug?"RSum:":"";
 						
 						ConfigBean configGroupBean1 = (ConfigBean)colGroupList.get(0);
-						String sortIdKey = summaryType+"_"+configBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
+						String sortIdKey = summaryType+"_"+colDispBean.getName()+"_"+reportU.getShortColName(configGroupBean1.getName()); 
 						
-						rowHtml.append("<td align='right' class='sort_"+sortIdKey+"'>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</td> \n");
-						
-						
+						rowHtml.append("<td align='right' class='sort_"+sortIdKey+"'>"+debug+Utils.convertDigitToDisplay(colDispBean.getDispText(),valueRowSum)+"</td> \n");
+
 					}//for
+					
+					//add rowCodeLits 
+					ConfigBean rowCodeBean = new ConfigBean(rs.getString(groupByBean.getName()+"_CODE"), rs.getString(groupByBean.getName()+"_CODE"), "");
+					rowCodeList.add(rowCodeBean);
+					
+					// add column %contribute summary by Row 
+					if(SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType)){
+						for(int c=0;c<colDispList.size();c++){
+							colDispBean = (ConfigBean)colDispList.get(c);
+							//debug
+							String debug = isDebug?"RSumCon:":"";
+							conIDKey = "CON_"+rs.getString(groupByBean.getName()+"_CODE")+"_"+colDispBean.getName(); 
+							rowHtml.append("<td align='right' class='sort_'>"+debug+"<span >"+conIDKey+"</span>"+"</td> \n");
+						}//for
+					}
 				}//if
 
 				rowHtml.append("</tr>\n");
 				
+				/** Summary All Column Hide or Show Row  **/
 				/** For Check Row Sum Case ==0 Hide Row  **/
-				BigDecimal rowSumAll = bigZero;
-				for(int d=0;d<colDispList.size();d++){
-					ConfigBean configBean = (ConfigBean)colDispList.get(d);
-					String resultRowSumBean = configBean.getName();
-					BigDecimal valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
+				rowSumAll = bigZero;
+				for(col=0;col<colDispList.size();col++){
+					colDispBean = (ConfigBean)colDispList.get(col);
+					resultRowSumBean = colDispBean.getName();
+					 valueRowSum = (BigDecimal)summaryRowMap.get(resultRowSumBean);
 					debug.debug("before["+resultRowSumBean+"] valueRowSum["+valueRowSum.doubleValue()+"]");
 					
 					if(valueRowSum.doubleValue() <0){
@@ -693,9 +779,9 @@ public class SAGenerate {
 					debug.debug("after["+resultRowSumBean+"] valueRowSum["+valueRowSum.doubleValue()+"]");
 					
 					rowSumAll = rowSumAll.add(valueRowSum);
-					
 				}
-				//Show All Row
+				
+				//Validate Show All Row Sum > 0 is show
 				if(hideRowEnable==false){
 					 no++;
 					 rowNoHtml.append("  <tr> \n");
@@ -717,8 +803,7 @@ public class SAGenerate {
 				}
 				//reset RowHtml
 				rowHtml = new StringBuffer("");
-				
-				
+
 			}//while row data all
 			
 			htmlStr.append("</tbody> \n");
@@ -740,15 +825,13 @@ public class SAGenerate {
 				columnCount  = ((isNoDisplayed)?2:3); 
 			}
 			
-			//Summary Column 
+			//Summary Column ALl
 			StringBuffer summaryRowHtml = new StringBuffer("");
 			StringBuffer summaryRowHtml2 = new StringBuffer("");
-			
 			BigDecimal summaryAll = new BigDecimal("0");
-			
 			if(found){
-				for(int i=0;i<colGroupList.size();i++){
-					ConfigBean configGroupBean = (ConfigBean)colGroupList.get(i);
+				for(i=0;i<colGroupList.size();i++){
+					configGroupBean = (ConfigBean)colGroupList.get(i);
 					for(int d=0;d<colDispList.size();d++){
 						ConfigBean configBean = (ConfigBean)colDispList.get(d);
 						String resultKey = configBean.getName()+"_"+reportU.getShortColName(configGroupBean.getName());
@@ -757,7 +840,7 @@ public class SAGenerate {
 		
 						if(summaryColumnMap != null && summaryColumnMap.get(resultKey) != null){
 							summaryValue = (BigDecimal)summaryColumnMap.get(resultKey);
-						}
+						}//if
 						//For Check Hide Summary 
 						summaryAll = summaryAll.add(summaryValue);
 						
@@ -781,8 +864,8 @@ public class SAGenerate {
 							
 							if(summaryValue1.compareTo(bigZero) != 0){
 								summaryValue = (summaryValue2.divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
-							}
-						}
+							}//if
+						}//if
 							
 						columnCount++;
 						String debug = isDebug?"CSum:":"";
@@ -812,23 +895,21 @@ public class SAGenerate {
 						debug.debug("colValue2["+colValue2+"]",1);
 						
 						if(colValue1.compareTo(bigZero) != 0){
-							
 						    colPercent = (colValue2.divide(colValue1,4,BigDecimal.ROUND_FLOOR)).multiply(big100);
 						    
 						    debug.debug("Result colPercent["+colPercent+"]",1);
 						    
-						    if(summaryPercentMap1.get(colDispKey1) != null){
-								BigDecimal colPercentAdd = summaryPercentMap1.get(colDispKey1);
+						    if(summaryPercentMap.get(colDispKey1) != null){
+								BigDecimal colPercentAdd = summaryPercentMap.get(colDispKey1);
 								colPercentAdd = colPercentAdd.add(colPercent);
-								summaryPercentMap1.put(colDispKey1, colPercentAdd);
+								summaryPercentMap.put(colDispKey1, colPercentAdd);
 							}else{
-								summaryPercentMap1.put(colDispKey1, colPercent);
-							}		
-						}
+								summaryPercentMap.put(colDispKey1, colPercent);
+							}//if		
+						}//if
 					}//for
-				}//if				
-				
-			}//if
+				}//ifisPercent 			
+			}//if found data
 			
 			// Summary All case SumRow == Show not Show
 			if(hideRowEnable == false ){
@@ -846,28 +927,29 @@ public class SAGenerate {
 			
 			htmlStr.append(summaryRowHtml);
 			
+			//Add Total Summary
 			if(isSummry && found){
-				for(int d=0;d<colDispList.size();d++){
-					ConfigBean configBean = (ConfigBean)colDispList.get(d);
-					String resultRowSumBean = configBean.getName();
-					BigDecimal valueRowSum = (BigDecimal)summaryPerMap1.get(resultRowSumBean);
+				for(col=0;col<colDispList.size();col++){
+					colDispBean = (ConfigBean)colDispList.get(col);
+					resultRowSumBean = colDispBean.getName();
+					 valueRowSum = (BigDecimal)summaryPerMap.get(resultRowSumBean);
 					boolean isPct = false;
 					
 					if(resultRowSumBean.startsWith("PER")){
 						//Sum1
-						ConfigBean configBean1 = (ConfigBean)colDispList.get(d-2);
+						ConfigBean configBean1 = (ConfigBean)colDispList.get(col-2);
 						String resultKey1 = configBean1.getName();
 						BigDecimal summaryValue1 = new BigDecimal("0");
-						if(summaryPerMap1 != null && summaryPerMap1.get(resultKey1) != null){
-							summaryValue1 = (BigDecimal)summaryPerMap1.get(resultKey1);
+						if(summaryPerMap != null && summaryPerMap.get(resultKey1) != null){
+							summaryValue1 = (BigDecimal)summaryPerMap.get(resultKey1);
 						}
 						
 						//Sum2
-						ConfigBean configBean2 = (ConfigBean)colDispList.get(d-1);
+						ConfigBean configBean2 = (ConfigBean)colDispList.get(col-1);
 						String resultKey2 = configBean2.getName();
 						BigDecimal summaryValue2 = new BigDecimal("0");
-						if(summaryPerMap1 != null && summaryPerMap1.get(resultKey2) != null){
-							summaryValue2 = (BigDecimal)summaryPerMap1.get(resultKey2);
+						if(summaryPerMap != null && summaryPerMap.get(resultKey2) != null){
+							summaryValue2 = (BigDecimal)summaryPerMap.get(resultKey2);
 						}
 						//debug.debug("summaryValue1:"+summaryValue1);
 						//debug.debug("summaryValue2:"+summaryValue2);
@@ -876,23 +958,19 @@ public class SAGenerate {
 							valueRowSum = (summaryValue2.divide(summaryValue1,4,BigDecimal.ROUND_FLOOR)).multiply(new BigDecimal("100"));
 							isPct = true;
 						}
-					}
+					}//if PER-
 					
 					if(isPercent){
 						ConfigBean colGroup1 = (ConfigBean)colGroupList.get(colGroupList.size()-2);
-						
-						ConfigBean configBeanP =  (ConfigBean)colDispList.get(d);
+						ConfigBean configBeanP =  (ConfigBean)colDispList.get(col);
 						
 						//Sum1
 						String resultKey1 = configBeanP.getName()+"_"+reportU.getShortColName(colGroup1.getName());
-						BigDecimal summaryValue1 = summaryPercentMap1.get(resultKey1) != null?(BigDecimal)summaryPercentMap1.get(resultKey1):bigZero;
-						
-						
+						BigDecimal summaryValue1 = summaryPercentMap.get(resultKey1) != null?(BigDecimal)summaryPercentMap.get(resultKey1):bigZero;
+
 						debug.debug("summaryPercentValue1:"+summaryValue1,1);
-						
 					    valueRowSum = summaryValue1;
-						
-					}
+					}//if isPercent
 					
 					if(SAInitial.SUMMARY_TYPE_AVG.equals(summaryType) && !isPct){
 						valueRowSum = valueRowSum.divide(BigDecimal.valueOf(colGroupList.size()), 2, BigDecimal.ROUND_HALF_UP);
@@ -900,9 +978,64 @@ public class SAGenerate {
 					
 					columnCount++;
 					String debug = isDebug?"TSum:":"";
-					htmlStr.append("<td class='summary' align='right'><b>"+debug+Utils.convertDigitToDisplay(configBean.getDispText(),valueRowSum)+"</b></td> \n");
+					htmlStr.append("<td class='summary' align='right'><b>"+debug+Utils.convertDigitToDisplay(colDispBean.getDispText(),valueRowSum)+"</b></td> \n");
 				}//for
-			}
+				
+				//add Total Summary %Contribute
+				if(SAInitial.SUMMARY_TYPE_SUM_CONTRIBUTE.equals(summaryType)){
+					for(col=0;col<colDispList.size();col++){
+						columnCount++;
+						String debug = isDebug?"TSum:":"";
+						htmlStr.append("<td class='summary' align='right'><b>"+debug+"100.00"+"</b></td> \n");
+					}//for
+				}//if %contribute set
+			
+				debug.debug("*** Start Cal % Contribute ***");
+				String htmlStrTemp  = htmlStr.toString();
+				if(rowCodeList != null && rowCodeList.size()>0){
+					for(r =0;r<rowCodeList.size();r++){
+						ConfigBean rowCodeBean = rowCodeList.get(r);
+						for(gc=0;gc<colGroupList.size();gc++){
+							configGroupBean = (ConfigBean)colGroupList.get(gc);
+								// add column %contribute summary by Row 
+								for(col=0;col<colDispList.size();col++){
+									colDispBean = (ConfigBean)colDispList.get(col);
+									//debug.debug("colDispBean Name["+c+"]:"+colDispBean.getName());
+									
+									debug.debug("*************************************************",1);
+									//summary by Column
+									colSumKey = colDispBean.getName();
+									colSum = (BigDecimal)summaryPerMap.get(colSumKey);
+									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]colSumKey["+colSumKey+"]colSum["+colSum+"]",1);
+									
+									//summary by Row
+									rowSumKey = "SUM_ROW_"+rowCodeBean.getName()+"_"+colDispBean.getName();
+									rowSum = (BigDecimal)summaryAllRowMap.get(rowSumKey);
+									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]rowSumKey["+rowSumKey+"]rowSum["+rowSum+"]",1);
+									
+									//calc contribute
+									conPercent = new BigDecimal(rowSum.doubleValue()/colSum.doubleValue());
+									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]BeforeconPercent["+conPercent+"]",1);
+									conPercent = conPercent.multiply(big100).setScale(6,BigDecimal.ROUND_HALF_UP);
+									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]AfterconPercent["+conPercent+"]",1);
+									
+									//debug
+									//debug = isDebug?"TSumCon:":"";
+									conIDKey = "CON_"+rowCodeBean.getName()+"_"+colDispBean.getName(); 
+									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]conIDKey["+conIDKey+"] for replace value["+conPercent.doubleValue()+"]",1);
+									htmlStrTemp = htmlStrTemp.replace(conIDKey,Utils.decimalFormat(conPercent.doubleValue(),Utils.format_current_2_disgit));
+									
+									//replace StringBuffer By ConIDKey
+									
+								}//for 3
+						}//for 2
+					}//for 1
+				}//if rowCodeList
+				debug.debug("*** End Cal % Contribute ***");
+				
+				htmlStr = new StringBuffer(htmlStrTemp);
+				
+			}//if summary and found data
 			htmlStr.append("</tr> </tfoot> \n");
 			/*************************************************/
 			

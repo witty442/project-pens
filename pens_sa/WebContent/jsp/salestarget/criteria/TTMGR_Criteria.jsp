@@ -80,7 +80,10 @@ function salesManagerFinish(path){
 	var r = checkCanFinish();
 	//alert(r);
 	if(r){
-	    if(confirm("กรุณายืนยันการอนุมัติเป้าหมาย")){
+	    if(confirm("กรุณายืนยันการ อนุมัติเป้าหมายทุกแบรนด์")){
+	    	/**Control Save Lock Screen **/
+	    	startControlSaveLockScreen();
+	    	
 			form.action = path + "/jsp/salesTargetAction.do?do=salesManagerFinish";
 			form.submit();
 			return true;
@@ -95,14 +98,35 @@ function salesManagerFinish(path){
 function checkCanFinish(){
 	var r= true;
 	var status = document.getElementsByName("status");
+	
 	//alert(status.length);
 	for(var i=0;i<status.length;i++){
-		 //alert("["+status[i].value+"]");
+	  //alert("["+status[i].value+"]");
+	  status[i].className ='disableText';
+	  
+	  document.getElementById("span_cust_cat_no_"+i).className='normalText';
+	  document.getElementById("span_sales_zone_"+i).className='normalText';
+	  document.getElementById("span_brand_"+i).className='normalText';
+	  document.getElementById("span_brand_name_"+i).className='normalText';
+	  document.getElementById("span_target_qty_"+i).className='normalText';
+	  document.getElementById("span_target_amount_"+i).className='normalText';
+	  document.getElementById("span_sales_target_qty_"+i).className='normalText';
+	  document.getElementById("span_sales_target_amount_"+i).className='normalText';
 	  if(status[i].value != 'Finish') { //Not check row finish
 		  if(status[i].value != 'Accept') {
 			 // alert(status[i].innerHTML);
 			  r = false;
-			  break;
+			  //break;
+			  
+			  status[i].className ='errorTextBold';
+			  document.getElementById("span_cust_cat_no_"+i).className='errorTextBold';
+			  document.getElementById("span_sales_zone_"+i).className='errorTextBold';
+			  document.getElementById("span_brand_"+i).className='errorTextBold';
+			  document.getElementById("span_brand_name_"+i).className='errorTextBold';
+			  document.getElementById("span_target_qty_"+i).className='errorTextBold';
+			  document.getElementById("span_target_amount_"+i).className='errorTextBold';
+			  document.getElementById("span_sales_target_qty_"+i).className='errorTextBold';
+			  document.getElementById("span_sales_target_amount_"+i).className='errorTextBold';
 		  }//if
 	  }//if
 	}//for
@@ -111,6 +135,7 @@ function checkCanFinish(){
 function unacceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 	var status = document.getElementsByName("status")[rowId-1];
 	var unacceptDiv = document.getElementsByName("unaccept_div")[rowId-1];
+	var div_msg = document.getElementById("div_msg");
 	//alert(unacceptDiv);
 	
 	var returnString = "";
@@ -130,11 +155,13 @@ function unacceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 		//set new status and hide unaccept Action
 		status.value ="Unaccept";
 		unacceptDiv.style.display = 'none'; 
+		div_msg.style.display = 'block'; 
 	}
 }
 function acceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 	var status = document.getElementsByName("status")[rowId-1];
 	var acceptDiv = document.getElementsByName("accept_div")[rowId-1];
+	var div_msg = document.getElementById("div_msg");
 	//alert(unacceptDiv);
 	
 	var returnString = "";
@@ -154,12 +181,13 @@ function acceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 		//set new status and hide unaccept Action
 		status.value ="Finish";
 		acceptDiv.style.display = 'none'; 
+		div_msg.style.display = 'block'; 
 	}
 }
 </script>
 
  <!-- Progress Bar -->
- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
+ <%-- <div id="dialog" title=" กรุณารอสักครู่......"  style="display:none">
  <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
     <tr>
 		<td align="center" width ="100%">
@@ -172,9 +200,11 @@ function acceptRow(path,salesZone,brand,custCatNo,period,startDate,rowId){
 		 </td>
    </tr>
   </table>   	      
-</div>
+</div> --%>
  <!-- Progress Bar -->
- 
+ <div id="div_msg" style="display:none">
+   <b><font size="2" color="red">บันทึกข้อมูลเรียบร้อยแล้ว</font></b>
+ </div>
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
 	       <tr>
                 <td> เดือน <font color="red">*</font></td>

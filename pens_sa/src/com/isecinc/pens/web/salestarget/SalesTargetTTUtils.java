@@ -189,6 +189,66 @@ public class SalesTargetTTUtils {
 		}
 	 return monthYearList;
 	}
+	public static List<PopupBean> initPeriodTT(Connection conn){
+		List<PopupBean> monthYearList = new ArrayList<PopupBean>();
+		Calendar cal = Calendar.getInstance();
+		String periodName = "";
+		PopupBean item = new PopupBean();
+		SalesTargetBean period = null;
+		try{
+		
+			//Next Month
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, 1);//Current+1
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
+			//Current Month
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
+			//Prev Month
+			item = new PopupBean();
+			cal.add(Calendar.MONTH, -1);//Current-1
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
+			//Prev Month
+			item = new PopupBean();
+			cal.add(Calendar.MONTH, -2);//Current-2
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			
+		/*	//Fortest 
+			//Prev Month
+			item = new PopupBean();
+			cal.add(Calendar.MONTH, -5);//Current-5
+			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			period = getPeriodList(conn,periodName).get(0);//get Period View
+			item.setKeyName(periodName);
+			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+			monthYearList.add(item);
+			*/
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	 return monthYearList;
+	}
 	public static List<PopupBean> initPeriodAllYear(int prevMonth,int nextMonth) throws Exception{
 		Connection conn = null;
 		try{
@@ -879,7 +939,8 @@ public class SalesTargetTTUtils {
 			}
 			 sql.append("\n  and m.zone in(0,1,2,3,4 )");
 			//Filter By User Case Role TTSUPER,TTMGR : MKT(ALL)
-			if ( !"admin".equalsIgnoreCase(user.getUserName()) && UserUtils.userInRoleSalesTarget(user,new String[]{User.TTSUPER,User.TTMGR}) ){
+			if ( !"admin".equalsIgnoreCase(user.getUserName()) && !UserUtils.userInRoleSalesTarget(user, new String[]{User.MKT})
+					&& UserUtils.userInRoleSalesTarget(user,new String[]{User.TTSUPER,User.TTMGR}) ){
 				 sql.append("\n  and m.zone in( ");
 				 sql.append("\n  select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
 				 sql.append("\n  where  user_name='"+user.getUserName()+"'");
@@ -922,7 +983,9 @@ public class SalesTargetTTUtils {
 			sql.append("\n where M.salesrep_id =S.salesrep_id ");
 			sql.append("\n and M.zone in(0,1,2,3,4 )");
 			//Filter By User Case Role TTSUPER,TTMGR : MKT(ALL)
-			if ( !"admin".equalsIgnoreCase(user.getUserName())){
+			if ( !"admin".equalsIgnoreCase(user.getUserName())
+				&& !UserUtils.userInRoleSalesTarget(user, new String[]{User.MKT})
+				){
 				 sql.append("\n  and M.zone in( ");
 				 sql.append("\n  select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
 				 sql.append("\n  where  user_name='"+user.getUserName()+"'");
@@ -966,7 +1029,9 @@ public class SalesTargetTTUtils {
 			if( !Utils.isNull(salesZone).equals("")){
 			  sql.append("\n  and m.sales_zone ='"+salesZone+"'");
 			}
-			if( !"admin".equalsIgnoreCase(user.getUserName())){
+			if( !"admin".equalsIgnoreCase(user.getUserName()) 
+				&& !UserUtils.userInRoleSalesTarget(user, new String[]{User.MKT})
+			 ){
 				sql.append("\n  and m.user_name ='"+user.getUserName()+"'");
 			}
 			sql.append("\n  ORDER BY M.cust_cat_no asc \n");
@@ -1045,11 +1110,11 @@ public class SalesTargetTTUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListTT(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
+	public static List<PopupBean> searchSalesrepListTT(User user,String salesChannelNo,String custCatNo,String salesZone) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListTT(conn,salesChannelNo,custCatNo,salesZone);
+			return searchSalesrepListTT(conn,user,salesChannelNo,custCatNo,salesZone);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -1058,7 +1123,7 @@ public class SalesTargetTTUtils {
 			}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListTT(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
+	public static List<PopupBean> searchSalesrepListTT(Connection conn,User user,String salesChannelNo,String custCatNo,String salesZone){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1085,6 +1150,13 @@ public class SalesTargetTTUtils {
 			}
 			if( !Utils.isNull(salesZone).equals("")){
 				sql.append("\n  and Z.zone ='"+salesZone+"'");
+			}
+			//Filter By User Case Role TTSUPER,TTMGR : MKT(ALL)
+			if ( !"admin".equalsIgnoreCase(user.getUserName()) && UserUtils.userInRoleSalesTarget(user,new String[]{User.TTSUPER,User.TTMGR}) ){
+				 sql.append("\n  and Z.zone in( ");
+				 sql.append("\n  select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
+				 sql.append("\n  where  user_name='"+user.getUserName()+"'");
+				 sql.append("\n  )");
 			}
 			sql.append("\n  ORDER BY S.code asc \n");		
 			logger.debug("sql:"+sql);
@@ -1129,12 +1201,11 @@ public class SalesTargetTTUtils {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n  SELECT distinct M.sales_channel_no ,S.sales_channel_desc "
-					+ "from XXPENS_BI_MST_CUST_CAT_MAP M ,XXPENS_BI_MST_SALES_CHANNEL S ");
+			sql.append("\n  SELECT distinct S.sales_channel_no ,S.sales_channel_desc ");
+			sql.append("\n  from XXPENS_BI_MST_SALES_CHANNEL S ");
 			sql.append("\n  where 1=1  ");
-			sql.append("\n  and M.sales_channel_no in(0,1,2,3,4) ");
-			sql.append("\n  and M.sales_channel_no = S.sales_channel_no  ");
-			sql.append("\n  ORDER BY M.sales_channel_no asc \n");
+			sql.append("\n  and S.sales_channel_no in(0,1,2,3,4) ");
+			sql.append("\n  ORDER BY S.sales_channel_no asc \n");
 			
 			logger.debug("sql:"+sql);
 			

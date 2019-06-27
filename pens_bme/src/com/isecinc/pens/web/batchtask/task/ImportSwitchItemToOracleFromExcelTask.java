@@ -43,6 +43,7 @@ import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelUtils;
@@ -67,7 +68,7 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 		return "Import File From Excel";
 	}
 	public String getDevInfo(){
-		return "";
+		return "apps.xxpens_inv_vanmisc_temp";
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -319,6 +320,12 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 					lineMsg +=	ITEM_NO+"|"+TRANSACTION_QTY +"|"+UOM_CODE+"|"+GL_ACCOUNT;
 			        
 					//Step validate (no valid)
+					//Validate transactionDate <= sysdate? OK: error 
+					if(TRANSACTION_DATE.after(DateToolsUtil.getCurrentDateNoTime()) ){
+						errorMsg ="Transaction Date ["+TRANSACTION_DATE_STR+"] ต้อง น้อยกว่า หรือ เท่ากับ วันที่ปัจจุบันเท่านั้น ";
+						importError = true;
+					}
+					
 					//step 1 validate UOM_CODE (CTN OR EA )ONLY
 					if( !"CTN".equals(UOM_CODE) && !"EA".equals(UOM_CODE)){
 						errorMsg ="UOM CODE ต้องเป็น CTN หรือ EA เท่านั้น ";

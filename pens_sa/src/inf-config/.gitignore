@@ -1,1 +1,4 @@
 /inf-env.properties
+/env.txt
+/production-env.properties
+/uat-env.properties

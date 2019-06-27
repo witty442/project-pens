@@ -100,23 +100,27 @@ public class SalesTargetTTControlPage {
 		try{
 			logger.debug("prepareSearchTTSUPER");
 			//init monthYearList
-			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriod(conn));
+			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriodTT(conn));
 
 			//SALES_ZONE_LIST
 			//add Blank Row
 			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
-			PopupBean item = new PopupBean();
-			item.setSalesZone("");
-			item.setSalesZoneDesc("");
-			salesZoneList.add(item);
 			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
-			salesZoneList.addAll(salesZoneList_s);
+			if(user.getUserName().equalsIgnoreCase("admin") || salesZoneList_s.size() >2){
+				PopupBean item = new PopupBean();
+				item.setSalesZone("");
+				item.setSalesZoneDesc("");
+				salesZoneList.add(item);
+				salesZoneList.addAll(salesZoneList_s);
+			}else{
+				salesZoneList.addAll(salesZoneList_s);
+			}
 			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 			
 			//Cust Cat No List
 			//add Blank Row
 			List<PopupBean> custCatNoList = new ArrayList<PopupBean>();
-			item = new PopupBean();
+			PopupBean item = new PopupBean();
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
@@ -132,25 +136,76 @@ public class SalesTargetTTControlPage {
 		try{
 			
 			//init monthYearList
-			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriod(conn));
+			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriodTT(conn));
 			//init salesChannelList
 
-			//SALES_CHANNEL_LIST
+			//SALES_ZONE_LIST
 			//add Blank Row
 			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
-			PopupBean item = new PopupBean();
-			item.setSalesZone("");
-			item.setSalesZoneDesc("");
-			salesZoneList.add(item);
-			
 			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
-			salesZoneList.addAll(salesZoneList_s);
+			if(user.getUserName().equalsIgnoreCase("admin") || salesZoneList_s.size() >2){
+				PopupBean item = new PopupBean();
+				item.setSalesZone("");
+				item.setSalesZoneDesc("");
+				salesZoneList.add(item);
+				salesZoneList.addAll(salesZoneList_s);
+			}else{
+				salesZoneList.addAll(salesZoneList_s);
+			}
 			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 			
 			//Cust Cat No List
 			//add Blank Row
 			List<PopupBean> custCatNoList = new ArrayList<PopupBean>();
+			PopupBean item = new PopupBean();
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
+			custCatNoList.add(item);
+			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoTTListModel(conn));
+			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
+			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			List<PopupBean> salesChannelList = new ArrayList<PopupBean>();
 			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			salesChannelList.add(item);
+			
+			List<PopupBean> salesChannelList_s = SalesTargetTTUtils.searchSalesChannelTTListModel(conn, user);
+			salesChannelList.addAll(salesChannelList_s);
+			request.getSession().setAttribute("SALES_CHANNEL_LIST",salesChannelList);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
+	public static void prepareSearchTTADMIN(HttpServletRequest request,Connection conn,User user,String pageName){
+		try{
+			
+			//init monthYearList
+			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriodTT(conn));
+			//init salesChannelList
+
+			//SALES_ZONE_LIST
+			//add Blank Row
+			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
+			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
+			if(user.getUserName().equalsIgnoreCase("admin") || salesZoneList_s.size() >2){
+				PopupBean item = new PopupBean();
+				item.setSalesZone("");
+				item.setSalesZoneDesc("");
+				salesZoneList.add(item);
+				salesZoneList.addAll(salesZoneList_s);
+			}else{
+				salesZoneList.addAll(salesZoneList_s);
+			}
+			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
+			
+			//Cust Cat No List
+			//add Blank Row
+			List<PopupBean> custCatNoList = new ArrayList<PopupBean>();
+			PopupBean item = new PopupBean();
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			custCatNoList.add(item);
@@ -307,6 +362,8 @@ public class SalesTargetTTControlPage {
 			}
 			aForm.setBean(sales);
 			
+			logger.debug("canSet:"+aForm.getBean().isCanSet());
+			
 			//Get target total by product from MKT page(XXPENS_BI_SALES_TARGET_TT)
 			List<SalesTargetBean> productMKTList = SalesTargetTTDAO.searchSalesTargetProductListTTSUPER(conn, sales, user);
 
@@ -412,8 +469,9 @@ public class SalesTargetTTControlPage {
 		List<PopupBean> dataList = null;
 		logger.debug("prepareSearchReportSalesTargetTT");
 		try{
+			
 			//init periodList
-			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriod(conn));
+			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriodTT(conn));
 			
 			/**
 			 * 1. ประเภทขาย / ภาคตามสายดูแล / พนักงานขาย		
@@ -488,16 +546,19 @@ public class SalesTargetTTControlPage {
 			dataList.add(new PopupBean("status","",SalesTargetConstants.STATUS_OPEN));
 			request.getSession().setAttribute("STATUS_LIST",dataList);
 			
-			//SALES_CHANNEL_LIST
+			//SALES_ZONE_LIST
 			//add Blank Row
 			List<PopupBean> salesZoneList = new ArrayList<PopupBean>();
-			item = new PopupBean();
-			item.setSalesZone("");
-			item.setSalesZoneDesc("");
-			salesZoneList.add(item);
-			
 			List<PopupBean> salesZoneList_s = SalesTargetTTUtils.searchSalesZoneTTListModel(conn,user, "");
-			salesZoneList.addAll(salesZoneList_s);
+			if(user.getUserName().equalsIgnoreCase("admin") || salesZoneList_s.size() >2){
+				item = new PopupBean();
+				item.setSalesZone("");
+				item.setSalesZoneDesc("");
+				salesZoneList.add(item);
+				salesZoneList.addAll(salesZoneList_s);
+			}else{
+				salesZoneList.addAll(salesZoneList_s);
+			}
 			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

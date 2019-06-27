@@ -381,7 +381,8 @@ public class SummaryAction extends I_Action {
 						}
 						
 						//By StoreCode ONLY ,All Store Not Set
-						if( !Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).equals("ALL")){
+						if( !Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).equals("ALL")
+							&& Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).indexOf(",") == -1){
 						   summaryForm.setEndDate(GenerateStockEndDateLotus.getEndDateStock(summaryForm.getOnhandSummary().getPensCustCodeFrom()));
 						   summaryForm.setEndSaleDate(GenerateStockEndDateLotus.getEndSaleDateLotus(summaryForm.getOnhandSummary().getPensCustCodeFrom(),summaryForm.getOnhandSummary().getSalesDate()) );
 						}

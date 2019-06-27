@@ -1,1 +1,3 @@
 /inf-env.properties
+/production-env.properties
+/uat-env.properties

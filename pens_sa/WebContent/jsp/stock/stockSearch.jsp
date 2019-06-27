@@ -1,4 +1,3 @@
-
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
@@ -91,7 +90,7 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 						<div align="center">
 						   	<%if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ %>
 						       <jsp:include page="criteria/ReportCreditCriteria.jsp" /> 
-						    <%} %>
+						    <% } %>
 					    </div>
 					  
 					   <!-- ************************Result ***************************************************-->

@@ -39,6 +39,9 @@
 		<form-bean name="promotionForm" type="com.isecinc.pens.web.promotion.PromotionForm" />
 		<form-bean name="stockVanForm" type="com.isecinc.pens.web.stockvan.StockVanForm" />
 		<form-bean name="stockMCForm" type="com.isecinc.pens.web.stockmc.StockMCForm" />
+		<!-- Admin Console -->
+		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
+		<form-bean name="billPlanForm" type="com.isecinc.pens.web.billplan.BillPlanForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -144,6 +147,9 @@
 		<action name="moveOrderForm" path="/jsp/moveOrderAction" parameter="do" scope="session" type="com.isecinc.pens.web.moveorder.MoveOrderAction">
 			<forward name="search" path="/jsp/moveorder/moveOrderSearch.jsp" />
 		</action>
+		<action name="billPlanForm" path="/jsp/billPlanAction" parameter="do" scope="session" type="com.isecinc.pens.web.billplan.BillPlanAction">
+			<forward name="search" path="/jsp/billPlan/billPlanSearch.jsp" />
+		</action>
 		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
 			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
 		</action>
@@ -153,6 +159,10 @@
 			<forward name="monitorSpiderDetail" path="/jsp/location/monitorSpiderDetail.jsp" />
 			<forward name="tripSearch" path="/jsp/location/tripSearch.jsp" />
 			<forward name="tripDetail" path="/jsp/location/tripDetail.jsp" />
+		</action>
+			<!-- AdminConsole -->
+		<action name="adminConsoleForm" path="/jsp/adminConsole" parameter="do" scope="request" type="com.isecinc.pens.web.adminconsole.AdminConsoleAction" >
+			<forward name="process" path="/jsp/adminConsole/adminConsole.jsp" />
 		</action>
 	</action-mappings>
  

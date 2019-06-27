@@ -2,11 +2,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <script>
-function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
-	new Epoch('epoch_popup', 'th', document.getElementById('endDate'));
+function loadCalendar(){
+	/* new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+	new Epoch('epoch_popup', 'th', document.getElementById('endDate')); */
+	
+	 $('#startDate').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+	 $('#endDate').calendarsPicker({calendar: $.calendars.instance('thai','th')});
 }
-
+function loadMe(){}
 function search(path){
 	var form = document.shopForm;
    var startDate = form.startDate;
@@ -26,9 +29,9 @@ function search(path){
    <tr>
 	<td align="right" width="10%"> จาก วันที่ขาย</td>
 	<td align="left" width="20%">
-	<html:text property="bean.startDate" styleId="startDate" readonly="true" size="10"/>
+	<html:text property="bean.startDate" styleId="startDate" readonly="false" size="10" styleClass="\" autoComplete=\"off"/>
 	&nbsp;&nbsp;ถึง วันที่ขาย&nbsp;&nbsp;
-    <html:text property="bean.endDate" styleId="endDate" readonly="true" size="10"/>
+    <html:text property="bean.endDate" styleId="endDate" readonly="false" size="10" styleClass="\" autoComplete=\"off"/>
 	</td>
   </tr>
    <tr>

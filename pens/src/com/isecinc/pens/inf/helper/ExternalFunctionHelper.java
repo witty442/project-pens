@@ -355,6 +355,10 @@ public class ExternalFunctionHelper {
 					id = "N";
 				}
 				exe = false;
+			/** for mark order_line is update */
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_UPDATE_FLAG")){	
+				id = "Y";
+				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_ADDRESS_ID")){
 				findColumn = "ADDRESS_ID";
 				sql.append("  select "+findColumn+" FROM m_address WHERE REFERENCE_ID = "+value+"" );		

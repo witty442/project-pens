@@ -9,6 +9,8 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import util.ControlCode;
+import util.DateToolsUtil;
 import util.Utils;
 
 import com.isecinc.pens.bean.User;
@@ -19,6 +21,7 @@ public class SAGenCondition {
 	
 	protected static  Logger logger = Logger.getLogger("PENS");
 	SAUtils reportU = new SAUtils();
+    boolean getOldVersion = true;
 	public static void main(String[] a){
 		try{
 			genWhereCondSQLCaseByYEAR("INVOICE","'2017','2015'");
@@ -26,6 +29,299 @@ public class SAGenCondition {
 			e.printStackTrace();
 		}
 	}
+	
+   /** WIT Say:Wait for Case Month year difference Not work 21/06/2019 **/
+	public static String genWhereCondSQLCaseByMonthYearMain(String tab,String schema,String type,String colGroupName){
+		 String sql = "";
+		 boolean getNewVersion = ControlCode.canExecuteMethod("SAGenCondition", "genWhereCondSQLCaseByMonthYearNewVersion");
+		 if("ORDER".equalsIgnoreCase(type)){
+			 if( getNewVersion){
+				 //new version 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondMonthYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND sales_order_date >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND sales_order_date <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+				 
+			 }else{
+				 //orginal version
+				 sql = tab+" AND sales_order_year || sales_order_month  IN("+colGroupName+")";
+			 }
+		 }else{
+			 if(getNewVersion){
+				//new version 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondMonthYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND INVOICE_DATE >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND INVOICE_DATE <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+			 }else{
+				//orginal version
+				 sql = tab+" AND invoice_YEAR || invoice_month  IN("+colGroupName+")";
+			 }
+		 }
+		 return sql;
+	 }
+	
+	 public static String genWhereCondSQLCaseByMonthYear(String tab,String schema,String type,String colGroupName){
+		 String sql = "";
+		 boolean getNewVersion = ControlCode.canExecuteMethod("SAGenCondition", "genWhereCondSQLCaseByMonthYearNewVersion");
+		 if("ORDER".equalsIgnoreCase(type)){
+			 if(getNewVersion){
+				 //new vision 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondMonthYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND sales_order_date >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND sales_order_date <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+			 }else{
+				 //orginal version
+				 sql = tab+" AND sales_order_year || sales_order_month  IN("+colGroupName+")"; 
+			 }
+		 }else{
+			 if(getNewVersion){
+				 //new version 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondMonthYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND INVOICE_DATE >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND INVOICE_DATE <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+			 }else{
+				//orginal version
+				 sql = tab+" AND invoice_year || invoice_month  IN("+colGroupName+")";
+			 }
+		 }
+		 return sql;
+	 }
+	 
+     /**
+      * String[2] 
+      * @param allMonthYear
+      * @return String[0]= minDate ,String[1]=maxDate
+      */
+     public static String[] genDateFromCondMonthYear(String allYYYYMM) {
+    	
+	    String[] dateReturnArr = null;
+	    int[] dateReturnArrSort = null;
+	    String yyyymmdd = "";
+    	Date date = null;
+    	int indexArr = 0;
+    	try{
+    		logger.debug("allYYYYMM:"+allYYYYMM);
+    		allYYYYMM = allYYYYMM.replaceAll("'", "");
+    		
+	    	if(allYYYYMM.indexOf(",") != -1){
+		    	String[] allYYYYMM_ARR = allYYYYMM.split("\\,");
+		    	 dateReturnArr = new String[allYYYYMM_ARR.length*2];
+		    	 dateReturnArrSort = new int[allYYYYMM_ARR.length*2];
+		    	 
+		    	if(allYYYYMM_ARR.length >0){
+		          for(int i=0;i<=allYYYYMM_ARR.length-1;i++){
+		        	  //minDateOfMonth
+		        	  yyyymmdd = allYYYYMM_ARR[i]+"01";
+		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
+		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+		        	  logger.debug("minDateOfMonth:"+yyyymmdd);
+		        	  
+		        	  //maxDateOfMonth
+		        	  date = Utils.parse(yyyymmdd, "yyyyMMdd");
+		        	  yyyymmdd = allYYYYMM_ARR[i]+DateToolsUtil.getMaxDayOfMonth(date);
+		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
+		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+		        	  
+		        	  logger.debug("maxDateOfMonth:"+yyyymmdd);
+		          }//for
+		          
+		          //Sort Array of Mast min to max
+		          Arrays.sort(dateReturnArrSort);
+		          
+		    	}//if
+	    	}else{
+	    		dateReturnArr = new String[2];
+	    		
+	    		//minDateOfMonth
+	        	yyyymmdd = allYYYYMM+"01";
+	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+	        	logger.debug("minDateOfMonth:"+yyyymmdd);
+	        	  
+	        	//maxDateOfMonth
+	        	date = Utils.parse(yyyymmdd, "yyyyMMdd");
+	        	yyyymmdd = allYYYYMM+DateToolsUtil.getMaxDayOfMonth(date);
+	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+	        	  
+	        	logger.debug("maxDateOfMonth:"+yyyymmdd);
+	    	}
+    	}catch(Exception e){
+    		logger.error(e.getMessage(),e);
+    	}
+	    return dateReturnArr;
+	 }
+     
+     public static String genWhereCondSQLCaseByQuarterYearMain(String tab,String schema,String type,String colGroupName){
+    	 String sql = "";
+    	 boolean getNewVersion = ControlCode.canExecuteMethod("SAGenCondition", "genWhereCondSQLCaseByMonthYearNewVersion");
+    	 if("ORDER".equalsIgnoreCase(type)){
+    		 if(getNewVersion){
+    			 //new vision 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondQuarterYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND sales_order_date >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND sales_order_date <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+    		 }else{
+    			 //orginal version
+			    sql = tab+" AND sales_order_year||sales_order_quarter IN ("+colGroupName+")";
+    		 }
+		 }else{
+			 if(getNewVersion){
+				 //new version 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondQuarterYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND INVOICE_DATE >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND INVOICE_DATE <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+			 }else{
+				//orginal version
+				 sql = tab+" AND invoice_year||invoice_quarter IN ("+colGroupName+")";  
+			 }
+		 }//if
+    	 return sql;
+	 }
+	
+     public static String genWhereCondSQLCaseByQuarterYear(String tab,String schema,String type,String colGroupName){
+    	 String sql = "";
+    	 boolean getNewVersion = ControlCode.canExecuteMethod("SAGenCondition", "genWhereCondSQLCaseByMonthYearNewVersion");
+    	 if("ORDER".equalsIgnoreCase(type)){
+    		 if(getNewVersion){
+    			 //new vision 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondQuarterYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND sales_order_date >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND sales_order_date <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+    		 }else{
+    			 //orginal version
+			     sql = tab+" AND sales_order_year||sales_order_quarter IN ("+colGroupName+")";
+    		 }
+		 }else{
+			 if(getNewVersion){
+				 //new version 2 gen month to date
+				 String[] dateReturnArr =  genDateFromCondQuarterYear(colGroupName);
+				 String minDateStr  = dateReturnArr[0];
+				 String maxDateStr = dateReturnArr[dateReturnArr.length-1];
+				 sql  = tab+" AND INVOICE_DATE >= to_date('"+minDateStr+"','yyyymmdd') \n";
+				 sql += tab+" AND INVOICE_DATE <= to_date('"+maxDateStr+"','yyyymmdd') \n";
+			 }else{
+				//orginal version
+				 sql = tab+" AND invoice_year||invoice_quarter IN ("+colGroupName+")"; 
+			 }
+		 }//if
+    	 return sql;
+	 }
+     
+     
+     /**
+      * String[2] 
+      * @param allYYYYQQ
+      * @return String[0]= minDate ,String[1]=maxDate
+      */
+     public static String[] genDateFromCondQuarterYear(String allYYYYQQ) {
+    	
+	    String[] dateReturnArr = null;
+	    int[] dateReturnArrSort = null;
+	    String yyyymmdd = "";
+    	Date date = null;
+    	int indexArr = 0;
+    	String yyyy = "";
+    	String[] mm = null;
+    	String qq="";
+    	try{
+    		logger.debug("allYYYYQQ:"+allYYYYQQ);
+    		allYYYYQQ = allYYYYQQ.replaceAll("'", "");
+    		
+	    	if(allYYYYQQ.indexOf(",") != -1){
+		    	String[] allYYYYQQ_ARR = allYYYYQQ.split("\\,");
+		    	 dateReturnArr = new String[allYYYYQQ_ARR.length*2];
+		    	 dateReturnArrSort = new int[allYYYYQQ_ARR.length*2];
+		    	 
+		    	if(allYYYYQQ_ARR.length >0){
+		          for(int i=0;i<=allYYYYQQ_ARR.length-1;i++){
+		        	  //get month from Quarter
+			    	  yyyy = allYYYYQQ_ARR[i].substring(0,4);
+			    	  qq = allYYYYQQ_ARR[i].substring(4,5);
+			    	  mm = getMonthFromQuarter(qq);
+			    		
+		        	  //minDateOfMonth
+		        	  yyyymmdd =yyyy+mm[0]+"01";
+		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
+		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+		        	  logger.debug("minDateOfMonth:"+yyyymmdd);
+		        	  
+		        	  //maxDateOfMonth
+		        	  date = Utils.parse(yyyy+mm[1]+"01", "yyyyMMdd");
+		        	  yyyymmdd = yyyy+mm[1]+DateToolsUtil.getMaxDayOfMonth(date);
+		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
+		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+		        	  
+		        	  logger.debug("maxDateOfMonth:"+yyyymmdd);
+		          }//for
+		          
+		          //Sort Array of Mast min to max
+		          Arrays.sort(dateReturnArrSort);
+		          
+		    	}//if
+	    	}else{
+	    		dateReturnArr = new String[2];
+	    		//get month from Quarter
+	    		yyyy = allYYYYQQ.substring(0,4);
+	    		qq = allYYYYQQ.substring(4,5);
+	    		mm = getMonthFromQuarter(qq);
+	    		
+	    		//logger.debug("mm[0]"+mm[0]);
+	    		//logger.debug("mm[1]"+mm[1]);
+	    		
+	    		//minDateOfMonth
+	        	yyyymmdd = yyyy+mm[0]+"01";
+	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+	        	logger.debug("minDateOfMonth:"+yyyymmdd);
+	        	  
+	        	//maxDateOfMonth
+	        	date = Utils.parse(yyyy+mm[1]+"01", "yyyyMMdd");
+	        	yyyymmdd = yyyy+mm[1]+DateToolsUtil.getMaxDayOfMonth(date);
+	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
+	        	  
+	        	logger.debug("maxDateOfMonth:"+yyyymmdd);
+	    	}
+    	}catch(Exception e){
+    		logger.error(e.getMessage(),e);
+    	}
+	    return dateReturnArr;
+	 }
+     
+     /**
+      * Get Month By Quarter
+      * @param quarter
+      * @return string[0] = minMonthOfQyarter ,String[1] maxMonthOfQuater
+      */
+     public static String[] getMonthFromQuarter(String quarter){
+    	 String[] mm = new String[2];
+    	 if(quarter.equals("1")){
+    		 mm[0] = "01";
+    		 mm[1] = "03";
+    	 }else  if(quarter.equals("2")){
+    		 mm[0] = "04";
+    		 mm[1] = "06";
+    	 }else  if(quarter.equals("3")){
+    		 mm[0] = "07";
+    		 mm[1] = "09";
+    	 }else  if(quarter.equals("4")){
+    		 mm[0] = "10";
+    		 mm[1] = "12";
+    	 }
+    	 return mm;
+     }
+     
+     
 	 public static String genWhereCondSQLCaseByYEAR(String typeColumn,String allYear){
 	    	String sql = "";
 	    	logger.debug("allYear:"+allYear);
@@ -46,20 +342,20 @@ public class SAGenCondition {
 		        	 
 		        	if("INVOICE".equalsIgnoreCase(typeColumn)){
 		 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
-		 	    		sql +="\t AND INVOICE_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t\t AND INVOICE_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
 		 	    	}else{
 		 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
-		 	    		sql +="\t AND ORDERED_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t\t AND ORDERED_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
 		 	    	}
 		    	}
 	    	}else{
 	    		allYear = allYear.replaceAll("'", "");
 	    		if("INVOICE".equalsIgnoreCase(typeColumn)){
 	 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
-	 	    		sql +="\t AND INVOICE_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t\t AND INVOICE_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
 	 	    	}else{
 	 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
-	 	    		sql +="\t AND ORDERED_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t\t AND ORDERED_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
 	 	    	}
 	    	}
 	    	return sql;
@@ -456,15 +752,23 @@ public class SAGenCondition {
 			
 			/** Where Condition By Group  **/
 			if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
-			    sql.append(""+" AND sales_order_year||sales_order_month = '"+colGroupName+"' \n");
+			    //sql.append(""+" AND sales_order_month = '"+colGroupName.substring(4,6)+"' \n");
+			    //sql.append("\t\t"+" AND sales_order_year = '"+colGroupName.substring(0,4)+"' \n");
+			    
+			    sql.append(SAGenCondition.genWhereCondSQLCaseByMonthYear("\t\t","","ORDER","'"+colGroupName+"'"));
+			    
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(""+" AND sales_order_year||sales_order_quarter = '"+colGroupName+"' \n");
+				//sql.append(""+" AND sales_order_quarter = '"+colGroupName.substring(4,5)+"' \n");
+				//sql.append("\t\t"+" AND sales_order_year = '"+colGroupName.substring(0,4)+"' \n");
+				
+				sql.append(SAGenCondition.genWhereCondSQLCaseByQuarterYear("\t\t","","ORDER","'"+colGroupName+"'"));
+				
 			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				//sql.append(""+" AND sales_order_year = '"+colGroupName+"' \n");
 				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",colGroupName));
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo() , Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append(""+"AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
+				sql.append("\t\t"+"AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
 			}
 			
 			//Include Pos or not
@@ -481,15 +785,22 @@ public class SAGenCondition {
 			
 			/** Where Condition By Group  **/
 			if(SAInitial.TYPE_SEARCH_MONTH.equalsIgnoreCase(salesBean.getTypeSearch())){
-			    sql.append(""+" AND invoice_year||invoice_month = '"+colGroupName+"' \n");
+			   // sql.append(""+" AND invoice_month = '"+colGroupName.substring(4,6)+"' \n");
+			   // sql.append("\t\t"+" AND invoice_year = '"+colGroupName.substring(0,4)+"' \n");
+				
+				 sql.append(SAGenCondition.genWhereCondSQLCaseByMonthYear("\t\t","","INVOICE","'"+colGroupName+"'"));
 			}else if(SAInitial.TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
-				sql.append(""+" AND invoice_year||invoice_quarter = '"+colGroupName+"' \n");
+				//sql.append(""+" AND invoice_quarter = '"+colGroupName.substring(4,5)+"' \n");
+				//sql.append("\t\t"+" AND invoice_year = '"+colGroupName.substring(0,4)+"' \n");
+				
+				 sql.append(SAGenCondition.genWhereCondSQLCaseByQuarterYear("\t\t","","INVOICE","'"+colGroupName+"'"));
+				 
 			}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 				//sql.append(""+" AND invoice_year = '"+colGroupName+"' \n");
 				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",colGroupName));
 			}else{
 				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append(""+" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+				sql.append("\t\t"+" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 			}
 			
 			//Include Pos or not

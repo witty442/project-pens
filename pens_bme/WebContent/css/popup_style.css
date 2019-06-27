@@ -4,7 +4,8 @@ TABLE.tableHead TH {
 	color:#FFFFFF;
 }
 TABLE.tableHead TD {
-	
+	height: 25px;
+	font-size: 13px;
 }
 .headTitle{
 	background-color:#02a7b9;

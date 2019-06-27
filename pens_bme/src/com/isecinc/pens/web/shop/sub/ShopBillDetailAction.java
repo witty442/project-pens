@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForm;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
+import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.shop.ShopBean;
@@ -164,7 +165,11 @@ public class ShopBillDetailAction {
 			sql.append("\n   ,( ((P.discount_percent/100)*a.price) * A.qty) discount_amt");
 			sql.append("\n   FROM(");
 			sql.append("\n     SELECT ");
-			sql.append("\n      H.order_date,MP.MATERIAL_MASTER");
+			if(newVersion){
+			   sql.append("\n      MP.MATERIAL_MASTER");
+			}else{
+			   sql.append("\n      H.order_date,MP.MATERIAL_MASTER");
+			}
 			sql.append("\n     ,MP.pens_item,MP.inventory_item_id");
 			sql.append("\n     ,D.price");
 			if(newVersion){
@@ -180,11 +185,13 @@ public class ShopBillDetailAction {
 			sql.append("\n      ,MP.PENS_VALUE as PENS_ITEM,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n      ,MP.INTERFACE_DESC as BARCODE ");
 			sql.append("\n      FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
-			sql.append("\n      where MP.reference_code ='7CItem' ");
+			sql.append("\n      where MP.reference_code in('7CItem') ");
 			sql.append("\n      AND MP.pens_value =I.segment1");
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
+			//MAYA SHOP
+			sql.append("\n     AND H.CUSTOMER_NUMBER ='"+PickConstants.STORE_TYPE_PENSHOP_CODE+"' ");
 			
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n    AND MP.MATERIAL_MASTER LIKE '"+Utils.isNull(o.getGroupCode())+"%'");
@@ -203,7 +210,11 @@ public class ShopBillDetailAction {
 				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
-			sql.append("\n     group by H.order_date,MP.MATERIAL_MASTER");
+			if(newVersion){
+			   sql.append("\n     group by MP.MATERIAL_MASTER");
+			}else{
+			   sql.append("\n     group by H.order_date,MP.MATERIAL_MASTER");
+			}
 			sql.append("\n     ,MP.pens_item,MP.inventory_item_id ,D.price ");
 			if(newVersion){
 				sql.append("\n        ,D.list_line_id");
@@ -356,7 +367,7 @@ public class ShopBillDetailAction {
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
-			
+			sql.append("\n     AND H.customer_number ='"+PickConstants.STORE_TYPE_PENSHOP_CODE+"'");
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n    AND MP.MATERIAL_MASTER LIKE '"+Utils.isNull(o.getGroupCode())+"%'");
 			}
@@ -496,7 +507,7 @@ public class ShopBillDetailAction {
 					h.append("</tr>");
 				}
 				/** Summary **/
-				ShopBean s = form.getSummary();
+				ShopBean s = searchSummary(conn, form.getBean());
 				h.append("<tr> \n");
 				  h.append("<td class='text'></td> \n");
 				  h.append("<td class='text'></td> \n");

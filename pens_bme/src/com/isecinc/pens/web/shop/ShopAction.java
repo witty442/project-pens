@@ -82,6 +82,7 @@ public class ShopAction extends I_Action {
 					 forward = "searchPromotion"; 
 				 }else if(P_SHOP_BILL_DETAIL.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
 				 }
 				 mayaForm.setBean(bean);
 				 mayaForm.setResults(null);

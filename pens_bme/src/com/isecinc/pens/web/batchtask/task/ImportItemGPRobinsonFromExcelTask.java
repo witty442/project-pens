@@ -69,7 +69,7 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 		return "Import File From Excel";
 	}
 	public String getDevInfo(){
-		return "";
+		return "PENSBI.PENSBME_ITEMBY_GP";
 	}
 	public String getValidateScript(){
 		String script ="";

@@ -824,7 +824,7 @@ public class MOrder extends I_Model<Order> {
 			}
 		}
 	}
-	
+
 	
 	public List<Order> getOrderVanNotReceipt(Connection conn,User user) throws Exception {
 

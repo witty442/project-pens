@@ -122,10 +122,12 @@ public class SalesTargetTTDAO {
 			
 			h = convertCriteria(h);
 			
-			//update status Unaccept
+			//update status accept to finish
 			SalesTargetTTDAO.updateStatusHead_TEMPByTTSUPER(conn, h);
 			SalesTargetTTDAO.updateStatusItem_TEMPByTTSUPER(conn, h);
 			
+			//update TT for MKT
+			SalesTargetTTDAO.updateStatusHead_TTByMKT(conn, h);
 			conn.commit();
 			r = true;
 		} catch (Exception e) {
@@ -270,12 +272,25 @@ public class SalesTargetTTDAO {
 			//convert Criteria
 			o = convertCriteria(o);
 
-			sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand");
+			sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand,M.status as status_tt ");
 			sql.append("\n  ,(select max(zone_name) from PENSBI.XXPENS_BI_MST_SALES_ZONE B where B.zone = M.zone) as zone_name ");
 			sql.append("\n  ,(select max(cust_cat_desc) from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT B where B.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_DESC ");
 			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
 			sql.append("\n  ,(select nvl(sum(target_qty),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_qty ");
 			sql.append("\n  ,(select nvl(sum(target_amount),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_amount ");
+			
+			sql.append("\n  ,(select nvl(sum(target_qty),0) ");
+			sql.append("\n    from PENSBI.XXPENS_BI_SALES_TARGET_TEMP H ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    where H.id=L.id and H.salesrep_id = Z.salesrep_id");
+			sql.append("\n    and H.period = M.period and H.brand = M.brand ");
+			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
+			sql.append("\n    and Z.zone = M.zone");
+			sql.append("\n    and H.target_month = M.target_month");
+			sql.append("\n    and H.target_quarter = M.target_quarter");
+			sql.append("\n    and H.target_year = M.target_year");
+			sql.append("\n  ) as total_sales_target_qty ");
+			
 			sql.append("\n  , M.status as tt_status ,M.reject_reason ");
 			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
 			sql.append("\n  where 1=1 ");
@@ -336,9 +351,12 @@ public class SalesTargetTTDAO {
 			   h.setTargetQuarter(o.getTargetQuarter());
 			   h.setTargetYear(o.getTargetYear());
 			   
-			   h.setStatus(findStatusTEMPByTTSUPER(conn,h));
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h,rst.getString("status_tt")));
 			   if( Utils.isNull(h.getStatus()).equals("") ){
 				  h.setStatus(Utils.isNull(rst.getString("tt_status")));
+			   }
+			   if(rst.getInt("total_sales_target_qty") <= 0){
+				   h.setCanCopy(true);
 			   }
 			   
 			   //get Total Qty
@@ -370,10 +388,10 @@ public class SalesTargetTTDAO {
 		return o;
 	}
 	public static SalesTargetBean searchTargetHeadByTTMGR_TT(SalesTargetBean o,User user,String pageName ) throws Exception {
-		return searchTargetHeadByTTMGR_TTTypeBrand(o, user, pageName);
+		return searchTargetHeadByTTMGR_TTypeBrand(o, user, pageName);
 	}
 	
-	public static SalesTargetBean searchTargetHeadByTTMGR_TTTypeBrand(SalesTargetBean o,User user,String pageName ) throws Exception {
+	public static SalesTargetBean searchTargetHeadByTTMGR_TTypeBrand(SalesTargetBean o,User user,String pageName ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -390,7 +408,7 @@ public class SalesTargetTTDAO {
 			//convert Criteria
 			o = convertCriteria(o);
 
-			sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand");
+			sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand,M.status as status_tt ");
 			sql.append("\n  ,(select max(zone_name) from PENSBI.XXPENS_BI_MST_SALES_ZONE B where B.zone = M.zone) as zone_name ");
 			sql.append("\n  ,(select max(cust_cat_desc) from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT B where B.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_DESC ");
 			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
@@ -400,16 +418,26 @@ public class SalesTargetTTDAO {
 			
 			sql.append("\n  ,(select nvl(sum(target_qty),0) ");
 			sql.append("\n    from PENSBI.XXPENS_BI_SALES_TARGET_TEMP H ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
-			sql.append("\n    where H.id=L.id ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    where H.id=L.id and H.salesrep_id = Z.salesrep_id");
 			sql.append("\n    and H.period = M.period and H.brand = M.brand ");
 			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
+			sql.append("\n    and Z.zone = M.zone");
+			sql.append("\n    and H.target_month = M.target_month");
+			sql.append("\n    and H.target_quarter = M.target_quarter");
+			sql.append("\n    and H.target_year = M.target_year");
 			sql.append("\n  ) as total_sales_target_qty ");
 			
 			sql.append("\n  ,(select nvl(sum(target_amount),0) ");
 			sql.append("\n    from PENSBI.XXPENS_BI_SALES_TARGET_TEMP H ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
-			sql.append("\n    where H.id=L.id ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    where H.id=L.id and H.salesrep_id = Z.salesrep_id");
 			sql.append("\n    and H.period = M.period and H.brand = M.brand ");
 			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
+			sql.append("\n    and Z.zone = M.zone");
+			sql.append("\n    and H.target_month = M.target_month");
+			sql.append("\n    and H.target_quarter = M.target_quarter");
+			sql.append("\n    and H.target_year = M.target_year");
 			sql.append("\n  ) as total_sales_target_amount ");
 			
 			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
@@ -447,7 +475,6 @@ public class SalesTargetTTDAO {
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
 			   rowId++;
 			   h = new SalesTargetBean();
@@ -470,32 +497,29 @@ public class SalesTargetTTDAO {
 			   h.setTargetMonth(o.getTargetMonth());
 			   h.setTargetQuarter(o.getTargetQuarter());
 			   h.setTargetYear(o.getTargetYear());
-			   h.setStatus(findStatusTEMPByTTSUPER(conn,h));
+			   
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h,rst.getString("status_tt")));
 			  
 			   //get Total Qty MKT
-			   totalTargetQty = totalTargetQty+ rst.getInt("TOTAL_TARGET_QTY");
-			   totalTargetAmount = totalTargetAmount+ rst.getDouble("TOTAL_TARGET_AMOUNT");
+			   totalTargetQty += rst.getInt("TOTAL_TARGET_QTY");
+			   totalTargetAmount += rst.getDouble("TOTAL_TARGET_AMOUNT");
 			
 			   //Total By TTSUPER
-			   totalSalesTargetQty = totalSalesTargetQty+ rst.getInt("TOTAL_SALES_TARGET_QTY");
-			   totalSalesTargetAmount = totalSalesTargetAmount+ rst.getDouble("TOTAL_SALES_TARGET_AMOUNT");
+			   totalSalesTargetQty += rst.getInt("TOTAL_SALES_TARGET_QTY");
+			   totalSalesTargetAmount += rst.getDouble("TOTAL_SALES_TARGET_AMOUNT");
 			  
 			   //set Access Action
 			   h = SalesTargetTTUtils.setAccess(h,user,pageName);
-			   logger.debug("canUnAccept:"+h.isCanUnAccept());
-			   logger.debug("canFinish:"+h.isCanFinish());
+			  // logger.debug("canUnAccept:"+h.isCanUnAccept());
+			  // logger.debug("canFinish:"+h.isCanFinish());
 			   
 			   items.add(h);
-			   
-			   
-			   //Check can Finish All Search
-			   if( !SalesTargetConstants.STATUS_FINISH.equalsIgnoreCase(h.getStatus())){
-				 if( SalesTargetConstants.STATUS_ACCEPT.equalsIgnoreCase(h.getStatus())){
-				   canFinish = true;
-				 }
-			   }
+			   canFinish = true;//show alway
 			}//while
 
+			//logger.debug("totalSalesTargetQty:"+totalSalesTargetQty);
+			//logger.debug("totalSalesTargetAmount:"+totalSalesTargetAmount);
+			
 			//set Result 
 			o.setItems(items);
 			o.setTotalTargetQty(Utils.decimalFormat(totalTargetQty, Utils.format_current_no_disgit));
@@ -514,6 +538,164 @@ public class SalesTargetTTDAO {
 		}
 		return o;
 	}
+	
+	public static SalesTargetBean searchTargetHeadByTTADMIN_TT(SalesTargetBean o,User user,String pageName ) throws Exception {
+		return searchTargetHeadByTTADMIN_TTypeBrand(o, user, pageName);
+	}
+	
+	public static SalesTargetBean searchTargetHeadByTTADMIN_TTypeBrand(SalesTargetBean o,User user,String pageName ) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		SalesTargetBean h = null;
+		List<SalesTargetBean> items = new ArrayList<SalesTargetBean>();
+		int totalTargetQty = 0;
+		double totalTargetAmount = 0;
+		int totalSalesTargetQty = 0;
+		double totalSalesTargetAmount = 0;
+		boolean canFinish = false;
+		int rowId=0;
+		try {
+			//convert Criteria
+			o = convertCriteria(o);
+			sql.append("\n SELECT A.BRAND  ");
+			sql.append("\n SUM(total_target_qty) as total_target_qty  ");
+			sql.append("\n SUM(total_target_amount) as total_target_amount  ");
+			sql.append("\n FROM(  ");
+			sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand,M.status as status_tt ");
+			sql.append("\n  ,(select max(zone_name) from PENSBI.XXPENS_BI_MST_SALES_ZONE B where B.zone = M.zone) as zone_name ");
+			sql.append("\n  ,(select max(cust_cat_desc) from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT B where B.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_DESC ");
+			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
+			
+			sql.append("\n  ,(select nvl(sum(target_qty),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_qty ");
+			sql.append("\n  ,(select nvl(sum(target_amount),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_amount ");
+			
+			sql.append("\n  ,(select nvl(sum(target_qty),0) ");
+			sql.append("\n    from PENSBI.XXPENS_BI_SALES_TARGET_TEMP H ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    where H.id=L.id and H.salesrep_id = Z.salesrep_id");
+			sql.append("\n    and H.period = M.period and H.brand = M.brand ");
+			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
+			sql.append("\n    and Z.zone = M.zone");
+			sql.append("\n    and H.target_month = M.target_month");
+			sql.append("\n    and H.target_quarter = M.target_quarter");
+			sql.append("\n    and H.target_year = M.target_year");
+			sql.append("\n  ) as total_sales_target_qty ");
+			
+			sql.append("\n  ,(select nvl(sum(target_amount),0) ");
+			sql.append("\n    from PENSBI.XXPENS_BI_SALES_TARGET_TEMP H ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
+			sql.append("\n    ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    where H.id=L.id and H.salesrep_id = Z.salesrep_id");
+			sql.append("\n    and H.period = M.period and H.brand = M.brand ");
+			sql.append("\n    and H.CUSTOMER_CATEGORY = M.CUSTOMER_CATEGORY ");
+			sql.append("\n    and Z.zone = M.zone");
+			sql.append("\n    and H.target_month = M.target_month");
+			sql.append("\n    and H.target_quarter = M.target_quarter");
+			sql.append("\n    and H.target_year = M.target_year");
+			sql.append("\n  ) as total_sales_target_amount ");
+			
+			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
+			sql.append("\n  where 1=1 ");
+			sql.append("\n  and m.status <> '"+SalesTargetConstants.STATUS_OPEN+"'");
+			if( !Utils.isNull(o.getSalesZone()).equals("")){
+				sql.append("\n and M.zone = '"+Utils.isNull(o.getSalesZone())+"'");
+			}
+			if( !Utils.isNull(o.getCustCatNo()).equals("")){
+				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+			}
+			if( !Utils.isNull(o.getTargetMonth()).equals("")){
+				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+			}
+			if( !Utils.isNull(o.getTargetQuarter()).equals("")){
+				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+			}
+			if( !Utils.isNull(o.getTargetYear()).equals("")){
+				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+			}
+			if( !Utils.isNull(o.getBrand()).equals("")){
+				sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+			}
+			//filter user login
+			if( !Utils.isNull(user.getUserName()).equalsIgnoreCase("admin")){
+				sql.append("\n and M.zone in( ");
+				sql.append("\n  select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT");
+				sql.append("\n  where user_name = '"+user.getUserName()+"'");
+				sql.append("\n ) ");
+			}
+			sql.append("\n )A ");
+			
+			sql.append("\n ORDER BY A.brand asc ");
+
+			logger.debug("sql:"+sql);
+			
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   rowId++;
+			   h = new SalesTargetBean();
+			   h.setRowId(rowId);
+			   h.setPeriod(o.getPeriod());
+			   h.setStartDate(o.getStartDate());
+			   h.setCustCatNo(rst.getString("CUSTOMER_CATEGORY"));  
+			   h.setCustCatDesc(rst.getString("CUSTOMER_CATEGORY_DESC")); 
+			   h.setSalesZone(rst.getString("zone"));
+			   h.setSalesZoneDesc(rst.getString("zone_name"));
+			   h.setBrand(rst.getString("brand"));  
+			   h.setBrandName(rst.getString("brand_name"));
+			   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit,""));
+			   h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
+			
+			   h.setSalesTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_SALES_TARGET_QTY"), Utils.format_current_no_disgit,""));
+			   h.setSalesTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_SALES_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
+			
+			   //get status from temp //more 1 status
+			   h.setTargetMonth(o.getTargetMonth());
+			   h.setTargetQuarter(o.getTargetQuarter());
+			   h.setTargetYear(o.getTargetYear());
+			   
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h,rst.getString("status_tt")));
+			  
+			   //get Total Qty MKT
+			   totalTargetQty += rst.getInt("TOTAL_TARGET_QTY");
+			   totalTargetAmount += rst.getDouble("TOTAL_TARGET_AMOUNT");
+			
+			   //Total By TTSUPER
+			   totalSalesTargetQty += rst.getInt("TOTAL_SALES_TARGET_QTY");
+			   totalSalesTargetAmount += rst.getDouble("TOTAL_SALES_TARGET_AMOUNT");
+			  
+			   //set Access Action
+			   h = SalesTargetTTUtils.setAccess(h,user,pageName);
+			  // logger.debug("canUnAccept:"+h.isCanUnAccept());
+			  // logger.debug("canFinish:"+h.isCanFinish());
+			   
+			   items.add(h);
+			   canFinish = true;//show alway
+			}//while
+
+			//logger.debug("totalSalesTargetQty:"+totalSalesTargetQty);
+			//logger.debug("totalSalesTargetAmount:"+totalSalesTargetAmount);
+			
+			//set Result 
+			o.setItems(items);
+			o.setTotalTargetQty(Utils.decimalFormat(totalTargetQty, Utils.format_current_no_disgit));
+			o.setTotalTargetAmount(Utils.decimalFormat(totalTargetAmount, Utils.format_current_2_disgit));
+			o.setTotalSalesTargetQty(Utils.decimalFormat(totalSalesTargetQty, Utils.format_current_no_disgit));
+			o.setTotalSalesTargetAmount(Utils.decimalFormat(totalSalesTargetAmount, Utils.format_current_2_disgit));
+			o.setCanFinish(canFinish);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return o;
+	}
+	
 	public static SalesTargetBean searchSalesTargetTT(Connection conn,SalesTargetBean cri,boolean getItems,User user,String pageName) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -522,9 +704,9 @@ public class SalesTargetTTDAO {
 		try {
 			cri = convertCriteria(cri);
 			
-			sql.append("\n   select M.id ");
+			sql.append("\n   select M.id ,M.status as status_tt ");
 			sql.append("\n  ,M.BRAND_GROUP,M.PERIOD ,Z.ZONE,Z.ZONE_NAME");
-			sql.append("\n  ,M.status ,M.brand ,M.CUSTOMER_CATEGORY ");
+			sql.append("\n  ,M.status as status_tt ,M.brand ,M.CUSTOMER_CATEGORY ");
 			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
 			sql.append("\n  ,(select nvl(sum(amt_avg12),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as amt_avg12 ");
 			sql.append("\n  ,(select nvl(sum(amt_avg3),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as amt_avg3 ");	
@@ -565,7 +747,7 @@ public class SalesTargetTTDAO {
 			if(rst.next()) {
 			   h = new SalesTargetBean();
 			   h.setId(rst.getLong("ID"));
-			   h.setStatus(Utils.isNull(rst.getString("status"))); 
+			  
 			   h.setSalesZone(Utils.isNull(rst.getString("zone"))); 
 			   h.setSalesZoneDesc(Utils.isNull(rst.getString("zone_name"))); 
 			   h.setBrand(Utils.isNull(rst.getString("brand"))); 
@@ -583,6 +765,8 @@ public class SalesTargetTTDAO {
 			   h.setTargetYear(Utils.isNull(rst.getString("target_year")));
 			   
 			   h.setPeriod(rst.getString("period"));
+			   
+			   h.setStatus(findStatusTEMPByTTSUPER(conn,h,rst.getString("status_tt")));
 			   //get period
 			   SalesTargetBean period = SalesTargetTTUtils.getPeriodList(conn,h.getPeriod()).get(0);//get Period View
 			   if(period != null){
@@ -789,9 +973,13 @@ public class SalesTargetTTDAO {
 			   h.setSalesrepCode(rst.getString("salesrep_code"));
 			   h.setItemCode(rst.getString("INVENTORY_ITEM_CODE"));
 			   h.setItemName(rst.getString("INVENTORY_ITEM_DESC"));
-			   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TARGET_QTY"), Utils.format_number_no_digit));
-			   h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TARGET_AMOUNT"), Utils.format_current_2_disgit));
-              
+			   if(rst.getDouble("TARGET_QTY") != 0){
+			       h.setTargetQty(Utils.decimalFormat(rst.getDouble("TARGET_QTY"), Utils.format_number_no_digit));
+			       h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TARGET_AMOUNT"), Utils.format_current_2_disgit));
+			   }else{
+				   h.setTargetQty("");
+				   h.setTargetAmount("");
+			   }
 			   keyMap ="target_qty_"+h.getItemCode()+"_"+h.getSalesrepCode();
                
 			   dataMap.put(keyMap, h);
@@ -828,7 +1016,6 @@ public class SalesTargetTTDAO {
 			sql.append("\n    where S.cust_cat_no = '"+cri.getCustCatNo()+"') as cust_cat_desc");
 			sql.append("\n  from apps.xxpens_salesreps_v M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id and M.isactive ='Y'");
-			sql.append("\n  and M.salesrep_full_name not like '%ยกเลิก%'");
 			
 			if( Utils.isNull(cri.getCustCatNo()).equalsIgnoreCase("ORDER - VAN SALES")){
 				sql.append("\n  and M.sales_channel = 'C'");
@@ -1210,9 +1397,9 @@ public class SalesTargetTTDAO {
 							    logger.debug("Insert new LineID:"+l.getLineId());
 							    insertXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn, l);
 						   }else{
-								 logger.debug("UPDATE LineID:"+l.getLineId());
-							     //update Item by LineId
-							     updateXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn,l);
+								logger.debug("UPDATE LineID:"+l.getLineId());
+							    //update Item by LineId
+							    updateXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn,l);
 						   }//if
 					   }//for
 					}//if
@@ -1287,7 +1474,7 @@ public class SalesTargetTTDAO {
 	 return maxLineId;
 	}
 	
-	public static String findStatusTEMPByTTSUPER(Connection conn,SalesTargetBean o){
+	public static String findStatusTEMPByTTSUPER(Connection conn,SalesTargetBean o,String status_tt){
 		String status = "";
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1306,7 +1493,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
 			sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
 			
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
@@ -1317,6 +1504,9 @@ public class SalesTargetTTDAO {
 			}//while
 			if(status.length()>0){
 				status = status.substring(0,status.length()-1);
+			}
+			if(Utils.isNull(status).equals("")){
+				status = Utils.isNull(status_tt);
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

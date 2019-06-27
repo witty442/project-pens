@@ -2290,13 +2290,31 @@ public class SummaryDAO {
 			List<StoreBean> storeList = null;
 			try {
 				conn = DBConnection.getInstance().getConnection();
+				logger.debug("test "+Utils.isNull(c.getPensCustCodeFrom())+":"+Utils.isNull(c.getPensCustCodeFrom()).indexOf(","));
 				
-				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL") 
+						&& Utils.isNull(c.getPensCustCodeFrom()).indexOf(",") == -1){
 					//Get By Store
 					storeList =  new ArrayList<StoreBean>();
 					StoreBean storeBean = new StoreBean();
 					storeBean.setStoreCode(c.getPensCustCodeFrom());
 					storeList.add(storeBean);
+				}else if( Utils.isNull(c.getPensCustCodeFrom()).indexOf(",") != -1){ //select multi store
+					logger.debug("Multi storeCode");
+					String[] storeCodeArr = Utils.isNull(c.getPensCustCodeFrom()).split("\\,");
+					StoreBean m = new StoreBean();
+					StoreBean storeB = null;
+					storeList = new ArrayList<StoreBean>();
+					for(int i=0;i<storeCodeArr.length;i++){
+						m = new StoreBean();
+						m.setStoreCode(storeCodeArr[i]);
+						//get StoreName
+						storeB = StoreDAO.getStoreName(conn,"Store",m.getStoreCode(),"LOTUS");
+						if(storeB != null){
+							m.setStoreName(storeB.getStoreName());
+						}
+						storeList.add(m);
+					}
 				}else{
 					//Get AllStore Lotus
 					storeList = StoreDAO.getStoreList(conn, PickConstants.STORE_TYPE_LOTUS_CODE);
@@ -2306,7 +2324,7 @@ public class SummaryDAO {
 				for(int i=0;i<storeList.size();i++){
 					//Loop Step by Store Code
 					StoreBean storeBean = storeList.get(i);
-					f.getOnhandSummary().setPensCustCodeFrom(storeBean.getStoreCode());
+					c.setPensCustCodeFrom(storeBean.getStoreCode());
 					
 					sql = ReportEndDateLotusSQL.genSQL(conn, c, user, f.getSummaryType(),"ReportEndDate");
 					

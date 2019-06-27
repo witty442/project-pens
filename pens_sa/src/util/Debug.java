@@ -7,8 +7,8 @@ public class Debug {
 	private Logger logger = Logger.getLogger("PENS");
 	private boolean isDebug = true;
 	private int level = 0;
-	public  int level_0 = 0;//debug all;
-	public  int level_1 = 1;//debug request;
+	public static int level_0 = 0;//debug all;
+	public static int level_1 = 1;//debug request;
 
 	
 	public Debug(boolean isDebug,int level){
@@ -27,7 +27,7 @@ public class Debug {
 	public void debug(String message,int level){
 		if(isDebug){
 			if(level == level_1){
-		      logger.debug(message);
+		     // logger.debug(message);
 			}
 		}
 	}

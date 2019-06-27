@@ -4,12 +4,36 @@ TABLE.tableHead TH {
 	color:#FFFFFF;
 }
 TABLE.tableHead TD {
-	
+
 }
 .headTitle{
 	background-color:#02a7b9;
 	color:#FFFFFF;
+	font-weight: bold;
+	font-size: 25px;
 }
+
+.headSubTitle{
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.linePopupE {
+	background-color: #e7eefa;
+}
+
+.linePopupE:hover {
+	background-color: #c0d8d8;
+}
+
+.linePopupO {
+	background-color: #e7eefa;
+}
+
+.linePopupO:hover {
+	background-color: #c0d8d8;
+}
+
 /** Style Button **/
 .newPosBtnLong {
 	-moz-box-shadow: 3px 4px 0px 0px #899599;

@@ -19,6 +19,7 @@ public class BeanParameter implements Serializable {
 	private static String modifierPricebreakheader;
 	private static String modifierPromotiongood;
 	// ATTRIBUTE TYPE
+	private static String modifierAllItem;
 	private static String modifierItemCategory;
 	private static String modifierItemNumber;
 	// BREAK TYPE
@@ -44,8 +45,21 @@ public class BeanParameter implements Serializable {
 
 	// QUALIFIER -- end --
 
+	
 	public static String getDatabase() {
 		return database;
+	}
+
+	public static String getModifierAllItem() {
+		return modifierAllItem;
+	}
+
+	public static void setModifierAllItem(String modifierAllItem) {
+		BeanParameter.modifierAllItem = modifierAllItem;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	public static void setDatabase(String database) {

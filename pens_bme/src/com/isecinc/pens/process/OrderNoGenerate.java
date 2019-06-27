@@ -5,12 +5,15 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 import com.pens.util.helper.SequenceProcessAll;
 
 public class OrderNoGenerate {
+  protected static Logger logger = Logger.getLogger("PENS");
   protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 	
    public static String genOrderNoKEY(Date orderDate,String code) throws Exception{
@@ -38,7 +41,7 @@ public class OrderNoGenerate {
    }
    
    /** Next OrderNo by count 400->new Order **/
-   public static String genOrderNoSplit(Connection conn ,Date orderDate,String code) throws Exception{
+   public static String genOrderNoSplit(Date orderDate,String code) throws Exception{
 	   String orderNo = "";
 	   try{
 		   String today = df.format(orderDate);
@@ -47,9 +50,10 @@ public class OrderNoGenerate {
 		   int curMonth = Integer.parseInt(d1[1]);
            
 		   //get Seq
-		   int seq = SequenceProcess.getNextValue(conn, "ORDER_NO", code,orderDate);
-		   
+		   int seq = SequenceProcess.getNextValue("ORDER_NO", code,orderDate);
+		   logger.debug("seq:"+seq);
 		   orderNo = new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("000000000").format(seq);
+	       logger.debug("orderNo:"+orderNo);
 	   }catch(Exception e){
 		   throw e;
 	   }
@@ -58,11 +62,11 @@ public class OrderNoGenerate {
    
    /** 13 Digit EAN13**/
    /** 911+RunningNo+CheckDitgit(EAN13)->911000000001C**/
-   public static String genBarOnBox(Connection conn ,Date orderDate) throws Exception{
+   public static String genBarOnBox(Date orderDate) throws Exception{
 	   String orderNo = "";
 	   try{
 		   //get Seq
-		   int seq = SequenceProcessAll.getNextValue(conn, "BAR_ON_BOX");
+		   int seq = SequenceProcessAll.getNextValue("BAR_ON_BOX");
 		   String barcodeInput12Digit = "911"+new DecimalFormat("000000000").format(seq);
 		   int chkDigitEAN13 = BarcodeGenerate.genBarcode(barcodeInput12Digit);
 		  

@@ -25,10 +25,20 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script> --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<!-- Calendar -->
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
 <%
 	User user = (User)session.getAttribute("user");
 	String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
@@ -96,13 +106,13 @@ function clearForm(path){
 					<div id="div_m" align="center">	
 					 <!-- ************* CRITERIA ********************************************************* -->
 						<%if(ShopAction.P_MAYA_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
-						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" /> 
+						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" flush="true"/> 
 						<%}else if(ShopAction.P_MAYA_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
-						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
+						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp"  flush="true"/> 
 						<%}else if(ShopAction.P_SHOP_BILL_DETAIL.equalsIgnoreCase(request.getParameter("pageName"))) {%>
-						     <jsp:include page="criteria/shopBillCriteria.jsp" /> 
+						     <jsp:include page="criteria/shopBillCriteria.jsp" flush="true" /> 
 						<%}if(ShopAction.P_TM_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
-						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" /> 
+						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" flush="true" /> 
 						<%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
 						<%} %>
@@ -169,5 +179,8 @@ function clearForm(path){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+<script>
+   loadCalendar();
+</script>
 </body>
 </html>

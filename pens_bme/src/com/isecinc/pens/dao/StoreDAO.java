@@ -9,12 +9,131 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.StoreBean;
+import com.isecinc.pens.dao.constants.Constants;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.pens.util.Utils;
 
 public class StoreDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
+	public static StoreBean getStoreName(String refCode ,String storeNo) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getStoreName(conn, refCode, storeNo);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+		
+	}
+	
+	public static StoreBean getStoreName(String refCode ,String storeNo,String storeType) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getStoreName(conn, refCode, storeNo,storeType);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();conn=null;
+			}
+		}
+		
+	}
+	public static StoreBean getStoreName(Connection conn ,String refCode ,String storeCode,String storeType) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		StoreBean m = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeCode+"' and reference_code ='"+refCode+"' \n");
+			
+			if( !Utils.isNull(storeType).equalsIgnoreCase("")){
+				if(storeType.equalsIgnoreCase("lotus") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_LOTUS_CODE)){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_LOTUS_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("bigc") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_BIGC_CODE)){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_BIGC_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("tops") || storeType.equalsIgnoreCase(Constants.STORE_TYPE_TOPS_CODE)){
+					sql.append(" and pens_value LIKE '"+Constants.STORE_TYPE_TOPS_CODE+"%' \n");
+				}else if(storeType.equalsIgnoreCase("MTT")
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_MTT_CODE_1)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_HISHER_CODE)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_2)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_3)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_4)
+						|| storeType.equalsIgnoreCase(Constants.STORE_TYPE_KING_POWER_5)
+				){
+					sql.append(" and ( pens_value LIKE '"+Constants.STORE_TYPE_MTT_CODE_1+"%' \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_HISHER_CODE+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_2+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_3+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_4+"%'  \n");
+					sql.append("     OR pens_value LIKE '"+Constants.STORE_TYPE_KING_POWER_5+"%' ) \n");
+				}
+			}
+			
+		   // logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				m = new StoreBean();
+				m.setStoreCode(rs.getString("pens_value"));
+				m.setStoreName(rs.getString("pens_desc"));
+			}
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return m;
+	} 
+	
+	public static StoreBean getStoreName(Connection conn ,String refCode ,String storeCode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		StoreBean m = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE  pens_value ='"+storeCode+"' and reference_code ='"+refCode+"' \n");
+			
+		   // logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				m = new StoreBean();
+				m.setStoreCode(rs.getString("pens_value"));
+				m.setStoreName(rs.getString("pens_desc"));
+				m.setStoreEngName(rs.getString("interface_value"));
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+		}
+		return m;
+	} 
 	 public static List<StoreBean> getStoreList(Connection conn,String groupStore) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

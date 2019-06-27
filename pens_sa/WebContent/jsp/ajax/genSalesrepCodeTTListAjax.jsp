@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetTTUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="util.Utils"%>
@@ -5,6 +6,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 <%
+User user = (User) request.getSession().getAttribute("user");
 String salesChannelNo = (String)request.getParameter("salesChannelNo");
 String custCatNo = (String)request.getParameter("custCatNo");
 String salesZone = (String)request.getParameter("salesZone");
@@ -14,7 +16,7 @@ System.out.println("salesZone:"+salesZone);
 
 List<PopupBean> dataList= null;
 try{
-   dataList = SalesTargetTTUtils.searchSalesrepListTT(salesChannelNo,custCatNo,salesZone);
+   dataList = SalesTargetTTUtils.searchSalesrepListTT(user,salesChannelNo,custCatNo,salesZone);
 }catch(Exception e){ 
 	e.printStackTrace();
 }finally{

@@ -136,13 +136,8 @@ public class SalesTargetControlPage {
 		}
 	}
 	public static void prepareSearchReportSalesTarget(HttpServletRequest request,Connection conn,User user
-			,String pageName,String subPagName){
-		logger.debug("subPagName:"+subPagName);
-		if("TT".equalsIgnoreCase(subPagName)){
-			SalesTargetTTControlPage.prepareSearchReportSalesTargetTT(request, conn, user, pageName);
-		}else{
-			prepareSearchReportSalesTargetMT(request, conn, user, pageName);
-		}
+			,String pageName){
+		prepareSearchReportSalesTargetMT(request, conn, user, pageName);
 	}
 	public static void prepareSearchReportSalesTargetMT(HttpServletRequest request,Connection conn,User user
 			,String pageName){

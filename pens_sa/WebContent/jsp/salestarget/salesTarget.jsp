@@ -98,6 +98,10 @@ function save(path){
 	var form = document.salesTargetForm;
 	if(checkTableCanSave()){
 	   if(confirm("กรุณายืนยันการ บันทึก เป้าหมายให้กับ Sale")){
+		   
+		   /**Control Save Lock Screen **/
+		   startControlSaveLockScreen();
+		   
 			form.action = path + "/jsp/salesTargetAction.do?do=save";
 			form.submit();
 			return true;
@@ -522,3 +526,6 @@ function updateStatusManual(path,status){
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

@@ -277,10 +277,10 @@ function removeRowByIndex(path,drow,index){
 								<tr>
                                     <td align="right">เริ่มต้น<font color="red">*</font> </td>
 									<td >
-						               <html:text property="bean.startDate" styleId="startDate" size="15" readonly ="true" styleClass="\" autoComplete=\"off"/>
+						               <html:text property="bean.startDate" styleId="startDate" size="15" readonly ="false" styleClass="\" autoComplete=\"off"/>
 						                                
 						                 &nbsp;&nbsp;สิ้นสุด <font color="red">*</font>
-						                <html:text property="bean.endDate" styleId="endDate" size="15" readonly ="true" styleClass="\" autoComplete=\"off"/>
+						                <html:text property="bean.endDate" styleId="endDate" size="15" readonly ="false" styleClass="\" autoComplete=\"off"/>
 									   
 									</td>
 								</tr>	

@@ -96,8 +96,13 @@ function backForm(path){
 }
 function save(path){
 	var form = document.salesTargetForm;
+	
 	if(checkTableCanSave()){
 	   if(confirm("กรุณายืนยันการ บันทึก เป้าหมายให้กับ Sale")){
+		   
+		    /**Control Save Lock Screen **/
+		    startControlSaveLockScreen();
+		   
 			form.action = path + "/jsp/salesTargetAction.do?do=save";
 			form.submit();
 			return true;
@@ -107,10 +112,17 @@ function save(path){
 }
 function postToSales(path){
 	var form = document.salesTargetForm;
+	if(document.getElementById('check_save_before_post').value =="save_before_post"){
+	    alert("มีการเปลี่ยนแปลงข้อมูล กรุณาบันทึกข้อมูลก่อน ทำการ Post To Sales")
+		return false;
+	}
 	if(confirm("กรุณายืนยันการ POST เป้าหมายให้กับ Sale")){
 		var r = checkCanPostToSalesFound();
 		//alert(r);
 		if(checkCanPostToSalesFound()){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 			form.action = path + "/jsp/salesTargetAction.do?do=postToSales";
 			form.submit();
 			return true;
@@ -127,6 +139,9 @@ function salesAcceptToSalesManager(path){
 		var r = checkCanAccept();
 		//alert(r);
 		if(r){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 			form.action = path + "/jsp/salesTargetAction.do?do=salesAcceptToSalesManager";
 			form.submit();
 			return true;
@@ -318,6 +333,7 @@ function updateStatusManual(path,status){
 									  <c:set var="tabIndex" value="${tabIndex + 1}" />
 									  <input type="text" name="targetQty" id="targetQty" value ="${results.targetQty}" size="10"
 										    onblur="isNumPositive(this);calcTargetAmount(this,${results.rowId})"
+										    onchange="setDataChange(this);"
 										    class="${results.lineNumberStyle}"  tabindex="${tabIndex}"
 										    ${results.lineReadonly}
 										    onkeypress="nextRowKeypress(event,${results.rowId})"
@@ -462,6 +478,7 @@ function updateStatusManual(path,status){
 				</c:if>
 					<!-- ************************Result ***************************************************-->
 					<!-- hidden field -->
+					<!-- check_save_before_post: --> <input type="hidden" name="check_save_before_post" id="check_save_before_post"/>
 					</html:form>
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
@@ -488,3 +505,6 @@ function updateStatusManual(path,status){
 </table>
 </body>
 </html>
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

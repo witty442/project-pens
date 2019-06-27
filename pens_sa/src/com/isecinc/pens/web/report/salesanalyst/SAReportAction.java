@@ -37,13 +37,13 @@ public class SAReportAction extends I_Action {
 	protected Logger logger = Logger.getLogger("PENS");
 	
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception {
-		logger.debug("SalesAnalystReportAction Prepare Form action:"+request.getParameter("action"));
+		logger.debug("SalesAnalystReportAction Prepare have ID Form action:"+request.getParameter("action"));
 		SAReportForm formBean = (SAReportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "prepare";
 		try {
 			logger.debug("Clear Session");
-			request.getSession().setAttribute("RESULT",null);
+			request.getSession().setAttribute("RESULT_SA",null);
 			//Display User Role Info\
 			request.getSession().setAttribute("USER_ROLE_INFO", SecurityHelper.genHtmlUserRoleInfo(user));	
 			
@@ -67,16 +67,20 @@ public class SAReportAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String returnText = "prepare";
 		try {
-			logger.debug("Clear Session");
-			request.getSession().setAttribute("RESULT",null);
-			//Display User Role Info\
-			request.getSession().setAttribute("USER_ROLE_INFO", SecurityHelper.genHtmlUserRoleInfo(user));	
-			
-			SABean saBean = new SABean();
-			saBean.setIncludePos("Y");
-			
-			formBean.setSalesBean(saBean);
-
+			if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
+				logger.debug("Clear Session");
+				request.getSession().setAttribute("RESULT_SA",null);
+				//Display User Role Info\
+				request.getSession().setAttribute("USER_ROLE_INFO", SecurityHelper.genHtmlUserRoleInfo(user));	
+				
+				SABean saBean = new SABean();
+				saBean.setIncludePos("Y");
+				
+				formBean.setSalesBean(saBean);
+				
+				//init session List
+				SAInitial.getInstance().initSession(request);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -120,18 +124,18 @@ public class SAReportAction extends I_Action {
 			request.getSession().setAttribute("maxOrderedTime", maxTime);
 			
 			if( !Utils.isNull(htmlCode).equals("")){
-			    request.getSession().setAttribute("RESULT", htmlCode);
+			    request.getSession().setAttribute("RESULT_SA", htmlCode);
 			    request.getSession().setAttribute("RESULT_SQL", sql);
 			}else{
 				logger.debug("Data not found");
 			    request.setAttribute("Message", "ไม่พบข้อมูลที่ค้นหา");
-			    request.getSession().setAttribute("RESULT", null);	
+			    request.getSession().setAttribute("RESULT_SA", null);	
 			    request.getSession().setAttribute("RESULT_SQL", null);	
 			}
 
 			
 		} catch (Exception e) {
-			request.getSession().setAttribute("RESULT", null);	
+			request.getSession().setAttribute("RESULT_SA", null);	
 			request.getSession().setAttribute("RESULT_SQL", null);	
 			logger.debug(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -148,8 +152,8 @@ public class SAReportAction extends I_Action {
 		String htmlCode ="";
 		try {	
 			logger.debug("export");
-            if( request.getSession().getAttribute("RESULT") != null	){
-            	htmlCode = Utils.isNull(request.getSession().getAttribute("RESULT"));
+            if( request.getSession().getAttribute("RESULT_SA") != null	){
+            	htmlCode = Utils.isNull(request.getSession().getAttribute("RESULT_SA"));
             	
             }
 		    if( !Utils.isNull(htmlCode).equals("")){

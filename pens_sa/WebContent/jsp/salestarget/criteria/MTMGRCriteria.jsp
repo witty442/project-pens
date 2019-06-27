@@ -53,6 +53,9 @@ function salesManagerFinish(path){
 		var r = checkCanFinish();
 		//alert(r);
 		if(r){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
 			form.action = path + "/jsp/salesTargetAction.do?do=salesManagerFinish";
 			form.submit();
 			return true;
