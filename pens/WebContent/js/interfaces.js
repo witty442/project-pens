@@ -1,13 +1,29 @@
-function reGen(path, type) {
-	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=reGen&rf=N&action=submited";
-	document.interfacesForm.submit();
-	return true;
+
+/** Validate check vpn Connected **/
+function synchronizeFromOracle(path, type) {
+	/**Control Test URL Conn Lock Screen **/
+	startControlTestURLConnLockScreen("synchronizeFromOracle");
+	
+	//check vpn is connected
+	 $(function(){
+		var getData = $.ajax({
+			url: path+"/jsp/ajax/checkVPNConnected.jsp",
+			data :"",
+			async: true,
+			success: function(getData){
+				returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	}); 
+	
 }
-function syschronizeFromOracle(path, type) {
+
+function synchronizeFromOracleModel(path, type) {
 	var confirmText = "ยืนยันการ Import เข้าระบบ Sales";
 	var chImportAll = document.getElementsByName("monitorBean.importAll")[0];
 	var requestTable =document.getElementsByName("monitorBean.requestTable")[0];
 	var requestUserName =document.getElementsByName("monitorBean.requestImportUserName")[0];
+	
 	if(type =='admin'){
 		//alert(requestTable.value);
 	   if( requestTable.value == 'm_inventory_onhand|TRANSACTION' ){
@@ -17,20 +33,69 @@ function syschronizeFromOracle(path, type) {
 			    return false;
 			}
 	   }
-	   
 	   confirmText += " TableName:"+requestTable.value ;
 		if(chImportAll.checked){
 			confirmText += " นำข้อมูลเข้าใหม่ทั้งหมด (ALL) "; 
 		}
 	}
 	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeFromOracle&rf=N&action=submited";
+		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=synchronizeFromOracle&rf=N&action=submited";
 		document.interfacesForm.submit();
 		return true;
 	}
 	return false;
 }
 
+/** Validate check vpn Connected **/
+function synchronizeToOracle(path, type) {
+	/**Control Test URL Conn Lock Screen **/
+	startControlTestURLConnLockScreen("synchronizeToOracle");
+	
+	//check vpn is connected
+	 $(function(){
+		var getData = $.ajax({
+			url: path+"/jsp/ajax/checkVPNConnected.jsp",
+			data :"",
+			async: true,
+			success: function(getData){
+				returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	}); 
+}
+
+function synchronizeToOracleModel(path, type) {
+	var confirmText = "ยืนยันการ Export";
+	var importText = "ท่านต้องการ ดึงข้อมูลจากส่วนกลาง ด้วยหรือไม่";
+
+	if(type =='admin'){
+	  var requestTable =document.getElementsByName("monitorBean.requestExportTable")[0];
+	  var requestExportUserName =document.getElementsByName("monitorBean.requestExportUserName")[0];
+	 
+	  if(   requestTable.value == 'm_customer|MASTER' || requestTable.value == 't_order|TRANSACTION'
+		 || requestTable.value == 't_receipt|TRANSACTION' || requestTable.value == 't_visit|TRANSACTION' ){
+			if(requestExportUserName.value ==''){
+				requestExportUserName.focus();
+			    alert("กรุณาระบุ User Name ที่ต้องการ Export");
+			    return false;
+			}
+			confirmText += " Export TableName:"+requestTable.value+ " UserName :"+requestExportUserName.value;
+	   }
+	  
+	}
+	if(confirm(confirmText)){
+		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=synchronizeToOracle&rf=N&import=N";
+		
+		document.interfacesForm.submit();
+		return true;
+	}
+	return false;
+}
+function reGen(path, type) {
+	document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=reGen&rf=N&action=submited";
+	document.interfacesForm.submit();
+	return true;
+}
 function updateSalesTransaction(path, type) {
 	var confirmText = "ยืนยันการ Update Sales Transaction";
 	var requestUserName =document.getElementsByName("monitorBean.requestImportUpdateUserName")[0];
@@ -73,35 +138,6 @@ function importWebMember(path, type) {
 	}
 	if(confirm(confirmText)){
 		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=importWebMember&action=submited";
-		document.interfacesForm.submit();
-		return true;
-	}
-	return false;
-}
-
-
-function syschronizeToOracle(path, type) {
-	var confirmText = "ยืนยันการ Export";
-	var importText = "ท่านต้องการ ดึงข้อมูลจากส่วนกลาง ด้วยหรือไม่";
-	
-	if(type =='admin'){
-	  var requestTable =document.getElementsByName("monitorBean.requestExportTable")[0];
-	  var requestExportUserName =document.getElementsByName("monitorBean.requestExportUserName")[0];
-	 
-	  if(   requestTable.value == 'm_customer|MASTER' || requestTable.value == 't_order|TRANSACTION'
-		 || requestTable.value == 't_receipt|TRANSACTION' || requestTable.value == 't_visit|TRANSACTION' ){
-			if(requestExportUserName.value ==''){
-				requestExportUserName.focus();
-			    alert("กรุณาระบุ User Name ที่ต้องการ Export");
-			    return false;
-			}
-			confirmText += " Export TableName:"+requestTable.value+ " UserName :"+requestExportUserName.value;
-	   }
-	  
-	}
-	if(confirm(confirmText)){
-		document.interfacesForm.action = path + "/jsp/interfacesAction.do?do=syschronizeToOracle&rf=N&import=N";
-		
 		document.interfacesForm.submit();
 		return true;
 	}

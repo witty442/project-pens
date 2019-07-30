@@ -153,7 +153,7 @@ public class SalesTargetTTCopy {
 			sql.append("\n  BRAND_GROUP, ");
 			sql.append("\n  'Open' as STATUS, ");
 			sql.append("\n  '' as REJECT_REASON, ");
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE ");
@@ -189,27 +189,35 @@ public class SalesTargetTTCopy {
 			sql.append("\n  'Open' as status, ");
 			sql.append("\n  '' as remark, ");
 			sql.append("\n  '' as REJECT_REASON, ");
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
-			sql.append("\n  p.SUM12, ");//AMT_AVG12
-			sql.append("\n  p.SUM3, ");//AMT_AVG3
+			//AMT_AVG12
+			sql.append("\n  ( ");
+			sql.append("\n    SELECT MAX(V.SUM12) ");
+			sql.append("\n    FROM APPS.XXPENS_BI_MST_SALES_AVG_V V,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
+			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
+			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n  ) as SUM12, ");
+			
+			//sql.append("\n  0 as SUM3, ");//AMT_AVG3
+			sql.append("\n  ( ");
+			sql.append("\n    SELECT MAX(V.SUM3) ");
+			sql.append("\n    FROM APPS.XXPENS_BI_MST_SALES_AVG_V V,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
+			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
+			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n  ) as SUM3, ");
+			
 			sql.append("\n  ( SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n    where P.INVENTORY_ITEM_ID =L.INVENTORY_ITEM_ID " );
 			sql.append("\n    and P.list_header_id ="+priceListId+") as price ");//Price
+			
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT_L L ");
-			sql.append("\n  LEFT OUTER JOIN ( ");
-			
-			sql.append("\n   SELECT INVENTORY_ITEM_ID ,SUM(V.sum3) as SUM3,sum(V.SUM12) as SUM12 ");
-			sql.append("\n   FROM apps.XXPENS_BI_MST_SALES_AVG_V V ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
-			sql.append("\n   WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
-			sql.append("\n   AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
-			sql.append("\n   AND Z.ZONE ='"+curBean.getSalesZone()+"'");
-			sql.append("\n   AND V.salesrep_id = Z.salesrep_id");
-			sql.append("\n   GROUP BY INVENTORY_ITEM_ID ");
-			
-			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  WHERE L.ID="+idCopy);
 		   logger.debug("sql:"+sql);
 		    

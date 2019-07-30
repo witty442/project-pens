@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.pd;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -213,6 +214,121 @@ public class PDReceiptAction extends I_Action {
 		return mapping.findForward("prepare");
 	}
 	
+	public ActionForward prepareAdmin(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		PDReceiptForm aForm = (PDReceiptForm) form;
+		try {
+			String curDate = DateToolsUtil.stringDateValue(new Date(), DateToolsUtil.DD_MM_YYYY_WITH_SLASH,DateToolsUtil.local_th);
+			Receipt r = new Receipt();
+			r.setReceiptDateFrom(curDate);
+			r.setReceiptDateTo(curDate);
+			aForm.setReceipt(r);
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			e.printStackTrace();
+		}
+		return mapping.findForward("admin");
+	}
+	public ActionForward searchAdmin(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		PDReceiptForm pdForm = (PDReceiptForm) form;
+		User user = (User)request.getSession().getAttribute("user");
+		try {
+			String orderNoFrom = pdForm.getReceipt().getOrderNoFrom();
+			String orderNoTo = pdForm.getReceipt().getOrderNoTo();
+			
+			String receiptDateFrom = pdForm.getReceipt().getReceiptDateFrom();
+			String receiptDateTo = pdForm.getReceipt().getReceiptDateTo();
+			
+			StringBuffer whereClause = new StringBuffer("\n AND ISPDPAID = 'N' AND DOC_STATUS = 'SV' ");
+			if(!StringUtils.isEmpty(orderNoFrom)){
+				whereClause.append("\n  AND RECEIPT_NO >= '"+orderNoFrom+"'");
+			}
+			
+			if(!StringUtils.isEmpty(orderNoTo)){
+				whereClause.append("\n  AND RECEIPT_NO >= '"+orderNoTo+"'");
+			}
+			
+			if(!StringUtils.isEmpty(receiptDateFrom)){
+				whereClause.append("\n  AND RECEIPT_DATE >= '"+DateToolsUtil.convertToTimeStamp(receiptDateFrom)+"'");
+			}
+			
+			if(!StringUtils.isEmpty(receiptDateTo)){
+				whereClause.append("\n  AND RECEIPT_DATE <= '"+DateToolsUtil.convertToTimeStamp(receiptDateTo)+"'");
+			}
+			logger.debug("sql:"+whereClause);
+			
+			Receipt[] pdReceipts = null; 
+			pdReceipts = PDReceiptDAO.searchPDReceiptHistory(pdForm, user);
+			
+			if(pdReceipts != null && pdReceipts.length > 0){
+				pdForm.getCriteria().setSearchResult(pdReceipts.length);
+				pdForm.setPdReceipts(pdReceipts);
+			}
+			else{
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+			}
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			e.printStackTrace();
+		}
+		return mapping.findForward("admin");
+	}
+	public ActionForward saveAdmin(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		PDReceiptForm aForm = (PDReceiptForm) form;
+		User user = (User)request.getSession().getAttribute("user");
+		MOrder mOrder = new MOrder();
+		MReceipt mReceipt = new MReceipt();
+		Connection conn = null;
+		String pdPaid = "";
+		try {
+			logger.debug("saveAdmin");
+			conn = DBConnection.getInstance().getConnection();
+			String orderNo = Utils.isNull(request.getParameter("orderNo"));
+			
+			//get pdPaid not userAdmin
+			pdPaid = PDReceiptDAO.getPdPaid(conn);
+			
+			logger.debug("orderNo["+orderNo+"]pdPaid["+pdPaid+"]");
+			
+			//Case PD_PAID =N
+			if( !Utils.isNull(pdPaid).equalsIgnoreCase("Y")){
+				Receipt receipt = new Receipt();
+				receipt.setReceiptNo(orderNo);
+				
+				//delete t_pd_receipt_his To DB
+				PDReceiptDAO.deletePdReceiptHis(conn, receipt);
+				
+				//delete t_receipt_pdpaid_no
+				PDReceiptDAO.deleteReceiptPdPaidNo(conn,receipt);
+				
+			}else{
+				//PD_PAID =Y
+				
+				//Step 1 -> update receipt IsPDPaid,pdPaidDate =null
+				Receipt[] receiptArr = mReceipt.search(" and receipt_no ='"+orderNo+"'");
+				Receipt receipt = receiptArr[0];
+				receipt.setPdPaymentMethod("");
+				receipt.setPdPaidDate("");
+				receipt.setIsPDPaid("N");
+				receipt.setChequeDate("");
+				//update receipt
+				PDReceiptDAO.updateReceiptCancelPdPaid(conn,receipt);
+				
+				//delete pd_receipt_his To DB
+				PDReceiptDAO.deletePdReceiptHis(conn, receipt);
+			}
+			
+			request.setAttribute("Message","ยกเลิก รายการบันทึกรับเงินเชื่อ เรียบร้อยแล้ว");
+		} catch (Exception e) {
+			request.setAttribute("Message","Cannot save \n"+e.getMessage());
+			e.printStackTrace();
+		}
+		return mapping.findForward("admin");
+	}
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {

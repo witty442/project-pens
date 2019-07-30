@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -1013,6 +1015,158 @@ public class SalesTargetDAO {
 					ps.close();ps=null;
 				}
 			}
+		}
+	 
+	 public static SalesTargetBean searchTargetHeadByMTADMIN(SalesTargetBean o,User user,String pageName ) throws Exception {
+			return searchTargetHeadByADMIN_TypeBrand(o, user, pageName);
+		}
+		
+		public static SalesTargetBean searchTargetHeadByADMIN_TypeBrand(SalesTargetBean o,User user,String pageName ) throws Exception {
+			PreparedStatement ps = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			SalesTargetBean h = null;
+			List<SalesTargetBean> items = new ArrayList<SalesTargetBean>();
+			int rowId=0;
+			try {
+				//convert Criteria
+				o = convertCriteria(o);
+				sql.append("\n SELECT A.BRAND ,A.brand_name ");
+				sql.append("\n ,SUM(total_target_qty) as total_target_qty  ");
+				sql.append("\n ,SUM(total_target_amount) as total_target_amount  ");
+				sql.append("\n FROM(  ");
+				sql.append("\n  select M.CUSTOMER_CATEGORY,M.ZONE,M.brand,M.status as status_tt ");
+				sql.append("\n  ,(select max(zone_name) from PENSBI.XXPENS_BI_MST_SALES_ZONE B where B.zone = M.zone) as zone_name ");
+				sql.append("\n  ,(select max(cust_cat_desc) from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT B where B.cust_cat_no = M.CUSTOMER_CATEGORY) as CUSTOMER_CATEGORY_DESC ");
+				sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND B where B.brand_no = M.brand) as brand_name ");
+				
+				sql.append("\n  ,(select nvl(sum(target_qty),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_qty ");
+				sql.append("\n  ,(select nvl(sum(target_amount),0) from PENSBI.XXPENS_BI_SALES_TARGET_TT_L L where L.id=M.id) as total_target_amount ");
+				
+				sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M , ");
+				sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+				sql.append("\n  where M.salesrep_id = Z.salesrep_id ");
+				sql.append("\n  and M.division ='B' ");//Van And Credit
+				if( !Utils.isNull(o.getSalesZone()).equals("")){
+					sql.append("\n and Z.zone = '"+Utils.isNull(o.getSalesZone())+"'");
+				}
+				if( !Utils.isNull(o.getCustCatNo()).equals("")){
+					sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				}
+				if( !Utils.isNull(o.getTargetMonth()).equals("")){
+					sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				}
+				if( !Utils.isNull(o.getTargetQuarter()).equals("")){
+					sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				}
+				if( !Utils.isNull(o.getTargetYear()).equals("")){
+					sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+				}
+				if( !Utils.isNull(o.getBrand()).equals("")){
+					sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				}
+				/*//filter user login
+				if( !Utils.isNull(user.getUserName()).equalsIgnoreCase("admin")){
+					sql.append("\n and M.zone in( ");
+					sql.append("\n  select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT");
+					sql.append("\n  where user_name = '"+user.getUserName()+"'");
+					sql.append("\n ) ");
+				}*/
+				sql.append("\n )A ");
+				sql.append("\n GROUP BY A.brand ,A.brand_name ");
+				sql.append("\n ORDER BY A.brand asc ");
+
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				ps = conn.prepareStatement(sql.toString());
+				rst = ps.executeQuery();
+				while(rst.next()) {
+				   rowId++;
+				   h = new SalesTargetBean();
+				   h.setRowId(rowId);
+				   h.setPeriod(o.getPeriod());
+				   h.setStartDate(o.getStartDate());
+				
+				   h.setBrand(rst.getString("brand"));  
+				   h.setBrandName(rst.getString("brand_name"));
+				   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit,""));
+				   h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_AMOUNT"), Utils.format_current_2_disgit,""));
+				
+				   //get status from temp //more 1 status
+				   h.setTargetMonth(o.getTargetMonth());
+				   h.setTargetQuarter(o.getTargetQuarter());
+				   h.setTargetYear(o.getTargetYear());
+				   
+				   h.setCustCatNo(o.getCustCatNo());
+				   h.setSalesZone(o.getSalesZone());
+				   h.setStatus(findStatusTEMPByMTADMIN(conn,h));
+				  
+				   items.add(h);
+				}//while
+				//set Result 
+				o.setItems(items);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					ps.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return o;
+		}
+		public static String findStatusTEMPByMTADMIN(Connection conn,SalesTargetBean o){
+			String status = "";
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Map<String, String> mapStatus = new HashMap<String, String>();
+			try{
+				sql.append("\n SELECT distinct STATUS ");
+				sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
+				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z"); 
+				sql.append("\n where 1=1  ");
+				sql.append("\n and M.salesrep_id = Z.salesrep_id  ");
+				sql.append("\n and M.period = '"+Utils.isNull(o.getPeriod())+"'");
+				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
+				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
+				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
+				if(!"".equals(Utils.isNull(o.getCustCatNo()))){
+				  sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(o.getCustCatNo())+"'");
+				}
+				if(!"".equals(Utils.isNull(o.getBrand()))){
+				  sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
+				}
+				if(!"".equals(Utils.isNull(o.getSalesZone()))){
+				  sql.append("\n and Z.zone= '"+Utils.isNull(o.getSalesZone())+"'");
+				}
+				 
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					if(mapStatus.get(rst.getString("STATUS")) ==null){
+					   status += rst.getString("STATUS")+"/";
+					}
+					mapStatus.put(rst.getString("STATUS"), rst.getString("STATUS"));
+				}//while
+				if(status.length()>0){
+					status = status.substring(0,status.length()-1);
+				}
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+		 return status;
 		}
 		
 }

@@ -1002,6 +1002,8 @@ public class ExportProcess {
 			rs = ps.executeQuery();
 			while(rs.next()){
 				totalRows++;
+				/** CASE Status = 'VO' >>> request_date >= 01/08/2019 **/
+				
 				//Add Order Header
 				for(i=0;i<tableBean.getColumnBeanList().size();i++){
 					ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
@@ -1322,7 +1324,12 @@ public class ExportProcess {
 	            "	UOM1  AS UOM_CODE \n"+
 	            "   FROM t_move_order_line l ," +
 	            "   (SELECT @rownum:=0) a" +
-	            "   where request_number ='"+requestNumber+"' and status ='SV' ";
+	            "   where request_number ='"+requestNumber+"' and status ='SV' "+
+	            "   and request_number in( "+
+	            "     select request_number from t_move_order "+
+	            "     where request_number ='"+requestNumber+"'"+
+	            "     and status ='SV'"+
+	            "   )";
   
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();

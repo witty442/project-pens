@@ -22,6 +22,7 @@ public class InitialParameter extends I_Initial {
 	private String realPath;
 	private String reportPath;
 	private String logoPath;
+	private String tempPath;
 
 	/**
 	 * Initial with
@@ -33,6 +34,7 @@ public class InitialParameter extends I_Initial {
 			if (initParameter != null) {
 				realPath = context.getRealPath(initParameter);
 				reportPath = context.getRealPath("/reports/");
+				tempPath = context.getRealPath("");
 				logoPath = context.getRealPath("/images/");
 			}
 			if (BeanParameter.getFileName().equals("")) {
@@ -58,6 +60,7 @@ public class InitialParameter extends I_Initial {
 		// BeanParameter.setReportPath(xmlread.doRead("parameter", "reportPath"));
 		// BeanParameter.setLogo(xmlread.doRead("parameter", "logo"));
 		BeanParameter.setReportPath(reportPath + (reportPath.indexOf("/") != -1 ? "/" : "\\"));
+		BeanParameter.setTempPath(tempPath);
 		BeanParameter.setLogo(logoPath + (logoPath.indexOf("/") != -1 ? "/" : "\\")
 				+ xmlread.doRead("parameter", "logo"));
 		BeanParameter.setPensTaxNo(xmlread.doRead("parameter", "penstaxno"));

@@ -10,17 +10,19 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import util.DBConnection;
+import util.SQLHelper;
 import util.Utils;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
 
 public class SalesTargetCopy {
-
+	
+   /**MT ONLY **/
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static String copyFromLastMonth(User user,SalesTargetBean destBean,String pageName)  throws Exception {
-		logger.debug("copyFromLastMonth");
+	public static String copyFromLastMonthMT(User user,SalesTargetBean destBean,String pageName)  throws Exception {
+		logger.debug("copyFromLastMonth MT");
 		Connection conn = null;
         Calendar curCal = Calendar.getInstance();
         String errorCode = "";
@@ -41,7 +43,7 @@ public class SalesTargetCopy {
 				errorCode ="DATA_CUR_EXIST_EXCEPTION";
 				logger.debug("ErrorCode["+errorCode+"]");
 			}else{
-				//setDate prevMonth
+				//setData prevMonth
 				sourceBean = new SalesTargetBean();
 				curCal.add(Calendar.MONTH, -1);
 				sourceBean.setStartDate(Utils.stringValue(curCal.getTime(), Utils.DD_MMM_YYYY));
@@ -97,6 +99,7 @@ public class SalesTargetCopy {
 			sql.append("\n select id ,customer_category ,salesrep_id ");
 			sql.append("\n ,customer_id ,sales_channel ");
 			sql.append("\n from XXPENS_BI_SALES_TARGET_TEMP M where 1=1 ");
+			sql.append("\n and division <> 'B' ");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.brand = '"+sourceBean.getBrand()+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
@@ -160,7 +163,7 @@ public class SalesTargetCopy {
 			sql.append("\n  SALES_CHANNEL, ");
 			sql.append("\n  BRAND, ");
 			sql.append("\n  BRAND_GROUP, ");
-			sql.append("\n  'Open' as STATUS, ");
+			sql.append("\n  'Open' as STATUS, "); 
 			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
@@ -214,7 +217,7 @@ public class SalesTargetCopy {
 			//new version 06/2019
 			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
-			sql.append("\n   and P.list_header_id ="+priceListId+") as price");
+			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price");
 			
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
@@ -225,7 +228,7 @@ public class SalesTargetCopy {
 			sql.append("\n    AND CUSTOMER_ID ='"+curBean.getCustomerId()+"'");
 			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  WHERE L.ID="+idCopy);
-		   //logger.debug("sql:"+sql);
+		    logger.debug("sql:"+sql);
 		    
 			ps = conn.prepareStatement(sql.toString());
 			ps.execute();
@@ -253,6 +256,7 @@ public class SalesTargetCopy {
 			sql.append("\n     where L.id= M.id) as item_count");
 			sql.append("\n   from XXPENS_BI_SALES_TARGET_TEMP  M ");
 			sql.append("\n   where 1=1 ");
+			sql.append("\n   and division <> 'B' ");//B = credit,van sales
 			if( !Utils.isNull(status).equals("")){
 			  sql.append("\n   and M.status ='"+status+"'");
 			}

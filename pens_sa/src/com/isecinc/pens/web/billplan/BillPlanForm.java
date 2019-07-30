@@ -15,7 +15,7 @@ public class BillPlanForm extends I_Form {
 	private static final long serialVersionUID = 1992834459956870881L;
     private List<BillPlanBean> resultsSearch = new ArrayList<BillPlanBean>();
     private String pageName;
-    private BillPlanBean bean = new BillPlanBean();
+    private BillPlanBean bean ;
     private BillPlanBean beanCriteria ;
     
 	public List<BillPlanBean> getResultsSearch() {

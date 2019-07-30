@@ -83,6 +83,7 @@ public class MUser extends I_Model<User> {
 				userDefault.setPassword("1234");
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 		} finally {
 			try {

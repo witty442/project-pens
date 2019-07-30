@@ -11,12 +11,14 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import util.DBConnection;
 import util.Utils;
 
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 
@@ -1043,7 +1045,7 @@ public class SAGenrateCondPopup {
 					}
 					//SALES ZONE
 				 }else if("SALES_ZONE".equalsIgnoreCase(currCondType)){
-					 sql = "select distinct ZONE,ZONE_NAME  from XXPENS_BI_MST_SALES_ZONE where ZONE is not null \n";
+					 sql = "select distinct ZONE,ZONE_NAME  from PENSBI.XXPENS_BI_MST_SALES_ZONE where ZONE is not null \n";
 						
 						if(!Utils.isNull(code).equals("")){
 							if(code.indexOf(",") > -1){
@@ -1061,7 +1063,7 @@ public class SAGenrateCondPopup {
 						sql += SecurityHelper.genWhereSqlFilterByUserForSearchPopup(conn,user, "SALES_ZONE","");
 						
 						sql += "order by ZONE \n";
-						
+						logger.debug("sql:"+sql);
 						ps = conn.prepareStatement(sql);
 						rs = ps.executeQuery();
 						while(rs.next()){
@@ -1312,6 +1314,10 @@ public class SAGenrateCondPopup {
 					}
 				}
 	
+		    //debug sql to temp_file
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp//temp/sql.sql", sql.toString());
+			}
 			}catch(Exception e){
 			   throw e;
 			}finally{

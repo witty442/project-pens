@@ -1,11 +1,6 @@
-
-<%@page import="com.isecinc.pens.web.prodshow.ProdShowBean"%>
-<%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
+<%@page import="com.isecinc.pens.web.stockonhand.StockOnhandAction"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -15,7 +10,7 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:useBean id="stockVanForm" class="com.isecinc.pens.web.stockvan.StockVanForm" scope="session" />
+<jsp:useBean id="stockOnhandForm" class="com.isecinc.pens.web.stockonhand.StockOnhandForm" scope="session" />
 <%
 String pageName = Utils.isNull(request.getParameter("pageName")); 
 %>
@@ -57,8 +52,9 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
 		     <jsp:include page="../program.jsp">
-				<jsp:param name="function" value="StockVan"/>
+				<jsp:param name="function" value="<%=pageName %>"/>
 			</jsp:include>
+		
 			<!-- Hidden Field -->
 		 <%--    <html:hidden property="pageName" value="<%=pageName %>"/> --%>
 	      	<!-- TABLE BODY -->
@@ -73,14 +69,25 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 		            <td bgcolor="#f8f8f8">
 		            
 						<!-- BODY -->
-						<html:form action="/jsp/stockVanAction">
+						<html:form action="/jsp/stockOnhandAction">
 						<jsp:include page="../error.jsp"/>
 						<div align="center">
 						   	<!--  Criteria -->
-						    <jsp:include page="criteria/stockVanCriteria.jsp" />  
-					    
+						   	<%if(StockOnhandAction.PAGE_STOCK_VAN.equalsIgnoreCase(pageName)) {%>
+						       <jsp:include page="criteria/stockVanCriteria.jsp" flush="true"/>  
+						    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)) {%>  
+						       <jsp:include page="criteria/stockOnhandCriteria.jsp" flush="true"/> 
+					        <%} %>
+					        
+					        
 					 	    <!-- ************************Result *************-->
-					 	    <jsp:include page="result/stockVanResult.jsp" />  
+					 	    <%if(StockOnhandAction.PAGE_STOCK_VAN.equalsIgnoreCase(pageName)) {%>
+					 	       <jsp:include page="result/stockVanResult.jsp" flush="true"/>  
+					 	    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)) {  
+					 	          if(request.getAttribute("RESULTS_DATA") != null){
+					 	        	  out.println( ((StringBuffer)request.getAttribute("RESULTS_DATA")).toString());
+					 	          }
+					 	    } %>
 					 	</div>
 					 	
 					 	<!-- INPUT HIDDEN -->

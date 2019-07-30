@@ -82,7 +82,7 @@ public class ExternalProcess {
 		 logger.info("--- 1.Run Process backup By Thread ---");
 		new DBBackUpManager().process(userLogin);
 		 
-		 //Backup By Thread
+		 //Backup By Thread despricate
 		//new UploadDatabaseBackupWorker(userLogin).start();
 		
 		//RunScript From FTP Server Folder :Manual-script

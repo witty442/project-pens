@@ -255,12 +255,6 @@ function copyRowByBrand(path,salesZone,brand,custCatNo,period,rowId){
 					 <a href="javascript:copyFromLastMonthByTTSUPER('${pageContext.request.contextPath}',event)">
 					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
 					</a> 
-		
-					<%if(UserUtils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
-					<%-- 	<a href="javascript:copyMonthToMonthyTTSUPER('${pageContext.request.contextPath}')">
-						  <input type="button" value="Copy  Month To Month" class="newPosBtnLong">
-						</a> 	 --%>	
-					<%} %>		
 				</td>
 			</tr>
 		</table>

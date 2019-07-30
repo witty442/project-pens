@@ -123,7 +123,9 @@ function submitExport(path){
 						<!-- BODY -->
 						<html:form action="/jsp/jojoAction">
 						<jsp:include page="../error.jsp"/>
-
+                          <div align="center">
+                          <img src="${pageContext.request.contextPath}/images2/jojo_manu.jpg" width="300" height="200"/>
+                          </div>
 						   <table style="width:100%" border="0" align="center" class="text">
 							
 							  <tr>

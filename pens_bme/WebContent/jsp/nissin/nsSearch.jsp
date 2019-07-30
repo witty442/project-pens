@@ -280,9 +280,12 @@ function openPensEdit(path,orderId){
 							<th >Sale Code</th>
 							<th >Cup72 (CTN)</th>
 							<th >Cup72 (CUP)</th>
-							<th >BAG (CTN)</th>
-							<th >BAG (PAC 6)</th>
-							<th >BAG (PAC 10)</th>
+							
+							<th >BAG6 (CTN)</th>
+							<th >BAG6 (BAG)</th>
+							<th >BAG10 (CTN)</th>
+							<th >BAG10 (BAG)</th>
+							
 							<th >Pooh72 (CTN)</th>
 							<th >Pooh72 (CUP)</th>
 							<th >Remark1</th>
@@ -358,8 +361,9 @@ function openPensEdit(path,orderId){
 								<td class="td_text" width="5%" nowrap><%=mc.getSaleCode()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getCupQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getCupNQty()%></td>
-								<td class="td_text_center" width="4%"><%=mc.getPacQty()%></td>
-								<td class="td_text_center" width="4%"><%=mc.getPacNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPac6CTNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPac6Qty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getPac10CTNQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPac10Qty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPoohQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPoohNQty()%></td>
@@ -376,8 +380,9 @@ function openPensEdit(path,orderId){
 							<td class="td_text_right"  colspan="15" align="right">Total</td>
 							<td class="td_text_center" width="4%"><%=s.getCupQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getCupNQty()%></td>
-							<td class="td_text_center" width="4%"><%=s.getPacQty()%></td>
-							<td class="td_text_center" width="4%"><%=s.getPacNQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPac6CTNQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPac6Qty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getPac10CTNQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPac10Qty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPoohQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPoohNQty()%></td>

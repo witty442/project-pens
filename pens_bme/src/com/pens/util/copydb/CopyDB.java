@@ -18,6 +18,7 @@ public class CopyDB {
 	private static Logger logger = Logger.getLogger("PENS");
 	
 	public static void main(String[] args) {
+		String whereSQL  ="";
 		try{
 			//Parameter
 			//String schema ="pensbi";
@@ -41,6 +42,17 @@ public class CopyDB {
 			//processProductionToUAT("pensbi","C_USER_INFO","");
 			//processProductionToUAT("pensbi","XXPENS_BI_MST_SALES_ZONE","");
 			
+			//SalesTarget
+			//processProductionToUAT("pensbi","XXPENS_BI_SALES_TARGET_TT","where period ='AUG-19'");
+			
+			//whereSQL = "where id in("+
+					         //"select id from XXPENS_BI_SALES_TARGET_TT where period ='AUG-19')";
+			//processProductionToUAT("pensbi","XXPENS_BI_SALES_TARGET_TT_L",whereSQL);
+			
+			//processProductionToUAT("pensbi","XXPENS_BI_SALES_TARGET_TEMP","where period ='JUL-19'");
+			//whereSQL = "where id in("+
+	         //"select id from XXPENS_BI_SALES_TARGET_TEMP where period ='JUL-19')";
+            // processProductionToUAT("pensbi","XXPENS_BI_SALES_TARGET_TEMP_L",whereSQL);
 			/*****************copy Test to product********************/
 			//copy Test to product
 			//processUATToProduction("pensbi","PENSBME_ONHAND_BME_LOCKED_FRI","");

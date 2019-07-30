@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import util.DBConnection;
 import util.Utils;
 
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.web.location.LocationControlPage;
 
 public class PopupDAO {
@@ -30,10 +31,10 @@ public class PopupDAO {
 				sql.append("\n SELECT M.* FROM (");
 				sql.append("\n SELECT distinct pd.subinventory_code,pd.name as subinv_name ");
 				sql.append("\n from apps.xxpens_inv_onhand_r00_v pd");
-				sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+				sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 				sql.append("\n ,apps.xxpens_salesreps_v s");
 				sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-				sql.append("\n  AND subinv.user_id = s.user_id");
+				sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append("\n and pd.subinventory_code ='"+c.getCodeSearch()+"' ");
 				}
@@ -50,10 +51,10 @@ public class PopupDAO {
 				
 				sql.append("\n SELECT distinct pd_int.to_subinventory as subinventory_code ,pd_int.name as subinv_name ");
 				sql.append("\n from apps.xxpens_inv_intransit_r00_v pd_int");
-				sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+				sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 				sql.append("\n ,apps.xxpens_salesreps_v s");
 				sql.append("\n  WHERE pd_int.to_subinventory = subinv.subinventory");
-				sql.append("\n  AND subinv.user_id = s.user_id");
+				sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append("\n and pd_int.subinventory_code ='"+c.getCodeSearch()+"' ");
 				}
@@ -929,5 +930,109 @@ public class PopupDAO {
 		}
 		return pos;
 	}
-	  
+	 
+	 public static List<PopupForm> searchSubInvList(PopupForm c){
+		    List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuffer sql = new StringBuffer("");
+			Statement stmt = null;
+			ResultSet rst = null;
+			String subInv = "",subInvName ="";
+			Connection  conn = null;
+			int no = 0;
+			try{
+				conn = DBConnection.getInstance().getConnectionApps();
+				//criteria
+				subInv = Utils.isNull(c.getCodeSearch());
+				subInvName = Utils.isNull(c.getDescSearch());
+				
+				sql.append("select distinct a.secondary_inventory_name,a.description from \n");
+				sql.append("apps.mtl_secondary_inventories a where 1=1 \n");
+				if( !Utils.isNull(subInv).equals("")){
+				   sql.append("where a.secondary_inventory_name ='"+subInv+"' \n");
+				}
+				if( !Utils.isNull(subInvName).equals("")){
+					   sql.append("where a.description ='"+subInvName+"' \n");
+					}
+				sql.append("and a.organization_id = 166 \n");
+				sql.append("order by a.secondary_inventory_name ");
+				
+				logger.debug("sql:"+sql.toString());
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while(rst.next()){
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("secondary_inventory_name"));
+					item.setDesc(rst.getString("description"));
+					pos.add(item);
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+		 return pos;
+	}
+	 
+	 public static List<PopupForm> searchItemList(PopupForm c){
+		    List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuffer sql = new StringBuffer("");
+			Statement stmt = null;
+			ResultSet rst = null;
+			String productCode = "",productName ="",brand ="";;
+			Connection  conn = null;
+			int no = 0;
+			try{
+				conn = DBConnection.getInstance().getConnectionApps();
+				//criteria
+				productCode = Utils.isNull(c.getCodeSearch());
+				productName = Utils.isNull(c.getDescSearch());
+				if(c.getCriteriaMap() != null){
+					brand = Utils.isNull(c.getCriteriaMap().get("brand"));
+				}
+				
+				sql.append("select a.segment1,a.description \n");
+				sql.append("from apps.xxpens_om_item_mst_v a where 1=1 \n");
+				if( !Utils.isNull(productCode).equals("")){
+				   sql.append("and a.segment1 LIKE '%"+productCode+"%' \n");
+				}
+				if( !Utils.isNull(productName).equals("")){
+				   sql.append("and a.description LIKE '%"+productName+"%' \n");
+				}
+				if( !Utils.isNull(brand).equals("")){
+					sql.append("and a.segment1 LIKE '"+brand+"%' \n");
+				}
+				
+				sql.append("and rownum <= 500 ");
+				sql.append("order by a.segment1 ");
+				
+				logger.debug("sql:"+sql.toString());
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while(rst.next()){
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("segment1"));
+					item.setDesc(rst.getString("description"));
+					pos.add(item);
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+		 return pos;
+	}
 }

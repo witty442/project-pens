@@ -1,3 +1,4 @@
+/** backup 1 year **/
 /**012560 */
 CREATE TABLE c_temp_location(
 	lat varchar(40),
@@ -41,19 +42,19 @@ add (trip_day varchar(5),
 	trip_day3 varchar(5)
 	);
 	
-delete from pens.c_reference where reference_id in (2601,2602,2603);
-insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y');
-insert into pens.c_reference values ('2602','PartyType','ร้านขายยา','ร้านขายยา','D','Y' );
-insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','Y');
-insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','Y');
+delete from pens.c_reference where reference_id in (2601,2602,2603,2604);
+insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y','Y');
+insert into pens.c_reference values ('2602','PartyType','ร้านขายยา','ร้านขายยา','D','Y','Y' );
+insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','Y','Y');
+insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','Y','Y');
 
-insert into pens.c_reference values ('2700','CustShowTrip','ShowOnlyTrip','ShowOnlyTrip','Y','Y');
+insert into pens.c_reference values ('2700','CustShowTrip','ShowOnlyTrip','ShowOnlyTrip','Y','Y','Y');
 
 /** 10/2560 **/
 alter table c_reference modify value varchar(20);
  
-insert into pens.c_reference values ('2800','CreditDateFix','CreditDateFix','CreditDateFix','01/01/2560','Y');
-insert into pens.c_reference values ('2801','VanDateFix','VanDateFix','VanDateFix Case PD_PAID NO','01/10/2560','Y');
+insert into pens.c_reference values ('2800','CreditDateFix','CreditDateFix','CreditDateFix','01/01/2560','Y','Y');
+insert into pens.c_reference values ('2801','VanDateFix','VanDateFix','VanDateFix Case PD_PAID NO','01/10/2560','Y','Y');
 
 CREATE TABLE pens.t_receipt_pdpaid_no (
 	ORDER_NO varchar(20) NOT NULL,
@@ -251,20 +252,20 @@ CREATE TABLE pens.t_receipt_by_his (
 );
 
 delete from c_reference where code='PaymentMethod';
-insert into c_reference values (1101,'PaymentMethod','เงินสด','เงินสด','CS','Y');
-insert into c_reference values (1102,'PaymentMethod','เช็ค','เช็ค','CH','Y');
-insert into c_reference values (1103,'PaymentMethod','Bank Transfer','เงินโอน','TR','Y');
-insert into c_reference values (1104,'PaymentMethod','บัตรเครดิต','บัตรเครดิต','CR','Y');
-insert into c_reference values (1105,'PaymentMethod','ชำระผ่าน PD','ชำระผ่าน PD','PD','N');
-insert into c_reference values (1106,'PaymentMethod','ชำระผ่านแอร์เพย์','ชำระผ่านแอร์เพย์','AP','N');
+insert into c_reference values (1101,'PaymentMethod','เงินสด','เงินสด','CS','Y','Y');
+insert into c_reference values (1102,'PaymentMethod','เช็ค','เช็ค','CH','Y','Y');
+insert into c_reference values (1103,'PaymentMethod','Bank Transfer','เงินโอน','TR','Y','Y');
+insert into c_reference values (1104,'PaymentMethod','บัตรเครดิต','บัตรเครดิต','CR','Y','Y');
+insert into c_reference values (1105,'PaymentMethod','ชำระผ่าน PD','ชำระผ่าน PD','PD','N','Y');
+insert into c_reference values (1106,'PaymentMethod','ชำระผ่านแอร์เพย์','ชำระผ่านแอร์เพย์','AP','N','Y');
 
 alter table c_reference modify name varchar(255);
 delete from c_reference where code='TransferBank';
-insert into pens.c_reference values (2302 ,'TransferBank','ธนาคารไทยพาณิชย์|สาขาสาธุประดิษฐ์|068-2-81805-7' , 'ธนาคารไทยพาณิชย์-สาขาสาธุประดิษฐ์ 068-2-81805-7','002','Y');					
-insert into pens.c_reference values (2303 ,'TransferBank','ธนาคารกสิกรไทย|สาขาท่าเรือสาธุประดิษฐ์|048-2-51789-9' , 'ธนาคารกสิกรไทย-สาขาท่าเรือสาธุประดิษฐ์ 048-2-51789-9','005','Y');					
-insert into pens.c_reference values (2304 ,'TransferBank','ธนาคาร กรุงไทย จำกัด (มหาชน)|สาขาสาธุประดิษฐ์|083-0-32922-6' , 'ธนาคาร กรุงไทย จำกัด (มหาชน)-สาขาสาธุประดิษฐ์ 083-0-32922-6','009','Y');					
-insert into pens.c_reference values (2305 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75514-4' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75514-4','006','Y');					
-insert into pens.c_reference values (2306 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75402-2' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75402-2','001','Y');					
+insert into pens.c_reference values (2302 ,'TransferBank','ธนาคารไทยพาณิชย์|สาขาสาธุประดิษฐ์|068-2-81805-7' , 'ธนาคารไทยพาณิชย์-สาขาสาธุประดิษฐ์ 068-2-81805-7','002','Y','Y');					
+insert into pens.c_reference values (2303 ,'TransferBank','ธนาคารกสิกรไทย|สาขาท่าเรือสาธุประดิษฐ์|048-2-51789-9' , 'ธนาคารกสิกรไทย-สาขาท่าเรือสาธุประดิษฐ์ 048-2-51789-9','005','Y','Y');					
+insert into pens.c_reference values (2304 ,'TransferBank','ธนาคาร กรุงไทย จำกัด (มหาชน)|สาขาสาธุประดิษฐ์|083-0-32922-6' , 'ธนาคาร กรุงไทย จำกัด (มหาชน)-สาขาสาธุประดิษฐ์ 083-0-32922-6','009','Y','Y');					
+insert into pens.c_reference values (2305 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75514-4' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75514-4','006','Y','Y');					
+insert into pens.c_reference values (2306 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75402-2' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75402-2','001','Y','Y');					
 
 alter table t_receipt_by add receive_Cash_Date date;
 alter table t_receipt_by_his add receive_Cash_Date date;

@@ -11,6 +11,7 @@
 <%@page import="java.util.List"%>
 <jsp:useBean id="shopForm" class="com.isecinc.pens.web.shop.ShopForm" scope="session" />
 <%
+
   //get d-xxx-d parameter d-49489-p=16
   String queryStr= request.getQueryString();
 if(queryStr.indexOf("d-") != -1){
@@ -38,10 +39,12 @@ if(queryStr.indexOf("d-") != -1){
 		    <display:column  title="Style" property="style"  sortable="false" class="td_text_center" style="width:8%"/>	
 		    <display:column  title="Qty" property="qty"  sortable="false" class="td_number" style="width:8%"/>
 		    <display:column  title="Free Item" property="freeItem"  sortable="false" class="td_text_center" style="width:5%"/>	
+		  
 		    <display:column  title="Unit Price" property="unitPrice"  sortable="false" class="td_number" style="width:7%"/>		
 		    <display:column  title="Line Amount" property="lineAmount"  sortable="false" class="td_number" style="width:7%"/>
 		    <display:column  title="Discount " property="discount"  sortable="false" class="td_number" style="width:7%"/>	
 		    <display:column  title="Vat Amount " property="vatAmount"  sortable="false" class="td_number" style="width:7%"/>	
+		  
 		    <display:column  title="Total Line Amount(In. Vat) " property="totalAmount"  sortable="false" class="td_number" style="width:10%"/>	
 		    <display:column  title="Total Line Amount(Ex. Vat) " property="totalAmountExVat"  sortable="false" class="td_number" style="width:10%"/>	
 		     <%if(currentPage.equalsIgnoreCase(totalPage)){ %>

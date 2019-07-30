@@ -190,6 +190,21 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 									 </tr>
 									</table>
 							    </div>
+						 <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){  %>
+							  <div align="center">
+								   <table  border="0" cellpadding="3" cellspacing="0" >
+									<tr>
+										<td align="center" >
+											<a href="javascript:changeStatusTTByAdmin('${pageContext.request.contextPath}')">
+												 <input type="button" value=" บันทึก  " class="newPosBtnLong">
+											</a>
+											<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
+											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+											</a>
+										</td>	
+									 </tr>
+									</table>
+							    </div>
 					 <% } }%>
 					</html:form>
 					<!-- BODY -->

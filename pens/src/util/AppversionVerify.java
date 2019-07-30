@@ -50,11 +50,11 @@ public class AppversionVerify {
 		if(app ==null){
 		   app = new AppversionVerify();
 		   if(initAllMap==null){
-				initAllMap = getInitAllToMapToDB();
+				initAllMap = getInitAllToMapFromDB();
 			}
 		}else{
 			if(initAllMap==null){
-				initAllMap = getInitAllToMapToDB();
+				initAllMap = getInitAllToMapFromDB();
 			}
 		}
 		return app;
@@ -67,12 +67,12 @@ public class AppversionVerify {
 		   conn = DBConnection.getInstance().getConnection();
 		   // Check 1 time for day and get Config From Dropbox and insert to DB
 		   boolean isToDayCheck = isTodayCheck(conn);
-		   logger.info("isToDayCheck:"+isToDayCheck);
+		   logger.info("isToDayCheck:"+isToDayCheck +",No initAppVersion");
 		   if(isToDayCheck==false){
-			   String urlTestInternetConnection = "https://www.google.co.th";
+			  /* String urlTestInternetConnection = "https://www.google.co.th";
 			   boolean isInternetConnect = Utils.isInternetConnect(urlTestInternetConnection);
-			   logger.info("is internet is connected["+isInternetConnect+"]");
-			   if(isInternetConnect){
+			   logger.info("is internet is connected["+isInternetConnect+"]");*/
+			   if(true){
 				   if(initAllMap==null){
 					   initAllMap =  new HashMap<String, String>();
 				   }
@@ -256,7 +256,22 @@ public class AppversionVerify {
 	        }
 	        return pathFileMap;
 	  }
-	 
+	 public static Map<String,String> getInitAllToMapFromDB(){
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnection();
+			 return getInitAllToMapFromDB(conn);
+		 }catch(Exception e){
+			 logger.error(e.getMessage(),e);
+		 }finally{
+			 try{
+				 if(conn != null){
+					 conn.close();
+				 }
+			 }catch(Exception ee){}
+		 }
+		return null;
+	 }
 	 public static Map<String,String> getInitAllToMapFromDB(Connection conn){
         Map<String,String> pathFileMap = new HashMap<String, String>();
     	Statement stmt = null;

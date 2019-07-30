@@ -76,6 +76,13 @@ function saveProfile(path, type) {
 	return false;
 }
 
+function editProfile(path, type) {
+	var profileId = $('#profileId').val();
+    var url = path + "/jsp/manageProfileSearchAction.do?do=prepare&action=new&profileId="+profileId;
+    PopupCenter(url, "", 500, 300) ;
+}
+
+
 function changeProfile(path, type) {
 	var profileId = $('#profileId').val();
 	if(profileId != '0'){

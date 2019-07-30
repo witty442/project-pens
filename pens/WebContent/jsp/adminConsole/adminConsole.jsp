@@ -263,8 +263,9 @@ function addSlqToeSQL(sqlUtils){
 		     <select id="sqlUtils" onchange="addSlqToeSQL(this)">
 			  <option value=""></option>
 			  <option value="delete from monitor; delete from monitor_item;delete from monitor_item_detail;">ClearMonitorImportExport</option>
-			  <option value="delete from t_temp_import_trans;">ClearTempImport</option>
+			  <option value="delete from t_temp_import_trans;">ClearTempImportImportTrans</option>
 			  <option value="delete from c_control_run_script_db;">ClearControlRunScriptDB</option>
+			  <option value="delete from c_control_salesapp_version;">ClearControlSalesAppVersion</option>
 			</select>
 		  <BR>
 		    Please enter your text SQL To Execute:

@@ -16,7 +16,7 @@ setTimeout("preventback()",0);
 /* window.onbeforeunload = function() { 
 return "กดปุ่มนี้ ข้อมูลอาจเกิดความเสียหาย ต้องกดใช่หรือไม่."; 
 };   */
-
+ 
 
 /*** Control Save Lock Screen ***/
    var progressCount = 0;//CountPercent

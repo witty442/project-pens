@@ -212,8 +212,8 @@ public class InterfacesAction extends I_Action {
 	/**
 	 * Import To DB
 	 */
-	public ActionForward syschronizeFromOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Import :syschronizeFromOracle");
+	public ActionForward synchronizeFromOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("Import :synchronizeFromOracle");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
 		ImportManager importManager =  new ImportManager();
@@ -285,8 +285,8 @@ public class InterfacesAction extends I_Action {
 	/**
 	 * Export To Txt
 	 */
-	public ActionForward syschronizeToOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Export :syschronizeToOracle");
+	public ActionForward synchronizeToOracle(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("Export :synchronizeToOracle");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
 		ExportManager exportManager =  new ExportManager();

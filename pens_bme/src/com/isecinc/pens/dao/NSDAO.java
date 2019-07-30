@@ -114,11 +114,12 @@ public class NSDAO {
 					   h.setInvoiceDate("");
 				   }
 				   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
-				   h.setPacQty(Utils.isNull(rst.getInt("PAC_QTY")));
+				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
 				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
 				   
 				   h.setCupNQty(Utils.isNull(rst.getInt("CUP_QTY_N")));
-				   h.setPacNQty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+				   h.setPac6Qty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+				   h.setPac10CTNQty(Utils.isNull(rst.getInt("PAC_QTY_CTN_10")));
 				   h.setPac10Qty(Utils.isNull(rst.getInt("PAC_QTY_10")));
 				   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
 					
@@ -219,11 +220,12 @@ public class NSDAO {
 					   h.setInvoiceDate("");
 				   }
 				   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
-				   h.setPacQty(Utils.isNull(rst.getInt("PAC_QTY")));
+				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
 				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
 				   
 				   h.setCupNQty(Utils.isNull(rst.getInt("CUP_QTY_N")));
-				   h.setPacNQty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+				   h.setPac6Qty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+				   h.setPac10CTNQty(Utils.isNull(rst.getInt("PAC_QTY_CTN_10")));
 				   h.setPac10Qty(Utils.isNull(rst.getInt("PAC_QTY_10")));
 				   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
 					
@@ -324,7 +326,9 @@ public class NSDAO {
 			    
 			    sql.append("\n ,nvl(sum(cup_qty_n),0) as cup_qty_n " );
 			    sql.append("\n ,nvl(sum(pac_qty_n),0) as pac_qty_n " );
+			    sql.append("\n ,nvl(sum(pac_qty_ctn_10),0) as pac_qty_ctn_10 " );
 			    sql.append("\n ,nvl(sum(pac_qty_10),0) as pac_qty_10 " );
+			    
 			    sql.append("\n ,nvl(sum(pooh_qty_n),0) as pooh_qty_n " );
 			    sql.append("\n from PENSBI.NISSIN_ORDER h where 1=1 ");
 			    sql.append(genWhereSearchList(o));
@@ -337,13 +341,17 @@ public class NSDAO {
 				if(rst.next()) {
 					summary = new NSBean();
 					summary.setCupQty(Utils.decimalFormat(rst.getInt("cup_qty"),Utils.format_current_no_disgit));
-					summary.setPacQty(Utils.decimalFormat(rst.getInt("pac_qty"),Utils.format_current_no_disgit));
-					summary.setPoohQty(Utils.decimalFormat(rst.getInt("pooh_qty"),Utils.format_current_no_disgit));
-					   
 					summary.setCupNQty(Utils.decimalFormat(rst.getInt("cup_qty_n"),Utils.format_current_no_disgit));
-					summary.setPacNQty(Utils.decimalFormat(rst.getInt("pac_qty_n"),Utils.format_current_no_disgit));
-					summary.setPac10Qty(Utils.decimalFormat(rst.getInt("pac_qty_10"),Utils.format_current_no_disgit));
+					
+					summary.setPoohQty(Utils.decimalFormat(rst.getInt("pooh_qty"),Utils.format_current_no_disgit));
 					summary.setPoohNQty(Utils.decimalFormat(rst.getInt("pooh_qty_n"),Utils.format_current_no_disgit));
+					
+					
+					summary.setPac6CTNQty(Utils.decimalFormat(rst.getInt("pac_qty"),Utils.format_current_no_disgit));
+					summary.setPac6Qty(Utils.decimalFormat(rst.getInt("pac_qty_n"),Utils.format_current_no_disgit));
+					summary.setPac10CTNQty(Utils.decimalFormat(rst.getInt("pac_qty_ctn_10"),Utils.format_current_no_disgit));
+					summary.setPac10Qty(Utils.decimalFormat(rst.getInt("pac_qty_10"),Utils.format_current_no_disgit));
+					
 					
 				}//while
 			} catch (Exception e) {
@@ -478,7 +486,7 @@ public class NSDAO {
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?, CUP_QTY=?,CUP_QTY_N=?" +
-					",PAC_QTY = ?, PAC_QTY_N = ?,PAC_QTY_10 =?, POOH_QTY =?,POOH_QTY_N =?   \n");
+					",PAC_QTY = ?, PAC_QTY_N = ?, PAC_QTY_CTN_10=?, PAC_QTY_10 =?, POOH_QTY =?,POOH_QTY_N =?   \n");
 			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ,CUSTOMER_CODE =? ,PENDING_REASON =?,CUSTOMER_NAME =? ,ADDRESS_LINE1 =?,ADDRESS_LINE2 =? \n");
 			sql.append(" WHERE ORDER_ID = ?  \n" );
 
@@ -497,9 +505,12 @@ public class NSDAO {
 			ps.setString(c++, Utils.isNull(o.getInvoiceNo()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getCupQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getCupNQty()));
-			ps.setInt(c++, Utils.convertStrToInt(o.getPacQty()));
-			ps.setInt(c++, Utils.convertStrToInt(o.getPacNQty()));
+			
+			ps.setInt(c++, Utils.convertStrToInt(o.getPac6CTNQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getPac6Qty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getPac10CTNQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPac10Qty()));
+			
 			ps.setInt(c++, Utils.convertStrToInt(o.getPoohQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPoohNQty()));
 			ps.setString(c++, o.getCreateUser());

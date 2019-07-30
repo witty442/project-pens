@@ -103,10 +103,11 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n where M.salesrep_id = Z.salesrep_id ");
+			sql.append("\n and M.division = 'B' ");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
-			sql.append("\n  and M.brand ='"+Utils.isNull(sourceBean.getBrand())+"'");
-			sql.append("\n  and M.CUSTOMER_CATEGORY ='"+Utils.isNull(sourceBean.getCustCatNo())+"'");
-			sql.append("\n  and Z.zone ='"+Utils.isNull(sourceBean.getSalesZone())+"'");
+			sql.append("\n and M.brand ='"+Utils.isNull(sourceBean.getBrand())+"'");
+			sql.append("\n and M.CUSTOMER_CATEGORY ='"+Utils.isNull(sourceBean.getCustCatNo())+"'");
+			sql.append("\n and Z.zone ='"+Utils.isNull(sourceBean.getSalesZone())+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
 			sql.append("\n and M.target_year = '"+Utils.isNull(sourceBean.getTargetYear())+"'");
@@ -139,6 +140,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 					//set for get Avg Order
 					destBean.setCustCatNo(Utils.isNull(rst.getString("customer_category")));
 					destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
+					destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
 					
 					//find priceListId
 					priceListId = SalesTargetTTUtils.getPriceListId(conn, Utils.isNull(rst.getString("zone")), Utils.isNull(rst.getString("customer_category")),user);
@@ -245,6 +247,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
 			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
 			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id ="+curBean.getSalesrepId());
 			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
 			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  WHERE L.ID="+idCopy);
@@ -261,7 +264,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n      and M.customer_category = '"+Utils.isNull(curBean.getCustCatNo())+"'");
 			sql.append("\n      and M.zone = '"+Utils.isNull(curBean.getSalesZone())+"'");
 			sql.append("\n  ) ");
-		   //logger.debug("sql:"+sql);
+		   logger.debug("sql:"+sql);
 		    
 			ps = conn.prepareStatement(sql.toString());
 			ps.execute();
@@ -285,6 +288,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n  select M.id ");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
+			sql.append("\n  and M.division = 'B' ");//B = credit,van sales
 			if( !Utils.isNull(status).equals("")){
 			   sql.append("\n  and M.status ='"+status+"'");
 			}

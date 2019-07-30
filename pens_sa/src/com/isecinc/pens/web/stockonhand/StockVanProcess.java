@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.stockvan;
+package com.isecinc.pens.web.stockonhand;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
@@ -32,14 +32,14 @@ import com.isecinc.pens.init.InitialMessages;
  * @author WITTY
  * 
  */
-public class StockVanAction extends I_Action {
+public class StockVanProcess extends I_Action {
 
 	public static int pageSize = 99999;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	public ActionForward prepareSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareSearch");
-		StockVanForm aForm = (StockVanForm) form;
+		StockOnhandForm aForm = (StockOnhandForm) form;
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
@@ -54,7 +54,7 @@ public class StockVanAction extends I_Action {
 				//clear session 
 				aForm.setResultsSearch(null);
 				//prepare bean
-				StockVanBean bean = new StockVanBean();
+				StockOnhandBean bean = new StockOnhandBean();
 				bean.setDispPlan("");
 				bean.setDispHaveQty("true");
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
@@ -68,7 +68,7 @@ public class StockVanAction extends I_Action {
 				request.setAttribute("RESULT_DATA",null);
 				aForm.setResultsSearch(null);
 				//prepare bean
-				StockVanBean bean = new StockVanBean();
+				StockOnhandBean bean = new StockOnhandBean();
 				bean.setDispPlan("");
 				bean.setDispHaveQty("true");
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
@@ -117,7 +117,7 @@ public class StockVanAction extends I_Action {
 	}
 	public ActionForward searchHead(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("searchHead");
-		StockVanForm aForm = (StockVanForm) form;
+		StockOnhandForm aForm = (StockOnhandForm) form;
 		Connection conn = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
@@ -133,11 +133,11 @@ public class StockVanAction extends I_Action {
 				}
 
 			   //get max column by product or PD
-				List<StockVanBean> columnList = StockVanDAO.searchColumnList(conn, aForm.getBean());
+				List<StockOnhandBean> columnList = StockVanDAO.searchColumnList(conn, aForm.getBean());
 				request.getSession().setAttribute("COLUMN_LIST", columnList);
 				
 				//get Items Show by Page Size
-				List<StockVanBean> items = StockVanDAO.searchStockVanList(conn,aForm.getBean(),columnList);
+				List<StockOnhandBean> items = StockVanDAO.searchStockVanList(conn,aForm.getBean(),columnList);
 				aForm.setResultsSearch(items);
 				
 				if(items.size() <=0 || columnList.size()<=0){
@@ -149,10 +149,10 @@ public class StockVanAction extends I_Action {
 				}
 			}else{
 			   //get max column by product or PD
-				List<StockVanBean> columnList = (List<StockVanBean>)request.getSession().getAttribute("COLUMN_LIST");
+				List<StockOnhandBean> columnList = (List<StockOnhandBean>)request.getSession().getAttribute("COLUMN_LIST");
 				
 				//get Items Show by Page Size
-			    List<StockVanBean> items = StockVanDAO.searchStockVanList(conn,aForm.getBean(),columnList);
+			    List<StockOnhandBean> items = StockVanDAO.searchStockVanList(conn,aForm.getBean(),columnList);
 				aForm.setResultsSearch(items);
 				
 			}
@@ -175,7 +175,7 @@ public class StockVanAction extends I_Action {
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		User user = (User) request.getSession().getAttribute("user");
-		StockVanForm aForm = (StockVanForm) form;
+		StockOnhandForm aForm = (StockOnhandForm) form;
 		String pageName = aForm.getPageName();
 		
 		return "detail";
@@ -186,7 +186,7 @@ public class StockVanAction extends I_Action {
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
-		StockVanForm aForm = (StockVanForm) form;
+		StockOnhandForm aForm = (StockOnhandForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			
@@ -212,13 +212,13 @@ public class StockVanAction extends I_Action {
 			HttpServletResponse response) {
 		
 		logger.debug("exportToExcel : ");
-		StockVanForm stockVanForm = (StockVanForm) form;
+		StockOnhandForm stockVanForm = (StockOnhandForm) form;
 		StringBuffer resultTable = null;
 		String pageName = stockVanForm.getPageName();
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
-			List<StockVanBean> items = stockVanForm.getResultsSearch();
+			List<StockOnhandBean> items = stockVanForm.getResultsSearch();
 		    if(items!= null && items.size() >0){
 		    	resultTable = StockVanExport.genResultStockVanPD(stockVanForm, request,"EXCEL");
 				
@@ -262,7 +262,7 @@ public class StockVanAction extends I_Action {
 	 * Search
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		StockVanForm orderForm = (StockVanForm) form;
+		StockOnhandForm orderForm = (StockOnhandForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String msg = "";
 		try {

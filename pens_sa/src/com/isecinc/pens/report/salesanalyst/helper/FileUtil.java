@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 
@@ -72,6 +73,17 @@ public class FileUtil {
 	    } catch (IOException e) {
 	       throw e;
 	    }
+	}
+	public static byte[] readFileToByte(InputStream is) throws IOException{
+		byte[] bytes = null;
+		try {
+			bytes = IOUtils.toByteArray(is);
+		}catch(IOException e){
+			throw e;
+	    }finally{
+	   
+	    }
+       return bytes;
 	}
 	public static String readControlEnvFile(InputStream fis) throws Exception {
 	    BufferedInputStream bis = null;

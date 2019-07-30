@@ -21,10 +21,11 @@ SIdUtils.getInstance().clearInstance();
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRoleSalesTarget();
 String pageName = Utils.isNull(request.getParameter("pageName"));
+String popup = Utils.isNull(request.getParameter("popup"));
 if(pageName.equals("")){
 	pageName = stockForm.getPageName();
 }
-String pageNameTemp = "";
+String pageNameTemp = pageName;
 if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "ReportStockCredit";
 }
@@ -71,6 +72,8 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 			</jsp:include>
 			<!-- Hidden Field -->
 		    <html:hidden property="pageName" value="<%=pageName %>"/>
+		    <html:hidden property="popup" value="<%=popup %>"/>
+		        
 		    <input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -89,7 +92,11 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 
 						<div align="center">
 						   	<%if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ %>
-						       <jsp:include page="criteria/ReportCreditCriteria.jsp" /> 
+						       <jsp:include page="criteria/ReportCreditCriteria.jsp" flush="true" /> 
+						   <%}else if(StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){ %>
+						       <jsp:include page="criteria/stockCloseVanCriteria.jsp" flush="true"/> 
+						   <%}else if(StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/stockPDVanCriteria.jsp" flush="true"/>  
 						    <% } %>
 					    </div>
 					  
@@ -128,3 +135,7 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 </table>
 </body>
 </html>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

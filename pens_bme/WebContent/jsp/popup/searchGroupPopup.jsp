@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -10,40 +11,24 @@
 <html>
 <head>
 <title></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css" type="text/css" />
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" /> --%>
-<style type="text/css">
-input[type=checkbox]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
-input[type=radio]
-{
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
-}
+<style type="text/css">
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 <%
 	String types = Utils.isNull(request.getParameter("types"));
     String storeType = Utils.isNull(request.getParameter("storeType"));
+    String pageName = Utils.isNull(request.getParameter("pageName"));
     String currentPage = request.getParameter("d-1552-p")==null?"1":request.getParameter("d-1552-p");
     
     /** Store Select MutilCode in each Page **/
@@ -249,6 +234,7 @@ window.onload = function(){
 <input type="hidden" name="codes" value ="<%=codes%>" />
 <input type="hidden" name="descs" value ="<%=descs%>" />
 <input type="hidden" name="selectOne" value="<%=selectOne %>"/>
+<input type="hidden" name="pageName" value="<%=pageName %>"/>
 
 <table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
     <tr height="21px">
@@ -257,13 +243,13 @@ window.onload = function(){
 	</tr>
 	<tr height="21px">
 		<td width="15%" ><b>รหัส</b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
+		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off" />
 			&nbsp;<input type="button" name="search"  class="newPosBtnLong" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td nowrap><b>รายละเอียด</b></td>
-		<td ><html:text property="descSearch"  size="30" style="height:20px"/>
+		<td ><html:text property="descSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off" />
 	
 		</td>
 	</tr>

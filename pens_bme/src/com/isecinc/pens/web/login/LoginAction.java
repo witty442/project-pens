@@ -103,7 +103,7 @@ public class LoginAction extends DispatchAction {
 			}
 			logger.debug("After Calc ScreenWidth:"+screenWidth);
 			
-			request.getSession().setAttribute("User", user.getUserName()+"_"+role+"_"+request.getLocalAddr());
+			request.getSession().setAttribute("User", user.getUserName()+"_"+role);
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			request.getSession(true).setAttribute("screenHeight", screenHeight);
 			

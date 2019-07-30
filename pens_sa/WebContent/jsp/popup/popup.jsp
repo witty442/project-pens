@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.popup.PopupHelper"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="util.Utils"%>
 <%@page import="util.Constants"%>
@@ -28,39 +29,15 @@
     String currentPage = "1";
     String hideAll = Utils.isNull(request.getParameter("hideAll"));//hide select all (checkbox)
     String selectone = Utils.isNull(request.getParameter("selectone"));//select multiple checkbox or radio(selectone)
+    
+    /** Gen Criteria Name **/
     String headName ="";
     String codeSearchTxtName = "";
 	String descSearchTxtName = "";
-	
-    /** Criteria Name **/
-    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
-       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	){
-    	headName = "แบรนด์("+pageName+")";
-    	codeSearchTxtName = "Brand";
-    	descSearchTxtName = "Brand Name";
-    }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
-      || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
-      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName) 
-      || "CustomerStockMC".equalsIgnoreCase(pageName)){
-    	
-    	if("CustomerLocNoTrip".equalsIgnoreCase(pageName)){
-    	  headName = "<span title='"+pageName+"'>ร้านค้า(ที่ยังไม่การกำหนด จุด/Trip)</span>";
-    	}else{
-    	  headName = "<span title='"+pageName+"'>ร้านค้า("+pageName+")</span>";
-    	}
-    	
-    	codeSearchTxtName = "Customer Code";
-    	descSearchTxtName = "Customer Name";
-    }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
-    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)|| "ItemStockVan".equalsIgnoreCase(pageName)  	){
-    	headName = "รหัสสินค้า("+pageName+")";
-    	codeSearchTxtName = "รหัสสินค้า";
-    	descSearchTxtName = "ชื่อสินค้า";
-    }else  if("PDStockVan".equalsIgnoreCase(pageName)){
-	 	headName = "PD/หน่วยรถ("+pageName+")";
-	 	codeSearchTxtName = "PD/หน่วยรถ";
-	 	descSearchTxtName = "ชื่อ PD/หน่วยรถ";
-    }
+    String[] headTextArr = PopupHelper.genHeadTextPopup(pageName);//Gen By PageName Serarch
+    headName = headTextArr[0];
+    codeSearchTxtName = headTextArr[1];
+    descSearchTxtName = headTextArr[2];
     
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
@@ -307,10 +284,12 @@ window.onload = function(){
 	     
 	<%}else if("PDStockVan".equalsIgnoreCase(pageName) ){ %>
 	     <jsp:include page="popup_sub/pdStockVanResult.jsp" /> 
-	  
-	<%} %>   
+	<%}else{ %>  
+	  <!-- Result all PageName -->
+	   <jsp:include page="popup_sub/popupResult.jsp" /> 
+	<%} %> 
 <%}else if(session.getAttribute("search_submit") != null){ %>
- <font size="2" color="red">ไม่พบข้อมูล</font>
+    <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>
 <!-- RESULT -->
 </html:form>

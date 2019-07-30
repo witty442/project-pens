@@ -107,7 +107,6 @@ public class ShopSaleOutAction {
 		String colspan ="13";
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
-			
 			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
 				colspan ="11";
 			}
@@ -186,7 +185,96 @@ public class ShopSaleOutAction {
 		}
 		return h;
 	}
- 
+ public static StringBuffer exportToExcelTM(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
+		StringBuffer h = new StringBuffer("");
+		String colspan ="13";
+		try{
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			 if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_TERMINAL_CODE)){
+				if( user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {
+					colspan ="9";
+				}
+			 }
+			
+			//Header
+			h.append("<table border='1'> \n");
+			h.append(" <tr> \n");
+			h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Terminal Shop</td> \n");
+			h.append(" </tr> \n");
+			h.append(" <tr> \n");
+			h.append("  <td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getBean().getStartDate()+"-"+form.getBean().getEndDate()+"</td> \n");
+			h.append(" </tr> \n");
+			h.append("</table> \n");
+
+			if(list != null){
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<th>Sales Date</th> \n");
+				  h.append("<th>Order No</th> \n");
+				  h.append("<th>Pens Item</th> \n");
+				  h.append("<th>Barcode</th> \n");
+				  h.append("<th>Style</th> \n");
+				  h.append("<th>Qty </th> \n");
+				  h.append("<th>Free Item</th> \n");
+				  if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {
+					  h.append("<th>Unit Price</th> \n");
+					  h.append("<th>Line Amount</th> \n");
+					  h.append("<th>Discount</th> \n");
+					  h.append("<th>Vat Amount</th> \n");
+				  }
+				  h.append("<th>Total Line Amount(In. Vat)</th> \n");
+				  h.append("<th>Total Line Amount(Ex. Vat)</th> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					ShopBean s = (ShopBean)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td class='text'>"+s.getOrderDate()+"</td> \n");
+					  h.append("<td class='text'>"+s.getOrderNo()+"</td> \n");
+					  h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
+					  h.append("<td class='text'>"+s.getBarcode()+"</td> \n");
+					  h.append("<td class='text'>"+s.getStyle()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getQty()+"</td> \n");
+					  h.append("<td class='text'>"+s.getFreeItem()+"</td> \n");
+					  if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {
+						  h.append("<td class='currency'>"+s.getUnitPrice()+"</td> \n");
+						  h.append("<td class='currency'>"+s.getLineAmount()+"</td> \n");
+						  h.append("<td class='currency'>"+s.getDiscount()+"</td> \n");
+						  h.append("<td class='currency'>"+s.getVatAmount()+"</td> \n");
+					  }
+					  h.append("<td class='currency'>"+s.getTotalAmount()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getTotalAmountExVat()+"</td> \n");
+					h.append("</tr>");
+				}
+				
+				/** Summary **/
+				ShopBean s = (ShopBean)request.getSession().getAttribute("summary");
+				h.append("<tr> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					h.append("<td>&nbsp;<b>รวม</b></td> \n");
+					h.append("<td class='num_currency_bold'>"+s.getQty()+"</td> \n");
+					h.append("<td>&nbsp;</td> \n");
+					if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {
+						h.append("<td>&nbsp;</td> \n");
+						h.append("<td class='currency_bold'>"+s.getLineAmount()+"</td> \n");
+						h.append("<td class='currency_bold'>"+s.getDiscount()+"</td> \n");
+						h.append("<td class='currency_bold'>"+s.getVatAmount()+"</td> \n");
+					}
+					h.append("<td class='currency_bold'>"+s.getTotalAmount()+"</td> \n");
+					h.append("<td class='currency_bold'>"+s.getTotalAmountExVat()+"</td> \n");
+				h.append("</tr>");
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
+
  public static StringBuilder genSQL(Connection conn,ShopForm f) throws Exception{
 		StringBuilder sql = new StringBuilder();
 		Date dateTemp = null;

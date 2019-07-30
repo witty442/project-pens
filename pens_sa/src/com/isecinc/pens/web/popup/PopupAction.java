@@ -167,6 +167,12 @@ public class PopupAction extends I_Action {
 				 
 			}else if("CustomerStockMC".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchCustomerStockMC(popupForm);
+				
+			}else if("SubInvOnhand".equalsIgnoreCase(popupForm.getPageName()) ){
+				results = PopupDAO.searchSubInvList(popupForm);
+				
+			}else if("Item".equalsIgnoreCase(popupForm.getPageName()) ){
+				results = PopupDAO.searchItemList(popupForm);
 			}
 			
 			 if(results != null && results.size() >0){
@@ -174,7 +180,7 @@ public class PopupAction extends I_Action {
 			 }else{
 				 request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
 			 }
-			 //mark flag serch
+			 //mark flag search
 			 request.getSession().setAttribute("search_submit", "search");
 		} catch (Exception e) {
 			e.printStackTrace();

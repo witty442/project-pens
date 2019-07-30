@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import util.DBConnection;
+import util.SQLHelper;
 import util.Utils;
 
 import com.isecinc.pens.process.SequenceProcessAll;
@@ -138,6 +139,7 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n select id ,customer_category ,salesrep_id ");
 			sql.append("\n ,customer_id ,sales_channel ");
 			sql.append("\n from XXPENS_BI_SALES_TARGET_TEMP M where 1=1 ");
+			sql.append("\n and division <> 'B' ");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
@@ -250,10 +252,17 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n  null as UPDATE_DATE, ");
 			sql.append("\n  p.SUM12, ");//AMT_AVG12
 			sql.append("\n  p.SUM3, ");//AMT_AVG3
-			sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
+			//old code
+		/*	sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 			sql.append("\n    where P.product_id =L.INVENTORY_ITEM_ID " );
 			sql.append("\n    and P.primary_uom_code ='Y' " );
 			sql.append("\n    and P.pricelist_id ="+priceListId+") as price ");//Price
+*/			
+			//new version 06/2019
+			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
+			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price");
+			
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
 			sql.append("\n  LEFT OUTER JOIN ( ");
 			sql.append("\n    SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
@@ -291,6 +300,7 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n     where L.id= M.id) as item_count");
 			sql.append("\n   from XXPENS_BI_SALES_TARGET_TEMP  M ");
 			sql.append("\n   where 1=1 ");
+			sql.append("\n   and division <> 'B' ");//B = credit,van sales
 			if( !Utils.isNull(status).equals("")){
 			  sql.append("\n   and M.status ='"+status+"'");
 			}

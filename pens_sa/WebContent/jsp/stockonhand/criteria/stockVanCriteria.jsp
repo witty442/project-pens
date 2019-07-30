@@ -1,13 +1,13 @@
 <%@page import="util.SessionUtils"%>
-<%@page import="com.isecinc.pens.web.stockvan.StockVanBean"%>
-<%@page import="com.isecinc.pens.web.stockvan.StockVanForm"%>
+<%@page import="com.isecinc.pens.web.stockonhand.StockOnhandBean"%>
+<%@page import="com.isecinc.pens.web.stockonhand.StockOnhandForm"%>
 <%@page import="util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 /*clear session form other page */
-SessionUtils.clearSessionUnusedForm(request, "stockVanForm");
+SessionUtils.clearSessionUnusedForm(request, "stockOnhandForm");
 
-StockVanBean bean = ((StockVanForm)session.getAttribute("stockVanForm")).getBean();
+StockOnhandBean bean = ((StockOnhandForm)session.getAttribute("stockOnhandForm")).getBean();
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <script type="text/javascript">
@@ -16,21 +16,21 @@ window.onload = function(){
 }
 function loadMe(){
 	MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png');
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	
 	//set SaleChannel Salesrep,CustCateNo
 	 document.getElementsByName('bean.salesChannelNo')[0].value = "<%=Utils.isNull(bean.getSalesChannelNo())%>";
 
 }
 function clearForm(path){
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	var pageName = "";//document.getElementsByName("pageName")[0].value;
-	form.action = path + "/jsp/stockVanAction.do?do=prepareSearch&action=back&pageName="+pageName;
+	form.action = path + "/jsp/stockOnhandAction.do?do=prepareSearch&action=back&pageName="+pageName;
 	form.submit();
 	return true;
 }
 function search(path){
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	if( form.pdType.value ==""){
 		alert("กรุณาระบุ ประเภท");
 		form.pdType.focus();
@@ -57,24 +57,24 @@ function search(path){
 		}
 	}
 	
-	form.action = path + "/jsp/stockVanAction.do?do=searchHead&action=newsearch";
+	form.action = path + "/jsp/stockOnhandAction.do?do=searchHead&action=newsearch";
 	form.submit();
 	return true;
 }
 function exportToExcel(path){
-	var form = document.stockVanForm;
-	form.action = path + "/jsp/stockVanAction.do?do=exportToExcel&action=newsearch";
+	var form = document.stockOnhandForm;
+	form.action = path + "/jsp/stockOnhandAction.do?do=exportToExcel&action=newsearch";
 	form.submit();
 	return true;
 }
 function gotoPage(path,currPage){
-	var form = document.stockVanForm;
-	form.action = path + "/jsp/stockVanAction.do?do=searchHead&currPage="+currPage;
+	var form = document.stockOnhandForm;
+	form.action = path + "/jsp/stockOnhandAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
 }
 function getBrandNameKeypress(e,brandId){
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	if(e != null && e.keyCode == 13){
 		if(brandId.value ==''){
 			form.name.value = '';
@@ -86,7 +86,7 @@ function getBrandNameKeypress(e,brandId){
 //Return String :brandName
 function getBrandNameModel(brandId){
 	var returnString = "";
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/getBrandNameAjax.jsp",
 			data : "brandId=" + brandId.value,
@@ -106,7 +106,7 @@ function getBrandNameModel(brandId){
 	}
 }
 function openPopup(path,pageName){
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	var param = "&pageName="+pageName+"&hideAll=true";
 	if("PDStockVan" == pageName){
         param +="&salesChannelNo="+form.salesChannelNo.value+"&pdType="+form.pdType.value+"&selectone=false";;
@@ -119,7 +119,7 @@ function openPopup(path,pageName){
 	PopupCenterFullHeight(url,"",600);
 }
 function setDataPopupValue(code,desc,pageName){
-	var form = document.stockVanForm;
+	var form = document.stockOnhandForm;
 	if("PDStockVan" == pageName){
 		form.pdCode.value = code;
 	}else if("BrandStockVan" == pageName){

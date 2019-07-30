@@ -17,7 +17,9 @@ import util.SIdUtils;
 import util.UserUtils;
 import util.Utils;
 
+import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.process.login.LoginProcess;
 
 /**
@@ -58,6 +60,10 @@ public class LoginAction extends DispatchAction {
 			User user = null;
 			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
+			//Case Van Login dummy
+			if(user ==null && loginForm.getUserName().toLowerCase().startsWith("v")){
+				user = loginDummyVan(loginForm.getUserName(), loginForm.getPassword());
+			}
             
 			if (user == null) {
 				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
@@ -87,6 +93,7 @@ public class LoginAction extends DispatchAction {
 				forwordStr = "pass_salestarget";
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());
 			return mapping.findForward("fail");
@@ -96,5 +103,110 @@ public class LoginAction extends DispatchAction {
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward(forwordStr);
+	}
+	
+	public ActionForward loginCrossServer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		Connection conn = null;
+		LoginForm loginForm = null;
+		String forwordStr = "pathRedirect";
+		String url = "";
+		try {
+			logger.debug("PENS_SA loginCrossServer Locale:"+Locale.getDefault());
+			
+			//remove session id
+			//SessionIdUtils.getInstance().clearInstance();
+			
+			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
+			//payAction|prepare2|new
+			String pathRedirect = Utils.isNull(request.getParameter("pathRedirect"));
+			logger.debug("url before:"+pathRedirect);
+			
+		    if( !pathRedirect.equals("")){
+		    	url  = pathRedirect.replaceAll("\\$", "&");
+		    	request.setAttribute("url",url );
+		    }
+			logger.debug("serverForm:"+serverForm);
+			logger.debug("url after:"+url);
+			
+			String userName = Utils.isNull(request.getParameter("userName"));
+			String password = Utils.isNull(request.getParameter("password"));
+			String pageName = Utils.isNull(request.getParameter("pageName"));
+			
+			//decode
+			password = util.EncyptUtils.base64decode(password);
+			
+			request.getSession(true).removeAttribute("user");
+			loginForm = (LoginForm) form;
+			
+			//conn = DBConnection.getInstance().getConnection();
+			//user = new LoginProcess().login(userName, password, conn);
+			/*
+            
+			if (user == null) {
+				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
+				return mapping.findForward("fail");
+			}*/
+			User user = new User();
+			user.setUserName(userName);
+			user.setPassword(password);
+			user.setUserGroupName("Van Sales");
+			user.setRoleVanSales(User.VANSALES);
+			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(user.getUserName());
+			if(salesrepBean != null){
+				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
+			}
+			
+			request.getSession(true).setAttribute("user", user);
+			request.getSession(true).setAttribute("username", user.getUserName());
+			
+			/*String role = user.getRole().getKey();
+			logger.debug("role:"+role);
+			*/
+			forwordStr = "pathRedirect";
+			
+			logger.debug("forwordStr:"+forwordStr);
+			
+			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
+			if(screenWidth.equals("")){
+				screenWidth ="0";
+			}
+			logger.debug("Before ScreenWidth["+screenWidth+"]");
+			if(Integer.parseInt(screenWidth) < 600){
+				screenWidth = "0";
+			}
+			logger.debug("After Calc ScreenWidth:"+screenWidth);
+			
+			request.getSession(true).setAttribute("screenWidth", screenWidth);
+			request.getSession(true).setAttribute("GEN_PDF_SUCCESS", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			request.setAttribute("errormsg", e.getMessage());
+			return mapping.findForward("fail");
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward(forwordStr);
+	}
+	
+	private User loginDummyVan(String userName,String password){
+		User user = null;
+		try{
+			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(userName);
+			if(salesrepBean != null && password.equalsIgnoreCase("1234")){
+				user = new User();
+				user.setUserName(userName);
+				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
+				user.setPassword(password);
+				user.setUserGroupName("Van Sales");
+				user.setRoleVanSales(User.VANSALES);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(), e);
+		}
+		return user;
 	}
 }

@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.stockvan;
+package com.isecinc.pens.web.stockonhand;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,12 +15,12 @@ import util.Utils;
 public class StockVanDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static List<StockVanBean> searchColumnList(Connection conn,StockVanBean o) throws Exception {
+	public static List<StockOnhandBean> searchColumnList(Connection conn,StockOnhandBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		List<StockVanBean> columnList = new ArrayList<StockVanBean>();
-		StockVanBean columnBean = null;
+		List<StockOnhandBean> columnList = new ArrayList<StockOnhandBean>();
+		StockOnhandBean columnBean = null;
 		try {
 			//Case 1  แนวตั้ง : PD/หน่วยรถ    แนวนอน :  รหัสสินค้า  
 			if("1".equals(o.getDispType())){
@@ -28,11 +28,11 @@ public class StockVanDAO {
 				if( Utils.isNull(o.getDispPlan()).equals("")){
 					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 					 //GenWhereSQL
 					sql.append(" "+genWhereCondSql(conn,o));
@@ -41,11 +41,11 @@ public class StockVanDAO {
 					sql.append("\n SELECT distinct p.column_code FROM (");
 					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 					 //GenWhereSQL
 					sql.append(" "+genWhereCondSql(conn,o));
@@ -54,11 +54,11 @@ public class StockVanDAO {
 					
 					sql.append("\n  SELECT distinct p.segment1 as column_code from ");
 					sql.append("\n  apps.xxpens_inv_intransit_r00_v pd");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd.to_subinventory = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 					 //GenWhereSQL
 					sql.append(" "+genWhereCondSql(conn,o));
@@ -70,13 +70,13 @@ public class StockVanDAO {
 			}else if("2".equals(o.getDispType())){
 				//no display pd intransit
 				if( Utils.isNull(o.getDispPlan()).equals("")){
-					sql.append("\n  SELECT distinct pd.subinventory_code as column_code from ");
+					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 					 //GenWhereSQL
 					sql.append(" "+genWhereCondSql(conn,o));
@@ -84,15 +84,15 @@ public class StockVanDAO {
 				
 				//display pd intransit
 				}else{
-					sql.append("\n SELECT DISTINCT A.column_code");
+					sql.append("\n SELECT DISTINCT A.column_code,A.subinv_name");
 					sql.append("\n FROM ( ");
-					sql.append("\n  SELECT distinct pd.subinventory_code as column_code from ");
+					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 					sql.append("\n  AND ROUND(pd.primary_quantity,2) <> 0");
 					 //GenWhereSQL
@@ -100,13 +100,13 @@ public class StockVanDAO {
 				
 					sql.append("\n  UNION  ");
 					
-					sql.append("\n  SELECT distinct pd_int.to_subinventory as column_code from ");
+					sql.append("\n  SELECT distinct pd_int.to_subinventory as column_code,pd_int.name as subinv_name from ");
 					sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
-					sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
 					sql.append("\n ,apps.xxpens_om_item_mst_v p");
 					sql.append("\n  WHERE pd_int.to_subinventory = subinv.subinventory");
-					sql.append("\n  AND subinv.user_id = s.user_id");
+					sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 					sql.append("\n  AND pd_int.inventory_item_id = p.inventory_item_id");
 					sql.append("\n  AND ROUND(pd_int.quantity_intransit,2) <> 0");
 					 //GenWhereSQL
@@ -122,16 +122,18 @@ public class StockVanDAO {
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			while(rst.next()) {
-				columnBean = new StockVanBean();
+				columnBean = new StockOnhandBean();
 				if("1".equals(o.getDispType())){
 					columnBean.setProductCode(Utils.isNull(rst.getString("column_code")));
 				}else if("2".equals(o.getDispType())){
 					//no display pd intransit
 					if( Utils.isNull(o.getDispPlan()).equals("")){
 					   columnBean.setPdCode(Utils.isNull(rst.getString("column_code")));
+					   columnBean.setPdDesc(Utils.isNull(rst.getString("subinv_name")));
 					}else{
 					   //display pd intransit
 						columnBean.setPdCode(Utils.isNull(rst.getString("column_code")));
+						columnBean.setPdDesc(Utils.isNull(rst.getString("subinv_name")));
 						columnBean.setPdCodeIntransit(Utils.isNull(rst.getString("column_code")));
 					}
 				}
@@ -148,15 +150,15 @@ public class StockVanDAO {
 		return columnList;
 	}
 
-	public static List<StockVanBean> searchStockVanList(Connection conn,StockVanBean o ,List<StockVanBean> columnList) throws Exception {
+	public static List<StockOnhandBean> searchStockVanList(Connection conn,StockOnhandBean o ,List<StockOnhandBean> columnList) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		StockVanBean rowItem = null;
-		List<StockVanBean> items = new ArrayList<StockVanBean>();
-		List<StockVanBean> rowColumnDataList = new ArrayList<StockVanBean>();
-		StockVanBean columnBean = null;
-		StockVanBean columnDataBean = null;
+		StockOnhandBean rowItem = null;
+		List<StockOnhandBean> items = new ArrayList<StockOnhandBean>();
+		List<StockOnhandBean> rowColumnDataList = new ArrayList<StockOnhandBean>();
+		StockOnhandBean columnBean = null;
+		StockOnhandBean columnDataBean = null;
 		String keyMap = "";
 		try {
 			sql.append("\n select A.* from (");
@@ -173,11 +175,11 @@ public class StockVanDAO {
 			}
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd.primary_quantity,2) <> 0");
 			 //GenWhereSQL
@@ -196,11 +198,11 @@ public class StockVanDAO {
 			}
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd_int.to_subinventory = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd_int.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd_int.quantity_intransit,2) <> 0");
 			 //GenWhereSQL
@@ -212,12 +214,12 @@ public class StockVanDAO {
 			logger.debug("sql:"+sql);
 			
 			//Get DataAllMap to Map 
-			Map<String, StockVanBean> dataAllMap = getDataAllByColumnCodeToMap(conn, o);
+			Map<String, StockOnhandBean> dataAllMap = getDataAllByColumnCodeToMap(conn, o);
 			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			while(rst.next()) {
-			   rowItem = new StockVanBean();
+			   rowItem = new StockOnhandBean();
 			  
 			   //1 row by pd ,column product
 			   if( Utils.isNull(o.getDispType()).equals("1")){
@@ -230,9 +232,9 @@ public class StockVanDAO {
 			   }
 			   
 			   if(columnList != null && columnList.size() >0){
-				   rowColumnDataList = new ArrayList<StockVanBean>();
+				   rowColumnDataList = new ArrayList<StockOnhandBean>();
 				   for(int c =0;c<columnList.size();c++){
-					   columnBean = (StockVanBean)columnList.get(c);
+					   columnBean = (StockOnhandBean)columnList.get(c);
 					   
 					   //1 row by pd ,column product
 					   if( Utils.isNull(o.getDispType()).equals("1")){
@@ -242,7 +244,7 @@ public class StockVanDAO {
 						   keyMap =  rowItem.getProductCode()+"_"+columnBean.getPdCode();
 					   }
 					   
-					    columnDataBean = dataAllMap.get(keyMap)!=null?(StockVanBean)dataAllMap.get(keyMap):null;
+					    columnDataBean = dataAllMap.get(keyMap)!=null?(StockOnhandBean)dataAllMap.get(keyMap):null;
 						if(columnDataBean!= null){
 							//found in map
 						}else{
@@ -272,10 +274,10 @@ public class StockVanDAO {
 		return items;
 	}
 	
-	public static Map<String,StockVanBean> getDataAllByColumnCodeToMap(Connection conn,StockVanBean o) throws Exception{
+	public static Map<String,StockOnhandBean> getDataAllByColumnCodeToMap(Connection conn,StockOnhandBean o) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
-		Map<String,StockVanBean> map = new HashMap<String,StockVanBean>();
+		Map<String,StockOnhandBean> map = new HashMap<String,StockOnhandBean>();
 		StringBuffer sql = new StringBuffer("");
 		try{
 			sql.append("\n select M.product_code,M.product_name");
@@ -294,11 +296,11 @@ public class StockVanDAO {
 			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd.primary_quantity,2) <> 0");
 			 //GenWhereSQL
@@ -314,11 +316,11 @@ public class StockVanDAO {
 			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd_int.to_subinventory = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd_int.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd_int.quantity_intransit,2) <> 0");
 			 //GenWhereSQL
@@ -335,11 +337,11 @@ public class StockVanDAO {
 			sql.append("\n  ,pd.primary_quantity as pd_qty ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd.subinventory_code = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd.primary_quantity,2) <> 0");
 			 //GenWhereSQL
@@ -357,11 +359,11 @@ public class StockVanDAO {
 			sql.append("\n  ,pd_int.quantity_intransit as pd_int_qty ");
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
-			sql.append("\n ,apps.xxpens_inv_subinventory_rule subinv");
+			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
 			sql.append("\n ,apps.xxpens_om_item_mst_v p");
 			sql.append("\n  WHERE pd_int.to_subinventory = subinv.subinventory");
-			sql.append("\n  AND subinv.user_id = s.user_id");
+			sql.append("\n  AND subinv.salesrep_id = s.salesrep_id");
 			sql.append("\n  AND pd_int.inventory_item_id = p.inventory_item_id");
 			sql.append("\n  AND ROUND(pd_int.quantity_intransit,2) <> 0");
 			 //GenWhereSQL
@@ -374,7 +376,7 @@ public class StockVanDAO {
 			rs = ps.executeQuery();
 			String keyMap = "";
 			while(rs.next()){
-				StockVanBean m = new StockVanBean();
+				StockOnhandBean m = new StockOnhandBean();
 			
 				if("1".equals(o.getDispType())){
 					//no display pd intransit
@@ -461,7 +463,7 @@ public class StockVanDAO {
 		return map;
 	} 
 	
-	public static StringBuffer genWhereCondSql(Connection conn,StockVanBean o) throws Exception{
+	public static StringBuffer genWhereCondSql(Connection conn,StockOnhandBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		
 		if( !Utils.isNull(o.getSalesChannelNo()).equals("")){

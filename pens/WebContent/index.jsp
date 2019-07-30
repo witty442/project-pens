@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
@@ -156,9 +157,12 @@ function login(path){
 		              <%} %>
 		            </tr>
 		            <tr>
-		            	<td colspan="2" nowrap>
+		            	<td colspan="2" nowrap><b>
 		            		Application Version
-		            		<font color="red"><b><bean:message bundle="sysprop" key="AppVersion"/></b></font>
+		            		<font color="red"><bean:message bundle="sysprop" key="AppVersion"/>
+		            		(<%=EnvProperties.getInstance().getProperty("config.type") %>)
+		            		</font>
+		            		</b>
 		            	</td>
 		            </tr>
 		            <tr>

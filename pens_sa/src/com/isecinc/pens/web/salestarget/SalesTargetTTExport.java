@@ -462,7 +462,7 @@ public class SalesTargetTTExport {
 				h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
 				h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
 				h.append("<td class='td_text_center' width='10%'> \n");
-				h.append(" <input type='text' readonly class='disableText' size='5' name='status' value='"+item.getStatus()+"' /> \n");
+				h.append(" <input type='text' readonly class='disableText' size='20' name='status' value='"+item.getStatus()+"' /> \n");
 				h.append("</td> \n");
 
 				/**** Change Status ***************************************/
@@ -472,6 +472,8 @@ public class SalesTargetTTExport {
 				h.append("<option value='Open'>Open</option> \n");
 				h.append("<option value='Post'>Post</option> \n");
 				h.append("</select> \n");
+				/** hidden field **/
+				h.append("  <input type='hidden' name='brand_change' value='"+item.getBrand()+"'/> \n");
 				h.append("</td> \n");
 				h.append("</tr> \n");
 		    }//for

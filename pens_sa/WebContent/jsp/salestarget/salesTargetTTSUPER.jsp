@@ -906,21 +906,7 @@ function sumTotalByCurCol(obj,curCol){
 								</tr>
 						</table>
 						<div align="center">
-						   <%if("GOD".equalsIgnoreCase(user.getUserName())){ %>
-								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Open')">
-									 <input type="button" value="ÍÑ¾Ê¶Ò¹Ðä»à»ç¹ Open(GOD)" class="newPosBtn">
-								</a>
-								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Post')">
-									 <input type="button" value="ÍÑ¾Ê¶Ò¹Ðä»à»ç¹ Post(GOD)" class="newPosBtn">
-								</a>
-								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Accept')">
-									 <input type="button" value="ÍÑ¾Ê¶Ò¹Ðä»à»ç¹ Accept(GOD)" class="newPosBtn">
-								</a>
-								<a href="javascript:updateStatusManual('${pageContext.request.contextPath}','Finish')">
-									 <input type="button" value="ÍÑ¾Ê¶Ò¹Ðä»à»ç¹ Finish(GOD)" class="newPosBtn">
-								</a>
-								
-							<%} %>
+						 
 						</div>
 					</div>
 			

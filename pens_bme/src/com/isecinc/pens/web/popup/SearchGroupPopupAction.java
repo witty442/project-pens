@@ -93,19 +93,23 @@ public class SearchGroupPopupAction extends I_Action {
 		List<PopupForm> results = null;
 		try {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
+			String pageName = Utils.isNull(request.getParameter("pageName"));
 			logger.debug("storeType:"+storeType);
 			
-			 if("tops".equalsIgnoreCase(storeType)){
-				 results = searchGroupCodeListTypeTops(popupForm);
-			 }else{
-			     results = searchGroupCodeList(popupForm);
-			 }
+			if("lockItemOrder".equalsIgnoreCase(pageName)){
+				results = searchGroupCodeListByRefCode(popupForm,"LotusItem");
+			}else{
+				 if("tops".equalsIgnoreCase(storeType)){
+					 results = searchGroupCodeListTypeTops(popupForm);
+				 }else{
+				     results = searchGroupCodeList(popupForm);
+				 }
+			}
 			 if(results != null && results.size() >0){
 				 request.setAttribute("GROUP_LIST", results);
 			 }else{
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
 			 }
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -167,6 +171,51 @@ public class SearchGroupPopupAction extends I_Action {
 		Connection conn = null;
 		try {
 			sql.append("  SELECT pens_desc2 from PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'TOPSitem' \n");
+
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append(" and pens_desc2 LIKE '%"+c.getCodeSearch()+"%' \n");
+			}
+			if( !Utils.isNull(c.getDescSearch()).equals("")){
+				sql.append(" and pens_desc2 LIKE '%"+c.getDescSearch()+"%' \n");
+			}
+			
+			sql.append("  ORDER BY pens_desc2 asc \n");
+			
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
+			while (rst.next()) {
+				PopupForm item = new PopupForm();
+				no++;
+				item.setNo(no);
+				item.setCode(rst.getString("pens_desc2"));
+				item.setDesc(rst.getString("pens_desc2"));
+				pos.add(item);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
+	
+  public static List<PopupForm> searchGroupCodeListByRefCode(PopupForm c,String refCode) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try {
+			sql.append("  SELECT distinct pens_desc2 from PENSBI.PENSBME_MST_REFERENCE");
+			sql.append("  WHERE reference_code = '"+refCode+"' \n");
 
 			if( !Utils.isNull(c.getCodeSearch()).equals("")){
 				sql.append(" and pens_desc2 LIKE '%"+c.getCodeSearch()+"%' \n");

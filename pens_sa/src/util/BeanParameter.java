@@ -12,7 +12,7 @@ public class BeanParameter implements Serializable {
 	private static String reportPath;
 	private static String logo;
 	private static String pensTaxNo;
-
+	private static String tempPath;
 	// MODIFIER
 	// MOD TYPE
 	private static String modifierDiscount;
@@ -44,8 +44,17 @@ public class BeanParameter implements Serializable {
 
 	// QUALIFIER -- end --
 
+	
 	public static String getDatabase() {
 		return database;
+	}
+
+	public static String getTempPath() {
+		return tempPath;
+	}
+
+	public static void setTempPath(String tempPath) {
+		BeanParameter.tempPath = tempPath;
 	}
 
 	public static void setDatabase(String database) {

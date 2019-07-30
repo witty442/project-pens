@@ -189,7 +189,8 @@ public class SAGenerate {
 					  allCond +="'"+salesBean.getChkYear()[i]+"'";
 					}
 				}
-				criBean.setYear(allCond);
+				debug.debug("allCond:"+allCond);
+				criBean.setAllCond(allCond);
 				
 				/** Display group by **/
 				groupByBean = new ConfigBean(salesBean.getGroupBy(),salesBean.getGroupBy(),Utils.isNull(SAInitial.getInstance().GROUP_BY_MAP.get(salesBean.getGroupBy())));
@@ -1014,7 +1015,12 @@ public class SAGenerate {
 									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]rowSumKey["+rowSumKey+"]rowSum["+rowSum+"]",1);
 									
 									//calc contribute
-									conPercent = new BigDecimal(rowSum.doubleValue()/colSum.doubleValue());
+									debug.debug("colSum["+colSum.doubleValue()+"]",1);
+									if(colSum.doubleValue()!=0){
+									   conPercent = new BigDecimal(rowSum.doubleValue()/colSum.doubleValue());
+									}else{
+									   conPercent =new BigDecimal("0");
+									}
 									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]BeforeconPercent["+conPercent+"]",1);
 									conPercent = conPercent.multiply(big100).setScale(6,BigDecimal.ROUND_HALF_UP);
 									debug.debug("row["+r+"]gc["+gc+"]col["+col+"]AfterconPercent["+conPercent+"]",1);

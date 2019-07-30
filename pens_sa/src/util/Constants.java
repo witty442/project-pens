@@ -16,5 +16,4 @@ public class Constants {
 	public static final int LINE_PER_PAGE = 20; //10
 	public static final int CACHE_PAGE_SIZE = 500; //5
 	
-
 }

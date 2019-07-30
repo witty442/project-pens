@@ -162,6 +162,7 @@ public class FTPManager {
 			//ftp.setDefaultPort(FTPClient.DEFAULT_PORT);
 			//ftp.setDefaultPort(FTPClient.DEFAULT_PORT);
 			ftp.connect(server);
+			//ftp.setConnectTimeout(100);
 			replyDesc = ftp.getReplyString();
 			logger.debug("["+server+"]:["+replyDesc+"]");
 		}catch(Exception e){

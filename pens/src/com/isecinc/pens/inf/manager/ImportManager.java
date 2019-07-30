@@ -241,7 +241,7 @@ public class ImportManager {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			ftpManager.canConnectFTPServer();
 			
-			/** Set Trasaction no Auto Commit **/
+			/** Set Transaction no Auto Commit **/
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 		

@@ -301,6 +301,7 @@ public class SalesTargetTTAction  {
 			bean.setUpdateUser(user.getUserName());
 			
 			String errorCode = SalesTargetTTSUPERCopy.copyFromLastMonthByTTSUPER(user, bean,aForm.getPageName());
+			
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
 				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
 			}else if(errorCode.equalsIgnoreCase("DATA_MKT_NOT_POST_FOUND")){
@@ -444,7 +445,67 @@ public class SalesTargetTTAction  {
 		return mapping.findForward("detail");
 	}
 	
-	
+	public ActionForward changeStatusTTByAdmin(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("changeStatusTTByAdmin");
+		Connection conn = null;
+		SalesTargetForm aForm = (SalesTargetForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			SalesTargetBean h = new SalesTargetBean();
+			h.setPeriod(aForm.getBean().getPeriod());
+			h.setStartDate(aForm.getBean().getStartDate());
+			h.setBrand(aForm.getBean().getBrand());
+			h.setCustCatNo(aForm.getBean().getCustCatNo());
+			h.setSalesZone(aForm.getBean().getSalesZone());
+			
+			//get parameter
+			String[] brandChange = request.getParameterValues("brand_change");
+			String[] statusChange = request.getParameterValues("status_change");
+			
+			if(brandChange.length>0){
+				for(int i=0;i<brandChange.length;i++){
+					if( !Utils.isNull(statusChange[i]).equals("")){
+						
+						h.setStatus(Utils.isNull(statusChange[i]));
+						h.setBrand(Utils.isNull(brandChange[i]));
+						h.setUpdateUser(user.getUserName());
+						
+						//update status TT
+						SalesTargetTTDAO.updateStatusHead_TTByAdmin(conn, h);
+						SalesTargetTTDAO.updateStatusItem_TTByAdmin(conn, h);
+						
+						//update status TEMP
+						SalesTargetTTDAO.updateStatusHead_TEMPByTTADMIN(conn, h);
+						SalesTargetTTDAO.updateStatusItem_TEMPByTTADMIN(conn, h);
+					}
+					
+				}//for
+			}
+			conn.commit();
+			
+			request.setAttribute("Message","Change Status  เรียบร้อยแล้ว");
+			
+			SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTADMIN_TT(aForm.getBean(),user,aForm.getPageName());
+			aForm.setBean(salesReuslt);
+			if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+				 request.getSession().setAttribute("RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTADMIN(request,aForm.getBean(),user));
+			}
+		
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} finally {
+			try {
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("search");
+	}
 	
 	public ActionForward postToSalesTT(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("postToSales By Marketing TT");

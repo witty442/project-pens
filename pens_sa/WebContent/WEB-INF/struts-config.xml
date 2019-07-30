@@ -37,11 +37,13 @@
 		<form-bean name="prodShowForm" type="com.isecinc.pens.web.prodshow.ProdShowForm" />
 		<form-bean name="moveOrderForm" type="com.isecinc.pens.web.moveorder.MoveOrderForm" />
 		<form-bean name="promotionForm" type="com.isecinc.pens.web.promotion.PromotionForm" />
-		<form-bean name="stockVanForm" type="com.isecinc.pens.web.stockvan.StockVanForm" />
+		<form-bean name="stockOnhandForm" type="com.isecinc.pens.web.stockonhand.StockOnhandForm" />
 		<form-bean name="stockMCForm" type="com.isecinc.pens.web.stockmc.StockMCForm" />
 		<!-- Admin Console -->
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 		<form-bean name="billPlanForm" type="com.isecinc.pens.web.billplan.BillPlanForm" />
+		<form-bean name="manageProfileSearchForm" type="com.isecinc.pens.web.profilesearch.ManageProfileSearchForm" />
+		
 	</form-beans>
 	
 	<global-forwards>
@@ -55,6 +57,7 @@
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
              <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new" redirect="true" /> 
+			 <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
 		
@@ -79,6 +82,10 @@
 			<forward name="prepare" path="/jsp/administer/role.jsp" />
 			<forward name="view" path="/jsp/administer/role.jsp" />
 			<forward name="clearform" path="/jsp/administer/role.jsp" />
+		</action>
+		 <!-- Manage Profile Search -->
+		<action name="manageProfileSearchForm" path="/jsp/manageProfileSearchAction" parameter="do" scope="request" type="com.isecinc.pens.web.profilesearch.ManageProfileSearchAction">
+			<forward name="search" path="/jsp/administer/manageProfileSearch.jsp" />
 		</action>
 		<!-- ROLE ADD -->
 		<action name="roleForm" path="/jsp/roleAddAction" parameter="do" scope="request" type="com.isecinc.pens.web.role.RoleAction">
@@ -138,8 +145,8 @@
 			<forward name="searchMasterItem" path="/jsp/stockMC/stockMCMasterItemSearch.jsp" />
 			<forward name="detailMasterItem" path="/jsp/stockMC/stockMCMasterItem.jsp" />
 		</action>
-		<action name="stockVanForm" path="/jsp/stockVanAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockvan.StockVanAction">
-			<forward name="search" path="/jsp/stockvan/stockVanSearch.jsp" />
+		<action name="stockOnhandForm" path="/jsp/stockOnhandAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockonhand.StockOnhandAction">
+			<forward name="search" path="/jsp/stockonhand/stockOnhandSearch.jsp" />
 		</action>
 		<action name="promotionForm" path="/jsp/promotionAction" parameter="do" scope="session" type="com.isecinc.pens.web.promotion.PromotionAction">
 			<forward name="search" path="/jsp/promotion/promotionSearch.jsp" />
@@ -152,6 +159,7 @@
 		</action>
 		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
 			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
+			<forward name="stockVanReport" path="/jsp/stock/stockVanPDPopupReport.jsp" />
 		</action>
 		<action name="locationForm" path="/jsp/locationAction" parameter="do" scope="session" type="com.isecinc.pens.web.location.LocationAction">
 			<forward name="spider" path="/jsp/location/locationSearch.jsp" />

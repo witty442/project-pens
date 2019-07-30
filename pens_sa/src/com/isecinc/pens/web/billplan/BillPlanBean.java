@@ -23,7 +23,17 @@ public class BillPlanBean implements Serializable{
 	private String item;
 	private String itemName;
 	private String planQty;
+	private String dispType;
+	
 	private List<BillPlanBean> items = new ArrayList<BillPlanBean>();
+	
+	
+	public String getDispType() {
+		return dispType;
+	}
+	public void setDispType(String dispType) {
+		this.dispType = dispType;
+	}
 	public String getSalesZone() {
 		return salesZone;
 	}

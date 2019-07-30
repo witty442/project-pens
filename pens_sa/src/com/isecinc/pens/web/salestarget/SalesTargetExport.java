@@ -395,5 +395,52 @@ public class SalesTargetExport {
 		}finally{
 		}
 	}
-	
+	public static StringBuffer genResultSearchTargetHeadByMTADMIN(HttpServletRequest request,SalesTargetBean o,User user) throws Exception{
+		StringBuffer h = new StringBuffer("");
+		String className = "";
+		try{
+			if(o.getItems() != null && o.getItems().size() >0){
+				
+			h.append(ExcelHeader.EXCEL_HEADER);
+			h.append("<table id='tblProduct' align='center' border='1' width='60%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
+			h.append("<tr> \n");
+			h.append("<th>แบรนด์</th> \n");
+			h.append("<th>เป้าหมายขาย (หีบ)</th> \n");
+			h.append("<th>เป้าหมายขาย (บาท)</th> \n");
+			h.append("<th>สถานะ</th> \n");
+			h.append("<th>Change Status To</th>	\n");		
+			h.append("</tr> \n");
+			
+		    for(int i=0;i<o.getItems().size();i++){
+		    	SalesTargetBean item = o.getItems().get(i);
+		    	className = (i %2 == 0)?"lineE":"lineO";
+		    	
+				h.append("<tr class='"+className+"'> \n");
+				h.append("<td class='td_text' width='10%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
+				h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
+				h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
+				h.append("<td class='td_text_center' width='10%'> \n");
+				h.append(" <input type='text' readonly class='disableText' size='20' name='status' value='"+item.getStatus()+"' /> \n");
+				h.append("</td> \n");
+
+				/**** Change Status ***************************************/
+				h.append("<td class='td_text_center' width='10%'> \n");
+				h.append("<select id='status_change' name='status_change'> \n");
+				h.append("<option value=''></option> \n");
+				h.append("<option value='Open'>Open</option> \n");
+				h.append("<option value='Post'>Post</option> \n");
+				h.append("</select> \n");
+				/** hidden field **/
+				h.append("  <input type='hidden' name='brand_change' value='"+item.getBrand()+"'/> \n");
+				h.append("</td> \n");
+				h.append("</tr> \n");
+		    }//for
+			h.append("</table> \n");
+			}
+		   return h;
+		}catch(Exception e){
+			throw e;
+		}finally{
+		}
+	}
 }

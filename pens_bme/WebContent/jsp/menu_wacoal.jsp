@@ -150,7 +150,7 @@
 
 <!-- Shop Menu-->
 <% if ( Utils.userInRole(user,new String[]{User.WACOAL}) ){ no=0;%>
-    <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
+    <li><a  href="javascript: void(0)" class="parent"><span>SHOP</span></a>
 		<ul> 
 		    <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
@@ -164,6 +164,9 @@
 	        <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
 	        </li>
+	         <li>
+		       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_SALEOUT%>');"><span><%no++;out.print(no);%><bean:message key="TMSaleOut" bundle="sysprop"/></span></a>
+		     </li>
 		</ul>
 	</li>   
 <%} %>

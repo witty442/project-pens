@@ -734,7 +734,9 @@ public class ReportUtilServlet extends HttpServlet {
 			}else if("list_order_product_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_report".equalsIgnoreCase(fileName)
 					|| "tax_invoice_summary_new_report".equalsIgnoreCase(fileName)
-					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)){
+					|| "tax_invoice_summary_2_report".equalsIgnoreCase(fileName)
+					|| "control_all_report".equalsIgnoreCase(fileName)
+					){
 				try{
 					//Select Printer Small Is online
 					/*if(ControlCode.canExecuteMethod("PrinterUtils", "selectPrinterSmallIsOnlineCheckOnline")){

@@ -144,7 +144,7 @@ public class SAInitial {
 	private String maxOrderedDate = "";
 	private String maxOrderedTime ="";
 	
-	public  void initSession(HttpServletRequest requestWeb) {
+	public  void initSession(HttpServletRequest requestWeb,User user) {
 		References r = null;
 		HttpSession session = requestWeb.getSession(true);
 		Connection conn = null;
@@ -343,6 +343,7 @@ public class SAInitial {
 			List<References> profileList = new ArrayList<References>();
 			r = new References("0","ไม่เลือก");
 			profileList.add(r);
+			/*
 			r = new References("1","Profile 1");
 			profileList.add(r);
 			r = new References("2","Profile 2");
@@ -353,6 +354,10 @@ public class SAInitial {
 			profileList.add(r);
 			r = new References("5","Profile 5");
 			profileList.add(r);
+			session.setAttribute("profileList", profileList);*/
+			
+			//new Code
+			profileList.addAll(initProfileList(conn, user.getId()));
 			session.setAttribute("profileList", profileList);
 			
 			
@@ -417,6 +422,46 @@ public class SAInitial {
 			}
 		}
 		return yearList;
+	}
+	
+	public static List<References> initProfileList(Connection conn,int userId) throws Exception{
+		String sql = "";
+		PreparedStatement ps = null;
+		ResultSet rs= null;
+        List<References> profileList = new ArrayList<References>();
+        String profileName ="";
+        int maxProfileId= 0;
+		try{
+			sql = "SELECT * from pensbi.c_user_profile where user_id ="+userId +" order by profile_id asc ";
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				if( !Utils.isNull(rs.getString("profile_name")).equals("")){
+				    profileName = Utils.isNull(rs.getString("profile_name"));
+				}else{
+					profileName = "Profile " +rs.getString("profile_id");
+				}
+				profileList.add(new References(rs.getString("profile_id"), profileName));
+				maxProfileId = rs.getInt("profile_id");
+			}
+			//add to show 5 profile
+			int diff = 5-profileList.size();
+			for(int i=0;i<diff;i++){
+				maxProfileId++;
+				profileList.add(new References(String.valueOf(maxProfileId), "Profile "+maxProfileId));
+			}
+		}catch(Exception e){
+			 throw e;
+		}finally{
+			
+			if(ps != null){
+			   ps.close();ps= null;
+			}
+			if(rs != null){
+			   rs.close();rs=null;
+			}
+		}
+		return profileList;
 	}
 	
 	/**
@@ -520,12 +565,14 @@ public class SAInitial {
 				}else if(TYPE_SEARCH_QUARTER.equalsIgnoreCase(salesBean.getTypeSearch())){
 					//sql.append("\t"+" AND sales_order_quarter IN("+criBean.getQuarter()+") \n");
 					//sql.append("\t"+" AND sales_order_year IN("+criBean.getYear()+") \n");
-					 sql.append(SAGenCondition.genWhereCondSQLCaseByQuarterYearMain("\t","","ORDER",criBean.getAllCond()));
+					 
+					sql.append(SAGenCondition.genWhereCondSQLCaseByQuarterYearMain("\t","","ORDER",criBean.getAllCond()));
 					 
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}else if(TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 					//sql.append("\t"+" AND sales_order_year IN("+all+") \n");
-					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",criBean.getYear()));
+					
+					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",criBean.getAllCond()));
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {
@@ -577,7 +624,7 @@ public class SAInitial {
 				}else if(TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 					//sql.append("\t"+" AND invoice_year IN("+all+") \n");
 					
-					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",criBean.getYear()));
+					sql.append(""+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",criBean.getAllCond()));
 					sql.append("\t"+" GROUP BY "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {

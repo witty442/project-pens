@@ -24,7 +24,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
 
 <%
@@ -315,24 +314,35 @@ function cancelAction(path){
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
 			                                    <tr>
 			                                      <th colspan="2">CUP 72</th>
-			                                      <th colspan="3">BAG</th>
+			                                      <th colspan="4">BAG</th>
 			                                      <th colspan="2">POOH 72</th>
 			                                    </tr>
 			                                    <tr>
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
-			                                      <th>CTN</th>
-			                                      <th>BAG 6</th>
-			                                      <th>BAG 10</th>
+			                                      
+			                                      <th>BAG 6(CTN)</th>
+			                                      <th>BAG 6(BAG)</th>
+			                                      
+			                                      <th>BAG 10(CTN)</th>
+			                                      <th>BAG 10(BAG)</th>
+			                                       
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
 			                                    </tr>
 			                                    <tr>
 			                                       <td><html:text property="bean.cupQty" styleClass="\" autoComplete=\"off" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
 			                                       <td><html:text property="bean.cupNQty" styleClass="\" autoComplete=\"off" styleId="cupNQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.pacQty" styleClass="\" autoComplete=\"off" styleId="pacQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.pacNQty" styleClass="\" autoComplete=\"off" styleId="pacNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG6(CTN) -->
+			                                       <td><html:text property="bean.pac6CTNQty" styleClass="\" autoComplete=\"off" styleId="pac6CTNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG6(BAG) -->
+			                                       <td><html:text property="bean.pac6Qty" styleClass="\" autoComplete=\"off" styleId="pac6Qty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       
+			                                       <!-- BAG10(CTN) -->
+			                                       <td><html:text property="bean.pac10CTNQty" styleClass="\" autoComplete=\"off" styleId="pac10CTNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG10(BAG) -->
 			                                       <td><html:text property="bean.pac10Qty" styleClass="\" autoComplete=\"off" styleId="pac10Qty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       
 			                                       <td><html:text property="bean.poohQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="10" onkeydown="return inputNum(event);"/> </td>
 			                                       <td><html:text property="bean.poohNQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="10" onkeydown="return inputNum(event);"/> </td>
 			                                    </tr>

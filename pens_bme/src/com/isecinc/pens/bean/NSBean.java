@@ -38,14 +38,17 @@ public class NSBean implements Serializable{
 	private String saleCode;
 
 	private String cupQty;
-	private String pacQty;
-	private String poohQty;
-	
 	private String cupNQty;
-	private String pacNQty;//equals pac 6
-	private String pac10Qty;
+	
+	private String poohQty;
 	private String poohNQty;
 	
+	private String pac6CTNQty;//BAG6(CTN) =PAC_QTY
+	private String pac6Qty;//BAG6 (BAG) = PAC_QTY_N
+	
+	private String pac10CTNQty;//BAG10(CTN) =PAC_QTY_CTN_10
+	private String pac10Qty;// BAG10 (BAG) = PAC_QTY_10
+
 	private String status;
 	private String statusDesc;
 
@@ -60,6 +63,14 @@ public class NSBean implements Serializable{
     private NSBean summary;
 	
     
+	public String getPac10CTNQty() {
+		return pac10CTNQty;
+	}
+
+	public void setPac10CTNQty(String pac10ctnQty) {
+		pac10CTNQty = pac10ctnQty;
+	}
+
 	public String getPac10Qty() {
 		return pac10Qty;
 	}
@@ -140,12 +151,12 @@ public class NSBean implements Serializable{
 		this.cupNQty = cupNQty;
 	}
 
-	public String getPacNQty() {
-		return pacNQty;
+	public String getPac6Qty() {
+		return pac6Qty;
 	}
 
-	public void setPacNQty(String pacNQty) {
-		this.pacNQty = pacNQty;
+	public void setPac6Qty(String pac6Qty) {
+		this.pac6Qty = pac6Qty;
 	}
 
 	public String getPoohNQty() {
@@ -292,12 +303,14 @@ public class NSBean implements Serializable{
 		this.cupQty = cupQty;
 	}
 
-	public String getPacQty() {
-		return pacQty;
+	
+
+	public String getPac6CTNQty() {
+		return pac6CTNQty;
 	}
 
-	public void setPacQty(String pacQty) {
-		this.pacQty = pacQty;
+	public void setPac6CTNQty(String pac6ctnQty) {
+		pac6CTNQty = pac6ctnQty;
 	}
 
 	public String getPoohQty() {

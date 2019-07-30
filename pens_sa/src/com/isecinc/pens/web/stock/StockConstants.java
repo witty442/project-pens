@@ -11,5 +11,6 @@ public class StockConstants {
 
   
   public static final String PAGE_CREDIT = "CREDIT";
- 
+  public static final String PAGE_STOCK_CLOSE_VAN = "STOCK_CLOSE_VAN";
+  public static final String PAGE_STOCK_CLOSEPD_VAN = "STOCK_CLOSEPD_VAN";
 }

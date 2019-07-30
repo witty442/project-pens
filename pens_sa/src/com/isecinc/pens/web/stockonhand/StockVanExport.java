@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.stockvan;
+package com.isecinc.pens.web.stockonhand;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +15,13 @@ public class StockVanExport {
 	public static Logger logger = Logger.getLogger("PENS");
 	
 	
-public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpServletRequest request,String typeExport) throws Exception{
+public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,HttpServletRequest request,String typeExport) throws Exception{
    StringBuffer out = new StringBuffer("");
    String td_text_center = "td_text_center";
    String td_text = "td_text";
    String td_number = "td_number";
    String td_number_bold = "td_number_bold";
+   String pdDescShow = "";
    try{
 	   /** Case Export to Excel **/
 	   if("EXCEL".equalsIgnoreCase(typeExport)){
@@ -39,14 +40,14 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   if(stockVanForm.getResultsSearch() != null && stockVanForm.getResultsSearch().size()>0){
 	   	
 	   /** For summary column **/
-	   Map<String,StockVanBean> summaryByColumnMap = new HashMap<String,StockVanBean>();
+	   Map<String,StockOnhandBean> summaryByColumnMap = new HashMap<String,StockOnhandBean>();
 	   double totalRowQty = 0;//for check 
 
-	   StockVanBean sumBean = null;
+	   StockOnhandBean sumBean = null;
 	   StringBuffer headTableHtml = new StringBuffer("");
 	   StringBuffer rowTableHtml = new StringBuffer("");
 
-	   List<StockVanBean> columnList = (List<StockVanBean>)request.getSession().getAttribute("COLUMN_LIST");
+	   List<StockOnhandBean> columnList = (List<StockOnhandBean>)request.getSession().getAttribute("COLUMN_LIST");
 	   if(columnList ==null || (columnList !=null && columnList.size()==0)){
 		   return new StringBuffer("");
 	   }
@@ -82,15 +83,15 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   }
 
 	   /***********************Validate Sum Qty Column,Row <>0***********************************/
-	   List<StockVanBean> resultList = stockVanForm.getResultsSearch();
+	   List<StockOnhandBean> resultList = stockVanForm.getResultsSearch();
 	   /************* Summary by Column *********************************************************/
 	   if(true){
 		   for(int n=0;n<resultList.size();n++){
-		   	  StockVanBean rowItem = (StockVanBean)resultList.get(n);
+		   	  StockOnhandBean rowItem = (StockOnhandBean)resultList.get(n);
 		      //for by column
 		      if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
 		          	for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
-		          		StockVanBean columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
+		          		StockOnhandBean columnDataBean = (StockOnhandBean)rowItem.getRowColumnDataList().get(c);
 		          		
 		          		//1 Row by pd  ,column product
 		          		if( dispType.equals("1")){
@@ -105,7 +106,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                         	 //add to summary Map
 		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
 		                         }else{
-		                         	 sumBean = new StockVanBean();
+		                         	 sumBean = new StockOnhandBean();
 		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
 		                         	 
@@ -126,7 +127,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	 //add to summary Map
 		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);	
 		                         }else{
-		                          	 sumBean = new StockVanBean();
+		                          	 sumBean = new StockOnhandBean();
 		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
 		                        	 
@@ -150,7 +151,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                         	 //add to summary Map
 		                         	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);
 		                         }else{
-		                         	 sumBean = new StockVanBean();
+		                         	 sumBean = new StockOnhandBean();
 		                         	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                         	 double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
 		                         	 sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
@@ -177,7 +178,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	 //add to summary Map
 		                          	 summaryByColumnMap.put(columnDataBean.getProductCode(), sumBean);	
 		                         }else{
-		                          	 sumBean = new StockVanBean();
+		                          	 sumBean = new StockOnhandBean();
 		                          	 double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	 double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
 		                          	 double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
@@ -205,7 +206,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	//add to summary Map
 		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
 		                         }else{
-		                          	sumBean = new StockVanBean();
+		                          	sumBean = new StockOnhandBean();
 		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
 		                          	
@@ -224,7 +225,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	//add to summary Map
 		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
 		                         }else{
-		                          	sumBean = new StockVanBean();
+		                          	sumBean = new StockOnhandBean();
 		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
 		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
@@ -244,7 +245,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	//add to summary Map
 		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
 		                         }else{
-		                          	sumBean = new StockVanBean();
+		                          	sumBean = new StockOnhandBean();
 		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
 		                          	sumBean.setPdQty(String.valueOf(sumPdQty));//add summary
@@ -268,7 +269,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		                          	//add to summary Map
 		                          	summaryByColumnMap.put(columnDataBean.getPdCode(), sumBean);
 		                         }else{
-		                          	sumBean = new StockVanBean();
+		                          	sumBean = new StockOnhandBean();
 		                          	double sumPdQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdQty());
 		                          	double sumPdPrice = Utils.convertStrToDouble2Digit(columnDataBean.getPdPrice());
 		                          	double sumPdIntQty = Utils.convertStrToDouble2Digit(columnDataBean.getPdIntQty());
@@ -298,7 +299,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   				headTableHtml.append("<th>ชื่อ PD</th>\n");
 	   				
              	    for(int k=0;k<columnList.size();k++){
-                      StockVanBean s = (StockVanBean)columnList.get(k);
+                      StockOnhandBean s = (StockOnhandBean)columnList.get(k);
                       //check qty <> 0 to show
                       if(dispHaveQty){
                          if(Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty())  != 0){
@@ -313,7 +314,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   				  headTableHtml.append("<th rowspan='2'>PD/หน่วยรถ</th> \n");
 	   				  headTableHtml.append("<th rowspan='2'>ชื่อ PD</th> \n");
 	   			      for(int k=0;k<columnList.size();k++){
-                          StockVanBean s = (StockVanBean)columnList.get(k);
+                          StockOnhandBean s = (StockOnhandBean)columnList.get(k);
                           //check qty <> 0 to show
                           if(dispHaveQty){
 	                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
@@ -330,7 +331,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   					  headTableHtml.append("<th rowspan='2'>PD/หน่วยรถ</th> \n");
 		   				  headTableHtml.append("<th rowspan='2'>ชื่อ PD</th> \n");
 		   			      for(int k=0;k<columnList.size();k++){
-	                          StockVanBean s = (StockVanBean)columnList.get(k);
+	                          StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                          //check qty <> 0 to show
 	                          if(dispHaveQty){
 		                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
@@ -347,7 +348,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   				  headTableHtml.append("<th rowspan='3'>PD/หน่วยรถ</th> \n");
 		   				  headTableHtml.append("<th rowspan='3'>ชื่อ PD</th> \n");
 		   			      for(int k=0;k<columnList.size();k++){
-	                         StockVanBean s = (StockVanBean)columnList.get(k);
+	                         StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                         //check qty <> 0 to show
 	                         if(dispHaveQty){
 		                          if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
@@ -367,14 +368,16 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   			 headTableHtml.append("<th>รหัสสินค้า</th> \n");
 		   		     headTableHtml.append("<th>ชื่อสินค้า</th> \n");
 			   		 for(int k=0;k<columnList.size();k++){
-	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                     //check qty <> 0 to show
 	                     if(dispHaveQty){
 		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty())  != 0){
-		                         headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+		                    	 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+		                         headTableHtml.append("<th>"+s.getPdCode()+pdDescShow+"</th>");
 		                      }
 	                     }else{
-	                   	     headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+	                    	 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+	                         headTableHtml.append("<th>"+s.getPdCode()+pdDescShow+"</th>");
 	                     }
 	                  }//for 
 		   		// 2.2) display plan,no price test=pass
@@ -382,16 +385,18 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   			 headTableHtml.append("<th>รหัสสินค้า</th> \n");
 		   		     headTableHtml.append("<th>ชื่อสินค้า</th> \n");
 		   			 for(int k=0;k<columnList.size();k++){
-	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                     //check qty <> 0 to show
 	                     if(dispHaveQty){
 	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
 	      	                   	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
-	                    		  headTableHtml.append("<th>"+s.getPdCode()+"</th>");
-	 	                          headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ระหว่างทาง</th>");
+	                    		 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+		                         headTableHtml.append("<th>"+s.getPdCode()+pdDescShow+"</th>");
+	 	                         headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ระหว่างทาง</th>");
 		                      }
 	                     }else{
-	                    	 headTableHtml.append("<th>"+s.getPdCode()+"</th>");
+	                    	 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+	                         headTableHtml.append("<th>"+s.getPdCode()+pdDescShow+"</th>");
 	                         headTableHtml.append("<th>"+s.getPdCodeIntransit()+" ระหว่างทาง</th>");
 	                     }
 	                  }//for 
@@ -400,14 +405,16 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   			 headTableHtml.append("<th rowspan='2'>รหัสสินค้า</th> \n");
 		   		     headTableHtml.append("<th rowspan='2'>ชื่อสินค้า</th> \n");
 			   		 for(int k=0;k<columnList.size();k++){
-	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                     //check qty <> 0 to show
 	                     if(dispHaveQty){
 	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0 ){
-	                    		  headTableHtml.append("<th colspan='2'>"+s.getPdCode()+"</th>");
+	                    		 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+		                         headTableHtml.append("<th colspan='2'>"+s.getPdCode()+pdDescShow+"</th>");
 		                      }
 	                     }else{
-	                    	 headTableHtml.append("<th colspan='2'>"+s.getPdCode()+"</th>");
+	                    	 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+	                         headTableHtml.append("<th colspan='2'>"+s.getPdCode()+pdDescShow+"</th>");
 	                     }
 	                  }//for 
 		   		// 2.4) display plan ,display price  test=
@@ -415,15 +422,17 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   			 headTableHtml.append("<th rowspan='3'>รหัสสินค้า</th> \n");
 		   		     headTableHtml.append("<th rowspan='3'>ชื่อสินค้า</th> \n");
 		   		 	 for(int k=0;k<columnList.size();k++){
-	                     StockVanBean s = (StockVanBean)columnList.get(k);
+	                     StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                     //check qty <> 0 to show
 	                     if(dispHaveQty){
 	                    	 if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0 
 	                    	   || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
-	                    		  headTableHtml.append("<th colspan='4'>"+s.getPdCode()+"</th>");
+	                    		 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+		                         headTableHtml.append("<th colspan='4'>"+s.getPdCode()+pdDescShow+"</th>");
 		                      }
 	                     }else{
-	                    	 headTableHtml.append("<th colspan='4'>"+s.getPdCode()+"</th>");
+	                    	 pdDescShow = "EXCEL".equals(typeExport)?"-"+s.getPdDesc():"";//show only export excel
+	                         headTableHtml.append("<th colspan='4'>"+s.getPdCode()+pdDescShow+"</th>");
 	                     }
 	                  }//for 
 		   		}//if
@@ -441,7 +450,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
    			}else if( dispPlan==true && dispPrice==false){ 
 		   	      headTableHtml.append("<tr>");
 		   	      for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
@@ -458,7 +467,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   }else if( dispPlan==false && dispPrice==true){ 
 			     headTableHtml.append("<tr>");
 		   	     for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
@@ -476,7 +485,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 			     //***** Row head 2 *************************************************/
 			      headTableHtml.append("<tr>");
 		   	      for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
@@ -492,7 +501,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   	     //***** Row head 3 *************************************************/
 			   	 headTableHtml.append("<tr>");
 		   	     for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0 ){
@@ -523,7 +532,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	    		  headTableHtml.append("<tr>");
 	    		  logger.debug("Case 2.3 columnSize:"+columnList.size());
 		   	      for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
 	                	   logger.debug("add -->:dispHaveQty");
@@ -542,7 +551,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	    		 //***** Row head 2 *************************************************/
 			     headTableHtml.append("<tr>");
 		   	      for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
@@ -560,7 +569,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 		   	     //***** Row head 3 *************************************************/
 			   	 headTableHtml.append("<tr>");
 		   	     for(int k=0;k<columnList.size();k++){
-	                StockVanBean s = (StockVanBean)columnList.get(k);
+	                StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                if(dispHaveQty){
 	                   if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
 	               	    || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0 ){
@@ -586,11 +595,11 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	      
 	     /********************* Row Detail *******************************************************/
 	   	String tabclass ="";
-	   	StockVanBean rowItem = null;
-	   	StockVanBean columnDataBean = null;
+	   	StockOnhandBean rowItem = null;
+	   	StockOnhandBean columnDataBean = null;
 	   	for(int n=0;n<resultList.size();n++){
 	   		rowTableHtml = new StringBuffer("");
-	   		rowItem = (StockVanBean)resultList.get(n);
+	   		rowItem = (StockOnhandBean)resultList.get(n);
 	   		if(n%2==0){ 
 	   			tabclass="lineO";
 	   		}else{
@@ -610,7 +619,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   			 //<!--  For By Column Select List-->
 	   		        if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
 	   		        	for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
-	   		        		columnDataBean = (StockVanBean)rowItem.getRowColumnDataList().get(c);
+	   		        		columnDataBean = (StockOnhandBean)rowItem.getRowColumnDataList().get(c);
 	   		        		
 	   		        		//1) Row by pd  ,column product
 	   		        		if(dispType.equals("1")){
@@ -804,7 +813,7 @@ public static StringBuffer genResultStockVanPD(StockVanForm stockVanForm,HttpSer
 	   	out.append("<td width='"+(column_1+column_2)+"%' colspan='2' align='right'>ยอดรวม</td> \n");
 	   	if(columnList != null && columnList.size() >0){
 	        for(int k=0;k<columnList.size();k++){
-	              StockVanBean s = (StockVanBean)columnList.get(k);
+	              StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	              //1 Row by pd  ,column product
 	          		if(dispType.equals("1")){
 	          		   // 1.1) no plan,no price test=pass

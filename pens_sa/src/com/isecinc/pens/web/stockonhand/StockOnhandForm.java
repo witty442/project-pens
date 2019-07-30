@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.stockvan;
+package com.isecinc.pens.web.stockonhand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,25 +7,25 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.web.I_Form;
 
-public class StockVanForm extends I_Form {
+public class StockOnhandForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
-    private List<StockVanBean> results = new ArrayList<StockVanBean>();
-    private List<StockVanBean> resultsSearch = new ArrayList<StockVanBean>();
+    private List<StockOnhandBean> results = new ArrayList<StockOnhandBean>();
+    private List<StockOnhandBean> resultsSearch = new ArrayList<StockOnhandBean>();
     private String pageName;
-    private StockVanBean bean ;
-    private StockVanBean beanCriteria ;
+    private StockOnhandBean bean ;
+    private StockOnhandBean beanCriteria ;
     
-	public List<StockVanBean> getResultsSearch() {
+	public List<StockOnhandBean> getResultsSearch() {
 		return resultsSearch;
 	}
-	public void setResultsSearch(List<StockVanBean> resultsSearch) {
+	public void setResultsSearch(List<StockOnhandBean> resultsSearch) {
 		this.resultsSearch = resultsSearch;
 	}
-	public List<StockVanBean> getResults() {
+	public List<StockOnhandBean> getResults() {
 		return results;
 	}
-	public void setResults(List<StockVanBean> results) {
+	public void setResults(List<StockOnhandBean> results) {
 		this.results = results;
 	}
 	
@@ -35,16 +35,16 @@ public class StockVanForm extends I_Form {
 	public void setPageName(String pageName) {
 		this.pageName = pageName;
 	}
-	public StockVanBean getBean() {
+	public StockOnhandBean getBean() {
 		return bean;
 	}
-	public void setBean(StockVanBean bean) {
+	public void setBean(StockOnhandBean bean) {
 		this.bean = bean;
 	}
-	public StockVanBean getBeanCriteria() {
+	public StockOnhandBean getBeanCriteria() {
 		return beanCriteria;
 	}
-	public void setBeanCriteria(StockVanBean beanCriteria) {
+	public void setBeanCriteria(StockOnhandBean beanCriteria) {
 		this.beanCriteria = beanCriteria;
 	}
 	public void reset(ActionMapping mapping, HttpServletRequest request) {

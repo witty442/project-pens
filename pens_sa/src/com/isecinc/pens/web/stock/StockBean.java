@@ -49,6 +49,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	//total
 	private String salesZone;
 	private String salesZoneName;
+	private String pdCode;
 	//Control Access Button
 
 	//optional
@@ -63,6 +64,15 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private StringBuffer dataStrBuffer;
     private String columnNameSort;
     private String orderSortType;
+
+    
+	public String getPdCode() {
+		return pdCode;
+	}
+
+	public void setPdCode(String pdCode) {
+		this.pdCode = pdCode;
+	}
 
 	public String getSalesZoneName() {
 		return salesZoneName;

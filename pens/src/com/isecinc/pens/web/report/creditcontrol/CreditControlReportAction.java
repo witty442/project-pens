@@ -16,10 +16,10 @@ import com.isecinc.pens.report.detailedsales.DetailedSalesReport;
 import com.isecinc.pens.report.detailedsales.DetailedSalesReportProcess;
 
 /**
- * Detailed Sales Report Action.
+ * CreditControlReportAction
  * 
- * @author Aneak.t
- * @version $Id: DetailedSalesReportAction.java,v 1.0 20/01/2011 15:52:00 aneak.t Exp $
+ * @author Witty.B
+ * @version $Id: CreditControlReportAction.java,v 1.0 20/01/2018 15:52:00  $
  * 
  */
 

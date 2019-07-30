@@ -3,6 +3,8 @@
 alter table t_temp_import_trans
 modify seq decimal(15,2);
 
+alter table t_order_line add selling_price decimal(15,5);
+
 insert into pens.c_control_code values ('OrderUtils','canPrintBillCreditCaseVan','Y');
 
 create  table t_pd_receipt_his (
@@ -26,11 +28,11 @@ insert into pens.c_control_code values ('OrderProcess','sumQtyProductPromotionDu
 insert into pens.c_control_code values ('PrinterUtils','selectPrinterSmallIsOnlineCheckOnline','Y');
 /** 05/2561 **/
 alter table t_order add van_payment_method varchar(15);
-insert into pens.c_reference values ('2900','VanPaymentMethod','à§Ô¹Ê´','à§Ô¹Ê´ ','CASH','Y');
-insert into pens.c_reference values ('2901','VanPaymentMethod','à§Ô¹àª×èÍ','à§Ô¹àª×èÍ','CREDIT','Y');
+insert into pens.c_reference values ('2900','VanPaymentMethod','à§Ô¹Ê´','à§Ô¹Ê´ ','CASH','Y','Y');
+insert into pens.c_reference values ('2901','VanPaymentMethod','à§Ô¹àª×èÍ','à§Ô¹àª×èÍ','CREDIT','Y','Y');
 
 /** 06/2561 **/
-insert into pens.c_reference values ('3000','ProdShowFileSize','¢¹Ò´ä¿Åì  Prod Show upload(KB)','¢¹Ò´ä¿Åì  Prod Show upload(KB)','2000','Y');
+insert into pens.c_reference values ('3000','ProdShowFileSize','¢¹Ò´ä¿Åì  Prod Show upload(KB)','¢¹Ò´ä¿Åì  Prod Show upload(KB)','2000','Y','Y');
 
 create table t_prod_show(
   Order_no varchar(30)not null,
@@ -81,6 +83,7 @@ CREATE TABLE pens.t_temp_import_trans_err (
 INSERT INTO pens.c_doctype VALUES (444, 'StockReturn', 'StockReturn', 'Y');
 insert into pens.c_control_code values ('ClearDupDB','clearDupCustDB','N');
 insert into pens.c_control_code values ('SessionUtils','clearSessionUnusedFormModel','Y');
+alter table c_reference add is_load char(1);
 
 INSERT INTO c_reference(REFERENCE_ID, CODE, name, DESCRIPTION, value, ISACTIVE, is_load) 
 VALUES (2502, 'backDateInvStkReturn', 'backDateInvoiceStockReturn', 'backDateInvoiceStockReturn', '12', 'Y', 'N');
@@ -138,4 +141,24 @@ CREATE TABLE pens.t_stock_return_line (
 	UPDATED timestamp NULL DEFAULT NULL,
 	UPDATED_BY varchar(20),
 	PRIMARY KEY (request_number,line_number)
+);
+alter table ad_user add money_to_pens char(1);
+CREATE TABLE pens.t_bank_transfer (
+	line_id int(10) NOT NULL,
+	USER_ID int(10) NOT NULL,
+	create_date date NOT NULL,
+	transfer_date date NOT NULL,
+	transfer_type varchar(10) NOT NULL,
+	transfer_bank varchar(10) NOT NULL,
+	transfer_time varchar(10) NOT NULL,
+	amount decimal(15,5),
+	cheque_no varchar(30),
+	cheque_date date,
+	status varchar(2),
+	exported char(1),
+	CREATED timestamp NOT NULL,
+	CREATED_BY varchar(20),
+	UPDATED datetime,
+	UPDATED_BY varchar(20),
+	PRIMARY KEY (line_id)
 );

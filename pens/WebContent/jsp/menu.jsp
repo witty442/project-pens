@@ -1,3 +1,4 @@
+<%@page import="util.EncyptUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -5,13 +6,14 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%
-String role = ((User)session.getAttribute("user")).getType();
-User user = (User)session.getAttribute("user");
-/** No of menu **/
-int no = 0;
-int subNo = 0;
+  String role = ((User)session.getAttribute("user")).getType();
+  User user = (User)session.getAttribute("user");
+  
+  /** No of menu **/
+  int no = 0;
+  int subNo = 0;
+ // System.out.println("Role:"+user.getRole().getKey());
 %>
-
 <ul id="nav">
 	<li><a  href="javascript: void(0)" class="parent"><bean:message key="HomeMenu" bundle="sysprop"/></a>
 	<% no=0; %>
@@ -38,28 +40,27 @@ int subNo = 0;
             </li>
             <%} %>
             <%if(role.equalsIgnoreCase(User.VAN)){ %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/inventory.do';"><span><%no++;out.print(no);%>.<bean:message key="InventoryOnhand" bundle="sysprop"/></span></a>
-            </li>
-           
+	           <%--  <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/inventory.do';"><span><%no++;out.print(no);%>.<bean:message key="InventoryOnhand" bundle="sysprop"/></span></a>
+	            </li> --%>
             <%} %>
             <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/tripAction.do?do=prepare&type=admin';"><span><%no++;out.print(no);%>.<bean:message key="Trip" bundle="sysprop"/></span></a>
-            </li>
+	           <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/tripAction.do?do=prepare&type=admin';"><span><%no++;out.print(no);%>.<bean:message key="Trip" bundle="sysprop"/></span></a>
+	            </li> 
             <%}%>
             <%if(!role.equalsIgnoreCase(User.DD) && !role.equalsIgnoreCase(User.ADMIN)) {%>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/tripAction.do?do=prepare&type=user';"><span><%no++;out.print(no);%>.<bean:message key="Trip" bundle="sysprop"/></span></a>
-            </li>
+	          <%--   <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/tripAction.do?do=prepare&type=user';"><span><%no++;out.print(no);%>.<bean:message key="Trip" bundle="sysprop"/></span></a>
+	            </li> --%>
             <%} %>
             <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-           	<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/customerSeqUpdate.jsp';"><span><%no++;out.print(no);%>.<bean:message key="CustomerSequenceUpdate" bundle="sysprop"/></span></a>
-			</li>
-			<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
-			</li>
+	           	<li>
+					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/customerSeqUpdate.jsp';"><span><%no++;out.print(no);%>.<bean:message key="CustomerSequenceUpdate" bundle="sysprop"/></span></a>
+				</li>
+				<li>
+					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
+				</li>
 			<%} %>
 			<!-- WIT EDIT  -->
 			<%if(role.equalsIgnoreCase(User.VAN) || role.equalsIgnoreCase(User.TT) || role.equalsIgnoreCase(User.DD)){ %>
@@ -67,13 +68,21 @@ int subNo = 0;
 					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
 				</li>
 			<%} %>
-		
-			<li>
-			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="ManageCreditReceipt" bundle="sysprop"/></span></a>
-			</li>
-           <li>
-			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transferAction.do?do=prepareSearch&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Transfer" bundle="sysprop"/></span></a>
-			</li>
+			<%if(role.equalsIgnoreCase(User.VAN)){ %>
+				<li>
+				  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="ManageCreditReceipt" bundle="sysprop"/></span></a>
+				</li>
+				
+	           <li>
+				  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transferAction.do?do=prepareSearch&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Transfer" bundle="sysprop"/></span></a>
+				</li>
+			<%} %>
+			
+			<%if( role.equalsIgnoreCase(User.ADMIN)){ %>
+				<li>
+					  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepareAdmin';"><span><%no++;out.print(no);%>.จัดการบันทึก การเก็บเงินเชื่อ(Admin)</span></a>
+				</li>
+			<%} %>
 			<%-- <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"><span><%no++;out.print(no);%>.ปรับปรุงโปรแกรม SalesApp</span></a>
 			</li> --%>
@@ -82,6 +91,11 @@ int subNo = 0;
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/clearInvoiceAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="ClearInvoice" bundle="sysprop"/></span></a>
 			</li> --%>
 			<%} %>
+			<%if(role.equalsIgnoreCase(User.VAN)){ %>
+	             <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/controlAllReport.do';"><span><%no++;out.print(no);%>.<bean:message key="ControlAllReport" bundle="sysprop"/></span></a>
+	            </li> 
+            <%} %>
 		</ul>
 	</li>
 	<!-- WIT Edit :04/08/2554 -->
@@ -229,10 +243,10 @@ int subNo = 0;
      <%} %>
      
      <li><a  href="javascript: void(0)" class="parent">ค้นหาข้อมูล</a><%no=0; %>
-	     <ul>
-	    		<li>
-	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.รายงานการขาย By Item</span></a>
-	            </li>
+        <ul>
+    		<li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.รายงานการขาย By Item</span></a>
+            </li>
 	     </ul>
      </li>
 
@@ -271,9 +285,12 @@ int subNo = 0;
 		         <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/billPlanAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.รับบิลที (Bill T)  </span></a>
 		        </li>
-		         <li>
+		        <li>
+            	 <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockVan/stockVanPDReport.jsp';"><span><%no++;out.print(no);%>.<bean:message key="StockVanPDReport" bundle="sysprop"/> </span></a>
+              </li>
+		      <%--    <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requisitionProductAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="RequisitionProduct" bundle="sysprop"/> </span></a>
-		        </li>
+		        </li> --%>
 		     </ul>
 	     </li>
 	 <%} %>

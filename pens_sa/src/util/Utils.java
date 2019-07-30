@@ -31,6 +31,7 @@ public class Utils {
 	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
+	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
 	public static final String DD_MM_YYYY_HH_MM_WITH_SLASH = "dd/MM/yyyy HH:mm";
 	
 	public static final Locale local_th= new Locale("th","TH");
@@ -39,6 +40,7 @@ public class Utils {
 	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyy-HHmm";
 	public static final String DD_MMM_YYYY = "dd-MMM-yyyy";
 	public static final String MMM_YY = "MMM-yy";
+	public static final String MMMM_YYYY = "MMMM-yyyy";
 	
 	@SuppressWarnings("unused")
 	private static String DECIMAL_FORMAT ="#.00000000000000000000";

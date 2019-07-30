@@ -51,7 +51,6 @@ public class SAReportAction extends I_Action {
 			saBean.setIncludePos("Y");
 			
 			formBean.setSalesBean(saBean);
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
@@ -79,7 +78,7 @@ public class SAReportAction extends I_Action {
 				formBean.setSalesBean(saBean);
 				
 				//init session List
-				SAInitial.getInstance().initSession(request);
+				SAInitial.getInstance().initSession(request,user);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

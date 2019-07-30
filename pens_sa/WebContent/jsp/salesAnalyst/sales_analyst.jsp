@@ -11,6 +11,7 @@
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
+
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "salesAnalystReportForm");
@@ -228,16 +229,24 @@ function chkSearch(){
 			                  <tr><td>
 		                            <fieldset>
 		                             <legend><b>รูปแบบการค้นหาที่ใช้ประจำ</b></legend>
-					                <table width="80%" border="0" align="center" cellpadding="1" cellspacing="1">
+					                <table width="80%" border="0" align="left" cellpadding="1" cellspacing="1">
 					                  <tr>
-					                      <td width="15%" align="left">
+					                      <td width="15%" align="left" nowrap>
+					                        <%--    <a href="javascript:editProfile('${pageContext.request.contextPath}','admin')">
+					                              <b>แก้ไข/เพิ่ม Profile</b>
+					                          </a>  
+					                          &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; --%>
 		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" styleClass="txt_style" >
 											         <html:options collection="profileList" property="key" labelProperty="name"/>
 									            </html:select>
 		                                  </td>
 		                                  <td width="65%" align="left">
+		                                  &nbsp;&nbsp;&nbsp;&nbsp;
 		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="btnSmallLong" style="width: 185px;" 
-											onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" />
+											onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" /> 
+										<%-- 	&nbsp;&nbsp;
+											<input type="button" value="แก้ไข/เพิ่ม Profile" class="btnSmallLong" style="width: 180px;" 
+											onClick="javascript:editProfile('${pageContext.request.contextPath}','admin')" /> --%>
 										 </td>
 		                              </tr>
 		                            </table>

@@ -168,7 +168,7 @@ public class ExportManager {
 						
 						/** T_PROD_SHOW **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_prod_show")){
-						logger.info("--Start Export t_move_order --");
+						logger.info("--Start Export t_prod_show --");
 						/** Count Record and Prepare Monitor_item_detail(Data Export)  */
 						modelDetailItem = infDAO.prepareMonitorItemDetail(conn,tableBean.getPrepareSqlSelect(), tableBean.getTableName());	
 					    /** Check Data Found Before Export **/
@@ -177,7 +177,7 @@ public class ExportManager {
 						   tableBean = exProcess.exportProdShow(conn,tableBean,userRequest);	
 						}
 						
-						logger.info("--Start Export t_move_order --");
+						logger.info("--Start Export t_prod_show --");
 					/** T_STOCK **/	
 					}else if(tableBean.getTableName().equalsIgnoreCase("t_stock")){
 						logger.info("--Start Export t_stock --");

@@ -60,7 +60,15 @@
 	   <servlet-name>PhotoServlet</servlet-name>
 	   <url-pattern>/photoServlet</url-pattern>
   </servlet-mapping>
-	
+  <servlet>
+	   <servlet-name>DownloadStockCloseVanServlet</servlet-name>
+	   <servlet-class>com.isecinc.pens.web.servlet.DownloadStockCloseVanServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	   <servlet-name>DownloadStockCloseVanServlet</servlet-name>
+	   <url-pattern>/downloadStockCloseVanServlet</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>

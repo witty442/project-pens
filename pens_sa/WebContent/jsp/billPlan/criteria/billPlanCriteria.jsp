@@ -5,6 +5,7 @@
 <%@page import="util.Utils"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<jsp:useBean id="billPlanForm" class="com.isecinc.pens.web.billplan.BillPlanForm" scope="session" />
 
 <script type="text/javascript">
 window.onload = function(){
@@ -15,7 +16,11 @@ function loadMe(){
 	var form = document.billPlanForm;
 	
 	//load SalesrepList
+	document.getElementsByName('bean.salesZone')[0].value ='<%=Utils.isNull(billPlanForm.getBean().getSalesZone())%>'; 
+	
 	loadSalesrepCodeList();
+	
+	document.getElementsByName('bean.salesrepCode')[0].value ='<%=Utils.isNull(billPlanForm.getBean().getSalesrepCode())%>'; 
 
 }
 function clearForm(path){
@@ -72,11 +77,15 @@ function loadSalesrepCodeList(){
 				    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
 				</html:select>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-			 พนักงานขาย 
+			 พนักงานขาย &nbsp;
 			     <html:select property="bean.salesrepCode" styleId="salesrepCode">
 					<html:options collection="SALESREP_LIST" property="salesrepId" labelProperty="salesrepCode"/>
 			    </html:select>
-			  
+			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			  รูปแบบ  &nbsp;<html:select property="bean.dispType" styleId="dispType">
+					<html:option value="summary">แบบสรุป</html:option>
+					<html:option value="detail">แบบแสดงรายละเอียด</html:option>
+			    </html:select>
 			</td>
 		</tr>	 
    </table>

@@ -115,6 +115,30 @@ public class StockControlPage {
 		}
 	}
 	
+	public static void prepareSearchStockCloseVanReport(HttpServletRequest request,Connection conn,User user,String pageName){
+		PopupBean item = null;
+		List<PopupBean> dataList = null;
+		try{
+			//init periodList
+			request.getSession().setAttribute("PERIOD_LIST", initPeriodStockCloseVan(conn));
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	public static void prepareSearchStockPDVanReport(HttpServletRequest request,Connection conn,User user,String pageName){
+		try{
+			//init periodList
+			request.getSession().setAttribute("PERIOD_LIST", initPeriodStockCloseVan(conn));
+			
+			//init pdList
+			request.getSession().setAttribute("PD_LIST", initPDLISTVan(conn,user.getUserName()));
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	
 	public static List<PopupBean> initPeriod(Connection conn){
 		List<PopupBean> monthYearList = new ArrayList<PopupBean>();
 		Calendar cal = Calendar.getInstance();
@@ -159,7 +183,107 @@ public class StockControlPage {
 		}
 	 return monthYearList;
 	}
+	public static List<PopupBean> initPDLISTVan(Connection conn,String salesrepCode){
+		List<PopupBean> pdList = new ArrayList<PopupBean>();
+		PopupBean item = new PopupBean();
+		StringBuffer sql = new StringBuffer("");
+		Statement stmt = null;
+		ResultSet rst = null;
+		try{
+			sql.append("select distinct s.subinventory ,a.description from \n");
+			sql.append("apps.xxpens_inv_subinv_access s \n");
+			sql.append(",apps.mtl_secondary_inventories a \n");
+			sql.append("where s.code ='"+salesrepCode+"' \n");
+			sql.append("and a.secondary_inventory_name = s.subinventory \n");
+			sql.append("and a.organization_id = 84 \n");
+			sql.append("and a.attribute3 = 'สร' \n");
+			   
+			logger.debug("sql:"+sql.toString());
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while(rst.next()){
+				item = new PopupBean();
+				item.setPdCode(Utils.isNull(rst.getString("subinventory")));
+				item.setPdDesc(Utils.isNull(rst.getString("subinventory"))+"-"+Utils.isNull(rst.getString("description")));
+				pdList.add(item);	
+			}
+			logger.debug("pdList size:"+pdList.size());
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return pdList;
+	}
+	public static List<PopupBean> initPeriodStockCloseVan(Connection conn){
+		List<PopupBean> monthYearList = new ArrayList<PopupBean>();
+		Calendar cal = Calendar.getInstance();
+		String periodName = "";
+		String periodValue = "";
+		PopupBean item = new PopupBean();
+		SalesTargetBean period = null;
+		try{
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			//if(day >1){ //For TEST
+			
+			/*if(day>=27){ //prod
+				//Next Month +2
+				item = new PopupBean();
+				cal.add(Calendar.MONTH, 2);//Current+1
+				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				period = getPeriodList(conn,periodName).get(0);//get Period View
+				item.setKeyName(periodName);
+				item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
+				monthYearList.add(item);
+			}*/
+			
+			//Cur Month
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			item.setKeyName(periodName);
+			item.setValue(periodValue);
+			monthYearList.add(item);
+			
+			//Cur Month -1
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, -1);//Current-1
+			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			item.setKeyName(periodName);
+			item.setValue(periodValue);
+			monthYearList.add(item);
 	
+			//Cur Month -1
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, -2);//Current-2
+			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			item.setKeyName(periodName);
+			item.setValue(periodValue);
+			monthYearList.add(item);
+			
+			//Cur Month -1
+			item = new PopupBean();
+			cal = Calendar.getInstance();
+			cal.add(Calendar.MONTH, -3);//Current-3
+			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			item.setKeyName(periodName);
+			item.setValue(periodValue);
+			monthYearList.add(item);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	 return monthYearList;
+	}
 	public static List<PopupBean> searchCustCatNoListModel(Connection conn,String pageName,String salesChannelNo){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;

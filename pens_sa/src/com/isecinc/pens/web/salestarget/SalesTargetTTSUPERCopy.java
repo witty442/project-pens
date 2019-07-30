@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -94,6 +96,8 @@ public class SalesTargetTTSUPERCopy {
 		String priceListId  ="";
 		BigDecimal idNew = new BigDecimal("0");
 		boolean foundDataMKTPost = false;
+		String keyPriceListMap = "";
+		Map<String,String> priceListMap = new HashMap<String, String>();
 		try {
 			sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 			
@@ -102,6 +106,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n where M.salesrep_id = Z.salesrep_id ");
+			sql.append("\n and M.division = 'B' ");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
@@ -118,6 +123,18 @@ public class SalesTargetTTSUPERCopy {
 		    	sql.append("\n    select cust_cat_no,zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT" );
 		    	sql.append("\n  )");
 		    }
+		    //Only MKT Post 
+		    sql.append("\n  and ( M.customer_category ,Z.zone ,M.brand )");
+		    sql.append("\n  in( ");
+		    sql.append("\n    select M.customer_category ,Z.zone,M.brand ");
+			sql.append("\n  	from XXPENS_BI_SALES_TARGET_TT M ");
+			sql.append("\n  	where 1=1");
+			sql.append("\n  	and M.status ='"+SalesTargetConstants.STATUS_POST+"'");
+			sql.append("\n  	and M.target_month = '"+Utils.isNull(destBean.getTargetMonth())+"'");
+			sql.append("\n  	and M.target_quarter = '"+Utils.isNull(destBean.getTargetQuarter())+"'");
+			sql.append("\n  	and M.target_year = '"+Utils.isNull(destBean.getTargetYear())+"'");
+		    sql.append("\n  )");
+		    
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
@@ -127,17 +144,25 @@ public class SalesTargetTTSUPERCopy {
 				destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
 				destBean.setBrand(Utils.isNull(rst.getString("brand")));
 				//validate brand MKT Post TO Sales 
-				 foundDataMKTPost = getBrandIsMKTPost(conn,destBean,user);
 				
-				 if(foundDataMKTPost){
+				//foundDataMKTPost = getBrandIsMKTPost(conn,destBean,user);
+				
+				 if(true){//if(foundDataMKTPost){
 					//insert head
 					idNew = insertHeadTTSUPER(conn, destBean, rst.getBigDecimal("id"));
 					//set for get Avg Order
 					destBean.setCustCatNo(Utils.isNull(rst.getString("customer_category")));
 					destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
+					destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
 					
-					//find priceListId
-					priceListId = SalesTargetTTUtils.getPriceListId(conn, Utils.isNull(rst.getString("zone")), Utils.isNull(rst.getString("customer_category")),user);
+					keyPriceListMap = Utils.isNull(rst.getString("zone"))+"_"+Utils.isNull(rst.getString("customer_category"));
+					if(priceListMap.get(keyPriceListMap) != null){
+						priceListId = priceListMap.get(keyPriceListMap);
+					}else{
+					   //find priceListId
+					    priceListId = SalesTargetTTUtils.getPriceListId(conn, Utils.isNull(rst.getString("zone")), Utils.isNull(rst.getString("customer_category")),user);
+					    priceListMap.put(keyPriceListMap, priceListId);
+					}
 					//insert Line
 				    insertLineTTSUPER(conn, priceListId, destBean, rst.getBigDecimal("id"), idNew);
 				}
@@ -179,7 +204,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  BRAND, ");
 			sql.append("\n  BRAND_GROUP, ");
 			sql.append("\n  'Post' as STATUS, ");
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
@@ -216,7 +241,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  'Open' as status, ");
 			sql.append("\n  '' as remark, ");
 			sql.append("\n  '' as REJECT_REASON, ");
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
@@ -235,6 +260,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
 			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
 			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id ="+curBean.getSalesrepId());
 			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
 			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
 			sql.append("\n  WHERE L.ID="+idCopy);
@@ -275,6 +301,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  select M.id ");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
+			sql.append("\n  and M.division = 'B' ");//B = credit,van sales
 			if( !Utils.isNull(status).equals("")){
 			   sql.append("\n  and M.status ='"+status+"'");
 			}
@@ -324,6 +351,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  select M.id ");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TT M ");
 			sql.append("\n  where 1=1");
+			
 			sql.append("\n  and M.status ='"+SalesTargetConstants.STATUS_POST+"'");
 			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
 			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");

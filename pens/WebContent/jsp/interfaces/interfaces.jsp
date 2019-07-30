@@ -21,7 +21,6 @@
 User user = (User) session.getAttribute("user");
 String role = ((User)session.getAttribute("user")).getType();
 
-
 List<References> importList = ImportHelper.readConfigTableImport();
 pageContext.setAttribute("importList",importList,PageContext.PAGE_SCOPE);
 
@@ -37,9 +36,8 @@ String screenHeight= Utils.isNull(session.getAttribute("screenHeight"));
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
-<meta http-equiv="Cache-Control" content="no-cache" /> 
-<meta http-equiv="Pragma" content="no-cache" /> 
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
+<link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -98,7 +96,7 @@ body {
 	$.ajaxSetup({cache: false});
 	
 	// Show Option Run Import Trans (Case Error)
-	function setSeimportUpdateTrans(){
+	function setReimportUpdateTrans(){
 		document.getElementById("reimportUpdateTransDiv").style.display = "block";
 	}
 	function openPopupAdminConsole(path){
@@ -275,8 +273,8 @@ body {
 								<tr>
 									<td align="right" width ="50%"><b>Import ข้อมูลจากส่วนกลาง<font color="red">*</font> </b></td>
 									<td align="left" width ="50%" nowrap>
-									   <input type="button" name ="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtnLong"  onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','sales')">
-									   &nbsp;&nbsp;<a href="javascript: void(0)" onclick="setSeimportUpdateTrans()"><b>[...]</b></a>
+									   <input type="button" name ="import"  id="import" value="ดึงข้อมูลจากส่วนกลาง" class="newPosBtnLong"  onClick="javascript:synchronizeFromOracle('${pageContext.request.contextPath}','sales')">
+									   &nbsp;&nbsp;<a href="javascript: void(0)" onclick="setReimportUpdateTrans()"><b>[...]</b></a>
 									</td>
 								</tr>
 								<tr>
@@ -290,7 +288,7 @@ body {
 								<tr>
 								  <td align="right" width ="50%"><b>Export ข้อมูลไปยังส่วนกลาง<font color="red">*</font> </b></td>
 								  <td align="left">
-								       <input type="button" name ="export" value="ส่งข้อมูลไปส่วนกลาง   " class="newPosBtnLong"  onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','sales')">
+								       <input type="button" name ="export"  id="export" value="ส่งข้อมูลไปส่วนกลาง   " class="newPosBtnLong"  onClick="javascript:synchronizeToOracle('${pageContext.request.contextPath}','sales')">
 				                  </td>
 							  </tr>
 							</table>
@@ -321,7 +319,7 @@ body {
 									<tr>
 										<td align="right" width ="50%"></td>
 										<td align="left" width ="50%">
-										<input type="button" name ="import" value="Import" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeFromOracle('${pageContext.request.contextPath}','admin')">	
+										<input type="button" name ="import"  id="import" value="Import" class="newPosBtnLong" style="width: 100px;" onClick="javascript:synchronizeFromOracle('${pageContext.request.contextPath}','admin')">	
 										</td>
 									</tr>
 								</table>
@@ -372,7 +370,7 @@ body {
 									<tr>
 										<td align="right" width ="50%"></td>
 										<td align="left" width ="50%">
-										    <input type="button" name ="export" value="Export" class="newPosBtnLong" style="width: 100px;" onClick="javascript:syschronizeToOracle('${pageContext.request.contextPath}','admin')">
+										    <input type="button" name ="export" id="export" value="Export" class="newPosBtnLong" style="width: 100px;" onClick="javascript:synchronizeToOracle('${pageContext.request.contextPath}','admin')">
 										    
 										</td>
 									</tr>
@@ -400,6 +398,9 @@ body {
 								</td>
 							</tr>
 						</table>
+						 <div align="center">
+						   <font color="blue" size="6"><b>!!! เชื่อมต่อ VPN ก่อน ส่งข้อมูล หรือดึงข้อมูล ทุกครั้ง  !!!</b></font>
+						  </div>
                         <br/>
 						<div id="dispMsg" style="" align="center">
 						  ..
@@ -602,3 +603,6 @@ body {
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlTestURLConnLockScreen.jsp" flush="true"/> 
+<!-- Control Save Lock Screen -->

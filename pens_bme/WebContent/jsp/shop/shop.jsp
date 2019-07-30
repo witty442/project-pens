@@ -146,7 +146,7 @@ function clearForm(path){
 					<%}else if(ShopAction.P_SHOP_BILL_DETAIL.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						  <jsp:include page="subreports/subShopBillDetail.jsp" /> 
 					<%}else if(ShopAction.P_TM_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
-						  <jsp:include page="subreports/subMayaSaleOut.jsp" /> 
+						  <jsp:include page="subreports/subMayaSaleOutTM.jsp" /> 
                     <%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						  <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
                     <%} %>

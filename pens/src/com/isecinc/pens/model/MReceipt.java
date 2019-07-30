@@ -323,7 +323,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				DateToolsUtil.convertToTimeStamp(receipt.getReceiptDate()),
 				ConvertNullUtil.convertToString(receipt.getOrderType()).trim(), receipt.getCustomerId(),
 				ConvertNullUtil.convertToString(receipt.getCustomerName()).trim(), null, null,
-				Utils.parseCheckNull(receipt.getChequeDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th) , null,
+				 null ,Utils.parseCheckNull(receipt.getChequeDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th) ,
 				receipt.getReceiptAmount(), receipt.getInterfaces(), receipt.getDocStatus(),
 				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),

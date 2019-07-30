@@ -12,19 +12,237 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.log4j.Logger;
+
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.inf.helper.Utils;
 
 public class DateToolsUtil {
-
+	protected static Logger logger = Logger.getLogger("PENS");
 	public static final String SHORT_TIME = "HH:mm";
 
+	public static final String DD_MM_YYYY_WITH_SLASH = "dd/MM/yyyy";
+	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
+	public static final String DD_MM_YYYY_HH_mm_ss_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
+	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
+	public static final String YYYY_MM_DD_WITH_LINE = "yyyy-MM-dd";
+	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
+	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
+	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
+	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyyHHmm";
+	public static final String DD_MM_YYYY_HHmmss_WITHOUT_SLASH = "ddMMyyyyHHmmss";
+	
+	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
+	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
+	public static final String YY_MM = "yyMM";
+	public static final String YYYY_MM = "yyyyMM";
+	public static final String MMM_YYYY = "MMM yyyy";
+	public static final String MMMM_YYYY = "MMMM yyyy";
+	public static final Locale local_th = new Locale("th","TH");
+	
 	public static final int DAY = 1;
 	public static final int MONTH = 2;
 	public static final int YEAR = 3;
 	private static final long ONE_HOUR = 60 * 60 * 1000L;
 	private static ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 
+	public static String getCurrentDate(String format,Locale locale){
+		String d = "";
+		try{
+		    d = stringDateValue(new Date(), format, locale);
+		}catch(Exception e){
+			
+		}
+		return d;
+	}
+	/**
+	 * Convert {@link Date} to {@link String} and return date string
+	 * @param date
+	 * @param format the format that you want to convert
+	 * @return date string
+	 */
+	public static String stringDateValue(Date date, String format) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		
+		try {
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+			
+		}
+
+		return dateStr;
+	}
+	
+	
+	public static String stringDateValue(Timestamp date, String format) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		
+		try {
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+			
+		}
+
+		return dateStr;
+	}
+	
+	/**
+	 * Convert {@link java.util.Date} to {@link java.lang.String} and return date string
+	 * @param date - {@link java.util.Date} object
+	 * @param format - the format that you want to convert
+	 * @param locale - the locale of date
+	 * @return String
+	 * @throws Exception
+	 */
+	public static String stringDateValue(Date date, String format ,String locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale(locale.toLowerCase()));
+		try {
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	
+	public static String stringDateValue(Date date, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	public static String stringDateValueNull(Date date, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date != null){
+			   dateStr = ft.format(date);
+			}else{
+			   dateStr = "";
+			}
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	public static String stringDateValueDefault(Date date, String format ,Locale locale,String defaultS) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date==null){
+				return defaultS;
+			}
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	
+	public static Timestamp getCurrentTimestamp() {
+		return new Timestamp(System.currentTimeMillis());
+	}
+	
+	public static Date getCurrentDate() {
+		return new Date(System.currentTimeMillis());
+	}
+	
+	public static String format(Date date, String pattern) {
+		if (date == null) {
+			return "";
+		}
+		return new SimpleDateFormat(pattern, Locale.US).format(date);
+	}
+	/**
+	 * Parse from {@link String} to {@link Date}
+	 * @param dateString the string of date
+	 * @param format the format of date
+	 * @return {@link Date}
+	 */
+	public static Date parse(String dateString, String format) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		try {
+			date = ft.parse(dateString);
+		} catch (Exception e) {	
+		}
+		return date;
+	}
+	
+	public static Date parseCheckNull(String dateString, String format) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		try {
+			if( !Utils.isNull(dateString).equals(""))
+			 date = ft.parse(dateString);
+		} catch (Exception e) {	
+		}
+		return date;
+	}
+	/**
+	 * 
+	 * @param dateString
+	 * @param format
+	 * @return
+	 * @throws Exception
+	 */
+	public static Date parseToBudishDate(String dateString, String format) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale("TH","th"));
+		
+		try {
+			date = ft.parse(dateString);
+		} catch (Exception e) {
+			
+		}
+		
+		return date;
+	}
+	
+	/**
+	 * 
+	 * @param dateString - the string of date
+	 * @param format - the format of date
+	 * @param locale - the locale of date
+	 * @return {@link java.util.Date}
+	 * @throws Exception
+	 */
+	public static Date parse(String dateString, String format ,String locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale(locale.toLowerCase()));
+		
+		try {
+			date = ft.parse(dateString);
+		} catch (Exception e) {
+			
+		}
+		
+		return date;
+	}
+	
+	public static Date parse(String dateString, String format ,Locale locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			date = ft.parse(dateString);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}
+		return date;
+	}
+	public static Date parseCheckNull(String dateString, String format ,Locale locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if( !Utils.isNull(dateString).equals(""))
+			  date = ft.parse(dateString);
+		} catch (Exception e) {
+			
+		}
+		return date;
+	}
 	public static String getToday(Connection con, int format) throws Exception {
 		String stroutput = "";
 
@@ -447,5 +665,25 @@ public class DateToolsUtil {
 			return false;
 		}
 		return true;
+	}
+	/**
+	 * 
+	 * @param date
+	 * @return dateArr[0] =01/10/2562 ,dateArr[1]=31/10/2562
+	 */
+	public static String[] getStartEndDateInMonth(Date date){
+		String[] dateArr = new String[2];
+		try{
+			Calendar cal = Calendar.getInstance(local_th);
+			cal.setTime(date);
+			String mm = String.valueOf(cal.get(Calendar.MONTH)+1);
+			       mm = mm.length()==1?"0"+mm:mm;
+			dateArr[0] = "01/"+mm+"/"+cal.get(Calendar.YEAR);
+			dateArr[1] = cal.getActualMaximum(Calendar.DAY_OF_MONTH) +"/"+mm+"/"+cal.get(Calendar.YEAR);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return dateArr;
 	}
 }

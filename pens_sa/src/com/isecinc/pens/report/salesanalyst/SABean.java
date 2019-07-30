@@ -22,6 +22,7 @@ public class SABean implements Serializable{
 	private String[] chkYear;
 	private String groupBy;
 	private String profileId;
+	private String profileName;
 	private String userId;
 	
 	/** Condition Search **/
@@ -75,6 +76,12 @@ public class SABean implements Serializable{
 	private String order_by_name= "";
 
 	
+	public String getProfileName() {
+		return profileName;
+	}
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
 	public String getUserId() {
 		return userId;
 	}

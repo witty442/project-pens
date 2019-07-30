@@ -37,7 +37,7 @@ return "กดปุ่มนี้ ข้อมูลอาจเกิดความเสียหาย ต้องกดใช่หรือไม่.";
    function updateProgress(status){
     	 if(status != '1' && status != "-1"){ //Running
     		 if(progressCount > 90){
-	    	   progressCount += 0.1; 
+	    	   progressCount += 0.01; 
     		 }else if(progressCount > 80){
     		   progressCount += 0.5; 
     		 }else if(progressCount > 50){

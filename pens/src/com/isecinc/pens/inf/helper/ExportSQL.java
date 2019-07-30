@@ -193,11 +193,34 @@ public class ExportSQL {
 					"	DESCRIPTION ,\n"+
 					"	USER_ID ,\n"+
 					"	( CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN 'T' ELSE 'R' END) AS MOVE_TYPE ,\n"+
+					"	( CASE WHEN STATUS  = 'SV' THEN 'N' ELSE 'X' END) AS STATUS ,\n"+
 					"	CREATED_LONG \n"+
 				"	from t_move_order \n"+
-				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') and status ='SV' \n"+
-				"   and request_date <= now() \n";
+				"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') \n"+
+				"   and request_date <= now() \n"+
+				"   and status ='SV' \n"; 
 				
+	             /** WITTY Edit 02072562: new Case Export Cancel(VO) to Oracle , request_date >= 01082019 **/
+				str +="union all \n";
+				str +="select \n"+
+						"	'H'	AS 	RECORD_TYPE,	\n"+
+						"	REQUEST_NUMBER  , \n"+
+						"	REQUEST_DATE ,\n"+
+						"	ORGANIZATION_ID , \n"+
+						"	(CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN PD_CODE ELSE SALES_CODE END) AS FROM_SUBINVENTORY_CODE, \n "+
+						"	(CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN SALES_CODE ELSE PD_CODE END) AS TO_SUBINVENTORY_CODE, \n"+
+						"	'"+tableBean.getFileFtpNameFull()+"' AS	FILE_NAME,	\n"+
+						"	DESCRIPTION ,\n"+
+						"	USER_ID ,\n"+
+						"	( CASE WHEN MOVE_ORDER_TYPE ='MoveOrderRequisition' THEN 'T' ELSE 'R' END) AS MOVE_TYPE ,\n"+
+						"	( CASE WHEN STATUS  = 'SV' THEN 'N' ELSE 'X' END) AS STATUS ,\n"+
+						"	CREATED_LONG \n"+
+					"	from t_move_order \n"+
+					"   where ( EXPORTED  = 'N' OR EXPORTED  IS NULL OR TRIM(EXPORTED) ='') \n"+
+					"   and request_date <= now() \n"+
+					"   and status ='VO' \n"+ 
+					"   and request_date >= '2019-08-01' \n";
+					
 			}else if(tableBean.getTableName().equalsIgnoreCase("t_requisition_product")){
 				str ="select \n"+
 					"	'H'	AS 	RECORD_TYPE,	\n"+

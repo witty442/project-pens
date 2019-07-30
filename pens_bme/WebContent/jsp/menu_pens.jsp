@@ -285,7 +285,7 @@
 
 <!-- Shop Menu-->
 <% if ( Utils.userInRole(user,new String[]{User.SALE,User.ADMIN,User.PICK}) ){ no=0;%>
-    <li><a  href="javascript: void(0)" class="parent"><span>MAYA</span></a>
+    <li><a  href="javascript: void(0)" class="parent"><span>SHOP</span></a>
 		<ul> 
 		    <li><a class="parent"><span><%no++;out.print(no);%>.MAYA</span></a>
 			   <%subNo=0; %>

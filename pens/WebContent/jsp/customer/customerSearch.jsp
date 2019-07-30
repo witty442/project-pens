@@ -28,9 +28,6 @@
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "customerForm");
 
-//Start init Appversion Verify
-new AppversionVerifyWorker().start();
-
 String role = ((User)session.getAttribute("user")).getType();
 
 List<District> districtsAll = new ArrayList<District>();
@@ -65,9 +62,12 @@ String[] msg4 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 	msg4=  (String[])request.getSession().getAttribute("appVersionCheckMsg");
 }else{
-	System.out.println("Header.jsp AppVerify ");
+	//System.out.println("Header.jsp AppVerify ");
 	msg4 = AppversionVerify.getApp().checkAppVersion(request) ;
 } 
+
+//Start init Appversion Verify 1 time in a day
+new AppversionVerifyWorker().start();
 
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
@@ -272,11 +272,11 @@ $(function() {
 						
 						<tr>
 							<td align="right"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left" colspan="2"><html:text property="customer.code"/></td>
+							<td align="left" colspan="2"><html:text property="customer.code"  styleClass="\" autoComplete=\"off" /></td>
 						</tr>
 						<tr>
 							<td align="right"><bean:message key="Customer.Name" bundle="sysele"/>&nbsp;&nbsp;</td>
-							<td align="left" colspan="2"><html:text property="customer.name"/></td>
+							<td align="left" colspan="2"><html:text property="customer.name"  styleClass="\" autoComplete=\"off" /></td>
 						</tr>
 						<tr>
 							<td align="right"><bean:message key="Status" bundle="sysele"/>&nbsp;&nbsp;</td>
@@ -552,6 +552,7 @@ $(function() {
 	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
 	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
 	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
+	<p><font size="1" color="green">App Version [08-2561.1] for check deploy</font> </p>
 </div>
 
 </body>

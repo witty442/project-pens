@@ -97,8 +97,10 @@ public class Utils {
         boolean r = true;
         try{
             URL url = new URL(urlTest);
+            
             url.openConnection();
             url.openStream();
+            
         }catch(Exception e){
             e.printStackTrace();
             return false;

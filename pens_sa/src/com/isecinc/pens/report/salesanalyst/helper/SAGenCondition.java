@@ -327,11 +327,13 @@ public class SAGenCondition {
 	    	logger.debug("allYear:"+allYear);
 	    	if(allYear.indexOf(",") != -1){
 		    	String[] yearAllArr = allYear.split("\\,");
+		    	logger.debug("yearAllArr length:"+yearAllArr.length);
 		    	//sort year asc
 		    	if(yearAllArr.length >0){
-		    	  int[] yearAllArrInt = new int[yearAllArr.length-1];
-		          for(int i=0;i<yearAllArr.length-1;i++){
+		    	  int[] yearAllArrInt = new int[yearAllArr.length];
+		          for(int i=0;i<yearAllArr.length;i++){
 		        	  yearAllArrInt[i] = Utils.convertStrToInt(yearAllArr[i].replaceAll("'", ""));
+		        	  logger.debug("yearAllArrInt["+i+"]["+yearAllArrInt[i]+"]");
 		          }
 		          Arrays.sort(yearAllArrInt);
 		          

@@ -46,6 +46,7 @@ public class User extends I_PO implements Serializable {
 	public static final String TTSUPER = "TTSUPER";//Supper
 	public static final String TTMGR = "TTMGR";//ManagerSale
 	
+	public static final String VANSALES = "VANSALES";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -212,8 +213,17 @@ public class User extends I_PO implements Serializable {
     private String roleStockVan;
     private String roleMC;
     private String roleSA;
+    private String roleVanSales;
     
     
+	public String getRoleVanSales() {
+		return roleVanSales;
+	}
+
+	public void setRoleVanSales(String roleVanSales) {
+		this.roleVanSales = roleVanSales;
+	}
+
 	public String getRoleSA() {
 		return roleSA;
 	}

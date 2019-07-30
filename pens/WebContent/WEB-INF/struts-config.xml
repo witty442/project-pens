@@ -115,6 +115,8 @@
 		<form-bean name="creditControlReportForm"
 			type="com.isecinc.pens.web.report.creditcontrol.CreditControlReportForm" />
 			
+		<form-bean name="controlAllReportForm"
+			type="com.isecinc.pens.web.report.controlall.ControlAllReportForm" />
 		<!-- Interfaces -->
 		<form-bean name="interfacesForm"
 			type="com.isecinc.pens.web.interfaces.InterfacesForm" />
@@ -231,6 +233,7 @@
 			type="com.isecinc.pens.web.login.LoginAction">
 			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
 			<forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" />
+			<forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			<forward name="fail" path="/index.jsp" />
 			<forward name="logoff" path="/index.jsp" /> 
 		</action>
@@ -452,6 +455,16 @@
 			type="com.isecinc.pens.web.report.creditcontrol.CreditControlReportAction">
 			<forward name="report" path="/jsp/reports/creditControlReport.jsp" />
 			<forward name="clearform" path="/jsp/reports/creditControlReport.jsp" />
+		</action>
+		
+		<!-- Control ALL REPORT -->
+		<action name="controlAllReportForm" path="/jsp/controlAllReport"
+			forward="/jsp/reports/controlAllReport.jsp" />
+		<action name="controlAllReportForm" path="/jsp/controlAllReportAction"
+			parameter="do" scope="request"
+			type="com.isecinc.pens.web.report.controlall.ControlAllReportAction">
+			<forward name="report" path="/jsp/reports/controlAllReport.jsp" />
+			<forward name="clearform" path="/jsp/reports/controlAllReport.jsp" />
 		</action>
 		
 		 <!-- Credit Paid REPORT -->
@@ -720,6 +733,7 @@
 			type="com.isecinc.pens.web.pd.PDReceiptAction" >
 			<forward name="prepare" path="/jsp/pd/pdReceipt.jsp" />
 			<forward name="search" path="/jsp/pd/pdReceipt.jsp" />
+			<forward name="admin" path="/jsp/pd/pdReceiptAdmin.jsp" />
 		</action>
 		
 		<!-- AdminConsole -->

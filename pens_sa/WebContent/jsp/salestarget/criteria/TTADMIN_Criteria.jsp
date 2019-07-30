@@ -55,6 +55,19 @@ function search(path){
 	return true;
 }
 
+function changeStatusTTByAdmin(path){
+	var form = document.salesTargetForm;
+	if(confirm("ยืนยันเปลี่ยน สถานะ")){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
+		form.action = path + "/jsp/salesTargetAction.do?do=changeStatusTTByAdmin";
+		form.submit();
+		return true;
+	}
+	return false;
+}
+
 function openEdit(path,salesZone,brand,custCatNo,mode){
 	var form = document.salesTargetForm;
 	var param  = "&salesZone="+salesZone;
@@ -155,17 +168,7 @@ function setPeriodDate(periodDesc){
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
 					</a>	
-					&nbsp;&nbsp;	
-					<!-- Copy From Last Month -->
-					 <a href="javascript:copyFromLastMonthByTTSUPER('${pageContext.request.contextPath}',event)">
-					  <input type="button" value="Copy From Last Month" class="newPosBtnLong">
-					</a> 
-		
-					<%if(UserUtils.userInRoleSalesTarget(user, new String[]{User.ADMIN})){ %>
-					<%-- 	<a href="javascript:copyMonthToMonthyTTSUPER('${pageContext.request.contextPath}')">
-						  <input type="button" value="Copy  Month To Month" class="newPosBtnLong">
-						</a> 	 --%>	
-					<%} %>		
+					
 				</td>
 			</tr>
 		</table>

@@ -239,7 +239,7 @@ public class ShopAction extends I_Action {
 			}else if(P_TM_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				fileName="Report Sale TERMINAL Shop.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = ShopSaleOutAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopSaleOutAction.exportToExcelTM(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");

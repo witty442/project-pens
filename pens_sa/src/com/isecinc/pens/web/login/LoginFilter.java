@@ -72,7 +72,7 @@ public class LoginFilter extends HttpServlet implements Filter {
 			// have user
 			chain.doFilter(request, response);
 		} else {
-			logger.debug("no user...");
+			logger.debug("pens_sa no user...");
 			// no user in session
 			req.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.CREDENTIAL_REQUIRE, Locale
 					.getDefault()));

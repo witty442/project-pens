@@ -141,7 +141,6 @@ public class BillPlanAction extends I_Action {
 			    aForm.setEndRec(endRec);
 			    
 				//get Items Show by Page Size
-			   
 				List<BillPlanBean> items = BillPlanDAO.searchBillTList(conn,aForm.getBean(),allRec,currPage,pageSize);
 				aForm.setResultsSearch(items);
 				
@@ -229,7 +228,7 @@ public class BillPlanAction extends I_Action {
 			conn = DBConnection.getInstance().getConnectionApps();
 			List<BillPlanBean> items = BillPlanDAO.searchBillTList(conn,aForm.getBean(),true,0,pageSize);
 		    if(items!= null && items.size() >0){
-		    	resultTable = genExcelHTMLTable(items);
+		    	resultTable = genExcelHTMLTable(aForm.getBean(), items);
 				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
@@ -257,12 +256,16 @@ public class BillPlanAction extends I_Action {
 		return null;
 	}
 	
-	private StringBuffer genExcelHTMLTable(List<BillPlanBean> items) throws Exception{
+	private StringBuffer genExcelHTMLTable(BillPlanBean o, List<BillPlanBean> items) throws Exception{
 	 StringBuffer h = new StringBuffer("");
+	 String colSpan = "8";
+	 if("summary".equalsIgnoreCase(o.getDispType())){
+		 colSpan = "6";
+	 }
 	 h.append(ExcelHeader.EXCEL_HEADER);
 	 
 	 h.append("<table border='1'> \n");
-	 h.append("<tr><td colspan='8'><b>รายงาน   Bill-T ที่ยังไม่ได้รับเข้าระบบ</b></td></tr> \n");
+	 h.append("<tr><td colspan='"+colSpan+"'><b>รายงาน   Bill-T ที่ยังไม่ได้รับเข้าระบบ</b></td></tr> \n");
 	 h.append("</table> \n");
 	 h.append("<table border='1'> \n");
 	 h.append("<tr> \n");
@@ -271,8 +274,10 @@ public class BillPlanAction extends I_Action {
 	 h.append("<th >ชื่อพนักงานขาย</th>\n");
 	 h.append("<th >เลขที่ Bill-T</th>\n");
 	 h.append("<th >วันที่ Bill-T</th>\n");
-	 h.append("<th >รหัสสินค้า</th>\n");
-	 h.append("<th >ชื่อสินค้า</th>\n");
+	 if("detail".equalsIgnoreCase(o.getDispType())){
+	  h.append("<th >รหัสสินค้า</th>\n");
+	  h.append("<th >ชื่อสินค้า</th>\n");
+	 }
 	 h.append("<th >จำนวนที่ Plan ไป</th>\n");
 	 h.append("</tr> \n");
 	 for(int i=0;i<items.size();i++){
@@ -283,8 +288,10 @@ public class BillPlanAction extends I_Action {
 		 h.append("<td class='text'> "+p.getSalesrepName()+"</td>\n");
 		 h.append("<td class='text'> "+p.getBillTNo()+"</td>\n");
 		 h.append("<td class='text'> "+p.getBillTDate()+"</td>\n");
-		 h.append("<td class='text'> "+p.getItem()+"</td>\n");
-		 h.append("<td class='text'> "+p.getItemName()+"</td>\n");
+		 if("detail".equalsIgnoreCase(o.getDispType())){
+		   h.append("<td class='text'> "+p.getItem()+"</td>\n");
+		   h.append("<td class='text'> "+p.getItemName()+"</td>\n");
+		 }
 		 h.append("<td class='num'> "+p.getPlanQty()+"</td>\n");
 		 h.append("</tr> \n");
 	 }

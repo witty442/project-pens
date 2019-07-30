@@ -21,21 +21,21 @@ public class UserUtils {
 			roleCheck = roles[i].toLowerCase().trim();
 			userRoleTemp = "";
             if("ROLE_SALESTARGET".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleSalesTarget().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleSalesTarget()).toLowerCase().trim();
             }else if("ROLE_CR_STOCK".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleCRStock().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleCRStock()).toLowerCase().trim();
             }else if("ROLE_SPIDER".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleSpider().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleSpider()).toLowerCase().trim();
             }else if("ROLE_STOCK_VAN".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleStockVan().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleStockVan()).toLowerCase().trim();
             }else if("ROLE_SA".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleSA().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleSA()).toLowerCase().trim();
             }else if("ROLE_PRODSHOW".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleProdShow().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleProdShow()).toLowerCase().trim();
             }else if("ROLE_MC".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleMC().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleMC()).toLowerCase().trim();
             }else if("ROLE_VANDOC".equalsIgnoreCase(roleType)){
-            	userRoleTemp = user.getRoleVanDoc().toLowerCase().trim();
+            	userRoleTemp = Utils.isNull(user.getRoleVanDoc()).toLowerCase().trim();
             }
             
             userRoles = userRoleTemp.split("\\|");

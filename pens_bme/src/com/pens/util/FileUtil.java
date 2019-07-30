@@ -23,6 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -207,6 +208,18 @@ public class FileUtil {
 	      scanner.close();
 	    }
        return text.toString();
+	}
+	
+	public static byte[] readFileToByte(InputStream is) throws IOException{
+		byte[] bytes = null;
+		try {
+			bytes = IOUtils.toByteArray(is);
+		}catch(IOException e){
+			throw e;
+	    }finally{
+	   
+	    }
+       return bytes;
 	}
 	
 	public static String getFileSize(String str) {

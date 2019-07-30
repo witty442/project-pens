@@ -709,6 +709,7 @@ function clearForm(path){
 								    		 || "reportEndDateLotus".equalsIgnoreCase(request.getParameter("page")) 
 								    		 || "onhandMTTDetail".equalsIgnoreCase(request.getParameter("page")) 
 								    		 || "onhandBigC".equalsIgnoreCase(request.getParameter("page")) 
+								    		 || "sizeColorKing".equalsIgnoreCase(request.getParameter("page")) 
 								    		 ){%>
 									      <html:checkbox property="onhandSummary.dispHaveQty" />แสดงเฉพาะรายการที่มีจำนวน
 									    <%} %>

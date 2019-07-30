@@ -159,7 +159,7 @@ public class BatchProcessManager {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.icc.ip.server"), env.getProperty("ftp.icc.username"), env.getProperty("ftp.icc.password"));
 			ftpManager.canConnectFTPServer();
 			
-			/** Set Trasaction no Auto Commit **/
+			/** Set Transaction no Auto Commit **/
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 		

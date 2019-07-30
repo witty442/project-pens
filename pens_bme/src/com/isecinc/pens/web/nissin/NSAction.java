@@ -571,9 +571,13 @@ public class NSAction extends I_Action {
 					
 					h.append("<th>Cup72 (CTN)</th>\n");
 					h.append("<th>Cup72 (CUP)</th>\n");
-					h.append("<th>BAG (CTN)</th>\n");
-					h.append("<th>BAG (PAC 6)</th>\n");
-					h.append("<th>BAG (PAC 10)</th>\n");
+					
+					h.append("<th>BAG6(CTN)</th>\n");
+					h.append("<th>BAG6(BAG)</th>\n");
+					
+					h.append("<th>BAG10(CTN)</th>\n");
+					h.append("<th>BAG10(BAG)</th>\n");
+					
 					h.append("<th>Pooh72 (CTN)</th>\n");
 					h.append("<th>Pooh72 (CUP)</th>\n");
 					
@@ -600,8 +604,9 @@ public class NSAction extends I_Action {
 					h.append("<td>"+mc.getSaleCode()+"</td>");
 					h.append("<td>"+mc.getCupQty()+"</td>");
 					h.append("<td>"+mc.getCupNQty()+"</td>");
-					h.append("<td>"+mc.getPacQty()+"</td>");
-					h.append("<td>"+mc.getPacNQty()+"</td>");
+					h.append("<td>"+mc.getPac6CTNQty()+"</td>");
+					h.append("<td>"+mc.getPac6Qty()+"</td>");
+					h.append("<td>"+mc.getPac10CTNQty()+"</td>");
 					h.append("<td>"+mc.getPac10Qty()+"</td>");
 					h.append("<td>"+mc.getPoohQty()+"</td>"); 
 					h.append("<td>"+mc.getPoohNQty()+"</td>"); 
@@ -618,8 +623,9 @@ public class NSAction extends I_Action {
 			    	h.append("<td class='colum_head' colspan='15'>Total</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getCupQty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getCupNQty()+"</td>");
-					h.append("<td class='num_currency_bold'>"+summary.getPacQty()+"</td>");
-					h.append("<td class='num_currency_bold'>"+summary.getPacNQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPac6CTNQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPac6Qty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getPac10CTNQty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getPac10Qty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getPoohQty()+"</td>"); 
 					h.append("<td class='num_currency_bold'>"+summary.getPoohNQty()+"</td>"); 

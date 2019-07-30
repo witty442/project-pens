@@ -52,8 +52,10 @@
 						<th >ชื่อพนักงาน</th>
 						<th >เลขที่ Bill-T</th>
 						<th >วันที่ Bill-T</th> 
-						<th>รหัสสินค้า</th>
+						<% if("detail".equalsIgnoreCase(billPlanForm.getBean().getDispType())){ %>
+						<th> รหัสสินค้า</th>
 						<th >ชื่อสินค้า</th>
+						<%} %>
 						<th >จำนวนที่ Plan ไป</th>
 				   </tr>
 				<% 
@@ -74,8 +76,10 @@
 							<td class="td_text" width="10%" nowrap><%=item.getSalesrepName() %></td>
 							<td class="td_text_center" width="5%"><%=item.getBillTNo() %></td>
 							<td class="td_text_center" width="5%"> <%=item.getBillTDate() %></td>
-							<td class="td_text" width="7%"> <%=item.getItem() %></td>
-							<td class="td_text" width="15%"><%=item.getItemName()%></td>
+							<% if("detail".equalsIgnoreCase(billPlanForm.getBean().getDispType())){ %>
+							  <td class="td_text" width="7%"> <%=item.getItem() %></td>
+							  <td class="td_text" width="15%"><%=item.getItemName()%></td>
+							<%} %>
 							<td class="td_number" width="5%"> <%=item.getPlanQty() %></td>
 						</tr>
 				<%      no++;

@@ -98,11 +98,11 @@ public class RunScriptDBAction {
 	}
 	
 	public static void runManualScriptProcess(String prefix,User user){
-		if(ControlCode.canExecuteMethod("RunScriptDBAction", "runManualScriptProcessOLD")){
+		/*if(ControlCode.canExecuteMethod("RunScriptDBAction", "runManualScriptProcessOLD")){
 			runManualScriptProcessOLD(prefix,user);
-		}else{
+		}else{*/
 			runManualScriptProcessNew(prefix,user);
-		}
+		//}
 	}
 	
 	public static void runManualScriptProcessOLD(String prefix,User user){
