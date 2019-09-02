@@ -1,3 +1,6 @@
+
+<%@page import="util.PageVisit"%>
+<%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stockonhand.StockOnhandAction"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
@@ -12,7 +15,13 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="stockOnhandForm" class="com.isecinc.pens.web.stockonhand.StockOnhandForm" scope="session" />
 <%
-String pageName = Utils.isNull(request.getParameter("pageName")); 
+String pageName = Utils.isNull(request.getParameter("pageName"));
+
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "stockOnhandForm");
+/** Count Visit Page */
+PageVisit.processPageVisit(request, pageName);
+
 %>
 <html>
 <head>
@@ -30,7 +39,6 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -55,8 +63,6 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 				<jsp:param name="function" value="<%=pageName %>"/>
 			</jsp:include>
 		
-			<!-- Hidden Field -->
-		 <%--    <html:hidden property="pageName" value="<%=pageName %>"/> --%>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -72,22 +78,26 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 						<html:form action="/jsp/stockOnhandAction">
 						<jsp:include page="../error.jsp"/>
 						<div align="center">
+						
 						   	<!--  Criteria -->
 						   	<%if(StockOnhandAction.PAGE_STOCK_VAN.equalsIgnoreCase(pageName)) {%>
 						       <jsp:include page="criteria/stockVanCriteria.jsp" flush="true"/>  
 						    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)) {%>  
 						       <jsp:include page="criteria/stockOnhandCriteria.jsp" flush="true"/> 
+					        <%}else if(StockOnhandAction.PAGE_STOCK_CV.equalsIgnoreCase(pageName)) {%>  
+						       <jsp:include page="criteria/stockCVCriteria.jsp" flush="true"/> 
 					        <%} %>
 					        
-					        
-					 	    <!-- ************************Result *************-->
+					 	    <!-- Result -->
 					 	    <%if(StockOnhandAction.PAGE_STOCK_VAN.equalsIgnoreCase(pageName)) {%>
-					 	       <jsp:include page="result/stockVanResult.jsp" flush="true"/>  
-					 	    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)) {  
-					 	          if(request.getAttribute("RESULTS_DATA") != null){
-					 	        	  out.println( ((StringBuffer)request.getAttribute("RESULTS_DATA")).toString());
+					 	        <jsp:include page="result/stockVanResult.jsp" flush="true"/>  
+					 	    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)
+					 	    		|| StockOnhandAction.PAGE_STOCK_CV.equalsIgnoreCase(pageName)){   
+					 	          if(request.getAttribute("stockOnhandForm_RESULT") != null){
+					 	        	  out.println( ((StringBuffer)request.getAttribute("stockOnhandForm_RESULT")).toString());
 					 	          }
-					 	    } %>
+					 	     }
+					 	    %>
 					 	</div>
 					 	
 					 	<!-- INPUT HIDDEN -->

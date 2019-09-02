@@ -326,11 +326,11 @@ public class PromotionUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
+	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone,String salesrepCode) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnectionApps();
-			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone);
+			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone,salesrepCode);
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -339,7 +339,8 @@ public class PromotionUtils {
 			} catch (Exception e) {}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
+	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo
+			,String custCatNo,String salesZone,String salesrepCode){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -375,6 +376,9 @@ public class PromotionUtils {
 			
 			sql.append("\n  and length(S.code) >= 3");
 			sql.append("\n  and S.ISACTIVE ='Y'");
+			if( !salesrepCode.equals("")){
+				sql.append("\n  and S.code  = '"+salesrepCode+"' ");
+			}
 			//Not in()
 			//sql.append("\n  and S.code not in('V081','V082') ");
 			sql.append("\n  ORDER BY S.code asc ");
@@ -425,6 +429,12 @@ public class PromotionUtils {
 			sql.append("\n  SELECT distinct S.sales_channel_no ,S.sales_channel_desc from XXPENS_BI_MST_SALES_CHANNEL S ");
 			sql.append("\n  where 1=1  ");
 			sql.append("\n  and sales_channel_no in('0','1','2','3','4') ");
+
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				sql.append("\n  and sales_channel_no ='"+user.getUserName().substring(1,2)+"'");
+			}
+			
 			sql.append("\n  ORDER BY S.sales_channel_no asc \n");
 			logger.debug("sql:"+sql);
 			
@@ -452,7 +462,7 @@ public class PromotionUtils {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesZoneListModel(Connection conn){
+	public static List<PopupBean> searchSalesZoneListModel(Connection conn,String salesrepCode){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -461,6 +471,9 @@ public class PromotionUtils {
 			sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
 			sql.append("\n  where 1=1  ");
 			sql.append("\n  and zone in('0','1','2','3','4') ");
+			if( !salesrepCode.equals("")){
+				sql.append("\n  and S.salesrep_code  = '"+salesrepCode+"' ");
+			}
 			sql.append("\n  ORDER BY S.zone asc \n");
 			logger.debug("sql:"+sql);
 			

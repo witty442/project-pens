@@ -33,9 +33,16 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 		   td_number_bold = "currency_bold";
 	   }
 	   String dispType = Utils.isNull(stockVanForm.getBean().getDispType());
+	   String pdType = Utils.isNull(stockVanForm.getBean().getPdType());
 	   boolean dispHaveQty = !Utils.isNull(stockVanForm.getBean().getDispHaveQty()).equals("")?true:false;
 	   boolean dispPlan = !Utils.isNull(stockVanForm.getBean().getDispPlan()).equals("")?true:false;
 	   boolean dispPrice = !Utils.isNull(stockVanForm.getBean().getDispPrice()).equals("")?true:false;
+	   
+	   logger.debug("pdType:"+pdType);
+	   logger.debug("dispType:"+dispType);
+	   logger.debug("dispHaveQty:"+dispHaveQty);
+	   logger.debug("dispPlan:"+dispPlan);
+	   logger.debug("dispPrice:"+dispPrice);
 	   
 	   if(stockVanForm.getResultsSearch() != null && stockVanForm.getResultsSearch().size()>0){
 	   	
@@ -297,7 +304,9 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   			 if( dispPlan==false && dispPrice==false){ 
 	   				headTableHtml.append("<th>PD/หน่วยรถ</th> \n");
 	   				headTableHtml.append("<th>ชื่อ PD</th>\n");
-	   				
+	   			    if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+	   					headTableHtml.append("<th>จังหวัด</th>\n");
+	   				}
              	    for(int k=0;k<columnList.size();k++){
                       StockOnhandBean s = (StockOnhandBean)columnList.get(k);
                       //check qty <> 0 to show
@@ -313,6 +322,9 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   			  }else if( dispPlan==true && dispPrice==false){ 
 	   				  headTableHtml.append("<th rowspan='2'>PD/หน่วยรถ</th> \n");
 	   				  headTableHtml.append("<th rowspan='2'>ชื่อ PD</th> \n");
+	   				  if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+	   					  headTableHtml.append("<th rowspan='2'>จังหวัด</th>\n");
+	   				  }
 	   			      for(int k=0;k<columnList.size();k++){
                           StockOnhandBean s = (StockOnhandBean)columnList.get(k);
                           //check qty <> 0 to show
@@ -330,6 +342,9 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   				}else if( dispPlan ==false && dispPrice==true){ 
 	   					  headTableHtml.append("<th rowspan='2'>PD/หน่วยรถ</th> \n");
 		   				  headTableHtml.append("<th rowspan='2'>ชื่อ PD</th> \n");
+		   				  if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+		   					  headTableHtml.append("<th rowspan='2'>จังหวัด</th>\n");
+		   				  }
 		   			      for(int k=0;k<columnList.size();k++){
 	                          StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                          //check qty <> 0 to show
@@ -347,6 +362,9 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   				}else if( dispPlan==true && dispPrice==true){ 
 		   				  headTableHtml.append("<th rowspan='3'>PD/หน่วยรถ</th> \n");
 		   				  headTableHtml.append("<th rowspan='3'>ชื่อ PD</th> \n");
+		   				  if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+		   					  headTableHtml.append("<th rowspan='3'>จังหวัด</th>\n");
+		   				  }
 		   			      for(int k=0;k<columnList.size();k++){
 	                         StockOnhandBean s = (StockOnhandBean)columnList.get(k);
 	                         //check qty <> 0 to show
@@ -611,7 +629,10 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   		    if(dispType.equals("1")){
 	   		       rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getPdCode()+"</td> \n");
 	   		       rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getPdDesc()+"</td> \n");
-	   			}else{ 
+	   		       if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+	   		    	  rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getProvince()+"</td> \n");
+ 				   }
+	   		    }else{ 
 	   			 //<!--2)  Row by product  ,column pd--> 
 	   			   rowTableHtml.append("<td class='"+td_text_center+"' width='"+column_1+"%'>"+rowItem.getProductCode()+"</td> \n");
 	   			   rowTableHtml.append("<td class='"+td_text+"' width='"+column_2+"%'>"+rowItem.getProductName()+"</td> \n");
@@ -810,7 +831,11 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	   	
 	  /**************** Summary ***************************************************************/
 	   	out.append("<tr class='row_hilight'>"); 
-	   	out.append("<td width='"+(column_1+column_2)+"%' colspan='2' align='right'>ยอดรวม</td> \n");
+	    if(pdType.equalsIgnoreCase("P") && dispType.equals("1")){
+	   	   out.append("<td width='"+(column_1+column_2+column_2)+"%' colspan='3' align='right'>ยอดรวม</td> \n");
+	    }else{
+	       out.append("<td width='"+(column_1+column_2)+"%' colspan='2' align='right'>ยอดรวม</td> \n"); 
+	    }
 	   	if(columnList != null && columnList.size() >0){
 	        for(int k=0;k<columnList.size();k++){
 	              StockOnhandBean s = (StockOnhandBean)columnList.get(k);
@@ -820,7 +845,7 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			if(dispPlan==false && dispPrice==false){
 	          			   sumBean = summaryByColumnMap.get(s.getProductCode());
 		          		   if(dispHaveQty){ //check qty <> 0 to show
-		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
+		                      if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0){
 		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 		                      }
 		          		   }else{
@@ -831,7 +856,8 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			}else if( dispPlan==true && dispPrice==false){ 
 	          			   sumBean = summaryByColumnMap.get(s.getProductCode());
 		          		   if(dispHaveQty){ //check qty <> 0 to show
-		                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
+		                      if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0
+		                    	|| Utils.convertStrToDouble(sumBean.getPdIntQty()) != 0){
 		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 		          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
 		                      }
@@ -843,7 +869,7 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			 }else if(dispPlan==false && dispPrice==true){ 
 	          				   sumBean = summaryByColumnMap.get(s.getProductCode());
 			          		   if(dispHaveQty){ //check qty <> 0 to show
-			                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0){
+			                      if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0){
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
 			                      }
@@ -855,8 +881,8 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			}else if( dispPlan==true && dispPrice==true){
 	          				   sumBean = summaryByColumnMap.get(s.getProductCode());
 			          		   if(dispHaveQty){ //check qty <> 0 to show
-			                      if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdQty()) != 0
-			                    		|| Utils.convertStrToDouble(summaryByColumnMap.get(s.getProductCode()).getPdIntQty()) != 0  ){
+			                      if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0
+			                    		|| Utils.convertStrToDouble(sumBean.getPdIntQty()) != 0  ){
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
@@ -875,7 +901,7 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			if(dispPlan==false && dispPrice==false){
 	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
 	          				 if(dispHaveQty){//check qty <> 0 to show
-	                           if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
+	                           if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0){
 	          				      out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 	                           }
 	          				 }else{
@@ -885,8 +911,8 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			}else if( dispPlan==true && dispPrice==false){ 
 	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
 	          				 if(dispHaveQty){
-			                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
-			                        || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0){
+			                       if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0
+			                        || Utils.convertStrToDouble(sumBean.getPdIntQty()) != 0){
 			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");
 			                       }
@@ -898,7 +924,7 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			}else if(dispPlan==false && dispPrice==true){ 
 	          				 sumBean = summaryByColumnMap.get(s.getPdCode());
 	          				 if(dispHaveQty){
-			                       if( Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0){
+			                       if( Utils.convertStrToDouble(sumBean.getPdQty()) != 0){
 			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 			          				   out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
 			                       }
@@ -910,8 +936,8 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
 	          			}else if( dispPlan==true && dispPrice==true){
 	          				   sumBean = summaryByColumnMap.get(s.getPdCode());
 			          		   if(dispHaveQty){ //check qty <> 0 to show
-			                      if(   Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdQty()) != 0
-			                    	 || Utils.convertStrToDouble(summaryByColumnMap.get(s.getPdCode()).getPdIntQty()) != 0){
+			                      if(   Utils.convertStrToDouble(sumBean.getPdQty()) != 0
+			                    	 || Utils.convertStrToDouble(sumBean.getPdIntQty()) != 0){
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdQty(),Utils.format_current_2_disgit)+"</td> \n");
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdPrice(),Utils.format_current_2_disgit)+"</td> \n");
 			          				 out.append("<td class='"+td_number_bold+"'>"+Utils.convertStrDoubleToStr(sumBean.getPdIntQty(),Utils.format_current_2_disgit)+"</td> \n");

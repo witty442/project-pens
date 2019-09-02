@@ -13,14 +13,16 @@ String hideAll = "";
   <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
 		 <tr>
 		    <td width="30%"></td>
-			<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; <html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
+			<td align="left">จาก วันที่ขาย&nbsp;&nbsp;&nbsp; 
+			<html:text property="transactionSummary.salesDateFrom" styleId="salesDateFrom" readonly="true"/>
 			ถึง วันที่ขาย&nbsp;&nbsp;&nbsp;<html:text property="transactionSummary.salesDateTo" styleId="salesDateTo"/></td>
 		</tr>
 		<tr>
 		    <td width="30%"></td>
-			<td align="left">รหัสร้านค้า
-			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			    <html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
+			<td align="left" nowrap>รหัสร้านค้า
+			    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			    <html:text property="transactionSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" styleClass="\" autoComplete=\"off" 
+			    size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
 			    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','king')"/>
 			    <html:text property="transactionSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="40"/>
 			</td>
@@ -28,7 +30,10 @@ String hideAll = "";
 		<tr>
 		    <td width="30%"></td>
 			<td align="left">ชื่อไฟล์ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-			    <html:text property="transactionSummary.fileName" styleId="fileName"/></td>
-			<td align="left"></td>
+			    <html:text property="transactionSummary.fileName" styleId="fileName" styleClass="\" autoComplete=\"off" />
+			    &nbsp;&nbsp;&nbsp;
+			   Group  
+			 <html:text property="transactionSummary.groupCode" styleId="groupCode" size="15" styleClass="\" autoComplete=\"off" />
+			</td>
 		</tr>
 	 </table>

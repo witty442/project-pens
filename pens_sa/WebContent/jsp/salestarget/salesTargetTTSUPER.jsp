@@ -16,8 +16,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
 //for test
@@ -71,6 +69,12 @@ Map<String, SalesTargetBean> dataMap = null;
 <!-- freeze table  -->
 
 <script type="text/javascript">
+
+/** disable back button alway **/
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+
 //To disable f5
  $(document).bind("keydown", disableF5);
 

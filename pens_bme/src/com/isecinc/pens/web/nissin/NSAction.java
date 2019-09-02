@@ -55,6 +55,7 @@ public class NSAction extends I_Action {
 		logger.debug("prepare2");
 		NSForm aForm = (NSForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
 		try {
 			String page = Utils.isNull(request.getParameter("page"));
 			String action = Utils.isNull(request.getParameter("action"));
@@ -64,6 +65,9 @@ public class NSAction extends I_Action {
 				ad.setNoPicRcv("true");
 				ad.setCreateUser(user.getUserName());
 				aForm.setBean(ad);
+				
+				//prepare conn
+				conn = DBConnection.getInstance().getConnection();
 				
 				//prepare session
 				List<PopupForm> billTypeList = new ArrayList<PopupForm>();
@@ -79,6 +83,13 @@ public class NSAction extends I_Action {
 				customerSubTypeList.addAll(ControlConstantsDB.getCondList(ControlConstantsDB.NS_CUTSOMER_SUB_TYPE));
 				request.getSession().setAttribute("customerSubTypeList",customerSubTypeList);
 				
+				//
+				List<NSBean> dataList = new ArrayList<NSBean>();
+				NSBean beanItem = new NSBean(); 
+				dataList.add(beanItem);
+				dataList.addAll(NSDAO.searchSalesZoneListModel(conn));
+				request.getSession().setAttribute("SALES_ZONE_LIST",dataList);
+				
 			}else if("back".equals(action)){
 				NSBean cri  = aForm.getBeanCriteria();
 				aForm.setBean(cri);
@@ -87,7 +98,9 @@ public class NSAction extends I_Action {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search");
 	}

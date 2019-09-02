@@ -14,7 +14,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceHelper;
+import com.pens.util.helper.SequenceProcess;
 
 /**
  * @author WITTY
@@ -77,7 +77,7 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).startsWith("GET_SEQ")){
 				//VALUE :GET-SEQ|TABLE_NAME
 				 String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
-				 id = SequenceHelper.getNextValue(values[1]).toString();
+				 id = SequenceProcess.getNextValue(values[1]).toString();
 				 exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_INTERFACES_FLAG")){	
 				id = "Y";

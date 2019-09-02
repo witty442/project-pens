@@ -1,3 +1,4 @@
+
 <%@page import="com.isecinc.pens.web.rt.RTConstant"%>
 <%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Date"%>
@@ -8,8 +9,6 @@
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.bean.NSBean"%>
 <%@page import="java.util.Calendar"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -24,7 +23,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
 <%
 int pageNumber = 1;
@@ -225,6 +223,13 @@ function openPensEdit(path,orderId){
 									<td>&nbsp;To Date&nbsp;
 										  <font color="red"></font>
                                         <html:text property="bean.orderDateTo" readonly ="true" styleClass="" styleId="orderDateTo"></html:text>
+									 <%if("PENS".equalsIgnoreCase(request.getParameter("page"))) {%>
+										&nbsp;&nbsp;&nbsp;
+										 ภาคตามสายดูแล 
+									      <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList()">
+											<html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
+									    </html:select>
+								    <%} %>
 									</td>
 								</tr>
 						   </table>

@@ -36,6 +36,10 @@ public class UserUtils {
             	userRoleTemp = Utils.isNull(user.getRoleMC()).toLowerCase().trim();
             }else if("ROLE_VANDOC".equalsIgnoreCase(roleType)){
             	userRoleTemp = Utils.isNull(user.getRoleVanDoc()).toLowerCase().trim();
+            }else if("ROLE_ONHAND".equalsIgnoreCase(roleType)){
+            	userRoleTemp = Utils.isNull(user.getRoleOnhand()).toLowerCase().trim();
+            }else if("ROLE_COVERAGE".equalsIgnoreCase(roleType)){
+            	userRoleTemp = Utils.isNull(user.getRoleCoverage()).toLowerCase().trim();
             }
             
             userRoles = userRoleTemp.split("\\|");

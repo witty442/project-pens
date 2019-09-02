@@ -844,6 +844,9 @@ public class SummaryDAO {
 				if(!Utils.isNull(c.getFileName()).equals("")){
 					sql.append(" and file_name LIKE '%"+c.getFileName()+"%' \n");
 				}
+				if(!Utils.isNull(c.getGroupCode()).equals("")){
+					sql.append(" and group_code LIKE '"+c.getGroupCode()+"%' \n");
+				}
 				
 				sql.append("\n  ORDER BY sale_date ,CUST_GROUP asc \n");
 				
@@ -2904,15 +2907,23 @@ public class SummaryDAO {
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-				
 				while (rst.next()) {
 					OnhandSummary item = new OnhandSummary();
 					
-					item.setStoreCode(rst.getString("customer_code"));
-					item.setStoreName(rst.getString("customer_name"));
-					item.setSubInv(rst.getString("sub_inv"));
-					item.setPensItem(rst.getString("pens_item"));
-					item.setGroup(rst.getString("group_type"));
+					if( !Utils.isNull(rst.getString("customer_code")).equals("")){
+						item.setStoreCode(rst.getString("customer_code"));
+						item.setStoreName(rst.getString("customer_name"));
+						item.setSubInv(rst.getString("sub_inv"));
+						item.setPensItem(rst.getString("pens_item"));
+						item.setGroup(rst.getString("group_type"));
+					}else{
+						//Get from init sub query for display
+						item.setStoreCode(rst.getString("customer_code_init"));
+						item.setStoreName(rst.getString("customer_name_init"));
+						item.setSubInv(rst.getString("sub_inv_int"));
+						item.setPensItem(rst.getString("pens_item_int"));
+						item.setGroup(rst.getString("group_type_init"));
+					}
 					
 					item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("INIT_QTY"),Utils.format_current_no_disgit));
 					item.setTransInQty(Utils.decimalFormat(rst.getDouble("TRANS_IN_QTY"),Utils.format_current_no_disgit));

@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 String screenWidth = "";
@@ -20,9 +19,9 @@ System.out.println("screenWidth:"+screenWidth);
 </style>
 
 <%
-  if(request.getAttribute("RESULT_DATA") != null){
+  if(request.getAttribute("stockOnhandForm_RESULT") != null){
 	  out.print("<div id ='scroll'>");
-	  out.print(((StringBuffer)request.getAttribute("RESULT_DATA")).toString());
+	  out.print(((StringBuffer)request.getAttribute("stockOnhandForm_RESULT")).toString());
 	  out.print("</div>");
   }
 %>

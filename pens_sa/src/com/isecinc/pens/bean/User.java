@@ -35,10 +35,12 @@ public class User extends I_PO implements Serializable {
 	public static final String DD_SALES = "DDSALES";
 	public static final String MTMGR = "MTMGR";
 	public static final String STOCKCR = "STOCKCR";
+	public static final String STOCKCRSALE = "STOCKCRSALE";
 	public static final String SPIDER = "SPIDER";
 	public static final String PRODSHOW = "PRODSHOW";
 	public static final String VANDOC = "VANDOC";
 	public static final String STOCKVAN = "STOCKVAN";
+	public static final String ONHAND = "ONHAND";
 	public static final String MC_ENTRY = "MC_ENTRY";
 	public static final String MT_QUERY = "MT_QUERY"; 
 	public static final String SA = "SA"; //salesAnalysis
@@ -47,6 +49,7 @@ public class User extends I_PO implements Serializable {
 	public static final String TTMGR = "TTMGR";//ManagerSale
 	
 	public static final String VANSALES = "VANSALES";
+	public static final String COVERAGE = "COVERAGE";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -103,8 +106,10 @@ public class User extends I_PO implements Serializable {
 		setRoleStockVan(convertToString(rst.getString("ROLE_STOCK_VAN")));
 		setRoleMC(convertToString(rst.getString("ROLE_MC")));
 		setRoleSA(convertToString(rst.getString("ROLE_SA")));
+		setRoleOnhand(convertToString(rst.getString("ROLE_ONHAND")));
+		setRoleCoverage(convertToString(rst.getString("ROLE_COVERAGE")));
 		
-		System.out.println("setRoleMC:"+getRoleMC()+";"+convertToString(rst.getString("ROLE_MC")));
+		//System.out.println("setRoleMC:"+getRoleMC()+";"+convertToString(rst.getString("ROLE_MC")));
 		// set display label
 		setDisplayLabel();
   
@@ -214,8 +219,26 @@ public class User extends I_PO implements Serializable {
     private String roleMC;
     private String roleSA;
     private String roleVanSales;
+    private String roleOnhand;
+    private String roleCoverage;
     
     
+	public String getRoleCoverage() {
+		return roleCoverage;
+	}
+
+	public void setRoleCoverage(String roleCoverage) {
+		this.roleCoverage = roleCoverage;
+	}
+
+	public String getRoleOnhand() {
+		return roleOnhand;
+	}
+
+	public void setRoleOnhand(String roleOnhand) {
+		this.roleOnhand = roleOnhand;
+	}
+
 	public String getRoleVanSales() {
 		return roleVanSales;
 	}

@@ -21,13 +21,20 @@ function defaultDate(paymentMethod,row,currDate){
 			//show
 			//alert(document.getElementById("div_chequeDate_"+row));
 			
-			document.getElementById("div_chequeDate_"+row).style.display="block";
+			//document.getElementById("div_chequeDate_"+row).style.display="block";
 			var chequeDate = document.getElementsByName("chequeDate")[eval(row-1)];
-			new Epoch('epoch_popup', 'th', chequeDate);
+			//new Epoch('epoch_popup', 'th', chequeDate);
+			
+			chequeDate.disabled = false;
+			chequeDate.className ='normalText';
 		}else{
 			//hide
-			document.getElementsByName("chequeDate")[eval(row-1)].value='';
-			document.getElementById("div_chequeDate_"+row).style.display="none";
+			var chequeDate = document.getElementsByName("chequeDate")[eval(row-1)];
+			chequeDate.value='';
+			chequeDate.disabled = true;
+			chequeDate.className ='disableText';
+			
+			//document.getElementById("div_chequeDate_"+row).style.display="none";
 		}
 	}else{
 		document.getElementsByName("pdReceiptDate")[eval(row-1)].value='';
@@ -53,6 +60,8 @@ function save(path){
 	var isFirst = true;
 	var noValueSelect = true;
 	for(var i=0;i<paymentMethods.length;i++){
+		chequeDates[i].disabled = false;//set for save in Action
+		
 		if(paymentMethods[i].value != null && paymentMethods[i].value.length > 0){
 			if(paidDates[i].value == null || trim(paidDates[i].value).length == 0 ){
 				alert("กรุณาระบุ วันที่ส่งเงิน");
@@ -71,7 +80,12 @@ function save(path){
 				p_receiptId = p_receiptId+receiptIds[i].value;
 				p_paymentMethods = p_paymentMethods+paymentMethods[i].value;
 				p_pdPaidDate = p_pdPaidDate+paidDates[i].value;
-				p_chequeDate = p_chequeDate+chequeDates[i].value;
+				if(chequeDates[i].value !=''){
+					p_chequeDate = p_chequeDate+chequeDates[i].value;
+				}else{
+					p_chequeDate = p_chequeDate+'null';
+				}
+			
 				
 				isFirst = false;
 				noValueSelect = false;
@@ -79,7 +93,11 @@ function save(path){
 				p_receiptId = p_receiptId+","+receiptIds[i].value;
 				p_paymentMethods = p_paymentMethods+","+paymentMethods[i].value;
 				p_pdPaidDate = p_pdPaidDate+","+paidDates[i].value;
-				p_chequeDate = p_chequeDate+","+chequeDates[i].value;
+				if(chequeDates[i].value !=''){
+				   p_chequeDate = p_chequeDate+","+chequeDates[i].value;
+				}else{
+				   p_chequeDate = p_chequeDate+",null";
+				}
 			}
 		}
 		else{

@@ -1,9 +1,8 @@
+<%@page import="util.PageVisit"%>
+<%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -15,8 +14,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="stockForm" class="com.isecinc.pens.web.stock.StockForm" scope="session" />
 <%
-//for test clear session
-SIdUtils.getInstance().clearInstance();
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "stockForm");
 		
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRoleSalesTarget();
@@ -26,9 +25,14 @@ if(pageName.equals("")){
 	pageName = stockForm.getPageName();
 }
 String pageNameTemp = pageName;
-if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ 
+if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "ReportStockCredit";
+}else if(StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "ReportStockCallCardCredit";
 }
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,pageNameTemp);
 %>
 <html>
 <head>
@@ -46,6 +50,13 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<script>
+/** disable back button alway **/
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+</script>
 
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
@@ -91,20 +102,32 @@ if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
 						<jsp:include page="../error.jsp"/>
 
 						<div align="center">
-						   	<%if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ %>
-						       <jsp:include page="criteria/ReportCreditCriteria.jsp" flush="true" /> 
+						   <%if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){ %>
+						       <jsp:include page="criteria/stockCreditCriteria.jsp" flush="true" /> 
+						   <%}else if(StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){ %>
+						       <jsp:include page="criteria/stockCallCardCreditCriteria.jsp" flush="true" /> 
 						   <%}else if(StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){ %>
 						       <jsp:include page="criteria/stockCloseVanCriteria.jsp" flush="true"/> 
 						   <%}else if(StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/stockPDVanCriteria.jsp" flush="true"/>  
-						    <% } %>
+						    <%}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/stockCreditExpireCriteria.jsp" flush="true"/>  
+						   <% } %>
 					    </div>
 					  
 					   <!-- ************************Result ***************************************************-->
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
-					  if(request.getSession().getAttribute("RESULTS") != null) {
-					    out.println(request.getSession().getAttribute("RESULTS"));
+					  if(request.getSession().getAttribute("stockForm_RESULTS") != null) {
+						  if(   StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
+					   %>
+							<div id ="scroll" align="center">
+								<% out.println(request.getSession().getAttribute("stockForm_RESULTS")); %>
+							</div>
+					  <% 
+						  }else{
+					          out.println(request.getSession().getAttribute("stockForm_RESULTS"));
+						  }
 					  }
 					  %>
 					<!-- ************************Result ***************************************************-->

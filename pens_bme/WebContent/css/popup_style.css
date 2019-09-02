@@ -11,6 +11,10 @@ TABLE.tableHead TD {
 	background-color:#02a7b9;
 	color:#FFFFFF;
 }
+.headTitle1{
+	background-color:#A2D9CE;
+	color:#000000;
+}
 /** Style Button **/
 .newPosBtnLong {
 	-moz-box-shadow: 3px 4px 0px 0px #899599;

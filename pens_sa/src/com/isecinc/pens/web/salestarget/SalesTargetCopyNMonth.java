@@ -213,7 +213,12 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
-			sql.append("\n  '"+curBean.getPeriod()+"' as PERIOD ");
+			sql.append("\n  '"+curBean.getPeriod()+"' as PERIOD, ");
+			sql.append("\n  null as invoiced_qty ,");
+			sql.append("\n  null as invoiced_amt ,");
+			sql.append("\n  null as estimate_qty ,");
+			sql.append("\n  null as estimate_amt ,");
+			sql.append("\n  null as price");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP WHERE ID="+idCopy);
 		   // logger.debug("sql:"+sql);
 			

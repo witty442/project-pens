@@ -140,7 +140,7 @@
 			<forward name="search" path="/jsp/prodshow/prodShowSearch.jsp" />
 		</action>
 		<action name="stockMCForm" path="/jsp/stockMCAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockmc.StockMCAction">
-			<forward name="search" path="/jsp/stockMC/stockMCSearch.jsp" />
+			<forward name="search" path="/jsp/stockMC/stockMCSearch.jsp"/>
 			<forward name="detail" path="/jsp/stockMC/stockMC.jsp" />
 			<forward name="searchMasterItem" path="/jsp/stockMC/stockMCMasterItemSearch.jsp" />
 			<forward name="detailMasterItem" path="/jsp/stockMC/stockMCMasterItem.jsp" />

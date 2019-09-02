@@ -502,6 +502,10 @@ public class StockReturnAction extends I_Action {
 				//Fail
 				msg = InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc();
 			}else{
+				
+				//ReCalc Update total in Head 
+				mDAO.reCalcAmountInHead(conn, m);
+				
 				//Success
 				msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 			}
@@ -521,8 +525,7 @@ public class StockReturnAction extends I_Action {
 			  stockForm.getBean().setShowSaveBtn(true);
 			  stockForm.getBean().setShowCancelBtn(true);
 			}
-			// save token
-			saveToken(request);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "detail";

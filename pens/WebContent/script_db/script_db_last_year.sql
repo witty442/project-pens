@@ -162,3 +162,9 @@ CREATE TABLE pens.t_bank_transfer (
 	UPDATED_BY varchar(20),
 	PRIMARY KEY (line_id)
 );
+
+delete from pens.c_reference where reference_id in (2601,2602,2603,2604);
+insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y','Y');
+insert into pens.c_reference values ('2602','PartyType','ร้านธงฟ้า','ร้านธงฟ้า','B','Y','Y' );
+insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','N','Y');
+insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','N','Y');

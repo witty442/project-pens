@@ -24,7 +24,7 @@ function loadMe(){
 }
 function clearForm(path){
 	var form = document.stockOnhandForm;
-	var pageName = "";//document.getElementsByName("pageName")[0].value;
+	var pageName = document.getElementsByName("pageName")[0].value;
 	form.action = path + "/jsp/stockOnhandAction.do?do=prepareSearch&action=back&pageName="+pageName;
 	form.submit();
 	return true;

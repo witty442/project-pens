@@ -143,8 +143,9 @@ function search(path){
 	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
 	   //var pensCustCodeTo = form.pensCustCodeTo.value;
 	   var fileName = form.fileName.value;
+	   var groupCode = form.groupCode.value;
 	   
-	   if(salesDateFrom =="" && salesDateTo =="" && pensCustCodeFrom ==""  &&fileName ==""){
+	   if(salesDateFrom =="" && salesDateTo =="" && pensCustCodeFrom ==""  &&fileName =="" && groupCode.value ==""){
 		   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
 		   return false;
 	   } 

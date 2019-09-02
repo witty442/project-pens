@@ -38,7 +38,7 @@ System.out.println("salesTargetForm Bean:"+salesTargetForm.getBean());
 String pageNameTemp = "";
 if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "MKT_SalesTarget";
-}else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ 
+}else if(SalesTargetConstants.PAGE_MTSALES.equalsIgnoreCase(pageName)){ 
 	if(role.equalsIgnoreCase(User.DD_SALES)){
 	   pageNameTemp = "DD_SalesTarget";
 	}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES}) ){
@@ -62,6 +62,8 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 	pageNameTemp = "TTMGR_SalesTarget";
 }else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "TTADMIN_SalesTarget";
+}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ 
+	pageNameTemp = "MTADMIN_SalesTarget";
 }
 //System.out.println("pageNameTemp:"+pageNameTemp);
 %>
@@ -81,8 +83,14 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/page/salesTarget.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-</head>		
+
+ <script>
+ /** disable back button alway **/
+ window.location.hash="no-back-button";
+ window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+ window.onhashchange=function(){window.location.hash="no-back-button";}
+ </script>
+ </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
@@ -125,8 +133,8 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 						<div align="center">
 						   	<%if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MKTCriteria.jsp" flush="true"/> 
-						    <%}else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/MTCriteria.jsp" flush="true" />  
+						    <%}else if(SalesTargetConstants.PAGE_MTSALES.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/MTSalesCriteria.jsp" flush="true" />  
 						    <%}else if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MTMGRCriteria.jsp" flush="true" /> 
 						    <%}else if(SalesTargetConstants.PAGE_REPORT_SALES_TARGET.equalsIgnoreCase(pageName)){ %>
@@ -143,16 +151,18 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 						        <jsp:include page="criteria/TTSUPER_Criteria.jsp" flush="true" />   
 						    <%}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/TTMGR_Criteria.jsp" flush="true" />   
-						      <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ %>
+						     <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/TTADMIN_Criteria.jsp" flush="true" />   
-						    <%} %>
+						     <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/MTADMIN_Criteria.jsp" flush="true" />   
+						     <%} %>
 					    </div>
 					  
 					   <!-- ************************Result ***************************************************-->
 					  <%
-					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
-					  if(request.getSession().getAttribute("RESULTS") != null) {
-					     out.println(request.getSession().getAttribute("RESULTS"));
+					  //System.out.println("Results:"+request.getSession().getAttribute("salesTargetForm_RESULTS"));
+					  if(request.getSession().getAttribute("salesTargetForm_RESULTS") != null) {
+					     out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
 					  
 					  %>
 						<!-- ************************Result ***************************************************-->
@@ -195,12 +205,42 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 								   <table  border="0" cellpadding="3" cellspacing="0" >
 									<tr>
 										<td align="center" >
-											<a href="javascript:changeStatusTTByAdmin('${pageContext.request.contextPath}')">
+											<a href="javascript:changeStatusByAdmin('${pageContext.request.contextPath}')">
 												 <input type="button" value=" บันทึก  " class="newPosBtnLong">
 											</a>
 											<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
 											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
 											</a>
+										</td>	
+									 </tr>
+									</table>
+							    </div>
+						 <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){  %>
+							  <div align="center">
+								   <table  border="0" cellpadding="3" cellspacing="0" >
+									<tr>
+										<td align="center" >
+											<a href="javascript:changeStatusByAdmin('${pageContext.request.contextPath}')">
+												 <input type="button" value=" บันทึก  " class="newPosBtnLong">
+											</a>
+											<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
+											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+											</a>
+										</td>	
+									 </tr>
+									</table>
+							    </div>
+						 <%}else if(SalesTargetConstants.PAGE_MTSALES.equalsIgnoreCase(pageName)){  %>
+							  <div align="center">
+								   <table  border="0" cellpadding="3" cellspacing="0" >
+									<tr>
+										<td align="center" >
+											<a href="javascript:save('${pageContext.request.contextPath}')">
+												 <input type="button" value=" บันทึก  " class="newPosBtnLong">
+											</a>
+											<%-- <a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
+											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
+											</a> --%>
 										</td>	
 									 </tr>
 									</table>

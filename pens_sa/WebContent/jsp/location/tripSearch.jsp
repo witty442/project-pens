@@ -1,4 +1,5 @@
 
+<%@page import="util.PageVisit"%>
 <%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.location.LocationBean"%>
 <%@page import="com.isecinc.pens.web.location.LocationForm"%>
@@ -23,6 +24,9 @@
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "locationForm");
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"Trip");
+
 %>
 <html>
 <head>

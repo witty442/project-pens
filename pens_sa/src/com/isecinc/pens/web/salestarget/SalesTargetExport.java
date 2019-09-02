@@ -18,6 +18,8 @@ public class SalesTargetExport {
 		String action ="";
 		char singleQuote ='"';
 		try{
+			logger.debug("status test:"+o.getStatus());
+			
 			if(o.getItems() != null && o.getItems().size() >0){
 				
 			h.append(ExcelHeader.EXCEL_HEADER);
@@ -30,18 +32,25 @@ public class SalesTargetExport {
 			h.append("<th >เป้าหมายขาย (บาท)</th> \n");
 			h.append("<th >สถานะ</th> \n");
 			h.append("<th >Set</th>	 \n");		
+			if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+				h.append("<th >ขายได้(หีบ)</th>	 \n");	
+				h.append("<th >ขายได้(บาท)</th> \n");	
+				h.append("<th >คาดปิด(หีบ)</th>	 \n");	
+				h.append("<th >ราคา</th> \n");
+				h.append("<th >คาดปิด(บาท)</th> \n");	
+			}
 			h.append("</tr> \n");
 		    for(int i=0;i<o.getItems().size();i++){
 		    	SalesTargetBean item = o.getItems().get(i);
 		    	className = (i %2 == 0)?"lineE":"lineO";
 				h.append("<tr class='"+className+"'> \n");
-				    h.append("<td class='td_text_center' width='10%'>"+item.getSalesrepCode()+"</td> \n");
-					h.append("<td class='td_text_center' width='10%'>"+item.getCustomerCode()+"</td> \n");
-					h.append("<td class='td_text_center' width='20%'>"+item.getCustomerName()+"</td> \n");
+				    h.append("<td class='td_text_center' width='6%'>"+item.getSalesrepCode()+"</td> \n");
+					h.append("<td class='td_text_center' width='6%'>"+item.getCustomerCode()+"</td> \n");
+					h.append("<td class='td_text_center' width='15%'>"+item.getCustomerName()+"</td> \n");
 					h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
 					h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
-					h.append("<td class='td_text_center' width='10%'>"+item.getStatus()+"</td> \n");
-					h.append("<td class='td_text_center' width='20%'> \n");
+					h.append("<td class='td_text_center' width='6%'>"+item.getStatus()+"</td> \n");
+					h.append("<td class='td_text_center' width='10%'> \n");
 					
 					action = item.isCanSet()?"Set":"View";
 					
@@ -52,6 +61,17 @@ public class SalesTargetExport {
 					h.append("   "+action);
 					h.append("</a> \n");
 					h.append("</td> \n");
+					if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+						h.append("<td class='td_text_center' width='8%'>"+Utils.isNull(item.getInvoicedQty())+"</td> \n");
+						h.append("<td class='td_text_center' width='8%'>"+Utils.isNull(item.getInvoicedAmt())+"</td> \n");
+						h.append("<td class='td_text_center' width='6%'>"+Utils.isNull(item.getEstimateQty())+"</td> \n");
+						if( !Utils.isNull(item.getEstimateAmt()).equals("")){
+						   h.append("<td class='td_text_center' width='6%'>"+Utils.isNull(item.getPrice())+"</td> \n");
+						}else{
+						   h.append("<td class='td_text_center' width='6%'></td> \n");
+						}
+						h.append("<td class='td_text_center' width='8%'>"+Utils.isNull(item.getEstimateAmt())+"</td> \n");
+					}
 				h.append("</tr> \n");
 		    }
 			h.append("<tr class='hilight_text'> \n");
@@ -68,6 +88,13 @@ public class SalesTargetExport {
 				h.append("</td> \n");
 				h.append("<td class=''></td> \n");
 				h.append("<td class=''></td> \n");
+				if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+				}
 			h.append("</tr> \n");
 			h.append("</table> \n");
 			}
@@ -97,8 +124,11 @@ public class SalesTargetExport {
 		double grandTotalQty = 0;
 		double grandTotalAmount = 0;
 		int n = 0;
+		int rowId = 0;
 		try{
 			if(o.getItems() != null && o.getItems().size() >0){
+				
+				//logger.debug("status:"+o.getStatus());
 				
 			h.append(ExcelHeader.EXCEL_HEADER);
 			h.append("<table id='tblProduct' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
@@ -110,20 +140,28 @@ public class SalesTargetExport {
 			h.append("<th >เป้าหมายขาย (หีบ)</th> \n");
 			h.append("<th >เป้าหมายขาย (บาท)</th> \n");
 			h.append("<th >สถานะ</th> \n");
-			h.append("<th >ดูรายละเอียด</th>	 \n");		
+			h.append("<th >ดูรายละเอียด</th>	\n");	
+			if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+				h.append("<th >ขายได้(หีบ)</th>	 \n");	
+				h.append("<th >ขายได้(บาท)</th> \n");	
+				h.append("<th >คาดปิด(หีบ)</th>	 \n");	
+				h.append("<th >ราคา</th> \n");
+				h.append("<th >คาดปิด(บาท)</th> \n");		
+			}
 			h.append("</tr> \n");
 		    for(int i=0;i<o.getItems().size();i++){
+		    	rowId++;
 		    	SalesTargetBean item = o.getItems().get(i);
 		    	className = (i %2 == 0)?"lineE":"lineO";
 				h.append("<tr class='"+className+"'> \n");
-					h.append("<td class='td_text_center' width='10%'>"+item.getCustomerCode()+"</td> \n");
-					h.append("<td class='td_text_center' width='20%'>"+item.getCustomerName()+"</td> \n");
+					h.append("<td class='td_text_center' width='8%'>"+item.getCustomerCode()+"</td> \n");
+					h.append("<td class='td_text_center' width='15%'>"+item.getCustomerName()+"</td> \n");
 				    h.append("<td class='td_text_center' width='5%'>"+item.getBrand()+"</td> \n");
-				    h.append("<td class='td_text_center' width='15%'>"+item.getBrandName()+"</td> \n");
-					h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
-					h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
-					h.append("<td class='td_text_center' width='10%'>"+item.getStatus()+"</td> \n");
-					h.append("<td class='td_text_center' width='20%'> \n");
+				    h.append("<td class='td_text_center' width='10%'>"+item.getBrandName()+"</td> \n");
+					h.append("<td class='td_number' width='5%'>"+item.getTargetQty()+"</td> \n");
+					h.append("<td class='td_number' width='5%'>"+item.getTargetAmount()+"</td> \n");
+					h.append("<td class='td_text_center' width='8%'>"+item.getStatus()+"</td> \n");
+					h.append("<td class='td_text_center' width='8%'> \n");
 						action = item.isCanSet()?"View":"View";
 						h.append(" <a href="+singleQuote+"javascript:openView('"+request.getContextPath()+"'  \n");
 						h.append("  , "+item.getId()+" \n");
@@ -133,7 +171,32 @@ public class SalesTargetExport {
 						h.append("   "+action);
 						h.append("</a> \n");
 					h.append("</td> \n");
+					
+					if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+						h.append("<td class='td_text_center' width='8%'>"+item.getInvoicedQty()+" \n");
+						h.append("  <input type='hidden' id ='invoicedQty' name='invoicedQty' value ='"+item.getInvoicedQty()+"' /> \n");
+						h.append("  <input type='hidden' id ='invoicedAmt' name='invoicedAmt' value ='"+item.getInvoicedAmt()+"' /> \n");
+						h.append("</td> \n");
+						h.append("<td class='td_text_center' width='8%'>"+item.getInvoicedAmt()+"</td> \n");
+						
+						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("  <input type='text' name='estimateQty' id='estimateQty' class='enableNumber'");
+						h.append("    value ='"+item.getEstimateQty()+"' size='4' \n");
+						h.append("    onblur='isNumPositive(this);calcEstimateAmt(this,"+rowId+")' autocomplete='off' />");
+						h.append("  <input type='hidden' id ='ids' name='ids' value ='"+item.getId()+"' /> \n");
+						h.append("</td> \n");
+						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("  <input type='text' name='price' id='price' class='enableNumber'");
+						h.append("    value ='"+item.getPrice()+"' size='4' \n");
+						h.append("    onblur='isNumPositive(this);calcEstimateAmt(this,"+rowId+")' autocomplete='off' />");
+						h.append("</td> \n");
+						
+						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("  <input type='text' name='estimateAmt' id='estimateAmt' class='disableNumber' readonly value ='"+item.getEstimateAmt()+"' size='10'/>");
+						h.append("</td> \n");
+					}
 				h.append("</tr> \n");
+				
 				
 				/** sum Total **/
 				totalQty += Utils.convertStrToDouble(item.getTargetQty());
@@ -163,6 +226,13 @@ public class SalesTargetExport {
 						h.append("</td> \n");
 						h.append("<td class=''></td> \n");
 						h.append("<td class=''></td> \n");
+						if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+						}
 				    h.append("</tr> \n");
 				    //reset Total Summary
 				    totalQty =0;
@@ -184,6 +254,13 @@ public class SalesTargetExport {
 				h.append("</td> \n");
 				h.append("<td class=''></td> \n");
 				h.append("<td class=''></td> \n");
+				if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+				}
 			h.append("</tr> \n");
 			h.append("</table> \n");
 			}
@@ -194,6 +271,140 @@ public class SalesTargetExport {
 		}
 	}
 	
+	/**
+	 * Role MT(Sales)
+	 * @param request
+	 * @param o
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	public static StringBuffer genResultSearchTargetHeadExcelByMT(HttpServletRequest request,SalesTargetBean o,User user) throws Exception{
+		StringBuffer h = new StringBuffer("");
+		String className = "";
+		String nextCustomerTemp= "";
+		double totalQty = 0;
+		double totalAmount = 0;
+		double grandTotalQty = 0;
+		double grandTotalAmount = 0;
+		int n = 0;
+		int rowId = 0;
+		try{
+			if(o.getItems() != null && o.getItems().size() >0){
+				
+				//logger.debug("status:"+o.getStatus());
+				
+			h.append(ExcelHeader.EXCEL_HEADER);
+			h.append("<table id='tblProduct' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
+			h.append("<tr> \n");
+			h.append("<th >รหัสร้านค้า</th> \n");
+			h.append("<th >ชื่อร้านค้า</th> \n");
+			h.append("<th >แบรนด์</th> \n");
+			h.append("<th >ชื่อแบรนด์</th> \n");
+			h.append("<th >เป้าหมายขาย (หีบ)</th> \n");
+			h.append("<th >เป้าหมายขาย (บาท)</th> \n");
+			h.append("<th >สถานะ</th> \n");
+			if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+				h.append("<th >ขายได้(หีบ)</th>	 \n");	
+				h.append("<th >ขายได้(บาท)</th> \n");	
+				h.append("<th >คาดปิด(หีบ)</th>	 \n");	
+				h.append("<th >ราคา</th> \n");
+				h.append("<th >คาดปิด(บาท)</th> \n");		
+			}
+			h.append("</tr> \n");
+		    for(int i=0;i<o.getItems().size();i++){
+		    	rowId++;
+		    	SalesTargetBean item = o.getItems().get(i);
+		    	className = (i %2 == 0)?"lineE":"lineO";
+				h.append("<tr class='"+className+"'> \n");
+					h.append("<td class='td_text_center' width='8%'>"+item.getCustomerCode()+"</td> \n");
+					h.append("<td class='td_text_center' width='15%'>"+item.getCustomerName()+"</td> \n");
+				    h.append("<td class='td_text_center' width='5%'>"+item.getBrand()+"</td> \n");
+				    h.append("<td class='td_text_center' width='10%'>"+item.getBrandName()+"</td> \n");
+					h.append("<td class='td_number' width='5%'>"+item.getTargetQty()+"</td> \n");
+					h.append("<td class='td_number' width='5%'>"+item.getTargetAmount()+"</td> \n");
+					h.append("<td class='td_text_center' width='8%'>"+item.getStatus()+"</td> \n");
+					
+					if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+						h.append("<td class='td_text_center' width='8%'>"+item.getInvoicedQty()+" \n");
+						h.append("<td class='td_text_center' width='8%'>"+item.getInvoicedAmt()+"</td> \n");
+						h.append("<td class='td_text_center' width='8%'>"+item.getEstimateQty()+"</td> \n");
+						h.append("<td class='td_text_center' width='8%'>"+item.getPrice()+" </td> \n");
+						h.append("<td class='td_text_center' width='8%'> "+item.getEstimateAmt()+"</td> \n");
+					}
+				h.append("</tr> \n");
+				
+				
+				/** sum Total **/
+				totalQty += Utils.convertStrToDouble(item.getTargetQty());
+				totalAmount += Utils.convertStrToDouble(item.getTargetAmount());
+				grandTotalQty += Utils.convertStrToDouble(item.getTargetQty());
+				grandTotalAmount += Utils.convertStrToDouble(item.getTargetAmount());
+				
+				/** Gen Total Summary By Customer Code*/
+				n = i+1;
+				nextCustomerTemp = "";
+				if(n<o.getItems().size()){
+				   nextCustomerTemp = o.getItems().get(n).getCustomerCode();
+				}
+				if( (!nextCustomerTemp.equalsIgnoreCase(item.getCustomerCode()))){
+					h.append("<tr class='hilight_text'> \n");
+						h.append("<td class=''></td>  \n");
+						h.append("<td class=''></td>  \n");
+						h.append("<td class=''></td>  \n");
+						h.append("<td class='' align='right'> \n");
+						h.append("  <B> Total</B> \n");
+						h.append("</td> \n");
+						h.append("<td class='td_number_bold' align='right'> \n");
+						h.append("  <B>  "+Utils.decimalFormat(totalQty, Utils.format_current_no_disgit)+" </B> \n");
+						h.append("</td> \n");
+						h.append("<td class='td_number_bold' align='right'> \n");
+						h.append("  <B> "+Utils.decimalFormat(totalAmount, Utils.format_current_2_disgit)+"</B> \n");
+						h.append("</td> \n");
+						h.append("<td class=''></td> \n");
+						if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+							h.append("<td class=''></td> \n");
+						}
+				    h.append("</tr> \n");
+				    //reset Total Summary
+				    totalQty =0;
+					totalAmount = 0;
+				}
+		    }
+			h.append("<tr class='hilight_text'> \n");
+				h.append("<td class=''></td>  \n");
+				h.append("<td class=''></td>  \n");
+				h.append("<td class=''></td>  \n");
+				h.append("<td class='' align='right'> \n");
+				h.append("  <B> Grand Total</B> \n");
+				h.append("</td> \n");
+				h.append("<td class='td_number_bold' align='right'> \n");
+				h.append("  <B> "+Utils.decimalFormat(grandTotalQty, Utils.format_current_no_disgit)+" </B> \n");
+				h.append("</td> \n");
+				h.append("<td class='td_number_bold' align='right'> \n");
+				h.append("  <B> "+Utils.decimalFormat(grandTotalAmount, Utils.format_current_2_disgit)+"</B> \n");
+				h.append("</td> \n");
+				h.append("<td class=''></td> \n");
+				if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+					h.append("<td class=''></td> \n");
+				}
+			h.append("</tr> \n");
+			h.append("</table> \n");
+			}
+		   return h;
+		}catch(Exception e){
+			throw e;
+		}finally{
+		}
+	}
 	/**
 	 * Role Manager MT(Sales)
 	 * @param request
@@ -335,7 +546,7 @@ public class SalesTargetExport {
 		}
 	}
 	
-	public static StringBuffer genExportExcelByMT(HttpServletRequest request,SalesTargetBean o,User user) throws Exception{
+	public static StringBuffer genExportExcelDetailByMT(HttpServletRequest request,SalesTargetBean o,User user) throws Exception{
 		StringBuffer h = new StringBuffer("");
 		String className = "";
 		String colspan = "10";
@@ -345,16 +556,16 @@ public class SalesTargetExport {
 			h.append(ExcelHeader.EXCEL_HEADER);
 			h.append("<table id='tblProduct' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
 			h.append("<tr> \n");
-			  h.append("<td class='colum_head' colspan="+colspan+">ข้อมูลเป้ายอดขาย</td> \n");
+			h.append("<td class='colum_head' colspan="+colspan+">ข้อมูลเป้ายอดขาย</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			  h.append("<td class='colum_head' colspan="+colspan+">เดือน "+o.getPeriod()+"   "+o.getStartDate()+"-"+o.getEndDate()+"   แบรนด์ "+o.getBrand()+"-"+o.getBrandName()+"</td> \n");
+			h.append("<td class='colum_head' colspan="+colspan+">เดือน "+o.getPeriod()+"   "+o.getStartDate()+"-"+o.getEndDate()+"   แบรนด์ "+o.getBrand()+"-"+o.getBrandName()+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			  h.append("<td class='colum_head' colspan="+colspan+">ภาคการขาย	 "+o.getSalesChannelName()+"   ประเภทขาย "+o.getCustCatNo()+"</td> \n");
+			h.append("<td class='colum_head' colspan="+colspan+">ภาคการขาย	 "+o.getSalesChannelName()+"   ประเภทขาย "+o.getCustCatNo()+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			  h.append("<td class='colum_head' colspan="+colspan+">รหัสร้านค้า	 "+o.getCustomerCode()+"   ชื่อร้านค้า "+o.getCustomerName()+"</td> \n");
+			h.append("<td class='colum_head' colspan="+colspan+">รหัสร้านค้า	 "+o.getCustomerCode()+"   ชื่อร้านค้า "+o.getCustomerName()+"</td> \n");
 			h.append("</tr> \n");
 			h.append("</table> \n");
 			
@@ -404,6 +615,8 @@ public class SalesTargetExport {
 			h.append(ExcelHeader.EXCEL_HEADER);
 			h.append("<table id='tblProduct' align='center' border='1' width='60%' cellpadding='3' cellspacing='1' class='tableSearch'> \n");
 			h.append("<tr> \n");
+			h.append("<th>ร้านค้า</th> \n");
+			h.append("<th>ชื่อร้านค้า</th> \n");
 			h.append("<th>แบรนด์</th> \n");
 			h.append("<th>เป้าหมายขาย (หีบ)</th> \n");
 			h.append("<th>เป้าหมายขาย (บาท)</th> \n");
@@ -416,6 +629,8 @@ public class SalesTargetExport {
 		    	className = (i %2 == 0)?"lineE":"lineO";
 		    	
 				h.append("<tr class='"+className+"'> \n");
+				h.append("<td class='td_text' width='10%'>"+item.getCustomerCode()+"</td> \n");
+				h.append("<td class='td_text' width='10%'>"+item.getCustomerName()+"</td> \n");
 				h.append("<td class='td_text' width='10%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
 				h.append("<td class='td_number' width='10%'>"+item.getTargetQty()+"</td> \n");
 				h.append("<td class='td_number' width='10%'>"+item.getTargetAmount()+"</td> \n");
@@ -431,6 +646,7 @@ public class SalesTargetExport {
 				h.append("<option value='Post'>Post</option> \n");
 				h.append("</select> \n");
 				/** hidden field **/
+				h.append("  <input type='hidden' name='customer_code_change' value='"+item.getBrand()+"'/> \n");
 				h.append("  <input type='hidden' name='brand_change' value='"+item.getBrand()+"'/> \n");
 				h.append("</td> \n");
 				h.append("</tr> \n");

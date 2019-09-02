@@ -237,7 +237,8 @@ public class LocationAction extends I_Action {
 					if(html.length() >0){
 				       request.getSession().setAttribute("RESULTS", html);
 					}else{
-					   request.setAttribute("Message", "ไม่พบข้อมูล");
+						request.getSession().setAttribute("RESULTS", html);
+					    request.setAttribute("Message", "ไม่พบข้อมูล");
 					}
 				}// oracle
 			}else if("monitorSpider".equalsIgnoreCase(aForm.getPageName())){
@@ -253,6 +254,7 @@ public class LocationAction extends I_Action {
 				if(html.length() >0){
 			       request.getSession().setAttribute("RESULTS", html);
 				}else{
+					request.getSession().setAttribute("RESULTS", html);
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
 				

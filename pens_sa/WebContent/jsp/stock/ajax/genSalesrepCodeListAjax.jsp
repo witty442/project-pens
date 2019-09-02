@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.stock.StockControlPage"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="util.Utils"%>
@@ -12,10 +13,15 @@ System.out.println("salesChannelNo:"+salesChannelNo);
 System.out.println("custCatNo:"+custCatNo);
 System.out.println("salesZone:"+salesZone);
 List<PopupBean> dataList= null;
+String salesrepCode = "";
+User user = (User)session.getAttribute("user");
 try{
-	//if( !Utils.isNull(salesChannelNo).equals("")){
-		dataList = StockControlPage.searchSalesrepListAll(salesChannelNo,custCatNo,salesZone); 
-	//}
+	//Case Sales Login filter show only salesrepCode 
+	if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+		salesrepCode = user.getUserName().toUpperCase();
+	}
+	dataList = StockControlPage.searchSalesrepListAll(salesChannelNo,custCatNo,salesZone,salesrepCode); 
+	
 if(dataList != null){
 	if(dataList.size()>1){
 	%>

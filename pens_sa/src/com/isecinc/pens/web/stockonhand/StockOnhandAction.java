@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.PageVisit;
 import util.Utils;
 
 import com.isecinc.core.bean.Messages;
@@ -29,6 +30,7 @@ public class StockOnhandAction extends I_Action {
 	public static int pageSize = 99999;
 	public static String PAGE_STOCK_VAN ="StockVan";
 	public static String PAGE_STOCK_OH ="StockOnhand";
+	public static String PAGE_STOCK_CV ="StockCoverage";
 	
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
@@ -43,6 +45,8 @@ public class StockOnhandAction extends I_Action {
 				return new StockVanProcess().prepareSearch(mapping, aForm, request, response);
 			}else if(PAGE_STOCK_OH.equalsIgnoreCase(pageName)){
 				return new StockOnhandProcess().prepareSearch(mapping, aForm, request, response);
+			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
+				return new StockCVProcess().prepareSearch(mapping, aForm, request, response);
 			}
 		
 		} catch (Exception e) {
@@ -67,6 +71,8 @@ public class StockOnhandAction extends I_Action {
 				return new StockVanProcess().searchHead(mapping, aForm, request, response);
 			}else if(PAGE_STOCK_OH.equalsIgnoreCase(pageName)){
 			   return new StockOnhandProcess().searchHead(mapping, aForm, request, response);
+			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
+			   return new StockCVProcess().searchHead(mapping, aForm, request, response);
 			} 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -132,6 +138,8 @@ public class StockOnhandAction extends I_Action {
 				return new StockVanProcess().exportToExcel(mapping, stockVanForm, request, response);
 			}else if(PAGE_STOCK_OH.equalsIgnoreCase(pageName)){
 			    return new StockOnhandProcess().exportToExcel(mapping, stockVanForm, request, response);
+			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
+			    return new StockCVProcess().exportToExcel(mapping, stockVanForm, request, response);
 			} 
 		} catch (Exception e) {
 			e.printStackTrace();

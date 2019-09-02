@@ -1,4 +1,6 @@
 
+<%@page import="util.SessionUtils"%>
+<%@page import="util.PageVisit"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowBean"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
@@ -23,6 +25,11 @@
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRoleSalesTarget();
 
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "promotionForm");
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"Promotion");
 %>
 <html>
 <head>

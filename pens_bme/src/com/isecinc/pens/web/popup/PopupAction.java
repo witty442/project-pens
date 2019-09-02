@@ -1,6 +1,8 @@
 package com.isecinc.pens.web.popup;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -136,8 +138,8 @@ public class PopupAction extends I_Action {
 				 }else{
 					 request.setAttribute("Message", "ไม่พบข่อมูล");
 				 }
+				 
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -147,7 +149,87 @@ public class PopupAction extends I_Action {
 		return forward;
 	}
 
+	public ActionForward prepareAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareAll");
+		PopupForm popupForm = (PopupForm) form;
+		String forward = "prepareAll";
+		String pageName  =Utils.isNull(request.getParameter("pageName"));
+		String action  =Utils.isNull(request.getParameter("action"));
+		try {
+			logger.debug("prepare action:"+action+",pageName["+pageName+"]");
+			 
+			 if("new".equalsIgnoreCase(action) ){
+				 request.getSession().setAttribute("search_submit", null);
+				 request.getSession().setAttribute("DATA_LIST", null);
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
+				 popupForm.setNo(0);
+				 popupForm.setPageName(pageName);
+				 popupForm.setCriteriaMap(null);
+				 
+				 //set Criteria From Main Page
+				 String[] queryStr = request.getQueryString().split("\\&");
+				// logger.debug("queryStr:"+queryStr);
+				 if(queryStr != null && queryStr.length>0){
+					 Map<String, String> criteriaMap = new HashMap<String, String>();
+					 String paramName = "";
+					 String paramValue = "";
+					 String[] paramNameAll = null;
+					 for(int i=0;i<queryStr.length;i++){
+						
+						 if( !queryStr[i].startsWith("do") && !queryStr[i].startsWith("action") 
+							&& !queryStr[i].startsWith("pageName")){
+							 
+							logger.debug("queryStr[i]:"+queryStr[i]);
+							 
+						    paramNameAll = queryStr[i].split("\\=");
+						    paramName = paramNameAll[0];
+						    if(paramNameAll.length >1){
+						       paramValue = paramNameAll[1];
+						    }else{
+						       paramValue ="";
+						    }
+						    logger.debug(paramName+":"+paramValue);
+						    criteriaMap.put(paramName, paramValue);
+						 }//if
+					 }
+					 popupForm.setCriteriaMap(criteriaMap);
+				 }
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("descs", null);
+				 request.getSession().setAttribute("descs2", null);
+				 request.getSession().setAttribute("descs3", null);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward(forward);
+	}
 	
+	public ActionForward searchAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchAll");
+		PopupForm popupForm = (PopupForm) form;
+		String forward = "prepareAll";
+		try {
+			 request.getSession().setAttribute("DATA_LIST", null);
+			 
+			if("SalesrepSales".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupForm> results = PopupDAO.searchSalesrepSalesList(popupForm);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			}
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward(forward);
+	}
 	/**
 	 * Save
 	 */

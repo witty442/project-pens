@@ -121,11 +121,11 @@ body {
 												bundle="sysele" />
 											<bean:message key="From" bundle="sysele" />&nbsp;&nbsp;</td>
 										<td align="left"><html:text
-												property="receipt.orderNoFrom" maxlength="10" size="15"
+												property="receipt.orderNoFrom" maxlength="30" size="15"
 												styleId="orderNoFrom" /></td>
 										<td align="right"><bean:message key="To" bundle="sysele" />&nbsp;&nbsp;</td>
 										<td align="left"><html:text property="receipt.orderNoTo"
-												maxlength="10" size="15" styleId="orderNoTo" /></td>
+												maxlength="30" size="15" styleId="orderNoTo" /></td>
 									</tr>
 									<tr>
 										<td align="right"><bean:message key="TransactionDate"
@@ -168,7 +168,7 @@ body {
 										<bean:message key="Records" bundle="sysprop" />
 									</div>
 									<table align="center" border="0" cellpadding="3"
-										cellspacing="1" class="tableSearchNoWidth" width="100%" >
+										cellspacing="1" class="tableSearchNoWidth" width="90%" >
 										<tr>
 											<th><bean:message key="No" bundle="sysprop" /></th>
 											<th><bean:message key="Order.No" bundle="sysele" /></th>
@@ -203,13 +203,14 @@ body {
 														<option value="CH"><bean:message key="PaymentMethod.Cheque" bundle="sysele" /></option>
 													</select>
 												</td>
-												<td class="td_text_center" width="10%">
-													<input type="text" name="pdReceiptDate" maxlength="10" size="10"  readonly="readonly" id="pdReceiptDate">
+												<td class="td_text_center" width="5%">
+													<input type="text" name="pdReceiptDate" id="pdReceiptDate" maxlength="10" size="10"  readonly="readonly" >
 												</td>
-												<td class="td_text_center" width="10%">
-												    <div id="div_chequeDate_${rows.index+1}" style="display:none">
-													  <input type="text" name="chequeDate" maxlength="10" size="10" id="chequeDate" readonly="readonly">
-													</div>
+												<td class="td_text" width="10%">
+												   <%--  <div id="div_chequeDate_${rows.index+1}" style="display:none"> --%>
+													  <input type="text" name="chequeDate" maxlength="10" size="10" id="chequeDate" readonly="readonly" disabled="true">
+													<!-- </div> -->
+													
 												</td>
 											</tr>
 										</c:forEach>
@@ -225,7 +226,10 @@ body {
 										
 										for(var i=0;i<pdReceiptDate.length ; i++){
 											new Epoch('epoch_popup', 'th', pdReceiptDate[i]);
-											new Epoch('epoch_popup', 'th', chequeDate[i]);
+											//alert(chequeDate+":"+chequeDate.length);
+											if(chequeDate != null && chequeDate[i] != null){
+											  new Epoch('epoch_popup', 'th', chequeDate[i]);
+											}
 										}
 									
 									</script>

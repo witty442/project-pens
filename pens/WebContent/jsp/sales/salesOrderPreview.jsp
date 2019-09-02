@@ -581,6 +581,8 @@ $(function(){
 							</tr>
 						</table>
 						<span title="SalesOrderPreview">...</span>
+						<span title="<%=Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION")) %>">...</span>
+						
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
 						<html:hidden property="autoReceipt.paymentMethod"/>

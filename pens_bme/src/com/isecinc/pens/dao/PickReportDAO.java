@@ -335,6 +335,70 @@ public class PickReportDAO{
 		return items;
 	}
 	
+	public static List<PickReportBean> searchExportBarcodeDetail(Connection conn,PickReportBean o) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		PickReportBean h = null;
+		List<PickReportBean> items = new ArrayList<PickReportBean>();
+		try {
+			sql.append("\n select AA.barcode,AA.group_code ,AA.pens_item,NVL(SUM(AA.issue_qty),0) as issue_qty ");
+			sql.append("\n FROM (");
+			sql.append("\n   select SS.barcode,SS.group_code,SS.pens_item ,nvl(count(*),0) as issue_qty ");
+			sql.append("\n   from( ");
+			sql.append("\n     select D.pens_item,D.material_master ,D.group_code ");
+			sql.append("\n     ,(select max(barcode) FROM PENSBI.PENSBME_PICK_BARCODE_ITEM M "); 
+			sql.append("\n      where M.box_no = D.box_no  ");
+			sql.append("\n      and M.group_code = D.group_code");
+			sql.append("\n      and M.pens_item = D.pens_item ");
+			sql.append("\n      and M.material_master = D.material_master) as barcode  ");
+			sql.append("\n     from PENSBI.PENSBME_PICK_STOCK S,PENSBI.PENSBME_PICK_STOCK_I D");
+		    sql.append("\n     where S.issue_req_no = D.issue_req_no");
+		    //Where Condition
+		    sql.append("\n     and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
+		    sql.append("\n     and D.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
+		    sql.append("\n     and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+			sql.append("\n	)SS ");
+			sql.append("\n  GROUP BY SS.barcode,SS.group_code,SS.pens_item");
+			
+		    sql.append("\n   UNION ALL");
+		    
+		    sql.append("\n   select D.barcode,D.group_code,D.pens_item,NVL(sum(D.issue_qty),0) as issue_qty");
+			sql.append("\n   from PENSBI.PENSBME_STOCK_ISSUE S,PENSBI.PENSBME_STOCK_ISSUE_ITEM D");
+		    sql.append("\n   where S.issue_req_no = D.issue_req_no");
+		    //Where Condition
+		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"' ");
+		    sql.append("\n   and D.status  ='"+PickConstants.STATUS_ISSUED+"' ");
+		    sql.append("\n   and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+		    sql.append("\n   GROUP BY D.barcode ,D.group_code ,D.pens_item ");
+		    sql.append("\n   )AA ");
+		    sql.append("\n  group by AA.barcode ,AA.group_code ,AA.pens_item");
+		    sql.append("\n  order by AA.barcode ,AA.group_code ,AA.pens_item asc");
+  
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   h = new PickReportBean();
+			   h.setBarcode(Utils.isNull(rst.getString("barcode"))); 
+			   h.setGroupCode(Utils.isNull(rst.getString("group_code")));
+			   h.setPensItem(Utils.isNull(rst.getString("pens_item"))); 
+			   h.setIssueQty(Utils.decimalFormat(rst.getInt("issue_qty"),Utils.format_current_no_disgit));
+			  
+			   items.add(h);
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return items;
+	}
+	
 	public static StringBuffer genWhereSearchHeadList(PickReportBean o,String tableName) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		

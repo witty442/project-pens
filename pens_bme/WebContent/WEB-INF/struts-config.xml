@@ -116,7 +116,8 @@
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
 		<form-bean name="pickReportForm" type="com.isecinc.pens.web.pick.PickReportForm" />
-	
+	    <form-bean name="itManageForm" type="com.isecinc.pens.web.itmanage.ITManageForm" />
+	    <form-bean name="manualStockForm" type="com.isecinc.pens.web.manualstock.ManualStockForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -206,6 +207,8 @@
 			<forward name="searchPensItemByGroupPopup" path="/jsp/popup/searchPensItemByGroupPopup.jsp" />
 			<forward name="searchEmpPopup" path="/jsp/popup/searchEmpPopup.jsp" />
 			<forward name="searchCheckStockDatePopup" path="/jsp/popup/searchCheckStockDatePopup.jsp" />
+			
+			<forward name="prepareAll" path="/jsp/popup/popup.jsp" />
 		</action>
 		
 		<!-- Report -->
@@ -620,7 +623,12 @@
 			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
 			<forward name="printPayPopup" path="/jsp/popup/printPayPopup.jsp" />
 		</action>
-		
+		<action name="itManageForm" path="/jsp/itManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.itmanage.ITManageAction">
+			<forward name="search" path="/jsp/itmanage/itManageSearch.jsp" />
+			<forward name="detailITStockItem" path="/jsp/itmanage/itStockItemDetail.jsp" />
+			<!-- 
+			<forward name="printPayPopup" path="/jsp/popup/printPayPopup.jsp" /> -->
+		</action>
 		<action name="payWhiteForm" path="/jsp/payWhiteAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayWhiteAction">
 			<forward name="search" path="/jsp/pay/payWhiteSearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payWhiteDetail.jsp" />
@@ -721,7 +729,10 @@
 			<forward name="searchPromotion" path="/jsp/shop/shopPromotionSearch.jsp" />
 			<forward name="detailPromotion" path="/jsp/shop/shopPromotion.jsp" />
 		</action>
-		
+		<action name="manualStockForm" path="/jsp/manualStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.manualstock.ManualStockAction">
+			<forward name="search" path="/jsp/manualStock/manualStockSearch.jsp" />
+			<forward name="detail" path="/jsp/manualstock/manualStock.jsp" />
+		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />
 	<message-resources key="sysele" parameter="SystemElements_th" />

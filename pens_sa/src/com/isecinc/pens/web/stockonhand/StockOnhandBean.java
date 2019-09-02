@@ -18,6 +18,7 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 
 	private String pdType;
 	private String pdCode;
+	private String province;
 	private String pdCodeIntransit;
 	private String pdDesc;
 	private String salesChannelNo;
@@ -51,8 +52,84 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	private String onhandQty;
 	private String priUomCode;
 	private String orgCode;
+	private String transDate;
+	private String description;
+	private String sale90Day;
+	private String unitPrice;
+	private String dailyMeanSaleCTN;
+	private String dailyMeanSaleTHB;
+	private String bwStockBalCTN;
+	private String bwStockBalTHB;
+	private String stockCoverageDay;
+	private String stockCoverageDayByBrand;
 	
 	
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getSale90Day() {
+		return sale90Day;
+	}
+	public void setSale90Day(String sale90Day) {
+		this.sale90Day = sale90Day;
+	}
+	public String getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(String unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	public String getDailyMeanSaleCTN() {
+		return dailyMeanSaleCTN;
+	}
+	public void setDailyMeanSaleCTN(String dailyMeanSaleCTN) {
+		this.dailyMeanSaleCTN = dailyMeanSaleCTN;
+	}
+	public String getDailyMeanSaleTHB() {
+		return dailyMeanSaleTHB;
+	}
+	public void setDailyMeanSaleTHB(String dailyMeanSaleTHB) {
+		this.dailyMeanSaleTHB = dailyMeanSaleTHB;
+	}
+	public String getBwStockBalCTN() {
+		return bwStockBalCTN;
+	}
+	public void setBwStockBalCTN(String bwStockBalCTN) {
+		this.bwStockBalCTN = bwStockBalCTN;
+	}
+	public String getBwStockBalTHB() {
+		return bwStockBalTHB;
+	}
+	public void setBwStockBalTHB(String bwStockBalTHB) {
+		this.bwStockBalTHB = bwStockBalTHB;
+	}
+	public String getStockCoverageDay() {
+		return stockCoverageDay;
+	}
+	public void setStockCoverageDay(String stockCoverageDay) {
+		this.stockCoverageDay = stockCoverageDay;
+	}
+	public String getStockCoverageDayByBrand() {
+		return stockCoverageDayByBrand;
+	}
+	public void setStockCoverageDayByBrand(String stockCoverageDayByBrand) {
+		this.stockCoverageDayByBrand = stockCoverageDayByBrand;
+	}
+	public String getTransDate() {
+		return transDate;
+	}
+	public void setTransDate(String transDate) {
+		this.transDate = transDate;
+	}
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
 	public String getOrgCode() {
 		return orgCode;
 	}

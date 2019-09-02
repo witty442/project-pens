@@ -274,9 +274,11 @@ public class SAGenrateCondPopup {
 				}
 				
 				/** filter by user **/
-				sql += SecurityHelper.genWhereSqlFilterByUser(request, "Brand");
+				sql += SecurityHelper.genWhereSqlFilterByUser(request, "Brand","Brand_no");
 				
 				sql += "order by brand_group_no \n";
+				
+				logger.debug("SQL:"+sql);
 				
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
@@ -376,7 +378,7 @@ public class SAGenrateCondPopup {
 				}
 				sql +="order by ORDER_DATE \n";
 				
-				logger.debug("SQL:"+sql);
+				//logger.debug("SQL:"+sql);
 				
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();

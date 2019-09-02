@@ -1,10 +1,12 @@
+<%@page import="org.apache.struts.Globals"%>
+<%@page import="org.apache.struts.action.Action"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="util.Utils"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -43,7 +45,6 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
 <style type="text/css">
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
@@ -73,8 +74,13 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery.stickytable.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.stickytable.js"></script> 
 
-
 <script type="text/javascript">
+
+/** disable back button alway **/
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+
 function loadMe(){
 	<%if(stockMCForm.getResults() != null && stockMCForm.getResults().size() >0){ %>
 		<% List<StockMCBean> results = stockMCForm.getResults();
@@ -157,7 +163,8 @@ function loadItem(path){
 						<!-- Hidden -->
 		                 <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
 						 <input type="hidden" id="tabIndex" name="tabIndex" value="<%=tabIndex%>"/>
-						   
+						TokenKey:<input type="hidden" name="TokenKey" value="<%= session.getAttribute(Globals.TRANSACTION_TOKEN_KEY) %>" >
+
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
 								<td colspan="4" align="center">

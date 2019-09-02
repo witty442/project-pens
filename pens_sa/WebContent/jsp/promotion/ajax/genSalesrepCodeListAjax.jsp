@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.promotion.PromotionUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="util.Utils"%>
@@ -11,10 +12,15 @@ String salesZone = Utils.isNull(request.getParameter("salesZone"));
 System.out.println("salesChannelNo:"+salesChannelNo);
 System.out.println("custCatNo:"+custCatNo);
 List<PopupBean> dataList= null;
+String salesrepCode = "";
+User user = (User)session.getAttribute("user");
 try{
-	//if( !Utils.isNull(salesChannelNo).equals("")){
-		dataList = PromotionUtils.searchSalesrepListAll(salesChannelNo,custCatNo,salesZone);
-	//}
+	//Case Sales Login filter show only salesrepCode 
+	if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+		salesrepCode = user.getUserName().toUpperCase();
+	}
+	dataList = PromotionUtils.searchSalesrepListAll(salesChannelNo,custCatNo,salesZone,salesrepCode);
+	
 if(dataList != null){ 
 	if(dataList.size()>1){
 	%>

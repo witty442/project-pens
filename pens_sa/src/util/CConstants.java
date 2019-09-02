@@ -16,6 +16,7 @@ public class CConstants {
 	//Group Of C_CONSTANTS
 	public static final String SPIDER_REF_CODE ="SPIDER";
 	public static final String MOVEORDER_REF_CODE ="MOVEORDER";
+	public static final String STOCKCREDIT_CODE ="StockCredit";
 	
 	//Type of C_CONSTANTS ,Van Or Credit
 	public static final String MAX_DISTANCE ="MaxDistance"; 
@@ -25,6 +26,7 @@ public class CConstants {
 	public static final String MAX_NOT_EQUALS_MASLOC ="MaxNotEqualsMasloc";
 	
 	public static final String MOVEORDER_MAX_MOVEDAY ="MoveOrderMaxMoveDay"; 
+	public static final String STOCK_CALLC_CREDIT_START_DATE ="StockCallCCreditStartDate"; 
 	
 	 public static CConstantsBean getConstants(Connection conn,String refCode,String code) throws Exception {
 		 return getConstantsModel(conn,refCode, code);

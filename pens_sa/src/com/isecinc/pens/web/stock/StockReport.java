@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +13,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.bean.User;
+import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
+import com.isecinc.pens.web.location.LocationBean;
+
 import util.DBConnection;
+import util.DateToolsUtil;
 import util.ExcelHeader;
 import util.Utils;
 
@@ -27,7 +34,7 @@ public class StockReport {
 		COLUMNNAME_MAP.put("ITEM_NO", "SKU");
 		COLUMNNAME_MAP.put("ZONE", "ภาคตามการดูแล");
 	}
-	public static StockBean searchReport(String contextPath ,StockBean o,boolean excel){
+	public static StockBean searchReport(String contextPath ,StockBean o,boolean excel,User user){
 	    logger.debug("excel:"+excel);
 		if(o.getItemsList() !=null && o.getItemsList().size()>0){
 			logger.debug("itemList:"+o.getItemsList().size());
@@ -35,12 +42,12 @@ public class StockReport {
 		}
 		
 		if( !Utils.isNull(o.getDispLastUpdate()).equals("")){
-		   return searchReportLatestModel(contextPath,o,excel);
+		   return searchReportLatestModel(contextPath,o,excel,user);
 		}else{
-		   return searchReportModel(contextPath,o,excel);
+		   return searchReportModel(contextPath,o,excel,user);
 		}
 	}
-	public static StockBean searchReportModel(String contextPath,StockBean o,boolean excel){
+	public static StockBean searchReportModel(String contextPath,StockBean o,boolean excel,User user){
 		StockBean item = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -84,13 +91,30 @@ public class StockReport {
 			
 			sql.append("\n  SELECT "+columnAllSql);
 			sql.append(","+genSelectColumnNameDispType(dispColumnNameArr));
+			
+			//Get AVG Prev Month 6
+			/*String yyyymm = "";
+			String mm = "";
+			Date startDateInit = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
+			Calendar c = Calendar.getInstance();
+			c.setTime(startDateInit);
+			for(int i=0;i<1;i++){
+			   c.add(Calendar.MONTH, -1);
+			   mm = (c.get(Calendar.MONTH)+1)+"";
+			   mm = mm.length()==1?"0"+mm:mm;
+			   yyyymm = ""+c.get(Calendar.YEAR)+ mm;
+			   
+			   logger.debug("yyyymm:"+yyyymm);
+			   sql.append(genSqlAvgByMonth(o, (i+1), yyyymm));
+			}*/
+			
 			sql.append("\n  FROM "+viewName+" M , PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  WHERE M.SALESREP_ID = Z.SALESREP_ID ");
-		     //SalesChannel
+		    //SalesChannel
 			if( !Utils.isNull(o.getCustCatNo()).equals("")){
 				sql.append("\n and M.sales_channel_name = '"+Utils.isNull(o.getCustCatNo())+"'");
 			}
-			 //SalesZone
+			//SalesZone
 			if( !Utils.isNull(o.getSalesZone()).equals("")){
 		    	sql.append("\n  AND Z.zone ='"+Utils.isNull(o.getSalesZone())+"'");
 			}
@@ -116,6 +140,11 @@ public class StockReport {
 			if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
 				sql.append("\n and M.item_no in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
 			}
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+			    sql.append("\n and M.sales_code = '"+user.getUserName().toUpperCase()+"'");
+			}
+			
 			//request date
 			//TypeSerch Month
 			if(Utils.isNull(o.getTypeSearch()).equals("month")){
@@ -145,7 +174,10 @@ public class StockReport {
 			sql.append("\n GROUP BY "+columnAllGroupBySql );
 			sql.append("\n ORDER BY "+columnAllGroupBySql);
 			
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp//temp//sql.sql", sql.toString());
+			}
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
@@ -192,7 +224,12 @@ public class StockReport {
 			  }
 			  
 			  item.setAvgQty(Utils.decimalFormat(rst.getDouble("AVG_QTY"), Utils.format_current_no_disgit)); 
-			  
+			  /*item.setAvgQty1(Utils.decimalFormat(rst.getDouble("AVG_QTY_1"), Utils.format_current_no_disgit)); 
+			  item.setAvgQty2(Utils.decimalFormat(rst.getDouble("AVG_QTY_2"), Utils.format_current_no_disgit)); 
+			  item.setAvgQty3(Utils.decimalFormat(rst.getDouble("AVG_QTY_3"), Utils.format_current_no_disgit)); 
+			  item.setAvgQty4(Utils.decimalFormat(rst.getDouble("AVG_QTY_4"), Utils.format_current_no_disgit)); 
+			  item.setAvgQty5(Utils.decimalFormat(rst.getDouble("AVG_QTY_5"), Utils.format_current_no_disgit)); 
+			  item.setAvgQty6(Utils.decimalFormat(rst.getDouble("AVG_QTY_6"), Utils.format_current_no_disgit)); */
 			  //add to List
 			  itemList.add(item);
 			  
@@ -227,7 +264,79 @@ public class StockReport {
 	  return o;
 	}
 	
-	public static StockBean searchReportLatestModel(String contextPath,StockBean o,boolean excel){
+	 private static StringBuffer genSqlAvgByMonth(StockBean o ,int c,String yyyymm){
+		 StringBuffer sql = new StringBuffer();
+		 try {
+			 sql.append("\n ,( ");
+			 sql.append("\n  SELECT  NVL(SUM(INVOICED_AMT),0) AS INVOICED_AMT ");
+			 sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V ");
+			 sql.append("\n  ,PENSBI.XXPENS_BI_MST_ITEM P ");
+			 sql.append("\n  ,PENSBI.XXPENS_BI_MST_CUSTOMER C ");
+			 sql.append("\n  WHERE V.inventory_item_id = P.inventory_item_id  ");
+			 sql.append("\n  AND V.customer_id = C.customer_id  ");
+			  //SalesChannel
+				if( !Utils.isNull(o.getCustCatNo()).equals("")){
+					if("Credit Sales".equals(Utils.isNull(o.getCustCatNo()))){
+					   sql.append("\n  AND V.Customer_Category = 'ORDER - CREDIT SALES' ");
+					}
+				}
+				 //SalesZone
+				if( !Utils.isNull(o.getSalesZone()).equals("")){
+			    	sql.append("\n  AND V.sales_zone ='"+Utils.isNull(o.getSalesZone())+"' ");
+				}
+				//Region
+				if( !Utils.isNull(o.getSalesChannelNo()).equals("")){
+					sql.append("\n AND V.sales_channel = '"+Utils.isNull(o.getSalesChannelNo())+"' ");
+				}
+				if( !Utils.isNull(o.getSalesrepCode()).equals("")){
+					sql.append("\n AND V.salesrep_id in(  ");
+					sql.append("\n  select salesrep_id from PENSBI.XXPENS_BI_MST_SALESREP  "); 
+					sql.append("\n  where .salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"' ");
+					sql.append("\n ) ");
+				}
+				if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
+					// Brand 504 must show 503494,503544,503681 (Case Special case )
+					if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
+						sql.append("\n and ( V.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n     or P.inventory_item_codein('503494','503544','503681' ) ) ");
+					}else{
+						sql.append("\n and V.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")  ");
+					}
+				}
+				if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
+					sql.append("\n  AND C.customer_code in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")  ");
+				}
+				if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
+					sql.append("\n AND P.inventory_item_code in( "+Utils.converToTextSqlIn(o.getCustomerCode())+") ");
+				}
+				sql.append("\n AND TO_CHAR(V.INVOICE_DATE,'YYYYMM') = '"+yyyymm+"' ");
+				
+				//where join by display column
+				/*dataList.add(new PopupBean("reportType","SKU","ITEM_NO"));
+				dataList.add(new PopupBean("reportType","ร้านค้า,SKU","CUSTOMER_NUMBER,ITEM_NO"));
+				dataList.add(new PopupBean("reportType","พนักงานขาย,ร้านค้า,SKU","SALES_CODE,CUSTOMER_NUMBER,ITEM_NO"));
+				dataList.add(new PopupBean("reportType","ภาค,แบรนด์,SKU","REGION,BRAND,ITEM_NO"));
+				dataList.add(new PopupBean("reportType","ภาค,พนักงานขาย,แบรนด์,SKU","REGION,SALES_CODE,BRAND,ITEM_NO"));
+				
+				dataList.add(new PopupBean("reportType","ภาคตามสายดูแล,แบรนด์,SKU","ZONE,BRAND,ITEM_NO"));
+				dataList.add(new PopupBean("reportType","ภาคตามสายดูแล,พนักงานขาย,แบรนด์,SKU","ZONE,SALES_CODE,BRAND,ITEM_NO"));*/
+				
+				if(o.getReportType().equals("ITEM_NO")){//SKU
+					sql.append("\n and P.inventory_item_code = M.item_no");
+					sql.append("\n and V.invoice_date = M.request_date");
+					
+					sql.append("\n GROUP BY P.inventory_item_code");
+				}
+				
+			 sql.append("\n ) as avg_qty_"+c);
+			 
+		 }catch(Exception e){
+			 logger.error(e.getMessage(),e);
+		 }
+		return sql;
+	 }
+	 
+	public static StockBean searchReportLatestModel(String contextPath,StockBean o,boolean excel,User user){
 		StockBean item = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -341,10 +450,19 @@ public class StockReport {
 				sql.append("\n and M.item_no in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
 			}
 			
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				sql.append("\n and M.sales_code = '"+user.getUserName().toUpperCase()+"'");
+			}
+			
 			sql.append("\n GROUP BY "+columnAllGroupBySql );
 			sql.append("\n ORDER BY "+columnAllGroupBySql);
 			
-			logger.debug("sql:"+sql);
+			//logger.debug("sql:"+sql);
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp//temp//sql.sql", sql.toString());
+			}
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
@@ -640,14 +758,33 @@ public class StockReport {
 		}
 		
 		for(int i=0;i<columnNameArr.length;i++){
-		   h.append(" <th  rowspan='2'  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i]));
-		   if( excel ==false){
-			   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('"+columnNameArr[i]+"','ASC') />");
-			   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('"+columnNameArr[i]+"','DESC') />");
-		   }
-		   h.append(" </th> \n");
+		  if( excel ==false){
+			   h.append(" <th  rowspan='2'  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i]));
+			   if( excel ==false){
+				   h.append("  &nbsp;&nbsp;");
+				   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('"+columnNameArr[i]+"','ASC') />");
+				   h.append("  &nbsp;&nbsp;");
+				   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('"+columnNameArr[i]+"','DESC') />");
+			   }
+			   h.append(" </th> \n");
+		  }else{
+			  h.append(" <th  rowspan='2'  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i]) +"</th>");
+			/*  COLUMNNAME_MAP.put("BRAND", "แบรนด์");
+				COLUMNNAME_MAP.put("REGION", "ภาคการขาย");
+				COLUMNNAME_MAP.put("SALES_CODE", "พนักงานขาย");
+				COLUMNNAME_MAP.put("CUSTOMER_NUMBER", "ร้านค้า");
+				COLUMNNAME_MAP.put("ITEM_NO", "SKU");
+				COLUMNNAME_MAP.put("ZONE", "ภาคตามการดูแล");*/
+			  //split name 
+			  logger.debug("columnNameArr[i]:"+columnNameArr[i]);
+			  if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
+				  h.append(" <th  rowspan='2'  nowrap>ชื่อ SKU</th>");
+			  }else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
+				  h.append(" <th  rowspan='2'  nowrap>ชื่อ ร้านค้า</th>");
+			  }else if("SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
+				  h.append(" <th  rowspan='2'  nowrap>ชื่อ พนักงาน</th>");
+			  }
+		  }
 		}
 		h.append(" <th colspan='2' rowspan='1' nowrap>ยอดตรวจนับ</th> \n");
 		if(head.getDispType().equalsIgnoreCase("pri_qty,sec_qty,order_qty")){
@@ -678,7 +815,29 @@ public class StockReport {
 				h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('AVG_QTY','DESC') />");
 			}
 			h.append("</th> \n");
-		
+			
+			//Get AVG Prev Month 6
+		/*	String monthYear = "";
+			Date startDateInit = Utils.parse(head.getStartDate(), Utils.DD_MMM_YYYY);
+			Calendar c = Calendar.getInstance();
+			c.setTime(startDateInit);
+			for(int i=0;i<6;i++){
+			   c.add(Calendar.MONTH, -1);
+			   monthYear = Utils.stringValue(c.getTime(), Utils.MMM_YY,Utils.local_th);
+			   
+			   logger.debug("monthYear"+monthYear);
+			   
+				h.append(" <th rowspan='2' nowrap >");
+				h.append(" ยอดขาย "+monthYear);
+				 if( excel ==false){
+					h.append("  &nbsp;&nbsp;");
+					h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('AVG_QTY_"+(i+1)+"','ASC') />");
+					h.append("  &nbsp;&nbsp;");
+					h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('AVG_QTY_"+(i+1)+"','DESC') />");
+				}
+				h.append("</th> \n");
+			}//for
+*/		
 		h.append("</tr> \n");
 		h.append("<tr> \n");
 		h.append(" <th nowrap>หีบ");
@@ -740,21 +899,40 @@ public class StockReport {
 					classNameCenter="td_text_center";
 				}
 			}
-
-			if("REGION".equalsIgnoreCase(columnNameArr[i])){
-				 h.append("<td class='"+className+"' width='10%'>"+item.getSalesChannelName()+"</td> \n");
-			}else if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='20%'>"+item.getItemCode()+"-"+item.getItemName()+"</td> \n");
-			}else if("ZONE".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='10%'>"+item.getSalesZone()+"-"+item.getSalesZoneName()+"</td> \n");
-			}else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='10%'>"+item.getCustomerCode()+"-"+item.getCustomerName()+"</td> \n");
-			}else if("SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='10%'>"+item.getSalesrepCode()+"-"+item.getSalesrepName()+"</td> \n");
-			}else if("BRAND".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='8%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
+           
+			if(excel==false){
+				if("REGION".equalsIgnoreCase(columnNameArr[i])){
+					 h.append("<td class='"+className+"' width='10%'>"+item.getSalesChannelName()+"</td> \n");
+				}else if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='20%'>"+item.getItemCode()+"-"+item.getItemName()+"</td> \n");
+				}else if("ZONE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getSalesZone()+"-"+item.getSalesZoneName()+"</td> \n");
+				}else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getCustomerCode()+"-"+item.getCustomerName()+"</td> \n");
+				}else if("SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getSalesrepCode()+"-"+item.getSalesrepName()+"</td> \n");
+				}else if("BRAND".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='8%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
+				}
+			}else{
+				 //split name 
+				if("REGION".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getSalesChannelName()+"</td> \n");
+				}else if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='5%'>"+item.getItemCode()+"</td> \n");
+					h.append("<td class='"+className+"' width='15%'>"+item.getItemName()+"</td> \n");
+				}else if("ZONE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getSalesZone()+"-"+item.getSalesZoneName()+"</td> \n");
+				}else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='4%'>"+item.getCustomerCode()+"</td> \n");
+					h.append("<td class='"+className+"' width='6%'>"+item.getCustomerName()+"</td> \n");
+				}else if("SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='3%'>"+item.getSalesrepCode()+"</td> \n");
+					h.append("<td class='"+className+"' width='7%'>"+item.getSalesrepName()+"</td> \n");
+				}else if("BRAND".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='8%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
+				}
 			}
-
 		}
 		h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getPriQty()+"</td> \n");
 		h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getSecQty()+"</td> \n");
@@ -764,6 +942,12 @@ public class StockReport {
 		  h.append("<td class='"+classNameCenter+"' width='8%'>"+item.getExpireDate()+"</td> \n");
 		}
 	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty()+"</td> \n");
+	  /*  h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty1()+"</td> \n");
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty2()+"</td> \n");
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty3()+"</td> \n");
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty4()+"</td> \n");
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty5()+"</td> \n");
+	    h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getAvgQty6()+"</td> \n");*/
 		h.append("</tr> \n");
 		
 		return h;
@@ -773,6 +957,7 @@ public class StockReport {
 		StringBuffer h = new StringBuffer("");
 		String className ="hilight_text";
 		String classNameNumber = "td_number";
+		int colspan=0;
 		if(excel){
 			className ="colum_head";
 			classNameNumber = "num_currency_bold";
@@ -780,10 +965,33 @@ public class StockReport {
 		
 		h.append("<tr class='"+className+"'> \n");
 		if( !Utils.isNull(head.getDispRequestDate()).equals("")){
-			String colspan=""+(columnNameArr.length+1);
+			colspan = columnNameArr.length+1;
+			if(excel){
+				colspan=1;
+				for(int i=0;i<columnNameArr.length;i++){
+				  logger.debug("columnNameArr[i]:"+columnNameArr[i]);
+				  colspan++;
+				  if("ITEM_NO".equalsIgnoreCase(columnNameArr[i]) 
+					|| "CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])
+					|| "SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
+					  colspan++;
+				  }
+				}
+			}
 			h.append(" <td class='"+className+"' align='right' colspan="+colspan+">Total</td> \n");
 		}else{
-			String colspan=""+columnNameArr.length;
+			colspan = columnNameArr.length;
+			if(excel){
+				for(int i=0;i<columnNameArr.length;i++){
+				  logger.debug("columnNameArr[i]:"+columnNameArr[i]);
+				  colspan++;
+				  if("ITEM_NO".equalsIgnoreCase(columnNameArr[i]) 
+					|| "CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])
+					|| "SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
+					  colspan++;
+				  }
+				}
+			}
 			h.append(" <td class='"+className+"' align='right' colspan="+colspan+">Total</td> \n");
 		}
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalPriQty, Utils.format_current_no_disgit)+"</td> \n");

@@ -29,6 +29,7 @@ public class Utils {
 	
 	public static final String DD_MM_YYYY_WITH_SLASH = "dd/MM/yyyy";
 	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
+	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
 	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
 	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
 	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
@@ -145,14 +146,25 @@ public class Utils {
 		return r;
 	}
 	
+	// Round halfup  2.979 -> 2.98
 	public static String decimalFormat(double num,String format){
 		NumberFormat formatter = new DecimalFormat(format);
 		return formatter.format(num);
 	}
+	
+	// Round halfup  2.979 -> 2.98
 	public static String decimalFormat(double num,String format,String defaultS){
 		if(num==0 || num == 0.00 || num ==0.0)
 			return defaultS;
 		NumberFormat formatter = new DecimalFormat(format);
+		return formatter.format(num);
+	}
+	
+	// No Round  2.979 -> 2.97
+	public static String decimalFormatNoRound(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		//No Round 
+		formatter.setRoundingMode(java.math.RoundingMode.DOWN);
 		return formatter.format(num);
 	}
 	/**

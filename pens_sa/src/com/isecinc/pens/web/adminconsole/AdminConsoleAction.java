@@ -72,7 +72,7 @@ public class AdminConsoleAction extends I_Action {
 				
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
-				configInfo +="DB User : "+username+"\n";
+				//configInfo +="DB User : "+username+"\n";
 				//configInfo +="DB Password : "+password+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 	
@@ -92,15 +92,6 @@ public class AdminConsoleAction extends I_Action {
 						  } catch(Exception e) {
 							 configInfoTest += " \n error :>> "+e.getMessage();
 						  }
-						
-					/*configInfoTest += "\n ----------------------  Result Test GPS Connection ------------------------------------------------------------- \n";
-						try {   
-							 // SerialTest2.test();
-							  configInfoTest += "\n Test GPS Start ";
-						  } catch(Exception e) {
-							 configInfoTest += " \n error :>> "+e.getMessage();
-						  }
-				    */
 			   }		
 			   
 			   logger.debug(configInfo);

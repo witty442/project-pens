@@ -70,7 +70,8 @@ public class StockVanDAO {
 			}else if("2".equals(o.getDispType())){
 				//no display pd intransit
 				if( Utils.isNull(o.getDispPlan()).equals("")){
-					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name from ");
+					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name ");
+					sql.append("\n  ,province from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
 					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
@@ -86,7 +87,8 @@ public class StockVanDAO {
 				}else{
 					sql.append("\n SELECT DISTINCT A.column_code,A.subinv_name");
 					sql.append("\n FROM ( ");
-					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name from ");
+					sql.append("\n  SELECT distinct pd.subinventory_code as column_code,pd.name as subinv_name ");
+					sql.append("\n  ,province from ");
 					sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
 					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
@@ -100,7 +102,8 @@ public class StockVanDAO {
 				
 					sql.append("\n  UNION  ");
 					
-					sql.append("\n  SELECT distinct pd_int.to_subinventory as column_code,pd_int.name as subinv_name from ");
+					sql.append("\n  SELECT distinct pd_int.to_subinventory as column_code,pd_int.name as subinv_name ");
+					sql.append("\n  ,province from ");
 					sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
 					sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 					sql.append("\n ,apps.xxpens_salesreps_v s");
@@ -168,10 +171,12 @@ public class StockVanDAO {
 			//1 row by pd
 			if( Utils.isNull(o.getDispType()).equals("1")){
 				sql.append("\n  pd.subinventory_code ,pd.name as subinv_name");
+				sql.append("\n  ,pd.province ");
 			}else{
 				//2 row by product
 			   sql.append("\n  p.segment1 as product_code ");
 			   sql.append("\n  ,p.description as product_name ");
+			 
 			}
 			sql.append("\n  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
@@ -191,6 +196,7 @@ public class StockVanDAO {
 			//1 row by pd
 			if( Utils.isNull(o.getDispType()).equals("1")){
 				sql.append("\n  pd_int.to_subinventory as subinventory_code,pd_int.name as subinv_name");
+				sql.append("\n  ,pd_int.province ");
 			}else{
 				//2 row by product
 			   sql.append("\n  p.segment1 as product_code ");
@@ -225,6 +231,7 @@ public class StockVanDAO {
 			   if( Utils.isNull(o.getDispType()).equals("1")){
 				   rowItem.setPdCode(Utils.isNull(rst.getString("subinventory_code")));
 				   rowItem.setPdDesc(Utils.isNull(rst.getString("subinv_name")));
+				   rowItem.setProvince(Utils.isNull(rst.getString("province")));
 			   }else{
 				  //2 row by product ,column by pdcode
 				   rowItem.setProductCode(Utils.isNull(rst.getString("product_code")));
@@ -281,7 +288,7 @@ public class StockVanDAO {
 		StringBuffer sql = new StringBuffer("");
 		try{
 			sql.append("\n select M.product_code,M.product_name");
-			sql.append("\n ,M.subinventory_code");
+			sql.append("\n ,M.subinventory_code  ,M.province ");
 			sql.append("\n ,PD.pd_qty");
 			sql.append("\n ,(NVL(PD.pd_qty,0) * NVL(M.unit_price,0)) as pd_price");
 			sql.append("\n ,PD_INT.pd_int_qty");
@@ -294,7 +301,7 @@ public class StockVanDAO {
 			sql.append("\n  ,pd.subinventory_code ");
 			sql.append("\n  ,(select unit_price from apps.xxpens_om_price_list_cs_v pr ");
 			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
-			sql.append("\n  from ");
+			sql.append("\n  ,pd.province  from ");
 			sql.append("\n  apps.xxpens_inv_onhand_r00_v pd");
 			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
@@ -314,7 +321,7 @@ public class StockVanDAO {
 			sql.append("\n  ,pd_int.to_subinventory as subinventory_code ");
 			sql.append("\n  ,(select unit_price from apps.xxpens_om_price_list_cs_v pr ");
 			sql.append("\n    where pr.inventory_item_id = p.inventory_item_id) as unit_price ");
-			sql.append("\n  from ");
+			sql.append("\n  ,pd_int.province from ");
 			sql.append("\n  apps.xxpens_inv_intransit_r00_v pd_int");
 			sql.append("\n ,apps.xxpens_inv_subinv_access subinv");
 			sql.append("\n ,apps.xxpens_salesreps_v s");
@@ -383,6 +390,7 @@ public class StockVanDAO {
 					if( Utils.isNull(o.getDispPlan()).equals("")){
 					   m.setPdCode(Utils.isNull(rs.getString("subinventory_code")));
 					   m.setPdDesc(Utils.isNull(rs.getString("subinventory_code")));
+					   m.setProvince(Utils.isNull(rs.getString("province")));
 					   m.setProductCode(Utils.isNull(rs.getString("product_code")));
 					   
 					   double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;
@@ -396,6 +404,7 @@ public class StockVanDAO {
 						//display  pd intransit
 						m.setPdCode(Utils.isNull(rs.getString("subinventory_code")));
 						m.setPdDesc(Utils.isNull(rs.getString("subinventory_code")));
+						m.setProvince(Utils.isNull(rs.getString("province")));
 						m.setProductCode(Utils.isNull(rs.getString("product_code")));
 						
 						double pd_qty = (double) Math.round(rs.getDouble("pd_qty") * 100) / 100;

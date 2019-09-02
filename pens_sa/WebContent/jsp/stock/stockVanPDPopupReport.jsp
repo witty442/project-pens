@@ -22,7 +22,7 @@ if(pageName.equals("")){
 	pageName = stockForm.getPageName();
 }
 String pageNameTemp = pageName;
-if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){ 
+if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "ReportStockCredit";
 }
 System.out.println("pageNameTemp:"+pageNameTemp);

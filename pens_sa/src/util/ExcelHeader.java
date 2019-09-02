@@ -29,6 +29,11 @@ public class ExcelHeader {
 		EXCEL_HEADER.append("   mso-number-format:'"+a+"'; \n");
 		EXCEL_HEADER.append(" } \n");
 		
+		EXCEL_HEADER.append(" .text_with_bt_line{ \n");
+		EXCEL_HEADER.append("   mso-number-format:'"+a+"'; \n");
+		EXCEL_HEADER.append("   border-bottom: 3px solid black; ");
+		EXCEL_HEADER.append(" } \n");
+		
 		EXCEL_HEADER.append(" .colum_head{ \n");
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
@@ -38,6 +43,11 @@ public class ExcelHeader {
 		EXCEL_HEADER.append("   font-weight: bold; \n");
 		EXCEL_HEADER.append(" } \n");
 		
+		EXCEL_HEADER.append(" .currency_with_bt_line{ \n");
+		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
+		EXCEL_HEADER.append("   border-bottom: 3px solid black; ");
+		EXCEL_HEADER.append(" } \n");
+		
 		EXCEL_HEADER.append(" .currency{ \n");
 		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
 		EXCEL_HEADER.append(" } \n");
@@ -45,6 +55,17 @@ public class ExcelHeader {
 		EXCEL_HEADER.append(" .currency_bold{ \n");
 		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
 		EXCEL_HEADER.append("   font-weight: bold; \n");
+		EXCEL_HEADER.append(" } \n");
+		
+		EXCEL_HEADER.append(" .currency_bold_with_bt_line{ \n");
+		EXCEL_HEADER.append("   mso-number-format:\\#\\,\\#\\#0\\.00; \n");
+		EXCEL_HEADER.append("   font-weight: bold; \n");
+		EXCEL_HEADER.append("   border-bottom: 5px solid black; ");
+		EXCEL_HEADER.append("   vertical-align: middle; ");
+		EXCEL_HEADER.append(" } \n");
+		
+		EXCEL_HEADER.append(" .tr_with_bt_line{ \n");
+		EXCEL_HEADER.append("  border-bottom: 4px solid black; \n");
 		EXCEL_HEADER.append(" } \n");
 		
 		EXCEL_HEADER.append("</style> \n");

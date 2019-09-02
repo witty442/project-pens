@@ -55,13 +55,13 @@ function search(path){
 	return true;
 }
 
-function changeStatusTTByAdmin(path){
+function changeStatusByAdmin(path){
 	var form = document.salesTargetForm;
 	if(confirm("ยืนยันเปลี่ยน สถานะ")){
 		/**Control Save Lock Screen **/
 		startControlSaveLockScreen();
 		
-		form.action = path + "/jsp/salesTargetAction.do?do=changeStatusTTByAdmin";
+		form.action = path + "/jsp/salesTargetAction.do?do=changeStatusByAdmin";
 		form.submit();
 		return true;
 	}

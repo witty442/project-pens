@@ -240,13 +240,15 @@ function chkSearch(){
 											         <html:options collection="profileList" property="key" labelProperty="name"/>
 									            </html:select>
 		                                  </td>
-		                                  <td width="65%" align="left">
-		                                  &nbsp;&nbsp;&nbsp;&nbsp;
+		                                  <td width="65%" align="left" nowrap>     
 		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="btnSmallLong" style="width: 185px;" 
 											onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" /> 
-										<%-- 	&nbsp;&nbsp;
-											<input type="button" value="แก้ไข/เพิ่ม Profile" class="btnSmallLong" style="width: 180px;" 
-											onClick="javascript:editProfile('${pageContext.request.contextPath}','admin')" /> --%>
+										 	<%if(user.getUserName().equalsIgnoreCase("pornsawas")
+										 		|| user.getUserName().equalsIgnoreCase("sansern")) {%>
+											 	&nbsp;&nbsp;
+												<input type="button" value="แก้ไขชื่อ/เพิ่ม" class="btnSmallLong" style="width: 120px;" 
+												onClick="javascript:editProfile('${pageContext.request.contextPath}','admin')" /> 
+										    <%} %>
 										 </td>
 		                              </tr>
 		                            </table>

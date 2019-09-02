@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="it_stock_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="30" bottomMargin="5">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="reportName" class="java.lang.String"/>
+	<parameter name="docType" class="java.lang.String"/>
+	<parameter name="docDate" class="java.lang.String"/>
+	<parameter name="salesrepCode" class="java.lang.String"/>
+	<parameter name="salesrepFullName" class="java.lang.String"/>
+	<parameter name="zoneName" class="java.lang.String"/>
+	<field name="lineId" class="java.lang.Integer"/>
+	<field name="itemName" class="java.lang.String"/>
+	<field name="serialNo" class="java.lang.String"/>
+	<field name="qty" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="180" splitType="Stretch">
+			<staticText>
+				<reportElement x="237" y="0" width="45" height="25" forecolor="#3399FF">
+					<printWhenExpression><![CDATA[$P{docType}.equals("Requisition")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="22" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ขอเบิก]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="52" width="36" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ข้อมูลผู้]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="81" width="341" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{salesrepFullName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="81" width="83" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[ชื่อ-สกุล ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="101" width="341" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{salesrepCode}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="430" y="30" width="56" height="22"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[วันที่ : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="169" y="0" width="67" height="25"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[แบบฟอร์ม]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="120" height="25"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[อุปกรณ์สารสนเทศ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="101" width="83" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[รหัสหน่วย ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="121" width="83" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[ภาคตามการดูแล ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="121" width="341" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{zoneName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="237" y="0" width="45" height="25" forecolor="#FF3333">
+					<printWhenExpression><![CDATA[$P{docType}.equals("Return")]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="22" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[ขอคืน]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="486" y="30" width="99" height="22"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $P{docDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="25" width="146" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เรียน แผนกสารสนเทศ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="147" width="93" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[มีความประสงค์จะขอ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="147" width="370" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[อุปกรณ์สารสนเทศ  เพื่อนำไปใช้ในงานขาย  ประกอบด้วยรายการ ดังต่อไปนี้ ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="119" y="147" width="17" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docType}.equals("Return")?"คืน":"เบิก"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="59" y="52" width="17" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docType}.equals("Return")?"คืน":"เบิก"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="26" y="1" width="23" height="29"/>
+				<box>
+					<topPen lineWidth="0.1" lineStyle="Solid"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ลำดับ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="49" y="1" width="203" height="29"/>
+				<box>
+					<topPen lineWidth="0.1" lineStyle="Solid"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[อุปกรณ์]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="1" width="119" height="29"/>
+				<box>
+					<topPen lineWidth="0.1" lineStyle="Solid"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Serial No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="1" width="33" height="29"/>
+				<box>
+					<topPen lineWidth="0.1" lineStyle="Solid"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="1" width="181" height="29"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[หมายเหตุ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="26" y="0" width="23" height="21"/>
+				<box>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{lineId}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="49" y="0" width="203" height="21"/>
+				<box>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["  "+$F{itemName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="252" y="0" width="119" height="21"/>
+				<box>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{serialNo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="404" y="0" width="181" height="21"/>
+				<box>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$F{remark}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="371" y="0" width="33" height="21"/>
+				<box>
+					<leftPen lineWidth="0.1" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="13"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{qty}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band height="300" splitType="Stretch">
+			<staticText>
+				<reportElement x="130" y="51" width="52" height="30"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[ลงชื่อผู้ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="237" y="51" width="263" height="30"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[..........................................................(ตัวบรรจง)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="184" y="51" width="53" height="30"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docType}.equals("Return")?"ขอคืน":"ขอเบิก"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="130" y="81" width="52" height="30"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[ลงวันที่ ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="184" y="81" width="53" height="30"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docType}.equals("Return")?"คืนอุปกรณ์":"เบิกอุปกรณ์"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="237" y="81" width="263" height="30"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[..........................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="155" width="226" height="113"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[  อนุมัติโดย
+
+  ลงชื่อ .................................................
+          (ตำแหน่งผู้จัดการภาค)
+
+  ลงวันที่  .............................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="322" y="155" width="226" height="113"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[  อนุมัติโดย
+
+  ลงชื่อ .................................................
+                ( VP ฝ่ายขาย )
+
+  ลงวันที่  .............................................]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

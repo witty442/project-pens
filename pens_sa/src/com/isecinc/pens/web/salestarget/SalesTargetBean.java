@@ -62,6 +62,11 @@ public class SalesTargetBean implements Serializable{
 	private String rejectReason;
 	private String totalAmountBrandBySale;
 
+	private String invoicedQty;
+	private String invoicedAmt;
+	private String estimateQty;
+	private String estimateAmt;
+	
 	//total
 	private String totalTargetQty;
 	private String totalTargetAmount;
@@ -87,7 +92,33 @@ public class SalesTargetBean implements Serializable{
 	
 	private List<SalesTargetBean> itemsList;
 	
+    
 	
+	public String getInvoicedAmt() {
+		return invoicedAmt;
+	}
+	public void setInvoicedAmt(String invoicedAmt) {
+		this.invoicedAmt = invoicedAmt;
+	}
+	
+	public String getInvoicedQty() {
+		return invoicedQty;
+	}
+	public void setInvoicedQty(String invoicedQty) {
+		this.invoicedQty = invoicedQty;
+	}
+	public String getEstimateQty() {
+		return estimateQty;
+	}
+	public void setEstimateQty(String estimateQty) {
+		this.estimateQty = estimateQty;
+	}
+	public String getEstimateAmt() {
+		return estimateAmt;
+	}
+	public void setEstimateAmt(String estimateAmt) {
+		this.estimateAmt = estimateAmt;
+	}
 	public boolean isCanCopy() {
 		return canCopy;
 	}

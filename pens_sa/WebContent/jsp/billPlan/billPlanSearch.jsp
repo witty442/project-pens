@@ -1,3 +1,4 @@
+<%@page import="util.PageVisit"%>
 <%@page import="util.SessionUtils"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
@@ -17,6 +18,9 @@
 SessionUtils.clearSessionUnusedForm(request, "billPlanForm");
 		
 User user = (User) request.getSession().getAttribute("user");
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"BILLT_INCOMPLETE");
 %>
 <html>
 <head>

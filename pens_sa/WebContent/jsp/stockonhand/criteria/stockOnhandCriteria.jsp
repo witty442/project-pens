@@ -79,9 +79,9 @@ function openPopup(path,pageName){
 	var form = document.stockOnhandForm;
 	var param = "&pageName="+pageName+"&hideAll=true";
 	if("SubInvOnhand" == pageName){
-        param +="&selectone=true";;
+        param +="&selectone=false";;
 	}else if("Brand" == pageName){
-		param +="&brand="+form.brand.value+"&selectone=true";
+		param +="&brand="+form.brand.value+"&selectone=false";
 	}else if("Item" == pageName){
 		param +="&brand="+form.brand.value+"&selectone=false";
 	}
@@ -114,7 +114,7 @@ function setDataPopupValue(code,desc,pageName){
 		 <html:text property="bean.subInv" styleId="subInv" size="20" styleClass="\" autoComplete=\"off"/>
 		    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','SubInvOnhand')"/>   
 		</td>
-	   <td>&nbsp;&nbsp;
+	   <td>&nbsp;&nbsp;&nbsp;&nbsp;
 	           รูปแบบการแสดงผล  <font color="red">*</font>
 		     <html:select property="bean.reportType" styleId="reportType">
 			<html:options collection="REPORT_TYPE_LIST" property="reportValue" labelProperty="reportType"/>
@@ -128,6 +128,8 @@ function setDataPopupValue(code,desc,pageName){
 		    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','Brand')"/>   
 		</td>
 	   <td>
+	   &nbsp;&nbsp;&nbsp;&nbsp;
+	      <html:checkbox property="bean.dispHaveQty" styleId="dispHaveQty"> </html:checkbox>&nbsp; แสดงเฉพาะที่มีสินค้า
 		</td> 
 	</tr>	
 	<tr>
@@ -138,11 +140,6 @@ function setDataPopupValue(code,desc,pageName){
 		</td>
 	   <td>
 		</td> 
-	</tr>	
-	<tr>
-		<td colspan="3">
-		   <html:checkbox property="bean.dispHaveQty" styleId="dispHaveQty"> </html:checkbox>&nbsp; แสดงเฉพาะที่มีสินค้า
-		</td>
 	</tr>	
   </table>
    <table  border="0" cellpadding="3" cellspacing="0" >

@@ -308,6 +308,14 @@ public class NSDAO {
 		if( !Utils.isNull(o.getChannelId()).equals("")){
 			sql.append("\n and h.channel_id ='"+o.getChannelId()+"'");
 		}
+		if( !Utils.isNull(o.getSalesZone()).equals("")){
+			sql.append("\n and h.sale_code in(");
+			sql.append("\n  select salesrep_code from PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
+			sql.append("\n  where Z.zone in('0','1','2','3','4')");
+			sql.append("\n  and Z.zone ='"+Utils.isNull(o.getSalesZone())+"'");
+			sql.append("\n )");
+		}
+		
 		return sql;
 	 }
 	 
@@ -576,7 +584,6 @@ public class NSDAO {
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n  SELECT M.* \n");
 				sql.append("\n  from pens_sales_channel M");
 				
@@ -610,6 +617,41 @@ public class NSDAO {
 			}
 			return pos;
 		}
+	 
+	 public static List<NSBean> searchSalesZoneListModel(Connection conn){
+			List<NSBean> pos = new ArrayList<NSBean>();
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			try{
+				sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
+				sql.append("\n  where 1=1  ");
+				sql.append("\n  and zone in('0','1','2','3','4') ");
+				sql.append("\n  ORDER BY S.zone asc \n");
+				logger.debug("sql:"+sql);
+				
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					NSBean item = new NSBean();
+					item.setSalesZone(Utils.isNull(rst.getString("zone")));
+					item.setSalesZoneDesc(Utils.isNull(rst.getString("zone_name")));
+					pos.add(item);
+				}//while
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+		 return pos;
+		}
+
 	 
 	 public static List<PopupForm> searchProvinceList(String channelId,String operation) throws Exception {
 			Statement stmt = null;

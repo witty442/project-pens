@@ -1,3 +1,4 @@
+<%@page import="util.PageVisit"%>
 <%@page import="util.SessionUtils"%>
 <%@page import="util.CConstants"%>
 <%@page import="com.isecinc.pens.bean.CConstantsBean"%>
@@ -13,7 +14,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -22,6 +22,8 @@
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "locationForm");
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"MonitorSpider");
 
 String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 
@@ -102,6 +104,8 @@ function loadMe(path){
 		){%>
 	   document.getElementsByName('bean.custCatNo')[0].value = "<%=Utils.isNull(locationForm.getBean().getCustCatNo())%>";
 	   document.getElementsByName('bean.salesChannelNo')[0].value = "<%=Utils.isNull(locationForm.getBean().getSalesChannelNo())%>";
+	   document.getElementsByName('bean.salesZone')[0].value = "<%=Utils.isNull(locationForm.getBean().getSalesZone())%>";
+	   
 	   loadSalesrepCodeList('${pageContext.request.contextPath}');
 	   document.getElementsByName('bean.salesrepCode')[0].value = "<%=Utils.isNull(locationForm.getBean().getSalesrepCode())%>";
 	<%} %>
@@ -191,7 +195,8 @@ function viewDetail(detailType,salesrepId,tripDate){
                                      </td> 
 									<td width="10%" align="right" nowrap><b>ภาคตามสายดูแล</b>  </td>
 									<td width="20%" align="left">
-									   <html:select property="bean.salesZone" styleId="salesZone" onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
+									   <html:select property="bean.salesZone" styleId="salesZone" 
+									     onchange="loadSalesrepCodeList('${pageContext.request.contextPath}')">
 									    <html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
 									   </html:select>
 									</td>

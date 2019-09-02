@@ -16,7 +16,10 @@
 <jsp:useBean id="userForm" class="com.isecinc.pens.web.user.UserForm" scope="request" />
 <%@page import="com.isecinc.pens.model.MGroupRole"%>
 <%
- String userName = ((User)session.getAttribute("user")).getUserName();
+ User user= (User)session.getAttribute("user");
+ String userName = user.getUserName();
+ String password = user.getPassword();
+ userForm.getCriteria().getUser().setPassword(password);
 %>
 <html>
 <head>
@@ -118,14 +121,14 @@ function logout(path){
 								<td align="right"></td>
 								<td align="left"></td>
 							</tr>
-							<tr>
+							<%-- <tr>
 								<td align="right">รหัสผ่านเก่า<font color="red">*</font></td>
 								<td align="left">
 								   <html:password property="user.password" size="20" maxlength="10"/>
 								</td>
 								<td align="right"></td>
 								<td align="left"></td>
-							</tr>
+							</tr> --%>
                             <tr>
 								<td align="right">รหัสผ่านใหม่<font color="red">*</font></td>
 								<td align="left">

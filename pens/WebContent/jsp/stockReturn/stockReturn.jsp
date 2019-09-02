@@ -4,7 +4,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.Date"%>
@@ -12,9 +11,7 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.bean.Address"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.isecinc.pens.model.MAddress"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="stockReturnForm" class="com.isecinc.pens.web.stockreturn.StockReturnForm" scope="request" />
@@ -437,5 +434,9 @@ function gotoReportXXXX(path, reportType,requestNumber){
 </table>
 </body>
 </html>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->
 
 

@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.popup;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.struts.action.ActionForm;
 
@@ -28,6 +29,8 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String storeType;
 	private String code;
 	private String desc;
+	private String desc2;
+	private String desc3;
 	private String price;
 	
 	//search3
@@ -61,7 +64,34 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String branchId;
 	private String branchName;
 	
+	private String pageName;
+	private Map<String, String> criteriaMap; 
+	
 
+	public String getDesc2() {
+		return desc2;
+	}
+	public void setDesc2(String desc2) {
+		this.desc2 = desc2;
+	}
+	public String getDesc3() {
+		return desc3;
+	}
+	public void setDesc3(String desc3) {
+		this.desc3 = desc3;
+	}
+	public String getPageName() {
+		return pageName;
+	}
+	public void setPageName(String pageName) {
+		this.pageName = pageName;
+	}
+	public Map<String, String> getCriteriaMap() {
+		return criteriaMap;
+	}
+	public void setCriteriaMap(Map<String, String> criteriaMap) {
+		this.criteriaMap = criteriaMap;
+	}
 	public String getSubInvSearch() {
 		return subInvSearch;
 	}

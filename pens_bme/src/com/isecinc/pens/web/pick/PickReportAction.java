@@ -24,14 +24,17 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.MTTBean;
+import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.PickReportBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.MTTBeanDAO;
+import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.PickReportDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.order.OrderForm;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
@@ -227,6 +230,8 @@ public class PickReportAction extends I_Action {
 				htmlTable = genExportReportSummary(request,aForm,user,issueReqNoAll);
 			}else if("Detail".equalsIgnoreCase(reportType)){
 			    htmlTable = genExportReportDetail(request,aForm,user,issueReqNoAll);
+			}else if("ExportBarcode".equalsIgnoreCase(reportType)){
+			    htmlTable = genExportBarcodeDetail(request, aForm);
 			}
 			Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
 			w.write(htmlTable.toString());
@@ -244,6 +249,74 @@ public class PickReportAction extends I_Action {
 			
 		}
 		return mapping.findForward("search");
+	}
+	
+	
+	public StringBuffer genExportBarcodeDetail(HttpServletRequest request,ActionForm form)  throws Exception {
+		logger.debug("genExportBarcodeDetail");
+		PickReportForm aForm = (PickReportForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		StringBuffer h = new StringBuffer("");
+		Connection conn = null;
+		int qty = 0;
+		int r = 0;
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			String chkAll = Utils.isNull(request.getParameter("chkAll"));
+			logger.debug("chkAll:"+chkAll);
+			
+			//get select checkbox issueReqNo filter export 
+			String issueReqNoAll = "";
+			if( !Utils.isNull(chkAll).equals("")){
+			   issueReqNoAll =  aForm.getIssueReqNoAll();
+			}else{
+			   issueReqNoAll =  Utils.isNull(request.getParameter("codes"));
+			}
+			
+			logger.debug("issueReqNoAll:"+issueReqNoAll);
+			if(issueReqNoAll.length()>0){
+				issueReqNoAll = issueReqNoAll.substring(0,issueReqNoAll.length()-1);
+			}
+			aForm.getBean().setIssueReqNoArr(issueReqNoAll);
+			
+			List<PickReportBean> dataList= PickReportDAO.searchExportBarcodeDetail(conn,aForm.getBean());
+			if(dataList != null){
+				//logger.debug("header:"+ExcelHeader.EXCEL_HEADER.toString());
+				
+				h.append(ExcelHeader.EXCEL_HEADER);
+				h.append("<table border='1'>");
+				h.append("<tr>");
+			    h.append("<td>Barcode </td>");
+			    h.append("<td>Material Master</td>");
+			    h.append("<td>Pens Item</td>");
+	            h.append("</tr>");    
+	            
+	            if(dataList != null && dataList.size() > 0){
+	            	for(int i=0;i<dataList.size();i++){
+	            		PickReportBean o = dataList.get(i);
+	            		// Loop By Qty 
+	            		qty = Integer.parseInt(o.getIssueQty());
+	            		for(r=0;r<qty;r++){
+		            		h.append("<tr> \n");    
+		            		h.append("<td class='text'>"+o.getBarcode()+"</td>");
+		  				    h.append("<td class='text'>"+o.getGroupCode()+"</td>");
+		  				    h.append("<td class='text'>"+o.getPensItem()+"</td>");
+		  				    h.append("</tr> "); 
+	            		}//for 2
+	            	}//for 1
+	            }
+	            h.append("</table> \n"); 
+	        
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return h;
 	}
 	
 	//Normal

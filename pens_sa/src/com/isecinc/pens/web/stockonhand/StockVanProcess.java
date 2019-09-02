@@ -47,7 +47,7 @@ public class StockVanProcess extends I_Action {
 			String pageName = Utils.isNull(request.getParameter("pageName")); 
 			
 			if("new".equals(action)){
-				request.setAttribute("RESULT_DATA",null);
+				request.setAttribute("stockOnhandForm_RESULT",null);
 				
 				//init connection
 				conn = DBConnection.getInstance().getConnectionApps();
@@ -65,7 +65,7 @@ public class StockVanProcess extends I_Action {
 				
 			}else if("back".equals(action)){
 				//clear session 
-				request.setAttribute("RESULT_DATA",null);
+				request.setAttribute("stockOnhandForm_RESULT",null);
 				aForm.setResultsSearch(null);
 				//prepare bean
 				StockOnhandBean bean = new StockOnhandBean();
@@ -142,10 +142,10 @@ public class StockVanProcess extends I_Action {
 				
 				if(items.size() <=0 || columnList.size()<=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
-				   request.getSession().setAttribute("RESULT_DATA",null);
+				   request.getSession().setAttribute("stockOnhandForm_RESULT",null);
 				   aForm.setResultsSearch(null);
 				}else{
-					request.setAttribute("RESULT_DATA", StockVanExport.genResultStockVanPD(aForm, request,"HTML"));
+					request.setAttribute("stockOnhandForm_RESULT", StockVanExport.genResultStockVanPD(aForm, request,"HTML"));
 				}
 			}else{
 			   //get max column by product or PD

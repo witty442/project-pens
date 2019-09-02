@@ -15,7 +15,6 @@ import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceHelper;
 
 public class SADamageDAO {
 

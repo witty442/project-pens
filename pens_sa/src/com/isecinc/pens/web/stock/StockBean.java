@@ -44,6 +44,12 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String secQty;
 	private String orderQty;
 	private String avgQty;
+	private String avgQty1;
+	private String avgQty2;
+	private String avgQty3;
+	private String avgQty4;
+	private String avgQty5;
+	private String avgQty6;
 	private String expireDate;
 	private String requestDate;
 	//total
@@ -64,8 +70,66 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private StringBuffer dataStrBuffer;
     private String columnNameSort;
     private String orderSortType;
+    private String recordType;
 
     
+    
+	public String getRecordType() {
+		return recordType;
+	}
+
+	public void setRecordType(String recordType) {
+		this.recordType = recordType;
+	}
+
+	public String getAvgQty2() {
+		return avgQty2;
+	}
+
+	public void setAvgQty2(String avgQty2) {
+		this.avgQty2 = avgQty2;
+	}
+
+	public String getAvgQty1() {
+		return avgQty1;
+	}
+
+	public void setAvgQty1(String avgQty1) {
+		this.avgQty1 = avgQty1;
+	}
+
+	public String getAvgQty3() {
+		return avgQty3;
+	}
+
+	public void setAvgQty3(String avgQty3) {
+		this.avgQty3 = avgQty3;
+	}
+
+	public String getAvgQty4() {
+		return avgQty4;
+	}
+
+	public void setAvgQty4(String avgQty4) {
+		this.avgQty4 = avgQty4;
+	}
+
+	public String getAvgQty5() {
+		return avgQty5;
+	}
+
+	public void setAvgQty5(String avgQty5) {
+		this.avgQty5 = avgQty5;
+	}
+
+	public String getAvgQty6() {
+		return avgQty6;
+	}
+
+	public void setAvgQty6(String avgQty6) {
+		this.avgQty6 = avgQty6;
+	}
+
 	public String getPdCode() {
 		return pdCode;
 	}

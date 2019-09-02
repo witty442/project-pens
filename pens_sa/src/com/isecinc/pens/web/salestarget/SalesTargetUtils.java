@@ -67,7 +67,8 @@ public class SalesTargetUtils {
 			}
 			//logger.debug("itemCode:"+o.getItemCode()+",status["+o.getStatus()+"],lineReadonly["+o.getLineReadonly()+"]");
 		//MT
-		}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  && pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_SALES)){
+		}else if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN,User.MT_SALES,User.DD_SALES})  
+				&& pageName.equalsIgnoreCase(SalesTargetConstants.PAGE_MTSALES)){
 			if(   Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_POST )
 	           || Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_UN_ACCEPT )	
 			 ){
@@ -425,6 +426,39 @@ public class SalesTargetUtils {
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
 				price =Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit);
+			}//while
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	  return price;
+	}
+	
+	/**
+	 * 
+	 * @param conn
+	 * @param priceListId
+	 * @return  first record item of brand (MKT set)
+	 */
+	public static String getPriceByBrand(Connection conn,String priceListId,String brand){
+		String price = "";
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			sql.append("\n  SELECT unit_price  from apps.xxpens_om_price_list_v M  ");
+			sql.append("\n  where item_no like '"+brand+"%' and uom_code ='CTN'");
+			sql.append("\n  and list_header_id in( "+Utils.converToTextSqlIn(priceListId)+") and rownum =1 ");
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				price =Utils.decimalFormat(rst.getDouble("unit_price"),Utils.format_current_2_disgit);
 			}//while
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -1235,4 +1269,49 @@ public class SalesTargetUtils {
 			}
 		 return pos;
 		}
+	  
+	  public static SalesTargetBean getInvoiceAmtFromSalesAnalyst(Connection conn,SalesTargetBean o ) throws Exception{
+			 SalesTargetBean bean = null;
+			 StringBuffer sql = new StringBuffer();
+			 PreparedStatement ps = null;
+			 ResultSet rs = null;
+			 try {
+				 sql.append("\n  SELECT  NVL(SUM(INVOICED_AMT),0) AS INVOICED_AMT ");
+				 sql.append("\n  ,  NVL(SUM(INVOICED_QTY),0) AS INVOICED_QTY ");
+				 sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V ");
+				 sql.append("\n  WHERE 1=1 ");
+			     sql.append("\n  AND V.Customer_Category = '"+Utils.isNull(o.getCustCatNo())+"' ");
+				 sql.append("\n  AND V.sales_channel = '"+Utils.isNull(o.getSalesChannelNo())+"' ");
+				 sql.append("\n  AND V.salesrep_id = '"+Utils.isNull(o.getSalesrepId())+"' ");
+				 sql.append("\n  AND V.brand = '"+Utils.isNull(o.getBrand())+"' ");
+				 sql.append("\n  AND V.customer_id ='"+Utils.isNull(o.getCustomerId())+"'");
+					
+		    	 //minDateOfMonth
+		         String startDate = o.getTargetYear()+o.getTargetMonth()+"01";
+		         logger.debug("minDateOfMonth:"+startDate);
+		        
+		         //maxDateOfMonth
+		         Date date = Utils.parse(startDate, "yyyyMMdd");
+		         String endDate = o.getTargetYear()+o.getTargetMonth()+DateToolsUtil.getMaxDayOfMonth(date);
+		         sql.append("\n  AND V.INVOICE_DATE >= to_date('"+startDate+"','yyyymmdd') ");
+		         sql.append("\n  AND V.INVOICE_DATE <= to_date('"+endDate+"','yyyymmdd')");
+				 
+				 logger.debug("sql: \n"+sql.toString());
+				 
+				 ps = conn.prepareStatement(sql.toString());
+				 rs = ps.executeQuery();
+				 if(rs.next()){
+					 bean = new SalesTargetBean();
+					 bean.setInvoicedQty(Utils.decimalFormat(rs.getDouble("INVOICED_QTY"), Utils.format_current_no_disgit,""));
+					 bean.setInvoicedAmt(Utils.decimalFormat(rs.getDouble("INVOICED_AMT"), Utils.format_current_2_disgit,""));
+				 }
+				 
+			 }catch(Exception e){
+				 logger.error(e.getMessage(),e);
+			 }finally{
+				 ps.close();
+				 rs.close();
+			 }
+			return bean;
+		 }
 }

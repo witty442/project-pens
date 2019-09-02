@@ -14,3 +14,7 @@ CREATE TABLE pens.c_control_thread (
 );
 INSERT INTO pens.c_control_code(class_name, method_name, ISACTIVE)
 VALUES ('TestURLConnection', 'testURLConnection', 'Y');
+
+/** 09-2562 **/
+INSERT INTO pens.c_control_code(class_name, method_name, ISACTIVE)
+VALUES ('ControlOrderPage', 'stepIsValid', 'Y');

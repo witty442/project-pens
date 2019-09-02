@@ -64,7 +64,7 @@ public class PDReceiptAction extends I_Action {
 		}
 		
 		if(!StringUtils.isEmpty(orderNoTo)){
-			whereClause.append("\n  AND RECEIPT_NO >= '"+orderNoTo+"'");
+			whereClause.append("\n  AND RECEIPT_NO <= '"+orderNoTo+"'");
 		}
 		
 		if(!StringUtils.isEmpty(receiptDateFrom)){
@@ -112,6 +112,9 @@ public class PDReceiptAction extends I_Action {
 		try{
 			logger.debug("ids:"+ids);
 			logger.debug("chequedates:"+chequedates);
+			logger.debug("chequedates:"+chequedates.split("[,]").length);
+			logger.debug("pdates:"+pdates);
+			logger.debug("pdates:"+pdates.split("[,]").length);
 			
 			if(!StringUtils.isEmpty(ids)){
 				logger.debug("PD_PAID:"+user.getPdPaid());
@@ -138,7 +141,11 @@ public class PDReceiptAction extends I_Action {
 						receiptSave.setPdPaymentMethod(pm[idx]);
 						receiptSave.setPdPaidDate(pdate[idx]);
 						receiptSave.setIsPDPaid("Y");
-						receiptSave.setChequeDate(chequedate != null?chequedate[idx]:"");
+						if( !Utils.isNull(chequedate[idx]).equals("null") && !Utils.isNull(chequedate[idx]).equals("")){
+						    receiptSave.setChequeDate(chequedate[idx]);
+						}else{
+							receiptSave.setChequeDate("");	
+						}
 						
 						//Save to DB
 						mReceipt.saveReceiptCasePDPaidNo(conn,receiptSave,user);
@@ -157,7 +164,11 @@ public class PDReceiptAction extends I_Action {
 						receipt.setPdPaidDate(pdate[idx]);
 						receipt.setIsPDPaid("Y");
 						//Edit 09/01/2562 add 
-						receipt.setChequeDate(chequedate != null?chequedate[idx]:"");
+						if( !Utils.isNull(chequedate[idx]).equals("null") && !Utils.isNull(chequedate[idx]).equals("")){
+						   receipt.setChequeDate(chequedate[idx]);
+						}else{
+						   receipt.setChequeDate("");	
+						}
 						
 						//Save to DB
 						mReceipt.updateReceiptFromPDReceipt(receipt, user.getId(), conn);
@@ -173,7 +184,11 @@ public class PDReceiptAction extends I_Action {
 						receiptSave.setReceiptAmount(order.getNetAmount());
 						receiptSave.setPdPaymentMethod(pm[idx]);
 						receiptSave.setPdPaidDate(pdate[idx]);
-						receiptSave.setChequeDate(chequedate != null?chequedate[idx]:"");
+						if( !Utils.isNull(chequedate[idx]).equals("null") && !Utils.isNull(chequedate[idx]).equals("")){
+						    receiptSave.setChequeDate(chequedate[idx]);
+						}else{
+							receiptSave.setChequeDate("");	
+						}
 						
 						//Save To DB
 						mReceipt.savePDReceiptHis(conn,receiptSave,user);

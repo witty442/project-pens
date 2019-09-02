@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.CConstantsBean;
+import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 
 import sun.misc.Cleaner;
 import util.CConstants;
@@ -80,8 +81,7 @@ public class MonitorSpiderReport {
 				logger.debug("mmyyyyB:"+mmyyyyB);
 				
 				sql = genSqlMonitorReport(conn, c,mmyyyy);
-				logger.debug("sql:"+sql);
-
+				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				while (rst.next()) {
@@ -167,43 +167,44 @@ public class MonitorSpiderReport {
 				  html.append("</tr>");
 				}//while
 				
-				//Gen Row Summary
-				html.append("<tr class='row_hilight'>");
-				html.append("<td  width='20%' colspan='3'>รวม</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_cust_all_by_trip,Utils.format_current_no_disgit));
-				html.append("</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_visit_cust_by_trip,Utils.format_current_no_disgit));
-				html.append("</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_sale_cust_by_trip,Utils.format_current_no_disgit) );
-				html.append("</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_visit_cust_by_real,Utils.format_current_no_disgit));
-				html.append("</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_sale_cust_by_real,Utils.format_current_no_disgit));
-				html.append("</td>");
-				html.append("<td  width='5%'>");
-				html.append(    Utils.decimalFormat(count_cust_not_equals_trip,Utils.format_current_no_disgit));
-				html.append("</td>");
-				/***********************************************************/
-				html.append("<td  width='5%'>");//View Cust No equals Trip
-				html.append("</td>");
-				/*************************************************************/
-				html.append("<td  width='5%'>");
-				html.append(  Utils.decimalFormat(count_cust_not_equal_masloc,Utils.format_current_no_disgit));
-				html.append("</td>");
-				/***********************************************************/
-				html.append("<td  width='5%'>");//View Cust No equals Trip
-				html.append("</td>");
-				/*************************************************************/
-				html.append("<td width='5%'>");//View Detail
-				html.append("</td>");
-				/*************************************************************/
-				html.append("</tr>");
-				
+				if(r>0){
+					//Gen Row Summary
+					html.append("<tr class='row_hilight'>");
+					html.append("<td  width='20%' colspan='3'>รวม</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_cust_all_by_trip,Utils.format_current_no_disgit));
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_visit_cust_by_trip,Utils.format_current_no_disgit));
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_sale_cust_by_trip,Utils.format_current_no_disgit) );
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_visit_cust_by_real,Utils.format_current_no_disgit));
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_sale_cust_by_real,Utils.format_current_no_disgit));
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_cust_not_equals_trip,Utils.format_current_no_disgit));
+					html.append("</td>");
+					/***********************************************************/
+					html.append("<td  width='5%'>");//View Cust No equals Trip
+					html.append("</td>");
+					/*************************************************************/
+					html.append("<td  width='5%'>");
+					html.append(  Utils.decimalFormat(count_cust_not_equal_masloc,Utils.format_current_no_disgit));
+					html.append("</td>");
+					/***********************************************************/
+					html.append("<td  width='5%'>");//View Cust No equals Trip
+					html.append("</td>");
+					/*************************************************************/
+					html.append("<td width='5%'>");//View Detail
+					html.append("</td>");
+					/*************************************************************/
+					html.append("</tr>");
+				}
 				logger.debug("r:"+r);
 				
 				if(r >= 1){
@@ -386,6 +387,10 @@ public class MonitorSpiderReport {
 				sql.append("\n )A ");
 				sql.append("\n  ORDER BY A.sales_code ,A.trip_day_num ");
 
+				//debug log sql
+				if(logger.isDebugEnabled()){
+					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
+				}
 			} catch (Exception e) {
 				throw e;
 			} finally { 
@@ -741,7 +746,7 @@ public class MonitorSpiderReport {
 				sql.append("\n and s"+schema_name+".sales_channel = '"+Utils.isNull(c.getCustCatNo())+"' ");
 			}
 			if( !Utils.isNull(c.getSalesChannelNo()).equals("")){
-				sql.append("\n and s"+schema_name+".region = '"+Utils.isNull(c.getSalesChannelNo())+"' ");
+				sql.append("\n and s"+schema_name+".region = "+Utils.isNull(c.getSalesChannelNo())+" ");
 			}
 			if( !Utils.isNull(c.getSalesrepCode()).equals("")){
 				sql.append("\n and cs"+schema_name+".primary_salesrep_id = "+Utils.isNull(c.getSalesrepCode())+"");

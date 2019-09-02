@@ -80,6 +80,18 @@ TABLE.tableSearchNoSetTH TD {
 	font-size: 13px;
 }
 
+.tableSearchNoSet {
+	height: 30px;
+}
+TABLE.tableSearchNoSet TH {
+	background-color: #03A4B6;
+	height: 30px;
+}
+TABLE.tableSearchNoSet TD {
+	height: 25px;
+	font-size: 13px;
+}
+
 .table_hilight {
 	background-color: #909090;
 	COLOR: #FFFFFF;
@@ -104,17 +116,31 @@ TABLE.tableSearchNoSetTH TD {
 	font-weight: bold;
 	font-size: 16px;
 }
-
+.tr_with_bt_line{
+    padding: 10px;
+    border-bottom: 4px solid black;
+}
 .td_text{
 	text-align: left;
+}
+.td_text_with_bt_line{
+	text-align: left;
+    border-bottom: 3px solid black;
+}
+.td_text_bold{
+	text-align: left;
+	font-weight: bold;
 }
 .td_text_center{
 	align:center;
 }
-
+.td_text_center_bold{
+	align:center;
+	font-weight: bold;
+}
 table.tableSearchNoWidth td.td_text_right {
-  text-align: right;
-  align:right;
+   text-align: right;
+   align:right;
 }
 
 table.tableSearch td.td_text_right {
@@ -131,9 +157,18 @@ table.tableSearch td.td_text_right {
 .td_number{
 	text-align:right;
 }
+.td_number_with_bt_line{
+	text-align:right;
+    border-bottom: 3px solid black;
+}
 .td_number_bold{
 	text-align:right;
 	font-weight: bold;
+}
+.td_number_bold_with_bt_line{
+	text-align:right;
+	font-weight: bold;
+    border-bottom: 3px solid black;
 }
 
 /* show page number */

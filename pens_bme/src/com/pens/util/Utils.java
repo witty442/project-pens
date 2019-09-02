@@ -339,16 +339,19 @@ public class Utils {
 	  }  
 	  return true;  
 	}
-	
+	// Round halfup  2.979 -> 2.98
 	public static String decimalFormat(double num){
 		NumberFormat formatter = new DecimalFormat(format_current_2_disgit);
 		return formatter.format(num);
 	}
 	
+	// Round halfup  2.979 -> 2.98
 	public static String decimalFormat(double num,String format){
 		NumberFormat formatter = new DecimalFormat(format);
 		return formatter.format(num);
 	}
+	
+	// Round halfup  2.979 -> 2.98
 	public static String decimalFormat(double num,String format,String defaultS){
 		if(num==0 || num == 0.00 || num ==0.0)
 			return defaultS;
@@ -356,6 +359,14 @@ public class Utils {
 		return formatter.format(num);
 	}
 	
+	// No Round  2.979 -> 2.97
+	public static String decimalFormatNoRound(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		//No Round 
+		formatter.setRoundingMode(java.math.RoundingMode.DOWN);
+		return formatter.format(num);
+	}
+		
 	public static double strToDouble(String s){
 		if(s == null || "".equals(s)){
 			return Double.parseDouble("0");

@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import util.DBConnection;
+import util.SQLHelper;
 import util.Utils;
 
 import com.isecinc.pens.bean.PopupBean;
@@ -406,7 +408,136 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	
+	 
+	 public static List<PopupForm> searchCustomerCreditSalesList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				//prepare parameter Fix CConstant 
+				logger.debug("startDate:"+Utils.isNull(c.getCriteriaMap().get("startDate")));
+				Date startDate = Utils.parse(Utils.isNull(c.getCriteriaMap().get("startDate")), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				logger.debug("startDateStr:"+startDateStr);
+				
+				String userName = Utils.isNull(c.getCriteriaMap().get("userName"));
+				String salesrepCode = Utils.isNull(c.getCriteriaMap().get("salesrepCode"));
+				
+				sql.append("\n SELECT distinct C.account_number as customer_code ,C.party_name as customer_desc " );
+				sql.append("\n from apps.xxpens_ar_cust_sales_all M,apps.xxpens_ar_customer_all_v C");
+				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+				sql.append("\n where M.cust_account_id = C.cust_account_id ");
+				sql.append("\n and M.primary_salesrep_id = Z.salesrep_id ");
+				sql.append("\n and M.code like 'S%' ");//Credit Sales Only
+				sql.append("\n and Z.zone in('0','1','2','3','4') ");
+				if( !Utils.isNull(salesrepCode).equals("")){
+					sql.append("\n and Z.salesrep_code in("+SQLHelper.converToTextSqlIn(salesrepCode)+")");
+				}
+				/** filter sales by user login **/
+				if( !Utils.isNull(userName).equals("")){
+					sql.append("\n and Z.zone in( ");
+					sql.append("\n   select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
+					sql.append("\n   where user_name ='"+userName+"'");
+					sql.append("\n ) ");
+				}
+				/** filter customer is check stock **/
+			/*	sql.append("\n and C.account_number in( ");
+				sql.append("\n   select customer_number from apps.xxpens_om_check_order_v ");
+				sql.append("\n   where request_date >= to_date('"+startDateStr+"','dd/mm/yyyy') ");
+				sql.append("\n )");*/
+				
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and C.account_number ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and C.party_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY C.account_number asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("customer_code"));
+					item.setDesc(rst.getString("customer_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 public static List<PopupForm> searchSalesrepCreditSalesList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				String userName = Utils.isNull(c.getCriteriaMap().get("userName"));
+				
+				sql.append("\n SELECT distinct code ,salesrep_full_name " );
+				sql.append("\n from apps.xxpens_salesreps_v M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
+				sql.append("\n where M.salesrep_id =Z.salesrep_id ");
+				sql.append("\n and z.zone in('0','1','2','3','4') ");
+				sql.append("\n and M.code like 'S%' ");//Credit Sales Only
+				
+				/** filter sales by user login **/
+				if( !Utils.isNull(userName).equals("")){
+					sql.append("\n and Z.zone in( ");
+					sql.append("\n   select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT where user_name ='"+userName+"'");
+					sql.append("\n ) ");
+				}
+				
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and M.code ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and M.salesrep_full_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY M.code asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("code"));
+					item.setDesc(rst.getString("salesrep_full_name"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 	 public static List<PopupForm> searchCustomerStockList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

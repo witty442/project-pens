@@ -89,6 +89,36 @@ function exportExcel(path,reportType){
 	form.submit();
 	return true;
 }
+function exportBarcodeExcel(path,reportType){
+	var form = document.pickReportForm;
+	if( $('#custGroup').val()=="" ){
+		alert("กรุณากรอก กลุ่มร้านค้า");
+		$('#custGroup').focus();
+		return false;
+	}
+	//validate start end date is same month
+	if( $('#issueReqDateFrom').val() !="" && $('#issueReqDateTo').val() !=""){
+		 if(!dateFromToInSameYear($('#issueReqDateFrom').val(),$('#issueReqDateTo').val())){
+			 alert("กรุณาเลือกวันที่ ในช่วงปีเดียวกันเท่านั้น");
+			 $('#issueReqDateTo').focus();
+			 return false;
+		 }
+	 }else{
+		 if( $('#issueReqDateFrom').val() =="" && $('#issueReqDateTo').val() ==""){
+			 alert("กรุณาระบุวันที่");
+			 $('#issueReqDateTo').focus();
+			 return false;
+		 }
+	 }
+	var codes = document.getElementsByName("codes")[0].value;
+	if(codes == ''){
+		alert("กรุณาระบุ รายการที่ต้องการ Export ก่อน");
+		return false;
+	}
+	form.action = path + "/jsp/pickReportAction.do?do=exportReport&action=newsearch&reportType="+reportType;
+	form.submit();
+	return true;
+}
 function search(path){
 	var form = document.pickReportForm;
 	 if( $('#custGroup').val()=="" ){
@@ -436,18 +466,21 @@ function setGroupMainValue(code,desc,types){
 									<td align="left">
 										<a href="javascript:search('${pageContext.request.contextPath}')">
 										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-										</a>
+										</a>&nbsp;
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>	
+										</a>&nbsp;	
 										<a href="javascript:exportExcel('${pageContext.request.contextPath}','Normal')">
 						                   <input type="button" value="  Export  " class="newPosBtnLong"> 
-						                </a>	
+						                </a>&nbsp;	
 						                <a href="javascript:exportExcel('${pageContext.request.contextPath}','Summary')">
 						                   <input type="button" value="Export Summary by Item" class="newPosBtnLong"> 
-						                </a>
+						                </a>&nbsp;
 						                <a href="javascript:exportExcel('${pageContext.request.contextPath}','Detail')">
 						                   <input type="button" value="Export Detail" class="newPosBtnLong"> 
+						                </a>&nbsp;
+						                <a href="javascript:exportBarcodeExcel('${pageContext.request.contextPath}','ExportBarcode')">
+						                   <input type="button" value="Export Barcode To Excel" class="newPosBtnLong"> 
 						                </a>				
 									</td>
 								</tr>

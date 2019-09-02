@@ -44,6 +44,12 @@ String codes = Utils.isNull(session.getAttribute("stock_mc_codes"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/stockMC.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 
 <script type="text/javascript">
+
+/** disable back button alway **/
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+
 window.onload = function(){
 	loadMe();
 }

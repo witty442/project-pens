@@ -14,12 +14,13 @@ import util.DBConnection;
 import util.Utils;
 
 import com.isecinc.pens.bean.SalesrepBean;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 
 public class PromotionDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	public static int searchPromotionListTotalRec(Connection conn,PromotionBean o) throws Exception {
+	public static int searchPromotionListTotalRec(Connection conn,PromotionBean o,User user) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -36,7 +37,7 @@ public class PromotionDAO {
 			sql.append("\n    WHERE C.account_number = H.customer_number");
 			sql.append("\n  )S WHERE 1=1");
 			 //GenWhereSQL
-			sql.append(" "+genWhereCondSql(conn,o));
+			sql.append(" "+genWhereCondSql(conn,o,user));
 			sql.append("\n )A ");
 			logger.debug("sql:"+sql);
 
@@ -57,7 +58,7 @@ public class PromotionDAO {
 		}
 		return totalRec;
 	}
-	public static List<PromotionBean> searchPromotionList(Connection conn,PromotionBean o,boolean allRec,int currPage,int pageSize ) throws Exception {
+	public static List<PromotionBean> searchPromotionList(Connection conn,PromotionBean o,boolean allRec,int currPage,int pageSize,User user) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -90,7 +91,7 @@ public class PromotionDAO {
 			sql.append("\n  WHERE C.account_number = H.customer_number");
 			sql.append("\n )S WHERE 1=1");
 			 //GenWhereSQL
-			sql.append(" "+genWhereCondSql(conn,o));
+			sql.append(" "+genWhereCondSql(conn,o,user));
 		
 			sql.append("\n    ORDER BY S.sales_code,S.request_date,S.request_no asc ");
 			sql.append("\n   )A ");
@@ -134,7 +135,7 @@ public class PromotionDAO {
 		return items;
 	}
 	
-	public static StringBuffer genWhereCondSql(Connection conn,PromotionBean o) throws Exception{
+	public static StringBuffer genWhereCondSql(Connection conn,PromotionBean o,User user) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 
 		if( !Utils.isNull(o.getCustCatNo()).equals("")){
@@ -168,6 +169,10 @@ public class PromotionDAO {
 			
 			sql.append("\n and S.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 			sql.append("\n and S.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+		}
+		//Case Sales Login filter show only salesrepCode 
+		if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+		    sql.append("\n and S.sales_code = '"+user.getUserName().toUpperCase()+"'");
 		}
 		return sql;
 	}

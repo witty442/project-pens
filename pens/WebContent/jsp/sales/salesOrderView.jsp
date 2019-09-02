@@ -561,6 +561,7 @@ function stampPrint(){
 							</tr>
 						</table>
 					    <span title="SalesOrderView">...</span>
+					    <span title="<%=Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION")) %>">...</span>
 						<!--  -->
 						<html:hidden property="order.payment" styleId="payment"/>
 						<html:hidden property="deletedId"/>

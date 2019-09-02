@@ -1,3 +1,5 @@
+<%@page import="util.SessionUtils"%>
+<%@page import="util.PageVisit"%>
 <%@page import="util.Utils"%>
 <%@page import="util.SIdUtils"%>
 <%@page import="java.util.ArrayList"%>
@@ -19,6 +21,11 @@
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRoleSalesTarget();
 
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "moveOrderForm");
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"MoveOrder");
 %>
 <html>
 <head>

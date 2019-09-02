@@ -47,7 +47,7 @@ public class StockOnhandProcess extends I_Action {
 			String action = Utils.isNull(request.getParameter("action")); 
 			logger.debug("action:"+action);
 			if("new".equals(action)){
-				request.setAttribute("RESULT_DATA",null);
+				request.setAttribute("stockOnhandForm_RESULT",null);
 				
 				//init connection
 				conn = DBConnection.getInstance().getConnectionApps();
@@ -57,6 +57,7 @@ public class StockOnhandProcess extends I_Action {
 				StockOnhandBean bean = new StockOnhandBean();
 				bean.setDispHaveQty("true");
 				bean.setOrgCode("B00");
+				bean.setSubInv("B001");
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
 				aForm.setBean(bean);
 				
@@ -71,7 +72,7 @@ public class StockOnhandProcess extends I_Action {
 	
 			}else if("back".equals(action)){
 				//clear session 
-				request.setAttribute("RESULT_DATA",null);
+				request.setAttribute("stockOnhandForm_RESULT",null);
 				aForm.setResultsSearch(null);
 				//prepare bean
 				StockOnhandBean bean = new StockOnhandBean();
@@ -107,20 +108,20 @@ public class StockOnhandProcess extends I_Action {
 				aForm.getBean().setOrderSortType(Utils.isNull(request.getParameter("orderSortType")));
 			}else{
 				//search new
-				request.setAttribute("RESULTS_DATA",null);
+				request.setAttribute("stockOnhandForm_RESULT",null);
 				aForm.getBean().setItemsList(null);
 			}
 			StockOnhandBean stockResult = StockOnhandReport.searchOnhandReport(request.getContextPath(),aForm.getBean(),false);
 			StringBuffer resultHtmlTable = stockResult.getDataStrBuffer();
 			if(resultHtmlTable != null){
-				 request.setAttribute("RESULTS_DATA",resultHtmlTable);
+				 request.setAttribute("stockOnhandForm_RESULT",resultHtmlTable);
 				 foundData = true;
 			}
 			aForm.getBean().setItemsList(stockResult.getItemsList());
 			
 			if(foundData==false){
 				 request.setAttribute("Message", "ไม่พบข้อมูล");
-				 request.setAttribute("RESULTS_DATA",null);
+				 request.setAttribute("stockOnhandForm_RESULT",null);
 				 aForm.getBean().setItemsList(null);
 			}
 			logger.debug("pageName:"+aForm.getPageName());
@@ -212,7 +213,7 @@ public class StockOnhandProcess extends I_Action {
 				 conn.close();
 			} catch (Exception e2) {}
 		}
-		return null;//
+		return null;
 	}
 	
 	

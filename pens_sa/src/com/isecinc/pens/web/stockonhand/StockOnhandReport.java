@@ -13,7 +13,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import util.DBConnection;
+import util.DateToolsUtil;
 import util.ExcelHeader;
+import util.SQLHelper;
 import util.Utils;
 
 public class StockOnhandReport {
@@ -90,15 +92,15 @@ public class StockOnhandReport {
 			}
 		     //subInv
 			if( !Utils.isNull(o.getSubInv()).equals("")){
-				sql.append("\n and M.SUBINVENTORY_CODE = '"+Utils.isNull(o.getSubInv())+"'");
+				sql.append("\n and M.SUBINVENTORY_CODE in("+SQLHelper.converToTextSqlIn(o.getSubInv())+")");
 			}
 			 //Brand
 			if( !Utils.isNull(o.getBrand()).equals("")){
-		    	sql.append("\n  AND M.brand ='"+Utils.isNull(o.getBrand())+"'");
+		    	sql.append("\n  AND M.brand in("+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 			}
 			//Sku
 			if( !Utils.isNull(o.getProductCode()).equals("")){
-				sql.append("\n and M.segment1 = '"+Utils.isNull(o.getProductCode())+"'");
+				sql.append("\n and M.segment1 in("+SQLHelper.converToTextSqlIn(o.getProductCode())+")");
 			}
 			
 			sql.append("\n GROUP BY "+columnGroupBy );
@@ -287,52 +289,50 @@ public class StockOnhandReport {
 	 * @throws Exception
 	 */
 	private static StringBuffer genHeadTable(String contextPath,StockOnhandBean head,boolean excel,String[] columnNameArr) throws Exception{
-		String icoZise=  "width='20px' height='20px'";
 		StringBuffer h = new StringBuffer("");
 		if(excel){
 			h.append(ExcelHeader.EXCEL_HEADER);
 			h.append("<table id='tblProduct' align='center' border='1'> \n");
 			h.append("<tr> \n");
-			h.append("<td colspan="+columnNameArr.length+2+"><b> Stock On-hand</b></td> \n");
+			h.append("<td colspan="+((columnNameArr.length*2)+2)+"><b> Stock On-hand</b> </td>\n");
+			h.append("</tr> \n");
+			h.append("<tr> \n");
+			h.append(" <td colspan="+((columnNameArr.length*2)+2)+"> \n");
+			h.append(" วันที่พิมพ์ : &nbsp;"+DateToolsUtil.getCurrentDateTime(Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH)+"</td> \n");
 			h.append("</tr> \n");
 			h.append("</table> \n");
 		}
 		String width="100%";
-		if(columnNameArr.length<2){
-			width="60%";
-		}
 		h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
 		h.append("<tr> \n");
 		for(int i=0;i<columnNameArr.length;i++){
-		   h.append(" <th  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i]));
-		   if( excel ==false){
-			/*   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('"+columnNameArr[i]+"','ASC') />");
-			   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('"+columnNameArr[i]+"','DESC') />");*/
+		   h.append(" <th  nowrap>"+COLUMNNAME_MAP.get(columnNameArr[i])+"</th> \n");
+		   if( excel ==true){
+			   if( "SUBINVENTORY_CODE".equalsIgnoreCase(columnNameArr[i])){
+				   h.append(" <th  nowrap>SubInv Name</th> \n");
+			   }else  if( "BRAND".equalsIgnoreCase(columnNameArr[i])){
+				   h.append(" <th  nowrap>Brand Name</th> \n");
+			   }else  if( "SEGMENT1".equalsIgnoreCase(columnNameArr[i])){
+				   h.append(" <th  nowrap>ชื่อ SKU </th> \n");
+			   }
 		   }
-		   h.append(" </th> \n");
+		  
 		}//for
 		
 		h.append(" <th  nowrap>ONHAND QTY");
 		 if( excel ==false){
-			/*h.append("  &nbsp;&nbsp;");
-			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('PRIMARY_QUANTITY','ASC') />");
-		    h.append("  &nbsp;&nbsp;");
-			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('PRIMARY_QUANTITY','DESC') />");*/
+		
 		 }
 		h.append("</th> \n");
 		h.append(" <th  nowrap>Primary UOM");
 		 if( excel ==false){
-			/*h.append("  &nbsp;&nbsp;");
-			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('PRIMARY_UOM_CODE','ASC') />");
-		    h.append("  &nbsp;&nbsp;");
-			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('PRIMARY_UOM_CODE','DESC') />");*/
+			
 		 }
 		h.append("</th> \n");
 		h.append("</tr> \n");
 		return h;
 	}
+	
 	/**
 	 * 
 	 * @param columnNameArr
@@ -352,7 +352,6 @@ public class StockOnhandReport {
 			classNameCenter ="text";
 			classNameNumber = "num_currency";
 		}
-		
 		h.append("<tr> \n");
 		
 		for(int i=0;i<columnNameArr.length;i++){
@@ -371,16 +370,28 @@ public class StockOnhandReport {
 					classNameCenter="td_text_center";
 				}
 			}
-
-			if("BRAND".equalsIgnoreCase(columnNameArr[i])){
-				 h.append("<td class='"+classNameCenter+"' width='10%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
-			}else if("SUBINVENTORY_CODE".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+classNameCenter+"' width='15%'>"+item.getSubInv()+"-"+item.getSubInvDesc()+"</td> \n");
-			}else if("SEGMENT1".equalsIgnoreCase(columnNameArr[i])){
-				h.append("<td class='"+className+"' width='20%'>"+item.getProductCode()+"-"+item.getProductName()+"</td> \n");
-			}
+           if(excel==false){
+				if("BRAND".equalsIgnoreCase(columnNameArr[i])){
+					 h.append("<td class='"+className+"' width='10%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
+				}else if("SUBINVENTORY_CODE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getSubInv()+"-"+item.getSubInvDesc()+"</td> \n");
+				}else if("SEGMENT1".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='30%'>"+item.getProductCode()+"-"+item.getProductName()+"</td> \n");
+				}
+           }else{
+        	   if("BRAND".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='3%'>"+item.getBrand()+"</td> \n");
+					h.append("<td class='"+className+"' width='7%'>"+item.getBrandName()+"</td> \n");
+				}else if("SUBINVENTORY_CODE".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='3%'>"+item.getSubInv()+"</td> \n");
+					h.append("<td class='"+className+"' width='7%'>"+item.getSubInvDesc()+"</td> \n");
+				}else if("SEGMENT1".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+className+"' width='10%'>"+item.getProductCode()+"</td> \n");
+					h.append("<td class='"+className+"' width='20%'>"+item.getProductName()+"</td> \n");
+				}
+		   }
 		}
-		h.append("<td class='"+classNameNumber+"' width='10%'>"+item.getOnhandQty()+"</td> \n");
+		h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getOnhandQty()+"</td> \n");
 		h.append("<td class='"+classNameCenter+"' width='8%'>"+item.getPriUomCode()+"</td> \n");
 		h.append("</tr> \n");
 		
@@ -397,13 +408,23 @@ public class StockOnhandReport {
 		}
 		
 		h.append("<tr class='"+className+"'> \n");
-		String colspan=""+columnNameArr.length;
+		int colspan=columnNameArr.length;
+		if(excel){
+			colspan = 0;
+			for(int i=0;i<columnNameArr.length;i++){
+			  logger.debug("columnNameArr[i]:"+columnNameArr[i]);
+			  colspan++;
+			  if("BRAND".equalsIgnoreCase(columnNameArr[i]) 
+				|| "SUBINVENTORY_CODE".equalsIgnoreCase(columnNameArr[i])
+				|| "SEGMENT1".equalsIgnoreCase(columnNameArr[i])){
+				  colspan++;
+			  }
+			}
+		}
 		h.append(" <td class='"+className+"' align='right' colspan="+colspan+">Total</td> \n");
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalOnhandQty, Utils.format_current_no_disgit)+"</td> \n");
 		h.append("<td ></td> \n");
 		h.append("</tr> \n");
-		
 		return h;
 	}
-	
 }

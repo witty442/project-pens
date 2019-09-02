@@ -372,21 +372,21 @@ public class SalesTargetControlPage {
 	
 	
 	/**
-	 * prepareDetailMT
+	 * prepareDetailMTSales
 	 * @param form
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
-	public static String prepareDetailMT(ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	public static String prepareDetailMTSales(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String forward = "detail";
 		SalesTargetForm aForm = (SalesTargetForm) form;
 		Connection conn = null;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			logger.debug("prepareDetailMT");
+			logger.debug("prepareDetailMTSales");
 			//Create Connection
 			conn = DBConnection.getInstance().getConnection();
 			//clear old session for check dup item in page
@@ -485,7 +485,7 @@ public class SalesTargetControlPage {
 			cri.setCustCatNo(bean.getCustCatNo());
 			cri.setStartDate(bean.getStartDate());
 			cri.setEndDate(bean.getEndDate());
-		}else if(SalesTargetConstants.PAGE_SALES.equalsIgnoreCase(pageName)){
+		}else if(SalesTargetConstants.PAGE_MTSALES.equalsIgnoreCase(pageName)){
 			cri.setPeriod(bean.getPeriod());
 			cri.setPeriodDesc(bean.getPeriodDesc());
 			cri.setBrand(bean.getBrand());

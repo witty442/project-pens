@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.record.formula.ControlPtg;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -258,6 +259,10 @@ public class OrderAction extends I_Action {
 				orderForm.getOrder().setPricelistLabel(
 						InitialMessages.getMessages().get(Messages.NO_PRICELIST).getDesc());
 			}
+			
+			//Set Prev Step Action
+			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
+			
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
@@ -321,7 +326,6 @@ public class OrderAction extends I_Action {
 		if (request.getParameter("action").equalsIgnoreCase("edit")) return "prepare";
 		return "view";
 	}
-	
 	
 	/**
 	 * Prepare to Edit order
@@ -532,10 +536,23 @@ public class OrderAction extends I_Action {
 		Connection conn = null;
 		OrderProcess orderProcess = new OrderProcess();
 		try {
+			//Validate Step Order 
+			if( !ControlOrderPage.stepIsValid(request, ControlOrderPage.STEP_ORDER_2)){
+				request.setAttribute("Message", "ไม่สามารถทำรายการต่อได้  เนื่องจากมีการกดปุ่ม Back อาจทำให้ข้อมูลเสียหายได้  กรุณาไปที่ หน้าจัดการข้อมูลลูกค้า อีกครั้ง");
+				return mapping.findForward("prepare"); 
+			}
+			
 			OrderForm orderForm = (OrderForm) form;
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			User userActive = (User) request.getSession().getAttribute("user");
 			Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+			
+			/** Case User back action init new OrderDate to CurrentDate*/
+			if(orderForm.getOrder().getId() == 0){
+			   logger.info("set Order Date new To  CurrentDate");
+			   orderForm.getOrder().setOrderDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
+			   orderForm.getOrder().setOrderTime(new SimpleDateFormat("HH:mm", new Locale("th", "TH")).format(new Date()));
+			}
 			
 			/** Promotion Process  add to Lines */
 			
@@ -647,6 +664,9 @@ public class OrderAction extends I_Action {
 			//Set Data to Session to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print", orderForm);
 			
+			//Set Prev Step Action
+			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_2);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -724,6 +744,9 @@ public class OrderAction extends I_Action {
 			//Merg to 1 Line to Show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			
+			//Set Prev Step Action
+			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
+			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -749,6 +772,12 @@ public class OrderAction extends I_Action {
 		OrgRuleBean orgRuleBean;
 		User user = (User) request.getSession(true).getAttribute("user");
 		try {
+			//Validate Step Order 
+			if( !ControlOrderPage.stepIsValid(request, ControlOrderPage.STEP_ORDER_3)){
+				request.setAttribute("Message", "ไม่สามารถทำรายการต่อได้  เนื่องจากมีการกดปุ่ม Back อาจทำให้ข้อมูลเสียหายได้  กรุณาไปที่ หน้าจัดการข้อมูลลูกค้า อีกครั้ง");
+				return "view";
+			}
+			
 			//clear Session Temp to Print ListOrderProduct
 			request.getSession().setAttribute("order_from_to_print",null);
 			
@@ -1053,6 +1082,9 @@ public class OrderAction extends I_Action {
 			
 			// save token
 			saveToken(request);
+			
+			//Clear Prev Step Action -success 
+			ControlOrderPage.setPrevOrderStepAction(request, "");
 			
 		} catch (Exception e) {
 			orderForm.getOrder().setId(orderId);

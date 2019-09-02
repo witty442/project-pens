@@ -288,7 +288,9 @@ public class ShopBillDetailAction {
 				   h.setRetailSellAmt(Utils.decimalFormat(rst.getDouble("retail_sell_amt"),Utils.format_current_2_disgit));
 				   
 				   h.setDiscountPercent(Utils.decimalFormat(rst.getDouble("discount_percent"),Utils.format_current_2_disgit));
+				   logger.debug("discount_amt:"+rst.getDouble("discount_amt"));
 				   h.setDiscountAmt(Utils.decimalFormat(rst.getDouble("discount_amt"),Utils.format_current_2_disgit));
+				   logger.debug("result discount_amt:"+h.getDiscountAmt());
 				   
 				   h.setSellAfDisc(Utils.decimalFormat(rst.getDouble("sell_af_disc"),Utils.format_current_2_disgit));
 				   h.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"),Utils.format_current_2_disgit));

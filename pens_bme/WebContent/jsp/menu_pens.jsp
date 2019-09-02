@@ -600,6 +600,13 @@
 	                </a>
 	             </li> 
 		    <%} %>
+		    <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){ %>
+	           <%--  <li>
+		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/manualStockAction.do?do=prepareSearch&action=new');">
+		          <span><%no++;out.print(no);%>.<bean:message key="ManualStock" bundle="sysprop"/>
+		          </span></a>
+		        </li> --%>
+		    <%} %>
 		</ul>
 	</li>
 <%} %>
@@ -836,7 +843,7 @@
 	</li> 
 <%} %>
 
-<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDDOC,User.REDEDIT}) ){ no=0;%>
+<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDDOC,User.REDEDIT,User.IT}) ){ no=0;%>
   	<li><a  href="javascript: void(0)" class="parent"><span>Document Menu</span></a>
 		<ul>
 			<li>
@@ -850,14 +857,18 @@
 				</li>
 			<%} %>
 			<%if ( Utils.userInRole(user,new String[]{User.IT,User.ADMIN}) ){%>
-			<li>
-			  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=filePosBME');">
-			  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="filePosBME"/></span></a>
-			</li> 
-			<li>
-			  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/genVanScriptAction.do?do=prepare&action=new');">
-			  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="genVanScript"/></span></a>
-			</li> 
+				<li>
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=filePosBME');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="filePosBME"/></span></a>
+				</li> 
+				<li>
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/genVanScriptAction.do?do=prepare&action=new');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="genVanScript"/></span></a>
+				</li> 
+				 <li>
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/itManageAction.do?do=prepareHead&action=new&pageName=ITStock');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="ITStock"/></span></a>
+				</li> 
 			<%} %>
 		</ul>
 	</li> 

@@ -58,11 +58,29 @@ public class NSBean implements Serializable{
 	private boolean canCancel;
 	private String noPicRcv;
 	private String orderType;
+	private String salesZone;
+	private String salesZoneDesc;
 	
 	private List<NSBean> items;
     private NSBean summary;
 	
     
+	public String getSalesZoneDesc() {
+		return salesZoneDesc;
+	}
+
+	public void setSalesZoneDesc(String salesZoneDesc) {
+		this.salesZoneDesc = salesZoneDesc;
+	}
+
+	public String getSalesZone() {
+		return salesZone;
+	}
+
+	public void setSalesZone(String salesZone) {
+		this.salesZone = salesZone;
+	}
+
 	public String getPac10CTNQty() {
 		return pac10CTNQty;
 	}

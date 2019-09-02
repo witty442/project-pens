@@ -193,9 +193,19 @@ function createNewStockReturn(path){
 								<td class="td_text" width="20%"><c:out value='${item.customerName}'/></td>
 								
 								<td class="td_text_center" width="10%">
-								   <a href="#" onclick="javascript:viewStockReturn('${pageContext.request.contextPath}','${item.requestNumber}');">
-									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
-								   </a>
+								  
+								   <c:choose>
+										<c:when test="${item.exported == 'Y'}">
+											 <a href="#" onclick="javascript:viewStockReturn('${pageContext.request.contextPath}','${item.requestNumber}');">
+									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
+								             </a>
+										</c:when> 
+										<c:otherwise>
+											 <a href="#" onclick="javascript:viewStockReturn('${pageContext.request.contextPath}','${item.requestNumber}');">
+											  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
+										   </a>
+										</c:otherwise>
+									</c:choose>
 								</td>
 								
 							</tr>

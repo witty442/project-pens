@@ -28,7 +28,8 @@ User user = (User)session.getAttribute("user");
 <script type="text/javascript">
 function loadMe(path){
 	<%if(request.getAttribute("save_success") != null){%>
-	  window.opener.changeProfile(path,'');
+	   var profileId = document.getElementById("profileId");
+	   window.opener.changeProfile(path,profileId);
 	<%}%>
 }
 function saveProfile(path){
@@ -36,7 +37,7 @@ function saveProfile(path){
 	document.manageProfileSearchForm.submit();
 }
 function addProfile(path){
-	 var profileName = prompt("เพิ่ม profile ใหม่ กรุณาระบุ ชื่อ Profile", "Profile");
+	 var profileName = prompt("เพิ่ม รูปแบบการค้นหาใหม่ กรุณาระบุ ชื่อ รูปแบบการค้นหา", "Profile");
 	 if (profileName != null) {
 	     document.getElementById("profileName").value =profileName;
 	 }
@@ -58,29 +59,33 @@ function changeProfile(){
 	<jsp:include page="../error.jsp"/>
 	<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 	    <tr>
-			<td width="100%" colspan="4" align="center">
+			<td width="100%" colspan="2" align="center">
 			<font size="2"><b>
-			    <bean:message key="ManageProfileSearch" bundle="sysprop"/>
+			  <%--   <bean:message key="ManageProfileSearch" bundle="sysprop"/> --%>
+			          เพิ่ม/แก้ไข  รูปแบบการค้นหาที่ใช้ประจำ
 			  </b>
 			</font>
 			</td>
 		</tr>
 		<tr>
-			<td width="10%">&nbsp;</td>
-			<td width="10%"></td>
-			<td width="10%"></td>
+			<td width="30%">&nbsp;</td>
 			<td width="70%"></td>
+			
 		</tr>
 		<tr>
-			<td align="right"><b>Profile:</b></td>
+			<td align="right"><b>รูปแบบการค้นหา:</b></td>
 			<td align="left">
 			   <html:select property="bean.profileId" styleId="profileId" onchange="changeProfile()" styleClass="txt_style" >
 					 <html:options collection="profileList" property="key" labelProperty="name"/>
 			   </html:select>
+			   (เลือกรายการที่ต้องการเปลี่ยนชื่อ)
 			</td>
-			<td align="right" nowrap>ชื่อ Profile:</td>
+		</tr>
+		<tr>
+			<td align="right" nowrap><b>ชื่อ รูปแบบการค้นหา:</b></td>
 			<td align="left">
-				<html:text property="bean.profileName" size="50" styleId="profileName"  styleClass="\" autoComplete=\"off" />
+				<html:text property="bean.profileName" size="60" styleId="profileName"  styleClass="\" autoComplete=\"off"
+				maxlength="58" />
 			</td>
 		</tr>
 	</table>
@@ -89,16 +94,16 @@ function changeProfile(){
 	<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 		<tr>
 			<td align="center">
-			<a href="#" onclick="return addProfile('${pageContext.request.contextPath}');">
-				  <input type="button" value="เพิ่มโปรไฟล์" class="newPosBtn"/>
-				</a>
-				
 				<a href="#" onclick="return saveProfile('${pageContext.request.contextPath}');">
-				  <input type="button" value="บันทึก" class="newPosBtn"/>
+				  <input type="button" value="  บันทึก   " class="newPosBtn"/>
 				</a>
 				 
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
+				<a href="#" onclick="window.close()">
 				<input type="button" value="ปิดหน้าจอ" class="newNegBtn"/>
+				</a>
+				&nbsp;&nbsp;
+				  <a href="#" onclick="return addProfile('${pageContext.request.contextPath}');">
+				  <input type="button" value="เพิ่มรายการใหม่" class="newPosBtn"/>
 				</a>
 			</td>
 		</tr>

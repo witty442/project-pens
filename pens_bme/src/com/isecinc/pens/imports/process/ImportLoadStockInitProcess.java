@@ -180,14 +180,25 @@ public class ImportLoadStockInitProcess {
 				  
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
 	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
-	            
+	            Object cellCheckValue = null;
+	            Cell cellCheck = null;
 				for (int i = rowNo; i < sheet.getLastRowNum()+1; i++) {
 					row = sheet.getRow(i);
 					
 					/** Check Row is null **/
-					Cell cellCheck = row.getCell((short) 1);
-					Object cellCheckValue = xslUtils.getCellValue(1, cellCheck);
-					logger.debug("cellCheckValue["+cellCheckValue+"]");
+					cellCheckValue = null;
+					cellCheck = null;
+					try{
+						//Cell cellCheck = row.getCell((short) 1);
+						if(row != null){
+						   cellCheck = row.getCell(1);
+						   cellCheckValue = xslUtils.getCellValue(1, cellCheck);
+						}
+						logger.debug("cellCheckValue["+cellCheckValue+"]");
+					}catch(Exception ee){
+						ee.printStackTrace();
+						logger.debug("Exception null:cellCheckValue["+cellCheckValue+"]");
+					}
 					
 					if(cellCheckValue == null ){
 						break;
@@ -242,6 +253,8 @@ public class ImportLoadStockInitProcess {
 						 barcode = master.getBarcode();
 						 groupCode = master.getGroupCode();
 						 
+					     logger.debug("barcode:["+barcode+"]");
+					     
 						 ps.setString(index++, groupCode);//GROUP_CODE 5
 						 ps.setString(index++, pensItem);//PENS_ITEM 6
 						 ps.setString(index++, barcode);//BARCODE 7
@@ -249,6 +262,7 @@ public class ImportLoadStockInitProcess {
 						pensItem = "";
 						barcode = "";
 						
+						ps.setString(index++, "null");
 						ps.setString(index++, "null");
 						ps.setString(index++, "null");
 					}
@@ -291,7 +305,7 @@ public class ImportLoadStockInitProcess {
 				         s.setMessage(ms);
 				         errorMap.put(i+"", s);
 			         }  
-			         
+			         //logger.debug("2barcode:["+barcode+"]");
 					 ps.executeUpdate();
 				}//for Row
 			}

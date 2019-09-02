@@ -42,8 +42,8 @@ public class SecurityHelper {
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Division","div_no"); //Division
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Sales_Channel", "SALES_CHANNEL_NO"); //ภาคตามพนักงานขาย Area
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Customer_Category","cust_cat_no");//SaleType
-		MASTER_COLUMN_SEARCH_KEY_MAP.put("Salesrep_id", "salesrep_code");	//SalesMan
-		
+		MASTER_COLUMN_SEARCH_KEY_MAP.put("Salesrep_id", "salesrep_id");	//SalesMan
+	
 		//COLUMN_KEY_MAP.put("Customer_id", "customer_category");
 		//COLUMN_KEY_MAP.put("inventory_item_id", "inventory_item_id");
 	}
@@ -202,14 +202,13 @@ public class SecurityHelper {
 			   rs.close();rs=null;
 			}
 		}
-		
 	}
 	
 	public static String genWhereSqlFilterByUser(User user,String columnAccess) throws Exception{
 		Connection conn = null;
 		try{
 		     conn = DBConnection.getInstance().getConnection();
-		     return genWhereSqlFilterByUserModel(conn,null,user, columnAccess,"");
+		     return genWhereSqlFilterByUserModel(conn,null,user, columnAccess,"","");
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -218,14 +217,26 @@ public class SecurityHelper {
 	}
 	
 	public static String genWhereSqlFilterByUser(Connection conn,User user,String columnAccess,String alias) throws Exception{
-		 return genWhereSqlFilterByUserModel(conn,null,user, columnAccess,alias);
+		 return genWhereSqlFilterByUserModel(conn,null,user, columnAccess,alias,"");
 	}
 	
 	public static String genWhereSqlFilterByUser(HttpServletRequest request,String columnAccess) throws Exception{
 		Connection conn = null;
 		try{
 		     conn = DBConnection.getInstance().getConnection();
-		     return genWhereSqlFilterByUserModel(conn,request,null, columnAccess,"");
+		     return genWhereSqlFilterByUserModel(conn,request,null, columnAccess,"","");
+		}catch(Exception e){
+			throw e;
+		}finally{
+			DBConnection.getInstance().closeConn(conn, null, null);
+		}
+	}
+	
+	public static String genWhereSqlFilterByUser(HttpServletRequest request,String columnAccess,String columnNameAlias) throws Exception{
+		Connection conn = null;
+		try{
+		     conn = DBConnection.getInstance().getConnection();
+		     return genWhereSqlFilterByUserModel(conn,request,null, columnAccess,"",columnNameAlias);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -234,10 +245,10 @@ public class SecurityHelper {
 	}
 	
 	public static String genWhereSqlFilterByUser(Connection conn,HttpServletRequest request,String columnAccess) throws Exception{
-		  return genWhereSqlFilterByUserModel(conn,request,null, columnAccess,"");
+		  return genWhereSqlFilterByUserModel(conn,request,null, columnAccess,"","");
 	}
 	
-	public static String genWhereSqlFilterByUserModel(Connection conn,HttpServletRequest request,User user,String roleColumnAccess,String alias) throws Exception{
+	public static String genWhereSqlFilterByUserModel(Connection conn,HttpServletRequest request,User user,String roleColumnAccess,String alias,String columnNameAlias) throws Exception{
 		String sql = "";
 		PreparedStatement ps = null;
 		ResultSet rs= null;
@@ -251,8 +262,7 @@ public class SecurityHelper {
 			if(user == null && request != null){
 			   user = (User) request.getSession(true).getAttribute("user");
 			}
-		
-			conn =DBConnection.getInstance().getConnection();
+
 			sql += " select distinct rc.role_column_access  \n";
 			sql += " from c_user_info a ,c_group_role ag ,c_role r ,c_role_access rc  \n";
 			sql += " where 1=1  \n";
@@ -278,7 +288,13 @@ public class SecurityHelper {
 			     String filterCode = filterArray[1];
 			     if( !Utils.isNull(filterCond).equals("") && !Utils.isNull(filterCond).equals("'ALL'")){//not equals ALL
 			    	// whereSql +="/** RoleColumn:"+roleColumnAccess+" :"+filterCode+"**/ \n";
-			    	 whereSql +=" AND "+alias+roleColumnAccess+" IN("+filterCond+") \n";
+			    	
+			    	 /** Case columnNameAlias is not null use */
+					if( !Utils.isNull(columnNameAlias).equals("")){
+						whereSql +=" AND "+alias+columnNameAlias+" IN("+filterCond+") \n";	
+					}else{
+			    	    whereSql +=" AND "+alias+roleColumnAccess+" IN("+filterCond+") \n";
+					}
 			     }else{
 			    	 //whereSql +="/** RoleColumn:"+roleColumnAccess+":"+filterCode+" **/ \n";
 			     }	
@@ -287,9 +303,6 @@ public class SecurityHelper {
 		}catch(Exception e){
 			 throw e;
 		}finally{
-			if(conn != null){
-				conn.close();conn=null;
-			}
 			if(ps != null){
 			   ps.close();ps= null;
 			}

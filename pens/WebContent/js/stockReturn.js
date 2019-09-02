@@ -22,6 +22,9 @@ function confirmInputReason(){
 }
 function save(path,moveOrderType){
 	if(checkTableCanSave()){
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=save";
 		document.stockReturnForm.submit();
 		return true;

@@ -173,6 +173,13 @@ public class PopupAction extends I_Action {
 				
 			}else if("Item".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchItemList(popupForm);
+				
+			}else if("SalesrepCreditSales".equalsIgnoreCase(popupForm.getPageName()) ){
+				results = PopupDAO.searchSalesrepCreditSalesList(popupForm);
+				
+			}else if("CustomerCreditSales".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalesTarget
+				 results = PopupDAO.searchCustomerCreditSalesList(popupForm);
 			}
 			
 			 if(results != null && results.size() >0){

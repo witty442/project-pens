@@ -361,7 +361,7 @@ public class PopupDAO {
 				sql.append("\n GROUP BY h.ar_invoice_no ");
 				sql.append("\n ORDER BY h.ar_invoice_no asc ");
 				
-				logger.debug("sql:"+sql);
+				//logger.debug("sql:"+sql);
 			
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
@@ -462,7 +462,7 @@ public class PopupDAO {
 				sql.append("\n GROUP BY h.ar_invoice_no ,l.product_id,l.uom_id");
 				sql.append("\n ORDER BY h.ar_invoice_no asc ");
 				
-				logger.debug("sql:"+sql);
+				//logger.debug("sql:"+sql);
 			
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
@@ -470,21 +470,21 @@ public class PopupDAO {
 					priAllQty += StockUtilsDAO.calcPriQty(conn,rst.getString("product_id"), rst.getString("uom_id"), rst.getInt("remain_pri_qty"));
                     productId = rst.getString("product_id");
 				}//while
-				logger.debug("priAllQty:"+priAllQty);
+				//logger.debug("priAllQty:"+priAllQty);
 				
 				/** del stockReturnItem <> curRequestnumber **/
 				priQtyNotInCurrRequestNumber = getPriQtyExistNotInCurrentNumber(conn, arInvoiceNo, curRequestNumber, productId);
-				logger.debug("priQtyNotInCurrRequestNumber:"+priQtyNotInCurrRequestNumber);
+				//logger.debug("priQtyNotInCurrRequestNumber:"+priQtyNotInCurrRequestNumber);
 				
 				/** PriQtyInit ***/
 				priQtyInit = getPriQtyInt(conn,user, arInvoiceNo, c.getCustomerCode(), productId);
-				logger.debug("priQtyInit:"+priQtyInit);		
+				//logger.debug("priQtyInit:"+priQtyInit);		
 						
 				/**  = priQtyall +(neg priQtyInit) - priQty(exist <> curRequestNumber) **/
-				logger.debug("Calc priAllQty["+priAllQty+"]-priQtyInit["+priQtyInit+"]-priQtyNotInCurrReqNum["+priQtyNotInCurrRequestNumber+"]");
+				//logger.debug("Calc priAllQty["+priAllQty+"]-priQtyInit["+priQtyInit+"]-priQtyNotInCurrReqNum["+priQtyNotInCurrRequestNumber+"]");
 				priAllQty =  priAllQty + priQtyInit - priQtyNotInCurrRequestNumber;
 				priAllQty = NumberToolsUtil.round(priAllQty, 5, BigDecimal.ROUND_HALF_UP); 
-				logger.debug("Result priAllQty:"+priAllQty);
+				//logger.debug("Result priAllQty:"+priAllQty);
 				
 				bean.setPriAllQty(priAllQty);
 				
@@ -492,8 +492,8 @@ public class PopupDAO {
 				String tempPriAllQty = priAllQty+"";
 				double priQty = Utils.convertStrToDouble(tempPriAllQty.substring(0,tempPriAllQty.indexOf(".")));
 				double subQtyTemp =Utils.convertStrToDouble(tempPriAllQty.substring(tempPriAllQty.indexOf("."),tempPriAllQty.length()));
-				logger.debug("priQty["+priQty+"]");
-				logger.debug("subQtyTemp["+subQtyTemp+"]");
+				//logger.debug("priQty["+priQty+"]");
+				//logger.debug("subQtyTemp["+subQtyTemp+"]");
 				
 				//get Uom2
 				Product p = new MProduct().getStockReturnProduct(c.getProductCode(),user);
@@ -501,7 +501,7 @@ public class PopupDAO {
 				if(p != null){
 				   subQty = StockUtilsDAO.calcPriQtyToSubQty(conn, productId, p.getUom2(), subQtyTemp); 
 				}
-				logger.debug("after clac subQty["+subQty+"]");
+				//logger.debug("after clac subQty["+subQty+"]");
 				
 				bean.setPriQty(priQty);
 				bean.setSubQty(subQty);

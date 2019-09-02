@@ -242,7 +242,6 @@ body {
 												       <img border=0 src="${pageContext.request.contextPath}/icons/process.gif"></a>
 													</c:otherwise>
 												    </c:choose>
-													
 												</c:if>
 											</c:if>
 										</c:if>

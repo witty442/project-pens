@@ -151,18 +151,20 @@ function saveSelectedInPage(no){
 	    removeUnSelected(retCode);
     }
 	
-	$(function(){
-		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/setValueSelected.jsp",
-			data : "codes=" + encodeURIComponent(document.getElementsByName("codes")[0].value) +
-			       "&keys=" + encodeURIComponent('') +
-			       "&descs=" + encodeURIComponent(document.getElementsByName("descs")[0].value),
-			//async: false,
-			cache: true,
-			success: function(){
-			}
-		}).responseText;
-	});
+    <%if(selectone.equalsIgnoreCase("false")){%>
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/setValueSelected.jsp",
+				data : "codes=" + encodeURIComponent(document.getElementsByName("codes")[0].value) +
+				       "&keys=" + encodeURIComponent('') +
+				       "&descs=" + encodeURIComponent(document.getElementsByName("descs")[0].value),
+				//async: false,
+				cache: true,
+				success: function(){
+				}
+			}).responseText;
+		});
+	<%}%>
 }
 
 function chekCodeDupInCodesAll(codeCheck){

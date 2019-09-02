@@ -1,4 +1,5 @@
 
+<%@page import="util.PageVisit"%>
 <%@page import="util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowBean"%>
 <%@page import="util.Utils"%>
@@ -21,6 +22,10 @@
 SessionUtils.clearSessionUnusedForm(request, "prodShowForm");
 
 String pageName = Utils.isNull(request.getParameter("pageName")); 
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"ProdShow");
+
 %>
 <html>
 <head>

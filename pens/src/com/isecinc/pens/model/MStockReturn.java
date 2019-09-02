@@ -26,6 +26,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.document.StockReturnDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.sun.org.apache.bcel.internal.classfile.LineNumber;
 
 
 public class MStockReturn {
@@ -185,6 +186,7 @@ public class MStockReturn {
     
 	public StockReturn save(User user,StockReturn head) throws Exception {
 		Connection conn = null;
+		String lineIdNodel = "";
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -224,6 +226,8 @@ public class MStockReturn {
 				        line.setLineId(maxLineNumber);
 					    insertStockReturnLine(conn,head, line);
 					}
+					//set for no del line
+					lineIdNodel += line.getLineId()+",";
 				}//for
 			}
 			
@@ -235,6 +239,14 @@ public class MStockReturn {
 					
 					logger.debug("delete requestNumber["+head.getRequestNumber()+"]lineId["+lineNumber+"]result["+r+"]");
 				}
+			}
+			
+			//For case Exception in above function-> delete lineId is not insert or update
+			if( !Utils.isNull(lineIdNodel).equals("")){
+				lineIdNodel = lineIdNodel.substring(0,lineIdNodel.length()-1);
+				
+				int r = deleteStockReturnLineNotInLineId(conn, head.getRequestNumber(),lineIdNodel);
+				logger.debug("Delete Step 2 result:"+r);
 			}
 			
 			conn.commit();
@@ -612,6 +624,30 @@ public class MStockReturn {
 		}
 		return r;
 	}
+	private int deleteStockReturnLineNotInLineId(Connection conn ,String requestNumber,String notInLineId) throws Exception {
+		int r= 0;
+		PreparedStatement ps = null;
+		try {
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" delete from t_stock_return_line  \n");
+			sql.append(" WHERE request_number=? \n");
+			sql.append(" and line_number not in("+notInLineId+") \n");
+			
+			logger.debug("SQL:"+sql);
+			int index = 0;
+			
+			ps = conn.prepareStatement(sql.toString());
+			ps.setString(++index, requestNumber);//request_number
+			r = ps.executeUpdate();
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+		return r;
+	}
 	public  Date getBackDate(Connection conn,String requestNumber)
 			throws Exception {
 		Statement stmt = null;
@@ -894,5 +930,43 @@ public class MStockReturn {
 			return nextLineNo;
 		}
 	  
-	  
+	  public boolean reCalcAmountInHead(Connection conn ,StockReturn head) throws Exception {
+			boolean result = false;
+			PreparedStatement ps = null;
+			try {
+				StringBuffer sql = new StringBuffer("");
+			
+				sql.append(" update t_stock_return h \n");
+				sql.append(" set total_nonvat_amount = ( \n");
+				sql.append("   select ROUND(sum(total_amount),2) \n");
+				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append("   and l.status ='SV' \n");
+				sql.append("  ) \n");
+				sql.append(",total_vat_amount = ( \n");
+				sql.append("   select ROUND(sum(total_amount) *0.07,2) \n");
+				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append("   and l.status ='SV' \n");
+				sql.append(") \n");
+				sql.append(",total_amount = ( \n");
+				sql.append("   select ROUND( (sum(total_amount) +sum(total_amount) *0.07 ),2) \n");
+				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append("   and l.status ='SV' \n");
+				sql.append(") \n");
+				sql.append(" where  h.request_number ='"+head.getRequestNumber()+"' \n");
+				logger.debug("SQL:"+sql);
+				
+				ps = conn.prepareStatement(sql.toString());
+				int ch = ps.executeUpdate();
+				result = ch>0?true:false;
+				
+				logger.debug("ins:"+ch);
+			} catch (Exception ex) {
+				throw ex;
+			} finally {
+				if(ps != null){
+					ps.close();ps = null;
+				}
+			}
+			return result;
+		}
 }

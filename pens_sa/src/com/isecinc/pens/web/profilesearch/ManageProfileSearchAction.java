@@ -115,9 +115,27 @@ public class ManageProfileSearchAction extends I_Action {
 			conn.setAutoCommit(false);
 			
 			if("save".equalsIgnoreCase(action)){
+				//update 
 				aForm.getBean().setUserId(user.getId());
 			    status = ProfileProcess.updateProfileNameModel(conn, user, aForm.getBean());
+			    if(status ==false){
+			    	//insert new
+					SABean saBean = new SABean();
+					saBean.setUserId(user.getId()+"");
+					saBean.setProfileName(aForm.getBean().getProfileName());
+					//getMax ProfileID by user ID
+					int nextProfileId = ProfileProcess.getMaxProfileId(conn, user.getId())+1;
+					saBean.setProfileId(nextProfileId+"");
+					
+					status = ProfileProcess.insertProfileBlankModel(conn, user, saBean);
+					
+					//set display
+					aForm.getBean().setUserId(user.getId());
+					aForm.getBean().setProfileId(Utils.convertStrToInt(saBean.getProfileId()));
+					aForm.getBean().setProfileName(saBean.getProfileName());
+			    }
 			}else{
+				//insert new
 				SABean saBean = new SABean();
 				saBean.setUserId(user.getId()+"");
 				saBean.setProfileName(aForm.getBean().getProfileName());
@@ -133,7 +151,7 @@ public class ManageProfileSearchAction extends I_Action {
 				aForm.getBean().setProfileName(saBean.getProfileName());
 		
 			}
-			
+			logger.debug("status:"+status);
 			if(status){
 				/** init profileList new update profile **/
 				List<References> profileList = new ArrayList<References>();

@@ -79,12 +79,11 @@ function saveProfile(path, type) {
 function editProfile(path, type) {
 	var profileId = $('#profileId').val();
     var url = path + "/jsp/manageProfileSearchAction.do?do=prepare&action=new&profileId="+profileId;
-    PopupCenter(url, "", 500, 300) ;
+    PopupCenter(url, "", 600, 300) ;
 }
 
 
-function changeProfile(path, type) {
-	var profileId = $('#profileId').val();
+function changeProfile(path, profileId) {
 	if(profileId != '0'){
 	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=changeProfile";
 	   document.salesAnalystReportForm.submit();
@@ -562,27 +561,29 @@ function loadValue(e, field,change){
 		}
 		//alert('condCode.val():'+condCode.val()+',condType.val(:'+condType.val());
 		
-		$(function(){
-			var getData = $.ajax({
-				url: path+"/jsp/ajax/searchValueQuery.jsp",
-				data : "condCode=" + encodeURIComponent(condCode.val()) + "&condType=" + condType.val(),
-				//async: false,
-				cache: true,
-				success: function(getData){
-					var returnString = jQuery.trim(getData);
-				    if(returnString.split('|')[0] ==''){
-					   alert("ไม่พบข้อมูล");
-					   condCode.focus();
-				       condCode.val('');
-				       condValue.val('');
-					   condDisp.val('');
-				    }else{
-					   condValue.val(returnString.split('|')[0]);
-					   condDisp.val(returnString.split('|')[1]);
-				    }
-				}
-			}).responseText;
-		});
+		if(condCode.val() != ''){
+			$(function(){
+				var getData = $.ajax({
+					url: path+"/jsp/ajax/searchValueQuery.jsp",
+					data : "condCode=" + encodeURIComponent(condCode.val()) + "&condType=" + condType.val(),
+					//async: false,
+					cache: true,
+					success: function(getData){
+						var returnString = jQuery.trim(getData);
+					    if(returnString.split('|')[0] ==''){
+						   alert("ไม่พบข้อมูล");
+						   condCode.focus();
+					       condCode.val('');
+					       condValue.val('');
+						   condDisp.val('');
+					    }else{
+						   condValue.val(returnString.split('|')[0]);
+						   condDisp.val(returnString.split('|')[1]);
+					    }
+					}
+				}).responseText;
+			});
+		}
 	}
 }
 

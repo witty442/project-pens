@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +33,8 @@ import com.isecinc.pens.inf.exception.LogisticException;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
-import com.isecinc.pens.web.order.OrderAction;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceHelper;
 import com.pens.util.helper.SequenceProcess;
-import com.pens.util.helper.SequenceProcessAll;
 
 public class OrderDAO {
 	protected static Logger logger = Logger.getLogger("PENS");

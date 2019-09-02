@@ -134,7 +134,6 @@ public class SalesTargetTTAction  {
 			
 			SalesTargetBean bean = aForm.getBean();
 		
-			
 			//save Item target_temp
 			List<SalesTargetBean> productMKTList =(List<SalesTargetBean>)request.getSession().getAttribute("productMKTList");
 			List<SalesTargetBean> salesrepList = (List<SalesTargetBean>)request.getSession().getAttribute("salesrepList");
@@ -206,6 +205,7 @@ public class SalesTargetTTAction  {
 		    			
 		        	    logger.debug("** Prepare head *****");
 		        	    logger.debug("salesrepCode:"+h.getSalesrepCode()+",id:"+h.getId());
+		        	    
 		        	    salesrepDataSaveList.add(h);
 	        	    }
 	        	    

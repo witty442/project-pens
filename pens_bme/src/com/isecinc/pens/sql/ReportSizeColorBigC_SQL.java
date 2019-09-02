@@ -44,7 +44,8 @@ public class ReportSizeColorBigC_SQL {
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
-				    sql.append("\n SELECT DISTINCT ");
+			        /** Edit 21/08/2562 change to get from PENSBME_SALES_FROM_BIGC_TEMP */
+				   /* sql.append("\n SELECT DISTINCT ");
 				    sql.append("\n L.store_code");
 				    sql.append("\n ,(select X.pens_desc from PENSBME_MST_REFERENCE X WHERE X.pens_value=L.store_code and reference_code = 'Store') as store_name ");
 				    sql.append("\n ,(select X.interface_desc from PENSBME_MST_REFERENCE X WHERE X.pens_value=L.store_code and reference_code = 'SubInv') as sub_inv ");
@@ -68,22 +69,34 @@ public class ReportSizeColorBigC_SQL {
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
 						sql.append("\n AND L.group_code LIKE '"+c.getGroup()+"%' ");
-					}
-				    sql.append("\n UNION ALL");
-				    
-					/*sql.append("\n SELECT DISTINCT ");
-					sql.append("\n L.pens_item, L.group_item as group_type, L.material_master,L.barcode ");
-					sql.append("\n FROM  PENSBME_ONHAND_BME_LOCKED L ");
+					}*/
+			       /** NEW CODE :21/08/2562 **/
+				    sql.append("\n SELECT DISTINCT ");
+				    sql.append("\n  L.pens_cust_code as store_code");
+				    sql.append("\n ,L.pens_cust_desc as store_name ");
+				    sql.append("\n ,(select X.interface_desc from PENSBME_MST_REFERENCE X WHERE X.pens_value=L.pens_cust_code and reference_code = 'SubInv') as sub_inv ");
+					sql.append("\n ,M.pens_item, L.pens_group_type as group_type, M.material_master,L.barcode ");
+					sql.append("\n FROM  pensbi.PENSBME_SALES_FROM_BIGC_TEMP L");
+					sql.append("\n ,( ");
+					sql.append("\n   select pens_value as pens_item,");
+					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
+					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
+					sql.append("\n   )M ");
 					sql.append("\n WHERE 1=1   ");
-					
+					sql.append("\n AND L.barcode = M.barcode  ");
+					sql.append("\n AND L.pens_cust_code LIKE '"+storeCode+"%'");
+					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						sql.append("\n AND L.pens_cust_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-						sql.append("\n AND L.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-						sql.append("\n AND L.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
+						sql.append("\n AND M.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND M.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
-					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.group_item IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
-					}
-					sql.append("\n UNION ALL");*/
+					if( !Utils.isNull(c.getGroup()).equals(""))
+						sql.append("\n AND L.pens_group_type LIKE '"+c.getGroup()+"%' ");
+						
+				    sql.append("\n UNION ALL");
 					
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n L.cust_no as store_code");
@@ -193,6 +206,7 @@ public class ReportSizeColorBigC_SQL {
 						sql.append("\n AND I.group_code LIKE '"+c.getGroup()+"%' ");
 					}
 					sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
+					
 					sql.append("\n UNION ALL  ");
 					
 					sql.append("\n SELECT  DISTINCT");
@@ -257,14 +271,13 @@ public class ReportSizeColorBigC_SQL {
 				sql.append("\n AND M.material_master = INIT_MTT.material_master AND M.barcode = INIT_MTT.barcode ");	
 				
  		   sql.append("\n LEFT OUTER JOIN(	 ");
- 				sql.append("\n SELECT ");
-				sql.append("\n L.CUST_NO AS STORE_CODE,L.PENS_ITEM, ");
+ 		        /** Edit 21/08/2562 change to get from PENSBME_SALES_FROM_BIGC_TEMP */
+ 				/*sql.append("\n SELECT L.CUST_NO AS STORE_CODE,L.PENS_ITEM, ");
 			    sql.append("\n L.GROUP_CODE as group_type, L.material_master,L.barcode , ");
 				sql.append("\n NVL(COUNT(*),0) AS SALE_OUT_QTY ");
 				sql.append("\n FROM PENSBME_SALES_OUT L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n AND L.status = 'N'");
-					
 				if(initDate != null){
 					 sql.append("\n AND L.sale_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 					 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -284,8 +297,40 @@ public class ReportSizeColorBigC_SQL {
 				}
 				sql.append("\n AND L.CUST_NO LIKE '"+storeCode+"%'");
 				sql.append("\n  GROUP BY ");
-				sql.append("\n  L.CUST_NO,L.PENS_ITEM, L.GROUP_CODE , L.material_master,L.barcode ");
+				sql.append("\n  L.CUST_NO,L.PENS_ITEM, L.GROUP_CODE , L.material_master,L.barcode ");*/
 				
+ 		        /** NEW CODE :21/08/2562 **/
+	 		    sql.append("\n SELECT L.PENS_CUST_CODE AS STORE_CODE,L.PENS_ITEM, ");
+			    sql.append("\n L.PENS_GROUP_TYPE as group_type, M.material_master,L.barcode , ");
+				sql.append("\n NVL(SUM(L.QTY),0) AS SALE_OUT_QTY ");
+				sql.append("\n FROM PENSBI.PENSBME_SALES_FROM_BIGC_TEMP L");
+				sql.append("\n ,( ");
+				sql.append("\n   select pens_value as pens_item,");
+				sql.append("\n   interface_value as material_master,interface_desc as barcode ");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
+				sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
+				sql.append("\n   )M ");
+				sql.append("\n WHERE L.barcode = M.barcode  ");
+				sql.append("\n AND L.PENS_CUST_CODE LIKE '"+storeCode+"%'");
+				if(initDate != null){
+					 sql.append("\n AND L.sales_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+					 sql.append("\n AND L.sales_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+				}else{
+					 sql.append("\n AND L.sales_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+				}
+				
+				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+					sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				}
+				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+					sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
+				}
+				if( !Utils.isNull(c.getGroup()).equals("")){
+					sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+				}
+				sql.append("\n  GROUP BY L.PENS_CUST_CODE,L.PENS_ITEM,");
+				sql.append("\n  L.PENS_GROUP_TYPE , M.material_master,L.barcode ");
 				sql.append("\n ) SALE_OUT ");
 				
 				sql.append("\n ON  M.pens_item = SALE_OUT.pens_item ");	 

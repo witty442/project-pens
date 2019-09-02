@@ -921,6 +921,8 @@ function validateVanCreditLimit(){
 						</table>
 				
 						<span title="SalesOrder">...</span>
+						<span title="<%=Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION")) %>">...</span>
+						 
 						<!-- AUTO RECEIPT -->
 						<html:hidden property="autoReceiptFlag"/>
 						<html:hidden property="autoReceipt.paymentMethod"/>
@@ -949,6 +951,8 @@ function validateVanCreditLimit(){
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>
 						
+					
+						 
 						<div id="productList" style="display: none;"></div>
 						<div id="ByList" style="display: none;"></div>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>

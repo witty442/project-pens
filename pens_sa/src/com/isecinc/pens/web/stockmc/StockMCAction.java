@@ -1,12 +1,6 @@
 package com.isecinc.pens.web.stockmc;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +9,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.ExcelHeader;
 import util.Utils;
 
 import com.isecinc.core.bean.Messages;
@@ -106,11 +98,10 @@ public class StockMCAction extends I_Action {
 			HttpServletResponse response) {
 		
 		logger.debug("viewDetail : ");
-		StockMCForm aForm = (StockMCForm) form;
 		String pageName = Utils.isNull(request.getParameter("pageName")); 
 		try {
 			logger.debug("pageName:"+pageName);
-			
+
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
 				return new StockMCProcess().viewDetail(mapping, form, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){
@@ -174,7 +165,7 @@ public class StockMCAction extends I_Action {
 		String pageName = Utils.isNull(request.getParameter("pageName")); 
 		try {
 			logger.debug("save-->");
-
+           
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
 				return new StockMCProcess().save(aForm, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){

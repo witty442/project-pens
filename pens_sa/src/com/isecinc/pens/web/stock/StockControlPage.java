@@ -30,7 +30,13 @@ public class StockControlPage {
 	public static void prepareSearchCreditReport(HttpServletRequest request,Connection conn,User user,String pageName){
 		PopupBean item = null;
 		List<PopupBean> dataList = null;
+		String salesrepCode = "";
 		try{
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				salesrepCode = user.getUserName().toUpperCase();
+			}
+			
 			//init periodList
 			request.getSession().setAttribute("PERIOD_LIST", initPeriod(conn));
 			
@@ -65,7 +71,7 @@ public class StockControlPage {
 			item.setCustCatNo("");
 			item.setCustCatDesc("");
 			
-			List<PopupBean> dataTempList = searchCustCatNoListModel(conn,StockConstants.PAGE_CREDIT, "");
+			List<PopupBean> dataTempList = searchCustCatNoListModel(conn,StockConstants.PAGE_STOCK_CREDIT, "");
 			if(dataTempList != null &&dataTempList.size() ==1){
 			  dataList.addAll(dataTempList);
 			}else{
@@ -82,7 +88,7 @@ public class StockControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn);
+			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn,user);
 			dataList.addAll(salesChannelList_s);
 			request.getSession().setAttribute("SALES_CHANNEL_LIST",dataList);
 			
@@ -94,7 +100,7 @@ public class StockControlPage {
 			item.setSalesZoneDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesZoneList =searchSalesZoneListModel(conn);
+			List<PopupBean> salesZoneList =searchSalesZoneListModel(conn,salesrepCode);
 			dataList.addAll(salesZoneList);
 			request.getSession().setAttribute("SALES_ZONE_LIST",dataList);
 			
@@ -106,7 +112,7 @@ public class StockControlPage {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","");
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","",salesrepCode);
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
 			
@@ -115,9 +121,86 @@ public class StockControlPage {
 		}
 	}
 	
-	public static void prepareSearchStockCloseVanReport(HttpServletRequest request,Connection conn,User user,String pageName){
+	public static void prepareSearchCreditExpireReport(HttpServletRequest request,Connection conn,User user,String pageName){
 		PopupBean item = null;
 		List<PopupBean> dataList = null;
+		String salesrepCode = "";
+		try{
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				salesrepCode = user.getUserName().toUpperCase();
+			}
+	
+			//REPORT_TYPE_LIST
+			/* - SKU		
+			 - ร้านค้า , SKU		
+			 - พนักงานขาย , ร้านค้า , SKU		
+			 - ภาค , แบรนด์ , SKU		
+			 - ภาค , พนักงานขาย, แบรนด์ , SKU		
+            */
+			dataList = new ArrayList<PopupBean>();
+			dataList.add(new PopupBean("reportType","ร้านค้า,SKU","CUSTOMER_NUMBER,ITEM_NO"));
+			dataList.add(new PopupBean("reportType","พนักงานขาย,ร้านค้า,SKU","SALES_CODE,CUSTOMER_NUMBER,ITEM_NO"));
+			request.getSession().setAttribute("REPORT_TYPE_LIST",dataList);
+			
+			//Cust Cat No List
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setCustCatNo("");
+			item.setCustCatDesc("");
+			
+			List<PopupBean> dataTempList = searchCustCatNoListModel(conn,StockConstants.PAGE_STOCK_CREDIT, "");
+			if(dataTempList != null &&dataTempList.size() ==1){
+			  dataList.addAll(dataTempList);
+			}else{
+			  dataList.add(item);
+			  dataList.addAll(dataTempList);
+			}
+			request.getSession().setAttribute("CUST_CAT_LIST",dataList);
+			
+			//SALES_CHANNEL_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesChannelList_s =searchSalesChannelListModel(conn,user);
+			dataList.addAll(salesChannelList_s);
+			request.getSession().setAttribute("SALES_CHANNEL_LIST",dataList);
+			
+			//SALESZONE_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesZone("");
+			item.setSalesZoneDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesZoneList =searchSalesZoneListModel(conn,salesrepCode);
+			dataList.addAll(salesZoneList);
+			request.getSession().setAttribute("SALES_ZONE_LIST",dataList);
+			
+			//SALESREP_LIST
+			//add Blank Row
+			dataList = new ArrayList<PopupBean>();
+			item = new PopupBean();
+			item.setSalesChannelNo("");
+			item.setSalesChannelDesc("");
+			dataList.add(item);
+			
+			List<PopupBean> salesrepList_s = searchSalesrepListAll(conn,"","","",salesrepCode);
+			dataList.addAll(salesrepList_s);
+			request.getSession().setAttribute("SALESREP_LIST",dataList);
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+	}
+	public static void prepareSearchStockCloseVanReport(HttpServletRequest request,Connection conn,User user,String pageName){
+
 		try{
 			//init periodList
 			request.getSession().setAttribute("PERIOD_LIST", initPeriodStockCloseVan(conn));
@@ -295,7 +378,7 @@ public class StockControlPage {
 			if( !Utils.isNull(salesChannelNo).equals("")){
 			  sql.append("\n  and C.sales_channel_no ='"+salesChannelNo+"'");
 			}
-			if(StockConstants.PAGE_CREDIT.equalsIgnoreCase(pageName)){
+			if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){
 				  sql.append("\n  and C.cust_cat_no ='ORDER - CREDIT SALES'");
 			}
 			sql.append("\n  ORDER BY C.cust_cat_no asc \n");
@@ -324,7 +407,7 @@ public class StockControlPage {
 	 return pos;
 	}
 	
-	public static List<PopupBean> searchSalesChannelListModel(Connection conn){
+	public static List<PopupBean> searchSalesChannelListModel(Connection conn,User user){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -333,6 +416,12 @@ public class StockControlPage {
 			sql.append("\n  SELECT distinct S.sales_channel_no ,S.sales_channel_desc from XXPENS_BI_MST_SALES_CHANNEL S ");
 			sql.append("\n  where 1=1  ");
 			sql.append("\n  and sales_channel_no in('0','1','2','3','4') ");
+			
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				sql.append("\n  and sales_channel_no ='"+user.getUserName().substring(1,2)+"'");
+			}
+			
 			sql.append("\n  ORDER BY S.sales_channel_no asc \n");
 			logger.debug("sql:"+sql);
 			
@@ -358,7 +447,7 @@ public class StockControlPage {
 		}
 	 return pos;
 	}
-	public static List<PopupBean> searchSalesZoneListModel(Connection conn){
+	public static List<PopupBean> searchSalesZoneListModel(Connection conn,String salesrepCode){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -367,6 +456,9 @@ public class StockControlPage {
 			sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
 			sql.append("\n  where 1=1  ");
 			sql.append("\n  and zone in('0','1','2','3','4') ");
+			if( !salesrepCode.equals("")){
+				sql.append("\n  and S.salesrep_code  = '"+salesrepCode+"' ");
+			}
 			sql.append("\n  ORDER BY S.zone asc \n");
 			logger.debug("sql:"+sql);
 			
@@ -392,11 +484,11 @@ public class StockControlPage {
 		}
 	 return pos;
 	}
-	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone) throws Exception{
+	public static List<PopupBean> searchSalesrepListAll(String salesChannelNo,String custCatNo,String salesZone,String salesrepCode) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone);
+			return searchSalesrepListAll(conn, salesChannelNo, custCatNo,salesZone,salesrepCode);
 		}catch(Exception e){
 			throw e;
 		} finally {
@@ -405,7 +497,7 @@ public class StockControlPage {
 			} catch (Exception e) {}
 		}
 	}
-	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo,String salesZone){
+	public static List<PopupBean> searchSalesrepListAll(Connection conn,String salesChannelNo,String custCatNo,String salesZone,String salesrepCode){
 		PopupBean bean = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -436,6 +528,9 @@ public class StockControlPage {
 				sql.append("\n    select salesrep_code from pensbi.XXPENS_BI_MST_SALES_ZONE ");
 				sql.append("\n    where zone = "+Utils.isNull(salesZone) );
 				sql.append("\n  )");
+			}
+			if( !salesrepCode.equals("")){
+				sql.append("\n  and S.salesrep_code  = '"+salesrepCode+"' ");
 			}
 			sql.append("\n  ORDER BY S.salesrep_code asc ");
 			

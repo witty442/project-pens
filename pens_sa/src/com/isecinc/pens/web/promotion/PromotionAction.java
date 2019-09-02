@@ -89,7 +89,13 @@ public class PromotionAction extends I_Action {
 	}
 	
 	public  void prepareSearchData(HttpServletRequest request,Connection conn,User user){
+		String salesrepCode = "";
 		try{
+			//Case Sales Login filter show only salesrepCode 
+			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+				salesrepCode = user.getUserName().toUpperCase();
+			}
+			
 			//init monthYearList
 			request.getSession().setAttribute("PERIOD_LIST", PromotionUtils.initPeriod(conn));
 			
@@ -122,7 +128,7 @@ public class PromotionAction extends I_Action {
 			item.setSalesChannelDesc("");
 			dataList.add(item);
 			
-			List<PopupBean> salesrepList_s = PromotionUtils.searchSalesrepListAll(conn,"","S","");
+			List<PopupBean> salesrepList_s = PromotionUtils.searchSalesrepListAll(conn,"","S","",salesrepCode);
 			dataList.addAll(salesrepList_s);
 			request.getSession().setAttribute("SALESREP_LIST",dataList);
 			
@@ -134,7 +140,7 @@ public class PromotionAction extends I_Action {
 			item.setSalesZoneDesc("");
 			salesZoneList.add(item);
 			
-			List<PopupBean> salesZoneList_s = PromotionUtils.searchSalesZoneListModel(conn);
+			List<PopupBean> salesZoneList_s = PromotionUtils.searchSalesZoneListModel(conn,salesrepCode);
 			salesZoneList.addAll(salesZoneList_s);
 			request.getSession().setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
@@ -164,7 +170,7 @@ public class PromotionAction extends I_Action {
 				aForm.setCurrPage(currPage);
 				
 				//get Total Record
-				aForm.setTotalRecord(PromotionDAO.searchPromotionListTotalRec(conn,aForm.getBean()));
+				aForm.setTotalRecord(PromotionDAO.searchPromotionListTotalRec(conn,aForm.getBean(),user));
 				//calc TotalPage
 				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
 				//calc startRec endRec
@@ -178,7 +184,7 @@ public class PromotionAction extends I_Action {
 			    
 				//get Items Show by Page Size
 			   
-				List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),allRec,currPage,pageSize);
+				List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),allRec,currPage,pageSize,user);
 				aForm.setResultsSearch(items);
 				
 				if(items.size() <=0){
@@ -200,7 +206,7 @@ public class PromotionAction extends I_Action {
 			    aForm.setEndRec(endRec);
 			    
 				//get Items Show by Page Size
-			    List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),allRec,currPage,pageSize);
+			    List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),allRec,currPage,pageSize,user);
 				aForm.setResultsSearch(items);
 				
 			}
@@ -351,9 +357,10 @@ public class PromotionAction extends I_Action {
 		StringBuffer resultTable = null;
 		String pageName = aForm.getPageName();
 		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
-			List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),true,0,pageSize);
+			List<PromotionBean> items = PromotionDAO.searchPromotionList(conn,aForm.getBean(),true,0,pageSize,user);
 		    if(items!= null && items.size() >0){
 		    	resultTable = genExcelHTMLTable(items);
 				

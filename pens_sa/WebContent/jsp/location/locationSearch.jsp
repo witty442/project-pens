@@ -1,4 +1,5 @@
 
+<%@page import="util.PageVisit"%>
 <%@page import="util.SessionUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -16,12 +17,13 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <jsp:useBean id="locationForm" class="com.isecinc.pens.web.location.LocationForm" scope="session" />
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "locationForm");
-
+/** Count Visit Page */
+PageVisit.processPageVisit(request,"Location");
+		
 String typeSearch = Utils.isNull(request.getAttribute("DATA"));
 //String path = request.getP
 java.util.List yearList = null;
