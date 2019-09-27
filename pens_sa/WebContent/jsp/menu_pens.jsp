@@ -322,7 +322,7 @@
 <%if ( UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN, User.B2B}) ){ 
 	  no=0;
 %>
- <%--  <li><a href="javascript: void(0)" class="parent" ><span>B2B</span></a>
+   <li><a href="javascript: void(0)" class="parent" ><span>B2B</span></a>
 		<ul>
           <%if (UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN,User.B2B}) ){ %>
                <li>
@@ -333,7 +333,7 @@
              </li>  
 		   <%} %>
 	 	</ul>
-	</li>       --%>  
+	</li>      
 <%}%>
 <!-- ************************************************************************** -->
 <li>

@@ -41,7 +41,6 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
-import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.batchtask.task.ImportB2BMakroFromExcelTask;
@@ -50,6 +49,7 @@ import com.pens.util.BeanParameter;
 import com.pens.util.CConstants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

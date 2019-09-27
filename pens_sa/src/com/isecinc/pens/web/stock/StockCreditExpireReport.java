@@ -15,11 +15,11 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.web.location.LocationBean;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;

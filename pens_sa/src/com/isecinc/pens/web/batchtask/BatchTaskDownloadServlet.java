@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
-import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })

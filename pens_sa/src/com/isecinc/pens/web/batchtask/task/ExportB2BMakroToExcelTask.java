@@ -3,6 +3,7 @@ package com.isecinc.pens.web.batchtask.task;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,16 +46,18 @@ import org.apache.struts.upload.FormFile;
 
 
 
+
+
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.SequenceProcessAll;
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
-import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
+import com.pens.util.FileUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelUtils;
@@ -199,14 +202,17 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 		String errorMsg ="",errorCode ="";
 		XSSFWorkbook workbook = null;
 		EnvProperties env = EnvProperties.getInstance();
-		String rootPath = env.getProperty("path.temp");
+		String rootPath = "";
 		String pathFile = "";
 		String fileName = "";
 		int status = Constants.STATUS_SUCCESS;
 		try{
+			//get RootOathTemp
+			rootPath = FileUtil.getRootPathTemp(env);
+			
 		    //Step 1 Call Procedure
 			try{
-			   //callProcedure(conn);
+			   callProcedure(conn);
 			}catch(Exception ee){
 				status = Constants.STATUS_FAIL;
 				errorMsg = "Exception Cannot Call Procedure :apps.xxpens_om_push_order_pkg.b2b() \n";

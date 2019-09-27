@@ -1,6 +1,7 @@
 package com.pens.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -12,14 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.net.InetAddress;
-import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -28,6 +23,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
+
 
 
 /**
@@ -35,11 +32,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  */
 public class FileUtil {
-	public static Logger logger = Logger.getLogger("PENS");
+	public static Logger logger = Logger.getLogger(FileUtil.class);
 
-	public static void main(String[] s){
-		
-	}
 	public static void writeExcel(String path,HSSFWorkbook xssfWorkbook) throws Exception{
 		FileOutputStream outPutStream = null;
         try {
@@ -60,7 +54,6 @@ public class FileUtil {
 	}
 	
 	public static BufferedReader getBufferReaderFromClassLoader(String filename) throws Exception {
-		logger.debug("fileName:"+filename);
 		BufferedReader br = null;
 		ClassLoader cl = FileUtil.class.getClassLoader();
 		/*logger.debug("ClassLoader:"+cl);
@@ -74,6 +67,7 @@ public class FileUtil {
 		return br;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static String readFile(String filename) throws Exception {
 		File file = new File(filename);
 	    FileInputStream fis = null;
@@ -103,7 +97,17 @@ public class FileUtil {
 	       throw e;
 	    }
 	}
-	
+	public static byte[] readFileToByte(InputStream is) throws IOException{
+		byte[] bytes = null;
+		try {
+			bytes = IOUtils.toByteArray(is);
+		}catch(IOException e){
+			throw e;
+	    }finally{
+	   
+	    }
+       return bytes;
+	}
 	public static String readControlEnvFile(InputStream fis) throws Exception {
 	    BufferedInputStream bis = null;
 	    DataInputStream dis = null;
@@ -137,90 +141,22 @@ public class FileUtil {
 	    }
 	}
 	
-	public static String readFile(String fileName,String encoding)  {
-    
-	   InputStream is = null;
-	   Writer writer = new StringWriter();
-       try{
-    	   is = new FileInputStream(fileName);
-           Reader reader = null;
-	       char[] buffer = new char[1024];
-            try {
-            	reader = new BufferedReader(new InputStreamReader(is,encoding));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                     writer.write(buffer, 0, n);
-                 }
-            }finally {
-                if(is != null){
-                	is.close();
-                	is =null;
-                }
-                if(reader != null){
-                  reader.close();
-                  reader = null;
-                }
-                writer.flush();
-            }
-	            
-       }catch(Exception e){
-    	   logger.error(e.getMessage(),e);
-       }
-       return writer.toString();
-    }
+	public static void writeFile(String fileName,String str) {
+		FileWriter fstream =null;
+		try{
+		    // Create file 
+		    fstream = new FileWriter(fileName);
+		    BufferedWriter out = new BufferedWriter(fstream);
+		    out.write(str);
+		    //Close the output stream
+		    out.close();
+		    fstream.close();
+		    
+	    }catch (Exception e){//Catch exception if any
+	       logger.error("Write File Error:"+e.getMessage(),e);
+	    }
+	  }
 	
-	public static String readFile(InputStream fis,String encoding)  {
-		   Writer writer = new StringWriter();
-	       try{
-	           Reader reader = null;
-		       char[] buffer = new char[1024];
-	            try {
-	            	reader = new BufferedReader(new InputStreamReader(fis,encoding));
-	                int n;
-	                while ((n = reader.read(buffer)) != -1) {
-	                     writer.write(buffer, 1, n);
-	                 }
-	            }finally {
-	               
-	                if(reader != null){
-	                  reader.close();
-	                  reader = null;
-	                }
-	                writer.flush();
-	            }
-		            
-	       }catch(Exception e){
-	    	   logger.error(e.getMessage(),e);
-	       }
-	       return writer.toString();
-	    }
-	
-	public static String readFile2(InputStream fis,String encoding) {
-		StringBuilder text = new StringBuilder();
-	    String NL = System.getProperty("line.separator");
-	    Scanner scanner = new Scanner(fis, encoding);
-	    try {
-	      while (scanner.hasNextLine()){
-	        text.append(scanner.nextLine() + NL);
-	      }
-	    }
-	    finally{
-	      scanner.close();
-	    }
-       return text.toString();
-	}
-	
-	public static byte[] readFileToByte(InputStream is) throws IOException{
-		byte[] bytes = null;
-		try {
-			bytes = IOUtils.toByteArray(is);
-		}catch(IOException e){
-			throw e;
-	    }finally{
-	   
-	    }
-       return bytes;
-	}
 	
 	public static String getFileSize(String str) {
 		File file = null;
@@ -246,87 +182,28 @@ public class FileUtil {
 	    return fileSize;
 	  }
 	
-	public static void writeFile(String fileName,String str) {
-		FileWriter fstream =null;
-		try{
-		    // Create file 
-		    fstream = new FileWriter(fileName);
-		    BufferedWriter out = new BufferedWriter(fstream);
-		    out.write(str);
-		    //Close the output stream
-		    out.close();
-		    fstream.close();
-		    
-	    }catch (Exception e){//Catch exception if any
-	       logger.error("Write File Error:"+e.getMessage(),e);
-	    }
-	}
-	
    public static void writeFile(String filename,String dataStr,String encoding) {
-	   File backupFile = new File(filename);
+        BufferedOutputStream bufferedOutput = null; 
         try {
-            // Change Method TO Write File
-            FileUtils.writeStringToFile(backupFile, dataStr,encoding);
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(),ex);
+            //Construct the BufferedOutputStream object
+            bufferedOutput = new BufferedOutputStream(new FileOutputStream(filename));
+            bufferedOutput.write(dataStr.getBytes(encoding));
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         } finally {
             //Close the BufferedOutputStream
+            try {
+                if (bufferedOutput != null) {
+                    bufferedOutput.flush();
+                    bufferedOutput.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
-    }
-   
-   public static void writeFile(String fileName,StringBuffer dataStr,String encoding) {
-	   OutputStreamWriter os = null;
-	   BufferedWriter out = null;
-	   FileOutputStream fs = null;
-	   try{
-		   fs = new FileOutputStream(fileName);
-		   os = new OutputStreamWriter(fs,encoding);
-		   out = new BufferedWriter(os);
-		   out.write(dataStr.toString());
-		  
-		  }catch(UnsupportedEncodingException ue){
-		     logger.error(ue.getMessage(),ue);
-		  }catch(IOException e){
-			  logger.error(e.getMessage(),e);
-		  }finally{
-			  try{
-				  if(out != null){
-					 out.close();out=null;
-				  }
-				  if(os != null){
-					 os.close();os=null;
-				  }
-				  if(fs != null){
-					 fs.close();fs = null;
-				  }
-			  }catch(Exception ee){}
-		  }
-		  
-	}
-   
-   public static void writeFileOpt(String fileName,String dataStr) {
-	   FileWriter fs =null;
-	   BufferedWriter out = null;
-	   try{
-		    // Create file 
-		    fs = new FileWriter(fileName);
-		    out = new BufferedWriter(fs);
-		    out.write(dataStr);
-		    //Close the output stream
-		    out.flush();
-		    fs.flush();
-	    }catch (Exception e){//Catch exception if any
-	       logger.error("Write File Error:"+e.getMessage(),e);
-	    }finally{
-	    	try{
-	    		if(out != null){
-	    	       out.close();out = null;
-	    		}
-	    		if(fs != null){
-			       fs.close();fs = null;
-	    		}
-	    	}catch(Exception ee){}
-	    }
     }
 	
 	public static void writeFile(String fileName,byte[] bytefile) throws Exception{
@@ -344,7 +221,6 @@ public class FileUtil {
 	        }
 	    }	    
 	  }
-	
 	/**
 	 * get file content from classloader path
 	 */
@@ -394,7 +270,7 @@ public class FileUtil {
 			fo = new FileOutputStream(destFile);
 			fo.write(fileData);
 		} finally {
-			if(fo != null)fo.close();
+			fo.close();
 		}
 
 		return destFile;
@@ -431,44 +307,6 @@ public class FileUtil {
 		createDir(f.getAbsolutePath());
 	}
 
-	public static void deleteFile(String fileName) {
-		File f = null;
-		try{
-		   f = new File(fileName);
-		   boolean success = f.delete();
-		   if(!success){
-			   logger.info("deleteFile "+fileName+" fail");
-		   }else{
-			   logger.info("deleteFile "+fileName+" success");
-		   }
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage(),e);
-		}finally{
-			if( f != null){
-				f = null;
-			}
-		}
-	}
-	
-	public static void deleteFile2(String fileName) {
-		File f = null;
-		try{
-		   f = new File(fileName);
-		   boolean success = f.delete();
-		   if(!success){
-			   logger.info("deleteFile "+fileName+" fail");
-		   }
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e.getMessage(),e);
-		}finally{
-			if( f != null){
-				f = null;
-			}
-		}
-	}
-
 	
 	public static String getQueryStr(String path,String table) throws Exception {
 		String r = "";
@@ -487,8 +325,6 @@ public class FileUtil {
 		// }
 		return r;
 	}
-	
-	
 	
 	public static void zipFile(String sourceFile ,String destFile,String fileName) throws Exception{
 		// Create a buffer for reading the files
@@ -557,26 +393,26 @@ public class FileUtil {
 	      }
 	    }
 	 
-
-		/** Get Root Temp fro write file temp */
-		/** UAT:d://dev_temp/ **/
-		/** PROD:/PENS/ERP/apps/inst/saleonline/dev_temp/  **/
-		
-		public static String getRootPathTemp(EnvProperties env) {
-			String rootPathTemp = env.getProperty("path.temp");
-			try{
-				//Case rootPath prouctType=production (but deploy for test on 192.168.202.7or8)
-				// use path: d://dev_temp/
-				if(env.getProperty("productType").equalsIgnoreCase("production")){
-					if(InetAddress.getLocalHost().equals("192.168.202.7") //witty
-						|| InetAddress.getLocalHost().equals("192.168.202.8")){
-						rootPathTemp = "d://dev_temp//";
-					}
+	/** Get Root Temp fro write file temp */
+	/** UAT:d://dev_temp/ **/
+	/** PROD:/PENS/ERP/apps/inst/saleonline/dev_temp/  **/
+	
+	public static String getRootPathTemp(EnvProperties env) {
+		String rootPathTemp = env.getProperty("path.temp");
+		try{
+			//Case rootPath prouctType=production (but deploy for test on 192.168.202.7or8)
+			// use path: d://dev_temp/
+			if(env.getProperty("productType").equalsIgnoreCase("production")){
+				if(InetAddress.getLocalHost().equals("192.168.202.7") //witty
+					|| InetAddress.getLocalHost().equals("192.168.202.8")){
+					rootPathTemp = "d://dev_temp//";
 				}
-				
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
 			}
-			return rootPathTemp;
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
+		return rootPathTemp;
+	}
+	
 }

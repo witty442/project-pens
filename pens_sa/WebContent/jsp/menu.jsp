@@ -16,6 +16,6 @@
 <%if ( Utils.isNull(user.getRoleVanSales()).equalsIgnoreCase(User.VANSALES)){ %>
    <jsp:include page="menu_vansales.jsp" flush="true"/>
 <%}else{%>
-   <jsp:include page="menu_sa.jsp" flush="true"/>
+   <jsp:include page="menu_pens.jsp" flush="true"/>
 <%}%>
    

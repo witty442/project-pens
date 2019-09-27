@@ -15,11 +15,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
 public class SAGenrateCondPopup {
